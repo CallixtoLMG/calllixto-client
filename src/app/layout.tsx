@@ -1,7 +1,10 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-import StyledComponentsRegistry from './registry'
+"use client"
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { usePathname } from 'next/navigation';
+import StyledComponentsRegistry from './registry';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -15,11 +18,55 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+
+const pathname = usePathname()
+
   return (
     <html lang="en">
       <StyledComponentsRegistry>
-        <body className={inter.className}>{children}</body>
+        <body className={inter.className}>
+        {pathname !== "/iniciarSesion" && <Header />}
+          {children}
+        {pathname !== "/iniciarSesion" && <Footer />}
+        </body>
       </StyledComponentsRegistry>
     </html>
   )
 }
+
+// import { useRouter } from 'next/router';
+// import { Contactos, Paginas, Whatsapp } from '../../config';
+// import BotonInicio from './BotonInicio';
+// import BotonRojoPrincipal from './BotonRojoPrincipal';
+// import Footer from './Footer';
+// import GloboContacto from './GloboContacto';
+// import Header from './Header';
+// import {
+//   ContenedorBotones,
+// } from "./styles";
+
+// export default function Layout({ children }) {
+//   const router = useRouter();
+//   const rutasDinamicas = [`${Paginas.Propiedades}/[id]`, `${Paginas.Emprendimientos}/[id]`];
+//   const mostrarGlobo = !rutasDinamicas.includes(router.pathname);
+
+//   return (
+//     <>
+//       <Header rutaActiva={router.asPath} />
+//       <main>{children}</main>
+//       {router.pathname !== Paginas.Asistente && <BotonRojoPrincipal />}
+//       <ContenedorBotones>
+//         {mostrarGlobo && <GloboContacto
+//           titulo="Te asesoramos!"
+//           tel={`tel:+${Contactos.whatsappDuit.numero}`}
+//           mail={`mailto:${Contactos.emailContacto}`}
+//           whatsApp={`${Whatsapp.contactarUrlBase}${Contactos.whatsappDuit.numero}`}
+//           imagen={`/imagenes/whatsapp-duit.png`}
+//           movil
+//         />}
+//         <BotonInicio />
+//       </ContenedorBotones>
+//       {router.pathname !== "/" && <Footer />}
+//     </>
+//   )
+// };

@@ -30,15 +30,13 @@ const LoginForm = () => (
             placeholder='Contraseña'
             type='password'
           />
-          <Link href={"/productos"}>
           <Button style={{ backgroundColor: "#579294", color: "white" }} fluid size='large'>
             Ingresar
           </Button>
-          </Link>
         </Segment>
       </Form>
       <Message>
-        Quieres conocer maduras calientes a 5km? <a href='#'> Haz click aqui</a>
+        Quieres conocer maduras calientes a 5km? <Link href={"/productos"}> Haz click aqui</Link>
       </Message>
     </Grid.Column>
   </Grid>

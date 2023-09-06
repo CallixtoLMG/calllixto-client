@@ -1,26 +1,31 @@
 "use client"
 import ButtonDelete from "@/components/ButtonDelete";
+import CreateBudget from "@/components/CreateBudget";
 import Pager from "@/components/Pager";
 import PopUpEdit from "@/components/PopUpEdit";
 import { Container, Table } from 'semantic-ui-react';
-import { MainContainer } from "./styles";
+import { MainContainer, ModTableCell, ModTableHeaderCell } from "./styles";
 
 const TableOfProducts = ({ headerNames, users }) => {
   return (
     <>
+      <Container>
+        
+      </Container>
       <MainContainer>
+      <CreateBudget />
         <Table celled compact definition>
           <Table.Header fullWidth>
             <Table.Row>
               {headerNames.map((header) => (
-                <Table.HeaderCell key={header.id} textAlign='center'>{header.name}</Table.HeaderCell>
+                <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
               ))}
             </Table.Row>
           </Table.Header>
           {users.map((user) => (
             <Table.Body key={user.id}>
               <Table.Row>
-                <Table.Cell textAlign='center'>{user.id}</Table.Cell>
+                <ModTableCell textAlign='center'>{user.id}</ModTableCell>
                 <Table.Cell>{user.name}</Table.Cell>
                 <Table.Cell>{user.email}</Table.Cell>
                 <Table.Cell>{user.phone}</Table.Cell>
