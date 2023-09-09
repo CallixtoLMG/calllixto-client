@@ -1,16 +1,17 @@
 "use client"
-import ButtonCreateBudget from "@/components/ButtonCreateBudget";
+import ButtonBack from "@/components/ButtonBack";
 import ButtonDelete from "@/components/ButtonDelete";
-import Pager from "@/components/Pager";
 import PopUpEdit from "@/components/PopUpEdit";
-import { Button, Container, Table } from 'semantic-ui-react';
-import { MainContainer, ModLink, ModTableCell, ModTableHeaderCell } from "./styles";
+import { Container, Table } from 'semantic-ui-react';
+import { MainContainer, ModTableCell, ModTableHeaderCell } from "./styles";
 
-const TableOfProducts = ({ headerNames, users }) => {
+const ShowProduct = ({ headerNames, user }) => {
   return (
     <>
       <MainContainer>
-      <ButtonCreateBudget />
+        <Container>
+          <ButtonBack/>
+        </Container>
         <Table celled compact definition>
           <Table.Header fullWidth>
             <Table.Row>
@@ -19,8 +20,7 @@ const TableOfProducts = ({ headerNames, users }) => {
               ))}
             </Table.Row>
           </Table.Header>
-          {users.map((user) => (
-            <Table.Body key={user.id}>
+            <Table.Body>
               <Table.Row>
                <ModTableCell textAlign='center'>{user.id}</ModTableCell>
                 <Table.Cell >{user.name}</Table.Cell>
@@ -30,19 +30,15 @@ const TableOfProducts = ({ headerNames, users }) => {
                   <Container fluid>
                     <PopUpEdit />
                     <ButtonDelete />
-                    <ModLink href={`/productos/${user.id}`}><Button size="tiny">Ir al producto</Button></ModLink>
                   </Container>
                 </Table.Cell>
               </Table.Row>
             </Table.Body>
-          ))}
         </Table>
       </MainContainer>
-      <Container textAlign="center">
-        <Pager />
-      </Container>
+     
     </>
   )
 }
 
-export default TableOfProducts;
+export default ShowProduct;

@@ -19,8 +19,6 @@ const Header = () => {
   useEffect(() => {
     pathname === "/productos" ? setDestacarProducto(true) : setDestacarProducto(false);
     pathname === "/presupuestos" ? setDestacarPresupuesto(true) : setDestacarPresupuesto(false);
-
-    console.log(destacarProducto)
   })
 
 

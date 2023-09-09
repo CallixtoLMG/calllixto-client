@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Button } from 'semantic-ui-react';
 
-const CreateBudget = () => (
+const ButtonCreateBudget = () => (
   <div>
     <Link href={"/presupuestos"}>
       <Button color='green' content='Crear presupuesto' icon='add' labelPosition='right' />
@@ -9,7 +9,7 @@ const CreateBudget = () => (
   </div>
 )
 
-export default CreateBudget;
+export default ButtonCreateBudget;
 
 
 

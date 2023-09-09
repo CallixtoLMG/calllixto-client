@@ -1,16 +1,17 @@
 "use client"
-import ButtonCreateBudget from "@/components/ButtonCreateBudget";
 import ButtonDelete from "@/components/ButtonDelete";
 import Pager from "@/components/Pager";
-import PopUpEdit from "@/components/PopUpEdit";
-import { Button, Container, Table } from 'semantic-ui-react';
-import { MainContainer, ModLink, ModTableCell, ModTableHeaderCell } from "./styles";
+import SearchBar from "@/components/SearchBar";
+import { Container, Table } from 'semantic-ui-react';
+import { MainContainer, ModTableCell, ModTableHeaderCell, SearchBarContainer } from "./styles";
 
-const TableOfProducts = ({ headerNames, users }) => {
+const Budget = ({ headerNames, products }) => {
   return (
     <>
+      <SearchBarContainer>
+        <SearchBar products={products} />
+      </SearchBarContainer>
       <MainContainer>
-      <ButtonCreateBudget />
         <Table celled compact definition>
           <Table.Header fullWidth>
             <Table.Row>
@@ -19,18 +20,18 @@ const TableOfProducts = ({ headerNames, users }) => {
               ))}
             </Table.Row>
           </Table.Header>
-          {users.map((user) => (
-            <Table.Body key={user.id}>
+          {products.map((product) => (
+            <Table.Body key={product.id}>
               <Table.Row>
-               <ModTableCell textAlign='center'>{user.id}</ModTableCell>
-                <Table.Cell >{user.name}</Table.Cell>
-                <Table.Cell>{user.email}</Table.Cell>
-                <Table.Cell>{user.phone}</Table.Cell>
+                <ModTableCell textAlign='center'>{product.id}</ModTableCell>
+                <Table.Cell>{product.title}</Table.Cell>
+                <Table.Cell textAlign='center'>{product.stock}</Table.Cell>
+                <Table.Cell textAlign='center'>{`$${product.price}`}</Table.Cell>
+                <Table.Cell textAlign='center'></Table.Cell>
+                <Table.Cell></Table.Cell>
                 <Table.Cell textAlign='center'>
                   <Container fluid>
-                    <PopUpEdit />
                     <ButtonDelete />
-                    <ModLink href={`/productos/${user.id}`}><Button size="tiny">Ir al producto</Button></ModLink>
                   </Container>
                 </Table.Cell>
               </Table.Row>
@@ -45,4 +46,4 @@ const TableOfProducts = ({ headerNames, users }) => {
   )
 }
 
-export default TableOfProducts;
+export default Budget;

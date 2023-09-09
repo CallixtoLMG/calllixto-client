@@ -1,11 +1,14 @@
-import Link from "next/link";
 import { Flex } from "rebass";
 import { Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
-  margin: 75px 30px 30px 30px!important;
+  margin: 50px 30px 30px 30px!important;
   flex-direction: column;
+`;
+
+const SearchBarContainer = styled(Flex)`
+  margin:100px 0 0 40px!important;
 `;
 
 const ModTableCell = styled(Table.Cell)({
@@ -16,11 +19,7 @@ const ModTableHeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important"
 });
 
-const ModLink = styled(Link)({
- 
-});
-
 export {
-  MainContainer, ModLink, ModTableCell, ModTableHeaderCell
+  MainContainer, ModTableCell, ModTableHeaderCell, SearchBarContainer
 };
 
