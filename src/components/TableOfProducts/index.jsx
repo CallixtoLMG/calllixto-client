@@ -6,7 +6,7 @@ import PopUpEdit from "@/components/PopUpEdit";
 import { Button, Container, Table } from 'semantic-ui-react';
 import { MainContainer, ModLink, ModTableCell, ModTableHeaderCell } from "./styles";
 
-const TableOfProducts = ({ headerNames, users }) => {
+const TableOfProducts = ({ headerNames, products }) => {
   return (
     <>
       <MainContainer>
@@ -19,18 +19,18 @@ const TableOfProducts = ({ headerNames, users }) => {
               ))}
             </Table.Row>
           </Table.Header>
-          {users.map((user) => (
-            <Table.Body key={user.id}>
+          {products.map((product) => (
+            <Table.Body key={products.id}>
               <Table.Row>
-               <ModTableCell textAlign='center'>{user.id}</ModTableCell>
-                <Table.Cell >{user.name}</Table.Cell>
-                <Table.Cell>{user.email}</Table.Cell>
-                <Table.Cell>{user.phone}</Table.Cell>
+               <ModTableCell textAlign='center'>{product.id}</ModTableCell>
+                <Table.Cell >{product.title}</Table.Cell>
+                <Table.Cell textAlign='center'>{product.stock}</Table.Cell>
+                <Table.Cell>{product.category}</Table.Cell>
                 <Table.Cell textAlign='center'>
                   <Container fluid>
                     <PopUpEdit />
                     <ButtonDelete />
-                    <ModLink href={`/productos/${user.id}`}><Button size="tiny">Ir al producto</Button></ModLink>
+                    <ModLink href={`/productos/${product.id}`}><Button size="tiny">Ir al producto</Button></ModLink>
                   </Container>
                 </Table.Cell>
               </Table.Row>
