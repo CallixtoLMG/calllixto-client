@@ -1,4 +1,7 @@
+"use client"
 import TableOfProducts from "@/components/TableOfProducts";
+import { useProducts } from "@/context/productContext";
+
 const headerCell = [
   {
     name: "Codigo",
@@ -28,6 +31,8 @@ async function loadProducts() {
 };
 
 async function Products() {
+  const values = useProducts()
+  console.log(values)
   const products = await loadProducts()
 
   return (

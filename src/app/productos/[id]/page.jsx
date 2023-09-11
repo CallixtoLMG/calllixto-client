@@ -7,14 +7,14 @@ const headerCell = [
     id: 1
   },
   {
-    name: "Nombre Completo",
+    name: "Nombre del producto",
     id: 2
   }, {
-    name: "Mail",
+    name: "Stock",
     id: 3
   },
   {
-    name: "Telefono",
+    name: "Categoria",
     id: 4
   },
   {
@@ -23,16 +23,16 @@ const headerCell = [
   },
 ];
 
-async function getUser(id) {
-  const res = await fetch(`https://jsonplaceholder.typicode.com/users/${id}`);
+async function getProduct(id) {
+  const res = await fetch(`https://dummyjson.com/products/${id}`);
   const data = await res.json();
   return data;
 };
 
 async function Producto({ params }) {
-  const user = await getUser(params.id)
+  const product = await getProduct(params.id)
   return (
-    <ShowProduct headerNames={headerCell} user={user} />
+    <ShowProduct headerNames={headerCell} product={product} />
   )
 }
 

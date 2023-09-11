@@ -5,7 +5,7 @@ import PopUpEdit from "@/components/PopUpEdit";
 import { Container, Table } from 'semantic-ui-react';
 import { MainContainer, ModTableCell, ModTableHeaderCell } from "./styles";
 
-const ShowProduct = ({ headerNames, user }) => {
+const ShowProduct = ({ headerNames, product }) => {
   return (
     <>
       <MainContainer>
@@ -22,10 +22,10 @@ const ShowProduct = ({ headerNames, user }) => {
           </Table.Header>
             <Table.Body>
               <Table.Row>
-               <ModTableCell textAlign='center'>{user.id}</ModTableCell>
-                <Table.Cell >{user.name}</Table.Cell>
-                <Table.Cell>{user.email}</Table.Cell>
-                <Table.Cell>{user.phone}</Table.Cell>
+               <ModTableCell textAlign='center'>{product.id}</ModTableCell>
+                <Table.Cell >{product.title}</Table.Cell>
+                <Table.Cell textAlign='center'>{product.stock}</Table.Cell>
+                <Table.Cell>{product.category}</Table.Cell>
                 <Table.Cell textAlign='center'>
                   <Container fluid>
                     <PopUpEdit />

@@ -1,6 +1,7 @@
 "use client"
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
+import TaskProvider from "@/context/productContext";
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { usePathname } from 'next/navigation';
@@ -19,15 +20,17 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
 
-const pathname = usePathname()
+  const pathname = usePathname()
 
   return (
     <html lang="en">
       <StyledComponentsRegistry>
         <body className={inter.className}>
-        {pathname !== "/iniciarSesion" && <Header />}
-          {children}
-        {pathname !== "/iniciarSesion" && <Footer />}
+          <TaskProvider>
+            <Header />
+            {children}
+            {pathname !== "/iniciarSesion" && <Footer />}
+          </TaskProvider>
         </body>
       </StyledComponentsRegistry>
     </html>

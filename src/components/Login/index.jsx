@@ -2,44 +2,46 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import 'semantic-ui-css/semantic.min.css';
-import { Button, Form, Grid, Header, Message, Segment } from 'semantic-ui-react';
-import { Text } from "./styled";
+import { Form, Header, Message, Segment } from 'semantic-ui-react';
+import { ModButton2, ModGrid, ModGridColumn, Text } from "./styled";
 
-const LoginForm = () => (
-  <Grid textAlign='center' style={{ height: '100vh', backgroundColor: "#C8E3DF" }} verticalAlign='middle'>
-    <Grid.Column style={{ maxWidth: 450 }}>
-      <Header as='h3' textAlign='center'>
-        <div>
-          <Image
-            src="/Callixto.png"
-            alt="Callixto.png Logo"
-            width={300}
-            height={100}
-            priority
-          />
-          <Text style={{ color: "#579294" }}>Ingresa a tu cuenta</Text>
-        </div>
-      </Header>
-      <Form size='large'>
-        <Segment stacked>
-          <Form.Input fluid icon='user' iconPosition='left' placeholder='Correo electrónico' />
-          <Form.Input
-            fluid
-            icon='lock'
-            iconPosition='left'
-            placeholder='Contraseña'
-            type='password'
-          />
-          <Button style={{ backgroundColor: "#579294", color: "white" }} fluid size='large'>
-            Ingresar
-          </Button>
-        </Segment>
-      </Form>
-      <Message>
-        Quieres conocer maduras calientes a 5km? <Link href={"/productos"}> Haz click aqui</Link>
-      </Message>
-    </Grid.Column>
-  </Grid>
-)
+const LoginForm = () => {
+  return (
+    <ModGrid textAlign='center' verticalAlign='middle'>
+      <ModGridColumn >
+        <Header as='h3' textAlign='center'>
+          <div>
+            <Image
+              src="/Callixto.png"
+              alt="Callixto.png Logo"
+              width={300}
+              height={100}
+              priority
+            />
+            <Text>Ingresa a tu cuenta</Text>
+          </div>
+        </Header>
+        <Form size='large'>
+          <Segment stacked>
+            <Form.Input fluid icon='user' iconPosition='left' placeholder='Correo electrónico' />
+            <Form.Input
+              fluid
+              icon='lock'
+              iconPosition='left'
+              placeholder='Contraseña'
+              type='password'
+            />
+            <ModButton2 fluid size='large'>
+              Ingresar
+            </ModButton2>
+          </Segment>
+        </Form>
+        <Message>
+          <Link href={"/productos"}> Perdiste tu contraseña?</Link>
+        </Message>
+      </ModGridColumn>
+    </ModGrid>
+  )
+}
 
 export default LoginForm
