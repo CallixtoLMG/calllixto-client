@@ -1,13 +1,14 @@
-import EditForm from "@/components/EditForm"
-import { Button, Popup } from 'semantic-ui-react'
+import { Button } from 'semantic-ui-react';
 
-const PopUpEdit = () => (
-  <Popup
-    trigger={<Button color='blue' size="tiny">Editar</Button>}
-    content={<EditForm />}
-    position='left center'
-    on='click'
-  />
-)
+import Link from "next/link";
+
+const PopUpEdit = ({ product }) => {
+
+  return (
+    <Link href={`/editarProducto/${product?.id}`}>
+      < Button color='blue' size="tiny" > Editar</Button >
+    </Link>
+  )
+};
 
 export default PopUpEdit

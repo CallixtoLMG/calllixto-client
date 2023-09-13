@@ -1,4 +1,6 @@
-import Budget from "@/components/Butget";
+"use client"
+import Budget from "@/components/Budget";
+import { useProducts } from "@/context/productContext";
 
 const headerCell = [
   {
@@ -6,40 +8,24 @@ const headerCell = [
     id: 1
   },
   {
-    name: "Nombre del producto",
+    name: "Cliente",
     id: 2
-  }, {
-    name: "Cantidad",
+  },
+  {
+    name: "Fecha de creacion",
     id: 3
   },
   {
-    name: "Precio",
+    name: "Monto total",
     id: 4
-  },
-  {
-    name: "Descuento",
-    id: 5
-  },
-  {
-    name: "Precio total",
-    id: 6
-  },
-  {
-    name: "Acciones",
-    id: 6
   },
 ];
 
-async function loadProducts() {
-  const res = await fetch("https://dummyjson.com/products");
-  const data = await res.json()
-  return data
-};
+function Presupuesto() {
+  const { products } = useProducts()
 
-async function Presupuesto() {
-  const products = await loadProducts();
   return (
-    <Budget products={products.products} headerNames={headerCell}  />
+    <Budget products={products} headerNames={headerCell} />
   )
 };
 

@@ -18,10 +18,11 @@
     "next": "13.4.19",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hot-toast": "^2.4.1",
     "rebass": "^4.0.7",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "^2.1.4",
     "styled-components": "^6.0.7",
-    "typescript": "5.2.2"
+    "typescript": "^5.2.2"
   }
 }

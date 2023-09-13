@@ -7,7 +7,7 @@ import { ModButton2, ModGrid, ModGridColumn, Text } from "./styled";
 
 const LoginForm = () => {
   return (
-    <ModGrid textAlign='center' verticalAlign='middle'>
+    <ModGrid textAlign='center' vertical Align='middle'>
       <ModGridColumn >
         <Header as='h3' textAlign='center'>
           <div>
@@ -42,6 +42,6 @@ const LoginForm = () => {
       </ModGridColumn>
     </ModGrid>
   )
-}
+};
 
-export default LoginForm
+export default LoginForm;

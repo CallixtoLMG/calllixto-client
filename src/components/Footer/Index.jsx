@@ -4,7 +4,6 @@ import { usePathname } from 'next/navigation';
 import 'semantic-ui-css/semantic.min.css';
 import {
   Container,
-  Divider,
   List,
   Segment
 } from 'semantic-ui-react';
@@ -14,9 +13,8 @@ const Footer = () => {
   return (
     <>
       {pathname !== "/iniciarSesion" &&
-        <Segment vertical style={{ margin: '1em 0em 0em', padding: '3em 0em' }}>
+        <Segment style={{ margin: '1em 0em 0em', padding: '3em 0em' }}>
           <Container textAlign='center'>
-            <Divider section />
             <div>
               <Image
                 src="/Logo Madera Las Tapias.png"
@@ -25,24 +23,17 @@ const Footer = () => {
                 height={40}
               />
             </div>
-            <List horizontal divided link size='small'>
+            <List link size='small'>
               <List.Item as='a' href='#'>
-                Site Map
+                © Copyright 2023 - Todos los derechos reservados por la empresa CallixtoGLM
               </List.Item>
               <List.Item as='a' href='#'>
-                Contact Us
-              </List.Item>
-              <List.Item as='a' href='#'>
-                Terms and Conditions
-              </List.Item>
-              <List.Item as='a' href='#'>
-                Privacy Policy
+                Contactanos
               </List.Item>
             </List>
           </Container>
-        </Segment>}
+        </Segment >}
     </>
-
   )
 };
 

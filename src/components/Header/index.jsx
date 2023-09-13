@@ -1,3 +1,4 @@
+"use client"
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from "react";
@@ -12,14 +13,13 @@ import {
 const Header = () => {
 
   const pathname = usePathname();
-  const [destacarProducto, setDestacarProducto] = useState(false)
-  const [destacarPresupuesto, setDestacarPresupuesto] = useState(false)
+  const [destacarProducto, setDestacarProducto] = useState(null);
+  const [destacarPresupuesto, setDestacarPresupuesto] = useState(null);
 
   useEffect(() => {
-    pathname === "/productos" ? setDestacarProducto(true) : setDestacarProducto(false);
-    pathname === "/presupuestos" ? setDestacarPresupuesto(true) : setDestacarPresupuesto(false);
-  })
-
+    pathname === "/productos" ? setDestacarProducto(true) : setDestacarProducto(null);
+    pathname === "/presupuestos" ? setDestacarPresupuesto(true) : setDestacarPresupuesto(null);
+  },[]);
 
   return (
     <>
@@ -40,11 +40,11 @@ const Header = () => {
               <ModLink href='/iniciarSesion'>
                 <Menu.Item > <Text>Cerrar sesión</Text></Menu.Item>
               </ModLink>
-              <ModLink destacar={destacarProducto} href='/productos'>
-                <Menu.Item ><Text destacar={destacarProducto}>Productos</Text></Menu.Item>
+              <ModLink $destacar={destacarProducto} href='/productos'>
+                <Menu.Item ><Text $destacar={destacarProducto}>Productos</Text></Menu.Item>
               </ModLink>
-              <ModLink destacar={destacarPresupuesto} href='/presupuestos'>
-                <Menu.Item ><Text destacar={destacarPresupuesto}>Presupuestos</Text></Menu.Item>
+              <ModLink $destacar={destacarPresupuesto} href='/presupuestos'>
+                <Menu.Item ><Text $destacar={destacarPresupuesto}>Presupuestos</Text></Menu.Item>
               </ModLink>
             </Container>
           </Menu>

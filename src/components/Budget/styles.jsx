@@ -3,12 +3,12 @@ import { Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
-  margin: 50px 30px 30px 30px!important;
+  margin: 30px 30px 30px 30px!important;
   flex-direction: column;
 `;
 
 const SearchBarContainer = styled(Flex)`
-  margin:100px 0 0 40px!important;
+  margin:100px 0 0 35px!important;
 `;
 
 const ModTableCell = styled(Table.Cell)({

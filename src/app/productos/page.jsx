@@ -10,12 +10,13 @@ const headerCell = [
   {
     name: "Nombre del producto",
     id: 2
-  }, {
+  },
+  {
     name: "Cantidad en stock",
     id: 3
   },
   {
-    name: "Categoria",
+    name: "Precio",
     id: 4
   },
   {
@@ -24,19 +25,11 @@ const headerCell = [
   },
 ];
 
-async function loadProducts() {
-  const res = await fetch("https://dummyjson.com/products");
-  const data = await res.json()
-  return data
-};
-
-async function Products() {
-  const values = useProducts()
-  console.log(values)
-  const products = await loadProducts()
+const Products = () => {
+  const { products } = useProducts();
 
   return (
-    <TableOfProducts products={products.products} headerNames={headerCell} />
+    <TableOfProducts products={products} headerNames={headerCell} />
   )
 };
 

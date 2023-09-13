@@ -6,8 +6,8 @@ const ModLink = styled(Link)`
   position: relative;
   align-items: center;
   transition: all 0.2s ease-in-out;
-  font-size: ${props => props.destacar && "15px" };
-  background-color: ${props => props.destacar && "#f5f5f5" };
+  font-size: ${props => props.$destacar && "15px" };
+  background-color: ${props => props.$destacar && "#f5f5f5" };
 
   &:hover {
     background-color: #f5f5f5;
@@ -29,7 +29,7 @@ const Text = styled.p`
     content: '';
     position: absolute;
     width: 100%;
-    transform: ${props => props.destacar ? "scaleX(1)" : "scaleX(0)"};
+    transform: ${props => props.$destacar ? "scaleX(1)" : "scaleX(0)"};
     height: 2px;
     bottom: -2px;
     left: 0;

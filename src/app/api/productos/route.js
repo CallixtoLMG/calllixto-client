@@ -8,8 +8,7 @@ export async function GET() {
 }
 
 export async function POST(request) {
-  const {nombre, apellido} = await request.json();
-  console.log(nombre, apellido)
+  const { nombre, apellido } = await request.json();
   return NextResponse.json({
     message: "Creando DATOS!"
   })

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Flex } from "rebass";
 import { Table } from "semantic-ui-react";
 import styled from "styled-components";
@@ -16,11 +15,11 @@ const ModTableHeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important"
 });
 
-const ModLink = styled(Link)({
- 
+const ModTableRow = styled(Table.Row)({
+  cursor: "pointer!important"
 });
 
 export {
-  MainContainer, ModLink, ModTableCell, ModTableHeaderCell
+  MainContainer, ModTableCell, ModTableHeaderCell, ModTableRow
 };
 

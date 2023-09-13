@@ -1,18 +1,20 @@
 "use client"
-import ButtonDelete from "@/components/ButtonDelete";
+import ButtonAddBudget from "@/components/ButtonAddBudget";
 import Pager from "@/components/Pager";
 import SearchBar from "@/components/SearchBar";
 import { Container, Table } from 'semantic-ui-react';
 import { MainContainer, ModTableCell, ModTableHeaderCell, SearchBarContainer } from "./styles";
 
 const Budget = ({ headerNames, products }) => {
+
   return (
     <>
       <SearchBarContainer>
         <SearchBar products={products} />
       </SearchBarContainer>
       <MainContainer>
-        <Table celled compact definition>
+        <ButtonAddBudget />
+        <Table striped celled compact definition>
           <Table.Header fullWidth>
             <Table.Row>
               {headerNames.map((header) => (
@@ -20,20 +22,13 @@ const Budget = ({ headerNames, products }) => {
               ))}
             </Table.Row>
           </Table.Header>
-          {products.map((product) => (
+          {products?.map((product) => (
             <Table.Body key={product.id}>
               <Table.Row>
                 <ModTableCell textAlign='center'>{product.id}</ModTableCell>
-                <Table.Cell>{product.title}</Table.Cell>
+                <Table.Cell textAlign='center'>{product.name}</Table.Cell>
                 <Table.Cell textAlign='center'>{product.stock}</Table.Cell>
                 <Table.Cell textAlign='center'>{`$${product.price}`}</Table.Cell>
-                <Table.Cell textAlign='center'></Table.Cell>
-                <Table.Cell></Table.Cell>
-                <Table.Cell textAlign='center'>
-                  <Container fluid>
-                    <ButtonDelete />
-                  </Container>
-                </Table.Cell>
               </Table.Row>
             </Table.Body>
           ))}
@@ -44,6 +39,6 @@ const Budget = ({ headerNames, products }) => {
       </Container>
     </>
   )
-}
+};
 
 export default Budget;

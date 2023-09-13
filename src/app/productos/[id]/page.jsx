@@ -1,5 +1,6 @@
 "use client"
 import ShowProduct from "@/components/ShowProduct";
+import { useProducts } from "@/context/productContext";
 
 const headerCell = [
   {
@@ -14,26 +15,16 @@ const headerCell = [
     id: 3
   },
   {
-    name: "Categoria",
+    name: "Precio",
     id: 4
   },
-  {
-    name: "Acciones",
-    id: 5
-  },
 ];
+const Producto = ({ params }) => {
+  const { products } = useProducts()
 
-async function getProduct(id) {
-  const res = await fetch(`https://dummyjson.com/products/${id}`);
-  const data = await res.json();
-  return data;
-};
-
-async function Producto({ params }) {
-  const product = await getProduct(params.id)
   return (
-    <ShowProduct headerNames={headerCell} product={product} />
+    <ShowProduct headerNames={headerCell} product={products[params.id-1]} />
   )
-}
+};
 
 export default Producto;
