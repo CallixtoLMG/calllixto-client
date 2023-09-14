@@ -1,6 +1,10 @@
 import { Button, Grid } from "semantic-ui-react";
 import { styled } from "styled-components";
 
+// const MainContainer = styled(Flex)`
+//   margin-top: 30vh;
+// `;
+
 const Text = styled.p`
   display: flex;
   position: relative;

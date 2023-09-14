@@ -24,36 +24,11 @@ const NewBudget = ({ params }) => {
   const { products, createProduct, updateProduct } = useProducts();
   const router = useRouter();
 
-  const clientes = products.map((product) => {
-    return (
-      { key: product.id, value: product.name, text: product.name, }
-    )
-  })
-
-  const countryOptions = [
-    { key: 'af', value: 'af', flag: 'af', text: 'Afghanistan' },
-    { key: 'ax', value: 'ax', flag: 'ax', text: 'Aland Islands' },
-    { key: 'al', value: 'al', flag: 'al', text: 'Albania' },
-    { key: 'dz', value: 'dz', flag: 'dz', text: 'Algeria' },
-    { key: 'as', value: 'as', flag: 'as', text: 'American Samoa' },
-    { key: 'ad', value: 'ad', flag: 'ad', text: 'Andorra' },
-    { key: 'ao', value: 'ao', flag: 'ao', text: 'Angola' },
-    { key: 'ai', value: 'ai', flag: 'ai', text: 'Anguilla' },
-    { key: 'ag', value: 'ag', flag: 'ag', text: 'Antigua' },
-    { key: 'ar', value: 'ar', flag: 'ar', text: 'Argentina' },
-    { key: 'am', value: 'am', flag: 'am', text: 'Armenia' },
-    { key: 'aw', value: 'aw', flag: 'aw', text: 'Aruba' },
-    { key: 'au', value: 'au', flag: 'au', text: 'Australia' },
-    { key: 'at', value: 'at', flag: 'at', text: 'Austria' },
-    { key: 'az', value: 'az', flag: 'az', text: 'Azerbaijan' },
-    { key: 'bs', value: 'bs', flag: 'bs', text: 'Bahamas' },
-    { key: 'bh', value: 'bh', flag: 'bh', text: 'Bahrain' },
-    { key: 'bd', value: 'bd', flag: 'bd', text: 'Bangladesh' },
-    { key: 'bb', value: 'bb', flag: 'bb', text: 'Barbados' },
-    { key: 'by', value: 'by', flag: 'by', text: 'Belarus' },
-    { key: 'be', value: 'be', flag: 'be', text: 'Belgium' },
-    { key: 'bz', value: 'bz', flag: 'bz', text: 'Belize' },
-    { key: 'bj', value: 'bj', flag: 'bj', text: 'Benin' },
+  const clients = [
+    { key: '1', value: 'mi', text: 'Milton' },
+    { key: '2', value: 'le', text: 'Levi' },
+    { key: '3', value: 'ga', text: 'Gawa' },
+    { key: '4', value: 'ma', text: 'Marcelo' },
   ]
 
   const handleChange = (e) => {
@@ -86,10 +61,9 @@ const NewBudget = ({ params }) => {
     };
   }, []);
 
-  useEffect(() => {
-    console.log((e) => e.target.value)
-  }, [])
-
+  const handleSelect = (e) => {
+    e.target.value
+  }
 
   return (
     <>
@@ -97,22 +71,15 @@ const NewBudget = ({ params }) => {
         <Header as='h1'>Concepto del presupuesto</Header>
         <Form onSubmit={handleSubmit}>
           <Form.Field>
-            <Dropdown
-              placeholder='Elejir cliente'
-              fluid
+            <Label>Cliente</Label>
+            <Dropdown placeholder='Elejir cliente'
               search
               selection
-              options={countryOptions}
+              options={clients}
               onChange={handleChange}
               noResultsMessage="No se encontraron clientes!.."
-              name="name"
-            />
-            {/* <Label>Nombre del cliente</Label>
-            <input onChange={handleChange} name="name" value={product.name} placeholder='Nombre del cliente...' /> */}
-          </Form.Field>
-          <Form.Field>
-            <Label>Fecha de creacion</Label>
-            <input type="date" onChange={handleChange} name="stock" value={product.stock} placeholder='Fecha de creacion...' />
+              name="name">
+            </Dropdown>
           </Form.Field>
           <Form.Field>
             <Label>Precio</Label>
@@ -130,9 +97,27 @@ const NewBudget = ({ params }) => {
           </Button>
         </Form>
       </MainContainer>
-
     </>
   )
 };
 
 export default NewBudget;
+
+//Crear una constante donde este figure el nombre de los productos, y el precio, el stock en lo posible,
+//como el search que ya tengo, y que esos datos se muestren en el search, OnClick, se tendria que pushaer
+//el nuevo item a la tabla, pero como estoy usando un state para guardarlo mejor hacerlo con setState?
+//Ver en el search cuales son los values que guarda,
+//HAcer un mapeo en la tabla por el cual, por cada producto se agrege un compoente y asi populo la tabla
+// una constantae que guarde todos los precios en valor de numero, los sume... y esa constante es la que te
+// tengo qeu pushear en el valor monto total...
+// APARTE DE ESO se tiene que crear un objeto presupuesto con todos los prodcutos dentro, fecha y cliente...
+// Seria algo asi:
+
+// presupuesto = {
+//   cliente: "juan",
+//   fecha_inicio: "20/04/2020 8:35 pm",
+//   fecha_fin: "26/07/2020 9pm",
+//   productos: [
+//     { nombre: "producto1", precio: 1, stock: 2 },
+//     { nombre: "producto2", precio: 2, stock: 2 }]
+// }

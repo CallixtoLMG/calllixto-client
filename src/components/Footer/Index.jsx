@@ -4,16 +4,18 @@ import { usePathname } from 'next/navigation';
 import 'semantic-ui-css/semantic.min.css';
 import {
   Container,
-  List,
-  Segment
+  List
 } from 'semantic-ui-react';
+import {
+  ModSegment
+} from "./styles";
 
 const Footer = () => {
   const pathname = usePathname();
   return (
     <>
       {pathname !== "/iniciarSesion" &&
-        <Segment style={{ margin: '1em 0em 0em', padding: '3em 0em' }}>
+        <ModSegment>
           <Container textAlign='center'>
             <div>
               <Image
@@ -32,7 +34,7 @@ const Footer = () => {
               </List.Item>
             </List>
           </Container>
-        </Segment >}
+        </ModSegment >}
     </>
   )
 };

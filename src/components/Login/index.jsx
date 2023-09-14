@@ -7,40 +7,40 @@ import { ModButton2, ModGrid, ModGridColumn, Text } from "./styled";
 
 const LoginForm = () => {
   return (
-    <ModGrid textAlign='center' vertical Align='middle'>
-      <ModGridColumn >
-        <Header as='h3' textAlign='center'>
-          <div>
-            <Image
-              src="/Callixto.png"
-              alt="Callixto.png Logo"
-              width={300}
-              height={100}
-              priority
-            />
-            <Text>Ingresa a tu cuenta</Text>
-          </div>
-        </Header>
-        <Form size='large'>
-          <Segment stacked>
-            <Form.Input fluid icon='user' iconPosition='left' placeholder='Correo electrónico' />
-            <Form.Input
-              fluid
-              icon='lock'
-              iconPosition='left'
-              placeholder='Contraseña'
-              type='password'
-            />
-            <ModButton2 fluid size='large'>
-              Ingresar
-            </ModButton2>
-          </Segment>
-        </Form>
-        <Message>
-          <Link href={"/productos"}> Perdiste tu contraseña?</Link>
-        </Message>
-      </ModGridColumn>
-    </ModGrid>
+      <ModGrid textAlign='center' verticalAlign='middle'>
+        <ModGridColumn >
+          <Header as='h3' textAlign='center'>
+            <div>
+              <Image
+                src="/Callixto.png"
+                alt="Callixto.png Logo"
+                width={300}
+                height={100}
+                priority
+              />
+              <Text>Ingresa a tu cuenta</Text>
+            </div>
+          </Header>
+          <Form size='large'>
+            <Segment stacked>
+              <Form.Input fluid icon='user' iconPosition='left' placeholder='Correo electrónico' />
+              <Form.Input
+                fluid
+                icon='lock'
+                iconPosition='left'
+                placeholder='Contraseña'
+                type='password'
+              />
+              <ModButton2 fluid size='large'>
+                Ingresar
+              </ModButton2>
+            </Segment>
+          </Form>
+          <Message>
+            <Link href={"/productos"}> Perdiste tu contraseña?</Link>
+          </Message>
+        </ModGridColumn>
+      </ModGrid>
   )
 };
 

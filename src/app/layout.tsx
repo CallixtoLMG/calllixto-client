@@ -1,3 +1,4 @@
+"use client"
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import Toaster from "@/components/Toaster";
@@ -5,6 +6,9 @@ import TaskProvider from "@/context/productContext";
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import StyledComponentsRegistry from './registry';
+import {
+  LayoutChildrenContainer
+} from "./stylesLayout";
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -25,7 +29,9 @@ export default function RootLayout({
         <body className={inter.className}>
           <TaskProvider>
             <Header />
-            <div style={{ minHeight: "80vh" }}>{children}</div>
+            <LayoutChildrenContainer >
+              {children}
+            </LayoutChildrenContainer>
             <Toaster position="bottom-left" />
             <Footer />
           </TaskProvider>
