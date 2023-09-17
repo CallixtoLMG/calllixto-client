@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import 'semantic-ui-css/semantic.min.css';
@@ -9,18 +9,19 @@ import {
 import {
   ModSegment
 } from "./styles";
+import { PAGES } from "@/constants";
 
 const Footer = () => {
   const pathname = usePathname();
   return (
     <>
-      {pathname !== "/login" &&
+      {pathname !== PAGES.LOGIN.BASE &&
         <ModSegment>
           <Container textAlign='center'>
             <div>
               <Image
-                src="/Logo Madera Las Tapias.png"
-                alt="Logo Madera Las Tapias.png Logo"
+                src="/callixto.png"
+                alt="Callixto logo"
                 width={100}
                 height={40}
               />
@@ -34,7 +35,8 @@ const Footer = () => {
               </List.Item>
             </List>
           </Container>
-        </ModSegment >}
+        </ModSegment >
+      }
     </>
   )
 };

@@ -1,6 +1,5 @@
 "use client";
 import ButtonDelete from "@/components/ButtonDelete";
-import PopUpEdit from "@/components/PopUpEdit";
 import { useRouter } from 'next/navigation';
 import { Button, Container, Table } from 'semantic-ui-react';
 import { MainContainer, ModTableHeaderCell, ModTableRow } from "./styles";
@@ -26,14 +25,16 @@ const ProductsPage = ({ products = [] }) => {
         </Table.Header>
         {products.map((product) => (
           <Table.Body key={product.code}>
-            <ModTableRow onClick={() => { router.push(PAGES.PRODUCTS.SHOW(product.code)) }} >
+            <ModTableRow onClick={() => { router.push(PAGES.PRODUCTS.SHOW(product.code)) }}>
               {HEADERS
                 .filter(header => !header.hide)
                 .map((header) => <Table.Cell textAlign='center'>{product[header.value]}</Table.Cell>)
               }
               <Table.Cell textAlign='center'>
                 <Container fluid>
-                  <PopUpEdit product={product} />
+                  <Link href={PAGES.PRODUCTS.UPDATE(product.code)}>
+                    <Button color='blue' size="tiny">Editar</Button>
+                  </Link>
                   <ButtonDelete product={product} />
                 </Container>
               </Table.Cell>

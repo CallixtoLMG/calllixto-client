@@ -14,10 +14,10 @@ const ButtonDelete = ({ product }) => {
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
     >
-      <Header icon='archive' content='Esta seguro que de sea borra el producto?' />
+      <Header icon='archive' content='Estás seguro que desea borra el producto?' />
       <Modal.Actions>
         <Button color='red' onClick={() => setOpen(false)}>
-          <Icon name='remove' /> No
+          <Icon name='remove' />No
         </Button>
         <Button color='green' onClick={() => {
           setOpen(false);
@@ -25,7 +25,7 @@ const ButtonDelete = ({ product }) => {
           toast.success("Producto eliminado exitosamente",
             { duration: 4000 })
         }}>
-          <Icon name='checkmark' /> Si
+          <Icon name='checkmark' />Si
         </Button>
       </Modal.Actions>
     </Modal>
