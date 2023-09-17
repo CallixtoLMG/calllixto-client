@@ -7,6 +7,7 @@ import StyledComponentsRegistry from './registry';
 import {
   LayoutChildrenContainer
 } from "./stylesLayout";
+import 'semantic-ui-css/semantic.min.css';
 
 const inter = Inter({ subsets: ['latin'] })
 

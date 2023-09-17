@@ -15,7 +15,7 @@ const ProductsPage = ({ products = [] }) => {
       <Link href={PAGES.PRODUCTS.CREATE}>
         <Button color='green' content='Crear producto' icon='add' labelPosition='right' />
       </Link>
-      <Table striped celled compact definition>
+      <Table celled striped compact>
         <Table.Header fullWidth>
           <Table.Row>
             {HEADERS.map((header) => (

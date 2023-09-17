@@ -1,7 +1,6 @@
 "use client";
 import Image from 'next/image';
 import Link from 'next/link';
-import 'semantic-ui-css/semantic.min.css';
 import { Form, Header, Message, Segment } from 'semantic-ui-react';
 import { ModButton2, ModGrid, ModGridColumn, Text } from "./styled";
 import { PAGES } from "@/constants";

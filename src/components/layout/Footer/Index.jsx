@@ -1,7 +1,6 @@
 "use client";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import 'semantic-ui-css/semantic.min.css';
 import {
   Container,
   List
