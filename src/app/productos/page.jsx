@@ -1,35 +1,27 @@
 "use client"
-import TableOfProducts from "@/components/TableOfProducts";
-import { useProducts } from "@/context/productContext";
-
-const headerCell = [
-  {
-    name: "Codigo",
-    id: 1
-  },
-  {
-    name: "Nombre del producto",
-    id: 2
-  },
-  {
-    name: "Cantidad en stock",
-    id: 3
-  },
-  {
-    name: "Precio",
-    id: 4
-  },
-  {
-    name: "Acciones",
-    id: 5
-  },
-];
+import ProductsPage from "@/components/products/ProductsPage";
 
 const Products = () => {
-  const { products } = useProducts();
+  const products = [
+    {
+      code: 1,
+      name: "Madera",
+      price: 150
+    },
+    {
+      code: 2,
+      name: "Piedra",
+      price: 250
+    },
+    {
+      code: 3,
+      name: "Ripio",
+      price: 450
+    }
+  ];
 
   return (
-    <TableOfProducts products={products} headerNames={headerCell} />
+    <ProductsPage products={products} />
   )
 };
 

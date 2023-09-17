@@ -1,12 +1,9 @@
-"use client"
-import { useProducts } from '@/context/productContext';
+"use client";
 import { useState } from 'react';
 import { toast } from "react-hot-toast";
 import { Button, Header, Icon, Modal } from 'semantic-ui-react';
 
-
 const ButtonDelete = ({ product }) => {
-  const { deleteProduct } = useProducts();
   const [open, setOpen] = useState(false);
 
   return (

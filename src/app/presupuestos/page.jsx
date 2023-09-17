@@ -1,6 +1,6 @@
-"use client"
-import Budget from "@/components/Budget";
-import { useProducts } from "@/context/productContext";
+"use client";
+
+import BudgetsPage from "../../components/budgets/BudgetPage";
 
 const headerCell = [
   {
@@ -22,10 +22,27 @@ const headerCell = [
 ];
 
 function Presupuesto() {
-  const { products } = useProducts()
+  const budgets = [{
+    id: 1,
+    customer: "Pepito",
+    createdAt: "2021-10-10",
+    totalAmount: 1000
+  },
+  {
+    id: 2,
+    customer: "Roberto",
+    createdAt: "2021-10-10",
+    totalAmount: 1500
+  },
+  {
+    id: 3,
+    customer: "José",
+    createdAt: "2021-10-10",
+    totalAmount: 2000
+  }];
 
   return (
-    <Budget products={products} headerNames={headerCell} />
+    <BudgetsPage budgets={budgets} />
   )
 };
 
