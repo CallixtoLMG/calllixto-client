@@ -1,4 +1,5 @@
 import { Flex } from "rebass";
+import { Button } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
@@ -6,9 +7,13 @@ const MainContainer = styled(Flex)`
   flex-direction: column;
 `;
 
+const ModButton = styled(Button)({
+  marginTop: "14px!important",
+})
+
 const Label = styled.label`
   font-size: 14px!important;
   margin-left: 15px!important;
 `;
-export { Label, MainContainer };
+export { Label, MainContainer, ModButton };
 

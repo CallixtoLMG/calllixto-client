@@ -1,10 +1,10 @@
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Button, Form, Icon } from 'semantic-ui-react';
+import { Button, Form, Icon, Input } from 'semantic-ui-react';
 import { Label } from "./styles";
-import { useForm } from "react-hook-form";
 
 const ProductForm = ({ product }) => {
-  const { register, handleSubmit } = useForm();
+  const { register, handleSubmit, control } = useForm();
 
   const onSubmit = (data) => {
     console.log(data);
@@ -15,15 +15,27 @@ const ProductForm = ({ product }) => {
     <Form onSubmit={handleSubmit(onSubmit)}>
       <Form.Field>
         <Label>Código</Label>
-        <input name="code" placeholder='Código...' {...register("code")} />
+        <Controller
+          name="code"
+          control={control}
+          render={({ field }) => <Input {...field} />}
+        />
       </Form.Field>
       <Form.Field>
         <Label>Nombre</Label>
-        <input name="name" placeholder='Nombre...' {...register("name")} />
+        <Controller
+          name="name"
+          control={control}
+          render={({ field }) => <Input {...field} />}
+        />
       </Form.Field>
       <Form.Field>
         <Label>Precio</Label>
-        <input name="price" placeholder='Precio...' {...register("price")} />
+        <Controller
+          name="price"
+          control={control}
+          render={({ field }) => <Input {...field} />}
+        />
       </Form.Field>
       <Form.Field>
       </Form.Field>
