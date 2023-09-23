@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Button } from "semantic-ui-react";
+import { Button, Dropdown } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
@@ -7,13 +7,25 @@ const MainContainer = styled(Flex)`
   flex-direction: column;
 `;
 
-const ModButton = styled(Button)({
+const ModButtonProduct = styled(Button)({
   marginTop: "14px!important",
+  width: "14rem!important"
+})
+
+const ModButtonBudget = styled(Button)({
+  width: "14rem!important"
+})
+
+const ModDropdown = styled(Dropdown)({
+  width: "20rem!important",
+  display:"flex!important",
+  // overflow:"hidden!important",
+  // textOverflow: "ellipsis!important"
 })
 
 const Label = styled.label`
   font-size: 14px!important;
   margin-left: 15px!important;
 `;
-export { Label, MainContainer, ModButton };
+export { Label, MainContainer, ModButtonBudget, ModButtonProduct, ModDropdown };
 
