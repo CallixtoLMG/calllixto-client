@@ -1,10 +1,10 @@
 "use client";
 import SearchBar from "@/components/SearchBar";
-import { Button, Table } from 'semantic-ui-react';
-import { MainContainer, ModTableHeaderCell, SearchBarContainer } from "./styles";
 import { PAGES } from "@/constants";
-import { HEADERS } from "../budgets.common";
 import Link from "next/link";
+import { Button, Table } from 'semantic-ui-react';
+import { HEADERS } from "../budgets.common";
+import { MainContainer, ModTableHeaderCell, SearchBarContainer } from "./styles";
 
 const BudgetsPage = ({ budgets }) => {
   return (
@@ -16,7 +16,7 @@ const BudgetsPage = ({ budgets }) => {
         </Link>
       </SearchBarContainer>
       <MainContainer>
-        <Table striped celled compact definition>
+        <Table celled striped compact definition>
           <Table.Header fullWidth>
             <Table.Row>
               {HEADERS.map((header) => (

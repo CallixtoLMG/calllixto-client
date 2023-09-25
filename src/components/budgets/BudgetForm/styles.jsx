@@ -1,31 +1,39 @@
-import { Flex } from "rebass";
-import { Button, Dropdown } from "semantic-ui-react";
-import styled from "styled-components";
+import { Button, Dropdown, Input, Table } from 'semantic-ui-react';
+import styled from 'styled-components';
 
-const MainContainer = styled(Flex)`
-  margin: 75px 30px 30px 30px!important;
-  flex-direction: column;
+const ModInput = styled(Input)`
+  input {
+    text-align: center!important;
+  }
 `;
 
 const ModButtonProduct = styled(Button)({
   marginTop: "14px!important",
   width: "14rem!important"
-})
+});
 
 const ModButtonBudget = styled(Button)({
   width: "14rem!important"
-})
+});
+
+const TotalText = styled.h3`
+  margin-left: 2rem;
+`;
 
 const ModDropdown = styled(Dropdown)({
   width: "20rem!important",
-  display:"flex!important",
-  // overflow:"hidden!important",
-  // textOverflow: "ellipsis!important"
-})
+  display: "flex!important",
+});
 
-const Label = styled.label`
-  font-size: 14px!important;
-  margin-left: 15px!important;
+const ModTableRow = styled(Table.Row)`
+  th:first-child {
+    min-width: 20rem!important;
+  };
+
+  th:not(:first-child) {
+    width: 12rem!important;
+  };
 `;
-export { Label, MainContainer, ModButtonBudget, ModButtonProduct, ModDropdown };
+
+export { ModButtonBudget, ModButtonProduct, ModDropdown, ModInput, ModTableRow, TotalText };
 
