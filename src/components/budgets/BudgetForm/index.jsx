@@ -83,7 +83,7 @@ const BudgetForm = () => {
         <Table.Header>
           <ModTableRow>
             {Headers.map((header) => {
-              return (<Table.HeaderCell textAlign='center'>{header.name}</Table.HeaderCell>)
+              return (<Table.HeaderCell key={header.id} textAlign='center'>{header.name}</Table.HeaderCell>)
             })}
           </ModTableRow>
         </Table.Header>

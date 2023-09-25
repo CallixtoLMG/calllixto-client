@@ -28,7 +28,7 @@ const BudgetsPage = ({ budgets }) => {
             <Table.Body key={budget.id}>
               <Table.Row>
                 {HEADERS
-                  .map((header) => <Table.Cell textAlign='center'>{budget[header.value]}</Table.Cell>)
+                  .map((header) => <Table.Cell key={header.id} textAlign='center'>{budget[header.value]}</Table.Cell>)
                 }
               </Table.Row>
             </Table.Body>

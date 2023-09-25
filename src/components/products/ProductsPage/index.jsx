@@ -1,11 +1,11 @@
 "use client";
 import ButtonDelete from "@/components/ButtonDelete";
+import { PAGES } from "@/constants";
+import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Button, Container, Table } from 'semantic-ui-react';
-import { MainContainer, ModTableHeaderCell, ModTableRow } from "./styles";
-import Link from "next/link";
-import { PAGES } from "@/constants";
 import { HEADERS } from "../products.common";
+import { MainContainer, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const ProductsPage = ({ products = [] }) => {
   const router = useRouter();
@@ -28,7 +28,7 @@ const ProductsPage = ({ products = [] }) => {
             <ModTableRow onClick={() => { router.push(PAGES.PRODUCTS.SHOW(product.code)) }}>
               {HEADERS
                 .filter(header => !header.hide)
-                .map((header) => <Table.Cell textAlign='center'>{product[header.value]}</Table.Cell>)
+                .map((header) => <Table.Cell key={header.id} textAlign='center'>{product[header.value]}</Table.Cell>)
               }
               <Table.Cell textAlign='center'>
                 <Container fluid>
