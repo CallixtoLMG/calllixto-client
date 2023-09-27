@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { Flex } from "rebass";
-import { Button, Table } from "semantic-ui-react";
+import { Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
@@ -20,15 +19,7 @@ const ModTableRow = styled(Table.Row)({
   cursor: "pointer!important"
 });
 
-const ModButtonProduct = styled(Button)({
-  width: "14rem!important",
-});
-
-const ModLink = styled(Link)({
-  width: "14rem!important",
-});
-
 export {
-  MainContainer, ModButtonProduct, ModLink, ModTableCell, ModTableHeaderCell, ModTableRow
+  MainContainer, ModTableCell, ModTableHeaderCell, ModTableRow
 };
 

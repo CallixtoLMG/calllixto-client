@@ -1,39 +1,46 @@
 "use client"
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { Button, Form, Icon, Input } from 'semantic-ui-react';
 import { Label } from "./styles";
 
-const ProductForm = ({ product, onSubmit }) => {
+const ProductForm = ({ customer }) => {
   const router = useRouter();
   const { register, handleSubmit, control } = useForm();
 
+  const onSubmit = (data) => {
+    console.log(data);
+    toast.success("Cliente creado exitosamente");
+    router.push("/clientes");
+  };
+
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <Form.Field>
-        <Label>Código</Label>
-        <Controller
-          name="code"
-          control={control}
-          defaultValue={product?.code || ""}
-          render={({ field }) => <Input value {...field} />}
-        />
-      </Form.Field>
       <Form.Field>
         <Label>Nombre</Label>
         <Controller
           name="name"
           control={control}
-          defaultValue={product?.name || ""}
+          defaultValue={customer?.name || ""}
           render={({ field }) => <Input {...field} />}
         />
       </Form.Field>
       <Form.Field>
-        <Label>Precio</Label>
+        <Label>Telefono</Label>
         <Controller
-          name="price"
+          name="tel"
           control={control}
-          defaultValue={product?.price || ""}
+          defaultValue={customer?.tel || ""}
+          render={({ field }) => <Input {...field} />}
+        />
+      </Form.Field>
+      <Form.Field>
+        <Label>Email</Label>
+        <Controller
+          name="mail"
+          control={control}
+          defaultValue={customer?.mail || ""}
           render={({ field }) => <Input {...field} />}
         />
       </Form.Field>
@@ -45,7 +52,7 @@ const ProductForm = ({ product, onSubmit }) => {
         labelPosition='right'
         color="green"
       >
-        <Icon name="add" /> {product?.code ? "Actualizar producto" : "Crear producto"}
+        <Icon name="add" /> {customer?.code ? "Actualizar cliente" : "Crear cliente"}
       </Button>
     </Form>
   )

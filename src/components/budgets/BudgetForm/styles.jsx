@@ -26,13 +26,13 @@ const ModDropdown = styled(Dropdown)({
 });
 
 const ModTableRow = styled(Table.Row)`
-  th:first-child {
-    min-width: 20rem!important;
-  };
+  th{ min-width: 8rem!important; }
 
-  th:not(:first-child) {
-    width: 12rem!important;
-  };
+  th:first-child { min-width: 20rem!important; };
+
+  th:nth-child(6) { min-width: 10rem!important; }
+
+  th:not(:first-child) { width: 12rem!important; };
 `;
 
 export { ModButtonBudget, ModButtonProduct, ModDropdown, ModInput, ModTableRow, TotalText };

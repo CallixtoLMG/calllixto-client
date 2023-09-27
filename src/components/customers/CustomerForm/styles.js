@@ -6,7 +6,9 @@ const MainContainer = styled(Flex)`
   flex-direction: column;
 `;
 
-export {
-  MainContainer
-};
+const Label = styled.label`
+  font-size: 14px!important;
+  margin-left: 15px!important;
+`;
+export { Label, MainContainer };
 

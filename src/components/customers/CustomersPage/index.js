@@ -4,17 +4,17 @@ import { PAGES } from "@/constants";
 import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Button, Table } from 'semantic-ui-react';
-import { HEADERS } from "../products.common";
-import { MainContainer, ModButtonProduct, ModLink, ModTableCell, ModTableHeaderCell } from "./styles";
+import { HEADERS } from "../clients.common";
+import { MainContainer, ModTableCell, ModTableHeaderCell } from "./styles";
 
-const ProductsPage = ({ products = [], deleteProduct }) => {
+const CustomersPage = ({ customers = [] }) => {
   const router = useRouter();
 
   return (
     <MainContainer>
-      <ModLink href={PAGES.PRODUCTS.CREATE}>
-        <ModButtonProduct color='green' content='Crear producto' icon='add' labelPosition='right' />
-      </ModLink>
+      <Link href={PAGES.CUSTOMERS.CREATE}>
+        <Button color='green' content='Crear cliente' icon='add' labelPosition='right' />
+      </Link>
       <Table celled striped compact>
         <Table.Header fullWidth>
           <Table.Row>
@@ -23,23 +23,23 @@ const ProductsPage = ({ products = [], deleteProduct }) => {
             ))}
           </Table.Row>
         </Table.Header>
-        {products.map((product) => (
-          <Table.Body key={product.code}>
+        {customers.map((customer) => (
+          <Table.Body key={customer.email}>
             <Table.Row >
               {HEADERS
                 .filter(header => !header.hide)
                 .map((header) => <ModTableCell
-                  onClick={() => { router.push(PAGES.PRODUCTS.SHOW(product.code)) }}
+                  onClick={() => { router.push(PAGES.CUSTOMERS.SHOW(customer.code)) }}
                   key={header.id}
                   textAlign='center'>
-                  {product[header.value]}
+                  {customer[header.value]}
                 </ModTableCell>)
               }
               <Table.Cell textAlign='center'>
-                <Link href={PAGES.PRODUCTS.UPDATE(product.code)}>
+                <Link href={PAGES.CUSTOMERS.UPDATE(customer.code)}>
                   <Button color='blue' size="tiny">Editar</Button>
                 </Link>
-                <ButtonDelete deleteProduct={deleteProduct} product={product} />
+                <ButtonDelete customer={customer} />
               </Table.Cell>
             </Table.Row>
           </Table.Body>
@@ -49,4 +49,4 @@ const ProductsPage = ({ products = [], deleteProduct }) => {
   )
 };
 
-export default ProductsPage;
+export default CustomersPage;

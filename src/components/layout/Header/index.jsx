@@ -1,4 +1,5 @@
 "use client";
+import { PAGES } from "@/constants";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import {
@@ -8,7 +9,6 @@ import {
 import {
   ModLink, Text
 } from "./styles";
-import { PAGES } from "@/constants";
 
 const Header = () => {
   const pathname = usePathname();
@@ -31,12 +31,16 @@ const Header = () => {
             <ModLink href={PAGES.LOGIN.BASE}>
               <Menu.Item > <Text>Cerrar sesión</Text></Menu.Item>
             </ModLink>
-            <ModLink $destacar={pathname.includes(PAGES.PRODUCTS.BASE)} href={PAGES.PRODUCTS.BASE}>
-              <Menu.Item ><Text $destacar={pathname.includes(PAGES.PRODUCTS.BASE)}>Productos</Text></Menu.Item>
+            <ModLink $destacar={pathname.includes(PAGES.CUSTOMERS.BASE)} href={PAGES.CUSTOMERS.BASE}>
+              <Menu.Item ><Text $destacar={pathname.includes(PAGES.CUSTOMERS.BASE)}>Clientes</Text></Menu.Item>
             </ModLink>
             <ModLink $destacar={pathname.includes(PAGES.BUDGETS.BASE)} href={PAGES.BUDGETS.BASE}>
               <Menu.Item ><Text $destacar={pathname.includes(PAGES.BUDGETS.BASE)}>Presupuestos</Text></Menu.Item>
             </ModLink>
+            <ModLink $destacar={pathname.includes(PAGES.PRODUCTS.BASE)} href={PAGES.PRODUCTS.BASE}>
+              <Menu.Item ><Text $destacar={pathname.includes(PAGES.PRODUCTS.BASE)}>Productos</Text></Menu.Item>
+            </ModLink>
+
           </Container>
         </Menu>
       }
