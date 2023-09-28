@@ -20,7 +20,17 @@ const ModTableHeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important"
 });
 
+const ModTable = styled(Table)`
+  tbody:nth-child(odd) {
+    background-color: #f2f2f2!important;
+  }
+`;
+
+const ModTableRow = styled(Table.Row)`
+  th:first-child { width: 50px!important; };
+`;
+
 export {
-  MainContainer, ModTableCell, ModTableHeaderCell, SearchBarContainer
+  MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SearchBarContainer
 };
 

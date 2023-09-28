@@ -15,11 +15,17 @@ const ModTableHeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important"
 });
 
-const ModTableRow = styled(Table.Row)({
-  cursor: "pointer!important"
-});
+const ModTableRow = styled(Table.Row)`
+  th:first-child { width: 50px!important; };
+`;
+
+const ModTable = styled(Table)`
+  tbody:nth-child(odd) {
+    background-color: #f2f2f2!important;
+  }
+`;
 
 export {
-  MainContainer, ModTableCell, ModTableHeaderCell, ModTableRow
+  MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
 };
 

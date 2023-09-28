@@ -1,12 +1,19 @@
 "use client"
-import { useRouter } from "next/navigation";
+import { get } from "lodash";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Form, Icon, Input } from 'semantic-ui-react';
-import { Label } from "./styles";
+import { Label, WarningMessage } from "./styles";
 
 const ProductForm = ({ product, onSubmit }) => {
-  const router = useRouter();
-  const { register, handleSubmit, control } = useForm();
+  const { handleSubmit, control } = useForm();
+
+  const validateCode = (value) => {
+    return /^[A-Za-z0-9]{4}$/.test(value);
+  };
+
+  const validatePrice = (value) => {
+    return /^[0-9]+$/.test(value);
+  };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -15,8 +22,16 @@ const ProductForm = ({ product, onSubmit }) => {
         <Controller
           name="code"
           control={control}
-          defaultValue={product?.code || ""}
-          render={({ field }) => <Input value {...field} />}
+          defaultValue={get(product, "code", "")}
+          rules={{ validate: validateCode }}
+          render={({ field, fieldState }) => (
+            <>
+              <Input {...field} />
+              {fieldState?.invalid && (
+                <WarningMessage >El código debe tener 4 caracteres alfanuméricos.</WarningMessage>
+              )}
+            </>
+          )}
         />
       </Form.Field>
       <Form.Field>
@@ -24,7 +39,7 @@ const ProductForm = ({ product, onSubmit }) => {
         <Controller
           name="name"
           control={control}
-          defaultValue={product?.name || ""}
+          defaultValue={get(product, "name", "")}
           render={({ field }) => <Input {...field} />}
         />
       </Form.Field>
@@ -33,8 +48,16 @@ const ProductForm = ({ product, onSubmit }) => {
         <Controller
           name="price"
           control={control}
-          defaultValue={product?.price || ""}
-          render={({ field }) => <Input {...field} />}
+          defaultValue={get(product, "price", "")}
+          rules={{ validate: validatePrice }}
+          render={({ field, fieldState }) => (
+            <>
+              <Input {...field} />
+              {fieldState?.invalid && (
+                <WarningMessage >El precio debe contener solo números.</WarningMessage>
+              )}
+            </>
+          )}
         />
       </Form.Field>
       <Form.Field>

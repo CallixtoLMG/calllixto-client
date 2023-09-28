@@ -1,16 +1,11 @@
 export const HEADERS = [
   {
-    name: "",
-    value: "code",
-    id: 1
-  },
-  {
     name: "Nombre",
     value: "name",
     id: 2
   },
   {
-    name: "Telefono",
+    name: "Teléfono",
     value: "phone",
     id: 3
   },

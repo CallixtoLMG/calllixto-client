@@ -4,7 +4,7 @@ import { PAGES } from "@/constants";
 import Link from "next/link";
 import { Button, Table } from 'semantic-ui-react';
 import { HEADERS } from "../budgets.common";
-import { MainContainer, ModTableHeaderCell, SearchBarContainer } from "./styles";
+import { MainContainer, ModTable, ModTableHeaderCell, ModTableRow, SearchBarContainer } from "./styles";
 
 const BudgetsPage = ({ budgets }) => {
   return (
@@ -16,24 +16,26 @@ const BudgetsPage = ({ budgets }) => {
         </Link>
       </SearchBarContainer>
       <MainContainer>
-        <Table celled striped compact definition>
+        <ModTable celled compact >
           <Table.Header fullWidth>
-            <Table.Row>
+            <ModTableRow>
+              <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
               {HEADERS.map((header) => (
                 <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
               ))}
-            </Table.Row>
+            </ModTableRow>
           </Table.Header>
-          {budgets?.map((budget) => (
+          {budgets?.map((budget, index) => (
             <Table.Body key={budget.id}>
-              <Table.Row>
+              <ModTableRow>
+                <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
                 {HEADERS
                   .map((header) => <Table.Cell key={header.id} textAlign='center'>{budget[header.value]}</Table.Cell>)
                 }
-              </Table.Row>
+              </ModTableRow>
             </Table.Body>
           ))}
-        </Table>
+        </ModTable>
       </MainContainer>
     </>
   )

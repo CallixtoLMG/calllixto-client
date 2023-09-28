@@ -1,9 +1,11 @@
 "use client";
 import ProductForm from "@/components/products/ProductForm";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { MainContainer } from "./styles";
 
 const CreateProduct = () => {
-
+  const router = useRouter()
   const create = (product) => {
     var requestOptions = {
       method: 'POST',
@@ -19,6 +21,7 @@ const CreateProduct = () => {
       .then(response => response.text())
       .then(result => console.log(result))
       .catch(error => console.log('error', error));
+    router.push(PAGES.PRODUCTS.BASE)
   };
 
   return (

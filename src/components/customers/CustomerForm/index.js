@@ -1,19 +1,10 @@
 "use client"
-import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 import { Button, Form, Icon, Input } from 'semantic-ui-react';
 import { Label } from "./styles";
 
-const ProductForm = ({ customer }) => {
-  const router = useRouter();
+const ProductForm = ({ customer, onSubmit }) => {
   const { register, handleSubmit, control } = useForm();
-
-  const onSubmit = (data) => {
-    console.log(data);
-    toast.success("Cliente creado exitosamente");
-    router.push("/clientes");
-  };
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
@@ -27,20 +18,20 @@ const ProductForm = ({ customer }) => {
         />
       </Form.Field>
       <Form.Field>
-        <Label>Telefono</Label>
+        <Label>Teléfono</Label>
         <Controller
-          name="tel"
+          name="phone"
           control={control}
-          defaultValue={customer?.tel || ""}
+          defaultValue={customer?.phone || ""}
           render={({ field }) => <Input {...field} />}
         />
       </Form.Field>
       <Form.Field>
         <Label>Email</Label>
         <Controller
-          name="mail"
+          name="email"
           control={control}
-          defaultValue={customer?.mail || ""}
+          defaultValue={customer?.email || ""}
           render={({ field }) => <Input {...field} />}
         />
       </Form.Field>

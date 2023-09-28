@@ -2,28 +2,9 @@
 
 import BudgetsPage from "../../components/budgets/BudgetPage";
 
-const headerCell = [
-  {
-    name: "Codigo",
-    id: 1
-  },
-  {
-    name: "Cliente",
-    id: 2
-  },
-  {
-    name: "Fecha de creacion",
-    id: 3
-  },
-  {
-    name: "Monto total",
-    id: 4
-  },
-];
-
 function Presupuesto() {
   const budgets = [{
-    id: 1,
+    id: 32,
     customer: "Pepito",
     createdAt: "2021-10-10",
     totalAmount: 1000
@@ -35,7 +16,7 @@ function Presupuesto() {
     totalAmount: 1500
   },
   {
-    id: 3,
+    id: 13,
     customer: "José",
     createdAt: "2021-10-10",
     totalAmount: 2000
