@@ -11,7 +11,7 @@ async function Customer({ params }) {
   const customer = await loadCustomer(params.id);
 
   return (
-    <ShowCustomer customer={customer} />
+    <ShowCustomer customer={customer} id={params.id} />
   )
 };
 

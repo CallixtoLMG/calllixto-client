@@ -37,7 +37,6 @@ const BudgetForm = () => {
 
   const addProduct = () => {
     setProducts([...products, { name: '', quantity: '', discount: '' }]);
-    console.log(products)
   };
 
   const deleteProduct = (index) => {
