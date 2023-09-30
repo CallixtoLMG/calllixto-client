@@ -2,8 +2,9 @@
 import { useState } from 'react';
 import { toast } from "react-hot-toast";
 import { Button, Header, Icon, Modal } from 'semantic-ui-react';
+import { deleteCustomer } from '../../app/clientes/page';
 
-const ButtonDelete = ({ product }) => {
+const ButtonDelete = ({ product, customer }) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -21,7 +22,7 @@ const ButtonDelete = ({ product }) => {
         </Button>
         <Button color='green' onClick={() => {
           setOpen(false);
-          deleteProduct(product.id);
+          deleteCustomer(customer.id);
           toast.success("Producto eliminado exitosamente",
             { duration: 4000 })
         }}>

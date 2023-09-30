@@ -10,5 +10,11 @@ const Label = styled.label`
   font-size: 14px!important;
   margin-left: 15px!important;
 `;
-export { Label, MainContainer };
+
+const WarningMessage = styled.p`
+  margin-left: 5px!important;
+  color: red;
+`;
+
+export { Label, MainContainer, WarningMessage };
 

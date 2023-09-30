@@ -12,9 +12,16 @@ const PAGES = {
   },
   LOGIN: {
     BASE: "/login"
+  },
+  CUSTOMERS: {
+    BASE: "/clientes",
+    CREATE: "/clientes/crear",
+    UPDATE: (code) => `/clientes/${code}/editar`,
+    SHOW: (id) => `/clientes/${id}`
   }
-}
+};
 
 export {
   PAGES
-}
+};
+

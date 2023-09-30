@@ -1,19 +1,18 @@
-"use client";
-import { MainContainer } from "./styles";
 import ProductForm from "@/components/products/ProductForm";
 
-const CreateProduct = ({ params }) => {
-  const product = {
-    code: params.code,
-    name: "Maderita",
-    price: 150
-  };
+async function showProduct(code) {
+  const res = await fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/products/${code}`);
+  const data = await res.json()
+  return data
+};
+
+async function CreateProduct({ params }) {
+  const product = await showProduct(params.code);
 
   return (
-    <MainContainer>
-      <ProductForm product={product} />
-    </MainContainer>
+    <ProductForm product={product} />
   )
 };
 
 export default CreateProduct;
+

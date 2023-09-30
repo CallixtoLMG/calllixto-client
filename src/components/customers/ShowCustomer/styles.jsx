@@ -6,5 +6,7 @@ const MainContainer = styled(Flex)`
   flex-direction: column;
 `;
 
-export { MainContainer };
+export {
+  MainContainer
+};
 

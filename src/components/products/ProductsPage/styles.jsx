@@ -1,5 +1,6 @@
+import Link from "next/link";
 import { Flex } from "rebass";
-import { Table } from "semantic-ui-react";
+import { Button, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
@@ -8,18 +9,32 @@ const MainContainer = styled(Flex)`
 `;
 
 const ModTableCell = styled(Table.Cell)({
-  background: "#EEEEEE!important"
+  cursor: "pointer!important"
 });
 
 const ModTableHeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important"
 });
 
-const ModTableRow = styled(Table.Row)({
-  cursor: "pointer!important"
+const ModButtonProduct = styled(Button)({
+  width: "14rem!important",
 });
 
+const ModLink = styled(Link)({
+  width: "14rem!important",
+});
+
+const ModTable = styled(Table)`
+  tbody:nth-child(odd) {
+    background-color: #f2f2f2!important;
+  }
+`;
+
+const ModTableRow = styled(Table.Row)`
+  th:first-child { width: 50px!important; };
+`;
+
 export {
-  MainContainer, ModTableCell, ModTableHeaderCell, ModTableRow
+  MainContainer, ModButtonProduct, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
 };
 
