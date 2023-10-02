@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Flex } from "rebass";
 import { Table } from "semantic-ui-react";
 import styled from "styled-components";
@@ -25,7 +26,11 @@ const ModTable = styled(Table)`
   }
 `;
 
+const ModLink = styled(Link)({
+  width: "14rem!important",
+});
+
 export {
-  MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
+  MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
 };
 

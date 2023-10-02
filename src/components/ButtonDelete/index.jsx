@@ -1,4 +1,5 @@
 "use client";
+import { deleteProduct } from '@/app/productos/page';
 import { useState } from 'react';
 import { toast } from "react-hot-toast";
 import { Button, Header, Icon, Modal } from 'semantic-ui-react';
@@ -15,15 +16,22 @@ const ButtonDelete = ({ product, customer }) => {
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
     >
-      <Header icon='archive' content='Estás seguro que desea borra el producto?' />
+      <Header icon='archive'
+        content={
+          product ? `¿Está seguro que desea eliminar el producto ${product.name}?` :
+            customer ? `¿Está seguro que desea eliminar al cliente ${customer.name}?` : ''
+        } />
       <Modal.Actions>
         <Button color='red' onClick={() => setOpen(false)}>
           <Icon name='remove' />No
         </Button>
         <Button color='green' onClick={() => {
           setOpen(false);
-          deleteCustomer(customer.id);
-          toast.success("Producto eliminado exitosamente",
+          {
+            customer ? deleteCustomer(customer.id) :
+              product ? deleteProduct(product.code) : ""
+          }
+          toast.success("Elemento eliminado exitosamente",
             { duration: 4000 })
         }}>
           <Icon name='checkmark' />Si

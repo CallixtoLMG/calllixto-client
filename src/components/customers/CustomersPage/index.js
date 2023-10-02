@@ -1,20 +1,20 @@
 "use client";
 import ButtonDelete from "@/components/ButtonDelete";
+import ButtonEdit from "@/components/ButtonEdit";
 import { PAGES } from "@/constants";
-import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Button, Table } from 'semantic-ui-react';
 import { HEADERS } from "../clients.common";
-import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, } from "./styles";
 
 const CustomersPage = ({ customers = [] }) => {
   const router = useRouter();
 
   return (
     <MainContainer>
-      <Link href={PAGES.CUSTOMERS.CREATE}>
+      <ModLink href={PAGES.CUSTOMERS.CREATE}>
         <Button color='green' content='Crear cliente' icon='add' labelPosition='right' />
-      </Link>
+      </ModLink>
       <ModTable celled compact>
         <Table.Header fullWidth>
           <ModTableRow>
@@ -38,9 +38,7 @@ const CustomersPage = ({ customers = [] }) => {
                 </ModTableCell>)
               }
               <Table.Cell textAlign='center'>
-                <Link href={PAGES.CUSTOMERS.UPDATE(customer.id)}>
-                  <Button color='blue' size="tiny">Editar</Button>
-                </Link>
+                <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
                 <ButtonDelete customer={customer} />
               </Table.Cell>
             </ModTableRow>

@@ -1,9 +1,9 @@
 "use client";
 import ButtonDelete from "@/components/ButtonDelete";
+import ButtonEdit from "@/components/ButtonEdit";
 import { PAGES } from "@/constants";
-import Link from "next/link";
 import { useRouter } from 'next/navigation';
-import { Button, Table } from 'semantic-ui-react';
+import { Table } from 'semantic-ui-react';
 import { HEADERS } from "../products.common";
 import { MainContainer, ModButtonProduct, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
@@ -38,9 +38,7 @@ const ProductsPage = ({ products = [], deleteProduct }) => {
                 </ModTableCell>)
               }
               <Table.Cell textAlign='center'>
-                <Link href={PAGES.PRODUCTS.UPDATE(product.code)}>
-                  <Button color='blue' size="tiny">Editar</Button>
-                </Link>
+                <ButtonEdit page={"PRODUCTS"} element={product.code} />
                 <ButtonDelete deleteProduct={deleteProduct} product={product} />
               </Table.Cell>
             </ModTableRow>

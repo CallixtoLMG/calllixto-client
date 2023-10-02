@@ -9,13 +9,13 @@ import { MainContainer, ModTable, ModTableHeaderCell, ModTableRow, SearchBarCont
 const BudgetsPage = ({ budgets }) => {
   return (
     <>
-      <SearchBarContainer>
-        <SearchBar budgets={budgets} />
-        <Link href={PAGES.BUDGETS.CREATE}>
-          <Button color='green' content='Crear presupuesto' icon='add' labelPosition='right' />
-        </Link>
-      </SearchBarContainer>
       <MainContainer>
+        <SearchBarContainer>
+          <Link href={PAGES.BUDGETS.CREATE}>
+            <Button color='green' content='Crear presupuesto' icon='add' labelPosition='right' />
+          </Link>
+          <SearchBar budgets={budgets} />
+        </SearchBarContainer>
         <ModTable celled compact >
           <Table.Header fullWidth>
             <ModTableRow>

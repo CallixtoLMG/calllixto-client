@@ -3,7 +3,6 @@ import CustomerForm from "@/components/customers/CustomerForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
-import { MainContainer } from "./styles";
 
 const CreateCustomer = () => {
   const router = useRouter()
@@ -27,9 +26,7 @@ const CreateCustomer = () => {
   };
 
   return (
-    <MainContainer>
-      <CustomerForm onSubmit={create} />
-    </MainContainer>
+    <CustomerForm create={create} />
   )
 };
 

@@ -6,7 +6,7 @@ async function loadCustomers() {
   return data
 };
 
-export async function deleteCustomer(code) {
+export async function deleteCustomer(id) {
   var requestOptions = {
     method: 'DELETE',
     redirect: 'follow',
@@ -16,13 +16,13 @@ export async function deleteCustomer(code) {
     cache: "no-store",
   };
 
-  await fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/customers/${code}`, requestOptions)
+  await fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/customers/${id}`, requestOptions)
     .then(response => response.text())
     .then(result => console.log(result))
     .catch(error => console.log('error', error));
 };
 
-export async function editCustomer(code) {
+export async function editCustomer(id) {
   var requestOptions = {
     method: 'PUT',
     redirect: 'follow',
@@ -32,7 +32,7 @@ export async function editCustomer(code) {
     cache: "no-store",
   };
 
-  await fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/customers/${code}`, requestOptions)
+  await fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/customers/${id}`, requestOptions)
     .then(response => response.text())
     .then(result => console.log(result))
     .catch(error => console.log('error', error));
