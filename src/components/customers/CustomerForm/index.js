@@ -1,25 +1,23 @@
 "use client"
-import { editCustomer } from "@/app/clientes/page";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Form, Icon, Input } from 'semantic-ui-react';
 import { Label, MainContainer } from "./styles";
 
-const CustomerForm = ({ customer, create }) => {
+const CustomerForm = ({ customer, onSubmit }) => {
   const { register, handleSubmit, control } = useForm();
 
   return (
     <MainContainer>
-      <Form onSubmit={customer?.id ? handleSubmit(() => editCustomer(customer.id)) : handleSubmit(create)}>
-        {!customer?.id &&
-          <Form.Field>
-            <Label>Nombre</Label>
-            <Controller
-              name="name"
-              control={control}
-              defaultValue={customer?.name || ""}
-              render={({ field }) => <Input {...field} />}
-            />
-          </Form.Field>}
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Form.Field>
+          <Label>Nombre</Label>
+          <Controller
+            name="name"
+            control={control}
+            defaultValue={customer?.name || ""}
+            render={({ field }) => <Input {...field} />}
+          />
+        </Form.Field>
         <Form.Field>
           <Label>Teléfono</Label>
           <Controller
