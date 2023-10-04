@@ -7,6 +7,24 @@ import { deleteCustomer } from '../../app/clientes/page';
 
 const ButtonDelete = ({ product, customer }) => {
   const [open, setOpen] = useState(false);
+  const [confirmationText, setConfirmationText] = useState('');
+  const [isDeleteEnabled, setIsDeleteEnabled] = useState(true);
+
+  const handleConfirmationTextChange = (e) => {
+    const text = e.target.value;
+    setConfirmationText(text);
+
+    // Habilitar el botón de eliminación solo si el texto coincide con "borrar"
+    setIsDeleteEnabled(text.toLowerCase() === 'borrar');
+  };
+
+  const handleDeleteClick = () => {
+    // Realizar la eliminación del elemento aquí
+    if (isDeleteEnabled) {
+      // Coloca el código para eliminar el elemento
+      console.log('Elemento eliminado');
+    }
+  };
 
   return (
     <Modal
@@ -22,10 +40,14 @@ const ButtonDelete = ({ product, customer }) => {
             customer ? `¿Está seguro que desea eliminar al cliente ${customer.name}?` : ''
         } />
       <Modal.Actions>
+        <input
+          type="text"
+          value={confirmationText}
+          onChange={handleConfirmationTextChange} />
         <Button color='red' onClick={() => setOpen(false)}>
           <Icon name='remove' />No
         </Button>
-        <Button color='green' onClick={() => {
+        <Button disabled={isDeleteEnabled} color='green' onClick={() => {
           setOpen(false);
           {
             customer ? deleteCustomer(customer.id) :

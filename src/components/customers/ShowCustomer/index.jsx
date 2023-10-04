@@ -1,5 +1,4 @@
 "use client";
-import ButtonDelete from "@/components/ButtonDelete";
 import { Grid, Label, Segment } from 'semantic-ui-react';
 import { MainContainer } from "./styles";
 
@@ -19,7 +18,6 @@ const ShowCustomer = ({ customer, id }) => {
           </Grid.Column>
         </Grid.Row>
       </Grid>
-      <ButtonDelete customer={id} />
     </MainContainer>
   )
 };

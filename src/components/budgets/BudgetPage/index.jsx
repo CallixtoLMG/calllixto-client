@@ -2,11 +2,14 @@
 import SearchBar from "@/components/SearchBar";
 import { PAGES } from "@/constants";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button, Table } from 'semantic-ui-react';
 import { HEADERS } from "../budgets.common";
-import { MainContainer, ModTable, ModTableHeaderCell, ModTableRow, SearchBarContainer } from "./styles";
+import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SearchBarContainer } from "./styles";
 
 const BudgetsPage = ({ budgets }) => {
+  const router = useRouter();
+
   return (
     <>
       <MainContainer>
@@ -30,7 +33,10 @@ const BudgetsPage = ({ budgets }) => {
               <ModTableRow>
                 <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
                 {HEADERS
-                  .map((header) => <Table.Cell key={header.id} textAlign='center'>{budget[header.value]}</Table.Cell>)
+                  .map((header) => <ModTableCell
+                    onClick={() => { router.push(PAGES.BUDGETS.SHOW(budget.id)) }}
+                    key={header.id}
+                    textAlign='center'>{budget[header.value]}</ModTableCell>)
                 }
               </ModTableRow>
             </Table.Body>

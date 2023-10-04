@@ -26,7 +26,7 @@ const CreateCustomer = () => {
   };
 
   return (
-    <CustomerForm create={create} />
+    <CustomerForm onSubmit={create} />
   )
 };
 

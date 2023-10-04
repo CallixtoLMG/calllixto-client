@@ -1,5 +1,8 @@
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { toast } from "react-hot-toast";
 import { Button, Dropdown, Form, Icon, Table } from 'semantic-ui-react';
 import { ModButtonBudget, ModButtonProduct, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
 
@@ -26,14 +29,17 @@ const customers = [
   { key: '4', value: 'Marcelo', text: 'Marcelo' },
 ];
 
-const BudgetForm = () => {
+const BudgetForm = ({ onSubmit, customers }) => {
+  const router = useRouter()
+  console.log(customers)
+
   const { control, handleSubmit, setValue, getValues, watch } = useForm();
   const [products, setProducts] = useState([{ name: '', quantity: '', discount: '' }]);
 
-  const onSubmit = (data) => {
-    const total = calculateTotal();
-    console.log({ ...data, total });
-  };
+  // const onSubmit = (data) => {
+  //   const total = calculateTotal();
+  //   console.log({ ...data, total });
+  // };
 
   const addProduct = () => {
     setProducts([...products, { name: '', quantity: '', discount: '' }]);
@@ -57,9 +63,14 @@ const BudgetForm = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={() => {
+      handleSubmit(onSubmit),
+        toast.success("Presupuesto creado exitosamente");
+      router.push(PAGES.BUDGETS.BASE)
+    }
+    }>
       <ModDropdown
-        name="client"
+        name="customerId"
         placeholder='Clientes...'
         search
         selection
