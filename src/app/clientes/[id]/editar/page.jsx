@@ -1,5 +1,7 @@
 "use client"
 import CustomerForm from "@/components/customers/CustomerForm";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
@@ -10,15 +12,16 @@ async function showCustomer(code) {
 };
 
 function EditCustomer({ params }) {
-  const [customer, setCustomer] = useState(null)
+  const router = useRouter();
+  const [customer, setCustomer] = useState(null);
   useEffect(() => {
     async function customerData() {
       const data = await showCustomer(params.id);
-      console.log(data)
-      setCustomer(data)
-    }
-    customerData()
-  }, [])
+      console.log(data);
+      setCustomer(data);
+    };
+    customerData();
+  }, []);
 
   function editCustomer(customer) {
     console.log(customer)
@@ -36,15 +39,15 @@ function EditCustomer({ params }) {
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res)
-        console.log(response)
-        if (res.status === 200) {
-          toast.success("Producto creado exitosamente");
+        console.log(res)
+        if (res.message === "Customer Updated") {
+          toast.success("Cliente modificado exitosamente", { duration: 4000, position: "top-center" });
         } else {
-          toast.error(res.message)
-        }
+          toast.error(res.message, { duration: 4000, position: "top-center" });
+        };
       })
       .catch(error => console.log('error', error));
-    // router.push(PAGES.PRODUCTS.BASE)
+    router.push(PAGES.CUSTOMERS.BASE)
   };
 
   return (

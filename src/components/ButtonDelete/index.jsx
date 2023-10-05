@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { toast } from "react-hot-toast";
 import { Button, Header, Icon, Modal } from 'semantic-ui-react';
 import { deleteCustomer } from '../../app/clientes/page';
+import { ModInput } from "./styles";
 
 const ButtonDelete = ({ product, customer }) => {
   const [open, setOpen] = useState(false);
@@ -13,17 +14,7 @@ const ButtonDelete = ({ product, customer }) => {
   const handleConfirmationTextChange = (e) => {
     const text = e.target.value;
     setConfirmationText(text);
-
-    // Habilitar el botón de eliminación solo si el texto coincide con "borrar"
     setIsDeleteEnabled(text.toLowerCase() === 'borrar');
-  };
-
-  const handleDeleteClick = () => {
-    // Realizar la eliminación del elemento aquí
-    if (isDeleteEnabled) {
-      // Coloca el código para eliminar el elemento
-      console.log('Elemento eliminado');
-    }
   };
 
   return (
@@ -40,21 +31,21 @@ const ButtonDelete = ({ product, customer }) => {
             customer ? `¿Está seguro que desea eliminar al cliente ${customer.name}?` : ''
         } />
       <Modal.Actions>
-        <input
+        <ModInput
+          placeholder="Escriba 'borrar' para eliminar"
           type="text"
           value={confirmationText}
           onChange={handleConfirmationTextChange} />
         <Button color='red' onClick={() => setOpen(false)}>
           <Icon name='remove' />No
         </Button>
-        <Button disabled={isDeleteEnabled} color='green' onClick={() => {
+        <Button disabled={!isDeleteEnabled} color='green' onClick={() => {
           setOpen(false);
           {
             customer ? deleteCustomer(customer.id) :
               product ? deleteProduct(product.code) : ""
           }
-          toast.success("Elemento eliminado exitosamente",
-            { duration: 4000 })
+          toast.success("Elemento eliminado exitosamente", { duration: 4000, position: "top-center" });
         }}>
           <Icon name='checkmark' />Si
         </Button>

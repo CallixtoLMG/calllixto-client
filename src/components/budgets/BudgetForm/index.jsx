@@ -1,8 +1,6 @@
-import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { toast } from "react-hot-toast";
 import { Button, Dropdown, Form, Icon, Table } from 'semantic-ui-react';
 import { ModButtonBudget, ModButtonProduct, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
 
@@ -22,7 +20,7 @@ const productsList = [
   { code: 3, name: "Ripio", price: 450, key: 3, value: "Ripio", text: "Ripio" }
 ];
 
-const customers = [
+const fakeCustomers = [
   { key: '1', value: 'Milton', text: 'Milton' },
   { key: '2', value: 'Levi', text: 'Levi' },
   { key: '3', value: 'Gawain', text: 'Gawain' },
@@ -31,15 +29,9 @@ const customers = [
 
 const BudgetForm = ({ onSubmit, customers }) => {
   const router = useRouter()
-  console.log(customers)
 
   const { control, handleSubmit, setValue, getValues, watch } = useForm();
   const [products, setProducts] = useState([{ name: '', quantity: '', discount: '' }]);
-
-  // const onSubmit = (data) => {
-  //   const total = calculateTotal();
-  //   console.log({ ...data, total });
-  // };
 
   const addProduct = () => {
     setProducts([...products, { name: '', quantity: '', discount: '' }]);
@@ -63,12 +55,7 @@ const BudgetForm = ({ onSubmit, customers }) => {
   };
 
   return (
-    <Form onSubmit={() => {
-      handleSubmit(onSubmit),
-        toast.success("Presupuesto creado exitosamente");
-      router.push(PAGES.BUDGETS.BASE)
-    }
-    }>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       <ModDropdown
         name="customerId"
         placeholder='Clientes...'
@@ -76,7 +63,7 @@ const BudgetForm = ({ onSubmit, customers }) => {
         selection
         minCharacters={2}
         noResultsMessage="No se ha encontrado cliente!"
-        options={customers}
+        options={fakeCustomers}
         onChange={(e, { name, value }) => {
           setValue(name, value);
         }}

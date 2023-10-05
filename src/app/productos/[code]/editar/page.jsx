@@ -1,6 +1,9 @@
 "use client"
 import ProductForm from "@/components/products/ProductForm";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 async function showProduct(code) {
   const res = await fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/products/${code}`);
@@ -9,15 +12,16 @@ async function showProduct(code) {
 };
 
 function EditProduct({ params }) {
-  const [product, setProduct] = useState(null)
+  
+  const router = useRouter();
+  const [product, setProduct] = useState(null);
   useEffect(() => {
     async function productData() {
       const data = await showProduct(params.code);
-      console.log(data)
-      setProduct(data)
-    }
-    productData()
-  }, [params.code])
+      setProduct(data);
+    };
+    productData();
+  }, [params.code]);
 
   async function editProduct(product) {
     console.log(product)
@@ -30,9 +34,20 @@ function EditProduct({ params }) {
       },
       cache: "no-store",
     };
-    const response = await fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/products/${params.code}`, requestOptions)
-    const data = await response.json()
-    console.log(data)
+
+    fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/products/${params.code}`, requestOptions)
+      .then(async response => {
+        let res = await response.text()
+        res = JSON.parse(res)
+        console.log(res)
+        if (res.message === "Product Updated") {
+          toast.success("Producto modificado exitosamente", { duration: 4000, position: "top-center" });
+        } else {
+          toast.error(res.message, { duration: 4000, position: "top-center" });
+        }
+      })
+      .catch(error => console.log('error', error));
+    router.push(PAGES.PRODUCTS.BASE)
   };
 
   return (

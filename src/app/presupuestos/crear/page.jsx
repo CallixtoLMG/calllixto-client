@@ -22,11 +22,18 @@ const CreateBudget = () => {
     };
 
     fetch("https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/budgets", requestOptions)
-      .then(response => response.text())
-      .then(result => console.log(result))
+      .then(async response => {
+        let res = await response.text()
+        res = JSON.parse(res)
+        console.log(res)
+        if (res.status === 201) {
+          toast.success("Presupuesto creado exitosamente", { duration: 4000, position: "top-center" });
+        } else {
+          toast.error(res.message, { duration: 4000, position: "top-center" });
+        };
+      })
       .catch(error => console.log('error', error));
-    toast.success("Presupuesto creado exitosamente");
-    router.push(PAGES.BUDGETS.BASE)
+    router.push(PAGES.BUDGETS.BASE);
   };
 
   return (

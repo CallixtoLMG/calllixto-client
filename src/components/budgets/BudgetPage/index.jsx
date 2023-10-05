@@ -1,11 +1,9 @@
 "use client";
-import SearchBar from "@/components/SearchBar";
 import { PAGES } from "@/constants";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button, Table } from 'semantic-ui-react';
 import { HEADERS } from "../budgets.common";
-import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SearchBarContainer } from "./styles";
+import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const BudgetsPage = ({ budgets }) => {
   const router = useRouter();
@@ -13,12 +11,9 @@ const BudgetsPage = ({ budgets }) => {
   return (
     <>
       <MainContainer>
-        <SearchBarContainer>
-          <Link href={PAGES.BUDGETS.CREATE}>
-            <Button color='green' content='Crear presupuesto' icon='add' labelPosition='right' />
-          </Link>
-          <SearchBar budgets={budgets} />
-        </SearchBarContainer>
+        <ModLink href={PAGES.BUDGETS.CREATE}>
+          <Button color='green' content='Crear presupuesto' icon='add' labelPosition='right' />
+        </ModLink>
         <ModTable celled compact >
           <Table.Header fullWidth>
             <ModTableRow>

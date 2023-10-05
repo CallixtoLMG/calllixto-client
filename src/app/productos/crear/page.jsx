@@ -23,9 +23,9 @@ const CreateProduct = () => {
         res = JSON.parse(res)
         console.log(res)
         if (res.status === 201) {
-          toast.success("Producto creado exitosamente");
+          toast.success("Producto creado exitosamente", { duration: 4000, position: "top-center" });
         } else {
-          toast.error(res.message)
+          toast.error(res.message, { duration: 4000, position: "top-center" });
         }
       })
       .catch(error => console.log('error', error));

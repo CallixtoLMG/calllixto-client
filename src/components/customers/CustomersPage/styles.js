@@ -27,7 +27,7 @@ const ModTable = styled(Table)`
 `;
 
 const ModLink = styled(Link)({
-  width: "14rem!important",
+  width: "fit-content",
 });
 
 export {

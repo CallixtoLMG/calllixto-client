@@ -3,9 +3,9 @@ import ButtonDelete from "@/components/ButtonDelete";
 import ButtonEdit from "@/components/ButtonEdit";
 import { PAGES } from "@/constants";
 import { useRouter } from 'next/navigation';
-import { Table } from 'semantic-ui-react';
+import { Button, Table } from 'semantic-ui-react';
 import { HEADERS } from "../products.common";
-import { MainContainer, ModButtonProduct, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const ProductsPage = ({ products = [], deleteProduct }) => {
   const router = useRouter();
@@ -13,7 +13,7 @@ const ProductsPage = ({ products = [], deleteProduct }) => {
   return (
     <MainContainer>
       <ModLink href={PAGES.PRODUCTS.CREATE}>
-        <ModButtonProduct color='green' content='Crear producto' icon='add' labelPosition='right' />
+        <Button color='green' content='Crear producto' icon='add' labelPosition='right' />
       </ModLink>
       <ModTable celled compact>
         <Table.Header fullWidth>

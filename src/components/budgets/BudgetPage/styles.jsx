@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Flex } from "rebass";
 import { Table } from "semantic-ui-react";
 import styled from "styled-components";
@@ -5,10 +6,6 @@ import styled from "styled-components";
 const MainContainer = styled(Flex)`
   margin: 75px 30px 30px 30px!important;
   flex-direction: column;
-`;
-
-const SearchBarContainer = styled(Flex)`
-  justify-content: space-around;
 `;
 
 const ModTableCell = styled(Table.Cell)({
@@ -29,7 +26,11 @@ const ModTableRow = styled(Table.Row)`
   th:first-child { width: 50px!important; };
 `;
 
+const ModLink = styled(Link)({
+  width: "fit-content",
+});
+
 export {
-  MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SearchBarContainer
+  MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
 };
 
