@@ -24,7 +24,6 @@ function EditProduct({ params }) {
   }, [params.code]);
 
   async function editProduct(product) {
-    console.log(product)
     const requestOptions = {
       body: JSON.stringify(product),
       method: 'PUT',
@@ -39,7 +38,6 @@ function EditProduct({ params }) {
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res)
-        console.log(res)
         if (res.message === "Product Updated") {
           toast.success("Producto modificado exitosamente", { duration: 4000, position: "top-center" });
         } else {

@@ -6,7 +6,7 @@ async function loadBudget(id) {
   return data;
 };
 
-async function Customer({ params }) {
+async function Budgets({ params }) {
 
   const budget = await loadBudget(params.id);
 
@@ -15,4 +15,4 @@ async function Customer({ params }) {
   )
 };
 
-export default Customer;
+export default Budgets;

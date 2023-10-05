@@ -14,17 +14,16 @@ async function showCustomer(code) {
 function EditCustomer({ params }) {
   const router = useRouter();
   const [customer, setCustomer] = useState(null);
+
   useEffect(() => {
     async function customerData() {
       const data = await showCustomer(params.id);
-      console.log(data);
       setCustomer(data);
     };
     customerData();
   }, []);
 
   function editCustomer(customer) {
-    console.log(customer)
     var requestOptions = {
       body: JSON.stringify(customer),
       method: 'PUT',
@@ -39,7 +38,6 @@ function EditCustomer({ params }) {
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res)
-        console.log(res)
         if (res.message === "Customer Updated") {
           toast.success("Cliente modificado exitosamente", { duration: 4000, position: "top-center" });
         } else {

@@ -1,12 +1,13 @@
 "use client";
 import { deleteProduct } from '@/app/productos/page';
+import { useRouter } from "next/navigation";
 import { useState } from 'react';
-import { toast } from "react-hot-toast";
 import { Button, Header, Icon, Modal } from 'semantic-ui-react';
 import { deleteCustomer } from '../../app/clientes/page';
 import { ModInput } from "./styles";
 
 const ButtonDelete = ({ product, customer }) => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(true);
@@ -45,7 +46,7 @@ const ButtonDelete = ({ product, customer }) => {
             customer ? deleteCustomer(customer.id) :
               product ? deleteProduct(product.code) : ""
           }
-          toast.success("Elemento eliminado exitosamente", { duration: 4000, position: "top-center" });
+          router.refresh();
         }}>
           <Icon name='checkmark' />Si
         </Button>

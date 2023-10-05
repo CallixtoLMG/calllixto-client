@@ -9,9 +9,9 @@ const ShowProduct = ({ product }) => {
       <Grid divided>
         <Grid.Row stretched>
           <Grid.Column>
-            <Label> Codigo </Label>
+            <Label>Codigo</Label>
             <Segment><p>{product.code}</p></Segment>
-            <Label>Nombre del Producto</Label>
+            <Label>Nombre</Label>
             <Segment><p>{product.name}</p></Segment>
             <Label> Precio </Label>
             <Segment> <p>{product.price}</p></Segment>

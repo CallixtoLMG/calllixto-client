@@ -21,7 +21,6 @@ const CreateProduct = () => {
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res)
-        console.log(res)
         if (res.status === 201) {
           toast.success("Producto creado exitosamente", { duration: 4000, position: "top-center" });
         } else {

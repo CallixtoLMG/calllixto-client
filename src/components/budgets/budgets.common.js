@@ -1,19 +1,14 @@
 const HEADERS = [
   {
-    name: "Id",
-    value: "id",
-    id: 1
-  },
-  {
     name: "Cliente",
     value: "customerId",
-    id: 2
+    id: 1
   },
   {
     name: "Fecha",
     value: "createdAt",
-    id: 3
-  }
+    id: 2
+  },
 ];
 
 const PRODUCTSHEADERS = [

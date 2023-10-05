@@ -14,11 +14,9 @@ const ShowBudget = ({ budget }) => {
       <Grid divided>
         <Grid.Row stretched>
           <Grid.Column>
-            <Label>Nombre del Cliente</Label>
+            <Label>Cliente</Label>
             <Segment><p>{budget.customerId}</p></Segment>
-            <Label> ID </Label>
-            <Segment> <p>{budget.id}</p></Segment>
-            <Label> Fecha de creacion </Label>
+            <Label> Fecha </Label>
             <Segment> <p>{budget.createdAt}</p></Segment>
             <Label> Productos </Label>
             <ModTable celled compact>

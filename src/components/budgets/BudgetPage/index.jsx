@@ -7,7 +7,6 @@ import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, Mod
 
 const BudgetsPage = ({ budgets }) => {
   const router = useRouter();
-
   return (
     <>
       <MainContainer>
@@ -21,6 +20,7 @@ const BudgetsPage = ({ budgets }) => {
               {HEADERS.map((header) => (
                 <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
               ))}
+              <ModTableHeaderCell textAlign='center'>Total</ModTableHeaderCell>
             </ModTableRow>
           </Table.Header>
           {budgets?.map((budget, index) => (
@@ -33,6 +33,7 @@ const BudgetsPage = ({ budgets }) => {
                     key={header.id}
                     textAlign='center'>{budget[header.value]}</ModTableCell>)
                 }
+                <Table.Cell textAlign='center'>Monto total</Table.Cell>
               </ModTableRow>
             </Table.Body>
           ))}

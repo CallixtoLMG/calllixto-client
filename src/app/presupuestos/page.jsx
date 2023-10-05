@@ -12,25 +12,6 @@ async function Presupuesto() {
 
   const budgets = await loadBudgets()
 
-  const budgets1 = [{
-    id: 32,
-    customer: "Pepito",
-    createdAt: "2021-10-10",
-    totalAmount: 1000
-  },
-  {
-    id: 2,
-    customer: "Roberto",
-    createdAt: "2021-10-10",
-    totalAmount: 1500
-  },
-  {
-    id: 13,
-    customer: "José",
-    createdAt: "2021-10-10",
-    totalAmount: 2000
-  }];
-
   return (
     <BudgetsPage budgets={budgets} />
   )

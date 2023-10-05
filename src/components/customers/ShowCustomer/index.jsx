@@ -9,11 +9,11 @@ const ShowCustomer = ({ customer, id }) => {
       <Grid divided>
         <Grid.Row stretched>
           <Grid.Column>
-            <Label>Nombre del Cliente</Label>
+            <Label>Cliente</Label>
             <Segment><p>{customer.name}</p></Segment>
-            <Label> Teléfono </Label>
+            <Label>Teléfono</Label>
             <Segment> <p>{customer.phone}</p></Segment>
-            <Label> Mail </Label>
+            <Label>Mail</Label>
             <Segment> <p>{customer.email}</p></Segment>
           </Grid.Column>
         </Grid.Row>
