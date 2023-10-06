@@ -6,6 +6,7 @@ async function loadProducts() {
   const data = await res.json()
   return data
 };
+
 export async function deleteProduct(code) {
   var requestOptions = {
     method: 'DELETE',
@@ -21,9 +22,9 @@ export async function deleteProduct(code) {
       let res = await response.text()
       res = JSON.parse(res)
       if (res.message === "Product Deleted") {
-        toast.success("Producto eliminado exitosamente", { duration: 4000, position: "top-center" });
+        toast.success("Producto eliminado exitosamente");
       } else {
-        toast.error(res.message, { duration: 4000, position: "top-center" });
+        toast.error(res.message);
       };
     })
     .catch(error => console.log('error', error));

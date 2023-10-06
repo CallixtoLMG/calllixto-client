@@ -1,20 +1,19 @@
 "use client";
-import { Grid, Label, Segment } from 'semantic-ui-react';
-import { MainContainer } from "./styles";
+import { Grid } from 'semantic-ui-react';
+import { MainContainer, ModLabel, ModSegment } from "./styles";
 
 const ShowCustomer = ({ customer, id }) => {
   return (
     <MainContainer>
-
       <Grid divided>
         <Grid.Row stretched>
           <Grid.Column>
-            <Label>Cliente</Label>
-            <Segment><p>{customer.name}</p></Segment>
-            <Label>Teléfono</Label>
-            <Segment> <p>{customer.phone}</p></Segment>
-            <Label>Mail</Label>
-            <Segment> <p>{customer.email}</p></Segment>
+            <ModLabel>Cliente</ModLabel>
+            <ModSegment>{customer.name}</ModSegment>
+            <ModLabel>Teléfono</ModLabel>
+            <ModSegment> {customer.phone}</ModSegment>
+            <ModLabel>Mail</ModLabel>
+            <ModSegment> {customer.email}</ModSegment>
           </Grid.Column>
         </Grid.Row>
       </Grid>

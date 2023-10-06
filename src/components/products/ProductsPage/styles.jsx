@@ -6,6 +6,7 @@ import styled from "styled-components";
 const MainContainer = styled(Flex)`
   margin: 75px 30px 30px 30px!important;
   flex-direction: column;
+  max-width: 120vh!important;
 `;
 
 const ModTableCell = styled(Table.Cell)({
@@ -27,7 +28,11 @@ const ModTable = styled(Table)`
 `;
 
 const ModTableRow = styled(Table.Row)`
+  th:not(:first-child) {min-width: 150px!important}
   th:first-child { width: 50px!important; };
+  th:nth-child(2){min-width: 100px!important;}
+  th:nth-child(3){min-width: 250px!important;}
+  th:last-child { width: 250px!important; };
 `;
 
 export {

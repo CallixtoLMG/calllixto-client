@@ -1,18 +1,8 @@
-import { useRouter } from "next/navigation";
+import { SHOWPRODUCTSHEADERS } from "@/components/budgets/budgets.common";
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Button, Dropdown, Form, Icon, Table } from 'semantic-ui-react';
 import { ModButtonBudget, ModButtonProduct, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
-
-const Headers = [
-  { name: "Nombre", value: "name", id: 1 },
-  { name: "Precio", value: "price", id: 2 },
-  { name: "Cantidad", value: "quantity", id: 3 },
-  { name: "Subtotal", value: "subtotal", id: 4 },
-  { name: "Descuento en %", value: "discount", id: 5 },
-  { name: "Total", value: "total", id: 6 },
-  { name: "Acciones", value: "actions", id: 7 },
-];
 
 const productsList = [
   { code: 1, name: "Madera", price: 150, key: 1, value: "Madera", text: "Madera" },
@@ -27,10 +17,9 @@ const fakeCustomers = [
   { key: '4', value: 'Marcelo', text: 'Marcelo' },
 ];
 
-const BudgetForm = ({ onSubmit, customers }) => {
-  const router = useRouter()
+const BudgetForm = ({ onSubmit }) => {
 
-  const { control, handleSubmit, setValue, getValues, watch } = useForm();
+  const { control, handleSubmit, setValue, watch } = useForm();
   const [products, setProducts] = useState([{ name: '', quantity: '', discount: '' }]);
 
   const addProduct = () => {
@@ -79,7 +68,7 @@ const BudgetForm = ({ onSubmit, customers }) => {
       <Table celled>
         <Table.Header>
           <ModTableRow>
-            {Headers.map((header) => {
+            {SHOWPRODUCTSHEADERS.map((header) => {
               return (<Table.HeaderCell key={header.id} textAlign='center'>{header.name}</Table.HeaderCell>)
             })}
           </ModTableRow>

@@ -1,14 +1,17 @@
 "use client";
+import { deleteProduct } from "@/app/productos/page";
 import ButtonDelete from "@/components/ButtonDelete";
 import ButtonEdit from "@/components/ButtonEdit";
 import { PAGES } from "@/constants";
+import { modPrice } from "@/utils";
 import { useRouter } from 'next/navigation';
 import { Button, Table } from 'semantic-ui-react';
 import { HEADERS } from "../products.common";
 import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
-const ProductsPage = ({ products = [], deleteProduct }) => {
+const ProductsPage = ({ products = [] }) => {
   const router = useRouter();
+  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`
 
   return (
     <MainContainer>
@@ -24,7 +27,7 @@ const ProductsPage = ({ products = [], deleteProduct }) => {
             ))}
           </ModTableRow>
         </Table.Header>
-        {products.map((product, index) => (
+        {products.map ? products.map((product, index) => (
           <Table.Body key={product.code}>
             <ModTableRow >
               <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
@@ -34,16 +37,16 @@ const ProductsPage = ({ products = [], deleteProduct }) => {
                   onClick={() => { router.push(PAGES.PRODUCTS.SHOW(product.code)) }}
                   key={header.id}
                   textAlign='center'>
-                  {product[header.value]}
+                  {header.value === "price" ? modPrice(product[header.value]) : product[header.value]}
                 </ModTableCell>)
               }
               <Table.Cell textAlign='center'>
                 <ButtonEdit page={"PRODUCTS"} element={product.code} />
-                <ButtonDelete deleteProduct={deleteProduct} product={product} />
+                <ButtonDelete onDelete={deleteProduct} params={product.code} deleteQuestion={deleteQuestion(product.name)} />
               </Table.Cell>
             </ModTableRow>
           </Table.Body>
-        ))}
+        )) : ""}
       </ModTable>
     </MainContainer>
   )

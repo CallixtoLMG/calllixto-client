@@ -39,9 +39,9 @@ function EditCustomer({ params }) {
         let res = await response.text()
         res = JSON.parse(res)
         if (res.message === "Customer Updated") {
-          toast.success("Cliente modificado exitosamente", { duration: 4000, position: "top-center" });
+          toast.success("Cliente modificado exitosamente");
         } else {
-          toast.error(res.message, { duration: 4000, position: "top-center" });
+          toast.error(res.message);
         };
       })
       .catch(error => console.log('error', error));

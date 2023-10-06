@@ -1,12 +1,9 @@
 "use client";
-import { loadCustomers } from "@/app/clientes/page";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { MainContainer } from "./styles";
-
-const customers = loadCustomers();
 
 const CreateBudget = () => {
   const router = useRouter()
@@ -26,9 +23,9 @@ const CreateBudget = () => {
         let res = await response.text()
         res = JSON.parse(res)
         if (res.status === 201) {
-          toast.success("Presupuesto creado exitosamente", { duration: 4000, position: "top-center" });
+          toast.success("Presupuesto creado exitosamente");
         } else {
-          toast.error(res.message, { duration: 4000, position: "top-center" });
+          toast.error(res.message);
         };
       })
       .catch(error => console.log('error', error));
@@ -37,7 +34,7 @@ const CreateBudget = () => {
 
   return (
     <MainContainer>
-      <BudgetForm customers={customers} onSubmit={create} />
+      <BudgetForm onSubmit={create} />
     </MainContainer>
   )
 }

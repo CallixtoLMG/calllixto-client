@@ -25,7 +25,11 @@ export default function RootLayout({
           <LayoutChildrenContainer >
             {children}
           </LayoutChildrenContainer>
-          <Toaster position="bottom-left" />
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 4000
+            }} />
           {/* <Footer /> */}
         </body>
       </StyledComponentsRegistry>

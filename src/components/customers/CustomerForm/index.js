@@ -1,43 +1,43 @@
 "use client"
 import { Controller, useForm } from "react-hook-form";
-import { Button, Form, Icon, Input } from 'semantic-ui-react';
-import { Label, MainContainer } from "./styles";
+import { Button, Form, Icon } from 'semantic-ui-react';
+import { MainContainer, ModFormField, ModInput, ModLabel } from "./styles";
 
 const CustomerForm = ({ customer, onSubmit }) => {
-  const { register, handleSubmit, control } = useForm();
+  const { handleSubmit, control } = useForm();
 
   return (
     <MainContainer>
       <Form onSubmit={handleSubmit(onSubmit)}>
-        <Form.Field>
-          <Label>Nombre</Label>
+        <ModFormField>
+          <ModLabel >Nombre</ModLabel>
           <Controller
             name="name"
             control={control}
             defaultValue={customer?.name || ""}
-            render={({ field }) => <Input {...field} />}
+            render={({ field }) => <ModInput {...field} />}
           />
-        </Form.Field>
-        <Form.Field>
-          <Label>Teléfono</Label>
+        </ModFormField>
+        <ModFormField>
+          <ModLabel>Teléfono</ModLabel>
           <Controller
             name="phone"
             control={control}
             defaultValue={customer?.phone || ""}
-            render={({ field }) => <Input {...field} />}
+            render={({ field }) => <ModInput {...field} />}
           />
-        </Form.Field>
-        <Form.Field>
-          <Label>Email</Label>
+        </ModFormField>
+        <ModFormField>
+          <ModLabel>Email</ModLabel>
           <Controller
             name="email"
             control={control}
             defaultValue={customer?.email || ""}
-            render={({ field }) => <Input {...field} />}
+            render={({ field }) => <ModInput {...field} />}
           />
-        </Form.Field>
-        <Form.Field>
-        </Form.Field>
+        </ModFormField>
+        <ModFormField>
+        </ModFormField>
         <Button
           type="submit"
           icon

@@ -1,4 +1,5 @@
 "use client";
+import { deleteCustomer } from "@/app/clientes/page";
 import ButtonDelete from "@/components/ButtonDelete";
 import ButtonEdit from "@/components/ButtonEdit";
 import { PAGES } from "@/constants";
@@ -9,6 +10,7 @@ import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, Mod
 
 const CustomersPage = ({ customers = [] }) => {
   const router = useRouter();
+  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`
 
   return (
     <MainContainer>
@@ -39,7 +41,7 @@ const CustomersPage = ({ customers = [] }) => {
               }
               <Table.Cell textAlign='center'>
                 <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
-                <ButtonDelete customer={customer} />
+                <ButtonDelete onDelete={deleteCustomer} params={customer.id} deleteQuestion={deleteQuestion(customer.name)} />
               </Table.Cell>
             </ModTableRow>
           </Table.Body>

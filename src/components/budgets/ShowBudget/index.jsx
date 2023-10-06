@@ -1,23 +1,20 @@
 "use client";
-import { Grid, Label, Segment, Table } from 'semantic-ui-react';
+import { Grid, Label, Table } from 'semantic-ui-react';
+import { modDate, totalSum } from '../../../utils';
 import { PRODUCTSHEADERS } from "../budgets.common";
-import { MainContainer, ModTable, ModTableHeaderCell, ModTableRow } from "./styles";
+import { MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const ShowBudget = ({ budget }) => {
-
-  const totalSum = budget.products.reduce((accumulator, product) => {
-    return accumulator + Number(product.total || 0);
-  }, 0);
 
   return (
     <MainContainer>
       <Grid divided>
         <Grid.Row stretched>
-          <Grid.Column>
-            <Label>Cliente</Label>
-            <Segment><p>{budget.customerId}</p></Segment>
-            <Label> Fecha </Label>
-            <Segment> <p>{budget.createdAt}</p></Segment>
+          <Grid.Column >
+            <ModLabel>Cliente</ModLabel>
+            <ModSegment>{budget.customerId}</ModSegment>
+            <ModLabel> Fecha </ModLabel>
+            <ModSegment>{modDate(budget.createdAt)}</ModSegment>
             <Label> Productos </Label>
             <ModTable celled compact>
               <Table.Header fullWidth>
@@ -48,7 +45,7 @@ const ShowBudget = ({ budget }) => {
                   <Table.HeaderCell />
                   <Table.HeaderCell textAlign="center" colSpan='1'><strong>Suma Total</strong></Table.HeaderCell>
                   <Table.HeaderCell colSpan='3' />
-                  <Table.HeaderCell textAlign="center" colSpan='1'><strong>{totalSum.toFixed(2)}</strong></Table.HeaderCell>
+                  <Table.HeaderCell textAlign="center" colSpan='1'><strong>{totalSum(budget.products)}</strong></Table.HeaderCell>
                 </Table.Row>
               </Table.Footer>
             </ModTable>

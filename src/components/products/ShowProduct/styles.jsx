@@ -1,4 +1,5 @@
 import { Flex } from "rebass";
+import { Label, Segment } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
@@ -6,7 +7,17 @@ const MainContainer = styled(Flex)`
   flex-direction: column;
 `;
 
+const ModLabel = styled(Label)({
+  maxWidth: "50vh!important",
+  margin: "0!important"
+});
+
+const ModSegment = styled(Segment)({
+  maxWidth: "50vh!important",
+  height: "50px!important",
+});
+
 export {
-  MainContainer
+  MainContainer, ModLabel, ModSegment
 };
 

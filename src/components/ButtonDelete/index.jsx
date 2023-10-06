@@ -1,16 +1,14 @@
 "use client";
-import { deleteProduct } from '@/app/productos/page';
 import { useRouter } from "next/navigation";
 import { useState } from 'react';
 import { Button, Header, Icon, Modal } from 'semantic-ui-react';
-import { deleteCustomer } from '../../app/clientes/page';
 import { ModInput } from "./styles";
 
-const ButtonDelete = ({ product, customer }) => {
+const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [confirmationText, setConfirmationText] = useState('');
-  const [isDeleteEnabled, setIsDeleteEnabled] = useState(true);
+  const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
 
   const handleConfirmationTextChange = (e) => {
     const text = e.target.value;
@@ -26,11 +24,7 @@ const ButtonDelete = ({ product, customer }) => {
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
     >
-      <Header icon='archive'
-        content={
-          product ? `¿Está seguro que desea eliminar el producto ${product.name}?` :
-            customer ? `¿Está seguro que desea eliminar al cliente ${customer.name}?` : ''
-        } />
+      <Header icon='archive' content={deleteQuestion || ""} />
       <Modal.Actions>
         <ModInput
           placeholder="Escriba 'borrar' para eliminar"
@@ -42,10 +36,7 @@ const ButtonDelete = ({ product, customer }) => {
         </Button>
         <Button disabled={!isDeleteEnabled} color='green' onClick={() => {
           setOpen(false);
-          {
-            customer ? deleteCustomer(customer.id) :
-              product ? deleteProduct(product.code) : ""
-          }
+          onDelete(params)
           router.refresh();
         }}>
           <Icon name='checkmark' />Si
