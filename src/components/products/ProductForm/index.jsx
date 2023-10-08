@@ -67,7 +67,7 @@ const ProductForm = ({ product, onSubmit }) => {
         <Button
           type="submit"
           icon
-          ModLabelPosition='right'
+          labelPosition='right'
           color="green"
         >
           <Icon name="add" /> {product?.code ? "Actualizar producto" : "Crear producto"}
