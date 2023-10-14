@@ -21,7 +21,7 @@ const CreateCustomer = () => {
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res)
-        if (res.status === 201) {
+        if (res.statusOk) {
           toast.success("Cliente creado exitosamente");
         } else {
           toast.error(res.message);

@@ -38,7 +38,7 @@ function EditCustomer({ params }) {
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res)
-        if (res.message === "Customer Updated") {
+        if (res.statusOk) {
           toast.success("Cliente modificado exitosamente");
         } else {
           toast.error(res.message);
@@ -50,7 +50,7 @@ function EditCustomer({ params }) {
 
   return (
     <>
-      {customer && <CustomerForm customer={customer} onSubmit={editCustomer} />}
+      {customer && <CustomerForm customer={customer.customer} onSubmit={editCustomer} />}
     </>
   )
 };

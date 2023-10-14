@@ -13,7 +13,7 @@ async function Presupuesto() {
   const budgets = await loadBudgets()
 
   return (
-    <BudgetsPage budgets={budgets} />
+    <BudgetsPage budgets={budgets.budgets} />
   )
 };
 

@@ -21,7 +21,7 @@ export async function deleteProduct(code) {
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)
-      if (res.message === "Product Deleted") {
+      if (res.statusOk) {
         toast.success("Producto eliminado exitosamente");
       } else {
         toast.error(res.message);
@@ -35,7 +35,7 @@ async function Products() {
   const products = await loadProducts();
 
   return (
-    <ProductsPage products={products} />
+    <ProductsPage products={products.products} />
   )
 };
 

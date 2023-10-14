@@ -1,11 +1,13 @@
 "use client";
-import { Grid, Label, Table } from 'semantic-ui-react';
+import PDFfile from '@/components/PDFfile';
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import Link from 'next/link';
+import { Button, Grid, Label, Table } from 'semantic-ui-react';
 import { modDate, totalSum } from '../../../utils';
 import { PRODUCTSHEADERS } from "../budgets.common";
 import { MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const ShowBudget = ({ budget }) => {
-
   return (
     <MainContainer>
       <Grid divided>
@@ -51,6 +53,12 @@ const ShowBudget = ({ budget }) => {
             </ModTable>
           </Grid.Column>
         </Grid.Row>
+        <Link href={`${budget.id}/verPdf`}>
+          <Button> Ver PDF</Button>
+        </Link>
+        <PDFDownloadLink document={<PDFfile />} fileName={`Presupuesto ${budget.customerId}.pdf`} >
+          {({ blob, url, loading, error }) => (loading ? <Button>Cargando presupuesto</Button> : <Button>Descargar presupuesto</Button>)}
+        </PDFDownloadLink>
       </Grid>
     </MainContainer>
   )

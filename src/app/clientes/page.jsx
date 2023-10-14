@@ -22,7 +22,7 @@ export async function deleteCustomer(id) {
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)
-      if (res.message === "Customer Deleted") {
+      if (res.statusOk) {
         toast.success("Cliente eliminado exitosamente");
       } else {
         toast.error(res.message);
@@ -35,7 +35,7 @@ async function Customers() {
   const customers = await loadCustomers()
 
   return (
-    <CustomersPage customers={customers} />
+    <CustomersPage customers={customers.customers} />
   )
 };
 

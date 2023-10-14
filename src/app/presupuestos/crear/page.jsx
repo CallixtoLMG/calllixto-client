@@ -22,7 +22,7 @@ const CreateBudget = () => {
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res)
-        if (res.status === 201) {
+        if (res.statusOk) {
           toast.success("Presupuesto creado exitosamente");
         } else {
           toast.error(res.message);

@@ -38,7 +38,7 @@ function EditProduct({ params }) {
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res)
-        if (res.message === "Product Updated") {
+        if (res.statusOk) {
           toast.success("Producto modificado exitosamente", { duration: 4000, position: "top-center" });
         } else {
           toast.error(res.message, { duration: 4000, position: "top-center" });
@@ -50,7 +50,7 @@ function EditProduct({ params }) {
 
   return (
     <>
-      {product && <ProductForm product={product} onSubmit={editProduct} />}
+      {product && <ProductForm product={product.product} onSubmit={editProduct} />}
     </>
   )
 };

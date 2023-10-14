@@ -65,7 +65,7 @@ const BudgetForm = ({ onSubmit }) => {
         onClick={addProduct}
       >
         <Icon name="add" />Agregar producto</ModButtonProduct>
-      <Table celled>
+      <Table>
         <Table.Header>
           <ModTableRow>
             {SHOWPRODUCTSHEADERS.map((header) => {
