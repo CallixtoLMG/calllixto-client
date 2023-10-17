@@ -1,5 +1,8 @@
 "use client"
-import { Document, Font, Page, StyleSheet, Text } from "@react-pdf/renderer";
+import { PRODUCTSHEADERS } from "@/components/budgets/budgets.common";
+import { IVA, modDate, totalIVA, totalSum } from '@/utils';
+import { Document, Font, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+
 const styles = StyleSheet.create({
   page: {
     flexDirection: 'column',
@@ -194,10 +197,9 @@ Font.register({
   src: 'https://fonts.gstatic.com/s/roboto/v27/KFOmCnqEu92Fr1Mu4mxP.ttf',
 });
 
-const SeePDFfile = ({ budget }) => {
+const PDFfile = ({ budget }) => {
   console.log(budget)
   return (
-    <PDFViewer style={{ marginTop: "70px", width: "100%", height: "90vh" }}>
       <Document>
         <Page size="A4" style={styles.page}>
           <Text style={styles.title}>Presupuesto</Text>
@@ -275,7 +277,6 @@ const SeePDFfile = ({ budget }) => {
           )} fixed />
         </Page>
       </Document>
-    </PDFViewer >
   );
 };
 

@@ -56,7 +56,7 @@ const ShowBudget = ({ budget }) => {
         <Link href={`${budget.id}/verPdf`}>
           <Button> Ver PDF</Button>
         </Link>
-        <PDFDownloadLink document={<PDFfile />} fileName={`Presupuesto ${budget.customerId}.pdf`} >
+        <PDFDownloadLink document={<PDFfile budget={budget} />} fileName={`Presupuesto ${budget.customerId}.pdf`} >
           {({ blob, url, loading, error }) => (loading ? <Button>Cargando presupuesto</Button> : <Button>Descargar presupuesto</Button>)}
         </PDFDownloadLink>
       </Grid>
