@@ -65,7 +65,7 @@ const BudgetForm = ({ onSubmit }) => {
         onClick={addProduct}
       >
         <Icon name="add" />Agregar producto</ModButtonProduct>
-      <Table>
+      <Table celled>
         <Table.Header>
           <ModTableRow>
             {SHOWPRODUCTSHEADERS.map((header) => {
@@ -168,6 +168,7 @@ const BudgetForm = ({ onSubmit }) => {
                   icon="trash"
                   color="red"
                   onClick={() => deleteProduct(index)}
+                  type="button"
                 />
               </Table.Cell>
             </Table.Row>

@@ -6,6 +6,19 @@ export const totalSum = (value) => {
   );
 };
 
+export const IVA = (value) => {
+  value = Number(value)
+  const iva = value * 0.21;
+  return iva.toFixed(2);
+};
+
+export const totalIVA = (value) => {
+  value = Number(value)
+  const iva = value * 0.21;
+  const totalConIVA = value + iva;
+  return totalConIVA.toFixed(2);
+};
+
 export const modDate = (date) => {
   return date.split("T")[0]
 };
