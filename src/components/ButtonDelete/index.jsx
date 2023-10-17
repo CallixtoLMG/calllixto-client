@@ -1,11 +1,20 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useState } from 'react';
-import { toast } from "react-hot-toast";
 import { Button, Header, Icon, Modal } from 'semantic-ui-react';
-import { deleteCustomer } from '../../app/clientes/page';
+import { ModInput } from "./styles";
 
-const ButtonDelete = ({ product, customer }) => {
+const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [confirmationText, setConfirmationText] = useState('');
+  const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
+
+  const handleConfirmationTextChange = (e) => {
+    const text = e.target.value;
+    setConfirmationText(text);
+    setIsDeleteEnabled(text.toLowerCase() === 'borrar');
+  };
 
   return (
     <Modal
@@ -15,16 +24,20 @@ const ButtonDelete = ({ product, customer }) => {
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
     >
-      <Header icon='archive' content='Estás seguro que desea borra el producto?' />
+      <Header icon='archive' content={deleteQuestion || ""} />
       <Modal.Actions>
+        <ModInput
+          placeholder="Escriba 'borrar' para eliminar"
+          type="text"
+          value={confirmationText}
+          onChange={handleConfirmationTextChange} />
         <Button color='red' onClick={() => setOpen(false)}>
           <Icon name='remove' />No
         </Button>
-        <Button color='green' onClick={() => {
+        <Button disabled={!isDeleteEnabled} color='green' onClick={() => {
           setOpen(false);
-          deleteCustomer(customer.id);
-          toast.success("Producto eliminado exitosamente",
-            { duration: 4000 })
+          onDelete(params)
+          router.refresh();
         }}>
           <Icon name='checkmark' />Si
         </Button>

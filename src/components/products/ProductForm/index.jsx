@@ -1,8 +1,8 @@
 "use client"
 import { get } from "lodash";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Form, Icon, Input } from 'semantic-ui-react';
-import { Label, MainContainer, WarningMessage } from "./styles";
+import { Button, Form, Icon } from 'semantic-ui-react';
+import { MainContainer, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
 
 const ProductForm = ({ product, onSubmit }) => {
   const { handleSubmit, control } = useForm();
@@ -19,8 +19,8 @@ const ProductForm = ({ product, onSubmit }) => {
     <MainContainer>
       <Form onSubmit={handleSubmit(onSubmit)}>
         {!product?.code &&
-          <Form.Field>
-            <Label>Código</Label>
+          <ModFormField>
+            <ModLabel>Código</ModLabel>
             <Controller
               name="code"
               control={control}
@@ -28,25 +28,25 @@ const ProductForm = ({ product, onSubmit }) => {
               rules={{ validate: validateCode }}
               render={({ field, fieldState }) => (
                 <>
-                  <Input {...field} />
+                  <ModInput {...field} />
                   {fieldState?.invalid && (
                     <WarningMessage >El código debe tener 4 caracteres alfanuméricos.</WarningMessage>
                   )}
                 </>
               )}
             />
-          </Form.Field>}
-        <Form.Field>
-          <Label>Nombre</Label>
+          </ModFormField>}
+        <ModFormField>
+          <ModLabel>Nombre</ModLabel>
           <Controller
             name="name"
             control={control}
             defaultValue={get(product, "name", "")}
-            render={({ field }) => <Input {...field} />}
+            render={({ field }) => <ModInput {...field} />}
           />
-        </Form.Field>
-        <Form.Field>
-          <Label>Precio</Label>
+        </ModFormField>
+        <ModFormField>
+          <ModLabel>Precio</ModLabel>
           <Controller
             name="price"
             control={control}
@@ -54,16 +54,16 @@ const ProductForm = ({ product, onSubmit }) => {
             rules={{ validate: validatePrice }}
             render={({ field, fieldState }) => (
               <>
-                <Input {...field} />
+                <ModInput {...field} />
                 {fieldState?.invalid && (
                   <WarningMessage >El precio debe contener solo números.</WarningMessage>
                 )}
               </>
             )}
           />
-        </Form.Field>
-        <Form.Field>
-        </Form.Field>
+        </ModFormField>
+        <ModFormField>
+        </ModFormField>
         <Button
           type="submit"
           icon

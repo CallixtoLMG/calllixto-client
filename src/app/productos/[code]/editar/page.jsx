@@ -1,4 +1,9 @@
+"use client"
 import ProductForm from "@/components/products/ProductForm";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 async function showProduct(code) {
   const res = await fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/products/${code}`);
@@ -6,13 +11,49 @@ async function showProduct(code) {
   return data
 };
 
-async function CreateProduct({ params }) {
-  const product = await showProduct(params.code);
+function EditProduct({ params }) {
+  
+  const router = useRouter();
+  const [product, setProduct] = useState(null);
+  useEffect(() => {
+    async function productData() {
+      const data = await showProduct(params.code);
+      setProduct(data);
+    };
+    productData();
+  }, [params.code]);
+
+  async function editProduct(product) {
+    const requestOptions = {
+      body: JSON.stringify(product),
+      method: 'PUT',
+      redirect: 'follow',
+      Headers: {
+        'Content-Type': 'application-json'
+      },
+      cache: "no-store",
+    };
+
+    fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/products/${params.code}`, requestOptions)
+      .then(async response => {
+        let res = await response.text()
+        res = JSON.parse(res)
+        if (res.statusOk) {
+          toast.success("Producto modificado exitosamente", { duration: 4000, position: "top-center" });
+        } else {
+          toast.error(res.message, { duration: 4000, position: "top-center" });
+        }
+      })
+      .catch(error => console.log('error', error));
+    router.push(PAGES.PRODUCTS.BASE)
+  };
 
   return (
-    <ProductForm product={product} />
+    <>
+      {product && <ProductForm product={product.product} onSubmit={editProduct} />}
+    </>
   )
 };
 
-export default CreateProduct;
+export default EditProduct;
 

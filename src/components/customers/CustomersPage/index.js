@@ -1,20 +1,22 @@
 "use client";
+import { deleteCustomer } from "@/app/clientes/page";
 import ButtonDelete from "@/components/ButtonDelete";
+import ButtonEdit from "@/components/ButtonEdit";
 import { PAGES } from "@/constants";
-import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Button, Table } from 'semantic-ui-react';
 import { HEADERS } from "../clients.common";
-import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, } from "./styles";
 
 const CustomersPage = ({ customers = [] }) => {
   const router = useRouter();
+  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`
 
   return (
     <MainContainer>
-      <Link href={PAGES.CUSTOMERS.CREATE}>
+      <ModLink href={PAGES.CUSTOMERS.CREATE}>
         <Button color='green' content='Crear cliente' icon='add' labelPosition='right' />
-      </Link>
+      </ModLink>
       <ModTable celled compact>
         <Table.Header fullWidth>
           <ModTableRow>
@@ -38,10 +40,8 @@ const CustomersPage = ({ customers = [] }) => {
                 </ModTableCell>)
               }
               <Table.Cell textAlign='center'>
-                <Link href={PAGES.CUSTOMERS.UPDATE(customer.id)}>
-                  <Button color='blue' size="tiny">Editar</Button>
-                </Link>
-                <ButtonDelete customer={customer} />
+                <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
+                <ButtonDelete onDelete={deleteCustomer} params={customer.id} deleteQuestion={deleteQuestion(customer.name)} />
               </Table.Cell>
             </ModTableRow>
           </Table.Body>

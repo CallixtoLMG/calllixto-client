@@ -1,17 +1,8 @@
+import { SHOWPRODUCTSHEADERS } from "@/components/budgets/budgets.common";
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Button, Dropdown, Form, Icon, Table } from 'semantic-ui-react';
 import { ModButtonBudget, ModButtonProduct, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
-
-const Headers = [
-  { name: "Nombre", value: "name", id: 1 },
-  { name: "Precio", value: "price", id: 2 },
-  { name: "Cantidad", value: "quantity", id: 3 },
-  { name: "Subtotal", value: "subtotal", id: 4 },
-  { name: "Descuento en %", value: "discount", id: 5 },
-  { name: "Total", value: "total", id: 6 },
-  { name: "Acciones", value: "actions", id: 7 },
-];
 
 const productsList = [
   { code: 1, name: "Madera", price: 150, key: 1, value: "Madera", text: "Madera" },
@@ -19,21 +10,17 @@ const productsList = [
   { code: 3, name: "Ripio", price: 450, key: 3, value: "Ripio", text: "Ripio" }
 ];
 
-const customers = [
+const fakeCustomers = [
   { key: '1', value: 'Milton', text: 'Milton' },
   { key: '2', value: 'Levi', text: 'Levi' },
   { key: '3', value: 'Gawain', text: 'Gawain' },
   { key: '4', value: 'Marcelo', text: 'Marcelo' },
 ];
 
-const BudgetForm = () => {
-  const { control, handleSubmit, setValue, getValues, watch } = useForm();
-  const [products, setProducts] = useState([{ name: '', quantity: '', discount: '' }]);
+const BudgetForm = ({ onSubmit }) => {
 
-  const onSubmit = (data) => {
-    const total = calculateTotal();
-    console.log({ ...data, total });
-  };
+  const { control, handleSubmit, setValue, watch } = useForm();
+  const [products, setProducts] = useState([{ name: '', quantity: '', discount: '' }]);
 
   const addProduct = () => {
     setProducts([...products, { name: '', quantity: '', discount: '' }]);
@@ -59,13 +46,13 @@ const BudgetForm = () => {
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <ModDropdown
-        name="client"
+        name="customerId"
         placeholder='Clientes...'
         search
         selection
         minCharacters={2}
         noResultsMessage="No se ha encontrado cliente!"
-        options={customers}
+        options={fakeCustomers}
         onChange={(e, { name, value }) => {
           setValue(name, value);
         }}
@@ -81,7 +68,7 @@ const BudgetForm = () => {
       <Table celled>
         <Table.Header>
           <ModTableRow>
-            {Headers.map((header) => {
+            {SHOWPRODUCTSHEADERS.map((header) => {
               return (<Table.HeaderCell key={header.id} textAlign='center'>{header.name}</Table.HeaderCell>)
             })}
           </ModTableRow>
@@ -181,6 +168,7 @@ const BudgetForm = () => {
                   icon="trash"
                   color="red"
                   onClick={() => deleteProduct(index)}
+                  type="button"
                 />
               </Table.Cell>
             </Table.Row>

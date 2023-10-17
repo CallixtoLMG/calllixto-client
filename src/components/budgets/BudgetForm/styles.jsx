@@ -9,11 +9,11 @@ const ModInput = styled(Input)`
 
 const ModButtonProduct = styled(Button)({
   marginTop: "14px!important",
-  width: "14rem!important"
+  width: "15rem!important"
 });
 
 const ModButtonBudget = styled(Button)({
-  width: "14rem!important"
+  width: "15rem!important"
 });
 
 const TotalText = styled.h3`

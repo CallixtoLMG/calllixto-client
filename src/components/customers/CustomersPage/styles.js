@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Flex } from "rebass";
 import { Table } from "semantic-ui-react";
 import styled from "styled-components";
@@ -5,6 +6,7 @@ import styled from "styled-components";
 const MainContainer = styled(Flex)`
   margin: 75px 30px 30px 30px!important;
   flex-direction: column;
+  max-width: 120vh!important;
 `;
 
 const ModTableCell = styled(Table.Cell)({
@@ -16,7 +18,10 @@ const ModTableHeaderCell = styled(Table.HeaderCell)({
 });
 
 const ModTableRow = styled(Table.Row)`
-  th:first-child { width: 50px!important; };
+  th:not(:first-child) { min-width: 200px!important; }
+  th:nth-child(3){ min-width: 150px!important; }
+  th:first-child { min-width: 50px!important; };
+  th:last-child { width: 250px!important; };
 `;
 
 const ModTable = styled(Table)`
@@ -25,7 +30,11 @@ const ModTable = styled(Table)`
   }
 `;
 
+const ModLink = styled(Link)({
+  width: "fit-content",
+});
+
 export {
-  MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
+  MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
 };
 
