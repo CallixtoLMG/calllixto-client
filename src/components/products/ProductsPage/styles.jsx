@@ -9,6 +9,10 @@ const MainContainer = styled(Flex)`
   max-width: 120vh!important;
 `;
 
+const SubContainer = styled(Flex)`
+  flex-direction: row;
+`;
+
 const ModTableCell = styled(Table.Cell)({
   cursor: "pointer!important"
 });
@@ -36,6 +40,6 @@ const ModTableRow = styled(Table.Row)`
 `;
 
 export {
-  MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
+  MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer
 };
 

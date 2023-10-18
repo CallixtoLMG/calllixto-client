@@ -6,8 +6,9 @@ import { PAGES } from "@/constants";
 import { modPrice } from "@/utils";
 import { useRouter } from 'next/navigation';
 import { Button, Table } from 'semantic-ui-react';
+import ImportExcel from "../ImportProduct";
 import { HEADERS } from "../products.common";
-import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
 
 const ProductsPage = ({ products = [] }) => {
   const router = useRouter();
@@ -15,9 +16,12 @@ const ProductsPage = ({ products = [] }) => {
 
   return (
     <MainContainer>
-      <ModLink href={PAGES.PRODUCTS.CREATE}>
-        <Button color='green' content='Crear producto' icon='add' labelPosition='right' />
-      </ModLink>
+      <SubContainer>
+        <ModLink href={PAGES.PRODUCTS.CREATE}>
+          <Button color='green' content='Crear producto' icon='add' labelPosition='right' />
+        </ModLink>
+        <ImportExcel />
+      </SubContainer>
       <ModTable celled compact>
         <Table.Header fullWidth>
           <ModTableRow>
