@@ -1,16 +1,14 @@
 "use client";
-import PDFfile from '@/components/PDFfile';
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import Link from 'next/link';
 import { Button, Grid, Label, Table } from 'semantic-ui-react';
-import { modDate, totalSum } from '../../../utils';
+import { modDate, modPrice, totalSum } from '../../../utils';
 import { PRODUCTSHEADERS } from "../budgets.common";
 import { MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const ShowBudget = ({ budget }) => {
   return (
     <MainContainer>
-      <Grid divided>
+      <Grid >
         <Grid.Row stretched>
           <Grid.Column >
             <ModLabel>Cliente</ModLabel>
@@ -36,7 +34,7 @@ const ShowBudget = ({ budget }) => {
                       .map((header) => <Table.Cell
                         key={header.id}
                         textAlign='center'>
-                        {product[header.value]}
+                        {header.value === "price" ? modPrice(product[header.value]) : product[header.value]}
                       </Table.Cell>)
                     }
                   </ModTableRow>
@@ -47,18 +45,15 @@ const ShowBudget = ({ budget }) => {
                   <Table.HeaderCell />
                   <Table.HeaderCell textAlign="center" colSpan='1'><strong>Suma Total</strong></Table.HeaderCell>
                   <Table.HeaderCell colSpan='3' />
-                  <Table.HeaderCell textAlign="center" colSpan='1'><strong>{totalSum(budget.products)}</strong></Table.HeaderCell>
+                  <Table.HeaderCell textAlign="center" colSpan='1'><strong>{modPrice(totalSum(budget.products))}</strong></Table.HeaderCell>
                 </Table.Row>
               </Table.Footer>
             </ModTable>
           </Grid.Column>
         </Grid.Row>
         <Link href={`${budget.id}/verPdf`}>
-          <Button> Ver PDF</Button>
+          <Button color='blue'>Ver PDF</Button>
         </Link>
-        <PDFDownloadLink document={<PDFfile budget={budget} />} fileName={`Presupuesto ${budget.customerId}.pdf`} >
-          {({ blob, url, loading, error }) => (loading ? <Button>Cargando presupuesto</Button> : <Button>Descargar presupuesto</Button>)}
-        </PDFDownloadLink>
       </Grid>
     </MainContainer>
   )

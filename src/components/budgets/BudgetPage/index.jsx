@@ -2,7 +2,7 @@
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { Button, Table } from 'semantic-ui-react';
-import { modDate, totalSum } from "../../../utils";
+import { modDate, modPrice, totalSum } from "../../../utils";
 import { HEADERS } from "../budgets.common";
 import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
@@ -38,7 +38,7 @@ const BudgetsPage = ({ budgets }) => {
                       {header.value === "createdAt" ? modDate(budget[header.value]) : budget[header.value]}
                     </ModTableCell>)
                 }
-                <Table.Cell textAlign='center'>{totalSum(budget.products)}</Table.Cell>
+                <Table.Cell onClick={() => { router.push(PAGES.BUDGETS.SHOW(budget.id)) }} textAlign='center'>{modPrice(totalSum(budget.products))}</Table.Cell>
                 <Table.Cell textAlign='center'><Button color="green" size="tiny">Copiar</Button> </Table.Cell>
               </ModTableRow>
             </Table.Body>

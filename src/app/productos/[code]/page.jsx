@@ -10,7 +10,7 @@ async function Product({ params }) {
   const product = await showProduct(params.code);
 
   return (
-    <ShowProduct product={product} />
+    <ShowProduct product={product.product} />
   )
 };
 

@@ -38,16 +38,12 @@ const ImportExcel = () => {
       const data = e.target.result;
       const workbook = XLSX.read(data, { type: "binary" });
       const sheetName = workbook.SheetNames[0];
-      console.log(sheetName)
       const sheet = workbook.Sheets[sheetName];
-      console.log(sheet)
       const parsedData = XLSX.utils.sheet_to_json(sheet);
-      console.log(parsedData)
       parsedData.length && parsedData.forEach((product) => {
         product.code = product.code.toString();
         product.name = product.name.toString();
         product.price = Number(product.price);
-        console.log(product)
         create(product)
       })
       // promiseall

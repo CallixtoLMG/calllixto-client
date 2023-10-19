@@ -18,12 +18,12 @@ const ModTableRow = styled(Table.Row)`
 `;
 
 const ModLabel = styled(Label)({
-  maxWidth: "50vh!important",
+  // maxWidth: "50vh!important",
   margin: "0!important"
 });
 
 const ModSegment = styled(Segment)({
-  maxWidth: "50vh!important",
+  // maxWidth: "50vh!important",
   height: "50px!important",
 });
 
