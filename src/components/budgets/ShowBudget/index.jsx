@@ -1,25 +1,32 @@
 "use client";
-import Link from 'next/link';
-import { Button, Grid, Label, Table } from 'semantic-ui-react';
+import ButtonGoto from "@/components/buttons/GoTo";
+import ButtonSend from "@/components/buttons/Send";
+import { PAGES } from "@/constants";
+import { Grid, Label, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from '../../../utils';
 import { PRODUCTSHEADERS } from "../budgets.common";
-import { MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow } from "./styles";
-
+import { DataContainer, MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
 const ShowBudget = ({ budget }) => {
   return (
     <MainContainer>
+      <SubContainer>
+        <DataContainer>
+          <ModLabel>Cliente</ModLabel>
+          <ModSegment>{budget.customerId}</ModSegment>
+        </DataContainer>
+        <DataContainer>
+          <ModLabel> Fecha </ModLabel>
+          <ModSegment>{modDate(budget.createdAt)}</ModSegment>
+        </DataContainer>
+      </SubContainer>
       <Grid >
         <Grid.Row stretched>
-          <Grid.Column >
-            <ModLabel>Cliente</ModLabel>
-            <ModSegment>{budget.customerId}</ModSegment>
-            <ModLabel> Fecha </ModLabel>
-            <ModSegment>{modDate(budget.createdAt)}</ModSegment>
+          <Grid.Column textAlign='center' >
             <Label> Productos </Label>
-            <ModTable celled compact>
+            <ModTable celled={true} compact>
               <Table.Header fullWidth>
                 <ModTableRow>
-                  <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
+                  <ModTableHeaderCell ></ModTableHeaderCell>
                   {PRODUCTSHEADERS.map((header) => (
                     <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
                   ))}
@@ -51,9 +58,8 @@ const ShowBudget = ({ budget }) => {
             </ModTable>
           </Grid.Column>
         </Grid.Row>
-        <Link href={`${budget.id}/verPdf`}>
-          <Button color='blue'>Ver PDF</Button>
-        </Link>
+        <ButtonGoto goTo={PAGES.BUDGETS.SHOWPDF(budget.id)} iconName="eye" text="Ver PDF" color="blue" />
+        <ButtonSend />
       </Grid>
     </MainContainer>
   )

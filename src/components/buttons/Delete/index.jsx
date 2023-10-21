@@ -20,7 +20,7 @@ const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
     <Modal
       closeIcon
       open={open}
-      trigger={<Button color='red' size='tiny'>Eliminar</Button>}
+      trigger={<Button color='red' content='Eliminar' size='tiny' />}
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
     >

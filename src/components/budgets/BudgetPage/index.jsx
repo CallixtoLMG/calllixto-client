@@ -1,20 +1,19 @@
 "use client";
+import ButtonGoTo from "@/components/buttons/GoTo";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { Button, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from "../../../utils";
 import { HEADERS } from "../budgets.common";
-import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const BudgetsPage = ({ budgets }) => {
   const router = useRouter();
   return (
     <>
       <MainContainer>
-        <ModLink href={PAGES.BUDGETS.CREATE}>
-          <Button color='green' content='Crear presupuesto' icon='add' labelPosition='right' />
-        </ModLink>
-        <ModTable celled compact >
+        <ButtonGoTo color="green" text="Crear presupuesto" iconName="add" goTo={PAGES.BUDGETS.CREATE} />
+        <ModTable celled={true} compact >
           <Table.Header fullWidth>
             <ModTableRow>
               <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>

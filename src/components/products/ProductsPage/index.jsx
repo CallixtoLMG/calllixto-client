@@ -1,14 +1,15 @@
 "use client";
 import { deleteProduct } from "@/app/productos/page";
-import ButtonDelete from "@/components/ButtonDelete";
-import ButtonEdit from "@/components/ButtonEdit";
+import ButtonDelete from "@/components/buttons/Delete";
+import ButtonEdit from "@/components/buttons/Edit";
+import ButtonGoTo from "@/components/buttons/GoTo";
 import { PAGES } from "@/constants";
 import { modPrice } from "@/utils";
 import { useRouter } from 'next/navigation';
-import { Button, Table } from 'semantic-ui-react';
+import { Table } from 'semantic-ui-react';
 import ImportExcel from "../ImportProduct";
 import { HEADERS } from "../products.common";
-import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
+import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
 
 const ProductsPage = ({ products = [] }) => {
   const router = useRouter();
@@ -17,12 +18,10 @@ const ProductsPage = ({ products = [] }) => {
   return (
     <MainContainer>
       <SubContainer>
-        <ModLink href={PAGES.PRODUCTS.CREATE}>
-          <Button color='green' content='Crear producto' icon='add' labelPosition='right' />
-        </ModLink>
+        <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
         <ImportExcel />
       </SubContainer>
-      <ModTable celled compact>
+      <ModTable celled={true} compact>
         <Table.Header fullWidth>
           <ModTableRow>
             <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>

@@ -7,6 +7,16 @@ const MainContainer = styled(Flex)`
   flex-direction: column;
 `;
 
+const SubContainer = styled(Flex)`
+  flex-direction: row;
+`;
+
+const DataContainer = styled(Flex)`
+  flex-direction: column;
+  margin: 0 10px 10px 0!important;
+  width: 200px!important;
+`;
+
 const ModTable = styled(Table)`
   tbody:nth-child(odd) {
     background-color: #f2f2f2!important;
@@ -18,12 +28,11 @@ const ModTableRow = styled(Table.Row)`
 `;
 
 const ModLabel = styled(Label)({
-  // maxWidth: "50vh!important",
   margin: "0!important"
 });
 
 const ModSegment = styled(Segment)({
-  // maxWidth: "50vh!important",
+  marginTop: "5px!important",
   height: "50px!important",
 });
 
@@ -31,7 +40,5 @@ const ModTableHeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important"
 });
 
-export {
-  MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow
-};
+export { DataContainer, MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow, SubContainer };
 

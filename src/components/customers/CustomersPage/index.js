@@ -1,12 +1,13 @@
 "use client";
 import { deleteCustomer } from "@/app/clientes/page";
-import ButtonDelete from "@/components/ButtonDelete";
-import ButtonEdit from "@/components/ButtonEdit";
+import ButtonDelete from "@/components/buttons/Delete";
+import ButtonEdit from "@/components/buttons/Edit";
+import ButtonGoTo from "@/components/buttons/GoTo";
 import { PAGES } from "@/constants";
 import { useRouter } from 'next/navigation';
-import { Button, Table } from 'semantic-ui-react';
+import { Table } from 'semantic-ui-react';
 import { HEADERS } from "../clients.common";
-import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, } from "./styles";
+import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const CustomersPage = ({ customers = [] }) => {
   const router = useRouter();
@@ -14,10 +15,8 @@ const CustomersPage = ({ customers = [] }) => {
 
   return (
     <MainContainer>
-      <ModLink href={PAGES.CUSTOMERS.CREATE}>
-        <Button color='green' content='Crear cliente' icon='add' labelPosition='right' />
-      </ModLink>
-      <ModTable celled compact>
+      <ButtonGoTo color="green" text="Crear cliente" iconName="add" goTo={PAGES.CUSTOMERS.CREATE} />
+      <ModTable celled={true} compact>
         <Table.Header fullWidth>
           <ModTableRow>
             <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
