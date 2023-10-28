@@ -2,7 +2,7 @@ import { SHOWPRODUCTSHEADERS } from "@/components/budgets/budgets.common";
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Button, Dropdown, Form, Icon, Table } from 'semantic-ui-react';
-import { ModButtonBudget, ModButtonProduct, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
+import { ModButton, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
 
 const productsList = [
   { code: 1, name: "Madera", price: 150, key: 1, value: "Madera", text: "Madera" },
@@ -57,14 +57,13 @@ const BudgetForm = ({ onSubmit }) => {
           setValue(name, value);
         }}
       />
-      <ModButtonProduct
-        icon
-        labelPosition='right'
+      <ModButton
         color="green"
         type="button"
         onClick={addProduct}
       >
-        <Icon name="add" />Agregar producto</ModButtonProduct>
+        <Icon name="add" />Agregar producto</ModButton>
+
       <Table celled={true}>
         <Table.Header>
           <ModTableRow>
@@ -195,14 +194,12 @@ const BudgetForm = ({ onSubmit }) => {
           </Table.Row>
         </Table.Footer>
       </Table>
-      <ModButtonBudget
+      <ModButton
         floated="right"
         type="submit"
-        icon
-        labelPosition='right'
         color="green"
       >
-        <Icon name="add" /> Crear presupuesto </ModButtonBudget>
+        <Icon name="add" />Crear presupuesto</ModButton>
     </Form>
   );
 };

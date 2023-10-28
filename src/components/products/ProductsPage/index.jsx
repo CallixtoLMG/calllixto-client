@@ -19,7 +19,7 @@ const ProductsPage = ({ products = [] }) => {
     <MainContainer>
       <SubContainer>
         <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
-        <ImportExcel />
+        <ImportExcel products={products} />
       </SubContainer>
       <ModTable celled={true} compact>
         <Table.Header fullWidth>

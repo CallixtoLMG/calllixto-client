@@ -1,11 +1,17 @@
 import { Button, Icon, Popup } from "semantic-ui-react";
-import { ButtonContainer, ModalContainer } from "./styles";
+import { ButtonContainer, ModButton, ModalContainer } from "./styles";
 
-const ButtonEdit = ({ page, element }) => {
+const ButtonEdit = () => {
   return (
     <Popup
       position='right center'
-      trigger={<ButtonContainer><Button fluid color="blue" ><Icon name='send' />Enviar</Button></ButtonContainer>}
+      trigger={
+        <ButtonContainer>
+          <ModButton fluid color="blue" >
+            <Icon name='send' />
+            Enviar
+          </ModButton>
+        </ButtonContainer>}
       content={
         <ModalContainer>
           <Button color='green' size="tiny" ><Icon name='whatsapp' />WhatsApp</Button>

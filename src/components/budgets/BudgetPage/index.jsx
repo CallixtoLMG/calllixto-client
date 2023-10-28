@@ -2,10 +2,10 @@
 import ButtonGoTo from "@/components/buttons/GoTo";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { Button, Table } from 'semantic-ui-react';
+import { Button, Popup, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from "../../../utils";
 import { HEADERS } from "../budgets.common";
-import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { MainContainer, ModIcon, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const BudgetsPage = ({ budgets }) => {
   const router = useRouter();
@@ -38,7 +38,8 @@ const BudgetsPage = ({ budgets }) => {
                     </ModTableCell>)
                 }
                 <Table.Cell onClick={() => { router.push(PAGES.BUDGETS.SHOW(budget.id)) }} textAlign='center'>{modPrice(totalSum(budget.products))}</Table.Cell>
-                <Table.Cell textAlign='center'><Button color="green" size="tiny">Copiar</Button> </Table.Cell>
+                <Table.Cell textAlign='center'><Popup content="Copiar" size="mini" trigger={<Button color="green" size='tiny' ><ModIcon name="copy" /></Button>} /> </Table.Cell>
+
               </ModTableRow>
             </Table.Body>
           ))}

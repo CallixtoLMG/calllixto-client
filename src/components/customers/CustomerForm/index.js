@@ -1,7 +1,7 @@
 "use client"
 import { Controller, useForm } from "react-hook-form";
-import { Button, Form, Icon } from 'semantic-ui-react';
-import { MainContainer, ModFormField, ModInput, ModLabel } from "./styles";
+import { Form, Icon } from 'semantic-ui-react';
+import { MainContainer, ModButton, ModFormField, ModInput, ModLabel } from "./styles";
 
 const CustomerForm = ({ customer, onSubmit }) => {
   const { handleSubmit, control } = useForm();
@@ -38,14 +38,12 @@ const CustomerForm = ({ customer, onSubmit }) => {
         </ModFormField>
         <ModFormField>
         </ModFormField>
-        <Button
+        <ModButton
           type="submit"
-          icon
-          labelPosition='right'
           color="green"
         >
           <Icon name="add" /> {customer?.id ? "Actualizar cliente" : "Crear cliente"}
-        </Button>
+        </ModButton>
       </Form>
     </MainContainer>
   )

@@ -1,11 +1,16 @@
 import { Flex } from "rebass";
-import { Form, Input, Label } from "semantic-ui-react";
+import { Button, Form, Input, Label } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
   margin: 75px 30px 30px 30px!important;
   flex-direction: column;
 `;
+
+const ModButton = styled(Button)({
+  width: "170px!important",
+  padding: "10px 0!important",
+});
 
 const ModLabel = styled(Label)({
   maxWidth: "50vh!important",
@@ -34,5 +39,5 @@ const WarningMessage = styled.p`
   color: red;
 `;
 
-export { MainContainer, ModFormField, ModInput, ModLabel, WarningMessage };
+export { MainContainer, ModButton, ModFormField, ModInput, ModLabel, WarningMessage };
 

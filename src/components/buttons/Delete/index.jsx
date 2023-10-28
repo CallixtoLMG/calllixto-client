@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from 'react';
 import { Button, Header, Icon, Modal } from 'semantic-ui-react';
-import { ModInput } from "./styles";
+import { ModIcon, ModInput } from "./styles";
 
 const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
   const router = useRouter();
@@ -20,9 +20,9 @@ const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
     <Modal
       closeIcon
       open={open}
-      trigger={<Button color='red' content='Eliminar' size='tiny' />}
       onClose={() => setOpen(false)}
       onOpen={() => setOpen(true)}
+      trigger={(<Button color='red' size='tiny' content={<ModIcon name="trash" />} />)}
     >
       <Header icon='archive' content={deleteQuestion || ""} />
       <Modal.Actions>
@@ -32,7 +32,7 @@ const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
           value={confirmationText}
           onChange={handleConfirmationTextChange} />
         <Button color='red' onClick={() => setOpen(false)}>
-          <Icon name='remove' />No
+          <Icon name='trash' />No
         </Button>
         <Button disabled={!isDeleteEnabled} color='green' onClick={() => {
           setOpen(false);

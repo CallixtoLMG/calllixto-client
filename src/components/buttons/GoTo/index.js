@@ -1,12 +1,11 @@
-import Link from "next/link";
 import { Icon } from "semantic-ui-react";
-import { ModButton } from "./styles";
+import { ModButton, ModLink } from "./styles";
 
 const ButtonGoTo = ({ goTo, iconName, text, color }) => {
   return (
-    <Link href={goTo}>
+    <ModLink href={goTo}>
       <ModButton color={color}> <Icon name={iconName} />{text}</ModButton>
-    </Link>
+    </ModLink>
   )
 };
 

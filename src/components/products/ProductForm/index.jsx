@@ -1,8 +1,8 @@
 "use client"
 import { get } from "lodash";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Form, Icon } from 'semantic-ui-react';
-import { MainContainer, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
+import { Form, Icon } from 'semantic-ui-react';
+import { MainContainer, ModButton, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
 
 const ProductForm = ({ product, onSubmit }) => {
   const { handleSubmit, control } = useForm();
@@ -20,6 +20,7 @@ const ProductForm = ({ product, onSubmit }) => {
       <Form onSubmit={handleSubmit(onSubmit)}>
         {!product?.code &&
           <ModFormField>
+            <>
             <ModLabel>Código</ModLabel>
             <Controller
               name="code"
@@ -35,6 +36,7 @@ const ProductForm = ({ product, onSubmit }) => {
                 </>
               )}
             />
+            </>
           </ModFormField>}
         <ModFormField>
           <ModLabel>Nombre</ModLabel>
@@ -64,14 +66,12 @@ const ProductForm = ({ product, onSubmit }) => {
         </ModFormField>
         <ModFormField>
         </ModFormField>
-        <Button
+        <ModButton
           type="submit"
-          icon
-          labelPosition='right'
           color="green"
         >
           <Icon name="add" /> {product?.code ? "Actualizar producto" : "Crear producto"}
-        </Button>
+        </ModButton>
       </Form>
     </MainContainer>
   )

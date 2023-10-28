@@ -1,9 +1,15 @@
+import Link from "next/link";
 import { Button } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ModButton = styled(Button)`
-  width: 180px!important;
+  width: 170px!important;
+  padding: 10px 0!important;
 `;
 
-export { ModButton };
+const ModLink = styled(Link)`
+  padding-right: 0!important;
+`;
+
+export { ModButton, ModLink };
 

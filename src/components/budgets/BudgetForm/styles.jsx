@@ -7,13 +7,9 @@ const ModInput = styled(Input)`
   }
 `;
 
-const ModButtonProduct = styled(Button)({
-  marginTop: "14px!important",
-  width: "15rem!important"
-});
-
-const ModButtonBudget = styled(Button)({
-  width: "15rem!important"
+const ModButton = styled(Button)({
+  width: "170px!important",
+  padding: "10px 0!important",
 });
 
 const TotalText = styled.h3`
@@ -23,6 +19,7 @@ const TotalText = styled.h3`
 const ModDropdown = styled(Dropdown)({
   width: "20rem!important",
   display: "flex!important",
+  marginBottom: "14px!important",
 });
 
 const ModTableRow = styled(Table.Row)`
@@ -35,5 +32,5 @@ const ModTableRow = styled(Table.Row)`
   th:not(:first-child) { width: 12rem!important; };
 `;
 
-export { ModButtonBudget, ModButtonProduct, ModDropdown, ModInput, ModTableRow, TotalText };
+export { ModButton, ModDropdown, ModInput, ModTableRow, TotalText };
 
