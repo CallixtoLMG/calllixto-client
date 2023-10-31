@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const ModInput = styled(Input)`
   input {
     text-align: center!important;
-  }
+  };
 `;
 
 const ModButton = styled(Button)({
@@ -23,12 +23,9 @@ const ModDropdown = styled(Dropdown)({
 });
 
 const ModTableRow = styled(Table.Row)`
-  th{ min-width: 8rem!important; }
-
+  th{ min-width: 8rem!important; };
   th:first-child { min-width: 20rem!important; };
-
-  th:nth-child(6) { min-width: 10rem!important; }
-
+  th:nth-child(6) { min-width: 10rem!important; };
   th:not(:first-child) { width: 12rem!important; };
 `;
 

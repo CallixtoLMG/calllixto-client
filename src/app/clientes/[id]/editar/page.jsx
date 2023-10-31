@@ -21,7 +21,7 @@ function EditCustomer({ params }) {
       setCustomer(data);
     };
     customerData();
-  }, []);
+  }, [params.id]);
 
   function editCustomer(customer) {
     var requestOptions = {

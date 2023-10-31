@@ -1,14 +1,12 @@
-import { PAGES } from "@/constants";
 import { modPrice } from "@/utils";
-import { get } from "lodash";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Button, Form, Icon, Input, Modal, Table } from "semantic-ui-react";
+import { Button, Form, Icon, Input, Modal, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { HEADERS } from "../products.common";
-import { ContainerModal, MainContainer, ModLabel, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, ModalModLabel, SubContainer, WarningMessage } from "./styles";
+import { ContainerModal, MainContainer, ModInput, ModLabel, ModTable, ModTableHeaderCell, ModTableRow, ModalModLabel, SubContainer, WarningMessage } from "./styles";
 
 const ImportExcel = ({ products }) => {
   const [open, setOpen] = useState(false);
@@ -36,7 +34,7 @@ const ImportExcel = ({ products }) => {
         }
       })
       .catch(error => console.log('error', error));
-    router.push(PAGES.PRODUCTS.BASE)
+    router.refresh()
   };
 
   const [newProducts, setNewProducts] = useState([]);
@@ -58,7 +56,7 @@ const ImportExcel = ({ products }) => {
       const parsedData = XLSX.utils.sheet_to_json(sheet);
       const productosRepetidos = [];
       const productosNuevo = [];
-      const codigosExistente = {};
+      const codigosExistente = {}; // los datos de todos los Code?
       products.forEach((producto) => {
         codigosExistente[producto.code] = true;
       });
@@ -73,34 +71,29 @@ const ImportExcel = ({ products }) => {
       setEditProducts(productosRepetidos)
       setNewProducts(productosNuevo)
       setOpen(true)
-      // const accepts = () => {
-      //   parsedData.length && parsedData.forEach((product) => {
-      //     product.code = product.code.toString();
-      //     product.name = product.name.toString();
-      //     product.price = Number(product.price);
-      //     create(product)
-
-      //   })
-      // }
       // promiseall
     };
   }
   const { handleSubmit, control } = useForm();
 
-  const validateCode = (value) => {
-    return /^[A-Za-z0-9]{4}$/.test(value);
+  const validationRules = {
+    code: {
+      validate: (value) => /^[A-Za-z0-9]{4}$/.test(value),
+      message: 'El código debe tener 4 caracteres alfanuméricos.',
+    },
+    price: {
+      validate: (value) => /^\$\s?\d{1,3}(\.\d{3})*(,\d+)?$/.test(value),
+      message: 'Error de formato. Ejemplo: $ 1.200,54',
+    },
   };
 
-  const validatePrice = (value) => {
-    return /^[0-9]+$/.test(value);
-  };
-
-  const handleAccept = () => {
+  const handleAcceptCreate = () => {
     newProducts.length && newProducts.forEach((product) => {
       product.code = product.code.toString();
       product.name = product.name.toString();
-      product.price = Number(product.price);
+      product.price = parseFloat(product.price)
       create(product)
+      setOpen(false)
     })
   };
 
@@ -120,110 +113,107 @@ const ImportExcel = ({ products }) => {
         />
       </ModLabel>
       <MainContainer  >
-        <Modal
-          closeIcon
-          open={open}
-          onClose={() => setOpen(false)}
-          onOpen={() => setOpen(true)}
-        >
-          <ContainerModal>
-            <Form onSubmit={handleSubmit(create)}>
-              <ModalModLabel >{`Archivo seleccionado: ${selectedFile}`}</ModalModLabel>
-              <ModalModLabel >Nuevos productos</ModalModLabel>
-              <ModTable celled={true} compact>
-                <Table.Header fullWidth>
-                  <ModTableRow>
-                    <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
-                    {HEADERS
-                      .filter(header => !header.hide)
-                      .map((header) => (
-                        <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
-                      ))}
-                  </ModTableRow>
-                </Table.Header>
-                {newProducts.map ? newProducts.map((newProduct, index) => (
-                  <Table.Body key={newProduct.code}>
-                    <ModTableRow >
-                      <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+        <Transition animation="fade" duration={500} visible={open} >
+          <Modal
+            closeIcon
+            open={open}
+            onClose={() => setOpen(false)}
+            onOpen={() => setOpen(true)}
+          >
+            <ContainerModal>
+              {/* si pongo esta funcion, crea los que cargo, si pongo la otra, me toma lo escrito, pero crea un objeto y necesitaria el batch? */}
+              <Form onSubmit={handleSubmit(handleAcceptCreate)}>
+                <ModalModLabel >{`Archivo seleccionado: ${selectedFile}`}</ModalModLabel>
+                <ModalModLabel >Nuevos productos</ModalModLabel>
+                <ModTable celled={true} compact>
+                  <Table.Header fullWidth>
+                    <ModTableRow>
+                      <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
                       {HEADERS
                         .filter(header => !header.hide)
-                        .map((header) =>
-                          <Controller
-                            name={header.value}
-                            control={control}
-                            defaultValue={get(newProduct, header.value, "")}
-                            // rules={{ validate: validateCode }}
-                            render={({ field, fieldState }) => (
-                              <>
-                                <ModTableCell
+                        .map((header) => (
+                          <ModTableHeaderCell key={header.id}>{header.name}</ModTableHeaderCell>
+                        ))}
+                    </ModTableRow>
+                  </Table.Header>
+                  {newProducts.map && newProducts.map((newProduct, index) => (
+                    <Table.Body key={newProduct.code}>
+                      <ModTableRow >
+                        <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                        {HEADERS
+                          .filter(header => !header.hide)
+                          .map((header) =>
+                            <Controller
+                              key={header.id}
+                              name={`newProducts[${index}].${header.value}`}
+                              control={control}
+                              defaultValue={header.value === "price" ? modPrice(newProduct[header.value]) : newProduct[header.value]}
+                              // defaultValue={get(newProduct, header.value === "price" && modPrice(header.value), header.value)}
+                              rules={validationRules[header.value]}
+                              render={({ field, fieldState }) => (
+                                <Table.Cell
                                   key={header.id}
                                   textAlign='center'>
-                                  <Input {...field} />
-                                  <p>{[header.value]} </p>
-                                </ModTableCell>
-                                {fieldState?.invalid && (
-                                  <WarningMessage >El código debe tener 4 caracteres alfanuméricos.</WarningMessage>
-                                )}
-                              </>
-                            )}
-                          />
-                          //    <Controller
-                          //   name={header.value}
-                          //   control={control}
-                          //   defaultValue={header.value === "price" ? modPrice(newProduct[header.value]) : newProduct[header.value]}
-                          //   rules={{ validate: validateCode }}
-                          //   render={({ field, fieldState }) => (
-                          //     <>
-                          //       <Input {...field} />
-                          //       {fieldState?.invalid && (
-                          //         <WarningMessage >El código debe tener 4 caracteres alfanuméricos.</WarningMessage>
-                          //       )}
-                          //     </>
-                          //   )}
-                          //  /> 
-                          //    {header.value === "price" ? modPrice(product[header.value]) : product[header.value]} 
-                        )
-                      }
-                    </ModTableRow>
-                  </Table.Body>
-                )) : ""}
-              </ModTable>
-
-              <ModalModLabel  >Productos a modificar</ModalModLabel>
-              <ModTable celled={true} compact>
-                <Table.Header fullWidth>
-                  <ModTableRow>
-                    <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
-                    {HEADERS
-                      .filter(header => !header.hide)
-                      .map((header) => (
-                        <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
-                      ))}
-                  </ModTableRow>
-                </Table.Header>
-                {editProducts.map ? editProducts.map((product, index) => (
-                  <Table.Body key={product.code}>
-                    <ModTableRow >
-                      <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                                  {header.value === "code" ? <ModInput readonly {...field} /> : <ModInput {...field} />}
+                                  {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
+                                </Table.Cell>
+                              )}
+                            />
+                          )
+                        }
+                      </ModTableRow>
+                    </Table.Body>
+                  ))}
+                </ModTable>
+                <ModalModLabel >Productos a modificar</ModalModLabel>
+                <ModTable celled={true} compact>
+                  <Table.Header fullWidth>
+                    <ModTableRow>
+                      <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
                       {HEADERS
                         .filter(header => !header.hide)
-                        .map((header) => <ModTableCell
-                          key={header.id}
-                          textAlign='center'>
-                          {header.value === "price" ? modPrice(product[header.value]) : product[header.value]}
-                        </ModTableCell>)
-                      }
+                        .map((header) => (
+                          <ModTableHeaderCell key={header.id}>{header.name}</ModTableHeaderCell>
+                        ))}
                     </ModTableRow>
-                  </Table.Body>
-                )) : ""}
-              </ModTable>
-              <SubContainer>
-                <Button type="submit" color="green" content="Aceptar" />
-                <Button onClick={() => (setOpen(false), setNewProducts([]), setEditProducts([]))} color="red" content="Cancelar" />
-              </SubContainer>
-            </Form>
-          </ContainerModal>
-        </Modal>
+                  </Table.Header>
+                  {editProducts.map && editProducts.map((newProduct, index) => (
+                    <Table.Body key={editProducts.code}>
+                      <ModTableRow >
+                        <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                        {HEADERS
+                          .filter(header => !header.hide)
+                          .map((header) =>
+                            <Controller
+                              key={header.id}
+                              name={`editProducts[${index}].${header.value}`}
+                              control={control}
+                              defaultValue={header.value === "price" ? modPrice(editProducts[header.value]) : editProducts[header.value]}
+                              // defaultValue={get(newProduct, header.value === "price" && modPrice(header.value), header.value)}
+                              rules={validationRules[header.value]}
+                              render={({ field, fieldState }) => (
+                                <Table.Cell
+                                  key={header.id}
+                                  textAlign='center'>
+                                  {header.value === "code" ? <ModInput readonly {...field} /> : <ModInput {...field} />}
+                                  {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
+                                </Table.Cell>
+                              )}
+                            />
+                          )
+                        }
+                      </ModTableRow>
+                    </Table.Body>
+                  ))}
+                </ModTable>
+                <SubContainer>
+                  <Button type="submit" color="green" content="Aceptar" />
+                  <Button onClick={() => setOpen(false)} color="red" content="Cancelar" />
+                </SubContainer>
+              </Form>
+            </ContainerModal>
+          </Modal>
+        </Transition>
       </MainContainer>
 
     </>

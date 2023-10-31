@@ -21,7 +21,7 @@ const ModTableRow = styled(Table.Row)`
   th:not(:first-child) { min-width: 200px!important; }
   th:nth-child(3){ min-width: 150px!important; }
   th:first-child { width: 50px!important };
-  th:last-child { width: 250px!important; };
+  th:last-child { width: 200px!important; };
 `;
 
 const ModTable = styled(Table)`

@@ -14,30 +14,18 @@ const ContainerModal = styled(Flex)`
   padding: 10px!important;
 `;
 
-const ModInput = styled(Input)`
-  // opacity: 0!important;
-  // width: 0!important;
-  // height: 0!important;
-  align-self: center!important;
-  max-height: 36px!important;
-    > input  {
-    padding: 6px!important;
-    }
-`;
-
 const SubContainer = styled(Flex)`
   flex-direction: row;
   justify-content: center;
   margin-top: 14px!important;
 `;
 
-const ModTableCell = styled(Table.Cell)({
-});
-
-const ModTableHeaderCell = styled(Table.HeaderCell)({
-  background: "#EEEEEE!important"
-});
-
+const ModTableHeaderCell = styled(Table.HeaderCell)`
+  background: #EEEEEE!important;
+  text-align: center!important;
+  tr:nth-child(2){ width: 50px!important;}
+`;
+  
 const ModLink = styled(Link)({
   width: "fit-content",
 });
@@ -65,19 +53,29 @@ const ModLabel = styled(Label)`
   }
 `;
 
+const ModInput = styled(Input)`
+  input {
+    border: none!important;
+    background-color: inherit!important;
+    padding: 0!important;
+    text-align: center!important;
+  }
+`;
+
 const WarningMessage = styled.p`
   margin-left: 5px!important;
   color: red;
+  font-size: 10px!important;
 `;
 
 const ModTableRow = styled(Table.Row)`
   th:not(:first-child) {min-width: 150px!important}
   th:first-child { width: 50px!important };
-  th:nth-child(2){min-width: 100px!important;}
+  th:nth-child(2){width: 100px!important;}
   th:nth-child(3){min-width: 250px!important;}
   th:last-child { width: 250px!important; };
 `;
 
-export { ContainerModal, MainContainer, ModButton, ModInput, ModLabel, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, ModalModLabel, SubContainer, WarningMessage };
+export { ContainerModal, MainContainer, ModButton, ModInput, ModLabel, ModLink, ModTable, ModTableHeaderCell, ModTableRow, ModalModLabel, SubContainer, WarningMessage };
 
 
