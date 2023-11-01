@@ -1,7 +1,7 @@
 import { Button, Icon, Popup } from "semantic-ui-react";
 import { ButtonContainer, ModButton, ModalContainer } from "./styles";
 
-const ButtonEdit = () => {
+const ButtonSend = () => {
   return (
     <Popup
       position='right center'
@@ -23,4 +23,4 @@ const ButtonEdit = () => {
   )
 };
 
-export default ButtonEdit;
+export default ButtonSend;

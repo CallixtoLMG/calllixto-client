@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Flex } from "rebass";
-import { Button, Input, Label, Table } from "semantic-ui-react";
+import { Button, Container, Input, Label, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
@@ -25,7 +25,7 @@ const ModTableHeaderCell = styled(Table.HeaderCell)`
   text-align: center!important;
   tr:nth-child(2){ width: 50px!important;}
 `;
-  
+
 const ModLink = styled(Link)({
   width: "fit-content",
 });
@@ -53,6 +53,11 @@ const ModLabel = styled(Label)`
   }
 `;
 
+const ModalHeaderContainer = styled(Container)`
+  margin: 0 0 14px 0 !important;
+  margin-left: 0!important;
+`;
+
 const ModInput = styled(Input)`
   input {
     border: none!important;
@@ -76,6 +81,6 @@ const ModTableRow = styled(Table.Row)`
   th:last-child { width: 250px!important; };
 `;
 
-export { ContainerModal, MainContainer, ModButton, ModInput, ModLabel, ModLink, ModTable, ModTableHeaderCell, ModTableRow, ModalModLabel, SubContainer, WarningMessage };
+export { ContainerModal, MainContainer, ModButton, ModInput, ModLabel, ModLink, ModTable, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage };
 
 
