@@ -25,7 +25,7 @@ const ImportExcel = ({ products }) => {
     console.log(requestOptions.body)
 
     // fetch("https://7dcb0rpwbd.execute-api.sa-east-1.amazonaws.com/ba18aa5a-5dc1-4f55-9d37-3f6d74016b05/products", requestOptions)
-    fetch(" https://7dcb0rpwbd.execute-api.sa-east-1.amazonaws.com/ba18aa5a-5dc1-4f55-9d37-3f6d74016b05/products/batch", requestOptions)
+    fetch(" https://t1k6ta4mzg.execute-api.sa-east-1.amazonaws.com/fe1af28f-b478-4d9e-b434-f4cf6e4355cc/products/batch", requestOptions)
 
       .then(async response => {
         let res = await response.text()

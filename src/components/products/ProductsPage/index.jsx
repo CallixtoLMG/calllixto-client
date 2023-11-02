@@ -21,7 +21,7 @@ const ProductsPage = ({ products = [] }) => {
         <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
         <ImportExcel products={products} />
       </SubContainer>
-      <ModTable celled={true} compact>
+      {!!products.length && <ModTable celled={true} compact>
         <Table.Header fullWidth>
           <ModTableRow>
             <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
@@ -50,7 +50,7 @@ const ProductsPage = ({ products = [] }) => {
             </ModTableRow>
           </Table.Body>
         )) : ""}
-      </ModTable>
+      </ModTable>}
     </MainContainer>
   )
 };

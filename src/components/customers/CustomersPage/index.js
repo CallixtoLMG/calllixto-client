@@ -16,36 +16,38 @@ const CustomersPage = ({ customers = [] }) => {
   return (
     <MainContainer>
       <ButtonGoTo color="green" text="Crear cliente" iconName="add" goTo={PAGES.CUSTOMERS.CREATE} />
-      <ModTable celled={true} compact>
-        <Table.Header fullWidth>
-          <ModTableRow>
-            <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
-            {HEADERS.map((header) => (
-              <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
-            ))}
-          </ModTableRow>
-        </Table.Header>
-        {customers.map((customer, index) => (
-          <Table.Body key={customer.email}>
-            <ModTableRow >
-              <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
-              {HEADERS
-                .filter(header => !header.hide)
-                .map((header) => <ModTableCell
-                  onClick={() => { router.push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
-                  key={header.id}
-                  textAlign='center'>
-                  {customer[header.value]}
-                </ModTableCell>)
-              }
-              <Table.Cell textAlign='center'>
-                <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
-                <ButtonDelete onDelete={deleteCustomer} params={customer.id} deleteQuestion={deleteQuestion(customer.name)} />
-              </Table.Cell>
+      {!!customers.length &&
+        <ModTable celled={true} compact>
+          <Table.Header fullWidth>
+            <ModTableRow>
+              <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
+              {HEADERS.map((header) => (
+                <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
+              ))}
             </ModTableRow>
-          </Table.Body>
-        ))}
-      </ModTable>
+          </Table.Header>
+          {customers.map((customer, index) => (
+            <Table.Body key={customer.email}>
+              <ModTableRow >
+                <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                {HEADERS
+                  .filter(header => !header.hide)
+                  .map((header) => <ModTableCell
+                    onClick={() => { router.push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
+                    key={header.id}
+                    textAlign='center'>
+                    {customer[header.value]}
+                  </ModTableCell>)
+                }
+                <Table.Cell textAlign='center'>
+                  <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
+                  <ButtonDelete onDelete={deleteCustomer} params={customer.id} deleteQuestion={deleteQuestion(customer.name)} />
+                </Table.Cell>
+              </ModTableRow>
+            </Table.Body>
+          ))}
+        </ModTable>
+      }
     </MainContainer>
   )
 };

@@ -10,9 +10,9 @@ import { MainContainer, ModIcon, ModTable, ModTableCell, ModTableHeaderCell, Mod
 const BudgetsPage = ({ budgets }) => {
   const router = useRouter();
   return (
-    <>
-      <MainContainer>
-        <ButtonGoTo color="green" text="Crear presupuesto" iconName="add" goTo={PAGES.BUDGETS.CREATE} />
+    <MainContainer>
+      <ButtonGoTo color="green" text="Crear presupuesto" iconName="add" goTo={PAGES.BUDGETS.CREATE} />
+      {!!budgets &&
         <ModTable celled={true} compact >
           <Table.Header fullWidth>
             <ModTableRow>
@@ -43,9 +43,8 @@ const BudgetsPage = ({ budgets }) => {
               </ModTableRow>
             </Table.Body>
           ))}
-        </ModTable>
-      </MainContainer>
-    </>
+        </ModTable>}
+    </MainContainer>
   )
 };
 
