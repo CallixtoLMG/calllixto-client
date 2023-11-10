@@ -3,6 +3,7 @@ import { deleteProduct } from "@/app/productos/page";
 import ButtonDelete from "@/components/buttons/Delete";
 import ButtonEdit from "@/components/buttons/Edit";
 import ButtonGoTo from "@/components/buttons/GoTo";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { modPrice } from "@/utils";
 import { useRouter } from 'next/navigation';
@@ -17,6 +18,7 @@ const ProductsPage = ({ products = [] }) => {
 
   return (
     <MainContainer>
+      <PageHeader title={"Productos"}/>
       <SubContainer>
         <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
         <ImportExcel products={products} />

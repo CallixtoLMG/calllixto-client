@@ -1,5 +1,4 @@
 import { SHOWPRODUCTSHEADERS } from "@/components/budgets/budgets.common";
-import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Button, Dropdown, Form, Icon, Table } from 'semantic-ui-react';
 import { ModButton, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
@@ -19,24 +18,24 @@ const fakeCustomers = [
 
 const BudgetForm = ({ onSubmit }) => {
 
-  const { control, handleSubmit, setValue, watch } = useForm();
-  const [products, setProducts] = useState([{ name: '', quantity: '', discount: '' }]);
+  const { control, handleSubmit, setValue, watch, getValues } = useForm();
+  // const [products, setProducts] = useState([{ name: '', quantity: '', discount: '' }]);
 
+  const watchProducts = watch("products", [{ name: '', quantity: '', discount: '' }]);
+  console.log(watchProducts);
   const addProduct = () => {
-    setProducts([...products, { name: '', quantity: '', discount: '' }]);
+    setValue("products", [...watchProducts, { name: '', quantity: '', discount: '' }]);
   };
 
   const deleteProduct = (index) => {
-    if (typeof index === 'number') {
-      const newProducts = [...products];
-      newProducts.splice(index, 1);
-      setProducts(newProducts);
-    }
+    const newProducts = [...watchProducts];
+    newProducts.splice(index, 1);
+    setValue("products", newProducts);
   };
 
   const calculateTotal = () => {
     let total = 0;
-    products.forEach((product, index) => {
+    watchProducts.forEach((product, index) => {
       const subtotal = watch(`products[${index}].total`) || 0;
       total += parseFloat(subtotal);
     });
@@ -73,13 +72,12 @@ const BudgetForm = ({ onSubmit }) => {
           </ModTableRow>
         </Table.Header>
         <Table.Body>
-          {products.map((product, index) => (
-            <Table.Row key={index}>
+          {watchProducts.map((product, index) => (
+            <Table.Row key={`${product.code}-${index}`}>
               <Table.Cell>
                 <Controller
                   name={`products[${index}].name`}
                   control={control}
-                  defaultValue={product.name || ''}
                   render={({ field }) => (
                     <Dropdown
                       fluid
@@ -90,8 +88,9 @@ const BudgetForm = ({ onSubmit }) => {
                       {...field}
                       onChange={(e, { value }) => {
                         field.onChange(value);
-                        const productPrice = productsList.find((opt) => opt.value === value)?.price || 0;
-                        setValue(`products[${index}].price`, productPrice);
+                        const product = productsList.find((opt) => opt.value === value);
+                        setValue(`products[${index}].price`, product.price);
+                        setValue(`products[${index}].code`, product.code);
                       }}
                     />
                   )}

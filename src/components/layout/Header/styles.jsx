@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Container } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ModLink = styled(Link)`
@@ -13,6 +14,11 @@ const ModLink = styled(Link)`
     background-color: #f5f5f5;
     font-size: 15px;
   }
+`;
+
+const ModContainer = styled(Container)`
+a:last-child { align-self: flex-end };
+
 `;
 
 const Text = styled.p`
@@ -39,7 +45,5 @@ const Text = styled.p`
   }
 `;
 
-export {
-  ModLink, Text
-};
+export { ModContainer, ModLink, Text };
 

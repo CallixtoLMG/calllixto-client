@@ -1,5 +1,6 @@
 "use client";
 import ButtonGoTo from "@/components/buttons/GoTo";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { Button, Popup, Table } from 'semantic-ui-react';
@@ -12,6 +13,7 @@ const BudgetsPage = ({ budgets }) => {
   return (
     <>
       <MainContainer>
+      <PageHeader title={"Presupuestos"}/>
         <ButtonGoTo color="green" text="Crear presupuesto" iconName="add" goTo={PAGES.BUDGETS.CREATE} />
         <ModTable celled={true} compact >
           <Table.Header fullWidth>
