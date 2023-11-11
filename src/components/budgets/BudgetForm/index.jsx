@@ -1,4 +1,6 @@
 import { SHOWPRODUCTSHEADERS } from "@/components/budgets/budgets.common";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from 'react-hook-form';
 import { Button, Dropdown, Form, Icon, Table } from 'semantic-ui-react';
 import { ModButton, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
@@ -16,15 +18,18 @@ const fakeCustomers = [
   { key: '4', value: 'Marcelo', text: 'Marcelo' },
 ];
 
-const BudgetForm = ({ onSubmit }) => {
+const BudgetForm = ({ onSubmit, products, customers }) => {
 
-  const { control, handleSubmit, setValue, watch, getValues } = useForm();
-  // const [products, setProducts] = useState([{ name: '', quantity: '', discount: '' }]);
+  
+  const router = useRouter()
 
-  const watchProducts = watch("products", [{ name: '', quantity: '', discount: '' }]);
-  console.log(watchProducts);
+  console.log(products)
+  console.log(customers)
+
+  const { control, handleSubmit, setValue, watch } = useForm();
+  const watchProducts = watch("products", [{ name: '', quantity: 0, discount: 0 }]);
   const addProduct = () => {
-    setValue("products", [...watchProducts, { name: '', quantity: '', discount: '' }]);
+    setValue("products", [...watchProducts, { name: '', quantity: 0, discount: 0 }]);
   };
 
   const deleteProduct = (index) => {
@@ -42,8 +47,16 @@ const BudgetForm = ({ onSubmit }) => {
     return total.toFixed(2);
   };
 
+  const handleCreate = (data) => {
+    onSubmit(data)
+    setTimeout(() => {
+      router.push(PAGES.BUDGETS.BASE);
+    }, 500);
+    // promiseall
+  };
+
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(handleCreate)}>
       <ModDropdown
         name="customerId"
         placeholder='Clientes...'
@@ -51,7 +64,7 @@ const BudgetForm = ({ onSubmit }) => {
         selection
         minCharacters={2}
         noResultsMessage="No se ha encontrado cliente!"
-        options={fakeCustomers}
+        options={customers}
         onChange={(e, { name, value }) => {
           setValue(name, value);
         }}
@@ -84,11 +97,11 @@ const BudgetForm = ({ onSubmit }) => {
                       search
                       selection
                       noResultsMessage="No se ha encontrado producto!"
-                      options={productsList}
+                      options={products}
                       {...field}
                       onChange={(e, { value }) => {
                         field.onChange(value);
-                        const product = productsList.find((opt) => opt.value === value);
+                        const product = products.find((opt) => opt.value === value);
                         setValue(`products[${index}].price`, product.price);
                         setValue(`products[${index}].code`, product.code);
                       }}
@@ -100,10 +113,10 @@ const BudgetForm = ({ onSubmit }) => {
                 <Controller
                   name={`products[${index}].price`}
                   control={control}
-                  defaultValue={product.price || ''}
+                  defaultValue={product.price || 0}
                   render={({ field }) => (
                     <ModInput
-                      type="text"
+                      type="number"
                       value={field.value}
                       readOnly
                       {...field}
@@ -115,7 +128,7 @@ const BudgetForm = ({ onSubmit }) => {
                 <Controller
                   name={`products[${index}].quantity`}
                   control={control}
-                  defaultValue={product.quantity || ''}
+                  defaultValue={product.quantity || 0}
                   render={({ field }) => (
                     <ModInput
                       type="number"
@@ -128,7 +141,7 @@ const BudgetForm = ({ onSubmit }) => {
               <Table.Cell>
                 <ModInput
                   type="text"
-                  value={watch(`products[${index}].quantity`) * watch(`products[${index}].price`) || ''}
+                  value={watch(`products[${index}].quantity`) * watch(`products[${index}].price`) || 0}
                   readOnly
                 />
               </Table.Cell>
@@ -136,7 +149,7 @@ const BudgetForm = ({ onSubmit }) => {
                 <Controller
                   name={`products[${index}].discount`}
                   control={control}
-                  defaultValue={product.discount || ''}
+                  defaultValue={product.discount || 0}
                   render={({ field }) => (
                     <ModInput
                       type="number"
@@ -157,7 +170,7 @@ const BudgetForm = ({ onSubmit }) => {
               <Table.Cell>
                 <ModInput
                   type="text"
-                  value={watch(`products[${index}].total`) || ''}
+                  value={watch(`products[${index}].total`) || 0}
                   readOnly
                 />
               </Table.Cell>

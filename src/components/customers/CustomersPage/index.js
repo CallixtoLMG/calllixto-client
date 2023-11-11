@@ -11,7 +11,6 @@ import { HEADERS } from "../clients.common";
 import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const CustomersPage = ({ customers = [] }) => {
-  console.log(customers)
   const router = useRouter();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`
 
