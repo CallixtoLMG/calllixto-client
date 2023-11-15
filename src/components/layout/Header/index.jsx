@@ -2,7 +2,7 @@
 import { PAGES } from "@/constants";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu } from 'semantic-ui-react';
+import { Container, Menu } from 'semantic-ui-react';
 import { ModContainer, ModLink, Text } from "./styles";
 
 const Header = () => {
@@ -14,14 +14,14 @@ const Header = () => {
         <Menu fixed='top'>
           <ModContainer>
             <Menu.Item >
-              <div>
+              <Container fluid>
                 <Image
                   src="/Callixto.png"
                   alt="Callixto logo"
                   width={90}
                   height={30}
                 />
-              </div>
+              </Container>
             </Menu.Item>
             <ModLink $destacar={pathname.includes(PAGES.CUSTOMERS.BASE)} href={PAGES.CUSTOMERS.BASE}>
               <Menu.Item ><Text $destacar={pathname.includes(PAGES.CUSTOMERS.BASE)}>Clientes</Text></Menu.Item>

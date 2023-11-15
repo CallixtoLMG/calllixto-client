@@ -1,7 +1,7 @@
 import { Button, Icon, Popup } from "semantic-ui-react";
 import { ButtonContainer, ModButton, ModalContainer } from "./styles";
 
-const ButtonSend = () => {
+const ButtonSend = ({ customerData }) => {
   return (
     <Popup
       position='right center'
@@ -14,8 +14,17 @@ const ButtonSend = () => {
         </ButtonContainer>}
       content={
         <ModalContainer>
-          <Button color='green' size="tiny" ><Icon name='whatsapp' />WhatsApp</Button>
-          <Button color='green' size="tiny" ><Icon name='mail' />Mail</Button>
+          {customerData.phone &&
+            <Button
+              href={`https://api.whatsapp.com/send?phone=${customerData.phone}
+              &text=${encodeURIComponent(`Hola estimado ${customerData.name}, aqui esta el presupuesto que nos has pedido!`
+              )}`} color='green' size="tiny" ><Icon name='whatsapp' />WhatsApp</Button>}
+
+          {customerData.email &&
+            <Button
+              href={`mailto:${customerData.email}
+              ?Subject=${encodeURIComponent(`Hola estimado ${customerData.name}, aqui esta el presupuesto que nos has pedido!`
+              )}`} color='green' size="tiny" ><Icon name='mail' />Mail</Button>}
         </ModalContainer>
       }
       on='click'

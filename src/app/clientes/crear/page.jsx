@@ -1,6 +1,7 @@
 "use client";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { PAGES } from "@/constants";
+import { CLIENTID, PATHS, URL } from "@/fetchUrls";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 
@@ -17,7 +18,7 @@ const CreateCustomer = () => {
       cache: "no-store"
     };
 
-    fetch("https://t1k6ta4mzg.execute-api.sa-east-1.amazonaws.com/fe1af28f-b478-4d9e-b434-f4cf6e4355cc/customers", requestOptions)
+    fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}`, requestOptions)
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res)
@@ -28,7 +29,9 @@ const CreateCustomer = () => {
         };
       })
       .catch(error => console.log('error', error));
-    router.push(PAGES.CUSTOMERS.BASE)
+    setTimeout(() => {
+      router.push(PAGES.CUSTOMERS.BASE);
+    }, 500);
   };
 
   return (

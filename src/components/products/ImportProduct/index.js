@@ -1,3 +1,4 @@
+import { BATCH, CLIENTID, PATHS, URL } from "@/fetchUrls";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -5,7 +6,7 @@ import { toast } from "react-hot-toast";
 import { Button, Form, Icon, Input, Modal, Segment, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { HEADERS } from "../products.common";
-import { ContainerModal, MainContainer, ModInput, ModLabel, ModTable, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
+import { ContainerModal, MainContainer, ModInput, ModLabel, ModTable, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
 
 const ImportExcel = ({ products }) => {
   const [open, setOpen] = useState(false);
@@ -21,8 +22,7 @@ const ImportExcel = ({ products }) => {
       },
       cache: "no-store"
     };
-
-    fetch("https://t1k6ta4mzg.execute-api.sa-east-1.amazonaws.com/fe1af28f-b478-4d9e-b434-f4cf6e4355cc/products/batch", requestOptions)
+    fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${BATCH}`, requestOptions)
 
       .then(async response => {
         let res = await response.text()
@@ -139,7 +139,7 @@ const ImportExcel = ({ products }) => {
           <Modal
             closeIcon
             open={open}
-            onClose={() => (setOpen(false), setNewProducts([]), setEditProducts([]))}
+            onClose={() => (setOpen(false))}
             onOpen={() => setOpen(true)}
           >
             <ContainerModal>
@@ -150,89 +150,95 @@ const ImportExcel = ({ products }) => {
                 </ModalHeaderContainer>
                 {!!newProducts.length &&
                   <>
+                    {/* <ModalTable identification="code" title="Nuevos productos" dataName="newProducts" values={newProducts} /> */}
                     <ModalModLabel >Nuevos productos</ModalModLabel>
-                    <ModTable celled={true} compact>
-                      <Table.Header fullWidth>
-                        <ModTableRow>
-                          <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
-                          {HEADERS
-                            .filter(header => !header.hide)
-                            .map((header) => (
-                              <ModTableHeaderCell key={header.id}>{header.name}</ModTableHeaderCell>
-                            ))}
-                        </ModTableRow>
-                      </Table.Header>
-                      {newProducts.map((newProduct, index) => (
-                        <Table.Body key={newProduct.code}>
-                          <ModTableRow >
-                            <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                    <ModTableContainer>
+                      <ModTable celled compact>
+                        <Table.Header fullWidth>
+                          <ModTableRow>
+                            <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
                             {HEADERS
                               .filter(header => !header.hide)
-                              .map((header) =>
-                                <Controller
-                                  key={header.id}
-                                  name={`newProducts[${index}].${header.value}`}
-                                  control={control}
-                                  defaultValue={header.value === "price" ? (newProduct[header.value]) : newProduct[header.value]}
-                                  rules={validationRules[header.value]}
-                                  render={({ field, fieldState }) => (
-                                    <Table.Cell
-                                      key={header.id}
-                                      textAlign='center'>
-                                      <ModInput {...field} />
-                                      {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
-                                    </Table.Cell>
-                                  )}
-                                />
-                              )
-                            }
+                              .map((header) => (
+                                <ModTableHeaderCell key={header.id}>{header.name}</ModTableHeaderCell>
+                              ))}
                           </ModTableRow>
-                        </Table.Body>
-                      ))}
-                    </ModTable>
+                        </Table.Header>
+                        {newProducts.map((newProduct, index) => (
+                          <Table.Body key={newProduct.code}>
+                            <ModTableRow >
+                              <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                              {HEADERS
+                                .filter(header => !header.hide)
+                                .map((header) =>
+                                  <Controller
+                                    key={header.id}
+                                    name={`newProducts[${index}].${header.value}`}
+                                    control={control}
+                                    defaultValue={header.value === "price" ? (newProduct[header.value]) : newProduct[header.value]}
+                                    rules={validationRules[header.value]}
+                                    render={({ field, fieldState }) => (
+                                      <Table.Cell
+                                        key={header.id}
+                                        textAlign='center'>
+                                        <ModInput {...field} />
+                                        {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
+                                      </Table.Cell>
+                                    )}
+                                  />
+                                )
+                              }
+                            </ModTableRow>
+                          </Table.Body>
+                        ))}
+
+                      </ModTable>
+                    </ModTableContainer>
                   </>}
                 {!!editProducts.length &&
                   <>
                     <ModalModLabel >Productos a modificar</ModalModLabel>
-                    <ModTable celled={true} compact>
-                      <Table.Header fullWidth>
-                        <ModTableRow>
-                          <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
-                          {HEADERS
-                            .filter(header => !header.hide)
-                            .map((header) => (
-                              <ModTableHeaderCell key={header.id}>{header.name}</ModTableHeaderCell>
-                            ))}
-                        </ModTableRow>
-                      </Table.Header>
-                      {editProducts.map((editProduct, index) => (
-                        <Table.Body key={editProducts.code}>
-                          <ModTableRow >
-                            <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                    <ModTableContainer>
+                      <ModTable celled compact>
+                        <Table.Header fullWidth>
+                          <ModTableRow>
+                            <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
                             {HEADERS
                               .filter(header => !header.hide)
-                              .map((header) =>
-                                <Controller
-                                  key={header.id}
-                                  name={`editProducts[${index}].${header.value}`}
-                                  control={control}
-                                  defaultValue={header.value === "price" ? (editProduct[header.value]) : editProduct[header.value]}
-                                  rules={validationRules[header.value]}
-                                  render={({ field, fieldState }) => (
-                                    <Table.Cell
-                                      key={header.id}
-                                      textAlign='center'>
-                                      {header.value === "code" ? <ModInput readOnly {...field} /> : <ModInput {...field} />}
-                                      {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
-                                    </Table.Cell>
-                                  )}
-                                />
-                              )
-                            }
+                              .map((header) => (
+                                <ModTableHeaderCell key={header.id}>{header.name}</ModTableHeaderCell>
+                              ))}
                           </ModTableRow>
-                        </Table.Body>
-                      ))}
-                    </ModTable>
+                        </Table.Header>
+                        {editProducts.map((editProduct, index) => (
+                          <Table.Body key={editProducts.code}>
+                            <ModTableRow >
+                              <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                              {HEADERS
+                                .filter(header => !header.hide)
+                                .map((header) =>
+                                  <Controller
+                                    key={header.id}
+                                    name={`editProducts[${index}].${header.value}`}
+                                    control={control}
+                                    defaultValue={header.value === "price" ? (editProduct[header.value]) : editProduct[header.value]}
+                                    rules={validationRules[header.value]}
+                                    render={({ field, fieldState }) => (
+                                      <Table.Cell
+                                        key={header.id}
+                                        textAlign='center'>
+                                        {header.value === "code" ? <ModInput readOnly {...field} /> : <ModInput {...field} />}
+                                        {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
+                                      </Table.Cell>
+                                    )}
+                                  />
+                                )
+                              }
+                            </ModTableRow>
+                          </Table.Body>
+                        ))}
+                      </ModTable>
+                    </ModTableContainer>
                   </>}
                 <SubContainer>
                   <Button type="submit" color="green" content="Aceptar" />

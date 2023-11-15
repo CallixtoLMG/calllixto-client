@@ -1,11 +1,13 @@
 const HEADERS = [
   {
     name: "Cliente",
-    value: "customerId",
+    object: "customer",
+    value: "name",
     id: 1
   },
   {
     name: "Fecha",
+    date: true,
     value: "createdAt",
     id: 2
   },
@@ -20,6 +22,7 @@ const PRODUCTSHEADERS = [
   {
     name: "Precio",
     value: "price",
+    modPrice: true,
     id: 2
   },
   {
@@ -35,6 +38,7 @@ const PRODUCTSHEADERS = [
   {
     name: "Total",
     value: "total",
+    modPrice: true,
     id: 5
   }
 ];

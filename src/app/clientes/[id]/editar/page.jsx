@@ -1,12 +1,13 @@
 "use client"
 import CustomerForm from "@/components/customers/CustomerForm";
 import { PAGES } from "@/constants";
+import { CLIENTID, PATHS, URL } from "@/fetchUrls";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-async function showCustomer(code) {
-  const res = await fetch(`https://t1k6ta4mzg.execute-api.sa-east-1.amazonaws.com/fe1af28f-b478-4d9e-b434-f4cf6e4355cc/customers/${code}`);
+async function showCustomer(id) {
+  const res = await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`);
   const data = await res.json()
   return data
 };
@@ -34,7 +35,7 @@ function EditCustomer({ params }) {
       cache: "no-store",
     };
 
-    fetch(`https://t1k6ta4mzg.execute-api.sa-east-1.amazonaws.com/fe1af28f-b478-4d9e-b434-f4cf6e4355cc/customers/${params.id}`, requestOptions)
+    fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${params.id}`, requestOptions)
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res)

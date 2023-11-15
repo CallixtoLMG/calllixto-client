@@ -8,6 +8,8 @@ const ModButton = styled(Button)`
 `;
 
 const ModLink = styled(Link)`
+  width: 170px!important; 
+  margin-right: 3.5px!important;
   padding-right: 0!important;
 `;
 

@@ -9,7 +9,7 @@ const TitleContainer = styled(Flex)`
 
 const ModTitleLabel = styled(Label)`
   font-size: 20px!important;
-  min-width: 40vw!important;
+  min-width: 30vw!important;
   text-align: center!important;
   padding: 5px!important;
 `;

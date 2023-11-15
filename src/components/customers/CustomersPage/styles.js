@@ -4,9 +4,15 @@ import { Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
+  justify-content: center!important;
+  width: 100%!important;
+`;
+
+const SubContainer = styled(Flex)`
   margin: 75px 30px 30px 30px!important;
   flex-direction: column;
-  max-width: 120vh!important;
+  width: 80%!important;
+  max-width: 900px!important;
 `;
 
 const ModTableCell = styled(Table.Cell)({
@@ -35,6 +41,6 @@ const ModLink = styled(Link)({
 });
 
 export {
-  MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
+  MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer
 };
 

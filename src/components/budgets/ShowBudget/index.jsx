@@ -6,13 +6,14 @@ import { Grid, Label, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from '../../../utils';
 import { PRODUCTSHEADERS } from "../budgets.common";
 import { DataContainer, MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
+
 const ShowBudget = ({ budget }) => {
   return (
     <MainContainer>
       <SubContainer>
         <DataContainer>
           <ModLabel>Cliente</ModLabel>
-          <ModSegment>{budget.customerId}</ModSegment>
+          <ModSegment>{budget.customer.name}</ModSegment>
         </DataContainer>
         <DataContainer>
           <ModLabel> Fecha </ModLabel>
@@ -23,7 +24,7 @@ const ShowBudget = ({ budget }) => {
         <Grid.Row stretched>
           <Grid.Column textAlign='center' >
             <Label> Productos </Label>
-            <ModTable celled={true} compact>
+            <ModTable celled compact>
               <Table.Header fullWidth>
                 <ModTableRow>
                   <ModTableHeaderCell ></ModTableHeaderCell>
@@ -33,7 +34,7 @@ const ShowBudget = ({ budget }) => {
                 </ModTableRow>
               </Table.Header>
               {budget.products.map((product, index) => (
-                <Table.Body key={product.id}>
+                <Table.Body key={product.code}>
                   <ModTableRow >
                     <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
                     {PRODUCTSHEADERS
@@ -41,7 +42,7 @@ const ShowBudget = ({ budget }) => {
                       .map((header) => <Table.Cell
                         key={header.id}
                         textAlign='center'>
-                        {header.value === "price" ? modPrice(product[header.value]) : product[header.value]}
+                        {header.modPrice ? modPrice(product[header.value]) : product[header.value]}
                       </Table.Cell>)
                     }
                   </ModTableRow>
@@ -59,7 +60,9 @@ const ShowBudget = ({ budget }) => {
           </Grid.Column>
         </Grid.Row>
         <ButtonGoto goTo={PAGES.BUDGETS.SHOWPDF(budget.id)} iconName="eye" text="Ver PDF" color="blue" />
-        <ButtonSend />
+        {budget.customer.phone && budget.customer.email && (
+          <ButtonSend customerData={budget.customer} />
+        )}
       </Grid>
     </MainContainer>
   )

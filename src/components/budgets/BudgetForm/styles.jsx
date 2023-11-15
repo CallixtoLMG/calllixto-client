@@ -1,5 +1,11 @@
+import { Flex } from "rebass";
 import { Button, Dropdown, Input, Table } from 'semantic-ui-react';
 import styled from 'styled-components';
+
+const MainContainer = styled(Flex)`
+  margin: 75px 30px 30px 30px!important;
+  flex-direction: column;
+`;
 
 const ModInput = styled(Input)`
   input {
@@ -29,5 +35,5 @@ const ModTableRow = styled(Table.Row)`
   th:not(:first-child) { width: 12rem!important; };
 `;
 
-export { ModButton, ModDropdown, ModInput, ModTableRow, TotalText };
+export { MainContainer, ModButton, ModDropdown, ModInput, ModTableRow, TotalText };
 

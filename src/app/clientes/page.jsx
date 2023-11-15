@@ -1,11 +1,7 @@
+import { loadCustomers } from "@/apiCalls/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
+import { CLIENTID, PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
-
-export async function loadCustomers() {
-  const res = await fetch("https://t1k6ta4mzg.execute-api.sa-east-1.amazonaws.com/fe1af28f-b478-4d9e-b434-f4cf6e4355cc/customers", { cache: "no-store" });
-  const data = await res.json()
-  return data
-};
 
 export async function deleteCustomer(id) {
 
@@ -18,7 +14,7 @@ export async function deleteCustomer(id) {
     cache: "no-store",
   };
 
-  await fetch(`https://t1k6ta4mzg.execute-api.sa-east-1.amazonaws.com/fe1af28f-b478-4d9e-b434-f4cf6e4355cc/${id}`, requestOptions)
+  await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`, requestOptions)
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)
@@ -35,7 +31,7 @@ async function Customers() {
   const customers = await loadCustomers()
 
   return (
-    <CustomersPage customers={customers.customers} />
+    <CustomersPage customers={customers} />
   )
 };
 

@@ -4,12 +4,18 @@ import { Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
-  margin: 75px 30px 30px 30px!important;
-  flex-direction: column;
-  max-width: 120vh!important;
+  justify-content: center!important;
+  width: 100%!important;
 `;
 
 const SubContainer = styled(Flex)`
+  margin: 75px 30px 30px 30px!important;
+  flex-direction: column;
+  width: 80%!important;
+  max-width: 900px!important;
+`;
+
+const ButtonsContainer = styled(Flex)`
   flex-direction: row;
 `;
 
@@ -43,7 +49,5 @@ const ModTableRow = styled(Table.Row)`
   th:last-child { width: 200px!important; };
 `;
 
-export {
-  MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer
-};
+export { ButtonsContainer, MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer };
 
