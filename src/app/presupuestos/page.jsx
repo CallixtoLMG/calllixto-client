@@ -1,10 +1,10 @@
 "use client";
-import { loadBudgets } from "@/apiCalls/budgets";
+import { loadBudgets } from "@/api/budgets";
 import BudgetsPage from "@/components/budgets/BudgetPage";
 
 async function Budgets() {
 
-  const budgets = await loadBudgets()
+  const budgets = await loadBudgets();
   return (
     <BudgetsPage budgets={budgets.budgets} />
   )

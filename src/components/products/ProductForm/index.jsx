@@ -4,7 +4,9 @@ import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from 'semantic-ui-react';
 import { MainContainer, ModButton, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
 
-const ProductForm = ({ product, onSubmit }) => {
+const ProductForm = ({ product, onSubmit, code }) => {
+  console.log(code)
+
   const { handleSubmit, control } = useForm();
 
   const validateCode = (value) => {
@@ -15,27 +17,31 @@ const ProductForm = ({ product, onSubmit }) => {
     return /^[0-9]+$/.test(value);
   };
 
+  const handleEdit = (data) => {
+    onSubmit(code, data)
+  };
+
   return (
     <MainContainer>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(handleEdit)}>
         {!product?.code &&
           <ModFormField>
             <>
-            <ModLabel>Código</ModLabel>
-            <Controller
-              name="code"
-              control={control}
-              defaultValue={get(product, "code", "")}
-              rules={{ validate: validateCode }}
-              render={({ field, fieldState }) => (
-                <>
-                  <ModInput {...field} />
-                  {fieldState?.invalid && (
-                    <WarningMessage >El código debe tener 4 caracteres alfanuméricos.</WarningMessage>
-                  )}
-                </>
-              )}
-            />
+              <ModLabel>Código</ModLabel>
+              <Controller
+                name="code"
+                control={control}
+                defaultValue={get(product, "code", "")}
+                rules={{ validate: validateCode }}
+                render={({ field, fieldState }) => (
+                  <>
+                    <ModInput {...field} />
+                    {fieldState?.invalid && (
+                      <WarningMessage >El código debe tener 4 caracteres alfanuméricos.</WarningMessage>
+                    )}
+                  </>
+                )}
+              />
             </>
           </ModFormField>}
         <ModFormField>

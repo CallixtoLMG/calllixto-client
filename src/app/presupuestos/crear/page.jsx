@@ -1,42 +1,42 @@
 "use client";
-import { create } from "@/apiCalls/budgets";
-import { loadCustomers } from "@/apiCalls/customers";
-import { loadProducts } from "@/apiCalls/products";
+import { create } from "@/api/budgets";
+import { customersList } from "@/api/customers";
+import { productsList } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { useEffect, useState } from "react";
 
 const CreateBudget = () => {
 
-  const [productsList, setProductsList] = useState(null)
-  const [customersList, setCustomersList] = useState(null)
+  const [products, setProductsList] = useState(null)
+  const [customers, setCustomersList] = useState(null)
 
   useEffect(() => {
     const fetchData = async () => {
-      const productsData = await loadProducts();
-      const productsList = productsData.map(product => ({
+      const productsFecthData = await productsList();
+      const productsFilteredList = productsFecthData.map(product => ({
         price: product.price,
         key: product.code,
         code: product.code,
         value: product.name,
         text: product.name,
       }));
-      setProductsList(productsList);
-      const customersData = await loadCustomers();
-      const customersList = customersData.map(customer => ({
+      setProductsList(productsFilteredList);
+      const customersFetchData = await customersList();
+      const customersFilteredList = customersFetchData.map(customer => ({
         key: customer.id,
         value: customer.name,
         text: customer.name,
         phone: customer.phone,
         email: customer.email,
       }));
-      setCustomersList(customersList);
+      setCustomersList(customersFilteredList);
     };
     fetchData()
 
   }, []);
 
   return (
-    <BudgetForm onSubmit={create} products={productsList} customers={customersList} />
+    <BudgetForm onSubmit={create} products={products} customers={customers} />
   )
 };
 

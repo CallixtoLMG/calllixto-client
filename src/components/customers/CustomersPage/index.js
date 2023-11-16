@@ -1,5 +1,5 @@
 "use client";
-import { deleteCustomer } from "@/app/clientes/page";
+import { deleteCustomer } from "@/api/customers";
 import ButtonDelete from "@/components/buttons/Delete";
 import ButtonEdit from "@/components/buttons/Edit";
 import ButtonGoTo from "@/components/buttons/GoTo";

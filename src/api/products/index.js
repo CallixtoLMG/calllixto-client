@@ -25,7 +25,7 @@ export async function create(product) {
     .catch(error => console.log('error', error));
 };
 
-export async function editProduct(product) {
+export async function edit(params, product) {
   const requestOptions = {
     body: JSON.stringify(product),
     method: 'PUT',
@@ -36,7 +36,7 @@ export async function editProduct(product) {
     cache: "no-store",
   };
 
-  fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${params.code}`, requestOptions)
+  fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${params}`, requestOptions)
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)
@@ -49,13 +49,13 @@ export async function editProduct(product) {
     .catch(error => console.log('error', error));
 };
 
-export async function loadProducts() {
+export async function productsList() {
   const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, { cache: "no-store" });
   const data = await res.json()
   return data.products
 };
 
-export async function showProduct(code) {
+export async function getProduct(code) {
   const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${code}`);
   const data = await res.json()
   return data

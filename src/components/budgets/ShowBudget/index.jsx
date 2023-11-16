@@ -1,6 +1,6 @@
 "use client";
 import ButtonGoto from "@/components/buttons/GoTo";
-import ButtonSend from "@/components/buttons/Send";
+// import ButtonSend from "@/components/buttons/Send";
 import { PAGES } from "@/constants";
 import { Grid, Label, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from '../../../utils';
@@ -13,7 +13,8 @@ const ShowBudget = ({ budget }) => {
       <SubContainer>
         <DataContainer>
           <ModLabel>Cliente</ModLabel>
-          <ModSegment>{budget.customer.name}</ModSegment>
+          {/* <ModSegment>{budget.customer.name}</ModSegment> */}
+          <ModSegment>Milton</ModSegment>
         </DataContainer>
         <DataContainer>
           <ModLabel> Fecha </ModLabel>
@@ -60,9 +61,9 @@ const ShowBudget = ({ budget }) => {
           </Grid.Column>
         </Grid.Row>
         <ButtonGoto goTo={PAGES.BUDGETS.SHOWPDF(budget.id)} iconName="eye" text="Ver PDF" color="blue" />
-        {budget.customer.phone && budget.customer.email && (
+        {/* {budget.customer.phone && budget.customer.email && (
           <ButtonSend customerData={budget.customer} />
-        )}
+        )} */}
       </Grid>
     </MainContainer>
   )

@@ -3,12 +3,15 @@ import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from 'semantic-ui-react';
 import { MainContainer, ModButton, ModFormField, ModInput, ModLabel } from "./styles";
 
-const CustomerForm = ({ customer, onSubmit }) => {
+const CustomerForm = ({ customer, onSubmit, id }) => {
   const { handleSubmit, control } = useForm();
+  const handleEdit = (data) => {
+    onSubmit(id, data);
+  };
 
   return (
     <MainContainer>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(handleEdit)}>
         <ModFormField>
           <ModLabel >Nombre</ModLabel>
           <Controller
