@@ -18,15 +18,12 @@ export async function create(budget) {
     cache: "no-store"
   };
 
-  fetch(`${URL}${CLIENTID}${PATHS.BUDGETS}`, requestOptions)
-    .then(async response => {
-      let res = await response.text()
-      res = JSON.parse(res)
-      if (res.statusOk) {
-        toast.success("Presupuesto creado exitosamente");
-      } else {
-        toast.error(res.message);
-      };
-    })
-    .catch(error => console.log('error', error));
+  const response = await fetch(`${URL}${CLIENTID}${PATHS.BUDGETS}`, requestOptions);
+  let res = await response.text()
+  res = JSON.parse(res)
+  if (res.statusOk) {
+    toast.success("Presupuesto creado exitosamente");
+  } else {
+    toast.error(res.message);
+  };
 };

@@ -1,17 +1,28 @@
 "use client"
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from 'semantic-ui-react';
 import { MainContainer, ModButton, ModFormField, ModInput, ModLabel } from "./styles";
 
 const CustomerForm = ({ customer, onSubmit, id }) => {
+  const router = useRouter();
+
   const { handleSubmit, control } = useForm();
-  const handleEdit = (data) => {
-    onSubmit(id, data);
+
+  const handleForm = (data) => {
+    if (!customer?.id) {
+      onSubmit(data)
+    } else {
+      onSubmit(id, data)
+    }
+    router.push(PAGES.CUSTOMERS.BASE)
   };
+
 
   return (
     <MainContainer>
-      <Form onSubmit={handleSubmit(handleEdit)}>
+      <Form onSubmit={handleSubmit(handleForm)}>
         <ModFormField>
           <ModLabel >Nombre</ModLabel>
           <Controller

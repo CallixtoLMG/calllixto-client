@@ -1,11 +1,13 @@
 "use client"
+import { PAGES } from "@/constants";
 import { get } from "lodash";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from 'semantic-ui-react';
 import { MainContainer, ModButton, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
 
 const ProductForm = ({ product, onSubmit, code }) => {
-  console.log(code)
+  const router = useRouter();
 
   const { handleSubmit, control } = useForm();
 
@@ -17,13 +19,18 @@ const ProductForm = ({ product, onSubmit, code }) => {
     return /^[0-9]+$/.test(value);
   };
 
-  const handleEdit = (data) => {
-    onSubmit(code, data)
+  const handleForm = (data) => {
+    if (!product?.code) {
+      onSubmit(data)
+    } else {
+      onSubmit(code, data)
+    }
+    router.push(PAGES.PRODUCTS.BASE)
   };
 
   return (
     <MainContainer>
-      <Form onSubmit={handleSubmit(handleEdit)}>
+      <Form onSubmit={handleSubmit(handleForm)}>
         {!product?.code &&
           <ModFormField>
             <>

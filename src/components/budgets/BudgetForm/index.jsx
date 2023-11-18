@@ -6,8 +6,7 @@ import { Button, Dropdown, Form, Icon, Table } from 'semantic-ui-react';
 import { MainContainer, ModButton, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
-  const router = useRouter()
-
+  const router = useRouter();
   const { control, handleSubmit, setValue, watch, register } = useForm();
   const watchProducts = watch("products", [{ name: '', quantity: 0, discount: 0 }]);
   const addProduct = () => {
@@ -30,7 +29,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
   };
 
   const handleCreate = (data) => {
-    onSubmit(data)
+    onSubmit(data);
     setTimeout(() => {
       router.push(PAGES.BUDGETS.BASE);
     }, 500);
@@ -49,23 +48,14 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
           options={customers}
           onChange={(e, { name, value }) => {
             setValue(name, value);
-            // const selectedCustomerData = customers.find(customer => customer.value === value);
-            // const filteredData = {
-            //   email: selectedCustomerData.email,
-            //   name: selectedCustomerData.text,
-            //   phone: selectedCustomerData.phone
-            // };
-            // setValue("customer", filteredData)
           }}
         />
-        {/* <ModInput type="hidden" {...register("customer")} /> */}
         <ModButton
           color="green"
           type="button"
           onClick={addProduct}
         >
           <Icon name="add" />Agregar producto</ModButton>
-
         <Table celled>
           <Table.Header>
             <ModTableRow>
@@ -99,7 +89,6 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                     )}
                   />
                 </Table.Cell>
-
                 <Table.Cell>
                   <Controller
                     name={`products[${index}].price`}

@@ -2,6 +2,7 @@ export const PATHS = {
   BUDGETS: "budgets",
   CUSTOMERS: "customers",
   PRODUCTS: "products",
+  LOGIN: "login"
 };
 export const BATCH = "/batch"
 export const URL = "https://t1k6ta4mzg.execute-api.sa-east-1.amazonaws.com/";

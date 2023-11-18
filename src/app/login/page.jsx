@@ -1,8 +1,11 @@
+"use client"
+import { login } from "@/api/login";
 import LoginForm from "@/components/Login";
+
 
 const Login = () => {
   return (
-    <LoginForm />
+    <LoginForm onSubmit={login} />
   )
 };
 
