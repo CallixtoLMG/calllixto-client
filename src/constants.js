@@ -22,6 +22,13 @@ const PAGES = {
   }
 };
 
+const ROLES = {
+  USER: "user",
+  ADMIN: "admin",
+  SUPERADMIN: "sadmin",
+  CALLIXTO: "callixto"
+};
+
 export {
   PAGES
 };

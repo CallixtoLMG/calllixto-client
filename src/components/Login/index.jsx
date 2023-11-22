@@ -11,7 +11,6 @@ const LoginForm = ({ onSubmit }) => {
   const { handleSubmit, control } = useForm();
 
   const handleForm = (data) => {
-    console.log(data)
     onSubmit(data)
   };
 

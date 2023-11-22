@@ -18,8 +18,8 @@ export async function deleteCustomer(id) {
   var requestOptions = {
     method: 'DELETE',
     redirect: 'follow',
-    Headers: {
-      'Content-type': 'application-json'
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`
     },
     cache: "no-store",
   };
@@ -42,8 +42,8 @@ export async function create(customer) {
     method: 'POST',
     body: JSON.stringify(customer),
     redirect: "follow",
-    Headers: {
-      'Content-type': 'application-json'
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`
     },
     cache: "no-store"
   };
@@ -52,6 +52,7 @@ export async function create(customer) {
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)
+      console.log(res)
       if (res.statusOk) {
         toast.success("Cliente creado exitosamente");
       } else {
@@ -66,7 +67,7 @@ export async function edit(id, customer) {
     body: JSON.stringify(customer),
     method: 'PUT',
     redirect: 'follow',
-    Headers: {
+    headers: {
       'Content-Type': 'application/json'
     },
     cache: "no-store",

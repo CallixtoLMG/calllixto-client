@@ -80,7 +80,7 @@ const ImportExcel = ({ products }) => {
       method: 'POST',
       body: JSON.stringify(product),
       redirect: "follow",
-      Headers: {
+      headers: {
         'Content-type': 'application-json'
       },
       cache: "no-store"
@@ -104,7 +104,7 @@ const ImportExcel = ({ products }) => {
       method: 'POST',
       body: JSON.stringify(product),
       redirect: "follow",
-      Headers: {
+      headers: {
         'Content-type': 'application-json'
       },
       cache: "no-store"

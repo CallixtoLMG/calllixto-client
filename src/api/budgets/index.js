@@ -12,7 +12,7 @@ export async function create(budget) {
     method: 'POST',
     body: JSON.stringify(budget),
     redirect: "follow",
-    Headers: {
+    headers: {
       'Content-type': 'application-json'
     },
     cache: "no-store"

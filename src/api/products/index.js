@@ -6,16 +6,18 @@ export async function create(product) {
     method: 'POST',
     body: JSON.stringify(product),
     redirect: "follow",
-    Headers: {
-      'Content-type': 'application-json'
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`
     },
     cache: "no-store"
   };
+  console.log(requestOptions)
 
   fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, requestOptions)
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)
+      console.log(res)
       if (res.statusOk) {
         toast.success("Producto creado exitosamente");
       } else {
@@ -30,7 +32,7 @@ export async function edit(params, product) {
     body: JSON.stringify(product),
     method: 'PUT',
     redirect: 'follow',
-    Headers: {
+    headers: {
       'Content-Type': 'application-json'
     },
     cache: "no-store",
@@ -65,7 +67,7 @@ export async function deleteProduct(code) {
   var requestOptions = {
     method: 'DELETE',
     redirect: 'follow',
-    Headers: {
+    headers: {
       'Content-type': 'application-json'
     },
     cache: "no-store"
