@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Container } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ModLink = styled(Link)`
@@ -6,13 +7,26 @@ const ModLink = styled(Link)`
   position: relative;
   align-items: center;
   transition: all 0.2s ease-in-out;
-  font-size: ${props => props.$destacar && "15px" };
-  background-color: ${props => props.$destacar && "#f5f5f5" };
+  font-size: 15px;
+  background-color: ${props => props.$destacar && "#f5f5f5"};
 
   &:hover {
     background-color: #f5f5f5;
-    font-size: 15px;
   }
+`;
+
+const ModContainer = styled(Container)`
+  a:last-child {  
+    margin-left: auto!important;
+    div {
+      border-left: 1px solid rgba(34,36,38,.1)!important;
+      border-right: 1px solid rgba(34,36,38,.1)!important;
+      &:before {
+        width: 0px!important;
+      }
+    }
+   
+  };
 `;
 
 const Text = styled.p`
@@ -39,7 +53,5 @@ const Text = styled.p`
   }
 `;
 
-export {
-  ModLink, Text
-};
+export { ModContainer, ModLink, Text };
 

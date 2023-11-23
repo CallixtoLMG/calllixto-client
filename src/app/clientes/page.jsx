@@ -1,42 +1,37 @@
+"use client";
+import { customersList } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
-import { toast } from "react-hot-toast";
+import { useEffect, useState } from "react";
 
-export async function loadCustomers() {
-  const res = await fetch("https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/customers", { cache: "no-store" });
-  const data = await res.json()
-  return data
-};
+const Customers = () => {
+  const [customers, setCustomers] = useState();
+  const token = localStorage.getItem('token');
 
-export async function deleteCustomer(id) {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const requestOptions = {
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          cache: "no-store",
+        };
 
-  var requestOptions = {
-    method: 'DELETE',
-    redirect: 'follow',
-    Headers: {
-      'Content-type': 'application-json'
-    },
-    cache: "no-store",
-  };
+        const fetchCustomers = await customersList(requestOptions);
+        setCustomers(fetchCustomers);
+      } catch (error) {
+        console.error('Error al cargar clientes:', error);
+      }
+    };
 
-  await fetch(`https://sj2o606gg6.execute-api.sa-east-1.amazonaws.com/7a7affa5-d1bc-4d98-b1c3-2359519798a7/customers/${id}`, requestOptions)
-    .then(async response => {
-      let res = await response.text()
-      res = JSON.parse(res)
-      if (res.statusOk) {
-        toast.success("Cliente eliminado exitosamente");
-      } else {
-        toast.error(res.message);
-      };
-    })
-    .catch(error => console.log('error', error));
-};
-
-async function Customers() {
-  const customers = await loadCustomers()
+    fetchData();
+  }, [token]);
 
   return (
-    <CustomersPage customers={customers.customers} />
-  )
+    <CustomersPage customers={customers} />
+  );
 };
 
 export default Customers;

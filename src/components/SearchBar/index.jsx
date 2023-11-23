@@ -47,7 +47,7 @@ function SearchBar({ products }) {
         results: _.filter(products, isMatch),
       })
     }, 300)
-  }, [])
+  }, [products])
   React.useEffect(() => {
     return () => {
       clearTimeout(timeoutRef.current)

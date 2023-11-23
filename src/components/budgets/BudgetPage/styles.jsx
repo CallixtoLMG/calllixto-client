@@ -1,12 +1,18 @@
 import Link from "next/link";
 import { Flex } from "rebass";
-import { Table } from "semantic-ui-react";
+import { Icon, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
+  justify-content: center!important;
+  width: 100%!important;
+`;
+
+const SubContainer = styled(Flex)`
   margin: 75px 30px 30px 30px!important;
   flex-direction: column;
-  max-width: 120vh!important;
+  width: 80%!important;
+  max-width: 900px!important;
 `;
 
 const ModTableCell = styled(Table.Cell)({
@@ -31,11 +37,15 @@ const ModTableRow = styled(Table.Row)`
   th:nth-child(5){ width: 150px!important;}
 `;
 
+const ModIcon = styled(Icon)({
+  margin: "0!important",
+});
+
 const ModLink = styled(Link)({
   width: "fit-content",
 });
 
 export {
-  MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
+  MainContainer, ModIcon, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer
 };
 

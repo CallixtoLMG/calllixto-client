@@ -1,14 +1,28 @@
 "use client"
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Form, Icon } from 'semantic-ui-react';
-import { MainContainer, ModFormField, ModInput, ModLabel } from "./styles";
+import { Form, Icon } from 'semantic-ui-react';
+import { MainContainer, ModButton, ModFormField, ModInput, ModLabel } from "./styles";
 
-const CustomerForm = ({ customer, onSubmit }) => {
+const CustomerForm = ({ customer, onSubmit, id }) => {
+  const router = useRouter();
+
   const { handleSubmit, control } = useForm();
+
+  const handleForm = (data) => {
+    if (!customer?.id) {
+      onSubmit(data);
+    } else {
+      onSubmit(id, data);
+    }
+    router.push(PAGES.CUSTOMERS.BASE);
+  };
+
 
   return (
     <MainContainer>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(handleForm)}>
         <ModFormField>
           <ModLabel >Nombre</ModLabel>
           <Controller
@@ -38,14 +52,12 @@ const CustomerForm = ({ customer, onSubmit }) => {
         </ModFormField>
         <ModFormField>
         </ModFormField>
-        <Button
+        <ModButton
           type="submit"
-          icon
-          labelPosition='right'
           color="green"
         >
           <Icon name="add" /> {customer?.id ? "Actualizar cliente" : "Crear cliente"}
-        </Button>
+        </ModButton>
       </Form>
     </MainContainer>
   )

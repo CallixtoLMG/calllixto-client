@@ -1,7 +1,7 @@
 "use client"
 import { PRODUCTSHEADERS } from "@/components/budgets/budgets.common";
-import { IVA, modDate, totalIVA, totalSum } from '@/utils';
-import { Document, Font, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
+import { IVA, modDate, modPrice, totalIVA, totalSum } from '@/utils';
+import { Document, Font, PDFViewer, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
   page: {
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     border: "1px solid #000",
     padding: "4px",
     minWidth: "35vw",
-    alignItems:"center"
+    alignItems: "center"
   },
   tableCell: {
     display: "flex",
@@ -198,8 +198,8 @@ Font.register({
 });
 
 const PDFfile = ({ budget }) => {
-  console.log(budget)
   return (
+    <PDFViewer style={{ marginTop: "70px", width: "100%", height: "90vh" }}>
       <Document>
         <Page size="A4" style={styles.page}>
           <Text style={styles.title}>Presupuesto</Text>
@@ -217,11 +217,11 @@ const PDFfile = ({ budget }) => {
                   <Text style={styles.segment}>Bolivia 652</Text>
                 </View>
                 <View style={styles.customerDataContainer}>
-                  <Text style={styles.label}>Provincia: </Text>
+                  <Text style={styles.label}>Provincia:</Text>
                   <Text style={styles.segment}>Cordoba</Text>
                 </View>
                 <View style={styles.customerDataContainer}>
-                  <Text style={styles.label}>Fecha: </Text>
+                  <Text style={styles.label}>Fecha:</Text>
                   <Text style={styles.segment}>{modDate(budget.createdAt)}</Text>
                 </View>
               </View>
@@ -233,31 +233,31 @@ const PDFfile = ({ budget }) => {
                 ))}
               </View>
               {budget.products.map((product, index) => (
-                  <View style={styles.tableRow} key={index}>
-                    <Text style={styles.firstTableCell}>{product.name}</Text>
-                    <Text style={styles.tableCell}>${product.price}</Text>
-                    <Text style={styles.tableCell}>{product.quantity}</Text>
-                    <Text style={styles.tableCell}>{product.discount}%</Text>
-                    <Text style={styles.tableCell}>${product.total}</Text>
-                  </View>
+                <View style={styles.tableRow} key={index}>
+                  <Text style={styles.firstTableCell}>{product.name}</Text>
+                  <Text style={styles.tableCell}>{modPrice(product.price)}</Text>
+                  <Text style={styles.tableCell}>{product.quantity}</Text>
+                  <Text style={styles.tableCell}>{product.discount} %</Text>
+                  <Text style={styles.tableCell}>{modPrice(product.total)}</Text>
+                </View>
               ))}
               <View style={styles.preTotalContainer}>
                 <Text style={styles.firstTableCell}></Text>
                 <Text style={styles.totalTableCell}></Text>
                 <Text style={styles.totalTableCell}></Text>
                 <Text style={styles.totalTableCell}>Total Bruto</Text>
-                <Text style={styles.totalTableCell}>${totalSum(budget.products)}</Text>
+                <Text style={styles.totalTableCell}>{modPrice(totalSum(budget.products))}</Text>
               </View>
               <View style={styles.preTotalContainer}>
                 <Text style={styles.firstTableCell}></Text>
                 <Text style={styles.totalTableCell}></Text>
                 <Text style={styles.totalTableCell}></Text>
-                <Text style={styles.totalTableCell}>I.V.A   21%</Text>
-                <Text style={styles.totalTableCell}>{IVA(totalSum(budget.products))}</Text>
+                <Text style={styles.totalTableCell}>I.V.A 21 %</Text>
+                <Text style={styles.totalTableCell}>{modPrice(IVA(totalSum(budget.products)))}</Text>
               </View>
               <View style={styles.totalContainer}>
                 <Text style={styles.totalLabel}>TOTAL PRESUPUESTO</Text>
-                <Text style={styles.totalSegment}>{totalIVA(totalSum(budget.products))}</Text>
+                <Text style={styles.totalSegment}>{modPrice(totalIVA(totalSum(budget.products)))}</Text>
               </View>
             </View>
             <View style={styles.payMethodContainer}>
@@ -277,6 +277,7 @@ const PDFfile = ({ budget }) => {
           )} fixed />
         </Page>
       </Document>
+    </PDFViewer >
   );
 };
 

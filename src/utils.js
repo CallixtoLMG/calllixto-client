@@ -19,10 +19,12 @@ export const totalIVA = (value) => {
   return totalConIVA.toFixed(2);
 };
 
-export const modDate = (date) => {
-  return date.split("T")[0]
-};
+export const modDate = (date) => date.split("T")[0];
 
 export const modPrice = (number) => {
-  return `$ ${Number(number.toLocaleString("de-DE"))}`
+  let modNumber = Number(number);
+  return modNumber.toLocaleString('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+  });
 };

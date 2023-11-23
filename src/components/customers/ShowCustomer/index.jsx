@@ -2,7 +2,7 @@
 import { Grid } from 'semantic-ui-react';
 import { MainContainer, ModLabel, ModSegment } from "./styles";
 
-const ShowCustomer = ({ customer, id }) => {
+const ShowCustomer = ({ customer }) => {
   return (
     <MainContainer>
       <Grid divided>

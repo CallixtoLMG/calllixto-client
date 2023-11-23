@@ -1,34 +1,41 @@
 "use client";
-import PDFfile from '@/components/PDFfile';
-import { PDFDownloadLink } from "@react-pdf/renderer";
-import Link from 'next/link';
-import { Button, Grid, Label, Table } from 'semantic-ui-react';
-import { modDate, totalSum } from '../../../utils';
+import ButtonGoto from "@/components/buttons/GoTo";
+// import ButtonSend from "@/components/buttons/Send"; // cuando se acomoden los pedidos, activar esto.
+import { PAGES } from "@/constants";
+import { Grid, Label, Table } from 'semantic-ui-react';
+import { modDate, modPrice, totalSum } from '../../../utils';
 import { PRODUCTSHEADERS } from "../budgets.common";
-import { MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow } from "./styles";
+import { DataContainer, MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
 
 const ShowBudget = ({ budget }) => {
   return (
     <MainContainer>
-      <Grid divided>
+      <SubContainer>
+        <DataContainer>
+          <ModLabel>Cliente</ModLabel>
+          {/* <ModSegment>{budget.customer.name}</ModSegment>   // cuando se acomoden los pedidos, activar esto.*/} 
+          <ModSegment>Milton</ModSegment>
+        </DataContainer>
+        <DataContainer>
+          <ModLabel> Fecha </ModLabel>
+          <ModSegment>{modDate(budget.createdAt)}</ModSegment>
+        </DataContainer>
+      </SubContainer>
+      <Grid >
         <Grid.Row stretched>
-          <Grid.Column >
-            <ModLabel>Cliente</ModLabel>
-            <ModSegment>{budget.customerId}</ModSegment>
-            <ModLabel> Fecha </ModLabel>
-            <ModSegment>{modDate(budget.createdAt)}</ModSegment>
+          <Grid.Column textAlign='center' >
             <Label> Productos </Label>
             <ModTable celled compact>
               <Table.Header fullWidth>
                 <ModTableRow>
-                  <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
+                  <ModTableHeaderCell ></ModTableHeaderCell>
                   {PRODUCTSHEADERS.map((header) => (
                     <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
                   ))}
                 </ModTableRow>
               </Table.Header>
               {budget.products.map((product, index) => (
-                <Table.Body key={product.id}>
+                <Table.Body key={product.code}>
                   <ModTableRow >
                     <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
                     {PRODUCTSHEADERS
@@ -36,7 +43,7 @@ const ShowBudget = ({ budget }) => {
                       .map((header) => <Table.Cell
                         key={header.id}
                         textAlign='center'>
-                        {product[header.value]}
+                        {header.modPrice ? modPrice(product[header.value]) : product[header.value]}
                       </Table.Cell>)
                     }
                   </ModTableRow>
@@ -47,18 +54,16 @@ const ShowBudget = ({ budget }) => {
                   <Table.HeaderCell />
                   <Table.HeaderCell textAlign="center" colSpan='1'><strong>Suma Total</strong></Table.HeaderCell>
                   <Table.HeaderCell colSpan='3' />
-                  <Table.HeaderCell textAlign="center" colSpan='1'><strong>{totalSum(budget.products)}</strong></Table.HeaderCell>
+                  <Table.HeaderCell textAlign="center" colSpan='1'><strong>{modPrice(totalSum(budget.products))}</strong></Table.HeaderCell>
                 </Table.Row>
               </Table.Footer>
             </ModTable>
           </Grid.Column>
         </Grid.Row>
-        <Link href={`${budget.id}/verPdf`}>
-          <Button> Ver PDF</Button>
-        </Link>
-        <PDFDownloadLink document={<PDFfile budget={budget} />} fileName={`Presupuesto ${budget.customerId}.pdf`} >
-          {({ blob, url, loading, error }) => (loading ? <Button>Cargando presupuesto</Button> : <Button>Descargar presupuesto</Button>)}
-        </PDFDownloadLink>
+        <ButtonGoto goTo={PAGES.BUDGETS.SHOWPDF(budget.id)} iconName="eye" text="Ver PDF" color="blue" />
+        {/* {budget.customer.phone && budget.customer.email && (
+          <ButtonSend customerData={budget.customer} />
+        )}  // cuando se acomoden los pedidos, activar esto. */}
       </Grid>
     </MainContainer>
   )

@@ -2,13 +2,8 @@
 import { PAGES } from "@/constants";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import {
-  Container,
-  Menu
-} from 'semantic-ui-react';
-import {
-  ModLink, Text
-} from "./styles";
+import { Container, Menu } from 'semantic-ui-react';
+import { ModContainer, ModLink, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -17,20 +12,17 @@ const Header = () => {
     <>
       {pathname !== "/login" &&
         <Menu fixed='top'>
-          <Container>
+          <ModContainer>
             <Menu.Item >
-              <div>
+              <Container fluid>
                 <Image
                   src="/Callixto.png"
                   alt="Callixto logo"
                   width={90}
                   height={30}
                 />
-              </div>
+              </Container>
             </Menu.Item>
-            <ModLink href={PAGES.LOGIN.BASE}>
-              <Menu.Item > <Text>Cerrar sesión</Text></Menu.Item>
-            </ModLink>
             <ModLink $destacar={pathname.includes(PAGES.CUSTOMERS.BASE)} href={PAGES.CUSTOMERS.BASE}>
               <Menu.Item ><Text $destacar={pathname.includes(PAGES.CUSTOMERS.BASE)}>Clientes</Text></Menu.Item>
             </ModLink>
@@ -40,8 +32,10 @@ const Header = () => {
             <ModLink $destacar={pathname.includes(PAGES.PRODUCTS.BASE)} href={PAGES.PRODUCTS.BASE}>
               <Menu.Item ><Text $destacar={pathname.includes(PAGES.PRODUCTS.BASE)}>Productos</Text></Menu.Item>
             </ModLink>
-
-          </Container>
+            <ModLink href={PAGES.LOGIN.BASE}>
+              <Menu.Item > <Text>Cerrar sesión</Text></Menu.Item>
+            </ModLink>
+          </ModContainer>
         </Menu>
       }
     </>

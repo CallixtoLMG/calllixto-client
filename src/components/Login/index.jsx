@@ -1,11 +1,19 @@
 "use client";
+import { PAGES } from "@/constants";
 import Image from 'next/image';
 import Link from 'next/link';
+import { Controller, useForm } from "react-hook-form";
 import { Form, Header, Message, Segment } from 'semantic-ui-react';
 import { ModButton2, ModGrid, ModGridColumn, Text } from "./styled";
-import { PAGES } from "@/constants";
 
-const LoginForm = () => {
+const LoginForm = ({ onSubmit }) => {
+
+  const { handleSubmit, control } = useForm();
+
+  const handleForm = (data) => {
+    onSubmit(data);
+  };
+
   return (
     <ModGrid textAlign='center' verticalAlign='middle'>
       <ModGridColumn >
@@ -21,17 +29,19 @@ const LoginForm = () => {
             <Text>Ingresa a tu cuenta</Text>
           </div>
         </Header>
-        <Form size='large'>
+        <Form onSubmit={handleSubmit(handleForm)} size='large'>
           <Segment stacked>
-            <Form.Input fluid icon='user' iconPosition='left' placeholder='Correo electrónico' />
-            <Form.Input
-              fluid
-              icon='lock'
-              iconPosition='left'
-              placeholder='Contraseña'
-              type='password'
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => <Form.Input placeholder='Correo electrónico' fluid icon='user' iconPosition='left' {...field} />}
             />
-            <ModButton2 fluid size='large'>
+            <Controller
+              name="password"
+              control={control}
+              render={({ field }) => <Form.Input type='password' placeholder='Contraseña' fluid icon='lock' iconPosition='left' {...field} />}
+            />
+            <ModButton2 fluid="true" size='large'>
               Ingresar
             </ModButton2>
           </Segment>

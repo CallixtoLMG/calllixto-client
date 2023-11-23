@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Form, Input, Label } from "semantic-ui-react";
+import { Button, Form, Input, Label } from "semantic-ui-react";
 import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
@@ -26,7 +26,12 @@ const ModInput = styled(Input)`
 const ModFormField = styled(Form.Field)({
   margin: "0!important",
   maxWidth: "50vh!important",
-
 });
-export { MainContainer, ModFormField, ModInput, ModLabel };
+
+const ModButton = styled(Button)({
+  width: "170px!important",
+  padding: "10px 0!important",
+});
+
+export { MainContainer, ModButton, ModFormField, ModInput, ModLabel };
 

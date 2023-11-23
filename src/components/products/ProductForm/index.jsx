@@ -1,10 +1,14 @@
 "use client"
+import { PAGES } from "@/constants";
 import { get } from "lodash";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Form, Icon } from 'semantic-ui-react';
-import { MainContainer, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
+import { Form, Icon } from 'semantic-ui-react';
+import { MainContainer, ModButton, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
 
-const ProductForm = ({ product, onSubmit }) => {
+const ProductForm = ({ product, onSubmit, code }) => {
+  const router = useRouter();
+
   const { handleSubmit, control } = useForm();
 
   const validateCode = (value) => {
@@ -15,26 +19,37 @@ const ProductForm = ({ product, onSubmit }) => {
     return /^[0-9]+$/.test(value);
   };
 
+  const handleForm = (data) => {
+    if (!product?.code) {
+      onSubmit(data);
+    } else {
+      onSubmit(code, data);
+    }
+    router.push(PAGES.PRODUCTS.BASE);
+  };
+
   return (
     <MainContainer>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(handleForm)}>
         {!product?.code &&
           <ModFormField>
-            <ModLabel>Código</ModLabel>
-            <Controller
-              name="code"
-              control={control}
-              defaultValue={get(product, "code", "")}
-              rules={{ validate: validateCode }}
-              render={({ field, fieldState }) => (
-                <>
-                  <ModInput {...field} />
-                  {fieldState?.invalid && (
-                    <WarningMessage >El código debe tener 4 caracteres alfanuméricos.</WarningMessage>
-                  )}
-                </>
-              )}
-            />
+            <>
+              <ModLabel>Código</ModLabel>
+              <Controller
+                name="code"
+                control={control}
+                defaultValue={get(product, "code", "")}
+                rules={{ validate: validateCode }}
+                render={({ field, fieldState }) => (
+                  <>
+                    <ModInput {...field} />
+                    {fieldState?.invalid && (
+                      <WarningMessage >El código debe tener 4 caracteres alfanuméricos.</WarningMessage>
+                    )}
+                  </>
+                )}
+              />
+            </>
           </ModFormField>}
         <ModFormField>
           <ModLabel>Nombre</ModLabel>
@@ -64,14 +79,12 @@ const ProductForm = ({ product, onSubmit }) => {
         </ModFormField>
         <ModFormField>
         </ModFormField>
-        <Button
+        <ModButton
           type="submit"
-          icon
-          labelPosition='right'
           color="green"
         >
           <Icon name="add" /> {product?.code ? "Actualizar producto" : "Crear producto"}
-        </Button>
+        </ModButton>
       </Form>
     </MainContainer>
   )

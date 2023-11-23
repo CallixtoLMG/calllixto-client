@@ -1,52 +1,57 @@
 "use client";
-import { deleteCustomer } from "@/app/clientes/page";
-import ButtonDelete from "@/components/ButtonDelete";
-import ButtonEdit from "@/components/ButtonEdit";
+import { deleteCustomer } from "@/api/customers";
+import ButtonDelete from "@/components/buttons/Delete";
+import ButtonEdit from "@/components/buttons/Edit";
+import ButtonGoTo from "@/components/buttons/GoTo";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from 'next/navigation';
-import { Button, Table } from 'semantic-ui-react';
+import { Table } from 'semantic-ui-react';
 import { HEADERS } from "../clients.common";
-import { MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, } from "./styles";
+import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
 
 const CustomersPage = ({ customers = [] }) => {
   const router = useRouter();
-  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`
+  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`;
 
   return (
     <MainContainer>
-      <ModLink href={PAGES.CUSTOMERS.CREATE}>
-        <Button color='green' content='Crear cliente' icon='add' labelPosition='right' />
-      </ModLink>
-      <ModTable celled compact>
-        <Table.Header fullWidth>
-          <ModTableRow>
-            <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
-            {HEADERS.map((header) => (
-              <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
+      <SubContainer>
+        <PageHeader title="Clientes" />
+        <ButtonGoTo color="green" text="Crear cliente" iconName="add" goTo={PAGES.CUSTOMERS.CREATE} />
+        {!!customers.length &&
+          <ModTable celled compact>
+            <Table.Header fullWidth>
+              <ModTableRow>
+                <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
+                {HEADERS.map((header) => (
+                  <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
+                ))}
+              </ModTableRow>
+            </Table.Header>
+            {customers.map((customer, index) => (
+              <Table.Body key={customer.email}>
+                <ModTableRow >
+                  <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                  {HEADERS
+                    .filter(header => !header.hide)
+                    .map((header) => <ModTableCell
+                      onClick={() => { router.push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
+                      key={header.id}
+                      textAlign='center'>
+                      {customer[header.value]}
+                    </ModTableCell>)
+                  }
+                  <Table.Cell textAlign='center'>
+                    <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
+                    <ButtonDelete onDelete={deleteCustomer} params={customer.id} deleteQuestion={deleteQuestion(customer.name)} />
+                  </Table.Cell>
+                </ModTableRow>
+              </Table.Body>
             ))}
-          </ModTableRow>
-        </Table.Header>
-        {customers.map((customer, index) => (
-          <Table.Body key={customer.email}>
-            <ModTableRow >
-              <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
-              {HEADERS
-                .filter(header => !header.hide)
-                .map((header) => <ModTableCell
-                  onClick={() => { router.push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
-                  key={header.id}
-                  textAlign='center'>
-                  {customer[header.value]}
-                </ModTableCell>)
-              }
-              <Table.Cell textAlign='center'>
-                <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
-                <ButtonDelete onDelete={deleteCustomer} params={customer.id} deleteQuestion={deleteQuestion(customer.name)} />
-              </Table.Cell>
-            </ModTableRow>
-          </Table.Body>
-        ))}
-      </ModTable>
+          </ModTable>
+        }
+      </SubContainer>
     </MainContainer>
   )
 };
