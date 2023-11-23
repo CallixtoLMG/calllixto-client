@@ -5,75 +5,12 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Button, Form, Icon, Input, Modal, Segment, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
-
 import { HEADERS } from "../products.common";
 import { ContainerModal, MainContainer, ModInput, ModLabel, ModTable, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
 
 const ImportExcel = ({ products }) => {
   const [open, setOpen] = useState(false);
   const router = useRouter()
-
-  // const createBatch = (product) => {
-  //   return new Promise((resolve, reject) => {
-  //     var requestOptions = {
-  //       method: 'POST',
-  //       body: JSON.stringify(product),
-  //       redirect: "follow",
-  //       headers: {
-  //         'Content-type': 'application-json'
-  //       },
-  //       cache: "no-store"
-  //     };
-  
-  //     fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${BATCH}`, requestOptions)
-  //       .then(async response => {
-  //         let res = await response.text()
-  //         res = JSON.parse(res)
-  //         if (res.statusOk) {
-  //           toast.success("Productos creados exitosamente");
-  //           resolve(res); // Resuelve la promesa con la respuesta
-  //         } else {
-  //           toast.error(res.message);
-  //           reject(res.message); // Rechaza la promesa con el mensaje de error
-  //         }
-  //       })
-  //       .catch(error => {
-  //         console.log('error', error);
-  //         reject(error); // Rechaza la promesa con el error
-  //       });
-  //   });
-  // };
-  
-  // const editBatch = (product) => {
-  //   return new Promise((resolve, reject) => {
-  //     var requestOptions = {
-  //       method: 'POST',
-  //       body: JSON.stringify(product),
-  //       redirect: "follow",
-  //       headers: {
-  //         'Content-type': 'application/json' // Corregí "json" aquí
-  //       },
-  //       cache: "no-store"
-  //     };
-  
-  //     fetch("https://t1k6ta4mzg.execute-api.sa-east-1.amazonaws.com/fe1af28f-b478-4d9e-b434-f4cf6e4355cc/products/transact", requestOptions)
-  //       .then(async response => {
-  //         let res = await response.text()
-  //         res = JSON.parse(res)
-  //         if (res.statusOk) {
-  //           toast.success("Productos importados exitosamente");
-  //           resolve(res); // Resuelve la promesa con la respuesta
-  //         } else {
-  //           toast.error(res.message);
-  //           reject(res.message); // Rechaza la promesa con el mensaje de error
-  //         }
-  //       })
-  //       .catch(error => {
-  //         console.log('error', error);
-  //         reject(error); // Rechaza la promesa con el error
-  //       });
-  //   });
-  // };
 
   const createBatch = (product) => {
     var requestOptions = {
@@ -85,11 +22,11 @@ const ImportExcel = ({ products }) => {
       },
       cache: "no-store"
     };
-    fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${BATCH}`, requestOptions)
 
+    fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${BATCH}`, requestOptions)
       .then(async response => {
         let res = await response.text()
-        res = JSON.parse(res)
+        res = JSON.parse(res);
         if (res.statusOk) {
           toast.success("Productos creados exitosamente");
         } else {
@@ -114,7 +51,7 @@ const ImportExcel = ({ products }) => {
 
       .then(async response => {
         let res = await response.text()
-        res = JSON.parse(res)
+        res = JSON.parse(res);
         if (res.statusOk) {
           toast.success("Productos importados exitosamente");
         } else {
@@ -143,7 +80,7 @@ const ImportExcel = ({ products }) => {
       const parsedData = XLSX.utils.sheet_to_json(sheet);
       const productosRepetidos = [];
       const productosNuevo = [];
-      const codigosExistente = {}; // los datos de todos los Code?
+      const codigosExistente = {};
       products.forEach((producto) => {
         codigosExistente[producto.code] = true;
       });
@@ -151,12 +88,12 @@ const ImportExcel = ({ products }) => {
         if (codigosExistente[nuevoProducto.code]) {
           productosRepetidos.push(nuevoProducto);
         } else {
-          productosNuevo.push(nuevoProducto)
+          productosNuevo.push(nuevoProducto);
         }
       });
-      setEditProducts(productosRepetidos)
-      setNewProducts(productosNuevo)
-      setOpen(true)
+      setEditProducts(productosRepetidos);
+      setNewProducts(productosNuevo);
+      setOpen(true);
     };
   }
   const { handleSubmit, control } = useForm();
@@ -165,11 +102,7 @@ const ImportExcel = ({ products }) => {
     code: {
       validate: (value) => /^[A-Za-z0-9]{4}$/.test(value),
       message: 'El código debe tener 4 caracteres alfanuméricos.',
-    },
-    // price: {
-    //   validate: (value) => /^\$\s?\d{1,3}(\.\d{3})*(,\d+)?$/.test(value),
-    //   message: 'Error de formato. Ejemplo: $ 1.200,54',
-    // },
+    }
   };
 
   const handleAcceptCreate = (data) => {
@@ -178,31 +111,8 @@ const ImportExcel = ({ products }) => {
     setTimeout(() => {
       router.refresh();
     }, 500);
-    setOpen(false)
-    // promiseall
+    setOpen(false);
   };
-
-  // const handleAcceptCreate = async (data) => {
-  //   try {
-  //     const createPromise = data.newProducts ? createBatch({ products: data.newProducts }) : null;
-  //     const editPromise = data.editProducts ? editBatch({ update: data.editProducts }) : null;
-  
-  //     // Usar Promise.all para esperar a que ambas promesas se resuelvan
-  //     const [createResult, editResult] = await Promise.all([createPromise, editPromise]);
-  
-  //     // Manejar los resultados según sea necesario
-  //     console.log('Resultado de createBatch:', createResult);
-  //     console.log('Resultado de editBatch:', editResult);
-  
-  //     setTimeout(() => {
-  //       router.refresh();
-  //     }, 500);
-  
-  //     setOpen(false);
-  //   } catch (error) {
-  //     console.error('Error al procesar lotes:', error);
-  //   }
-  // };
 
   return (
     <>
@@ -235,7 +145,6 @@ const ImportExcel = ({ products }) => {
                 </ModalHeaderContainer>
                 {!!newProducts.length &&
                   <>
-                    {/* <ModalTable identification="code" title="Nuevos productos" dataName="newProducts" values={newProducts} /> */}
                     <ModalModLabel >Nuevos productos</ModalModLabel>
                     <ModTableContainer>
                       <ModTable celled compact>

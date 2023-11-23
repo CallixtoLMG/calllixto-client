@@ -11,7 +11,7 @@ const LoginForm = ({ onSubmit }) => {
   const { handleSubmit, control } = useForm();
 
   const handleForm = (data) => {
-    onSubmit(data)
+    onSubmit(data);
   };
 
   return (

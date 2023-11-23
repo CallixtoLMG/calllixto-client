@@ -5,7 +5,7 @@ async function Customer({ params }) {
   const customer = await getCustomer(params.id);
 
   return (
-    <ShowCustomer customer={customer.customer} id={params.id} />
+    <ShowCustomer customer={customer} id={params.id} />
   )
 };
 

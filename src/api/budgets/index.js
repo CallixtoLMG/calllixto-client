@@ -3,8 +3,8 @@ import { toast } from "react-hot-toast";
 
 export async function loadBudgets() {
   const res = await fetch(`${URL}${CLIENTID}${PATHS.BUDGETS}`, { cache: "no-store" });
-  const data = await res.json()
-  return data
+  const data = await res.json();
+  return data;
 };
 
 export async function create(budget) {
@@ -19,8 +19,8 @@ export async function create(budget) {
   };
 
   const response = await fetch(`${URL}${CLIENTID}${PATHS.BUDGETS}`, requestOptions);
-  let res = await response.text()
-  res = JSON.parse(res)
+  let res = await response.text();
+  res = JSON.parse(res);
   if (res.statusOk) {
     toast.success("Presupuesto creado exitosamente");
   } else {

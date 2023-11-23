@@ -1,16 +1,16 @@
 import { CLIENTID, PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
 
-export async function customersList() {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}`, { cache: "no-store" });
-  const data = await res.json()
-  return data.customers
+export async function customersList(requestOptions) {
+  const res = await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}`, requestOptions);
+  const data = await res.json();
+  return data.customers;
 };
 
-export async function getCustomer(id) {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`, { cache: "no-store" });
+export async function getCustomer(id, requestOptions) {
+  const res = await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`, requestOptions);
   const data = await res.json();
-  return data;
+  return data.customers;
 };
 
 export async function deleteCustomer(id) {
@@ -26,8 +26,8 @@ export async function deleteCustomer(id) {
 
   await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`, requestOptions)
     .then(async response => {
-      let res = await response.text()
-      res = JSON.parse(res)
+      let res = await response.text();
+      res = JSON.parse(res);
       if (res.statusOk) {
         toast.success("Cliente eliminado exitosamente");
       } else {
@@ -50,9 +50,8 @@ export async function create(customer) {
 
   fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}`, requestOptions)
     .then(async response => {
-      let res = await response.text()
-      res = JSON.parse(res)
-      console.log(res)
+      let res = await response.text();
+      res = JSON.parse(res);
       if (res.statusOk) {
         toast.success("Cliente creado exitosamente");
       } else {
@@ -75,8 +74,8 @@ export async function edit(id, customer) {
 
   fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`, requestOptions)
     .then(async response => {
-      let res = await response.text()
-      res = JSON.parse(res)
+      let res = await response.text();
+      res = JSON.parse(res);
       if (res.statusOk) {
         toast.success("Cliente modificado exitosamente");
       } else {

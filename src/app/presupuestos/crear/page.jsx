@@ -7,8 +7,8 @@ import { useEffect, useState } from "react";
 
 const CreateBudget = () => {
 
-  const [products, setProductsList] = useState(null)
-  const [customers, setCustomersList] = useState(null)
+  const [products, setProductsList] = useState(null);
+  const [customers, setCustomersList] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,7 +31,7 @@ const CreateBudget = () => {
       }));
       setCustomersList(customersFilteredList);
     };
-    fetchData()
+    fetchData();
 
   }, []);
 

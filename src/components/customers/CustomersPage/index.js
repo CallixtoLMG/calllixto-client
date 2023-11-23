@@ -12,7 +12,7 @@ import { MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow,
 
 const CustomersPage = ({ customers = [] }) => {
   const router = useRouter();
-  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`
+  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`;
 
   return (
     <MainContainer>

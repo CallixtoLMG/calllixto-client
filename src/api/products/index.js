@@ -15,9 +15,8 @@ export async function create(product) {
 
   fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, requestOptions)
     .then(async response => {
-      let res = await response.text()
-      res = JSON.parse(res)
-      console.log(res)
+      let res = await response.text();
+      res = JSON.parse(res);
       if (res.statusOk) {
         toast.success("Producto creado exitosamente");
       } else {
@@ -43,9 +42,9 @@ export async function edit(params, product) {
       let res = await response.text()
       res = JSON.parse(res)
       if (res.statusOk) {
-        toast.success("Producto modificado exitosamente", { duration: 4000, position: "top-center" });
+        toast.success("Producto modificado exitosamente");
       } else {
-        toast.error(res.message, { duration: 4000, position: "top-center" });
+        toast.error(res.message);
       }
     })
     .catch(error => console.log('error', error));

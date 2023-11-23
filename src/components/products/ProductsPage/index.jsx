@@ -14,7 +14,7 @@ import { ButtonsContainer, MainContainer, ModTable, ModTableCell, ModTableHeader
 
 const ProductsPage = ({ products = [] }) => {
   const router = useRouter();
-  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`
+  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
 
   return (
     <MainContainer>

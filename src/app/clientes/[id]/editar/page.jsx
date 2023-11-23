@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 
 async function get(id) {
   const res = await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`);
-  const data = await res.json()
-  return data
+  const data = await res.json();
+  return data;
 };
 
 function EditCustomer({ params }) {

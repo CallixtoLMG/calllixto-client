@@ -12,11 +12,11 @@ const CustomerForm = ({ customer, onSubmit, id }) => {
 
   const handleForm = (data) => {
     if (!customer?.id) {
-      onSubmit(data)
+      onSubmit(data);
     } else {
-      onSubmit(id, data)
+      onSubmit(id, data);
     }
-    router.push(PAGES.CUSTOMERS.BASE)
+    router.push(PAGES.CUSTOMERS.BASE);
   };
 
 

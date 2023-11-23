@@ -21,11 +21,11 @@ const ProductForm = ({ product, onSubmit, code }) => {
 
   const handleForm = (data) => {
     if (!product?.code) {
-      onSubmit(data)
+      onSubmit(data);
     } else {
-      onSubmit(code, data)
+      onSubmit(code, data);
     }
-    router.push(PAGES.PRODUCTS.BASE)
+    router.push(PAGES.PRODUCTS.BASE);
   };
 
   return (

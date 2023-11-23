@@ -4,7 +4,7 @@ import ProductForm from "@/components/products/ProductForm";
 import { useEffect, useState } from "react";
 
 function EditProduct({ params }) {
-  const code = params.code
+  const code = params.code;
 
   const [product, setProduct] = useState(null);
   useEffect(() => {
