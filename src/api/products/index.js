@@ -11,8 +11,6 @@ export async function create(product) {
     },
     cache: "no-store"
   };
-  console.log(requestOptions)
-
   fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, requestOptions)
     .then(async response => {
       let res = await response.text();
@@ -32,7 +30,7 @@ export async function edit(params, product) {
     method: 'PUT',
     redirect: 'follow',
     headers: {
-      'Content-Type': 'application-json'
+      authorization: `Bearer ${localStorage.getItem("token")}`
     },
     cache: "no-store",
   };
@@ -50,16 +48,16 @@ export async function edit(params, product) {
     .catch(error => console.log('error', error));
 };
 
-export async function productsList() {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, { cache: "no-store" });
-  const data = await res.json()
-  return data.products
+export async function productsList(requestOptions) {
+  const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, requestOptions);
+  const data = await res.json();
+  return data.products;
 };
 
-export async function getProduct(code) {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${code}`);
-  const data = await res.json()
-  return data
+export async function getProduct(code, requestOptions) {
+  const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${code}`, requestOptions);
+  const data = await res.json();
+  return data.product;
 };
 
 export async function deleteProduct(code) {
@@ -67,7 +65,7 @@ export async function deleteProduct(code) {
     method: 'DELETE',
     redirect: 'follow',
     headers: {
-      'Content-type': 'application-json'
+      authorization: `Bearer ${localStorage.getItem("token")}`
     },
     cache: "no-store"
   };

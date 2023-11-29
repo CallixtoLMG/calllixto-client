@@ -10,11 +10,10 @@ export async function customersList(requestOptions) {
 export async function getCustomer(id, requestOptions) {
   const res = await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`, requestOptions);
   const data = await res.json();
-  return data.customers;
+  return data.customer;
 };
 
 export async function deleteCustomer(id) {
-
   var requestOptions = {
     method: 'DELETE',
     redirect: 'follow',
@@ -67,7 +66,7 @@ export async function edit(id, customer) {
     method: 'PUT',
     redirect: 'follow',
     headers: {
-      'Content-Type': 'application/json'
+      authorization: `Bearer ${localStorage.getItem("token")}`
     },
     cache: "no-store",
   };

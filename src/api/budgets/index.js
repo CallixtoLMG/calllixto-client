@@ -1,10 +1,16 @@
 import { CLIENTID, PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
 
-export async function loadBudgets() {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.BUDGETS}`, { cache: "no-store" });
+export async function budgetsList(requestOptions) {
+  const res = await fetch(`${URL}${CLIENTID}${PATHS.BUDGETS}`, requestOptions);
   const data = await res.json();
-  return data;
+  return data.budgets;
+};
+
+export async function getBudget(id, requestOptions) {
+  const res = await fetch(`${URL}${CLIENTID}${PATHS.BUDGETS}/${id}`, requestOptions);
+  const data = await res.json();
+  return data.budget;
 };
 
 export async function create(budget) {
@@ -13,7 +19,7 @@ export async function create(budget) {
     body: JSON.stringify(budget),
     redirect: "follow",
     headers: {
-      'Content-type': 'application-json'
+      authorization: `Bearer ${localStorage.getItem("token")}`
     },
     cache: "no-store"
   };

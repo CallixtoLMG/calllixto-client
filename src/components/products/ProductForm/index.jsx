@@ -6,26 +6,24 @@ import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from 'semantic-ui-react';
 import { MainContainer, ModButton, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
 
-const ProductForm = ({ product, onSubmit, code }) => {
+const ProductForm = ({ product, onSubmit }) => {
   const router = useRouter();
-
   const { handleSubmit, control } = useForm();
-
   const validateCode = (value) => {
     return /^[A-Za-z0-9]{4}$/.test(value);
   };
-
   const validatePrice = (value) => {
     return /^[0-9]+$/.test(value);
   };
-
   const handleForm = (data) => {
     if (!product?.code) {
       onSubmit(data);
     } else {
-      onSubmit(code, data);
+      onSubmit(product?.code, data);
     }
-    router.push(PAGES.PRODUCTS.BASE);
+    setTimeout(() => {
+      router.push(PAGES.PRODUCTS.BASE);
+    }, 1000)
   };
 
   return (

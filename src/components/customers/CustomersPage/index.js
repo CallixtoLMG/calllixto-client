@@ -30,7 +30,7 @@ const CustomersPage = ({ customers = [] }) => {
               </ModTableRow>
             </Table.Header>
             {customers.map((customer, index) => (
-              <Table.Body key={customer.email}>
+              <Table.Body key={customer.name}>
                 <ModTableRow >
                   <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
                   {HEADERS

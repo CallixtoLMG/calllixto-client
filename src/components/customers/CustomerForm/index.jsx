@@ -5,20 +5,19 @@ import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from 'semantic-ui-react';
 import { MainContainer, ModButton, ModFormField, ModInput, ModLabel } from "./styles";
 
-const CustomerForm = ({ customer, onSubmit, id }) => {
+const CustomerForm = ({ customer, onSubmit }) => {
   const router = useRouter();
-
   const { handleSubmit, control } = useForm();
-
   const handleForm = (data) => {
     if (!customer?.id) {
       onSubmit(data);
     } else {
-      onSubmit(id, data);
+      onSubmit(customer?.id, data);
     }
-    router.push(PAGES.CUSTOMERS.BASE);
+    setTimeout(() => {
+      router.push(PAGES.CUSTOMERS.BASE);
+    }, 1000)
   };
-
 
   return (
     <MainContainer>

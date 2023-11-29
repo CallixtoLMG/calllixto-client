@@ -39,7 +39,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
     <MainContainer>
       <Form onSubmit={handleSubmit(handleCreate)}>
         <ModDropdown
-          name={`customerId`}
+          name={`customerName`}
           placeholder='Clientes...'
           search
           selection

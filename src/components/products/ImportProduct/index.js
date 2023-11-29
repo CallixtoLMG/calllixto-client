@@ -18,7 +18,7 @@ const ImportExcel = ({ products }) => {
       body: JSON.stringify(product),
       redirect: "follow",
       headers: {
-        'Content-type': 'application-json'
+        authorization: `Bearer ${localStorage.getItem("token")}`
       },
       cache: "no-store"
     };
@@ -42,13 +42,11 @@ const ImportExcel = ({ products }) => {
       body: JSON.stringify(product),
       redirect: "follow",
       headers: {
-        'Content-type': 'application-json'
+        authorization: `Bearer ${localStorage.getItem("token")}`
       },
       cache: "no-store"
     };
-
     fetch("https://t1k6ta4mzg.execute-api.sa-east-1.amazonaws.com/fe1af28f-b478-4d9e-b434-f4cf6e4355cc/products/transact", requestOptions)
-
       .then(async response => {
         let res = await response.text()
         res = JSON.parse(res);

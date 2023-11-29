@@ -1,12 +1,33 @@
 "use client";
-import { loadBudgets } from "@/api/budgets";
+import { budgetsList } from "@/api/budgets";
 import BudgetsPage from "@/components/budgets/BudgetPage";
+import { useEffect, useState } from "react";
 
-async function Budgets() {
+const Budgets = () => {
+  const [budgets, setBudgets] = useState();
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const fetchData = async () => {
+      try {
+        const requestOptions = {
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          cache: "no-store",
+        };
+        const fetchBudgets = await budgetsList(requestOptions);
+        setBudgets(fetchBudgets);
+      } catch (error) {
+        console.error('Error al cargar clientes:', error);
+      };
+    };
+    fetchData();
+  }, []);
 
-  const budgets = await loadBudgets();
   return (
-    <BudgetsPage budgets={budgets.budgets} />
+    <BudgetsPage budgets={budgets} />
   )
 };
 

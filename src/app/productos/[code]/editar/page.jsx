@@ -3,21 +3,28 @@ import { edit, getProduct } from "@/api/products";
 import ProductForm from "@/components/products/ProductForm";
 import { useEffect, useState } from "react";
 
-function EditProduct({ params }) {
-  const code = params.code;
-
+const EditProduct = ({ params }) => {
   const [product, setProduct] = useState(null);
   useEffect(() => {
-    async function productData() {
-      const data = await getProduct(params.code);
+    const token = localStorage.getItem('token');
+    async function fectchData() {
+      var requestOptions = {
+        method: 'GET',
+        redirect: 'follow',
+        headers: {
+          authorization: `Bearer ${token}`
+        },
+        cache: "no-store",
+      };
+      const data = await getProduct(params.code, requestOptions);
       setProduct(data);
     };
-    productData();
+    fectchData();
   }, [params.code]);
 
   return (
     <>
-      {product && <ProductForm product={product.product} onSubmit={edit} code={code} />}
+      {product && <ProductForm product={product} onSubmit={edit} />}
     </>
   )
 };

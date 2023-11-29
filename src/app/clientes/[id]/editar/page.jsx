@@ -1,30 +1,30 @@
 "use client"
-import { edit } from "@/api/customers";
+import { edit, getCustomer } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
-import { CLIENTID, PATHS, URL } from "@/fetchUrls";
 import { useEffect, useState } from "react";
 
-async function get(id) {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`);
-  const data = await res.json();
-  return data;
-};
-
-function EditCustomer({ params }) {
-  const id = params.id;
+const EditCustomer = ({ params }) => {
   const [customer, setCustomer] = useState(null);
-
   useEffect(() => {
-    async function customerData() {
-      const data = await get(params.id);
+    const token = localStorage.getItem('token');
+    async function fetchData() {
+      var requestOptions = {
+        method: 'GET',
+        redirect: 'follow',
+        headers: {
+          authorization: `Bearer ${token}`
+        },
+        cache: "no-store",
+      };
+      const data = await getCustomer(params.id, requestOptions);
       setCustomer(data);
     };
-    customerData();
+    fetchData();
   }, [params.id]);
 
   return (
     <>
-      {customer && <CustomerForm customer={customer.customer} onSubmit={edit} id={id} />}
+      {customer && <CustomerForm customer={customer} onSubmit={edit} />}
     </>
   )
 };

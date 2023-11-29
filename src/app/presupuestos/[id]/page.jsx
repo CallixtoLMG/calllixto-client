@@ -1,19 +1,34 @@
+"use client"
+import { getBudget } from "@/api/budgets";
 import ShowBudget from "@/components/budgets/ShowBudget";
-import { CLIENTID, PATHS, URL } from "@/fetchUrls";
+import { useEffect, useState } from "react";
 
-async function loadBudget(id) {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.BUDGETS}/${id}`, { cache: "no-store" });
-  const data = await res.json();
-  return data;
-};
-
-async function Budgets({ params }) {
-
-  const budget = await loadBudget(params.id);
+const Budget = ({ params }) => {
+  const [budget, setBudget] = useState();
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    const fetchData = async () => {
+      try {
+        const requestOptions = {
+          method: 'GET',
+          headers: {
+            authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          cache: "no-store",
+        };
+        const fetchBudget = await getBudget(params.id, requestOptions);
+        setBudget(fetchBudget);
+      } catch (error) {
+        console.error('Error al cargar clientes:', error);
+      };
+    };
+    fetchData();
+  }, [])
 
   return (
-    <ShowBudget budget={budget.budget} id={params.id} />
+    <ShowBudget budget={budget} />
   )
 };
 
-export default Budgets;
+export default Budget;

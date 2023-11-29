@@ -1,6 +1,6 @@
 export const totalSum = (value) => {
   return (
-    value.reduce((accumulator, product) => {
+    value?.reduce((accumulator, product) => {
       return accumulator + Number(product.total || 0);
     }, 0).toFixed(2)
   );
@@ -19,7 +19,7 @@ export const totalIVA = (value) => {
   return totalConIVA.toFixed(2);
 };
 
-export const modDate = (date) => date.split("T")[0];
+export const modDate = (date) => date?.split("T")[0];
 
 export const modPrice = (number) => {
   let modNumber = Number(number);

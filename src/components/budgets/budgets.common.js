@@ -2,7 +2,7 @@ const HEADERS = [
   {
     name: "Cliente",
     object: "customer",
-    value: "name",
+    value: "customerName",
     id: 1
   },
   {
