@@ -24,7 +24,7 @@ const Product = ({ params }) => {
       };
     };
     fetchData();
-  }, []);
+  }, [params.code]);
 
   return (
     <ShowProduct product={product} />

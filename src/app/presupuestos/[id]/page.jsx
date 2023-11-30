@@ -24,7 +24,7 @@ const Budget = ({ params }) => {
       };
     };
     fetchData();
-  }, [])
+  }, [params.id])
 
   return (
     <ShowBudget budget={budget} />

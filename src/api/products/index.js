@@ -39,7 +39,7 @@ export async function createBatch(product) {
     let res = await response.text()
     res = JSON.parse(res);
     if (res.statusOk) {
-      toast.success("Productos importados creados exitosamente");
+      toast.success("Productos importados exitosamente");
     } else {
       toast.error(res.message);
     }
@@ -74,7 +74,7 @@ export async function edit(params, product) {
 export async function editBatch(product) {
   const requestOptions = {
     body: JSON.stringify(product),
-    method: 'PUT',
+    method: 'POST',
     redirect: 'follow',
     headers: {
       authorization: `Bearer ${localStorage.getItem("token")}`
@@ -88,7 +88,7 @@ export async function editBatch(product) {
         let res = await response.text()
         res = JSON.parse(res);
         if (res.statusOk) {
-          toast.success("Productos importados modificadosexitosamente");
+          toast.success("Productos modificados exitosamente");
         } else {
           toast.error(res.message);
         }

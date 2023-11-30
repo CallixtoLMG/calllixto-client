@@ -1,64 +1,14 @@
-// import { CLIENTID, CREATEBATCH, EDITBATCH, PATHS, URL } from "@/fetchUrls";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-// import { toast } from "react-hot-toast";
 import { Button, Form, Icon, Input, Modal, Segment, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { HEADERS } from "../products.common";
 import { ContainerModal, MainContainer, ModInput, ModLabel, ModTable, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
-  const [open, setOpen] = useState(false);
   const router = useRouter()
-
-  // const createBatch = (product) => {
-  //   var requestOptions = {
-  //     method: 'POST',
-  //     body: JSON.stringify(product),
-  //     redirect: "follow",
-  //     headers: {
-  //       authorization: `Bearer ${localStorage.getItem("token")}`
-  //     },
-  //     cache: "no-store"
-  //   };
-
-  //   fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${CREATEBATCH}`, requestOptions)
-  //     .then(async response => {
-  //       let res = await response.text()
-  //       res = JSON.parse(res);
-  //       if (res.statusOk) {
-  //         toast.success("Productos importados creados exitosamente");
-  //       } else {
-  //         toast.error(res.message);
-  //       }
-  //     })
-  //     .catch(error => console.log('error', error));
-  // };
-
-  // const editBatch = (product) => {
-  //   var requestOptions = {
-  //     method: 'POST',
-  //     body: JSON.stringify(product),
-  //     redirect: "follow",
-  //     headers: {
-  //       authorization: `Bearer ${localStorage.getItem("token")}`
-  //     },
-  //     cache: "no-store"
-  //   };
-  //   fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${EDITBATCH}`, requestOptions)
-  //     .then(async response => {
-  //       let res = await response.text()
-  //       res = JSON.parse(res);
-  //       if (res.statusOk) {
-  //         toast.success("Productos importados modificadosexitosamente");
-  //       } else {
-  //         toast.error(res.message);
-  //       }
-  //     })
-  //     .catch(error => console.log('error', error));
-  // };
-
+  const [open, setOpen] = useState(false);
   const [newProducts, setNewProducts] = useState([]);
   const [editProducts, setEditProducts] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -104,17 +54,11 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
   };
 
   const handleAcceptCreate = (data) => {
-    const update = {
-      create: [],
-      update: data.editProducts || [],
-    };
     data.newProducts && createBatch({ products: data.newProducts })
-    data.editProducts && editBatch(update)
-    console.log(update)
-
+    data.editProducts && editBatch({ update: data.editProducts })
     setTimeout(() => {
       router.refresh();
-    }, 500);
+    }, 1000);
     setOpen(false);
   };
 

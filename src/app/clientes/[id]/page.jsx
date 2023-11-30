@@ -24,7 +24,7 @@ const Customer = ({ params }) => {
       };
     };
     fetchData();
-  }, []);
+  }, [params.id]);
 
   return (
     <ShowCustomer customer={customer} />
