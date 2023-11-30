@@ -2,13 +2,8 @@
 import { PAGES } from "@/constants";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import {
-  Container,
-  List
-} from 'semantic-ui-react';
-import {
-  ModSegment
-} from "./styles";
+import { Container, List } from 'semantic-ui-react';
+import { ModSegment } from "./styles";
 
 const Footer = () => {
   const pathname = usePathname();
