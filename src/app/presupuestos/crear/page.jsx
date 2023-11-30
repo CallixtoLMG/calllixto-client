@@ -10,16 +10,16 @@ const CreateBudget = () => {
   const [customers, setCustomersList] = useState(null);
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      cache: "no-store",
+    };
     const fetchData = async () => {
       try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          cache: "no-store",
-        };
         const productsFecthData = await productsList(requestOptions);
         const productsFilteredList = productsFecthData.map(product => ({
           price: product.price,
@@ -33,21 +33,13 @@ const CreateBudget = () => {
         console.error('Error al cargar clientes:', error);
       }
       try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          cache: "no-store",
-        };
         const customersFetchData = await customersList(requestOptions);
         const customersFilteredList = customersFetchData.map(customer => ({
-        key: customer.name,
-        value: customer.name,
-        text: customer.name,
-        phone: customer.phone,
-        email: customer.email,
+          key: customer.name,
+          value: customer.name,
+          text: customer.name,
+          phone: customer.phone,
+          email: customer.email,
         }));
         setCustomersList(customersFilteredList);
       } catch (error) {

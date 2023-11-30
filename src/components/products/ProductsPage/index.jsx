@@ -12,7 +12,7 @@ import ImportExcel from "../ImportProduct";
 import { HEADERS } from "../products.common";
 import { ButtonsContainer, MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
 
-const ProductsPage = ({ products = [] }) => {
+const ProductsPage = ({ products = [], createBatch, editBatch }) => {
   const router = useRouter();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
 
@@ -22,7 +22,7 @@ const ProductsPage = ({ products = [] }) => {
         <PageHeader title={"Productos"} />
         <ButtonsContainer>
           <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
-          <ImportExcel products={products} />
+          <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
         </ButtonsContainer>
         {!!products.length && <ModTable celled compact>
           <Table.Header fullWidth>

@@ -1,4 +1,4 @@
-import { CLIENTID, PATHS, URL } from "@/fetchUrls";
+import { CLIENTID, CREATEBATCH, EDITBATCH, PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
 
 export async function create(product) {
@@ -24,6 +24,29 @@ export async function create(product) {
     .catch(error => console.log('error', error));
 };
 
+export async function createBatch(product) {
+  var requestOptions = {
+    method: 'POST',
+    body: JSON.stringify(product),
+    redirect: "follow",
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    cache: "no-store"
+  };
+  fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${CREATEBATCH}`, requestOptions)
+  .then(async response => {
+    let res = await response.text()
+    res = JSON.parse(res);
+    if (res.statusOk) {
+      toast.success("Productos importados creados exitosamente");
+    } else {
+      toast.error(res.message);
+    }
+  })
+  .catch(error => console.log('error', error));
+};
+
 export async function edit(params, product) {
   const requestOptions = {
     body: JSON.stringify(product),
@@ -47,6 +70,31 @@ export async function edit(params, product) {
     })
     .catch(error => console.log('error', error));
 };
+
+export async function editBatch(product) {
+  const requestOptions = {
+    body: JSON.stringify(product),
+    method: 'PUT',
+    redirect: 'follow',
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    cache: "no-store",
+  };
+
+  fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${EDITBATCH}`, requestOptions)
+
+      .then(async response => {
+        let res = await response.text()
+        res = JSON.parse(res);
+        if (res.statusOk) {
+          toast.success("Productos importados modificadosexitosamente");
+        } else {
+          toast.error(res.message);
+        }
+      })
+      .catch(error => console.log('error', error));
+  };
 
 export async function productsList(requestOptions) {
   const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, requestOptions);
