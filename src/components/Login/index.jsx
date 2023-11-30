@@ -2,16 +2,20 @@
 import { PAGES } from "@/constants";
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Controller, useForm } from "react-hook-form";
 import { Form, Header, Message, Segment } from 'semantic-ui-react';
-import { ModButton2, ModGrid, ModGridColumn, Text } from "./styled";
+import { ModButton, ModGrid, ModGridColumn, Text } from "./styled";
 
 const LoginForm = ({ onSubmit }) => {
-
+  const router = useRouter();
   const { handleSubmit, control } = useForm();
-
-  const handleForm = (data) => {
+  const handleForm = async (data) => {
+    const loginSuccess = await onSubmit(data);
     onSubmit(data);
+    if (loginSuccess) {
+      router.push(PAGES.PRODUCTS.BASE);
+    };
   };
 
   return (
@@ -41,9 +45,9 @@ const LoginForm = ({ onSubmit }) => {
               control={control}
               render={({ field }) => <Form.Input type='password' placeholder='Contraseña' fluid icon='lock' iconPosition='left' {...field} />}
             />
-            <ModButton2 fluid="true" size='large'>
+            <ModButton fluid="true" size='large'>
               Ingresar
-            </ModButton2>
+            </ModButton>
           </Segment>
         </Form>
         <Message>

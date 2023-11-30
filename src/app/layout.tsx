@@ -1,6 +1,6 @@
 "use client";
-import Footer from "@/components/layout/Footer";
-import Header from '@/components/layout/Header';
+// import Footer from "@/components/layout/Footer";
+import Header from "@/components/layout/Header";
 import Toaster from "@/components/layout/Toaster";
 import { Inter } from 'next/font/google';
 import 'semantic-ui-css/semantic.min.css';
@@ -21,16 +21,16 @@ export default function RootLayout({
     <html lang="en">
       <StyledComponentsRegistry>
         <body className={inter.className}>
-          <Header />
-          <LayoutChildrenContainer >
-            {children}
-          </LayoutChildrenContainer>
           <Toaster
             position="top-center"
             toastOptions={{
               duration: 4000
             }} />
-          <Footer />
+          <Header />
+          <LayoutChildrenContainer >
+            {children}
+          </LayoutChildrenContainer>
+          {/* <Footer /> */}
         </body>
       </StyledComponentsRegistry>
     </html>

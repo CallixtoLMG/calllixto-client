@@ -1,12 +1,20 @@
 "use client";
 import { PAGES } from "@/constants";
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useEffect } from "react";
 import { Container, Menu } from 'semantic-ui-react';
-import { ModContainer, ModLink, Text } from "./styles";
+import { LogOutDiv, ModContainer, ModLink, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
+  const router = useRouter();
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push(PAGES.LOGIN.BASE);
+  };
+  useEffect(() => {
+  }, []);
 
   return (
     <>
@@ -32,9 +40,9 @@ const Header = () => {
             <ModLink $destacar={pathname.includes(PAGES.PRODUCTS.BASE)} href={PAGES.PRODUCTS.BASE}>
               <Menu.Item ><Text $destacar={pathname.includes(PAGES.PRODUCTS.BASE)}>Productos</Text></Menu.Item>
             </ModLink>
-            <ModLink href={PAGES.LOGIN.BASE}>
-              <Menu.Item > <Text>Cerrar sesión</Text></Menu.Item>
-            </ModLink>
+            <LogOutDiv>
+              <Menu.Item onClick={handleLogout} > <Text>Cerrar sesión</Text></Menu.Item>
+            </LogOutDiv>
           </ModContainer>
         </Menu>
       }

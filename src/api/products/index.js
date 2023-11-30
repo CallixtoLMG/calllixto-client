@@ -1,4 +1,4 @@
-import { CLIENTID, PATHS, URL } from "@/fetchUrls";
+import { CLIENTID, CREATEBATCH, EDITBATCH, PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
 
 export async function create(product) {
@@ -11,8 +11,6 @@ export async function create(product) {
     },
     cache: "no-store"
   };
-  console.log(requestOptions)
-
   fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, requestOptions)
     .then(async response => {
       let res = await response.text();
@@ -26,13 +24,36 @@ export async function create(product) {
     .catch(error => console.log('error', error));
 };
 
+export async function createBatch(product) {
+  var requestOptions = {
+    method: 'POST',
+    body: JSON.stringify(product),
+    redirect: "follow",
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    cache: "no-store"
+  };
+  fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${CREATEBATCH}`, requestOptions)
+  .then(async response => {
+    let res = await response.text()
+    res = JSON.parse(res);
+    if (res.statusOk) {
+      toast.success("Productos importados exitosamente");
+    } else {
+      toast.error(res.message);
+    }
+  })
+  .catch(error => console.log('error', error));
+};
+
 export async function edit(params, product) {
   const requestOptions = {
     body: JSON.stringify(product),
     method: 'PUT',
     redirect: 'follow',
     headers: {
-      'Content-Type': 'application-json'
+      authorization: `Bearer ${localStorage.getItem("token")}`
     },
     cache: "no-store",
   };
@@ -50,16 +71,41 @@ export async function edit(params, product) {
     .catch(error => console.log('error', error));
 };
 
-export async function productsList() {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, { cache: "no-store" });
-  const data = await res.json()
-  return data.products
+export async function editBatch(product) {
+  const requestOptions = {
+    body: JSON.stringify(product),
+    method: 'POST',
+    redirect: 'follow',
+    headers: {
+      authorization: `Bearer ${localStorage.getItem("token")}`
+    },
+    cache: "no-store",
+  };
+
+  fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${EDITBATCH}`, requestOptions)
+
+      .then(async response => {
+        let res = await response.text()
+        res = JSON.parse(res);
+        if (res.statusOk) {
+          toast.success("Productos modificados exitosamente");
+        } else {
+          toast.error(res.message);
+        }
+      })
+      .catch(error => console.log('error', error));
+  };
+
+export async function productsList(requestOptions) {
+  const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, requestOptions);
+  const data = await res.json();
+  return data.products;
 };
 
-export async function getProduct(code) {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${code}`);
-  const data = await res.json()
-  return data
+export async function getProduct(code, requestOptions) {
+  const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${code}`, requestOptions);
+  const data = await res.json();
+  return data.product;
 };
 
 export async function deleteProduct(code) {
@@ -67,7 +113,7 @@ export async function deleteProduct(code) {
     method: 'DELETE',
     redirect: 'follow',
     headers: {
-      'Content-type': 'application-json'
+      authorization: `Bearer ${localStorage.getItem("token")}`
     },
     cache: "no-store"
   };

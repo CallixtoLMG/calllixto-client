@@ -5,9 +5,8 @@ import { useEffect, useState } from "react";
 
 const Customers = () => {
   const [customers, setCustomers] = useState();
-  const token = localStorage.getItem('token');
-
   useEffect(() => {
+    const token = localStorage.getItem('token');
     const fetchData = async () => {
       try {
         const requestOptions = {
@@ -18,16 +17,14 @@ const Customers = () => {
           },
           cache: "no-store",
         };
-
         const fetchCustomers = await customersList(requestOptions);
         setCustomers(fetchCustomers);
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       }
     };
-
     fetchData();
-  }, [token]);
+  }, []);
 
   return (
     <CustomersPage customers={customers} />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Flex } from "rebass";
 import { Container } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -15,17 +16,30 @@ const ModLink = styled(Link)`
   }
 `;
 
-const ModContainer = styled(Container)`
-  a:last-child {  
-    margin-left: auto!important;
-    div {
-      border-left: 1px solid rgba(34,36,38,.1)!important;
-      border-right: 1px solid rgba(34,36,38,.1)!important;
-      &:before {
-        width: 0px!important;
-      }
+const LogOutDiv = styled(Flex)`
+  position: relative;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+  font-size: 15px;
+  background-color: ${props => props.$destacar && "#f5f5f5"};
+  &:hover {
+    background-color: #f5f5f5!important;
+  }
+  a {
+    &:hover {
+      background-color: #f5f5f5!important;
     }
-   
+  }
+`;
+
+const ModContainer = styled(Container)`
+  div:last-child {  
+    margin-left: auto!important;
+    border-left: 1px solid rgba(34,36,38,.1)!important;
+    border-right: 1px solid rgba(34,36,38,.1)!important;
+    &:before {
+      width: 0px!important;
+    }
   };
 `;
 
@@ -53,5 +67,5 @@ const Text = styled.p`
   }
 `;
 
-export { ModContainer, ModLink, Text };
+export { LogOutDiv, ModContainer, ModLink, Text };
 

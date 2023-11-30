@@ -1,24 +1,24 @@
 "use client";
 import ButtonGoto from "@/components/buttons/GoTo";
-// import ButtonSend from "@/components/buttons/Send"; // cuando se acomoden los pedidos, activar esto.
+import ButtonSend from "@/components/buttons/Send";
 import { PAGES } from "@/constants";
+import { get } from "lodash";
 import { Grid, Label, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from '../../../utils';
 import { PRODUCTSHEADERS } from "../budgets.common";
 import { DataContainer, MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
 
-const ShowBudget = ({ budget }) => {
+const ShowBudget = (budget) => {
   return (
     <MainContainer>
       <SubContainer>
         <DataContainer>
           <ModLabel>Cliente</ModLabel>
-          {/* <ModSegment>{budget.customer.name}</ModSegment>   // cuando se acomoden los pedidos, activar esto.*/} 
-          <ModSegment>Milton</ModSegment>
+          <ModSegment>{get(budget, "budget.customer.name", "")}</ModSegment>
         </DataContainer>
         <DataContainer>
           <ModLabel> Fecha </ModLabel>
-          <ModSegment>{modDate(budget.createdAt)}</ModSegment>
+          <ModSegment>{modDate(get(budget, "budget.createdAt", ""))}</ModSegment>
         </DataContainer>
       </SubContainer>
       <Grid >
@@ -34,7 +34,7 @@ const ShowBudget = ({ budget }) => {
                   ))}
                 </ModTableRow>
               </Table.Header>
-              {budget.products.map((product, index) => (
+              {budget?.budget?.products?.map((product, index) => (
                 <Table.Body key={product.code}>
                   <ModTableRow >
                     <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
@@ -54,16 +54,17 @@ const ShowBudget = ({ budget }) => {
                   <Table.HeaderCell />
                   <Table.HeaderCell textAlign="center" colSpan='1'><strong>Suma Total</strong></Table.HeaderCell>
                   <Table.HeaderCell colSpan='3' />
-                  <Table.HeaderCell textAlign="center" colSpan='1'><strong>{modPrice(totalSum(budget.products))}</strong></Table.HeaderCell>
+                  <Table.HeaderCell textAlign="center" colSpan='1'><strong>{modPrice(totalSum(budget?.budget?.products))}</strong></Table.HeaderCell>
                 </Table.Row>
               </Table.Footer>
             </ModTable>
           </Grid.Column>
         </Grid.Row>
         <ButtonGoto goTo={PAGES.BUDGETS.SHOWPDF(budget.id)} iconName="eye" text="Ver PDF" color="blue" />
-        {/* {budget.customer.phone && budget.customer.email && (
-          <ButtonSend customerData={budget.customer} />
-        )}  // cuando se acomoden los pedidos, activar esto. */}
+        {(get(budget, "budget.customer.phone") ||
+          get(budget, "budget.customer.email")) && (
+            <ButtonSend customerData={get(budget, "budget.customer", null)} />
+          )}
       </Grid>
     </MainContainer>
   )

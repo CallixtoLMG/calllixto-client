@@ -1,4 +1,4 @@
-import { Button, Grid } from "semantic-ui-react";
+import { Grid } from "semantic-ui-react";
 import { styled } from "styled-components";
 
 const Text = styled.p`
@@ -14,12 +14,7 @@ const ModGrid = styled(Grid)({
   background: "#C8E3DF!important",
 });
 
-const ModButton = styled(Button)({
-  backgroundColor: "#579294",
-  color: "white",
-});
-
-const ModButton2 = styled.button`
+const ModButton = styled.button`
   background-color: #579294;
   color: white;
   width: 100%;
@@ -49,5 +44,5 @@ const ModGridColumn = styled(Grid.Column)({
   maxWidth: '450px!important',
 });
 
-export { ModButton, ModButton2, ModGrid, ModGridColumn, Text };
+export { ModButton, ModGrid, ModGridColumn, Text };
 
