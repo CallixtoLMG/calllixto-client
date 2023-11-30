@@ -1,5 +1,6 @@
 "use client";
 // import Footer from "@/components/layout/Footer";
+import Footers from "@/components/layout/Footers";
 import Header from "@/components/layout/Header";
 import Toaster from "@/components/layout/Toaster";
 import { Inter } from 'next/font/google';
@@ -30,7 +31,7 @@ export default function RootLayout({
             toastOptions={{
               duration: 4000
             }} />
-          {/* <Footer /> */}
+          <Footers />
         </body>
       </StyledComponentsRegistry>
     </html>
