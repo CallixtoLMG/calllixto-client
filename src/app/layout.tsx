@@ -1,5 +1,5 @@
 "use client";
-import Footer from "@/components/Footer";
+// import Footer from "@/components/layout/Footer";
 import Header from "@/components/layout/Header";
 import Toaster from "@/components/layout/Toaster";
 import { Inter } from 'next/font/google';
@@ -30,7 +30,7 @@ export default function RootLayout({
           <LayoutChildrenContainer >
             {children}
           </LayoutChildrenContainer>
-          <Footer />
+          {/* <Footer /> */}
         </body>
       </StyledComponentsRegistry>
     </html>
