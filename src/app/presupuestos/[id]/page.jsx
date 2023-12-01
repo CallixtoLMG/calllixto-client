@@ -1,9 +1,11 @@
 "use client"
 import { getBudget } from "@/api/budgets";
 import ShowBudget from "@/components/budgets/ShowBudget";
+import Loader1 from "@/components/layout/Loader";
 import { useEffect, useState } from "react";
 
 const Budget = ({ params }) => {
+  const [loader, setLoader] = useState(true)
   const [budget, setBudget] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -19,6 +21,7 @@ const Budget = ({ params }) => {
         };
         const fetchBudget = await getBudget(params.id, requestOptions);
         setBudget(fetchBudget);
+        setLoader(false)
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       };
@@ -27,7 +30,9 @@ const Budget = ({ params }) => {
   }, [params.id])
 
   return (
-    <ShowBudget budget={budget} />
+    <Loader1 active={loader}>
+      <ShowBudget budget={budget} />
+    </Loader1>
   )
 };
 
