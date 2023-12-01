@@ -1,24 +1,30 @@
 "use client";
 import { PAGES } from "@/constants";
+import Loader1 from "../layout/Loader";
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Controller, useForm } from "react-hook-form";
 import { Form, Header, Message, Segment } from 'semantic-ui-react';
 import { ModButton, ModGrid, ModGridColumn, Text } from "./styled";
+import { useState } from "react";
 
 const LoginForm = ({ onSubmit }) => {
   const router = useRouter();
   const { handleSubmit, control } = useForm();
+  const [loader, setLoader] = useState(false)
   const handleForm = async (data) => {
+    setLoader(true)
     const loginSuccess = await onSubmit(data);
     onSubmit(data);
     if (loginSuccess) {
       router.push(PAGES.PRODUCTS.BASE);
     };
+    setLoader(false)
   };
 
   return (
+    <Loader1 active={loader}>
     <ModGrid textAlign='center' verticalAlign='middle'>
       <ModGridColumn >
         <Header as='h3' textAlign='center'>
@@ -55,6 +61,7 @@ const LoginForm = ({ onSubmit }) => {
         </Message>
       </ModGridColumn>
     </ModGrid>
+    </Loader1>
   )
 };
 
