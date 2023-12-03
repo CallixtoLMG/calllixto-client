@@ -14,6 +14,9 @@ const PAGES = {
   LOGIN: {
     BASE: "/login"
   },
+  NOTFOUND: {
+    BASE: "/paginaNoEncontrada"
+  },
   CUSTOMERS: {
     BASE: "/clientes",
     CREATE: "/clientes/crear",
@@ -22,7 +25,12 @@ const PAGES = {
   }
 };
 
+const APIS = {
+  MAIL: (email, name) => `mailto:${email}?Subject=${encodeURIComponent(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
+  WSP: (phone, name) => `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
+};
+
 export {
-  PAGES
+  APIS, PAGES
 };
 

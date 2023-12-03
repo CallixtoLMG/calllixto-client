@@ -1,11 +1,14 @@
 "use client";
+import ButtonGoTo from "@/components/buttons/GoTo";
+import { PAGES } from "@/constants";
 import { Grid } from 'semantic-ui-react';
 import { modPrice } from '../../../utils';
-import { MainContainer, ModLabel, ModSegment } from "./styles";
+import { ModLabel, ModSegment } from "./styles";
 
 const ShowProduct = ({ product }) => {
   return (
-    <MainContainer>
+    <>
+      <ButtonGoTo goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
       <Grid divided>
         <Grid.Row stretched>
           <Grid.Column>
@@ -18,7 +21,7 @@ const ShowProduct = ({ product }) => {
           </Grid.Column>
         </Grid.Row>
       </Grid>
-    </MainContainer>
+    </>
   )
 };
 export default ShowProduct;

@@ -1,19 +1,6 @@
 import Link from "next/link";
-import { Flex } from "rebass";
 import { Icon, Table } from "semantic-ui-react";
 import styled from "styled-components";
-
-const MainContainer = styled(Flex)`
-  justify-content: center!important;
-  width: 100%!important;
-`;
-
-const SubContainer = styled(Flex)`
-  margin: 75px 30px 30px 30px!important;
-  flex-direction: column;
-  width: 80%!important;
-  max-width: 900px!important;
-`;
 
 const ModTableCell = styled(Table.Cell)({
   cursor: "pointer!important"
@@ -26,7 +13,8 @@ const ModTableHeaderCell = styled(Table.HeaderCell)({
 const ModTable = styled(Table)`
   tbody:nth-child(odd) {
     background-color: #f2f2f2!important;
-  }
+  };
+  margin-top: 0!important;
 `;
 
 const ModTableRow = styled(Table.Row)`
@@ -46,6 +34,6 @@ const ModLink = styled(Link)({
 });
 
 export {
-  MainContainer, ModIcon, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer
+  ModIcon, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
 };
 

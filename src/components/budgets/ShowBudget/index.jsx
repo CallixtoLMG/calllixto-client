@@ -6,11 +6,12 @@ import { get } from "lodash";
 import { Grid, Label, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from '../../../utils';
 import { PRODUCTSHEADERS } from "../budgets.common";
-import { DataContainer, MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
+import { DataContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
 
 const ShowBudget = (budget) => {
   return (
-    <MainContainer>
+    <>
+      <ButtonGoto goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
       <SubContainer>
         <DataContainer>
           <ModLabel>Cliente</ModLabel>
@@ -43,7 +44,7 @@ const ShowBudget = (budget) => {
                       .map((header) => <Table.Cell
                         key={header.id}
                         textAlign='center'>
-                        {header.modPrice ? modPrice(product[header.value]) : product[header.value]}
+                        {header.modPrice ? modPrice(get(product, header.value, '')) : get(product, header.value, '')}
                       </Table.Cell>)
                     }
                   </ModTableRow>
@@ -66,7 +67,7 @@ const ShowBudget = (budget) => {
             <ButtonSend customerData={get(budget, "budget.customer", null)} />
           )}
       </Grid>
-    </MainContainer>
+    </>
   )
 };
 

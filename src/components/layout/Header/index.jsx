@@ -15,10 +15,11 @@ const Header = () => {
   };
   useEffect(() => {
   }, []);
-
+  const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.NOTFOUND.BASE];
+  const shouldShowHeader = !routesWithoutHeader.includes(pathname);
   return (
     <>
-      {pathname !== "/login" &&
+      {shouldShowHeader &&
         <Menu fixed='top'>
           <ModContainer>
             <Menu.Item >

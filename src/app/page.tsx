@@ -1,15 +1,13 @@
-import Image from 'next/image';
+"use client"
+import React from 'react';
+import { Container, Subtitle, Title } from "./styles";
 
-export default function Home() {
+const Home: React.FC = () => {
   return (
-    <main style={{margin: "150px"}}>
-      <h1>Somos Callixto!</h1>
-      <Image
-        src="/callixto.png"
-        alt="Callixto logo"
-        width={100}
-        height={40}
-      />
-    </main>
-  )
-}
+    <Container>
+      <Title>Bienvenido a Callixto!</Title>
+      <Subtitle>Gracias por elegirnos. ¡Estamos encantados de ser parte de su viaje!</Subtitle>
+    </Container>
+  );
+};
+export default Home;

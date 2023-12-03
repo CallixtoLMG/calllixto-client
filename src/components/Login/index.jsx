@@ -12,7 +12,6 @@ const LoginForm = ({ onSubmit }) => {
   const { handleSubmit, control } = useForm();
   const handleForm = async (data) => {
     const loginSuccess = await onSubmit(data);
-    onSubmit(data);
     if (loginSuccess) {
       router.push(PAGES.PRODUCTS.BASE);
     };

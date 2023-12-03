@@ -1,9 +1,10 @@
 import { SHOWPRODUCTSHEADERS } from "@/components/budgets/budgets.common";
+import ButtonGoTo from "@/components/buttons/GoTo";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from 'react-hook-form';
 import { Button, Dropdown, Form, Icon, Table } from 'semantic-ui-react';
-import { MainContainer, ModButton, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
+import { ModButton, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
@@ -36,7 +37,8 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
   };
 
   return (
-    <MainContainer>
+    <>
+      <ButtonGoTo goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
       <Form onSubmit={handleSubmit(handleCreate)}>
         <ModDropdown
           name={`customerName`}
@@ -196,7 +198,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
         >
           <Icon name="add" />Crear presupuesto</ModButton>
       </Form>
-    </MainContainer>
+    </>
   );
 };
 

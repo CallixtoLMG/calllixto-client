@@ -1,10 +1,11 @@
 "use client"
+import ButtonGoTo from "@/components/buttons/GoTo";
 import { PAGES } from "@/constants";
 import { get } from "lodash";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from 'semantic-ui-react';
-import { MainContainer, ModButton, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
+import { ModButton, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
 
 const ProductForm = ({ product, onSubmit }) => {
   const router = useRouter();
@@ -27,7 +28,8 @@ const ProductForm = ({ product, onSubmit }) => {
   };
 
   return (
-    <MainContainer>
+    <>
+      <ButtonGoTo goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
       <Form onSubmit={handleSubmit(handleForm)}>
         {!product?.code &&
           <ModFormField>
@@ -84,7 +86,7 @@ const ProductForm = ({ product, onSubmit }) => {
           <Icon name="add" /> {product?.code ? "Actualizar producto" : "Crear producto"}
         </ModButton>
       </Form>
-    </MainContainer>
+    </>
   )
 };
 

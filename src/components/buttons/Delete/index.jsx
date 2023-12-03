@@ -22,10 +22,10 @@ const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
 
   const handleDelete = () => {
     setShowModal(false);
+    onDelete(params);
     setTimeout(() => {
       router.refresh();
-    }, 500);
-    onDelete(params);
+    }, 1000);
   };
 
   return (

@@ -1,12 +1,18 @@
 "use client"
 import { getProduct } from "@/api/products";
 import ShowProduct from "@/components/products/ShowProduct";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Product = ({ params }) => {
   const [product, setProduct] = useState({})
+  const router = useRouter();
   useEffect(() => {
     const token = localStorage.getItem('token');
+    if (!token) {
+      router.push(PAGES.LOGIN.BASE)
+    };
     const fetchData = async () => {
       try {
         const requestOptions = {

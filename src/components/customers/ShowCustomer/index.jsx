@@ -1,10 +1,13 @@
 "use client";
+import ButtonGoTo from "@/components/buttons/GoTo";
+import { PAGES } from "@/constants";
 import { Grid } from 'semantic-ui-react';
-import { MainContainer, ModLabel, ModSegment } from "./styles";
+import { ModLabel, ModSegment } from "./styles";
 
-const ShowCustomer = ({ customer={} }) => {
+const ShowCustomer = ({ customer = {} }) => {
   return (
-    <MainContainer>
+    <>
+      <ButtonGoTo goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
       <Grid divided>
         <Grid.Row stretched>
           <Grid.Column>
@@ -17,7 +20,7 @@ const ShowCustomer = ({ customer={} }) => {
           </Grid.Column>
         </Grid.Row>
       </Grid>
-    </MainContainer>
+    </>
   )
 };
 

@@ -1,12 +1,18 @@
 "use client"
 import { getBudget } from "@/api/budgets";
 import ShowBudget from "@/components/budgets/ShowBudget";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Budget = ({ params }) => {
+  const router = useRouter();
   const [budget, setBudget] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
+    if (!token) {
+      router.push(PAGES.LOGIN.BASE)
+    };
     const fetchData = async () => {
       try {
         const requestOptions = {

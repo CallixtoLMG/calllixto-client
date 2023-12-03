@@ -3,13 +3,19 @@ import { create } from "@/api/budgets";
 import { customersList } from "@/api/customers";
 import { productsList } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const CreateBudget = () => {
+  const router = useRouter();
   const [products, setProductsList] = useState(null);
   const [customers, setCustomersList] = useState(null);
   useEffect(() => {
     const token = localStorage.getItem('token');
+    if (!token) {
+      router.push(PAGES.LOGIN.BASE)
+    };
     const requestOptions = {
       method: 'GET',
       headers: {

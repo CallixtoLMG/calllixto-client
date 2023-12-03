@@ -1,9 +1,10 @@
 "use client"
+import ButtonGoTo from "@/components/buttons/GoTo";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from 'semantic-ui-react';
-import { MainContainer, ModButton, ModFormField, ModInput, ModLabel } from "./styles";
+import { ModButton, ModFormField, ModInput, ModLabel } from "./styles";
 
 const CustomerForm = ({ customer, onSubmit }) => {
   const router = useRouter();
@@ -20,7 +21,8 @@ const CustomerForm = ({ customer, onSubmit }) => {
   };
 
   return (
-    <MainContainer>
+    <>
+      <ButtonGoTo goTo={PAGES.CUSTOMERS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
       <Form onSubmit={handleSubmit(handleForm)}>
         <ModFormField>
           <ModLabel >Nombre</ModLabel>
@@ -58,7 +60,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
           <Icon name="add" /> {customer?.id ? "Actualizar cliente" : "Crear cliente"}
         </ModButton>
       </Form>
-    </MainContainer>
+    </>
   )
 };
 

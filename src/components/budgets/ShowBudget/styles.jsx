@@ -2,11 +2,6 @@ import { Flex } from "rebass";
 import { Label, Segment, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
-const MainContainer = styled(Flex)`
-  margin: 75px 30px 30px 30px!important;
-  flex-direction: column;
-`;
-
 const SubContainer = styled(Flex)`
   flex-direction: row;
 `;
@@ -40,5 +35,5 @@ const ModTableHeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important"
 });
 
-export { DataContainer, MainContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow, SubContainer };
+export { DataContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow, SubContainer };
 
