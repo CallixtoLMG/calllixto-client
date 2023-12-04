@@ -1,14 +1,15 @@
 "use client";
 import { createBatch, editBatch, productsList } from "@/api/products";
+import { getUserRol } from "@/api/rol";
 import ProductsPage from "@/components/products/ProductsPage";
 import { PAGES } from "@/constants";
-// import { URL } from "@/fetchUrls";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Products = () => {
   const router = useRouter();
   const [products, setProducts] = useState();
+  const [rol, setRol] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -30,21 +31,20 @@ const Products = () => {
         console.error('Error al cargar clientes:', error);
       };
     };
-    // const response = async () => {
-    //   try {
-    //     const response = await fetch(`${URL}validate`, requestOptions);
-    //     let res = await response.text()
-    //     console.log("HOLA")
-    //   } catch (error) {
-    //     console.error('Error al cargar clientes:', error);
-    //   };
-    // };
-    // response()
+    const fetchRol = async () => {
+      try {
+        const roles = await getUserRol();
+        setRol(roles);
+      } catch (error) {
+        console.error('Error al cargar clientes:', error);
+      };
+    };
     fetchProductData();
+    fetchRol()
   }, []);
 
   return (
-    <ProductsPage products={products} createBatch={createBatch} editBatch={editBatch} />
+    <ProductsPage products={products} createBatch={createBatch} editBatch={editBatch} rol={rol} />
   );
 };
 

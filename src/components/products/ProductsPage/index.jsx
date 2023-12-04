@@ -5,24 +5,25 @@ import ButtonDownload from "@/components/buttons/DownloadExcel";
 import ButtonEdit from "@/components/buttons/Edit";
 import ButtonGoTo from "@/components/buttons/GoTo";
 import { PAGES } from "@/constants";
-import { modPrice } from "@/utils";
+import { getVisibilityRules, modPrice } from "@/utils";
 import { useRouter } from 'next/navigation';
 import { Table } from 'semantic-ui-react';
 import ImportExcel from "../ImportProduct";
 import { HEADERS } from "../products.common";
 import { ButtonsContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
-const ProductsPage = ({ products = [], createBatch, editBatch }) => {
+const ProductsPage = ({ products = [], createBatch, editBatch, rol }) => {
   const router = useRouter();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
-
+  const visibilityRules = getVisibilityRules(rol)
   return (
     <>
-      <ButtonsContainer>
-        <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
-        <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
-        <ButtonDownload />
-      </ButtonsContainer>
+      {visibilityRules.canSeeButtons &&
+        <ButtonsContainer>
+          <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
+          <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
+          <ButtonDownload />
+        </ButtonsContainer>}
       {!!products.length && <ModTable celled compact>
         <Table.Header fullWidth>
           <ModTableRow>
