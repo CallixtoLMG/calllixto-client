@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 const Customer = ({ params }) => {
   const [customer, setCustomer] = useState();
+  const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
     const token = localStorage.getItem('token');
     const fetchData = async () => {
@@ -19,6 +20,7 @@ const Customer = ({ params }) => {
         };
         const fetchCustomer = await getCustomer(params.id, requestOptions);
         setCustomer(fetchCustomer);
+        setIsLoading(false)
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       };
@@ -27,7 +29,7 @@ const Customer = ({ params }) => {
   }, [params.id]);
 
   return (
-    <ShowCustomer customer={customer} />
+      <ShowCustomer customer={customer} isLoading={isLoading} />
   );
 };
 

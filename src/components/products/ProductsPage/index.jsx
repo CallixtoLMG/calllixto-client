@@ -11,8 +11,9 @@ import { Table } from 'semantic-ui-react';
 import ImportExcel from "../ImportProduct";
 import { HEADERS } from "../products.common";
 import { ButtonsContainer, MainContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
+import Loader from "@/components/layout/Loader";
 
-const ProductsPage = ({ products = [], createBatch, editBatch }) => {
+const ProductsPage = ({ products = [], createBatch, editBatch, isLoading }) => {
   const router = useRouter();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
 
@@ -24,7 +25,8 @@ const ProductsPage = ({ products = [], createBatch, editBatch }) => {
           <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
           <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
         </ButtonsContainer>
-        {!!products.length && <ModTable celled compact>
+        <Loader active={isLoading}>
+          <ModTable celled compact>
           <Table.Header fullWidth>
             <ModTableRow>
               <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
@@ -53,7 +55,8 @@ const ProductsPage = ({ products = [], createBatch, editBatch }) => {
               </ModTableRow>
             </Table.Body>
           )) : ""}
-        </ModTable>}
+        </ModTable>
+        </Loader>
       </SubContainer>
     </MainContainer>
   )
