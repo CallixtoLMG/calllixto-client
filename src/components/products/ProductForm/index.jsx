@@ -1,19 +1,24 @@
-"use client"
+"use client";
 import { PAGES } from "@/constants";
 import { get } from "lodash";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
-import { Form, Icon } from 'semantic-ui-react';
-import { MainContainer, ModButton, ModFormField, ModInput, ModLabel, WarningMessage } from "./styles";
+import { Form, Icon } from "semantic-ui-react";
+import {
+  MainContainer,
+  ModButton,
+  ModFormField,
+  ModInput,
+  ModLabel,
+  WarningMessage,
+} from "./styles";
+import { CurrencyInput } from "react-currency-mask";
 
 const ProductForm = ({ product, onSubmit }) => {
   const router = useRouter();
   const { handleSubmit, control } = useForm();
   const validateCode = (value) => {
     return /^[A-Za-z0-9]{4}$/.test(value);
-  };
-  const validatePrice = (value) => {
-    return /^[0-9]+$/.test(value);
   };
   const handleForm = (data) => {
     if (!product?.code) {
@@ -23,32 +28,36 @@ const ProductForm = ({ product, onSubmit }) => {
     }
     setTimeout(() => {
       router.push(PAGES.PRODUCTS.BASE);
-    }, 1000)
+    }, 1000);
   };
 
   return (
     <MainContainer>
       <Form onSubmit={handleSubmit(handleForm)}>
         {!product?.code &&
-          <ModFormField>
-            <>
-              <ModLabel>Código</ModLabel>
-              <Controller
-                name="code"
-                control={control}
-                defaultValue={get(product, "code", "")}
-                rules={{ validate: validateCode }}
-                render={({ field, fieldState }) => (
-                  <>
-                    <ModInput {...field} />
-                    {fieldState?.invalid && (
-                      <WarningMessage >El código debe tener 4 caracteres alfanuméricos.</WarningMessage>
-                    )}
-                  </>
-                )}
-              />
-            </>
-          </ModFormField>}
+          (
+            <ModFormField>
+              <>
+                <ModLabel>Código</ModLabel>
+                <Controller
+                  name="code"
+                  control={control}
+                  defaultValue={get(product, "code", "")}
+                  rules={{ validate: validateCode }}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <ModInput {...field} />
+                      {fieldState?.invalid && (
+                        <WarningMessage>
+                          El código debe tener 4 caracteres alfanuméricos.
+                        </WarningMessage>
+                      )}
+                    </>
+                  )}
+                />
+              </>
+            </ModFormField>
+          )}
         <ModFormField>
           <ModLabel>Nombre</ModLabel>
           <Controller
@@ -64,14 +73,16 @@ const ProductForm = ({ product, onSubmit }) => {
             name="price"
             control={control}
             defaultValue={get(product, "price", "")}
-            rules={{ validate: validatePrice }}
             render={({ field, fieldState }) => (
-              <>
-                <ModInput {...field} />
-                {fieldState?.invalid && (
-                  <WarningMessage >El precio debe contener solo números.</WarningMessage>
-                )}
-              </>
+                <CurrencyInput
+                  value={field.value}
+                  locale="es-AR"
+                  currency="ARS"
+                  onChangeValue={(_, value) => {
+                    field.onChange(value);
+                  }}
+                  InputElement={<ModInput />}
+                />
             )}
           />
         </ModFormField>
@@ -81,11 +92,12 @@ const ProductForm = ({ product, onSubmit }) => {
           type="submit"
           color="green"
         >
-          <Icon name="add" /> {product?.code ? "Actualizar producto" : "Crear producto"}
+          <Icon name="add" />{" "}
+          {product?.code ? "Actualizar producto" : "Crear producto"}
         </ModButton>
       </Form>
     </MainContainer>
-  )
+  );
 };
 
 export default ProductForm;
