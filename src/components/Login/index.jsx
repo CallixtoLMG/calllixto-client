@@ -1,11 +1,11 @@
 "use client";
 import { PAGES } from "@/constants";
 import Image from 'next/image';
-import Link from 'next/link';
+import Link from "next/link";
 import { useRouter } from 'next/navigation';
 import { Controller, useForm } from "react-hook-form";
-import { Form, Header, Message, Segment } from 'semantic-ui-react';
-import { ModButton, ModGrid, ModGridColumn, Text } from "./styled";
+import { Form, Segment } from 'semantic-ui-react';
+import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "./styled";
 
 const LoginForm = ({ onSubmit }) => {
   const router = useRouter();
@@ -18,9 +18,9 @@ const LoginForm = ({ onSubmit }) => {
   };
 
   return (
-    <ModGrid textAlign='center' verticalAlign='middle'>
+    <ModGrid>
       <ModGridColumn >
-        <Header as='h3' textAlign='center'>
+        <ModHeader as='h3' >
           <div>
             <Image
               src="/Callixto.png"
@@ -31,7 +31,7 @@ const LoginForm = ({ onSubmit }) => {
             />
             <Text>Ingresa a tu cuenta</Text>
           </div>
-        </Header>
+        </ModHeader>
         <Form onSubmit={handleSubmit(handleForm)} size='large'>
           <Segment stacked>
             <Controller
@@ -49,9 +49,9 @@ const LoginForm = ({ onSubmit }) => {
             </ModButton>
           </Segment>
         </Form>
-        <Message>
+        <ModMessage>
           <Link href={PAGES.PRODUCTS.BASE}> Perdiste tu contraseña?</Link>
-        </Message>
+        </ModMessage>
       </ModGridColumn>
     </ModGrid>
   )

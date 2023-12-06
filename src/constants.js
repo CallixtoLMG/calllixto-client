@@ -1,4 +1,5 @@
 const PAGES = {
+  BASE: "/",
   PRODUCTS: {
     BASE: "/productos",
     CREATE: "/productos/crear",
@@ -9,7 +10,7 @@ const PAGES = {
     BASE: "/presupuestos",
     CREATE: "/presupuestos/crear",
     SHOW: (id) => `/presupuestos/${id}`,
-    SHOWPDF: (id) => `/presupuestos/${id}/verPdf`
+    SHOWPDF: (id) => `/presupuestos/${id}/pdf`
   },
   LOGIN: {
     BASE: "/login"

@@ -20,29 +20,29 @@ const CustomersPage = ({ customers = [] }) => {
         <ModTable celled compact>
           <Table.Header fullWidth>
             <ModTableRow>
-              <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
+              <ModTableHeaderCell ></ModTableHeaderCell>
               {HEADERS.map((header) => (
-                <ModTableHeaderCell key={header.id} textAlign='center'>{header.name}</ModTableHeaderCell>
+                <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
               ))}
             </ModTableRow>
           </Table.Header>
           {customers.map((customer, index) => (
             <Table.Body key={customer.name}>
               <ModTableRow >
-                <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                <ModTableCell >{index + 1}</ModTableCell>
                 {HEADERS
                   .filter(header => !header.hide)
                   .map((header) => <ModTableCell
                     onClick={() => { router.push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
                     key={header.id}
-                    textAlign='center'>
+                  >
                     {customer[header.value]}
                   </ModTableCell>)
                 }
-                <Table.Cell textAlign='center'>
+                <ModTableCell >
                   <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
                   <ButtonDelete onDelete={deleteCustomer} params={customer.id} deleteQuestion={deleteQuestion(customer.name)} />
-                </Table.Cell>
+                </ModTableCell>
               </ModTableRow>
             </Table.Body>
           ))}

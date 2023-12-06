@@ -29,5 +29,14 @@ const ModTableRow = styled(Table.Row)`
   th:not(:first-child) { width: 12rem!important; };
 `;
 
-export { ModButton, ModDropdown, ModInput, ModTableRow, TotalText };
+const ModTableHeaderCell = styled(Table.HeaderCell)`
+  background-color: ${props => props.$header && "#EEEEEE!important"};
+  text-align: ${props => props.$left ? "left!important" : "center!important"}
+`;
+
+const ModTableCell = styled(Table.Cell)({
+  textAlign: 'center!important'
+});
+
+export { ModButton, ModDropdown, ModInput, ModTableCell, ModTableHeaderCell, ModTableRow, TotalText };
 

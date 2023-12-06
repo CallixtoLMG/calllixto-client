@@ -8,11 +8,13 @@ const ButtonsContainer = styled(Flex)`
 `;
 
 const ModTableCell = styled(Table.Cell)({
-  cursor: "pointer!important"
+  cursor: "pointer!important",
+  textAlign: "center!important"
 });
 
 const ModTableHeaderCell = styled(Table.HeaderCell)({
-  background: "#EEEEEE!important"
+  background: "#EEEEEE!important",
+  textAlign: "center!important"
 });
 
 const ModLink = styled(Link)({

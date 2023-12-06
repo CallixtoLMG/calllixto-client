@@ -89,6 +89,10 @@ const ModTableRow = styled(Table.Row)`
   th:last-child { width: 250px!important; };
 `;
 
-export { ContainerModal, DataNotFoundContainer, ModInput, ModLabel, ModLink, ModTable, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage };
+const ModTableCell = styled(Table.Cell)({
+  textAlign: 'center!important'
+});
+
+export { ContainerModal, DataNotFoundContainer, ModInput, ModLabel, ModLink, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage };
 
 

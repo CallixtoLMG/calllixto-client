@@ -1,7 +1,7 @@
 import { Flex } from 'rebass';
 import styled from 'styled-components';
 
-const NotFoundWrapper = styled(Flex)`
+const MainContainer = styled(Flex)`
  flex-direction: column;
  align-items: center;
  justify-content: center;
@@ -10,5 +10,6 @@ const NotFoundWrapper = styled(Flex)`
 `;
 
 export {
-  NotFoundWrapper
+  MainContainer
 };
+

@@ -28,29 +28,3 @@ export const modPrice = (number) => {
     currency: 'ARS',
   });
 };
-
-export const getVisibilityRules = (rol) => {
-  switch (rol) {
-    case 'user':
-    default:
-      return {
-        canCreateProduct: false,
-        canUseActions: false,
-      };
-    case 'admin':
-      return {
-        canSeeButtons: true,
-        canUseActions: true,
-      };
-    case 'superadmin':
-      return {
-        canSeeButtons: true,
-        canUseActions: true,
-      };
-    case 'callixto':
-      return {
-        canSeeButtons: true,
-        canUseActions: true,
-      };
-  };
-};

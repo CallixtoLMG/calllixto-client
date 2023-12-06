@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 const Products = () => {
   const router = useRouter();
   const [products, setProducts] = useState();
-  const [rol, setRol] = useState();
+  const [role, setRole] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -34,7 +34,7 @@ const Products = () => {
     const fetchRol = async () => {
       try {
         const roles = await getUserRol();
-        setRol(roles);
+        setRole(roles);
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       };
@@ -44,7 +44,7 @@ const Products = () => {
   }, []);
 
   return (
-    <ProductsPage products={products} createBatch={createBatch} editBatch={editBatch} rol={rol} />
+    <ProductsPage products={products} createBatch={createBatch} editBatch={editBatch} role={role} />
   );
 };
 

@@ -13,7 +13,7 @@ const ModLink = styled(Link)`
 
   &:hover {
     background-color: #f5f5f5;
-  }
+  };
 `;
 
 const LogOutDiv = styled(Flex)`
@@ -24,22 +24,23 @@ const LogOutDiv = styled(Flex)`
   background-color: ${props => props.$destacar && "#f5f5f5"};
   &:hover {
     background-color: #f5f5f5!important;
-  }
+  };
   a {
     &:hover {
       background-color: #f5f5f5!important;
-    }
-  }
+    };
+  };
 `;
 
 const ModContainer = styled(Container)`
+  height: 60px!important;
   div:last-child {  
     margin-left: auto!important;
     border-left: 1px solid rgba(34,36,38,.1)!important;
     border-right: 1px solid rgba(34,36,38,.1)!important;
     &:before {
       width: 0px!important;
-    }
+    };
   };
 `;
 
@@ -51,8 +52,8 @@ const Text = styled.p`
     &:after{
       transform: scaleX(1);
       transform-origin: bottom left;
-    }
-  }
+    };
+  };
   &:after {
     content: '';
     position: absolute;
@@ -64,7 +65,7 @@ const Text = styled.p`
     background-color: #0087ca;
     transform-origin: bottom right;
     transition: transform 0.25s ease-out;
-  }
+  };
 `;
 
 export { LogOutDiv, ModContainer, ModLink, Text };

@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Label, Segment, Table } from "semantic-ui-react";
+import { GridColumn, Label, Segment, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const SubContainer = styled(Flex)`
@@ -26,14 +26,23 @@ const ModLabel = styled(Label)({
   margin: "0!important"
 });
 
+const ModGridColumn = styled(GridColumn)({
+  textAlign: 'center!important'
+});
+
 const ModSegment = styled(Segment)({
   marginTop: "5px!important",
   height: "50px!important",
 });
 
-const ModTableHeaderCell = styled(Table.HeaderCell)({
-  background: "#EEEEEE!important"
+const ModTableHeaderCell = styled(Table.HeaderCell)`
+  background-color: ${props => props.$header && "#EEEEEE!important"};
+  text-align: ${props => props.$left ? "left!important" : "center!important"}
+`;
+
+const ModTableCell = styled(Table.Cell)({
+  textAlign: 'center!important'
 });
 
-export { DataContainer, ModLabel, ModSegment, ModTable, ModTableHeaderCell, ModTableRow, SubContainer };
+export { DataContainer, ModGridColumn, ModLabel, ModSegment, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer };
 

@@ -7,7 +7,7 @@ import { ModLabel, ModSegment } from "./styles";
 const ShowCustomer = ({ customer = {} }) => {
   return (
     <>
-      <ButtonGoTo goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
+      <ButtonGoTo goTo={PAGES.CUSTOMERS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
       <Grid divided>
         <Grid.Row stretched>
           <Grid.Column>

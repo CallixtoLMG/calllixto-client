@@ -1,8 +1,6 @@
 "use client";
-import PageHeader from "@/components/layout/PageHeader";
 import 'semantic-ui-css/semantic.min.css';
 import { MainContainer, SubContainer } from "../../commonStyles";
-
 
 export default function RootLayout({
   children,
@@ -13,7 +11,6 @@ export default function RootLayout({
   return (
     <MainContainer>
       <SubContainer>
-        <PageHeader title={"Presupuestos"} />
         {children}
       </SubContainer>
     </MainContainer>

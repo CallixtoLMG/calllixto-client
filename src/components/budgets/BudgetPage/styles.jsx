@@ -3,11 +3,13 @@ import { Icon, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ModTableCell = styled(Table.Cell)({
-  cursor: "pointer!important"
+  cursor: "pointer!important",
+  textAlign: 'center!important'
 });
 
 const ModTableHeaderCell = styled(Table.HeaderCell)({
-  background: "#EEEEEE!important"
+  background: "#EEEEEE!important",
+  textAlign: 'center!important'
 });
 
 const ModTable = styled(Table)`

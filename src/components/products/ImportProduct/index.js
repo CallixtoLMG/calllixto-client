@@ -4,28 +4,26 @@ import { Controller, useForm } from "react-hook-form";
 import { Button, Form, Icon, Input, Modal, Segment, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { HEADERS } from "../products.common";
-import { ContainerModal, DataNotFoundContainer, ModInput, ModLabel, ModTable, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
+import { ContainerModal, DataNotFoundContainer, ModInput, ModLabel, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
+  const { handleSubmit, control, reset } = useForm();
   const router = useRouter()
   const [open, setOpen] = useState(false);
   const [newProducts, setNewProducts] = useState([]);
   const [editProducts, setEditProducts] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
 
-  const cleanStates = () => {
-    setSelectedFile(null);
-    setNewProducts([]);
-    setEditProducts([]);
-  };
-
   const handleModalClose = () => {
-    cleanStates();
     setOpen(false);
   };
 
+  const handleModalOpen = () => {
+    setOpen(open);
+  };
+
   const handleFileUpload = (e) => {
-    console.log("before set FileName: ", selectedFile)
+    reset();
     const fileName = e.target.files[0]?.name;
     if (!fileName) {
       return;
@@ -61,10 +59,6 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
       const nonExistingProducts = [];
       const existingProducts = [];
       const existingCodes = {};
-      console.log("before set nonExistingProducts:", nonExistingProducts);
-      console.log("before set existingProducts:", existingProducts);
-      console.log("before set existingCodes:", existingCodes);
-      console.log("after set FileName: ", selectedFile)
       products.forEach((product) => {
         existingCodes[product.code] = true;
       });
@@ -77,19 +71,11 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
           nonExistingProducts.push(product);
         };
       });
-
-      console.log("after set existingProducts:", existingProducts);
-      console.log("after set nonExistingProducts:", nonExistingProducts);
-      console.log("after set existingCodes:", existingCodes);
       setEditProducts(existingProducts);
       setNewProducts(nonExistingProducts);
-      console.log("after set editProducts:", editProducts);
-      console.log("after set newProducts:", newProducts);
       setOpen(true);
     };
   };
-
-  const { handleSubmit, control } = useForm();
 
   const validationRules = {
     code: {
@@ -127,7 +113,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
           closeIcon
           open={open}
           onClose={handleModalClose}
-          onOpen={() => setOpen(true)}
+          onOpen={handleModalOpen}
         >
           <ContainerModal>
             <Form onSubmit={handleSubmit(handleAcceptCreate)}>
@@ -142,7 +128,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                     <ModTable celled compact>
                       <Table.Header fullWidth>
                         <ModTableRow>
-                          <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
+                          <ModTableHeaderCell></ModTableHeaderCell>
                           {HEADERS
                             .filter(header => !header.hide)
                             .map((header) => (
@@ -153,7 +139,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                       {newProducts.map((newProduct, index) => (
                         <Table.Body key={`${newProduct.code}-${index}`}>
                           <ModTableRow >
-                            <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                            <ModTableCell>{index + 1}</ModTableCell>
                             {HEADERS
                               .filter(header => !header.hide)
                               .map((header) =>
@@ -164,12 +150,10 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                                   defaultValue={header.value === "price" ? (newProduct[header.value]) : newProduct[header.value]}
                                   rules={validationRules[header.value]}
                                   render={({ field, fieldState }) => (
-                                    <Table.Cell
-                                      key={header.id}
-                                      textAlign='center'>
+                                    <ModTableCell key={header.id} >
                                       <ModInput {...field} />
                                       {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
-                                    </Table.Cell>
+                                    </ModTableCell>
                                   )}
                                 />
                               )
@@ -177,7 +161,6 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                           </ModTableRow>
                         </Table.Body>
                       ))}
-
                     </ModTable>
                   </ModTableContainer>
                 </>}
@@ -188,7 +171,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                     <ModTable celled compact>
                       <Table.Header fullWidth>
                         <ModTableRow>
-                          <ModTableHeaderCell textAlign='center'></ModTableHeaderCell>
+                          <ModTableHeaderCell ></ModTableHeaderCell>
                           {HEADERS
                             .filter(header => !header.hide)
                             .map((header) => (
@@ -199,7 +182,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                       {editProducts.map((editProduct, index) => (
                         <Table.Body key={`${editProduct.code}-${index}`}>
                           <ModTableRow >
-                            <Table.Cell textAlign='center'>{index + 1}</Table.Cell>
+                            <ModTableCell>{index + 1}</ModTableCell>
                             {HEADERS
                               .filter(header => !header.hide)
                               .map((header) =>
@@ -210,12 +193,10 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                                   defaultValue={header.value === "price" ? (editProduct[header.value]) : editProduct[header.value]}
                                   rules={validationRules[header.value]}
                                   render={({ field, fieldState }) => (
-                                    <Table.Cell
-                                      key={header.id}
-                                      textAlign='center'>
+                                    <ModTableCell key={header.id} >
                                       {header.value === "code" ? <ModInput readOnly {...field} /> : <ModInput {...field} />}
                                       {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
-                                    </Table.Cell>
+                                    </ModTableCell>
                                   )}
                                 />
                               )

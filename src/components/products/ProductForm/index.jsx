@@ -13,9 +13,9 @@ const ProductForm = ({ product, onSubmit }) => {
   const validateCode = (value) => {
     return /^[A-Za-z0-9]{4}$/.test(value);
   };
-  const validatePrice = (value) => {
-    return /^[0-9]+$/.test(value);
-  };
+  // const validatePrice = (value) => {
+  //   return /^[0-9]+$/.test(value);
+  // };
   const handleForm = (data) => {
     if (!product?.code) {
       onSubmit(data);
@@ -29,7 +29,7 @@ const ProductForm = ({ product, onSubmit }) => {
 
   return (
     <>
-      <ButtonGoTo goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
+      <ButtonGoTo goTo={PAGES.PRODUCTS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
       <Form onSubmit={handleSubmit(handleForm)}>
         {!product?.code &&
           <ModFormField>
@@ -66,25 +66,20 @@ const ProductForm = ({ product, onSubmit }) => {
             name="price"
             control={control}
             defaultValue={get(product, "price", "")}
-            rules={{ validate: validatePrice }}
             render={({ field, fieldState }) => (
               <>
-                <ModInput {...field} />
-                {fieldState?.invalid && (
+                <ModInput type="number" {...field} />
+                {/* {fieldState?.invalid && (
                   <WarningMessage >El precio debe contener solo números.</WarningMessage>
-                )}
+                )} */}
               </>
             )}
           />
         </ModFormField>
         <ModFormField>
         </ModFormField>
-        <ModButton
-          type="submit"
-          color="green"
-        >
-          <Icon name="add" /> {product?.code ? "Actualizar producto" : "Crear producto"}
-        </ModButton>
+        {product?.code ? <ModButton type="submit" color="blue" ><Icon name="upload" />Actualizar producto</ModButton> :
+          <ModButton type="submit" color="green"><Icon name="add" />Crear producto</ModButton>}
       </Form>
     </>
   )
