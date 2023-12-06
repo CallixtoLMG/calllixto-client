@@ -11,7 +11,7 @@ import {
   ModTableRow,
   TotalText,
 } from "./styles";
-import { CurrencyInput } from "react-currency-mask";
+import Mask from "@/components/layout/Mask";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
@@ -118,14 +118,9 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                     control={control}
                     defaultValue={product.price || 0}
                     render={({ field }) => (
-                      <CurrencyInput
-                        value={field.value}
-                        locale="es-AR"
-                        currency="ARS"
-                        onChangeValue={(_, value) => {
-                          field.onChange(value);
-                        }}
-                        InputElement={ <ModInput readOnly /> }
+                      <Mask
+                        field={field}
+                        inputElement={<ModInput readOnly />}
                       />
                     )}
                   />
@@ -145,16 +140,12 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                   />
                 </Table.Cell>
                 <Table.Cell>
-                      <CurrencyInput
-                        value={watch(`products[${index}].quantity`) *
+                  <Mask
+                    value={watch(`products[${index}].quantity`) *
                         watch(`products[${index}].price`) || 0}
-                        locale="es-AR"
-                        currency="ARS"
-                        onChangeValue={(_, value) => {
-                          field.onChange(value);
-                        }}
-                        InputElement={ <ModInput readOnly /> }
-                      />
+                    field={field}
+                    inputElement={<ModInput readOnly />}
+                  />
                 </Table.Cell>
                 <Table.Cell>
                   <Controller
@@ -185,21 +176,18 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                   />
                 </Table.Cell>
                 <Table.Cell>
-                      <CurrencyInput
-                        value={watch(`products[${index}].total`) || 0}
-                        locale="es-AR"
-                        currency="ARS"
-                        onChangeValue={(_, value) => {
-                          field.onChange(value);
-                        }}
-                        InputElement={ <ModInput readOnly /> }
-                      />
+                  <Mask
+                    value={watch(`products[${index}].total`) || 0}
+                    field={field}
+                    inputElement={<ModInput readOnly />}
+                  />
                 </Table.Cell>
                 <Table.Cell textAlign="center">
                   <Button
                     icon="trash"
                     color="red"
-                    onClick={() => deleteProduct(index)}
+                    onClick={() =>
+                      deleteProduct(index)}
                     type="button"
                   />
                 </Table.Cell>
@@ -212,15 +200,11 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                 <TotalText>Total</TotalText>
               </Table.HeaderCell>
               <Table.HeaderCell textAlign="center">
-                      <CurrencyInput
-                        value={calculateTotal() || ""}
-                        locale="es-AR"
-                        currency="ARS"
-                        onChangeValue={(_, value) => {
-                          field.onChange(value);
-                        }}
-                        InputElement={ <ModInput readOnly /> }
-                      />
+                <Mask
+                  value={calculateTotal() || ""}
+                  field={field}
+                  inputElement={<ModInput readOnly />}
+                />
               </Table.HeaderCell>
               <Table.HeaderCell textAlign="center">
               </Table.HeaderCell>
