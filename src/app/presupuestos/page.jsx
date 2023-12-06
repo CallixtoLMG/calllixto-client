@@ -4,6 +4,7 @@ import BudgetsPage from "@/components/budgets/BudgetPage";
 import { useEffect, useState } from "react";
 
 const Budgets = () => {
+  const [isLoading, setIsLoading] = useState(true)
   const [budgets, setBudgets] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -19,6 +20,7 @@ const Budgets = () => {
         };
         const fetchBudgets = await budgetsList(requestOptions);
         setBudgets(fetchBudgets);
+        setIsLoading(false)
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       };
@@ -27,7 +29,7 @@ const Budgets = () => {
   }, []);
 
   return (
-    <BudgetsPage budgets={budgets} />
+      <BudgetsPage budgets={budgets} isLoading={isLoading} />
   )
 };
 

@@ -1,9 +1,12 @@
 "use client"
 import { getProduct } from "@/api/products";
 import ShowProduct from "@/components/products/ShowProduct";
+import Loader from "@/components/layout/Loader"
 import { useEffect, useState } from "react";
 
+
 const Product = ({ params }) => {
+  const [isLoading, setIsLoading] = useState(true)
   const [product, setProduct] = useState({})
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -19,6 +22,7 @@ const Product = ({ params }) => {
         };
         const fetchProduct = await getProduct(params.code, requestOptions);
         setProduct(fetchProduct);
+        setIsLoading(false)
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       };
@@ -27,7 +31,7 @@ const Product = ({ params }) => {
   }, [params.code]);
 
   return (
-    <ShowProduct product={product} />
+       <ShowProduct product={product} isLoading={isLoading}/>
   )
 };
 

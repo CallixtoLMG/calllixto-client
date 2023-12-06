@@ -33,6 +33,7 @@ const ProductForm = ({ product, onSubmit }) => {
 
   const locale = "es-AR"
   const currency = "ARS"
+
   return (
     <MainContainer>
       <Form onSubmit={handleSubmit(handleForm)}>
@@ -79,7 +80,7 @@ const ProductForm = ({ product, onSubmit }) => {
                 <CurrencyInput
                   value={field.value}
                   locale={locale}
-                  currency="ARS"
+                  currency={currency}
                   onChangeValue={(_, value ) => {
                     field.onChange(value);
                   }}
