@@ -1,16 +1,32 @@
 import { SHOWPRODUCTSHEADERS } from "@/components/budgets/budgets.common";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from 'react-hook-form';
-import { Button, Dropdown, Form, Icon, Table } from 'semantic-ui-react';
-import { MainContainer, ModButton, ModDropdown, ModInput, ModTableRow, TotalText } from "./styles";
+import { Controller, useForm } from "react-hook-form";
+import { Button, Dropdown, Form, Icon, Table } from "semantic-ui-react";
+import {
+  MainContainer,
+  ModButton,
+  ModDropdown,
+  ModInput,
+  ModTableRow,
+  TotalText,
+} from "./styles";
+import { CurrencyInput } from "react-currency-mask";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
   const { control, handleSubmit, setValue, watch, register } = useForm();
-  const watchProducts = watch("products", [{ name: '', quantity: 0, discount: 0 }]);
+  const watchProducts = watch("products", [{
+    name: "",
+    quantity: 0,
+    discount: 0,
+  }]);
   const addProduct = () => {
-    setValue("products", [...watchProducts, { name: '', quantity: 0, discount: 0 }]);
+    setValue("products", [...watchProducts, {
+      name: "",
+      quantity: 1,
+      discount: 0,
+    }]);
   };
 
   const deleteProduct = (index) => {
@@ -35,12 +51,15 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
     }, 500);
   };
 
+  const locale = "es-AR"
+  const currency = "ARS"
+
   return (
     <MainContainer>
       <Form onSubmit={handleSubmit(handleCreate)}>
         <ModDropdown
           name={`customerName`}
-          placeholder='Clientes...'
+          placeholder="Clientes..."
           search
           selection
           minCharacters={2}
@@ -55,12 +74,17 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
           type="button"
           onClick={addProduct}
         >
-          <Icon name="add" />Agregar producto</ModButton>
+          <Icon name="add" />Agregar producto
+        </ModButton>
         <Table celled>
           <Table.Header>
             <ModTableRow>
               {SHOWPRODUCTSHEADERS.map((header) => {
-                return (<Table.HeaderCell key={header.id} textAlign='center'>{header.name}</Table.HeaderCell>)
+                return (
+                  <Table.HeaderCell key={header.id} textAlign="center">
+                    {header.name}
+                  </Table.HeaderCell>
+                );
               })}
             </ModTableRow>
           </Table.Header>
@@ -81,7 +105,9 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                         {...field}
                         onChange={(e, { value }) => {
                           field.onChange(value);
-                          const product = products.find((opt) => opt.value === value);
+                          const product = products.find((opt) =>
+                            opt.value === value
+                          );
                           setValue(`products[${index}].price`, product.price);
                           setValue(`products[${index}].code`, product.code);
                         }}
@@ -95,11 +121,14 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                     control={control}
                     defaultValue={product.price || 0}
                     render={({ field }) => (
-                      <ModInput
-                        type="number"
+                      <CurrencyInput
                         value={field.value}
-                        readOnly
-                        {...field}
+                        locale={locale}
+                        currency={currency}
+                        onChangeValue={(_, value) => {
+                          field.onChange(value);
+                        }}
+                        InputElement={ <ModInput readOnly /> }
                       />
                     )}
                   />
@@ -108,7 +137,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                   <Controller
                     name={`products[${index}].quantity`}
                     control={control}
-                    defaultValue={product.quantity || 0}
+                    defaultValue={product.quantity || 1}
                     render={({ field }) => (
                       <ModInput
                         type="number"
@@ -119,11 +148,16 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                   />
                 </Table.Cell>
                 <Table.Cell>
-                  <ModInput
-                    type="text"
-                    value={watch(`products[${index}].quantity`) * watch(`products[${index}].price`) || 0}
-                    readOnly
-                  />
+                      <CurrencyInput
+                        value={watch(`products[${index}].quantity`) *
+                        watch(`products[${index}].price`) || 0}
+                        locale={locale}
+                        currency={currency}
+                        onChangeValue={(_, value) => {
+                          field.onChange(value);
+                        }}
+                        InputElement={ <ModInput readOnly /> }
+                      />
                 </Table.Cell>
                 <Table.Cell>
                   <Controller
@@ -139,24 +173,32 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                         {...field}
                         onChange={(e) => {
                           field.onChange(e.target.value);
-                          const quantity = watch(`products[${index}].quantity`) || 0;
+                          const quantity =
+                            watch(`products[${index}].quantity`) || 0;
                           const price = watch(`products[${index}].price`) || 0;
                           const discount = parseFloat(e.target.value) || 0;
                           const total = quantity * price * (1 - discount / 100);
-                          setValue(`products[${index}].total`, total.toFixed(2));
+                          setValue(
+                            `products[${index}].total`,
+                            total.toFixed(2),
+                          );
                         }}
                       />
                     )}
                   />
                 </Table.Cell>
                 <Table.Cell>
-                  <ModInput
-                    type="text"
-                    value={watch(`products[${index}].total`) || 0}
-                    readOnly
-                  />
+                      <CurrencyInput
+                        value={watch(`products[${index}].total`) || 0}
+                        locale={locale}
+                        currency={currency}
+                        onChangeValue={(_, value) => {
+                          field.onChange(value);
+                        }}
+                        InputElement={ <ModInput readOnly /> }
+                      />
                 </Table.Cell>
-                <Table.Cell textAlign='center'>
+                <Table.Cell textAlign="center">
                   <Button
                     icon="trash"
                     color="red"
@@ -164,27 +206,26 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                     type="button"
                   />
                 </Table.Cell>
-
               </Table.Row>
             ))}
           </Table.Body>
           <Table.Footer>
             <Table.Row>
-              <Table.HeaderCell colSpan="5" textAlign='left'>
+              <Table.HeaderCell colSpan="5" textAlign="left">
                 <TotalText>Total</TotalText>
               </Table.HeaderCell>
-              <Table.HeaderCell textAlign='center'>
-                <ModInput
-                  name="totalBudget"
-                  type="text"
-                  onChange={(e, { name, value }) => {
-                    setValue(name, value);
-                  }}
-                  value={calculateTotal() || ''}
-                  readOnly
-                />
+              <Table.HeaderCell textAlign="center">
+                      <CurrencyInput
+                        value={calculateTotal() || ""}
+                        locale={locale}
+                        currency={currency}
+                        onChangeValue={(_, value) => {
+                          field.onChange(value);
+                        }}
+                        InputElement={ <ModInput readOnly /> }
+                      />
               </Table.HeaderCell>
-              <Table.HeaderCell textAlign='center'>
+              <Table.HeaderCell textAlign="center">
               </Table.HeaderCell>
             </Table.Row>
           </Table.Footer>
@@ -194,11 +235,11 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
           type="submit"
           color="green"
         >
-          <Icon name="add" />Crear presupuesto</ModButton>
+          <Icon name="add" />Crear presupuesto
+        </ModButton>
       </Form>
     </MainContainer>
   );
 };
 
 export default BudgetForm;
-

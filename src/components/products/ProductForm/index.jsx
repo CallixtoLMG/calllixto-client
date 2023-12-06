@@ -4,7 +4,6 @@ import { get } from "lodash";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
-import { CurrencyInput } from "react-currency-mask";
 import {
   MainContainer,
   ModButton,
@@ -13,15 +12,13 @@ import {
   ModLabel,
   WarningMessage,
 } from "./styles";
+import { CurrencyInput } from "react-currency-mask";
 
 const ProductForm = ({ product, onSubmit }) => {
   const router = useRouter();
   const { handleSubmit, control } = useForm();
   const validateCode = (value) => {
     return /^[A-Za-z0-9]{4}$/.test(value);
-  };
-  const validatePrice = (value) => {
-    return /^[0-9]+$/.test(value);
   };
   const handleForm = (data) => {
     if (!product?.code) {
@@ -33,10 +30,10 @@ const ProductForm = ({ product, onSubmit }) => {
       router.push(PAGES.PRODUCTS.BASE);
     }, 1000);
   };
-  const formatter = new Intl.NumberFormat("es-ar", {
-    style: "currency",
-    currency: "ARS",
-  });
+
+  const locale = "es-AR"
+  const currency = "ARS"
+
   return (
     <MainContainer>
       <Form onSubmit={handleSubmit(handleForm)}>
@@ -51,13 +48,7 @@ const ProductForm = ({ product, onSubmit }) => {
                   defaultValue={get(product, "code", "")}
                   rules={{ validate: validateCode }}
                   render={({ field, fieldState }) => (
-                    <CurrencyInput
-                      value={field.value}
-                      onChangeValue={(_, value)=>{
-                        field.onChange(value);
-                      }}
-                      InputElement={
-                                            <>
+                    <>
                       <ModInput {...field} />
                       {fieldState?.invalid && (
                         <WarningMessage>
@@ -65,8 +56,6 @@ const ProductForm = ({ product, onSubmit }) => {
                         </WarningMessage>
                       )}
                     </>
-
-                      }/>
                   )}
                 />
               </>
@@ -87,18 +76,16 @@ const ProductForm = ({ product, onSubmit }) => {
             name="price"
             control={control}
             defaultValue={get(product, "price", "")}
-            rules={{ validate: validatePrice }}
             render={({ field, fieldState }) => (
-              <>
-                <ModInput
-                  {...field}
+                <CurrencyInput
+                  value={field.value}
+                  locale={locale}
+                  currency={currency}
+                  onChangeValue={(_, value ) => {
+                    field.onChange(value);
+                  }}
+                  InputElement={<ModInput />}
                 />
-                {fieldState?.invalid && (
-                  <WarningMessage>
-                    El precio debe contener solo números.
-                  </WarningMessage>
-                )}
-              </>
             )}
           />
         </ModFormField>
