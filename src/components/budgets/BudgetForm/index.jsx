@@ -24,7 +24,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
   const addProduct = () => {
     setValue("products", [...watchProducts, {
       name: "",
-      quantity: 0,
+      quantity: 1,
       discount: 0,
     }]);
   };
