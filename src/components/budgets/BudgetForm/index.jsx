@@ -11,7 +11,7 @@ import {
   ModTableRow,
   TotalText,
 } from "./styles";
-import Mask from "@/components/layout/Mask";
+import { CurrencyInput } from "react-currency-mask";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
@@ -50,6 +50,9 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
       router.push(PAGES.BUDGETS.BASE);
     }, 500);
   };
+
+  const locale = "es-AR"
+  const currency = "ARS"
 
   return (
     <MainContainer>
@@ -118,9 +121,14 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                     control={control}
                     defaultValue={product.price || 0}
                     render={({ field }) => (
-                      <Mask
-                        field={field}
-                        inputElement={<ModInput readOnly />}
+                      <CurrencyInput
+                        value={field.value}
+                        locale={locale}
+                        currency={currency}
+                        onChangeValue={(_, value) => {
+                          field.onChange(value);
+                        }}
+                        InputElement={ <ModInput readOnly /> }
                       />
                     )}
                   />
@@ -140,12 +148,16 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                   />
                 </Table.Cell>
                 <Table.Cell>
-                  <Mask
-                    value={watch(`products[${index}].quantity`) *
+                      <CurrencyInput
+                        value={watch(`products[${index}].quantity`) *
                         watch(`products[${index}].price`) || 0}
-                    field={field}
-                    inputElement={<ModInput readOnly />}
-                  />
+                        locale={locale}
+                        currency={currency}
+                        onChangeValue={(_, value) => {
+                          field.onChange(value);
+                        }}
+                        InputElement={ <ModInput readOnly /> }
+                      />
                 </Table.Cell>
                 <Table.Cell>
                   <Controller
@@ -176,18 +188,21 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                   />
                 </Table.Cell>
                 <Table.Cell>
-                  <Mask
-                    value={watch(`products[${index}].total`) || 0}
-                    field={field}
-                    inputElement={<ModInput readOnly />}
-                  />
+                      <CurrencyInput
+                        value={watch(`products[${index}].total`) || 0}
+                        locale={locale}
+                        currency={currency}
+                        onChangeValue={(_, value) => {
+                          field.onChange(value);
+                        }}
+                        InputElement={ <ModInput readOnly /> }
+                      />
                 </Table.Cell>
                 <Table.Cell textAlign="center">
                   <Button
                     icon="trash"
                     color="red"
-                    onClick={() =>
-                      deleteProduct(index)}
+                    onClick={() => deleteProduct(index)}
                     type="button"
                   />
                 </Table.Cell>
@@ -200,11 +215,15 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                 <TotalText>Total</TotalText>
               </Table.HeaderCell>
               <Table.HeaderCell textAlign="center">
-                <Mask
-                  value={calculateTotal() || ""}
-                  field={field}
-                  inputElement={<ModInput readOnly />}
-                />
+                      <CurrencyInput
+                        value={calculateTotal() || ""}
+                        locale={locale}
+                        currency={currency}
+                        onChangeValue={(_, value) => {
+                          field.onChange(value);
+                        }}
+                        InputElement={ <ModInput readOnly /> }
+                      />
               </Table.HeaderCell>
               <Table.HeaderCell textAlign="center">
               </Table.HeaderCell>

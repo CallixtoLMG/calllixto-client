@@ -12,7 +12,7 @@ import {
   ModLabel,
   WarningMessage,
 } from "./styles";
-import  Mask from "@/components/layout/Mask"
+import { CurrencyInput } from "react-currency-mask";
 
 const ProductForm = ({ product, onSubmit }) => {
   const router = useRouter();
@@ -31,6 +31,8 @@ const ProductForm = ({ product, onSubmit }) => {
     }, 1000);
   };
 
+  const locale = "es-AR"
+  const currency = "ARS"
   return (
     <MainContainer>
       <Form onSubmit={handleSubmit(handleForm)}>
@@ -73,10 +75,15 @@ const ProductForm = ({ product, onSubmit }) => {
             name="price"
             control={control}
             defaultValue={get(product, "price", "")}
-            render={({ field }) => (
-                <Mask
-                  field={field}
-                  inputElement={<ModInput />}
+            render={({ field, fieldState }) => (
+                <CurrencyInput
+                  value={field.value}
+                  locale={locale}
+                  currency="ARS"
+                  onChangeValue={(_, value ) => {
+                    field.onChange(value);
+                  }}
+                  InputElement={<ModInput />}
                 />
             )}
           />
