@@ -8,6 +8,7 @@ const CustomerDataContainer = styled(Flex)`
 
 const ClientDataContainer = styled(Flex)`
   div:last-child { margin: 0!important; };
+  justify-content: space-between;
 `;
 
 const HeaderContainer = styled(Flex)`
@@ -19,7 +20,7 @@ const HeaderContainer = styled(Flex)`
 const DataContainer = styled(Flex)`
   flex-direction: column;
   margin: 0 10px 0px 0!important;
-  width: 200px!important;
+  width: ${({ width }) => width || '200px'} !important;
 `;
 
 const PayMethodContainer = styled(Flex)`
@@ -66,28 +67,41 @@ const ModTableLabel = styled(Label)({
   marginTop: "10px!important",
 });
 
-const ModLabel = styled(Label)({
-  margin: "0!important"
-});
+const ModLabel = styled(Label)`
+  margin: 0 !important;
+  background-color: white !important;
+  border: 0.5px solid grey !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  margin-bottom: -1px !important;
+`;
 
-const ModPayMethodLabel = styled(Label)({
-  display: "flex!important",
-  alignItems: "center!important",
-  justifyContent: "center!important",
-});
+const ModPayMethodLabel = styled(Label)`
+  display: flex !important;
+  background-color: white !important;
+  border-radius: 0 !important;
+  padding: 8px !important;
+`;
 
-const ModGridColumn = styled(GridColumn)({
-  textAlign: 'center!important'
-});
 
-const ModSegment = styled(Segment)({
-  marginTop: "5px!important",
-  height: "50px!important",
-});
+const ModGridColumn = styled(GridColumn)`
+  margin-top: 20px !important;
+`;
+
+const ModSegment = styled(Segment)`
+  margin-top: 5px !important;
+  height: 50px !important;
+  box-shadow: 0 0 0 0 !important;
+  background-color: white !important;
+  border: 0.5px solid grey !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  padding: 8px !important;
+`;
 
 const ModTableHeaderCell = styled(Table.HeaderCell)`
   background-color: ${props => props.$header && "#EEEEEE!important"};
-  text-align: ${props => props.$left ? "left!important" : "center!important"}
+  text-align: ${({ align }) => align || "center"} !important;
 `;
 
 const ModTableCell = styled(Table.Cell)({
@@ -104,8 +118,6 @@ const ModImage = styled(Image)`
 const ModPayMethodHeader = styled(Header)`
   margin: 20px 0 0 0!important;
 `;
-
-
 
 export { ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, ModGridColumn, ModImage, ModLabel, ModPayMethodHeader, ModPayMethodLabel, ModSegment, ModTable, ModTableCell, ModTableHeaderCell, ModTableLabel, ModTableRow, ModTitleHeader, PayMethodContainer, Sign };
 

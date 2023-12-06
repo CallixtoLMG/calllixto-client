@@ -30,7 +30,7 @@ const SeePdf = ({ params }) => {
       };
     };
     fetchData();
-  }, []);
+  }, [params.id, router]);
 
   return (
     <PDFfile budget={pdfBudget} />

@@ -15,19 +15,19 @@ const HEADERS = [
 
 const PRODUCTSHEADERS = [
   {
-    name: "Nombre",
+    name: "Descripción",
     value: "name",
     id: 1
   },
   {
-    name: "Precio",
-    value: "price",
-    modPrice: true,
+    name: "Cantidad",
+    value: "quantity",
     id: 2
   },
   {
-    name: "Cantidad",
-    value: "quantity",
+    name: "Precio Unitario",
+    value: "price",
+    modPrice: true,
     id: 3
   },
   {
@@ -36,7 +36,7 @@ const PRODUCTSHEADERS = [
     id: 4
   },
   {
-    name: "Total",
+    name: "Importe",
     value: "total",
     modPrice: true,
     id: 5

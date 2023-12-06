@@ -37,7 +37,7 @@ const ModSegment = styled(Segment)({
 
 const ModTableHeaderCell = styled(Table.HeaderCell)`
   background-color: ${props => props.$header && "#EEEEEE!important"};
-  text-align: ${props => props.$left ? "left!important" : "center!important"}
+  text-align: ${({ align }) => align || "center"} !important;
 `;
 
 const ModTableCell = styled(Table.Cell)({

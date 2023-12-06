@@ -89,10 +89,8 @@ const ShowBudget = ({budget}) => {
               ))}
               <Table.Footer celled fullWidth>
                 <Table.Row>
-                  <ModTableHeaderCell />
-                  <ModTableHeaderCell $center colSpan='1'><strong>Suma Total</strong></ModTableHeaderCell>
-                  <ModTableHeaderCell colSpan='3' />
-                  <ModTableHeaderCell $center colSpan='1'><strong>{modPrice(totalSum(budget?.products))}</strong></ModTableHeaderCell>
+                  <ModTableHeaderCell align="right" colSpan='5'><strong>TOTAL</strong></ModTableHeaderCell>
+                  <ModTableHeaderCell colSpan='1'><strong>{modPrice(totalSum(budget?.products))}</strong></ModTableHeaderCell>
                 </Table.Row>
               </Table.Footer>
             </ModTable>
