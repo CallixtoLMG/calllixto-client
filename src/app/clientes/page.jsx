@@ -1,11 +1,10 @@
 "use client";
 import { customersList } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
-import Loader1 from "@/components/layout/Loader";
 import { useEffect, useState } from "react";
 
 const Customers = () => {
-  const [loader, setLoader] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [customers, setCustomers] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -21,7 +20,7 @@ const Customers = () => {
         };
         const fetchCustomers = await customersList(requestOptions);
         setCustomers(fetchCustomers);
-        setLoader(false)
+        setIsLoading(false)
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       }
@@ -30,9 +29,7 @@ const Customers = () => {
   }, []);
 
   return (
-    <Loader1 active={loader}>
-      <CustomersPage customers={customers} />
-    </Loader1>
+      <CustomersPage customers={customers} isLoading={isLoading} />
   );
 };
 

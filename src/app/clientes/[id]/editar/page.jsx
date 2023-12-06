@@ -1,12 +1,12 @@
 "use client"
 import { edit, getCustomer } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
-import Loader1 from "@/components/layout/Loader";
+import Loader from "@/components/layout/Loader";
 import { useEffect, useState } from "react";
 
 const EditCustomer = ({ params }) => {
   const [customer, setCustomer] = useState(null);
-  const [loader, setLoader] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
     const token = localStorage.getItem('token');
     async function fetchData() {
@@ -20,7 +20,7 @@ const EditCustomer = ({ params }) => {
       };
       const data = await getCustomer(params.id, requestOptions);
       setCustomer(data);
-      setLoader(false)
+      setIsLoading(false)
     };
     fetchData();
   }, [params.id]);
@@ -28,9 +28,9 @@ const EditCustomer = ({ params }) => {
   return (
     <>
       {customer && 
-        <Loader1 active={loader}>  
+        <Loader active={isLoading}>  
           <CustomerForm customer={customer} onSubmit={edit} />
-        </Loader1>
+        </Loader>
       }
     </>
   )

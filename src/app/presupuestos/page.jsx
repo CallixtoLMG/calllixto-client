@@ -1,11 +1,10 @@
 "use client";
 import { budgetsList } from "@/api/budgets";
 import BudgetsPage from "@/components/budgets/BudgetPage";
-import Loader1 from "@/components/layout/Loader";
 import { useEffect, useState } from "react";
 
 const Budgets = () => {
-  const [loader, setLoader] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
   const [budgets, setBudgets] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -21,7 +20,7 @@ const Budgets = () => {
         };
         const fetchBudgets = await budgetsList(requestOptions);
         setBudgets(fetchBudgets);
-        setLoader(false)
+        setIsLoading(false)
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       };
@@ -30,9 +29,7 @@ const Budgets = () => {
   }, []);
 
   return (
-    <Loader1 active={loader}>
-      <BudgetsPage budgets={budgets} />
-    </Loader1>
+      <BudgetsPage budgets={budgets} isLoading={isLoading} />
   )
 };
 

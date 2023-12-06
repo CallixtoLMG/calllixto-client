@@ -1,15 +1,13 @@
 import React from "react";
-import { Dimmer, Image, Loader, Segment } from "semantic-ui-react";
+import { Dimmer, Loader as LoaderComp, Segment } from "semantic-ui-react";
 
-const Loader1 = ({children, active}) => {
+const Loader = ({children, active}) => {
     return (
-        <Segment>
-            <Dimmer active={active} inverted>
-                <Loader size="large"/>
-            </Dimmer>
-            {children}
-        </Segment>
+    <>
+
+  {active ? <LoaderComp active size="large"/> : children }
+        </>
     );
 };
 
-export default Loader1;
+export default Loader;
