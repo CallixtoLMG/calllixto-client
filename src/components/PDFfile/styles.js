@@ -24,7 +24,7 @@ const DataContainer = styled(Flex)`
 `;
 
 const PayMethodContainer = styled(Flex)`
-  margin-top: 20px!important;
+  margin-top: 18px!important;
   align-items: center;
 `;
 
@@ -54,9 +54,6 @@ const Sign = styled.div`
 `;
 
 const ModTable = styled(Table)`
-  tbody:nth-child(odd) {
-    background-color: #f2f2f2!important;
-  };
 `;
 
 const ModTableRow = styled(Table.Row)`
@@ -83,7 +80,6 @@ const ModPayMethodLabel = styled(Label)`
   padding: 8px !important;
 `;
 
-
 const ModGridColumn = styled(GridColumn)`
   margin-top: 20px !important;
 `;
@@ -100,8 +96,16 @@ const ModSegment = styled(Segment)`
 `;
 
 const ModTableHeaderCell = styled(Table.HeaderCell)`
-  background-color: ${props => props.$header && "#EEEEEE!important"};
+  background-color: rgb(255, 255, 255)!important;
   text-align: ${({ align }) => align || "center"} !important;
+`;
+
+const ModTableFooterCell = styled(Table.HeaderCell)`
+  background-color: rgb(255, 255, 255)!important;
+  text-align: ${({ align }) => align || "center"} !important;
+  strong{
+    margin-right: 3.3rem!important;
+  };
 `;
 
 const ModTableCell = styled(Table.Cell)({
@@ -119,5 +123,5 @@ const ModPayMethodHeader = styled(Header)`
   margin: 20px 0 0 0!important;
 `;
 
-export { ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, ModGridColumn, ModImage, ModLabel, ModPayMethodHeader, ModPayMethodLabel, ModSegment, ModTable, ModTableCell, ModTableHeaderCell, ModTableLabel, ModTableRow, ModTitleHeader, PayMethodContainer, Sign };
+export { ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, ModGridColumn, ModImage, ModLabel, ModPayMethodHeader, ModPayMethodLabel, ModSegment, ModTable, ModTableCell, ModTableFooterCell, ModTableHeaderCell, ModTableLabel, ModTableRow, ModTitleHeader, PayMethodContainer, Sign };
 

@@ -7,7 +7,7 @@ import { MainContainer } from "./styles";
 const NotFoundPage = () => {
   const router = useRouter();
   const handleClick = () => {
-    router.push(PAGES.BASE)
+    router.push(PAGES.PRODUCTS.BASE)
   };
   return (
     <MainContainer>
@@ -16,7 +16,7 @@ const NotFoundPage = () => {
         Página no encontrada
         o no posee autorización!
       </Header>
-      <Button onClick={handleClick} color='red'>Volver al inicio</Button>
+      <Button onClick={handleClick} color='red'>Volver a productos</Button>
     </MainContainer>
   );
 };

@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { GridColumn, Label, Segment, Table } from "semantic-ui-react";
+import { Button, GridColumn, Label, Segment, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const SubContainer = styled(Flex)`
@@ -16,6 +16,13 @@ const ModTable = styled(Table)`
   tbody:nth-child(odd) {
     background-color: #f2f2f2!important;
   }
+`;
+
+const ModButton = styled(Button)`
+  min-width: 170px!important;
+  padding: 10px 0!important;
+  max-height: 34px!important;
+  margin-left: 10px!important;
 `;
 
 const ModTableRow = styled(Table.Row)`
@@ -44,5 +51,5 @@ const ModTableCell = styled(Table.Cell)({
   textAlign: 'center!important'
 });
 
-export { DataContainer, ModGridColumn, ModLabel, ModSegment, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer };
+export { DataContainer, ModButton, ModGridColumn, ModLabel, ModSegment, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer };
 

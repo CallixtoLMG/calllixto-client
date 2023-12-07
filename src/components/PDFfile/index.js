@@ -3,17 +3,21 @@
 import { PRODUCTSHEADERS } from "@/components/budgets/budgets.common";
 import { modPrice, totalSum } from '@/utils';
 import { get } from "lodash";
-import { Grid, Table } from 'semantic-ui-react';
-import { ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, ModGridColumn, ModImage, ModLabel, ModPayMethodHeader, ModPayMethodLabel, ModSegment, ModTable, ModTableCell, ModTableHeaderCell, ModTableLabel, ModTableRow, ModTitleHeader, PayMethodContainer, Sign } from "./styles";
 import { Flex } from "rebass";
+import { Grid, Table } from 'semantic-ui-react';
+import { ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, ModGridColumn, ModImage, ModLabel, ModPayMethodHeader, ModPayMethodLabel, ModSegment, ModTable, ModTableCell, ModTableFooterCell, ModTableHeaderCell, ModTableRow, ModTitleHeader, PayMethodContainer, Sign } from "./styles";
 
-// import { PRODUCTSHEADERS } from "@/components/budgets/budgets.common";
-// import { IVA, modDate, modPrice, totalIVA, totalSum } from '@/utils';
-// import { Document, Font, PDFViewer, Page, StyleSheet, Text, View } from "@react-pdf/renderer";
-
-
-const PDFfile = ({ budget }) => {
-  console.log(budget)
+const PDFfile = ({ budget, seller }) => {
+  const dateOfIssue = (get(budget, "createdAt", ""))
+  function sumDays(dateOfIssue, days) {
+    let date = new Date(dateOfIssue);
+    date.setDate(date.getDate() + days);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const dateOfExpiration = sumDays(dateOfIssue, 10)
   return (
     <>
       <HeaderContainer>
@@ -24,15 +28,15 @@ const PDFfile = ({ budget }) => {
       <CustomerDataContainer>
         <DataContainer>
           <ModLabel>CUIT</ModLabel>
-          <ModSegment>20-34994199-7</ModSegment>
+          <ModSegment>{(get(budget, "customer.cuit", ""))}</ModSegment>
         </DataContainer>
         <DataContainer>
           <ModLabel>IVA</ModLabel>
-          <ModSegment>Responsable Inscripto</ModSegment>
+          <ModSegment>{(get(budget, "customer.iva", ""))}</ModSegment>
         </DataContainer>
         <DataContainer>
           <ModLabel>Dirección</ModLabel>
-          <ModSegment>Ruta 14 km, Las Tapias, Córdoba.</ModSegment>
+          <ModSegment>{(get(budget, "customer.address", ""))}</ModSegment>
         </DataContainer>
         <DataContainer>
           <ModLabel> Teléfono </ModLabel>
@@ -40,7 +44,7 @@ const PDFfile = ({ budget }) => {
         </DataContainer>
         <DataContainer>
           <ModLabel>Vendedor/a</ModLabel>
-          <ModSegment>Marcelo</ModSegment>
+          <ModSegment>{(get(seller, "name", ""))}</ModSegment>
         </DataContainer>
       </CustomerDataContainer>
       <Divider />
@@ -56,11 +60,11 @@ const PDFfile = ({ budget }) => {
           </DataContainer>
           <DataContainer width="120px">
             <ModLabel>Válido hasta</ModLabel>
-            <ModSegment>{(get(budget, "createdAt", ""))}</ModSegment>
+            <ModSegment>{dateOfExpiration}</ModSegment>
           </DataContainer>
           <DataContainer width="120px">
             <ModLabel>N° presupuesto</ModLabel>
-            <ModSegment>000005</ModSegment>
+            <ModSegment>{(get(budget, "numberOf", ""))}</ModSegment>
           </DataContainer>
         </Flex>
       </ClientDataContainer>
@@ -70,9 +74,9 @@ const PDFfile = ({ budget }) => {
             <ModTable celled compact>
               <Table.Header fullWidth>
                 <ModTableRow>
-                  <ModTableHeaderCell $header></ModTableHeaderCell>
+                  <ModTableHeaderCell ></ModTableHeaderCell>
                   {PRODUCTSHEADERS.map((header) => (
-                    <ModTableHeaderCell $header key={header.id} >{header.name}</ModTableHeaderCell>
+                    <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
                   ))}
                 </ModTableRow>
               </Table.Header>
@@ -92,7 +96,7 @@ const PDFfile = ({ budget }) => {
               ))}
               <Table.Footer>
                 <Table.Row>
-                  <ModTableHeaderCell align="right" colSpan='5'><strong>TOTAL</strong></ModTableHeaderCell>
+                  <ModTableFooterCell align="right" colSpan='5'><strong>TOTAL</strong></ModTableFooterCell>
                   <ModTableHeaderCell colSpan='1'><strong>{modPrice(totalSum(budget?.products))}</strong></ModTableHeaderCell>
                 </Table.Row>
               </Table.Footer>

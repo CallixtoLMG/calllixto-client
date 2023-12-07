@@ -1,52 +1,46 @@
 "use client";
-import ButtonGoto from "@/components/buttons/GoTo";
 import ButtonSend from "@/components/buttons/Send";
-import { PAGES } from "@/constants";
+import { CLIENTID, PATHS, PDF, URL } from "@/fetchUrls";
 import { get } from "lodash";
-import { Grid, Label, Table } from 'semantic-ui-react';
+import { Grid, Icon, Label, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from '../../../utils';
 import { PRODUCTSHEADERS } from "../budgets.common";
-import { DataContainer, ModGridColumn, ModLabel, ModSegment, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
+import { DataContainer, ModButton, ModGridColumn, ModLabel, ModSegment, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
 
-const ShowBudget = ({budget}) => {
-
-  // function downloadPdf(data, filename) {
-  //   const byteCharacters = atob(data);
-  //   const byteNumbers = new Array(byteCharacters.length);
-
-  //   for (let i = 0; i < byteCharacters.length; i++) {
-  //     byteNumbers[i] = byteCharacters.charCodeAt(i);
-  //   }
-
-  //   const byteArray = new Uint8Array(byteNumbers);
-  //   const blob = new Blob([byteArray], { type: 'application/pdf' });
-
-  //   const url = URL.createObjectURL(blob);
-
-  //   const enlaceDescarga = document.createElement('a');
-  //   enlaceDescarga.href = url;
-  //   enlaceDescarga.download = filename;
-
-  //   document.body.appendChild(enlaceDescarga);
-  //   enlaceDescarga.click();
-
-  //   document.body.removeChild(enlaceDescarga);
-  //   URL.revokeObjectURL(url);
-  // }
-  // useEffect(async () => {
-  //   const requestOptions = {
-  //     method: 'GET',
-  //     // body: JSON.stringify({ pdfUrl: "https://www.google.com/asdasdas" }),
-  //     redirect: "follow",
-  //     headers: {
-  //       authorization: `Bearer ${localStorage.getItem("token")}`
-  //     },
-  //     cache: "no-store"
-  //   };
-  //   const res = await fetch("https://4cxfyutpj4.execute-api.sa-east-1.amazonaws.com/pdf", requestOptions);
-  //   let data = await res.text();
-  //   downloadPdf(data.replace("data:application/pdf;base64,", ""), "myFileName.pdf");
-  // }, [])
+const ShowBudget = ({ budget }) => {
+  function downloadPdf(data, filename) {
+    const byteCharacters = atob(data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    };
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const downloadLink = document.createElement('a');
+    downloadLink.href = url;
+    downloadLink.download = filename;
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
+    URL.revokeObjectURL(url);
+  };
+  const budgetId = get(budget, "id", "");
+  console.log(`${URL}${CLIENTID}${PATHS.BUDGETS}/${budgetId}${PDF}`)
+  const handleDownloadPdf = async () => {
+    const requestOptions = {
+      method: 'GET',
+      redirect: "follow",
+      headers: {
+        authorization: `Bearer ${localStorage.getItem("token")}`
+      },
+      cache: "no-store"
+    };
+    const url = `https://4cxfyutpj4.execute-api.sa-east-1.amazonaws.com/pdf?customerId=${budgetId}`;
+    const res = await fetch(url, requestOptions);
+    let data = await res.text();
+    downloadPdf(data.replace("data:application/pdf;base64,", ""), "myFileName.pdf");
+  };
 
   return (
     <>
@@ -96,7 +90,7 @@ const ShowBudget = ({budget}) => {
             </ModTable>
           </ModGridColumn>
         </Grid.Row>
-        {budget && <ButtonGoto goTo={PAGES.BUDGETS.SHOWPDF(budget?.id)} iconName="eye" text="Ver PDF" color="blue" />}
+        {budget && <ModButton onClick={handleDownloadPdf} color="blue" ><Icon name="download" />Descargar PDF</ModButton>}
         {(get(budget, "customer.phone") ||
           get(budget, "customer.email")) && (
             <ButtonSend customerData={get(budget, "customer", null)} />
