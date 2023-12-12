@@ -1,6 +1,7 @@
 "use client"
 import { edit, getProduct } from "@/api/products";
 import { getUserRol } from "@/api/rol";
+import Loader from "@/components/layout/Loader";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -10,6 +11,7 @@ const EditProduct = ({ params }) => {
   const router = useRouter();
   const [role, setRole] = useState();
   const [product, setProduct] = useState(null);
+  const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -26,6 +28,7 @@ const EditProduct = ({ params }) => {
       };
       const data = await getProduct(params.code, requestOptions);
       setProduct(data);
+      setIsLoading(false)
     };
     const fetchRol = async () => {
       try {
@@ -43,7 +46,9 @@ const EditProduct = ({ params }) => {
   };
   return (
     <>
-      {product && <ProductForm product={product} onSubmit={edit} />}
+      <Loader active={isLoading}>
+        {product && <ProductForm product={product} onSubmit={edit} />}
+      </Loader>
     </>
   )
 };

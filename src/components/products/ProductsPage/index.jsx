@@ -4,6 +4,7 @@ import ButtonDelete from "@/components/buttons/Delete";
 import ButtonDownload from "@/components/buttons/DownloadExcel";
 import ButtonEdit from "@/components/buttons/Edit";
 import ButtonGoTo from "@/components/buttons/GoTo";
+import Loader from "@/components/layout/Loader";
 import { PAGES } from "@/constants";
 import { modPrice } from "@/utils";
 import { Rules } from "@/visibilityRules";
@@ -13,48 +14,50 @@ import ImportExcel from "../ImportProduct";
 import { HEADERS } from "../products.common";
 import { ButtonsContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
-const ProductsPage = ({ products = [], createBatch, editBatch, role }) => {
+const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading }) => {
   const router = useRouter();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
   const visibilityRules = Rules(role)
   return (
     <>
-      {visibilityRules.canSeeButtons &&
-        <ButtonsContainer>
-          <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
-          <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
-          <ButtonDownload />
-        </ButtonsContainer>}
-      {!!products.length && <ModTable celled compact>
-        <Table.Header fullWidth>
-          <ModTableRow>
-            <ModTableHeaderCell ></ModTableHeaderCell>
-            {HEADERS.filter(header => !header.hide || (header.value === "actions" && visibilityRules.canSeeButtons))
-              .map((header) => (
-                <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
-              ))}
-          </ModTableRow>
-        </Table.Header>
-        {products.map ? products.map((product, index) => (
-          <Table.Body key={product.code}>
-            <ModTableRow >
-              <ModTableCell >{index + 1}</ModTableCell>
-              {HEADERS
-                .filter(header => !header.hide)
-                .map((header) =>
-                  <ModTableCell key={header.id} onClick={() => { router.push(PAGES.PRODUCTS.SHOW(product.code)) }}>
-                    {header.value === "price" ? modPrice(product[header.value]) : product[header.value]}
-                  </ModTableCell>)
-              }
-              {visibilityRules.canSeeActions &&
-                <ModTableCell >
-                  <ButtonEdit page={"PRODUCTS"} element={product.code} />
-                  <ButtonDelete onDelete={deleteProduct} params={product.code} deleteQuestion={deleteQuestion(product.name)} />
-                </ModTableCell>}
+      <Loader active={isLoading}>
+        {visibilityRules.canSeeButtons &&
+          <ButtonsContainer>
+            <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
+            <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
+            <ButtonDownload />
+          </ButtonsContainer>}
+        <ModTable celled compact>
+          <Table.Header fullWidth>
+            <ModTableRow>
+              <ModTableHeaderCell ></ModTableHeaderCell>
+              {HEADERS.filter(header => !header.hide || (header.value === "actions" && visibilityRules.canSeeButtons))
+                .map((header) => (
+                  <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
+                ))}
             </ModTableRow>
-          </Table.Body>
-        )) : ""}
-      </ModTable>}
+          </Table.Header>
+          {products.map ? products.map((product, index) => (
+            <Table.Body key={product.code}>
+              <ModTableRow >
+                <ModTableCell >{index + 1}</ModTableCell>
+                {HEADERS
+                  .filter(header => !header.hide)
+                  .map((header) =>
+                    <ModTableCell key={header.id} onClick={() => { router.push(PAGES.PRODUCTS.SHOW(product.code)) }}>
+                      {header.value === "price" ? modPrice(product[header.value]) : product[header.value]}
+                    </ModTableCell>)
+                }
+                {visibilityRules.canSeeActions &&
+                  <ModTableCell >
+                    <ButtonEdit page={"PRODUCTS"} element={product.code} />
+                    <ButtonDelete onDelete={deleteProduct} params={product.code} deleteQuestion={deleteQuestion(product.name)} />
+                  </ModTableCell>}
+              </ModTableRow>
+            </Table.Body>
+          )) : ""}
+        </ModTable>
+      </Loader>
     </>
   )
 };

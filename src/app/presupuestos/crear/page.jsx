@@ -3,6 +3,7 @@ import { create } from "@/api/budgets";
 import { customersList } from "@/api/customers";
 import { productsList } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
+import Loader from "@/components/layout/Loader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,6 +12,7 @@ const CreateBudget = () => {
   const router = useRouter();
   const [products, setProductsList] = useState(null);
   const [customers, setCustomersList] = useState(null);
+  const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -35,6 +37,7 @@ const CreateBudget = () => {
           text: product.name,
         }));
         setProductsList(productsFilteredList);
+        setIsLoading(false)
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       }
@@ -56,7 +59,9 @@ const CreateBudget = () => {
     fetchData();
   }, []);
   return (
-    <BudgetForm onSubmit={create} products={products} customers={customers} />
+    <Loader active={isLoading}>
+      <BudgetForm onSubmit={create} products={products} customers={customers} />
+    </Loader>
   )
 };
 

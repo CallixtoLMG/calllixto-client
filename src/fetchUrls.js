@@ -10,5 +10,6 @@ export const PDF = "/pfd";
 export const VALIDATE = "validate";
 export const EDITBATCH = "/transact";
 export const USERS = "users/";
-export const URL = "https://zosudnr9ag.execute-api.sa-east-1.amazonaws.com/";
+export const URL = "https://zosudnr9ag.execute-api.sa-east-1.amazonaws.com/"
 export const CLIENTID = "maderera-las-tapias/";
+

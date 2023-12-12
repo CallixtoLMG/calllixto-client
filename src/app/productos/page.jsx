@@ -8,18 +8,19 @@ import { useEffect, useState } from "react";
 
 const Products = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true)
   const [products, setProducts] = useState();
   const [role, setRole] = useState();
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
       router.push(PAGES.LOGIN.BASE)
     };
     const requestOptions = {
-      method: 'GET',
+      method: "GET",
       headers: {
         authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       cache: "no-store",
     };
@@ -27,9 +28,10 @@ const Products = () => {
       try {
         const fetchProducts = await productsList(requestOptions);
         setProducts(fetchProducts);
+        setIsLoading(false)
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
-      };
+        console.error("Error al cargar clientes:", error);
+      }
     };
     const fetchRol = async () => {
       try {
@@ -44,7 +46,12 @@ const Products = () => {
   }, []);
 
   return (
-    <ProductsPage products={products} createBatch={createBatch} editBatch={editBatch} role={role} />
+      <ProductsPage
+        products={products}
+        createBatch={createBatch}
+        editBatch={editBatch} role={role}
+        isLoading={isLoading}
+      />
   );
 };
 

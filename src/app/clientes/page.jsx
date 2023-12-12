@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 const Customers = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true)
   const [customers, setCustomers] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -25,6 +26,7 @@ const Customers = () => {
         };
         const fetchCustomers = await customersList(requestOptions);
         setCustomers(fetchCustomers);
+        setIsLoading(false)
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       }
@@ -33,7 +35,7 @@ const Customers = () => {
   }, []);
 
   return (
-    <CustomersPage customers={customers} />
+      <CustomersPage customers={customers} isLoading={isLoading} />
   );
 };
 

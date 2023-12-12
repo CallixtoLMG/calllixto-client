@@ -5,7 +5,7 @@ import LoginForm from "@/components/Login";
 
 const Login = () => {
   return (
-    <LoginForm onSubmit={login} />
+      <LoginForm onSubmit={login} />
   )
 };
 
