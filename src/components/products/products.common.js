@@ -24,4 +24,5 @@ const HEADERS = [
 
 export {
   HEADERS
-}
+};
+

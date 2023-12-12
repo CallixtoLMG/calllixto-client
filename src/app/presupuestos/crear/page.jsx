@@ -4,14 +4,20 @@ import { customersList } from "@/api/customers";
 import { productsList } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import Loader from "@/components/layout/Loader";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const CreateBudget = () => {
+  const router = useRouter();
   const [products, setProductsList] = useState(null);
   const [customers, setCustomersList] = useState(null);
   const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
     const token = localStorage.getItem('token');
+    if (!token) {
+      router.push(PAGES.LOGIN.BASE)
+    };
     const requestOptions = {
       method: 'GET',
       headers: {
@@ -39,6 +45,7 @@ const CreateBudget = () => {
         const customersFetchData = await customersList(requestOptions);
         const customersFilteredList = customersFetchData.map(customer => ({
           key: customer.name,
+          id: customer.id,
           value: customer.name,
           text: customer.name,
           phone: customer.phone,

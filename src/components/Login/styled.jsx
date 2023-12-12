@@ -1,4 +1,4 @@
-import { Grid } from "semantic-ui-react";
+import { Grid, Header, Message } from "semantic-ui-react";
 import { styled } from "styled-components";
 
 const Text = styled.p`
@@ -9,10 +9,19 @@ const Text = styled.p`
   color: #579294;
 `;
 
-const ModGrid = styled(Grid)({
-  height: '100vh!important',
-  background: "#C8E3DF!important",
-});
+const ModGrid = styled(Grid)`
+  &&& {
+    background-color: #C8E3DF!important;
+    height: 100vh; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  };
+`;
+
+const ModMessage = styled(Message)`
+  text-align: center!important;
+`;
 
 const ModButton = styled.button`
   background-color: #579294;
@@ -44,5 +53,9 @@ const ModGridColumn = styled(Grid.Column)({
   maxWidth: '450px!important',
 });
 
-export { ModButton, ModGrid, ModGridColumn, Text };
+const ModHeader = styled(Header)({
+  textAlign: 'center!important'
+});
+
+export { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text };
 

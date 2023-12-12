@@ -1,15 +1,13 @@
 "use client"
 import { getBudget } from "@/api/budgets";
-import ShowBudget from "@/components/budgets/ShowBudget";
-import Loader from "@/components/layout/Loader";
+import PDFfile from "@/components/PDFfile";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const Budget = ({ params }) => {
+const SeePdf = ({ params }) => {
+  const [pdfBudget, setPdfBudget] = useState();
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true)
-  const [budget, setBudget] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -26,20 +24,18 @@ const Budget = ({ params }) => {
           cache: "no-store",
         };
         const fetchBudget = await getBudget(params.id, requestOptions);
-        setBudget(fetchBudget);
-        setIsLoading(false)
+        setPdfBudget(fetchBudget);
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       };
     };
     fetchData();
-  }, [params.id])
+  }, [params.id, router]);
 
   return (
-    <Loader active={isLoading}>
-      <ShowBudget budget={budget} />
-    </Loader>
+    <PDFfile budget={pdfBudget} />
   )
 };
 
-export default Budget;
+
+export default SeePdf;

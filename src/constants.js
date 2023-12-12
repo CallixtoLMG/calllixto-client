@@ -1,4 +1,5 @@
 const PAGES = {
+  BASE: "/",
   PRODUCTS: {
     BASE: "/productos",
     CREATE: "/productos/crear",
@@ -9,10 +10,13 @@ const PAGES = {
     BASE: "/presupuestos",
     CREATE: "/presupuestos/crear",
     SHOW: (id) => `/presupuestos/${id}`,
-    SHOWPDF: (id) => `/presupuestos/${id}/verPdf`
+    SHOWPDF: (id) => `/presupuestos/${id}/pdf`
   },
   LOGIN: {
     BASE: "/login"
+  },
+  NOTFOUND: {
+    BASE: "/paginaNoEncontrada"
   },
   CUSTOMERS: {
     BASE: "/clientes",
@@ -22,7 +26,12 @@ const PAGES = {
   }
 };
 
+const APIS = {
+  MAIL: (email, name) => `mailto:${email}?Subject=${encodeURIComponent(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
+  WSP: (phone, name) => `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
+};
+
 export {
-  PAGES
+  APIS, PAGES
 };
 

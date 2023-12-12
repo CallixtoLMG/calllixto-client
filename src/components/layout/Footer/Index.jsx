@@ -2,8 +2,8 @@
 import { PAGES } from "@/constants";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Container, List } from 'semantic-ui-react';
-import { ModSegment } from "./styles";
+import { List } from 'semantic-ui-react';
+import { ModContainer, ModSegment } from "./styles";
 
 const Footer = () => {
   const pathname = usePathname();
@@ -11,7 +11,7 @@ const Footer = () => {
     <>
       {pathname !== PAGES.LOGIN.BASE &&
         <ModSegment>
-          <Container textAlign='center'>
+          <ModContainer >
             <div>
               <Image
                 src="/callixto.png"
@@ -28,7 +28,7 @@ const Footer = () => {
                 Contactanos
               </List.Item>
             </List>
-          </Container>
+          </ModContainer>
         </ModSegment >
       }
     </>

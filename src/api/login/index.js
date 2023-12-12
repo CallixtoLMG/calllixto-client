@@ -1,28 +1,22 @@
 import { PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
 
-export async function login(data) {
-  var requestOptions = {
-    method: 'POST',
-    body: JSON.stringify(data),
-    cache: "no-store"
-  };
+const loginRequestOptions = {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  cache: "no-store"
+};
 
-  const response = await fetch(`${URL}${PATHS.LOGIN}`, requestOptions);
-  let res = await response.text();
-  res = JSON.parse(res);
+export async function login(data) {
+  const response = await fetch(`${URL}${PATHS.LOGIN}`, {
+    ...loginRequestOptions,
+    body: JSON.stringify(data),
+  });
+  const res = await response.json();
   if (res.$metadata?.httpStatusCode) {
     toast.success("Ingreso exitoso");
     const accessToken = res.AuthenticationResult.AccessToken;
     localStorage.setItem("token", accessToken);
-    var requestOptions = {
-      method: 'POST',
-      body: JSON.stringify(data),
-      cache: "no-store",
-      headers: {
-        authorization: `Bearer ${accessToken}`
-      },
-    };
     return true;
   } else {
     toast.error(res.message);

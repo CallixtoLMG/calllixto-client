@@ -2,10 +2,8 @@ import { Flex } from "rebass";
 import { Button } from "semantic-ui-react";
 import styled from "styled-components";
 
-
 const ModalContainer = styled(Flex)`
   flex-direction: row;
-  
 `;
 
 const ModButton = styled(Button)({
@@ -17,6 +15,7 @@ const ButtonContainer = styled(Flex)`
   width: 180px!important;
   padding: 0!important;
   margin-left: 14px!important;
+  height: 34px!important;
 `;
 
 export { ButtonContainer, ModButton, ModalContainer };

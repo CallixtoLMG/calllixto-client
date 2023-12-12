@@ -1,0 +1,127 @@
+import { Flex } from "rebass";
+import { GridColumn, Header, Image, Label, Segment, Table } from "semantic-ui-react";
+import styled from "styled-components";
+
+const CustomerDataContainer = styled(Flex)`
+  div:last-child { margin: 0!important; };
+`;
+
+const ClientDataContainer = styled(Flex)`
+  div:last-child { margin: 0!important; };
+  justify-content: space-between;
+`;
+
+const HeaderContainer = styled(Flex)`
+  flex-direction: row!important;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const DataContainer = styled(Flex)`
+  flex-direction: column;
+  margin: 0 10px 0px 0!important;
+  width: ${({ width }) => width || '200px'} !important;
+`;
+
+const PayMethodContainer = styled(Flex)`
+  margin-top: 18px!important;
+  align-items: center;
+`;
+
+const ModTitleHeader = styled(Header)`
+  display: flex!important;
+  margin: 0!important;
+  align-items: end!important;
+  font-size: 40px!important;
+  color: rgba(235,124,21,255)!important;
+`;
+
+const Divider = styled.div`
+  width: 100%;
+  height: 3px;
+  border-radius: 15px;
+  background-color: rgba(0,152,57,255);
+  margin: 20px 0;
+`;
+
+const Sign = styled.div`
+  width: 30%;
+  height: 3px;
+  color: green;
+  border-radius: 15px;
+  background-color: rgba(0,152,57,255);
+  margin-top: 70px;
+`;
+
+const ModTable = styled(Table)`
+`;
+
+const ModTableRow = styled(Table.Row)`
+  th:first-child { width: 50px!important; };
+`;
+
+const ModTableLabel = styled(Label)({
+  marginTop: "10px!important",
+});
+
+const ModLabel = styled(Label)`
+  margin: 0 !important;
+  background-color: white !important;
+  border: 0.5px solid grey !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  margin-bottom: -1px !important;
+`;
+
+const ModPayMethodLabel = styled(Label)`
+  display: flex !important;
+  background-color: white !important;
+  border-radius: 0 !important;
+  padding: 8px !important;
+`;
+
+const ModGridColumn = styled(GridColumn)`
+  margin-top: 20px !important;
+`;
+
+const ModSegment = styled(Segment)`
+  margin-top: 5px !important;
+  height: 50px !important;
+  box-shadow: 0 0 0 0 !important;
+  background-color: white !important;
+  border: 0.5px solid grey !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  padding: 8px !important;
+`;
+
+const ModTableHeaderCell = styled(Table.HeaderCell)`
+  background-color: rgb(255, 255, 255)!important;
+  text-align: ${({ align }) => align || "center"} !important;
+`;
+
+const ModTableFooterCell = styled(Table.HeaderCell)`
+  background-color: rgb(255, 255, 255)!important;
+  text-align: ${({ align }) => align || "center"} !important;
+  strong{
+    margin-right: 3.3rem!important;
+  };
+`;
+
+const ModTableCell = styled(Table.Cell)({
+  textAlign: 'center!important'
+});
+
+const ModImage = styled(Image)`
+  &&& {
+    width: 250px!important;
+    height: 100px!important;
+  };
+`;
+
+const ModPayMethodHeader = styled(Header)`
+  margin: 20px 0 0 0!important;
+`;
+
+export { ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, ModGridColumn, ModImage, ModLabel, ModPayMethodHeader, ModPayMethodLabel, ModSegment, ModTable, ModTableCell, ModTableFooterCell, ModTableHeaderCell, ModTableLabel, ModTableRow, ModTitleHeader, PayMethodContainer, Sign };
+

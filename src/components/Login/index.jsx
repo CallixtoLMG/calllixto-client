@@ -1,13 +1,13 @@
 "use client";
 import { PAGES } from "@/constants";
-import Loader from "../layout/Loader";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
-import { Form, Header, Message, Segment } from "semantic-ui-react";
-import { ModButton, ModGrid, ModGridColumn, Text } from "./styled";
 import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Form, Segment } from "semantic-ui-react";
+import Loader from "../layout/Loader";
+import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "./styled";
 
 const LoginForm = ({ onSubmit }) => {
   const router = useRouter();
@@ -16,7 +16,6 @@ const LoginForm = ({ onSubmit }) => {
   const handleForm = async (data) => {
     setIsLoading(true);
     const loginSuccess = await onSubmit(data);
-    onSubmit(data);
     if (loginSuccess) {
       router.push(PAGES.PRODUCTS.BASE);
     } else {
@@ -26,9 +25,9 @@ const LoginForm = ({ onSubmit }) => {
 
   return (
     <Loader active={isLoading}>
-      <ModGrid textAlign="center" verticalAlign="middle">
-        <ModGridColumn>
-          <Header as="h3" textAlign="center">
+      <ModGrid >
+        <ModGridColumn >
+          <ModHeader as='h3'>
             <div>
               <Image
                 src="/Callixto.png"
@@ -39,20 +38,20 @@ const LoginForm = ({ onSubmit }) => {
               />
               <Text>Ingresa a tu cuenta</Text>
             </div>
-          </Header>
-          <Form onSubmit={handleSubmit(handleForm)} size="large">
+          </ModHeader>
+          <Form onSubmit={handleSubmit(handleForm)} size='large'>
             <Segment stacked>
               <Controller
                 name="email"
                 control={control}
-                render={({ field }) => (
-                  <Form.Input
-                    placeholder="Correo electrónico"
-                    fluid
-                    icon="user"
-                    iconPosition="left"
-                    {...field}
-                  />
+                render={({ field }) =>
+                (<Form.Input
+                  placeholder='Correo electrónico'
+                  fluid
+                  icon='user'
+                  iconPosition='left'
+                  {...field}
+                />
                 )}
               />
               <Controller
@@ -60,23 +59,23 @@ const LoginForm = ({ onSubmit }) => {
                 control={control}
                 render={({ field }) => (
                   <Form.Input
-                    type="password"
-                    placeholder="Contraseña"
+                    type='password'
+                    placeholder='Contraseña'
                     fluid
-                    icon="lock"
-                    iconPosition="left"
+                    icon='lock'
+                    iconPosition='left'
                     {...field}
                   />
                 )}
               />
-              <ModButton fluid="true" size="large">
+              <ModButton fluid="true" size='large'>
                 Ingresar
               </ModButton>
             </Segment>
           </Form>
-          <Message>
-            <Link href={PAGES.PRODUCTS.BASE}>Perdiste tu contraseña?</Link>
-          </Message>
+          <ModMessage>
+            <Link href={PAGES.PRODUCTS.BASE}> Perdiste tu contraseña?</Link>
+          </ModMessage>
         </ModGridColumn>
       </ModGrid>
     </Loader>

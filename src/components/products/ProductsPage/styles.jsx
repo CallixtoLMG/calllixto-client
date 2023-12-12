@@ -3,28 +3,18 @@ import { Flex } from "rebass";
 import { Table } from "semantic-ui-react";
 import styled from "styled-components";
 
-const MainContainer = styled(Flex)`
-  justify-content: center!important;
-  width: 100%!important;
-`;
-
-const SubContainer = styled(Flex)`
-  margin: 75px 30px 30px 30px!important;
-  flex-direction: column;
-  width: 80%!important;
-  max-width: 900px!important;
-`;
-
 const ButtonsContainer = styled(Flex)`
   flex-direction: row;
 `;
 
 const ModTableCell = styled(Table.Cell)({
-  cursor: "pointer!important"
+  cursor: "pointer!important",
+  textAlign: "center!important"
 });
 
 const ModTableHeaderCell = styled(Table.HeaderCell)({
-  background: "#EEEEEE!important"
+  background: "#EEEEEE!important",
+  textAlign: "center!important"
 });
 
 const ModLink = styled(Link)({
@@ -34,7 +24,8 @@ const ModLink = styled(Link)({
 const ModTable = styled(Table)`
   tbody:nth-child(odd) {
     background-color: #f2f2f2!important;
-  }
+  };
+  margin-top: 0!important;
 `;
 
 const ModTableRow = styled(Table.Row)`
@@ -49,5 +40,5 @@ const ModTableRow = styled(Table.Row)`
   th:last-child { width: 200px!important; };
 `;
 
-export { ButtonsContainer, MainContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer };
+export { ButtonsContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow };
 

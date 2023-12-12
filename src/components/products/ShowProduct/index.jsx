@@ -1,13 +1,16 @@
 "use client";
+import ButtonGoTo from "@/components/buttons/GoTo";
+import Loader from "@/components/layout/Loader";
+import { PAGES } from "@/constants";
 import { Grid } from "semantic-ui-react";
 import { modPrice } from "../../../utils";
-import { MainContainer, ModLabel, ModSegment } from "./styles";
-import Loader from "@/components/layout/Loader";
+import { ModLabel, ModSegment } from "./styles";
 
 const ShowProduct = ({ product, isLoading }) => {
   return (
-    <MainContainer>
+    <>
       <Loader active={isLoading}>
+        <ButtonGoTo goTo={PAGES.PRODUCTS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
         <Grid divided>
           <Grid.Row stretched>
             <Grid.Column>
@@ -21,7 +24,7 @@ const ShowProduct = ({ product, isLoading }) => {
           </Grid.Row>
         </Grid>
       </Loader>
-    </MainContainer>
+    </>
   );
 };
 export default ShowProduct;

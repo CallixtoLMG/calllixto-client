@@ -1,17 +1,18 @@
 import Link from "next/link";
 import { Flex } from "rebass";
-import { Button, Container, Input, Label, Table } from "semantic-ui-react";
+import { Container, Input, Label, Table } from "semantic-ui-react";
 import styled from "styled-components";
-
-const MainContainer = styled(Flex)`
-  margin-left: 12px!important;
-  flex-direction: row!important;
-  padding: 10px!important;
-`;
 
 const ContainerModal = styled(Flex)`
   flex-direction: column!important;
   padding: 10px!important;
+`;
+
+const DataNotFoundContainer = styled(Container)`
+  text-align: center!important;
+  p {
+    font-size: 15px!important;
+  };
 `;
 
 const SubContainer = styled(Flex)`
@@ -47,12 +48,6 @@ const ModTableContainer = styled(Flex)`
   border-radius: 4px!important;
 `;
 
-
-const ModButton = styled(Button)({
-  width: "170px!important",
-  padding: "10px 0!important",
-});
-
 const ModalModLabel = styled(Label)({
   margin: "0 0 14px 0!important",
   display: "block!important"
@@ -62,7 +57,8 @@ const ModLabel = styled(Label)`
   > span {
     width: 170px!important;
     padding: 10px 0!important;
-  }
+    margin-left: 10px!important;
+  };
 `;
 
 const ModalHeaderContainer = styled(Container)`
@@ -93,6 +89,10 @@ const ModTableRow = styled(Table.Row)`
   th:last-child { width: 250px!important; };
 `;
 
-export { ContainerModal, MainContainer, ModButton, ModInput, ModLabel, ModLink, ModTable, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage };
+const ModTableCell = styled(Table.Cell)({
+  textAlign: 'center!important'
+});
+
+export { ContainerModal, DataNotFoundContainer, ModInput, ModLabel, ModLink, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage };
 
 

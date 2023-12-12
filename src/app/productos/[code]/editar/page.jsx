@@ -1,15 +1,23 @@
 "use client"
 import { edit, getProduct } from "@/api/products";
-import ProductForm from "@/components/products/ProductForm";
+import { getUserRol } from "@/api/rol";
 import Loader from "@/components/layout/Loader";
+import ProductForm from "@/components/products/ProductForm";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const EditProduct = ({ params }) => {
+  const router = useRouter();
+  const [role, setRole] = useState();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
     const token = localStorage.getItem('token');
-    async function fectchData() {
+    if (!token) {
+      router.push(PAGES.LOGIN.BASE)
+    };
+    async function fetchData() {
       var requestOptions = {
         method: 'GET',
         redirect: 'follow',
@@ -22,16 +30,25 @@ const EditProduct = ({ params }) => {
       setProduct(data);
       setIsLoading(false)
     };
-    fectchData();
+    const fetchRol = async () => {
+      try {
+        const roles = await getUserRol();
+        setRole(roles);
+      } catch (error) {
+        console.error('Error al cargar clientes:', error);
+      };
+    };
+    fetchData();
+    fetchRol();
   }, [params.code]);
-
+  if (role === "user") {
+    router.push(PAGES.NOTFOUND.BASE)
+  };
   return (
     <>
-      {product && 
-        <Loader active={isLoading}>
-          <ProductForm product={product} onSubmit={edit} />
-        </Loader>
-      }
+      <Loader active={isLoading}>
+        {product && <ProductForm product={product} onSubmit={edit} />}
+      </Loader>
     </>
   )
 };

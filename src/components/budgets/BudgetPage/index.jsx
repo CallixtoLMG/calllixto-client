@@ -1,99 +1,52 @@
 "use client";
 import ButtonGoTo from "@/components/buttons/GoTo";
+import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { Button, Popup, Table } from "semantic-ui-react";
 import { modDate, modPrice, totalSum } from "../../../utils";
 import { HEADERS } from "../budgets.common";
-import {
-  MainContainer,
-  ModIcon,
-  ModTable,
-  ModTableCell,
-  ModTableHeaderCell,
-  ModTableRow,
-  SubContainer,
-} from "./styles";
-import Loader from "@/components/layout/Loader";
+import { ModIcon, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const BudgetsPage = ({ budgets, isLoading }) => {
   const router = useRouter();
   return (
-    <MainContainer>
-      <SubContainer>
+    <>
+      <Loader active={isLoading}>
         <PageHeader title={"Presupuestos"} />
-        <ButtonGoTo
-          color="green"
-          text="Crear presupuesto"
-          iconName="add"
-          goTo={PAGES.BUDGETS.CREATE}
-        />
-        <Loader active={isLoading}>
-          <ModTable celled compact>
-            <Table.Header fullWidth>
+        <ButtonGoTo color="green" text="Crear presupuesto" iconName="add" goTo={PAGES.BUDGETS.CREATE} />
+        <ModTable celled compact >
+          <Table.Header fullWidth>
+            <ModTableRow>
+              {HEADERS.map((header) => (
+                <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
+              ))}
+              <ModTableHeaderCell>Total</ModTableHeaderCell>
+              <ModTableHeaderCell>Acciones</ModTableHeaderCell>
+            </ModTableRow>
+          </Table.Header>
+          {budgets?.map((budget, index) => (
+            <Table.Body key={budget.id}>
               <ModTableRow>
-                <ModTableHeaderCell textAlign="center"></ModTableHeaderCell>
-                {HEADERS.map((header) => (
-                  <ModTableHeaderCell key={header.id} textAlign="center">
-                    {header.name}
-                  </ModTableHeaderCell>
-                ))}
-                <ModTableHeaderCell textAlign="center">
-                  Total
-                </ModTableHeaderCell>
-                <ModTableHeaderCell textAlign="center">
-                  Acciones
-                </ModTableHeaderCell>
+                {HEADERS
+                  .map((header) =>
+                    <ModTableCell
+                      onClick={() => { router.push(PAGES.BUDGETS.SHOW(budget.id)) }}
+                      key={header.id}
+                    >
+                      {header.date ? modDate(budget[header.value]) : budget[header.object] ? budget[header.object][header.value] : budget[header.value]}
+                    </ModTableCell>)
+                }
+                <ModTableCell onClick={() => { router.push(PAGES.BUDGETS.SHOW(budget.id)) }}>{modPrice(totalSum(budget.products))}</ModTableCell>
+                <ModTableCell><Popup content="Copiar" size="mini" trigger={<Button color="green" size='tiny' ><ModIcon name="copy" /></Button>} /> </ModTableCell>
               </ModTableRow>
-            </Table.Header>
-            {budgets?.map((budget, index) => (
-              <Table.Body key={budget.id}>
-                <ModTableRow>
-                  <Table.Cell textAlign="center">{index + 1}</Table.Cell>
-                  {HEADERS
-                    .map((header) => (
-                      <ModTableCell
-                        onClick={() => {
-                          router.push(PAGES.BUDGETS.SHOW(budget.id));
-                        }}
-                        key={header.id}
-                        textAlign="center"
-                      >
-                        {header.date
-                          ? modDate(budget[header.value])
-                          : budget[header.object]
-                          ? budget[header.object][header.value]
-                          : budget[header.value]}
-                      </ModTableCell>
-                    ))}
-                  <Table.Cell
-                    onClick={() => {
-                      router.push(PAGES.BUDGETS.SHOW(budget.id));
-                    }}
-                    textAlign="center"
-                  >
-                    {modPrice(totalSum(budget.products))}
-                  </Table.Cell>
-                  <Table.Cell textAlign="center">
-                    <Popup
-                      content="Copiar"
-                      size="mini"
-                      trigger={
-                        <Button color="green" size="tiny">
-                          <ModIcon name="copy" />
-                        </Button>
-                      }
-                    />
-                  </Table.Cell>
-                </ModTableRow>
-              </Table.Body>
-            ))}
-          </ModTable>
-        </Loader>
-      </SubContainer>
-    </MainContainer>
-  );
+            </Table.Body>
+          ))}
+        </ModTable>
+      </Loader>
+    </>
+  )
 };
 
 export default BudgetsPage;
