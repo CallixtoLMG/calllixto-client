@@ -1,6 +1,6 @@
 "use client";
 import ButtonSend from "@/components/buttons/Send";
-import { CLIENTID, PATHS, PDF, URL } from "@/fetchUrls";
+import { URL } from "@/fetchUrls";
 import { get } from "lodash";
 import { Grid, Icon, Label, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from '../../../utils';
@@ -25,8 +25,8 @@ const ShowBudget = ({ budget }) => {
     document.body.removeChild(downloadLink);
     URL.revokeObjectURL(url);
   };
-  const budgetId = get(budget, "id", "");
-  console.log(`${URL}${CLIENTID}${PATHS.BUDGETS}/${budgetId}${PDF}`)
+  // const budgetId = get(budget, "id", "");
+  // console.log(`${URL}${CLIENTID}${PATHS.BUDGETS}/${budgetId}${PDF}`)
   const handleDownloadPdf = async () => {
     const requestOptions = {
       method: 'GET',
@@ -36,10 +36,11 @@ const ShowBudget = ({ budget }) => {
       },
       cache: "no-store"
     };
-    const url = `https://4cxfyutpj4.execute-api.sa-east-1.amazonaws.com/pdf?customerId=${budgetId}`;
-    const res = await fetch(url, requestOptions);
+    // const url = `https://4cxfyutpj4.execute-api.sa-east-1.amazonaws.com/pdf?customerId=${budgetId}`;
+    const res = await fetch("https://4cxfyutpj4.execute-api.sa-east-1.amazonaws.com/pdf", requestOptions);
+    // const res = await fetch(url, requestOptions);
     let data = await res.text();
-    downloadPdf(data.replace("data:application/pdf;base64,", ""), "myFileName.pdf");
+    downloadPdf(data, "myFileName.pdf");
   };
 
   return (

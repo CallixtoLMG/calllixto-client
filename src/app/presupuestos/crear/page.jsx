@@ -42,6 +42,7 @@ const CreateBudget = () => {
         const customersFetchData = await customersList(requestOptions);
         const customersFilteredList = customersFetchData.map(customer => ({
           key: customer.name,
+          id: customer.id,
           value: customer.name,
           text: customer.name,
           phone: customer.phone,

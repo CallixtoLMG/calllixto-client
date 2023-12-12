@@ -17,7 +17,6 @@ const BudgetsPage = ({ budgets }) => {
       <ModTable celled compact >
         <Table.Header fullWidth>
           <ModTableRow>
-            <ModTableHeaderCell></ModTableHeaderCell>
             {HEADERS.map((header) => (
               <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
             ))}
@@ -28,7 +27,6 @@ const BudgetsPage = ({ budgets }) => {
         {budgets?.map((budget, index) => (
           <Table.Body key={budget.id}>
             <ModTableRow>
-              <ModTableCell>{index + 1}</ModTableCell>
               {HEADERS
                 .map((header) =>
                   <ModTableCell

@@ -1,15 +1,17 @@
 const HEADERS = [
   {
+    name: "",
+    value: "id",
+  },
+  {
     name: "Cliente",
     object: "customer",
-    value: "customerName",
-    id: 1
+    value: "name",
   },
   {
     name: "Fecha",
     date: true,
     value: "createdAt",
-    id: 2
   },
 ];
 

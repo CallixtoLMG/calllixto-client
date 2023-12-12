@@ -39,11 +39,11 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
 
   return (
     <>
-    <PageHeader title={"Crear presupuesto"}/>
+      <PageHeader title={"Crear presupuesto"} />
       <ButtonGoTo goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
       <Form onSubmit={handleSubmit(handleCreate)}>
         <ModDropdown
-          name={`customerName`}
+          name={`customer`}
           placeholder='Clientes...'
           search
           selection
@@ -52,6 +52,10 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
           options={customers}
           onChange={(e, { name, value }) => {
             setValue(name, value);
+            const customer = customers.find((opt) => opt.value === value);
+            setValue(`customer.name`, customer.value);
+            setValue(`customer.id`, customer.id);
+            console.log(customer)
           }}
         />
         <ModButton
