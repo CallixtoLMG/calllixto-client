@@ -36,9 +36,11 @@ const ShowBudget = ({ budget }) => {
       },
       cache: "no-store"
     };
-    // const url = `https://4cxfyutpj4.execute-api.sa-east-1.amazonaws.com/pdf?customerId=${budgetId}`;
-    const res = await fetch("https://4cxfyutpj4.execute-api.sa-east-1.amazonaws.com/pdf", requestOptions);
+    // const url = `https://zosudnr9ag.execute-api.sa-east-1.amazonaws.com/pdf?customerId=${budgetId}`;
+    // const url = `https://zosudnr9ag.execute-api.sa-east-1.amazonaws.com/pdf/${budgetId}`;
     // const res = await fetch(url, requestOptions);
+
+    const res = await fetch(`https://zosudnr9ag.execute-api.sa-east-1.amazonaws.com/pdf/${budget.id}`, requestOptions);
     let data = await res.text();
     downloadPdf(data, "myFileName.pdf");
   };
