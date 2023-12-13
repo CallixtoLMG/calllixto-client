@@ -5,7 +5,6 @@ import styled from "styled-components";
 const ModButton = styled(Button)`
   width: 170px!important;
   padding: 10px 0!important;
-  margin-bottom: 14px!important;
   display: inline-block!important;
 `;
 

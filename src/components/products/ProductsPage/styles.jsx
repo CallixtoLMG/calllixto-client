@@ -3,8 +3,9 @@ import { Flex } from "rebass";
 import { Table } from "semantic-ui-react";
 import styled from "styled-components";
 
-const ButtonsContainer = styled(Flex)`
+const ButtonContainer = styled(Flex)`
   flex-direction: row;
+  margin-bottom: 20px!important;
 `;
 
 const ModTableCell = styled(Table.Cell)({
@@ -40,5 +41,9 @@ const ModTableRow = styled(Table.Row)`
   th:last-child { width: 200px!important; };
 `;
 
-export { ButtonsContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow };
+const HeaderContainer = styled(Flex)`
+  margin-bottom: 20px!important;
+`;
+
+export { ButtonContainer, HeaderContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow };
 

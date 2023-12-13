@@ -5,6 +5,7 @@ import ButtonDownload from "@/components/buttons/DownloadExcel";
 import ButtonEdit from "@/components/buttons/Edit";
 import ButtonGoTo from "@/components/buttons/GoTo";
 import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { modPrice } from "@/utils";
 import { Rules } from "@/visibilityRules";
@@ -12,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import { Table } from 'semantic-ui-react';
 import ImportExcel from "../ImportProduct";
 import { HEADERS } from "../products.common";
-import { ButtonsContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { ButtonContainer, HeaderContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading }) => {
   const router = useRouter();
@@ -21,12 +22,15 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading }
   return (
     <>
       <Loader active={isLoading}>
+        <HeaderContainer>
+          <PageHeader title={"Productos"} />
+        </HeaderContainer>
         {visibilityRules.canSeeButtons &&
-          <ButtonsContainer>
+          <ButtonContainer>
             <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
             <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
             <ButtonDownload />
-          </ButtonsContainer>}
+          </ButtonContainer>}
         <ModTable celled compact>
           <Table.Header fullWidth>
             <ModTableRow>

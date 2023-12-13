@@ -1,3 +1,4 @@
+import { Flex } from "rebass";
 import { Button, Dropdown, Input, Table } from 'semantic-ui-react';
 import styled from 'styled-components';
 
@@ -19,7 +20,7 @@ const TotalText = styled.h3`
 const ModDropdown = styled(Dropdown)({
   width: "20rem!important",
   display: "flex!important",
-  marginBottom: "14px!important",
+  marginBottom: "20px!important",
 });
 
 const ModTableRow = styled(Table.Row)`
@@ -38,5 +39,9 @@ const ModTableCell = styled(Table.Cell)({
   textAlign: 'center!important'
 });
 
-export { ModButton, ModDropdown, ModInput, ModTableCell, ModTableHeaderCell, ModTableRow, TotalText };
+const HeaderContainer = styled(Flex)`
+  margin-bottom: 20px!important;
+`;
+
+export { HeaderContainer, ModButton, ModDropdown, ModInput, ModTableCell, ModTableHeaderCell, ModTableRow, TotalText };
 

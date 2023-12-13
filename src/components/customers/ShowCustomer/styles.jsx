@@ -1,3 +1,4 @@
+import { Flex } from "rebass";
 import { Label, Segment } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -11,7 +12,9 @@ const ModSegment = styled(Segment)({
   height: "50px!important",
 });
 
-export {
-  ModLabel, ModSegment
-};
+const HeaderContainer = styled(Flex)`
+  margin-bottom: 20px!important;
+`;
+
+export { HeaderContainer, ModLabel, ModSegment };
 

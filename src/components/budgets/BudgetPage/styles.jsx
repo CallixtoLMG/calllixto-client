@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Flex } from "rebass";
 import { Icon, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -35,7 +36,14 @@ const ModLink = styled(Link)({
   width: "fit-content",
 });
 
-export {
-  ModIcon, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow
-};
+const ButtonContainer = styled(Flex)`
+  flex-direction: row;
+  margin-bottom: 20px!important;
+`;
+
+const HeaderContainer = styled(Flex)`
+  margin-bottom: 20px!important;
+`;
+
+export { ButtonContainer, HeaderContainer, ModIcon, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow };
 

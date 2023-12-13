@@ -4,11 +4,12 @@ import ButtonDelete from "@/components/buttons/Delete";
 import ButtonEdit from "@/components/buttons/Edit";
 import ButtonGoTo from "@/components/buttons/GoTo";
 import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { Table } from "semantic-ui-react";
 import { HEADERS } from "../clients.common";
-import { ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { ButtonContainer, HeaderContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const CustomersPage = ({ customers = [], isLoading }) => {
   const router = useRouter();
@@ -18,11 +19,16 @@ const CustomersPage = ({ customers = [], isLoading }) => {
   return (
     <>
       <Loader active={isLoading}>
-        <ButtonGoTo
-          color="green"
-          text="Crear cliente"
-          iconName="add"
-          goTo={PAGES.CUSTOMERS.CREATE} />
+        <HeaderContainer>
+          <PageHeader title={"Clientes"} />
+        </HeaderContainer>
+        <ButtonContainer>
+          <ButtonGoTo
+            color="green"
+            text="Crear cliente"
+            iconName="add"
+            goTo={PAGES.CUSTOMERS.CREATE} />
+        </ButtonContainer>
         {!!customers.length &&
           <ModTable celled compact>
             <Table.Header fullWidth>

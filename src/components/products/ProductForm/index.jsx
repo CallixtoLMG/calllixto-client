@@ -1,5 +1,6 @@
 "use client";
 import ButtonGoTo from "@/components/buttons/GoTo";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { get } from "lodash";
 import { useRouter } from "next/navigation";
@@ -7,6 +8,7 @@ import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
 import {
+  HeaderContainer,
   ModButton,
   ModFormField,
   ModInput,
@@ -36,7 +38,10 @@ const ProductForm = ({ product, onSubmit }) => {
 
   return (
     <>
-      <ButtonGoTo goTo={PAGES.PRODUCTS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
+      <HeaderContainer>
+        <ButtonGoTo goTo={PAGES.PRODUCTS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
+        <PageHeader title={!product?.code ? "Crear producto" : "Actualizar producto"} />
+      </HeaderContainer>
       <Form onSubmit={handleSubmit(handleForm)}>
         {!product?.code &&
           (

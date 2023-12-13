@@ -7,11 +7,12 @@ import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Dropdown, Form, Icon, Table } from "semantic-ui-react";
 import {
+  HeaderContainer,
   ModButton,
   ModDropdown,
   ModInput, ModTableCell, ModTableHeaderCell,
   ModTableRow,
-  TotalText,
+  TotalText
 } from "./styles";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
@@ -57,8 +58,10 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
 
   return (
     <>
-      <PageHeader title={"Crear presupuesto"} />
-      <ButtonGoTo goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
+      <HeaderContainer>
+        <ButtonGoTo goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
+        <PageHeader title={"Crear presupuesto"} />
+      </HeaderContainer >
       <Form onSubmit={handleSubmit(handleCreate)}>
         <ModDropdown
           name={`customer`}

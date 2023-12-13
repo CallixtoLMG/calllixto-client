@@ -1,15 +1,19 @@
 "use client";
 import ButtonGoTo from "@/components/buttons/GoTo";
 import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { Grid } from "semantic-ui-react";
-import { ModLabel, ModSegment } from "./styles";
+import { HeaderContainer, ModLabel, ModSegment } from "./styles";
 
 const ShowCustomer = ({ customer = {}, isLoading }) => {
   return (
     <>
       <Loader active={isLoading}>
-        <ButtonGoTo goTo={PAGES.CUSTOMERS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
+        <HeaderContainer>
+          <ButtonGoTo goTo={PAGES.CUSTOMERS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
+          <PageHeader title={"Detalle"} />
+        </HeaderContainer >
         <Grid divided>
           <Grid.Row stretched>
             <Grid.Column>
