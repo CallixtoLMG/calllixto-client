@@ -28,11 +28,13 @@ const Product = ({ params }) => {
         const fetchProduct = await getProduct(params.code, requestOptions);
         setProduct(fetchProduct);
         setIsLoading(false)
+        
       } catch (error) {
         console.error('Error al cargar clientes:', error);
       };
     };
     fetchData();
+    console.log(product)
   }, [params.code]);
 
   return (

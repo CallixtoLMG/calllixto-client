@@ -1,5 +1,5 @@
 "use client";
-import { deleteCustomer } from "@/api/customers";
+// import { deleteCustomer } from "@/api/customers";
 import ButtonDelete from "@/components/buttons/Delete";
 import ButtonEdit from "@/components/buttons/Edit";
 import ButtonGoTo from "@/components/buttons/GoTo";
@@ -11,10 +11,9 @@ import { Table } from "semantic-ui-react";
 import { HEADERS } from "../clients.common";
 import { ButtonContainer, HeaderContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
-const CustomersPage = ({ customers = [], isLoading }) => {
+const CustomersPage = ({ customers = [], isLoading, onDelete }) => {
   const router = useRouter();
-  const deleteQuestion = (name) =>
-    `¿Está seguro que desea eliminar el cliente "${name}"?`;
+  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`;
 
   return (
     <>
@@ -55,7 +54,7 @@ const CustomersPage = ({ customers = [], isLoading }) => {
                   <ModTableCell >
                     <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
                     <ButtonDelete
-                      onDelete={deleteCustomer}
+                      onDelete={onDelete}
                       params={customer.id}
                       deleteQuestion={deleteQuestion(customer.name)} />
                   </ModTableCell>
@@ -63,7 +62,6 @@ const CustomersPage = ({ customers = [], isLoading }) => {
               </Table.Body>
             ))}
           </ModTable>
-
         }
       </Loader>
     </>

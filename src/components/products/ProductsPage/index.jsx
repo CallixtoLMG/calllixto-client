@@ -1,5 +1,4 @@
 "use client";
-import { deleteProduct } from "@/api/products";
 import ButtonDelete from "@/components/buttons/Delete";
 import ButtonDownload from "@/components/buttons/DownloadExcel";
 import ButtonEdit from "@/components/buttons/Edit";
@@ -15,7 +14,8 @@ import ImportExcel from "../ImportProduct";
 import { HEADERS } from "../products.common";
 import { ButtonContainer, HeaderContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
-const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading }) => {
+const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading, onDelete }) => {
+  console.log(products)
   const router = useRouter();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
   const visibilityRules = Rules(role)
@@ -55,7 +55,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading }
                 {visibilityRules.canSeeActions &&
                   <ModTableCell >
                     <ButtonEdit page={"PRODUCTS"} element={product.code} />
-                    <ButtonDelete onDelete={deleteProduct} params={product.code} deleteQuestion={deleteQuestion(product.name)} />
+                    <ButtonDelete onDelete={onDelete} params={product.code} deleteQuestion={deleteQuestion(product.name)} />
                   </ModTableCell>}
               </ModTableRow>
             </Table.Body>
