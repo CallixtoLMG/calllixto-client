@@ -57,7 +57,7 @@ const CreateBudget = () => {
       };
     };
     fetchData();
-  }, []);
+  }, [router]);
   return (
     <Loader active={isLoading}>
       <BudgetForm onSubmit={create} products={products} customers={customers} />

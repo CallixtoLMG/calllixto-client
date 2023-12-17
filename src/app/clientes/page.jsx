@@ -33,7 +33,7 @@ const Customers = () => {
       };
     };
     fetchData();
-  }, []);
+  }, [router]);
 
   const handleDeleteCustomer = async (id) => {
     try {

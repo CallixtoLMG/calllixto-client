@@ -33,7 +33,7 @@ const Budgets = () => {
       };
     };
     fetchData();
-  }, []);
+  }, [router]);
 
   return (
       <BudgetsPage budgets={budgets} isLoading={isLoading} />

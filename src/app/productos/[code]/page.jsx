@@ -33,7 +33,7 @@ const Product = ({ params }) => {
       };
     };
     fetchData();
-  }, [params.code]);
+  }, [params.code, router]);
 
   return (
        <ShowProduct product={product} isLoading={isLoading}/>

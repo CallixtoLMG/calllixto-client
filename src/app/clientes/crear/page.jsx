@@ -12,7 +12,7 @@ const CreateCustomer = () => {
     if (!token) {
       router.push(PAGES.LOGIN.BASE)
     };
-  }, []);
+  }, [router]);
   return (
     <CustomerForm onSubmit={create} />
   )

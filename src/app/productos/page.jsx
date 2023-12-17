@@ -44,7 +44,7 @@ const Products = () => {
     };
     fetchProductData();
     fetchRol()
-  }, []);
+  }, [router]);
 
   const handleDeleteProduct = async (code) => {
     try {

@@ -40,7 +40,7 @@ const EditProduct = ({ params }) => {
     };
     fetchData();
     fetchRol();
-  }, [params.code]);
+  }, [params.code, router]);
   if (role === "user") {
     router.push(PAGES.NOTFOUND.BASE)
   };

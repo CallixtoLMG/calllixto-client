@@ -33,7 +33,7 @@ const Budget = ({ params }) => {
       };
     };
     fetchData();
-  }, [params.id])
+  }, [params.id, router])
 
   return (
     <Loader active={isLoading}>

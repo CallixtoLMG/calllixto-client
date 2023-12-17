@@ -23,7 +23,7 @@ const CreateProduct = () => {
       };
     };
     setRole(fetchRol());
-  }, []);
+  }, [router]);
   if (role === "user") {
     router.push(PAGES.NOTFOUND.BASE)
   };

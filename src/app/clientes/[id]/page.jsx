@@ -32,7 +32,7 @@ const Customer = ({ params }) => {
       };
     };
     fetchData();
-  }, [params.id]);
+  }, [params.id, router]);
 
   return (
       <ShowCustomer customer={customer} isLoading={isLoading} />
