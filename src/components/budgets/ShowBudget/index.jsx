@@ -1,8 +1,6 @@
 "use client";
-import ButtonGoTo from "@/components/buttons/GoTo";
 import ButtonSend from "@/components/buttons/Send";
 import PageHeader from "@/components/layout/PageHeader";
-import { PAGES } from "@/constants";
 import { get } from "lodash";
 import { Grid, Icon, Label, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from '../../../utils';
@@ -44,7 +42,6 @@ const ShowBudget = ({ budget }) => {
   return (
     <>
       <HeaderContainer>
-        <ButtonGoTo goTo={PAGES.BUDGETS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
         <PageHeader title={"Detalle"} />
       </HeaderContainer >
       <SubContainer>

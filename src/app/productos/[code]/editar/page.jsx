@@ -35,7 +35,7 @@ const EditProduct = ({ params }) => {
         const roles = await getUserRol();
         setRole(roles);
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar producto:', error);
       };
     };
     fetchData();

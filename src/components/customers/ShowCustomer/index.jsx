@@ -1,8 +1,6 @@
 "use client";
-import ButtonGoTo from "@/components/buttons/GoTo";
 import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
-import { PAGES } from "@/constants";
 import { DataContainer, HeaderContainer, ModLabel, ModSegment, SubContainer } from "./styles";
 
 const ShowCustomer = ({ customer = {}, isLoading }) => {
@@ -10,7 +8,6 @@ const ShowCustomer = ({ customer = {}, isLoading }) => {
     <>
       <Loader active={isLoading}>
         <HeaderContainer>
-          <ButtonGoTo goTo={PAGES.CUSTOMERS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
           <PageHeader title={"Detalle"} />
         </HeaderContainer>
         <SubContainer>

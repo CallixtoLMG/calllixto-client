@@ -13,6 +13,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
   const [newProducts, setNewProducts] = useState([]);
   const [editProducts, setEditProducts] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleModalClose = () => {
     setOpen(false);
@@ -60,16 +61,15 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
       const existingProducts = [];
       const existingCodes = {};
       products.forEach((product) => {
-        existingCodes[product.code] = true;
+        existingCodes[product.code.toUpperCase()] = true;
       });
-      console.log("after set existingCodes:", existingCodes);
       parsedData.forEach((product) => {
-        console.log("Processing product: ", product);
-        if (existingCodes[product.code]) {
+        const upperCaseCode = product.code.toUpperCase();
+        if (existingCodes[upperCaseCode]) {
           existingProducts.push(product);
         } else {
           nonExistingProducts.push(product);
-        };
+        }
       });
       setEditProducts(existingProducts);
       setNewProducts(nonExistingProducts);
@@ -90,6 +90,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
     setTimeout(() => {
       router.refresh();
     }, 1000);
+    setIsLoading(true);
     setOpen(false);
   };
 
@@ -212,8 +213,8 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                   <p>No se encontraron datos.</p>
                 </DataNotFoundContainer>}
               <SubContainer>
-                <Button type="submit" color="green" content="Aceptar" />
-                <Button onClick={() => setOpen(false)} color="red" content="Cancelar" />
+                <Button disabled={isLoading} loading={isLoading} type="submit" color="green" content="Aceptar" />
+                <Button disabled={isLoading} onClick={() => setOpen(false)} color="red" content="Cancelar" />
               </SubContainer>
             </Form>
           </ContainerModal>

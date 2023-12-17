@@ -4,7 +4,10 @@ import styled from 'styled-components';
 
 const ModInput = styled(Input)`
   input {
+    border: ${(props) => props.$nonBorder && "none!important"};
+    background: ${(props)=> props.$greyBack && "#f9fafb!important"};
     text-align: center!important;
+    padding:7px!important;
   };
 `;
 
@@ -24,24 +27,47 @@ const ModDropdown = styled(Dropdown)({
 });
 
 const ModTableRow = styled(Table.Row)`
-  th{ min-width: 8rem!important; };
-  th:first-child { min-width: 20rem!important; };
+  th{ min-width: 10rem!important; };
+  th:first-child { min-width: 18rem!important; };
+  th:nth-child(3) { min-width: 6rem!important; };
+  th:nth-child(5) { min-width: 6rem!important; };
   th:nth-child(6) { min-width: 10rem!important; };
-  th:not(:first-child) { width: 12rem!important; };
+  th:nth-child(7) { min-width: 6rem!important; };
+  th:not(:first-child) { width: 13rem!important; };
 `;
 
 const ModTableHeaderCell = styled(Table.HeaderCell)`
   background-color: ${props => props.$header && "#EEEEEE!important"};
-  text-align: ${props => props.$left ? "left!important" : "center!important"}
+  padding: ${(props) => props.$nonBorder ? "0!important" : "11px!important"};
+  text-align: ${props => props.$right ? "right!important" : "center!important"};
+  h3{
+    margin-right: 0.7rem!important;
+  };
 `;
 
-const ModTableCell = styled(Table.Cell)({
-  textAlign: 'center!important'
-});
+const ModTableFooter = styled(Table.Footer)`
+  th:nth-child(2) { 
+    min-width: 12rem!important;
+    padding: 5px!important;
+   };
+`;
+
+const ModTableCell = styled(Table.Cell)`
+  padding: ${(props) => props.$nonBorder ? "0!important" : "5px!important"};
+  text-align: center!important;
+  `;
 
 const HeaderContainer = styled(Flex)`
   margin-bottom: 20px!important;
 `;
 
-export { HeaderContainer, ModButton, ModDropdown, ModInput, ModTableCell, ModTableHeaderCell, ModTableRow, TotalText };
+const WarningMessage = styled.p`
+  position: relative;
+  margin: 5px 0 0 0!important;
+  color: red;
+  font-size: 14px!important;
+  top: 0.2rem!important;
+`;
+
+export { HeaderContainer, ModButton, ModDropdown, ModInput, ModTableCell, ModTableFooter, ModTableHeaderCell, ModTableRow, TotalText, WarningMessage };
 

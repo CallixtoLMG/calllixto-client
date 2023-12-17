@@ -19,7 +19,7 @@ const CreateProduct = () => {
         const roles = await getUserRol();
         setRole(roles);
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al crear producto:', error);
       };
     };
     setRole(fetchRol());

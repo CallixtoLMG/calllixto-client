@@ -6,6 +6,11 @@ import styled from "styled-components";
 const ButtonContainer = styled(Flex)`
   flex-direction: row;
   margin-bottom: 20px!important;
+  justify-content: space-between;
+`;
+
+const RightAlignedContainer = styled(Flex)`
+  margin-left: auto;
 `;
 
 const ModTableCell = styled(Table.Cell)({
@@ -45,5 +50,5 @@ const HeaderContainer = styled(Flex)`
   margin-bottom: 20px!important;
 `;
 
-export { ButtonContainer, HeaderContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow };
+export { ButtonContainer, HeaderContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, RightAlignedContainer };
 

@@ -1,15 +1,26 @@
 "use client"
-import ButtonGoTo from "@/components/buttons/GoTo";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from 'semantic-ui-react';
 import { HeaderContainer, ModButton, ModFormField, ModInput, ModLabel } from "./styles";
 
 const CustomerForm = ({ customer, onSubmit }) => {
   const router = useRouter();
-  const { handleSubmit, control } = useForm();
+  const { handleSubmit, control, reset } = useForm();
+  const isUpdating = useMemo(() => !!customer?.id, [customer]);
+  const [isLoading, setIsLoading] = useState(false);
+  const buttonConfig = useMemo(() => {
+    return {
+      icon: isUpdating ? "edit" : "add",
+      title: isUpdating ? "Actualizar" : "Crear",
+    }
+  }, [isUpdating]);
+  const handleReset = () => {
+    reset();
+  };
   const handleForm = (data) => {
     if (!customer?.id) {
       onSubmit(data);
@@ -24,7 +35,6 @@ const CustomerForm = ({ customer, onSubmit }) => {
   return (
     <>
       <HeaderContainer>
-        <ButtonGoTo goTo={PAGES.CUSTOMERS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
         <PageHeader title={!customer?.id ? "Crear cliente" : "Actualizar cliente"} />
       </HeaderContainer >
       <Form onSubmit={handleSubmit(handleForm)}>
@@ -57,12 +67,8 @@ const CustomerForm = ({ customer, onSubmit }) => {
         </ModFormField>
         <ModFormField>
         </ModFormField>
-        <ModButton
-          type="submit"
-          color="green"
-        >
-          <Icon name="add" /> {customer?.id ? "Actualizar cliente" : "Crear cliente"}
-        </ModButton>
+        <ModButton disabled={isLoading} loading={isLoading} type="submit" color="green" ><Icon name={buttonConfig.icon} />{buttonConfig.title}</ModButton>
+        <ModButton type="button" onClick={handleReset} color="red" $marginLeft>Borrar cambios</ModButton>
       </Form>
     </>
   )

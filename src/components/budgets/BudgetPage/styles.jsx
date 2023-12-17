@@ -3,10 +3,10 @@ import { Flex } from "rebass";
 import { Icon, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
-const ModTableCell = styled(Table.Cell)({
-  cursor: "pointer!important",
-  textAlign: 'center!important'
-});
+const ModTableCell = styled(Table.Cell)`
+  cursor: pointer!important;
+  text-align: center!important;
+`;
 
 const ModTableHeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important",
@@ -21,6 +21,7 @@ const ModTable = styled(Table)`
 `;
 
 const ModTableRow = styled(Table.Row)`
+  height: 45px!important;
   th:not(:first-child) { min-width: 150px!important }
   th:first-child { width: 50px!important; }
   th:nth-child(3){ width: 250px!important;}

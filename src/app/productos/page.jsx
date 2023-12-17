@@ -29,7 +29,7 @@ const Products = () => {
         const roles = await getUserRol();
         setRole(roles);
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar roles:', error);
       }
     };
     const fetchProductData = async () => {
@@ -37,7 +37,7 @@ const Products = () => {
         const fetchProducts = await productsList(requestOptions);
         setProducts(fetchProducts);
       } catch (error) {
-        console.error("Error al cargar clientes:", error);
+        console.error("Error al cargar productos:", error);
       } finally {
         setIsLoading(false)
       };
@@ -52,7 +52,7 @@ const Products = () => {
       const updatedProducts = products.filter(product => product.code !== code);
       setProducts(updatedProducts);
     } catch (error) {
-      console.error('Error borrando customer', error);
+      console.error('Error borrando producto', error);
     }
   };
 

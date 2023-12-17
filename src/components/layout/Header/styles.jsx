@@ -16,7 +16,7 @@ const ModLink = styled(Link)`
   };
 `;
 
-const LogOutDiv = styled(Flex)`
+const LogDiv = styled(Flex)`
   position: relative;
   align-items: center;
   transition: all 0.2s ease-in-out;
@@ -68,5 +68,5 @@ const Text = styled.p`
   };
 `;
 
-export { LogOutDiv, ModContainer, ModLink, Text };
+export { LogDiv, ModContainer, ModLink, Text };
 

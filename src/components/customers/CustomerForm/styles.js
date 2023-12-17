@@ -27,10 +27,11 @@ const ModFormField = styled(Form.Field)({
   maxWidth: "50vh!important",
 });
 
-const ModButton = styled(Button)({
-  width: "170px!important",
-  padding: "10px 0!important",
-});
+const ModButton = styled(Button)`
+  width: 170px!important;
+  padding: 10px 0!important;
+  margin-left: ${(props => props.$marginLeft && "10px!important")};
+`;
 
 export { HeaderContainer, ModButton, ModFormField, ModInput, ModLabel };
 

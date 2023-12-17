@@ -12,10 +12,9 @@ import { useRouter } from 'next/navigation';
 import { Table } from 'semantic-ui-react';
 import ImportExcel from "../ImportProduct";
 import { HEADERS } from "../products.common";
-import { ButtonContainer, HeaderContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { ButtonContainer, HeaderContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, RightAlignedContainer } from "./styles";
 
 const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading, onDelete }) => {
-  console.log(products)
   const router = useRouter();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
   const visibilityRules = Rules(role)
@@ -28,8 +27,10 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading, 
         {visibilityRules.canSeeButtons &&
           <ButtonContainer>
             <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
-            <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
-            <ButtonDownload />
+            <RightAlignedContainer>
+              <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
+              <ButtonDownload />
+            </RightAlignedContainer>
           </ButtonContainer>}
         <ModTable celled compact>
           <Table.Header fullWidth>

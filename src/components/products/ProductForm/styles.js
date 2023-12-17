@@ -2,10 +2,10 @@ import { Flex } from "rebass";
 import { Button, Form, Input, Label } from "semantic-ui-react";
 import styled from "styled-components";
 
-const ModButton = styled(Button)({
+const ModButton = styled(Button)`
   width: "170px!important",
   padding: "10px 0!important",
-});
+`;
 
 const ModLabel = styled(Label)({
   maxWidth: "50vh!important",

@@ -3,7 +3,9 @@ import React from 'react';
 
 const NotFound: React.FC = () => {
   return (
-    <NotFoundPage />
+    <>
+      <NotFoundPage />
+    </>
   )
 };
 

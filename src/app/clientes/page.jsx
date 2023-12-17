@@ -41,7 +41,7 @@ const Customers = () => {
       const updatedCustomers = customers.filter(customer => customer.id !== id);
       setCustomers(updatedCustomers);
     } catch (error) {
-      console.error('Error borrando customer', error);
+      console.error('Error borrando cliente', error);
     }
   };
 
