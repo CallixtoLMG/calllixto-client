@@ -29,7 +29,7 @@ const EditCustomer = ({ params }) => {
       setIsLoading(false)
     };
     fetchData();
-  }, [params.id]);
+  }, [params.id, router]);
 
   return (
     <>

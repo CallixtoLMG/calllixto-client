@@ -26,7 +26,7 @@ const SeePdf = ({ params }) => {
         const fetchBudget = await getBudget(params.id, requestOptions);
         setPdfBudget(fetchBudget);
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar PDF:', error);
       };
     };
     fetchData();

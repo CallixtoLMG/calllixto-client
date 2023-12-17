@@ -29,11 +29,11 @@ const Budget = ({ params }) => {
         setBudget(fetchBudget);
         setIsLoading(false)
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar presupuesto:', error);
       };
     };
     fetchData();
-  }, [params.id])
+  }, [params.id, router])
 
   return (
     <Loader active={isLoading}>

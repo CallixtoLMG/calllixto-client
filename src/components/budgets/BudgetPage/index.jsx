@@ -7,15 +7,20 @@ import { useRouter } from "next/navigation";
 import { Button, Popup, Table } from "semantic-ui-react";
 import { modDate, modPrice, totalSum } from "../../../utils";
 import { HEADERS } from "../budgets.common";
-import { ModIcon, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { ButtonContainer, HeaderContainer, ModIcon, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
 const BudgetsPage = ({ budgets, isLoading }) => {
+  const showActions = false;
   const router = useRouter();
   return (
     <>
       <Loader active={isLoading}>
-        <PageHeader title={"Presupuestos"} />
-        <ButtonGoTo color="green" text="Crear presupuesto" iconName="add" goTo={PAGES.BUDGETS.CREATE} />
+        <HeaderContainer>
+          <PageHeader title={"Presupuestos"} />
+        </HeaderContainer>
+        <ButtonContainer>
+          <ButtonGoTo color="green" text="Crear presupuesto" iconName="add" goTo={PAGES.BUDGETS.CREATE} />
+        </ButtonContainer>
         <ModTable celled compact >
           <Table.Header fullWidth>
             <ModTableRow>
@@ -23,7 +28,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                 <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
               ))}
               <ModTableHeaderCell>Total</ModTableHeaderCell>
-              <ModTableHeaderCell>Acciones</ModTableHeaderCell>
+              {showActions && <ModTableHeaderCell>Acciones</ModTableHeaderCell>}
             </ModTableRow>
           </Table.Header>
           {budgets?.map((budget, index) => (
@@ -39,7 +44,12 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                     </ModTableCell>)
                 }
                 <ModTableCell onClick={() => { router.push(PAGES.BUDGETS.SHOW(budget.id)) }}>{modPrice(totalSum(budget.products))}</ModTableCell>
-                <ModTableCell><Popup content="Copiar" size="mini" trigger={<Button color="green" size='tiny' ><ModIcon name="copy" /></Button>} /> </ModTableCell>
+                {showActions && <ModTableCell>
+                  <Popup
+                    content="Copiar"
+                    size="mini"
+                    trigger={<Button color="green" size='tiny' ><ModIcon name="copy" /></Button>} />
+                </ModTableCell>}
               </ModTableRow>
             </Table.Body>
           ))}

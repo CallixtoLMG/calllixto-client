@@ -11,6 +11,7 @@ import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "
 
 const LoginForm = ({ onSubmit }) => {
   const router = useRouter();
+  const recovery = false;
   const { handleSubmit, control } = useForm();
   const [isLoading, setIsLoading] = useState(false);
   const handleForm = async (data) => {
@@ -73,9 +74,10 @@ const LoginForm = ({ onSubmit }) => {
               </ModButton>
             </Segment>
           </Form>
-          <ModMessage>
-            <Link href={PAGES.PRODUCTS.BASE}> Perdiste tu contraseña?</Link>
-          </ModMessage>
+          {recovery &&
+            <ModMessage>
+              <Link href={PAGES.PRODUCTS.BASE}> Perdiste tu contraseña?</Link>
+            </ModMessage>}
         </ModGridColumn>
       </ModGrid>
     </Loader>

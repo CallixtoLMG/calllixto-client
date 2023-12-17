@@ -115,13 +115,13 @@ export async function deleteProduct(code) {
     headers: {
       authorization: `Bearer ${localStorage.getItem("token")}`
     },
-    cache: "no-store"
+    cache: "no-store",
   };
 
   await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${code}`, requestOptions)
     .then(async response => {
-      let res = await response.text()
-      res = JSON.parse(res)
+      let res = await response.text();
+      res = JSON.parse(res);
       if (res.statusOk) {
         toast.success("Producto eliminado exitosamente");
       } else {

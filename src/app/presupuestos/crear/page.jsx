@@ -39,7 +39,7 @@ const CreateBudget = () => {
         setProductsList(productsFilteredList);
         setIsLoading(false)
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar productos:', error);
       }
       try {
         const customersFetchData = await customersList(requestOptions);
@@ -53,11 +53,11 @@ const CreateBudget = () => {
         }));
         setCustomersList(customersFilteredList);
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al crear clientes:', error);
       };
     };
     fetchData();
-  }, []);
+  }, [router]);
   return (
     <Loader active={isLoading}>
       <BudgetForm onSubmit={create} products={products} customers={customers} />

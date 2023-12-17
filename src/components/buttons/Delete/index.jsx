@@ -21,11 +21,8 @@ const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
   };
 
   const handleDelete = () => {
-    setShowModal(false);
     onDelete(params);
-    setTimeout(() => {
-      router.refresh();
-    }, 1000);
+    setShowModal(false);
   };
 
   return (

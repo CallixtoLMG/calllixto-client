@@ -1,5 +1,5 @@
 "use client";
-import { customersList } from "@/api/customers";
+import { customersList, deleteCustomer } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -26,16 +26,27 @@ const Customers = () => {
         };
         const fetchCustomers = await customersList(requestOptions);
         setCustomers(fetchCustomers);
-        setIsLoading(false)
       } catch (error) {
         console.error('Error al cargar clientes:', error);
-      }
+      } finally {
+        setIsLoading(false)
+      };
     };
     fetchData();
-  }, []);
+  }, [router]);
+
+  const handleDeleteCustomer = async (id) => {
+    try {
+      await deleteCustomer(id);
+      const updatedCustomers = customers.filter(customer => customer.id !== id);
+      setCustomers(updatedCustomers);
+    } catch (error) {
+      console.error('Error borrando cliente', error);
+    }
+  };
 
   return (
-      <CustomersPage customers={customers} isLoading={isLoading} />
+    <CustomersPage customers={customers} isLoading={isLoading} onDelete={handleDeleteCustomer} />
   );
 };
 

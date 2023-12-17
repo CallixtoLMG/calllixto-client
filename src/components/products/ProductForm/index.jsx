@@ -1,12 +1,14 @@
 "use client";
-import ButtonGoTo from "@/components/buttons/GoTo";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { get } from "lodash";
 import { useRouter } from "next/navigation";
+import { useMemo, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
 import {
+  HeaderContainer,
   ModButton,
   ModFormField,
   ModInput,
@@ -16,17 +18,32 @@ import {
 
 const ProductForm = ({ product, onSubmit }) => {
   const router = useRouter();
-  const { handleSubmit, control } = useForm();
+  const { handleSubmit, control, reset } = useForm();
   const validateCode = (value) => {
     return /^[A-Za-z0-9]{4}$/.test(value);
   };
+  const isUpdating = useMemo(() => !!product?.code, [product]);
+  const [isLoading, setIsLoading] = useState(false);
+  const buttonConfig = useMemo(() => {
+    return {
+      icon: isUpdating ? "edit" : "add",
+      title: isUpdating ? "Actualizar" : "Crear",
+    }
+  }, [isUpdating]);
+
+  const handleReset = () => {
+    reset();
+  };
+
   const handleForm = (data) => {
+    setIsLoading(true);
     if (!product?.code) {
       onSubmit(data);
     } else {
       onSubmit(product?.code, data);
     }
     setTimeout(() => {
+      setIsLoading(false);
       router.push(PAGES.PRODUCTS.BASE);
     }, 1000);
   };
@@ -36,7 +53,9 @@ const ProductForm = ({ product, onSubmit }) => {
 
   return (
     <>
-      <ButtonGoTo goTo={PAGES.PRODUCTS.BASE} iconName="chevron left" text="Volver atrás" color="green" />
+      <HeaderContainer>
+        <PageHeader title={!product?.code ? "Crear producto" : "Actualizar producto"} />
+      </HeaderContainer>
       <Form onSubmit={handleSubmit(handleForm)}>
         {!product?.code &&
           (
@@ -88,8 +107,8 @@ const ProductForm = ({ product, onSubmit }) => {
         </ModFormField>
         <ModFormField>
         </ModFormField>
-        {product?.code ? <ModButton type="submit" color="blue" ><Icon name="upload" />Actualizar producto</ModButton> :
-          <ModButton type="submit" color="green"><Icon name="add" />Crear producto</ModButton>}
+        <ModButton disabled={isLoading} loading={isLoading} type="submit" color="green" ><Icon name={buttonConfig.icon} />{buttonConfig.title}</ModButton>
+        <ModButton type="button" onClick={handleReset} color="red" $marginLeft>Borrar cambios</ModButton>
       </Form>
     </>
   )

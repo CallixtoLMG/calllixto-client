@@ -1,11 +1,11 @@
 "use client";
 import ButtonSend from "@/components/buttons/Send";
-import { URL } from "@/fetchUrls";
+import PageHeader from "@/components/layout/PageHeader";
 import { get } from "lodash";
 import { Grid, Icon, Label, Table } from 'semantic-ui-react';
 import { modDate, modPrice, totalSum } from '../../../utils';
 import { PRODUCTSHEADERS } from "../budgets.common";
-import { DataContainer, ModButton, ModGridColumn, ModLabel, ModSegment, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
+import { DataContainer, HeaderContainer, ModButton, ModGridColumn, ModLabel, ModSegment, ModTable, ModTableCell, ModTableFooterCell, ModTableHeaderCell, ModTableRow, SubContainer } from "./styles";
 
 const ShowBudget = ({ budget }) => {
   function downloadPdf(data, filename) {
@@ -16,17 +16,15 @@ const ShowBudget = ({ budget }) => {
     };
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: 'application/pdf' });
-    const url = URL.createObjectURL(blob);
+    const url = window.URL.createObjectURL(blob);
     const downloadLink = document.createElement('a');
     downloadLink.href = url;
     downloadLink.download = filename;
     document.body.appendChild(downloadLink);
     downloadLink.click();
     document.body.removeChild(downloadLink);
-    URL.revokeObjectURL(url);
+    window.URL.revokeObjectURL(url);
   };
-  // const budgetId = get(budget, "id", "");
-  // console.log(`${URL}${CLIENTID}${PATHS.BUDGETS}/${budgetId}${PDF}`)
   const handleDownloadPdf = async () => {
     const requestOptions = {
       method: 'GET',
@@ -36,15 +34,16 @@ const ShowBudget = ({ budget }) => {
       },
       cache: "no-store"
     };
-    // const url = `https://4cxfyutpj4.execute-api.sa-east-1.amazonaws.com/pdf?customerId=${budgetId}`;
-    const res = await fetch("https://4cxfyutpj4.execute-api.sa-east-1.amazonaws.com/pdf", requestOptions);
-    // const res = await fetch(url, requestOptions);
+    const res = await fetch(`https://zosudnr9ag.execute-api.sa-east-1.amazonaws.com/pdf/${budget.id}`, requestOptions);
     let data = await res.text();
     downloadPdf(data, "myFileName.pdf");
   };
 
   return (
     <>
+      <HeaderContainer>
+        <PageHeader title={"Detalle"} />
+      </HeaderContainer >
       <SubContainer>
         <DataContainer>
           <ModLabel>Cliente</ModLabel>
@@ -84,7 +83,7 @@ const ShowBudget = ({ budget }) => {
               ))}
               <Table.Footer celled fullWidth>
                 <Table.Row>
-                  <ModTableHeaderCell align="right" colSpan='5'><strong>TOTAL</strong></ModTableHeaderCell>
+                  <ModTableFooterCell align="right" colSpan='5'><strong>TOTAL</strong></ModTableFooterCell>
                   <ModTableHeaderCell colSpan='1'><strong>{modPrice(totalSum(budget?.products))}</strong></ModTableHeaderCell>
                 </Table.Row>
               </Table.Footer>
