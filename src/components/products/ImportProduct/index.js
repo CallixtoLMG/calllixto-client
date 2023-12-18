@@ -1,5 +1,6 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Form, Icon, Input, Modal, Segment, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
@@ -14,6 +15,8 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
   const [editProducts, setEditProducts] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const locale = "es-AR";
+  const currency = "ARS";
 
   const handleModalClose = () => {
     setOpen(false);
@@ -56,7 +59,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
           t: 's',
         };
       };
-      const parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
+      let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
       const nonExistingProducts = [];
       const existingProducts = [];
       const existingCodes = {};
@@ -64,11 +67,16 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
         existingCodes[product.code.toUpperCase()] = true;
       });
       parsedData.forEach((product) => {
-        const upperCaseCode = product.code.toUpperCase();
-        if (existingCodes[upperCaseCode]) {
-          existingProducts.push(product);
+        const code = typeof product.code === 'number' ? String(product.code).toUpperCase() : product.code;
+        const price = typeof product.price === 'string'
+          ? parseFloat(product.price.replace(/[^\d,]/g, '').replace(',', '.'))
+          : product.price;
+        const formattedProduct = { ...product, code, price };
+        console.log(formattedProduct)
+        if (existingCodes[code]) {
+          existingProducts.push(formattedProduct);
         } else {
-          nonExistingProducts.push(product);
+          nonExistingProducts.push(formattedProduct);
         }
       });
       setEditProducts(existingProducts);
@@ -79,8 +87,8 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
 
   const validationRules = {
     code: {
-      validate: (value) => /^[A-Za-z0-9]{4}$/.test(value),
-      message: 'El código debe tener 4 caracteres alfanuméricos.',
+      validate: (value) => /^[A-Z0-9]{4}$/.test(value),
+      message: 'Código: 4 caracteres alfanuméricos y en mayúscula.',
     }
   };
 
@@ -98,7 +106,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
     <>
       <ModLabel as="label" htmlFor="file" >
         <Button as="span" color="blue">
-          <Icon name="file" />
+          <Icon name="upload" />
           Importar
         </Button>
         <Input
@@ -148,11 +156,19 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                                   key={header.id}
                                   name={`newProducts[${index}].${header.value}`}
                                   control={control}
-                                  defaultValue={header.value === "price" ? (newProduct[header.value]) : newProduct[header.value]}
+                                  defaultValue={newProduct[header.value]}
                                   rules={validationRules[header.value]}
                                   render={({ field, fieldState }) => (
                                     <ModTableCell key={header.id} >
-                                      <ModInput {...field} />
+                                      {header.value === "price" ? <CurrencyInput
+                                        value={Number(newProduct[header.value])}
+                                        locale={locale}
+                                        currency={currency}
+                                        onChangeValue={(_, value) => {
+                                          field.onChange(value);
+                                        }}
+                                        InputElement={<ModInput />}
+                                      /> : <ModInput {...field} />}
                                       {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
                                     </ModTableCell>
                                   )}
@@ -191,11 +207,19 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                                   key={header.id}
                                   name={`editProducts[${index}].${header.value}`}
                                   control={control}
-                                  defaultValue={header.value === "price" ? (editProduct[header.value]) : editProduct[header.value]}
+                                  defaultValue={header.value === "code" ? (editProduct[header.value]).toUpperCase() : editProduct[header.value]}
                                   rules={validationRules[header.value]}
                                   render={({ field, fieldState }) => (
                                     <ModTableCell key={header.id} >
-                                      {header.value === "code" ? <ModInput readOnly {...field} /> : <ModInput {...field} />}
+                                      {header.value === "price" ? <CurrencyInput
+                                        value={Number(editProduct[header.value])}
+                                        locale={locale}
+                                        currency={currency}
+                                        onChangeValue={(_, value) => {
+                                          field.onChange(value);
+                                        }}
+                                        InputElement={<ModInput />}
+                                      /> : <ModInput {...field} />}
                                       {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
                                     </ModTableCell>
                                   )}

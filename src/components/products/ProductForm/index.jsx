@@ -20,7 +20,7 @@ const ProductForm = ({ product, onSubmit }) => {
   const router = useRouter();
   const { handleSubmit, control, reset } = useForm();
   const validateCode = (value) => {
-    return /^[A-Za-z0-9]{4}$/.test(value);
+    return /^[A-Z0-9]{4}$/.test(value);
   };
   const isUpdating = useMemo(() => !!product?.code, [product]);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +70,7 @@ const ProductForm = ({ product, onSubmit }) => {
                   <>
                     <ModInput {...field} />
                     {fieldState?.invalid && (
-                      <WarningMessage >El código debe tener 4 caracteres alfanuméricos.</WarningMessage>
+                      <WarningMessage >Código: 4 caracteres alfanuméricos y en mayúscula.</WarningMessage>
                     )}
                   </>
                 )}

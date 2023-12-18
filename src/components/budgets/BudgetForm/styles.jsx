@@ -65,8 +65,6 @@ const WarningMessage = styled.p`
   position: relative;
   margin: 5px 0 0 0!important;
   color: red;
-  font-size: 14px!important;
-  top: 0.2rem!important;
 `;
 
 export { HeaderContainer, ModButton, ModDropdown, ModInput, ModTableCell, ModTableFooter, ModTableHeaderCell, ModTableRow, TotalText, WarningMessage };
