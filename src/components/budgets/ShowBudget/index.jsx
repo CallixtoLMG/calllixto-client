@@ -1,23 +1,25 @@
 "use client";
 import ButtonSend from "@/components/buttons/Send";
+import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import { get } from "lodash";
+import { useState } from "react";
 import { Grid, Icon, Label, Table } from "semantic-ui-react";
 import { modDate, modPrice, totalSum } from "../../../utils";
 import { PRODUCTSHEADERS } from "../budgets.common";
 import {
   DataContainer,
+  HeaderContainer,
   ModButton,
   ModGridColumn,
   ModLabel,
   ModSegment,
   ModTable,
   ModTableCell,
-  ModTableHeaderCell,
+  ModTableFooterCell, ModTableHeaderCell,
   ModTableRow,
   SubContainer,
 } from "./styles";
-import Loader from "@/components/layout/Loader";
-import { useState } from "react";
 
 const ShowBudget = ({ budget }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -28,9 +30,9 @@ const ShowBudget = ({ budget }) => {
       byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
     const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: "application/pdf" });
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
     const url = window.URL.createObjectURL(blob);
-    const downloadLink = document.createElement("a");
+    const downloadLink = document.createElement('a');
     downloadLink.href = url;
     downloadLink.download = filename;
     document.body.appendChild(downloadLink);
@@ -66,6 +68,9 @@ const ShowBudget = ({ budget }) => {
   return (
     <>
       <Loader active={isLoading} message="Generando PDF...">
+        <HeaderContainer>
+          <PageHeader title={"Detalle"} />
+        </HeaderContainer >
         <SubContainer>
           <DataContainer>
             <ModLabel>Cliente</ModLabel>
@@ -111,9 +116,9 @@ const ShowBudget = ({ budget }) => {
                 ))}
                 <Table.Footer celled fullWidth>
                   <Table.Row>
-                    <ModTableHeaderCell align="right" colSpan="5">
+                    <ModTableFooterCell align="right" colSpan="5">
                       <strong>TOTAL</strong>
-                    </ModTableHeaderCell>
+                    </ModTableFooterCell>
                     <ModTableHeaderCell colSpan="1">
                       <strong>{modPrice(totalSum(budget?.products))}</strong>
                     </ModTableHeaderCell>
@@ -129,10 +134,10 @@ const ShowBudget = ({ budget }) => {
           )}
           {(get(budget, "customer.phone") ||
             get(budget, "customer.email")) && (
-            <ButtonSend customerData={get(budget, "customer", null)} />
-          )}
+              <ButtonSend customerData={get(budget, "customer", null)} />
+            )}
         </Grid>
-      </Loader>
+      </Loader >
     </>
   );
 };

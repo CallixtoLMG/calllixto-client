@@ -1,3 +1,4 @@
+import { Flex } from "rebass";
 import { Button, Form, Input, Label } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -17,15 +18,20 @@ const ModInput = styled(Input)`
   }
 `;
 
+const HeaderContainer = styled(Flex)`
+  margin-bottom: 20px!important;
+`;
+
 const ModFormField = styled(Form.Field)({
   margin: "0!important",
   maxWidth: "50vh!important",
 });
 
-const ModButton = styled(Button)({
-  width: "170px!important",
-  padding: "10px 0!important",
-});
+const ModButton = styled(Button)`
+  width: 170px!important;
+  padding: 10px 0!important;
+  margin-left: ${(props => props.$marginLeft && "10px!important")};
+`;
 
-export { ModButton, ModFormField, ModInput, ModLabel };
+export { HeaderContainer, ModButton, ModFormField, ModInput, ModLabel };
 

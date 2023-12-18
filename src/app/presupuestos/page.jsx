@@ -25,14 +25,15 @@ const Budgets = () => {
           cache: "no-store",
         };
         const fetchBudgets = await budgetsList(requestOptions);
-        setBudgets(fetchBudgets);
-        setIsLoading(false)
+        const sortedBudgets = fetchBudgets?.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        setBudgets(sortedBudgets);
+        setIsLoading(false);
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar presupuestos:', error);
       };
     };
     fetchData();
-  }, []);
+  }, [router]);
 
   return (
       <BudgetsPage budgets={budgets} isLoading={isLoading} />

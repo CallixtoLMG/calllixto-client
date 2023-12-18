@@ -5,7 +5,6 @@ import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-
 const Product = ({ params }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [product, setProduct] = useState({})
@@ -28,12 +27,13 @@ const Product = ({ params }) => {
         const fetchProduct = await getProduct(params.code, requestOptions);
         setProduct(fetchProduct);
         setIsLoading(false)
+        
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar productos:', error);
       };
     };
     fetchData();
-  }, [params.code]);
+  }, [params.code, router]);
 
   return (
        <ShowProduct product={product} isLoading={isLoading}/>

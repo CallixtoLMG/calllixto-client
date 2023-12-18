@@ -6,6 +6,10 @@ const SubContainer = styled(Flex)`
   flex-direction: row;
 `;
 
+const HeaderContainer = styled(Flex)`
+  margin-bottom: 20px!important;
+`;
+
 const DataContainer = styled(Flex)`
   flex-direction: column;
   margin: 0 10px 10px 0!important;
@@ -42,6 +46,14 @@ const ModSegment = styled(Segment)({
   height: "50px!important",
 });
 
+const ModTableFooterCell = styled(Table.HeaderCell)`
+  background-color: rgb(255, 255, 255)!important;
+  text-align: ${({ align }) => align || "center"} !important;
+  strong{
+    margin-right: 3.3rem!important;
+  };
+`;
+
 const ModTableHeaderCell = styled(Table.HeaderCell)`
   background-color: ${props => props.$header && "#EEEEEE!important"};
   text-align: ${({ align }) => align || "center"} !important;
@@ -51,5 +63,5 @@ const ModTableCell = styled(Table.Cell)({
   textAlign: 'center!important'
 });
 
-export { DataContainer, ModButton, ModGridColumn, ModLabel, ModSegment, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, SubContainer };
+export { DataContainer, HeaderContainer, ModButton, ModGridColumn, ModLabel, ModSegment, ModTable, ModTableCell, ModTableFooterCell, ModTableHeaderCell, ModTableRow, SubContainer };
 

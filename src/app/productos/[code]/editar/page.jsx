@@ -35,12 +35,12 @@ const EditProduct = ({ params }) => {
         const roles = await getUserRol();
         setRole(roles);
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar producto:', error);
       };
     };
     fetchData();
     fetchRol();
-  }, [params.code]);
+  }, [params.code, router]);
   if (role === "user") {
     router.push(PAGES.NOTFOUND.BASE)
   };

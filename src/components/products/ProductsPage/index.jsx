@@ -1,10 +1,10 @@
 "use client";
-import { deleteProduct } from "@/api/products";
 import ButtonDelete from "@/components/buttons/Delete";
 import ButtonDownload from "@/components/buttons/DownloadExcel";
 import ButtonEdit from "@/components/buttons/Edit";
 import ButtonGoTo from "@/components/buttons/GoTo";
 import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { modPrice } from "@/utils";
 import { Rules } from "@/visibilityRules";
@@ -12,21 +12,26 @@ import { useRouter } from 'next/navigation';
 import { Table } from 'semantic-ui-react';
 import ImportExcel from "../ImportProduct";
 import { HEADERS } from "../products.common";
-import { ButtonsContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { ButtonContainer, HeaderContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, RightAlignedContainer } from "./styles";
 
-const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading }) => {
+const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading, onDelete }) => {
   const router = useRouter();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
   const visibilityRules = Rules(role)
   return (
     <>
       <Loader active={isLoading}>
+        <HeaderContainer>
+          <PageHeader title={"Productos"} />
+        </HeaderContainer>
         {visibilityRules.canSeeButtons &&
-          <ButtonsContainer>
+          <ButtonContainer>
             <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
-            <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
-            <ButtonDownload />
-          </ButtonsContainer>}
+            <RightAlignedContainer>
+              <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
+              <ButtonDownload />
+            </RightAlignedContainer>
+          </ButtonContainer>}
         <ModTable celled compact>
           <Table.Header fullWidth>
             <ModTableRow>
@@ -51,7 +56,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading }
                 {visibilityRules.canSeeActions &&
                   <ModTableCell >
                     <ButtonEdit page={"PRODUCTS"} element={product.code} />
-                    <ButtonDelete onDelete={deleteProduct} params={product.code} deleteQuestion={deleteQuestion(product.name)} />
+                    <ButtonDelete onDelete={onDelete} params={product.code} deleteQuestion={deleteQuestion(product.name)} />
                   </ModTableCell>}
               </ModTableRow>
             </Table.Body>

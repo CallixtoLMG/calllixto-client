@@ -28,11 +28,11 @@ const Customer = ({ params }) => {
         setCustomer(fetchCustomer);
         setIsLoading(false)
       } catch (error) {
-        console.error('Error al cargar clientes:', error);
+        console.error('Error al cargar cliente:', error);
       };
     };
     fetchData();
-  }, [params.id]);
+  }, [params.id, router]);
 
   return (
       <ShowCustomer customer={customer} isLoading={isLoading} />

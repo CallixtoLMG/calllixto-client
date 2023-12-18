@@ -11,6 +11,11 @@ const ModButton = styled(Button)({
   padding: "10px 0!important",
 });
 
+const MailButton = styled(Button)`
+  background-color: ${(props) => props.background || 'inherit'};
+  color: white!important;
+`;
+
 const ButtonContainer = styled(Flex)`
   width: 180px!important;
   padding: 0!important;
@@ -18,5 +23,5 @@ const ButtonContainer = styled(Flex)`
   height: 34px!important;
 `;
 
-export { ButtonContainer, ModButton, ModalContainer };
+export { ButtonContainer, MailButton, ModButton, ModalContainer };
 
