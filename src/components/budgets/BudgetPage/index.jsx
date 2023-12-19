@@ -17,7 +17,7 @@ const BudgetsPage = ({ budgets }) => {
       <Table celled compact striped>
         <Table.Header fullWidth>
           {BUDGETS_COLUMNS.map((column) => (
-            <HeaderCell key={column.id}>{column.name}</HeaderCell>
+            <HeaderCell key={column.id}>{column.title}</HeaderCell>
           ))}
           {showActions && <HeaderCell>Acciones</HeaderCell>}
         </Table.Header>

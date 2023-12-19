@@ -2,19 +2,19 @@ import { formatedPrice, getTotal, formatedDate, getTotalSum } from "@/utils";
 
 const BUDGETS_COLUMNS = [
   {
-    value: "id",
+    title: "Id",
     value: (budget) => budget.id
   },
   {
-    name: "Cliente",
+    title: "Cliente",
     value: (budget) => budget.customer.name
   },
   {
-    name: "Fecha",
+    title: "Fecha",
     value: (budget) => formatedDate(budget.createdAt)
   },
   {
-    name: "Total",
+    title: "Total",
     value: (budget) => formatedPrice(getTotalSum(budget.products))
   },
 ];
@@ -50,7 +50,6 @@ const PRODUCTS_COLUMNS = [
     value: (product) => formatedPrice(getTotal(product)),
     id: 6
   },
-
 ];
 
 const BUDGET_FORM_PRODUCT_COLUMNS = [
