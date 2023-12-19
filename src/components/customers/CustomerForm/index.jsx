@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from 'semantic-ui-react';
 import { HeaderContainer, ModButton, ModFormField, ModInput, ModLabel } from "./styles";
+import { createDate } from "@/utils";
 
 const CustomerForm = ({ customer, onSubmit }) => {
   const router = useRouter();
@@ -23,8 +24,10 @@ const CustomerForm = ({ customer, onSubmit }) => {
   };
   const handleForm = (data) => {
     if (!customer?.id) {
+      data.createdAt = createDate()
       onSubmit(data);
     } else {
+      data.updatedAt = createDate()
       onSubmit(customer?.id, data);
     }
     setTimeout(() => {

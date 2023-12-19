@@ -17,6 +17,7 @@ import {
   WarningMessage
 } from "./styles";
 import { modPrice } from "@/utils";
+import { createDate } from "@/utils";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
@@ -62,6 +63,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
   };
 
   const handleCreate = (data) => {
+    data.createdAt = createDate()
     onSubmit(data);
     setTimeout(() => {
       router.push(PAGES.BUDGETS.BASE);
