@@ -6,7 +6,7 @@ import ButtonGoTo from "@/components/buttons/GoTo";
 import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
-import { modPrice } from "@/utils";
+import { formatedPrice } from "@/utils";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from 'next/navigation';
 import { Table } from 'semantic-ui-react';
@@ -20,10 +20,10 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading, 
   const visibilityRules = Rules(role)
   return (
     <>
+      <HeaderContainer>
+        <PageHeader title={"Productos"} />
+      </HeaderContainer>
       <Loader active={isLoading}>
-        <HeaderContainer>
-          <PageHeader title={"Productos"} />
-        </HeaderContainer>
         {visibilityRules.canSeeButtons &&
           <ButtonContainer>
             <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
@@ -50,7 +50,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading, 
                   .filter(header => !header.hide)
                   .map((header) =>
                     <ModTableCell key={header.id} onClick={() => { router.push(PAGES.PRODUCTS.SHOW(product.code)) }}>
-                      {header.value === "price" ? modPrice(product[header.value]) : product[header.value]}
+                      {header.value === "price" ? formatedPrice(product[header.value]) : product[header.value]}
                     </ModTableCell>)
                 }
                 {visibilityRules.canSeeActions &&

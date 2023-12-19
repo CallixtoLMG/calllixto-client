@@ -12,33 +12,19 @@ const HeaderContainer = styled(Flex)`
   margin-bottom: 20px!important;
 `;
 
-const ModTableCell = styled(Table.Cell)({
+const Cell = styled(Table.Cell)({
   cursor: "pointer!important",
   textAlign: "center!important"
 });
 
-const ModTableHeaderCell = styled(Table.HeaderCell)({
+const HeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important",
   textAlign: "center!important"
 });
-
-const ModTableRow = styled(Table.Row)`
-  th:not(:first-child) { min-width: 200px!important; }
-  th:nth-child(3){ min-width: 150px!important; }
-  th:first-child { width: 50px!important };
-  th:last-child { width: 200px!important; };
-`;
-
-const ModTable = styled(Table)`
-  tbody:nth-child(odd) {
-    background-color: #f2f2f2!important;
-  };
-  margin-top: 0!important;
-`;
 
 const ModLink = styled(Link)({
   width: "fit-content",
 });
 
-export { ButtonContainer, HeaderContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow };
+export { ButtonContainer, HeaderContainer, ModLink, Cell, HeaderCell };
 

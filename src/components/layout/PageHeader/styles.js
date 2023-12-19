@@ -7,13 +7,13 @@ const TitleContainer = styled(Flex)`
   justify-content: center!important;
 `;
 
-const ModTitleLabel = styled(Label)`
+const Title = styled(Label)`
   font-size: 20px!important;
   min-width: 30vw!important;
   min-height: 34px!important;
   text-align: center!important;
-  padding: 5px!important;
+  padding: 7px!important;
 `;
 
-export { ModTitleLabel, TitleContainer };
+export { Title, TitleContainer };
 

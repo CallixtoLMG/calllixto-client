@@ -1,6 +1,6 @@
 "use client"
 import { edit, getProduct } from "@/api/products";
-import { getUserRol } from "@/api/rol";
+import { getUserData } from "@/api/userData";
 import Loader from "@/components/layout/Loader";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
@@ -30,14 +30,25 @@ const EditProduct = ({ params }) => {
       setProduct(data);
       setIsLoading(false)
     };
+    const validateToken = async () => {
+      try {
+        const userData = await getUserData();
+        if (!userData.isAuthorized) {
+          router.push(PAGES.LOGIN.BASE)
+        };
+      } catch (error) {
+        console.error('Error, ingreso no valido(token):', error);
+      };
+    };
     const fetchRol = async () => {
       try {
-        const roles = await getUserRol();
-        setRole(roles);
+        const userData = await getUserData();
+        setRole(userData.roles[0]);
       } catch (error) {
         console.error('Error al cargar producto:', error);
       };
     };
+    validateToken();
     fetchData();
     fetchRol();
   }, [params.code, router]);

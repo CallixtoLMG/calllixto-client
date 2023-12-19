@@ -1,23 +1,19 @@
-import { SHOWPRODUCTSHEADERS } from "@/components/budgets/budgets.common";
-import PageHeader from "@/components/layout/PageHeader";
+import { BUDGET_FORM_PRODUCT_COLUMNS } from "@/components/budgets/budgets.common";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Dropdown, Form, Icon, Table } from "semantic-ui-react";
+import { Button as SButton, Dropdown as SDropdown, Form, Icon, Table } from "semantic-ui-react";
 import {
-  HeaderContainer,
-  ModButton,
-  ModDropdown,
-  ModInput, ModTableCell,
-  ModTableFooter,
-  ModTableHeaderCell,
-  ModTableRow,
+  Button,
+  Dropdown,
+  Input,
+  Cell,
+  HeaderCell,
   TotalText,
   WarningMessage
 } from "./styles";
-import { modPrice } from "@/utils";
-import { createDate } from "@/utils";
+import { formatedPrice, getTotal, getTotalSum, createDate } from "@/utils";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
@@ -70,161 +66,148 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
     }, 500);
   };
 
-  const getTotal = useCallback((price, quantity, discount) => {
-    return price * quantity * (1 - (discount / 100));
-  }, []);
-
-  const calculateTotal = useCallback(() => {
-    return watchProducts.reduce((a, b) => a + getTotal(b.price, b.quantity, b.discount), 0) || 0;
-  }, [watchProducts, getTotal]);
+  const calculateTotal = useCallback(() => getTotalSum(watchProducts), [watchProducts]);
 
   return (
-    <>
-      <HeaderContainer>
-        <PageHeader title={"Crear presupuesto"} />
-      </HeaderContainer >
-      <Form onSubmit={handleSubmit(handleCreate)}>
-        <ModDropdown
-          name={`customer`}
-          placeholder='Clientes...'
-          search
-          selection
-          minCharacters={2}
-          noResultsMessage="No se ha encontrado cliente!"
-          options={customers}
-          onChange={(e, { value}) => {
-            const customer = customers.find((opt) => opt.value === value);
-            setValue(`customer.name`, customer.value);
-            setValue(`customer.id`, customer.id);
-          }}
-        />
-        <ModButton
-          color="green"
-          type="button"
-          onClick={addProduct}
-        >
-          <Icon name="add" />Agregar producto
-        </ModButton>
-        <Table celled>
-          <Table.Header>
-            <ModTableRow>
-              {SHOWPRODUCTSHEADERS.map((header) => {
-                return (<ModTableHeaderCell $header key={header.id} >{header.name}</ModTableHeaderCell>)
-              })}
-            </ModTableRow>
-          </Table.Header>
-          <Table.Body>
-            {watchProducts.map((product, index) => (
-              <Table.Row key={`${product.code}-${index}`}>
-                <ModTableCell>
-                  <Controller
-                    name={`products[${index}].name`}
-                    control={control}
-                    render={({ field }) => (
-                      <>
-                        <Dropdown
-                          fluid
-                          search
-                          selection
-                          noResultsMessage="No se ha encontrado producto!"
-                          options={products}
-                          {...field}
-                          onChange={(e, { value }) => {
-                            field.onChange(value);
-                            const product = products.find((opt) => opt.value === value);
-                            setValue(`products[${index}].price`, product.price);
-                            setValue(`products[${index}].code`, product.code);
-                            setValue(`products[${index}].quantity`, 1);
-                            setTotal(calculateTotal());
-                          }}
-                        />
-                        {triedToAddWithoutSelection && !watchProducts[index].code && (
-                          <WarningMessage> Debe seleccionar un producto </WarningMessage>
-                        )}
-                      </>
-                    )}
-                  />
-                </ModTableCell>
-                <ModTableCell>
-                  {modPrice(product.price)}
-                </ModTableCell>
-                <ModTableCell>
-                  <Controller
-                    name={`products[${index}].quantity`}
-                    control={control}
-                    render={({ field }) => (
-                      <ModInput
-                        type="number"
-                        min={0}
-                        defaultValue={1}
-                        onChange={(e) => {
-                          const value = e.target.value;
-                          field.onChange(value);
-                          setTotal(calculateTotal());
-                        }}
-                      />
-                    )}
-                  />
-                </ModTableCell>
-                <ModTableCell>
-                  {modPrice(product.price * product.quantity)}
-                </ModTableCell>
-                <ModTableCell>
-                  <Controller
-                    name={`products[${index}].discount`}
-                    control={control}
-                    defaultValue={product.discount || 0}
-                    render={({ field }) => (
-                      <ModInput
+    <Form onSubmit={handleSubmit(handleCreate)}>
+      <Dropdown
+        name={`customer`}
+        placeholder='Clientes...'
+        search
+        selection
+        minCharacters={2}
+        noResultsMessage="No se ha encontrado cliente!"
+        options={customers}
+        onChange={(e, { value }) => {
+          const customer = customers.find((opt) => opt.value === value);
+          setValue(`customer.name`, customer.value);
+          setValue(`customer.id`, customer.id);
+        }}
+      />
+      <Button
+        color="green"
+        type="button"
+        onClick={addProduct}
+      >
+        <Icon name="add" />Agregar producto
+      </Button>
+      <Table celled striped compact>
+        <Table.Header>
+          {BUDGET_FORM_PRODUCT_COLUMNS.map((column) => (
+            <HeaderCell $header key={column.id} >{column.title}</HeaderCell>
+          ))}
+        </Table.Header>
+        <Table.Body>
+          {watchProducts.map((product, index) => (
+            <Table.Row key={`${product.code}-${index}`}>
+              <Cell>
+                <Controller
+                  name={`products[${index}].name`}
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <SDropdown
                         fluid
-                        type="number"
-                        min={0}
-                        max={100}
+                        search
+                        selection
+                        noResultsMessage="No se ha encontrado producto!"
+                        options={products}
                         {...field}
-                        onChange={(e) => {
-                          field.onChange(e.target.value);
+                        onChange={(e, { value }) => {
+                          field.onChange(value);
+                          const product = products.find((opt) => opt.value === value);
+                          setValue(`products[${index}].price`, product.price);
+                          setValue(`products[${index}].code`, product.code);
+                          setValue(`products[${index}].quantity`, 1);
                           setTotal(calculateTotal());
                         }}
                       />
-                    )}
-                  />
-                </ModTableCell>
-                <ModTableCell>
-                  {modPrice(getTotal(product.price, product.quantity, product.discount) || 0)}
-                </ModTableCell>
-                <ModTableCell >
-                  <Button
-                    icon="trash"
-                    color="red"
-                    onClick={() => deleteProduct(index)}
-                    type="button"
-                  />
-                </ModTableCell>
-              </Table.Row>
-            ))}
-          </Table.Body>
-          <ModTableFooter>
-            <Table.Row>
-              <ModTableHeaderCell $right colSpan="5">
-                <TotalText>Total</TotalText>
-              </ModTableHeaderCell>
-              <ModTableHeaderCell $nonBorder>
-                <TotalText>{modPrice(total)}</TotalText>
-              </ModTableHeaderCell>
-              <ModTableHeaderCell >
-              </ModTableHeaderCell>
+                      {triedToAddWithoutSelection && !watchProducts[index].code && (
+                        <WarningMessage> Debe seleccionar un producto </WarningMessage>
+                      )}
+                    </>
+                  )}
+                />
+              </Cell>
+              <Cell>
+                {formatedPrice(product.price)}
+              </Cell>
+              <Cell>
+                <Controller
+                  name={`products[${index}].quantity`}
+                  control={control}
+                  render={({ field }) => (
+                    <Input
+                      type="number"
+                      min={0}
+                      defaultValue={1}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        field.onChange(value);
+                        setTotal(calculateTotal());
+                      }}
+                    />
+                  )}
+                />
+              </Cell>
+              <Cell>
+                {formatedPrice(product.price * product.quantity)}
+              </Cell>
+              <Cell>
+                <Controller
+                  name={`products[${index}].discount`}
+                  control={control}
+                  defaultValue={product.discount || 0}
+                  render={({ field }) => (
+                    <Input
+                      fluid
+                      type="number"
+                      min={0}
+                      max={100}
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e.target.value);
+                        setTotal(calculateTotal());
+                      }}
+                    />
+                  )}
+                />
+              </Cell>
+              <Cell>
+                {formatedPrice(getTotal(product))}
+              </Cell>
+              <Cell >
+                <SButton
+                  icon="trash"
+                  color="red"
+                  onClick={() => deleteProduct(index)}
+                  type="button"
+                />
+              </Cell>
             </Table.Row>
-          </ModTableFooter>
-        </Table>
-        <ModButton
-          floated="right"
-          type="submit"
-          color="green"
-        >
-          <Icon name="add" />Crear presupuesto
-        </ModButton>
-      </Form>
-    </>
+          ))}
+        </Table.Body>
+        <Table.Footer>
+          <Table.Row>
+            <HeaderCell $right colSpan="5">
+              <TotalText>Total</TotalText>
+            </HeaderCell>
+            <HeaderCell $nonBorder>
+              <TotalText>{formatedPrice(total)}</TotalText>
+            </HeaderCell>
+            <HeaderCell >
+            </HeaderCell>
+          </Table.Row>
+        </Table.Footer>
+      </Table>
+      <Button
+        floated="right"
+        type="submit"
+        color="green"
+      >
+        <Icon name="add" />Crear presupuesto
+      </Button>
+    </Form>
   );
 };
 

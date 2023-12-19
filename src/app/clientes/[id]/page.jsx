@@ -1,6 +1,10 @@
 "use client";
 import { getCustomer } from "@/api/customers";
+import { getUserData } from "@/api/userData";
+import { HeaderContainer } from "@/components/customers/CustomerForm/styles";
 import ShowCustomer from "@/components/customers/ShowCustomer";
+import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -14,6 +18,16 @@ const Customer = ({ params }) => {
     if (!token) {
       router.push(PAGES.LOGIN.BASE)
     };
+    const validateToken = async () => {
+      try {
+        const userData = await getUserData();
+        if (!userData.isAuthorized) {
+          router.push(PAGES.LOGIN.BASE)
+        };
+      } catch (error) {
+        console.error('Error, ingreso no valido(token):', error);
+      };
+    };
     const fetchData = async () => {
       try {
         const requestOptions = {
@@ -26,16 +40,24 @@ const Customer = ({ params }) => {
         };
         const fetchCustomer = await getCustomer(params.id, requestOptions);
         setCustomer(fetchCustomer);
-        setIsLoading(false)
+        setIsLoading(false);
       } catch (error) {
         console.error('Error al cargar cliente:', error);
       };
     };
+    validateToken();
     fetchData();
   }, [params.id, router]);
 
   return (
-      <ShowCustomer customer={customer} isLoading={isLoading} />
+    <>
+      <HeaderContainer>
+        <PageHeader title="Cliente" />
+      </HeaderContainer>
+      <Loader active={isLoading}>
+        <ShowCustomer customer={customer} />
+      </Loader>
+    </>
   );
 };
 

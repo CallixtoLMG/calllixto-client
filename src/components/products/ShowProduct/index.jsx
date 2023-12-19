@@ -1,16 +1,16 @@
 "use client";
 import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
-import { modPrice } from "../../../utils";
+import { formatedPrice } from "../../../utils";
 import { DataContainer, HeaderContainer, ModLabel, ModSegment, SubContainer } from "./styles";
 
 const ShowProduct = ({ product, isLoading }) => {
   return (
     <>
+      <HeaderContainer>
+        <PageHeader title={"Detalle"} />
+      </HeaderContainer>
       <Loader active={isLoading}>
-        <HeaderContainer>
-          <PageHeader title={"Detalle"} />
-        </HeaderContainer>
         <SubContainer>
           <DataContainer>
             <ModLabel>Código</ModLabel>
@@ -22,7 +22,7 @@ const ShowProduct = ({ product, isLoading }) => {
           </DataContainer>
           <DataContainer>
             <ModLabel>Precio</ModLabel>
-            <ModSegment>{modPrice(product?.price)}</ModSegment>
+            <ModSegment>{formatedPrice(product?.price)}</ModSegment>
           </DataContainer>
         </SubContainer>
       </Loader>

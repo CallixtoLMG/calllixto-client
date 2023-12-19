@@ -8,6 +8,7 @@ import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
 import {
+  FormContainer,
   HeaderContainer,
   ModButton,
   ModFormField,
@@ -59,60 +60,63 @@ const ProductForm = ({ product, onSubmit }) => {
       <HeaderContainer>
         <PageHeader title={!product?.code ? "Crear producto" : "Actualizar producto"} />
       </HeaderContainer>
-      <Form onSubmit={handleSubmit(handleForm)}>
-        {!product?.code &&
-          (
-            <ModFormField>
-              <ModLabel>Código</ModLabel>
-              <Controller
-                name="code"
-                control={control}
-                defaultValue={get(product, "code", "")}
-                rules={{ validate: validateCode }}
-                render={({ field, fieldState }) => (
-                  <>
-                    <ModInput {...field} />
-                    {fieldState?.invalid && (
-                      <WarningMessage >Código: 4 caracteres alfanuméricos y en mayúscula.</WarningMessage>
-                    )}
-                  </>
-                )}
-              />
-            </ModFormField>
-          )}
-        <ModFormField>
-          <ModLabel>Nombre</ModLabel>
-          <Controller
-            name="name"
-            control={control}
-            defaultValue={get(product, "name", "")}
-            render={({ field }) => <ModInput {...field} />}
-          />
-        </ModFormField>
-        <ModFormField>
-          <ModLabel>Precio</ModLabel>
-          <Controller
-            name="price"
-            control={control}
-            defaultValue={get(product, "price", "")}
-            render={({ field, fieldState }) => (
-              <CurrencyInput
-                value={field.value}
-                locale={locale}
-                currency={currency}
-                onChangeValue={(_, value) => {
-                  field.onChange(value);
-                }}
-                InputElement={<ModInput />}
-              />
+      <FormContainer>
+        <Form onSubmit={handleSubmit(handleForm)}>
+          {!product?.code &&
+            (
+              <ModFormField>
+                <ModLabel>Código</ModLabel>
+                <Controller
+                  name="code"
+                  control={control}
+                  defaultValue={get(product, "code", "")}
+                  rules={{ validate: validateCode }}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <ModInput required {...field} />
+                      {fieldState?.invalid && (
+                        <WarningMessage >Código: 4 caracteres alfanuméricos y en mayúscula.</WarningMessage>
+                      )}
+                    </>
+                  )}
+                />
+              </ModFormField>
             )}
-          />
-        </ModFormField>
-        <ModFormField>
-        </ModFormField>
-        <ModButton disabled={isLoading} loading={isLoading} type="submit" color="green" ><Icon name={buttonConfig.icon} />{buttonConfig.title}</ModButton>
-        <ModButton type="button" onClick={handleReset} color="red" $marginLeft>Borrar cambios</ModButton>
-      </Form>
+          <ModFormField>
+            <ModLabel>Nombre</ModLabel>
+            <Controller
+              name="name"
+              control={control}
+              defaultValue={get(product, "name", "")}
+              render={({ field }) => <ModInput required {...field} />}
+            />
+          </ModFormField>
+          <ModFormField>
+            <ModLabel>Precio</ModLabel>
+            <Controller
+              name="price"
+              control={control}
+              defaultValue={get(product, "price", "")}
+              render={({ field, fieldState }) => (
+                <CurrencyInput
+                  value={field.value}
+                  locale={locale}
+                  currency={currency}
+                  onChangeValue={(_, value) => {
+                    field.onChange(value);
+                  }}
+                  InputElement={<ModInput />}
+                />
+              )}
+            />
+          </ModFormField>
+          <ModFormField>
+          </ModFormField>
+          <ModButton disabled={isLoading} loading={isLoading} type="submit" color="green" ><Icon name={buttonConfig.icon} />{buttonConfig.title}</ModButton>
+          <ModButton type="button" onClick={handleReset} color="brown" $marginLeft><Icon name="erase" />Limpiar cambios</ModButton>
+        </Form>
+      </FormContainer>
+
     </>
   )
 };

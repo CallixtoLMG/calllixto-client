@@ -1,6 +1,6 @@
 "use client";
 import { createBatch, deleteProduct, editBatch, productsList } from "@/api/products";
-import { getUserRol } from "@/api/rol";
+import { getUserData } from "@/api/userData";
 import ProductsPage from "@/components/products/ProductsPage";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -24,13 +24,23 @@ const Products = () => {
       },
       cache: "no-store",
     };
+    const validateToken = async () => {
+      try {
+        const userData = await getUserData();
+        if (!userData.isAuthorized) {
+          router.push(PAGES.LOGIN.BASE)
+        };
+      } catch (error) {
+        console.error('Error, ingreso no valido(token):', error);
+      };
+    };
     const fetchRol = async () => {
       try {
-        const roles = await getUserRol();
-        setRole(roles);
+        const userData = await getUserData();
+        setRole(userData.roles[0]);
       } catch (error) {
         console.error('Error al cargar roles:', error);
-      }
+      };
     };
     const fetchProductData = async () => {
       try {
@@ -42,8 +52,9 @@ const Products = () => {
         setIsLoading(false)
       };
     };
+    validateToken();
     fetchProductData();
-    fetchRol()
+    fetchRol();
   }, [router]);
 
   const handleDeleteProduct = async (code) => {
@@ -53,7 +64,7 @@ const Products = () => {
       setProducts(updatedProducts);
     } catch (error) {
       console.error('Error borrando producto', error);
-    }
+    };
   };
 
   return (

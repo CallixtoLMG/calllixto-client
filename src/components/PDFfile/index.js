@@ -1,7 +1,7 @@
 "use client";
 // import { useEffect } from "react";
-import { PRODUCTSHEADERS } from "@/components/budgets/budgets.common";
-import { modPrice, totalSum } from '@/utils';
+import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
+import { formatedPrice, totalSum } from '@/utils';
 import { get } from "lodash";
 import { Flex } from "rebass";
 import { Grid, Table } from 'semantic-ui-react';
@@ -75,20 +75,22 @@ const PDFfile = ({ budget, seller }) => {
               <Table.Header fullWidth>
                 <ModTableRow>
                   <ModTableHeaderCell ></ModTableHeaderCell>
-                  {PRODUCTSHEADERS.map((header) => (
-                    <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
-                  ))}
+                  {PRODUCTS_COLUMNS
+                    .filter(header => !header.hide)
+                    .map((header) => (
+                      <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
+                    ))}
                 </ModTableRow>
               </Table.Header>
               {budget?.products?.map((product, index) => (
                 <Table.Body key={product.code}>
                   <ModTableRow >
                     <ModTableCell >{index + 1}</ModTableCell>
-                    {PRODUCTSHEADERS
+                    {PRODUCTS_COLUMNS
                       .filter(header => !header.hide)
                       .map((header) =>
                         <ModTableCell key={header.id}>
-                          {header.modPrice ? modPrice(get(product, header.value, '')) : get(product, header.value, '')}
+                          {header.formatedPrice ? formatedPrice(get(product, header.value, '')) : get(product, header.value, '')}
                         </ModTableCell>)
                     }
                   </ModTableRow>
@@ -97,7 +99,7 @@ const PDFfile = ({ budget, seller }) => {
               <Table.Footer>
                 <Table.Row>
                   <ModTableFooterCell align="right" colSpan='5'><strong>TOTAL</strong></ModTableFooterCell>
-                  <ModTableHeaderCell colSpan='1'><strong>{modPrice(totalSum(budget?.products))}</strong></ModTableHeaderCell>
+                  <ModTableHeaderCell colSpan='1'><strong>{formatedPrice(totalSum(budget?.products))}</strong></ModTableHeaderCell>
                 </Table.Row>
               </Table.Footer>
             </ModTable>

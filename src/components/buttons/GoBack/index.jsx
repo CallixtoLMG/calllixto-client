@@ -6,7 +6,7 @@ import { ModButton } from "./styles";
 const GoBack = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const notShow = [PAGES.LOGIN.BASE, PAGES.BASE];
+  const notShow = [PAGES.LOGIN.BASE, PAGES.BASE, PAGES.NOTFOUND.BASE];
   const show = !notShow.includes(pathname)
   const handleClick = () => {
     router.back();

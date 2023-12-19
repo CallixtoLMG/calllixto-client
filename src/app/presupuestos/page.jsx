@@ -1,6 +1,10 @@
 "use client";
 import { budgetsList } from "@/api/budgets";
+import { getUserData } from "@/api/userData";
 import BudgetsPage from "@/components/budgets/BudgetPage";
+import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
+import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,6 +17,16 @@ const Budgets = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       router.push(PAGES.LOGIN.BASE)
+    };
+    const validateToken = async () => {
+      try {
+        const userData = await getUserData();
+        if (!userData.isAuthorized) {
+          router.push(PAGES.LOGIN.BASE)
+        };
+      } catch (error) {
+        console.error('Error, ingreso no valido(token):', error);
+      };
     };
     const fetchData = async () => {
       try {
@@ -32,11 +46,19 @@ const Budgets = () => {
         console.error('Error al cargar presupuestos:', error);
       };
     };
+    validateToken();
     fetchData();
   }, [router]);
 
   return (
-      <BudgetsPage budgets={budgets} isLoading={isLoading} />
+    <>
+      <HeaderContainer>
+        <PageHeader title="Presupuestos" />
+      </HeaderContainer>
+      <Loader active={isLoading}>
+        <BudgetsPage budgets={budgets} />
+      </Loader>
+    </>
   )
 };
 

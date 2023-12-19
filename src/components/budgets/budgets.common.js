@@ -1,61 +1,69 @@
-const HEADERS = [
+import { formatedPrice, getTotal, formatedDate, getTotalSum } from "@/utils";
+
+const BUDGETS_COLUMNS = [
   {
-    name: "",
     value: "id",
+    value: (budget) => budget.id
   },
   {
     name: "Cliente",
-    object: "customer",
-    value: "name",
+    value: (budget) => budget.customer.name
   },
   {
     name: "Fecha",
-    date: true,
-    value: "createdAt",
+    value: (budget) => formatedDate(budget.createdAt)
+  },
+  {
+    name: "Total",
+    value: (budget) => formatedPrice(getTotalSum(budget.products))
   },
 ];
 
-const PRODUCTSHEADERS = [
+const PRODUCTS_COLUMNS = [
   {
-    name: "Descripción",
-    value: "name",
+    title: "Descripción",
+    value: (product) => product.name,
     id: 1
   },
   {
-    name: "Cantidad",
-    value: "quantity",
+    title: "Cantidad",
+    value: (product) => product.quantity || 0,
     id: 2
   },
   {
-    name: "Precio Unitario",
-    value: "price",
-    modPrice: true,
+    title: "Precio Unitario",
+    value: (product) => formatedPrice(product.price || 0),
     id: 3
   },
   {
-    name: "Descuento",
-    value: "discount",
+    title: "Subtotal",
+    value: (product) => formatedPrice(product.price * product.quantity || 0),
     id: 4
   },
   {
-    name: "Importe",
-    value: "total",
-    modPrice: true,
+    title: "Desc. %",
+    value: (product) => product.discount || 0,
     id: 5
-  }
+  },
+  {
+    title: "Importe",
+    value: (product) => formatedPrice(getTotal(product)),
+    id: 6
+  },
+
 ];
 
-const SHOWPRODUCTSHEADERS = [
-  { name: "Nombre", value: "name", id: 1 },
-  { name: "Precio", value: "price", id: 2 },
-  { name: "Cantidad", value: "quantity", id: 3 },
-  { name: "Subtotal", value: "subtotal", id: 4 },
-  { name: "Desc.", value: "discount", id: 5 },
-  { name: "Total", value: "total", id: 6 },
-  { name: "Acciones", value: "actions", id: 7 },
+const BUDGET_FORM_PRODUCT_COLUMNS = [
+  { title: "Nombre", value: "name", id: 1 },
+  { title: "Precio", value: "price", id: 2 },
+  { title: "Cantidad", value: "quantity", id: 3 },
+  { title: "Subtotal", value: "subtotal", id: 4 },
+  { title: "Desc.", value: "discount", id: 5 },
+  { title: "Total", value: "total", id: 6 },
+  { title: "Acciones", value: "actions", id: 7 },
 ];
 
 export {
-  HEADERS, PRODUCTSHEADERS, SHOWPRODUCTSHEADERS
+  BUDGETS_COLUMNS, PRODUCTS_COLUMNS, BUDGET_FORM_PRODUCT_COLUMNS
 };
 

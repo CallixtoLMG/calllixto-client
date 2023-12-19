@@ -6,7 +6,8 @@ import { MainContainer } from "./styles";
 const NotFoundPage = () => {
   const router = useRouter();
   const handleClick = () => {
-    router.back()
+    router.back();
+    router.back();
   };
   return (
     <MainContainer>

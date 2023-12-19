@@ -1,6 +1,6 @@
 "use client"
 import { create } from "@/api/products";
-import { getUserRol } from "@/api/rol";
+import { getUserData } from "@/api/userData";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -14,15 +14,26 @@ const CreateProduct = () => {
     if (!token) {
       router.push(PAGES.LOGIN.BASE)
     };
-    const fetchRol = async () => {
+    const validateToken = async () => {
       try {
-        const roles = await getUserRol();
-        setRole(roles);
+        const userData = await getUserData();
+        if (!userData.isAuthorized) {
+          router.push(PAGES.LOGIN.BASE)
+        };
       } catch (error) {
-        console.error('Error al crear producto:', error);
+        console.error('Error, ingreso no valido(token):', error);
       };
     };
-    setRole(fetchRol());
+    const fetchRol = async () => {
+      try {
+        const userData = await getUserData();
+        setRole(userData.roles[0]);
+      } catch (error) {
+        console.error('Error, rol no valido:', error);
+      };
+    };
+    validateToken();
+    fetchRol();
   }, [router]);
   if (role === "user") {
     router.push(PAGES.NOTFOUND.BASE)
