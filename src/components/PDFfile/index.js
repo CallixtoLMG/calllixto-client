@@ -75,9 +75,11 @@ const PDFfile = ({ budget, seller }) => {
               <Table.Header fullWidth>
                 <ModTableRow>
                   <ModTableHeaderCell ></ModTableHeaderCell>
-                  {PRODUCTSHEADERS.map((header) => (
-                    <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
-                  ))}
+                  {PRODUCTSHEADERS
+                    .filter(header => !header.hide)
+                    .map((header) => (
+                      <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
+                    ))}
                 </ModTableRow>
               </Table.Header>
               {budget?.products?.map((product, index) => (

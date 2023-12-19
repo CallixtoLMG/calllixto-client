@@ -3,12 +3,14 @@ import { Label, Segment } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ModLabel = styled(Label)({
-  margin: "0!important"
+  margin: "0!important",
+  width: "100%!important"
 });
 
 const ModSegment = styled(Segment)({
   marginTop: "5px!important",
   height: "50px!important",
+  margin: "1rem 0!important",
 });
 
 const HeaderContainer = styled(Flex)`
@@ -16,13 +18,15 @@ const HeaderContainer = styled(Flex)`
 `;
 
 const SubContainer = styled(Flex)`
-  flex-direction: row;
+  flex-direction: column;
+  align-items: center;
+  width: 350px!important;
+  align-self: center;
 `;
 
 const DataContainer = styled(Flex)`
   flex-direction: column;
-  margin: 0 10px 10px 0!important;
-  width: 250px!important;
+  width:100%!important;
 `;
 
 export { DataContainer, HeaderContainer, ModLabel, ModSegment, SubContainer };

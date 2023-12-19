@@ -13,7 +13,6 @@ const FormContainer = styled(Flex)`
 `;
 
 const ModLabel = styled(Label)({
-  maxWidth: "50vh!important",
   width: "100%!important"
 });
 
@@ -34,7 +33,6 @@ const ModInput = styled(Input)`
 
 const ModFormField = styled(Form.Field)({
   margin: "0!important",
-  maxWidth: "50vh!important",
 });
 
 const WarningMessage = styled.p`
