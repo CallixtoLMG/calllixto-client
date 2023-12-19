@@ -1,4 +1,4 @@
-import { formatedPrice, getTotal, formatedDate, getTotalSum } from "@/utils";
+import { formatedPrice, formatedPercentage, getTotal, formatedDate, getTotalSum } from "@/utils";
 
 const BUDGETS_COLUMNS = [
   {
@@ -42,7 +42,7 @@ const PRODUCTS_COLUMNS = [
   },
   {
     title: "Desc.",
-    value: (product) => product.discount || 0,
+    value: (product) => formatedPercentage(product.discount || 0),
     id: 5
   },
   {
