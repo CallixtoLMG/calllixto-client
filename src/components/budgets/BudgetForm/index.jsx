@@ -17,6 +17,7 @@ import { formatedPrice, getTotal, getTotalSum, createDate } from "@/utils";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const { control, handleSubmit, setValue, watch, formState: { isValid, isDirty } } = useForm({
     defaultValues: {
       products: [
@@ -67,7 +68,8 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
   }, [watchProducts, calculateTotal])
 
   const handleCreate = (data) => {
-    data.createdAt = createDate()
+    setIsLoading(true);
+    data.createdAt = createDate();
     onSubmit(data);
     setTimeout(() => {
       router.push(PAGES.BUDGETS.BASE);
@@ -219,7 +221,8 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
         floated="right"
         type="submit"
         color="green"
-        disabled={!isValid || !isDirty}
+        disabled={isLoading || !isValid || !isDirty}
+        loading={isLoading}
       >
         <Icon name="add" />Crear presupuesto
       </Button>

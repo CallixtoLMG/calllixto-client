@@ -106,11 +106,11 @@ const ProductForm = ({ product, onSubmit }) => {
           color="green">
           <Icon name={buttonConfig.icon} />{buttonConfig.title}</Button>
         {isUpdating ? (
-          <Button type="button" onClick={() => handleReset(product)} color="brown" $marginLeft disabled={!isDirty}>
+          <Button type="button" onClick={() => handleReset(product)} color="brown" $marginLeft disabled={isLoading || !isDirty}>
             <Icon name="undo" />Restaurar
           </Button>
         ) : (
-          <Button type="button" onClick={() => handleReset()} color="brown" $marginLeft disabled={!isDirty}>
+          <Button type="button" onClick={() => handleReset()} color="brown" $marginLeft disabled={isLoading ||  !isDirty}>
             <Icon name="erase" />Limpiar
           </Button>
         )}

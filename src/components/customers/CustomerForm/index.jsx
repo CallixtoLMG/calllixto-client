@@ -94,11 +94,11 @@ const CustomerForm = ({ customer, onSubmit }) => {
               <Icon name={buttonConfig.icon} />{buttonConfig.title}
             </Button>
             {isUpdating ? (
-              <Button type="button" onClick={() => handleReset(customer)} color="brown" disabled={!isDirty}>
+              <Button type="button" onClick={() => handleReset(customer)} color="brown" disabled={isLoading || !isDirty}>
                 <Icon name="undo" />Restaurar
               </Button>
             ) : (
-              <Button type="button" onClick={() => handleReset()} color="brown" disabled={!isDirty}>
+              <Button type="button" onClick={() => handleReset()} color="brown" disabled={isLoading || !isDirty}>
                 <Icon name="erase" />Limpiar
               </Button>
             )}
