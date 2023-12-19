@@ -1,18 +1,21 @@
-import { formatedPrice, getTotal } from "@/utils";
+import { formatedPrice, getTotal, formatedDate, getTotalSum } from "@/utils";
 
-const HEADERS = [
+const BUDGETS_COLUMNS = [
   {
     value: "id",
+    value: (budget) => budget.id
   },
   {
     name: "Cliente",
-    object: "customer",
-    value: "name",
+    value: (budget) => budget.customer.name
   },
   {
     name: "Fecha",
-    date: true,
-    value: "createdAt",
+    value: (budget) => formatedDate(budget.createdAt)
+  },
+  {
+    name: "Total",
+    value: (budget) => formatedPrice(getTotalSum(budget.products))
   },
 ];
 
@@ -61,6 +64,6 @@ const SHOW_PRODUCTS_HEADERS = [
 ];
 
 export {
-  HEADERS, PRODUCTS_COLUMNS, SHOW_PRODUCTS_HEADERS
+  BUDGETS_COLUMNS, PRODUCTS_COLUMNS, SHOW_PRODUCTS_HEADERS
 };
 

@@ -2,7 +2,7 @@
 import ButtonSend from "@/components/buttons/Send";
 import { get } from "lodash";
 import { Icon, Label, Table as STable } from "semantic-ui-react";
-import { modDate, formatedPrice, getTotalSum } from "../../../utils";
+import { formatedDate, formatedPrice, getTotalSum } from "../../../utils";
 import { PRODUCTS_COLUMNS } from "../budgets.common";
 import {
   DataContainer,
@@ -27,7 +27,7 @@ const ShowBudget = ({ budget }) => {
         </DataContainer>
         <DataContainer>
           <Label>Fecha</Label>
-          <Segment>{modDate(get(budget, "createdAt", ""))}</Segment>
+          <Segment>{formatedDate(get(budget, "createdAt", ""))}</Segment>
         </DataContainer>
       </SubContainer>
       <Flex flexDirection="column" width="100%" marginTop="10px">

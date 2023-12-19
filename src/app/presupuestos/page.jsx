@@ -2,6 +2,9 @@
 import { budgetsList } from "@/api/budgets";
 import { getUserData } from "@/api/userData";
 import BudgetsPage from "@/components/budgets/BudgetPage";
+import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
+import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -48,7 +51,14 @@ const Budgets = () => {
   }, [router]);
 
   return (
-      <BudgetsPage budgets={budgets} isLoading={isLoading} />
+    <>
+      <HeaderContainer>
+        <PageHeader title="Presupuestos" />
+      </HeaderContainer>
+      <Loader active={isLoading}>
+        <BudgetsPage budgets={budgets} />
+      </Loader>
+    </>
   )
 };
 

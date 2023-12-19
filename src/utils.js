@@ -19,7 +19,7 @@ export const totalIVA = (value) => {
   return totalConIVA.toFixed(2);
 };
 
-export const modDate = (date) => date?.split("T")[0];
+export const formatedDate = (date) => date?.split("T")[0];
 
 export const formatedPrice = (number) => {
   let modNumber = Number(number);
