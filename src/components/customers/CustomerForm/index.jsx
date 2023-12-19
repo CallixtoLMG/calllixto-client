@@ -1,7 +1,7 @@
 "use client"
 import { PAGES, REGEX } from "@/constants";
 import { useParams, useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box } from "rebass";
 import { Form, Icon } from 'semantic-ui-react';
@@ -37,6 +37,10 @@ const CustomerForm = ({ customer, onSubmit }) => {
     }, 1000)
   };
 
+  const handleReset = useCallback(() => {
+    reset({ name: '', email: '', phone: { areaCode: '', number: '' } });
+  }, [reset]);
+
   return (
     <>
       <Form onSubmit={handleSubmit(handleForm)}>
@@ -57,7 +61,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
                 name="email"
                 control={control}
                 rules={{ required: true, pattern: REGEX.EMAIL }}
-                render={({ field }) => <Input required {...field} placeholder="Email"/>}
+                render={({ field }) => <Input required {...field} placeholder="Email" />}
               />
             </FormField>
             <FormField width="300px">
@@ -89,7 +93,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
             >
               <Icon name={buttonConfig.icon} />{buttonConfig.title}
             </Button>
-            <Button type="button" onClick={reset} color="brown">
+            <Button type="button" onClick={handleReset} color="brown">
               <Icon name="erase" />Limpiar
             </Button>
           </ButtonsContainer>
