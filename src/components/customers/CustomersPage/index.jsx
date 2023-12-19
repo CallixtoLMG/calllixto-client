@@ -28,41 +28,39 @@ const CustomersPage = ({ customers = [], isLoading, onDelete }) => {
             iconName="add"
             goTo={PAGES.CUSTOMERS.CREATE} />
         </ButtonContainer>
-        {customers.length &&
-          <Table celled compact striped>
-            <Table.Header fullWidth>
-              <HeaderCell />
-              {HEADERS.map((header) => (
-                <HeaderCell key={header.id} >{header.name}</HeaderCell>
-              ))}
-            </Table.Header>
-            <Table.Body>
-              {customers.map((customer, index) => (
-                <Table.Row key={customer.name}>
-                  <Cell>{index + 1}</Cell>
-                  {HEADERS
-                    .filter(header => !header.hide)
-                    .map((header) => (
-                      <Cell
-                        onClick={() => { push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
-                        key={header.id}
-                      >
-                        {customer[header.value]}
-                      </Cell>
-                    ))
-                  }
-                  <Cell>
-                    <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
-                    <ButtonDelete
-                      onDelete={onDelete}
-                      params={customer.id}
-                      deleteQuestion={deleteQuestion(customer.name)} />
-                  </Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
-        }
+        <Table celled compact striped>
+          <Table.Header fullWidth>
+            <HeaderCell />
+            {HEADERS.map((header) => (
+              <HeaderCell key={header.id} >{header.name}</HeaderCell>
+            ))}
+          </Table.Header>
+          <Table.Body>
+            {customers.map((customer, index) => (
+              <Table.Row key={customer.name}>
+                <Cell>{index + 1}</Cell>
+                {HEADERS
+                  .filter(header => !header.hide)
+                  .map((header) => (
+                    <Cell
+                      onClick={() => { push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
+                      key={header.id}
+                    >
+                      {customer[header.value]}
+                    </Cell>
+                  ))
+                }
+                <Cell>
+                  <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
+                  <ButtonDelete
+                    onDelete={onDelete}
+                    params={customer.id}
+                    deleteQuestion={deleteQuestion(customer.name)} />
+                </Cell>
+              </Table.Row>
+            ))}
+          </Table.Body>
+        </Table>
       </Loader>
     </>
   );
