@@ -6,26 +6,11 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 export const createDate = () => {
-  const date = new Date()
-  const timezone = dayjs.tz.guess()
-  const formattedDate = dayjs(date).tz(timezone).local().toDate().toLocaleString()
-  return formattedDate
+  const date = dayjs().tz(dayjs.tz.guess()).toISOString();
+  return date;
 }
 
-export const IVA = (value) => {
-  value = Number(value)
-  const iva = value * 0.21;
-  return iva.toFixed(2);
-};
-
-export const totalIVA = (value) => {
-  value = Number(value)
-  const iva = value * 0.21;
-  const totalConIVA = value + iva;
-  return totalConIVA.toFixed(2);
-};
-
-export const formatedDate = (date) => date?.split("T")[0];
+export const formatedDate = (date) => dayjs(date).format('DD-MM-YYYY - hh:mm A');
 
 export const formatedPrice = (number) => {
   let modNumber = Number(number);
