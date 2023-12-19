@@ -1,23 +1,13 @@
 "use client";
-// import { useEffect } from "react";
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
-import { formatedPrice, totalSum } from '@/utils';
+import { formatedPrice, getTotalSum } from '@/utils';
 import { get } from "lodash";
 import { Flex } from "rebass";
-import { Grid, Table } from 'semantic-ui-react';
-import { ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, ModGridColumn, ModImage, ModLabel, ModPayMethodHeader, ModPayMethodLabel, ModSegment, ModTable, ModTableCell, ModTableFooterCell, ModTableHeaderCell, ModTableRow, ModTitleHeader, PayMethodContainer, Sign } from "./styles";
+import { Table } from 'semantic-ui-react';
+import { ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, ModGridColumn, ModImage, ModLabel, ModPayMethodHeader, ModPayMethodLabel, ModSegment, ModTableCell, ModTableFooterCell, ModTableHeaderCell, ModTableRow, ModTitleHeader, PayMethodContainer, Sign } from "./styles";
+import dayjs from "dayjs";
 
 const PDFfile = ({ budget, seller }) => {
-  const dateOfIssue = (get(budget, "createdAt", ""))
-  function sumDays(dateOfIssue, days) {
-    let date = new Date(dateOfIssue);
-    date.setDate(date.getDate() + days);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-  const dateOfExpiration = sumDays(dateOfIssue, 10)
   return (
     <>
       <HeaderContainer>
@@ -28,23 +18,23 @@ const PDFfile = ({ budget, seller }) => {
       <CustomerDataContainer>
         <DataContainer>
           <ModLabel>CUIT</ModLabel>
-          <ModSegment>{(get(budget, "customer.cuit", ""))}</ModSegment>
+          <ModSegment>CUIT</ModSegment>
         </DataContainer>
         <DataContainer>
           <ModLabel>IVA</ModLabel>
-          <ModSegment>{(get(budget, "customer.iva", ""))}</ModSegment>
+          <ModSegment>IVA</ModSegment>
         </DataContainer>
         <DataContainer>
           <ModLabel>Dirección</ModLabel>
-          <ModSegment>{(get(budget, "customer.address", ""))}</ModSegment>
+          <ModSegment>ADDRESS</ModSegment>
         </DataContainer>
         <DataContainer>
-          <ModLabel> Teléfono </ModLabel>
-          <ModSegment>{(get(budget, "customer.phone", ""))}</ModSegment>
+          <ModLabel>Teléfono </ModLabel>
+          <ModSegment>PHONE</ModSegment>
         </DataContainer>
         <DataContainer>
           <ModLabel>Vendedor/a</ModLabel>
-          <ModSegment>{(get(seller, "name", ""))}</ModSegment>
+          <ModSegment>VENDEDOR</ModSegment>
         </DataContainer>
       </CustomerDataContainer>
       <Divider />
@@ -56,56 +46,50 @@ const PDFfile = ({ budget, seller }) => {
         <Flex>
           <DataContainer width="120px">
             <ModLabel>Fecha</ModLabel>
-            <ModSegment>{(get(budget, "createdAt", ""))}</ModSegment>
+            <ModSegment>{dayjs(budget?.createdAt).format('DD-MM-YYYY')}</ModSegment>
           </DataContainer>
           <DataContainer width="120px">
             <ModLabel>Válido hasta</ModLabel>
-            <ModSegment>{dateOfExpiration}</ModSegment>
+            <ModSegment>{dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</ModSegment>
           </DataContainer>
           <DataContainer width="120px">
-            <ModLabel>N° presupuesto</ModLabel>
-            <ModSegment>{(get(budget, "numberOf", ""))}</ModSegment>
+            <ModLabel>N°</ModLabel>
+            <ModSegment>{budget?.id}</ModSegment>
           </DataContainer>
         </Flex>
       </ClientDataContainer>
-      <Grid >
-        <Grid.Row stretched>
-          <ModGridColumn>
-            <ModTable celled compact>
-              <Table.Header fullWidth>
-                <ModTableRow>
-                  <ModTableHeaderCell ></ModTableHeaderCell>
-                  {PRODUCTS_COLUMNS
-                    .filter(header => !header.hide)
-                    .map((header) => (
-                      <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
-                    ))}
-                </ModTableRow>
-              </Table.Header>
-              {budget?.products?.map((product, index) => (
-                <Table.Body key={product.code}>
-                  <ModTableRow >
-                    <ModTableCell >{index + 1}</ModTableCell>
-                    {PRODUCTS_COLUMNS
-                      .filter(header => !header.hide)
-                      .map((header) =>
-                        <ModTableCell key={header.id}>
-                          {header.formatedPrice ? formatedPrice(get(product, header.value, '')) : get(product, header.value, '')}
-                        </ModTableCell>)
-                    }
-                  </ModTableRow>
-                </Table.Body>
-              ))}
-              <Table.Footer>
-                <Table.Row>
-                  <ModTableFooterCell align="right" colSpan='5'><strong>TOTAL</strong></ModTableFooterCell>
-                  <ModTableHeaderCell colSpan='1'><strong>{formatedPrice(totalSum(budget?.products))}</strong></ModTableHeaderCell>
-                </Table.Row>
-              </Table.Footer>
-            </ModTable>
-          </ModGridColumn>
-        </Grid.Row>
-      </Grid>
+      <ModGridColumn>
+        <Table celled compact striped>
+          <Table.Header fullWidth>
+            <ModTableRow>
+              <ModTableHeaderCell ></ModTableHeaderCell>
+              {PRODUCTS_COLUMNS
+                .map((column) => (
+                  <ModTableHeaderCell key={column.id} >{column.title}</ModTableHeaderCell>
+                ))}
+            </ModTableRow>
+          </Table.Header>
+          <Table.Body>
+            {budget?.products?.map((product, index) => (
+              <ModTableRow key={product.code}>
+                <ModTableCell >{index + 1}</ModTableCell>
+                {PRODUCTS_COLUMNS
+                  .map((column) =>
+                    <ModTableCell key={column.id}>
+                      {column.value(product)}
+                    </ModTableCell>)
+                }
+              </ModTableRow>
+            ))}
+          </Table.Body>
+          <Table.Footer>
+            <Table.Row>
+              <ModTableFooterCell align="right" colSpan='6'><strong>TOTAL</strong></ModTableFooterCell>
+              <ModTableHeaderCell colSpan='1'><strong>{formatedPrice(getTotalSum(budget?.products))}</strong></ModTableHeaderCell>
+            </Table.Row>
+          </Table.Footer>
+        </Table>
+      </ModGridColumn>
       <Sign />
       <Flex alignItems="flex-start">
         <ModPayMethodHeader as="h3">Formas de pago:</ModPayMethodHeader>

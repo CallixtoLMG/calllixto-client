@@ -12,14 +12,6 @@ export const createDate = () => {
   return formattedDate
 }
 
-export const totalSum = (value, propName) => {
-  return (
-    value?.reduce((accumulator, product) => {
-      return accumulator + Number(product[propName] || 0);
-    }, 0).toFixed(2)
-  );
-};
-
 export const IVA = (value) => {
   value = Number(value)
   const iva = value * 0.21;
@@ -48,5 +40,5 @@ export const getTotal = (product) => {
 };
 
 export const getTotalSum = (products) => {
-  return products.reduce((a, b) => a + getTotal(b), 0);
+  return products?.reduce((a, b) => a + getTotal(b), 0);
 };

@@ -41,7 +41,7 @@ const PRODUCTS_COLUMNS = [
     id: 4
   },
   {
-    title: "Desc. %",
+    title: "Desc.",
     value: (product) => product.discount || 0,
     id: 5
   },
