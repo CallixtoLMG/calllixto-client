@@ -97,7 +97,6 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
           />
         )}
       />
-
       <Button
         color="green"
         type="button"

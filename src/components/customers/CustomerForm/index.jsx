@@ -98,7 +98,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
                 <Icon name="undo" />Restaurar
               </Button>
             ) : (
-              <Button type="button" onClick={handleReset} color="brown" disabled={!isDirty}>
+              <Button type="button" onClick={() => handleReset()} color="brown" disabled={!isDirty}>
                 <Icon name="erase" />Limpiar
               </Button>
             )}
