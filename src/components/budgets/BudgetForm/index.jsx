@@ -1,7 +1,7 @@
 import { BUDGET_FORM_PRODUCT_COLUMNS } from "@/components/budgets/budgets.common";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button as SButton, Dropdown as SDropdown, Form, Icon, Table } from "semantic-ui-react";
 import {
@@ -52,11 +52,19 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
     };
   };
 
-  const deleteProduct = (index) => {
+  const calculateTotal = useCallback(() => {
+    setTotal(getTotalSum(watchProducts), [watchProducts]);
+  }, [setTotal, watchProducts]);
+
+  const deleteProduct = useCallback((index) => {
     const newProducts = [...watchProducts];
     newProducts.splice(index, 1);
     setValue("products", newProducts);
-  };
+  }, [watchProducts, setValue]);
+
+  useEffect(() => {
+    calculateTotal();
+  }, [watchProducts, calculateTotal])
 
   const handleCreate = (data) => {
     data.createdAt = createDate()
@@ -65,8 +73,6 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
       router.push(PAGES.BUDGETS.BASE);
     }, 500);
   };
-
-  const calculateTotal = useCallback(() => getTotalSum(watchProducts), [watchProducts]);
 
   return (
     <Form onSubmit={handleSubmit(handleCreate)}>
@@ -119,7 +125,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                           setValue(`products[${index}].price`, product.price);
                           setValue(`products[${index}].code`, product.code);
                           setValue(`products[${index}].quantity`, 1);
-                          setTotal(calculateTotal());
+                          calculateTotal();
                         }}
                       />
                       {triedToAddWithoutSelection && !watchProducts[index].code && (
@@ -144,7 +150,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                       onChange={(e) => {
                         const value = e.target.value;
                         field.onChange(value);
-                        setTotal(calculateTotal());
+                        calculateTotal();
                       }}
                     />
                   )}
@@ -167,7 +173,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                       {...field}
                       onChange={(e) => {
                         field.onChange(e.target.value);
-                        setTotal(calculateTotal());
+                        calculateTotal();
                       }}
                     />
                   )}
@@ -180,7 +186,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                 <SButton
                   icon="trash"
                   color="red"
-                  onClick={() => deleteProduct(index)}
+                  onClick={() => { deleteProduct(index) }}
                   type="button"
                 />
               </Cell>
