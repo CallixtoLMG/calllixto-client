@@ -3,14 +3,13 @@ import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Dropdown, Form, Icon, Table } from "semantic-ui-react";
+import { Button as SButton, Dropdown as SDropdown, Form, Icon, Table } from "semantic-ui-react";
 import {
-  ModButton,
-  ModDropdown,
-  ModInput, ModTableCell,
-  ModTableFooter,
-  ModTableHeaderCell,
-  ModTableRow,
+  Button,
+  Dropdown,
+  Input,
+  Cell,
+  HeaderCell,
   TotalText,
   WarningMessage
 } from "./styles";
@@ -70,7 +69,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
 
   return (
     <Form onSubmit={handleSubmit(handleCreate)}>
-      <ModDropdown
+      <Dropdown
         name={`customer`}
         placeholder='Clientes...'
         search
@@ -84,31 +83,29 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
           setValue(`customer.id`, customer.id);
         }}
       />
-      <ModButton
+      <Button
         color="green"
         type="button"
         onClick={addProduct}
       >
         <Icon name="add" />Agregar producto
-      </ModButton>
+      </Button>
       <Table celled striped compact>
         <Table.Header>
-          <ModTableRow>
-            {SHOW_PRODUCTS_HEADERS.map((header) => {
-              return (<ModTableHeaderCell $header key={header.id} >{header.name}</ModTableHeaderCell>)
-            })}
-          </ModTableRow>
+          {SHOW_PRODUCTS_HEADERS.map((header) => {
+            return (<HeaderCell $header key={header.id} >{header.name}</HeaderCell>)
+          })}
         </Table.Header>
         <Table.Body>
           {watchProducts.map((product, index) => (
             <Table.Row key={`${product.code}-${index}`}>
-              <ModTableCell>
+              <Cell>
                 <Controller
                   name={`products[${index}].name`}
                   control={control}
                   render={({ field }) => (
                     <>
-                      <Dropdown
+                      <SDropdown
                         fluid
                         search
                         selection
@@ -130,16 +127,16 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                     </>
                   )}
                 />
-              </ModTableCell>
-              <ModTableCell>
+              </Cell>
+              <Cell>
                 {formatedPrice(product.price)}
-              </ModTableCell>
-              <ModTableCell>
+              </Cell>
+              <Cell>
                 <Controller
                   name={`products[${index}].quantity`}
                   control={control}
                   render={({ field }) => (
-                    <ModInput
+                    <Input
                       type="number"
                       min={0}
                       defaultValue={1}
@@ -151,17 +148,17 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                     />
                   )}
                 />
-              </ModTableCell>
-              <ModTableCell>
+              </Cell>
+              <Cell>
                 {formatedPrice(product.price * product.quantity)}
-              </ModTableCell>
-              <ModTableCell>
+              </Cell>
+              <Cell>
                 <Controller
                   name={`products[${index}].discount`}
                   control={control}
                   defaultValue={product.discount || 0}
                   render={({ field }) => (
-                    <ModInput
+                    <Input
                       fluid
                       type="number"
                       min={0}
@@ -174,41 +171,41 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                     />
                   )}
                 />
-              </ModTableCell>
-              <ModTableCell>
+              </Cell>
+              <Cell>
                 {formatedPrice(getTotal(product))}
-              </ModTableCell>
-              <ModTableCell >
-                <Button
+              </Cell>
+              <Cell >
+                <SButton
                   icon="trash"
                   color="red"
                   onClick={() => deleteProduct(index)}
                   type="button"
                 />
-              </ModTableCell>
+              </Cell>
             </Table.Row>
           ))}
         </Table.Body>
-        <ModTableFooter>
+        <Table.Footer>
           <Table.Row>
-            <ModTableHeaderCell $right colSpan="5">
+            <HeaderCell $right colSpan="5">
               <TotalText>Total</TotalText>
-            </ModTableHeaderCell>
-            <ModTableHeaderCell $nonBorder>
+            </HeaderCell>
+            <HeaderCell $nonBorder>
               <TotalText>{formatedPrice(total)}</TotalText>
-            </ModTableHeaderCell>
-            <ModTableHeaderCell >
-            </ModTableHeaderCell>
+            </HeaderCell>
+            <HeaderCell >
+            </HeaderCell>
           </Table.Row>
-        </ModTableFooter>
+        </Table.Footer>
       </Table>
-      <ModButton
+      <Button
         floated="right"
         type="submit"
         color="green"
       >
         <Icon name="add" />Crear presupuesto
-      </ModButton>
+      </Button>
     </Form>
   );
 };

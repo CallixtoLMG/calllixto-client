@@ -1,8 +1,8 @@
 import { Flex } from "rebass";
-import { Button, Dropdown, Input, Table } from 'semantic-ui-react';
+import { Button as SButton, Dropdown as SDropdown, Input as SInput, Table } from 'semantic-ui-react';
 import styled from 'styled-components';
 
-const ModInput = styled(Input)`
+const Input = styled(SInput)`
   input {
     border: ${(props) => props.$nonBorder && "none!important"};
     background: ${(props) => props.$greyBack && "#f9fafb!important"};
@@ -11,7 +11,7 @@ const ModInput = styled(Input)`
   };
 `;
 
-const ModButton = styled(Button)({
+const Button = styled(SButton)({
   width: "170px!important",
   padding: "10px 0!important",
 });
@@ -20,7 +20,7 @@ const TotalText = styled.h3`
   margin-left: 0.7rem;
 `;
 
-const ModDropdown = styled(Dropdown)({
+const Dropdown = styled(SDropdown)({
   width: "20rem!important",
   display: "flex!important",
   marginBottom: "20px!important",
@@ -36,7 +36,7 @@ const ModTableRow = styled(Table.Row)`
   th:not(:first-child) { width: 13rem!important; };
 `;
 
-const ModTableHeaderCell = styled(Table.HeaderCell)`
+const HeaderCell = styled(Table.HeaderCell)`
   background-color: ${props => props.$header && "#EEEEEE!important"};
   padding: ${(props) => props.$nonBorder ? "0!important" : "11px!important"};
   text-align: ${props => props.$right ? "right!important" : "center!important"};
@@ -45,14 +45,7 @@ const ModTableHeaderCell = styled(Table.HeaderCell)`
   };
 `;
 
-const ModTableFooter = styled(Table.Footer)`
-  th:nth-child(2) { 
-    min-width: 12rem!important;
-    padding: 5px!important;
-   };
-`;
-
-const ModTableCell = styled(Table.Cell)`
+const Cell = styled(Table.Cell)`
   padding: ${(props) => props.$nonBorder ? "0!important" : "5px!important"};
   text-align: center!important;
   `;
@@ -67,5 +60,5 @@ const WarningMessage = styled.p`
   color: red;
 `;
 
-export { HeaderContainer, ModButton, ModDropdown, ModInput, ModTableCell, ModTableFooter, ModTableHeaderCell, ModTableRow, TotalText, WarningMessage };
+export { HeaderContainer, Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage };
 
