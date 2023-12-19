@@ -72,7 +72,6 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
           ? parseFloat(product.price.replace(/[^\d,]/g, '').replace(',', '.'))
           : product.price;
         const formattedProduct = { ...product, code, price };
-        console.log(formattedProduct)
         if (existingCodes[code]) {
           existingProducts.push(formattedProduct);
         } else {

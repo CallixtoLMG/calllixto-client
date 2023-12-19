@@ -1,16 +1,16 @@
 "use client"
 import PageHeader from "@/components/layout/PageHeader";
-import { PAGES } from "@/constants";
+import { PAGES, REGEX } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import InputMask from "react-input-mask";
 import { Form, Icon } from 'semantic-ui-react';
-import { FormContainer, HeaderContainer, ModButton, ModFormField, ModInput, ModLabel } from "./styles";
+import { FormContainer, HeaderContainer, Button, FieldsContainer, Input, Label, FormField, ButtonsContainer, PhoneContainer } from "./styles";
+import { Box } from "rebass";
 
 const CustomerForm = ({ customer, onSubmit }) => {
   const router = useRouter();
-  const { handleSubmit, control, reset } = useForm();
+  const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm();
   const isUpdating = useMemo(() => !!customer?.id, [customer]);
   const [isLoading, setIsLoading] = useState(false);
   const buttonConfig = useMemo(() => {
@@ -19,16 +19,16 @@ const CustomerForm = ({ customer, onSubmit }) => {
       title: isUpdating ? "Actualizar" : "Crear",
     }
   }, [isUpdating]);
-  const handleReset = () => {
-    reset();
-  };
+
   const handleForm = (data) => {
+    setIsLoading(true);
     if (!customer?.id) {
       onSubmit(data);
     } else {
       onSubmit(customer?.id, data);
     }
     setTimeout(() => {
+      setIsLoading(false);
       router.push(PAGES.CUSTOMERS.BASE);
     }, 1000)
   };
@@ -38,51 +38,64 @@ const CustomerForm = ({ customer, onSubmit }) => {
       <HeaderContainer>
         <PageHeader title={!customer?.id ? "Crear cliente" : "Actualizar cliente"} />
       </HeaderContainer >
-      <FormContainer>
-        <Form onSubmit={handleSubmit(handleForm)}>
-          <ModFormField>
-            <ModLabel >Nombre</ModLabel>
-            <Controller
-              name="name"
-              control={control}
-              defaultValue={customer?.name || ""}
-              render={({ field }) => <ModInput required {...field} />}
-            />
-          </ModFormField>
-          <ModFormField>
-            <ModLabel>Teléfono</ModLabel>
-            <InputMask
-              mask="999 - 99999999"
-              maskChar=""
-              value={customer?.phone || ""}
+      <Form onSubmit={handleSubmit(handleForm)}>
+        <FormContainer>
+          <FieldsContainer>
+            <FormField>
+              <Label >Nombre</Label>
+              <Controller
+                name="name"
+                control={control}
+                defaultValue={customer?.name || ""}
+                rules={{ required: true }}
+                render={({ field }) => <Input required {...field} placeholder="Nombre" />}
+              />
+            </FormField>
+            <FormField>
+              <Label>Email</Label>
+              <Controller
+                name="email"
+                control={control}
+                defaultValue={customer?.email || ""}
+                rules={{ required: true, pattern: REGEX.EMAIL }}
+                render={({ field }) => <Input {...field} />}
+              />
+            </FormField>
+            <FormField width="300px">
+              <Label>Teléfono</Label>
+              <PhoneContainer>
+                <Box width="100px">
+                  <Controller
+                    name="phone.areaCode"
+                    control={control}
+                    render={({ field }) => <Input {...field} placeholder="Área" />}
+                  />
+                </Box>
+                <Box width="300px">
+                  <Controller
+                    name="phone.number"
+                    control={control}
+                    render={({ field }) => <Input {...field} placeholder="Número" />}
+                  />
+                </Box>
+              </PhoneContainer>
+            </FormField>
+          </FieldsContainer>
+          <ButtonsContainer>
+            <Button
+              disabled={isLoading || !isDirty || !isValid}
+              loading={isLoading}
+              type="submit"
+              color="green"
             >
-              {(inputProps) => <ModInput {...inputProps} />}
-            </InputMask>
-          </ModFormField>
-          {/* <ModFormField>
-            <ModLabel>Teléfono</ModLabel>
-            <Controller
-              name="phone"
-              control={control}
-              defaultValue={customer?.phone || ""}
-              render={({ field }) => <ModInput {...field} />}
-            />
-          </ModFormField> */}
-          <ModFormField>
-            <ModLabel>Email</ModLabel>
-            <Controller
-              name="email"
-              control={control}
-              defaultValue={customer?.email || ""}
-              render={({ field }) => <ModInput {...field} />}
-            />
-          </ModFormField>
-          <ModFormField>
-          </ModFormField>
-          <ModButton disabled={isLoading} loading={isLoading} type="submit" color="green" ><Icon name={buttonConfig.icon} />{buttonConfig.title}</ModButton>
-          <ModButton type="button" onClick={handleReset} color="brown" $marginLeft><Icon name="erase" />Limpiar cambios</ModButton>
-        </Form>
-      </FormContainer>
+              <Icon name={buttonConfig.icon} />{buttonConfig.title}
+            </Button>
+            <Button type="button" onClick={reset} color="brown">
+              <Icon name="erase" />Limpiar
+            </Button>
+          </ButtonsContainer>
+        </FormContainer >
+      </Form>
     </>
   )
 };
