@@ -37,8 +37,8 @@ const CustomerForm = ({ customer, onSubmit }) => {
     }, 1000)
   };
 
-  const handleReset = useCallback(() => {
-    reset({ name: '', email: '', phone: { areaCode: '', number: '' } });
+  const handleReset = useCallback((customer) => {
+    reset(customer || { name: '', email: '', phone: { areaCode: '', number: '' } });
   }, [reset]);
 
   return (
@@ -93,9 +93,15 @@ const CustomerForm = ({ customer, onSubmit }) => {
             >
               <Icon name={buttonConfig.icon} />{buttonConfig.title}
             </Button>
-            <Button type="button" onClick={handleReset} color="brown">
-              <Icon name="erase" />Limpiar
-            </Button>
+            {isUpdating ? (
+              <Button type="button" onClick={() => handleReset(customer)} color="brown" disabled={!isDirty}>
+                <Icon name="undo" />Restaurar
+              </Button>
+            ) : (
+              <Button type="button" onClick={handleReset} color="brown" disabled={!isDirty}>
+                <Icon name="erase" />Limpiar
+              </Button>
+            )}
           </ButtonsContainer>
         </FormContainer >
       </Form>
