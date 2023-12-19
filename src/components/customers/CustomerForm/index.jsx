@@ -7,12 +7,12 @@ import { Box } from "rebass";
 import { Form, Icon } from 'semantic-ui-react';
 import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, PhoneContainer } from "./styles";
 import { createDate } from "@/utils";
-
+import { omit } from "lodash";
 
 const CustomerForm = ({ customer, onSubmit }) => {
   const { push } = useRouter();
   const params = useParams();
-  const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: customer });
+  const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: omit(customer, ['id', 'createdAt']) });
   const isUpdating = useMemo(() => !!params.id, [params.id]);
   const [isLoading, setIsLoading] = useState(false);
   const buttonConfig = useMemo(() => {
