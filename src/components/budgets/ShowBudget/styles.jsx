@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Button as SButton, Segment as SSegment, Table as STable} from "semantic-ui-react";
+import { Button as SButton, Segment as SSegment, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const SubContainer = styled(Flex)`
@@ -14,12 +14,6 @@ const DataContainer = styled(Flex)`
   flex-direction: column;
   margin: 0 10px 10px 0!important;
   width: 200px!important;
-`;
-
-const Table = styled(STable)`
-  tbody:nth-child(odd) {
-    background-color: #f2f2f2!important;
-  }
 `;
 
 const Button = styled(SButton)`
@@ -45,7 +39,7 @@ const FooterCell = styled(Table.HeaderCell)`
   };
 `;
 
-const TableHeader = styled(Table.HeaderCell)`
+const HeaderCell = styled(Table.HeaderCell)`
   background-color: ${props => props.$header && "#EEEEEE!important"};
   text-align: ${({ align }) => align || "center"} !important;
 `;
@@ -54,5 +48,5 @@ const Cell = styled(Table.Cell)({
   textAlign: 'center!important'
 });
 
-export { DataContainer, HeaderContainer, Button, Segment, Table, Cell, FooterCell, TableHeader, Row, SubContainer };
+export { DataContainer, HeaderContainer, Button, Segment, Cell, FooterCell, HeaderCell, Row, SubContainer };
 

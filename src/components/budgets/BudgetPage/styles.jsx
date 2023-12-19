@@ -3,24 +3,17 @@ import { Flex } from "rebass";
 import { Icon, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
-const ModTableCell = styled(Table.Cell)`
+const Cell = styled(Table.Cell)`
   cursor: pointer!important;
   text-align: center!important;
 `;
 
-const ModTableHeaderCell = styled(Table.HeaderCell)({
+const HeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important",
   textAlign: 'center!important'
 });
 
-const ModTable = styled(Table)`
-  tbody:nth-child(odd) {
-    background-color: #f2f2f2!important;
-  };
-  margin-top: 0!important;
-`;
-
-const ModTableRow = styled(Table.Row)`
+const Row = styled(Table.Row)`
   height: 45px!important;
   th:not(:first-child) { min-width: 150px!important }
   th:first-child { width: 50px!important; }
@@ -46,5 +39,5 @@ const HeaderContainer = styled(Flex)`
   margin-bottom: 20px!important;
 `;
 
-export { ButtonContainer, HeaderContainer, ModIcon, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow };
+export { ButtonContainer, HeaderContainer, ModIcon, ModLink, Cell, HeaderCell, Row };
 

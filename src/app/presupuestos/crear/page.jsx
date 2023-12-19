@@ -4,7 +4,9 @@ import { customersList } from "@/api/customers";
 import { productsList } from "@/api/products";
 import { getUserData } from "@/api/userData";
 import BudgetForm from "@/components/budgets/BudgetForm";
+import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
 import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -71,9 +73,14 @@ const CreateBudget = () => {
     fetchData();
   }, [router]);
   return (
-    <Loader active={isLoading}>
-      <BudgetForm onSubmit={create} products={products} customers={customers} />
-    </Loader>
+    <>
+      <HeaderContainer>
+        <PageHeader title="Crear presupuesto" />
+      </HeaderContainer >
+      <Loader active={isLoading}>
+        <BudgetForm onSubmit={create} products={products} customers={customers} />
+      </Loader>
+    </>
   )
 };
 

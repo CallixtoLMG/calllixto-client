@@ -7,12 +7,12 @@ import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { Table as STable } from "semantic-ui-react";
+import { Table } from "semantic-ui-react";
 import { HEADERS } from "../clients.common";
-import { ButtonContainer, HeaderContainer, Table, Cell, TableHeader, Row } from "./styles";
+import { ButtonContainer, HeaderContainer, Cell, HeaderCell } from "./styles";
 
 const CustomersPage = ({ customers = [], isLoading, onDelete }) => {
-  const router = useRouter();
+  const { push } = useRouter();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`;
 
   return (
@@ -29,22 +29,22 @@ const CustomersPage = ({ customers = [], isLoading, onDelete }) => {
             goTo={PAGES.CUSTOMERS.CREATE} />
         </ButtonContainer>
         {customers.length &&
-          <Table celled compact>
-            <STable.Header fullWidth>
-              <TableHeader />
+          <Table celled compact striped>
+            <Table.Header fullWidth>
+              <HeaderCell />
               {HEADERS.map((header) => (
-                <TableHeader key={header.id} >{header.name}</TableHeader>
+                <HeaderCell key={header.id} >{header.name}</HeaderCell>
               ))}
-            </STable.Header>
-            {customers.map((customer, index) => (
-              <STable.Body key={customer.name}>
-                <Row >
+            </Table.Header>
+            <Table.Body>
+              {customers.map((customer, index) => (
+                <Table.Row key={customer.name}>
                   <Cell>{index + 1}</Cell>
                   {HEADERS
                     .filter(header => !header.hide)
                     .map((header) => (
                       <Cell
-                        onClick={() => { router.push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
+                        onClick={() => { push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
                         key={header.id}
                       >
                         {customer[header.value]}
@@ -58,9 +58,9 @@ const CustomersPage = ({ customers = [], isLoading, onDelete }) => {
                       params={customer.id}
                       deleteQuestion={deleteQuestion(customer.name)} />
                   </Cell>
-                </Row>
-              </STable.Body>
-            ))}
+                </Table.Row>
+              ))}
+            </Table.Body>
           </Table>
         }
       </Loader>
