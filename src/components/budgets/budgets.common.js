@@ -53,17 +53,17 @@ const PRODUCTS_COLUMNS = [
 
 ];
 
-const SHOW_PRODUCTS_HEADERS = [
-  { name: "Nombre", value: "name", id: 1 },
-  { name: "Precio", value: "price", id: 2 },
-  { name: "Cantidad", value: "quantity", id: 3 },
-  { name: "Subtotal", value: "subtotal", id: 4 },
-  { name: "Desc.", value: "discount", id: 5 },
-  { name: "Total", value: "total", id: 6 },
-  { name: "Acciones", value: "actions", id: 7 },
+const BUDGET_FORM_PRODUCT_COLUMNS = [
+  { title: "Nombre", value: "name", id: 1 },
+  { title: "Precio", value: "price", id: 2 },
+  { title: "Cantidad", value: "quantity", id: 3 },
+  { title: "Subtotal", value: "subtotal", id: 4 },
+  { title: "Desc.", value: "discount", id: 5 },
+  { title: "Total", value: "total", id: 6 },
+  { title: "Acciones", value: "actions", id: 7 },
 ];
 
 export {
-  BUDGETS_COLUMNS, PRODUCTS_COLUMNS, SHOW_PRODUCTS_HEADERS
+  BUDGETS_COLUMNS, PRODUCTS_COLUMNS, BUDGET_FORM_PRODUCT_COLUMNS
 };
 

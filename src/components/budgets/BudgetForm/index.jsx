@@ -1,4 +1,4 @@
-import { SHOW_PRODUCTS_HEADERS } from "@/components/budgets/budgets.common";
+import { BUDGET_FORM_PRODUCT_COLUMNS } from "@/components/budgets/budgets.common";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -92,9 +92,9 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
       </Button>
       <Table celled striped compact>
         <Table.Header>
-          {SHOW_PRODUCTS_HEADERS.map((header) => {
-            return (<HeaderCell $header key={header.id} >{header.name}</HeaderCell>)
-          })}
+          {BUDGET_FORM_PRODUCT_COLUMNS.map((column) => (
+            <HeaderCell $header key={column.id} >{column.title}</HeaderCell>
+          ))}
         </Table.Header>
         <Table.Body>
           {watchProducts.map((product, index) => (
