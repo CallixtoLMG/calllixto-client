@@ -1,28 +1,24 @@
-const HEADERS = [
+import { formatedPrice } from "@/utils";
+
+const PRODUCT_COLUMNS = [
   {
-    name: "Código",
-    value: "code",
-    id: 1
+    title: "Código",
+    id: 1,
+    value: (product) => product.code
   },
   {
-    name: "Nombre",
-    value: "name",
-    id: 2
+    title: "Nombre",
+    id: 2,
+    value: (product) => product.name,
   },
   {
-    name: "Precio",
-    value: "price",
-    id: 3
-  },
-  {
-    name: "Acciones",
-    value: "actions",
-    hide: true,
-    id: 4
-  },
+    title: "Precio",
+    id: 3,
+    value: (product) => formatedPrice(product.code)
+  }
 ];
 
 export {
-  HEADERS
+  PRODUCT_COLUMNS
 };
 

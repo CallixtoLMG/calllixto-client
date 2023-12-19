@@ -17,7 +17,7 @@ import { formatedPrice, getTotal, getTotalSum } from "@/utils";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
-  const { control, handleSubmit, setValue, watch } = useForm({
+  const { control, handleSubmit, setValue, watch, formState: { isValid, isDirty } } = useForm({
     defaultValues: {
       products: [
         {
@@ -203,6 +203,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
         floated="right"
         type="submit"
         color="green"
+        disabled={!isValid || !isDirty}
       >
         <Icon name="add" />Crear presupuesto
       </Button>

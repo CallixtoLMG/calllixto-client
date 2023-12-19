@@ -1,6 +1,9 @@
 "use client";
 import { createBatch, deleteProduct, editBatch, productsList } from "@/api/products";
 import { getUserData } from "@/api/userData";
+import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
+import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import ProductsPage from "@/components/products/ProductsPage";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -68,14 +71,22 @@ const Products = () => {
   };
 
   return (
-    <ProductsPage
-      products={products}
-      createBatch={createBatch}
-      editBatch={editBatch}
-      role={role}
-      isLoading={isLoading}
-      onDelete={handleDeleteProduct}
-    />
+    <>
+      <HeaderContainer>
+        <PageHeader title={"Productos"} />
+      </HeaderContainer>
+      <Loader active={isLoading}>
+        <ProductsPage
+          products={products}
+          createBatch={createBatch}
+          editBatch={editBatch}
+          role={role}
+          isLoading={isLoading}
+          onDelete={handleDeleteProduct}
+        />
+      </Loader>
+    </>
+
   );
 };
 

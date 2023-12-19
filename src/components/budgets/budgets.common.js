@@ -31,7 +31,7 @@ const PRODUCTS_COLUMNS = [
     id: 2
   },
   {
-    title: "Precio Unitario",
+    title: "Precio",
     value: (product) => formatedPrice(product.price || 0),
     id: 3
   },

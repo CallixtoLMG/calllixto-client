@@ -9,16 +9,12 @@ const ButtonContainer = styled(Flex)`
   justify-content: space-between;
 `;
 
-const RightAlignedContainer = styled(Flex)`
-  margin-left: auto;
-`;
-
-const ModTableCell = styled(Table.Cell)({
+const Cell = styled(Table.Cell)({
   cursor: "pointer!important",
   textAlign: "center!important"
 });
 
-const ModTableHeaderCell = styled(Table.HeaderCell)({
+const HeaderCell = styled(Table.HeaderCell)({
   background: "#EEEEEE!important",
   textAlign: "center!important"
 });
@@ -34,21 +30,9 @@ const ModTable = styled(Table)`
   margin-top: 0!important;
 `;
 
-const ModTableRow = styled(Table.Row)`
-  th:not(:first-child) {min-width: 200px!important}
-  th:first-child { width: 50px!important };
-  th:nth-child(2) {
-    min-width: 100px!important;
-    width: 100px!important
-  };
-  th:nth-child(3){min-width: 250px!important;};
-  th:nth-child(4){ width: 200px!important;};
-  th:last-child { width: 200px!important; };
-`;
-
 const HeaderContainer = styled(Flex)`
   margin-bottom: 20px!important;
 `;
 
-export { ButtonContainer, HeaderContainer, ModLink, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow, RightAlignedContainer };
+export { ButtonContainer, HeaderContainer, ModLink, ModTable, Cell, HeaderCell };
 
