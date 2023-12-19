@@ -6,6 +6,8 @@ import { Controller, useForm } from "react-hook-form";
 import { Box } from "rebass";
 import { Form, Icon } from 'semantic-ui-react';
 import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, PhoneContainer } from "./styles";
+import { createDate } from "@/utils";
+
 
 const CustomerForm = ({ customer, onSubmit }) => {
   const { push } = useRouter();
@@ -23,8 +25,10 @@ const CustomerForm = ({ customer, onSubmit }) => {
   const handleForm = (data) => {
     setIsLoading(true);
     if (!isUpdating) {
+      data.createdAt = createDate()
       onSubmit(data);
     } else {
+      data.updatedAt = createDate()
       onSubmit(params.id, data);
     }
     setTimeout(() => {

@@ -16,6 +16,7 @@ import {
   ModLabel,
   WarningMessage,
 } from "./styles";
+import { createDate } from "@/utils";
 
 const ProductForm = ({ product, onSubmit }) => {
   const router = useRouter();
@@ -39,8 +40,10 @@ const ProductForm = ({ product, onSubmit }) => {
   const handleForm = (data) => {
     setIsLoading(true);
     if (!product?.code) {
+      data.createdAt = createDate()
       onSubmit(data);
     } else {
+      data.updatedAt = createDate()
       onSubmit(product?.code, data);
     }
     setTimeout(() => {

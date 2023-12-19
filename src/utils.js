@@ -1,3 +1,17 @@
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc"
+import timezone from "dayjs/plugin/timezone"
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+export const createDate = () => {
+  const date = new Date()
+  const timezone = dayjs.tz.guess()
+  const formattedDate = dayjs(date).tz(timezone).local().toDate().toLocaleString()
+  return formattedDate
+}
+
 export const totalSum = (value, propName) => {
   return (
     value?.reduce((accumulator, product) => {

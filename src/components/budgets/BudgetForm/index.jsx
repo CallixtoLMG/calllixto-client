@@ -13,7 +13,7 @@ import {
   TotalText,
   WarningMessage
 } from "./styles";
-import { formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { formatedPrice, getTotal, getTotalSum, createDate } from "@/utils";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
@@ -59,6 +59,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
   };
 
   const handleCreate = (data) => {
+    data.createdAt = createDate()
     onSubmit(data);
     setTimeout(() => {
       router.push(PAGES.BUDGETS.BASE);
