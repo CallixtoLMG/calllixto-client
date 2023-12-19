@@ -4,11 +4,11 @@ import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Form, Icon, Input, Modal, Segment, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
-import { HEADERS } from "../products.common";
+import { PRODUCT_COLUMNS } from "../products.common";
 import { ContainerModal, DataNotFoundContainer, ModInput, ModLabel, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
-  const { handleSubmit, control, reset } = useForm();
+  const { handleSubmit, control, reset, setValue } = useForm();
   const router = useRouter()
   const [open, setOpen] = useState(false);
   const [newProducts, setNewProducts] = useState([]);
@@ -80,6 +80,8 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
       });
       setEditProducts(existingProducts);
       setNewProducts(nonExistingProducts);
+      setValue('newProducts', nonExistingProducts);
+      setValue('editProducts', existingProducts);
       setOpen(true);
     };
   };
@@ -136,11 +138,10 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                     <ModTable celled compact>
                       <Table.Header fullWidth>
                         <ModTableRow>
-                          <ModTableHeaderCell></ModTableHeaderCell>
-                          {HEADERS
-                            .filter(header => !header.hide)
-                            .map((header) => (
-                              <ModTableHeaderCell key={header.id}>{header.name}</ModTableHeaderCell>
+                          <ModTableHeaderCell />
+                          {PRODUCT_COLUMNS
+                            .map((column) => (
+                              <ModTableHeaderCell key={column.id}>{column.title}</ModTableHeaderCell>
                             ))}
                         </ModTableRow>
                       </Table.Header>
@@ -148,27 +149,23 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                         <Table.Body key={`${newProduct.code}-${index}`}>
                           <ModTableRow >
                             <ModTableCell>{index + 1}</ModTableCell>
-                            {HEADERS
-                              .filter(header => !header.hide)
-                              .map((header) =>
+                            {PRODUCT_COLUMNS
+                              .map((column) =>
                                 <Controller
-                                  key={header.id}
-                                  name={`newProducts[${index}].${header.value}`}
+                                  key={column.id}
+                                  name={`newProducts[${index}].${column.path}`}
                                   control={control}
-                                  defaultValue={newProduct[header.value]}
-                                  rules={validationRules[header.value]}
-                                  render={({ field, fieldState }) => (
-                                    <ModTableCell key={header.id} >
-                                      {header.value === "price" ? <CurrencyInput
-                                        value={Number(newProduct[header.value])}
+                                  render={({ field }) => (
+                                    <ModTableCell key={column.id} >
+                                      <CurrencyInput
+                                        value={column.value(newProduct)}
                                         locale={locale}
                                         currency={currency}
                                         onChangeValue={(_, value) => {
                                           field.onChange(value);
                                         }}
                                         InputElement={<ModInput />}
-                                      /> : <ModInput {...field} />}
-                                      {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
+                                      />
                                     </ModTableCell>
                                   )}
                                 />
@@ -187,11 +184,10 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                     <ModTable celled compact>
                       <Table.Header fullWidth>
                         <ModTableRow>
-                          <ModTableHeaderCell ></ModTableHeaderCell>
-                          {HEADERS
-                            .filter(header => !header.hide)
-                            .map((header) => (
-                              <ModTableHeaderCell key={header.id}>{header.name}</ModTableHeaderCell>
+                          <ModTableHeaderCell />
+                          {PRODUCT_COLUMNS
+                            .map((column) => (
+                              <ModTableHeaderCell key={column.id}>{column.title}</ModTableHeaderCell>
                             ))}
                         </ModTableRow>
                       </Table.Header>
@@ -199,27 +195,23 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                         <Table.Body key={`${editProduct.code}-${index}`}>
                           <ModTableRow >
                             <ModTableCell>{index + 1}</ModTableCell>
-                            {HEADERS
-                              .filter(header => !header.hide)
-                              .map((header) =>
+                            {PRODUCT_COLUMNS
+                              .map((column) =>
                                 <Controller
-                                  key={header.id}
-                                  name={`editProducts[${index}].${header.value}`}
+                                  key={column.id}
+                                  name={`editProducts[${index}].${column.path}`}
                                   control={control}
-                                  defaultValue={header.value === "code" ? (editProduct[header.value]).toUpperCase() : editProduct[header.value]}
-                                  rules={validationRules[header.value]}
-                                  render={({ field, fieldState }) => (
-                                    <ModTableCell key={header.id} >
-                                      {header.value === "price" ? <CurrencyInput
-                                        value={Number(editProduct[header.value])}
+                                  render={({ field }) => (
+                                    <ModTableCell key={column.id} >
+                                      <CurrencyInput
+                                        value={column.value(product)}
                                         locale={locale}
                                         currency={currency}
                                         onChangeValue={(_, value) => {
                                           field.onChange(value);
                                         }}
                                         InputElement={<ModInput />}
-                                      /> : <ModInput {...field} />}
-                                      {fieldState?.invalid && <WarningMessage >{validationRules[header.value].message}</WarningMessage>}
+                                      />
                                     </ModTableCell>
                                   )}
                                 />
