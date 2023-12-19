@@ -14,7 +14,7 @@ const PRODUCT_COLUMNS = [
   {
     title: "Precio",
     id: 3,
-    value: (product) => formatedPrice(product.code)
+    value: (product) => formatedPrice(product.price)
   }
 ];
 
