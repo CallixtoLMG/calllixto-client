@@ -67,7 +67,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
         existingCodes[product.code.toUpperCase()] = true;
       });
       parsedData.forEach((product) => {
-        const code = typeof product.code === 'number' ? String(product.code).toUpperCase() : product.code;
+        const code = String(product.code).toUpperCase();
         const price = typeof product.price === 'string'
           ? parseFloat(product.price.replace(/[^\d,]/g, '').replace(',', '.'))
           : product.price;

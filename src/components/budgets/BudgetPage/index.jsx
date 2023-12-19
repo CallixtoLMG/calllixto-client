@@ -14,10 +14,10 @@ const BudgetsPage = ({ budgets, isLoading }) => {
   const router = useRouter();
   return (
     <>
+      <HeaderContainer>
+        <PageHeader title={"Presupuestos"} />
+      </HeaderContainer>
       <Loader active={isLoading}>
-        <HeaderContainer>
-          <PageHeader title={"Presupuestos"} />
-        </HeaderContainer>
         <ButtonContainer>
           <ButtonGoTo color="green" text="Crear presupuesto" iconName="add" goTo={PAGES.BUDGETS.CREATE} />
         </ButtonContainer>

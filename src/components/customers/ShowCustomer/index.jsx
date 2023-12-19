@@ -6,10 +6,10 @@ import { DataContainer, HeaderContainer, ModLabel, ModSegment, SubContainer } fr
 const ShowCustomer = ({ customer = {}, isLoading }) => {
   return (
     <>
+      <HeaderContainer>
+        <PageHeader title={"Detalle"} />
+      </HeaderContainer>
       <Loader active={isLoading}>
-        <HeaderContainer>
-          <PageHeader title={"Detalle"} />
-        </HeaderContainer>
         <SubContainer>
           <DataContainer>
             <ModLabel>Cliente</ModLabel>

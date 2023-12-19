@@ -17,10 +17,10 @@ const CustomersPage = ({ customers = [], isLoading, onDelete }) => {
 
   return (
     <>
+      <HeaderContainer>
+        <PageHeader title={"Clientes"} />
+      </HeaderContainer>
       <Loader active={isLoading}>
-        <HeaderContainer>
-          <PageHeader title={"Clientes"} />
-        </HeaderContainer>
         <ButtonContainer>
           <ButtonGoTo
             color="green"

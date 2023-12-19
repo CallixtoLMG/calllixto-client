@@ -67,10 +67,10 @@ const ShowBudget = ({ budget }) => {
 
   return (
     <>
+      <HeaderContainer>
+        <PageHeader title={"Detalles"} />
+      </HeaderContainer >
       <Loader active={isLoading} message="Generando PDF...">
-        <HeaderContainer>
-          <PageHeader title={"Detalle"} />
-        </HeaderContainer >
         <SubContainer>
           <DataContainer>
             <ModLabel>Cliente</ModLabel>

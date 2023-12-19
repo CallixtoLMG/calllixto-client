@@ -1,5 +1,6 @@
 "use client";
 import { budgetsList } from "@/api/budgets";
+import { getUserData } from "@/api/userData";
 import BudgetsPage from "@/components/budgets/BudgetPage";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -13,6 +14,16 @@ const Budgets = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       router.push(PAGES.LOGIN.BASE)
+    };
+    const validateToken = async () => {
+      try {
+        const userData = await getUserData();
+        if (!userData.isAuthorized) {
+          router.push(PAGES.LOGIN.BASE)
+        };
+      } catch (error) {
+        console.error('Error, ingreso no valido(token):', error);
+      };
     };
     const fetchData = async () => {
       try {
@@ -32,6 +43,7 @@ const Budgets = () => {
         console.error('Error al cargar presupuestos:', error);
       };
     };
+    validateToken();
     fetchData();
   }, [router]);
 

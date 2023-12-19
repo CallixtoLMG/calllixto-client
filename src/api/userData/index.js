@@ -1,6 +1,6 @@
 import { URL, VALIDATE } from "@/fetchUrls";
 
-export async function getUserRol() {
+export async function getUserData() {
   const response = await fetch(`${URL}${VALIDATE}`, {
     method: 'POST',
     headers: {
@@ -12,7 +12,6 @@ export async function getUserRol() {
   if (!response.ok) {
     throw new Error('No se pudo obtener la información del rol del usuario');
   };
-
   const data = await response.json();
-  return data.roles[0];
+  return data;
 };
