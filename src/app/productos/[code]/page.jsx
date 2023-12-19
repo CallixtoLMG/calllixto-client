@@ -1,6 +1,9 @@
 "use client"
 import { getProduct } from "@/api/products";
 import { getUserData } from "@/api/userData";
+import { HeaderContainer } from "@/components/customers/CustomersPage/styles";
+import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import ShowProduct from "@/components/products/ShowProduct";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -47,7 +50,14 @@ const Product = ({ params }) => {
   }, [params.code, router]);
 
   return (
-       <ShowProduct product={product} isLoading={isLoading}/>
+    <>
+      <HeaderContainer>
+        <PageHeader title="Producto" />
+      </HeaderContainer>
+      <Loader active={isLoading}>
+        <ShowProduct product={product} />
+      </Loader>
+    </>
   )
 };
 

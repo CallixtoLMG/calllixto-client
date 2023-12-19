@@ -43,7 +43,7 @@ const CreateProduct = () => {
   return (
     <>
       <HeaderContainer>
-        <PageHeader title="Crear producto" />
+        <PageHeader title="Crear Producto" />
       </HeaderContainer>
       <ProductForm onSubmit={create} />
     </>
