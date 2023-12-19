@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { GridColumn, Header, Image, Label, Segment, Table } from "semantic-ui-react";
+import { Header as SHeader, Image as SImage, Label as SLabel, Segment as SSegment, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const CustomerDataContainer = styled(Flex)`
@@ -28,11 +28,8 @@ const PayMethodContainer = styled(Flex)`
   align-items: center;
 `;
 
-const ModTitleHeader = styled(Header)`
-  display: flex!important;
-  margin: 0!important;
-  align-items: end!important;
-  font-size: 40px!important;
+const Title = styled(SHeader)`
+  margin: auto !important;
   color: rgba(235,124,21,255)!important;
 `;
 
@@ -53,18 +50,7 @@ const Sign = styled.div`
   margin-top: 70px;
 `;
 
-const ModTable = styled(Table)`
-`;
-
-const ModTableRow = styled(Table.Row)`
-  th:first-child { width: 50px!important; };
-`;
-
-const ModTableLabel = styled(Label)({
-  marginTop: "10px!important",
-});
-
-const ModLabel = styled(Label)`
+const Label = styled(SLabel)`
   margin: 0 !important;
   background-color: white !important;
   border: 0.5px solid grey !important;
@@ -73,18 +59,12 @@ const ModLabel = styled(Label)`
   margin-bottom: -1px !important;
 `;
 
-const ModPayMethodLabel = styled(Label)`
-  display: flex !important;
+const SubtleLabel = styled(SLabel)`
   background-color: white !important;
-  border-radius: 0 !important;
-  padding: 8px !important;
+  border: 0.5px solid grey !important;
 `;
 
-const ModGridColumn = styled(GridColumn)`
-  margin-top: 20px !important;
-`;
-
-const ModSegment = styled(Segment)`
+const Segment = styled(SSegment)`
   margin-top: 5px !important;
   height: 50px !important;
   box-shadow: 0 0 0 0 !important;
@@ -95,12 +75,7 @@ const ModSegment = styled(Segment)`
   padding: 8px !important;
 `;
 
-const ModTableHeaderCell = styled(Table.HeaderCell)`
-  background-color: rgb(255, 255, 255)!important;
-  text-align: ${({ align }) => align || "center"} !important;
-`;
-
-const ModTableFooterCell = styled(Table.HeaderCell)`
+const FooterCell = styled(Table.HeaderCell)`
   background-color: rgb(255, 255, 255)!important;
   text-align: ${({ align }) => align || "center"} !important;
   strong{
@@ -108,20 +83,27 @@ const ModTableFooterCell = styled(Table.HeaderCell)`
   };
 `;
 
-const ModTableCell = styled(Table.Cell)({
-  textAlign: 'center!important'
-});
+const Cell = styled(Table.Cell)`
+  text-align: center !important;
+`;
 
-const ModImage = styled(Image)`
+const Image = styled(SImage)`
   &&& {
     width: 250px!important;
     height: 100px!important;
   };
 `;
 
-const ModPayMethodHeader = styled(Header)`
-  margin: 20px 0 0 0!important;
+const Header = styled(SHeader)`
+  margin: 0 !important;
 `;
 
-export { ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, ModGridColumn, ModImage, ModLabel, ModPayMethodHeader, ModPayMethodLabel, ModSegment, ModTable, ModTableCell, ModTableFooterCell, ModTableHeaderCell, ModTableLabel, ModTableRow, ModTitleHeader, PayMethodContainer, Sign };
+const PayMethodsContainer = styled(Flex)`
+  flex-wrap: wrap;
+  row-gap: 5px;
+  column-gap: 5px;
+  margin-left: 15px !important;
+`;
+
+export { PayMethodsContainer, ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, Image, Label, SubtleLabel, Segment, Cell, FooterCell, Title, PayMethodContainer, Sign, Header };
 
