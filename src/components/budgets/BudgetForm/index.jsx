@@ -2,8 +2,7 @@ import { SHOWPRODUCTSHEADERS } from "@/components/budgets/budgets.common";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { CurrencyInput } from "react-currency-mask";
+import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Button, Dropdown, Form, Icon, Table } from "semantic-ui-react";
 import {
@@ -17,6 +16,7 @@ import {
   TotalText,
   WarningMessage
 } from "./styles";
+import { modPrice } from "@/utils";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
@@ -27,8 +27,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
           name: '',
           quantity: 1,
           discount: 0,
-          price: '0',
-          hasSelectedProduct: false,
+          price: 0,
         },
       ],
     },
@@ -36,19 +35,19 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
   const [triedToAddWithoutSelection, setTriedToAddWithoutSelection] = useState(false);
   const watchProducts = watch('products', [{
     name: '',
-    price: "0",
-    total: "0",
+    price: 0,
+    total: 0,
     quantity: 1,
     discount: 0,
-    hasSelectedProduct: false,
   }]);
+  const [total, setTotal] = useState(0);
 
   const addProduct = () => {
     const lastProduct = watchProducts[watchProducts.length - 1];
-    if (lastProduct.hasSelectedProduct) {
+    if (lastProduct?.code || !lastProduct) {
       setValue('products', [
         ...watchProducts,
-        { name: '', quantity: 1, discount: 0, hasSelectedProduct: false, price: "0" },
+        { name: '', quantity: 1, discount: 0, price: 0 },
       ]);
       setTriedToAddWithoutSelection(false);
     } else {
@@ -62,15 +61,6 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
     setValue("products", newProducts);
   };
 
-  const calculateTotal = () => {
-    let total = 0;
-    watchProducts.forEach((product, index) => {
-      const subtotal = watch(`products[${index}].total`) || 0;
-      total += parseFloat(subtotal);
-    });
-    return total.toFixed(2);
-  };
-
   const handleCreate = (data) => {
     onSubmit(data);
     setTimeout(() => {
@@ -78,8 +68,13 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
     }, 500);
   };
 
-  const locale = "es-AR"
-  const currency = "ARS"
+  const getTotal = useCallback((price, quantity, discount) => {
+    return price * quantity * (1 - (discount / 100));
+  }, []);
+
+  const calculateTotal = useCallback(() => {
+    return watchProducts.reduce((a, b) => a + getTotal(b.price, b.quantity, b.discount), 0) || 0;
+  }, [watchProducts, getTotal]);
 
   return (
     <>
@@ -95,8 +90,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
           minCharacters={2}
           noResultsMessage="No se ha encontrado cliente!"
           options={customers}
-          onChange={(e, { name, value }) => {
-            setValue(name, value);
+          onChange={(e, { value}) => {
             const customer = customers.find((opt) => opt.value === value);
             setValue(`customer.name`, customer.value);
             setValue(`customer.id`, customer.id);
@@ -138,52 +132,40 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                             const product = products.find((opt) => opt.value === value);
                             setValue(`products[${index}].price`, product.price);
                             setValue(`products[${index}].code`, product.code);
-                            setValue(`products[${index}].hasSelectedProduct`, true);
+                            setValue(`products[${index}].quantity`, 1);
+                            setTotal(calculateTotal());
                           }}
                         />
-                        {triedToAddWithoutSelection && !watchProducts[index].hasSelectedProduct && (
+                        {triedToAddWithoutSelection && !watchProducts[index].code && (
                           <WarningMessage> Debe seleccionar un producto </WarningMessage>
                         )}
                       </>
                     )}
                   />
                 </ModTableCell>
-                <ModTableCell $nonBorder>
-                  <CurrencyInput
-                    value={watch(`products[${index}].price`)}
-                    locale={locale}
-                    currency={currency}
-                    onChangeValue={(value) => {
-                      field.onChange(value);
-                    }}
-                    InputElement={<ModInput $nonBorder readOnly />}
-                  />
+                <ModTableCell>
+                  {modPrice(product.price)}
                 </ModTableCell>
                 <ModTableCell>
                   <Controller
                     name={`products[${index}].quantity`}
                     control={control}
-                    defaultValue={product.quantity || 1}
                     render={({ field }) => (
                       <ModInput
                         type="number"
-                        min="0"
-                        {...field}
+                        min={0}
+                        defaultValue={1}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value);
+                          setTotal(calculateTotal());
+                        }}
                       />
                     )}
                   />
                 </ModTableCell>
-                <ModTableCell $nonBorder>
-                  <CurrencyInput
-                    value={watch(`products[${index}].quantity`) *
-                      watch(`products[${index}].price`) || "0"}
-                    locale={locale}
-                    currency={currency}
-                    onChangeValue={(_, value) => {
-                      field.onChange(value);
-                    }}
-                    InputElement={<ModInput $nonBorder readOnly />}
-                  />
+                <ModTableCell>
+                  {modPrice(product.price * product.quantity)}
                 </ModTableCell>
                 <ModTableCell>
                   <Controller
@@ -194,36 +176,19 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                       <ModInput
                         fluid
                         type="number"
-                        min="0"
-                        max="100"
+                        min={0}
+                        max={100}
                         {...field}
                         onChange={(e) => {
                           field.onChange(e.target.value);
-                          const quantity =
-                            watch(`products[${index}].quantity`) || 0;
-                          const price = watch(`products[${index}].price`) || 0;
-                          const discount = parseFloat(e.target.value) || 0;
-                          const total = quantity * price * (1 - discount / 100);
-                          setValue(
-                            `products[${index}].total`,
-                            total.toFixed(2),
-                          );
+                          setTotal(calculateTotal());
                         }}
                       />
                     )}
                   />
                 </ModTableCell>
-                <ModTableCell $nonBorder>
-                  <CurrencyInput
-                    value={watch(`products[${index}].quantity`) *
-                      watch(`products[${index}].price`) * (1 - (watch(`products[${index}].discount`) || 0) / 100) || "0"}
-                    locale={locale}
-                    currency={currency}
-                    onChangeValue={(_, value) => {
-                      field.onChange(value);
-                    }}
-                    InputElement={<ModInput $nonBorder readOnly />}
-                  />
+                <ModTableCell>
+                  {modPrice(getTotal(product.price, product.quantity, product.discount) || 0)}
                 </ModTableCell>
                 <ModTableCell >
                   <Button
@@ -242,18 +207,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                 <TotalText>Total</TotalText>
               </ModTableHeaderCell>
               <ModTableHeaderCell $nonBorder>
-                <CurrencyInput
-                  value={watchProducts.reduce((acc, product) => {
-                    const total = parseFloat(product.total) || 0;
-                    return acc + total;
-                  }, 0).toFixed(2)}
-                  locale={locale}
-                  currency={currency}
-                  onChangeValue={(_, value) => {
-                    field.onChange(value);
-                  }}
-                  InputElement={<ModInput $greyBack $nonBorder readOnly />}
-                />
+                <TotalText>{modPrice(total)}</TotalText>
               </ModTableHeaderCell>
               <ModTableHeaderCell >
               </ModTableHeaderCell>
