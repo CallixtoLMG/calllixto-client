@@ -1,4 +1,4 @@
-import { SHOWPRODUCTSHEADERS } from "@/components/budgets/budgets.common";
+import { SHOW_PRODUCTS_HEADERS } from "@/components/budgets/budgets.common";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,7 @@ import {
   TotalText,
   WarningMessage
 } from "./styles";
-import { modPrice } from "@/utils";
+import { formatedPrice, getTotal, getTotalSum } from "@/utils";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
   const router = useRouter();
@@ -68,13 +68,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
     }, 500);
   };
 
-  const getTotal = useCallback((price, quantity, discount) => {
-    return price * quantity * (1 - (discount / 100));
-  }, []);
-
-  const calculateTotal = useCallback(() => {
-    return watchProducts.reduce((a, b) => a + getTotal(b.price, b.quantity, b.discount), 0) || 0;
-  }, [watchProducts, getTotal]);
+  const calculateTotal = useCallback(() => getTotalSum(watchProducts), [watchProducts]);
 
   return (
     <>
@@ -106,7 +100,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
         <Table celled>
           <Table.Header>
             <ModTableRow>
-              {SHOWPRODUCTSHEADERS.map((header) => {
+              {SHOW_PRODUCTS_HEADERS.map((header) => {
                 return (<ModTableHeaderCell $header key={header.id} >{header.name}</ModTableHeaderCell>)
               })}
             </ModTableRow>
@@ -144,7 +138,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                   />
                 </ModTableCell>
                 <ModTableCell>
-                  {modPrice(product.price)}
+                  {formatedPrice(product.price)}
                 </ModTableCell>
                 <ModTableCell>
                   <Controller
@@ -165,7 +159,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                   />
                 </ModTableCell>
                 <ModTableCell>
-                  {modPrice(product.price * product.quantity)}
+                  {formatedPrice(product.price * product.quantity)}
                 </ModTableCell>
                 <ModTableCell>
                   <Controller
@@ -188,7 +182,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                   />
                 </ModTableCell>
                 <ModTableCell>
-                  {modPrice(getTotal(product.price, product.quantity, product.discount) || 0)}
+                  {formatedPrice(getTotal(product))}
                 </ModTableCell>
                 <ModTableCell >
                   <Button
@@ -207,7 +201,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                 <TotalText>Total</TotalText>
               </ModTableHeaderCell>
               <ModTableHeaderCell $nonBorder>
-                <TotalText>{modPrice(total)}</TotalText>
+                <TotalText>{formatedPrice(total)}</TotalText>
               </ModTableHeaderCell>
               <ModTableHeaderCell >
               </ModTableHeaderCell>

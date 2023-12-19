@@ -1,6 +1,7 @@
+import { formatedPrice, getTotal } from "@/utils";
+
 const HEADERS = [
   {
-    name: "",
     value: "id",
   },
   {
@@ -15,65 +16,41 @@ const HEADERS = [
   },
 ];
 
-const TOTALS = [
+const PRODUCTS_COLUMNS = [
   {
-    name: "Desc. $",
-    value: "discountTotal",
-    modPrice: true,
-  },
-  {
-    name: "Importe",
-    value: "total",
-    modPrice: true,
-  },
-];
-
-const PRODUCTSHEADERS = [
-  {
-    name: "Descripción",
-    value: "name",
+    title: "Descripción",
+    value: (product) => product.name,
     id: 1
   },
   {
-    name: "Cantidad",
-    value: "quantity",
+    title: "Cantidad",
+    value: (product) => product.quantity || 0,
     id: 2
   },
   {
-    name: "Precio Unitario",
-    value: "price",
-    modPrice: true,
+    title: "Precio Unitario",
+    value: (product) => formatedPrice(product.price || 0),
     id: 3
   },
   {
-    name: "Subtotal",
-    value: "subtotal",
-    modPrice: true,
+    title: "Subtotal",
+    value: (product) => formatedPrice(product.price * product.quantity || 0),
     id: 4
   },
   {
-    name: "Desc. %",
-    value: "discount",
+    title: "Desc. %",
+    value: (product) => product.discount || 0,
     id: 5
   },
   {
-    name: "Desc. $",
-    value: "discountTotal",
-    modPrice: true,
-    hide: true,
+    title: "Importe",
+    value: (product) => formatedPrice(getTotal(product)),
     id: 6
-  },
-  {
-    name: "Importe",
-    value: "total",
-    modPrice: true,
-    hide: true,
-    id: 7
   },
 
 ];
 
-const SHOWPRODUCTSHEADERS = [
+const SHOW_PRODUCTS_HEADERS = [
   { name: "Nombre", value: "name", id: 1 },
   { name: "Precio", value: "price", id: 2 },
   { name: "Cantidad", value: "quantity", id: 3 },
@@ -84,6 +61,6 @@ const SHOWPRODUCTSHEADERS = [
 ];
 
 export {
-  HEADERS, PRODUCTSHEADERS, SHOWPRODUCTSHEADERS
+  HEADERS, PRODUCTS_COLUMNS, SHOW_PRODUCTS_HEADERS
 };
 

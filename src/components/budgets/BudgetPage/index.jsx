@@ -5,7 +5,7 @@ import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { Button, Popup, Table } from "semantic-ui-react";
-import { modDate, modPrice, totalSum } from "../../../utils";
+import { modDate, formatedPrice, totalSum } from "../../../utils";
 import { HEADERS } from "../budgets.common";
 import { ButtonContainer, HeaderContainer, ModIcon, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
 
@@ -43,7 +43,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                       {header.date ? modDate(budget[header.value]) : budget[header.object] ? budget[header.object][header.value] : budget[header.value]}
                     </ModTableCell>)
                 }
-                <ModTableCell onClick={() => { router.push(PAGES.BUDGETS.SHOW(budget.id)) }}>{modPrice(totalSum(budget.products))}</ModTableCell>
+                <ModTableCell onClick={() => { router.push(PAGES.BUDGETS.SHOW(budget.id)) }}>{formatedPrice(totalSum(budget.products))}</ModTableCell>
                 {showActions && <ModTableCell>
                   <Popup
                     content="Copiar"

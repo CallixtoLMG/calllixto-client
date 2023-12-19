@@ -1,8 +1,10 @@
 "use client"
 import { getBudget } from "@/api/budgets";
 import { getUserData } from "@/api/userData";
+import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
 import ShowBudget from "@/components/budgets/ShowBudget";
 import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -48,9 +50,15 @@ const Budget = ({ params }) => {
   }, [params.id, router])
 
   return (
-    <Loader active={isLoading}>
-      <ShowBudget budget={budget} />
-    </Loader>
+    <>
+      <HeaderContainer>
+        <PageHeader title="Presupuesto" />
+      </HeaderContainer >
+      <Loader active={isLoading}>
+        <ShowBudget budget={budget} />
+      </Loader>
+    </>
+
   )
 };
 
