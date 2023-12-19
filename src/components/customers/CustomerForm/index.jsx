@@ -47,7 +47,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
         <FormContainer>
           <FieldsContainer>
             <FormField>
-              <Label >Nombre</Label>
+              <Label>Nombre</Label>
               <Controller
                 name="name"
                 control={control}

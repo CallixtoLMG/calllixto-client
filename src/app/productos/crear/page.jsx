@@ -1,6 +1,8 @@
 "use client"
 import { create } from "@/api/products";
 import { getUserData } from "@/api/userData";
+import { HeaderContainer } from "@/components/customers/CustomersPage/styles";
+import PageHeader from "@/components/layout/PageHeader";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -39,7 +41,12 @@ const CreateProduct = () => {
     router.push(PAGES.NOTFOUND.BASE)
   };
   return (
-    <ProductForm onSubmit={create} />
+    <>
+      <HeaderContainer>
+        <PageHeader title="Crear producto" />
+      </HeaderContainer>
+      <ProductForm onSubmit={create} />
+    </>
   )
 };
 

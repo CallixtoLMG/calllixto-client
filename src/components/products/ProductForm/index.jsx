@@ -1,5 +1,4 @@
 "use client";
-import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { get } from "lodash";
 import { useRouter } from "next/navigation";
@@ -9,18 +8,16 @@ import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
 import {
   FormContainer,
-  HeaderContainer,
-  ModButton,
-  ModFormField,
-  ModInput,
-  ModLabel,
+  Button,
+  Input,
+  Label,
   WarningMessage,
 } from "./styles";
 import { createDate } from "@/utils";
 
 const ProductForm = ({ product, onSubmit }) => {
   const router = useRouter();
-  const { handleSubmit, control, reset } = useForm();
+  const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: product });
   const validateCode = (value) => {
     return /^[A-Z0-9]{4}$/.test(value);
   };
@@ -33,8 +30,8 @@ const ProductForm = ({ product, onSubmit }) => {
     }
   }, [isUpdating]);
 
-  const handleReset = () => {
-    reset();
+  const handleReset = (product) => {
+    reset(product || { name: '', price: 0, code: '' });
   };
 
   const handleForm = (data) => {
@@ -56,68 +53,69 @@ const ProductForm = ({ product, onSubmit }) => {
   const currency = "ARS";
 
   return (
-    <>
-      <HeaderContainer>
-        <PageHeader title={!product?.code ? "Crear producto" : "Actualizar producto"} />
-      </HeaderContainer>
-      <FormContainer>
-        <Form onSubmit={handleSubmit(handleForm)}>
-          {!product?.code &&
-            (
-              <ModFormField>
-                <ModLabel>Código</ModLabel>
-                <Controller
-                  name="code"
-                  control={control}
-                  defaultValue={get(product, "code", "")}
-                  rules={{ validate: validateCode }}
-                  render={({ field, fieldState }) => (
-                    <>
-                      <ModInput required {...field} />
-                      {fieldState?.invalid && (
-                        <WarningMessage >Código: 4 caracteres alfanuméricos y en mayúscula.</WarningMessage>
-                      )}
-                    </>
-                  )}
-                />
-              </ModFormField>
+    <FormContainer>
+      <Form onSubmit={handleSubmit(handleForm)}>
+        {!isUpdating &&
+          (
+            <Form.Field>
+              <Label>Código</Label>
+              <Controller
+                name="code"
+                control={control}
+                rules={{ validate: validateCode }}
+                render={({ field }) => (
+                  <Input required {...field} placeholder="Código (A123)" />
+                )}
+              />
+            </Form.Field>
+          )}
+        <Form.Field>
+          <Label>Nombre</Label>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => <Input required {...field} placeholder="Nombre" />}
+          />
+        </Form.Field>
+        <Form.Field>
+          <Label>Precio</Label>
+          <Controller
+            name="price"
+            control={control}
+            rules={{ required: true, min: 0.01 }}
+            render={({ field }) => (
+              <CurrencyInput
+                value={field.value}
+                locale={locale}
+                currency={currency}
+                placeholder="Precio"
+                onChangeValue={(_, value) => {
+                  field.onChange(value);
+                }}
+                InputElement={<Input />}
+              />
             )}
-          <ModFormField>
-            <ModLabel>Nombre</ModLabel>
-            <Controller
-              name="name"
-              control={control}
-              defaultValue={get(product, "name", "")}
-              render={({ field }) => <ModInput required {...field} />}
-            />
-          </ModFormField>
-          <ModFormField>
-            <ModLabel>Precio</ModLabel>
-            <Controller
-              name="price"
-              control={control}
-              defaultValue={get(product, "price", "")}
-              render={({ field, fieldState }) => (
-                <CurrencyInput
-                  value={field.value}
-                  locale={locale}
-                  currency={currency}
-                  onChangeValue={(_, value) => {
-                    field.onChange(value);
-                  }}
-                  InputElement={<ModInput />}
-                />
-              )}
-            />
-          </ModFormField>
-          <ModFormField>
-          </ModFormField>
-          <ModButton disabled={isLoading} loading={isLoading} type="submit" color="green" ><Icon name={buttonConfig.icon} />{buttonConfig.title}</ModButton>
-          <ModButton type="button" onClick={handleReset} color="brown" $marginLeft><Icon name="erase" />Limpiar cambios</ModButton>
-        </Form>
-      </FormContainer>
-
-    </>
+          />
+        </Form.Field>
+        <Form.Field>
+        </Form.Field>
+        <Button
+          disabled={isLoading || !isDirty || !isValid}
+          loading={isLoading}
+          type="submit"
+          color="green">
+          <Icon name={buttonConfig.icon} />{buttonConfig.title}</Button>
+        {isUpdating ? (
+          <Button type="button" onClick={() => handleReset(product)} color="brown" $marginLeft disabled={!isDirty}>
+            <Icon name="undo" />Restaurar
+          </Button>
+        ) : (
+          <Button type="button" onClick={() => handleReset()} color="brown" $marginLeft disabled={!isDirty}>
+            <Icon name="erase" />Limpiar
+          </Button>
+        )}
+      </Form>
+    </FormContainer>
   )
 };
 
