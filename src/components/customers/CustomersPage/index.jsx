@@ -7,9 +7,9 @@ import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { Table } from "semantic-ui-react";
+import { Table as STable } from "semantic-ui-react";
 import { HEADERS } from "../clients.common";
-import { ButtonContainer, HeaderContainer, ModTable, ModTableCell, ModTableHeaderCell, ModTableRow } from "./styles";
+import { ButtonContainer, HeaderContainer, Table, Cell, TableHeader, Row } from "./styles";
 
 const CustomersPage = ({ customers = [], isLoading, onDelete }) => {
   const router = useRouter();
@@ -28,40 +28,40 @@ const CustomersPage = ({ customers = [], isLoading, onDelete }) => {
             iconName="add"
             goTo={PAGES.CUSTOMERS.CREATE} />
         </ButtonContainer>
-        {!!customers.length &&
-          <ModTable celled compact>
-            <Table.Header fullWidth>
-              <ModTableRow>
-                <ModTableHeaderCell ></ModTableHeaderCell>
-                {HEADERS.map((header) => (
-                  <ModTableHeaderCell key={header.id} >{header.name}</ModTableHeaderCell>
-                ))}
-              </ModTableRow>
-            </Table.Header>
+        {customers.length &&
+          <Table celled compact>
+            <STable.Header fullWidth>
+              <TableHeader />
+              {HEADERS.map((header) => (
+                <TableHeader key={header.id} >{header.name}</TableHeader>
+              ))}
+            </STable.Header>
             {customers.map((customer, index) => (
-              <Table.Body key={customer.name}>
-                <ModTableRow >
-                  <ModTableCell >{index + 1}</ModTableCell>
+              <STable.Body key={customer.name}>
+                <Row >
+                  <Cell>{index + 1}</Cell>
                   {HEADERS
                     .filter(header => !header.hide)
-                    .map((header) => <ModTableCell
-                      onClick={() => { router.push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
-                      key={header.id}
-                    >
-                      {customer[header.value]}
-                    </ModTableCell>)
+                    .map((header) => (
+                      <Cell
+                        onClick={() => { router.push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
+                        key={header.id}
+                      >
+                        {customer[header.value]}
+                      </Cell>
+                    ))
                   }
-                  <ModTableCell >
+                  <Cell>
                     <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
                     <ButtonDelete
                       onDelete={onDelete}
                       params={customer.id}
                       deleteQuestion={deleteQuestion(customer.name)} />
-                  </ModTableCell>
-                </ModTableRow>
-              </Table.Body>
+                  </Cell>
+                </Row>
+              </STable.Body>
             ))}
-          </ModTable>
+          </Table>
         }
       </Loader>
     </>

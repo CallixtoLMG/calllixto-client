@@ -7,7 +7,7 @@ const ShowCustomer = ({ customer = {}, isLoading }) => {
   return (
     <>
       <HeaderContainer>
-        <PageHeader title={"Detalle"} />
+        <PageHeader title="Cliente" />
       </HeaderContainer>
       <Loader active={isLoading}>
         <SubContainer>

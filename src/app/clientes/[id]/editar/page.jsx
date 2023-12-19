@@ -44,13 +44,9 @@ const EditCustomer = ({ params }) => {
   }, [params.id, router]);
 
   return (
-    <>
-      {customer && 
-        <Loader active={isLoading}>  
-          <CustomerForm customer={customer} onSubmit={edit} />
-        </Loader>
-      }
-    </>
+    <Loader active={isLoading}>
+      <CustomerForm customer={customer} onSubmit={edit} />
+    </Loader>
   )
 };
 

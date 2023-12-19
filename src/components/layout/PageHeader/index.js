@@ -1,8 +1,8 @@
-import { ModTitleLabel, TitleContainer } from "./styles";
+import { Title, TitleContainer } from "./styles";
 
 const PageHeader = ({title}) => (
   <TitleContainer>
-    <ModTitleLabel>{title}</ModTitleLabel>
+    <Title>{title}</Title>
   </TitleContainer>
 )
 
