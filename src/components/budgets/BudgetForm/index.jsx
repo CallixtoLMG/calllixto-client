@@ -76,20 +76,28 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
 
   return (
     <Form onSubmit={handleSubmit(handleCreate)}>
-      <Dropdown
-        name={`customer`}
-        placeholder='Clientes...'
-        search
-        selection
-        minCharacters={2}
-        noResultsMessage="No se ha encontrado cliente!"
-        options={customers}
-        onChange={(e, { value }) => {
-          const customer = customers.find((opt) => opt.value === value);
-          setValue(`customer.name`, customer.value);
-          setValue(`customer.id`, customer.id);
-        }}
+      <Controller
+        name={`customer.name`}
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <Dropdown
+            name={`customer`}
+            placeholder='Clientes...'
+            search
+            selection
+            minCharacters={2}
+            noResultsMessage="No se ha encontrado cliente!"
+            options={customers}
+            onChange={(e, { value }) => {
+              field.onChange(value);
+              const customer = customers.find((opt) => opt.value === value);
+              setValue(`customer.id`, customer.id);
+            }}
+          />
+        )}
       />
+
       <Button
         color="green"
         type="button"
@@ -110,6 +118,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                 <Controller
                   name={`products[${index}].name`}
                   control={control}
+                  rules={{ required: true }}
                   render={({ field }) => (
                     <>
                       <SDropdown
@@ -186,8 +195,9 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
                 <SButton
                   icon="trash"
                   color="red"
-                  onClick={() => { deleteProduct(index) }}
+                  onClick={() => { watchProducts.length > 1 && deleteProduct(index) }}
                   type="button"
+                  disabled={watchProducts.length <= 1}
                 />
               </Cell>
             </Table.Row>
