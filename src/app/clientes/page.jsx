@@ -5,6 +5,9 @@ import CustomersPage from "@/components/customers/CustomersPage";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { HeaderContainer } from "../../components/customers/CustomersPage/styles";
+import Loader from "@/components/layout/Loader";
+import PageHeader from "@/components/layout/PageHeader";
 
 const Customers = () => {
   const router = useRouter();
@@ -58,7 +61,14 @@ const Customers = () => {
   };
 
   return (
-    <CustomersPage customers={customers} isLoading={isLoading} onDelete={handleDeleteCustomer} />
+    <>
+      <HeaderContainer>
+        <PageHeader title="Clientes" />
+      </HeaderContainer>
+      <Loader active={isLoading}>
+        <CustomersPage customers={customers} onDelete={handleDeleteCustomer} />
+      </Loader>
+    </>
   );
 };
 

@@ -38,9 +38,8 @@ const Budgets = () => {
           },
           cache: "no-store",
         };
-        const fetchBudgets = await budgetsList(requestOptions);
-        const sortedBudgets = fetchBudgets?.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-        setBudgets(sortedBudgets);
+        const budgets = await budgetsList(requestOptions);
+        setBudgets(budgets);
         setIsLoading(false);
       } catch (error) {
         console.error('Error al cargar presupuestos:', error);
