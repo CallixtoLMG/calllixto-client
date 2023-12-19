@@ -50,7 +50,7 @@ const ModTableFooterCell = styled(Table.HeaderCell)`
   background-color: rgb(255, 255, 255)!important;
   text-align: ${({ align }) => align || "center"} !important;
   strong{
-    margin-right: 3.3rem!important;
+    margin-right: 1rem!important;
   };
 `;
 

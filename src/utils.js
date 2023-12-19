@@ -1,7 +1,7 @@
-export const totalSum = (value) => {
+export const totalSum = (value, propName) => {
   return (
     value?.reduce((accumulator, product) => {
-      return accumulator + Number(product.total || 0);
+      return accumulator + Number(product[propName] || 0);
     }, 0).toFixed(2)
   );
 };

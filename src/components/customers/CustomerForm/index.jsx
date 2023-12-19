@@ -1,12 +1,11 @@
 "use client"
-import PageHeader from "@/components/layout/PageHeader";
 import { PAGES, REGEX } from "@/constants";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Form, Icon } from 'semantic-ui-react';
-import { FormContainer, HeaderContainer, Button, FieldsContainer, Input, Label, FormField, ButtonsContainer, PhoneContainer } from "./styles";
 import { Box } from "rebass";
+import { Form, Icon } from 'semantic-ui-react';
+import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, PhoneContainer } from "./styles";
 
 const CustomerForm = ({ customer, onSubmit }) => {
   const { push } = useRouter();
@@ -54,7 +53,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
                 name="email"
                 control={control}
                 rules={{ required: true, pattern: REGEX.EMAIL }}
-                render={({ field }) => <Input required {...field} />}
+                render={({ field }) => <Input required {...field} placeholder="Email"/>}
               />
             </FormField>
             <FormField width="300px">

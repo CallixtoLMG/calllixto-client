@@ -5,7 +5,7 @@ import styled from 'styled-components';
 const ModInput = styled(Input)`
   input {
     border: ${(props) => props.$nonBorder && "none!important"};
-    background: ${(props)=> props.$greyBack && "#f9fafb!important"};
+    background: ${(props) => props.$greyBack && "#f9fafb!important"};
     text-align: center!important;
     padding:7px!important;
   };
@@ -17,7 +17,7 @@ const ModButton = styled(Button)({
 });
 
 const TotalText = styled.h3`
-  margin-left: 2rem;
+  margin-left: 0.7rem;
 `;
 
 const ModDropdown = styled(Dropdown)({

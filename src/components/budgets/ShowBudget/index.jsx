@@ -22,6 +22,15 @@ import {
 } from "./styles";
 
 const ShowBudget = ({ budget }) => {
+
+  budget.products.forEach(product => {
+    const total = (product.price * Number(product.quantity)) * (1 - (Number(product.discount) / 100));
+    const subtotal = product.price * Number(product.quantity);
+    const discountTotal = (product.price * Number(product.quantity)) - total;
+    product.total = total;
+    product.subtotal = subtotal;
+    product.discountTotal = discountTotal;
+  });
   const [isLoading, setIsLoading] = useState(false);
   function downloadPdf(data, filename) {
     const byteCharacters = atob(data);
@@ -100,27 +109,26 @@ const ShowBudget = ({ budget }) => {
                   <Table.Body key={product.code}>
                     <ModTableRow>
                       <ModTableCell>{index + 1}</ModTableCell>
-                      {PRODUCTSHEADERS
-                        .filter((header) =>
-                          !header.hide
-                        )
-                        .map((header) => (
-                          <ModTableCell key={header.id}>
-                            {header.modPrice
-                              ? modPrice(get(product, header.value, ""))
-                              : get(product, header.value, "")}
-                          </ModTableCell>
-                        ))}
+                      {PRODUCTSHEADERS.map((header) => (
+                        <ModTableCell key={header.id}>
+                          {header.modPrice
+                            ? modPrice(get(product, header.value, ""))
+                            : get(product, header.value, "")}
+                        </ModTableCell>
+                      ))}
                     </ModTableRow>
                   </Table.Body>
                 ))}
                 <Table.Footer celled fullWidth>
                   <Table.Row>
-                    <ModTableFooterCell align="right" colSpan="5">
+                    <ModTableFooterCell align="right" colSpan="6">
                       <strong>TOTAL</strong>
                     </ModTableFooterCell>
                     <ModTableHeaderCell colSpan="1">
-                      <strong>{modPrice(totalSum(budget?.products))}</strong>
+                      <strong>{modPrice(totalSum(budget.products, "discountTotal"))}</strong>
+                    </ModTableHeaderCell>
+                    <ModTableHeaderCell colSpan="1">
+                      <strong>{modPrice(totalSum(budget.products, "total"))}</strong>
                     </ModTableHeaderCell>
                   </Table.Row>
                 </Table.Footer>

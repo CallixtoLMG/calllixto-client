@@ -7,8 +7,8 @@ const ModButton = styled(Button)`
   left: 25px!important;
   padding: 10px 15px!important;
   display: inline-block!important;
+  z-index: 2!important;
 `;
-
 
 export { ModButton };
 

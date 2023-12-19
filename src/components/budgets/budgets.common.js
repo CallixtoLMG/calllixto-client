@@ -15,6 +15,19 @@ const HEADERS = [
   },
 ];
 
+const TOTALS = [
+  {
+    name: "Desc. $",
+    value: "discountTotal",
+    modPrice: true,
+  },
+  {
+    name: "Importe",
+    value: "total",
+    modPrice: true,
+  },
+];
+
 const PRODUCTSHEADERS = [
   {
     name: "Descripción",
@@ -33,16 +46,31 @@ const PRODUCTSHEADERS = [
     id: 3
   },
   {
-    name: "Descuento",
-    value: "discount",
+    name: "Subtotal",
+    value: "subtotal",
+    modPrice: true,
     id: 4
+  },
+  {
+    name: "Desc. %",
+    value: "discount",
+    id: 5
+  },
+  {
+    name: "Desc. $",
+    value: "discountTotal",
+    modPrice: true,
+    hide: true,
+    id: 6
   },
   {
     name: "Importe",
     value: "total",
     modPrice: true,
-    id: 5
-  }
+    hide: true,
+    id: 7
+  },
+
 ];
 
 const SHOWPRODUCTSHEADERS = [
