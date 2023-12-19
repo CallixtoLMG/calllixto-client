@@ -15,11 +15,15 @@ const ModInput = styled(Input)`
   
   > input  {
     padding: 1em 1em!important;
-  }
+  };
 `;
 
 const HeaderContainer = styled(Flex)`
   margin-bottom: 20px!important;
+`;
+
+const FormContainer = styled(Flex)`
+  justify-content: center;
 `;
 
 const ModFormField = styled(Form.Field)({
@@ -30,8 +34,8 @@ const ModFormField = styled(Form.Field)({
 const ModButton = styled(Button)`
   width: 170px!important;
   padding: 10px 0!important;
-  margin-left: ${(props => props.$marginLeft && "10px!important")};
+  margin: ${(props => props.$marginLeft ? "0 0 0 10px!important" : "0!important")};
 `;
 
-export { HeaderContainer, ModButton, ModFormField, ModInput, ModLabel };
+export { FormContainer, HeaderContainer, ModButton, ModFormField, ModInput, ModLabel };
 

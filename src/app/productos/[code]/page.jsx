@@ -1,5 +1,6 @@
 "use client"
 import { getProduct } from "@/api/products";
+import { getUserData } from "@/api/userData";
 import ShowProduct from "@/components/products/ShowProduct";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -14,6 +15,16 @@ const Product = ({ params }) => {
     if (!token) {
       router.push(PAGES.LOGIN.BASE)
     };
+    const validateToken = async () => {
+      try {
+        const userData = await getUserData();
+        if (!userData.isAuthorized) {
+          router.push(PAGES.LOGIN.BASE)
+        };
+      } catch (error) {
+        console.error('Error, ingreso no valido(token):', error);
+      };
+    };
     const fetchData = async () => {
       try {
         const requestOptions = {
@@ -26,12 +37,12 @@ const Product = ({ params }) => {
         };
         const fetchProduct = await getProduct(params.code, requestOptions);
         setProduct(fetchProduct);
-        setIsLoading(false)
-        
+        setIsLoading(false);
       } catch (error) {
         console.error('Error al cargar productos:', error);
       };
     };
+    validateToken()
     fetchData();
   }, [params.code, router]);
 

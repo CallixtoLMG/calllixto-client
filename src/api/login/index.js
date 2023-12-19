@@ -1,5 +1,4 @@
 import { PATHS, URL } from "@/fetchUrls";
-import { toast } from "react-hot-toast";
 
 const loginRequestOptions = {
   method: 'POST',
@@ -14,12 +13,10 @@ export async function login(data) {
   });
   const res = await response.json();
   if (res.$metadata?.httpStatusCode) {
-    toast.success("Ingreso exitoso");
     const accessToken = res.AuthenticationResult.AccessToken;
     localStorage.setItem("token", accessToken);
     return true;
   } else {
-    toast.error(res.message);
     return false;
   };
 };

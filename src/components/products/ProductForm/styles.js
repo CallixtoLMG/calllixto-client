@@ -5,7 +5,11 @@ import styled from "styled-components";
 const ModButton = styled(Button)`
   width: 170px!important;
   padding: 10px 0!important;
-  margin-left: ${(props => props.$marginLeft && "10px!important")};
+  margin: ${(props => props.$marginLeft ? "0 0 0 10px!important" : "0!important")};
+`;
+
+const FormContainer = styled(Flex)`
+  justify-content: center;
 `;
 
 const ModLabel = styled(Label)({
@@ -36,9 +40,8 @@ const ModFormField = styled(Form.Field)({
 const WarningMessage = styled.p`
   position: relative;
   color: red!important;
-  left: 1rem!important;
   bottom: 0.5rem!important; 
 `;
 
-export { HeaderContainer, ModButton, ModFormField, ModInput, ModLabel, WarningMessage };
+export { FormContainer, HeaderContainer, ModButton, ModFormField, ModInput, ModLabel, WarningMessage };
 

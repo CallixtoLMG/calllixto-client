@@ -16,7 +16,7 @@ const PAGES = {
     BASE: "/login"
   },
   NOTFOUND: {
-    BASE: "/paginaNoEncontrada"
+    BASE: "/ups"
   },
   CUSTOMERS: {
     BASE: "/clientes",

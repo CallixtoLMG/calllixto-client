@@ -1,5 +1,6 @@
 "use client";
 import { customersList, deleteCustomer } from "@/api/customers";
+import { getUserData } from "@/api/userData";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -13,6 +14,16 @@ const Customers = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       router.push(PAGES.LOGIN.BASE)
+    };
+    const validateToken = async () => {
+      try {
+        const userData = await getUserData();
+        if (!userData.isAuthorized) {
+          router.push(PAGES.LOGIN.BASE)
+        };
+      } catch (error) {
+        console.error('Error, ingreso no valido(token):', error);
+      };
     };
     const fetchData = async () => {
       try {
@@ -32,6 +43,7 @@ const Customers = () => {
         setIsLoading(false)
       };
     };
+    validateToken();
     fetchData();
   }, [router]);
 

@@ -20,10 +20,10 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, isLoading, 
   const visibilityRules = Rules(role)
   return (
     <>
+      <HeaderContainer>
+        <PageHeader title={"Productos"} />
+      </HeaderContainer>
       <Loader active={isLoading}>
-        <HeaderContainer>
-          <PageHeader title={"Productos"} />
-        </HeaderContainer>
         {visibilityRules.canSeeButtons &&
           <ButtonContainer>
             <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />

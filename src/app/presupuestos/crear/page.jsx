@@ -2,6 +2,7 @@
 import { create } from "@/api/budgets";
 import { customersList } from "@/api/customers";
 import { productsList } from "@/api/products";
+import { getUserData } from "@/api/userData";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import Loader from "@/components/layout/Loader";
 import { PAGES } from "@/constants";
@@ -25,6 +26,16 @@ const CreateBudget = () => {
         'Content-Type': 'application/json',
       },
       cache: "no-store",
+    };
+    const validateToken = async () => {
+      try {
+        const userData = await getUserData();
+        if (!userData.isAuthorized) {
+          router.push(PAGES.LOGIN.BASE)
+        };
+      } catch (error) {
+        console.error('Error, ingreso no valido(token):', error);
+      };
     };
     const fetchData = async () => {
       try {
@@ -56,6 +67,7 @@ const CreateBudget = () => {
         console.error('Error al crear clientes:', error);
       };
     };
+    validateToken();
     fetchData();
   }, [router]);
   return (
