@@ -4,6 +4,7 @@ import { getUserData } from "@/api/userData";
 import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
 import ShowBudget from "@/components/budgets/ShowBudget";
 import Loader from "@/components/layout/Loader";
+import NoPrint from "@/components/layout/NoPrint";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -51,9 +52,11 @@ const Budget = ({ params }) => {
 
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Presupuesto" />
-      </HeaderContainer >
+      <NoPrint>
+        <HeaderContainer>
+          <PageHeader title="Presupuesto" />
+        </HeaderContainer >
+      </NoPrint>
       <Loader active={isLoading}>
         <ShowBudget budget={budget} />
       </Loader>

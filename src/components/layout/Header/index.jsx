@@ -4,6 +4,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import { Menu } from 'semantic-ui-react';
 import { LogDiv, ModContainer, ModLink, Text } from "./styles";
+import NoPrint from "../NoPrint";
 
 const Header = () => {
   const [token, setToken] = useState(null)
@@ -23,7 +24,7 @@ const Header = () => {
   const routesWithOnlyLogin = [PAGES.BASE];
   const showOnlyLogin = routesWithOnlyLogin.includes(pathname)
   return (
-    <>
+    <NoPrint>
       {shouldShowHeader &&
         <Menu fixed='top'>
           <ModContainer>
@@ -50,7 +51,7 @@ const Header = () => {
           </ModContainer>
         </Menu>
       }
-    </>
+    </NoPrint>
   );
 };
 
