@@ -36,9 +36,6 @@ const CustomerForm = ({ customer, onSubmit }) => {
 
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title={!isUpdating ? "Crear cliente" : "Actualizar cliente"} />
-      </HeaderContainer >
       <Form onSubmit={handleSubmit(handleForm)}>
         <FormContainer>
           <FieldsContainer>
