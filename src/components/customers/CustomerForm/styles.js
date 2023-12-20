@@ -1,20 +1,36 @@
+import InputMask from 'react-input-mask';
 import { Flex } from "rebass";
-import { Button as SButton, Form, Input as SInput, Label as SLabel } from "semantic-ui-react";
+import { Form, Button as SButton, Input as SInput, Label as SLabel, TextArea as STextArea } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Label = styled(SLabel)`
   width: 100%!important;
 `;
 
-const Input = styled(SInput)`
-  margin: 8px 0!important;
+const MaskedInput = styled(InputMask)`
+  margin: 1rem 0!important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   height: 50px!important;
 
-  > input  {
-    padding: 1em 1em!important;
+  > input {
+      &::-webkit-inner-spin-button,
+      &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+      }
   };
+`;
+
+const Input = styled(SInput)`
+  margin: 1rem 0!important;
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
+  border-radius: 0.28571429rem;
+  height: 50px!important;
+  > input {
+      &::-webkit-inner-spin-button, &::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+      }
+   };
 `;
 
 const HeaderContainer = styled(Flex)`
@@ -23,11 +39,21 @@ const HeaderContainer = styled(Flex)`
 
 const FormContainer = styled(Flex)`
   flex-direction: column;
+  margin-top: 14px!important;
 `;
 
 const FormField = styled(Form.Field)`
-  width: ${(props) => props.width || '200px'} !important;
-  flex: 1;
+  width: ${(props) => props.width || '200px!important'};
+  max-width: 300px!important;
+  min-width: 50px!important;
+  flex: ${(props) => props.flex || '1!important'};
+  margin: 0!important;
+`;
+
+const Textarea = styled(STextArea)`
+  margin: 1rem 0!important;
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
+  border-radius: 0.28571429rem;
 `;
 
 const Button = styled(SButton)`
@@ -37,6 +63,7 @@ const Button = styled(SButton)`
 `;
 
 const FieldsContainer = styled(Flex)`
+  flex-direction: row!important;
   justify-content: space-between;
   flex-wrap: wrap;
   column-gap: 20px;
@@ -52,5 +79,5 @@ const PhoneContainer = styled(Flex)`
   column-gap: 10px;
 `;
 
-export { FormContainer, HeaderContainer, Button, FormField, Input, Label, ButtonsContainer, FieldsContainer, PhoneContainer };
+export { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, HeaderContainer, Input, Label, MaskedInput, PhoneContainer, Textarea };
 

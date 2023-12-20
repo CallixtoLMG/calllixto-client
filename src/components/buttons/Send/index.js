@@ -17,7 +17,7 @@ const ButtonSend = ({ customerData }) => {
         <ModalContainer>
           {customerData.phone &&
             <Button
-              href={`${APIS.WSP(customerData.phone, customerData.name)}`}
+              href={`${APIS.WSP((customerData.phone.areaCode+customerData.phone.number), customerData.name)}`}
               color='green' size="tiny" ><Icon name='whatsapp' />WhatsApp</Button>}
           {customerData.email &&
             <MailButton

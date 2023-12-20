@@ -6,12 +6,12 @@ export const Rules = (role) => {
         canCreateProduct: false,
         canSeeActions: false,
       };
-    case 'admin':
+    case 'admin': 
       return {
         canSeeButtons: true,
         canSeeActions: true,
       };
-    case 'superadmin':
+    case 'sadmin':
       return {
         canSeeButtons: true,
         canSeeActions: true,

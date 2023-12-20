@@ -8,7 +8,7 @@ import { PRODUCT_COLUMNS } from "../products.common";
 import { ContainerModal, DataNotFoundContainer, ModInput, ModLabel, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
-  const { handleSubmit, control, reset, setValue } = useForm();
+  const { handleSubmit, control, reset, setValue, watch } = useForm();
   const router = useRouter()
   const [open, setOpen] = useState(false);
   const [newProducts, setNewProducts] = useState([]);
@@ -103,6 +103,14 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
     setOpen(false);
   };
 
+  const getEditProductsPrice = (index) => {
+    return watch(`editProducts[${index}].price`);
+  };
+
+  const getNewProductsPrice = (index) => {
+    return watch(`newProducts[${index}].price`);
+  };
+
   return (
     <>
       <ModLabel as="label" htmlFor="file" >
@@ -149,28 +157,51 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                         <Table.Body key={`${newProduct.code}-${index}`}>
                           <ModTableRow >
                             <ModTableCell>{index + 1}</ModTableCell>
-                            {PRODUCT_COLUMNS
-                              .map((column) =>
-                                <Controller
-                                  key={column.id}
-                                  name={`newProducts[${index}].${column.path}`}
-                                  control={control}
-                                  render={({ field }) => (
-                                    <ModTableCell key={column.id} >
-                                      <CurrencyInput
-                                        value={column.value(newProduct)}
-                                        locale={locale}
-                                        currency={currency}
-                                        onChangeValue={(_, value) => {
-                                          field.onChange(value);
-                                        }}
-                                        InputElement={<ModInput />}
-                                      />
-                                    </ModTableCell>
-                                  )}
-                                />
-                              )
-                            }
+                            <Controller
+                              key={`newProducts[${index}].code`}
+                              name={`newProducts[${index}].code`}
+                              control={control}
+                              defaultValue={(`newProducts[${index}].code`).toUpperCase()}
+                              rules={validationRules.code}
+                              render={({ field, fieldState }) => (
+                                <ModTableCell key={`newProducts[${index}].code`} >
+                                  <ModInput {...field} />
+                                  {fieldState?.invalid && <WarningMessage >{validationRules.code.message}</WarningMessage>}
+                                </ModTableCell>
+                              )}
+                            />
+                            <Controller
+                              key={`newProducts[${index}].name`}
+                              name={`newProducts[${index}].name`}
+                              control={control}
+                              defaultValue={(`newProducts[${index}].name`)}
+                              render={({ field, fieldState }) => (
+                                <ModTableCell key={`newProducts[${index}].name`} >
+                                  <ModInput {...field} />
+                                  {fieldState?.invalid && <WarningMessage >
+                                  </WarningMessage>}
+                                </ModTableCell>
+                              )}
+                            />
+                            <Controller
+                              key={`newProducts[${index}].price`}
+                              name={`newProducts[${index}].price`}
+                              control={control}
+                              defaultValue={getNewProductsPrice(index)}
+                              render={({ field }) => (
+                                <ModTableCell  >
+                                  <CurrencyInput
+                                    value={getNewProductsPrice(index)}
+                                    locale={locale}
+                                    currency={currency}
+                                    onChangeValue={(_, value) => {
+                                      field.onChange(value);
+                                    }}
+                                    InputElement={<ModInput />}
+                                  />
+                                </ModTableCell>
+                              )}
+                            />
                           </ModTableRow>
                         </Table.Body>
                       ))}
@@ -195,28 +226,51 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                         <Table.Body key={`${editProduct.code}-${index}`}>
                           <ModTableRow >
                             <ModTableCell>{index + 1}</ModTableCell>
-                            {PRODUCT_COLUMNS
-                              .map((column) =>
-                                <Controller
-                                  key={column.id}
-                                  name={`editProducts[${index}].${column.path}`}
-                                  control={control}
-                                  render={({ field }) => (
-                                    <ModTableCell key={column.id} >
-                                      <CurrencyInput
-                                        value={column.value(product)}
-                                        locale={locale}
-                                        currency={currency}
-                                        onChangeValue={(_, value) => {
-                                          field.onChange(value);
-                                        }}
-                                        InputElement={<ModInput />}
-                                      />
-                                    </ModTableCell>
-                                  )}
-                                />
-                              )
-                            }
+                            <Controller
+                              key={`editProducts[${index}].code`}
+                              name={`editProducts[${index}].code`}
+                              control={control}
+                              defaultValue={(`editProducts[${index}].code`).toUpperCase()}
+                              rules={validationRules.code}
+                              render={({ field, fieldState }) => (
+                                <ModTableCell key={`editProducts[${index}].code`} >
+                                  <ModInput readOnly {...field} />
+                                  {fieldState?.invalid && <WarningMessage >{validationRules.code.message}</WarningMessage>}
+                                </ModTableCell>
+                              )}
+                            />
+                            <Controller
+                              key={`editProducts[${index}].name`}
+                              name={`editProducts[${index}].name`}
+                              control={control}
+                              defaultValue={(`editProducts[${index}].name`)}
+                              render={({ field, fieldState }) => (
+                                <ModTableCell key={`editProducts[${index}].name`} >
+                                  <ModInput {...field} />
+                                  {fieldState?.invalid && <WarningMessage >
+                                  </WarningMessage>}
+                                </ModTableCell>
+                              )}
+                            />
+                            <Controller
+                              key={`editProducts[${index}].price`}
+                              name={`editProducts[${index}].price`}
+                              control={control}
+                              defaultValue={getEditProductsPrice(index)}
+                              render={({ field }) => (
+                                <ModTableCell  >
+                                  <CurrencyInput
+                                    value={getEditProductsPrice(index)}
+                                    locale={locale}
+                                    currency={currency}
+                                    onChangeValue={(_, value) => {
+                                      field.onChange(value);
+                                    }}
+                                    InputElement={<ModInput />}
+                                  />
+                                </ModTableCell>
+                              )}
+                            />
                           </ModTableRow>
                         </Table.Body>
                       ))}
@@ -237,6 +291,6 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
       </Transition>
     </>
   );
-}
+};
 
 export default ImportExcel;

@@ -1,23 +1,37 @@
 "use client";
-import { DataContainer, ModLabel, ModSegment, SubContainer } from "./styles";
+import { formatedPhone } from "@/utils";
+import { Container, DataContainer, Label, Segment, SubContainer } from "./styles";
 
 const ShowCustomer = ({ customer = {} }) => {
-  if(customer.phone && customer.phone.areaCode ) {
-    customer.phone.realPhone = Number(customer.phone.areaCode + customer.phone.number);
-  };
-  
   return (
-    <SubContainer>
-      <DataContainer>
-        <ModLabel>Cliente</ModLabel>
-        <ModSegment>{customer.name}</ModSegment></DataContainer>
-      <DataContainer>
-        <ModLabel>Teléfono</ModLabel>
-        <ModSegment>{customer.phone.realPhone ? customer.phone.realPhone : customer.phone}</ModSegment></DataContainer>
-      <DataContainer>
-        <ModLabel>Mail</ModLabel>
-        <ModSegment>{customer.email}</ModSegment></DataContainer>
-    </SubContainer>
+    <Container>
+      <SubContainer>
+        <DataContainer width="330px">
+          <Label>Nombre</Label>
+          <Segment>{customer.name}</Segment>
+        </DataContainer>
+      </SubContainer>
+      <SubContainer>
+        <DataContainer>
+          <Label>Mail</Label>
+          <Segment>{customer.email}</Segment>
+        </DataContainer>
+        <DataContainer>
+          <Label>Dirección</Label>
+          <Segment>{customer.address || "Sin dato"}</Segment>
+        </DataContainer>
+        <DataContainer flex="none" width="200px">
+          <Label>Teléfono</Label>
+          <Segment>{formatedPhone(customer.phone.areaCode, customer.phone.number)}</Segment>
+        </DataContainer>
+      </SubContainer>
+      <SubContainer>
+        <DataContainer maxWidth="100%" >
+          <Label>Comentarios</Label>
+          <Segment>{customer.comments || "Sin comentarios."}</Segment>
+        </DataContainer>
+      </SubContainer>
+    </Container>
   );
 };
 
