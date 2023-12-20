@@ -1,15 +1,20 @@
 import { Flex } from "rebass";
-import { Label, Segment } from "semantic-ui-react";
+import { Label as SLabel, Segment as SSegment } from "semantic-ui-react";
 import styled from "styled-components";
 
-const ModLabel = styled(Label)({
-  margin: "0!important",
-  width: "100%!important"
-});
+const Label = styled(SLabel)`
+  width: 100%!important;
+`;
 
-const ModSegment = styled(Segment)({
+const SubContainer = styled(Flex)`
+  flex-direction: row!important;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  column-gap: 20px;
+  max-width: 900px;
+`;
+const Segment = styled(SSegment)({
   marginTop: "5px!important",
-  height: "50px!important",
   margin: "1rem 0!important",
 });
 
@@ -17,18 +22,20 @@ const HeaderContainer = styled(Flex)`
   margin-bottom: 20px!important;
 `;
 
-const SubContainer = styled(Flex)`
+const Container = styled(Flex)`
+  margin-top: 14px!important;
   flex-direction: column;
-  align-items: center;
-  width: 350px!important;
-  align-self: center;
 `;
 
 const DataContainer = styled(Flex)`
+  width: ${(props) => props.width || '200px!important'};
+  max-width: ${(props) => props.maxWidth || "300px!important"};
+  min-width: 50px!important;
+  flex: ${(props) => props.flex || '1!important'};
+  margin: 0!important;
   flex-direction: column;
-  width:100%!important;
 `;
 
-export { DataContainer, HeaderContainer, ModLabel, ModSegment, SubContainer };
+export { Container, DataContainer, HeaderContainer, Label, Segment, SubContainer };
 
 

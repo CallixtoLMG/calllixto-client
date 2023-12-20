@@ -1,19 +1,21 @@
 "use client";
 import { PAGES } from "@/constants";
-import { get } from "lodash";
+import { createDate } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
 import {
-  FormContainer,
   Button,
+  ButtonsContainer,
+  FieldsContainer,
+  FormContainer,
+  FormField,
   Input,
   Label,
-  WarningMessage,
+  Textarea
 } from "./styles";
-import { createDate } from "@/utils";
 
 const ProductForm = ({ product, onSubmit }) => {
   const router = useRouter();
@@ -31,7 +33,7 @@ const ProductForm = ({ product, onSubmit }) => {
   }, [isUpdating]);
 
   const handleReset = (product) => {
-    reset(product || { name: '', price: 0, code: '' });
+    reset(product || { name: '', price: 0, code: '', comments: "" });
   };
 
   const handleForm = (data) => {
@@ -53,69 +55,79 @@ const ProductForm = ({ product, onSubmit }) => {
   const currency = "ARS";
 
   return (
-    <FormContainer>
-      <Form onSubmit={handleSubmit(handleForm)}>
-        {!isUpdating &&
-          (
-            <Form.Field>
-              <Label>Código</Label>
-              <Controller
-                name="code"
-                control={control}
-                rules={{ validate: validateCode }}
-                render={({ field }) => (
-                  <Input required {...field} placeholder="Código (A123)" />
-                )}
-              />
-            </Form.Field>
-          )}
-        <Form.Field>
-          <Label>Nombre</Label>
-          <Controller
-            name="name"
-            control={control}
-            render={({ field }) => <Input required {...field} placeholder="Nombre" />}
-          />
-        </Form.Field>
-        <Form.Field>
-          <Label>Precio</Label>
-          <Controller
-            name="price"
-            control={control}
-            rules={{ required: true, min: 0.01 }}
-            render={({ field }) => (
-              <CurrencyInput
-                value={field.value}
-                locale={locale}
-                currency={currency}
-                placeholder="Precio"
-                onChangeValue={(_, value) => {
-                  field.onChange(value);
-                }}
-                InputElement={<Input />}
-              />
+    <Form onSubmit={handleSubmit(handleForm)}>
+      <FormContainer>
+        <FieldsContainer>
+          {!isUpdating &&
+            (
+              <FormField>
+                <Label>Código</Label>
+                <Controller
+                  name="code"
+                  control={control}
+                  rules={{ validate: validateCode }}
+                  render={({ field }) => (
+                    <Input required {...field} placeholder="Código (A123)" />
+                  )}
+                />
+              </FormField>
             )}
+          <FormField>
+            <Label>Nombre</Label>
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => <Input required {...field} placeholder="Nombre" />}
+            />
+          </FormField>
+          <FormField>
+            <Label>Precio</Label>
+            <Controller
+              name="price"
+              control={control}
+              rules={{ required: true, min: 0.01 }}
+              render={({ field }) => (
+                <CurrencyInput
+                  value={field.value}
+                  locale={locale}
+                  currency={currency}
+                  placeholder="Precio"
+                  onChangeValue={(_, value) => {
+                    field.onChange(value);
+                  }}
+                  InputElement={<Input />}
+                />
+              )}
+            />
+          </FormField>
+        </FieldsContainer>
+        <FieldsContainer>
+          <Label >Comentarios</Label>
+          <Controller
+            name="comments"
+            control={control}
+            render={({ field }) => <Textarea maxlength="2000" {...field} placeholder="Comentarios" />}
           />
-        </Form.Field>
-        <Form.Field>
-        </Form.Field>
-        <Button
-          disabled={isLoading || !isDirty || !isValid}
-          loading={isLoading}
-          type="submit"
-          color="green">
-          <Icon name={buttonConfig.icon} />{buttonConfig.title}</Button>
-        {isUpdating ? (
-          <Button type="button" onClick={() => handleReset(product)} color="brown" $marginLeft disabled={isLoading || !isDirty}>
-            <Icon name="undo" />Restaurar
-          </Button>
-        ) : (
-          <Button type="button" onClick={() => handleReset()} color="brown" $marginLeft disabled={isLoading ||  !isDirty}>
-            <Icon name="erase" />Limpiar
-          </Button>
-        )}
-      </Form>
-    </FormContainer>
+        </FieldsContainer>
+        <ButtonsContainer>
+          <Button
+            disabled={isLoading || !isDirty || !isValid}
+            loading={isLoading}
+            type="submit"
+            color="green">
+            <Icon name={buttonConfig.icon} />{buttonConfig.title}</Button>
+          {isUpdating ? (
+            <Button type="button" onClick={() => handleReset(product)} color="brown" $marginLeft disabled={isLoading || !isDirty}>
+              <Icon name="undo" />Restaurar
+            </Button>
+          ) : (
+            <Button type="button" onClick={() => handleReset()} color="brown" $marginLeft disabled={isLoading || !isDirty}>
+              <Icon name="erase" />Limpiar
+            </Button>
+          )}
+        </ButtonsContainer>
+      </FormContainer>
+    </Form>
   )
 };
 
