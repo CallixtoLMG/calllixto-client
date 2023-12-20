@@ -8,7 +8,7 @@ const Label = styled(SLabel)`
 `;
 
 const MaskedInput = styled(InputMask)`
-  margin: 1rem 0!important;
+  margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   height: 50px!important;
@@ -22,7 +22,7 @@ const MaskedInput = styled(InputMask)`
 `;
 
 const Input = styled(SInput)`
-  margin: 1rem 0!important;
+  margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   height: 50px!important;
@@ -39,7 +39,7 @@ const HeaderContainer = styled(Flex)`
 
 const FormContainer = styled(Flex)`
   flex-direction: column;
-  margin-top: 14px!important;
+  row-gap: 15px;
 `;
 
 const FormField = styled(Form.Field)`
@@ -51,7 +51,7 @@ const FormField = styled(Form.Field)`
 `;
 
 const Textarea = styled(STextArea)`
-  margin: 1rem 0!important;
+  margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
 `;
