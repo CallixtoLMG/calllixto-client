@@ -12,7 +12,7 @@ import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, In
 const CustomerForm = ({ customer, onSubmit }) => {
   const { push } = useRouter();
   const params = useParams();
-  const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: omit(customer, ['id', 'createdAt', "comments"]) });
+  const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: omit(customer, ['id', 'createdAt']) });
   const isUpdating = useMemo(() => !!params.id, [params.id]);
   const [isLoading, setIsLoading] = useState(false);
   const buttonConfig = useMemo(() => {
@@ -113,7 +113,9 @@ const CustomerForm = ({ customer, onSubmit }) => {
             <Controller
               name="comments"
               control={control}
-              render={({ field }) => <Textarea maxlength="2000" {...field} placeholder="Comentarios" />}
+              render={({ field }) => (
+                <Textarea maxlength="2000" {...field} placeholder="Comentarios" />
+              )}
             />
           </FieldsContainer>
           <ButtonsContainer>
