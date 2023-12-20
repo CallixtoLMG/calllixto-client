@@ -8,6 +8,7 @@ const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const inputElement = useRef(null);
 
@@ -25,8 +26,10 @@ const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
     setIsDeleteEnabled(text.toLowerCase() === 'borrar');
   };
 
-  const handleDelete = () => {
-    onDelete(params);
+  const handleDelete = async () => {
+    setIsLoading(true);
+    await onDelete(params);
+    setIsLoading(false);
     setShowModal(false);
   };
 
@@ -51,14 +54,15 @@ const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
               />
               <Flex flexDirection="row-reverse">
                 <Button
-                  disabled={!isDeleteEnabled}
+                  disabled={!isDeleteEnabled || isLoading}
+                  loading={isLoading}
                   color='green'
                   onClick={handleDelete}
                   type="submit"
                 >
                   <SIcon name='checkmark' />Si
                 </Button>
-                <Button color='red' onClick={() => setShowModal(false)}>
+                <Button color='red' onClick={() => setShowModal(false)} disabled={isLoading}>
                   <SIcon name='trash' />No
                 </Button>
               </Flex>
