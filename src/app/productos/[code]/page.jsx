@@ -51,7 +51,7 @@ const Product = ({ params }) => {
     };
     validateToken()
     fetchData();
-  }, [params.code, router]);
+  }, [params.code, push]);
 
   return (
     <>
