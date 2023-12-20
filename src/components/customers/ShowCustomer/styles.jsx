@@ -13,17 +13,18 @@ const SubContainer = styled(Flex)`
   column-gap: 20px;
   max-width: 900px;
 `;
-const Segment = styled(SSegment)({
-  marginTop: "5px!important",
-  margin: "1rem 0!important",
-});
+
+const Segment = styled(SSegment)`
+  margin-top: 5px!important;
+  height: 50px!important;
+`;
 
 const HeaderContainer = styled(Flex)`
   margin-bottom: 20px!important;
 `;
 
 const Container = styled(Flex)`
-  margin-top: 14px!important;
+  row-gap: 15px;
   flex-direction: column;
 `;
 

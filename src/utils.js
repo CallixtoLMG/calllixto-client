@@ -20,6 +20,10 @@ export const formatedPrice = (number) => {
   });
 };
 
+export const formatedPercentage = (number) => {
+  return number + " %"
+}
+
 export const getTotal = (product) => {
   return product.price * product.quantity * (1 - (product.discount / 100)) || 0;
 };

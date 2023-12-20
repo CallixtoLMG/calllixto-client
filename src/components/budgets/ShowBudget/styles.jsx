@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Button as SButton, Segment as SSegment, Table } from "semantic-ui-react";
+import { Button as SButton, Segment as SSegment, Table as STable } from "semantic-ui-react";
 import styled from "styled-components";
 
 const SubContainer = styled(Flex)`
@@ -23,15 +23,16 @@ const Button = styled(SButton)`
   margin-left: 10px!important;
 `;
 
-const Row = styled(Table.Row)`
+const Row = styled(STable.Row)`
   th:first-child { width: 50px!important; };
 `;
-const Segment = styled(SSegment)({
-  marginTop: "5px!important",
-  height: "50px!important",
-});
 
-const FooterCell = styled(Table.HeaderCell)`
+const Segment = styled(SSegment)`
+  margin-top: 5px!important;
+  height: 50px!important;
+`;
+
+const FooterCell = styled(STable.HeaderCell)`
   background-color: rgb(255, 255, 255)!important;
   text-align: ${({ align }) => align || "center"} !important;
   strong{
@@ -39,14 +40,18 @@ const FooterCell = styled(Table.HeaderCell)`
   };
 `;
 
-const HeaderCell = styled(Table.HeaderCell)`
+const HeaderCell = styled(STable.HeaderCell)`
   background-color: ${props => props.$header && "#EEEEEE!important"};
   text-align: ${({ align }) => align || "center"} !important;
 `;
 
-const Cell = styled(Table.Cell)({
+const Cell = styled(STable.Cell)({
   textAlign: 'center!important'
 });
 
-export { DataContainer, HeaderContainer, Button, Segment, Cell, FooterCell, HeaderCell, Row, SubContainer };
+const Table = styled(STable)`
+  margin-top: 5px !important;
+`;
+
+export { DataContainer, HeaderContainer, Button, Segment, Cell, FooterCell, HeaderCell, Row, SubContainer, Table };
 

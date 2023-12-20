@@ -10,7 +10,7 @@ const Button = styled(SButton)`
 
 const FormContainer = styled(Flex)`
   flex-direction: column;
-  margin-top: 14px!important;
+  row-gap: 15px;
 `;
 
 const Label = styled(SLabel)({
@@ -22,7 +22,7 @@ const HeaderContainer = styled(Flex)`
 `;
 
 const Input = styled(SInput)`
-  margin: 1rem 0!important;
+  margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   height: 50px!important;
@@ -50,7 +50,7 @@ const FieldsContainer = styled(Flex)`
 `;
 
 const Textarea = styled(STextArea)`
-  margin: 1rem 0!important;
+  margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
 `;
