@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc"
-import timezone from "dayjs/plugin/timezone"
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -27,3 +27,9 @@ export const getTotal = (product) => {
 export const getTotalSum = (products) => {
   return products?.reduce((a, b) => a + getTotal(b), 0);
 };
+
+export const formatedPhone = (area, num) => {
+  if (!num || !area) return 'Sin datos.';
+  return `+54-${area}-${num}`
+};
+

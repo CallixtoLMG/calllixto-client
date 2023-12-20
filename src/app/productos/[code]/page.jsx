@@ -39,6 +39,11 @@ const Product = ({ params }) => {
           cache: "no-store",
         };
         const fetchProduct = await getProduct(params.code, requestOptions);
+        console.log(fetchProduct);
+        if (!fetchProduct) {
+          router.push("/ups");
+          return;
+        };
         setProduct(fetchProduct);
         setIsLoading(false);
       } catch (error) {

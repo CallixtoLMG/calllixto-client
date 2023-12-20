@@ -6,11 +6,11 @@ import ButtonGoTo from "@/components/buttons/GoTo";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from 'next/navigation';
+import { Flex } from "rebass";
 import { Table } from 'semantic-ui-react';
 import ImportExcel from "../ImportProduct";
 import { PRODUCT_COLUMNS } from "../products.common";
 import { ButtonContainer, Cell, HeaderCell } from "./styles";
-import { Flex } from "rebass";
 
 const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete }) => {
   const { push } = useRouter();
