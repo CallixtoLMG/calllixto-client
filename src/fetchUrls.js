@@ -10,6 +10,6 @@ export const PDF = "/pfd";
 export const VALIDATE = "validate";
 export const EDITBATCH = "/transact";
 export const USERS = "users/";
-export const URL = "https://vbfohr7ck7.execute-api.sa-east-1.amazonaws.com/";
+export const URL = process.env.NEXT_PUBLIC_URL;
 export const CLIENTID = "maderera-las-tapias/";
 
