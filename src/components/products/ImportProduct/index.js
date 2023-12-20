@@ -179,7 +179,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                 </>}
               {!!editProducts.length &&
                 <>
-                  <ModalModLabel >Productos a modificar</ModalModLabel>
+                  <ModalModLabel>Productos a modificar</ModalModLabel>
                   <ModTableContainer>
                     <ModTable celled compact>
                       <Table.Header fullWidth>

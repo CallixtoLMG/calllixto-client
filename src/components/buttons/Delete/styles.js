@@ -1,14 +1,21 @@
-import { Icon, Input } from "semantic-ui-react";
+import { Icon as SIcon, Input as SInput } from "semantic-ui-react";
 import styled from "styled-components";
 
 
-const ModInput = styled(Input)({
-  minWidth: "15rem!important"
+const Input = styled(SInput)({
+  minwWidth: "15rem!important"
 });
 
-const ModIcon = styled(Icon)({
+const Icon = styled(SIcon)({
   margin: "0!important",
 });
 
-export { ModIcon, ModInput };
+const Form = styled.form`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  column-gap: 10px;
+`;
+
+export { Icon, Input, Form };
 

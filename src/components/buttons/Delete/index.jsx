@@ -1,14 +1,19 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useState } from 'react';
-import { Button, Header, Icon, Modal, Popup, Transition } from 'semantic-ui-react';
-import { ModIcon, ModInput } from "./styles";
+import { useEffect, useRef, useState } from 'react';
+import { Button, Header, Icon as SIcon, Modal, Popup, Transition } from 'semantic-ui-react';
+import { Form, Icon, Input } from "./styles";
+import { Flex } from "rebass";
 
 const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
-  const router = useRouter();
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
   const [showModal, setShowModal] = useState(false);
+
+  const inputElement = useRef(null);
+
+  useEffect(() => {
+    inputElement?.current?.focus();
+  }, [showModal]);
 
   const handleButtonClick = () => {
     setShowModal(true);
@@ -30,26 +35,34 @@ const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
       <Popup
         size="mini"
         content="Eliminar"
-        trigger={<Button color='red' size='tiny' content={<ModIcon name="trash" />} onClick={handleButtonClick} />}
+        trigger={<Button color='red' size='tiny' content={<Icon name="trash" />} onClick={handleButtonClick} />}
       />
       <Transition visible={showModal} animation='scale' duration={500}>
         <Modal open={showModal} onClose={() => setShowModal(false)}>
           <Header icon='archive' content={deleteQuestion || ""} />
           <Modal.Actions>
-            <ModInput
-              placeholder="Escriba 'borrar' para eliminar"
-              type="text"
-              value={confirmationText}
-              onChange={handleConfirmationTextChange} />
-            <Button color='red' onClick={() => setShowModal(false)}>
-              <Icon name='trash' />No
-            </Button>
-            <Button
-              disabled={!isDeleteEnabled}
-              color='green'
-              onClick={handleDelete}>
-              <Icon name='checkmark' />Si
-            </Button>
+            <Form>
+              <Input
+                placeholder="Escriba 'borrar' para eliminar"
+                type="text"
+                value={confirmationText}
+                onChange={handleConfirmationTextChange}
+                ref={inputElement}
+              />
+              <Flex flexDirection="row-reverse">
+                <Button
+                  disabled={!isDeleteEnabled}
+                  color='green'
+                  onClick={handleDelete}
+                  type="submit"
+                >
+                  <SIcon name='checkmark' />Si
+                </Button>
+                <Button color='red' onClick={() => setShowModal(false)}>
+                  <SIcon name='trash' />No
+                </Button>
+              </Flex>
+            </Form>
           </Modal.Actions>
         </Modal>
       </Transition>
