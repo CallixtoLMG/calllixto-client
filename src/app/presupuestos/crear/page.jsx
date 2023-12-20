@@ -50,7 +50,6 @@ const CreateBudget = () => {
           text: product.name,
         }));
         setProductsList(productsFilteredList);
-        setIsLoading(false)
       } catch (error) {
         console.error('Error al cargar productos:', error);
       }
@@ -67,11 +66,13 @@ const CreateBudget = () => {
         setCustomersList(customersFilteredList);
       } catch (error) {
         console.error('Error al crear clientes:', error);
+      } finally {
+        setIsLoading(false);
       };
     };
     validateToken();
     fetchData();
-  }, []);
+  }, [push]);
   return (
     <>
       <HeaderContainer>
