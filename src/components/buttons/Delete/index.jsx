@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from 'react';
-import { Button, Header, Icon as SIcon, Modal, Popup, Transition } from 'semantic-ui-react';
-import { Form, Icon, Input } from "./styles";
 import { Flex } from "rebass";
+import { Button, Header, Modal, Popup, Icon as SIcon, Transition } from 'semantic-ui-react';
+import { Form, Icon, Input } from "./styles";
 
 const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
   const [confirmationText, setConfirmationText] = useState('');

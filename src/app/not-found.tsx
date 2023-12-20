@@ -1,15 +1,15 @@
 "use client"
+import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from 'react';
 
 const NotFound: React.FC = () => {
-  const router = useRouter()
+  const { push } = useRouter()
   useEffect(() => {
-    router.push("/ups")
+    push(PAGES.NOTFOUND.BASE);
   }, [])
   return (
-    <>
-    </>
+    <></>
   )
 };
 

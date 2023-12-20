@@ -10,14 +10,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Products = () => {
-  const router = useRouter();
+  const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true)
   const [products, setProducts] = useState();
   const [role, setRole] = useState();
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
-      router.push(PAGES.LOGIN.BASE)
+      push(PAGES.LOGIN.BASE);
     };
     const requestOptions = {
       method: "GET",
@@ -31,7 +31,7 @@ const Products = () => {
       try {
         const userData = await getUserData();
         if (!userData.isAuthorized) {
-          router.push(PAGES.LOGIN.BASE)
+          push(PAGES.LOGIN.BASE);
         };
       } catch (error) {
         console.error('Error, ingreso no valido(token):', error);
@@ -58,7 +58,7 @@ const Products = () => {
     validateToken();
     fetchProductData();
     fetchRol();
-  }, [router]);
+  }, []);
 
   const handleDeleteProduct = async (code) => {
     try {
@@ -86,7 +86,6 @@ const Products = () => {
         />
       </Loader>
     </>
-
   );
 };
 

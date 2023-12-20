@@ -10,19 +10,19 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const EditCustomer = ({ params }) => {
-  const router = useRouter();
+  const { push } = useRouter();
   const [customer, setCustomer] = useState(null);
   const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push(PAGES.LOGIN.BASE)
+      push(PAGES.LOGIN.BASE);
     };
     const validateToken = async () => {
       try {
         const userData = await getUserData();
         if (!userData.isAuthorized) {
-          router.push(PAGES.LOGIN.BASE)
+          push(PAGES.LOGIN.BASE);
         };
       } catch (error) {
         console.error('Error, ingreso no valido(token):', error);
@@ -38,12 +38,16 @@ const EditCustomer = ({ params }) => {
         cache: "no-store",
       };
       const data = await getCustomer(params.id, requestOptions);
+      if (!data) {
+        push(PAGES.NOTFOUND.BASE);
+        return;
+      };
       setCustomer(data);
       setIsLoading(false)
     };
     validateToken();
     fetchData();
-  }, [params.id, router]);
+  }, [params.id]);
 
   return (
     <>

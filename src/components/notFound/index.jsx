@@ -4,10 +4,10 @@ import { Button, Header, Icon } from 'semantic-ui-react';
 import { MainContainer } from "./styles";
 
 const NotFoundPage = () => {
-  const router = useRouter();
+  const { back } = useRouter();
   const handleClick = () => {
-    router.back();
-    router.back();
+    back();
+    back();
   };
   return (
     <MainContainer>

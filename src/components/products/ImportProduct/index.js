@@ -9,7 +9,7 @@ import { ContainerModal, DataNotFoundContainer, ModInput, ModLabel, ModTable, Mo
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
   const { handleSubmit, control, reset, setValue, watch } = useForm();
-  const router = useRouter()
+  const { refresh } = useRouter()
   const [open, setOpen] = useState(false);
   const [newProducts, setNewProducts] = useState([]);
   const [editProducts, setEditProducts] = useState([]);
@@ -97,7 +97,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
     data.newProducts && createBatch({ products: data.newProducts })
     data.editProducts && editBatch({ update: data.editProducts })
     setTimeout(() => {
-      router.refresh();
+      refresh();
     }, 1000);
     setIsLoading(true);
     setOpen(false);

@@ -9,24 +9,24 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const CreateCustomer = () => {
-  const router = useRouter();
+  const { push } = useRouter();
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push(PAGES.LOGIN.BASE)
+      push(PAGES.LOGIN.BASE);
     };
     const validateToken = async () => {
       try {
         const userData = await getUserData();
         if (!userData.isAuthorized) {
-          router.push(PAGES.LOGIN.BASE)
+          push(PAGES.LOGIN.BASE);
         };
       } catch (error) {
         console.error('Error, ingreso no valido(token):', error);
       };
     };
     validateToken();
-  }, [router]);
+  }, []);
   return (
     <>
       <HeaderContainer>

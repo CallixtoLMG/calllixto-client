@@ -1,22 +1,14 @@
 import { BUDGET_FORM_PRODUCT_COLUMNS } from "@/components/budgets/budgets.common";
 import { PAGES } from "@/constants";
+import { createDate, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Button as SButton, Dropdown as SDropdown, Form, Icon, Table } from "semantic-ui-react";
-import {
-  Button,
-  Dropdown,
-  Input,
-  Cell,
-  HeaderCell,
-  TotalText,
-  WarningMessage
-} from "./styles";
-import { formatedPrice, getTotal, getTotalSum, createDate } from "@/utils";
+import { Form, Icon, Button as SButton, Dropdown as SDropdown, Table } from "semantic-ui-react";
+import { Button, Cell, Dropdown, HeaderCell, Input, TotalText, WarningMessage } from "./styles";
 
 const BudgetForm = ({ onSubmit, products, customers }) => {
-  const router = useRouter();
+  const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { control, handleSubmit, setValue, watch, formState: { isValid, isDirty } } = useForm({
     defaultValues: {
@@ -72,7 +64,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
     data.createdAt = createDate();
     onSubmit(data);
     setTimeout(() => {
-      router.push(PAGES.BUDGETS.BASE);
+      push(PAGES.BUDGETS.BASE);
     }, 500);
   };
 

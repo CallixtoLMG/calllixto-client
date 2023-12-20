@@ -12,17 +12,17 @@ import { useEffect, useState } from "react";
 const Product = ({ params }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [product, setProduct] = useState({})
-  const router = useRouter();
+  const { push } = useRouter();
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push(PAGES.LOGIN.BASE)
+      push(PAGES.LOGIN.BASE);
     };
     const validateToken = async () => {
       try {
         const userData = await getUserData();
         if (!userData.isAuthorized) {
-          router.push(PAGES.LOGIN.BASE)
+          push(PAGES.LOGIN.BASE);
         };
       } catch (error) {
         console.error('Error, ingreso no valido(token):', error);
@@ -39,9 +39,8 @@ const Product = ({ params }) => {
           cache: "no-store",
         };
         const fetchProduct = await getProduct(params.code, requestOptions);
-        console.log(fetchProduct);
         if (!fetchProduct) {
-          router.push("/ups");
+          push(PAGES.NOTFOUND.BASE);
           return;
         };
         setProduct(fetchProduct);
