@@ -1,31 +1,44 @@
 "use client";
+import { getUserData } from "@/api/userData";
 import { PAGES } from "@/constants";
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from "react";
 import { Menu } from 'semantic-ui-react';
-import { LogDiv, ModContainer, ModLink, Text } from "./styles";
 import NoPrint from "../NoPrint";
+import { LogDiv, ModContainer, ModLink, Text } from "./styles";
 
 const Header = () => {
   const [token, setToken] = useState(null)
+  const [validateToken, setValidateToken] = useState(null)
   const pathname = usePathname();
-  const router = useRouter();
+  const { push } = useRouter();
   const handleLogout = () => {
     localStorage.removeItem('token');
-    router.push(PAGES.LOGIN.BASE);
+    push(PAGES.LOGIN.BASE);
   };
   useEffect(() => {
     const getToken = localStorage.getItem('token');
-    setToken(getToken)
+    setToken(getToken);
+    const validateToken = async () => {
+      try {
+        const userData = await getUserData();
+        if (userData.isAuthorized) {
+          setValidateToken(userData.isAuthorized);
+        };
+      } catch (error) {
+        console.error('Error, ingreso no valido(token):', error);
+      };
+    };
+    validateToken();
   }, []);
-  const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.NOTFOUND.BASE,];
+  const routesWithoutHeader = [PAGES.LOGIN.BASE];
   const dynamicRoutePattern = /^\/presupuestos\/[^\/]+\/pdf$/;
   const shouldShowHeader = !routesWithoutHeader.includes(pathname) && !dynamicRoutePattern.test(pathname);
   const routesWithOnlyLogin = [PAGES.BASE];
   const showOnlyLogin = routesWithOnlyLogin.includes(pathname)
   return (
     <NoPrint>
-      {shouldShowHeader &&
+      {shouldShowHeader && token && validateToken &&
         <Menu fixed='top'>
           <ModContainer>
             {showOnlyLogin && !token ? (

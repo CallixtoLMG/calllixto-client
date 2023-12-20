@@ -9,18 +9,18 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const CreateProduct = () => {
-  const router = useRouter();
+  const { push } = useRouter();
   const [role, setRole] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push(PAGES.LOGIN.BASE)
+      push(PAGES.LOGIN.BASE);
     };
     const validateToken = async () => {
       try {
         const userData = await getUserData();
         if (!userData.isAuthorized) {
-          router.push(PAGES.LOGIN.BASE)
+          push(PAGES.LOGIN.BASE);
         };
       } catch (error) {
         console.error('Error, ingreso no valido(token):', error);
@@ -36,9 +36,9 @@ const CreateProduct = () => {
     };
     validateToken();
     fetchRol();
-  }, [router]);
+  }, []);
   if (role === "user") {
-    router.push(PAGES.NOTFOUND.BASE)
+    push(PAGES.NOTFOUND.BASE)
   };
   return (
     <>

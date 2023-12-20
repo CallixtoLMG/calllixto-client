@@ -1,11 +1,9 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useState } from 'react';
 import { Button, Header, Icon, Modal, Popup, Transition } from 'semantic-ui-react';
 import { ModIcon, ModInput } from "./styles";
 
 const ButtonDelete = ({ params, deleteQuestion, onDelete }) => {
-  const router = useRouter();
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
   const [showModal, setShowModal] = useState(false);

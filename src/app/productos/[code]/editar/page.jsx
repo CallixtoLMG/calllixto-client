@@ -10,14 +10,14 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const EditProduct = ({ params }) => {
-  const router = useRouter();
+  const { push } = useRouter();
   const [role, setRole] = useState();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true)
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push(PAGES.LOGIN.BASE)
+      push(PAGES.LOGIN.BASE);
     };
     async function fetchData() {
       var requestOptions = {
@@ -29,6 +29,10 @@ const EditProduct = ({ params }) => {
         cache: "no-store",
       };
       const data = await getProduct(params.code, requestOptions);
+      if (!data) {
+        push(PAGES.NOTFOUND.BASE);
+        return;
+      };
       setProduct(data);
       setIsLoading(false)
     };
@@ -36,7 +40,7 @@ const EditProduct = ({ params }) => {
       try {
         const userData = await getUserData();
         if (!userData.isAuthorized) {
-          router.push(PAGES.LOGIN.BASE)
+          push(PAGES.LOGIN.BASE);
         };
       } catch (error) {
         console.error('Error, ingreso no valido(token):', error);
@@ -53,9 +57,9 @@ const EditProduct = ({ params }) => {
     validateToken();
     fetchData();
     fetchRol();
-  }, [params.code, router]);
+  }, [params.code]);
   if (role === "user") {
-    router.push(PAGES.NOTFOUND.BASE)
+    push(PAGES.NOTFOUND.BASE);
   };
   return (
     <>

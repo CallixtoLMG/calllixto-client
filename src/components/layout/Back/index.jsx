@@ -3,9 +3,9 @@ import { useRouter } from 'next/navigation';
 import { Button } from 'semantic-ui-react';
 
 const Back = () => {
-  const router = useRouter()
+  const { back } = useRouter()
   return (
-    <Button onClick={() => {router.back()}}>Volver</Button>
+    <Button onClick={() => { back() }}>Volver</Button>
   )
 };
 

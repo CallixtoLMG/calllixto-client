@@ -11,19 +11,19 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Budget = ({ params }) => {
-  const router = useRouter();
+  const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true)
   const [budget, setBudget] = useState();
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      router.push(PAGES.LOGIN.BASE)
+      push(PAGES.LOGIN.BASE);
     };
     const validateToken = async () => {
       try {
         const userData = await getUserData();
         if (!userData.isAuthorized) {
-          router.push(PAGES.LOGIN.BASE)
+          push(PAGES.LOGIN.BASE);
         };
       } catch (error) {
         console.error('Error, ingreso no valido(token):', error);
@@ -40,6 +40,10 @@ const Budget = ({ params }) => {
           cache: "no-store",
         };
         const fetchBudget = await getBudget(params.id, requestOptions);
+        if (!fetchBudget) {
+          push(PAGES.NOTFOUND.BASE);
+          return;
+        };
         setBudget(fetchBudget);
         setIsLoading(false)
       } catch (error) {
@@ -48,7 +52,7 @@ const Budget = ({ params }) => {
     };
     validateToken();
     fetchData();
-  }, [params.id, router])
+  }, [params.id]);
 
   return (
     <>

@@ -10,7 +10,7 @@ import Loader from "../layout/Loader";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "./styled";
 
 const LoginForm = ({ onSubmit }) => {
-  const router = useRouter();
+  const { push } = useRouter();
   const recovery = false;
   const { handleSubmit, control } = useForm();
   const [isLoading, setIsLoading] = useState(false);
@@ -18,7 +18,7 @@ const LoginForm = ({ onSubmit }) => {
     setIsLoading(true);
     const loginSuccess = await onSubmit(data);
     if (loginSuccess) {
-      router.push(PAGES.PRODUCTS.BASE);
+      push(PAGES.PRODUCTS.BASE);
     } else {
       setIsLoading(false);
     }

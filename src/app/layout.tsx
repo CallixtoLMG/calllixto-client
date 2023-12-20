@@ -4,7 +4,6 @@ import GoBack from "@/components/buttons/GoBack";
 import Header from "@/components/layout/Header";
 import Toaster from "@/components/layout/Toaster";
 import { Inter } from 'next/font/google';
-import { usePathname, useRouter } from 'next/navigation';
 import 'semantic-ui-css/semantic.min.css';
 import StyledComponentsRegistry from './registry';
 import {
@@ -13,10 +12,7 @@ import {
 
 const inter = Inter({ subsets: ['latin'] });
 
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const router = useRouter();
   return (
     <html lang="en">
       <StyledComponentsRegistry>
