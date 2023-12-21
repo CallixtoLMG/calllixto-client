@@ -4,13 +4,15 @@ const PAGES = {
     BASE: "/productos",
     CREATE: "/productos/crear",
     UPDATE: (code) => `/productos/${code}/editar`,
-    SHOW: (code) => `/productos/${code}`
+    SHOW: (code) => `/productos/${code}`,
+    NAME: 'Productos'
   },
   BUDGETS: {
     BASE: "/presupuestos",
     CREATE: "/presupuestos/crear",
     SHOW: (id) => `/presupuestos/${id}`,
-    SHOWPDF: (id) => `/presupuestos/${id}/pdf`
+    SHOWPDF: (id) => `/presupuestos/${id}/pdf`,
+    NAME: 'Presupuestos'
   },
   LOGIN: {
     BASE: "/login"
@@ -22,7 +24,8 @@ const PAGES = {
     BASE: "/clientes",
     CREATE: "/clientes/crear",
     UPDATE: (code) => `/clientes/${code}/editar`,
-    SHOW: (id) => `/clientes/${id}`
+    SHOW: (id) => `/clientes/${id}`,
+    NAME: 'Clientes'
   }
 };
 
