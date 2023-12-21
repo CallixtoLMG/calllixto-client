@@ -3,19 +3,19 @@ import { Cell } from "../Table/styles";
 
 export const HEADERS = [
   {
-    name: "Nombre",
+    title: "Nombre",
     value: "name",
     id: 1,
     value: (customer) => <Cell>{customer.name}</Cell>
   },
   {
-    name: "Teléfono",
+    title: "Teléfono",
     value: "phone",
     id: 2,
     value: (customer) => <Cell>{formatedPhone(customer.phone.areaCode, customer.phone.number)}</Cell>
   },
   {
-    name: "Email",
+    title: "Email",
     value: "email",
     id: 3,
     value: (customer) => <Cell>{customer.email}</Cell>

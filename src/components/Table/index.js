@@ -7,7 +7,7 @@ const CustomeTable = ({ headers = [], elements = [] }) => {
       <Table.Header fullWidth>
         <HeaderCell />
         {headers.map((header) => (
-          <HeaderCell key={header.id} >{header.name}</HeaderCell>
+          <HeaderCell key={header.id} >{header.title}</HeaderCell>
         ))}
       </Table.Header>
       <Table.Body>

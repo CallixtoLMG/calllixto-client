@@ -12,11 +12,8 @@ const CustomersPage = ({ customers = [], onDelete }) => {
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`;
 
   const mapCustomersForTable = useCallback((c) => {
-    console.log({ c })
     return c.map((customer, index) => ({ ...customer, key: index + 1 }));
   }, []);
-
-  console.log({ customers });
 
   return (
     <>
