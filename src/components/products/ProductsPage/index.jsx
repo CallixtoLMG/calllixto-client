@@ -1,6 +1,5 @@
 "use client";
-import ButtonDownload from "@/components/buttons/DownloadExcel";
-import ButtonGoTo from "@/components/buttons/GoTo";
+import { DownloadExcelButton, GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from 'next/navigation';
@@ -24,10 +23,10 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
     <>
       {visibilityRules.canSeeButtons &&
         <ButtonContainer>
-          <ButtonGoTo goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
+          <GoToButton goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
           <Flex margin-left="auto">
             <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
-            <ButtonDownload />
+            <DownloadExcelButton />
           </Flex>
         </ButtonContainer>}
       <Table headers={PRODUCT_COLUMNS} elements={mapCustomersForTable(products)} />

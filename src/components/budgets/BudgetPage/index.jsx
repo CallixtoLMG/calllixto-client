@@ -1,5 +1,5 @@
 "use client";
-import ButtonGoTo from "@/components/buttons/GoTo";
+import { GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { Button, Popup, Table } from "semantic-ui-react";
@@ -12,7 +12,7 @@ const BudgetsPage = ({ budgets }) => {
   return (
     <>
       <ButtonContainer>
-        <ButtonGoTo color="green" text="Crear presupuesto" iconName="add" goTo={PAGES.BUDGETS.CREATE} />
+        <GoToButton color="green" text="Crear presupuesto" iconName="add" goTo={PAGES.BUDGETS.CREATE} />
       </ButtonContainer>
       <Table celled compact striped>
         <Table.Header fullWidth>

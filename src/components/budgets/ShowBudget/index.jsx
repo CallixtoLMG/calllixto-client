@@ -1,5 +1,5 @@
 "use client";
-import ButtonSend from "@/components/buttons/Send";
+import { SendButton } from "@/components/common/buttons";
 import { get } from "lodash";
 import { Icon, Label, Table as STable } from "semantic-ui-react";
 import { formatedDate, formatedPrice, getTotalSum } from "@/utils";
@@ -71,7 +71,7 @@ const ShowBudget = ({ budget }) => {
               <Icon name="download" />Descargar PDF
             </Button>
             {(get(budget, "customer.phone") || get(budget, "customer.email")) && (
-              <ButtonSend customerData={budget.customer} />
+              <SendButton customerData={budget.customer} />
             )}
           </Flex>
         </Flex>

@@ -1,5 +1,5 @@
 "use client";
-import ButtonGoTo from "@/components/buttons/GoTo";
+import { GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { HEADERS } from "../customers.common";
@@ -18,7 +18,7 @@ const CustomersPage = ({ customers = [], onDelete }) => {
   return (
     <>
       <ButtonContainer>
-        <ButtonGoTo
+        <GoToButton
           color="green"
           text="Crear cliente"
           iconName="add"
