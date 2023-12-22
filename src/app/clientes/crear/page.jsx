@@ -2,7 +2,7 @@
 import { create } from "@/api/customers";
 import { getUserData } from "@/api/userData";
 import CustomerForm from "@/components/customers/CustomerForm";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

@@ -2,8 +2,7 @@
 import { budgetsList } from "@/api/budgets";
 import { getUserData } from "@/api/userData";
 import BudgetsPage from "@/components/budgets/BudgetPage";
-import Loader from "@/components/layout/Loader";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader, Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

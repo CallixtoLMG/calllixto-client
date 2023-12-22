@@ -16,8 +16,7 @@ import {
   Table
 } from "./styles";
 import { Flex } from "rebass";
-import NoPrint from "@/components/layout/NoPrint";
-import OnlyPrint from "@/components/layout/OnlyPrint";
+import { NoPrint, OnlyPrint } from "@/components/layout";
 import PDFFile from "../PDFfile";
 
 const ShowBudget = ({ budget }) => {

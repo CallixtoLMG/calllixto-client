@@ -1,4 +1,4 @@
-import NoPrint from '@/components/layout/NoPrint';
+import { NoPrint } from "@/components/layout";
 import { PAGES } from '@/constants';
 import { usePathname, useRouter } from 'next/navigation';
 import { Icon } from 'semantic-ui-react';

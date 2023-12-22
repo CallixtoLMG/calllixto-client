@@ -6,8 +6,6 @@ const NoPrintContainer = styled.div`
   }
 `;
 
-const NoPrint = ({ children }) => {
+export const NoPrint = ({ children }) => {
   return <NoPrintContainer>{children}</NoPrintContainer>
 };
-
-export default NoPrint;

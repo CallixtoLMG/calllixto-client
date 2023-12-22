@@ -13,8 +13,6 @@ const OnlyPrintContainer = styled.div`
   }
 `;
 
-const OnlyPrint = ({ children }) => {
+export const OnlyPrint = ({ children }) => {
     return <OnlyPrintContainer>{children}</OnlyPrintContainer>
 };
-
-export default OnlyPrint;

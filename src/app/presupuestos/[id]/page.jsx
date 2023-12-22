@@ -2,9 +2,7 @@
 import { getBudget } from "@/api/budgets";
 import { getUserData } from "@/api/userData";
 import ShowBudget from "@/components/budgets/ShowBudget";
-import Loader from "@/components/layout/Loader";
-import NoPrint from "@/components/layout/NoPrint";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader, Loader, NoPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

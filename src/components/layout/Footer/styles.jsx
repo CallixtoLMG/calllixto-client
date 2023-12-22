@@ -9,5 +9,5 @@ const ModSegment = styled(Segment)`
 const ModContainer = styled(Container)`
   text-align: center!important;
 `;
-export { ModContainer, ModSegment };
 
+export { ModContainer, ModSegment };

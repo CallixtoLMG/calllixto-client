@@ -1,8 +1,7 @@
 "use client"
 import { edit, getProduct } from "@/api/products";
 import { getUserData } from "@/api/userData";
-import Loader from "@/components/layout/Loader";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader, Loader } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";

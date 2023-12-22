@@ -1,7 +1,7 @@
 "use client"
 import { create } from "@/api/products";
 import { getUserData } from "@/api/userData";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";

@@ -2,7 +2,7 @@
 import { PAGES } from "@/constants";
 import { usePathname } from 'next/navigation';
 import { Menu } from 'semantic-ui-react';
-import NoPrint from "@/components/layout/NoPrint";
+import { NoPrint } from "@/components/layout";
 import { LogDiv, ModContainer, ModLink, Text } from "./styles";
 
 const Header = () => {
