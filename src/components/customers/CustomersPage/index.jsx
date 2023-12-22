@@ -24,7 +24,7 @@ const CustomersPage = ({ customers = [], onDelete }) => {
           iconName="add"
           goTo={PAGES.CUSTOMERS.CREATE} />
       </ButtonContainer>
-      <Table headers={HEADERS} elements={mapCustomersForTable(customers)} />
+      <Table headers={HEADERS} elements={mapCustomersForTable(customers)} page={PAGES.CUSTOMERS} />
     </>
   );
 };

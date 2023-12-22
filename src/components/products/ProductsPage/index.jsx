@@ -16,7 +16,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
   const visibilityRules = Rules(role);
 
   const mapCustomersForTable = useCallback((c) => {
-    return c.map(customer => ({ ...customer, key: customer.code }));
+    return c.map(customer => ({ ...customer, id: customer.code }));
   }, []);
 
   return (
@@ -29,7 +29,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
             <DownloadExcelButton />
           </Flex>
         </ButtonContainer>}
-      <Table headers={PRODUCT_COLUMNS} elements={mapCustomersForTable(products)} />
+      <Table headers={PRODUCT_COLUMNS} elements={mapCustomersForTable(products)} page={PAGES.PRODUCTS}/>
     </>
   )
 };

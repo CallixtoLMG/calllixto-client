@@ -3,6 +3,11 @@ import { Cell } from "@/components/common/table";
 
 export const HEADERS = [
   {
+    value: "id",
+    id: 1,
+    value: (customer) => <Cell>{customer.key}</Cell>
+  },
+  {
     title: "Nombre",
     value: "name",
     id: 1,
