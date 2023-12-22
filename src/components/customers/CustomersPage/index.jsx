@@ -4,7 +4,7 @@ import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { HEADERS } from "../customers.common";
 import { ButtonContainer } from "./styles";
-import Table from '@/components/Table';
+import { Table } from '@/components/common/Table';
 import { useCallback } from "react";
 
 const CustomersPage = ({ customers = [], onDelete }) => {

@@ -5,6 +5,7 @@ import styled from "styled-components";
 const TitleContainer = styled(Flex)`
   width: 100%!important;
   justify-content: center!important;
+  margin-bottom: 20px!important;
 `;
 
 const Title = styled(Label)`

@@ -1,7 +1,6 @@
 "use client"
 import { edit, getProduct } from "@/api/products";
 import { getUserData } from "@/api/userData";
-import { HeaderContainer } from "@/components/customers/CustomersPage/styles";
 import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 import ProductForm from "@/components/products/ProductForm";
@@ -63,9 +62,7 @@ const EditProduct = ({ params }) => {
   };
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Actualizar Producto" />
-      </HeaderContainer>
+      <PageHeader title="Actualizar Producto" />
       <Loader active={isLoading}>
         {product && <ProductForm product={product} onSubmit={edit} />}
       </Loader>

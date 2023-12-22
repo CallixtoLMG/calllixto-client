@@ -8,7 +8,7 @@ import { Flex } from "rebass";
 import ImportExcel from "../ImportProduct";
 import { PRODUCT_COLUMNS } from "../products.common";
 import { ButtonContainer } from "./styles";
-import Table from "@/components/Table";
+import { Table } from "@/components/common/Table";
 import { useCallback } from "react";
 
 const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete }) => {
@@ -30,7 +30,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
             <ButtonDownload />
           </Flex>
         </ButtonContainer>}
-        <Table headers={PRODUCT_COLUMNS} elements={mapCustomersForTable(products)} />
+      <Table headers={PRODUCT_COLUMNS} elements={mapCustomersForTable(products)} />
     </>
   )
 };

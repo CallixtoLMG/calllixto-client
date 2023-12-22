@@ -33,10 +33,6 @@ const Input = styled(SInput)`
    };
 `;
 
-const HeaderContainer = styled(Flex)`
-  margin-bottom: 20px!important;
-`;
-
 const FormContainer = styled(Flex)`
   flex-direction: column;
   row-gap: 15px;
@@ -79,5 +75,5 @@ const PhoneContainer = styled(Flex)`
   column-gap: 10px;
 `;
 
-export { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, HeaderContainer, Input, Label, MaskedInput, PhoneContainer, Textarea };
+export { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea };
 

@@ -7,13 +7,9 @@ const ButtonContainer = styled(Flex)`
   margin-bottom: 20px!important;
 `;
 
-const HeaderContainer = styled(Flex)`
-  margin-bottom: 20px!important;
-`;
-
 const ModLink = styled(Link)({
   width: "fit-content",
 });
 
-export { ButtonContainer, HeaderContainer, ModLink };
+export { ButtonContainer, ModLink };
 

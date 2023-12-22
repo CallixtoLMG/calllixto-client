@@ -1,6 +1,6 @@
 "use client";
 import 'semantic-ui-css/semantic.min.css';
-import { MainContainer, SubContainer } from "../../commonStyles";
+import { MainContainer, SubContainer } from "@/commonStyles";
 
 export default function RootLayout({
   children,

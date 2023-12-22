@@ -4,7 +4,6 @@ import { customersList } from "@/api/customers";
 import { productsList } from "@/api/products";
 import { getUserData } from "@/api/userData";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
 import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
@@ -75,9 +74,7 @@ const CreateBudget = () => {
   }, [push]);
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Crear presupuesto" />
-      </HeaderContainer >
+      <PageHeader title="Crear presupuesto" />
       <Loader active={isLoading}>
         <BudgetForm onSubmit={create} products={products} customers={customers} />
       </Loader>

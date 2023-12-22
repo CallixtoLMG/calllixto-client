@@ -19,10 +19,6 @@ const Segment = styled(SSegment)`
   height: 50px!important;
 `;
 
-const HeaderContainer = styled(Flex)`
-  margin-bottom: 20px!important;
-`;
-
 const Container = styled(Flex)`
   row-gap: 15px;
   flex-direction: column;
@@ -37,6 +33,6 @@ const DataContainer = styled(Flex)`
   flex-direction: column;
 `;
 
-export { Container, DataContainer, HeaderContainer, Label, Segment, SubContainer };
+export { Container, DataContainer, Label, Segment, SubContainer };
 
 

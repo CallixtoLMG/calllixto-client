@@ -7,7 +7,6 @@ import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { HeaderContainer } from "../../components/customers/CustomersPage/styles";
 
 const Customers = () => {
   const { push } = useRouter();
@@ -62,9 +61,7 @@ const Customers = () => {
 
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Clientes" />
-      </HeaderContainer>
+      <PageHeader title="Clientes" />
       <Loader active={isLoading}>
         <CustomersPage customers={customers} onDelete={handleDeleteCustomer} />
       </Loader>

@@ -1,7 +1,6 @@
 "use client"
 import { create } from "@/api/products";
 import { getUserData } from "@/api/userData";
-import { HeaderContainer } from "@/components/customers/CustomersPage/styles";
 import PageHeader from "@/components/layout/PageHeader";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
@@ -42,9 +41,7 @@ const CreateProduct = () => {
   };
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Crear Producto" />
-      </HeaderContainer>
+      <PageHeader title="Crear Producto" />
       <ProductForm onSubmit={create} />
     </>
   )

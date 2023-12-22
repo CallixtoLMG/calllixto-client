@@ -35,9 +35,5 @@ const ButtonContainer = styled(Flex)`
   margin-bottom: 20px!important;
 `;
 
-const HeaderContainer = styled(Flex)`
-  margin-bottom: 20px!important;
-`;
-
-export { ButtonContainer, HeaderContainer, ModIcon, ModLink, Cell, HeaderCell, Row };
+export { ButtonContainer, ModIcon, ModLink, Cell, HeaderCell, Row };
 

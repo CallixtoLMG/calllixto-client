@@ -1,7 +1,6 @@
 "use client"
 import { getBudget } from "@/api/budgets";
 import { getUserData } from "@/api/userData";
-import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
 import ShowBudget from "@/components/budgets/ShowBudget";
 import Loader from "@/components/layout/Loader";
 import NoPrint from "@/components/layout/NoPrint";
@@ -57,9 +56,7 @@ const Budget = ({ params }) => {
   return (
     <>
       <NoPrint>
-        <HeaderContainer>
-          <PageHeader title="Presupuesto" />
-        </HeaderContainer >
+        <PageHeader title="Presupuesto" />
       </NoPrint>
       <Loader active={isLoading}>
         <ShowBudget budget={budget} />

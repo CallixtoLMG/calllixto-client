@@ -20,9 +20,5 @@ const ModTable = styled(Table)`
   margin-top: 0!important;
 `;
 
-const HeaderContainer = styled(Flex)`
-  margin-bottom: 20px!important;
-`;
-
-export { ButtonContainer, HeaderContainer, ModLink, ModTable };
+export { ButtonContainer, ModLink, ModTable };
 

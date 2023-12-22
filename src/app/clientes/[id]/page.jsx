@@ -1,7 +1,6 @@
 "use client";
 import { getCustomer } from "@/api/customers";
 import { getUserData } from "@/api/userData";
-import { HeaderContainer } from "@/components/customers/CustomerForm/styles";
 import ShowCustomer from "@/components/customers/ShowCustomer";
 import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
@@ -55,9 +54,7 @@ const Customer = ({ params }) => {
 
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Cliente" />
-      </HeaderContainer>
+      <PageHeader title="Cliente" />
       <Loader active={isLoading}>
         <ShowCustomer customer={customer} />
       </Loader>

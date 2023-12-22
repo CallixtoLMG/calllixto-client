@@ -6,10 +6,6 @@ const SubContainer = styled(Flex)`
   flex-direction: row;
 `;
 
-const HeaderContainer = styled(Flex)`
-  margin-bottom: 20px!important;
-`;
-
 const DataContainer = styled(Flex)`
   flex-direction: column;
   margin: 0 10px 10px 0!important;
@@ -53,5 +49,5 @@ const Table = styled(STable)`
   margin-top: 5px !important;
 `;
 
-export { DataContainer, HeaderContainer, Button, Segment, Cell, FooterCell, HeaderCell, Row, SubContainer, Table };
+export { DataContainer, Button, Segment, Cell, FooterCell, HeaderCell, Row, SubContainer, Table };
 

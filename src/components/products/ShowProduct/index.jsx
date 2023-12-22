@@ -1,5 +1,5 @@
 "use client";
-import { formatedPrice } from "../../../utils";
+import { formatedPrice } from "@/utils";
 import { Container, DataContainer, Label, Segment, SubContainer } from "./styles";
 
 const ShowProduct = ({ product }) => {

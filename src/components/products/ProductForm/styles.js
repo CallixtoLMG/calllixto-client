@@ -17,10 +17,6 @@ const Label = styled(SLabel)({
   width: "100%!important"
 });
 
-const HeaderContainer = styled(Flex)`
-  margin-bottom: 20px!important;
-`;
-
 const Input = styled(SInput)`
   margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
@@ -60,5 +56,5 @@ const ButtonsContainer = styled(Flex)`
   column-gap: 20px;
 `;
 
-export { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, HeaderContainer, Input, Label, Textarea, WarningMessage };
+export { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea, WarningMessage };
 

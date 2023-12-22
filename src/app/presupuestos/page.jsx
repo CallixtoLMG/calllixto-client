@@ -2,7 +2,6 @@
 import { budgetsList } from "@/api/budgets";
 import { getUserData } from "@/api/userData";
 import BudgetsPage from "@/components/budgets/BudgetPage";
-import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
 import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
@@ -51,9 +50,7 @@ const Budgets = () => {
 
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Presupuestos" />
-      </HeaderContainer>
+      <PageHeader title="Presupuestos" />
       <Loader active={isLoading}>
         <BudgetsPage budgets={budgets} />
       </Loader>

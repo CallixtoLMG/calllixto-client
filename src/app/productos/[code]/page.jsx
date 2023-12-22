@@ -1,7 +1,6 @@
 "use client"
 import { getProduct } from "@/api/products";
 import { getUserData } from "@/api/userData";
-import { HeaderContainer } from "@/components/customers/CustomersPage/styles";
 import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 import ShowProduct from "@/components/products/ShowProduct";
@@ -55,9 +54,7 @@ const Product = ({ params }) => {
 
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Producto" />
-      </HeaderContainer>
+      <PageHeader title="Producto" />
       <Loader active={isLoading}>
         <ShowProduct product={product} />
       </Loader>

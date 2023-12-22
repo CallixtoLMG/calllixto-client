@@ -2,7 +2,6 @@
 import { edit, getCustomer } from "@/api/customers";
 import { getUserData } from "@/api/userData";
 import CustomerForm from "@/components/customers/CustomerForm";
-import { HeaderContainer } from "@/components/customers/CustomerForm/styles";
 import Loader from "@/components/layout/Loader";
 import PageHeader from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
@@ -51,9 +50,7 @@ const EditCustomer = ({ params }) => {
 
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Actualizar Cliente" />
-      </HeaderContainer >
+      <PageHeader title="Actualizar Cliente" />
       <Loader active={isLoading}>
         <CustomerForm customer={customer} onSubmit={edit} />
       </Loader>
