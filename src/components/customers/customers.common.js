@@ -3,26 +3,22 @@ import { Cell } from "@/components/common/table";
 
 export const HEADERS = [
   {
-    value: "id",
     id: 1,
     value: (customer) => <Cell>{customer.key}</Cell>
   },
   {
+    id: 2,
     title: "Nombre",
-    value: "name",
-    id: 1,
     value: (customer) => <Cell>{customer.name}</Cell>
   },
   {
+    id: 3,
     title: "Teléfono",
-    value: "phone",
-    id: 2,
     value: (customer) => <Cell>{formatedPhone(customer.phone.areaCode, customer.phone.number)}</Cell>
   },
   {
+    id: 4,
     title: "Email",
-    value: "email",
-    id: 3,
     value: (customer) => <Cell>{customer.email}</Cell>
   }
 ];

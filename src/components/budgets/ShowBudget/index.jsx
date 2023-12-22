@@ -1,19 +1,15 @@
 "use client";
 import { SendButton } from "@/components/common/buttons";
 import { get } from "lodash";
-import { Icon, Label, Table as STable } from "semantic-ui-react";
-import { formatedDate, formatedPrice, getTotalSum } from "@/utils";
+import { Icon, Label } from "semantic-ui-react";
+import { formatedDate } from "@/utils";
 import { PRODUCTS_COLUMNS } from "../budgets.common";
+import { Table } from "@/components/common/table";
 import {
   DataContainer,
   Button,
   Segment,
-  Cell,
-  FooterCell,
-  HeaderCell,
-  Row,
   SubContainer,
-  Table
 } from "./styles";
 import { Flex } from "rebass";
 import { NoPrint, OnlyPrint } from "@/components/layout";
@@ -35,36 +31,7 @@ const ShowBudget = ({ budget }) => {
         </SubContainer>
         <Flex flexDirection="column" width="100%" marginTop="15px">
           <Label align="center">Productos</Label>
-          <Table celled compact striped>
-            <STable.Header fullWidth>
-              <HeaderCell $header />
-              {PRODUCTS_COLUMNS.map((column) => (
-                <HeaderCell $header key={column.id}>
-                  {column.title}
-                </HeaderCell>
-              ))}
-            </STable.Header>
-            <STable.Body>
-              {budget?.products?.map((product, index) => (
-                <Row key={product.code}>
-                  <Cell>{index + 1}</Cell>
-                  {PRODUCTS_COLUMNS.map((column) => (
-                    <Cell key={column.id}>{column.value(product)}</Cell>
-                  ))}
-                </Row>
-              ))}
-            </STable.Body>
-            <STable.Footer celled fullWidth>
-              <STable.Row>
-                <FooterCell align="right" colSpan="6">
-                  <strong>TOTAL</strong>
-                </FooterCell>
-                <HeaderCell colSpan="1">
-                  <strong>{formatedPrice(getTotalSum(budget?.products))}</strong>
-                </HeaderCell>
-              </STable.Row>
-            </STable.Footer>
-          </Table>
+          <Table headers={PRODUCTS_COLUMNS} elements={budget?.products} />
           <Flex>
             <Button onClick={() => window.print()} color="blue">
               <Icon name="download" />Descargar PDF
