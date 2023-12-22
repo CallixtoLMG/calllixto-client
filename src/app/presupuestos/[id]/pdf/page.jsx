@@ -2,12 +2,14 @@
 import { getBudget } from "@/api/budgets";
 import { getUserData } from "@/api/userData";
 import PDFfile from "@/components/budgets/PDFfile";
+import { Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const PDF = ({ params }) => {
-  const [pdfBudget, setPdfBudget] = useState();
+  const [budget, setBudget] = useState();
+  const [isLoading, setIsLoading] = useState(true);
   const { push } = useRouter();
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -34,12 +36,13 @@ const PDF = ({ params }) => {
           },
           cache: "no-store",
         };
-        const fetchBudget = await getBudget(params.id, requestOptions);
-        if (!fetchBudget) {
+        const budget = await getBudget(params.id, requestOptions);
+        if (!budget) {
           push(PAGES.NOTFOUND.BASE);
           return;
         };
-        setPdfBudget(fetchBudget);
+        setIsLoading(false);
+        setBudget(budget);
       } catch (error) {
         console.error('Error al cargar PDF:', error);
       };
@@ -49,7 +52,9 @@ const PDF = ({ params }) => {
   }, [params.id, push]);
 
   return (
-    <PDFfile budget={pdfBudget} />
+    <Loader active={isLoading}>
+      <PDFfile budget={budget} />
+    </Loader>
   )
 };
 

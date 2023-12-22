@@ -75,18 +75,6 @@ const Segment = styled(SSegment)`
   padding: 8px !important;
 `;
 
-const FooterCell = styled(Table.HeaderCell)`
-  background-color: rgb(255, 255, 255)!important;
-  text-align: ${({ align }) => align || "center"} !important;
-  strong{
-    margin-right: 3.3rem!important;
-  };
-`;
-
-const Cell = styled(Table.Cell)`
-  text-align: center !important;
-`;
-
 const Image = styled(SImage)`
   &&& {
     width: 250px!important;
@@ -105,5 +93,5 @@ const PayMethodsContainer = styled(Flex)`
   margin-left: 15px !important;
 `;
 
-export { PayMethodsContainer, ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, Image, Label, SubtleLabel, Segment, Cell, FooterCell, Title, PayMethodContainer, Sign, Header };
+export { PayMethodsContainer, ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, Image, Label, SubtleLabel, Segment, Title, PayMethodContainer, Sign, Header };
 

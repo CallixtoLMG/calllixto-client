@@ -1,9 +1,8 @@
 "use client";
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
-import { formatedPrice, getTotalSum } from '@/utils';
 import { get } from "lodash";
 import { Flex } from "rebass";
-import { Table } from 'semantic-ui-react';
+import { Table } from '@/components/common/table';
 import {
   ClientDataContainer,
   CustomerDataContainer,
@@ -14,8 +13,6 @@ import {
   Label,
   SubtleLabel,
   Segment,
-  Cell,
-  FooterCell,
   Title,
   Header,
   Sign,
@@ -75,36 +72,7 @@ const PDFfile = ({ budget, seller }) => {
         </Flex>
       </ClientDataContainer>
       <Flex marginTop="20px">
-        <Table celled compact striped>
-          <Table.Header fullWidth>
-            <Table.Row>
-              <Table.HeaderCell />
-              {PRODUCTS_COLUMNS
-                .map((column) => (
-                  <Table.HeaderCell key={column.id} >{column.title}</Table.HeaderCell>
-                ))}
-            </Table.Row>
-          </Table.Header>
-          <Table.Body>
-            {budget?.products?.map((product, index) => (
-              <Table.Row key={product.code}>
-                <Cell >{index + 1}</Cell>
-                {PRODUCTS_COLUMNS
-                  .map((column) =>
-                    <Cell key={column.id}>
-                      {column.value(product)}
-                    </Cell>)
-                }
-              </Table.Row>
-            ))}
-          </Table.Body>
-          <Table.Footer>
-            <Table.Row>
-              <FooterCell align="right" colSpan='6'><strong>TOTAL</strong></FooterCell>
-              <Table.HeaderCell colSpan='1'><strong>{formatedPrice(getTotalSum(budget?.products))}</strong></Table.HeaderCell>
-            </Table.Row>
-          </Table.Footer>
-        </Table>
+        <Table headers={PRODUCTS_COLUMNS} elements={budget?.products} />
       </Flex>
       <Sign />
       <Flex alignItems="flex-start" padding="20px 0" wrap="wrap">
