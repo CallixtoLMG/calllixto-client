@@ -2,7 +2,7 @@
 import { getBudget } from "@/api/budgets";
 import { getUserData } from "@/api/userData";
 import ShowBudget from "@/components/budgets/ShowBudget";
-import { PageHeader, Loader, NoPrint } from "@/components/layout";
+import { PageHeader, Loader, NoPrint } from "@/components/layout/PageHeader";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -49,7 +49,7 @@ const Budget = ({ params }) => {
     };
     validateToken();
     fetchData();
-  }, [params.id]);
+  }, [params.id, push]);
 
   return (
     <>

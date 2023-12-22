@@ -1,5 +1,5 @@
 import { formatedPhone } from "@/utils";
-import { Cell } from "@/components/common/Table";
+import { Cell } from "@/components/common/table";
 
 export const HEADERS = [
   {

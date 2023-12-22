@@ -7,7 +7,7 @@ import { Flex } from "rebass";
 import ImportExcel from "../ImportProduct";
 import { PRODUCT_COLUMNS } from "../products.common";
 import { ButtonContainer } from "./styles";
-import { Table } from "@/components/common/Table";
+import { Table } from "@/components/common/table";
 import { useCallback } from "react";
 
 const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete }) => {

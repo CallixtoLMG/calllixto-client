@@ -45,7 +45,7 @@ const EditCustomer = ({ params }) => {
     };
     validateToken();
     fetchData();
-  }, [params.id]);
+  }, [params.id, push]);
 
   return (
     <>

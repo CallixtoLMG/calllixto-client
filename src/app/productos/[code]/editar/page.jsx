@@ -55,7 +55,7 @@ const EditProduct = ({ params }) => {
     validateToken();
     fetchData();
     fetchRol();
-  }, [params.code]);
+  }, [params.code, push]);
   if (role === "user") {
     push(PAGES.NOTFOUND.BASE);
   };

@@ -1,5 +1,5 @@
 import { formatedPrice } from "@/utils";
-import { Cell } from "@/components/common/Table";
+import { Cell } from "@/components/common/table";
 
 const PRODUCT_COLUMNS = [
   {

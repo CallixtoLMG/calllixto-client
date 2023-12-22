@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useRouter } from 'next/navigation';
 import { Button, Header, Icon } from 'semantic-ui-react';
 import { MainContainer } from "./styles";
