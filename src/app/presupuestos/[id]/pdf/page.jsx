@@ -1,7 +1,7 @@
 "use client"
 import { getBudget } from "@/api/budgets";
 import { getUserData } from "@/api/userData";
-import PDFfile from "@/components/PDFfile";
+import PDFfile from "@/components/budgets/PDFfile";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -46,7 +46,7 @@ const PDF = ({ params }) => {
     };
     validateToken();
     fetchData();
-  }, [params.id, router]);
+  }, [params.id, push]);
 
   return (
     <PDFfile budget={pdfBudget} />
