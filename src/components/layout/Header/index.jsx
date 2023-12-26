@@ -19,16 +19,20 @@ const Header = () => {
   };
 
   useEffect(() => {
+    setIsLoading(true);
+  }, [pathname]);
+
+  useEffect(() => {
     if (typeof window !== 'undefined') {
       const validateToken = async () => {
         try {
           const userData = await getUserData();
           setValidatedToken(userData?.isAuthorized);
-          setIsLoading(false);
         } catch (error) {
-          setIsLoading(false);
           console.error('Error, ingreso no valido(token):', error);
-        };
+        } finally {
+          setIsLoading(false);
+        }
       };
       validateToken();
     };
