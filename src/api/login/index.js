@@ -1,3 +1,4 @@
+import { getUserData } from "@/api/userData";
 import { PATHS, URL } from "@/fetchUrls";
 
 const loginRequestOptions = {
@@ -15,6 +16,7 @@ export async function login(data) {
   if (res.$metadata?.httpStatusCode) {
     const accessToken = res.AuthenticationResult.AccessToken;
     localStorage.setItem("token", accessToken);
+    await getUserData();
     return true;
   } else {
     return false;
