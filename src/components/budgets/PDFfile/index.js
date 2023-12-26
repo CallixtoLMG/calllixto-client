@@ -1,24 +1,24 @@
 "use client";
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
+import { Table } from '@/components/common/table';
+import dayjs from "dayjs";
 import { get } from "lodash";
 import { Flex } from "rebass";
-import { Table } from '@/components/common/table';
 import {
   ClientDataContainer,
   CustomerDataContainer,
   DataContainer,
   Divider,
+  Header,
   HeaderContainer,
   Image,
   Label,
-  SubtleLabel,
+  PayMethodsContainer,
   Segment,
-  Title,
-  Header,
   Sign,
-  PayMethodsContainer
+  SubtleLabel,
+  Title
 } from "./styles";
-import dayjs from "dayjs";
 
 const PDFfile = ({ budget, seller }) => {
   return (
@@ -72,7 +72,7 @@ const PDFfile = ({ budget, seller }) => {
         </Flex>
       </ClientDataContainer>
       <Flex marginTop="20px">
-        <Table headers={PRODUCTS_COLUMNS} elements={budget?.products} />
+        <Table headers={PRODUCTS_COLUMNS.filter((products) => !products.hide)} elements={budget?.products} />
       </Flex>
       <Sign />
       <Flex alignItems="flex-start" padding="20px 0" wrap="wrap">

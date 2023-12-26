@@ -1,9 +1,8 @@
 import { Table } from "semantic-ui-react";
 import styled from "styled-components";
-import { Flex } from "rebass";
 
 const Cell = styled(Table.Cell)`
-  text-align: center!important;
+  text-align: ${(props) => props.align || "center!important"};
   height: 40px;
   z-index: 2;
 `;
@@ -42,5 +41,5 @@ const LinkRow = styled(Table.Row)`
 `;
 
 
-export { HeaderCell, Cell, LinkRow, ActionsContainer };
+export { ActionsContainer, Cell, HeaderCell, LinkRow };
 

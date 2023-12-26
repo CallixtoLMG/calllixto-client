@@ -1,24 +1,24 @@
-import { formatedPhone } from "@/utils";
 import { Cell } from "@/components/common/table";
+import { formatedPhone } from "@/utils";
 
 export const HEADERS = [
   {
     id: 1,
-    value: (customer) => <Cell>{customer.key}</Cell>
+    value: (customer) => <Cell width={1}>{customer.key}</Cell>
   },
   {
     id: 2,
     title: "Nombre",
-    value: (customer) => <Cell>{customer.name}</Cell>
+    value: (customer) => <Cell align="left">{customer.name}</Cell>
   },
   {
     id: 3,
     title: "Teléfono",
-    value: (customer) => <Cell>{formatedPhone(customer.phone.areaCode, customer.phone.number)}</Cell>
+    value: (customer) => <Cell width={3}>{formatedPhone(customer.phone.areaCode, customer.phone.number)}</Cell>
   },
   {
     id: 4,
     title: "Email",
-    value: (customer) => <Cell>{customer.email}</Cell>
+    value: (customer) => <Cell width={4}>{customer.email}</Cell>
   }
 ];

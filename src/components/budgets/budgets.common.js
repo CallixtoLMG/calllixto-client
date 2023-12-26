@@ -1,26 +1,26 @@
-import { formatedPrice, formatedPercentage, getTotal, formatedDate, getTotalSum } from "@/utils";
 import { Cell } from "@/components/common/table";
+import { formatedDate, formatedPercentage, formatedPrice, getTotal, getTotalSum } from "@/utils";
 
 const BUDGETS_COLUMNS = [
   {
     id: 1,
     title: "Id",
-    value: (budget) => <Cell>{budget.id}</Cell>
+    value: (budget) => <Cell width={2}>{budget.id}</Cell>
   },
   {
     id: 2,
     title: "Cliente",
-    value: (budget) => <Cell>{budget.customer.name}</Cell>
+    value: (budget) => <Cell align="left">{budget.customer.name}</Cell>
   },
   {
     id: 3,
     title: "Fecha",
-    value: (budget) => <Cell>{formatedDate(budget.createdAt)}</Cell>
+    value: (budget) => <Cell width={4}>{formatedDate(budget.createdAt)}</Cell>
   },
   {
     id: 4,
     title: "Total",
-    value: (budget) => <Cell>{formatedPrice(getTotalSum(budget.products))}</Cell>
+    value: (budget) => <Cell width={2}>{formatedPrice(getTotalSum(budget.products))}</Cell>
   },
 ];
 
@@ -32,28 +32,29 @@ const PRODUCTS_COLUMNS = [
   },
   {
     id: 2,
-    title: "Cantidad",
-    value: (product) => <Cell>{product.quantity || 0}</Cell>
+    title: "Cant",
+    value: (product) => <Cell width={1}>{product.quantity || 0}</Cell>
   },
   {
     id: 3,
     title: "Precio",
-    value: (product) => <Cell>{formatedPrice(product.price || 0)}</Cell>
+    value: (product) => <Cell width={1}>{formatedPrice(product.price || 0)}</Cell>
   },
   {
     id: 4,
     title: "Subtotal",
-    value: (product) => <Cell>{formatedPrice(product.price * product.quantity || 0)}</Cell>
+    value: (product) => <Cell width={1}>{formatedPrice(product.price * product.quantity || 0)}</Cell>,
+    hide: true,
   },
   {
     id: 5,
     title: "Desc.",
-    value: (product) => <Cell>{formatedPercentage(product.discount || 0)}</Cell>
+    value: (product) => <Cell width={1}>{formatedPercentage(product.discount || 0)}</Cell>
   },
   {
     id: 6,
     title: "Importe",
-    value: (product) => <Cell>{formatedPrice(getTotal(product))}</Cell>
+    value: (product) => <Cell width={1}>{formatedPrice(getTotal(product))}</Cell>
   },
 ];
 
@@ -68,6 +69,6 @@ const BUDGET_FORM_PRODUCT_COLUMNS = [
 ];
 
 export {
-  BUDGETS_COLUMNS, PRODUCTS_COLUMNS, BUDGET_FORM_PRODUCT_COLUMNS
+  BUDGETS_COLUMNS, BUDGET_FORM_PRODUCT_COLUMNS, PRODUCTS_COLUMNS
 };
 
