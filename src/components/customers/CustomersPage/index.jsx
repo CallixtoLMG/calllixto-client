@@ -5,15 +5,47 @@ import { useRouter } from "next/navigation";
 import { HEADERS } from "../customers.common";
 import { ButtonContainer } from "./styles";
 import { Table } from '@/components/common/table';
-import { useCallback } from "react";
+import { ModalDelete } from '@/components/common/modals';
+import { useCallback, useState } from "react";
+import { set } from "react-hook-form";
 
 const CustomersPage = ({ customers = [], onDelete }) => {
   const { push } = useRouter();
-  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`;
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const mapCustomersForTable = useCallback((c) => {
-    return c.map((customer, index) => ({ ...customer, key: index + 1 }));
+  const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar el cliente "${name}"?`, []);
+
+  const mapCustomersForTable = useCallback((customer) => {
+    return customer.map((customer, index) => ({ ...customer, key: index + 1 }));
   }, []);
+
+  const actions = [
+    {
+      id: 1,
+      icon: 'edit',
+      color: 'blue',
+      onClick: (customer) => { push(PAGES.CUSTOMERS.UPDATE(customer.id)) },
+      tooltip: 'Editar'
+    },
+    {
+      id: 2,
+      icon: 'erase',
+      color: 'red',
+      onClick: (customer) => {
+        setSelectedCustomer(customer);
+        setShowModal(true);
+      },
+      tooltip: 'Eliminar'
+    }
+  ];
+
+  const handleDelete = useCallback(async () => {
+    setIsLoading(true);
+    await onDelete(selectedCustomer.id);
+    setIsLoading(false);
+  }, [selectedCustomer, setIsLoading, onDelete]);
 
   return (
     <>
@@ -24,7 +56,14 @@ const CustomersPage = ({ customers = [], onDelete }) => {
           iconName="add"
           goTo={PAGES.CUSTOMERS.CREATE} />
       </ButtonContainer>
-      <Table headers={HEADERS} elements={mapCustomersForTable(customers)} page={PAGES.CUSTOMERS} />
+      <Table headers={HEADERS} elements={mapCustomersForTable(customers)} page={PAGES.CUSTOMERS} actions={actions} />
+      <ModalDelete
+        showModal={showModal}
+        setShowModal={setShowModal}
+        title={deleteQuestion(selectedCustomer?.name)}
+        onDelete={handleDelete}
+        isLoading={isLoading}
+      />
     </>
   );
 };

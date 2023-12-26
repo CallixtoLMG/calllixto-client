@@ -1,9 +1,9 @@
-import Link from "next/link";
-import { HeaderCell, LinkRow } from "./styles";
+import { ActionsContainer, HeaderCell, LinkRow } from "./styles";
 import { Table } from "semantic-ui-react";
 import { useRouter } from "next/navigation";
+import Actions from "./Actions";
 
-const CustomeTable = ({ headers = [], elements = [], page }) => {
+const CustomTable = ({ headers = [], elements = [], page, actions = [] }) => {
   const { push } = useRouter();
   return (
     <Table celled compact striped>
@@ -16,14 +16,26 @@ const CustomeTable = ({ headers = [], elements = [], page }) => {
         {elements.map((element) => {
           if (page) {
             return (
-              <LinkRow key={element.key} onClick={() => push(page.SHOW(element.id)) }>
-                {headers.map((header) => header.value(element))}
-              </LinkRow>
+              <>
+                <LinkRow key={element.key} onClick={() => push(page.SHOW(element.id))}>
+                  {headers.map((header) => header.value(element))}
+                  {!!actions.length && (
+                    <ActionsContainer>
+                      <Actions actions={actions} element={element} />
+                    </ActionsContainer>
+                  )}
+                </LinkRow>
+              </>
             )
           }
           return (
             <Table.Row key={element.key}>
               {headers.map((header) => header.value(element))}
+              {!!actions.length && (
+                <ActionsContainer>
+                  <Actions actions={actions} />
+                </ActionsContainer>
+              )}
             </Table.Row>
           )
         })}
@@ -32,4 +44,4 @@ const CustomeTable = ({ headers = [], elements = [], page }) => {
   );
 };
 
-export default CustomeTable;
+export default CustomTable;

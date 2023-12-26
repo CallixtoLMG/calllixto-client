@@ -46,7 +46,7 @@ const Customers = () => {
     };
     validateToken();
     fetchData();
-  }, []);
+  }, [push]);
 
   const handleDeleteCustomer = async (id) => {
     try {
