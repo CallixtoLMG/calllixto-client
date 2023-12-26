@@ -4,8 +4,9 @@ import { createDate, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Form, Icon, Button as SButton, Dropdown as SDropdown, Table } from "semantic-ui-react";
+import { Form, Icon, Popup, Button as SButton, Dropdown as SDropdown, Table } from "semantic-ui-react";
 import { Button, Cell, Dropdown, HeaderCell, Input, TotalText, WarningMessage } from "./styles";
+import { Flex, Box } from "rebass";
 
 const BudgetForm = ({ onSubmit, products, customers, budget }) => {
   const { push } = useRouter();
@@ -109,34 +110,49 @@ const BudgetForm = ({ onSubmit, products, customers, budget }) => {
           {watchProducts.map((product, index) => (
             <Table.Row key={`${product.code}-${index}`}>
               <Cell>
-                <Controller
-                  name={`products[${index}].name`}
-                  control={control}
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <>
-                      <SDropdown
-                        fluid
-                        search
-                        selection
-                        noResultsMessage="No se ha encontrado producto!"
-                        options={products}
-                        {...field}
-                        onChange={(e, { value }) => {
-                          field.onChange(value);
-                          const product = products.find((opt) => opt.value === value);
-                          setValue(`products[${index}].price`, product.price);
-                          setValue(`products[${index}].code`, product.code);
-                          setValue(`products[${index}].quantity`, 1);
-                          calculateTotal();
-                        }}
-                      />
-                      {triedToAddWithoutSelection && !watchProducts[index].code && (
-                        <WarningMessage> Debe seleccionar un producto </WarningMessage>
-                      )}
-                    </>
+                <Flex alignItems="center">
+                  <Controller
+                    name={`products[${index}].name`}
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <>
+                        <SDropdown
+                          fluid
+                          search
+                          selection
+                          noResultsMessage="No se ha encontrado producto!"
+                          options={products}
+                          {...field}
+                          onChange={(e, { value }) => {
+                            field.onChange(value);
+                            const product = products.find((opt) => opt.value === value);
+                            setValue(`products[${index}].price`, product.price);
+                            setValue(`products[${index}].code`, product.code);
+                            setValue(`products[${index}].quantity`, 1);
+                            setValue(`products[${index}].comments`, product.comments);
+                            calculateTotal();
+                          }}
+                        />
+                        {triedToAddWithoutSelection && !watchProducts[index].code && (
+                          <WarningMessage> Debe seleccionar un producto </WarningMessage>
+                        )}
+                      </>
+                    )}
+                  />
+                  {product.comments && (
+                    <Popup
+                      size="mini"
+                      content={product.comments}
+                      position="top center"
+                      trigger={
+                        <Box marginX="5px">
+                          <Icon name="info circle" color="red" size="large" />
+                        </Box>
+                      }
+                    />
                   )}
-                />
+                </Flex>
               </Cell>
               <Cell>
                 {formatedPrice(product.price)}

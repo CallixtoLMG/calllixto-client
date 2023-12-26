@@ -55,9 +55,8 @@ const CreateBudget = () => {
       try {
         const productsFecthData = await productsList(requestOptions);
         const productsFilteredList = productsFecthData.map(product => ({
-          price: product.price,
+          ...product,
           key: product.code,
-          code: product.code,
           value: product.name,
           text: product.name,
         }));
