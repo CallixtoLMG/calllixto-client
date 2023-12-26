@@ -17,8 +17,9 @@ const Header = () => {
     sessionStorage.removeItem("userData");
     push(PAGES.LOGIN.BASE);
   };
-  if (typeof window !== 'undefined') {
-    useEffect(() => {
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
       const validateToken = async () => {
         try {
           const userData = await getUserData();
@@ -30,8 +31,9 @@ const Header = () => {
         };
       };
       validateToken();
-    }, [localStorage.token]);
-  };
+    };
+  }, [pathname]);
+
   const routesWithoutHeader = [PAGES.LOGIN.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
   return (
