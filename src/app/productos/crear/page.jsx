@@ -35,7 +35,7 @@ const CreateProduct = () => {
     };
     validateToken();
     fetchRol();
-  }, []);
+  }, [push]);
   if (role === "user") {
     push(PAGES.NOTFOUND.BASE)
   };

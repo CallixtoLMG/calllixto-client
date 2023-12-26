@@ -56,7 +56,7 @@ const Products = () => {
     validateToken();
     fetchProductData();
     fetchRol();
-  }, []);
+  }, [push]);
 
   const handleDeleteProduct = async (code) => {
     try {

@@ -45,7 +45,7 @@ const Budgets = () => {
     };
     validateToken();
     fetchData();
-  }, []);
+  }, [push]);
 
   return (
     <>

@@ -7,7 +7,7 @@ const NotFound: React.FC = () => {
   const { push } = useRouter()
   useEffect(() => {
     push(PAGES.NOTFOUND.BASE);
-  }, [])
+  }, [push])
   return (
     <></>
   )

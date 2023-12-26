@@ -25,7 +25,7 @@ const CreateCustomer = () => {
       };
     };
     validateToken();
-  }, []);
+  }, [push]);
   return (
     <>
       <PageHeader title="Crear Cliente" />
