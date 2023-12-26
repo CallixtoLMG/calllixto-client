@@ -6,7 +6,7 @@ import React, { useEffect } from 'react';
 const NotFound: React.FC = () => {
   const { push } = useRouter()
   useEffect(() => {
-    push(PAGES.NOTFOUND.BASE);
+    push(PAGES.NOT_FOUND.BASE);
   }, [push])
   return (
     <></>

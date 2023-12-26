@@ -1,5 +1,12 @@
 const PAGES = {
   BASE: "/",
+  CUSTOMERS: {
+    BASE: "/clientes",
+    CREATE: "/clientes/crear",
+    UPDATE: (code) => `/clientes/${code}/editar`,
+    SHOW: (id) => `/clientes/${id}`,
+    NAME: 'Clientes'
+  },
   BRANDS: {
     BASE: "/marcas",
     CREATE: "/marcas/crear",
@@ -25,16 +32,9 @@ const PAGES = {
   LOGIN: {
     BASE: "/login"
   },
-  NOTFOUND: {
+  NOT_FOUND: {
     BASE: "/ups"
   },
-  CUSTOMERS: {
-    BASE: "/clientes",
-    CREATE: "/clientes/crear",
-    UPDATE: (code) => `/clientes/${code}/editar`,
-    SHOW: (id) => `/clientes/${id}`,
-    NAME: 'Clientes'
-  }
 };
 
 const APIS = {
