@@ -10,6 +10,7 @@ const PAGES = {
   BUDGETS: {
     BASE: "/presupuestos",
     CREATE: "/presupuestos/crear",
+    CLONE: (id) => `/presupuestos/crear?clonar=${id}`,
     SHOW: (id) => `/presupuestos/${id}`,
     SHOWPDF: (id) => `/presupuestos/${id}/pdf`,
     NAME: 'Presupuestos'

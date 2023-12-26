@@ -7,11 +7,11 @@ import { Controller, useForm } from "react-hook-form";
 import { Form, Icon, Button as SButton, Dropdown as SDropdown, Table } from "semantic-ui-react";
 import { Button, Cell, Dropdown, HeaderCell, Input, TotalText, WarningMessage } from "./styles";
 
-const BudgetForm = ({ onSubmit, products, customers }) => {
+const BudgetForm = ({ onSubmit, products, customers, budget }) => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { control, handleSubmit, setValue, watch, formState: { isValid, isDirty } } = useForm({
-    defaultValues: {
+    defaultValues: budget || {
       products: [
         {
           name: '',
@@ -22,6 +22,7 @@ const BudgetForm = ({ onSubmit, products, customers }) => {
       ],
     },
   });
+
   const [triedToAddWithoutSelection, setTriedToAddWithoutSelection] = useState(false);
   const watchProducts = watch('products', [{
     name: '',
