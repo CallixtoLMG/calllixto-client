@@ -28,7 +28,7 @@ const PRODUCTS_COLUMNS = [
   {
     id: 1,
     title: "Descripción",
-    value: (product) => <Cell>{product.name}</Cell>
+    value: (product) => <Cell align="true" >{product.name}</Cell>
   },
   {
     id: 2,
