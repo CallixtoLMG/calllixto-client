@@ -3,7 +3,7 @@ import { formatedPrice, getBrandCode, getProductCode, getSupplierCode } from "@/
 import { Icon, Popup } from "semantic-ui-react";
 import { Flex, Box } from "rebass";
 
-const PRODUCT_COLUMNS = [
+const BRAND_COLUMNS = [
   {
     title: "Código",
     id: 1,
@@ -58,5 +58,5 @@ const PRODUCT_COLUMNS = [
 ];
 
 export {
-  PRODUCT_COLUMNS
+  BRAND_COLUMNS
 };

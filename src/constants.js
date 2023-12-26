@@ -1,5 +1,12 @@
 const PAGES = {
   BASE: "/",
+  BRANDS: {
+    BASE: "/marcas",
+    CREATE: "/marcas/crear",
+    UPDATE: (id) => `/marcas/${id}/editar`,
+    SHOW: (id) => `/marcas/${id}`,
+    NAME: 'Marcas'
+  },
   PRODUCTS: {
     BASE: "/productos",
     CREATE: "/productos/crear",

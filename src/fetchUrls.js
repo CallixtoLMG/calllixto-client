@@ -2,7 +2,8 @@ export const PATHS = {
   BUDGETS: "budgets",
   CUSTOMERS: "customers",
   PRODUCTS: "products",
-  LOGIN: "login"
+  LOGIN: "login",
+  BRANDS: "brands"
 };
 
 export const CREATEBATCH = "/batch";
