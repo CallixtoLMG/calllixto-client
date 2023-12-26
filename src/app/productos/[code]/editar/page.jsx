@@ -1,9 +1,7 @@
 "use client"
 import { edit, getProduct } from "@/api/products";
 import { getUserData } from "@/api/userData";
-import { HeaderContainer } from "@/components/customers/CustomersPage/styles";
-import Loader from "@/components/layout/Loader";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader, Loader } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -57,15 +55,13 @@ const EditProduct = ({ params }) => {
     validateToken();
     fetchData();
     fetchRol();
-  }, [params.code]);
+  }, [params.code, push]);
   if (role === "user") {
     push(PAGES.NOTFOUND.BASE);
   };
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Actualizar Producto" />
-      </HeaderContainer>
+      <PageHeader title="Actualizar Producto" />
       <Loader active={isLoading}>
         {product && <ProductForm product={product} onSubmit={edit} />}
       </Loader>

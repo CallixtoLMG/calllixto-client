@@ -1,10 +1,8 @@
 "use client";
 import { getCustomer } from "@/api/customers";
 import { getUserData } from "@/api/userData";
-import { HeaderContainer } from "@/components/customers/CustomerForm/styles";
 import ShowCustomer from "@/components/customers/ShowCustomer";
-import Loader from "@/components/layout/Loader";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader, Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -51,13 +49,11 @@ const Customer = ({ params }) => {
     };
     validateToken();
     fetchData();
-  }, [params.id]);
+  }, [params.id, push]);
 
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Cliente" />
-      </HeaderContainer>
+      <PageHeader title="Cliente" />
       <Loader active={isLoading}>
         <ShowCustomer customer={customer} />
       </Loader>

@@ -2,12 +2,10 @@
 import { customersList, deleteCustomer } from "@/api/customers";
 import { getUserData } from "@/api/userData";
 import CustomersPage from "@/components/customers/CustomersPage";
-import Loader from "@/components/layout/Loader";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader, Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { HeaderContainer } from "../../components/customers/CustomersPage/styles";
 
 const Customers = () => {
   const { push } = useRouter();
@@ -48,7 +46,7 @@ const Customers = () => {
     };
     validateToken();
     fetchData();
-  }, []);
+  }, [push]);
 
   const handleDeleteCustomer = async (id) => {
     try {
@@ -62,9 +60,7 @@ const Customers = () => {
 
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Clientes" />
-      </HeaderContainer>
+      <PageHeader title="Clientes" />
       <Loader active={isLoading}>
         <CustomersPage customers={customers} onDelete={handleDeleteCustomer} />
       </Loader>

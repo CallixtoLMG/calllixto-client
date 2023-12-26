@@ -9,16 +9,6 @@ const ButtonContainer = styled(Flex)`
   justify-content: space-between;
 `;
 
-const Cell = styled(Table.Cell)({
-  cursor: "pointer!important",
-  textAlign: "center!important"
-});
-
-const HeaderCell = styled(Table.HeaderCell)({
-  background: "#EEEEEE!important",
-  textAlign: "center!important"
-});
-
 const ModLink = styled(Link)({
   width: "fit-content",
 });
@@ -30,9 +20,5 @@ const ModTable = styled(Table)`
   margin-top: 0!important;
 `;
 
-const HeaderContainer = styled(Flex)`
-  margin-bottom: 20px!important;
-`;
-
-export { ButtonContainer, HeaderContainer, ModLink, ModTable, Cell, HeaderCell };
+export { ButtonContainer, ModLink, ModTable };
 

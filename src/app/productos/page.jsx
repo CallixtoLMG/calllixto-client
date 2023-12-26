@@ -1,9 +1,7 @@
 "use client";
 import { createBatch, deleteProduct, editBatch, productsList } from "@/api/products";
 import { getUserData } from "@/api/userData";
-import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
-import Loader from "@/components/layout/Loader";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader, Loader } from "@/components/layout";
 import ProductsPage from "@/components/products/ProductsPage";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -58,7 +56,7 @@ const Products = () => {
     validateToken();
     fetchProductData();
     fetchRol();
-  }, []);
+  }, [push]);
 
   const handleDeleteProduct = async (code) => {
     try {
@@ -72,9 +70,7 @@ const Products = () => {
 
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title={"Productos"} />
-      </HeaderContainer>
+      <PageHeader title={"Productos"} />
       <Loader active={isLoading}>
         <ProductsPage
           products={products}

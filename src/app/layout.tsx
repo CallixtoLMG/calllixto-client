@@ -1,8 +1,7 @@
 "use client";
-// import Footer from "@/components/layout/Footer";
-import GoBack from "@/components/buttons/GoBack";
-import Header from "@/components/layout/Header";
-import Toaster from "@/components/layout/Toaster";
+// import { Footer } from "@/components/layout";
+import { GoBackButton } from "@/components/common/buttons";
+import { Header, Toaster } from "@/components/layout";
 import { Inter } from 'next/font/google';
 import 'semantic-ui-css/semantic.min.css';
 import StyledComponentsRegistry from './registry';
@@ -23,7 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               duration: 4000
             }} />
           <Header />
-          <GoBack />
+          <GoBackButton />
           <LayoutChildrenContainer >
             {children}
           </LayoutChildrenContainer>

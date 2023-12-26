@@ -2,8 +2,7 @@
 import { create } from "@/api/customers";
 import { getUserData } from "@/api/userData";
 import CustomerForm from "@/components/customers/CustomerForm";
-import { HeaderContainer } from "@/components/customers/CustomersPage/styles";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -26,12 +25,10 @@ const CreateCustomer = () => {
       };
     };
     validateToken();
-  }, []);
+  }, [push]);
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Crear Cliente" />
-      </HeaderContainer >
+      <PageHeader title="Crear Cliente" />
       <CustomerForm onSubmit={create} />
     </>
   )

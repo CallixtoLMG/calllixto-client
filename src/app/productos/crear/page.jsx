@@ -1,8 +1,7 @@
 "use client"
 import { create } from "@/api/products";
 import { getUserData } from "@/api/userData";
-import { HeaderContainer } from "@/components/customers/CustomersPage/styles";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -36,15 +35,13 @@ const CreateProduct = () => {
     };
     validateToken();
     fetchRol();
-  }, []);
+  }, [push]);
   if (role === "user") {
     push(PAGES.NOTFOUND.BASE)
   };
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Crear Producto" />
-      </HeaderContainer>
+      <PageHeader title="Crear Producto" />
       <ProductForm onSubmit={create} />
     </>
   )

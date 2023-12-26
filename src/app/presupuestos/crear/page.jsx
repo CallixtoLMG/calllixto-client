@@ -1,21 +1,24 @@
 "use client";
-import { create } from "@/api/budgets";
+import { create, getBudget } from "@/api/budgets";
 import { customersList } from "@/api/customers";
 import { productsList } from "@/api/products";
 import { getUserData } from "@/api/userData";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { HeaderContainer } from "@/components/budgets/BudgetPage/styles";
-import Loader from "@/components/layout/Loader";
-import PageHeader from "@/components/layout/PageHeader";
+import { PageHeader, Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 const CreateBudget = () => {
   const { push } = useRouter();
   const [products, setProductsList] = useState(null);
   const [customers, setCustomersList] = useState(null);
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
+  const [cloneBudget, setCloneBudget] = useState(null);
+
+  const searchParams = useSearchParams();
+  const cloneId = useMemo(() => searchParams.get('clonar'), [searchParams]);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -40,12 +43,20 @@ const CreateBudget = () => {
       };
     };
     const fetchData = async () => {
+      if (cloneId) {
+        try {
+          const budget = await getBudget(cloneId, requestOptions);
+          setCloneBudget(budget);
+        } catch (error) {
+          console.error('Error al cargar presupuesto para clonar:', error);
+        }
+      }
+
       try {
         const productsFecthData = await productsList(requestOptions);
         const productsFilteredList = productsFecthData.map(product => ({
-          price: product.price,
+          ...product,
           key: product.code,
-          code: product.code,
           value: product.name,
           text: product.name,
         }));
@@ -53,6 +64,7 @@ const CreateBudget = () => {
       } catch (error) {
         console.error('Error al cargar productos:', error);
       }
+
       try {
         const customersFetchData = await customersList(requestOptions);
         const customersFilteredList = customersFetchData.map(customer => ({
@@ -72,14 +84,12 @@ const CreateBudget = () => {
     };
     validateToken();
     fetchData();
-  }, [push]);
+  }, [cloneId, push]);
   return (
     <>
-      <HeaderContainer>
-        <PageHeader title="Crear presupuesto" />
-      </HeaderContainer >
+      <PageHeader title="Crear presupuesto" />
       <Loader active={isLoading}>
-        <BudgetForm onSubmit={create} products={products} customers={customers} />
+        <BudgetForm onSubmit={create} products={products} customers={customers} budget={cloneBudget} />
       </Loader>
     </>
   )

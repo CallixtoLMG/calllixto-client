@@ -50,15 +50,11 @@ const Cell = styled(Table.Cell)`
   text-align: center!important;
   `;
 
-const HeaderContainer = styled(Flex)`
-  margin-bottom: 20px!important;
-`;
-
 const WarningMessage = styled.p`
   position: relative;
   margin: 5px 0 0 0!important;
   color: red;
 `;
 
-export { HeaderContainer, Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage };
+export { Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage };
 

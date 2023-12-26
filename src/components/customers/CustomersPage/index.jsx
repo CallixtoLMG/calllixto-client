@@ -1,59 +1,69 @@
 "use client";
-import ButtonDelete from "@/components/buttons/Delete";
-import ButtonEdit from "@/components/buttons/Edit";
-import ButtonGoTo from "@/components/buttons/GoTo";
+import { GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { Table } from "semantic-ui-react";
-import { HEADERS } from "../clients.common";
-import { ButtonContainer, Cell, HeaderCell } from "./styles";
+import { HEADERS } from "../customers.common";
+import { ButtonContainer } from "./styles";
+import { Table } from '@/components/common/table';
+import { ModalDelete } from '@/components/common/modals';
+import { useCallback, useState } from "react";
+import { set } from "react-hook-form";
 
 const CustomersPage = ({ customers = [], onDelete }) => {
   const { push } = useRouter();
-  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el cliente "${name}"?`;
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar el cliente "${name}"?`, []);
+
+  const mapCustomersForTable = useCallback((customer) => {
+    return customer.map((customer, index) => ({ ...customer, key: index + 1 }));
+  }, []);
+
+  const actions = [
+    {
+      id: 1,
+      icon: 'edit',
+      color: 'blue',
+      onClick: (customer) => { push(PAGES.CUSTOMERS.UPDATE(customer.id)) },
+      tooltip: 'Editar'
+    },
+    {
+      id: 2,
+      icon: 'erase',
+      color: 'red',
+      onClick: (customer) => {
+        setSelectedCustomer(customer);
+        setShowModal(true);
+      },
+      tooltip: 'Eliminar'
+    }
+  ];
+
+  const handleDelete = useCallback(async () => {
+    setIsLoading(true);
+    await onDelete(selectedCustomer.id);
+    setIsLoading(false);
+  }, [selectedCustomer, onDelete]);
 
   return (
     <>
       <ButtonContainer>
-        <ButtonGoTo
+        <GoToButton
           color="green"
           text="Crear cliente"
           iconName="add"
           goTo={PAGES.CUSTOMERS.CREATE} />
       </ButtonContainer>
-      <Table celled compact striped>
-        <Table.Header fullWidth>
-          <HeaderCell />
-          {HEADERS.map((header) => (
-            <HeaderCell key={header.id} >{header.name}</HeaderCell>
-          ))}
-        </Table.Header>
-        <Table.Body>
-          {customers.map((customer, index) => (
-            <Table.Row key={customer.name}>
-              <Cell>{index + 1}</Cell>
-              {HEADERS
-                .filter(header => !header.hide)
-                .map((header) => (
-                  <Cell
-                    onClick={() => { push(PAGES.CUSTOMERS.SHOW(customer.id)) }}
-                    key={header.id}
-                  >
-                    {customer[header.value]}
-                  </Cell>
-                ))
-              }
-              <Cell>
-                <ButtonEdit page={"CUSTOMERS"} element={customer.id} />
-                <ButtonDelete
-                  onDelete={onDelete}
-                  params={customer.id}
-                  deleteQuestion={deleteQuestion(customer.name)} />
-              </Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table>
+      <Table headers={HEADERS} elements={mapCustomersForTable(customers)} page={PAGES.CUSTOMERS} actions={actions} />
+      <ModalDelete
+        showModal={showModal}
+        setShowModal={setShowModal}
+        title={deleteQuestion(selectedCustomer?.name)}
+        onDelete={handleDelete}
+        isLoading={isLoading}
+      />
     </>
   );
 };
