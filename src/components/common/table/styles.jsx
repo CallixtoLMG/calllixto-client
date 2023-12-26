@@ -14,10 +14,11 @@ const HeaderCell = styled(Table.HeaderCell)`
 `;
 
 const ActionsContainer = styled.div`
+  display: flex;
   position: absolute;
   right: 0;
   top: 50%;
-  transform: translateY(-50%) translateX(105%);
+  transform: translateY(-50%) translateX(calc(100% + 5px));
   transition: all 0.1s ease-in-out;
   padding: 6px;
   opacity: 0;
@@ -27,6 +28,7 @@ const ActionsContainer = styled.div`
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   background-color: #f7f7f7;
+  column-gap: 3px;
 `;
 
 const LinkRow = styled(Table.Row)`
