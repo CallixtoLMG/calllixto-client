@@ -8,16 +8,47 @@ import ImportExcel from "../ImportProduct";
 import { PRODUCT_COLUMNS } from "../products.common";
 import { ButtonContainer } from "./styles";
 import { Table } from "@/components/common/table";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
+import { ModalDelete } from "@/components/common/modals";
 
 const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete }) => {
   const { push } = useRouter();
-  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
   const visibilityRules = Rules(role);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const mapCustomersForTable = useCallback((c) => {
+  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
+
+  const mapProductsForTable = useCallback((c) => {
     return c.map(customer => ({ ...customer, id: customer.code }));
   }, []);
+
+  const actions = [
+    {
+      id: 1,
+      icon: 'edit',
+      color: 'blue',
+      onClick: (product) => { push(PAGES.PRODUCTS.UPDATE(product.id)) },
+      tooltip: 'Editar'
+    },
+    {
+      id: 2,
+      icon: 'erase',
+      color: 'red',
+      onClick: (product) => {
+        setSelectedProduct(product);
+        setShowModal(true);
+      },
+      tooltip: 'Eliminar'
+    }
+  ];
+
+  const handleDelete = useCallback(async () => {
+    setIsLoading(true);
+    await onDelete(selectedProduct?.id);
+    setIsLoading(false);
+  }, [onDelete, selectedProduct?.id]);
 
   return (
     <>
@@ -29,7 +60,14 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
             <DownloadExcelButton />
           </Flex>
         </ButtonContainer>}
-      <Table headers={PRODUCT_COLUMNS} elements={mapCustomersForTable(products)} page={PAGES.PRODUCTS}/>
+      <Table headers={PRODUCT_COLUMNS} elements={mapProductsForTable(products)} page={PAGES.PRODUCTS} actions={actions} />
+      <ModalDelete
+        showModal={showModal}
+        setShowModal={setShowModal}
+        title={deleteQuestion(selectedProduct?.name)}
+        onDelete={handleDelete}
+        isLoading={isLoading}
+      />
     </>
   )
 };

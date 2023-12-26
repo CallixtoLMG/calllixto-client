@@ -45,7 +45,7 @@ const CustomersPage = ({ customers = [], onDelete }) => {
     setIsLoading(true);
     await onDelete(selectedCustomer.id);
     setIsLoading(false);
-  }, [selectedCustomer, setIsLoading, onDelete]);
+  }, [selectedCustomer, onDelete]);
 
   return (
     <>
