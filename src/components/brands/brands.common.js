@@ -1,17 +1,18 @@
-import { Cell } from "@/components/common/table";
 import { Icon, Popup } from "semantic-ui-react";
 import { Flex, Box } from "rebass";
 
 const BRAND_COLUMNS = [
   {
-    title: "Id",
     id: 1,
-    value: (brand) => <Cell width={1}>{brand.id}</Cell>
+    title: "Id",
+    width: 1,
+    value: (brand) => brand.id
   },
   {
+    id: 2,
     title: "Nombre",
-    id: 4,
-    value: (brand) => <Cell align="left">
+    align: "left",
+    value: (brand) =>
       <Flex justifyContent="space-between">
         {brand.name}
         {brand.comments && (
@@ -27,7 +28,6 @@ const BRAND_COLUMNS = [
           />
         )}
       </Flex>
-    </Cell>
   }
 ];
 

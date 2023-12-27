@@ -5,22 +5,26 @@ const BUDGETS_COLUMNS = [
   {
     id: 1,
     title: "Id",
-    value: (budget) => <Cell width={2}>{budget.id}</Cell>
+    width: 2,
+    value: (budget) => budget.id
   },
   {
     id: 2,
     title: "Cliente",
-    value: (budget) => <Cell align="left">{budget.customer.name}</Cell>
+    aligh: "left",
+    value: (budget) => budget.customer.name
   },
   {
     id: 3,
     title: "Fecha",
-    value: (budget) => <Cell width={4}>{formatedDate(budget.createdAt)}</Cell>
+    width: 4,
+    value: (budget) => formatedDate(budget.createdAt)
   },
   {
     id: 4,
     title: "Total",
-    value: (budget) => <Cell width={2}>{formatedPrice(getTotalSum(budget.products))}</Cell>
+    width: 2,
+    value: (budget) => formatedPrice(getTotalSum(budget.products))
   },
 ];
 
@@ -28,33 +32,39 @@ const PRODUCTS_COLUMNS = [
   {
     id: 1,
     title: "Descripción",
-    value: (product) => <Cell align="true" >{product.name}</Cell>
+    align: "left",
+    value: (product) => product.name
   },
   {
     id: 2,
     title: "Cant",
-    value: (product) => <Cell width={1}>{product.quantity || 0}</Cell>
+    width: 1,
+    value: (product) => product.quantity || 0
   },
   {
     id: 3,
     title: "Precio",
-    value: (product) => <Cell width={1}>{formatedPrice(product.price || 0)}</Cell>
+    width: 1,
+    value: (product) => formatedPrice(product.price || 0)
   },
   {
     id: 4,
     title: "Subtotal",
-    value: (product) => <Cell width={1}>{formatedPrice(product.price * product.quantity || 0)}</Cell>,
+    width: 1,
+    value: (product) => formatedPrice(product.price * product.quantity || 0),
     hide: true,
   },
   {
     id: 5,
     title: "Desc.",
-    value: (product) => <Cell width={1}>{formatedPercentage(product.discount || 0)}</Cell>
+    width: 1,
+    value: (product) => formatedPercentage(product.discount || 0)
   },
   {
     id: 6,
     title: "Importe",
-    value: (product) => <Cell width={1}>{formatedPrice(getTotal(product))}</Cell>
+    width: 1,
+    value: (product) => formatedPrice(getTotal(product))
   },
 ];
 

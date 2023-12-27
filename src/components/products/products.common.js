@@ -1,14 +1,14 @@
-import { Cell } from "@/components/common/table";
 import { formatedPrice, getBrandCode, getProductCode, getSupplierCode } from "@/utils";
 import { Icon, Popup } from "semantic-ui-react";
 import { Flex, Box } from "rebass";
 
 const PRODUCT_COLUMNS = [
   {
-    title: "Código",
     id: 1,
+    title: "Código",
+    width: 2,
     value: (product) =>
-      <Cell width={2}>
+      <>
         <Popup
           size="tiny"
           content={product.supplier}
@@ -22,17 +22,19 @@ const PRODUCT_COLUMNS = [
           trigger={<span>{getBrandCode(product.code)}</span>}
         />&nbsp;
         <span>{getProductCode(product.code)}</span>
-      </Cell>
+      </>
   },
   {
-    title: "Código Proveedor",
     id: 2,
-    value: (product) => <Cell width={1}>{product.supplierCode || '-'}</Cell>
+    title: "Código Proveedor",
+    width: 1,
+    value: (product) => product.supplierCode || '-'
   },
   {
+    id: 3,
     title: "Nombre",
-    id: 4,
-    value: (product) => <Cell align="left">
+    align: "left",
+    value: (product) =>
       <Flex justifyContent="space-between">
         {product.name}
         {product.comments && (
@@ -48,12 +50,12 @@ const PRODUCT_COLUMNS = [
           />
         )}
       </Flex>
-    </Cell>
   },
   {
+    id: 4,
     title: "Precio",
-    id: 5,
-    value: (product) => <Cell width={2}>{formatedPrice(product.price)}</Cell>
+    width: 2,
+    value: (product) => formatedPrice(product.price)
   }
 ];
 

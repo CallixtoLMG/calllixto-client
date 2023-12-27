@@ -1,4 +1,4 @@
-import { ActionsContainer, HeaderCell, LinkRow } from "./styles";
+import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow } from "./styles";
 import { Table } from "semantic-ui-react";
 import { useRouter } from "next/navigation";
 import Actions from "./Actions";
@@ -8,24 +8,30 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [] }) => {
   return (
     <Table celled compact striped>
       <Table.Header fullWidth>
-        {headers.map((header) => (
-          <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
-        ))}
+        <Table.Row>
+          {headers.map((header) => (
+            <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
+          ))}
+        </Table.Row>
       </Table.Header>
       <Table.Body>
         {elements.map((element) => {
           if (page) {
             return (
-              <>
-                <LinkRow key={element.key} onClick={() => push(page.SHOW(element.id))}>
-                  {headers.map((header) => header.value(element))}
-                  {!!actions.length && (
-                    <ActionsContainer>
+              <LinkRow key={element.key} onClick={() => push(page.SHOW(element.id))}>
+                {headers.map(header => (
+                  <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                    {header.value(element)}
+                  </Cell>
+                ))}
+                {!!actions.length && (
+                  <ActionsContainer>
+                    <InnerActionsContainer>
                       <Actions actions={actions} element={element} />
-                    </ActionsContainer>
-                  )}
-                </LinkRow>
-              </>
+                    </InnerActionsContainer>
+                  </ActionsContainer>
+                )}
+              </LinkRow>
             )
           }
           return (

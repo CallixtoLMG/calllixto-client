@@ -1,5 +1,6 @@
 import { Table } from "semantic-ui-react";
 import styled from "styled-components";
+import { Flex } from "rebass";
 
 const Cell = styled(Table.Cell)`
   text-align: ${(props) => props.align || "center!important"};
@@ -12,21 +13,25 @@ const HeaderCell = styled(Table.HeaderCell)`
   text-align: center!important;
 `;
 
-const ActionsContainer = styled.div`
-  display: flex;
+const ActionsContainer = styled.td`
   position: absolute;
   right: 0;
   top: 50%;
-  transform: translateY(-50%) translateX(calc(100% + 5px));
+  transform: translateY(-50%) translateX(calc(100%));
   transition: all 0.1s ease-in-out;
-  padding: 6px;
   opacity: 0;
   visibility: hidden;
-  border: 1px solid #d4d4d5;
+  border: none !important;
+  padding-left: 5px !important;
+`;
+
+const InnerActionsContainer = styled(Flex)`
+  border: 1px solid #d4d4d5 !important;
+  background-color: #f7f7f7;
+  padding: 5px !important;
   border-radius: 10px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  background-color: #f7f7f7;
   column-gap: 3px;
 `;
 
@@ -41,5 +46,5 @@ const LinkRow = styled(Table.Row)`
 `;
 
 
-export { ActionsContainer, Cell, HeaderCell, LinkRow };
+export { ActionsContainer, InnerActionsContainer, Cell, HeaderCell, LinkRow };
 
