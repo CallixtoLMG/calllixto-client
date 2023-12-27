@@ -1,15 +1,15 @@
-"use client"
-import { getBrand } from "@/api/brands";
+"use client";
 import { getUserData } from "@/api/userData";
 import { PageHeader, Loader } from "@/components/layout";
-import ShowBrand from "@/components/brands/ShowBrand";
+import ShowSupplier from "@/components/suppliers/ShowSupplier";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { getSupplier } from "@/api/suppliers";
 
-const Brand = ({ params }) => {
+const Supplier = ({ params }) => {
   const [isLoading, setIsLoading] = useState(true)
-  const [brand, setBrand] = useState({})
+  const [supplier, setSupplier] = useState({})
   const { push } = useRouter();
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -28,7 +28,7 @@ const Brand = ({ params }) => {
       };
     };
 
-    const fetchBrand = async () => {
+    const fetchSupplier = async () => {
       try {
         const requestOptions = {
           method: 'GET',
@@ -38,13 +38,13 @@ const Brand = ({ params }) => {
           },
           cache: "no-store",
         };
-        const brand = await getBrand(params.id, requestOptions);
+        const supplier = await getSupplier(params.id, requestOptions);
 
-        if (!brand) {
+        if (!supplier) {
           push(PAGES.NOT_FOUND.BASE);
           return;
         };
-        setBrand(brand);
+        setSupplier(supplier);
         setIsLoading(false);
       } catch (error) {
         console.error('Error al cargar marcas:', error);
@@ -52,17 +52,17 @@ const Brand = ({ params }) => {
     };
 
     validateToken()
-    fetchBrand();
+    fetchSupplier();
   }, [params.id, push]);
 
   return (
     <>
-      <PageHeader title="Marca" />
+      <PageHeader title="Proveedor" />
       <Loader active={isLoading}>
-        <ShowBrand brand={brand} />
+        <ShowSupplier supplier={supplier} />
       </Loader>
     </>
   )
 };
 
-export default Brand;
+export default Supplier;

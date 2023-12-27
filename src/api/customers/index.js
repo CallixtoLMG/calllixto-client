@@ -1,14 +1,16 @@
-import { CLIENTID, PATHS, URL } from "@/fetchUrls";
+import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
 
+const CUSTOMERS_URL = `${URL}${CLIENT_ID}${PATHS.CUSTOMERS}`;
+
 export async function customersList(requestOptions) {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}`, requestOptions);
+  const res = await fetch(CUSTOMERS_URL, requestOptions);
   const data = await res.json();
   return data.customers;
 };
 
 export async function getCustomer(id, requestOptions) {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`, requestOptions);
+  const res = await fetch(`${CUSTOMERS_URL}/${id}`, requestOptions);
   const data = await res.json();
   return data.customer;
 };
@@ -23,7 +25,7 @@ export async function deleteCustomer(id) {
     cache: "no-store",
   };
 
-  await fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`, requestOptions)
+  await fetch(`${CUSTOMERS_URL}/${id}`, requestOptions)
     .then(async response => {
       let res = await response.text();
       res = JSON.parse(res);
@@ -47,7 +49,7 @@ export async function create(customer) {
     cache: "no-store"
   };
 
-  fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}`, requestOptions)
+  fetch(CUSTOMERS_URL, requestOptions)
     .then(async response => {
       let res = await response.text();
       res = JSON.parse(res);
@@ -71,7 +73,7 @@ export async function edit(id, customer) {
     cache: "no-store",
   };
 
-  fetch(`${URL}${CLIENTID}${PATHS.CUSTOMERS}/${id}`, requestOptions)
+  fetch(`${CUSTOMERS_URL}/${id}`, requestOptions)
     .then(async response => {
       let res = await response.text();
       res = JSON.parse(res);

@@ -3,14 +3,13 @@ export const PATHS = {
   CUSTOMERS: "customers",
   PRODUCTS: "products",
   LOGIN: "login",
-  BRANDS: "brands"
+  BRANDS: "brands",
+  SUPPLIERS: "suppliers"
 };
 
-export const CREATEBATCH = "/batch";
-export const PDF = "/pfd";
+export const CREATE_BATCH = "batch";
 export const VALIDATE = "validate";
-export const EDITBATCH = "/transact";
-export const USERS = "users/";
+export const EDIT_BATCH = "transact";
 export const URL = process.env.NEXT_PUBLIC_URL;
-export const CLIENTID = "maderera-las-tapias/";
+export const CLIENT_ID = "maderera-las-tapias/";
 

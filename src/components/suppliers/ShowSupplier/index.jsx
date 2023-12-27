@@ -1,27 +1,27 @@
 "use client";
 import { Container, DataContainer, Label, Segment, SubContainer } from "./styles";
 
-const ShowBrand = ({ brand }) => {
+const ShowSupplier = ({ supplier }) => {
   return (
     <Container>
       <SubContainer>
         <DataContainer width="200px">
           <Label>Código</Label>
-          <Segment>{brand?.id}</Segment>
+          <Segment>{supplier?.id}</Segment>
         </DataContainer>
         <DataContainer width="200px">
           <Label>Nombre</Label>
-          <Segment>{brand?.name}</Segment>
+          <Segment>{supplier?.name}</Segment>
         </DataContainer>
       </SubContainer>
       <SubContainer>
         <DataContainer maxWidth="100%" >
           <Label>Comentarios</Label>
-          <Segment>{brand.comments || "Sin Comentarios."}</Segment>
+          <Segment>{supplier.comments || "Sin Comentarios."}</Segment>
         </DataContainer>
       </SubContainer>
     </Container>
   );
 };
 
-export default ShowBrand;
+export default ShowSupplier;

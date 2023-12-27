@@ -4,13 +4,13 @@ import { PageHeader, Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import BrandsPage from "@/components/brands/BrandsPage";
-import { brandsList, deleteBrand } from "@/api/brands";
+import { suppliersList, deleteSupplier } from "@/api/suppliers";
+import SuppliersPage from "@/components/suppliers/SuppliersPage";
 
-const Brands = () => {
+const Suppliers = () => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true);
-  const [brands, setBrands] = useState();
+  const [suppliers, setSuppliers] = useState();
   const [role, setRole] = useState();
 
   useEffect(() => {
@@ -48,10 +48,10 @@ const Brands = () => {
       };
     };
 
-    const fetchBrands = async () => {
+    const fetchSuppliers = async () => {
       try {
-        const brands = await brandsList(requestOptions);
-        setBrands(brands);
+        const suppliers = await suppliersList(requestOptions);
+        setSuppliers(suppliers);
       } catch (error) {
         console.error("Error al cargar marcas:", error);
       } finally {
@@ -60,15 +60,15 @@ const Brands = () => {
     };
 
     validateToken();
-    fetchBrands();
+    fetchSuppliers();
     fetchRol();
   }, [push]);
 
-  const handleDeleteBrand = async (id) => {
+  const handleDeleteSupplier = async (id) => {
     try {
-      await deleteBrand(id);
-      const updatedBrands = brands.filter(brand => brand.id !== id);
-      setBrands(updatedBrands);
+      await deleteSupplier(id);
+      const updatedSuppliers = suppliers.filter(suplier => suplier.id !== id);
+      setSuppliers(updatedSuppliers);
     } catch (error) {
       console.error('Error borrando marca', error);
     };
@@ -76,17 +76,17 @@ const Brands = () => {
 
   return (
     <>
-      <PageHeader title={"Marcas"} />
+      <PageHeader title={"Proveedores"} />
       <Loader active={isLoading}>
-        <BrandsPage
-          brands={brands}
+        <SuppliersPage
+          suppliers={suppliers}
           role={role}
           isLoading={isLoading}
-          onDelete={handleDeleteBrand}
+          onDelete={handleDeleteSupplier}
         />
       </Loader>
     </>
   );
 };
 
-export default Brands;
+export default Suppliers;

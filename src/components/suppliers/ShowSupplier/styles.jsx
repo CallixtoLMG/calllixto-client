@@ -32,3 +32,6 @@ const DataContainer = styled(Flex)`
 `;
 
 export { Container, DataContainer, Label, Segment, SubContainer };
+
+
+

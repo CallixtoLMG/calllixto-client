@@ -1,16 +1,16 @@
-"use client"
-import { edit, getBrand } from "@/api/brands";
+"use client";
+import { edit, getSupplier } from "@/api/suppliers";
 import { getUserData } from "@/api/userData";
 import { PageHeader, Loader } from "@/components/layout";
-import BrandForm from "@/components/brands/BrandForm";
+import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const EditBrand = ({ params }) => {
+const EditSupplier = ({ params }) => {
   const { push } = useRouter();
   const [role, setRole] = useState();
-  const [brand, setBrand] = useState(null);
+  const [supplier, setSupplier] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +19,7 @@ const EditBrand = ({ params }) => {
       push(PAGES.LOGIN.BASE);
     };
 
-    async function fetchBrand() {
+    async function fetchSupplier() {
       var requestOptions = {
         method: 'GET',
         redirect: 'follow',
@@ -28,12 +28,12 @@ const EditBrand = ({ params }) => {
         },
         cache: "no-store",
       };
-      const data = await getBrand(params.id, requestOptions);
+      const data = await getSupplier(params.id, requestOptions);
       if (!data) {
         push(PAGES.NOT_FOUND.BASE);
         return;
       };
-      setBrand(data);
+      setSupplier(data);
       setIsLoading(false);
     };
 
@@ -58,7 +58,7 @@ const EditBrand = ({ params }) => {
     };
 
     validateToken();
-    fetchBrand();
+    fetchSupplier();
     fetchRoles();
   }, [params.id, push]);
 
@@ -70,11 +70,10 @@ const EditBrand = ({ params }) => {
     <>
       <PageHeader title="Actualizar Marca" />
       <Loader active={isLoading}>
-        {brand && <BrandForm brand={brand} onSubmit={edit} />}
+        {supplier && <SupplierForm supplier={supplier} onSubmit={edit} />}
       </Loader>
     </>
   )
 };
 
-export default EditBrand;
-
+export default EditSupplier;

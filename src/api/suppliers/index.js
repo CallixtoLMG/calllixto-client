@@ -1,12 +1,12 @@
 import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
 
-const BRANDS_URL = `${URL}${CLIENT_ID}${PATHS.BRANDS}`;
+const SUPPLIER_URL = `${URL}${CLIENT_ID}${PATHS.SUPPLIERS}`;
 
-export async function create(brand) {
+export async function create(supplier) {
   var requestOptions = {
     method: 'POST',
-    body: JSON.stringify(brand),
+    body: JSON.stringify(supplier),
     redirect: "follow",
     headers: {
       authorization: `Bearer ${localStorage.getItem("token")}`
@@ -14,7 +14,7 @@ export async function create(brand) {
     cache: "no-store"
   };
 
-  fetch(BRANDS_URL, requestOptions)
+  fetch(SUPPLIER_URL, requestOptions)
     .then(async response => {
       let res = await response.text();
       res = JSON.parse(res);
@@ -27,9 +27,9 @@ export async function create(brand) {
     .catch(error => console.log('error', error));
 };
 
-export async function edit({ id, brand }) {
+export async function edit({ id, supplier }) {
   const requestOptions = {
-    body: JSON.stringify(brand),
+    body: JSON.stringify(supplier),
     method: 'PUT',
     redirect: 'follow',
     headers: {
@@ -38,7 +38,7 @@ export async function edit({ id, brand }) {
     cache: "no-store",
   };
 
-  fetch(`${BRANDS_URL}/${id}`, requestOptions)
+  fetch(`${SUPPLIER_URL}/${id}`, requestOptions)
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)
@@ -51,19 +51,19 @@ export async function edit({ id, brand }) {
     .catch(error => console.log('error', error));
 };
 
-export async function brandsList(requestOptions) {
-  const res = await fetch(BRANDS_URL, requestOptions);
+export async function suppliersList(requestOptions) {
+  const res = await fetch(SUPPLIER_URL, requestOptions);
   const data = await res.json();
-  return data.brands;
+  return data.suppliers;
 };
 
-export async function getBrand(id, requestOptions) {
-  const res = await fetch(`${BRANDS_URL}/${id}`, requestOptions);
+export async function getSupplier(id, requestOptions) {
+  const res = await fetch(`${SUPPLIER_URL}/${id}`, requestOptions);
   const data = await res.json();
-  return data.brand;
+  return data.supplier;
 };
 
-export async function deleteBrand(id) {
+export async function deleteSupplier(id) {
   var requestOptions = {
     method: 'DELETE',
     redirect: 'follow',
@@ -73,7 +73,7 @@ export async function deleteBrand(id) {
     cache: "no-store",
   };
 
-  await fetch(`${BRANDS_URL}/${id}`, requestOptions)
+  await fetch(`${SUPPLIER_URL}/${id}`, requestOptions)
     .then(async response => {
       let res = await response.text();
       res = JSON.parse(res);

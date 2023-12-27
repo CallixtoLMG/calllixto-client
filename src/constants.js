@@ -7,6 +7,13 @@ const PAGES = {
     SHOW: (id) => `/clientes/${id}`,
     NAME: 'Clientes'
   },
+  SUPPLIERS: {
+    BASE: "/proveedores",
+    CREATE: "/proveedores/crear",
+    UPDATE: (id) => `/proveedores/${id}/editar`,
+    SHOW: (id) => `/proveedores/${id}`,
+    NAME: 'Proveedores'
+  },
   BRANDS: {
     BASE: "/marcas",
     CREATE: "/marcas/crear",
@@ -26,7 +33,6 @@ const PAGES = {
     CREATE: "/presupuestos/crear",
     CLONE: (id) => `/presupuestos/crear?clonar=${id}`,
     SHOW: (id) => `/presupuestos/${id}`,
-    SHOWPDF: (id) => `/presupuestos/${id}/pdf`,
     NAME: 'Presupuestos'
   },
   LOGIN: {

@@ -1,5 +1,7 @@
-import { CLIENTID, CREATEBATCH, EDITBATCH, PATHS, URL } from "@/fetchUrls";
+import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
+
+const PRODUCTS_URL = `${URL}${CLIENT_ID}${PATHS.PRODUCTTS}`;
 
 export async function create(product) {
   var requestOptions = {
@@ -11,7 +13,7 @@ export async function create(product) {
     },
     cache: "no-store"
   };
-  fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, requestOptions)
+  fetch(PRODUCTS_URL, requestOptions)
     .then(async response => {
       let res = await response.text();
       res = JSON.parse(res);
@@ -34,7 +36,7 @@ export async function createBatch(product) {
     },
     cache: "no-store"
   };
-  fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${CREATEBATCH}`, requestOptions)
+  fetch(`${PRODUCTS_URL}/${CREATE_BATCH}`, requestOptions)
   .then(async response => {
     let res = await response.text()
     res = JSON.parse(res);
@@ -58,7 +60,7 @@ export async function edit(params, product) {
     cache: "no-store",
   };
 
-  fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${params}`, requestOptions)
+  fetch(`${PRODUCTS_URL}/${params}`, requestOptions)
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)
@@ -82,7 +84,7 @@ export async function editBatch(product) {
     cache: "no-store",
   };
 
-  fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}${EDITBATCH}`, requestOptions)
+  fetch(`${PRODUCTS_URL}/${EDIT_BATCH}`, requestOptions)
 
       .then(async response => {
         let res = await response.text()
@@ -97,13 +99,13 @@ export async function editBatch(product) {
   };
 
 export async function productsList(requestOptions) {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}`, requestOptions);
+  const res = await fetch(PRODUCTS_URL, requestOptions);
   const data = await res.json();
   return data.products;
 };
 
 export async function getProduct(code, requestOptions) {
-  const res = await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${code}`, requestOptions);
+  const res = await fetch(`${PRODUCTS_URL}/${code}`, requestOptions);
   const data = await res.json();
   return data.product;
 };
@@ -118,7 +120,7 @@ export async function deleteProduct(code) {
     cache: "no-store",
   };
 
-  await fetch(`${URL}${CLIENTID}${PATHS.PRODUCTS}/${code}`, requestOptions)
+  await fetch(`${PRODUCTS_URL}/${code}`, requestOptions)
     .then(async response => {
       let res = await response.text();
       res = JSON.parse(res);
