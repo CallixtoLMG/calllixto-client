@@ -4,9 +4,9 @@ import { ModButton, ModLink } from "./styles";
 const ButtonGoTo = ({ goTo, iconName, text, color }) => {
   return (
     <ModLink href={goTo}>
-      <ModButton fluid color={color}> <Icon name={iconName} />{text}</ModButton>
+      <ModButton text={text} fluid color={color}> <Icon name={iconName} />{text}</ModButton>
     </ModLink>
-  )
+  );
 };
 
 export default ButtonGoTo;
