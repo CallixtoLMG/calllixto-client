@@ -1,9 +1,11 @@
 import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS, URL } from "@/fetchUrls";
+import { createDate } from "@/utils";
 import { toast } from "react-hot-toast";
 
 const PRODUCTS_URL = `${URL}${CLIENT_ID}${PATHS.PRODUCTS}`;
 
 export async function create(product) {
+  product.createdAt = createDate()
   var requestOptions = {
     method: 'POST',
     body: JSON.stringify(product),
@@ -49,7 +51,8 @@ export async function createBatch(product) {
     .catch(error => console.log('error', error));
 };
 
-export async function edit(params, product) {
+export async function edit(product) {
+  product.updatedAt = createDate()
   const requestOptions = {
     body: JSON.stringify(product),
     method: 'PUT',
@@ -60,7 +63,7 @@ export async function edit(params, product) {
     cache: "no-store",
   };
 
-  fetch(`${PRODUCTS_URL}/${params}`, requestOptions)
+  fetch(`${PRODUCTS_URL}/${product.code}`, requestOptions)
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)

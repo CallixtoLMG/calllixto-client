@@ -1,6 +1,5 @@
 "use client";
 import { PAGES } from "@/constants";
-import { createDate } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
@@ -29,13 +28,7 @@ const ProductForm = ({ product, onSubmit }) => {
 
   const handleForm = (data) => {
     setIsLoading(true);
-    if (!isUpdating) {
-      data.createdAt = createDate();
-      onSubmit(data);
-    } else {
-      data.updatedAt = createDate();
-      onSubmit(product.code, data);
-    }
+    onSubmit(data);
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.PRODUCTS.BASE);
