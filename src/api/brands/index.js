@@ -1,9 +1,12 @@
 import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
+import { createDate } from "@/utils";
 import { toast } from "react-hot-toast";
+import { omit } from "lodash"
 
 const BRANDS_URL = `${URL}${CLIENT_ID}${PATHS.BRANDS}`;
 
 export async function create(brand) {
+  brand.createdAt = createDate()
   var requestOptions = {
     method: 'POST',
     body: JSON.stringify(brand),
@@ -27,9 +30,11 @@ export async function create(brand) {
     .catch(error => console.log('error', error));
 };
 
-export async function edit({ id, brand }) {
+export async function edit(brand) {
+  brand.updatedAt = createDate()
+  const validParams = omit(brand,["id", "createdAt"])
   const requestOptions = {
-    body: JSON.stringify(brand),
+    body: JSON.stringify(validParams),
     method: 'PUT',
     redirect: 'follow',
     headers: {
@@ -38,7 +43,7 @@ export async function edit({ id, brand }) {
     cache: "no-store",
   };
 
-  fetch(`${BRANDS_URL}/${id}`, requestOptions)
+  fetch(`${BRANDS_URL}/${brand.id}`, requestOptions)
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)

@@ -6,7 +6,6 @@ import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
 import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea } from "./styles";
-import { omit } from "lodash";
 
 const BrandForm = ({ brand, onSubmit }) => {
   const { push } = useRouter();
@@ -26,13 +25,7 @@ const BrandForm = ({ brand, onSubmit }) => {
 
   const handleForm = (data) => {
     setIsLoading(true);
-    if (!isUpdating) {
-      data.createdAt = createDate();
-      onSubmit(data);
-    } else {
-      data.updatedAt = createDate();
-      onSubmit({ id: brand.id, brand: omit(data, ['id', 'createdAt']) });
-    }
+    onSubmit(data);
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.BRANDS.BASE);
