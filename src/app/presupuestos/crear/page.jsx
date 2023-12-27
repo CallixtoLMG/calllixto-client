@@ -87,7 +87,7 @@ const CreateBudget = () => {
   }, [cloneId, push]);
   return (
     <>
-      <PageHeader title="Crear presupuesto" />
+      <PageHeader title="Crear Presupuesto" />
       <Loader active={isLoading}>
         <BudgetForm onSubmit={create} products={products} customers={customers} budget={cloneBudget} />
       </Loader>

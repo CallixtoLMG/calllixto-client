@@ -68,7 +68,7 @@ const EditSupplier = ({ params }) => {
 
   return (
     <>
-      <PageHeader title="Actualizar Marca" />
+      <PageHeader title="Actualizar Proveedor" />
       <Loader active={isLoading}>
         {supplier && <SupplierForm supplier={supplier} onSubmit={edit} />}
       </Loader>
