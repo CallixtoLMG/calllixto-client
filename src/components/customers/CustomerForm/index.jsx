@@ -1,6 +1,5 @@
 "use client"
 import { PAGES, REGEX } from "@/constants";
-import { createDate } from "@/utils";
 import { omit } from "lodash";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -12,7 +11,7 @@ import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, In
 const CustomerForm = ({ customer, onSubmit }) => {
   const { push } = useRouter();
   const params = useParams();
-  const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: omit(customer, ['id', 'createdAt']) });
+  const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: customer});
   const isUpdating = useMemo(() => !!params.id, [params.id]);
   const [isLoading, setIsLoading] = useState(false);
   const buttonConfig = useMemo(() => {
@@ -24,13 +23,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
 
   const handleForm = (data) => {
     setIsLoading(true);
-    if (!isUpdating) {
-      data.createdAt = createDate()
-      onSubmit(data);
-    } else {
-      data.updatedAt = createDate()
-      onSubmit(params.id, data);
-    }
+    onSubmit(data);
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.CUSTOMERS.BASE);
