@@ -11,28 +11,29 @@ export const HEADERS = [
   {
     id: 2,
     title: "Nombre",
-    value: (customer) => <Cell align="left">
-      <Flex justifyContent="space-between">
-        {customer.name}
-        {customer.comments && (
-          <Popup
-            size="mini"
-            content={customer.comments}
-            position="top center"
-            trigger={
-              <Box marginX="5px">
-                <Icon name="info circle" color="orange" />
-              </Box>
-            }
-          />
-        )}
-      </Flex>
-    </Cell>
+    value: (customer) =>
+      <Cell align="left">
+        <Flex justifyContent="space-between">
+          {customer.name}
+          {customer.comments && (
+            <Popup
+              size="mini"
+              content={customer.comments}
+              position="top center"
+              trigger={
+                <Box marginX="5px">
+                  <Icon name="info circle" color="orange" />
+                </Box>
+              }
+            />
+          )}
+        </Flex>
+      </Cell>
   },
   {
     id: 3,
     title: "Direccion",
-    value: (customer) => <Cell width={4}>{customer.address}</Cell>
+    value: (customer) => <Cell width={4} align="left">{customer.address}</Cell>
   },
   {
     id: 4,

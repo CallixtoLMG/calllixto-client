@@ -29,12 +29,12 @@ const ProductForm = ({ product, onSubmit }) => {
 
   const handleForm = (data) => {
     setIsLoading(true);
-    if (!product?.code) {
+    if (!isUpdating) {
       data.createdAt = createDate();
       onSubmit(data);
     } else {
       data.updatedAt = createDate();
-      onSubmit(product?.code, data);
+      onSubmit(product.code, data);
     }
     setTimeout(() => {
       setIsLoading(false);
@@ -49,20 +49,17 @@ const ProductForm = ({ product, onSubmit }) => {
     <Form onSubmit={handleSubmit(handleForm)}>
       <FormContainer>
         <FieldsContainer>
-          {!isUpdating &&
-            (
-              <FormField>
-                <Label>Código</Label>
-                <Controller
-                  name="code"
-                  control={control}
-                  rules={{ validate: validateCode }}
-                  render={({ field }) => (
-                    <Input required {...field} placeholder="Código (A123)" />
-                  )}
-                />
-              </FormField>
-            )}
+          <FormField>
+            <Label>Código</Label>
+            <Controller
+              name="code"
+              control={control}
+              rules={{ validate: validateCode }}
+              render={({ field }) => (
+                <Input required {...field} placeholder="Código (A123)" disabled={isUpdating} />
+              )}
+            />
+          </FormField>
           <FormField>
             <Label>Nombre</Label>
             <Controller

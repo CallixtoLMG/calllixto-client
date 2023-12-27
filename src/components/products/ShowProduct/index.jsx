@@ -6,13 +6,13 @@ const ShowProduct = ({ product }) => {
   return (
     <Container>
       <SubContainer>
+      <DataContainer flex="none" width="200px">
+          <Label>Código</Label>
+          <Segment>{product?.code}</Segment>
+        </DataContainer>
         <DataContainer maxWidth="350" width="300px" flex="none">
           <Label>Nombre</Label>
           <Segment>{product?.name}</Segment>
-        </DataContainer>
-        <DataContainer flex="none" width="200px">
-          <Label>Código</Label>
-          <Segment>{product?.code}</Segment>
         </DataContainer>
         <DataContainer flex="none" width="200px">
           <Label>Precio</Label>
