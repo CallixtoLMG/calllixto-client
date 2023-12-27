@@ -9,18 +9,14 @@ import { LogDiv, ModContainer, ModLink, Text } from "./styles";
 
 const Header = () => {
   const [validatedToken, setValidatedToken] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
   const pathname = usePathname();
   const { push } = useRouter();
+
   const handleLogout = () => {
     localStorage.removeItem('token');
     sessionStorage.removeItem("userData");
     push(PAGES.LOGIN.BASE);
   };
-
-  useEffect(() => {
-    setIsLoading(true);
-  }, [pathname]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -30,8 +26,6 @@ const Header = () => {
           setValidatedToken(userData?.isAuthorized);
         } catch (error) {
           console.error('Error, ingreso no valido(token):', error);
-        } finally {
-          setIsLoading(false);
         }
       };
       validateToken();
@@ -45,9 +39,7 @@ const Header = () => {
       {showHeader &&
         <Menu fixed='top'>
           <ModContainer>
-            {isLoading ? (
-              <></>
-            ) : !validatedToken ? (
+            {!validatedToken ? (
               <LogDiv>
                 <Menu.Item onClick={handleLogout} > <Text>Ingresar</Text></Menu.Item>
               </LogDiv>
