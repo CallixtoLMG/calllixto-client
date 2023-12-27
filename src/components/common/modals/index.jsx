@@ -1,1 +1,1 @@
-export { default as ModalDelete } from './Delete';
+export { default as ModalDelete } from './ModalDelete';

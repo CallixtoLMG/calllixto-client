@@ -4,7 +4,7 @@ import { Flex } from "rebass";
 import { Button, Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
 import { Form, Input } from "./styles";
 
-const Delete = ({ params, title, onDelete, showModal, setShowModal, isLoading }) => {
+const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoading }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
 
@@ -12,6 +12,7 @@ const Delete = ({ params, title, onDelete, showModal, setShowModal, isLoading })
 
   useEffect(() => {
     inputElement?.current?.focus();
+    setConfirmationText('');
   }, [showModal]);
 
   const handleConfirmationTextChange = (e) => {
@@ -59,4 +60,4 @@ const Delete = ({ params, title, onDelete, showModal, setShowModal, isLoading })
   )
 };
 
-export default Delete;
+export default ModalDelete;
