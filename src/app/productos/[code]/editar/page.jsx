@@ -28,7 +28,7 @@ const EditProduct = ({ params }) => {
       };
       const data = await getProduct(params.code, requestOptions);
       if (!data) {
-        push(PAGES.NOTFOUND.BASE);
+        push(PAGES.NOT_FOUND.BASE);
         return;
       };
       setProduct(data);
@@ -57,7 +57,7 @@ const EditProduct = ({ params }) => {
     fetchRol();
   }, [params.code, push]);
   if (role === "user") {
-    push(PAGES.NOTFOUND.BASE);
+    push(PAGES.NOT_FOUND.BASE);
   };
   return (
     <>

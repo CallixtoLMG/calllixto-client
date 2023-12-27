@@ -28,9 +28,9 @@ const EditBrand = ({ params }) => {
         },
         cache: "no-store",
       };
-      const data = await getBrand(params.code, requestOptions);
+      const data = await getBrand(params.id, requestOptions);
       if (!data) {
-        push(PAGES.NOTFOUND.BASE);
+        push(PAGES.NOT_FOUND.BASE);
         return;
       };
       setBrand(data);
@@ -60,9 +60,9 @@ const EditBrand = ({ params }) => {
     validateToken();
     fetchBrand();
     fetchRoles();
-  }, [params.code, push]);
+  }, [params.id, push]);
   if (role === "user") {
-    push(PAGES.NOTFOUND.BASE);
+    push(PAGES.NOT_FOUND.BASE);
   };
   return (
     <>

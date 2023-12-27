@@ -38,7 +38,7 @@ const Product = ({ params }) => {
         };
         const fetchProduct = await getProduct(params.code, requestOptions);
         if (!fetchProduct) {
-          push(PAGES.NOTFOUND.BASE);
+          push(PAGES.NOT_FOUND.BASE);
           return;
         };
         setProduct(fetchProduct);

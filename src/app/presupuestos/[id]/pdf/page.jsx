@@ -38,7 +38,7 @@ const PDF = ({ params }) => {
         };
         const budget = await getBudget(params.id, requestOptions);
         if (!budget) {
-          push(PAGES.NOTFOUND.BASE);
+          push(PAGES.NOT_FOUND.BASE);
           return;
         };
         setIsLoading(false);

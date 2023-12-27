@@ -97,7 +97,7 @@ const ProductForm = ({ product, onSubmit }) => {
           <Controller
             name="comments"
             control={control}
-            render={({ field }) => <Textarea maxlength="2000" {...field} placeholder="Comentarios" />}
+            render={({ field }) => <Textarea maxLength="2000" {...field} placeholder="Comentarios" />}
           />
         </FieldsContainer>
         <ButtonsContainer>

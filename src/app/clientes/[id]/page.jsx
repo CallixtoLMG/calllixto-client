@@ -38,7 +38,7 @@ const Customer = ({ params }) => {
         };
         const fetchCustomer = await getCustomer(params.id, requestOptions);
         if (!fetchCustomer) {
-          push(PAGES.NOTFOUND.BASE);
+          push(PAGES.NOT_FOUND.BASE);
           return;
         };
         setCustomer(fetchCustomer);

@@ -25,9 +25,9 @@ export async function create(brand) {
     .catch(error => console.log('error', error));
 };
 
-export async function edit(params, marca) {
+export async function edit({ id, brand }) {
   const requestOptions = {
-    body: JSON.stringify(marca),
+    body: JSON.stringify(brand),
     method: 'PUT',
     redirect: 'follow',
     headers: {
@@ -36,7 +36,7 @@ export async function edit(params, marca) {
     cache: "no-store",
   };
 
-  fetch(`${URL}${CLIENTID}${PATHS.BRANDS}/${params}`, requestOptions)
+  fetch(`${URL}${CLIENTID}${PATHS.BRANDS}/${id}`, requestOptions)
     .then(async response => {
       let res = await response.text()
       res = JSON.parse(res)

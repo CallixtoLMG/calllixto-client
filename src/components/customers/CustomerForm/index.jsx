@@ -114,7 +114,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
               name="comments"
               control={control}
               render={({ field }) => (
-                <Textarea maxlength="2000" {...field} placeholder="Comentarios" />
+                <Textarea maxLength="2000" {...field} placeholder="Comentarios" />
               )}
             />
           </FieldsContainer>

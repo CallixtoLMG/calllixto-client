@@ -41,7 +41,7 @@ const Brand = ({ params }) => {
         const brand = await getBrand(params.code, requestOptions);
 
         if (!brand) {
-          push(PAGES.NOTFOUND.BASE);
+          push(PAGES.NOT_FOUND.BASE);
           return;
         };
         setBrand(brand);

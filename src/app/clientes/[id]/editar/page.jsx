@@ -37,7 +37,7 @@ const EditCustomer = ({ params }) => {
       };
       const data = await getCustomer(params.id, requestOptions);
       if (!data) {
-        push(PAGES.NOTFOUND.BASE);
+        push(PAGES.NOT_FOUND.BASE);
         return;
       };
       setCustomer(data);

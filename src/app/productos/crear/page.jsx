@@ -37,7 +37,7 @@ const CreateProduct = () => {
     fetchRol();
   }, [push]);
   if (role === "user") {
-    push(PAGES.NOTFOUND.BASE)
+    push(PAGES.NOT_FOUND.BASE)
   };
   return (
     <>

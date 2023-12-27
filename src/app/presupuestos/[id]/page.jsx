@@ -38,7 +38,7 @@ const Budget = ({ params }) => {
         };
         const fetchBudget = await getBudget(params.id, requestOptions);
         if (!fetchBudget) {
-          push(PAGES.NOTFOUND.BASE);
+          push(PAGES.NOT_FOUND.BASE);
           return;
         };
         setBudget(fetchBudget);

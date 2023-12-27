@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
 import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea } from "./styles";
+import { omit } from "lodash";
 
 const BrandForm = ({ brand, onSubmit }) => {
   const { push } = useRouter();
@@ -28,12 +29,12 @@ const BrandForm = ({ brand, onSubmit }) => {
 
   const handleForm = (data) => {
     setIsLoading(true);
-    if (!brand?.id) {
+    if (!isUpdating) {
       data.createdAt = createDate();
       onSubmit(data);
     } else {
       data.updatedAt = createDate();
-      onSubmit(brand?.id, data);
+      onSubmit({ id: brand.id, brand: omit(data, ['id', 'createdAt']) });
     }
     setTimeout(() => {
       setIsLoading(false);
@@ -70,7 +71,7 @@ const BrandForm = ({ brand, onSubmit }) => {
           <Controller
             name="comments"
             control={control}
-            render={({ field }) => <Textarea maxlength="2000" {...field} placeholder="Comentarios" />}
+            render={({ field }) => <Textarea maxLength="2000" {...field} placeholder="Comentarios" />}
           />
         </FieldsContainer>
         <ButtonsContainer>
