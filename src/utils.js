@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import { REGEX } from "./constants";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -48,4 +49,6 @@ export const getBrandCode = (code) => {
 export const getProductCode = (code) => {
   return code.slice(4);
 }
+
+export const validate2DigitCode = (value) => REGEX.TWO_DIGIT_CODE.test(value);
 

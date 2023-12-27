@@ -1,6 +1,6 @@
 "use client";
 import { PAGES } from "@/constants";
-import { createDate } from "@/utils";
+import { createDate, validate2DigitCode } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -11,9 +11,6 @@ import { omit } from "lodash";
 const BrandForm = ({ brand, onSubmit }) => {
   const { push } = useRouter();
   const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: brand });
-  const validateCode = (value) => {
-    return /^[A-Z0-9]{2}$/.test(value);
-  };
   const isUpdating = useMemo(() => !!brand?.id, [brand]);
   const [isLoading, setIsLoading] = useState(false);
   const buttonConfig = useMemo(() => {
@@ -51,9 +48,15 @@ const BrandForm = ({ brand, onSubmit }) => {
             <Controller
               name="id"
               control={control}
-              rules={{ validate: validateCode }}
+              rules={{ validate: validate2DigitCode }}
               render={({ field }) => (
-                <Input required {...field} placeholder="Código (A1)" disabled={isUpdating} />
+                <Input required
+                  placeholder="Código (A1)"
+                  disabled={isUpdating}
+                  {...field}
+                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                  maxLength={2}
+                  />
               )}
             />
           </FormField>
@@ -62,6 +65,7 @@ const BrandForm = ({ brand, onSubmit }) => {
             <Controller
               name="name"
               control={control}
+              rules={{ required: true }}
               render={({ field }) => <Input required {...field} placeholder="Nombre" />}
             />
           </FormField>

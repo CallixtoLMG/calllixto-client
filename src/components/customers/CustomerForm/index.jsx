@@ -62,8 +62,8 @@ const CustomerForm = ({ customer, onSubmit }) => {
               <Controller
                 name="email"
                 control={control}
-                rules={{ required: true, pattern: REGEX.EMAIL }}
-                render={({ field }) => <Input required {...field} placeholder="Email" />}
+                rules={{ pattern: REGEX.EMAIL }}
+                render={({ field }) => <Input {...field} placeholder="Email" />}
               />
             </FormField>
             <FormField>
@@ -71,8 +71,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
               <Controller
                 name="address"
                 control={control}
-                rules={{ required: true }}
-                render={({ field }) => <Input required {...field} placeholder="Dirección" />}
+                render={({ field }) => <Input {...field} placeholder="Dirección" />}
               />
             </FormField>
             <FormField flex="none" width="200px">

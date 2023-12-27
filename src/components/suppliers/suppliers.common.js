@@ -1,5 +1,6 @@
 import { Icon, Popup } from "semantic-ui-react";
 import { Flex, Box } from "rebass";
+import { formatedPhone } from "@/utils";
 
 const SUPPLIERS_COLUMNS = [
   {
@@ -28,7 +29,18 @@ const SUPPLIERS_COLUMNS = [
           />
         )}
       </Flex>
-  }
+  },
+  {
+    id: 3,
+    title: "Dirección",
+    value: (supplier) => supplier.address
+  },
+  {
+    id: 4,
+    title: "Teléfono",
+    width: 3,
+    value: (supplier) => formatedPhone(supplier.phone?.areaCode, supplier.phone?.number)
+  },
 ];
 
 export { SUPPLIERS_COLUMNS };

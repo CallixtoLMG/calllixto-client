@@ -1,19 +1,17 @@
 "use client";
-import { PAGES } from "@/constants";
-import { createDate } from "@/utils";
+import { PAGES, REGEX } from "@/constants";
+import { createDate, validate2DigitCode } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
-import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea } from "./styles";
+import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea } from "./styles";
 import { omit } from "lodash";
+import { Box } from "rebass";
 
 const SupplierForm = ({ supplier, onSubmit }) => {
   const { push } = useRouter();
   const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: supplier });
-  const validateCode = (value) => {
-    return /^[A-Z0-9]{2}$/.test(value);
-  };
   const isUpdating = useMemo(() => !!supplier?.id, [supplier]);
   const [isLoading, setIsLoading] = useState(false);
   const buttonConfig = useMemo(() => {
@@ -51,9 +49,15 @@ const SupplierForm = ({ supplier, onSubmit }) => {
             <Controller
               name="id"
               control={control}
-              rules={{ validate: validateCode }}
+              rules={{ validate: validate2DigitCode }}
               render={({ field }) => (
-                <Input required {...field} placeholder="Código (A1)" disabled={isUpdating} />
+                <Input required
+                  placeholder="Código (A1)"
+                  disabled={isUpdating}
+                  {...field}
+                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                  maxLength={2}
+                />
               )}
             />
           </FormField>
@@ -62,8 +66,60 @@ const SupplierForm = ({ supplier, onSubmit }) => {
             <Controller
               name="name"
               control={control}
+              rules={{ required: true }}
               render={({ field }) => <Input required {...field} placeholder="Nombre" />}
             />
+          </FormField>
+        </FieldsContainer>
+        <FieldsContainer>
+          <FormField>
+            <Label>Email</Label>
+            <Controller
+              name="email"
+              control={control}
+              rules={{ pattern: REGEX.EMAIL }}
+              render={({ field }) => <Input {...field} placeholder="Email" />}
+            />
+          </FormField>
+          <FormField>
+            <Label >Dirección</Label>
+            <Controller
+              name="address"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Dirección" />}
+            />
+          </FormField>
+          <FormField flex="none" width="200px">
+            <Label>Teléfono</Label>
+            <PhoneContainer>
+              <Box width="70px">
+                <Controller
+                  name="phone.areaCode"
+                  control={control}
+                  render={({ field }) =>
+                    <MaskedInput
+                      mask="9999"
+                      maskChar={null}
+                      {...field}
+                      placeholder="Área"
+                    />
+                  }
+                />
+              </Box>
+              <Box width="130px">
+                <Controller
+                  name="phone.number"
+                  control={control}
+                  render={({ field }) =>
+                    <MaskedInput
+                      mask="99999999"
+                      maskChar={null}
+                      {...field}
+                      placeholder="Numero"
+                    />}
+                />
+              </Box>
+            </PhoneContainer>
           </FormField>
         </FieldsContainer>
         <FieldsContainer>
