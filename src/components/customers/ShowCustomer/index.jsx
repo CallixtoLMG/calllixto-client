@@ -1,6 +1,9 @@
 "use client";
+import { GoToButton } from "@/components/common/buttons";
+import { PAGES } from "@/constants";
 import { formatedPhone } from "@/utils";
-import { Container, DataContainer, Label, Segment, SubContainer } from "./styles";
+import { Popup } from 'semantic-ui-react';
+import { ButtonContainer, Container, DataContainer, Label, Segment, SubContainer } from "./styles";
 
 const ShowCustomer = ({ customer = {} }) => {
   return (
@@ -31,6 +34,16 @@ const ShowCustomer = ({ customer = {} }) => {
           <Segment>{customer.comments || "Sin comentarios."}</Segment>
         </DataContainer>
       </SubContainer>
+      <Popup
+        trigger={
+          <ButtonContainer>
+            <GoToButton goTo={PAGES.CUSTOMERS.UPDATE(customer.id)} iconName="edit" color="blue" ></GoToButton>
+          </ButtonContainer>
+        }
+        size="mini"
+        content="Editar Cliente"
+        position="top center"
+      />
     </Container>
   );
 };

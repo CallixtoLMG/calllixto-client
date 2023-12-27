@@ -1,4 +1,4 @@
-import { Table } from "semantic-ui-react";
+import { Header as SHeader, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Cell = styled(Table.Cell)`
@@ -12,6 +12,13 @@ const HeaderCell = styled(Table.HeaderCell)`
   text-align: center!important;
 `;
 
+const Header = styled(SHeader)`
+  padding: 5px!important;
+  text-align: center!important;
+  position: relative!important;
+  display: flex!important;
+`;
+
 const ActionsContainer = styled.div`
   display: flex;
   position: absolute;
@@ -19,7 +26,7 @@ const ActionsContainer = styled.div`
   top: 50%;
   transform: translateY(-50%) translateX(calc(100% + 5px));
   transition: all 0.1s ease-in-out;
-  padding: 6px;
+  padding: 4px;
   opacity: 0;
   visibility: hidden;
   border: 1px solid #d4d4d5;
@@ -35,11 +42,11 @@ const LinkRow = styled(Table.Row)`
   position: relative;
 
   &:hover ${ActionsContainer} {
-    opacity: 0.8;
+    opacity: 1;
     visibility: visible;
   }
 `;
 
 
-export { ActionsContainer, Cell, HeaderCell, LinkRow };
+export { ActionsContainer, Cell, Header, HeaderCell, LinkRow };
 

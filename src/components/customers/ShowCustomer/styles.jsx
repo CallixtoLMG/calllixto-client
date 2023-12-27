@@ -24,6 +24,10 @@ const Container = styled(Flex)`
   flex-direction: column;
 `;
 
+const ButtonContainer = styled(Flex)`
+  width: fit-content!important  
+`;
+
 const DataContainer = styled(Flex)`
   width: ${(props) => props.width || '200px!important'};
   max-width: ${(props) => props.maxWidth || "300px!important"};
@@ -33,6 +37,6 @@ const DataContainer = styled(Flex)`
   flex-direction: column;
 `;
 
-export { Container, DataContainer, Label, Segment, SubContainer };
+export { ButtonContainer, Container, DataContainer, Label, Segment, SubContainer };
 
 

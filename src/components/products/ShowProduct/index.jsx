@@ -1,4 +1,6 @@
 "use client";
+import { GoToButton } from "@/components/common/buttons";
+import { PAGES } from "@/constants";
 import { formatedPrice } from "@/utils";
 import { Container, DataContainer, Label, Segment, SubContainer } from "./styles";
 
@@ -6,7 +8,7 @@ const ShowProduct = ({ product }) => {
   return (
     <Container>
       <SubContainer>
-      <DataContainer flex="none" width="200px">
+        <DataContainer flex="none" width="200px">
           <Label>Código</Label>
           <Segment>{product?.code}</Segment>
         </DataContainer>
@@ -25,6 +27,7 @@ const ShowProduct = ({ product }) => {
           <Segment>{product.comments || "Sin Comentarios."}</Segment>
         </DataContainer>
       </SubContainer>
+      <GoToButton goTo={PAGES.PRODUCTS.UPDATE(product.id)} iconName="edit" text="Editar producto" color="green" />
     </Container>
   );
 };

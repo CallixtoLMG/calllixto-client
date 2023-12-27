@@ -1,13 +1,12 @@
 "use client";
 import { GoToButton } from "@/components/common/buttons";
+import { ModalDelete } from '@/components/common/modals';
+import { Table } from '@/components/common/table';
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 import { HEADERS } from "../customers.common";
 import { ButtonContainer } from "./styles";
-import { Table } from '@/components/common/table';
-import { ModalDelete } from '@/components/common/modals';
-import { useCallback, useState } from "react";
-import { set } from "react-hook-form";
 
 const CustomersPage = ({ customers = [], onDelete }) => {
   const { push } = useRouter();

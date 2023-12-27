@@ -14,6 +14,13 @@ const Delete = ({ params, title, onDelete, showModal, setShowModal, isLoading })
     inputElement?.current?.focus();
   }, [showModal]);
 
+  useEffect(() => {
+    if (!showModal) {
+      setConfirmationText('');
+      setIsDeleteEnabled(false);
+    }
+  }, [showModal]);
+
   const handleConfirmationTextChange = (e) => {
     const text = e.target.value;
     setConfirmationText(text);

@@ -1,15 +1,15 @@
 "use client";
 import { DownloadExcelButton, GoToButton } from "@/components/common/buttons";
+import { ModalDelete } from "@/components/common/modals";
+import { Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from 'next/navigation';
+import { useCallback, useState } from "react";
 import { Flex } from "rebass";
 import ImportExcel from "../ImportProduct";
 import { PRODUCT_COLUMNS } from "../products.common";
 import { ButtonContainer } from "./styles";
-import { Table } from "@/components/common/table";
-import { useCallback, useState } from "react";
-import { ModalDelete } from "@/components/common/modals";
 
 const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete }) => {
   const { push } = useRouter();
@@ -59,8 +59,13 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
             <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
             <DownloadExcelButton />
           </Flex>
-        </ButtonContainer>}
-      <Table headers={PRODUCT_COLUMNS} elements={mapProductsForTable(products)} page={PAGES.PRODUCTS} actions={actions} />
+        </ButtonContainer>
+      }
+      <Table
+        headers={PRODUCT_COLUMNS}
+        elements={mapProductsForTable(products)}
+        page={PAGES.PRODUCTS}
+        actions={visibilityRules.canSeeButtons && actions} />
       <ModalDelete
         showModal={showModal}
         setShowModal={setShowModal}
