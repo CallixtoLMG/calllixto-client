@@ -1,7 +1,7 @@
 "use client";
 import { createBatch, deleteProduct, editBatch, productsList } from "@/api/products";
 import { getUserData } from "@/api/userData";
-import { PageHeader, Loader } from "@/components/layout";
+import { Loader, PageHeader } from "@/components/layout";
 import ProductsPage from "@/components/products/ProductsPage";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";

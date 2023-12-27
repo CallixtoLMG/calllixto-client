@@ -1,7 +1,7 @@
-import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow } from "./styles";
-import { Table } from "semantic-ui-react";
 import { useRouter } from "next/navigation";
+import { Header, Table } from "semantic-ui-react";
 import Actions from "./Actions";
+import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow } from "./styles";
 
 const CustomTable = ({ headers = [], elements = [], page, actions = [] }) => {
   const { push } = useRouter();
@@ -15,36 +15,46 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [] }) => {
         </Table.Row>
       </Table.Header>
       <Table.Body>
-        {elements.map((element) => {
-          if (page) {
+        {elements.length === 0 ? (
+          <Table.Row>
+            <Table.Cell colSpan={headers.length} textAlign="center">
+              <Header as="h3">
+                No se encontraron ítems.
+              </Header>
+            </Table.Cell>
+          </Table.Row>
+        ) : (
+          elements.map((element) => {
+            if (page) {
+              return (
+                <LinkRow key={element.key} onClick={() => push(page.SHOW(element.id))}>
+                  {headers.map(header => (
+                    <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                      {header.value(element)}
+                    </Cell>
+                  ))}
+                  {!!actions.length && (
+                    <ActionsContainer>
+                      <InnerActionsContainer>
+                        <Actions actions={actions} element={element} />
+                      </InnerActionsContainer>
+                    </ActionsContainer>
+                  )}
+                </LinkRow>
+              );
+            }
             return (
-              <LinkRow key={element.key} onClick={() => push(page.SHOW(element.id))}>
-                {headers.map(header => (
-                  <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
-                    {header.value(element)}
-                  </Cell>
-                ))}
+              <Table.Row key={element.key}>
+                {headers.map((header) => header.value(element))}
                 {!!actions.length && (
                   <ActionsContainer>
-                    <InnerActionsContainer>
-                      <Actions actions={actions} element={element} />
-                    </InnerActionsContainer>
+                    <Actions actions={actions} />
                   </ActionsContainer>
                 )}
-              </LinkRow>
-            )
-          }
-          return (
-            <Table.Row key={element.key}>
-              {headers.map((header) => header.value(element))}
-              {!!actions.length && (
-                <ActionsContainer>
-                  <Actions actions={actions} />
-                </ActionsContainer>
-              )}
-            </Table.Row>
-          )
-        })}
+              </Table.Row>
+            );
+          })
+        )}
       </Table.Body>
     </Table>
   );
