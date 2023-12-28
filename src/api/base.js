@@ -23,3 +23,25 @@ export async function baseCreate(url, model, message) {
     toast.error(response.message);
   }
 };
+
+export async function baseUpdate(url, model, message) {
+  const requestOptions = {
+    body: JSON.stringify({ ...model, updatedAt: createDate() }),
+    method: 'PUT',
+    redirect: 'follow',
+    headers: {
+      authorization: `Bearer ${getToken()}`
+    },
+    cache: "no-store",
+  };
+
+  let response = await fetch(url, requestOptions);
+  response = await response.text();
+  response = JSON.parse(response);
+
+  if (response.statusOk) {
+    toast.success(message);
+  } else {
+    toast.error(response.message);
+  }
+};

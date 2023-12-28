@@ -2,12 +2,16 @@ import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS, URL } from "@/fetchUrls";
 import { createDate } from "@/utils";
 import { toast } from "react-hot-toast";
 import { omit } from "lodash";
-import { baseCreate } from "../base";
+import { baseCreate, baseUpdate } from "../base";
 
 const PRODUCTS_URL = `${URL}${CLIENT_ID}${PATHS.PRODUCTS}`;
 
 export async function create(product) {
   baseCreate(PRODUCTS_URL, product, 'Producto creado!');
+};
+
+export async function edit(product) {
+  baseUpdate(`${PRODUCTS_URL}/${product.code}`, omit(product, ["code", "createdAt"]), 'Producto actualizado!');
 };
 
 export async function createBatch(product) {
@@ -31,32 +35,6 @@ export async function createBatch(product) {
       res = JSON.parse(res);
       if (res.statusOk) {
         toast.success("Productos importados exitosamente");
-      } else {
-        toast.error(res.message);
-      }
-    })
-    .catch((error) => console.log("error", error));
-}
-
-export async function edit(product) {
-  product.updatedAt = createDate();
-  const validParams = omit(product, ["code", "createdAt"]);
-  const requestOptions = {
-    body: JSON.stringify(validParams),
-    method: "PUT",
-    redirect: "follow",
-    headers: {
-      authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    cache: "no-store",
-  };
-
-  fetch(`${PRODUCTS_URL}/${product.code}`, requestOptions)
-    .then(async (response) => {
-      let res = await response.text();
-      res = JSON.parse(res);
-      if (res.statusOk) {
-        toast.success("Producto modificado exitosamente");
       } else {
         toast.error(res.message);
       }

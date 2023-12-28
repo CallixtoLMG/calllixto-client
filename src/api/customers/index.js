@@ -2,12 +2,16 @@ import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
 import { createDate } from "@/utils";
 import { toast } from "react-hot-toast";
 import { omit } from "lodash";
-import { baseCreate } from "../base";
+import { baseCreate, baseUpdate } from "../base";
 
 const CUSTOMERS_URL = `${URL}${CLIENT_ID}${PATHS.CUSTOMERS}`;
 
 export async function create(customer) {
   baseCreate(CUSTOMERS_URL, customer, 'Cliente creado!');
+};
+
+export async function edit(customer) {
+  baseUpdate(`${CUSTOMERS_URL}/${customer.id}`, omit(customer,["id", "createdAt"]), 'Cliente actualizado!');
 };
 
 export async function customersList(requestOptions) {
@@ -38,32 +42,6 @@ export async function deleteCustomer(id) {
       res = JSON.parse(res);
       if (res.statusOk) {
         toast.success("Cliente eliminado exitosamente");
-      } else {
-        toast.error(res.message);
-      }
-    })
-    .catch((error) => console.log("error", error));
-}
-
-export async function edit(customer) {
-  customer.updatedAt = createDate();
-  const validParams = omit(customer,["id", "createdAt"])
-  var requestOptions = {
-    body: JSON.stringify(validParams),
-    method: "PUT",
-    redirect: "follow",
-    headers: {
-      authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    cache: "no-store",
-  };
-
-  fetch(`${CUSTOMERS_URL}/${customer.id}`, requestOptions)
-    .then(async (response) => {
-      let res = await response.text();
-      res = JSON.parse(res);
-      if (res.statusOk) {
-        toast.success("Cliente modificado exitosamente");
       } else {
         toast.error(res.message);
       }

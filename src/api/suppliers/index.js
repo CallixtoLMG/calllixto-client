@@ -2,7 +2,7 @@ import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
 import { createDate } from "@/utils";
 import { omit } from "lodash";
-import { baseCreate } from "../base";
+import { baseCreate, baseUpdate } from "../base";
 
 const SUPPLIER_URL = `${URL}${CLIENT_ID}${PATHS.SUPPLIERS}`;
 
@@ -11,29 +11,7 @@ export async function create(supplier) {
 };
 
 export async function edit(supplier) {
-  supplier.updatedAt = createDate()
-  const validParams = omit(supplier, ["id", "createdAt"])
-  const requestOptions = {
-    body: JSON.stringify(validParams),
-    method: 'PUT',
-    redirect: 'follow',
-    headers: {
-      authorization: `Bearer ${localStorage.getItem("token")}`
-    },
-    cache: "no-store",
-  };
-
-  fetch(`${SUPPLIER_URL}/${supplier.id}`, requestOptions)
-    .then(async response => {
-      let res = await response.text()
-      res = JSON.parse(res)
-      if (res.statusOk) {
-        toast.success("Proveedor modificado exitosamente");
-      } else {
-        toast.error(res.message);
-      }
-    })
-    .catch(error => console.log('error', error));
+  baseUpdate(`${SUPPLIER_URL}/${supplier.id}`, omit(supplier, ["id", "createdAt"]), 'Proveedor actualizado!');
 };
 
 export async function suppliersList(requestOptions) {
