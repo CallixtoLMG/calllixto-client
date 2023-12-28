@@ -1,10 +1,9 @@
 "use client";
 import { edit, getProduct } from "@/api/products";
-import { getUserData } from "@/api/userData";
 import { PageHeader, Loader } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
-import { useRole } from "@/hooks/userData";
+import { useRole, useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -13,13 +12,9 @@ const EditProduct = ({ params }) => {
   const role = useRole();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const token = useValidateToken();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE);
-    };
-
     async function fetchData() {
       var requestOptions = {
         method: 'GET',
@@ -38,23 +33,13 @@ const EditProduct = ({ params }) => {
       setIsLoading(false)
     };
 
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE);
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
-
-    validateToken();
     fetchData();
-  }, [params.code, push]);
+  }, [params.code, push, token]);
+
   if (role === "user") {
     push(PAGES.NOT_FOUND.BASE);
   };
+
   return (
     <>
       <PageHeader title="Actualizar Producto" />

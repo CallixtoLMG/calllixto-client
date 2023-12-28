@@ -1,31 +1,18 @@
 "use client";
 import { customersList, deleteCustomer } from "@/api/customers";
-import { getUserData } from "@/api/userData";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { PageHeader, Loader } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Customers = () => {
   const { push } = useRouter();
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
   const [customers, setCustomers] = useState();
+  const token = useValidateToken();
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE);
-    };
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE);
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
     const fetchData = async () => {
       try {
         const requestOptions = {
@@ -44,9 +31,9 @@ const Customers = () => {
         setIsLoading(false)
       };
     };
-    validateToken();
+
     fetchData();
-  }, [push]);
+  }, [push, token]);
 
   const handleDeleteCustomer = async (id) => {
     try {

@@ -1,31 +1,19 @@
 "use client"
 import { getBudget } from "@/api/budgets";
-import { getUserData } from "@/api/userData";
 import PDFfile from "@/components/budgets/PDFfile";
 import { Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useValidateToken } from "@/hooks/userData";
 
 const PDF = ({ params }) => {
   const [budget, setBudget] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const { push } = useRouter();
+  const token = useValidateToken();
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE);
-    };
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE);
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
     const fetchData = async () => {
       try {
         const requestOptions = {
@@ -47,9 +35,9 @@ const PDF = ({ params }) => {
         console.error('Error al cargar PDF:', error);
       };
     };
-    validateToken();
+
     fetchData();
-  }, [params.id, push]);
+  }, [params.id, push, token]);
 
   return (
     <Loader active={isLoading}>

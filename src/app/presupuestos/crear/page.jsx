@@ -2,10 +2,9 @@
 import { create, getBudget } from "@/api/budgets";
 import { customersList } from "@/api/customers";
 import { productsList } from "@/api/products";
-import { getUserData } from "@/api/userData";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { PageHeader, Loader } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { useValidateToken } from "@/hooks/userData";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -18,12 +17,9 @@ const CreateBudget = () => {
 
   const searchParams = useSearchParams();
   const cloneId = useMemo(() => searchParams.get('clonar'), [searchParams]);
+  const token = useValidateToken();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE)
-    };
     const requestOptions = {
       method: 'GET',
       headers: {
@@ -32,16 +28,7 @@ const CreateBudget = () => {
       },
       cache: "no-store",
     };
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE)
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
+
     const fetchData = async () => {
       if (cloneId) {
         try {
@@ -82,9 +69,10 @@ const CreateBudget = () => {
         setIsLoading(false);
       };
     };
-    validateToken();
+
     fetchData();
-  }, [cloneId, push]);
+  }, [cloneId, push, token]);
+
   return (
     <>
       <PageHeader title="Crear Presupuesto" />
