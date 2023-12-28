@@ -9,27 +9,27 @@ const ShowCustomer = ({ customer = {} }) => {
   return (
     <Container>
       <SubContainer>
-        <DataContainer width="330px">
+        <DataContainer width="50%!important" >
           <Label>Nombre</Label>
           <Segment>{customer.name}</Segment>
         </DataContainer>
       </SubContainer>
       <SubContainer>
-        <DataContainer>
-          <Label>Mail</Label>
-          <Segment>{customer.email}</Segment>
-        </DataContainer>
-        <DataContainer>
-          <Label>Dirección</Label>
-          <Segment>{customer.address || "Sin dato"}</Segment>
-        </DataContainer>
-        <DataContainer flex="none" width="200px">
+        <DataContainer >
           <Label>Teléfono</Label>
           <Segment>{formatedPhone(customer.phone.areaCode, customer.phone.number)}</Segment>
         </DataContainer>
+        <DataContainer flex="1" >
+          <Label>Email</Label>
+          <Segment>{customer.email}</Segment>
+        </DataContainer>
+        <DataContainer flex="1">
+          <Label>Dirección</Label>
+          <Segment>{customer.address || "Sin dato"}</Segment>
+        </DataContainer>
       </SubContainer>
       <SubContainer>
-        <DataContainer maxWidth="100%" >
+        <DataContainer flex="1" maxWidth="100%" >
           <Label>Comentarios</Label>
           <Segment>{customer.comments || "Sin comentarios."}</Segment>
         </DataContainer>

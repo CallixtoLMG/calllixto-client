@@ -1,12 +1,12 @@
 "use client";
 import { PAGES } from "@/constants";
 import { createDate, validate2DigitCode } from "@/utils";
+import { omit } from "lodash";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
 import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea } from "./styles";
-import { omit } from "lodash";
 
 const BrandForm = ({ brand, onSubmit }) => {
   const { push } = useRouter();
@@ -56,11 +56,11 @@ const BrandForm = ({ brand, onSubmit }) => {
                   {...field}
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                   maxLength={2}
-                  />
+                />
               )}
             />
           </FormField>
-          <FormField>
+          <FormField width="50%">
             <Label>Nombre</Label>
             <Controller
               name="name"

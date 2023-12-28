@@ -1,13 +1,13 @@
 "use client";
 import { PAGES, REGEX } from "@/constants";
 import { createDate, validate2DigitCode } from "@/utils";
+import { omit } from "lodash";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { Box } from "rebass";
 import { Form, Icon } from "semantic-ui-react";
 import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea } from "./styles";
-import { omit } from "lodash";
-import { Box } from "rebass";
 
 const SupplierForm = ({ supplier, onSubmit }) => {
   const { push } = useRouter();
@@ -61,7 +61,7 @@ const SupplierForm = ({ supplier, onSubmit }) => {
               )}
             />
           </FormField>
-          <FormField>
+          <FormField width="50%">
             <Label>Nombre</Label>
             <Controller
               name="name"
@@ -72,23 +72,6 @@ const SupplierForm = ({ supplier, onSubmit }) => {
           </FormField>
         </FieldsContainer>
         <FieldsContainer>
-          <FormField>
-            <Label>Email</Label>
-            <Controller
-              name="email"
-              control={control}
-              rules={{ pattern: REGEX.EMAIL }}
-              render={({ field }) => <Input {...field} placeholder="Email" />}
-            />
-          </FormField>
-          <FormField>
-            <Label >Dirección</Label>
-            <Controller
-              name="address"
-              control={control}
-              render={({ field }) => <Input {...field} placeholder="Dirección" />}
-            />
-          </FormField>
           <FormField flex="none" width="200px">
             <Label>Teléfono</Label>
             <PhoneContainer>
@@ -120,6 +103,23 @@ const SupplierForm = ({ supplier, onSubmit }) => {
                 />
               </Box>
             </PhoneContainer>
+          </FormField>
+          <FormField flex="1">
+            <Label>Email</Label>
+            <Controller
+              name="email"
+              control={control}
+              rules={{ pattern: REGEX.EMAIL }}
+              render={({ field }) => <Input {...field} placeholder="Email" />}
+            />
+          </FormField>
+          <FormField flex="1">
+            <Label >Dirección</Label>
+            <Controller
+              name="address"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Dirección" />}
+            />
           </FormField>
         </FieldsContainer>
         <FieldsContainer>

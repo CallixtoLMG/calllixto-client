@@ -8,17 +8,17 @@ const ShowBrand = ({ brand }) => {
   return (
     <Container>
       <SubContainer>
-        <DataContainer width="200px">
+        <DataContainer >
           <Label>Código</Label>
           <Segment>{brand?.id}</Segment>
         </DataContainer>
-        <DataContainer width="200px">
+        <DataContainer width="50%">
           <Label>Nombre</Label>
           <Segment>{brand?.name}</Segment>
         </DataContainer>
       </SubContainer>
       <SubContainer>
-        <DataContainer maxWidth="100%" >
+        <DataContainer flex="1" >
           <Label>Comentarios</Label>
           <Segment>{brand.comments || "Sin Comentarios."}</Segment>
         </DataContainer>
