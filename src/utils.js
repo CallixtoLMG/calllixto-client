@@ -7,7 +7,7 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 export const createDate = () => {
-  const date = dayjs().tz(dayjs.tz.guess()).toISOString();
+  const date = dayjs().tz(dayjs.tz.guess()).local().toDate().toLocaleString("es-AR");
   return date;
 }
 

@@ -1,7 +1,5 @@
 "use client";
 import { PAGES } from "@/constants";
-import { createDate } from "@/utils";
-import { omit } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -37,13 +35,7 @@ const BrandForm = ({ brand, onSubmit }) => {
 
   const handleForm = (data) => {
     setIsLoading(true);
-    if (!isUpdating) {
-      data.createdAt = createDate();
-      onSubmit(data);
-    } else {
-      data.updatedAt = createDate();
-      onSubmit({ id: brand.id, brand: omit(data, ['id', 'createdAt']) });
-    }
+    onSubmit(data);
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.BRANDS.BASE);
