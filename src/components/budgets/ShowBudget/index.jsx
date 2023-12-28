@@ -14,6 +14,7 @@ import {
 import { Flex } from "rebass";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import PDFFile from "../PDFfile";
+import { getTotalSum, formatedPrice } from "@/utils";
 
 const ShowBudget = ({ budget }) => {
   return (
@@ -31,7 +32,7 @@ const ShowBudget = ({ budget }) => {
         </SubContainer>
         <Flex flexDirection="column" width="100%" marginTop="15px">
           <Label align="center">Productos</Label>
-          <Table headers={PRODUCTS_COLUMNS} elements={budget?.products} />
+          <Table headers={PRODUCTS_COLUMNS} elements={budget?.products} total={formatedPrice(getTotalSum(budget?.products))} />
           <Flex>
             <Button onClick={() => window.print()} color="blue">
               <Icon name="download" />Descargar PDF

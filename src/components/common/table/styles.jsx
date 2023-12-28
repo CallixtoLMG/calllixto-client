@@ -10,7 +10,7 @@ const Cell = styled(Table.Cell)`
 
 const HeaderCell = styled(Table.HeaderCell)`
   background-color: #EEEEEE!important;
-  text-align: center!important;
+  text-align: ${({ textAlign }) => textAlign || 'center'} !important;
 `;
 
 const ActionsContainer = styled.td`
@@ -44,7 +44,6 @@ const LinkRow = styled(Table.Row)`
     visibility: visible;
   }
 `;
-
 
 export { ActionsContainer, InnerActionsContainer, Cell, HeaderCell, LinkRow };
 
