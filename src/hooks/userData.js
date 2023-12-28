@@ -3,7 +3,7 @@ import { PAGES } from '@/constants';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const getToken = () => {
+export const getToken = () => {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('token');
 }

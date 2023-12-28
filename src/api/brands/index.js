@@ -1,33 +1,13 @@
 import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
 import { createDate } from "@/utils";
 import { toast } from "react-hot-toast";
-import { omit } from "lodash"
+import { omit } from "lodash";
+import { baseCreate } from "../base";
 
 const BRANDS_URL = `${URL}${CLIENT_ID}${PATHS.BRANDS}`;
 
 export async function create(brand) {
-  brand.createdAt = createDate()
-  var requestOptions = {
-    method: 'POST',
-    body: JSON.stringify(brand),
-    redirect: "follow",
-    headers: {
-      authorization: `Bearer ${localStorage.getItem("token")}`
-    },
-    cache: "no-store"
-  };
-
-  fetch(BRANDS_URL, requestOptions)
-    .then(async response => {
-      let res = await response.text();
-      res = JSON.parse(res);
-      if (res.statusOk) {
-        toast.success("Marca creada exitosamente");
-      } else {
-        toast.error(res.message);
-      }
-    })
-    .catch(error => console.log('error', error));
+  baseCreate(BRANDS_URL, brand, 'Marca creada!');
 };
 
 export async function edit(brand) {

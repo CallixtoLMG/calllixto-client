@@ -2,33 +2,13 @@ import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS, URL } from "@/fetchUrls";
 import { createDate } from "@/utils";
 import { toast } from "react-hot-toast";
 import { omit } from "lodash";
+import { baseCreate } from "../base";
 
 const PRODUCTS_URL = `${URL}${CLIENT_ID}${PATHS.PRODUCTS}`;
 
 export async function create(product) {
-  product.createdAt = createDate();
-  console.log(product);
-  var requestOptions = {
-    method: "POST",
-    body: JSON.stringify(product),
-    redirect: "follow",
-    headers: {
-      authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    cache: "no-store",
-  };
-  fetch(PRODUCTS_URL, requestOptions)
-    .then(async (response) => {
-      let res = await response.text();
-      res = JSON.parse(res);
-      if (res.statusOk) {
-        toast.success("Producto creado exitosamente");
-      } else {
-        toast.error(res.message);
-      }
-    })
-    .catch((error) => console.log("error", error));
-}
+  baseCreate(PRODUCTS_URL, product, 'Producto creado!');
+};
 
 export async function createBatch(product) {
   for (const prod of product.products) {
