@@ -36,7 +36,11 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [] }) => {
           }
           return (
             <Table.Row key={element.key}>
-              {headers.map((header) => header.value(element))}
+              {headers.map(header => (
+                <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                  {header.value(element)}
+                </Cell>
+              ))}
               {!!actions.length && (
                 <ActionsContainer>
                   <Actions actions={actions} />
