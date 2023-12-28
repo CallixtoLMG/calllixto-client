@@ -1,31 +1,12 @@
 "use client"
 import { create } from "@/api/customers";
-import { getUserData } from "@/api/userData";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { PageHeader } from "@/components/layout";
-import { PAGES } from "@/constants";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useValidateToken } from "@/hooks/userData";
 
 const CreateCustomer = () => {
-  const { push } = useRouter();
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE);
-    };
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE);
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
-    validateToken();
-  }, [push]);
+  useValidateToken();
+
   return (
     <>
       <PageHeader title="Crear Cliente" />

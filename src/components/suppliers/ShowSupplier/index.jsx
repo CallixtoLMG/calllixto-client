@@ -1,6 +1,7 @@
 "use client";
 import { GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
+import { formatedPhone } from "@/utils";
 import { Popup } from 'semantic-ui-react';
 import { ButtonsContainer, Container, DataContainer, Label, Segment, SubContainer } from "./styles";
 
@@ -8,17 +9,31 @@ const ShowSupplier = ({ supplier }) => {
   return (
     <Container>
       <SubContainer>
-        <DataContainer width="200px">
+        <DataContainer >
           <Label>Código</Label>
           <Segment>{supplier?.id}</Segment>
         </DataContainer>
-        <DataContainer width="200px">
+        <DataContainer width="50%">
           <Label>Nombre</Label>
           <Segment>{supplier?.name}</Segment>
         </DataContainer>
       </SubContainer>
       <SubContainer>
-        <DataContainer maxWidth="100%" >
+        <DataContainer >
+          <Label>Teléfono</Label>
+          <Segment>{formatedPhone(supplier.phone.areaCode, supplier.phone.number)}</Segment>
+        </DataContainer>
+        <DataContainer flex="1">
+          <Label>Email</Label>
+          <Segment>{supplier?.email}</Segment>
+        </DataContainer>
+        <DataContainer flex="1">
+          <Label>Dirección</Label>
+          <Segment>{supplier?.address}</Segment>
+        </DataContainer>
+      </SubContainer>
+      <SubContainer>
+        <DataContainer flex="1" >
           <Label>Comentarios</Label>
           <Segment>{supplier.comments || "Sin Comentarios."}</Segment>
         </DataContainer>

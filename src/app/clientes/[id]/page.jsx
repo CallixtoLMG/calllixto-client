@@ -1,31 +1,19 @@
 "use client";
 import { getCustomer } from "@/api/customers";
-import { getUserData } from "@/api/userData";
 import ShowCustomer from "@/components/customers/ShowCustomer";
 import { PageHeader, Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useValidateToken } from "@/hooks/userData";
 
 const Customer = ({ params }) => {
   const { push } = useRouter();
   const [customer, setCustomer] = useState();
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
+  const token = useValidateToken();
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE);
-    };
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE);
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
     const fetchData = async () => {
       try {
         const requestOptions = {
@@ -47,9 +35,9 @@ const Customer = ({ params }) => {
         console.error('Error al cargar cliente:', error);
       };
     };
-    validateToken();
+
     fetchData();
-  }, [params.id, push]);
+  }, [params.id, push, token]);
 
   return (
     <>

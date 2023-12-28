@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Button as SButton, Segment as SSegment, Table as STable } from "semantic-ui-react";
+import { Button as SButton, Segment as SSegment } from "semantic-ui-react";
 import styled from "styled-components";
 
 const SubContainer = styled(Flex)`
@@ -22,7 +22,8 @@ const Button = styled(SButton)`
 const Segment = styled(SSegment)`
   margin-top: 5px!important;
   height: 50px!important;
+  font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
 `;
 
-export { DataContainer, Button, Segment, SubContainer };
+export { Button, DataContainer, Segment, SubContainer };
 

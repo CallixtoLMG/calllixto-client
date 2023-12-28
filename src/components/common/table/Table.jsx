@@ -3,7 +3,7 @@ import { Header, Table } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow } from "./styles";
 
-const CustomTable = ({ headers = [], elements = [], page, actions = [] }) => {
+const CustomTable = ({ headers = [], elements = [], page, actions = [], total }) => {
   const { push } = useRouter();
   return (
     <Table celled compact striped>
@@ -18,7 +18,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [] }) => {
         {elements.length === 0 ? (
           <Table.Row>
             <Table.Cell colSpan={headers.length} textAlign="center">
-              <Header as="h3">
+              <Header as="h4">
                 No se encontraron ítems.
               </Header>
             </Table.Cell>
@@ -45,7 +45,11 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [] }) => {
             }
             return (
               <Table.Row key={element.key}>
-                {headers.map((header) => header.value(element))}
+                {headers.map(header => (
+                  <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                    {header.value(element)}
+                  </Cell>
+                ))}
                 {!!actions.length && (
                   <ActionsContainer>
                     <Actions actions={actions} />
@@ -56,6 +60,14 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [] }) => {
           })
         )}
       </Table.Body>
+      {total && (
+        <Table.Footer celled fullWidth>
+          <Table.Row>
+            <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
+            <HeaderCell colSpan="1"><strong>{total}</strong></HeaderCell>
+          </Table.Row>
+        </Table.Footer>
+      )}
     </Table>
   );
 };

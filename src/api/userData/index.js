@@ -5,6 +5,7 @@ export async function getUserData() {
   if (data?.isAuthorized) {
     return data;
   };
+
   const response = await fetch(`${URL}${VALIDATE}`, {
     method: 'POST',
     headers: {
@@ -12,9 +13,11 @@ export async function getUserData() {
       authorization: `Bearer ${localStorage.getItem("token")}`
     }
   });
+
   if (!response.ok) {
     throw new Error('No se pudo obtener la información del rol del usuario');
   };
+
   data = await response.json();
   sessionStorage.setItem("userData", data);
   return data;

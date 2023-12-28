@@ -50,5 +50,3 @@ export const getProductCode = (code) => {
   return code.slice(4);
 }
 
-export const validate2DigitCode = (value) => REGEX.TWO_DIGIT_CODE.test(value);
-

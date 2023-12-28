@@ -6,19 +6,33 @@ import { Controller, useForm } from "react-hook-form";
 import { Box } from "rebass";
 import { Form, Icon } from 'semantic-ui-react';
 import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea } from "./styles";
+import { RuledLabel } from "@/components/common/forms";
 
 const CustomerForm = ({ customer, onSubmit }) => {
   const { push } = useRouter();
   const params = useParams();
-  const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: customer});
+  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: customer });
   const isUpdating = useMemo(() => !!params.id, [params.id]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleReset = useCallback((customer) => {
+    reset(customer || { name: '', email: '', phone: { areaCode: '', number: '' }, comments: '' });
+  }, [reset]);
+
   const buttonConfig = useMemo(() => {
     return {
-      icon: isUpdating ? "edit" : "add",
-      title: isUpdating ? "Actualizar" : "Crear",
+      submit: {
+        icon: isUpdating ? "edit" : "add",
+        title: isUpdating ? "Actualizar" : "Crear",
+      },
+      restore: {
+        onClick: () => handleReset(isUpdating ? customer : null),
+        icon: isUpdating ? 'undo' : 'erase',
+        title: isUpdating ? 'Restaurar' : 'Limpiar'
+      }
+
     }
-  }, [isUpdating]);
+  }, [customer, handleReset, isUpdating]);
 
   const handleForm = (data) => {
     setIsLoading(true);
@@ -29,43 +43,22 @@ const CustomerForm = ({ customer, onSubmit }) => {
     }, 1000)
   };
 
-  const handleReset = useCallback((customer) => {
-    reset(customer || { name: '', email: '', phone: { areaCode: '', number: '' }, comments: '' });
-  }, [reset]);
-
   return (
     <>
       <Form onSubmit={handleSubmit(handleForm)}>
         <FormContainer>
           <FieldsContainer>
-            <FormField width="300px">
-              <Label>Nombre</Label>
+            <FormField width="50%!important">
+              <RuledLabel title="Nombre" message={errors?.name?.message} required />
               <Controller
                 name="name"
                 control={control}
-                rules={{ required: true }}
-                render={({ field }) => <Input required {...field} placeholder="Nombre" />}
+                rules={{ required: 'El nombre es requerido' }}
+                render={({ field }) => <Input {...field} placeholder="Nombre" />}
               />
             </FormField>
           </FieldsContainer>
           <FieldsContainer>
-            <FormField>
-              <Label>Email</Label>
-              <Controller
-                name="email"
-                control={control}
-                rules={{ pattern: REGEX.EMAIL }}
-                render={({ field }) => <Input {...field} placeholder="Email" />}
-              />
-            </FormField>
-            <FormField>
-              <Label >Dirección</Label>
-              <Controller
-                name="address"
-                control={control}
-                render={({ field }) => <Input {...field} placeholder="Dirección" />}
-              />
-            </FormField>
             <FormField flex="none" width="200px">
               <Label>Teléfono</Label>
               <PhoneContainer>
@@ -98,9 +91,26 @@ const CustomerForm = ({ customer, onSubmit }) => {
                 </Box>
               </PhoneContainer>
             </FormField>
+            <FormField flex="1">
+              <RuledLabel title="Email" message={errors?.email?.message} />
+              <Controller
+                name="email"
+                control={control}
+                rules={{ pattern: { value: REGEX.EMAIL, message: 'Ingresar un mail válido' } }}
+                render={({ field }) => <Input {...field} placeholder="nombre@mail.com" />}
+              />
+            </FormField>
+            <FormField flex="1">
+              <Label>Dirección</Label>
+              <Controller
+                name="address"
+                control={control}
+                render={({ field }) => <Input {...field} placeholder="Dirección" />}
+              />
+            </FormField>
           </FieldsContainer>
           <FieldsContainer>
-            <Label >Comentarios</Label>
+            <Label>Comentarios</Label>
             <Controller
               name="comments"
               control={control}
@@ -111,25 +121,19 @@ const CustomerForm = ({ customer, onSubmit }) => {
           </FieldsContainer>
           <ButtonsContainer>
             <Button
-              disabled={isLoading || !isDirty || !isValid}
+              disabled={isLoading || !isDirty}
               loading={isLoading}
               type="submit"
               color="green"
             >
-              <Icon name={buttonConfig.icon} />{buttonConfig.title}
+              <Icon name={buttonConfig.submit.icon} />{buttonConfig.submit.title}
             </Button>
-            {isUpdating ? (
-              <Button type="button" onClick={() => handleReset(customer)} color="brown" disabled={isLoading || !isDirty}>
-                <Icon name="undo" />Restaurar
-              </Button>
-            ) : (
-              <Button type="button" onClick={() => handleReset()} color="brown" disabled={isLoading || !isDirty}>
-                <Icon name="erase" />Limpiar
-              </Button>
-            )}
+            <Button type="button" onClick={buttonConfig.restore.onClick} color="brown" disabled={isLoading || !isDirty}>
+              <Icon name={buttonConfig.restore.icon}/>{buttonConfig.restore.title}
+            </Button>
           </ButtonsContainer>
-        </FormContainer >
-      </Form >
+        </FormContainer>
+      </Form>
     </>
   )
 };

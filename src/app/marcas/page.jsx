@@ -1,24 +1,19 @@
 "use client";
-import { getUserData } from "@/api/userData";
 import { PageHeader, Loader } from "@/components/layout";
-import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { brandsList, deleteBrand } from "@/api/brands";
+import { useRole, useValidateToken } from "@/hooks/userData";
 
 const Brands = () => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [brands, setBrands] = useState();
-  const [role, setRole] = useState();
+  const role = useRole();
+  const token = useValidateToken();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      push(PAGES.LOGIN.BASE);
-    };
-
     const requestOptions = {
       method: "GET",
       headers: {
@@ -26,26 +21,6 @@ const Brands = () => {
         "Content-Type": "application/json",
       },
       cache: "no-store",
-    };
-
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE);
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
-
-    const fetchRol = async () => {
-      try {
-        const userData = await getUserData();
-        setRole(userData.roles[0]);
-      } catch (error) {
-        console.error('Error al cargar roles:', error);
-      };
     };
 
     const fetchBrands = async () => {
@@ -59,10 +34,8 @@ const Brands = () => {
       };
     };
 
-    validateToken();
     fetchBrands();
-    fetchRol();
-  }, [push]);
+  }, [push, token]);
 
   const handleDeleteBrand = async (id) => {
     try {

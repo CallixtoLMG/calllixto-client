@@ -9,21 +9,21 @@ const ShowProduct = ({ product }) => {
   return (
     <Container>
       <SubContainer>
-        <DataContainer flex="none" width="200px">
+        <DataContainer >
           <Label>Código</Label>
           <Segment>{product?.code}</Segment>
         </DataContainer>
-        <DataContainer maxWidth="350" width="300px" flex="none">
+        <DataContainer flex="1">
           <Label>Nombre</Label>
           <Segment>{product?.name}</Segment>
         </DataContainer>
-        <DataContainer flex="none" width="200px">
+        <DataContainer >
           <Label>Precio</Label>
           <Segment>{formatedPrice(product?.price)}</Segment>
         </DataContainer>
       </SubContainer>
       <SubContainer>
-        <DataContainer maxWidth="100%" >
+        <DataContainer flex="1" >
           <Label>Comentarios</Label>
           <Segment>{product.comments || "Sin Comentarios."}</Segment>
         </DataContainer>

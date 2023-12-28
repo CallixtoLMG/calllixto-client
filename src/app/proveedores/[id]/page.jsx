@@ -6,28 +6,15 @@ import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getSupplier } from "@/api/suppliers";
+import { useValidateToken } from "@/hooks/userData";
 
 const Supplier = ({ params }) => {
   const [isLoading, setIsLoading] = useState(true)
   const [supplier, setSupplier] = useState({})
   const { push } = useRouter();
+  const token = useValidateToken();
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE);
-    };
-
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE);
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
-
     const fetchSupplier = async () => {
       try {
         const requestOptions = {
@@ -51,9 +38,8 @@ const Supplier = ({ params }) => {
       };
     };
 
-    validateToken()
     fetchSupplier();
-  }, [params.id, push]);
+  }, [params.id, push, token]);
 
   return (
     <>

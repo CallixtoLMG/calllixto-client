@@ -19,6 +19,7 @@ import {
   SubtleLabel,
   Title
 } from "./styles";
+import { formatedPrice, getTotalSum } from "@/utils";
 
 const PDFfile = ({ budget, seller }) => {
   return (
@@ -72,7 +73,11 @@ const PDFfile = ({ budget, seller }) => {
         </Flex>
       </ClientDataContainer>
       <Flex marginTop="20px">
-        <Table headers={PRODUCTS_COLUMNS.filter((products) => !products.hide)} elements={budget?.products} />
+        <Table
+          headers={PRODUCTS_COLUMNS.filter((products) => !products.hide)}
+          elements={budget?.products}
+          total={formatedPrice(getTotalSum(budget?.products))}
+        />
       </Flex>
       <Sign />
       <Flex alignItems="flex-start" padding="20px 0" wrap="wrap">

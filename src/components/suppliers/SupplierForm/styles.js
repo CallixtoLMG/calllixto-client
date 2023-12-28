@@ -1,7 +1,7 @@
+import InputMask from 'react-input-mask';
 import { Flex } from "rebass";
 import { Form, Button as SButton, Input as SInput, Label as SLabel, TextArea as STextArea } from "semantic-ui-react";
 import styled from "styled-components";
-import InputMask from 'react-input-mask';
 
 const Button = styled(SButton)`
   width: 170px!important;
@@ -15,7 +15,8 @@ const FormContainer = styled(Flex)`
 `;
 
 const Label = styled(SLabel)({
-  width: "100%!important"
+  width: "100%!important",
+  margin: "0!important",
 });
 
 const Input = styled(SInput)`
@@ -33,17 +34,17 @@ const WarningMessage = styled.p`
 
 const FormField = styled(Form.Field)`
   width: ${(props) => props.width || '200px!important'};
-  max-width: 300px!important;
-  min-width: 50px!important;
-  flex: ${(props) => props.flex || '1!important'};
+  min-width: ${(props) => props.minWidth || "200px!important"};
+  flex: ${(props) => props.flex || 'none!important'};
   margin: 0!important;
+  flex-direction: column;
 `;
 
 const FieldsContainer = styled(Flex)`
-  flex-direction: row!important;
-  flex-wrap: wrap;
-  column-gap: 20px;
-  max-width: 900px;
+justify-content: ${(props) => props.jContent || "normal"};
+flex-wrap: wrap;
+column-gap: 20px;
+max-width: 900px;
 `;
 
 const Textarea = styled(STextArea)`
@@ -75,5 +76,5 @@ const PhoneContainer = styled(Flex)`
   column-gap: 10px;
 `;
 
-export { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea, WarningMessage, MaskedInput, PhoneContainer };
+export { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea, WarningMessage };
 

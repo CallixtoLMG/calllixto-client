@@ -14,7 +14,8 @@ const FormContainer = styled(Flex)`
 `;
 
 const Label = styled(SLabel)({
-  width: "100%!important"
+  width: "100%!important",
+  margin: "0!important",
 });
 
 const Input = styled(SInput)`
@@ -32,14 +33,14 @@ const WarningMessage = styled.p`
 
 const FormField = styled(Form.Field)`
   width: ${(props) => props.width || '200px!important'};
-  max-width: 300px!important;
-  min-width: 50px!important;
-  flex: ${(props) => props.flex || '1!important'};
+  min-width: ${(props) => props.minWidth || "200px!important"};
+  flex: ${(props) => props.flex || 'none!important'};
   margin: 0!important;
+  flex-direction: column;
 `;
 
 const FieldsContainer = styled(Flex)`
-  flex-direction: row!important;
+  justify-content: ${(props) => props.jContent || "normal"};
   flex-wrap: wrap;
   column-gap: 20px;
   max-width: 900px;

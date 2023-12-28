@@ -1,9 +1,9 @@
 "use client"
 import { getBudget } from "@/api/budgets";
-import { getUserData } from "@/api/userData";
 import ShowBudget from "@/components/budgets/ShowBudget";
 import { PageHeader, Loader, NoPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
+import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -11,21 +11,9 @@ const Budget = ({ params }) => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true)
   const [budget, setBudget] = useState();
+  const token = useValidateToken();
+
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE);
-    };
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE);
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
     const fetchData = async () => {
       try {
         const requestOptions = {
@@ -47,9 +35,9 @@ const Budget = ({ params }) => {
         console.error('Error al cargar presupuesto:', error);
       };
     };
-    validateToken();
+
     fetchData();
-  }, [params.id, push]);
+  }, [params.id, push, token]);
 
   return (
     <>
