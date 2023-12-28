@@ -63,7 +63,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget }) => {
 
   const handleCreate = (data) => {
     setIsLoading(true);
-    data.createdAt = createDate();
     onSubmit(data);
     setTimeout(() => {
       push(PAGES.BUDGETS.BASE);

@@ -1,6 +1,7 @@
 import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS, URL } from "@/fetchUrls";
 import { createDate } from "@/utils";
 import { toast } from "react-hot-toast";
+import { omit } from "lodash"
 
 const PRODUCTS_URL = `${URL}${CLIENT_ID}${PATHS.PRODUCTS}`;
 
@@ -53,8 +54,9 @@ export async function createBatch(product) {
 
 export async function edit(product) {
   product.updatedAt = createDate()
+  const validParams = omit(product, ["code", "createdAt"])
   const requestOptions = {
-    body: JSON.stringify(product),
+    body: JSON.stringify(validParams),
     method: 'PUT',
     redirect: 'follow',
     headers: {

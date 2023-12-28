@@ -27,13 +27,7 @@ const SupplierForm = ({ supplier, onSubmit }) => {
 
   const handleForm = (data) => {
     setIsLoading(true);
-    if (!isUpdating) {
-      data.createdAt = createDate();
-      onSubmit(data);
-    } else {
-      data.updatedAt = createDate();
-      onSubmit({ id: supplier.id, supplier: omit(data, ['id', 'createdAt']) });
-    }
+    onSubmit(data);
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.SUPPLIERS.BASE);
