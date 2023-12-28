@@ -7,8 +7,7 @@ const Label = styled(SLabel)`
 `;
 
 const SubContainer = styled(Flex)`
-  flex-direction: row!important;
-  justify-content: space-between;
+  justify-content: ${(props) => props.jContent || "normal"};
   flex-wrap: wrap;
   column-gap: 20px;
   max-width: 900px;
@@ -16,10 +15,11 @@ const SubContainer = styled(Flex)`
 
 const ButtonsContainer = styled(Flex)`
   width: fit-content!important;
+  align-self: self-end;
 `;
 
 const Segment = styled(SSegment)`
-  margin-top: 5px!important;
+  margin: 5px 0!important;
   height: 50px!important;
 `;
 
@@ -30,9 +30,8 @@ const Container = styled(Flex)`
 
 const DataContainer = styled(Flex)`
   width: ${(props) => props.width || '200px!important'};
-  max-width: ${(props) => props.maxWidth || "300px!important"};
-  min-width: 50px!important;
-  flex: ${(props) => props.flex || '1!important'};
+  min-width: ${(props) => props.minWidth || "200px!important"};
+  flex: ${(props) => props.flex || 'none!important'};
   margin: 0!important;
   flex-direction: column;
 `;

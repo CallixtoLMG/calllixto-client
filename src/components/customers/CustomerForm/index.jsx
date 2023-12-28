@@ -46,7 +46,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
       <Form onSubmit={handleSubmit(handleForm)}>
         <FormContainer>
           <FieldsContainer>
-            <FormField width="300px">
+            <FormField width="50%!important">
               <Label>Nombre</Label>
               <Controller
                 name="name"
@@ -57,23 +57,6 @@ const CustomerForm = ({ customer, onSubmit }) => {
             </FormField>
           </FieldsContainer>
           <FieldsContainer>
-            <FormField>
-              <Label>Email</Label>
-              <Controller
-                name="email"
-                control={control}
-                rules={{ pattern: REGEX.EMAIL }}
-                render={({ field }) => <Input {...field} placeholder="Email" />}
-              />
-            </FormField>
-            <FormField>
-              <Label >Dirección</Label>
-              <Controller
-                name="address"
-                control={control}
-                render={({ field }) => <Input {...field} placeholder="Dirección" />}
-              />
-            </FormField>
             <FormField flex="none" width="200px">
               <Label>Teléfono</Label>
               <PhoneContainer>
@@ -105,6 +88,23 @@ const CustomerForm = ({ customer, onSubmit }) => {
                   />
                 </Box>
               </PhoneContainer>
+            </FormField>
+            <FormField flex="1">
+              <Label>Email</Label>
+              <Controller
+                name="email"
+                control={control}
+                rules={{ pattern: REGEX.EMAIL }}
+                render={({ field }) => <Input {...field} placeholder="Email" />}
+              />
+            </FormField>
+            <FormField flex="1">
+              <Label >Dirección</Label>
+              <Controller
+                name="address"
+                control={control}
+                render={({ field }) => <Input {...field} placeholder="Dirección" />}
+              />
             </FormField>
           </FieldsContainer>
           <FieldsContainer>

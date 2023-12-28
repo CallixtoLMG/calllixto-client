@@ -60,7 +60,7 @@ const ProductForm = ({ product, onSubmit }) => {
               )}
             />
           </FormField>
-          <FormField>
+          <FormField flex="1" >
             <Label>Nombre</Label>
             <Controller
               name="name"
@@ -89,7 +89,7 @@ const ProductForm = ({ product, onSubmit }) => {
             />
           </FormField>
         </FieldsContainer>
-        <FieldsContainer>
+        <FieldsContainer flex="1">
           <Label >Comentarios</Label>
           <Controller
             name="comments"
