@@ -66,8 +66,8 @@ const BrandForm = ({ brand, onSubmit }) => {
               render={({ field }) => (
                 <Input
                   placeholder="Código (A1)"
-                  disabled={isUpdating}
                   {...field}
+                  disabled={isUpdating}
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                   maxLength={2}
                 />
