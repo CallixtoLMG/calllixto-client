@@ -88,14 +88,14 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
 
   const validationRules = {
     code: {
-      validate: (value) => /^[A-Z0-9]{4}$/.test(value),
-      message: 'Código: 4 caracteres alfanuméricos y en mayúscula.',
+      validate: (value) => /^[A-Z0-9]{7}$/.test(value),
+      message: 'Código: 7 caracteres alfanuméricos y en mayúscula.',
     }
   };
 
   const handleAcceptCreate = (data) => {
-    data.newProducts && createBatch({ products: data.newProducts })
-    data.editProducts && editBatch({ update: data.editProducts })
+    data?.newProducts?.length && createBatch({ products: data.newProducts })
+    data?.editProducts?.length && editBatch({ update: data.editProducts })
     setTimeout(() => {
       refresh();
     }, 1000);

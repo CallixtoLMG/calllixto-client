@@ -11,7 +11,7 @@ const ProductForm = ({ product, onSubmit }) => {
   const { push } = useRouter();
   const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: product });
   const validateCode = (value) => {
-    return /^[A-Z0-9]{4}$/.test(value);
+    return /^[A-Z0-9]{7}$/.test(value);
   };
   const isUpdating = useMemo(() => !!product?.code, [product]);
   const [isLoading, setIsLoading] = useState(false);
