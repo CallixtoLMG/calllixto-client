@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { brandsList, deleteBrand } from "@/api/brands";
+import { useRole } from "@/hooks/userData";
 
 const Brands = () => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [brands, setBrands] = useState();
-  const [role, setRole] = useState();
+  const role = useRole();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -39,15 +40,6 @@ const Brands = () => {
       };
     };
 
-    const fetchRol = async () => {
-      try {
-        const userData = await getUserData();
-        setRole(userData.roles[0]);
-      } catch (error) {
-        console.error('Error al cargar roles:', error);
-      };
-    };
-
     const fetchBrands = async () => {
       try {
         const brands = await brandsList(requestOptions);
@@ -61,7 +53,6 @@ const Brands = () => {
 
     validateToken();
     fetchBrands();
-    fetchRol();
   }, [push]);
 
   const handleDeleteBrand = async (id) => {

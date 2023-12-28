@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { suppliersList, deleteSupplier } from "@/api/suppliers";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
+import { useRole } from "@/hooks/userData";
 
 const Suppliers = () => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [suppliers, setSuppliers] = useState();
-  const [role, setRole] = useState();
+  const role = useRole();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -39,15 +40,6 @@ const Suppliers = () => {
       };
     };
 
-    const fetchRol = async () => {
-      try {
-        const userData = await getUserData();
-        setRole(userData.roles[0]);
-      } catch (error) {
-        console.error('Error al cargar roles:', error);
-      };
-    };
-
     const fetchSuppliers = async () => {
       try {
         const suppliers = await suppliersList(requestOptions);
@@ -61,7 +53,6 @@ const Suppliers = () => {
 
     validateToken();
     fetchSuppliers();
-    fetchRol();
   }, [push]);
 
   const handleDeleteSupplier = async (id) => {

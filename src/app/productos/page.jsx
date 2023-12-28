@@ -4,6 +4,7 @@ import { getUserData } from "@/api/userData";
 import { Loader, PageHeader } from "@/components/layout";
 import ProductsPage from "@/components/products/ProductsPage";
 import { PAGES } from "@/constants";
+import { useRole } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -11,12 +12,14 @@ const Products = () => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true)
   const [products, setProducts] = useState();
-  const [role, setRole] = useState();
+  const role = useRole();
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
       push(PAGES.LOGIN.BASE);
     };
+
     const requestOptions = {
       method: "GET",
       headers: {
@@ -25,6 +28,7 @@ const Products = () => {
       },
       cache: "no-store",
     };
+
     const validateToken = async () => {
       try {
         const userData = await getUserData();
@@ -35,14 +39,7 @@ const Products = () => {
         console.error('Error, ingreso no valido(token):', error);
       };
     };
-    const fetchRol = async () => {
-      try {
-        const userData = await getUserData();
-        setRole(userData.roles[0]);
-      } catch (error) {
-        console.error('Error al cargar roles:', error);
-      };
-    };
+
     const fetchProductData = async () => {
       try {
         const fetchProducts = await productsList(requestOptions);
@@ -55,7 +52,6 @@ const Products = () => {
     };
     validateToken();
     fetchProductData();
-    fetchRol();
   }, [push]);
 
   const handleDeleteProduct = async (code) => {

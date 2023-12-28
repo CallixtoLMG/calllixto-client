@@ -1,22 +1,25 @@
-"use client"
+"use client";
 import { edit, getProduct } from "@/api/products";
 import { getUserData } from "@/api/userData";
 import { PageHeader, Loader } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
+import { useRole } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const EditProduct = ({ params }) => {
   const { push } = useRouter();
-  const [role, setRole] = useState();
+  const role = useRole();
   const [product, setProduct] = useState(null);
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
       push(PAGES.LOGIN.BASE);
     };
+
     async function fetchData() {
       var requestOptions = {
         method: 'GET',
@@ -34,6 +37,7 @@ const EditProduct = ({ params }) => {
       setProduct(data);
       setIsLoading(false)
     };
+
     const validateToken = async () => {
       try {
         const userData = await getUserData();
@@ -44,17 +48,9 @@ const EditProduct = ({ params }) => {
         console.error('Error, ingreso no valido(token):', error);
       };
     };
-    const fetchRol = async () => {
-      try {
-        const userData = await getUserData();
-        setRole(userData.roles[0]);
-      } catch (error) {
-        console.error('Error al cargar producto:', error);
-      };
-    };
+
     validateToken();
     fetchData();
-    fetchRol();
   }, [params.code, push]);
   if (role === "user") {
     push(PAGES.NOT_FOUND.BASE);

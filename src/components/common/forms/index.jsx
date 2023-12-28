@@ -1,1 +1,1 @@
-export * from './RuledLabel';
+export { RuledLabel } from './RuledLabel';

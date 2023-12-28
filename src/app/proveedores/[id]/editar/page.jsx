@@ -4,12 +4,13 @@ import { getUserData } from "@/api/userData";
 import { PageHeader, Loader } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
+import { useRole } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const EditSupplier = ({ params }) => {
   const { push } = useRouter();
-  const [role, setRole] = useState();
+  const role = useRole();
   const [supplier, setSupplier] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,18 +49,8 @@ const EditSupplier = ({ params }) => {
       };
     };
 
-    const fetchRoles = async () => {
-      try {
-        const userData = await getUserData();
-        setRole(userData.roles[0]);
-      } catch (error) {
-        console.error('Error al cargar marca:', error);
-      };
-    };
-
     validateToken();
     fetchSupplier();
-    fetchRoles();
   }, [params.id, push]);
 
   if (role === "user") {

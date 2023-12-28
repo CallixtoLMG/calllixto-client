@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { create } from "@/api/brands";
 import { getUserData } from "@/api/userData";
 import { PageHeader } from "@/components/layout";
@@ -6,10 +6,11 @@ import BrandForm from "@/components/brands/BrandForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRole } from "@/hooks/userData";
 
 const CreateBrand = () => {
   const { push } = useRouter();
-  const [role, setRole] = useState();
+  const role = useRole();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -28,17 +29,7 @@ const CreateBrand = () => {
       };
     };
 
-    const fetchRol = async () => {
-      try {
-        const userData = await getUserData();
-        setRole(userData.roles[0]);
-      } catch (error) {
-        console.error('Error, rol no valido:', error);
-      };
-    };
-
     validateToken();
-    fetchRol();
   }, [push]);
 
   if (role === "user") {

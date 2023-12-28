@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { edit, getBrand } from "@/api/brands";
 import { getUserData } from "@/api/userData";
 import { PageHeader, Loader } from "@/components/layout";
@@ -6,10 +6,11 @@ import BrandForm from "@/components/brands/BrandForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useRole } from "@/hooks/userData";
 
 const EditBrand = ({ params }) => {
   const { push } = useRouter();
-  const [role, setRole] = useState();
+  const role = useRole();
   const [brand, setBrand] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -48,18 +49,8 @@ const EditBrand = ({ params }) => {
       };
     };
 
-    const fetchRoles = async () => {
-      try {
-        const userData = await getUserData();
-        setRole(userData.roles[0]);
-      } catch (error) {
-        console.error('Error al cargar marca:', error);
-      };
-    };
-
     validateToken();
     fetchBrand();
-    fetchRoles();
   }, [params.id, push]);
 
   if (role === "user") {

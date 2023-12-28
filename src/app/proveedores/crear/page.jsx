@@ -1,15 +1,16 @@
-"use client"
+"use client";
 import { create } from "@/api/suppliers";
 import { getUserData } from "@/api/userData";
 import { PageHeader } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useRole } from "@/hooks/userData";
 
 const CreateSupplier = () => {
   const { push } = useRouter();
-  const [role, setRole] = useState();
+  const role = useRole();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -28,17 +29,7 @@ const CreateSupplier = () => {
       };
     };
 
-    const fetchRol = async () => {
-      try {
-        const userData = await getUserData();
-        setRole(userData.roles[0]);
-      } catch (error) {
-        console.error('Error, rol no valido:', error);
-      };
-    };
-
     validateToken();
-    fetchRol();
   }, [push]);
 
   if (role === "user") {
