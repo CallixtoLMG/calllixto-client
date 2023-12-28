@@ -109,7 +109,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
               />
             </FormField>
             <FormField flex="1">
-              <Label >Dirección</Label>
+              <Label>Dirección</Label>
               <Controller
                 name="address"
                 control={control}
@@ -118,7 +118,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
             </FormField>
           </FieldsContainer>
           <FieldsContainer>
-            <Label >Comentarios</Label>
+            <Label>Comentarios</Label>
             <Controller
               name="comments"
               control={control}
@@ -140,8 +140,8 @@ const CustomerForm = ({ customer, onSubmit }) => {
               <Icon name={buttonConfig.restore.icon}/>{buttonConfig.restore.title}
             </Button>
           </ButtonsContainer>
-        </FormContainer >
-      </Form >
+        </FormContainer>
+      </Form>
     </>
   )
 };
