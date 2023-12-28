@@ -14,6 +14,10 @@ const SubContainer = styled(Flex)`
   max-width: 900px;
 `;
 
+const ButtonsContainer = styled(Flex)`
+  width: fit-content!important;
+`;
+
 const Segment = styled(SSegment)`
   margin-top: 5px!important;
   height: 50px!important;
@@ -33,7 +37,7 @@ const DataContainer = styled(Flex)`
   flex-direction: column;
 `;
 
-export { Container, DataContainer, Label, Segment, SubContainer };
+export { ButtonsContainer, Container, DataContainer, Label, Segment, SubContainer };
 
 
 

@@ -1,7 +1,7 @@
 import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS, URL } from "@/fetchUrls";
 import { toast } from "react-hot-toast";
 
-const PRODUCTS_URL = `${URL}${CLIENT_ID}${PATHS.PRODUCTTS}`;
+const PRODUCTS_URL = `${URL}${CLIENT_ID}${PATHS.PRODUCTS}`;
 
 export async function create(product) {
   var requestOptions = {
@@ -37,16 +37,16 @@ export async function createBatch(product) {
     cache: "no-store"
   };
   fetch(`${PRODUCTS_URL}/${CREATE_BATCH}`, requestOptions)
-  .then(async response => {
-    let res = await response.text()
-    res = JSON.parse(res);
-    if (res.statusOk) {
-      toast.success("Productos importados exitosamente");
-    } else {
-      toast.error(res.message);
-    }
-  })
-  .catch(error => console.log('error', error));
+    .then(async response => {
+      let res = await response.text();
+      res = JSON.parse(res);
+      if (res.statusOk) {
+        toast.success("Productos importados exitosamente");
+      } else {
+        toast.error(res.message);
+      };
+    })
+    .catch(error => console.log('error', error));
 };
 
 export async function edit(params, product) {
@@ -86,17 +86,17 @@ export async function editBatch(product) {
 
   fetch(`${PRODUCTS_URL}/${EDIT_BATCH}`, requestOptions)
 
-      .then(async response => {
-        let res = await response.text()
-        res = JSON.parse(res);
-        if (res.statusOk) {
-          toast.success("Productos modificados exitosamente");
-        } else {
-          toast.error(res.message);
-        }
-      })
-      .catch(error => console.log('error', error));
-  };
+    .then(async response => {
+      let res = await response.text()
+      res = JSON.parse(res);
+      if (res.statusOk) {
+        toast.success("Productos modificados exitosamente");
+      } else {
+        toast.error(res.message);
+      }
+    })
+    .catch(error => console.log('error', error));
+};
 
 export async function productsList(requestOptions) {
   const res = await fetch(PRODUCTS_URL, requestOptions);

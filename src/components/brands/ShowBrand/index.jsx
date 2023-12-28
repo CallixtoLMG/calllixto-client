@@ -1,5 +1,8 @@
 "use client";
-import { Container, DataContainer, Label, Segment, SubContainer } from "./styles";
+import { GoToButton } from "@/components/common/buttons";
+import { PAGES } from "@/constants";
+import { Popup } from 'semantic-ui-react';
+import { ButtonsContainer, Container, DataContainer, Label, Segment, SubContainer } from "./styles";
 
 const ShowBrand = ({ brand }) => {
   return (
@@ -20,6 +23,16 @@ const ShowBrand = ({ brand }) => {
           <Segment>{brand.comments || "Sin Comentarios."}</Segment>
         </DataContainer>
       </SubContainer>
+      <Popup
+        size="tiny"
+        content="Editar marca"
+        position="top center"
+        trigger={
+          <ButtonsContainer>
+            <GoToButton goTo={PAGES.BRANDS.UPDATE(brand.id)} iconName="edit" color="blue" />
+          </ButtonsContainer>
+        }
+      />
     </Container>
   );
 };
