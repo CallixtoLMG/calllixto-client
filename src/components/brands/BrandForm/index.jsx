@@ -1,6 +1,6 @@
 "use client";
 import { PAGES } from "@/constants";
-import { createDate, validate2DigitCode } from "@/utils";
+import { createDate } from "@/utils";
 import { omit } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -8,6 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
 import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea } from "./styles";
 import { RuledLabel } from "@/components/common/forms";
+import { REGEX } from "@/constants";
 
 const BrandForm = ({ brand, onSubmit }) => {
   const { push } = useRouter();
@@ -58,7 +59,10 @@ const BrandForm = ({ brand, onSubmit }) => {
             <Controller
               name="id"
               control={control}
-              rules={{ required: 'Campo requerido', validate: validate2DigitCode }}
+              rules={{
+                required: 'Campo requerido',
+                pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
+              }}
               render={({ field }) => (
                 <Input
                   placeholder="Código (A1)"
@@ -71,7 +75,7 @@ const BrandForm = ({ brand, onSubmit }) => {
             />
           </FormField>
           <FormField width="50%">
-          <RuledLabel title="Nombre" message={errors?.name?.message} required />
+            <RuledLabel title="Nombre" message={errors?.name?.message} required />
             <Controller
               name="name"
               control={control}

@@ -1,6 +1,6 @@
 "use client";
 import { PAGES, REGEX } from "@/constants";
-import { createDate, validate2DigitCode } from "@/utils";
+import { createDate } from "@/utils";
 import { omit } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
@@ -59,7 +59,10 @@ const SupplierForm = ({ supplier, onSubmit }) => {
             <Controller
               name="id"
               control={control}
-              rules={{ required: 'Campo requerido', validate: validate2DigitCode }}
+              rules={{
+                required: 'Campo requerido',
+                pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
+              }}
               render={({ field }) => (
                 <Input
                   placeholder="Código (A1)"
