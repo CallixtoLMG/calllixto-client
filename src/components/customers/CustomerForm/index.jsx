@@ -129,7 +129,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
           </FieldsContainer>
           <ButtonsContainer>
             <Button
-              disabled={isLoading}
+              disabled={isLoading || !isDirty}
               loading={isLoading}
               type="submit"
               color="green"

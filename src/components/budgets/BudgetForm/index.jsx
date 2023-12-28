@@ -11,7 +11,7 @@ import { Flex, Box } from "rebass";
 const BudgetForm = ({ onSubmit, products, customers, budget }) => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { control, handleSubmit, setValue, watch, formState: { isValid, isDirty } } = useForm({
+  const { control, handleSubmit, setValue, watch, formState: { isDirty } } = useForm({
     defaultValues: budget || {
       products: [
         {
@@ -230,7 +230,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget }) => {
         floated="right"
         type="submit"
         color="green"
-        disabled={isLoading || !isValid || !isDirty}
+        disabled={isLoading || !isDirty}
         loading={isLoading}
       >
         <Icon name="add" />Crear presupuesto

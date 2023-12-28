@@ -94,7 +94,7 @@ const BrandForm = ({ brand, onSubmit }) => {
         </FieldsContainer>
         <ButtonsContainer>
           <Button
-            disabled={isLoading}
+            disabled={isLoading || !isDirty}
             loading={isLoading}
             type="submit"
             color="green">
