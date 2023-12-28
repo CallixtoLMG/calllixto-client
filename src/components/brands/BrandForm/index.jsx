@@ -11,7 +11,7 @@ import { RuledLabel } from "@/components/common/forms";
 
 const BrandForm = ({ brand, onSubmit }) => {
   const { push } = useRouter();
-  const { handleSubmit, control, reset, formState: { isValid, isDirty, errors } } = useForm({ defaultValues: brand });
+  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: brand });
   const isUpdating = useMemo(() => !!brand?.id, [brand]);
   const [isLoading, setIsLoading] = useState(false);
 
