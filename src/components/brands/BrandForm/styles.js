@@ -24,13 +24,6 @@ const Input = styled(SInput)`
   border-radius: 0.28571429rem;
   height: 50px!important;
 `;
-
-const WarningMessage = styled.p`
-  position: relative;
-  color: red!important;
-  bottom: 0.5rem!important;
-`;
-
 const FormField = styled(Form.Field)`
   width: ${(props) => props.width || '200px!important'};
   min-width: ${(props) => props.minWidth || "200px!important"};
@@ -57,5 +50,5 @@ const ButtonsContainer = styled(Flex)`
   column-gap: 20px;
 `;
 
-export { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea, WarningMessage };
+export { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea };
 

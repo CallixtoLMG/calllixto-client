@@ -4,7 +4,7 @@ import { customersList } from "@/api/customers";
 import { productsList } from "@/api/products";
 import { getUserData } from "@/api/userData";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { PageHeader, Loader } from "@/components/layout";
+import { Loader, PageHeader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -49,8 +49,8 @@ const CreateBudget = () => {
           setCloneBudget(budget);
         } catch (error) {
           console.error('Error al cargar presupuesto para clonar:', error);
-        }
-      }
+        };
+      };
 
       try {
         const productsFecthData = await productsList(requestOptions);
@@ -63,7 +63,7 @@ const CreateBudget = () => {
         setProductsList(productsFilteredList);
       } catch (error) {
         console.error('Error al cargar productos:', error);
-      }
+      };
 
       try {
         const customersFetchData = await customersList(requestOptions);

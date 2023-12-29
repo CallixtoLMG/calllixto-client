@@ -10,9 +10,25 @@ const ShowProduct = ({ product }) => {
     <Container>
       <SubContainer>
         <DataContainer >
+          <Label>Proveedor</Label>
+          <Segment>{product?.supplier}</Segment>
+        </DataContainer>
+        <DataContainer >
+          <Label>Marca</Label>
+          <Segment>{product?.brand}</Segment>
+        </DataContainer>
+      </SubContainer>
+      <SubContainer>
+        <DataContainer >
           <Label>Código</Label>
           <Segment>{product?.code}</Segment>
         </DataContainer>
+        <DataContainer >
+          <Label>Código del proveedor</Label>
+          <Segment>{product?.supplierCode}</Segment>
+        </DataContainer>
+      </SubContainer>
+      <SubContainer>
         <DataContainer flex="1">
           <Label>Nombre</Label>
           <Segment>{product?.name}</Segment>
@@ -38,7 +54,7 @@ const ShowProduct = ({ product }) => {
           </ButtonsContainer>
         }
       />
-    </Container>
+    </Container >
   );
 };
 export default ShowProduct;
