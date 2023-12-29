@@ -1,8 +1,6 @@
 import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
-import { createDate } from "@/utils";
-import { toast } from "react-hot-toast";
 import { omit } from "lodash";
-import { baseCreate, baseUpdate } from "../base";
+import { baseCreate, baseDelete, baseUpdate } from "../base";
 
 const BRANDS_URL = `${URL}${CLIENT_ID}${PATHS.BRANDS}`;
 
@@ -12,6 +10,10 @@ export async function create(brand) {
 
 export async function edit(brand) {
   baseUpdate(`${BRANDS_URL}/${brand.id}`, omit(brand,["id", "createdAt"]), 'Marca actualizada!');
+};
+
+export async function deleteBrand(id) {
+  baseDelete(`${BRANDS_URL}/${id}`, 'Marca eliminada!');
 };
 
 export async function brandsList(requestOptions) {
@@ -25,29 +27,3 @@ export async function getBrand(id, requestOptions) {
   const data = await res.json();
   return data.brand;
 };
-
-export async function deleteBrand(id) {
-  var requestOptions = {
-    method: 'DELETE',
-    redirect: 'follow',
-    headers: {
-      authorization: `Bearer ${localStorage.getItem("token")}`
-    },
-    cache: "no-store",
-  };
-
-  await fetch(`${BRANDS_URL}/${id}`, requestOptions)
-    .then(async response => {
-      let res = await response.text();
-      res = JSON.parse(res);
-      if (res.statusOk) {
-        toast.success("Marca eliminada exitosamente");
-      } else {
-        toast.error(res.message);
-      };
-    })
-    .catch(error => console.log('error', error));
-};
-
-
-

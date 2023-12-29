@@ -45,3 +45,25 @@ export async function baseUpdate(url, model, message) {
     toast.error(response.message);
   }
 };
+
+export async function baseDelete(url, message) {
+  var requestOptions = {
+    method: 'DELETE',
+    redirect: 'follow',
+    headers: {
+      authorization: `Bearer ${getToken()}`
+    },
+    cache: "no-store",
+  };
+
+  let response = await fetch(url, requestOptions);
+  response = await response.text();
+  console.log({ response })
+  response = JSON.parse(response);
+
+  if (response.statusOk) {
+    toast.success(message);
+  } else {
+    toast.error(response.message);
+  };
+};
