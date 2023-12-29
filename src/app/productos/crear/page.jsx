@@ -10,7 +10,6 @@ const CreateProduct = () => {
   useValidateToken();
   const { push } = useRouter();
   const role = useRole();
-
   if (role === "user") {
     push(PAGES.NOT_FOUND.BASE)
   };
@@ -18,7 +17,7 @@ const CreateProduct = () => {
   return (
     <>
       <PageHeader title="Crear Producto" />
-      <ProductForm onSubmit={create} />
+      <ProductForm brands={brands} suppliers={suppliers} onSubmit={create} />
     </>
   )
 };

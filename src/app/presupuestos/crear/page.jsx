@@ -3,7 +3,7 @@ import { create } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { PageHeader, Loader } from "@/components/layout";
+import { Loader, PageHeader } from "@/components/layout";
 import { useUserData, useValidateToken } from "@/hooks/userData";
 import { useMemo } from "react";
 
@@ -31,7 +31,7 @@ const CreateBudget = () => {
     <>
       <PageHeader title="Crear Presupuesto" />
       <Loader active={loadingProducts || loadingCustomers}>
-        <BudgetForm onSubmit={create} products={mappedProducts} customers={mappedCustomers} user={user}/>
+        <BudgetForm onSubmit={create} products={mappedProducts} customers={mappedCustomers} user={user} />
       </Loader>
     </>
   )
