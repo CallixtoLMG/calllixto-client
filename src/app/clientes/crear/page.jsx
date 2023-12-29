@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { create } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { PageHeader } from "@/components/layout";

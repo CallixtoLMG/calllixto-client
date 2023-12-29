@@ -1,7 +1,7 @@
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { omit } from "lodash";
-import { baseCreate, baseDelete, baseUpdate } from "../base";
-import { METHODS, useAxios } from "../axios";
+import { baseCreate, baseDelete, baseUpdate } from "./base";
+import { METHODS, useAxios } from "./axios";
 
 const SUPPLIER_URL = `${CLIENT_ID}${PATHS.SUPPLIERS}`;
 

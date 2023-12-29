@@ -1,8 +1,8 @@
 import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { omit } from "lodash";
-import { baseCreate, baseDelete, baseUpdate } from "../base";
-import { METHODS, useAxios } from "../axios";
+import { baseCreate, baseDelete, baseUpdate } from "./base";
+import { METHODS, useAxios } from "./axios";
 
 const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
 

@@ -9,7 +9,7 @@ import { useValidateToken } from "@/hooks/userData";
 const Customer = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
-  const { customer, isLoading } = useGetCustomer(params.id)
+  const { customer, isLoading } = useGetCustomer(params.id);
 
   if (!isLoading && !customer) {
     push(PAGES.NOT_FOUND.BASE);

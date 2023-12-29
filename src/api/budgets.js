@@ -1,6 +1,6 @@
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import { baseCreate } from "../base";
-import { METHODS, useAxios } from "../axios";
+import { baseCreate } from "./base";
+import { METHODS, useAxios } from "./axios";
 
 const BUDGETS_URL = `${CLIENT_ID}${PATHS.BUDGETS}`;
 
