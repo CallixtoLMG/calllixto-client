@@ -53,7 +53,14 @@ const REGEX = {
   TWO_DIGIT_CODE: /^[A-Z0-9]{2}$/
 }
 
+const API_METHODS = {
+  GET: 'GET',
+  POST: 'POST',
+  PUT: 'PUT',
+  DELETE: 'DELETE'
+};
+
 export {
-  APIS, PAGES, REGEX
+  APIS, PAGES, REGEX, API_METHODS
 };
 
