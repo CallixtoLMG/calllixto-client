@@ -54,3 +54,18 @@ export const useTokenValidated = () => {
 
   return userData?.isAuthorized;
 }
+
+export const useUserData = () => {
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    async function getData() {
+      const data = await getUserData();
+      setUserData(data);
+    }
+
+    getData();
+  }, []);
+
+  return userData;
+}

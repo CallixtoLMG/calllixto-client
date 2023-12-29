@@ -6,7 +6,7 @@ dayjs.extend(utc)
 dayjs.extend(timezone)
 
 export const now = () => {
-  const date = dayjs().tz(dayjs.tz.guess()).local().toDate().toLocaleString("es-AR");
+  const date = dayjs().tz(dayjs.tz.guess()).toISOString();
   return date;
 }
 
@@ -33,8 +33,8 @@ export const getTotalSum = (products) => {
 };
 
 export const formatedPhone = (area, num) => {
-  if (!num || !area) return 'Sin datos.';
-  return `+54-${area}-${num}`
+  if (!num || !area) return '';
+  return `+54 ${area} ${num}`;
 };
 
 export const getSupplierCode = (code) => {

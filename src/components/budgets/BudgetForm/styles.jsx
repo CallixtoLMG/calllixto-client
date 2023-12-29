@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Button as SButton, Dropdown as SDropdown, Input as SInput, Table } from 'semantic-ui-react';
+import { Form, Button as SButton, Dropdown as SDropdown, Input as SInput, Table, Label as SLabel, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';
 
 const Input = styled(SInput)`
@@ -20,11 +20,27 @@ const TotalText = styled.h3`
   margin-left: 0.7rem;
 `;
 
-const Dropdown = styled(SDropdown)({
-  width: "20rem!important",
-  display: "flex!important",
-  marginBottom: "20px!important",
-});
+const Dropdown = styled(SDropdown)`
+  width: 300px !important;
+  display: flex!important;
+  margin-bottom: 20px!important;
+  margin-top: 5px!important;
+  height: 40px!important;
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15) !important;
+`;
+
+const FieldsContainer = styled(Flex)`
+  column-gap: 20px;
+  width: 100%;
+`;
+
+const FormField = styled(Form.Field)`
+  width: ${({ width }) => width || '300px'} !important;
+  min-width: 200px !important;
+  margin: 0!important;
+  flex-direction: column;
+  flex: ${({ flex }) => flex || 'none'} !important;
+`;
 
 const ModTableRow = styled(Table.Row)`
   th{ min-width: 10rem!important; };
@@ -56,5 +72,17 @@ const WarningMessage = styled.p`
   color: red;
 `;
 
-export { Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage };
+const Label = styled(SLabel)`
+  width: 100% !important;
+  margin: 0!important;
+`;
+
+const Segment = styled(SSegment)`
+  margin: 5px 0!important;
+  height: 40px!important;
+  font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
+  padding: 10px !important;
+`;
+
+export { Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage, FieldsContainer, FormField, Label, Segment };
 

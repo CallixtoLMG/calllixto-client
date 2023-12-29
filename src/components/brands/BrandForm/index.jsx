@@ -77,7 +77,7 @@ const BrandForm = ({ brand, onSubmit }) => {
           </FormField>
         </FieldsContainer>
         <FieldsContainer>
-          <Label >Comentarios</Label>
+          <Label>Comentarios</Label>
           <Controller
             name="comments"
             control={control}
