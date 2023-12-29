@@ -8,34 +8,26 @@ import { useEffect, useState } from "react";
 import { useValidateToken } from "@/hooks/userData";
 
 const EditCustomer = ({ params }) => {
+  useValidateToken();
   const { push } = useRouter();
   const [customer, setCustomer] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const token = useValidateToken();
 
   useEffect(() => {
     async function fetchData() {
-      var requestOptions = {
-        method: 'GET',
-        redirect: 'follow',
-        headers: {
-          authorization: `Bearer ${token}`
-        },
-        cache: "no-store",
-      };
-      const data = await getCustomer(params.id, requestOptions);
+      const customer = await getCustomer(params.id);
 
-      if (!data) {
+      if (!customer) {
         push(PAGES.NOT_FOUND.BASE);
         return;
       };
 
-      setCustomer(data);
+      setCustomer(customer);
       setIsLoading(false);
     };
 
     fetchData();
-  }, [params.id, push, token]);
+  }, [params.id, push]);
 
   return (
     <>

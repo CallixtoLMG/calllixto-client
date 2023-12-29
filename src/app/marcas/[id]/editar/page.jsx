@@ -8,33 +8,27 @@ import { useEffect, useState } from "react";
 import { useRole, useValidateToken } from "@/hooks/userData";
 
 const EditBrand = ({ params }) => {
+  useValidateToken();
   const { push } = useRouter();
   const role = useRole();
   const [brand, setBrand] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const token = useValidateToken();
 
   useEffect(() => {
-    async function fetchBrand() {
-      var requestOptions = {
-        method: 'GET',
-        redirect: 'follow',
-        headers: {
-          authorization: `Bearer ${token}`
-        },
-        cache: "no-store",
-      };
-      const data = await getBrand(params.id, requestOptions);
-      if (!data) {
+    async function fetchData() {
+      const brand = await getBrand(params.id);
+
+      if (!brand) {
         push(PAGES.NOT_FOUND.BASE);
         return;
       };
-      setBrand(data);
+
+      setBrand(brand);
       setIsLoading(false);
     };
 
-    fetchBrand();
-  }, [params.id, push, token]);
+    fetchData();
+  }, [params.id, push]);
 
   if (role === "user") {
     push(PAGES.NOT_FOUND.BASE);

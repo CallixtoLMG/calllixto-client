@@ -8,34 +8,27 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const EditSupplier = ({ params }) => {
+  useValidateToken();
   const { push } = useRouter();
   const role = useRole();
   const [supplier, setSupplier] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const token = useValidateToken();
 
   useEffect(() => {
-    async function fetchSupplier() {
-      var requestOptions = {
-        method: 'GET',
-        redirect: 'follow',
-        headers: {
-          authorization: `Bearer ${token}`
-        },
-        cache: "no-store",
-      };
-      const data = await getSupplier(params.id, requestOptions);
-      if (!data) {
+    async function fetchData() {
+      const supplier = await getSupplier(params.id);
+
+      if (!supplier) {
         push(PAGES.NOT_FOUND.BASE);
         return;
       };
 
-      setSupplier(data);
+      setSupplier(supplier);
       setIsLoading(false);
     };
 
-    fetchSupplier();
-  }, [params.id, push, token]);
+    fetchData();
+  }, [params.id, push]);
 
   if (role === "user") {
     push(PAGES.NOT_FOUND.BASE);

@@ -8,36 +8,26 @@ import { useEffect, useState } from "react";
 import { useValidateToken } from "@/hooks/userData";
 
 const Product = ({ params }) => {
+  useValidateToken();
   const [isLoading, setIsLoading] = useState(true)
   const [product, setProduct] = useState({})
   const { push } = useRouter();
-  const token = useValidateToken();
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          cache: "no-store",
-        };
-        const fetchProduct = await getProduct(params.code, requestOptions);
-        if (!fetchProduct) {
-          push(PAGES.NOT_FOUND.BASE);
-          return;
-        };
-        setProduct(fetchProduct);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error al cargar productos:', error);
+      const product = await getProduct(params.code);
+
+      if (!product) {
+        push(PAGES.NOT_FOUND.BASE);
+        return;
       };
-    };
+
+      setProduct(product);
+      setIsLoading(false);
+    }
 
     fetchData();
-  }, [params.code, push, token]);
+  }, [params.code, push]);
 
   return (
     <>

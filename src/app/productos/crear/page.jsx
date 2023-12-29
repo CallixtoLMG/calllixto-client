@@ -7,9 +7,9 @@ import { useRole, useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 
 const CreateProduct = () => {
+  useValidateToken();
   const { push } = useRouter();
   const role = useRole();
-  useValidateToken();
 
   if (role === "user") {
     push(PAGES.NOT_FOUND.BASE)

@@ -8,36 +8,26 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Budget = ({ params }) => {
+  useValidateToken();
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true)
   const [budget, setBudget] = useState();
-  const token = useValidateToken();
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          cache: "no-store",
-        };
-        const fetchBudget = await getBudget(params.id, requestOptions);
-        if (!fetchBudget) {
-          push(PAGES.NOT_FOUND.BASE);
-          return;
-        };
-        setBudget(fetchBudget);
-        setIsLoading(false)
-      } catch (error) {
-        console.error('Error al cargar presupuesto:', error);
+      const budget = await getBudget(params.id);
+
+      if (!budget) {
+        push(PAGES.NOT_FOUND.BASE);
+        return;
       };
+
+      setBudget(budget);
+      setIsLoading(false);
     };
 
     fetchData();
-  }, [params.id, push, token]);
+  }, [params.id, push]);
 
   return (
     <>

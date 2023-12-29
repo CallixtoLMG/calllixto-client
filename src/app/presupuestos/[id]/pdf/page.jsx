@@ -8,36 +8,26 @@ import { useEffect, useState } from "react";
 import { useValidateToken } from "@/hooks/userData";
 
 const PDF = ({ params }) => {
+  useValidateToken();
   const [budget, setBudget] = useState();
   const [isLoading, setIsLoading] = useState(true);
   const { push } = useRouter();
-  const token = useValidateToken();
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          cache: "no-store",
-        };
-        const budget = await getBudget(params.id, requestOptions);
-        if (!budget) {
-          push(PAGES.NOT_FOUND.BASE);
-          return;
-        };
-        setIsLoading(false);
-        setBudget(budget);
-      } catch (error) {
-        console.error('Error al cargar PDF:', error);
+      const budget = await getBudget(params.id);
+
+      if (!budget) {
+        push(PAGES.NOT_FOUND.BASE);
+        return;
       };
+
+      setIsLoading(false);
+      setBudget(budget);
     };
 
     fetchData();
-  }, [params.id, push, token]);
+  }, [params.id, push]);
 
   return (
     <Loader active={isLoading}>

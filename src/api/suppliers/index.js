@@ -1,6 +1,6 @@
 import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
 import { omit } from "lodash";
-import { baseCreate, baseDelete, baseUpdate } from "../base";
+import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
 
 const SUPPLIER_URL = `${URL}${CLIENT_ID}${PATHS.SUPPLIERS}`;
 
@@ -16,14 +16,12 @@ export async function deleteSupplier(id) {
   baseDelete(`${SUPPLIER_URL}/${id}`, 'Proveedor eliminado!');
 };
 
-export async function suppliersList(requestOptions) {
-  const res = await fetch(SUPPLIER_URL, requestOptions);
-  const data = await res.json();
-  return data.suppliers;
+export async function list() {
+  const { suppliers } = await baseGet(SUPPLIER_URL);
+  return suppliers;
 };
 
-export async function getSupplier(id, requestOptions) {
-  const res = await fetch(`${SUPPLIER_URL}/${id}`, requestOptions);
-  const data = await res.json();
-  return data.supplier;
+export async function getSupplier(id) {
+  const { supplier } = await baseGet(`${SUPPLIER_URL}/${id}`);
+  return supplier;
 };

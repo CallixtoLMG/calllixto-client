@@ -1,5 +1,5 @@
 "use client";
-import { customersList, deleteCustomer } from "@/api/customers";
+import { deleteCustomer, list } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { PageHeader, Loader } from "@/components/layout";
 import { useValidateToken } from "@/hooks/userData";
@@ -7,42 +7,23 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Customers = () => {
+  useValidateToken();
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [customers, setCustomers] = useState();
-  const token = useValidateToken();
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          cache: "no-store",
-        };
-        const fetchCustomers = await customersList(requestOptions);
-        setCustomers(fetchCustomers);
-      } catch (error) {
-        console.error('Error al cargar clientes:', error);
-      } finally {
-        setIsLoading(false)
-      };
+      const customers = await list();
+      setCustomers(customers);
+      setIsLoading(false);
     };
-
     fetchData();
-  }, [push, token]);
+  }, [push]);
 
   const handleDeleteCustomer = async (id) => {
-    try {
-      await deleteCustomer(id);
-      const updatedCustomers = customers.filter(customer => customer.id !== id);
-      setCustomers(updatedCustomers);
-    } catch (error) {
-      console.error('Error borrando cliente', error);
-    }
+    await deleteCustomer(id);
+    setCustomers(customers.filter(customer => customer.id !== id));
   };
 
   return (

@@ -8,37 +8,26 @@ import { useEffect, useState } from "react";
 import { useValidateToken } from "@/hooks/userData";
 
 const Brand = ({ params }) => {
+  useValidateToken();
   const [isLoading, setIsLoading] = useState(true)
   const [brand, setBrand] = useState({})
   const { push } = useRouter();
-  const token = useValidateToken();
 
   useEffect(() => {
-    const fetchBrand = async () => {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          cache: "no-store",
-        };
-        const brand = await getBrand(params.id, requestOptions);
+    const fetchData = async () => {
+      const brand = await getBrand(params.id);
 
-        if (!brand) {
-          push(PAGES.NOT_FOUND.BASE);
-          return;
-        };
-        setBrand(brand);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error al cargar marcas:', error);
+      if (!brand) {
+        push(PAGES.NOT_FOUND.BASE);
+        return;
       };
+
+      setBrand(brand);
+      setIsLoading(false);
     };
 
-    fetchBrand();
-  }, [params.id, push, token]);
+    fetchData();
+  }, [params.id, push]);
 
   return (
     <>

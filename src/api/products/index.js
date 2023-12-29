@@ -2,7 +2,7 @@ import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS, URL } from "@/fetchUrls";
 import { createDate } from "@/utils";
 import { toast } from "react-hot-toast";
 import { omit } from "lodash";
-import { baseCreate, baseDelete, baseUpdate } from "../base";
+import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
 
 const PRODUCTS_URL = `${URL}${CLIENT_ID}${PATHS.PRODUCTS}`;
 
@@ -16,6 +16,16 @@ export async function edit(product) {
 
 export async function deleteProduct(id) {
   baseDelete(`${PRODUCTS_URL}/${id}`, 'Producto eliminado!');
+};
+
+export async function list() {
+  const { products } = await baseGet(PRODUCTS_URL);
+  return products;
+};
+
+export async function getProduct(code) {
+  const { product } = await baseGet(`${PRODUCTS_URL}/${code}`);
+  return product;
 };
 
 export async function createBatch(product) {
@@ -71,16 +81,4 @@ export async function editBatch(product) {
       }
     })
     .catch((error) => console.log("error", error));
-}
-
-export async function productsList(requestOptions) {
-  const res = await fetch(PRODUCTS_URL, requestOptions);
-  const data = await res.json();
-  return data.products;
-}
-
-export async function getProduct(code, requestOptions) {
-  const res = await fetch(`${PRODUCTS_URL}/${code}`, requestOptions);
-  const data = await res.json();
-  return data.product;
 }

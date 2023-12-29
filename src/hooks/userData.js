@@ -3,11 +3,6 @@ import { PAGES } from '@/constants';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export const getToken = () => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('token');
-}
-
 export const useRole = () => {
   const [userData, setUserData] = useState(null);
   const { push } = useRouter();
@@ -32,20 +27,17 @@ export const useRole = () => {
 
 export const useValidateToken = () => {
   const { push } = useRouter();
-  const token = getToken();
 
   useEffect(() => {
     async function getData() {
       const data = await getUserData();
-      if (!token || !data.isAuthorized) {
+      if (!data.isAuthorized) {
         push(PAGES.LOGIN.BASE);
       }
     }
 
     getData();
-  }, [push, token]);
-
-  return token;
+  }, [push]);
 }
 
 export const useTokenValidated = () => {

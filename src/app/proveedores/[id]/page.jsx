@@ -1,5 +1,4 @@
 "use client";
-import { getUserData } from "@/api/userData";
 import { PageHeader, Loader } from "@/components/layout";
 import ShowSupplier from "@/components/suppliers/ShowSupplier";
 import { PAGES } from "@/constants";
@@ -9,37 +8,26 @@ import { getSupplier } from "@/api/suppliers";
 import { useValidateToken } from "@/hooks/userData";
 
 const Supplier = ({ params }) => {
+  useValidateToken();
   const [isLoading, setIsLoading] = useState(true)
   const [supplier, setSupplier] = useState({})
   const { push } = useRouter();
-  const token = useValidateToken();
 
   useEffect(() => {
-    const fetchSupplier = async () => {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          cache: "no-store",
-        };
-        const supplier = await getSupplier(params.id, requestOptions);
+    const fetchData = async () => {
+      const supplier = await getSupplier(params.id);
 
-        if (!supplier) {
-          push(PAGES.NOT_FOUND.BASE);
-          return;
-        };
-        setSupplier(supplier);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error al cargar marcas:', error);
+      if (!supplier) {
+        push(PAGES.NOT_FOUND.BASE);
+        return;
       };
+
+      setSupplier(supplier);
+      setIsLoading(false);
     };
 
-    fetchSupplier();
-  }, [params.id, push, token]);
+    fetchData();
+  }, [params.id, push]);
 
   return (
     <>

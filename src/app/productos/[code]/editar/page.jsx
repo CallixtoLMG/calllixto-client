@@ -8,33 +8,27 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const EditProduct = ({ params }) => {
+  useValidateToken();
   const { push } = useRouter();
   const role = useRole();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const token = useValidateToken();
 
   useEffect(() => {
     async function fetchData() {
-      var requestOptions = {
-        method: 'GET',
-        redirect: 'follow',
-        headers: {
-          authorization: `Bearer ${token}`
-        },
-        cache: "no-store",
-      };
-      const data = await getProduct(params.code, requestOptions);
-      if (!data) {
+      const product = await getProduct(params.code);
+
+      if (!product) {
         push(PAGES.NOT_FOUND.BASE);
         return;
       };
-      setProduct(data);
+
+      setProduct(product);
       setIsLoading(false)
     };
 
     fetchData();
-  }, [params.code, push, token]);
+  }, [params.code, push]);
 
   if (role === "user") {
     push(PAGES.NOT_FOUND.BASE);

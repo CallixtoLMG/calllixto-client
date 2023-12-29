@@ -1,6 +1,10 @@
 import { createDate } from "@/utils";
-import { getToken } from "@/hooks/userData";
 import { toast } from "react-hot-toast";
+
+const getToken = () => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('token');
+}
 
 export async function baseCreate(url, model, message) {
   const requestOptions = {
@@ -66,4 +70,19 @@ export async function baseDelete(url, message) {
   } else {
     toast.error(response.message);
   };
+};
+
+export async function baseGet(url) {
+  const requestOptions = {
+    method: "GET",
+    headers: {
+      authorization: `Bearer ${getToken()}`,
+      "Content-Type": "application/json",
+    },
+    cache: "no-store",
+  };
+
+  const res = await fetch(url, requestOptions);
+  const data = await res.json();
+  return data;
 };

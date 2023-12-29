@@ -2,49 +2,29 @@
 import { PageHeader, Loader } from "@/components/layout";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { suppliersList, deleteSupplier } from "@/api/suppliers";
+import { deleteSupplier, list } from "@/api/suppliers";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { useRole, useValidateToken } from "@/hooks/userData";
 
 const Suppliers = () => {
+  useValidateToken();
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [suppliers, setSuppliers] = useState();
   const role = useRole();
-  const token = useValidateToken();
 
   useEffect(() => {
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
+    const fetchData = async () => {
+      const suppliers = await list();
+      setSuppliers(suppliers);
+      setIsLoading(false);
     };
-
-    const fetchSuppliers = async () => {
-      try {
-        const suppliers = await suppliersList(requestOptions);
-        setSuppliers(suppliers);
-      } catch (error) {
-        console.error("Error al cargar marcas:", error);
-      } finally {
-        setIsLoading(false);
-      };
-    };
-
-    fetchSuppliers();
-  }, [push, token]);
+    fetchData();
+  }, [push]);
 
   const handleDeleteSupplier = async (id) => {
-    try {
-      await deleteSupplier(id);
-      const updatedSuppliers = suppliers.filter(suplier => suplier.id !== id);
-      setSuppliers(updatedSuppliers);
-    } catch (error) {
-      console.error('Error borrando marca', error);
-    };
+    await deleteSupplier(id);
+    setSuppliers(suppliers.filter(suplier => suplier.id !== id));
   };
 
   return (
