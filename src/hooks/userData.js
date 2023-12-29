@@ -22,7 +22,7 @@ export const useRole = () => {
     getData();
   }, [push]);
 
-  return userData?.roles[0];
+  return 'user';
 }
 
 export const useValidateToken = () => {

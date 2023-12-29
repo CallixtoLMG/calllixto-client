@@ -18,7 +18,7 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
 
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar la marca "${name}"?`;
 
-  const actions = [
+  const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
       icon: 'edit',
@@ -36,7 +36,7 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
       },
       tooltip: 'Eliminar'
     }
-  ];
+  ] : [];
 
   const handleDelete = useCallback(async () => {
     setIsLoading(true);
