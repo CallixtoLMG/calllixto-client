@@ -1,6 +1,7 @@
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { omit } from "lodash";
-import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
+import { baseCreate, baseDelete, baseUpdate } from "../base";
+import { METHODS, useAxios } from "../axios";
 
 const BRANDS_URL = `${CLIENT_ID}${PATHS.BRANDS}`;
 
@@ -9,19 +10,19 @@ export async function create(brand) {
 };
 
 export async function edit(brand) {
-  baseUpdate(`${BRANDS_URL}/${brand.id}`, omit(brand,["id", "createdAt"]), 'Marca actualizada!');
+  baseUpdate(`${BRANDS_URL}/${brand.id}`, omit(brand, ["id", "createdAt"]), 'Marca actualizada!');
 };
 
 export async function deleteBrand(id) {
   baseDelete(`${BRANDS_URL}/${id}`, 'Marca eliminada!');
 };
 
-export async function list() {
-  const { brands } = await baseGet(BRANDS_URL);
-  return brands;
+export function useListBrands() {
+  const { response, isLoading } = useAxios({ url: BRANDS_URL, method: METHODS.GET });
+  return { brands: response?.brands, isLoading };
 };
 
-export async function getBrand(id) {
-  const { brand } = await baseGet(`${BRANDS_URL}/${id}`);
-  return brand;
+export function useGetBrand(id) {
+  const { response, isLoading } = useAxios({ url: `${BRANDS_URL}/${id}`, method: METHODS.GET });
+  return { brand: response?.brand, isLoading };
 };

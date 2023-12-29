@@ -1,6 +1,7 @@
-import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
+import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { omit } from "lodash";
-import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
+import { baseCreate, baseDelete, baseUpdate } from "../base";
+import { METHODS, useAxios } from "../axios";
 
 const CUSTOMERS_URL = `${CLIENT_ID}${PATHS.CUSTOMERS}`;
 
@@ -16,12 +17,12 @@ export async function deleteCustomer(id) {
   baseDelete(`${CUSTOMERS_URL}/${id}`, 'Cliente eliminado!');
 };
 
-export async function list() {
-  const { customers } = await baseGet(CUSTOMERS_URL);
-  return customers;
+export function useListCustomers() {
+  const { response, isLoading } = useAxios({ url: CUSTOMERS_URL, method: METHODS.GET });
+  return { customers: response?.customers, isLoading };
 };
 
-export async function getCustomer(id) {
-  const { customer } = await baseGet(`${CUSTOMERS_URL}/${id}`);
-  return customer;
+export function useGetCustomer(id) {
+  const { response, isLoading } = useAxios({ url: `${CUSTOMERS_URL}/${id}`, method: METHODS.GET });
+  return { customer: response?.customer, isLoading };
 };

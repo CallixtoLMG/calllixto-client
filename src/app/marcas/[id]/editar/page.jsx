@@ -1,37 +1,20 @@
 "use client";
-import { edit, getBrand } from "@/api/brands";
+import { edit, useGetBrand } from "@/api/brands";
 import { PageHeader, Loader } from "@/components/layout";
 import BrandForm from "@/components/brands/BrandForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useRole, useValidateToken } from "@/hooks/userData";
 
 const EditBrand = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
   const role = useRole();
-  const [brand, setBrand] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { brand, isLoading } = useGetBrand(params.id);
 
-  useEffect(() => {
-    async function fetchData() {
-      const brand = await getBrand(params.id);
-
-      if (!brand) {
-        push(PAGES.NOT_FOUND.BASE);
-        return;
-      };
-
-      setBrand(brand);
-      setIsLoading(false);
-    };
-
-    fetchData();
-  }, [params.id, push]);
-
-  if (role === "user") {
+  if (!isLoading && !brand || role === "user") {
     push(PAGES.NOT_FOUND.BASE);
+    return;
   };
 
   return (

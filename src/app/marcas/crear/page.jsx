@@ -1,6 +1,5 @@
 "use client";
 import { create } from "@/api/brands";
-import { getUserData } from "@/api/userData";
 import { PageHeader } from "@/components/layout";
 import BrandForm from "@/components/brands/BrandForm";
 import { PAGES } from "@/constants";

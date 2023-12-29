@@ -1,6 +1,7 @@
-import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
+import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { omit } from "lodash";
-import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
+import { baseCreate, baseDelete, baseUpdate } from "../base";
+import { METHODS, useAxios } from "../axios";
 
 const SUPPLIER_URL = `${CLIENT_ID}${PATHS.SUPPLIERS}`;
 
@@ -16,12 +17,12 @@ export async function deleteSupplier(id) {
   baseDelete(`${SUPPLIER_URL}/${id}`, 'Proveedor eliminado!');
 };
 
-export async function list() {
-  const { suppliers } = await baseGet(SUPPLIER_URL);
-  return suppliers;
+export function useListSuppliers() {
+  const { response, isLoading } = useAxios({ url: SUPPLIER_URL, method: METHODS.GET });
+  return { suppliers: response?.suppliers, isLoading };
 };
 
-export async function getSupplier(id) {
-  const { supplier } = await baseGet(`${SUPPLIER_URL}/${id}`);
-  return supplier;
+export function useGetSupplier(id) {
+  const { response, isLoading } = useAxios({ url: `${SUPPLIER_URL}/${id}`, method: METHODS.GET });
+  return { supplier: response?.supplier, isLoading };
 };

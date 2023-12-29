@@ -1,8 +1,8 @@
 import { now } from "@/utils";
 import { toast } from "react-hot-toast";
-import axios from './axios';
+import { instance as axios } from './axios';
 
-export async function baseCreate(url, model, message) {
+export const baseCreate = async (url, model, message) => {
   let data;
 
   try {
@@ -19,7 +19,7 @@ export async function baseCreate(url, model, message) {
   }
 };
 
-export async function baseUpdate(url, model, message) {
+export const baseUpdate = async (url, model, message) => {
   let data;
 
   try {
@@ -36,7 +36,7 @@ export async function baseUpdate(url, model, message) {
   }
 };
 
-export async function baseDelete(url, message) {
+export const baseDelete = async (url, message) => {
   let data;
 
   try {
@@ -51,17 +51,4 @@ export async function baseDelete(url, message) {
   } else {
     toast.error(data.message);
   };
-};
-
-export async function baseGet(url) {
-  let data;
-
-  try {
-    const response = await axios.get(url);
-    data = response.data;
-  } catch (error) {
-    console.error(error);
-  }
-
-  return data;
 };

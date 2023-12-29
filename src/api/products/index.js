@@ -1,7 +1,8 @@
 import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { omit } from "lodash";
-import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
+import { baseCreate, baseDelete, baseUpdate } from "../base";
+import { METHODS, useAxios } from "../axios";
 
 const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
 
@@ -17,14 +18,14 @@ export async function deleteProduct(id) {
   baseDelete(`${PRODUCTS_URL}/${id}`, 'Producto eliminado!');
 };
 
-export async function list() {
-  const { products } = await baseGet(PRODUCTS_URL);
-  return products;
+export function useListProducts() {
+  const { response, isLoading } = useAxios({ url: PRODUCTS_URL, method: METHODS.GET });
+  return { products: response?.products, isLoading };
 };
 
-export async function getProduct(code) {
-  const { product } = await baseGet(`${PRODUCTS_URL}/${code}`);
-  return product;
+export function useGetProduct(code) {
+  const { response, isLoading } = useAxios({ url: `${PRODUCTS_URL}/${code}`, method: METHODS.GET });
+  return { product: response?.product, isLoading };
 };
 
 export async function createBatch(products) {

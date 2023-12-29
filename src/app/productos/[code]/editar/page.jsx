@@ -1,37 +1,20 @@
 "use client";
-import { edit, getProduct } from "@/api/products";
+import { edit, useGetProduct } from "@/api/products";
 import { PageHeader, Loader } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRole, useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const EditProduct = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
   const role = useRole();
-  const [product, setProduct] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { product, isLoading } = useGetProduct(params.code);
 
-  useEffect(() => {
-    async function fetchData() {
-      const product = await getProduct(params.code);
-
-      if (!product) {
-        push(PAGES.NOT_FOUND.BASE);
-        return;
-      };
-
-      setProduct(product);
-      setIsLoading(false)
-    };
-
-    fetchData();
-  }, [params.code, push]);
-
-  if (role === "user") {
+  if (!isLoading && !product || role === "user") {
     push(PAGES.NOT_FOUND.BASE);
+    return;
   };
 
   return (

@@ -1,12 +1,12 @@
 "use client";
-import { create, getBudget } from "@/api/budgets";
+import { create } from "@/api/budgets";
 import { list as customersList } from "@/api/customers";
 import { list as productsList } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { PageHeader, Loader } from "@/components/layout";
 import { useValidateToken } from "@/hooks/userData";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 const CreateBudget = () => {
   useValidateToken();
@@ -14,18 +14,9 @@ const CreateBudget = () => {
   const [products, setProductsList] = useState(null);
   const [customers, setCustomersList] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [cloneBudget, setCloneBudget] = useState(null);
-
-  const searchParams = useSearchParams();
-  const cloneId = useMemo(() => searchParams.get('clonar'), [searchParams]);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (cloneId) {
-        const budget = await getBudget(cloneId);
-        setCloneBudget(budget);
-      }
-
       const products = await productsList();
       const mappedProducts = products.map(product => ({
         ...product,
@@ -48,7 +39,7 @@ const CreateBudget = () => {
     };
 
     fetchData();
-  }, [cloneId, push]);
+  }, [push]);
 
   return (
     <>

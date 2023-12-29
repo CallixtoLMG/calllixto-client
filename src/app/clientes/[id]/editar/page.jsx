@@ -1,33 +1,20 @@
 "use client"
-import { edit, getCustomer } from "@/api/customers";
+import { edit, useGetCustomer } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { PageHeader, Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 import { useValidateToken } from "@/hooks/userData";
 
 const EditCustomer = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
-  const [customer, setCustomer] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { customer, isLoading } = useGetCustomer(params.id);
 
-  useEffect(() => {
-    async function fetchData() {
-      const customer = await getCustomer(params.id);
-
-      if (!customer) {
-        push(PAGES.NOT_FOUND.BASE);
-        return;
-      };
-
-      setCustomer(customer);
-      setIsLoading(false);
-    };
-
-    fetchData();
-  }, [params.id, push]);
+  if (!isLoading && !customer) {
+    push(PAGES.NOT_FOUND.BASE);
+    return;
+  };
 
   return (
     <>
