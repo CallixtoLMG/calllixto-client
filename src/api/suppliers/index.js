@@ -2,7 +2,7 @@ import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
 import { omit } from "lodash";
 import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
 
-const SUPPLIER_URL = `${URL}${CLIENT_ID}${PATHS.SUPPLIERS}`;
+const SUPPLIER_URL = `${CLIENT_ID}${PATHS.SUPPLIERS}`;
 
 export async function create(supplier) {
   baseCreate(SUPPLIER_URL, supplier, 'Proveedor creado!');

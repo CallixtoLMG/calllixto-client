@@ -1,32 +1,11 @@
-import { API_METHODS } from "@/constants";
 import { now } from "@/utils";
 import { toast } from "react-hot-toast";
-
-const getToken = () => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('token');
-}
-
-const getRequestOptions = (method, body) => {
-  return {
-    method,
-    body,
-    redirect: "follow",
-    headers: {
-      authorization: `Bearer ${getToken()}`
-    },
-    cache: "no-store"
-  };
-}
+import axios from './axios';
 
 export async function baseCreate(url, model, message) {
-  const body = JSON.stringify({ ...model, createdAt: now() });
+  const response = await axios.post(url, { ...model, createdAt: now() });
 
-  let response = await fetch(url, getRequestOptions(API_METHODS.POST, body));
-  response = await response.text();
-  response = JSON.parse(response);
-
-  if (response.statusOk) {
+  if (response.data.statusOk) {
     toast.success(message);
   } else {
     toast.error(response.message);
@@ -34,13 +13,9 @@ export async function baseCreate(url, model, message) {
 };
 
 export async function baseUpdate(url, model, message) {
-  const body = JSON.stringify({ ...model, updatedAt: now() });
+  const response = await axios.put(url, { ...model, updatedAt: now() });
 
-  let response = await fetch(url, getRequestOptions(API_METHODS.PUT, body));
-  response = await response.text();
-  response = JSON.parse(response);
-
-  if (response.statusOk) {
+  if (response.data.statusOk) {
     toast.success(message);
   } else {
     toast.error(response.message);
@@ -48,11 +23,9 @@ export async function baseUpdate(url, model, message) {
 };
 
 export async function baseDelete(url, message) {
-  let response = await fetch(url, getRequestOptions(API_METHODS.DELETE));
-  response = await response.text();
-  response = JSON.parse(response);
+  const response = await axios.delete(url);
 
-  if (response.statusOk) {
+  if (response.data.statusOk) {
     toast.success(message);
   } else {
     toast.error(response.message);
@@ -60,7 +33,6 @@ export async function baseDelete(url, message) {
 };
 
 export async function baseGet(url) {
-  const res = await fetch(url, getRequestOptions(API_METHODS.GET));
-  const data = await res.json();
-  return data;
+  const response = await axios.get(url);
+  return response.data;
 };

@@ -2,7 +2,7 @@ import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
 import { omit } from "lodash";
 import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
 
-const CUSTOMERS_URL = `${URL}${CLIENT_ID}${PATHS.CUSTOMERS}`;
+const CUSTOMERS_URL = `${CLIENT_ID}${PATHS.CUSTOMERS}`;
 
 export async function create(customer) {
   baseCreate(CUSTOMERS_URL, customer, 'Cliente creado!');

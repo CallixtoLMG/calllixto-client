@@ -1,8 +1,8 @@
-import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
+import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { omit } from "lodash";
 import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
 
-const BRANDS_URL = `${URL}${CLIENT_ID}${PATHS.BRANDS}`;
+const BRANDS_URL = `${CLIENT_ID}${PATHS.BRANDS}`;
 
 export async function create(brand) {
   baseCreate(BRANDS_URL, brand, 'Marca creada!');

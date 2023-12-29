@@ -4,7 +4,7 @@ import { toast } from "react-hot-toast";
 import { omit } from "lodash";
 import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
 
-const PRODUCTS_URL = `${URL}${CLIENT_ID}${PATHS.PRODUCTS}`;
+const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
 
 export async function create(product) {
   baseCreate(PRODUCTS_URL, product, 'Producto creado!');

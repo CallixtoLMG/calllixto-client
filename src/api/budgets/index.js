@@ -1,7 +1,7 @@
 import { CLIENT_ID, PATHS, URL } from "@/fetchUrls";
 import { baseCreate, baseGet } from "../base";
 
-const BUDGETS_URL = `${URL}${CLIENT_ID}${PATHS.BUDGETS}`;
+const BUDGETS_URL = `${CLIENT_ID}${PATHS.BUDGETS}`;
 
 export async function create(budget) {
   baseCreate(BUDGETS_URL, budget, 'Presupuesto creado!');
