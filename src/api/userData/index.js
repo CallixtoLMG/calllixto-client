@@ -1,12 +1,15 @@
 import { URL, VALIDATE } from "@/fetchUrls";
+import axios from "axios";
 
 export async function getUserData() {
   let data = sessionStorage.getItem("userData");
+
   if (data?.isAuthorized) {
     return data;
   };
 
-  const response = await fetch(`${URL}${VALIDATE}`, {
+  const { data: response} = await axios({
+    url: `${URL}${VALIDATE}`,
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -14,11 +17,10 @@ export async function getUserData() {
     }
   });
 
-  if (!response.ok) {
+  if (!response.isAuthorized) {
     throw new Error('No se pudo obtener la información del rol del usuario');
   };
 
-  data = await response.json();
-  sessionStorage.setItem("userData", data);
-  return data;
+  sessionStorage.setItem("userData", response);
+  return response;
 };
