@@ -1,6 +1,5 @@
-import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS, URL } from "@/fetchUrls";
+import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
-import { toast } from "react-hot-toast";
 import { omit } from "lodash";
 import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
 
@@ -28,57 +27,10 @@ export async function getProduct(code) {
   return product;
 };
 
-export async function createBatch(product) {
-  for (const prod of product.products) {
-    prod.createdAt = now();
-    prod.supplier = "supplier"
-    prod.brand = "brand"
-  }
-  var requestOptions = {
-    method: "POST",
-    body: JSON.stringify(product),
-    redirect: "follow",
-    headers: {
-      authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    cache: "no-store",
-  };
-  fetch(`${PRODUCTS_URL}/${CREATE_BATCH}`, requestOptions)
-    .then(async (response) => {
-      let res = await response.text();
-      res = JSON.parse(res);
-      if (res.statusOk) {
-        toast.success("Productos importados exitosamente");
-      } else {
-        toast.error(res.message);
-      }
-    })
-    .catch((error) => console.log("error", error));
+export async function createBatch(products) {
+  baseCreate(`${PRODUCTS_URL}/${CREATE_BATCH}`, products.map(product => ({ ...product, createdAt: now() })), 'Productos creados!');
 }
 
-export async function editBatch(product) {
-  for (const prod of product.update) {
-    prod.updatedAt = now();
-  }
-  const requestOptions = {
-    body: JSON.stringify(product),
-    method: "POST",
-    redirect: "follow",
-    headers: {
-      authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    cache: "no-store",
-  };
-
-  fetch(`${PRODUCTS_URL}/${EDIT_BATCH}`, requestOptions)
-    .then(async (response) => {
-      let res = await response.text();
-      res = JSON.parse(res);
-      if (res.statusOk) {
-        toast.success("Productos modificados exitosamente");
-      } else {
-        toast.error(res.message);
-      }
-    })
-    .catch((error) => console.log("error", error));
+export async function editBatch(products) {
+  baseCreate(`${PRODUCTS_URL}/${EDIT_BATCH}`, products.map(product => ({ ...product, createdAt: now() })), 'Productos actualizados!');
 }

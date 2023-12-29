@@ -94,11 +94,13 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
   };
 
   const handleAcceptCreate = (data) => {
-    data?.newProducts?.length && createBatch({ products: data.newProducts })
-    data?.editProducts?.length && editBatch({ update: data.editProducts })
+    data?.newProducts?.length && createBatch(data.newProducts);
+    data?.editProducts?.length && editBatch(data.editProducts);
+
     setTimeout(() => {
       refresh();
     }, 1000);
+
     setIsLoading(true);
     setOpen(false);
   };
