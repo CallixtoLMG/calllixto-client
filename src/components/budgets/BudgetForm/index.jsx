@@ -1,18 +1,22 @@
 import { BUDGET_FORM_PRODUCT_COLUMNS } from "@/components/budgets/budgets.common";
 import { PAGES } from "@/constants";
-import { createDate, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon, Popup, Button as SButton, Dropdown as SDropdown, Table } from "semantic-ui-react";
-import { Button, Cell, Dropdown, HeaderCell, Input, TotalText, WarningMessage } from "./styles";
+import { Button, Input, Cell, Dropdown, FieldsContainer, FormField, HeaderCell, TotalText, WarningMessage, Label, Segment } from "./styles";
 import { Flex, Box } from "rebass";
 
-const BudgetForm = ({ onSubmit, products, customers, budget }) => {
+const BudgetForm = ({ onSubmit, products, customers, budget, user }) => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { control, handleSubmit, setValue, watch, formState: { isValid, isDirty } } = useForm({
-    defaultValues: budget || {
+  const { control, handleSubmit, setValue, watch, formState: { isDirty } } = useForm({
+    defaultValues: budget ? {
+      ...budget,
+      seller: `${user.firstName} ${user.lastName}`
+    } : {
+      seller: `${user.firstName} ${user.lastName}`,
       products: [
         {
           name: '',
@@ -63,7 +67,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget }) => {
 
   const handleCreate = (data) => {
     setIsLoading(true);
-    data.createdAt = createDate();
     onSubmit(data);
     setTimeout(() => {
       push(PAGES.BUDGETS.BASE);
@@ -72,27 +75,61 @@ const BudgetForm = ({ onSubmit, products, customers, budget }) => {
 
   return (
     <Form onSubmit={handleSubmit(handleCreate)}>
-      <Controller
-        name={`customer.name`}
-        control={control}
-        rules={{ required: true }}
-        render={({ field }) => (
-          <Dropdown
-            name={`customer`}
-            placeholder='Clientes...'
-            search
-            selection
-            minCharacters={2}
-            noResultsMessage="No se ha encontrado cliente!"
-            options={customers}
-            onChange={(e, { value }) => {
-              field.onChange(value);
-              const customer = customers.find((opt) => opt.value === value);
-              setValue(`customer.id`, customer.id);
-            }}
+      <FieldsContainer>
+        <FormField>
+          <Label>Vendedor</Label>
+          <Controller
+            name="seller"
+            control={control}
+            rules={{ required: 'Campo requerido' }}
+            render={({ field: { value }}) => <Segment>{value}</Segment>}
           />
-        )}
-      />
+        </FormField>
+      </FieldsContainer>
+      <FieldsContainer marginY={15}>
+        <FormField>
+          <Label>Cliente</Label>
+          <Controller
+            name={`customer.name`}
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <Dropdown
+                name={`customer`}
+                placeholder='Clientes...'
+                search
+                selection
+                minCharacters={2}
+                noResultsMessage="No se ha encontrado cliente!"
+                options={customers}
+                onChange={(e, { value }) => {
+                  field.onChange(value);
+                  const customer = customers.find((opt) => opt.value === value);
+                  setValue('customer.id', customer.id);
+                  setValue('customer.address', customer.address ?? '');
+                  setValue('customer.phone', customer.phone ?? '')
+                }}
+              />
+            )}
+          />
+        </FormField>
+        <FormField flex={1}>
+          <Label>Dirección</Label>
+          <Controller
+            name="customer.address"
+            control={control}
+            render={({ field: { value }}) => <Segment>{value}</Segment>}
+          />
+        </FormField>
+        <FormField width="200px">
+          <Label>Teléfono</Label>
+          <Controller
+            name="customer.phone"
+            control={control}
+            render={({ field: { value }}) => <Segment>{formatedPhone(value?.areaCode, value?.number)}</Segment>}
+          />
+        </FormField>
+      </FieldsContainer>
       <Button
         color="green"
         type="button"
@@ -230,7 +267,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget }) => {
         floated="right"
         type="submit"
         color="green"
-        disabled={isLoading || !isValid || !isDirty}
+        disabled={isLoading || !isDirty}
         loading={isLoading}
       >
         <Icon name="add" />Crear presupuesto

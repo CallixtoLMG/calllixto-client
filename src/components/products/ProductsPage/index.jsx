@@ -24,7 +24,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
     return c.map(customer => ({ ...customer, id: customer.code }));
   }, []);
 
-  const actions = [
+  const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
       icon: 'edit',
@@ -42,7 +42,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
       },
       tooltip: 'Eliminar'
     }
-  ];
+  ] : [];
 
   const handleDelete = useCallback(async () => {
     setIsLoading(true);

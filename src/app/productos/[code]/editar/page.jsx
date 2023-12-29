@@ -1,64 +1,22 @@
-"use client"
-import { edit, getProduct } from "@/api/products";
-import { getUserData } from "@/api/userData";
+"use client";
+import { edit, useGetProduct } from "@/api/products";
 import { PageHeader, Loader } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
+import { useRole, useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
 
 const EditProduct = ({ params }) => {
+  useValidateToken();
   const { push } = useRouter();
-  const [role, setRole] = useState();
-  const [product, setProduct] = useState(null);
-  const [isLoading, setIsLoading] = useState(true)
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE);
-    };
-    async function fetchData() {
-      var requestOptions = {
-        method: 'GET',
-        redirect: 'follow',
-        headers: {
-          authorization: `Bearer ${token}`
-        },
-        cache: "no-store",
-      };
-      const data = await getProduct(params.code, requestOptions);
-      if (!data) {
-        push(PAGES.NOT_FOUND.BASE);
-        return;
-      };
-      setProduct(data);
-      setIsLoading(false)
-    };
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE);
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
-    const fetchRol = async () => {
-      try {
-        const userData = await getUserData();
-        setRole(userData.roles[0]);
-      } catch (error) {
-        console.error('Error al cargar producto:', error);
-      };
-    };
-    validateToken();
-    fetchData();
-    fetchRol();
-  }, [params.code, push]);
-  if (role === "user") {
+  const role = useRole();
+  const { product, isLoading } = useGetProduct(params.code);
+
+  if (!isLoading && !product || role === "user") {
     push(PAGES.NOT_FOUND.BASE);
+    return;
   };
+
   return (
     <>
       <PageHeader title="Actualizar Producto" />

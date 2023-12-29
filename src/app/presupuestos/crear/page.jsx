@@ -1,95 +1,37 @@
 "use client";
-import { create, getBudget } from "@/api/budgets";
-import { customersList } from "@/api/customers";
-import { productsList } from "@/api/products";
-import { getUserData } from "@/api/userData";
+import { create } from "@/api/budgets";
+import { useListCustomers } from "@/api/customers";
+import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, PageHeader } from "@/components/layout";
-import { PAGES } from "@/constants";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useUserData, useValidateToken } from "@/hooks/userData";
+import { useMemo } from "react";
 
 const CreateBudget = () => {
-  const { push } = useRouter();
-  const [products, setProductsList] = useState(null);
-  const [customers, setCustomersList] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [cloneBudget, setCloneBudget] = useState(null);
+  useValidateToken();
+  const user = useUserData();
+  const { products = [], isLoading: loadingProducts } = useListProducts();
+  const { customers = [], isLoading: loadingCustomers } = useListCustomers();
 
-  const searchParams = useSearchParams();
-  const cloneId = useMemo(() => searchParams.get('clonar'), [searchParams]);
+  const mappedProducts = useMemo(() => products.map(product => ({
+    ...product,
+    key: product.code,
+    value: product.name,
+    text: product.name,
+  })), [products]);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE)
-    };
-    const requestOptions = {
-      method: 'GET',
-      headers: {
-        authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      cache: "no-store",
-    };
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE)
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
-    const fetchData = async () => {
-      if (cloneId) {
-        try {
-          const budget = await getBudget(cloneId, requestOptions);
-          setCloneBudget(budget);
-        } catch (error) {
-          console.error('Error al cargar presupuesto para clonar:', error);
-        };
-      };
+  const mappedCustomers = useMemo(() => customers.map(customer => ({
+    ...customer,
+    key: customer.name,
+    value: customer.name,
+    text: customer.name,
+  })), [customers]);
 
-      try {
-        const productsFecthData = await productsList(requestOptions);
-        const productsFilteredList = productsFecthData.map(product => ({
-          ...product,
-          key: product.code,
-          value: product.name,
-          text: product.name,
-        }));
-        setProductsList(productsFilteredList);
-      } catch (error) {
-        console.error('Error al cargar productos:', error);
-      };
-
-      try {
-        const customersFetchData = await customersList(requestOptions);
-        const customersFilteredList = customersFetchData.map(customer => ({
-          key: customer.name,
-          id: customer.id,
-          value: customer.name,
-          text: customer.name,
-          phone: customer.phone,
-          email: customer.email,
-        }));
-        setCustomersList(customersFilteredList);
-      } catch (error) {
-        console.error('Error al crear clientes:', error);
-      } finally {
-        setIsLoading(false);
-      };
-    };
-    validateToken();
-    fetchData();
-  }, [cloneId, push]);
   return (
     <>
       <PageHeader title="Crear Presupuesto" />
-      <Loader active={isLoading}>
-        <BudgetForm onSubmit={create} products={products} customers={customers} budget={cloneBudget} />
+      <Loader active={loadingProducts || loadingCustomers}>
+        <BudgetForm onSubmit={create} products={mappedProducts} customers={mappedCustomers} user={user} />
       </Loader>
     </>
   )

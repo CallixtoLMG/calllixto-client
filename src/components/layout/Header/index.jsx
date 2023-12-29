@@ -1,36 +1,21 @@
 "use client";
-import { getUserData } from "@/api/userData";
 import { NoPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from "react";
 import { Menu } from 'semantic-ui-react';
 import { LogDiv, ModContainer, ModLink, Text } from "./styles";
+import { useTokenValidated } from "@/hooks/userData";
 
 const Header = () => {
-  const [validatedToken, setValidatedToken] = useState(null);
   const pathname = usePathname();
   const { push } = useRouter();
+  const validToken = useTokenValidated();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
     sessionStorage.removeItem("userData");
     push(PAGES.LOGIN.BASE);
   };
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const validateToken = async () => {
-        try {
-          const userData = await getUserData();
-          setValidatedToken(userData?.isAuthorized);
-        } catch (error) {
-          console.error('Error, ingreso no valido(token):', error);
-        }
-      };
-      validateToken();
-    };
-  }, [pathname]);
 
   const routesWithoutHeader = [PAGES.LOGIN.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
@@ -39,9 +24,9 @@ const Header = () => {
       {showHeader &&
         <Menu fixed='top'>
           <ModContainer>
-            {!validatedToken ? (
+            {!validToken ? (
               <LogDiv>
-                <Menu.Item onClick={handleLogout} > <Text>Ingresar</Text></Menu.Item>
+                <Menu.Item onClick={handleLogout}><Text>Ingresar</Text></Menu.Item>
               </LogDiv>
             ) : (
               <>
@@ -51,7 +36,7 @@ const Header = () => {
                   </ModLink>
                 ))}
                 <LogDiv>
-                  <Menu.Item onClick={handleLogout} > <Text>Cerrar sesión</Text></Menu.Item>
+                  <Menu.Item onClick={handleLogout}><Text>Cerrar sesión</Text></Menu.Item>
                 </LogDiv>
               </>
             )}

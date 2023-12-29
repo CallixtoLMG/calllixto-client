@@ -1,59 +1,20 @@
 "use client";
-import { getUserData } from "@/api/userData";
 import { PageHeader, Loader } from "@/components/layout";
 import ShowSupplier from "@/components/suppliers/ShowSupplier";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { getSupplier } from "@/api/suppliers";
+import { useGetSupplier } from "@/api/suppliers";
+import { useValidateToken } from "@/hooks/userData";
 
 const Supplier = ({ params }) => {
-  const [isLoading, setIsLoading] = useState(true)
-  const [supplier, setSupplier] = useState({})
+  useValidateToken();
+  const { supplier, isLoading } = useGetSupplier(params.id);
   const { push } = useRouter();
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      push(PAGES.LOGIN.BASE);
-    };
 
-    const validateToken = async () => {
-      try {
-        const userData = await getUserData();
-        if (!userData.isAuthorized) {
-          push(PAGES.LOGIN.BASE);
-        };
-      } catch (error) {
-        console.error('Error, ingreso no valido(token):', error);
-      };
-    };
-
-    const fetchSupplier = async () => {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          cache: "no-store",
-        };
-        const supplier = await getSupplier(params.id, requestOptions);
-
-        if (!supplier) {
-          push(PAGES.NOT_FOUND.BASE);
-          return;
-        };
-        setSupplier(supplier);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error al cargar marcas:', error);
-      };
-    };
-
-    validateToken()
-    fetchSupplier();
-  }, [params.id, push]);
+  if (!isLoading && !supplier) {
+    push(PAGES.NOT_FOUND.BASE);
+    return;
+  };
 
   return (
     <>

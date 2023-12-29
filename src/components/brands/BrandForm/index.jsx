@@ -1,38 +1,41 @@
 "use client";
 import { PAGES } from "@/constants";
-import { createDate, validate2DigitCode } from "@/utils";
-import { omit } from "lodash";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
 import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea } from "./styles";
+import { RuledLabel } from "@/components/common/forms";
+import { REGEX } from "@/constants";
 
 const BrandForm = ({ brand, onSubmit }) => {
   const { push } = useRouter();
-  const { handleSubmit, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: brand });
+  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: brand });
   const isUpdating = useMemo(() => !!brand?.id, [brand]);
   const [isLoading, setIsLoading] = useState(false);
+
+  const handleReset = useCallback((brand) => {
+    reset(brand || { name: '', id: '', comments: '' });
+  }, [reset]);
+
   const buttonConfig = useMemo(() => {
     return {
-      icon: isUpdating ? "edit" : "add",
-      title: isUpdating ? "Actualizar" : "Crear",
-    }
-  }, [isUpdating]);
+      submit: {
+        icon: isUpdating ? "edit" : "add",
+        title: isUpdating ? "Actualizar" : "Crear",
+      },
+      restore: {
+        onClick: () => handleReset(isUpdating ? brand : null),
+        icon: isUpdating ? 'undo' : 'erase',
+        title: isUpdating ? 'Restaurar' : 'Limpiar'
+      }
 
-  const handleReset = (brand) => {
-    reset(brand || { name: '', id: '', comments: '' });
-  };
+    }
+  }, [brand, handleReset, isUpdating]);
 
   const handleForm = (data) => {
     setIsLoading(true);
-    if (!isUpdating) {
-      data.createdAt = createDate();
-      onSubmit(data);
-    } else {
-      data.updatedAt = createDate();
-      onSubmit({ id: brand.id, brand: omit(data, ['id', 'createdAt']) });
-    }
+    onSubmit(data);
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.BRANDS.BASE);
@@ -44,16 +47,19 @@ const BrandForm = ({ brand, onSubmit }) => {
       <FormContainer>
         <FieldsContainer>
           <FormField>
-            <Label>Código</Label>
+            <RuledLabel title="Código" message={errors?.id?.message} required />
             <Controller
               name="id"
               control={control}
-              rules={{ validate: validate2DigitCode }}
+              rules={{
+                required: 'Campo requerido',
+                pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
+              }}
               render={({ field }) => (
-                <Input required
+                <Input
                   placeholder="Código (A1)"
-                  disabled={isUpdating}
                   {...field}
+                  disabled={isUpdating}
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                   maxLength={2}
                 />
@@ -61,17 +67,17 @@ const BrandForm = ({ brand, onSubmit }) => {
             />
           </FormField>
           <FormField width="50%">
-            <Label>Nombre</Label>
+            <RuledLabel title="Nombre" message={errors?.name?.message} required />
             <Controller
               name="name"
               control={control}
-              rules={{ required: true }}
-              render={({ field }) => <Input required {...field} placeholder="Nombre" />}
+              rules={{ required: 'Campo requerido' }}
+              render={({ field }) => <Input {...field} placeholder="Nombre" />}
             />
           </FormField>
         </FieldsContainer>
         <FieldsContainer>
-          <Label >Comentarios</Label>
+          <Label>Comentarios</Label>
           <Controller
             name="comments"
             control={control}
@@ -80,20 +86,15 @@ const BrandForm = ({ brand, onSubmit }) => {
         </FieldsContainer>
         <ButtonsContainer>
           <Button
-            disabled={isLoading || !isDirty || !isValid}
+            disabled={isLoading || !isDirty}
             loading={isLoading}
             type="submit"
             color="green">
-            <Icon name={buttonConfig.icon} />{buttonConfig.title}</Button>
-          {isUpdating ? (
-            <Button type="button" onClick={() => handleReset(brand)} color="brown" $marginLeft disabled={isLoading || !isDirty}>
-              <Icon name="undo" />Restaurar
-            </Button>
-          ) : (
-            <Button type="button" onClick={() => handleReset()} color="brown" $marginLeft disabled={isLoading || !isDirty}>
-              <Icon name="erase" />Limpiar
-            </Button>
-          )}
+            <Icon name={buttonConfig.submit.icon} />{buttonConfig.submit.title}
+          </Button>
+          <Button type="button" onClick={buttonConfig.restore.onClick} color="brown" disabled={isLoading || !isDirty}>
+            <Icon name={buttonConfig.restore.icon} />{buttonConfig.restore.title}
+          </Button>
         </ButtonsContainer>
       </FormContainer>
     </Form>

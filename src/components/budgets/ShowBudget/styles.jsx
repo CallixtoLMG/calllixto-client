@@ -4,12 +4,13 @@ import styled from "styled-components";
 
 const SubContainer = styled(Flex)`
   flex-direction: row;
+  column-gap: 20px;
 `;
 
 const DataContainer = styled(Flex)`
   flex-direction: column;
   margin: 0 10px 10px 0!important;
-  width: 200px!important;
+  width: ${({ width }) => width || '300px'} !important;
 `;
 
 const Button = styled(SButton)`
@@ -21,8 +22,9 @@ const Button = styled(SButton)`
 
 const Segment = styled(SSegment)`
   margin-top: 5px!important;
-  height: 50px!important;
+  height: 40px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
+  padding: 10px !important;
 `;
 
 export { Button, DataContainer, Segment, SubContainer };

@@ -1,0 +1,1 @@
+export { RuledLabel } from './RuledLabel';
