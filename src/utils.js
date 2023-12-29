@@ -1,12 +1,11 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import { REGEX } from "./constants";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
-export const createDate = () => {
+export const now = () => {
   const date = dayjs().tz(dayjs.tz.guess()).local().toDate().toLocaleString("es-AR");
   return date;
 }

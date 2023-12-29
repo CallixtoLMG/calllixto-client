@@ -1,5 +1,5 @@
 import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS, URL } from "@/fetchUrls";
-import { createDate } from "@/utils";
+import { now } from "@/utils";
 import { toast } from "react-hot-toast";
 import { omit } from "lodash";
 import { baseCreate, baseDelete, baseGet, baseUpdate } from "../base";
@@ -30,7 +30,7 @@ export async function getProduct(code) {
 
 export async function createBatch(product) {
   for (const prod of product.products) {
-    prod.createdAt = createDate();
+    prod.createdAt = now();
     prod.supplier = "supplier"
     prod.brand = "brand"
   }
@@ -58,7 +58,7 @@ export async function createBatch(product) {
 
 export async function editBatch(product) {
   for (const prod of product.update) {
-    prod.updatedAt = createDate();
+    prod.updatedAt = now();
   }
   const requestOptions = {
     body: JSON.stringify(product),

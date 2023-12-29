@@ -1,5 +1,5 @@
 import { API_METHODS } from "@/constants";
-import { createDate } from "@/utils";
+import { now } from "@/utils";
 import { toast } from "react-hot-toast";
 
 const getToken = () => {
@@ -20,7 +20,7 @@ const getRequestOptions = (method, body) => {
 }
 
 export async function baseCreate(url, model, message) {
-  const body = JSON.stringify({ ...model, createdAt: createDate() });
+  const body = JSON.stringify({ ...model, createdAt: now() });
 
   let response = await fetch(url, getRequestOptions(API_METHODS.POST, body));
   response = await response.text();
@@ -34,7 +34,7 @@ export async function baseCreate(url, model, message) {
 };
 
 export async function baseUpdate(url, model, message) {
-  const body = JSON.stringify({ ...model, updatedAt: createDate() });
+  const body = JSON.stringify({ ...model, updatedAt: now() });
 
   let response = await fetch(url, getRequestOptions(API_METHODS.PUT, body));
   response = await response.text();
