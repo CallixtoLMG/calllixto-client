@@ -39,7 +39,7 @@ const BrandForm = ({ brand, onSubmit }) => {
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.BRANDS.BASE);
-    }, 1000);
+    }, 2000);
   };
 
   return (

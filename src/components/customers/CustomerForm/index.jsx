@@ -40,7 +40,7 @@ const CustomerForm = ({ customer, onSubmit }) => {
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.CUSTOMERS.BASE);
-    }, 1000)
+    }, 2000);
   };
 
   return (

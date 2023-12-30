@@ -5,11 +5,11 @@ import { useMemo, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
-import { Button, ButtonsContainer, CodeInput, Dropdown, FieldsContainer, FormContainer, FormField, Input, Label, Textarea } from "./styles";
+import { Button, ButtonsContainer, CodeInput, Dropdown, FieldsContainer, FormContainer, FormField, Input, Label, Textarea, Segment } from "./styles";
 
 const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
   const { push } = useRouter();
-  const { handleSubmit, setValue, watch, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: product });
+  const { handleSubmit, setValue, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: product });
   const validateCode = (value) => {
     return /^[A-Z0-9]{3}$/.test(value);
   };
@@ -67,7 +67,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.PRODUCTS.BASE);
-    }, 1000);
+    }, 2000);
   };
 
   const locale = "es-AR";
@@ -79,50 +79,59 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
         <FieldsContainer>
           <FormField>
             <Label>Proveedor</Label>
-            <Controller
-              name="supplier"
-              control={control}
-              render={({ field }) => (
-                <Dropdown
-                  required
-                  name={`supplier`}
-                  placeholder='Proveedores'
-                  search
-                  selection
-                  minCharacters={2}
-                  noResultsMessage="Sin resultados!"
-                  options={suppliers}
-                  onChange={(e, { value }) => {
-                    field.onChange(value);
-                    handleSupplierChange(e, { value });
-                  }}
-                />
-              )}
-            />
+            {!isUpdating ? (
+              <Controller
+                name="supplier"
+                control={control}
+                render={({ field }) => (
+                  <Dropdown
+                    required
+                    name={`supplier`}
+                    placeholder='Proveedores'
+                    search
+                    selection
+                    minCharacters={2}
+                    noResultsMessage="Sin resultados!"
+                    options={suppliers}
+                    onChange={(e, { value }) => {
+                      field.onChange(value);
+                      handleSupplierChange(e, { value });
+                    }}
+                  />
+                )}
+              />
+            ) : (
+              <Segment>{product?.supplier}</Segment>
+            )}
           </FormField>
           <FormField>
             <Label>Marca</Label>
-            <Controller
-              name="brand"
-              control={control}
-              rules={{ required: true }}
-              render={({ field }) => (
-                <Dropdown
-                  required
-                  name={`brand`}
-                  placeholder='Marcas'
-                  search
-                  selection
-                  minCharacters={2}
-                  noResultsMessage="Sin resultados!"
-                  options={brands}
-                  onChange={(e, { value }) => {
-                    field.onChange(value);
-                    handleBrandChange(e, { value });
-                  }}
-                />
-              )}
-            />
+            {!isUpdating ? (
+              <Controller
+                name="brand"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <Dropdown
+                    required
+                    name={`brand`}
+                    placeholder='Marcas'
+                    search
+                    selection
+                    minCharacters={2}
+                    noResultsMessage="Sin resultados!"
+                    options={brands}
+                    disabled={isUpdating}
+                    onChange={(e, { value }) => {
+                      field.onChange(value);
+                      handleBrandChange(e, { value });
+                    }}
+                  />
+                )}
+              />
+            ): (
+              <Segment>{product?.brand}</Segment>
+            )}
           </FormField>
         </FieldsContainer>
         {customField && <CodeInput
@@ -157,7 +166,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
               name="supplierCode"
               control={control}
               render={({ field }) => (
-                <Input  {...field} placeholder="Código proveedor" disabled={isUpdating} />
+                <Input  {...field} placeholder="Código proveedor" />
               )}
             />
           </FormField>
@@ -203,7 +212,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
         </FieldsContainer>
         <ButtonsContainer>
           <Button
-            disabled={isLoading || !isDirty || !isValid}
+            disabled={isLoading || !isDirty}
             loading={isLoading}
             type="submit"
             color="green">

@@ -7,6 +7,7 @@ import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRole, useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 const CreateProduct = () => {
   useValidateToken();
@@ -19,11 +20,25 @@ const CreateProduct = () => {
     push(PAGES.NOT_FOUND.BASE)
   };
 
+  const mappedBrands = useMemo(() => brands?.map(brand => ({
+    ...brand,
+    key: brand.id,
+    value: brand.name,
+    text: brand.name,
+  })), [brands]);
+
+  const mappedSuppliers = useMemo(() => suppliers?.map(supplier => ({
+    ...supplier,
+    key: supplier.id,
+    value: supplier.name,
+    text: supplier.name,
+  })), [suppliers]);
+
   return (
     <>
       <PageHeader title="Crear Producto" />
       <Loader active={isLoadingBrands || isLoadingSuppliers}>
-        <ProductForm brands={brands} suppliers={suppliers} onSubmit={create} />
+        <ProductForm brands={mappedBrands} suppliers={mappedSuppliers} onSubmit={create} />
       </Loader>
     </>
   )

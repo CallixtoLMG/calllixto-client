@@ -39,7 +39,7 @@ const SupplierForm = ({ supplier, onSubmit }) => {
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.SUPPLIERS.BASE);
-    }, 1000);
+    }, 2000);
   };
 
   return (

@@ -70,7 +70,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user }) => {
     onSubmit(data);
     setTimeout(() => {
       push(PAGES.BUDGETS.BASE);
-    }, 500);
+    }, 2000);
   };
 
   return (
