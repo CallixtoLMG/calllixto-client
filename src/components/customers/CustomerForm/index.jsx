@@ -30,7 +30,6 @@ const CustomerForm = ({ customer, onSubmit }) => {
         icon: isUpdating ? 'undo' : 'erase',
         title: isUpdating ? 'Restaurar' : 'Limpiar'
       }
-
     }
   }, [customer, handleReset, isUpdating]);
 

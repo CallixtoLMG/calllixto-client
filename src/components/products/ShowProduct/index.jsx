@@ -3,7 +3,8 @@ import { GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
 import { formatedPrice } from "@/utils";
 import { Popup } from 'semantic-ui-react';
-import { ButtonsContainer, Container, DataContainer, Label, Segment, SubContainer } from "./styles";
+import { ButtonsContainer, Container, DataContainer, Label, SubContainer } from "./styles";
+import { Segment } from "@/components/common/forms";
 
 const ShowProduct = ({ product }) => {
   return (

@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Header as SHeader, Image as SImage, Label as SLabel, Segment as SSegment, Table } from "semantic-ui-react";
+import { Header as SHeader, Image as SImage, Label as SLabel, Segment as SSegment } from "semantic-ui-react";
 import styled from "styled-components";
 
 const CustomerDataContainer = styled(Flex)`

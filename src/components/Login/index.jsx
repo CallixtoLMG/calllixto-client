@@ -5,9 +5,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Form, Segment } from "semantic-ui-react";
+import { Form } from "semantic-ui-react";
 import { Loader } from "@/components/layout";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "./styled";
+import { Segment } from "@/components/common/forms";
 
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();

@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Form, Button as SButton, Dropdown as SDropdown, Input as SInput, Table, Label as SLabel, Segment as SSegment } from 'semantic-ui-react';
+import { Form, Button as SButton, Dropdown as SDropdown, Input as SInput, Table, Label as SLabel } from 'semantic-ui-react';
 import styled from 'styled-components';
 
 const Input = styled(SInput)`
@@ -77,12 +77,5 @@ const Label = styled(SLabel)`
   margin: 0!important;
 `;
 
-const Segment = styled(SSegment)`
-  margin: 5px 0!important;
-  height: 40px!important;
-  font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
-  padding: 10px !important;
-`;
-
-export { Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage, FieldsContainer, FormField, Label, Segment };
+export { Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage, FieldsContainer, FormField, Label };
 

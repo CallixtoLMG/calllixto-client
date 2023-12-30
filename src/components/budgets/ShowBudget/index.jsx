@@ -8,13 +8,13 @@ import { Table } from "@/components/common/table";
 import {
   DataContainer,
   Button,
-  Segment,
   SubContainer,
 } from "./styles";
 import { Flex } from "rebass";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import PDFFile from "../PDFfile";
 import { getTotalSum, formatedPrice } from "@/utils";
+import { Segment } from "@/components/common/forms";
 
 const ShowBudget = ({ budget }) => {
   return (

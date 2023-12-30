@@ -1,11 +1,12 @@
 "use client";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
-import { Button, ButtonsContainer, CodeInput, Dropdown, FieldsContainer, FormContainer, FormField, Input, Label, Textarea, Segment } from "./styles";
+import { Button, ButtonsContainer, CodeInput, Dropdown, FieldsContainer, FormContainer, FormField, Input, Label, Textarea } from "./styles";
+import { Segment } from "@/components/common/forms";
 
 const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
   const { push } = useRouter();
@@ -19,16 +20,23 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [selectedBrand, setSelectedBrand] = useState(null);
 
+  const handleReset = useCallback((product) => {
+    reset(product || { name: '', price: '', code: '', comments: "" });
+  }, [reset]);
+
   const buttonConfig = useMemo(() => {
     return {
-      icon: isUpdating ? "edit" : "add",
-      title: isUpdating ? "Actualizar" : "Crear",
+      submit: {
+        icon: isUpdating ? "edit" : "add",
+        title: isUpdating ? "Actualizar" : "Crear",
+      },
+      restore: {
+        onClick: () => handleReset(isUpdating ? product : null),
+        icon: isUpdating ? 'undo' : 'erase',
+        title: isUpdating ? 'Restaurar' : 'Limpiar'
+      }
     }
-  }, [isUpdating]);
-
-  const handleReset = (product) => {
-    reset(product || { name: '', price: '', code: '', comments: "" });
-  };
+  }, [product, handleReset, isUpdating]);
 
   const handleSupplierChange = (e, { value }) => {
     setValue(`supplier`, value);
@@ -129,7 +137,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
                   />
                 )}
               />
-            ): (
+            ) : (
               <Segment>{product?.brand}</Segment>
             )}
           </FormField>
@@ -144,21 +152,25 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
         <FieldsContainer>
           <FormField>
             <Label >Código</Label>
-            <Controller
-              name="code"
-              control={control}
-              rules={{ required: true, validate: validateCode }}
-              render={({ field }) => (
-                <>
-                  <Input paddingLeft={customField} required {...field}
-                    maxLength={3}
-                    placeholder="Código (A12)"
-                    onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                    disabled={isUpdating}
-                  ></Input>
-                </>
-              )}
-            />
+            {!isUpdating ? (
+              <Controller
+                name="code"
+                control={control}
+                rules={{ required: true, validate: validateCode }}
+                render={({ field }) => (
+                  <>
+                    <Input paddingLeft={customField} required {...field}
+                      maxLength={3}
+                      placeholder="Código (A12)"
+                      onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                      disabled={isUpdating}
+                    ></Input>
+                  </>
+                )}
+              />
+            ) : (
+              <Segment>{product?.code}</Segment>
+            )}
           </FormField>
           <FormField>
             <Label >Código del proveedor</Label>
@@ -216,16 +228,10 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
             loading={isLoading}
             type="submit"
             color="green">
-            <Icon name={buttonConfig.icon} />{buttonConfig.title}</Button>
-          {isUpdating ? (
-            <Button type="button" onClick={() => handleReset(product)} color="brown" $marginLeft disabled={isLoading || !isDirty}>
-              <Icon name="undo" />Restaurar
-            </Button>
-          ) : (
-            <Button type="button" onClick={() => handleReset()} color="brown" $marginLeft disabled={isLoading || !isDirty}>
-              <Icon name="erase" />Limpiar
-            </Button>
-          )}
+            <Icon name={buttonConfig.submit.icon} />{buttonConfig.submit.title}</Button>
+          <Button type="button" onClick={buttonConfig.restore.onClick} color="brown" disabled={isLoading || !isDirty}>
+            <Icon name={buttonConfig.restore.icon} />{buttonConfig.restore.title}
+          </Button>
         </ButtonsContainer>
       </FormContainer>
     </Form>
