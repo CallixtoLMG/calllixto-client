@@ -84,13 +84,6 @@ const FormField = styled(Form.Field)`
   flex-direction: column;
 `;
 
-const FieldsContainer = styled(Flex)`
-  justify-content: ${(props) => props.jContent || "normal"};
-  flex-wrap: wrap;
-  column-gap: 20px;
-  max-width: 900px;
-`;
-
 const Textarea = styled(STextArea)`
   margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
@@ -102,5 +95,5 @@ const ButtonsContainer = styled(Flex)`
   column-gap: 20px;
 `;
 
-export { Button, ButtonsContainer, CodeInput, Dropdown, FieldsContainer, FormField, Input, Label, MaskedInput, Textarea, WarningMessage };
+export { Button, ButtonsContainer, CodeInput, Dropdown, FormField, Input, Label, MaskedInput, Textarea, WarningMessage };
 

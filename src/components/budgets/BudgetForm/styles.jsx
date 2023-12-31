@@ -29,11 +29,6 @@ const Dropdown = styled(SDropdown)`
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15) !important;
 `;
 
-const FieldsContainer = styled(Flex)`
-  column-gap: 20px;
-  width: 100%;
-`;
-
 const FormField = styled(Form.Field)`
   width: ${({ width }) => width || '300px'} !important;
   min-width: 200px !important;
@@ -77,5 +72,5 @@ const Label = styled(SLabel)`
   margin: 0!important;
 `;
 
-export { Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage, FieldsContainer, FormField, Label };
+export { Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage, FormField, Label };
 

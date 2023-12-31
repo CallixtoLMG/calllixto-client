@@ -54,14 +54,6 @@ const Button = styled(SButton)`
   margin: ${(props => props.$marginLeft ? "0 0 0 10px!important" : "0!important")};
 `;
 
-const FieldsContainer = styled(Flex)`
-  justify-content: ${(props) => props.jContent || "normal"};
-  flex-wrap: wrap;
-  column-gap: 20px;
-  max-width: 900px;
-  justify-content: space-between;
-`;
-
 const ButtonsContainer = styled(Flex)`
   align-self: flex-end;
   column-gap: 20px;
@@ -71,5 +63,5 @@ const PhoneContainer = styled(Flex)`
   column-gap: 10px;
 `;
 
-export { Button, ButtonsContainer, FieldsContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea };
+export { Button, ButtonsContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea };
 
