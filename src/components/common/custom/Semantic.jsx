@@ -1,4 +1,11 @@
-import { Form, Segment as SSegment, Input as SInput, Label as SLabel, TextArea as STextarea } from "semantic-ui-react";
+import {
+  Form,
+  Segment as SSegment,
+  Input as SInput,
+  Label as SLabel,
+  TextArea as STextarea,
+  Dropdown as SDropdown
+} from "semantic-ui-react";
 import styled from "styled-components";
 
 export const Segment = styled(SSegment)`
@@ -32,4 +39,20 @@ export const TextArea = styled(STextarea)`
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   resize: ${({ readonly }) => readonly && 'none'} !important;
+`;
+
+export const Dropdown = styled(SDropdown)`
+  margin: 5px 0 !important;
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
+  border-radius: 0.28571429rem!important;
+  height: 50px!important;
+  display: flex!important;
+  flex-wrap: wrap;
+  align-content: center;
+  input {
+    height: 50px!important;
+  };
+  i.dropdown.icon {
+    top:15px!important;
+};
 `;

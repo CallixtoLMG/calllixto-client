@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
-import { CodeInput, Dropdown } from "./styles";
-import { Segment, Form, FieldsContainer, FormField, Input, Label, TextArea } from "@/components/common/custom";
+import { CodeInput } from "./styles";
+import { Segment, Form, FieldsContainer, FormField, Input, Label, TextArea, Dropdown } from "@/components/common/custom";
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { formatedPrice } from "@/utils";
 

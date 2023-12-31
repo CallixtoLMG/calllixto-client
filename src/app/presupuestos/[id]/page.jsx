@@ -1,14 +1,15 @@
 "use client";
 import { useGetBudget } from "@/api/budgets";
-import ShowBudget from "@/components/budgets/ShowBudget";
+import BudgetForm from "@/components/budgets/BudgetForm";
 import { PageHeader, Loader, NoPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
-import { useValidateToken } from "@/hooks/userData";
+import { useUserData, useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 
 const Budget = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
+  const user = useUserData();
   const { budget, isLoading } = useGetBudget(params.id);
 
   if (!isLoading && !budget) {
@@ -22,7 +23,7 @@ const Budget = ({ params }) => {
         <PageHeader title="Presupuesto" />
       </NoPrint>
       <Loader active={isLoading}>
-        <ShowBudget budget={budget} />
+        <BudgetForm readonly user={user} budget={budget} />
       </Loader>
     </>
   )

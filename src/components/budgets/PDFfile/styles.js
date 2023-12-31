@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Header as SHeader, Image as SImage, Segment as SSegment } from "semantic-ui-react";
+import { Label, Header as SHeader, Image as SImage, Segment as SSegment } from "semantic-ui-react";
 import styled from "styled-components";
 
 const CustomerDataContainer = styled(Flex)`
@@ -50,7 +50,7 @@ const Sign = styled.div`
   margin-top: 70px;
 `;
 
-const SubtleLabel = styled(SLabel)`
+const SubtleLabel = styled(Label)`
   background-color: white !important;
   border: 0.5px solid grey !important;
 `;
