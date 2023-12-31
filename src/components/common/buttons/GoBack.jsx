@@ -1,8 +1,17 @@
 import { NoPrint } from "@/components/layout";
 import { PAGES } from '@/constants';
 import { usePathname, useRouter } from 'next/navigation';
-import { Icon } from 'semantic-ui-react';
-import { ModButton } from "./styles";
+import { Icon, Button as SButton } from 'semantic-ui-react';
+import styled from "styled-components";
+
+const Button = styled(SButton)`
+  position: fixed!important;
+  top: 85px!important;
+  left: 25px!important;
+  padding: 10px 15px!important;
+  display: inline-block!important;
+  z-index: 2!important;
+`;
 
 const GoBack = () => {
   const { back } = useRouter();
@@ -14,7 +23,7 @@ const GoBack = () => {
   };
   return (
     <NoPrint>
-      {show && <ModButton onClick={handleClick} color="teal"><Icon name='chevron left' />  Atrás</ModButton>}
+      {show && <Button onClick={handleClick} color="teal"><Icon name='chevron left' />Atrás</Button>}
     </NoPrint>
   );
 };

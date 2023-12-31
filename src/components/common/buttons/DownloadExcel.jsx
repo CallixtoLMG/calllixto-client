@@ -1,6 +1,13 @@
-import { Icon } from "semantic-ui-react";
+import { Icon, Button as SButton } from "semantic-ui-react";
+import styled from "styled-components";
 import * as XLSX from 'xlsx';
-import { ModButton } from "./styles";
+
+const Button = styled(SButton)`
+  min-width: 170px!important;
+  padding: 10px 0!important;
+  max-height: 34px!important;
+  margin-left: 10px!important;
+`;
 
 const ButtonDownload = () => {
   const handleDownload = () => {
@@ -16,9 +23,8 @@ const ButtonDownload = () => {
     XLSX.writeFile(wb, 'Ejemplo de Tabla.xlsx');
   };
   return (
-    <ModButton onClick={handleDownload} color='blue'><Icon name="download" />Descargar plantilla</ModButton>
+    <Button onClick={handleDownload} color='blue'><Icon name="download" />Descargar plantilla</Button>
   )
 };
 
 export default ButtonDownload;
-

@@ -3,28 +3,28 @@ const PAGES = {
   CUSTOMERS: {
     BASE: "/clientes",
     CREATE: "/clientes/crear",
-    UPDATE: (code) => `/clientes/${code}/editar`,
+    UPDATE: (code) => `/clientes/${code}?update=true`,
     SHOW: (id) => `/clientes/${id}`,
     NAME: 'Clientes'
   },
   SUPPLIERS: {
     BASE: "/proveedores",
     CREATE: "/proveedores/crear",
-    UPDATE: (id) => `/proveedores/${id}/editar`,
+    UPDATE: (id) => `/proveedores/${id}?update=true`,
     SHOW: (id) => `/proveedores/${id}`,
     NAME: 'Proveedores'
   },
   BRANDS: {
     BASE: "/marcas",
     CREATE: "/marcas/crear",
-    UPDATE: (id) => `/marcas/${id}/editar`,
+    UPDATE: (id) => `/marcas/${id}?update=true`,
     SHOW: (id) => `/marcas/${id}`,
     NAME: 'Marcas'
   },
   PRODUCTS: {
     BASE: "/productos",
     CREATE: "/productos/crear",
-    UPDATE: (code) => `/productos/${code}/editar`,
+    UPDATE: (code) => `/productos/${code}?update=true`,
     SHOW: (code) => `/productos/${code}`,
     NAME: 'Productos'
   },
@@ -53,7 +53,29 @@ const REGEX = {
   TWO_DIGIT_CODE: /^[A-Z0-9]{2}$/
 }
 
-export {
-  APIS, PAGES, REGEX
-};
+const RULES = {
+  REQUIRED: {
+    required: 'Campo requerido'
+  },
+  REQUIRED_TWO_DIGIT: {
+    required: 'Campo requerido',
+    pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
+  },
+  PHONE: {
+    AREA_CODE: {
+      minLength: { value: 3, message: 'El código de área debe tener 3 o 4 cifras' },
+      maxLength: { value: 4, message: 'El código de área debe tener 3 o 4 cifras' },
+    },
+    NUMBER: {
+      minLength: { value: 6, message: 'El número debe tener 6 o 7 cifras' },
+      maxLength: { value: 7, message: 'El número debe tener 6 o 7 cifras' },
+    }
+  },
+  EMAIL: {
+    pattern: { value: REGEX.EMAIL, message: 'El email no es válido' }
+  },
+}
 
+export {
+  APIS, PAGES, REGEX, RULES
+};

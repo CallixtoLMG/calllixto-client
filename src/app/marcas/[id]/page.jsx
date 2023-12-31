@@ -1,15 +1,17 @@
 "use client";
-import { useGetBrand } from "@/api/brands";
+import { edit, useGetBrand } from "@/api/brands";
 import { PageHeader, Loader } from "@/components/layout";
-import ShowBrand from "@/components/brands/ShowBrand";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useValidateToken } from "@/hooks/userData";
+import BrandForm from "@/components/brands/BrandForm";
+import { useAllowUpdate } from "@/hooks/allowUpdate";
 
 const Brand = ({ params }) => {
   useValidateToken();
   const { brand, isLoading } = useGetBrand(params.id);
   const { push } = useRouter();
+  const [allowUpdate, Toggle] = useAllowUpdate();
 
   if (!isLoading && !brand) {
     push(PAGES.NOT_FOUND.BASE);
@@ -20,7 +22,8 @@ const Brand = ({ params }) => {
     <>
       <PageHeader title="Marca" />
       <Loader active={isLoading}>
-        <ShowBrand brand={brand} />
+        {Toggle}
+        <BrandForm brand={brand} onSubmit={edit} readonly={!allowUpdate} />
       </Loader>
     </>
   )

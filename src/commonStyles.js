@@ -16,4 +16,3 @@ const SubContainer = styled(Flex)`
 export {
   MainContainer, SubContainer
 };
-
