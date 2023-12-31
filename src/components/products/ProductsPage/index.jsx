@@ -7,7 +7,7 @@ import { Rules } from "@/visibilityRules";
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from "react";
 import { Flex } from "rebass";
-import ImportExcel from "../ImportProduct";
+import ImportProducts from "../ImportProduct";
 import { PRODUCT_COLUMNS } from "../products.common";
 import { ButtonContainer } from "./styles";
 
@@ -56,7 +56,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
         <ButtonContainer>
           <GoToButton goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
           <Flex margin-left="auto">
-            <ImportExcel products={products} createBatch={createBatch} editBatch={editBatch} />
+            <ImportProducts products={products} createBatch={createBatch} editBatch={editBatch} />
             <DownloadExcelButton />
           </Flex>
         </ButtonContainer>}

@@ -1,15 +1,17 @@
 "use client";
-import { useGetProduct } from "@/api/products";
+import { edit, useGetProduct } from "@/api/products";
 import { PageHeader, Loader } from "@/components/layout";
-import ShowProduct from "@/components/products/ShowProduct";
+import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useValidateToken } from "@/hooks/userData";
+import { useAllowUpdate } from "@/hooks/allowUpdate";
 
 const Product = ({ params }) => {
   useValidateToken();
-  const { product, isLoading } = useGetProduct(params.code);
   const { push } = useRouter();
+  const { product, isLoading } = useGetProduct(params.code);
+  const [allowUpdate, Toggle] = useAllowUpdate();
 
   if (!isLoading && !product) {
     push(PAGES.NOT_FOUND.BASE);
@@ -20,7 +22,8 @@ const Product = ({ params }) => {
     <>
       <PageHeader title="Producto" />
       <Loader active={isLoading}>
-        <ShowProduct product={product} />
+        {Toggle}
+        <ProductForm product={product} onSubmit={edit} readonly={!allowUpdate} />
       </Loader>
     </>
   )

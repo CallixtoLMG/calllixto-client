@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Flex } from "rebass";
-import { Container, Table } from "semantic-ui-react";
+import { Container, Label, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ContainerModal = styled(Flex)`

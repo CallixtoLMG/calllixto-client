@@ -1,19 +1,20 @@
 "use client";
-import { PAGES } from "@/constants";
+import { PAGES, RULES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
-import { Form, Icon } from "semantic-ui-react";
-import { Button, ButtonsContainer, CodeInput, Dropdown, Textarea } from "./styles";
-import { Segment, FormContainer, FieldsContainer, FormField, Input, Label } from "@/components/common/custom";
+import { CodeInput, Dropdown } from "./styles";
+import { Segment, Form, FieldsContainer, FormField, Input, Label, TextArea } from "@/components/common/custom";
+import { SubmitAndRestore } from "@/components/common/buttons";
+import { formatedPrice } from "@/utils";
 
-const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
+const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '' };
+
+const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
   const { push } = useRouter();
   const { handleSubmit, setValue, control, reset, formState: { isDirty } } = useForm({ defaultValues: product });
-  const validateCode = (value) => {
-    return /^[A-Z0-9]{3}$/.test(value);
-  };
+
   const isUpdating = useMemo(() => !!product?.code, [product]);
   const [isLoading, setIsLoading] = useState(false);
   const [customField, setCustomField] = useState('');
@@ -21,22 +22,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
   const [selectedBrand, setSelectedBrand] = useState(null);
 
   const handleReset = useCallback((product) => {
-    reset(product || { name: '', price: '', code: '', comments: "" });
+    reset(product || EMPTY_PRODUCT);
   }, [reset]);
-
-  const buttonConfig = useMemo(() => {
-    return {
-      submit: {
-        icon: isUpdating ? "edit" : "add",
-        title: isUpdating ? "Actualizar" : "Crear",
-      },
-      restore: {
-        onClick: () => handleReset(isUpdating ? product : null),
-        icon: isUpdating ? 'undo' : 'erase',
-        title: isUpdating ? 'Restaurar' : 'Limpiar'
-      }
-    }
-  }, [product, handleReset, isUpdating]);
 
   const handleSupplierChange = (e, { value }) => {
     setValue(`supplier`, value);
@@ -83,97 +70,99 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
 
   return (
     <Form onSubmit={handleSubmit(handleForm)}>
-      <FormContainer>
-        <FieldsContainer>
-          <FormField>
-            <Label>Proveedor</Label>
-            {!isUpdating ? (
-              <Controller
-                name="supplier"
-                control={control}
-                render={({ field }) => (
-                  <Dropdown
-                    required
-                    name={`supplier`}
-                    placeholder='Proveedores'
-                    search
-                    selection
-                    minCharacters={2}
-                    noResultsMessage="Sin resultados!"
-                    options={suppliers}
-                    onChange={(e, { value }) => {
-                      field.onChange(value);
-                      handleSupplierChange(e, { value });
-                    }}
-                  />
-                )}
-              />
-            ) : (
-              <Segment>{product?.supplier}</Segment>
-            )}
-          </FormField>
-          <FormField>
-            <Label>Marca</Label>
-            {!isUpdating ? (
-              <Controller
-                name="brand"
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <Dropdown
-                    required
-                    name={`brand`}
-                    placeholder='Marcas'
-                    search
-                    selection
-                    minCharacters={2}
-                    noResultsMessage="Sin resultados!"
-                    options={brands}
-                    disabled={isUpdating}
-                    onChange={(e, { value }) => {
-                      field.onChange(value);
-                      handleBrandChange(e, { value });
-                    }}
-                  />
-                )}
-              />
-            ) : (
-              <Segment>{product?.brand}</Segment>
-            )}
-          </FormField>
-        </FieldsContainer>
-        {customField && <CodeInput
+      <FieldsContainer>
+        <FormField>
+          <Label>Proveedor</Label>
+          {!readonly && !isUpdating ? (
+            <Controller
+              name="supplier"
+              control={control}
+              render={({ field }) => (
+                <Dropdown
+                  required
+                  name={`supplier`}
+                  placeholder='Proveedores'
+                  search
+                  selection
+                  minCharacters={2}
+                  noResultsMessage="Sin resultados!"
+                  options={suppliers}
+                  onChange={(e, { value }) => {
+                    field.onChange(value);
+                    handleSupplierChange(e, { value });
+                  }}
+                />
+              )}
+            />
+          ) : (
+            <Segment>{product?.supplier}</Segment>
+          )}
+        </FormField>
+        <FormField>
+          <Label>Marca</Label>
+          {!readonly && !isUpdating ? (
+            <Controller
+              name="brand"
+              control={control}
+              rules={RULES.REQUIRED}
+              render={({ field }) => (
+                <Dropdown
+                  required
+                  name={`brand`}
+                  placeholder='Marcas'
+                  search
+                  selection
+                  minCharacters={2}
+                  noResultsMessage="Sin resultados!"
+                  options={brands}
+                  disabled={isUpdating}
+                  onChange={(e, { value }) => {
+                    field.onChange(value);
+                    handleBrandChange(e, { value });
+                  }}
+                />
+              )}
+            />
+          ) : (
+            <Segment>{product?.brand}</Segment>
+          )}
+        </FormField>
+      </FieldsContainer>
+      {customField && (
+        <CodeInput
           value={customField}
           disabled
           onChange={(e) => {
             updateCustomField(selectedSupplier?.id, selectedBrand?.id);
           }}
-        />}
-        <FieldsContainer>
-          <FormField>
-            <Label >Código</Label>
-            {!isUpdating ? (
-              <Controller
-                name="code"
-                control={control}
-                rules={{ required: true, validate: validateCode }}
-                render={({ field }) => (
-                  <>
-                    <Input paddingLeft={customField} required {...field}
-                      maxLength={3}
-                      placeholder="Código (A12)"
-                      onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                      disabled={isUpdating}
-                    ></Input>
-                  </>
-                )}
-              />
-            ) : (
-              <Segment>{product?.code}</Segment>
-            )}
-          </FormField>
-          <FormField>
-            <Label >Código del proveedor</Label>
+        />
+      )}
+      <FieldsContainer>
+        <FormField>
+          <Label >Código</Label>
+          {!readonly && !isUpdating ? (
+            <Controller
+              name="code"
+              control={control}
+              rules={RULES.REQUIRED_THREE_DIGIT}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  paddingLeft={customField}
+                  maxLength={3}
+                  placeholder="Código (A12)"
+                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                  disabled={isUpdating}
+                />
+              )}
+            />
+          ) : (
+            <Segment>{product?.code}</Segment>
+          )}
+        </FormField>
+        <FormField>
+          <Label >Código del proveedor</Label>
+          {!readonly ? (
             <Controller
               name="supplierCode"
               control={control}
@@ -181,24 +170,32 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
                 <Input  {...field} placeholder="Código proveedor" />
               )}
             />
-          </FormField>
-        </FieldsContainer>
-        <FieldsContainer >
-          <FormField flex="1" >
-            <Label>Nombre</Label>
+          ) : (
+            <Segment>{product?.supplierCode}</Segment>
+          )}
+        </FormField>
+      </FieldsContainer>
+      <FieldsContainer >
+        <FormField flex="1" >
+          <Label>Nombre</Label>
+          {!readonly ? (
             <Controller
               name="name"
               control={control}
-              rules={{ required: true }}
+              rules={RULES.REQUIRED}
               render={({ field }) => <Input {...field} placeholder="Nombre" />}
             />
-          </FormField>
-          <FormField>
-            <Label>Precio</Label>
+          ) : (
+            <Segment>{product?.name}</Segment>
+          )}
+        </FormField>
+        <FormField>
+          <Label>Precio</Label>
+          {!readonly ? (
             <Controller
               name="price"
               control={control}
-              rules={{ required: true, min: 0.01 }}
+              rules={RULES.REQUIRED_PRICE}
               render={({ field }) => (
                 <CurrencyInput
                   value={field.value}
@@ -212,28 +209,34 @@ const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
                 />
               )}
             />
-          </FormField>
-        </FieldsContainer>
-        <FieldsContainer flex="1">
-          <Label >Comentarios</Label>
-          <Controller
-            name="comments"
-            control={control}
-            render={({ field }) => <Textarea maxLength="2000" {...field} placeholder="Comentarios" />}
-          />
-        </FieldsContainer>
-        <ButtonsContainer>
-          <Button
-            disabled={isLoading || !isDirty}
-            loading={isLoading}
-            type="submit"
-            color="green">
-            <Icon name={buttonConfig.submit.icon} />{buttonConfig.submit.title}</Button>
-          <Button type="button" onClick={buttonConfig.restore.onClick} color="brown" disabled={isLoading || !isDirty}>
-            <Icon name={buttonConfig.restore.icon} />{buttonConfig.restore.title}
-          </Button>
-        </ButtonsContainer>
-      </FormContainer>
+          ) : (
+            <Segment>{formatedPrice(product?.price)}</Segment>
+          )}
+        </FormField>
+      </FieldsContainer>
+      <FieldsContainer>
+        <Label >Comentarios</Label>
+        <Controller
+          name="comments"
+          control={control}
+          render={({ field }) => (
+            <TextArea
+              {...field}
+              maxLength="2000"
+              placeholder="Comentarios"
+              disabled={readonly}
+              readonly
+            />
+          )}
+        />
+      </FieldsContainer>
+      <SubmitAndRestore
+        show={!readonly}
+        isUpdating={isUpdating}
+        isLoading={isLoading}
+        isDirty={isDirty}
+        onClick={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : null)}
+      />
     </Form>
   )
 };

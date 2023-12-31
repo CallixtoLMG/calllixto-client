@@ -2,12 +2,6 @@ import InputMask from 'react-input-mask';
 import { Flex } from "rebass";
 import styled from "styled-components";
 
-const WarningMessage = styled.p`
-  position: relative;
-  color: red!important;
-  bottom: 0.5rem!important;
-`;
-
 const MaskedInput = styled(InputMask)`
   margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
@@ -26,4 +20,4 @@ const PhoneContainer = styled(Flex)`
   column-gap: 10px;
 `;
 
-export { MaskedInput, PhoneContainer, WarningMessage };
+export { MaskedInput, PhoneContainer };
