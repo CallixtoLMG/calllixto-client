@@ -1,12 +1,7 @@
 import InputMask from 'react-input-mask';
 import { Flex } from "rebass";
-import { Button as SButton, Label as SLabel, TextArea as STextArea } from "semantic-ui-react";
+import { Button as SButton, TextArea as STextArea } from "semantic-ui-react";
 import styled from "styled-components";
-
-const Label = styled(SLabel)`
-  width: 100%!important;
-  margin: 0!important;
-`;
 
 const MaskedInput = styled(InputMask)`
   margin: 5px 0 !important;
@@ -43,5 +38,5 @@ const PhoneContainer = styled(Flex)`
   column-gap: 10px;
 `;
 
-export { Button, ButtonsContainer, Label, MaskedInput, PhoneContainer, Textarea };
+export { Button, ButtonsContainer, MaskedInput, PhoneContainer, Textarea };
 

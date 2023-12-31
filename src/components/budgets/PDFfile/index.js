@@ -12,7 +12,6 @@ import {
   Header,
   HeaderContainer,
   Image,
-  Label,
   PayMethodsContainer,
   Segment,
   Sign,
@@ -20,6 +19,7 @@ import {
   Title
 } from "./styles";
 import { formatedPrice, getTotalSum } from "@/utils";
+import { Label } from "@/components/common/custom";
 
 const PDFfile = ({ budget, seller }) => {
   return (

@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Form, Button as SButton, Label as SLabel, TextArea as STextArea } from "semantic-ui-react";
+import { Form, Button as SButton, TextArea as STextArea } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Button = styled(SButton)`
@@ -7,11 +7,6 @@ const Button = styled(SButton)`
   padding: 10px 0!important;
   margin: ${(props => props.$marginLeft ? "0 0 0 10px!important" : "0!important")};
 `;
-
-const Label = styled(SLabel)({
-  width: "100%!important",
-  margin: "0!important",
-});
 
 const Textarea = styled(STextArea)`
   margin: 5px 0 !important;
@@ -24,4 +19,4 @@ const ButtonsContainer = styled(Flex)`
   column-gap: 20px;
 `;
 
-export { Button, ButtonsContainer, Label, Textarea };
+export { Button, ButtonsContainer, Textarea };

@@ -1,7 +1,7 @@
 "use client";
 import { SendButton } from "@/components/common/buttons";
 import { get } from "lodash";
-import { Icon, Label } from "semantic-ui-react";
+import { Icon } from "semantic-ui-react";
 import { formatedDate, formatedPhone } from "@/utils";
 import { PRODUCTS_COLUMNS } from "../budgets.common";
 import { Table } from "@/components/common/table";
@@ -14,7 +14,7 @@ import { Flex } from "rebass";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import PDFFile from "../PDFfile";
 import { getTotalSum, formatedPrice } from "@/utils";
-import { Segment } from "@/components/common/custom";
+import { Segment, Label } from "@/components/common/custom";
 
 const ShowBudget = ({ budget }) => {
   return (

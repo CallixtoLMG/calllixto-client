@@ -1,10 +1,5 @@
 import { Flex } from "rebass";
-import { Label as SLabel } from "semantic-ui-react";
 import styled from "styled-components";
-
-const Label = styled(SLabel)`
-  width: 100%!important;
-`;
 
 const SubContainer = styled(Flex)`
   justify-content: ${(props) => props.jContent || "normal"};
@@ -30,5 +25,5 @@ const DataContainer = styled(Flex)`
   flex-direction: column;
 `;
 
-export { ButtonsContainer, Container, DataContainer, Label, SubContainer };
+export { ButtonsContainer, Container, DataContainer, SubContainer };
 

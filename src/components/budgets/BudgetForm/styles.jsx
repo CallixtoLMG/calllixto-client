@@ -1,4 +1,4 @@
-import { Button as SButton, Dropdown as SDropdown, Table, Label as SLabel } from 'semantic-ui-react';
+import { Button as SButton, Dropdown as SDropdown, Table } from 'semantic-ui-react';
 import styled from 'styled-components';
 
 const Button = styled(SButton)({
@@ -49,10 +49,5 @@ const WarningMessage = styled.p`
   color: red;
 `;
 
-const Label = styled(SLabel)`
-  width: 100% !important;
-  margin: 0!important;
-`;
-
-export { Button, Dropdown, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage, Label };
+export { Button, Dropdown, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage };
 

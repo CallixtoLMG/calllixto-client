@@ -1,6 +1,6 @@
 import InputMask from 'react-input-mask';
 import { Flex } from "rebass";
-import { Button as SButton, Label as SLabel, TextArea as STextArea } from "semantic-ui-react";
+import { Button as SButton, TextArea as STextArea } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Button = styled(SButton)`
@@ -8,11 +8,6 @@ const Button = styled(SButton)`
   padding: 10px 0!important;
   margin: ${(props => props.$marginLeft ? "0 0 0 10px!important" : "0!important")};
 `;
-
-const Label = styled(SLabel)({
-  width: "100%!important",
-  margin: "0!important",
-});
 
 const WarningMessage = styled.p`
   position: relative;
@@ -49,5 +44,5 @@ const PhoneContainer = styled(Flex)`
   column-gap: 10px;
 `;
 
-export { Button, ButtonsContainer, Label, MaskedInput, PhoneContainer, Textarea, WarningMessage };
+export { Button, ButtonsContainer, MaskedInput, PhoneContainer, Textarea, WarningMessage };
 

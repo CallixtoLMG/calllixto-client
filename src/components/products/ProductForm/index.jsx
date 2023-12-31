@@ -5,8 +5,8 @@ import { useCallback, useMemo, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
-import { Button, ButtonsContainer, CodeInput, Dropdown, Label, Textarea } from "./styles";
-import { Segment, FormContainer, FieldsContainer, FormField, Input } from "@/components/common/custom";
+import { Button, ButtonsContainer, CodeInput, Dropdown, Textarea } from "./styles";
+import { Segment, FormContainer, FieldsContainer, FormField, Input, Label } from "@/components/common/custom";
 
 const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
   const { push } = useRouter();

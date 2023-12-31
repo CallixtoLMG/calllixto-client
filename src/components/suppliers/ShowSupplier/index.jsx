@@ -3,8 +3,8 @@ import { GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
 import { formatedPhone } from "@/utils";
 import { Popup } from 'semantic-ui-react';
-import { ButtonsContainer, Container, DataContainer, Label, SubContainer } from "./styles";
-import { Segment } from "@/components/common/custom";
+import { ButtonsContainer, Container, DataContainer, SubContainer } from "./styles";
+import { Segment, Label } from "@/components/common/custom";
 
 const ShowSupplier = ({ supplier }) => {
   return (

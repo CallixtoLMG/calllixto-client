@@ -5,8 +5,8 @@ import { Controller, useForm } from "react-hook-form";
 import { Button, Form, Icon, Modal, Segment, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { PRODUCT_COLUMNS } from "../products.common";
-import { ContainerModal, DataNotFoundContainer, ModLabel, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
-import { Input } from "@/components/common/custom";
+import { ContainerModal, DataNotFoundContainer, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
+import { Input, Label } from "@/components/common/custom";
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
   const { handleSubmit, control, reset, setValue, watch } = useForm();
@@ -116,7 +116,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
 
   return (
     <>
-      <ModLabel as="label" htmlFor="file" >
+      <Label as="label" htmlFor="file" >
         <Button as="span" color="blue">
           <Icon name="upload" />
           Importar
@@ -128,7 +128,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
           style={{ display: 'none' }}
           onChange={handleFileUpload}
         />
-      </ModLabel>
+      </Label>
       <Transition animation="fade" duration={500} visible={open} >
         <Modal
           closeIcon

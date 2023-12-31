@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Flex } from "rebass";
-import { Container, Label, Table } from "semantic-ui-react";
+import { Container, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ContainerModal = styled(Flex)`
@@ -53,14 +53,6 @@ const ModalModLabel = styled(Label)({
   display: "block!important"
 });
 
-const ModLabel = styled(Label)`
-  > span {
-    width: 170px!important;
-    padding: 10px 0!important;
-    margin-left: 10px!important;
-  };
-`;
-
 const ModalHeaderContainer = styled(Container)`
   margin: 0 0 14px 0 !important;
   margin-left: 0!important;
@@ -84,6 +76,6 @@ const ModTableCell = styled(Table.Cell)({
   textAlign: 'center!important'
 });
 
-export { ContainerModal, DataNotFoundContainer, ModLabel, ModLink, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage };
+export { ContainerModal, DataNotFoundContainer, ModLink, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage };
 
 
