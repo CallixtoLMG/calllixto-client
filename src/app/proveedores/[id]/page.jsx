@@ -1,15 +1,17 @@
 "use client";
 import { PageHeader, Loader } from "@/components/layout";
-import ShowSupplier from "@/components/suppliers/ShowSupplier";
+import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { useGetSupplier } from "@/api/suppliers";
+import { edit, useGetSupplier } from "@/api/suppliers";
 import { useValidateToken } from "@/hooks/userData";
+import { useAllowUpdate } from "@/hooks/allowUpdate";
 
 const Supplier = ({ params }) => {
   useValidateToken();
-  const { supplier, isLoading } = useGetSupplier(params.id);
   const { push } = useRouter();
+  const { supplier, isLoading } = useGetSupplier(params.id);
+  const [allowUpdate, Toggle] = useAllowUpdate();
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);
@@ -20,7 +22,8 @@ const Supplier = ({ params }) => {
     <>
       <PageHeader title="Proveedor" />
       <Loader active={isLoading}>
-        <ShowSupplier supplier={supplier} />
+        {Toggle}
+        <SupplierForm supplier={supplier} onSubmit={edit} readonly={!allowUpdate} />
       </Loader>
     </>
   )

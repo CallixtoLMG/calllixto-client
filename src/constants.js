@@ -67,8 +67,8 @@ const RULES = {
       maxLength: { value: 4, message: 'El código de área debe tener 3 o 4 cifras' },
     },
     NUMBER: {
-      minLength: { value: 6, message: 'El número debe tener 6 o 7 cifras' },
-      maxLength: { value: 7, message: 'El número debe tener 6 o 7 cifras' },
+      minLength: { value: 6, message: 'El número completo debe tener 10 cifras' },
+      maxLength: { value: 7, message: 'El número completo debe tener 10 cifras' },
     }
   },
   EMAIL: {

@@ -9,8 +9,8 @@ import { useAllowUpdate } from "@/hooks/allowUpdate";
 
 const Brand = ({ params }) => {
   useValidateToken();
-  const { brand, isLoading } = useGetBrand(params.id);
   const { push } = useRouter();
+  const { brand, isLoading } = useGetBrand(params.id);
   const [allowUpdate, Toggle] = useAllowUpdate();
 
   if (!isLoading && !brand) {

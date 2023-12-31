@@ -78,7 +78,7 @@ const CustomerForm = ({ customer, onSubmit, readonly }) => {
                       mask="99999999"
                       maskChar={null}
                       {...field}
-                      placeholder="Numero"
+                      placeholder="Número"
                     />}
                 />
               </Box>
