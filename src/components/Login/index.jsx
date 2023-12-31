@@ -8,7 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import { Loader } from "@/components/layout";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "./styled";
-import { Segment } from "@/components/common/forms";
+import { Segment } from "@/components/common/custom";
 
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();

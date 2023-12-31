@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { List } from 'semantic-ui-react';
 import { ModContainer } from "./styles";
-import { Segment } from "@/components/common/forms";
+import { Segment } from "@/components/common/custom";
 
 const Footer = () => {
   const pathname = usePathname();

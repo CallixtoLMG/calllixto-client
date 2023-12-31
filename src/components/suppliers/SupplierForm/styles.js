@@ -9,11 +9,6 @@ const Button = styled(SButton)`
   margin: ${(props => props.$marginLeft ? "0 0 0 10px!important" : "0!important")};
 `;
 
-const FormContainer = styled(Flex)`
-  flex-direction: column;
-  row-gap: 15px;
-`;
-
 const Label = styled(SLabel)({
   width: "100%!important",
   margin: "0!important",
@@ -76,5 +71,5 @@ const PhoneContainer = styled(Flex)`
   column-gap: 10px;
 `;
 
-export { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea, WarningMessage };
+export { Button, ButtonsContainer, FieldsContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea, WarningMessage };
 

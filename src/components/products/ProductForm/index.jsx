@@ -5,12 +5,12 @@ import { useCallback, useMemo, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
-import { Button, ButtonsContainer, CodeInput, Dropdown, FieldsContainer, FormContainer, FormField, Input, Label, Textarea } from "./styles";
-import { Segment } from "@/components/common/forms";
+import { Button, ButtonsContainer, CodeInput, Dropdown, FieldsContainer, FormField, Input, Label, Textarea } from "./styles";
+import { Segment, FormContainer } from "@/components/common/custom";
 
 const ProductForm = ({ product, onSubmit, brands, suppliers }) => {
   const { push } = useRouter();
-  const { handleSubmit, setValue, control, reset, formState: { isValid, isDirty } } = useForm({ defaultValues: product });
+  const { handleSubmit, setValue, control, reset, formState: { isDirty } } = useForm({ defaultValues: product });
   const validateCode = (value) => {
     return /^[A-Z0-9]{3}$/.test(value);
   };

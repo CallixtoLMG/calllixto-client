@@ -14,7 +14,7 @@ import { Flex } from "rebass";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import PDFFile from "../PDFfile";
 import { getTotalSum, formatedPrice } from "@/utils";
-import { Segment } from "@/components/common/forms";
+import { Segment } from "@/components/common/custom";
 
 const ShowBudget = ({ budget }) => {
   return (

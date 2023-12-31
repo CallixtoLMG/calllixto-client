@@ -39,11 +39,6 @@ const MaskedInput = styled(InputMask)`
   };
 `;
 
-const FormContainer = styled(Flex)`
-  flex-direction: column;
-  row-gap: 15px;
-`;
-
 const Label = styled(SLabel)({
   width: "100%!important",
   margin: "0!important",
@@ -107,5 +102,5 @@ const ButtonsContainer = styled(Flex)`
   column-gap: 20px;
 `;
 
-export { Button, ButtonsContainer, CodeInput, Dropdown, FieldsContainer, FormContainer, FormField, Input, Label, MaskedInput, Textarea, WarningMessage };
+export { Button, ButtonsContainer, CodeInput, Dropdown, FieldsContainer, FormField, Input, Label, MaskedInput, Textarea, WarningMessage };
 

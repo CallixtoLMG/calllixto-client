@@ -7,7 +7,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Form, Icon, Popup, Button as SButton, Dropdown as SDropdown, Table } from "semantic-ui-react";
 import { Button, Input, Cell, Dropdown, FieldsContainer, FormField, HeaderCell, TotalText, WarningMessage, Label } from "./styles";
 import { Flex, Box } from "rebass";
-import { Segment } from "@/components/common/forms";
+import { Segment } from "@/components/common/custom";
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user }) => {
   const { push } = useRouter();

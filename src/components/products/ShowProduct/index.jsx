@@ -4,7 +4,7 @@ import { PAGES } from "@/constants";
 import { formatedPrice } from "@/utils";
 import { Popup } from 'semantic-ui-react';
 import { ButtonsContainer, Container, DataContainer, Label, SubContainer } from "./styles";
-import { Segment } from "@/components/common/forms";
+import { Segment } from "@/components/common/custom";
 
 const ShowProduct = ({ product }) => {
   return (

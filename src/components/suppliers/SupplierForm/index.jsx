@@ -5,8 +5,8 @@ import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box } from "rebass";
 import { Form, Icon } from "semantic-ui-react";
-import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea } from "./styles";
-import { RuledLabel } from "@/components/common/forms";
+import { Button, ButtonsContainer, FieldsContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea } from "./styles";
+import { RuledLabel, FormContainer } from "@/components/common/custom";
 
 const SupplierForm = ({ supplier, onSubmit }) => {
   const { push } = useRouter();
