@@ -1,4 +1,4 @@
-import { Form, Segment as SSegment } from "semantic-ui-react";
+import { Form, Segment as SSegment, Input as SInput } from "semantic-ui-react";
 import styled from "styled-components";
 
 export const Segment = styled(SSegment)`
@@ -13,4 +13,11 @@ export const FormField = styled(Form.Field)`
   flex: ${({ flex }) => flex || 'none!important'};
   margin: 0 !important;
   flex-direction: column;
+`;
+
+export const Input = styled(SInput)`
+  margin: 5px 0 !important;
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
+  border-radius: 0.28571429rem;
+  height: 50px!important;
 `;

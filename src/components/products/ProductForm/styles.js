@@ -1,6 +1,6 @@
 import InputMask from 'react-input-mask';
 import { Flex } from "rebass";
-import { Form, Button as SButton, Dropdown as SDropdown, Input as SInput, Label as SLabel, TextArea as STextArea } from "semantic-ui-react";
+import { Form, Button as SButton, Dropdown as SDropdown, Label as SLabel, TextArea as STextArea } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Button = styled(SButton)`
@@ -44,16 +44,6 @@ const Label = styled(SLabel)({
   margin: "0!important",
 });
 
-const Input = styled(SInput)`
-  margin: 5px 0 !important;
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
-  border-radius: 0.28571429rem;
-  height: 50px!important;
-  input{
-    padding-left: ${(props) => props.paddingLeft && "4.1rem!important"};
-  };
-`;
-
 const CodeInput = styled(SInput)`
 position: absolute!important;
   top: 9.79rem!important;
@@ -87,5 +77,5 @@ const ButtonsContainer = styled(Flex)`
   column-gap: 20px;
 `;
 
-export { Button, ButtonsContainer, CodeInput, Dropdown, Input, Label, MaskedInput, Textarea, WarningMessage };
+export { Button, ButtonsContainer, CodeInput, Dropdown, Label, MaskedInput, Textarea, WarningMessage };
 

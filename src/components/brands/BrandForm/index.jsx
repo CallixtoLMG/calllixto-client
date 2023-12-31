@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Icon } from "semantic-ui-react";
-import { Button, ButtonsContainer, Input, Label, Textarea } from "./styles";
+import { Button, ButtonsContainer, Label, Textarea } from "./styles";
 import { RuledLabel } from "@/components/common/custom";
 import { REGEX } from "@/constants";
-import { FormContainer, FieldsContainer, FormField } from "@/components/common/custom";
+import { FormContainer, FieldsContainer, FormField, Input } from "@/components/common/custom";
 
 const BrandForm = ({ brand, onSubmit }) => {
   const { push } = useRouter();

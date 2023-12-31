@@ -2,10 +2,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Form, Icon, Input, Modal, Segment, Table, Transition } from "semantic-ui-react";
+import { Button, Form, Icon, Modal, Segment, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { PRODUCT_COLUMNS } from "../products.common";
-import { ContainerModal, DataNotFoundContainer, ModInput, ModLabel, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
+import { ContainerModal, DataNotFoundContainer, ModLabel, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
+import { Input } from "@/components/common/custom";
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
   const { handleSubmit, control, reset, setValue, watch } = useForm();
@@ -167,7 +168,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                               rules={validationRules.code}
                               render={({ field, fieldState }) => (
                                 <ModTableCell key={`newProducts[${index}].code`} >
-                                  <ModInput {...field} />
+                                  <Input {...field} />
                                   {fieldState?.invalid && <WarningMessage >{validationRules.code.message}</WarningMessage>}
                                 </ModTableCell>
                               )}
@@ -179,7 +180,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                               defaultValue={(`newProducts[${index}].name`)}
                               render={({ field, fieldState }) => (
                                 <ModTableCell key={`newProducts[${index}].name`} >
-                                  <ModInput {...field} />
+                                  <Input {...field} />
                                   {fieldState?.invalid && <WarningMessage >
                                   </WarningMessage>}
                                 </ModTableCell>
@@ -199,7 +200,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                                     onChangeValue={(_, value) => {
                                       field.onChange(value);
                                     }}
-                                    InputElement={<ModInput />}
+                                    InputElement={<Input />}
                                   />
                                 </ModTableCell>
                               )}
@@ -236,7 +237,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                               rules={validationRules.code}
                               render={({ field, fieldState }) => (
                                 <ModTableCell key={`editProducts[${index}].code`} >
-                                  <ModInput readOnly {...field} />
+                                  <Input readOnly {...field} />
                                   {fieldState?.invalid && <WarningMessage >{validationRules.code.message}</WarningMessage>}
                                 </ModTableCell>
                               )}
@@ -248,7 +249,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                               defaultValue={(`editProducts[${index}].name`)}
                               render={({ field, fieldState }) => (
                                 <ModTableCell key={`editProducts[${index}].name`} >
-                                  <ModInput {...field} />
+                                  <Input {...field} />
                                   {fieldState?.invalid && <WarningMessage >
                                   </WarningMessage>}
                                 </ModTableCell>
@@ -268,7 +269,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                                     onChangeValue={(_, value) => {
                                       field.onChange(value);
                                     }}
-                                    InputElement={<ModInput />}
+                                    InputElement={<Input />}
                                   />
                                 </ModTableCell>
                               )}
