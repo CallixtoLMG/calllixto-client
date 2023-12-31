@@ -7,7 +7,7 @@ export const FormContainer = styled(Flex)`
 `;
 
 export const FieldsContainer = styled(Flex)`
-  justify-content: ${({ justifyContent }) => justifyContent };
+  justify-content: ${({ justifyContent }) => justifyContent};
   flex-wrap: wrap;
   column-gap: 20px;
   max-width: 900px;

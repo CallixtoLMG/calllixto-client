@@ -19,13 +19,7 @@ const Input = styled(SInput)`
   border-radius: 0.28571429rem;
   height: 50px!important;
 `;
-const FormField = styled(Form.Field)`
-  width: ${(props) => props.width || '200px!important'};
-  min-width: ${(props) => props.minWidth || "200px!important"};
-  flex: ${(props) => props.flex || 'none!important'};
-  margin: 0!important;
-  flex-direction: column;
-`;
+
 
 const Textarea = styled(STextArea)`
   margin: 5px 0 !important;
@@ -38,5 +32,4 @@ const ButtonsContainer = styled(Flex)`
   column-gap: 20px;
 `;
 
-export { Button, ButtonsContainer, FormField, Input, Label, Textarea };
-
+export { Button, ButtonsContainer, Input, Label, Textarea };

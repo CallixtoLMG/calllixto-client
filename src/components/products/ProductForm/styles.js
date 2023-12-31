@@ -76,14 +76,6 @@ const WarningMessage = styled.p`
   bottom: 0.5rem!important;
 `;
 
-const FormField = styled(Form.Field)`
-  width: ${(props) => props.width || '200px!important'};
-  min-width: ${(props) => props.minWidth || "200px!important"};
-  flex: ${(props) => props.flex || 'none!important'};
-  margin: 0!important;
-  flex-direction: column;
-`;
-
 const Textarea = styled(STextArea)`
   margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
@@ -95,5 +87,5 @@ const ButtonsContainer = styled(Flex)`
   column-gap: 20px;
 `;
 
-export { Button, ButtonsContainer, CodeInput, Dropdown, FormField, Input, Label, MaskedInput, Textarea, WarningMessage };
+export { Button, ButtonsContainer, CodeInput, Dropdown, Input, Label, MaskedInput, Textarea, WarningMessage };
 

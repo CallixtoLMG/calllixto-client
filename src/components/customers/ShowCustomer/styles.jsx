@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Label as SLabel, Segment as SSegment } from "semantic-ui-react";
+import { Label as SLabel} from "semantic-ui-react";
 import styled from "styled-components";
 
 const Label = styled(SLabel)`
@@ -18,12 +18,6 @@ const ButtonsContainer = styled(Flex)`
   align-self: self-end;
 `;
 
-const Segment = styled(SSegment)`
-  margin: 5px 0!important;
-  height: 50px!important;
-  font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
-`;
-
 const Container = styled(Flex)`
   row-gap: 15px;
   flex-direction: column;
@@ -37,5 +31,4 @@ const DataContainer = styled(Flex)`
   flex-direction: column;
 `;
 
-export { ButtonsContainer, Container, DataContainer, Label, Segment, SubContainer };
-
+export { ButtonsContainer, Container, DataContainer, Label, SubContainer };

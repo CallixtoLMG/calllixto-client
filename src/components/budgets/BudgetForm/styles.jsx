@@ -29,14 +29,6 @@ const Dropdown = styled(SDropdown)`
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15) !important;
 `;
 
-const FormField = styled(Form.Field)`
-  width: ${({ width }) => width || '300px'} !important;
-  min-width: 200px !important;
-  margin: 0!important;
-  flex-direction: column;
-  flex: ${({ flex }) => flex || 'none'} !important;
-`;
-
 const ModTableRow = styled(Table.Row)`
   th{ min-width: 10rem!important; };
   th:first-child { min-width: 18rem!important; };
@@ -72,5 +64,5 @@ const Label = styled(SLabel)`
   margin: 0!important;
 `;
 
-export { Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage, FormField, Label };
+export { Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage, Label };
 
