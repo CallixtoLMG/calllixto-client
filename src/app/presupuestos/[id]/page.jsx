@@ -12,6 +12,8 @@ const Budget = ({ params }) => {
   const user = useUserData();
   const { budget, isLoading } = useGetBudget(params.id);
 
+  console.log({ budget })
+
   if (!isLoading && !budget) {
     push(PAGES.NOT_FOUND.BASE);
     return;

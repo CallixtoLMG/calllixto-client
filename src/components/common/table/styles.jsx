@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { Flex } from "rebass";
 
 const Cell = styled(Table.Cell)`
-  text-align: ${(props) => props.align || "center!important"};
+  text-align: ${({ align }) => align || "center!important"};
   height: 40px;
   z-index: 2;
 `;

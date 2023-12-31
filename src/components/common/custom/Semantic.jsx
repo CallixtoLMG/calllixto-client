@@ -26,7 +26,7 @@ export const Input = styled(SInput)`
   margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
-  height: 50px!important;
+  height: ${({ height }) => height || '50px'} !important;
 `;
 
 export const Label = styled(SLabel)`
@@ -45,7 +45,7 @@ export const Dropdown = styled(SDropdown)`
   margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
-  height: 50px!important;
+  height: ${({ height }) => height || '50px'} !important;
   display: flex!important;
   flex-wrap: wrap;
   align-content: center;

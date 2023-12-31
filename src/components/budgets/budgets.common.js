@@ -75,7 +75,7 @@ const BUDGET_FORM_PRODUCT_COLUMNS = [
   { title: "Subtotal", value: "subtotal", id: 4 },
   { title: "Desc.", value: "discount", id: 5 },
   { title: "Total", value: "total", id: 6 },
-  { title: "Acciones", value: "actions", id: 7 },
+  { title: "Acciones", value: "actions", id: 7, hide: (readonly) => readonly },
 ];
 
 export {

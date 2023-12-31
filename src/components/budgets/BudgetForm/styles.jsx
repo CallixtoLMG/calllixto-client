@@ -32,7 +32,7 @@ const HeaderCell = styled(Table.HeaderCell)`
 const Cell = styled(Table.Cell)`
   padding: ${(props) => props.$nonBorder ? "0!important" : "5px!important"};
   text-align: center!important;
-  `;
+`;
 
 const WarningMessage = styled.p`
   position: relative;

@@ -1,14 +1,15 @@
 import { BUDGET_FORM_PRODUCT_COLUMNS } from "@/components/budgets/budgets.common";
 import { PAGES } from "@/constants";
-import { formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Icon, Popup, Button as SButton, Table } from "semantic-ui-react";
-import { Button, Cell, HeaderCell, TotalText, WarningMessage } from "./styles";
+import { Button, HeaderCell, TotalText, WarningMessage } from "./styles";
 import { Flex, Box } from "rebass";
 import { Segment, FieldsContainer, FormField, Input, Label, Dropdown, Form } from "@/components/common/custom";
 import { SubmitAndRestore } from "@/components/common/buttons";
+import { Cell } from "@/components/common/table";
 
 const EMPTY_PRODUCT = {
   name: '',
@@ -38,7 +39,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
   });
 
   const [triedToAddWithoutSelection, setTriedToAddWithoutSelection] = useState(false);
-  const watchProducts = watch('products', [EMPTY_PRODUCT]);
+  const watchProducts = watch('products');
   const [total, setTotal] = useState(0);
 
   const addProduct = () => {
@@ -149,123 +150,142 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
           )}
         </FormField>
       </FieldsContainer>
-      <Button
-        color="green"
-        type="button"
-        onClick={addProduct}
-      >
-        <Icon name="add" />Agregar producto
-      </Button>
+      {!readonly && (
+        <Button
+          color="green"
+          type="button"
+          onClick={addProduct}
+        >
+          <Icon name="add" />Agregar producto
+        </Button>
+      )}
       <Table celled striped compact>
         <Table.Header>
-          {BUDGET_FORM_PRODUCT_COLUMNS.map((column) => (
-            <HeaderCell $header key={column.id} >{column.title}</HeaderCell>
-          ))}
+          {BUDGET_FORM_PRODUCT_COLUMNS.map((column) => {
+            if (!column.hide?.(readonly)) return <HeaderCell $header key={column.id} >{column.title}</HeaderCell>;
+          })}
         </Table.Header>
         <Table.Body>
           {watchProducts.map((product, index) => (
             <Table.Row key={`${product.code}-${index}`}>
-              <Cell>
-                <Flex alignItems="center">
-                  <Controller
-                    name={`products[${index}].name`}
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <>
-                        <Dropdown
-                          fluid
-                          search
-                          selection
-                          noResultsMessage="No se ha encontrado producto!"
-                          options={products}
-                          {...field}
-                          onChange={(e, { value }) => {
-                            field.onChange(value);
-                            const product = products.find((opt) => opt.value === value);
-                            setValue(`products[${index}].price`, product.price);
-                            setValue(`products[${index}].code`, product.code);
-                            setValue(`products[${index}].quantity`, 1);
-                            setValue(`products[${index}].comments`, product.comments);
-                            calculateTotal();
-                          }}
-                        />
-                        {triedToAddWithoutSelection && !watchProducts[index].code && (
-                          <WarningMessage> Debe seleccionar un producto </WarningMessage>
-                        )}
-                      </>
-                    )}
-                  />
-                  {product.comments && (
-                    <Popup
-                      size="mini"
-                      content={product.comments}
-                      position="top center"
-                      trigger={
-                        <Box marginX="5px">
-                          <Icon name="info circle" color="red" size="large" />
-                        </Box>
-                      }
+              <Cell align="left">
+                {!readonly ? (
+                  <Flex alignItems="center">
+                    <Controller
+                      name={`products[${index}].name`}
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <>
+                          <Dropdown
+                            {...field}
+                            fluid
+                            search
+                            selection
+                            noResultsMessage="No se ha encontrado producto!"
+                            options={products}
+                            height="40px"
+                            onChange={(e, { value }) => {
+                              field.onChange(value);
+                              const product = products.find((opt) => opt.value === value);
+                              setValue(`products[${index}].price`, product.price);
+                              setValue(`products[${index}].code`, product.code);
+                              setValue(`products[${index}].quantity`, 1);
+                              setValue(`products[${index}].comments`, product.comments);
+                              calculateTotal();
+                            }}
+                          />
+                          {triedToAddWithoutSelection && !watchProducts[index].code && (
+                            <WarningMessage> Debe seleccionar un producto </WarningMessage>
+                          )}
+                        </>
+                      )}
                     />
-                  )}
-                </Flex>
+                    {product.comments && (
+                      <Popup
+                        size="mini"
+                        content={product.comments}
+                        position="top center"
+                        trigger={
+                          <Box marginX="5px">
+                            <Icon name="info circle" color="red" size="large" />
+                          </Box>
+                        }
+                      />
+                    )}
+                  </Flex>
+                ) : (
+                  <p>{product?.name}</p>
+                )}
               </Cell>
               <Cell>
                 {formatedPrice(product.price)}
               </Cell>
-              <Cell>
-                <Controller
-                  name={`products[${index}].quantity`}
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      type="number"
-                      min={0}
-                      defaultValue={1}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        field.onChange(value);
-                        calculateTotal();
-                      }}
-                    />
-                  )}
-                />
+              <Cell width={1}>
+                {!readonly ? (
+                  <Controller
+                    name={`products[${index}].quantity`}
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        type="number"
+                        min={0}
+                        defaultValue={1}
+                        height="40px"
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value);
+                          calculateTotal();
+                        }}
+                      />
+                    )}
+                  />
+                ) : (
+                  <p>{product?.quantity}</p>
+                )}
               </Cell>
               <Cell>
                 {formatedPrice(product.price * product.quantity)}
               </Cell>
               <Cell>
-                <Controller
-                  name={`products[${index}].discount`}
-                  control={control}
-                  defaultValue={product.discount || 0}
-                  render={({ field }) => (
-                    <Input
-                      fluid
-                      type="number"
-                      min={0}
-                      max={100}
-                      {...field}
-                      onChange={(e) => {
-                        field.onChange(e.target.value);
-                        calculateTotal();
-                      }}
-                    />
-                  )}
-                />
+                {!readonly ? (
+                  <Controller
+                    name={`products[${index}].discount`}
+                    control={control}
+                    defaultValue={product.discount || 0}
+                    render={({ field }) => (
+                      <Input
+                        fluid
+                        type="number"
+                        min={0}
+                        max={100}
+                        height="40px"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          calculateTotal();
+                        }}
+                      />
+                    )}
+                  />
+                ) : (
+                  <p>{formatedPercentage(product?.discount)}</p>
+                )}
               </Cell>
               <Cell>
                 {formatedPrice(getTotal(product))}
               </Cell>
-              <Cell>
-                <SButton
-                  icon="trash"
-                  color="red"
-                  onClick={() => { watchProducts.length > 1 && deleteProduct(index) }}
-                  type="button"
-                  disabled={watchProducts.length <= 1}
-                />
-              </Cell>
+              {!readonly && (
+                <Cell width={1}>
+                  <SButton
+                    icon="trash"
+                    color="red"
+                    onClick={() => { watchProducts.length > 1 && deleteProduct(index) }}
+                    type="button"
+                    disabled={watchProducts.length <= 1}
+                  />
+                </Cell>
+              )}
             </Table.Row>
           ))}
         </Table.Body>
@@ -277,8 +297,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
             <HeaderCell $nonBorder>
               <TotalText>{formatedPrice(total)}</TotalText>
             </HeaderCell>
-            <HeaderCell >
-            </HeaderCell>
+            {!readonly && <HeaderCell />}
           </Table.Row>
         </Table.Footer>
       </Table>
