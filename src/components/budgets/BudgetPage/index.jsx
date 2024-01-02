@@ -5,6 +5,7 @@ import { BUDGETS_COLUMNS, FILTERS } from "../budgets.common";
 import { Table } from '@/components/common/table';
 import { useRouter } from "next/navigation";
 import { ButtonsContainer } from "@/components/common/custom";
+import { useCallback } from "react";
 
 const BudgetsPage = ({ budgets }) => {
   const { push } = useRouter();
@@ -18,6 +19,10 @@ const BudgetsPage = ({ budgets }) => {
     },
   ];
 
+  const mapBudgetsForTable = useCallback((budgets) => {
+    return budgets.map(budget => ({ ...budget, key: budget.id }));
+  }, []);
+
   return (
     <>
       <ButtonsContainer>
@@ -25,7 +30,7 @@ const BudgetsPage = ({ budgets }) => {
       </ButtonsContainer>
       <Table
         headers={BUDGETS_COLUMNS}
-        elements={budgets}
+        elements={mapBudgetsForTable(budgets)}
         page={PAGES.BUDGETS}
         actions={actions}
         filters={FILTERS}
