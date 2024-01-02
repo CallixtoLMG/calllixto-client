@@ -136,7 +136,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                   <Segment>{selectedFile}</Segment>
                 </FormField>
               </FieldsContainer>
-              {!!newProducts.length &&
+              {!!newProducts.length && (
                 <FieldsContainer>
                   <Label>Nuevos productos</Label>
                   <TableContainer>
@@ -203,9 +203,9 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                     </Table>
                   </TableContainer>
                 </FieldsContainer>
-              }
-              {!!editProducts.length &&
-                <>
+              )}
+              {!!editProducts.length && (
+                <FieldsContainer>
                   <Label>Productos a modificar</Label>
                   <TableContainer>
                     <Table celled compact striped>
@@ -270,7 +270,8 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                       </Table.Body>
                     </Table>
                   </TableContainer>
-                </>}
+                </FieldsContainer>
+              )}
               {!editProducts.length && !newProducts.length && (
                 <DataNotFoundContainer>
                   <p>No se encontraron datos.</p>
