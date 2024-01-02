@@ -106,7 +106,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
     };
   };
 
-  const handleAcceptCreate = async (data) => {
+  const handleAccept = async (data) => {
     setIsLoading(true);
     !!data?.newProducts?.length &&  await createBatch(data.newProducts);
     !!data?.editProducts?.length && await editBatch(data.editProducts);
@@ -134,7 +134,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
           onOpen={handleModalOpen}
         >
           <ContainerModal>
-            <Form onSubmit={handleSubmit(handleAcceptCreate)}>
+            <Form onSubmit={handleSubmit(handleAccept)}>
               <FieldsContainer>
                 <FormField width={6}>
                   <Label>Archivo seleccionado:</Label>
