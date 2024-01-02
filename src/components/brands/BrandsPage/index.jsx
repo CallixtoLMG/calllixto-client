@@ -57,7 +57,7 @@ const BrandsPage = ({ brands = [], role, onDelete }) => {
       <Table
         headers={BRAND_COLUMNS}
         elements={mapBrandsForTable(brands)}
-        page={PAGES.BRANDS}
+        page={{ page: PAGES.BRANDS }}
         actions={actions}
         filters={FILTERS}
       />
