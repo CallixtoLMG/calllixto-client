@@ -7,7 +7,7 @@ const MainContainer = styled(Flex)`
 `;
 
 const SubContainer = styled(Flex)`
-  margin: 75px 30px 30px 30px!important;
+  margin: 65px 30px 30px 30px!important;
   flex-direction: column;
   width: 80%!important;
   max-width: 1200px!important;
