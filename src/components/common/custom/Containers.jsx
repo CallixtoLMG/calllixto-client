@@ -14,3 +14,10 @@ export const FieldsContainer = styled(Flex)`
   column-gap: 20px;
   max-width: 900px;
 `;
+
+export const ButtonsContainer = styled(Flex)`
+  flex-direction: row;
+  margin-bottom: 10px !important;
+  justify-content: flex-end;
+  column-gap: 10px;
+`;

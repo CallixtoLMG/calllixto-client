@@ -6,10 +6,9 @@ import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from "react";
-import { Flex } from "rebass";
 import ImportProducts from "../ImportProduct";
 import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
-import { ButtonContainer } from "./styles";
+import { ButtonsContainer } from "@/components/common/custom";
 
 const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete }) => {
   const { push } = useRouter();
@@ -53,13 +52,11 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
   return (
     <>
       {visibilityRules.canSeeButtons &&
-        <ButtonContainer>
+        <ButtonsContainer>
           <GoToButton goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
-          <Flex margin-left="auto">
-            <ImportProducts products={products} createBatch={createBatch} editBatch={editBatch} />
-            <DownloadExcelButton />
-          </Flex>
-        </ButtonContainer>}
+          <ImportProducts products={products} createBatch={createBatch} editBatch={editBatch} />
+          <DownloadExcelButton />
+        </ButtonsContainer>}
       <Table
         headers={PRODUCT_COLUMNS}
         elements={mapProductsForTable(products)}

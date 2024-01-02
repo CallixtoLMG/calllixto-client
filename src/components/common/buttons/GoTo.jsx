@@ -10,10 +10,10 @@ const Button = styled(SButton)`
   i.icon {
     margin: ${(props) => !props.text && "0!important"};
   };
+  margin-right: 0 !important;
 `;
 
 const Link = styled(NLink)`
-  margin-right: 3.5px!important;
   padding-right: 0!important;
   display: inline-block!important;
 `;

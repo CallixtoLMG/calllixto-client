@@ -61,4 +61,5 @@ export const Dropdown = styled(SDropdown)`
 
 export const Button = styled(SButton)`
   width: ${({ width }) => width ? `${width} !important` : ''};
+  margin: 0 !important;
 `;

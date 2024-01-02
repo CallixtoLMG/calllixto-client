@@ -6,7 +6,7 @@ const Button = styled(SButton)`
   min-width: 170px!important;
   padding: 10px 0!important;
   max-height: 34px!important;
-  margin-left: 10px!important;
+  margin: 0 !important;
 `;
 
 const ButtonDownload = () => {

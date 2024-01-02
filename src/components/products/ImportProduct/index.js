@@ -1,12 +1,12 @@
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Form, Icon, Modal, Segment, Table, Transition } from "semantic-ui-react";
+import { Form, Icon, Modal, Segment, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { PRODUCT_COLUMNS } from "../products.common";
 import { ContainerModal, DataNotFoundContainer, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
-import { Input, Label } from "@/components/common/custom";
+import { Input, Button } from "@/components/common/custom";
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
   const { handleSubmit, control, reset, setValue, watch } = useForm();
@@ -18,6 +18,11 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
   const [isLoading, setIsLoading] = useState(false);
   const locale = "es-AR";
   const currency = "ARS";
+  const inputRef = useRef();
+
+  const handleClick = useCallback(() => {
+    inputRef?.current?.click();
+  }, [inputRef]);
 
   const handleModalClose = () => {
     setOpen(false);
@@ -116,19 +121,17 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
 
   return (
     <>
-      <Label as="label" htmlFor="file" >
-        <Button as="span" color="blue">
-          <Icon name="upload" />
-          Importar
-        </Button>
-        <Input
-          type="file"
-          id="file"
-          accept=".xlsx, .xls"
-          style={{ display: 'none' }}
-          onChange={handleFileUpload}
-        />
-      </Label>
+      <input
+        ref={inputRef}
+        type="file"
+        id="file"
+        accept=".xlsx, .xls"
+        style={{ display: 'none' }}
+        onChange={handleFileUpload}
+      />
+      <Button type="button" color="blue" onClick={handleClick}>
+        <Icon name="upload" /> Importar
+      </Button>
       <Transition animation="fade" duration={500} visible={open} >
         <Modal
           closeIcon
