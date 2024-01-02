@@ -174,7 +174,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                             <Controller
                               name={`newProducts[${index}].price`}
                               control={control}
-                              render={({ field, value }) => (
+                              render={({ field }) => (
                                 <Cell width={2}>
                                   <CurrencyInput
                                     {...field}
@@ -242,7 +242,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                             <Controller
                               name={`editProducts[${index}].price`}
                               control={control}
-                              render={({ field, value }) => (
+                              render={({ field }) => (
                                 <Cell width={2}>
                                   <CurrencyInput
                                     {...field}
