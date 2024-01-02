@@ -1,8 +1,8 @@
 import { useRouter } from "next/navigation";
-import { Form, Header, Icon, Input, Segment, Table } from "semantic-ui-react";
+import { Form, Header, Icon, Input, Popup, Segment, Table } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow } from "./styles";
-import { Flex } from 'rebass';
+import { Flex, Box } from 'rebass';
 import styled from "styled-components";
 import { Controller, useForm } from "react-hook-form";
 import { useCallback, useMemo, useState } from "react";
@@ -10,6 +10,7 @@ import { Button } from "@/components/common/custom";
 
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
+  align-items: center;
 `;
 
 const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [] }) => {
@@ -37,9 +38,18 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
           <Form onSubmit={handleSubmit(filter)}>
             <Flex justifyContent="space-between">
               <FiltersContainer>
-                <Button circular icon type="button" onClick={handleRestore}>
-                  <Icon name="undo" />
-                </Button>
+                <Popup
+                  content="Restaurar filtros"
+                  position="top center"
+                  size="tiny"
+                  trigger={(
+                    <Box>
+                      <Button circular icon type="button" onClick={handleRestore} size="mini">
+                        <Icon name="undo" />
+                      </Button>
+                    </Box>
+                  )}
+                />
                 {filters.map(filter =>
                   <Controller
                     key={`filter_${filter.value}`}
