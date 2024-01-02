@@ -90,7 +90,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
             filteredElements.map((element) => {
               if (page) {
                 return (
-                  <LinkRow key={element.key} onClick={() => push(page.SHOW(element.id))}>
+                  <LinkRow key={element.key} onClick={() => push(page.page.SHOW(element[page.key || 'id']))}>
                     {headers.map(header => (
                       <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
                         {header.value(element)}

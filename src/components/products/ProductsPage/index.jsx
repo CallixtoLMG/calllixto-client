@@ -28,7 +28,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
       id: 1,
       icon: 'edit',
       color: 'blue',
-      onClick: (product) => { push(PAGES.PRODUCTS.UPDATE(product.id)) },
+      onClick: (product) => { push(PAGES.PRODUCTS.UPDATE(product.code)) },
       tooltip: 'Editar'
     },
     {
@@ -45,9 +45,9 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
 
   const handleDelete = useCallback(async () => {
     setIsLoading(true);
-    await onDelete(selectedProduct?.id);
+    await onDelete(selectedProduct?.code);
     setIsLoading(false);
-  }, [onDelete, selectedProduct?.id]);
+  }, [onDelete, selectedProduct?.code]);
 
   return (
     <>
@@ -60,7 +60,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
       <Table
         headers={PRODUCT_COLUMNS}
         elements={mapProductsForTable(products)}
-        page={PAGES.PRODUCTS}
+        page={{ page: PAGES.PRODUCTS, key: 'code' }}
         actions={actions}
         filters={FILTERS}
       />

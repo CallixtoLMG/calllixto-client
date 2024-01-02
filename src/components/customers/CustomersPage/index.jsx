@@ -58,7 +58,7 @@ const CustomersPage = ({ customers = [], onDelete }) => {
       <Table
         headers={HEADERS}
         elements={mapCustomersForTable(customers)}
-        page={PAGES.CUSTOMERS}
+        page={{ page: PAGES.CUSTOMERS }}
         actions={actions}
         filters={FILTERS}
       />

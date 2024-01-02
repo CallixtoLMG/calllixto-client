@@ -53,7 +53,7 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
       <Table
         headers={SUPPLIERS_COLUMNS}
         elements={suppliers}
-        page={PAGES.SUPPLIERS}
+        page={{ page: PAGES.SUPPLIERS }}
         actions={actions}
         filters={FILTERS}
       />

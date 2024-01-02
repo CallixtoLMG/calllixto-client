@@ -31,7 +31,7 @@ const BudgetsPage = ({ budgets }) => {
       <Table
         headers={BUDGETS_COLUMNS}
         elements={mapBudgetsForTable(budgets)}
-        page={PAGES.BUDGETS}
+        page={{ page: PAGES.BUDGETS }}
         actions={actions}
         filters={FILTERS}
       />
