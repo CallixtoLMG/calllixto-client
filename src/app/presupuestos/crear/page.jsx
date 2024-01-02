@@ -3,15 +3,20 @@ import { create } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { Loader, PageHeader } from "@/components/layout";
+import { Loader, useBreadcrumContext } from "@/components/layout";
 import { useUserData, useValidateToken } from "@/hooks/userData";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 const CreateBudget = () => {
   useValidateToken();
   const user = useUserData();
   const { products = [], isLoading: loadingProducts } = useListProducts();
   const { customers = [], isLoading: loadingCustomers } = useListCustomers();
+  const { setLabels } = useBreadcrumContext();
+
+  useEffect(() => {
+    setLabels(['Presupuestos', 'Crear']);
+  }, [setLabels]);
 
   const mappedProducts = useMemo(() => products.map(product => ({
     ...product,
@@ -28,12 +33,9 @@ const CreateBudget = () => {
   })), [customers]);
 
   return (
-    <>
-      <PageHeader title="Crear Presupuesto" />
-      <Loader active={loadingProducts || loadingCustomers}>
-        <BudgetForm onSubmit={create} products={mappedProducts} customers={mappedCustomers} user={user} />
-      </Loader>
-    </>
+    <Loader active={loadingProducts || loadingCustomers}>
+      <BudgetForm onSubmit={create} products={mappedProducts} customers={mappedCustomers} user={user} />
+    </Loader>
   )
 };
 
