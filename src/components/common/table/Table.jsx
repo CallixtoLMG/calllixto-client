@@ -7,6 +7,7 @@ import styled from "styled-components";
 import { Controller, useForm } from "react-hook-form";
 import { useCallback, useMemo, useState } from "react";
 import { Button } from "@/components/common/custom";
+import { get } from "lodash";
 
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
@@ -21,10 +22,12 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
 
   const filter = useCallback((data) => {
     const newElements = elements.filter(element => {
-      return Object.keys(data).every(filter => element[filter]?.toLowerCase().includes(data[filter]?.toLowerCase()));
+      return filters.every(filter => {
+        return get(element, filter.map ? filter.map : filter.value, '')?.toLowerCase().includes(data[filter.value].toLowerCase());
+      });
     });
     setFilteredElements(newElements);
-  }, [elements]);
+  }, [elements, filters]);
 
   const handleRestore = useCallback(() => {
     reset(defaultValues);

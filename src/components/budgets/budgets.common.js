@@ -99,7 +99,8 @@ const BUDGET_FORM_PRODUCT_COLUMNS = [
 ];
 
 const FILTERS = [
-  { value: 'customer.name', placeholder: 'Cliente' },
+  { value: 'id', placeholder: 'Código' },
+  { value: 'customerName', placeholder: 'Cliente', map: 'customer.name' },
   { value: 'seller', placeholder: 'Vendedor' },
 ];
 
