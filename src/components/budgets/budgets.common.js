@@ -35,7 +35,7 @@ const BUDGETS_COLUMNS = [
     value: (budget) => formatedDate(budget.createdAt)
   },
   {
-    id: 5,
+    id: 6,
     title: "Total",
     width: 2,
     value: (budget) => formatedPrice(getTotalSum(budget.products))

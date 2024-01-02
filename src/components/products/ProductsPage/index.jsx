@@ -20,7 +20,7 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
 
   const mapProductsForTable = useCallback((c) => {
-    return c.map(customer => ({ ...customer, id: customer.code }));
+    return c.map(customer => ({ ...customer, key: customer.code }));
   }, []);
 
   const actions = visibilityRules.canSeeActions ? [
