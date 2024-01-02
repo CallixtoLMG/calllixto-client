@@ -1,33 +1,103 @@
 import { useRouter } from "next/navigation";
-import { Header, Table } from "semantic-ui-react";
+import { Form, Header, Icon, Input, Segment, Table } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow } from "./styles";
+import { Flex } from 'rebass';
+import styled from "styled-components";
+import { Controller, useForm } from "react-hook-form";
+import { useCallback, useMemo, useState } from "react";
+import { Button } from "@/components/common/custom";
 
-const CustomTable = ({ headers = [], elements = [], page, actions = [], total }) => {
+const FiltersContainer = styled(Flex)`
+  column-gap: 10px;
+`;
+
+const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [] }) => {
   const { push } = useRouter();
+  const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
+  const { handleSubmit, control, reset } = useForm({ defaultValues });
+  const [filteredElements, setFilteredElements] = useState(elements);
+
+  const filter = useCallback((data) => {
+    const newElements = elements.filter(element => {
+      return Object.keys(data).every(filter => element[filter]?.toLowerCase().includes(data[filter]?.toLowerCase()));
+    });
+    setFilteredElements(newElements);
+  }, [elements]);
+
+  const handleRestore = useCallback(() => {
+    reset(defaultValues);
+    setFilteredElements(elements);
+  }, [reset, defaultValues, elements]);
+
   return (
-    <Table celled compact striped>
-      <Table.Header fullWidth>
-        <Table.Row>
-          {headers.map((header) => (
-            <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
-          ))}
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {elements.length === 0 ? (
+    <>
+      {filters.length > 0 && (
+        <Segment>
+          <Form onSubmit={handleSubmit(filter)}>
+            <Flex justifyContent="space-between">
+              <FiltersContainer>
+                <Button circular icon type="button" onClick={handleRestore}>
+                  <Icon name="undo" />
+                </Button>
+                {filters.map(filter =>
+                  <Controller
+                    key={`filter_${filter.value}`}
+                    name={filter.value}
+                    control={control}
+                    render={({ field }) => (<Input {...field} placeholder={filter.placeholder} />)}
+                  />
+                )}
+              </FiltersContainer>
+              <Button type="submit" width="110px">
+                <Flex justifyContent="space-around">
+                  <span>Filtrar</span>
+                  <Icon name="search" />
+                </Flex>
+              </Button>
+            </Flex>
+          </Form>
+        </Segment>
+      )}
+      <Table celled compact striped>
+        <Table.Header fullWidth>
           <Table.Row>
-            <Table.Cell colSpan={headers.length} textAlign="center">
-              <Header as="h4">
-                No se encontraron ítems.
-              </Header>
-            </Table.Cell>
+            {headers.map((header) => (
+              <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
+            ))}
           </Table.Row>
-        ) : (
-          elements.map((element) => {
-            if (page) {
+        </Table.Header>
+        <Table.Body>
+          {filteredElements.length === 0 ? (
+            <Table.Row>
+              <Table.Cell colSpan={headers.length} textAlign="center">
+                <Header as="h4">
+                  No se encontraron ítems.
+                </Header>
+              </Table.Cell>
+            </Table.Row>
+          ) : (
+            filteredElements.map((element) => {
+              if (page) {
+                return (
+                  <LinkRow key={element.key} onClick={() => push(page.SHOW(element.id))}>
+                    {headers.map(header => (
+                      <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                        {header.value(element)}
+                      </Cell>
+                    ))}
+                    {!!actions.length && (
+                      <ActionsContainer>
+                        <InnerActionsContainer>
+                          <Actions actions={actions} element={element} />
+                        </InnerActionsContainer>
+                      </ActionsContainer>
+                    )}
+                  </LinkRow>
+                );
+              }
               return (
-                <LinkRow key={element.key} onClick={() => push(page.SHOW(element.id))}>
+                <Table.Row key={element.key}>
                   {headers.map(header => (
                     <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
                       {header.value(element)}
@@ -35,40 +105,24 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total })
                   ))}
                   {!!actions.length && (
                     <ActionsContainer>
-                      <InnerActionsContainer>
-                        <Actions actions={actions} element={element} />
-                      </InnerActionsContainer>
+                      <Actions actions={actions} />
                     </ActionsContainer>
                   )}
-                </LinkRow>
+                </Table.Row>
               );
-            }
-            return (
-              <Table.Row key={element.key}>
-                {headers.map(header => (
-                  <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
-                    {header.value(element)}
-                  </Cell>
-                ))}
-                {!!actions.length && (
-                  <ActionsContainer>
-                    <Actions actions={actions} />
-                  </ActionsContainer>
-                )}
-              </Table.Row>
-            );
-          })
+            })
+          )}
+        </Table.Body>
+        {total && (
+          <Table.Footer celled fullWidth>
+            <Table.Row>
+              <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
+              <HeaderCell colSpan="1"><strong>{total}</strong></HeaderCell>
+            </Table.Row>
+          </Table.Footer>
         )}
-      </Table.Body>
-      {total && (
-        <Table.Footer celled fullWidth>
-          <Table.Row>
-            <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
-            <HeaderCell colSpan="1"><strong>{total}</strong></HeaderCell>
-          </Table.Row>
-        </Table.Footer>
-      )}
-    </Table>
+      </Table>
+    </>
   );
 };
 

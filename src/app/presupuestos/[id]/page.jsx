@@ -1,15 +1,23 @@
 "use client";
 import { useGetBudget } from "@/api/budgets";
-import ShowBudget from "@/components/budgets/ShowBudget";
-import { PageHeader, Loader, NoPrint } from "@/components/layout";
+import BudgetForm from "@/components/budgets/BudgetForm";
+import { useBreadcrumContext, Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
-import { useValidateToken } from "@/hooks/userData";
+import { useUserData, useValidateToken } from "@/hooks/userData";
+import { formatedDate } from "@/utils";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Budget = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
+  const user = useUserData();
   const { budget, isLoading } = useGetBudget(params.id);
+  const { setLabels } = useBreadcrumContext();
+
+  useEffect(() => {
+    setLabels(['Presupuestos', budget ? `${budget?.customer?.name} (${formatedDate(budget?.createdAt)})` : '']);
+  }, [setLabels, budget]);
 
   if (!isLoading && !budget) {
     push(PAGES.NOT_FOUND.BASE);
@@ -17,14 +25,9 @@ const Budget = ({ params }) => {
   };
 
   return (
-    <>
-      <NoPrint>
-        <PageHeader title="Presupuesto" />
-      </NoPrint>
-      <Loader active={isLoading}>
-        <ShowBudget budget={budget} />
-      </Loader>
-    </>
+    <Loader active={isLoading}>
+      <BudgetForm readonly user={user} budget={budget} />
+    </Loader>
   )
 };
 

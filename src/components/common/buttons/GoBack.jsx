@@ -1,8 +1,6 @@
-import { NoPrint } from "@/components/layout";
 import { PAGES } from '@/constants';
 import { usePathname, useRouter } from 'next/navigation';
-import { Icon } from 'semantic-ui-react';
-import { ModButton } from "./styles";
+import { Icon, Button } from 'semantic-ui-react';
 
 const GoBack = () => {
   const { back } = useRouter();
@@ -13,9 +11,9 @@ const GoBack = () => {
     back();
   };
   return (
-    <NoPrint>
-      {show && <ModButton onClick={handleClick} color="teal"><Icon name='chevron left' />  Atrás</ModButton>}
-    </NoPrint>
+    <>
+      {show && <Button onClick={handleClick} color="teal" circular icon><Icon name='chevron left' /></Button>}
+    </>
   );
 };
 

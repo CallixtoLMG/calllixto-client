@@ -7,13 +7,13 @@ const MainContainer = styled(Flex)`
 `;
 
 const SubContainer = styled(Flex)`
-  margin: 85px 30px 30px 30px!important;
+  margin: 75px 30px 30px 30px!important;
   flex-direction: column;
   width: 80%!important;
-  max-width: 900px!important;
+  max-width: 1200px!important;
+  padding-top: 50px!important;
 `;
 
 export {
   MainContainer, SubContainer
 };
-

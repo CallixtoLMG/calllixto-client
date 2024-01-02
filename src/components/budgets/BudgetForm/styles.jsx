@@ -1,15 +1,5 @@
-import { Flex } from "rebass";
-import { Form, Button as SButton, Dropdown as SDropdown, Input as SInput, Table, Label as SLabel, Segment as SSegment } from 'semantic-ui-react';
+import { Button as SButton, Table } from 'semantic-ui-react';
 import styled from 'styled-components';
-
-const Input = styled(SInput)`
-  input {
-    border: ${(props) => props.$nonBorder && "none!important"};
-    background: ${(props) => props.$greyBack && "#f9fafb!important"};
-    text-align: center!important;
-    padding:7px!important;
-  };
-`;
 
 const Button = styled(SButton)({
   width: "170px!important",
@@ -18,28 +8,6 @@ const Button = styled(SButton)({
 
 const TotalText = styled.h3`
   margin-left: 0.7rem;
-`;
-
-const Dropdown = styled(SDropdown)`
-  width: 300px !important;
-  display: flex!important;
-  margin-bottom: 20px!important;
-  margin-top: 5px!important;
-  height: 40px!important;
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15) !important;
-`;
-
-const FieldsContainer = styled(Flex)`
-  column-gap: 20px;
-  width: 100%;
-`;
-
-const FormField = styled(Form.Field)`
-  width: ${({ width }) => width || '300px'} !important;
-  min-width: 200px !important;
-  margin: 0!important;
-  flex-direction: column;
-  flex: ${({ flex }) => flex || 'none'} !important;
 `;
 
 const ModTableRow = styled(Table.Row)`
@@ -64,7 +32,7 @@ const HeaderCell = styled(Table.HeaderCell)`
 const Cell = styled(Table.Cell)`
   padding: ${(props) => props.$nonBorder ? "0!important" : "5px!important"};
   text-align: center!important;
-  `;
+`;
 
 const WarningMessage = styled.p`
   position: relative;
@@ -72,17 +40,5 @@ const WarningMessage = styled.p`
   color: red;
 `;
 
-const Label = styled(SLabel)`
-  width: 100% !important;
-  margin: 0!important;
-`;
-
-const Segment = styled(SSegment)`
-  margin: 5px 0!important;
-  height: 40px!important;
-  font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
-  padding: 10px !important;
-`;
-
-export { Button, Dropdown, Input, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage, FieldsContainer, FormField, Label, Segment };
+export { Button, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage };
 

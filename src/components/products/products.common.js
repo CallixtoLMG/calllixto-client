@@ -59,6 +59,13 @@ const PRODUCT_COLUMNS = [
   }
 ];
 
+const FILTERS = [
+  { value: 'code', placeholder: 'Código' },
+  { value: 'supplierCode', placeholder: 'Código proveedor' },
+  { value: 'name', placeholder: 'Nombre' }
+];
+
 export {
-  PRODUCT_COLUMNS
+  PRODUCT_COLUMNS,
+  FILTERS
 };

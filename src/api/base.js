@@ -6,7 +6,6 @@ export const baseCreate = async (url, model, message) => {
   let data;
 
   try {
-    console.log({ now: now() })
     const response = await axios.post(url, { ...model, createdAt: now() });
     data = response.data;
   } catch (error) {

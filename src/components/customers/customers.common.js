@@ -43,3 +43,8 @@ export const HEADERS = [
     value: (customer) => formatedPhone(customer.phone.areaCode, customer.phone.number)
   },
 ];
+
+export const FILTERS = [
+  { value: 'name', placeholder: 'Nombre' },
+  { value: 'address', placeholder: 'Dirección' }
+];

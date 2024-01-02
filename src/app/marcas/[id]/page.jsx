@@ -1,15 +1,23 @@
 "use client";
-import { useGetBrand } from "@/api/brands";
-import { PageHeader, Loader } from "@/components/layout";
-import ShowBrand from "@/components/brands/ShowBrand";
+import { edit, useGetBrand } from "@/api/brands";
+import { Loader, useBreadcrumContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useValidateToken } from "@/hooks/userData";
+import BrandForm from "@/components/brands/BrandForm";
+import { useAllowUpdate } from "@/hooks/allowUpdate";
+import { useEffect } from "react";
 
 const Brand = ({ params }) => {
   useValidateToken();
-  const { brand, isLoading } = useGetBrand(params.id);
   const { push } = useRouter();
+  const { brand, isLoading } = useGetBrand(params.id);
+  const [allowUpdate, Toggle] = useAllowUpdate();
+  const { setLabels } = useBreadcrumContext();
+
+  useEffect(() => {
+    setLabels(['Marcas', brand?.name]);
+  }, [setLabels, brand]);
 
   if (!isLoading && !brand) {
     push(PAGES.NOT_FOUND.BASE);
@@ -17,12 +25,10 @@ const Brand = ({ params }) => {
   };
 
   return (
-    <>
-      <PageHeader title="Marca" />
-      <Loader active={isLoading}>
-        <ShowBrand brand={brand} />
-      </Loader>
-    </>
+    <Loader active={isLoading}>
+      {Toggle}
+      <BrandForm brand={brand} onSubmit={edit} readonly={!allowUpdate} />
+    </Loader>
   )
 };
 

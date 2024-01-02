@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Header as SHeader, Image as SImage, Label as SLabel, Segment as SSegment, Table } from "semantic-ui-react";
+import { Label, Header as SHeader, Image as SImage, Segment as SSegment } from "semantic-ui-react";
 import styled from "styled-components";
 
 const CustomerDataContainer = styled(Flex)`
@@ -50,16 +50,7 @@ const Sign = styled.div`
   margin-top: 70px;
 `;
 
-const Label = styled(SLabel)`
-  margin: 0 !important;
-  background-color: white !important;
-  border: 0.5px solid grey !important;
-  border-bottom-left-radius: 0 !important;
-  border-bottom-right-radius: 0 !important;
-  margin-bottom: -1px !important;
-`;
-
-const SubtleLabel = styled(SLabel)`
+const SubtleLabel = styled(Label)`
   background-color: white !important;
   border: 0.5px solid grey !important;
 `;
@@ -93,5 +84,5 @@ const PayMethodsContainer = styled(Flex)`
   margin-left: 15px !important;
 `;
 
-export { PayMethodsContainer, ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, Image, Label, SubtleLabel, Segment, Title, PayMethodContainer, Sign, Header };
+export { PayMethodsContainer, ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, Image, SubtleLabel, Segment, Title, PayMethodContainer, Sign, Header };
 

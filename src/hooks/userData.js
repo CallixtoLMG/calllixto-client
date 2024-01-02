@@ -42,6 +42,7 @@ export const useValidateToken = () => {
 
 export const useTokenValidated = () => {
   const [userData, setUserData] = useState(null);
+  const { pathname } = useRouter();
 
   useEffect(() => {
     async function getData() {
@@ -50,7 +51,7 @@ export const useTokenValidated = () => {
     }
 
     getData();
-  }, []);
+  }, [pathname]);
 
   return userData?.isAuthorized;
 }

@@ -2,7 +2,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Flex } from "rebass";
 import { Button, Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
-import { Form, Input } from "./styles";
+import { Form } from "./styles";
+import { Input } from "@/components/common/custom";
+
 
 const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoading }) => {
   const [confirmationText, setConfirmationText] = useState('');
@@ -38,6 +40,7 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
               value={confirmationText}
               onChange={handleConfirmationTextChange}
               ref={inputElement}
+              width="220px"
             />
             <Flex flexDirection="row-reverse">
               <Button

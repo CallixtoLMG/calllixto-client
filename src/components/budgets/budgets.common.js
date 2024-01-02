@@ -1,30 +1,50 @@
 import { Cell } from "@/components/common/table";
-import { formatedDate, formatedPercentage, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { formatedDate, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 
 const BUDGETS_COLUMNS = [
   {
     id: 1,
     title: "Id",
-    width: 2,
+    width: 1,
     value: (budget) => budget.id
   },
   {
     id: 2,
     title: "Cliente",
-    aligh: "left",
+    align: "left",
     value: (budget) => budget.customer.name
   },
   {
     id: 3,
-    title: "Fecha",
-    width: 4,
-    value: (budget) => formatedDate(budget.createdAt)
+    title: "Dirección",
+    align: "left",
+    width: 3,
+    value: (budget) => budget.customer?.address
   },
   {
     id: 4,
+    title: "Teléfono",
+    align: "left",
+    width: 3,
+    value: (budget) => formatedPhone(budget.customer?.phone?.areaCode, budget.customer?.phone?.number)
+  },
+  {
+    id: 5,
+    title: "Fecha",
+    width: 2,
+    value: (budget) => formatedDate(budget.createdAt)
+  },
+  {
+    id: 5,
     title: "Total",
     width: 2,
     value: (budget) => formatedPrice(getTotalSum(budget.products))
+  },
+  {
+    id: 7,
+    title: "Vendedor",
+    align: "left",
+    value: (budget) => budget.seller
   },
 ];
 
@@ -75,10 +95,18 @@ const BUDGET_FORM_PRODUCT_COLUMNS = [
   { title: "Subtotal", value: "subtotal", id: 4 },
   { title: "Desc.", value: "discount", id: 5 },
   { title: "Total", value: "total", id: 6 },
-  { title: "Acciones", value: "actions", id: 7 },
+  { title: "Acciones", value: "actions", id: 7, hide: (readonly) => readonly },
+];
+
+const FILTERS = [
+  { value: 'customer.name', placeholder: 'Cliente' },
+  { value: 'seller', placeholder: 'Vendedor' },
 ];
 
 export {
-  BUDGETS_COLUMNS, BUDGET_FORM_PRODUCT_COLUMNS, PRODUCTS_COLUMNS
+  BUDGETS_COLUMNS,
+  BUDGET_FORM_PRODUCT_COLUMNS,
+  PRODUCTS_COLUMNS,
+  FILTERS
 };
 

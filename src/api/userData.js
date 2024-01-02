@@ -17,10 +17,6 @@ export async function getUserData() {
     }
   });
 
-  if (!response.isAuthorized) {
-    throw new Error('No se pudo obtener la información del rol del usuario');
-  };
-
   sessionStorage.setItem("userData", response);
   return response;
 };

@@ -2,12 +2,11 @@
 import { GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { HEADERS } from "../customers.common";
-import { ButtonContainer } from "./styles";
+import { FILTERS, HEADERS } from "../customers.common";
 import { Table } from '@/components/common/table';
 import { ModalDelete } from '@/components/common/modals';
 import { useCallback, useState } from "react";
-import { set } from "react-hook-form";
+import { ButtonsContainer } from "@/components/common/custom";
 
 const CustomersPage = ({ customers = [], onDelete }) => {
   const { push } = useRouter();
@@ -49,14 +48,20 @@ const CustomersPage = ({ customers = [], onDelete }) => {
 
   return (
     <>
-      <ButtonContainer>
+      <ButtonsContainer>
         <GoToButton
           color="green"
           text="Crear cliente"
           iconName="add"
           goTo={PAGES.CUSTOMERS.CREATE} />
-      </ButtonContainer>
-      <Table headers={HEADERS} elements={mapCustomersForTable(customers)} page={PAGES.CUSTOMERS} actions={actions} />
+      </ButtonsContainer>
+      <Table
+        headers={HEADERS}
+        elements={mapCustomersForTable(customers)}
+        page={PAGES.CUSTOMERS}
+        actions={actions}
+        filters={FILTERS}
+      />
       <ModalDelete
         showModal={showModal}
         setShowModal={setShowModal}

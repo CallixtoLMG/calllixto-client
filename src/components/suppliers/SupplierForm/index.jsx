@@ -1,37 +1,25 @@
 "use client";
-import { PAGES, REGEX } from "@/constants";
+import { PAGES, RULES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box } from "rebass";
-import { Form, Icon } from "semantic-ui-react";
-import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, MaskedInput, PhoneContainer, Textarea } from "./styles";
-import { RuledLabel } from "@/components/common/forms";
+import { MaskedInput, PhoneContainer } from "./styles";
+import { RuledLabel, Form, FieldsContainer, FormField, Input, Label, TextArea, Segment } from "@/components/common/custom";
+import { SubmitAndRestore } from "@/components/common/buttons";
+import { formatedPhone } from "@/utils";
 
-const SupplierForm = ({ supplier, onSubmit }) => {
+const EMPTY_SUPPLIER = { id: '', name: '', email: '', phone: { areaCode: '', number: '' }, address: '', comments: '' };
+
+const SupplierForm = ({ supplier, onSubmit, readonly }) => {
   const { push } = useRouter();
   const { handleSubmit, control, reset, formState: { errors, isDirty } } = useForm({ defaultValues: supplier });
   const isUpdating = useMemo(() => !!supplier?.id, [supplier]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleReset = useCallback((supplier) => {
-    reset(supplier || { name: '', id: '', comments: '' });
+    reset(supplier || EMPTY_SUPPLIER);
   }, [reset]);
-
-  const buttonConfig = useMemo(() => {
-    return {
-      submit: {
-        icon: isUpdating ? "edit" : "add",
-        title: isUpdating ? "Actualizar" : "Crear",
-      },
-      restore: {
-        onClick: () => handleReset(isUpdating ? supplier : null),
-        icon: isUpdating ? 'undo' : 'erase',
-        title: isUpdating ? 'Restaurar' : 'Limpiar'
-      }
-
-    }
-  }, [supplier, handleReset, isUpdating]);
 
   const handleForm = (data) => {
     setIsLoading(true);
@@ -39,56 +27,62 @@ const SupplierForm = ({ supplier, onSubmit }) => {
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.SUPPLIERS.BASE);
-    }, 1000);
+    }, 2000);
   };
 
   return (
     <Form onSubmit={handleSubmit(handleForm)}>
-      <FormContainer>
-        <FieldsContainer>
-          <FormField>
-            <RuledLabel title="Código" message={errors?.id?.message} required />
+      <FieldsContainer>
+        <FormField>
+          <RuledLabel title="Código" message={errors?.id?.message} required />
+          {!readonly ? (
             <Controller
               name="id"
               control={control}
-              rules={{
-                required: 'Campo requerido',
-                pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
-              }}
+              rules={RULES.REQUIRED_TWO_DIGIT}
               render={({ field }) => (
                 <Input
-                  placeholder="Código (A1)"
                   {...field}
+                  placeholder="Código (A1)"
                   disabled={isUpdating}
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                   maxLength={2}
                 />
               )}
             />
-          </FormField>
-          <FormField width="50%">
-            <RuledLabel title="Nombre" message={errors?.name?.message} required />
+          ) : (
+            <Segment>{supplier?.id}</Segment>
+          )}
+        </FormField>
+        <FormField width="50%">
+          <RuledLabel title="Nombre" message={errors?.name?.message} required />
+          {!readonly ? (
             <Controller
               name="name"
               control={control}
-              rules={{ required: 'Campo requerido' }}
+              rules={RULES.REQUIRED}
               render={({ field }) => <Input {...field} placeholder="Nombre" />}
             />
-          </FormField>
-        </FieldsContainer>
-        <FieldsContainer>
-          <FormField flex="none" width="200px">
-            <Label>Teléfono</Label>
+          ) : (
+            <Segment>{supplier?.name}</Segment>
+          )}
+        </FormField>
+      </FieldsContainer>
+      <FieldsContainer>
+        <FormField flex="none" width="200px">
+        <RuledLabel title="Teléfono" message={errors?.phone?.areaCode?.message || errors?.phone?.number?.message} />
+          {!readonly ? (
             <PhoneContainer>
               <Box width="70px">
                 <Controller
                   name="phone.areaCode"
                   control={control}
+                  rules={RULES.PHONE.AREA_CODE}
                   render={({ field }) =>
                     <MaskedInput
+                      {...field}
                       mask="9999"
                       maskChar={null}
-                      {...field}
                       placeholder="Área"
                     />
                   }
@@ -98,55 +92,70 @@ const SupplierForm = ({ supplier, onSubmit }) => {
                 <Controller
                   name="phone.number"
                   control={control}
+                  rules={RULES.PHONE.NUMBER}
                   render={({ field }) =>
                     <MaskedInput
+                      {...field}
                       mask="99999999"
                       maskChar={null}
-                      {...field}
-                      placeholder="Numero"
+                      placeholder="Número"
                     />}
                 />
               </Box>
             </PhoneContainer>
-          </FormField>
-          <FormField flex="1">
-            <RuledLabel title="Email" message={errors?.email?.message} />
+          ) : (
+            <Segment>{formatedPhone(supplier?.phone?.areaCode, supplier?.phone?.number)}</Segment>
+          )}
+        </FormField>
+        <FormField flex="1">
+          <RuledLabel title="Email" message={errors?.email?.message} />
+          {!readonly ? (
             <Controller
               name="email"
               control={control}
-              rules={{ pattern: { value: REGEX.EMAIL, message: 'Ingresar un mail válido' } }}
+              rules={RULES.EMAIL}
               render={({ field }) => <Input {...field} placeholder="Email" />}
             />
-          </FormField>
-          <FormField flex="1">
-            <Label >Dirección</Label>
+          ) : (
+            <Segment>{supplier?.email}</Segment>
+          )}
+        </FormField>
+        <FormField flex="1">
+          <Label >Dirección</Label>
+          {!readonly ? (
             <Controller
               name="address"
               control={control}
               render={({ field }) => <Input {...field} placeholder="Dirección" />}
             />
-          </FormField>
-        </FieldsContainer>
-        <FieldsContainer>
-          <Label >Comentarios</Label>
-          <Controller
-            name="comments"
-            control={control}
-            render={({ field }) => <Textarea maxLength="2000" {...field} placeholder="Comentarios" />}
-          />
-        </FieldsContainer>
-        <ButtonsContainer>
-          <Button
-            disabled={isLoading || !isDirty}
-            loading={isLoading}
-            type="submit"
-            color="green">
-            <Icon name={buttonConfig.submit.icon} />{buttonConfig.submit.title}</Button>
-          <Button type="button" onClick={buttonConfig.restore.onClick} color="brown" disabled={isLoading || !isDirty}>
-            <Icon name={buttonConfig.restore.icon} />{buttonConfig.restore.title}
-          </Button>
-        </ButtonsContainer>
-      </FormContainer>
+          ) : (
+            <Segment>{supplier?.address}</Segment>
+          )}
+        </FormField>
+      </FieldsContainer>
+      <FieldsContainer>
+        <Label >Comentarios</Label>
+        <Controller
+          name="comments"
+          control={control}
+          render={({ field }) => (
+            <TextArea
+              {...field}
+              maxLength="2000"
+              placeholder="Comentarios"
+              disabled={readonly}
+              readonly
+            />
+          )}
+        />
+      </FieldsContainer>
+      <SubmitAndRestore
+        show={!readonly}
+        isUpdating={isUpdating}
+        isLoading={isLoading}
+        isDirty={isDirty}
+        onClick={() => handleReset(isUpdating ? { ...EMPTY_SUPPLIER, ...supplier } : null)}
+      />
     </Form>
   )
 };

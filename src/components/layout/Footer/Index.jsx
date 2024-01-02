@@ -3,14 +3,15 @@ import { PAGES } from "@/constants";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { List } from 'semantic-ui-react';
-import { ModContainer, ModSegment } from "./styles";
+import { ModContainer } from "./styles";
+import { Segment } from "@/components/common/custom";
 
 const Footer = () => {
   const pathname = usePathname();
   return (
     <>
       {pathname !== PAGES.LOGIN.BASE &&
-        <ModSegment>
+        <Segment>
           <ModContainer >
             <div>
               <Image
@@ -29,7 +30,7 @@ const Footer = () => {
               </List.Item>
             </List>
           </ModContainer>
-        </ModSegment >
+        </Segment>
       }
     </>
   )

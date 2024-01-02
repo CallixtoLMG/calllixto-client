@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Form, Segment } from "semantic-ui-react";
+import { Form } from "semantic-ui-react";
 import { Loader } from "@/components/layout";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "./styled";
 
@@ -41,42 +41,40 @@ const LoginForm = ({ onSubmit }) => {
             </div>
           </ModHeader>
           <Form onSubmit={handleSubmit(handleForm)} size='large'>
-            <Segment stacked>
-              <Controller
-                name="email"
-                control={control}
-                render={({ field }) =>
-                (<Form.Input
-                  placeholder='Correo electrónico'
-                  fluid
-                  icon='user'
-                  iconPosition='left'
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) =>
+              (<Form.Input
+                {...field}
+                placeholder='Correo electrónico'
+                fluid
+                icon='user'
+                iconPosition='left'
+              />
+              )}
+            />
+            <Controller
+              name="password"
+              control={control}
+              render={({ field }) => (
+                <Form.Input
                   {...field}
+                  type='password'
+                  placeholder='Contraseña'
+                  fluid
+                  icon='lock'
+                  iconPosition='left'
                 />
-                )}
-              />
-              <Controller
-                name="password"
-                control={control}
-                render={({ field }) => (
-                  <Form.Input
-                    type='password'
-                    placeholder='Contraseña'
-                    fluid
-                    icon='lock'
-                    iconPosition='left'
-                    {...field}
-                  />
-                )}
-              />
-              <ModButton fluid="true" size='large'>
-                Ingresar
-              </ModButton>
-            </Segment>
+              )}
+            />
+            <ModButton fluid="true" size='large'>
+              Ingresar
+            </ModButton>
           </Form>
           {recovery &&
             <ModMessage>
-              <Link href={PAGES.PRODUCTS.BASE}> Perdiste tu contraseña?</Link>
+              <Link href={PAGES.PRODUCTS.BASE}>Perdiste tu contraseña?</Link>
             </ModMessage>}
         </ModGridColumn>
       </ModGrid>

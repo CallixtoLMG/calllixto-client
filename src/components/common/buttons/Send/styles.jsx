@@ -1,17 +1,17 @@
 import { Flex } from "rebass";
-import { Button } from "semantic-ui-react";
+import { Button as SButton } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ModalContainer = styled(Flex)`
   flex-direction: row;
 `;
 
-const ModButton = styled(Button)({
+const Button = styled(SButton)({
   width: "170px!important",
   padding: "10px 0!important",
 });
 
-const MailButton = styled(Button)`
+const MailButton = styled(SButton)`
   background-color: ${(props) => props.background || 'inherit'};
   color: white!important;
 `;
@@ -23,5 +23,4 @@ const ButtonContainer = styled(Flex)`
   height: 34px!important;
 `;
 
-export { ButtonContainer, MailButton, ModButton, ModalContainer };
-
+export { ButtonContainer, MailButton, Button, ModalContainer };

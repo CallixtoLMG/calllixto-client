@@ -1,26 +1,29 @@
 "use client";
-import { PageHeader, Loader } from "@/components/layout";
+import { Loader, useBreadcrumContext } from "@/components/layout";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { deleteBrand, useListBrands } from "@/api/brands";
 import { useRole, useValidateToken } from "@/hooks/userData";
+import { useEffect } from "react";
 
 const Brands = () => {
   useValidateToken();
   const { brands, isLoading } = useListBrands();
   const role = useRole();
+  const { setLabels } = useBreadcrumContext();
+
+  useEffect(() => {
+    setLabels(['Marcas']);
+  }, [setLabels]);
 
   return (
-    <>
-      <PageHeader title={"Marcas"} />
-      <Loader active={isLoading}>
-        <BrandsPage
-          brands={brands || []}
-          role={role}
-          isLoading={isLoading}
-          onDelete={deleteBrand}
-        />
-      </Loader>
-    </>
+    <Loader active={isLoading}>
+      <BrandsPage
+        brands={brands || []}
+        role={role}
+        isLoading={isLoading}
+        onDelete={deleteBrand}
+      />
+    </Loader>
   );
 };
 

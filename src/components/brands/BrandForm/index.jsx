@@ -1,37 +1,22 @@
 "use client";
-import { PAGES } from "@/constants";
+import { PAGES, RULES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Form, Icon } from "semantic-ui-react";
-import { Button, ButtonsContainer, FieldsContainer, FormContainer, FormField, Input, Label, Textarea } from "./styles";
-import { RuledLabel } from "@/components/common/forms";
-import { REGEX } from "@/constants";
+import { Form, FieldsContainer, FormField, Input, Label, RuledLabel, TextArea, Segment } from "@/components/common/custom";
+import { SubmitAndRestore } from "@/components/common/buttons";
 
-const BrandForm = ({ brand, onSubmit }) => {
+const EMPTY_BRAND = { name: '', id: '', comments: '' };
+
+const BrandForm = ({ brand, onSubmit, readonly }) => {
   const { push } = useRouter();
   const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: brand });
   const isUpdating = useMemo(() => !!brand?.id, [brand]);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleReset = useCallback((brand) => {
-    reset(brand || { name: '', id: '', comments: '' });
+    reset(brand || EMPTY_BRAND);
   }, [reset]);
-
-  const buttonConfig = useMemo(() => {
-    return {
-      submit: {
-        icon: isUpdating ? "edit" : "add",
-        title: isUpdating ? "Actualizar" : "Crear",
-      },
-      restore: {
-        onClick: () => handleReset(isUpdating ? brand : null),
-        icon: isUpdating ? 'undo' : 'erase',
-        title: isUpdating ? 'Restaurar' : 'Limpiar'
-      }
-
-    }
-  }, [brand, handleReset, isUpdating]);
 
   const handleForm = (data) => {
     setIsLoading(true);
@@ -39,22 +24,19 @@ const BrandForm = ({ brand, onSubmit }) => {
     setTimeout(() => {
       setIsLoading(false);
       push(PAGES.BRANDS.BASE);
-    }, 1000);
+    }, 2000);
   };
 
   return (
     <Form onSubmit={handleSubmit(handleForm)}>
-      <FormContainer>
-        <FieldsContainer>
-          <FormField>
-            <RuledLabel title="Código" message={errors?.id?.message} required />
+      <FieldsContainer>
+        <FormField>
+          <RuledLabel title="Código" message={errors?.id?.message} required />
+          {!readonly ? (
             <Controller
               name="id"
               control={control}
-              rules={{
-                required: 'Campo requerido',
-                pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
-              }}
+              rules={RULES.REQUIRED_TWO_DIGIT}
               render={({ field }) => (
                 <Input
                   placeholder="Código (A1)"
@@ -65,38 +47,47 @@ const BrandForm = ({ brand, onSubmit }) => {
                 />
               )}
             />
-          </FormField>
-          <FormField width="50%">
-            <RuledLabel title="Nombre" message={errors?.name?.message} required />
+          ) : (
+            <Segment>{brand?.id}</Segment>
+          )}
+        </FormField>
+        <FormField width="50%">
+          <RuledLabel title="Nombre" message={errors?.name?.message} required />
+          {!readonly ? (
             <Controller
               name="name"
               control={control}
-              rules={{ required: 'Campo requerido' }}
+              rules={RULES.REQUIRED}
               render={({ field }) => <Input {...field} placeholder="Nombre" />}
             />
-          </FormField>
-        </FieldsContainer>
-        <FieldsContainer>
-          <Label>Comentarios</Label>
-          <Controller
-            name="comments"
-            control={control}
-            render={({ field }) => <Textarea maxLength="2000" {...field} placeholder="Comentarios" />}
-          />
-        </FieldsContainer>
-        <ButtonsContainer>
-          <Button
-            disabled={isLoading || !isDirty}
-            loading={isLoading}
-            type="submit"
-            color="green">
-            <Icon name={buttonConfig.submit.icon} />{buttonConfig.submit.title}
-          </Button>
-          <Button type="button" onClick={buttonConfig.restore.onClick} color="brown" disabled={isLoading || !isDirty}>
-            <Icon name={buttonConfig.restore.icon} />{buttonConfig.restore.title}
-          </Button>
-        </ButtonsContainer>
-      </FormContainer>
+          ) : (
+            <Segment>{brand?.name}</Segment>
+          )}
+        </FormField>
+      </FieldsContainer>
+      <FieldsContainer>
+        <Label>Comentarios</Label>
+        <Controller
+          name="comments"
+          control={control}
+          render={({ field }) => (
+            <TextArea
+              {...field}
+              maxLength="2000"
+              placeholder="Comentarios"
+              disabled={readonly}
+              readonly
+            />
+          )}
+        />
+      </FieldsContainer>
+      <SubmitAndRestore
+        show={!readonly}
+        isUpdating={isUpdating}
+        isLoading={isLoading}
+        isDirty={isDirty}
+        onClick={() => handleReset(isUpdating ? { ...EMPTY_BRAND, ...brand } : null)}
+      />
     </Form>
   )
 };

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Flex } from "rebass";
-import { Container, Input, Label, Table } from "semantic-ui-react";
+import { Container, Label, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ContainerModal = styled(Flex)`
@@ -43,8 +43,8 @@ const ModTableContainer = styled(Flex)`
   overflow-y: scroll!important;
   overflow-x: hidden!important;
   margin-bottom: 14px!important;
-  border: 1px solid rgba(34, 36, 38, 0.15); 
-  border-bottom: 1px solid #ccc; 
+  border: 1px solid rgba(34, 36, 38, 0.15);
+  border-bottom: 1px solid #ccc;
   border-radius: 4px!important;
 `;
 
@@ -53,26 +53,9 @@ const ModalModLabel = styled(Label)({
   display: "block!important"
 });
 
-const ModLabel = styled(Label)`
-  > span {
-    width: 170px!important;
-    padding: 10px 0!important;
-    margin-left: 10px!important;
-  };
-`;
-
 const ModalHeaderContainer = styled(Container)`
   margin: 0 0 14px 0 !important;
   margin-left: 0!important;
-`;
-
-const ModInput = styled(Input)`
-  input {
-    border: none!important;
-    background-color: inherit!important;
-    padding: 0!important;
-    text-align: center!important;
-  }
 `;
 
 const WarningMessage = styled.p`
@@ -93,6 +76,6 @@ const ModTableCell = styled(Table.Cell)({
   textAlign: 'center!important'
 });
 
-export { ContainerModal, DataNotFoundContainer, ModInput, ModLabel, ModLink, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage };
+export { ContainerModal, DataNotFoundContainer, ModLink, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage };
 
 
