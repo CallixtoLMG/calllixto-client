@@ -36,6 +36,16 @@ export const Label = styled(SLabel)`
   margin: 0!important;
 `;
 
+export const ImportLabel = styled(SLabel)`
+  width: 100%!important;
+  margin: auto!important;
+  height: 60px;
+  display: flex!important;
+  align-items: center!important;
+  justify-content: center!important;
+  font-size: 1em!important;
+`;
+
 export const TextArea = styled(STextarea)`
   margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);

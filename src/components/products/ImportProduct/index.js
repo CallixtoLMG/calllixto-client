@@ -6,7 +6,7 @@ import { Form, Icon, Modal, Segment, Table, Transition } from "semantic-ui-react
 import * as XLSX from "xlsx";
 import { PRODUCT_COLUMNS } from "../products.common";
 import { ContainerModal, DataNotFoundContainer, ModTable, ModTableCell, ModTableContainer, ModTableHeaderCell, ModTableRow, ModalHeaderContainer, ModalModLabel, SubContainer, WarningMessage } from "./styles";
-import { Input, Button } from "@/components/common/custom";
+import { Input, Button, ImportLabel } from "@/components/common/custom";
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
   const { handleSubmit, control, reset, setValue, watch } = useForm();
@@ -55,6 +55,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
         Codigo: "code",
         Nombre: "name",
         Precio: "price",
+        "Codigo Proveedor": "providerCode"
       };
       const transformedHeaders = headersRow.map((header) => {
         return columnMapping[header] || header;
@@ -163,16 +164,19 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                         <Table.Body key={`${newProduct.code}-${index}`}>
                           <ModTableRow >
                             <ModTableCell>{index + 1}</ModTableCell>
+                            <ModTableCell>
+                            <ImportLabel>{newProduct.code}</ImportLabel>
+                            </ModTableCell>
                             <Controller
-                              key={`newProducts[${index}].code`}
-                              name={`newProducts[${index}].code`}
+                              key={`newProducts[${index}].providerCode`}
+                              name={`newProducts[${index}].providerCode`}
                               control={control}
-                              defaultValue={(`newProducts[${index}].code`).toUpperCase()}
-                              rules={validationRules.code}
+                              defaultValue={newProducts[index].providerCode ? `newProducts[${index}].providerCode` : ""}
                               render={({ field, fieldState }) => (
-                                <ModTableCell key={`newProducts[${index}].code`} >
+                                <ModTableCell key={`newProducts[${index}].providerCode`} >
                                   <Input {...field} />
-                                  {fieldState?.invalid && <WarningMessage >{validationRules.code.message}</WarningMessage>}
+                                  {fieldState?.invalid && <WarningMessage >
+                                  </WarningMessage>}
                                 </ModTableCell>
                               )}
                             />

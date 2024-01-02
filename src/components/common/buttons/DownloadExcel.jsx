@@ -12,10 +12,10 @@ const Button = styled(SButton)`
 const ButtonDownload = () => {
   const handleDownload = () => {
     const mockData = [
-      ['Codigo', 'Nombre', 'Precio'],
-      ['a000', "Producto1", '200'],
-      ['a001', "Producto2", '500'],
-      ['a002', "Producto3", '800'],
+      ['Codigo', 'Codigo Proveedor', 'Nombre', 'Precio'],
+      ['a000', 'CP001', "Producto1", '200'],
+      ['a001', 'CP002', "Producto2", '500'],
+      ['a002', 'CP003', "Producto3", '800'],
     ];
     const ws = XLSX.utils.aoa_to_sheet(mockData);
     const wb = XLSX.utils.book_new();
