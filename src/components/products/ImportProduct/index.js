@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
@@ -11,7 +10,6 @@ import { Cell, HeaderCell } from "@/components/common/table";
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
   const { handleSubmit, control, reset, setValue } = useForm();
-  const { refresh } = useRouter()
   const [open, setOpen] = useState(false);
   const [newProducts, setNewProducts] = useState([]);
   const [editProducts, setEditProducts] = useState([]);
@@ -27,6 +25,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
   }, [inputRef]);
 
   const handleModalClose = () => {
+    inputRef.current.value = null;
     setOpen(false);
   };
 
@@ -36,16 +35,20 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
 
   const handleFileUpload = (e) => {
     reset();
+
     const fileName = e.target.files[0]?.name;
     if (!fileName) {
       return;
     };
+
     setSelectedFile(fileName);
     const reader = new FileReader();
     const file = e.target.files[0];
+
     if (!(file instanceof Blob)) {
       return;
     };
+
     reader.readAsBinaryString(file);
     reader.onload = (e) => {
       const data = e.target.result;
@@ -53,6 +56,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
+
       const columnMapping = {
         Codigo: "code",
         Nombre: "name",
@@ -60,22 +64,27 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
         "Codigo Proveedor": "providerCode",
         Comentarios: "comments",
       };
+
       const transformedHeaders = headersRow.map((header) => {
         return columnMapping[header] || header;
       });
+
       for (let i = 0; i < transformedHeaders.length; i++) {
         sheet[XLSX.utils.encode_cell({ r: 0, c: i })] = {
           v: transformedHeaders[i],
           t: 's',
         };
       };
+
       let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
       const nonExistingProducts = [];
       const existingProducts = [];
       const existingCodes = {};
+
       products.forEach((product) => {
         existingCodes[product.code.toUpperCase()] = true;
       });
+
       parsedData.forEach((product) => {
         const code = String(product.code).toUpperCase();
         const price = typeof product.price === 'string'
@@ -88,6 +97,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
           nonExistingProducts.push(formattedProduct);
         }
       });
+
       setEditProducts(existingProducts);
       setNewProducts(nonExistingProducts);
       setValue('newProducts', nonExistingProducts);
@@ -96,16 +106,11 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
     };
   };
 
-  const handleAcceptCreate = (data) => {
-    !!data?.newProducts?.length && createBatch(data.newProducts);
-    !!data?.editProducts?.length && editBatch(data.editProducts);
-
-    setTimeout(() => {
-      refresh();
-    }, 1000);
-
+  const handleAcceptCreate = async (data) => {
     setIsLoading(true);
-    setOpen(false);
+    !!data?.newProducts?.length &&  await createBatch(data.newProducts);
+    !!data?.editProducts?.length && await editBatch(data.editProducts);
+    setIsLoading(false);
   };
 
   return (

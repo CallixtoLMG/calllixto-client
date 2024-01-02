@@ -2,11 +2,11 @@ import { now } from "@/utils";
 import { toast } from "react-hot-toast";
 import { instance as axios } from './axios';
 
-export const baseCreate = async (url, model, message) => {
+export const baseCreate = async (url, model, message, addCreatedDate = true) => {
   let data;
 
   try {
-    const response = await axios.post(url, { ...model, createdAt: now() });
+    const response = await axios.post(url, { ...model, ...(addCreatedDate && { createdAt: now() }) });
     data = response.data;
   } catch (error) {
     console.error(error);
@@ -19,11 +19,11 @@ export const baseCreate = async (url, model, message) => {
   }
 };
 
-export const baseUpdate = async (url, model, message) => {
+export const baseUpdate = async (url, model, message, addUpdatedDate) => {
   let data;
 
   try {
-    const response = await axios.put(url, { ...model, updatedAt: now() });
+    const response = await axios.put(url, { ...model, ...(addUpdatedDate && { updatedAt: now() }) });
     data = response.data;
   } catch (error) {
     console.error(error);

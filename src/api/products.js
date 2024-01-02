@@ -29,9 +29,9 @@ export function useGetProduct(code) {
 };
 
 export async function createBatch(products) {
-  baseCreate(`${PRODUCTS_URL}/${CREATE_BATCH}`, products.map(product => ({ ...product, createdAt: now() })), 'Productos creados!');
+  baseCreate(`${PRODUCTS_URL}/${CREATE_BATCH}`, { products: products.map(product => ({ ...product, createdAt: now() })) }, 'Productos creados!', false);
 }
 
 export async function editBatch(products) {
-  baseCreate(`${PRODUCTS_URL}/${EDIT_BATCH}`, products.map(product => ({ ...product, createdAt: now() })), 'Productos actualizados!');
+  baseUpdate(`${PRODUCTS_URL}/${EDIT_BATCH}`, { products: products.map(product => ({ ...product, updatedAt: now() })) }, 'Productos actualizados!', false);
 }
