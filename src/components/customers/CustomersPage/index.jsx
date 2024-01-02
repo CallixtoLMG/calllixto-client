@@ -16,10 +16,6 @@ const CustomersPage = ({ customers = [], onDelete }) => {
 
   const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar el cliente "${name}"?`, []);
 
-  const mapCustomersForTable = useCallback((customer) => {
-    return customer.map((customer, index) => ({ ...customer, key: index + 1 }));
-  }, []);
-
   const actions = [
     {
       id: 1,
@@ -57,8 +53,8 @@ const CustomersPage = ({ customers = [], onDelete }) => {
       </ButtonsContainer>
       <Table
         headers={HEADERS}
-        elements={mapCustomersForTable(customers)}
-        page={{ page: PAGES.CUSTOMERS }}
+        elements={customers}
+        page={PAGES.CUSTOMERS}
         actions={actions}
         filters={FILTERS}
       />

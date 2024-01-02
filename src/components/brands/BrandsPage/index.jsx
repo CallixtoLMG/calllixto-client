@@ -44,10 +44,6 @@ const BrandsPage = ({ brands = [], role, onDelete }) => {
     setIsLoading(false);
   }, [onDelete, selectedBrand?.id]);
 
-  const mapBrandsForTable = useCallback((brands) => {
-    return brands.map(brand => ({ ...brand, key: brand.id }));
-  }, []);
-
   return (
     <>
       {visibilityRules.canSeeButtons &&
@@ -56,8 +52,8 @@ const BrandsPage = ({ brands = [], role, onDelete }) => {
         </ButtonsContainer>}
       <Table
         headers={BRAND_COLUMNS}
-        elements={mapBrandsForTable(brands)}
-        page={{ page: PAGES.BRANDS }}
+        elements={brands}
+        page={PAGES.BRANDS}
         actions={actions}
         filters={FILTERS}
       />

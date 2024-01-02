@@ -58,9 +58,10 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
           <DownloadExcelButton />
         </ButtonsContainer>}
       <Table
+        mainKey="code"
         headers={PRODUCT_COLUMNS}
         elements={mapProductsForTable(products)}
-        page={{ page: PAGES.PRODUCTS, key: 'code' }}
+        page={PAGES.PRODUCTS}
         actions={actions}
         filters={FILTERS}
       />

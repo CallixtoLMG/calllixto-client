@@ -48,4 +48,3 @@ export const getBrandCode = (code) => {
 export const getProductCode = (code) => {
   return code.slice(4);
 }
-

@@ -19,7 +19,7 @@ const EMPTY_PRODUCT = {
   discount: 0,
 };
 const EMPTY_BUDGET = (user) => ({
-  seller: `${user.firstName} ${user.lastName}`,
+  seller: `${user?.firstName} ${user?.lastName}`,
   customer: {
     name: '',
     address: '',

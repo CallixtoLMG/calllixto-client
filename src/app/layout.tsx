@@ -15,13 +15,15 @@ const inter = Inter({ subsets: ['latin'] });
 
 const NavigationContainer = styled.div`
   position: fixed;
-  top: 65px;
-  left: 10px;
+  top: 60px;
   padding: 10px 15px;
   display: flex;
   z-index: 2;
   align-items: center;
   column-gap: 20px;
+  background-color: #fff;
+  width: 100%;
+  border-bottom: 1px solid #ddd;
 `;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

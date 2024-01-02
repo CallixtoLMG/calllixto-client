@@ -14,7 +14,8 @@ const FiltersContainer = styled(Flex)`
   align-items: center;
 `;
 
-const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [] }) => {
+const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id' }) => {
+  console.log({ key: mainKey })
   const { push } = useRouter();
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset } = useForm({ defaultValues });
@@ -93,7 +94,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
             filteredElements.map((element) => {
               if (page) {
                 return (
-                  <LinkRow key={element.key} onClick={() => push(page.page.SHOW(element[page.key || 'id']))}>
+                  <LinkRow key={element[mainKey]} onClick={() => push(page.SHOW(element[mainKey]))}>
                     {headers.map(header => (
                       <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
                         {header.value(element)}
@@ -110,7 +111,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
                 );
               }
               return (
-                <Table.Row key={element.key}>
+                <Table.Row key={element[mainKey]}>
                   {headers.map(header => (
                     <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
                       {header.value(element)}
