@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 import { Breadcrumb as SBreadcrumb, BreadcrumbDivider, BreadcrumbSection } from 'semantic-ui-react';
 
-const BreadcrumContext = createContext(undefined);
+const BreadcrumContext = createContext();
 
 const BreadcrumProvider = ({ children }) => {
   const [labels, setLabels] = useState([]);

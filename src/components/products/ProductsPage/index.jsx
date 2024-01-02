@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useState } from "react";
 import { Flex } from "rebass";
 import ImportProducts from "../ImportProduct";
-import { PRODUCT_COLUMNS } from "../products.common";
+import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
 import { ButtonContainer } from "./styles";
 
 const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete }) => {
@@ -60,7 +60,13 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
             <DownloadExcelButton />
           </Flex>
         </ButtonContainer>}
-      <Table headers={PRODUCT_COLUMNS} elements={mapProductsForTable(products)} page={PAGES.PRODUCTS} actions={actions} />
+      <Table
+        headers={PRODUCT_COLUMNS}
+        elements={mapProductsForTable(products)}
+        page={PAGES.PRODUCTS}
+        actions={actions}
+        filters={FILTERS}
+      />
       <ModalDelete
         showModal={showModal}
         setShowModal={setShowModal}

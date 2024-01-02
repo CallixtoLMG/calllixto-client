@@ -3,6 +3,7 @@ import {
   Segment as SSegment,
   Input as SInput,
   Label as SLabel,
+  Button as SButton,
   TextArea as STextarea,
   Dropdown as SDropdown
 } from "semantic-ui-react";
@@ -27,6 +28,7 @@ export const Input = styled(SInput)`
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   height: ${({ height }) => height || '50px'} !important;
+  width: ${({ width }) => width ? `${width} !important` : ''};
 `;
 
 export const Label = styled(SLabel)`
@@ -54,5 +56,9 @@ export const Dropdown = styled(SDropdown)`
   };
   i.dropdown.icon {
     top:15px!important;
-};
+  };
+`;
+
+export const Button = styled(SButton)`
+  width: ${({ width }) => width ? `${width} !important` : ''};
 `;

@@ -43,4 +43,9 @@ const SUPPLIERS_COLUMNS = [
   },
 ];
 
-export { SUPPLIERS_COLUMNS };
+const FILTERS = [
+  { value: 'name', placeholder: 'Nombre' },
+  { value: 'address', placeholder: 'Dirección' }
+];
+
+export { SUPPLIERS_COLUMNS, FILTERS };

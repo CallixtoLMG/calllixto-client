@@ -98,7 +98,15 @@ const BUDGET_FORM_PRODUCT_COLUMNS = [
   { title: "Acciones", value: "actions", id: 7, hide: (readonly) => readonly },
 ];
 
+const FILTERS = [
+  { value: 'customer.name', placeholder: 'Cliente' },
+  { value: 'seller', placeholder: 'Vendedor' },
+];
+
 export {
-  BUDGETS_COLUMNS, BUDGET_FORM_PRODUCT_COLUMNS, PRODUCTS_COLUMNS
+  BUDGETS_COLUMNS,
+  BUDGET_FORM_PRODUCT_COLUMNS,
+  PRODUCTS_COLUMNS,
+  FILTERS
 };
 

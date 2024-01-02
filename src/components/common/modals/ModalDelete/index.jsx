@@ -40,6 +40,7 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
               value={confirmationText}
               onChange={handleConfirmationTextChange}
               ref={inputElement}
+              width="220px"
             />
             <Flex flexDirection="row-reverse">
               <Button

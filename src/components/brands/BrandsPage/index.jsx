@@ -7,7 +7,7 @@ import { ButtonContainer } from "./styles";
 import { Table } from "@/components/common/table";
 import { useCallback, useState } from "react";
 import { ModalDelete } from "@/components/common/modals";
-import { BRAND_COLUMNS } from "../brands.common";
+import { BRAND_COLUMNS, FILTERS } from "../brands.common";
 
 const BrandsPage = ({ brands = [], role, onDelete }) => {
   const { push } = useRouter();
@@ -50,7 +50,13 @@ const BrandsPage = ({ brands = [], role, onDelete }) => {
         <ButtonContainer>
           <GoToButton goTo={PAGES.BRANDS.CREATE} iconName="add" text="Crear marca" color="green" />
         </ButtonContainer>}
-      <Table headers={BRAND_COLUMNS} elements={brands} page={PAGES.BRANDS} actions={actions} />
+      <Table
+        headers={BRAND_COLUMNS}
+        elements={brands}
+        page={PAGES.BRANDS}
+        actions={actions}
+        filters={FILTERS}
+      />
       <ModalDelete
         showModal={showModal}
         setShowModal={setShowModal}

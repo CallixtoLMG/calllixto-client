@@ -7,7 +7,7 @@ import { ButtonContainer } from "./styles";
 import { Table } from "@/components/common/table";
 import { useCallback, useState } from "react";
 import { ModalDelete } from "@/components/common/modals";
-import { SUPPLIERS_COLUMNS } from "../suppliers.common";
+import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
 
 const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
   const { push } = useRouter();
@@ -50,7 +50,13 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
         <ButtonContainer>
           <GoToButton goTo={PAGES.SUPPLIERS.CREATE} iconName="add" text="Crear proveedor" color="green" />
         </ButtonContainer>}
-      <Table headers={SUPPLIERS_COLUMNS} elements={suppliers} page={PAGES.SUPPLIERS} actions={actions} />
+      <Table
+        headers={SUPPLIERS_COLUMNS}
+        elements={suppliers}
+        page={PAGES.SUPPLIERS}
+        actions={actions}
+        filters={FILTERS}
+      />
       <ModalDelete
         showModal={showModal}
         setShowModal={setShowModal}
