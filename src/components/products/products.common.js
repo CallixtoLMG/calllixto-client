@@ -59,6 +59,34 @@ const PRODUCT_COLUMNS = [
   }
 ];
 
+const IMPORT_PRODUCTS_COLUMNS = [
+  {
+    id: 1,
+    title: "Código",
+    width: 2,
+  },
+  {
+    id: 2,
+    title: "Código Proveedor",
+    width: 1,
+  },
+  {
+    id: 3,
+    title: "Nombre",
+    align: "left",
+  },
+  {
+    id: 4,
+    title: "Precio",
+    width: 2,
+  },
+  {
+    id: 5,
+    title: "Comentarios",
+    align: "left",
+  }
+]
+
 const FILTERS = [
   { value: 'code', placeholder: 'Código' },
   { value: 'supplierCode', placeholder: 'Código proveedor' },
@@ -67,5 +95,6 @@ const FILTERS = [
 
 export {
   PRODUCT_COLUMNS,
+  IMPORT_PRODUCTS_COLUMNS,
   FILTERS
 };
