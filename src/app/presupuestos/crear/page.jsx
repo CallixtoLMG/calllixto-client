@@ -1,17 +1,23 @@
 "use client";
-import { create } from "@/api/budgets";
+import { create, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useUserData, useValidateToken } from "@/hooks/userData";
 import { useEffect, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 
 const CreateBudget = () => {
   useValidateToken();
   const user = useUserData();
+  const searchParams = useSearchParams();
+  const cloneId = searchParams.get('clonar');
+
   const { products = [], isLoading: loadingProducts } = useListProducts();
   const { customers = [], isLoading: loadingCustomers } = useListCustomers();
+  const { budget, isLoading: loadingBudget } = useGetBudget(cloneId);
+
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
 
@@ -39,8 +45,8 @@ const CreateBudget = () => {
   })), [customers]);
 
   return (
-    <Loader active={loadingProducts || loadingCustomers}>
-      <BudgetForm onSubmit={create} products={mappedProducts} customers={mappedCustomers} user={user} />
+    <Loader active={loadingProducts || loadingCustomers || loadingBudget}>
+      <BudgetForm onSubmit={create} products={mappedProducts} customers={mappedCustomers} user={user} budget={budget}/>
     </Loader>
   )
 };
