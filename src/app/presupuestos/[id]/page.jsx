@@ -1,7 +1,7 @@
 "use client";
 import { useGetBudget } from "@/api/budgets";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { useBreadcrumContext, Loader } from "@/components/layout";
+import { useBreadcrumContext, Loader, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useUserData, useValidateToken } from "@/hooks/userData";
 import { formatedDate } from "@/utils";
@@ -14,6 +14,12 @@ const Budget = ({ params }) => {
   const user = useUserData();
   const { budget, isLoading } = useGetBudget(params.id);
   const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+
+  useEffect(() => {
+    resetActions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLabels(['Presupuestos', budget ? `${budget?.customer?.name} (${formatedDate(budget?.createdAt)})` : '']);

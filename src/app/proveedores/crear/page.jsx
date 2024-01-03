@@ -1,6 +1,6 @@
 "use client";
 import { create } from "@/api/suppliers";
-import { useBreadcrumContext } from "@/components/layout";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,12 @@ const CreateSupplier = () => {
   const { push } = useRouter();
   const role = useRole();
   const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+
+  useEffect(() => {
+    resetActions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLabels(['Proveedores', 'Crear']);

@@ -1,12 +1,10 @@
 "use client";
-import { GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { FILTERS, HEADERS } from "../customers.common";
 import { Table } from '@/components/common/table';
 import { ModalDelete } from '@/components/common/modals';
 import { useCallback, useState } from "react";
-import { ButtonsContainer } from "@/components/common/custom";
 
 const CustomersPage = ({ customers = [], onDelete }) => {
   const { push } = useRouter();
@@ -44,13 +42,6 @@ const CustomersPage = ({ customers = [], onDelete }) => {
 
   return (
     <>
-      <ButtonsContainer>
-        <GoToButton
-          color="green"
-          text="Crear cliente"
-          iconName="add"
-          goTo={PAGES.CUSTOMERS.CREATE} />
-      </ButtonsContainer>
       <Table
         headers={HEADERS}
         elements={customers}

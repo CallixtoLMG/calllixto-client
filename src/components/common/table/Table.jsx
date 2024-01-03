@@ -15,7 +15,6 @@ const FiltersContainer = styled(Flex)`
 `;
 
 const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id' }) => {
-  console.log({ key: mainKey })
   const { push } = useRouter();
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset } = useForm({ defaultValues });

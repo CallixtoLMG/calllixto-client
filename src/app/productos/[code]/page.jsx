@@ -1,6 +1,6 @@
 "use client";
 import { edit, useGetProduct } from "@/api/products";
-import { useBreadcrumContext, Loader } from "@/components/layout";
+import { useBreadcrumContext, Loader, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,12 @@ const Product = ({ params }) => {
   const { product, isLoading } = useGetProduct(params.code);
   const [allowUpdate, Toggle] = useAllowUpdate();
   const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+
+  useEffect(() => {
+    resetActions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLabels(['Productos', product?.name]);

@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
-import { Icon, Modal, Table, Transition } from "semantic-ui-react";
+import { ButtonContent, Icon, Modal, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { IMPORT_PRODUCTS_COLUMNS } from "../products.common";
 import { ContainerModal, DataNotFoundContainer, TableContainer } from "./styles";
@@ -108,7 +108,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
 
   const handleAccept = async (data) => {
     setIsLoading(true);
-    !!data?.newProducts?.length &&  await createBatch(data.newProducts);
+    !!data?.newProducts?.length && await createBatch(data.newProducts);
     !!data?.editProducts?.length && await editBatch(data.editProducts);
     setIsLoading(false);
   };
@@ -123,8 +123,17 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
         style={{ display: 'none' }}
         onChange={handleFileUpload}
       />
-      <Button type="button" color="blue" onClick={handleClick}>
-        <Icon name="upload" /> Importar
+      <Button
+        animated="vertical"
+        color="blue"
+        onClick={handleClick}
+        type="button"
+        width="100%"
+      >
+        <ButtonContent hidden>Importar</ButtonContent>
+        <ButtonContent visible>
+          <Icon name="upload" />
+        </ButtonContent>
       </Button>
       <Transition animation="fade" duration={500} visible={open} >
         <Modal

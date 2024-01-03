@@ -1,5 +1,4 @@
 "use client";
-import { GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from 'next/navigation';
@@ -7,7 +6,6 @@ import { Table } from "@/components/common/table";
 import { useCallback, useState } from "react";
 import { ModalDelete } from "@/components/common/modals";
 import { BRAND_COLUMNS, FILTERS } from "../brands.common";
-import { ButtonsContainer } from "@/components/common/custom";
 
 const BrandsPage = ({ brands = [], role, onDelete }) => {
   const { push } = useRouter();
@@ -46,10 +44,6 @@ const BrandsPage = ({ brands = [], role, onDelete }) => {
 
   return (
     <>
-      {visibilityRules.canSeeButtons &&
-        <ButtonsContainer>
-          <GoToButton goTo={PAGES.BRANDS.CREATE} iconName="add" text="Crear marca" color="green" />
-        </ButtonsContainer>}
       <Table
         headers={BRAND_COLUMNS}
         elements={brands}

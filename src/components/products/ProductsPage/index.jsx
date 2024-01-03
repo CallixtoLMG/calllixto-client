@@ -1,16 +1,13 @@
 "use client";
-import { DownloadExcelButton, GoToButton } from "@/components/common/buttons";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from 'next/navigation';
 import { useCallback, useState } from "react";
-import ImportProducts from "../ImportProduct";
 import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
-import { ButtonsContainer } from "@/components/common/custom";
 
-const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete }) => {
+const ProductsPage = ({ products = [], role, onDelete }) => {
   const { push } = useRouter();
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
@@ -51,12 +48,6 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
 
   return (
     <>
-      {visibilityRules.canSeeButtons &&
-        <ButtonsContainer>
-          <GoToButton goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
-          <ImportProducts products={products} createBatch={createBatch} editBatch={editBatch} />
-          <DownloadExcelButton />
-        </ButtonsContainer>}
       <Table
         mainKey="code"
         headers={PRODUCT_COLUMNS}
