@@ -57,7 +57,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
               }}
             />
           ) : (
-            <Segment>{product?.supplier}</Segment>
+            <Segment>{product?.supplierName}</Segment>
           )}
         </FormField>
         <FormField>
@@ -79,7 +79,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
               }}
             />
           ) : (
-            <Segment>{product?.brand}</Segment>
+            <Segment>{product?.brandName}</Segment>
           )}
         </FormField>
       </FieldsContainer>
