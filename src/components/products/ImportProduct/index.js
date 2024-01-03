@@ -21,11 +21,11 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
   const inputRef = useRef();
 
   const handleClick = useCallback(() => {
+    inputRef.current.value = null;
     inputRef?.current?.click();
   }, [inputRef]);
 
   const handleModalClose = () => {
-    inputRef.current.value = null;
     setOpen(false);
   };
 
