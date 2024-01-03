@@ -1,13 +1,11 @@
 "use client";
 import { PAGES } from "@/constants";
-import { useRouter } from "next/navigation";
 import { FILTERS, HEADERS } from "../customers.common";
 import { Table } from '@/components/common/table';
 import { ModalDelete } from '@/components/common/modals';
 import { useCallback, useState } from "react";
 
 const CustomersPage = ({ customers = [], onDelete }) => {
-  const { push } = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,13 +15,6 @@ const CustomersPage = ({ customers = [], onDelete }) => {
   const actions = [
     {
       id: 1,
-      icon: 'edit',
-      color: 'blue',
-      onClick: (customer) => { push(PAGES.CUSTOMERS.UPDATE(customer.id)) },
-      tooltip: 'Editar'
-    },
-    {
-      id: 2,
       icon: 'erase',
       color: 'red',
       onClick: (customer) => {
@@ -44,7 +35,7 @@ const CustomersPage = ({ customers = [], onDelete }) => {
     <>
       <Table
         headers={HEADERS}
-        elements={customers}
+        elements={customers.map((customer, index) => ({ ...customer, key: index + 1 }))}
         page={PAGES.CUSTOMERS}
         actions={actions}
         filters={FILTERS}

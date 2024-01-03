@@ -1,14 +1,12 @@
 "use client";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
-import { useRouter } from 'next/navigation';
 import { Table } from "@/components/common/table";
 import { useCallback, useState } from "react";
 import { ModalDelete } from "@/components/common/modals";
 import { BRAND_COLUMNS, FILTERS } from "../brands.common";
 
 const BrandsPage = ({ brands = [], role, onDelete }) => {
-  const { push } = useRouter();
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
@@ -19,13 +17,6 @@ const BrandsPage = ({ brands = [], role, onDelete }) => {
   const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
-      icon: 'edit',
-      color: 'blue',
-      onClick: (brand) => { push(PAGES.BRANDS.UPDATE(brand.id)) },
-      tooltip: 'Editar'
-    },
-    {
-      id: 2,
       icon: 'erase',
       color: 'red',
       onClick: (brand) => {

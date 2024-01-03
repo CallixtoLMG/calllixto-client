@@ -3,12 +3,10 @@ import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
-import { useRouter } from 'next/navigation';
 import { useCallback, useState } from "react";
 import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
 
 const ProductsPage = ({ products = [], role, onDelete }) => {
-  const { push } = useRouter();
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -23,13 +21,6 @@ const ProductsPage = ({ products = [], role, onDelete }) => {
   const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
-      icon: 'edit',
-      color: 'blue',
-      onClick: (product) => { push(PAGES.PRODUCTS.UPDATE(product.code)) },
-      tooltip: 'Editar'
-    },
-    {
-      id: 2,
       icon: 'erase',
       color: 'red',
       onClick: (product) => {

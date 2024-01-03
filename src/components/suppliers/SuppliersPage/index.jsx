@@ -1,14 +1,12 @@
 "use client";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
-import { useRouter } from 'next/navigation';
 import { Table } from "@/components/common/table";
 import { useCallback, useState } from "react";
 import { ModalDelete } from "@/components/common/modals";
 import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
 
 const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
-  const { push } = useRouter();
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
@@ -19,13 +17,6 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
   const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
-      icon: 'edit',
-      color: 'blue',
-      onClick: (supplier) => { push(PAGES.SUPPLIERS.UPDATE(supplier.id)) },
-      tooltip: 'Editar'
-    },
-    {
-      id: 2,
       icon: 'erase',
       color: 'red',
       onClick: (supplier) => {
