@@ -1,19 +1,38 @@
 "use client";
-import { useBreadcrumContext, Loader } from "@/components/layout";
+import { useBreadcrumContext, Loader, useNavActionsContext } from "@/components/layout";
 import { deleteSupplier, useListSuppliers } from "@/api/suppliers";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { useRole, useValidateToken } from "@/hooks/userData";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { PAGES } from "@/constants";
+import { Rules } from "@/visibilityRules";
 
 const Suppliers = () => {
   useValidateToken();
   const { suppliers, isLoading } = useListSuppliers();
   const role = useRole();
   const { setLabels } = useBreadcrumContext();
+  const { setActions } = useNavActionsContext();
+  const { push } = useRouter();
 
   useEffect(() => {
     setLabels(['Proveedores']);
   }, [setLabels]);
+
+  useEffect(() => {
+    const visibilityRules = Rules(role);
+    const actions = visibilityRules.canSeeButtons ? [
+      {
+        id: 1,
+        icon: 'add',
+        color: 'green',
+        onClick: () => { push(PAGES.SUPPLIERS.CREATE) },
+        text: 'Crear'
+      }
+    ] : [];
+    setActions(actions);
+  }, [push, role, setActions]);
 
   return (
     <Loader active={isLoading}>

@@ -3,7 +3,7 @@ import { create } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { Loader, useBreadcrumContext } from "@/components/layout";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useUserData, useValidateToken } from "@/hooks/userData";
 import { useEffect, useMemo } from "react";
 
@@ -13,6 +13,12 @@ const CreateBudget = () => {
   const { products = [], isLoading: loadingProducts } = useListProducts();
   const { customers = [], isLoading: loadingCustomers } = useListCustomers();
   const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+
+  useEffect(() => {
+    resetActions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLabels(['Presupuestos', 'Crear']);

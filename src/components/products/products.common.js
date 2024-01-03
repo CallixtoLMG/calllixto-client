@@ -11,13 +11,13 @@ const PRODUCT_COLUMNS = [
       <>
         <Popup
           size="tiny"
-          content={product.supplier}
+          content={product.supplierName}
           position="top center"
           trigger={<span>{getSupplierCode(product.code)}</span>}
         />&nbsp;
         <Popup
           size="tiny"
-          content={product.brand}
+          content={product.brandName}
           position="top center"
           trigger={<span>{getBrandCode(product.code)}</span>}
         />&nbsp;

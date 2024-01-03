@@ -2,7 +2,7 @@
 import { useListBrands } from "@/api/brands";
 import { create } from "@/api/products";
 import { useListSuppliers } from "@/api/suppliers";
-import { Loader, useBreadcrumContext } from "@/components/layout";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useRole, useValidateToken } from "@/hooks/userData";
@@ -16,6 +16,12 @@ const CreateProduct = () => {
   const { brands, isLoading: isLoadingBrands } = useListBrands();
   const { suppliers, isLoading: isLoadingSuppliers } = useListSuppliers();
   const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+
+  useEffect(() => {
+    resetActions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLabels(['Productos', 'Crear']);

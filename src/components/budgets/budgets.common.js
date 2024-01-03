@@ -1,4 +1,6 @@
-import { formatedDate, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import dayjs from "dayjs";
+import { Popup } from "semantic-ui-react";
 
 const BUDGETS_COLUMNS = [
   {
@@ -31,7 +33,13 @@ const BUDGETS_COLUMNS = [
     id: 5,
     title: "Fecha",
     width: 2,
-    value: (budget) => formatedDate(budget.createdAt)
+    value: (budget) => (
+      <Popup
+      position="top center"
+        content={dayjs(budget.createdAt).format('hh:mm A')}
+        trigger={<span>{dayjs(budget.createdAt).format('DD-MM-YYYY')}</span>}
+      />
+    )
   },
   {
     id: 6,
@@ -99,7 +107,8 @@ const BUDGET_FORM_PRODUCT_COLUMNS = [
 ];
 
 const FILTERS = [
-  { value: 'customer.name', placeholder: 'Cliente' },
+  { value: 'id', placeholder: 'Código' },
+  { value: 'customerName', placeholder: 'Cliente', map: 'customer.name' },
   { value: 'seller', placeholder: 'Vendedor' },
 ];
 

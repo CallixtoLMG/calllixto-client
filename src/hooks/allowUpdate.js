@@ -1,11 +1,9 @@
-import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Box } from "rebass";
 import { Checkbox } from "semantic-ui-react";
 
 export const useAllowUpdate = () => {
-  const update = useSearchParams().get('update');
-  const [allowUpdate, setAllowUpdate] = useState(update);
+  const [allowUpdate, setAllowUpdate] = useState(false);
 
   const button = (
     <Box marginY={15}>

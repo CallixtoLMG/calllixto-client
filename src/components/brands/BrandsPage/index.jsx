@@ -1,16 +1,12 @@
 "use client";
-import { GoToButton } from "@/components/common/buttons";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
-import { useRouter } from 'next/navigation';
 import { Table } from "@/components/common/table";
 import { useCallback, useState } from "react";
 import { ModalDelete } from "@/components/common/modals";
 import { BRAND_COLUMNS, FILTERS } from "../brands.common";
-import { ButtonsContainer } from "@/components/common/custom";
 
 const BrandsPage = ({ brands = [], role, onDelete }) => {
-  const { push } = useRouter();
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
@@ -21,13 +17,6 @@ const BrandsPage = ({ brands = [], role, onDelete }) => {
   const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
-      icon: 'edit',
-      color: 'blue',
-      onClick: (brand) => { push(PAGES.BRANDS.UPDATE(brand.id)) },
-      tooltip: 'Editar'
-    },
-    {
-      id: 2,
       icon: 'erase',
       color: 'red',
       onClick: (brand) => {
@@ -44,20 +33,12 @@ const BrandsPage = ({ brands = [], role, onDelete }) => {
     setIsLoading(false);
   }, [onDelete, selectedBrand?.id]);
 
-  const mapBrandsForTable = useCallback((brands) => {
-    return brands.map(brand => ({ ...brand, key: brand.id }));
-  }, []);
-
   return (
     <>
-      {visibilityRules.canSeeButtons &&
-        <ButtonsContainer>
-          <GoToButton goTo={PAGES.BRANDS.CREATE} iconName="add" text="Crear marca" color="green" />
-        </ButtonsContainer>}
       <Table
         headers={BRAND_COLUMNS}
-        elements={mapBrandsForTable(brands)}
-        page={{ page: PAGES.BRANDS }}
+        elements={brands}
+        page={PAGES.BRANDS}
         actions={actions}
         filters={FILTERS}
       />

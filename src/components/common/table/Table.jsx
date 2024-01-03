@@ -1,4 +1,5 @@
 import { Button } from "@/components/common/custom";
+import { get } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -13,7 +14,7 @@ const FiltersContainer = styled(Flex)`
   align-items: center;
 `;
 
-const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [] }) => {
+const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id' }) => {
   const { push } = useRouter();
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset } = useForm({ defaultValues });
@@ -22,17 +23,12 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
   const filter = useCallback((data) => {
     console.log(data)
     const newElements = elements.filter(element => {
-      return Object.entries(data).every(([key, value]) => {
-        const keys = key.split('.');
-        const nestedValue = keys.reduce((acc, nestedKey) => acc && acc[nestedKey], element);
-  
-        const stringValue = (nestedValue !== undefined && nestedValue !== null) ? String(nestedValue).toLowerCase() : '';
-  
-        return stringValue.includes(String(value).toLowerCase());
+      return filters.every(filter => {
+        return get(element, filter.map ? filter.map : filter.value, '')?.toLowerCase().includes(data[filter.value].toLowerCase());
       });
     });
     setFilteredElements(newElements);
-  }, [elements]);
+  }, [elements, filters]);
 
   const handleRestore = useCallback(() => {
     reset(defaultValues);
@@ -98,7 +94,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
             filteredElements.map((element) => {
               if (page) {
                 return (
-                  <LinkRow key={element.key} onClick={() => push(page.page.SHOW(element[page.key || 'id']))}>
+                  <LinkRow key={element[mainKey]} onClick={() => push(page.SHOW(element[mainKey]))}>
                     {headers.map(header => (
                       <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
                         {header.value(element)}
@@ -115,7 +111,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
                 );
               }
               return (
-                <Table.Row key={element.key}>
+                <Table.Row key={element[mainKey]}>
                   {headers.map(header => (
                     <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
                       {header.value(element)}

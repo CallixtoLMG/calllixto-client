@@ -1,6 +1,6 @@
 "use client";
 import { edit, useGetBrand } from "@/api/brands";
-import { Loader, useBreadcrumContext } from "@/components/layout";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useValidateToken } from "@/hooks/userData";
@@ -14,6 +14,12 @@ const Brand = ({ params }) => {
   const { brand, isLoading } = useGetBrand(params.id);
   const [allowUpdate, Toggle] = useAllowUpdate();
   const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+
+  useEffect(() => {
+    resetActions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLabels(['Marcas', brand?.name]);

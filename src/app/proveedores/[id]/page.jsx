@@ -1,5 +1,5 @@
 "use client";
-import { useBreadcrumContext, Loader } from "@/components/layout";
+import { useBreadcrumContext, Loader, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
@@ -14,6 +14,12 @@ const Supplier = ({ params }) => {
   const { supplier, isLoading } = useGetSupplier(params.id);
   const [allowUpdate, Toggle] = useAllowUpdate();
   const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+
+  useEffect(() => {
+    resetActions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLabels(['Proveedores', supplier?.name]);

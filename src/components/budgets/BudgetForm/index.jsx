@@ -12,7 +12,7 @@ import ProductSearch from "../../common/search/search";
 import { HeaderCell, TotalText, } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
-  seller: `${user.firstName} ${user.lastName}`,
+  seller: `${user?.firstName} ${user?.lastName}`,
   customer: {
     name: '',
     address: '',
