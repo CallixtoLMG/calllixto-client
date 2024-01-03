@@ -1,12 +1,12 @@
+import { Button } from "@/components/common/custom";
 import { useRouter } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { Box, Flex } from 'rebass';
 import { Form, Header, Icon, Input, Popup, Segment, Table } from "semantic-ui-react";
+import styled from "styled-components";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow } from "./styles";
-import { Flex, Box } from 'rebass';
-import styled from "styled-components";
-import { Controller, useForm } from "react-hook-form";
-import { useCallback, useMemo, useState } from "react";
-import { Button } from "@/components/common/custom";
 
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
@@ -20,8 +20,16 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
   const [filteredElements, setFilteredElements] = useState(elements);
 
   const filter = useCallback((data) => {
+    console.log(data)
     const newElements = elements.filter(element => {
-      return Object.keys(data).every(filter => element[filter]?.toLowerCase().includes(data[filter]?.toLowerCase()));
+      return Object.entries(data).every(([key, value]) => {
+        const keys = key.split('.');
+        const nestedValue = keys.reduce((acc, nestedKey) => acc && acc[nestedKey], element);
+  
+        const stringValue = (nestedValue !== undefined && nestedValue !== null) ? String(nestedValue).toLowerCase() : '';
+  
+        return stringValue.includes(String(value).toLowerCase());
+      });
     });
     setFilteredElements(newElements);
   }, [elements]);
