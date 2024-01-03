@@ -20,6 +20,18 @@ export const formatedPrice = (number) => {
   });
 };
 
+export const formatProductCode = (code, brand, supplier) => {
+  const firstPart = code ? code.substring(0, 2) : "";
+  const secondPart = code ? code.substring(2, 4) : "";
+  const thirdPart = code ? code.substring(4) : "";
+
+  return {
+    formattedCode: `${firstPart}-${secondPart}-${thirdPart}`,
+    brandName: brand,
+    supplierName: supplier,
+  };
+};
+
 export const formatedPercentage = (number) => {
   return number + " %"
 }

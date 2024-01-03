@@ -96,13 +96,14 @@ const PRODUCTS_COLUMNS = [
 ];
 
 const BUDGET_FORM_PRODUCT_COLUMNS = [
-  { title: "Nombre", value: "name", id: 1 },
-  { title: "Precio", value: "price", id: 2 },
-  { title: "Cantidad", value: "quantity", id: 3 },
-  { title: "Subtotal", value: "subtotal", id: 4 },
-  { title: "Desc.", value: "discount", id: 5 },
-  { title: "Total", value: "total", id: 6 },
-  { title: "Acciones", value: "actions", id: 7, hide: (readonly) => readonly },
+  { title: "Nombre", value: "name", id: 1, },
+  { title: "Código", value: "code", id: 2, },
+  { title: "Código Proveedor", value: "supplierCode", id: 3 },
+  { title: "Precio", value: "price", id: 4 },
+  { title: " Cantidad. ", value: "quantity", id: 5 },
+  { title: "Descuento", value: "discount", id: 6 },
+  { title: "Total", value: "total", id: 7 },
+  { title: "Acciones", value: "actions", id: 8, hide: (readonly) => readonly },
 ];
 
 const FILTERS = [
@@ -111,10 +112,29 @@ const FILTERS = [
   { value: 'seller', placeholder: 'Vendedor' },
 ];
 
+const PAYMETHOD = [{
+  text: 'Efectivo',
+  key: "Efectivo",
+  value: "Efectivo",
+}, {
+  text: 'Transferencia Bancaria',
+  key: "Transferencia Bancaria",
+  value: "Transferencia Bancaria",
+}, {
+  text: 'Tarjeta de débito',
+  key: "Tarjeta de débito",
+  value: "Tarjeta de débito",
+}, {
+  text: 'Tarjeta de crédito',
+  key: "Tarjeta de crédito",
+  value: "Tarjeta de crédito",
+}, {
+  text: 'Mercado Pago',
+  key: "Mercado Pago",
+  value: "Mercado Pago",
+},];
+
 export {
-  BUDGETS_COLUMNS,
-  BUDGET_FORM_PRODUCT_COLUMNS,
-  PRODUCTS_COLUMNS,
-  FILTERS
+  BUDGETS_COLUMNS, BUDGET_FORM_PRODUCT_COLUMNS, FILTERS, PAYMETHOD, PRODUCTS_COLUMNS
 };
 

@@ -1,19 +1,20 @@
 "use client";
+import { SubmitAndRestore } from "@/components/common/buttons";
+import { Dropdown, FieldsContainer, Form, FormField, Input, Label, Segment, TextArea } from "@/components/common/custom";
 import { PAGES, RULES } from "@/constants";
+import { formatedPrice } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
-import { Segment, Form, FieldsContainer, FormField, Input, Label, TextArea, Dropdown } from "@/components/common/custom";
-import { SubmitAndRestore } from "@/components/common/buttons";
-import { formatedPrice } from "@/utils";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplier: '', brand: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
   const { push } = useRouter();
-  const { handleSubmit, setValue, control, reset, watch, formState: { isDirty } } = useForm({ defaultValues: product });
-  const [supplierId = '', brandId = ''] = watch(['supplierId', 'brandId']);
+  const { handleSubmit, control, reset, formState: { isDirty } } = useForm({ defaultValues: product });
+  const [supplierId, setSupplierId] = useState("");
+  const [brandId, setBrandId] = useState("");
 
   const isUpdating = useMemo(() => !!product?.code, [product]);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +24,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
   }, [reset]);
 
   const handleForm = (data) => {
-    data.code = `${data.supplierId}${data.brandId}${data.code}`;
+    data.code = `${supplierId}${brandId}${data.code}`;
     setIsLoading(true);
     onSubmit(data);
     setTimeout(() => {
@@ -41,26 +42,19 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
         <FormField>
           <Label>Proveedor</Label>
           {!readonly && !isUpdating ? (
-            <Controller
-              name="supplierName"
-              control={control}
-              render={({ field }) => (
-                <Dropdown
-                  {...field}
-                  required
-                  name="supplier"
-                  placeholder='Proveedores'
-                  search
-                  selection
-                  minCharacters={2}
-                  noResultsMessage="Sin resultados!"
-                  options={suppliers}
-                  onChange={(e, { value }) => {
-                    field.onChange(value.name);
-                    setValue('supplierId', 'PA');
-                  }}
-                />
-              )}
+            <Dropdown
+              required
+              name="supplier"
+              placeholder='Proveedores'
+              search
+              selection
+              minCharacters={2}
+              noResultsMessage="Sin resultados!"
+              options={suppliers}
+              onChange={(e, { value }) => {
+                const selectedSupplier = suppliers.find((supplier) => supplier.name === value);
+                setSupplierId(selectedSupplier.id);
+              }}
             />
           ) : (
             <Segment>{product?.supplier}</Segment>
@@ -69,28 +63,20 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
         <FormField>
           <Label>Marca</Label>
           {!readonly && !isUpdating ? (
-            <Controller
-              name="brandName"
-              control={control}
-              rules={RULES.REQUIRED}
-              render={({ field }) => (
-                <Dropdown
-                  {...field}
-                  required
-                  name="brand"
-                  placeholder='Marcas'
-                  search
-                  selection
-                  minCharacters={2}
-                  noResultsMessage="Sin resultados!"
-                  options={brands}
-                  disabled={isUpdating}
-                  onChange={(e, { value }) => {
-                    field.onChange(value);
-                    setValue('brandId', 'PE');
-                  }}
-                />
-              )}
+            <Dropdown
+              required
+              name="brand"
+              placeholder='Marcas'
+              search
+              selection
+              minCharacters={2}
+              noResultsMessage="Sin resultados!"
+              options={brands}
+              disabled={isUpdating}
+              onChange={(e, { value }) => {
+                const brandSelected = brands.find((brand) => brand.name === value)
+                setBrandId(brandSelected.id);
+              }}
             />
           ) : (
             <Segment>{product?.brand}</Segment>
