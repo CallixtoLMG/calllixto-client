@@ -21,7 +21,6 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
   const [filteredElements, setFilteredElements] = useState(elements);
 
   const filter = useCallback((data) => {
-    console.log(data)
     const newElements = elements.filter(element => {
       return filters.every(filter => {
         return get(element, filter.map ? filter.map : filter.value, '')?.toLowerCase().includes(data[filter.value].toLowerCase());
