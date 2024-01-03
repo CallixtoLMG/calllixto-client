@@ -27,7 +27,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
       ...budget,
-      seller: `${user.firstName} ${user.lastName}`
+      seller: `${user?.firstName} ${user.lastName}`
     } : EMPTY_BUDGET(user),
   });
 
@@ -128,17 +128,17 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
             <Segment>{formatedPhone(budget?.customer?.phone?.areaCode, budget?.customer?.phone?.number)}</Segment>
           )}
         </FormField>
-
       </FieldsContainer>
-      <FormField width="300px">
-        <Label>Agregar Producto</Label>
-        <ProductSearch
-          products={products}
-          onProductSelect={(selectedProduct) => {
-            setValue("products", [...watchProducts, selectedProduct])
-          }}
-        />
-      </FormField>
+      {!readonly ? (
+        <FormField width="300px">
+          <Label>Agregar Producto</Label>
+          <ProductSearch
+            products={products}
+            onProductSelect={(selectedProduct) => {
+              setValue("products", [...watchProducts, selectedProduct])
+            }}
+          />
+        </FormField>) : ("")}
       <Table celled striped compact>
         <Table.Header>
           <Table.Row>
@@ -159,7 +159,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   trigger={<span>{formatProductCode(product.code).formattedCode.substring(0, 2)}</span>}
                   position="top center"
                   on="hover"
-                  content={`Brand: ${formatProductCode(product.code).brandName}`}
+                  content={`Brand: ${product.brandName}`}
                 />
                 {'-'}
                 <Popup
@@ -167,7 +167,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   trigger={<span>{formatProductCode(product.code).formattedCode.substring(3, 5)}</span>}
                   position="top center"
                   on="hover"
-                  content={`Supplier: ${formatProductCode(product.code).supplierName}`}
+                  content={`Supplier: ${product.supplierName}`}
                 />
                 {'-'}
                 <span>{formatProductCode(product.code).formattedCode.substring(6)}</span>

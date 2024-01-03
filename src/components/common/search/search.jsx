@@ -6,7 +6,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
   const [filteredProducts, setFilteredProducts] = useState(products);
 
   useEffect(() => {
-    setFilteredProducts(products.filter((product) =>
+    setFilteredProducts(products?.filter((product) =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.supplierCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -32,7 +32,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
       searchDelay={1000}
       onSearchChange={handleSearchChange}
       placeholder='Productos'
-      results={filteredProducts.slice(0, MAX_RESULTS).map((product) => ({
+      results={filteredProducts?.slice(0, MAX_RESULTS).map((product) => ({
         key: product.code,
         title: product.name,
         description: (
