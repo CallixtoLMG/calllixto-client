@@ -100,7 +100,7 @@ const BUDGET_FORM_PRODUCT_COLUMNS = [
   { title: "Código", value: "code", id: 2, },
   { title: "Código Proveedor", value: "supplierCode", id: 3 },
   { title: "Precio", value: "price", id: 4 },
-  { title: " Cantidad. ", value: "quantity", id: 5 },
+  { title: "Cantidad", value: "quantity", id: 5 },
   { title: "Descuento", value: "discount", id: 6 },
   { title: "Total", value: "total", id: 7 },
   { title: "Acciones", value: "actions", id: 8, hide: (readonly) => readonly },
