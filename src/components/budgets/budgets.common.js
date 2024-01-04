@@ -17,20 +17,6 @@ const BUDGETS_COLUMNS = [
   },
   {
     id: 3,
-    title: "Dirección",
-    align: "left",
-    width: 3,
-    value: (budget) => budget.customer?.address
-  },
-  {
-    id: 4,
-    title: "Teléfono",
-    align: "left",
-    width: 3,
-    value: (budget) => formatedPhone(budget.customer?.phone?.areaCode, budget.customer?.phone?.number)
-  },
-  {
-    id: 5,
     title: "Fecha",
     width: 2,
     value: (budget) => (
@@ -42,13 +28,13 @@ const BUDGETS_COLUMNS = [
     )
   },
   {
-    id: 6,
+    id: 4,
     title: "Total",
     width: 2,
     value: (budget) => formatedPrice(getTotalSum(budget.products))
   },
   {
-    id: 7,
+    id: 5,
     title: "Vendedor",
     align: "left",
     value: (budget) => budget.seller

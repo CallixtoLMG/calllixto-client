@@ -17,12 +17,14 @@ const ButtonSend = ({ customerData }) => {
         <ModalContainer>
           {customerData.phone &&
             <SButton
-              href={`${APIS.WSP((customerData.phone.areaCode+customerData.phone.number), customerData.name)}`}
+              href={`${APIS.WSP((`${customerData.phone.areaCode}${customerData.phone.number}`), customerData.name)}`}
               color='green' size="tiny"><Icon name='whatsapp' />WhatsApp</SButton>}
           {customerData.email &&
             <MailButton
               href={`${APIS.MAIL(customerData.email, customerData.name)}`}
-              background="rgb(219,68,55)!important" size="tiny" ><Icon name='mail' />Mail</MailButton>}
+              background="rgb(219,68,55)!important" size="tiny" ><Icon name='mail' />Mail
+            </MailButton>
+          }
         </ModalContainer>
       }
       on='click'

@@ -19,7 +19,7 @@ export const baseCreate = async (url, model, message, addCreatedDate = true) => 
   }
 };
 
-export const baseUpdate = async (url, model, message, addUpdatedDate) => {
+export const baseUpdate = async (url, model, message, addUpdatedDate = true) => {
   let data;
 
   try {
