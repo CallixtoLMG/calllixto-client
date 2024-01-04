@@ -2,16 +2,16 @@ import { BUDGET_FORM_PRODUCT_COLUMNS, PAYMETHOD } from "@/components/budgets/bud
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Cell } from "@/components/common/table";
+import { NoPrint, OnlyPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
-import { formatProductCode, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { formatProductCodePopup, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Icon, Popup, Button as SButton, Table } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
-import { HeaderCell, TotalText, } from "./styles";
-import { NoPrint, OnlyPrint } from "@/components/layout";
 import PDFfile from "../PDFfile";
+import { HeaderCell, TotalText, } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -24,6 +24,7 @@ const EMPTY_BUDGET = (user) => ({
 });
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) => {
+  const formattedPaymentMethods = budget?.paymentMethods.join(' - ');
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = useForm({
@@ -79,12 +80,12 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
           </FieldsContainer>
           <FieldsContainer>
             <FormField width="300px">
-              <Label>Cliente</Label>
+            <RuledLabel title="Nombre" message={errors?.customer?.name.message} required />
               {!readonly ? (
                 <Controller
                   name={`customer.name`}
                   control={control}
-                  rules={{ required: true }}
+                  rules={{ required: "Campo requerido" }}
                   render={({ field }) => (
                     <Dropdown
                       name={`customer`}
@@ -160,21 +161,21 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   <Cell>
                     <Popup
                       size="tiny"
-                      trigger={<span>{formatProductCode(product.code).formattedCode.substring(0, 2)}</span>}
+                      trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
                       position="top center"
                       on="hover"
-                      content={`Brand: ${product.brandName}`}
+                      content={product.brandName}
                     />
                     {'-'}
                     <Popup
                       size="tiny"
-                      trigger={<span>{formatProductCode(product.code).formattedCode.substring(3, 5)}</span>}
+                      trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>}
                       position="top center"
                       on="hover"
-                      content={`Supplier: ${product.supplierName}`}
+                      content={product.supplierName}
                     />
                     {'-'}
-                    <span>{formatProductCode(product.code).formattedCode.substring(6)}</span>
+                    <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
                   </Cell>
                   <Cell width={2}>
                     {product.supplierCode}
@@ -304,16 +305,16 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   )}
                 />
               ) : (
-                <Segment>{budget?.customer?.name}</Segment>
+                <Segment >{formattedPaymentMethods}</Segment>
               )}
             </FormField>
             <FormField flex="1">
-              <RuledLabel title="Fecha de vencimiento" message={errors?.email?.message} />
+              <RuledLabel title="Fecha de vencimiento" message={errors?.paymentMethods?.message} required />
               {!readonly ? (
                 <Controller
                   name="expirationOffsetDays"
                   control={control}
-                  render={({ field }) => <Input {...field} placeholder="Cantidad en días(p. ej: 3,10,12,etc)" />}
+                  render={({ field }) => <Input type="number" max="10" {...field} placeholder="Cantidad en días(p. ej: 3,10,12,etc)" />}
                 />
               ) : (
                 <Segment>{budget?.expirationOffsetDays}</Segment>
