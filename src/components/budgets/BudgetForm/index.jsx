@@ -1,23 +1,16 @@
-import { BUDGET_FORM_PRODUCT_COLUMNS } from "@/components/budgets/budgets.common";
+import { BUDGET_FORM_PRODUCT_COLUMNS, PAYMETHOD } from "@/components/budgets/budgets.common";
+import { SubmitAndRestore } from "@/components/common/buttons";
+import { Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { Cell } from "@/components/common/table";
 import { PAGES } from "@/constants";
-import { formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { formatProductCode, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Icon, Popup, Button as SButton, Table } from "semantic-ui-react";
-import { Button, HeaderCell, TotalText, WarningMessage } from "./styles";
-import { Flex, Box } from "rebass";
-import { Segment, FieldsContainer, FormField, Input, Label, Dropdown, Form } from "@/components/common/custom";
-import { SubmitAndRestore } from "@/components/common/buttons";
-import { Cell } from "@/components/common/table";
+import { Popup, Button as SButton, Table } from "semantic-ui-react";
+import ProductSearch from "../../common/search/search";
+import { HeaderCell, TotalText, } from "./styles";
 
-const EMPTY_PRODUCT = {
-  name: '',
-  price: 0,
-  total: 0,
-  quantity: 1,
-  discount: 0,
-};
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
   customer: {
@@ -25,35 +18,21 @@ const EMPTY_BUDGET = (user) => ({
     address: '',
     phone: ''
   },
-  products: [EMPTY_PRODUCT],
+  products: [],
 });
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { control, handleSubmit, setValue, watch, reset, formState: { isDirty } } = useForm({
+  const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
       ...budget,
-      seller: `${user.firstName} ${user.lastName}`
+      seller: `${user?.firstName} ${user.lastName}`
     } : EMPTY_BUDGET(user),
   });
 
-  const [triedToAddWithoutSelection, setTriedToAddWithoutSelection] = useState(false);
   const watchProducts = watch('products');
   const [total, setTotal] = useState(0);
-
-  const addProduct = () => {
-    const lastProduct = watchProducts[watchProducts.length - 1];
-    if (lastProduct?.code || !lastProduct) {
-      setValue('products', [
-        ...watchProducts,
-        { name: '', quantity: 1, discount: 0, price: 0 },
-      ]);
-      setTriedToAddWithoutSelection(false);
-    } else {
-      setTriedToAddWithoutSelection(true);
-    };
-  };
 
   const calculateTotal = useCallback(() => {
     setTotal(getTotalSum(watchProducts), [watchProducts]);
@@ -105,7 +84,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               render={({ field }) => (
                 <Dropdown
                   name={`customer`}
-                  placeholder='Clientes...'
+                  placeholder='Clientes'
                   search
                   selection
                   minCharacters={2}
@@ -150,76 +129,54 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
           )}
         </FormField>
       </FieldsContainer>
-      {!readonly && (
-        <Button
-          color="green"
-          type="button"
-          onClick={addProduct}
-        >
-          <Icon name="add" />Agregar producto
-        </Button>
-      )}
+      {!readonly ? (
+        <FormField width="300px">
+          <Label>Agregar Producto</Label>
+          <ProductSearch
+            products={products}
+            onProductSelect={(selectedProduct) => {
+              setValue("products", [...watchProducts, selectedProduct])
+            }}
+          />
+        </FormField>) : ("")}
       <Table celled striped compact>
         <Table.Header>
-          {BUDGET_FORM_PRODUCT_COLUMNS.map((column) => {
-            if (!column.hide?.(readonly)) return <HeaderCell $header key={column.id} >{column.title}</HeaderCell>;
-          })}
+          <Table.Row>
+            {BUDGET_FORM_PRODUCT_COLUMNS.map((column) => {
+              if (!column.hide?.(readonly)) return <HeaderCell $header key={column.id} >{column.title}</HeaderCell>;
+            })}
+          </Table.Row>
         </Table.Header>
         <Table.Body>
           {watchProducts.map((product, index) => (
             <Table.Row key={`${product.code}-${index}`}>
               <Cell align="left">
-                {!readonly ? (
-                  <Flex alignItems="center">
-                    <Controller
-                      name={`products[${index}].name`}
-                      control={control}
-                      rules={{ required: true }}
-                      render={({ field }) => (
-                        <>
-                          <Dropdown
-                            {...field}
-                            fluid
-                            search
-                            selection
-                            noResultsMessage="No se ha encontrado producto!"
-                            options={products}
-                            height="40px"
-                            onChange={(e, { value }) => {
-                              field.onChange(value);
-                              const product = products.find((opt) => opt.value === value);
-                              setValue(`products[${index}].price`, product.price);
-                              setValue(`products[${index}].code`, product.code);
-                              setValue(`products[${index}].quantity`, 1);
-                              setValue(`products[${index}].comments`, product.comments);
-                              calculateTotal();
-                            }}
-                          />
-                          {triedToAddWithoutSelection && !watchProducts[index].code && (
-                            <WarningMessage> Debe seleccionar un producto </WarningMessage>
-                          )}
-                        </>
-                      )}
-                    />
-                    {product.comments && (
-                      <Popup
-                        size="mini"
-                        content={product.comments}
-                        position="top center"
-                        trigger={
-                          <Box marginX="5px">
-                            <Icon name="info circle" color="red" size="large" />
-                          </Box>
-                        }
-                      />
-                    )}
-                  </Flex>
-                ) : (
-                  <p>{product?.name}</p>
-                )}
+                {product.name}
               </Cell>
               <Cell>
-                {formatedPrice(product.price)}
+                <Popup
+                  size="tiny"
+                  trigger={<span>{formatProductCode(product.code).formattedCode.substring(0, 2)}</span>}
+                  position="top center"
+                  on="hover"
+                  content={`Brand: ${product.brandName}`}
+                />
+                {'-'}
+                <Popup
+                  size="tiny"
+                  trigger={<span>{formatProductCode(product.code).formattedCode.substring(3, 5)}</span>}
+                  position="top center"
+                  on="hover"
+                  content={`Supplier: ${product.supplierName}`}
+                />
+                {'-'}
+                <span>{formatProductCode(product.code).formattedCode.substring(6)}</span>
+              </Cell>
+              <Cell width={2}>
+                {product.supplierCode}
+              </Cell>
+              <Cell width={1}>
+                {formatedPrice(product.price, product.brand)}
               </Cell>
               <Cell width={1}>
                 {!readonly ? (
@@ -244,10 +201,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   <p>{product?.quantity}</p>
                 )}
               </Cell>
-              <Cell>
-                {formatedPrice(product.price * product.quantity)}
-              </Cell>
-              <Cell>
+              <Cell width={1}>
                 {!readonly ? (
                   <Controller
                     name={`products[${index}].discount`}
@@ -272,7 +226,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   <p>{formatedPercentage(product?.discount)}</p>
                 )}
               </Cell>
-              <Cell>
+              <Cell width={2}>
                 {formatedPrice(getTotal(product))}
               </Cell>
               {!readonly && (
@@ -291,7 +245,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
         </Table.Body>
         <Table.Footer>
           <Table.Row>
-            <HeaderCell $right colSpan="5">
+            <HeaderCell $right colSpan="6">
               <TotalText>Total</TotalText>
             </HeaderCell>
             <HeaderCell $nonBorder>
@@ -301,6 +255,67 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
           </Table.Row>
         </Table.Footer>
       </Table>
+      <FieldsContainer>
+        <Label>Comentarios</Label>
+        <Controller
+          name="comments"
+          control={control}
+          render={({ field }) => (
+            <TextArea
+              {...field}
+              maxLength="2000"
+              placeholder="Comentarios"
+              disabled={readonly}
+              readonly
+            />
+          )}
+        />
+      </FieldsContainer>
+      <FieldsContainer>
+        <FormField width="10">
+          <Label>Metodos de pago</Label>
+          {!readonly ? (
+            <Controller
+              name={`paymentMethods`}
+              control={control}
+              rules={{ required: true }}
+              defaultValue={PAYMETHOD.map((method) => method.value)}
+              render={({ field }) => (
+                <Dropdown
+                  minHeight="50px"
+                  height="fit-content"
+                  name={`paymentMethods`}
+                  placeholder='Metodos de pago'
+                  multiple
+                  selection
+                  fluid
+                  minCharacters={2}
+                  noResultsMessage="No se ha encontrado metodo!"
+                  options={PAYMETHOD}
+                  value={field.value}
+                  onChange={(e, { value }) => {
+                    field.onChange(value);
+                  }}
+                />
+              )}
+            />
+          ) : (
+            <Segment>{budget?.customer?.name}</Segment>
+          )}
+        </FormField>
+        <FormField flex="1">
+          <RuledLabel title="Fecha de vencimiento" message={errors?.email?.message} />
+          {!readonly ? (
+            <Controller
+              name="expirationOffsetDays"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Cantidad en días(p. ej: 3,10,12,etc)" />}
+            />
+          ) : (
+            <Segment>{budget?.expirationOffsetDays}</Segment>
+          )}
+        </FormField>
+      </FieldsContainer>
       <SubmitAndRestore
         show={!readonly}
         isLoading={isLoading}
