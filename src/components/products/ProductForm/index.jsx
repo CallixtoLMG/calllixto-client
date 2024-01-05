@@ -1,6 +1,6 @@
 "use client";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Dropdown, FieldsContainer, Form, FormField, Input, Label, Segment, TextArea } from "@/components/common/custom";
+import { Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { PAGES, RULES } from "@/constants";
 import { formatedPrice } from "@/utils";
 import { useRouter } from "next/navigation";
@@ -12,7 +12,7 @@ const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplier: ''
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
   const { push } = useRouter();
-  const { handleSubmit, control, reset, formState: { isDirty } } = useForm({ defaultValues: product });
+  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: product });
   const [supplierId, setSupplierId] = useState("");
   const [brandId, setBrandId] = useState("");
 
@@ -84,7 +84,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
-        <FormField width={3}>
+        <FormField>
           <Label >Código</Label>
           {!readonly && !isUpdating ? (
             <Controller
@@ -124,7 +124,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
       </FieldsContainer>
       <FieldsContainer >
         <FormField flex="1" >
-          <Label>Nombre</Label>
+          <RuledLabel title="Nombre" message={errors?.name?.message} required />
           {!readonly ? (
             <Controller
               name="name"

@@ -1,11 +1,12 @@
+import { Flex } from "rebass";
 import { Table } from "semantic-ui-react";
 import styled from "styled-components";
-import { Flex } from "rebass";
 
 const Cell = styled(Table.Cell)`
-  text-align: ${({ align }) => align || "center!important"};
-  height: 40px;
+  height: 40px!important;
+  padding: 2px 7px!important;
   z-index: 2;
+  text-align: ${({ align }) => align || "center!important"};
 `;
 
 const HeaderCell = styled(Table.HeaderCell)`
@@ -45,5 +46,5 @@ const LinkRow = styled(Table.Row)`
   }
 `;
 
-export { ActionsContainer, InnerActionsContainer, Cell, HeaderCell, LinkRow };
+export { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow };
 

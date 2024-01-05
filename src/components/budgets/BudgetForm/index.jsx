@@ -3,8 +3,8 @@ import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Cell } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
-import { PAGES } from "@/constants";
-import { formatProductCodePopup, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { PAGES, RULES } from "@/constants";
+import { expirationDate, formatProductCodePopup, formatedDate, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -36,7 +36,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
 
   const watchProducts = watch('products');
   const [total, setTotal] = useState(0);
-
   const calculateTotal = useCallback(() => {
     setTotal(getTotalSum(watchProducts), [watchProducts]);
   }, [setTotal, watchProducts]);
@@ -80,7 +79,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
           </FieldsContainer>
           <FieldsContainer>
             <FormField width="300px">
-            <RuledLabel title="Nombre" message={errors?.customer?.name.message} required />
+              <RuledLabel title="Nombre" message={errors?.customer?.name.message} required />
               {!readonly ? (
                 <Controller
                   name={`customer.name`}
@@ -109,7 +108,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                 <Segment>{budget?.customer?.name}</Segment>
               )}
             </FormField>
-            <FormField flex={1}>
+            <FormField width={5}>
               <Label>Dirección</Label>
               {!readonly ? (
                 <Controller
@@ -136,7 +135,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
           </FieldsContainer>
           {!readonly ? (
             <FormField width="300px">
-              <Label>Agregar Producto</Label>
+              <RuledLabel title="Agregar Producto" message={errors?.message} required />
               <ProductSearch
                 products={products}
                 onProductSelect={(selectedProduct) => {
@@ -309,15 +308,21 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               )}
             </FormField>
             <FormField flex="1">
-              <RuledLabel title="Fecha de vencimiento" message={errors?.paymentMethods?.message} required />
+              <RuledLabel title="Fecha de vencimiento" message={errors?.expirationOffsetDays?.message} required />
               {!readonly ? (
                 <Controller
                   name="expirationOffsetDays"
                   control={control}
-                  render={({ field }) => <Input type="number" max="10" {...field} placeholder="Cantidad en días(p. ej: 3,10,12,etc)" />}
+                  rules={RULES.REQUIRED_THREE_NUMBERS}
+                  render={({ field }) =>
+                    <Input
+                      maxLength={50}
+                      {...field}
+                      placeholder="Cantidad en días(p. ej: 3, 10, 30, etc)"
+                    />}
                 />
               ) : (
-                <Segment>{budget?.expirationOffsetDays}</Segment>
+                <Segment>{formatedDate(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
               )}
             </FormField>
           </FieldsContainer>

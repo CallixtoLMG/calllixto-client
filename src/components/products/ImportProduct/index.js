@@ -1,12 +1,12 @@
+import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { Cell, HeaderCell } from "@/components/common/table";
 import { useCallback, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
-import { ButtonContent, Icon, Modal, Table, Transition } from "semantic-ui-react";
+import { ButtonContent, Icon, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { IMPORT_PRODUCTS_COLUMNS } from "../products.common";
-import { ContainerModal, DataNotFoundContainer, TableContainer } from "./styles";
-import { Input, Button, Label, Segment, Form, FormField, FieldsContainer, ButtonsContainer } from "@/components/common/custom";
-import { Cell, HeaderCell } from "@/components/common/table";
+import { ContainerModal, DataNotFoundContainer, Modal, TableContainer } from "./styles";
 
 const ImportExcel = ({ products, createBatch, editBatch }) => {
   const { handleSubmit, control, reset, setValue } = useForm();
@@ -265,7 +265,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                                     onChangeValue={(_, value) => {
                                       field.onChange(value);
                                     }}
-                                    InputElement={<Input />}
+                                    InputElement={<Input height="30px" />}
                                   />
                                 </Cell>
                               )}

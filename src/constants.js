@@ -51,13 +51,17 @@ const APIS = {
 const REGEX = {
   EMAIL: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,10}))$/,
   TWO_DIGIT_CODE: /^[A-Z0-9]{2}$/,
-  THREE_DIGIT_CODE: /^[A-Z0-9]{3}$/
-}
+  THREE_DIGIT_CODE: /^[A-Z0-9]{3}$/,
+  THREE_NUMBERS_CODE: /^[0-9]{1,3}$/,
+};
 
 const RULES = {
   REQUIRED: {
     required: 'Campo requerido'
   },
+  REQUIRED_PRODUCT: (value) => ({
+    required: value !== false ? 'Campo requerido' : 'Es necesario elegir un producto',
+  }),
   REQUIRED_TWO_DIGIT: {
     required: 'Campo requerido',
     pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
@@ -65,6 +69,10 @@ const RULES = {
   REQUIRED_THREE_DIGIT: {
     required: 'Campo requerido',
     pattern: { value: REGEX.THREE_DIGIT_CODE, message: 'El código debe ser de 3 cifras alfanumérico' }
+  },
+  REQUIRED_THREE_NUMBERS: {
+    required: 'Campo requerido',
+    pattern: { value: REGEX.THREE_NUMBERS_CODE, message: 'El valor puede ser hasta un máximo de 3 números' }
   },
   PHONE: {
     AREA_CODE: {
@@ -85,3 +93,4 @@ const RULES = {
 export {
   APIS, PAGES, REGEX, RULES
 };
+

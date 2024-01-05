@@ -1,10 +1,16 @@
 import { Flex } from "rebass";
-import { Container } from "semantic-ui-react";
+import { Container, Modal as SModal } from "semantic-ui-react";
 import styled from "styled-components";
+
+const Modal = styled(SModal)`
+  width: 90%!important;
+  height: 90vh!important;
+`;
 
 const ContainerModal = styled(Flex)`
   flex-direction: column!important;
   padding: 30px!important;
+  width: 100%!important;
 `;
 
 const DataNotFoundContainer = styled(Container)`
@@ -28,4 +34,5 @@ const WarningMessage = styled.p`
   font-size: 10px!important;
 `;
 
-export { ContainerModal, DataNotFoundContainer, TableContainer, WarningMessage };
+export { ContainerModal, DataNotFoundContainer, Modal, TableContainer, WarningMessage };
+

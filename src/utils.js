@@ -8,7 +8,13 @@ dayjs.extend(timezone)
 export const now = () => {
   const date = dayjs().tz(dayjs.tz.guess()).toISOString();
   return date;
-}
+};
+
+export const expirationDate = (createdAt, expirationOffsetDays) => {
+  const fechaCreacionParsed = dayjs(createdAt);
+  const fechaVencimiento = fechaCreacionParsed.add(expirationOffsetDays, 'day');
+  return fechaVencimiento.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+};
 
 export const formatedDate = (date) => dayjs(date).format('DD-MM-YYYY - hh:mm A');
 

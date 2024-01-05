@@ -12,7 +12,6 @@ export const FieldsContainer = styled(Flex)`
   justify-content: ${({ justifyContent }) => justifyContent};
   flex-wrap: wrap;
   column-gap: 20px;
-  max-width: 900px;
 `;
 
 export const ButtonsContainer = styled(Flex)`
