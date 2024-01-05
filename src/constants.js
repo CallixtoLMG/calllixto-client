@@ -87,7 +87,14 @@ const RULES = {
   EMAIL: {
     pattern: { value: REGEX.EMAIL, message: 'El email no es válido' }
   },
-  REQUIRED_PRICE: { required: true, min: 0.01 }
+  REQUIRED_PRICE: {
+    required: 'Campo requerido',
+    min: { value: 0.01, message: 'El precio debe ser mayor a 0' }
+  },
+  REQUIRED_POSITIVE: {
+    required: 'Campo requerido',
+    min: { value: 1, message: 'El campo debe ser mayor a 0' }
+  }
 }
 
 export {

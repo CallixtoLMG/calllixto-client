@@ -4,15 +4,17 @@ import { Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, S
 import { PAGES, RULES } from "@/constants";
 import { formatedPrice } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 
-const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplier: '', brand: '' };
+const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
   const { push } = useRouter();
-  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: product });
+  const { handleSubmit, control, reset, formState: { isDirty, errors, isSubmitted } } = useForm({ defaultValues: product });
+  const supplierRef = useRef(null);
+  const brandRef = useRef(null);
   const [supplierId, setSupplierId] = useState("");
   const [brandId, setBrandId] = useState("");
 
@@ -20,6 +22,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleReset = useCallback((product) => {
+    supplierRef.current.clearValue();
+    brandRef.current.clearValue();
     reset(product || EMPTY_PRODUCT);
   }, [reset]);
 
@@ -40,7 +44,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
     <Form onSubmit={handleSubmit(handleForm)}>
       <FieldsContainer>
         <FormField>
-          <Label>Proveedor</Label>
+          <RuledLabel title="Proveedor" message={isDirty && !supplierId && isSubmitted && 'Campo requerido'} required />
           {!readonly && !isUpdating ? (
             <Dropdown
               required
@@ -51,9 +55,11 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
               minCharacters={2}
               noResultsMessage="Sin resultados!"
               options={suppliers}
+              clearable
+              ref={supplierRef}
               onChange={(e, { value }) => {
                 const selectedSupplier = suppliers.find((supplier) => supplier.name === value);
-                setSupplierId(selectedSupplier.id);
+                setSupplierId(selectedSupplier?.id);
               }}
             />
           ) : (
@@ -61,7 +67,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
           )}
         </FormField>
         <FormField>
-          <Label>Marca</Label>
+          <RuledLabel title="Marca" message={isDirty && isSubmitted && !brandId && 'Campo requerido'} required />
           {!readonly && !isUpdating ? (
             <Dropdown
               required
@@ -72,10 +78,12 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
               minCharacters={2}
               noResultsMessage="Sin resultados!"
               options={brands}
+              clearable
+              ref={brandRef}
               disabled={isUpdating}
               onChange={(e, { value }) => {
                 const brandSelected = brands.find((brand) => brand.name === value)
-                setBrandId(brandSelected.id);
+                setBrandId(brandSelected?.id);
               }}
             />
           ) : (
@@ -84,8 +92,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
-        <FormField>
-          <Label >Código</Label>
+        <FormField >
+          <RuledLabel title="Código" message={errors?.code?.message} required />
           {!readonly && !isUpdating ? (
             <Controller
               name="code"
@@ -98,7 +106,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
                   placeholder="Código (A12)"
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                   disabled={isUpdating}
-                  {...((supplierId || brandId) && { label: { basic: true, content: `${supplierId} ${brandId}` } })}
+                  {...((supplierId || brandId) && { label: { basic: true, content: `${supplierId ?? ''} ${brandId ?? ''}` } })}
                   labelPosition='left'
                 />
               )}
@@ -137,7 +145,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
           )}
         </FormField>
         <FormField>
-          <Label>Precio</Label>
+          <RuledLabel title="Precio" message={errors?.price?.message} required />
           {!readonly ? (
             <Controller
               name="price"
