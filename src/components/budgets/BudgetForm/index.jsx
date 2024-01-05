@@ -2,16 +2,16 @@ import { BUDGET_FORM_PRODUCT_COLUMNS, PAYMENT_METHODS } from "@/components/budge
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Cell } from "@/components/common/table";
+import { NoPrint, OnlyPrint } from "@/components/layout";
 import { PAGES, RULES } from "@/constants";
-import { formatProductCode, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { expirationDate, formatProductCodePopup, formatedDate, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Icon, Popup, Button as SButton, Table } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
-import { HeaderCell, TotalText, } from "./styles";
-import { NoPrint, OnlyPrint } from "@/components/layout";
 import PDFfile from "../PDFfile";
+import { HeaderCell, TotalText, } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -23,10 +23,11 @@ const EMPTY_BUDGET = (user) => ({
   products: [],
   comments: '',
   paymentMethods: PAYMENT_METHODS.map((method) => method.value),
-  expirationOffsetDays: 10
+  expirationOffsetDays: ""
 });
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) => {
+  const formattedPaymentMethods = budget?.paymentMethods.join(' - ');
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const { control, handleSubmit, setValue, setError, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
@@ -39,7 +40,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
 
   const watchProducts = watch('products');
   const [total, setTotal] = useState(0);
-
   const calculateTotal = useCallback(() => {
     setTotal(getTotalSum(watchProducts), [watchProducts]);
   }, [setTotal, watchProducts]);
@@ -118,7 +118,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                 <Segment>{budget?.customer?.name}</Segment>
               )}
             </FormField>
-            <FormField flex={1}>
+            <FormField width={5}>
               <Label>Dirección</Label>
               {!readonly ? (
                 <Controller
@@ -170,21 +170,21 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   <Cell>
                     <Popup
                       size="tiny"
-                      trigger={<span>{formatProductCode(product.code).formattedCode.substring(0, 2)}</span>}
+                      trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
                       position="top center"
                       on="hover"
-                      content={`Brand: ${product.brandName}`}
+                      content={product.brandName}
                     />
                     {'-'}
                     <Popup
                       size="tiny"
-                      trigger={<span>{formatProductCode(product.code).formattedCode.substring(3, 5)}</span>}
+                      trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>}
                       position="top center"
                       on="hover"
-                      content={`Supplier: ${product.supplierName}`}
+                      content={product.supplierName}
                     />
                     {'-'}
-                    <span>{formatProductCode(product.code).formattedCode.substring(6)}</span>
+                    <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
                   </Cell>
                   <Cell width={2}>
                     {product.supplierCode}
@@ -314,7 +314,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   )}
                 />
               ) : (
-                <Segment>{budget?.customer?.name}</Segment>
+                <Segment >{formattedPaymentMethods}</Segment>
               )}
             </FormField>
             <FormField flex="1">
@@ -323,11 +323,16 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                 <Controller
                   name="expirationOffsetDays"
                   control={control}
-                  rules={RULES.REQUIRED_POSITIVE}
-                  render={({ field }) => <Input {...field} type="number" placeholder="Cantidad en días" />}
+                  rules={RULES.REQUIRED_THREE_NUMBERS}
+                  render={({ field }) =>
+                    <Input
+                      maxLength={50}
+                      {...field}
+                      placeholder="Cantidad en días(p. ej: 3, 10, 30, etc)"
+                    />}
                 />
               ) : (
-                <Segment>{budget?.expirationOffsetDays}</Segment>
+                <Segment>{formatedDate(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
               )}
             </FormField>
           </FieldsContainer>

@@ -1,9 +1,11 @@
+import { formatProductCode } from "@/utils";
 import { useEffect, useState } from 'react';
 import { Container, Search, Text } from "./styles";
 
 const ProductSearch = ({ products, onProductSelect }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(products);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     setFilteredProducts(products?.filter((product) =>
@@ -17,12 +19,15 @@ const ProductSearch = ({ products, onProductSelect }) => {
 
   const handleSearchChange = (event, { value }) => {
     setSearchQuery(value);
+    setSelectedProduct(null);
   };
 
-  const handleProductSelect = (event, value) => {
-    onProductSelect(value.result.value);
+  const handleProductSelect = (event, { result }) => {
+    onProductSelect(result.value);
     setSearchQuery(''); 
+    setSelectedProduct(result.value);
   };
+
   const MAX_RESULTS = 5;
 
   return (
@@ -31,15 +36,16 @@ const ProductSearch = ({ products, onProductSelect }) => {
       minCharacters={1}
       searchDelay={1000}
       onSearchChange={handleSearchChange}
-      placeholder='Productos'
+      value={selectedProduct ? '' : searchQuery}
+      noResultsMessage={"No se encontró producto"}
+      placeholder='Nombre, código, marca, proveedor'
       results={filteredProducts?.slice(0, MAX_RESULTS).map((product) => ({
         key: product.code,
         title: product.name,
         description: (
           <Container>
-            <Text>Código: {product.code}</Text>
-            <Text>Proveedor: {product.supplierName}</Text>
-            <Text>Marca: {product.brandName}</Text>
+            <Text>Código: {formatProductCode(product.code)}</Text>
+            <Text>Precio: {`$ ${product.price}`}</Text>
           </Container>
         ),
         value: product,

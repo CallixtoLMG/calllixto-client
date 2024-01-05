@@ -92,7 +92,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
-        <FormField width={3}>
+        <FormField >
           <RuledLabel title="Código" message={errors?.code?.message} required />
           {!readonly && !isUpdating ? (
             <Controller
