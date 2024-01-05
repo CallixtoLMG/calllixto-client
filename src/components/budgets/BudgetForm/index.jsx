@@ -1,11 +1,11 @@
-import { BUDGET_FORM_PRODUCT_COLUMNS, PAYMETHOD } from "@/components/budgets/budgets.common";
+import { BUDGET_FORM_PRODUCT_COLUMNS, PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Cell } from "@/components/common/table";
-import { PAGES } from "@/constants";
+import { PAGES, RULES } from "@/constants";
 import { formatProductCode, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Icon, Popup, Button as SButton, Table } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
@@ -21,17 +21,21 @@ const EMPTY_BUDGET = (user) => ({
     phone: ''
   },
   products: [],
+  comments: '',
+  paymentMethods: PAYMENT_METHODS.map((method) => method.value),
+  expirationOffsetDays: 10
 });
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = useForm({
+  const { control, handleSubmit, setValue, setError, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
       ...budget,
       seller: `${user?.firstName} ${user?.lastName}`
     } : EMPTY_BUDGET(user),
   });
+  const customerRef = useRef(null);
 
   const watchProducts = watch('products');
   const [total, setTotal] = useState(0);
@@ -48,7 +52,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
 
   useEffect(() => {
     calculateTotal();
-  }, [watchProducts, calculateTotal])
+  }, [watchProducts, calculateTotal]);
 
   const handleCreate = (data) => {
     setIsLoading(true);
@@ -57,6 +61,11 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
       push(PAGES.BUDGETS.BASE);
     }, 2000);
   };
+
+  const handleReset = useCallback(() => {
+    customerRef.current.clearValue();
+    reset(EMPTY_BUDGET(user));
+  }, [reset, user]);
 
   return (
     <>
@@ -79,12 +88,12 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
           </FieldsContainer>
           <FieldsContainer>
             <FormField width="300px">
-              <Label>Cliente</Label>
+              <RuledLabel title="Cliente" message={errors?.customer?.name?.message} required />
               {!readonly ? (
                 <Controller
                   name={`customer.name`}
                   control={control}
-                  rules={{ required: true }}
+                  rules={RULES.REQUIRED}
                   render={({ field }) => (
                     <Dropdown
                       name={`customer`}
@@ -94,12 +103,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                       minCharacters={2}
                       noResultsMessage="No se ha encontrado cliente!"
                       options={customers}
+                      ref={customerRef}
                       onChange={(e, { value }) => {
                         field.onChange(value);
                         const customer = customers.find((opt) => opt.value === value);
-                        setValue('customer.id', customer.id);
-                        setValue('customer.address', customer.address ?? '');
-                        setValue('customer.phone', customer.phone ?? '')
+                        setValue('customer.id', customer?.id);
+                        setValue('customer.address', customer?.address ?? '');
+                        setValue('customer.phone', customer?.phone ?? '')
                       }}
                     />
                   )}
@@ -135,7 +145,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
           </FieldsContainer>
           {!readonly ? (
             <FormField width="300px">
-              <Label>Agregar Producto</Label>
+              <RuledLabel title="Agregar producto" message={!watchProducts.length && isSubmitted && isDirty && 'Al menos 1 producto es requerido'} required />
               <ProductSearch
                 products={products}
                 onProductSelect={(selectedProduct) => {
@@ -187,6 +197,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                       <Controller
                         name={`products[${index}].quantity`}
                         control={control}
+                        rules={RULES.REQUIRED}
                         render={({ field }) => (
                           <Input
                             type="number"
@@ -238,9 +249,8 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                       <SButton
                         icon="trash"
                         color="red"
-                        onClick={() => { watchProducts.length > 1 && deleteProduct(index) }}
+                        onClick={() => { deleteProduct(index) }}
                         type="button"
-                        disabled={watchProducts.length <= 1}
                       />
                     </Cell>
                   )}
@@ -283,7 +293,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   name={`paymentMethods`}
                   control={control}
                   rules={{ required: true }}
-                  defaultValue={PAYMETHOD.map((method) => method.value)}
+                  defaultValue={PAYMENT_METHODS.map((method) => method.value)}
                   render={({ field }) => (
                     <Dropdown
                       minHeight="50px"
@@ -295,7 +305,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                       fluid
                       minCharacters={2}
                       noResultsMessage="No se ha encontrado metodo!"
-                      options={PAYMETHOD}
+                      options={PAYMENT_METHODS}
                       value={field.value}
                       onChange={(e, { value }) => {
                         field.onChange(value);
@@ -308,12 +318,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               )}
             </FormField>
             <FormField flex="1">
-              <RuledLabel title="Fecha de vencimiento" message={errors?.email?.message} />
+              <RuledLabel title="Vencimiento en días" message={errors?.expirationOffsetDays?.message} required />
               {!readonly ? (
                 <Controller
                   name="expirationOffsetDays"
                   control={control}
-                  render={({ field }) => <Input {...field} placeholder="Cantidad en días(p. ej: 3,10,12,etc)" />}
+                  rules={RULES.REQUIRED_POSITIVE}
+                  render={({ field }) => <Input {...field} type="number" placeholder="Cantidad en días" />}
                 />
               ) : (
                 <Segment>{budget?.expirationOffsetDays}</Segment>
@@ -325,7 +336,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               show={!readonly}
               isLoading={isLoading}
               isDirty={isDirty}
-              onClick={() => reset(EMPTY_BUDGET(user))}
+              onClick={handleReset}
             />
           )}
         </Form>
