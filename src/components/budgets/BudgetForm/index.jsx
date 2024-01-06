@@ -4,7 +4,7 @@ import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, I
 import { Cell } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { PAGES, RULES } from "@/constants";
-import { expirationDate, formatProductCodePopup, formatedDate, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -30,7 +30,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
   const formattedPaymentMethods = budget?.paymentMethods.join(' - ');
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [expiration, SetExpiration] = useState(false);
   const { control, handleSubmit, setValue, setError, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
+    
     defaultValues: budget ? {
       ...budget,
       seller: `${user?.firstName} ${user?.lastName}`
@@ -286,7 +288,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
             />
           </FieldsContainer>
           <FieldsContainer>
-            <FormField width="10">
+            <FormField flex={3}>
               <Label>Metodos de pago</Label>
               {!readonly ? (
                 <Controller
@@ -317,24 +319,37 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                 <Segment >{formattedPaymentMethods}</Segment>
               )}
             </FormField>
-            <FormField flex="1">
-              <RuledLabel title="Vencimiento en días" message={errors?.expirationOffsetDays?.message} required />
-              {!readonly ? (
-                <Controller
-                  name="expirationOffsetDays"
-                  control={control}
-                  rules={RULES.REQUIRED_THREE_NUMBERS}
-                  render={({ field }) =>
-                    <Input
-                      maxLength={50}
-                      {...field}
-                      placeholder="Cantidad en días(p. ej: 3, 10, 30, etc)"
-                    />}
-                />
-              ) : (
-                <Segment>{formatedDate(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
-              )}
-            </FormField>
+            {!readonly ? (
+              <>
+                <FormField flex={1} >
+                  <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
+                  <Controller
+                    name="expirationOffsetDays"
+                    control={control}
+                    rules={RULES.REQUIRED_THREE_NUMBERS}
+                    render={({ field }) =>
+                      <Input
+                        maxLength={50}
+                        {...field}
+                        placeholder="Cantidad en días(p. ej: 3, 10, 30, etc)"
+                        onChange={(e, { value }) => {
+                          field.onChange(value);
+                          SetExpiration(value);
+                        }}
+                      />}
+                  />
+                </FormField>
+                <FormField flex={1}>
+                  <Label>Fecha de vencimiento</Label>
+                  <Segment>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
+                </FormField>
+              </>
+            ) : (
+              <FormField>
+                <RuledLabel title="Fecha de vencimiento" message={errors?.expirationOffsetDays?.message} required />
+                <Segment>{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
+              </FormField>
+            )}
           </FieldsContainer>
           {!readonly && (
             <SubmitAndRestore
@@ -344,7 +359,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               onClick={handleReset}
             />
           )}
-        </Form>
+        </Form >
         {readonly && (
           <ButtonsContainer marginTop="15px">
             <Button onClick={() => window.print()} color="blue">
@@ -354,8 +369,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               <SendButton customerData={budget?.customer} />
             )}
           </ButtonsContainer>
-        )}
-      </NoPrint>
+        )
+        }
+      </NoPrint >
       <OnlyPrint>
         <PDFfile budget={budget} />
       </OnlyPrint>

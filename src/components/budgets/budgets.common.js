@@ -1,6 +1,4 @@
-import { formatedDate, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
-import dayjs from "dayjs";
-import { Popup } from "semantic-ui-react";
+import { formatedDateAndHour, formatedPercentage, formatedPrice, getTotal, getTotalSum } from "@/utils";
 
 const BUDGETS_COLUMNS = [
   {
@@ -19,7 +17,7 @@ const BUDGETS_COLUMNS = [
     id: 3,
     title: "Fecha",
     width: 3,
-    value: (budget) => formatedDate(budget.createdAt)
+    value: (budget) => formatedDateAndHour(budget.createdAt)
   },
   {
     id: 4,

@@ -15,8 +15,9 @@ export const expirationDate = (createdAt, expirationOffsetDays) => {
   const fechaVencimiento = fechaCreacionParsed.add(expirationOffsetDays, 'day');
   return fechaVencimiento.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 };
-
-export const formatedDate = (date) => dayjs(date).format('DD-MM-YYYY - hh:mm A');
+export const actualDate = dayjs();
+export const formatedDateAndHour = (date) => dayjs(date).format('DD-MM-YYYY - hh:mm A');
+export const formatedDateOnly = (date) => dayjs(date).format('DD-MM-YYYY');
 
 export const formatedPrice = (number) => {
   let modNumber = Number(number);

@@ -1,10 +1,10 @@
 "use client";
 import { useGetBudget } from "@/api/budgets";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { useBreadcrumContext, Loader, useNavActionsContext } from "@/components/layout";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useUserData, useValidateToken } from "@/hooks/userData";
-import { formatedDate } from "@/utils";
+import { formatedDateAndHour } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -22,7 +22,7 @@ const Budget = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels(['Presupuestos', budget ? `${budget?.customer?.name} (${formatedDate(budget?.createdAt)})` : '']);
+    setLabels(['Presupuestos', budget ? `${budget?.customer?.name} (${formatedDateAndHour(budget?.createdAt)})` : '']);
   }, [setLabels, budget]);
 
   if (!isLoading && !budget) {
