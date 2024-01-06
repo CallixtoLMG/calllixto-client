@@ -11,7 +11,6 @@ const ProductSearch = ({ products, onProductSelect }) => {
     setFilteredProducts(products?.filter((product) =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.supplierCode?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.supplierName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.brandName?.toLowerCase().includes(searchQuery.toLowerCase())
     ));

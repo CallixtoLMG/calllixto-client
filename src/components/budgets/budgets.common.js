@@ -76,12 +76,11 @@ const PRODUCTS_COLUMNS = [
 const BUDGET_FORM_PRODUCT_COLUMNS = [
   { title: "Nombre", value: "name", id: 1, },
   { title: "Código", value: "code", id: 2, },
-  { title: "Código Proveedor", value: "supplierCode", id: 3 },
-  { title: "Precio", value: "price", id: 4 },
-  { title: "Cantidad", value: "quantity", id: 5 },
-  { title: "Descuento", value: "discount", id: 6 },
-  { title: "Total", value: "total", id: 7 },
-  { title: "Acciones", value: "actions", id: 8, hide: (readonly) => readonly },
+  { title: "Precio", value: "price", id: 3 },
+  { title: "Cantidad", value: "quantity", id: 4 },
+  { title: "Descuento", value: "discount", id: 5 },
+  { title: "Total", value: "total", id: 6 },
+  { title: "Acciones", value: "actions", id: 7, hide: (readonly) => readonly },
 ];
 
 const FILTERS = [

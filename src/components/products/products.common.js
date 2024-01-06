@@ -1,6 +1,6 @@
 import { formatedPrice, getBrandCode, getProductCode, getSupplierCode } from "@/utils";
+import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
-import { Flex, Box } from "rebass";
 
 const PRODUCT_COLUMNS = [
   {
@@ -26,12 +26,6 @@ const PRODUCT_COLUMNS = [
   },
   {
     id: 2,
-    title: "Código Proveedor",
-    width: 1,
-    value: (product) => product.supplierCode || '-'
-  },
-  {
-    id: 3,
     title: "Nombre",
     align: "left",
     value: (product) =>
@@ -52,7 +46,7 @@ const PRODUCT_COLUMNS = [
       </Flex>
   },
   {
-    id: 4,
+    id: 3,
     title: "Precio",
     width: 2,
     value: (product) => formatedPrice(product.price)
@@ -67,21 +61,16 @@ const IMPORT_PRODUCTS_COLUMNS = [
   },
   {
     id: 2,
-    title: "Código Proveedor",
-    width: 1,
-  },
-  {
-    id: 3,
     title: "Nombre",
     align: "left",
   },
   {
-    id: 4,
+    id: 3,
     title: "Precio",
     width: 2,
   },
   {
-    id: 5,
+    id: 4,
     title: "Comentarios",
     align: "left",
   }
@@ -89,12 +78,10 @@ const IMPORT_PRODUCTS_COLUMNS = [
 
 const FILTERS = [
   { value: 'code', placeholder: 'Código' },
-  { value: 'supplierCode', placeholder: 'Código proveedor' },
   { value: 'name', placeholder: 'Nombre' }
 ];
 
 export {
-  PRODUCT_COLUMNS,
-  IMPORT_PRODUCTS_COLUMNS,
-  FILTERS
+  FILTERS, IMPORT_PRODUCTS_COLUMNS, PRODUCT_COLUMNS
 };
+
