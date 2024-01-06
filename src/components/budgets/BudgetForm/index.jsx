@@ -289,7 +289,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   <Cell align="left">
                     {product.name}
                   </Cell>
-                  <Cell>
+                  <Cell width={2}>
                     <Popup
                       size="tiny"
                       trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
@@ -307,9 +307,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                     />
                     {'-'}
                     <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
-                  </Cell>
-                  <Cell width={2}>
-                    {product.supplierCode}
                   </Cell>
                   <Cell width={1}>
                     {formatedPrice(product.price, product.brand)}
@@ -381,7 +378,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
             </Table.Body>
             <Table.Footer>
               <Table.Row>
-                <HeaderCell $right colSpan="6">
+                <HeaderCell $right colSpan="5">
                   <TotalText>Total</TotalText>
                 </HeaderCell>
                 <HeaderCell $nonBorder>
