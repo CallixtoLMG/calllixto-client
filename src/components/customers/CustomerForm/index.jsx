@@ -1,13 +1,12 @@
 "use client"
+import { SubmitAndRestore } from "@/components/common/buttons";
+import { FieldsContainer, Form, FormField, Input, Label, MaskedInput, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { PAGES, RULES } from "@/constants";
+import { formatedPhone } from "@/utils";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box } from "rebass";
-import { MaskedInput, PhoneContainer } from "./styles";
-import { Form, FieldsContainer, FormField, Input, RuledLabel, Label, TextArea, Segment } from "@/components/common/custom";
-import { SubmitAndRestore } from "@/components/common/buttons";
-import { formatedPhone } from "@/utils";
 
 const EMPTY_CUSTOMER = { name: '', email: '', phone: { areaCode: '', number: '' }, address: '', comments: '' };
 
