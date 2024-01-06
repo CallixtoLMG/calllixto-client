@@ -4,7 +4,6 @@ import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useUserData, useValidateToken } from "@/hooks/userData";
-import { formatedDateAndHour } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -18,11 +17,11 @@ const Budget = ({ params }) => {
 
   useEffect(() => {
     resetActions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    setLabels(['Presupuestos', budget ? `${budget?.customer?.name} (${formatedDateAndHour(budget?.createdAt)})` : '']);
+    setLabels(['Presupuestos', budget && budget?.id]);
   }, [setLabels, budget]);
 
   if (!isLoading && !budget) {

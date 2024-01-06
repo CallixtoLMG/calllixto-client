@@ -17,6 +17,12 @@ export const FieldsContainer = styled(Flex)`
 export const ButtonsContainer = styled(Flex)`
   flex-direction: row;
   margin-bottom: 10px !important;
+  margin-top: ${({ marginTop }) => marginTop};
   justify-content: flex-end;
+  column-gap: 10px;
+  width: ${({ width }) => width};
+`;
+
+export const PhoneContainer = styled(Flex)`
   column-gap: 10px;
 `;
