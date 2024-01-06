@@ -2,7 +2,7 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Form, FormField, Input, Label, MaskedInput, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { PAGES, RULES } from "@/constants";
-import { formatedPhone } from "@/utils";
+import { formatedPhone, preventSend } from "@/utils";
 import { useParams, useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -31,7 +31,7 @@ const CustomerForm = ({ customer, onSubmit, readonly }) => {
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleForm)}>
+    <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField width="50% !important">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />

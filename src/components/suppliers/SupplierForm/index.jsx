@@ -2,7 +2,7 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { PAGES, RULES } from "@/constants";
-import { formatedPhone } from "@/utils";
+import { formatedPhone, preventSend } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -31,7 +31,7 @@ const SupplierForm = ({ supplier, onSubmit, readonly }) => {
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleForm)}>
+    <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField>
           <RuledLabel title="Código" message={errors?.id?.message} required />

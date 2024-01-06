@@ -4,7 +4,7 @@ import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, I
 import { Cell } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { PAGES, RULES } from "@/constants";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum, preventSend } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -106,7 +106,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
     <>
       <NoPrint>
 
-        <Form onSubmit={handleSubmit(handleCreate)}>
+        <Form onSubmit={handleSubmit(handleCreate)} onKeyDown={preventSend}>
           {readonly &&
             <>
               <Transition visible={isModalOpen} animation='scale' duration={500}>

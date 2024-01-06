@@ -1,10 +1,11 @@
 "use client";
+import { SubmitAndRestore } from "@/components/common/buttons";
+import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { PAGES, RULES } from "@/constants";
+import { preventSend } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Form, FieldsContainer, FormField, Input, Label, RuledLabel, TextArea, Segment } from "@/components/common/custom";
-import { SubmitAndRestore } from "@/components/common/buttons";
 
 const EMPTY_BRAND = { name: '', id: '', comments: '' };
 
@@ -28,7 +29,7 @@ const BrandForm = ({ brand, onSubmit, readonly }) => {
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleForm)}>
+    <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField>
           <RuledLabel title="Código" message={errors?.id?.message} required />

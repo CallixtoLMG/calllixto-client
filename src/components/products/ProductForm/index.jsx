@@ -2,7 +2,7 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { PAGES, RULES } from "@/constants";
-import { formatedPrice } from "@/utils";
+import { formatedPrice, preventSend } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
@@ -17,7 +17,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
   const brandRef = useRef(null);
   const [supplierId, setSupplierId] = useState("");
   const [brandId, setBrandId] = useState("");
-
   const isUpdating = useMemo(() => !!product?.code, [product]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -41,7 +40,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
   const currency = "ARS";
 
   return (
-    <Form onSubmit={handleSubmit(handleForm)}>
+    <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField width="30%">
           <RuledLabel title="Proveedor" message={isDirty && !supplierId && !isUpdating  && isSubmitted && 'Campo requerido'} required />
