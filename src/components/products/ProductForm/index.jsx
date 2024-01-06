@@ -43,7 +43,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
   return (
     <Form onSubmit={handleSubmit(handleForm)}>
       <FieldsContainer>
-        <FormField>
+        <FormField width="30%">
           <RuledLabel title="Proveedor" message={isDirty && !supplierId && !isUpdating  && isSubmitted && 'Campo requerido'} required />
           {!readonly && !isUpdating ? (
             <Dropdown
@@ -66,7 +66,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
             <Segment>{product?.supplierName}</Segment>
           )}
         </FormField>
-        <FormField>
+        <FormField width="30%">
           <RuledLabel title="Marca" message={isDirty && isSubmitted && !isUpdating && !brandId && 'Campo requerido'} required />
           {!readonly && !isUpdating ? (
             <Dropdown
@@ -91,8 +91,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
           )}
         </FormField>
       </FieldsContainer>
-      <FieldsContainer>
-        <FormField >
+      <FieldsContainer >
+      <FormField width="20%">
           <RuledLabel title="Código" message={errors?.code?.message} required />
           {!readonly && !isUpdating ? (
             <Controller
@@ -115,22 +115,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
             <Segment>{product?.code}</Segment>
           )}
         </FormField>
-        <FormField>
-          <Label >Código del proveedor</Label>
-          {!readonly ? (
-            <Controller
-              name="supplierCode"
-              control={control}
-              render={({ field }) => (
-                <Input  {...field} placeholder="Código proveedor" />
-              )}
-            />
-          ) : (
-            <Segment>{product?.supplierCode}</Segment>
-          )}
-        </FormField>
-      </FieldsContainer>
-      <FieldsContainer >
         <FormField flex="1" >
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
           {!readonly ? (
@@ -144,7 +128,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
             <Segment>{product?.name}</Segment>
           )}
         </FormField>
-        <FormField>
+        <FormField width="20%">
           <RuledLabel title="Precio" message={errors?.price?.message} required />
           {!readonly ? (
             <Controller
