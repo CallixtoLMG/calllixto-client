@@ -44,7 +44,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
     <Form onSubmit={handleSubmit(handleForm)}>
       <FieldsContainer>
         <FormField>
-          <RuledLabel title="Proveedor" message={isDirty && !supplierId && isSubmitted && 'Campo requerido'} required />
+          <RuledLabel title="Proveedor" message={isDirty && !supplierId && !isUpdating  && isSubmitted && 'Campo requerido'} required />
           {!readonly && !isUpdating ? (
             <Dropdown
               required
@@ -67,7 +67,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
           )}
         </FormField>
         <FormField>
-          <RuledLabel title="Marca" message={isDirty && isSubmitted && !brandId && 'Campo requerido'} required />
+          <RuledLabel title="Marca" message={isDirty && isSubmitted && !isUpdating && !brandId && 'Campo requerido'} required />
           {!readonly && !isUpdating ? (
             <Dropdown
               required

@@ -33,5 +33,5 @@ export async function createBatch(products) {
 }
 
 export async function editBatch(products) {
-  baseUpdate(`${PRODUCTS_URL}/${EDIT_BATCH}`, { products: products.map(product => ({ ...product, updatedAt: now() })) }, 'Productos actualizados!', false);
+  baseCreate(`${PRODUCTS_URL}/${EDIT_BATCH}`, { update: products.map(product => ({ ...product, updatedAt: now() })) }, 'Productos actualizados!', false);
 }

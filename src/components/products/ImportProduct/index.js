@@ -61,7 +61,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
         Codigo: "code",
         Nombre: "name",
         Precio: "price",
-        "Codigo Proveedor": "providerCode",
+        "Codigo Proveedor": "supplierCode",
         Comentarios: "comments",
       };
 
@@ -168,7 +168,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                           <Table.Row key={`${newProduct.code}`}>
                             <Cell width={1}>{newProduct.code}</Cell>
                             <Controller
-                              name={`newProducts[${index}].providerCode`}
+                              name={`newProducts[${index}].supplierCode`}
                               control={control}
                               render={({ field }) => (
                                 <Cell width={2}>
@@ -236,7 +236,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                           <Table.Row key={`${editProduct.code}`}>
                             <Cell width={1}>{editProduct.code}</Cell>
                             <Controller
-                              name={`editProduct[${index}].providerCode`}
+                              name={`editProducts[${index}].supplierCode`}
                               control={control}
                               render={({ field }) => (
                                 <Cell width={2}>
