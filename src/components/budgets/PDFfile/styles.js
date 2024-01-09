@@ -15,6 +15,7 @@ const HeaderContainer = styled(Flex)`
   flex-direction: row!important;
   justify-content: space-between;
   width: 100%;
+  padding: 20px;
 `;
 
 const DataContainer = styled(Flex)`
