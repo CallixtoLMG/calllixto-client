@@ -7,12 +7,12 @@ import { ButtonContent, Icon, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { IMPORT_PRODUCTS_COLUMNS } from "../products.common";
 import { ContainerModal, DataNotFoundContainer, Modal, TableContainer } from "./styles";
+import { downloadExcel } from "@/utils";
 
-const ImportExcel = ({ products, createBatch, editBatch }) => {
+const ImportExcel = ({ products, createBatch }) => {
   const { handleSubmit, control, reset, setValue } = useForm();
   const [open, setOpen] = useState(false);
   const [newProducts, setNewProducts] = useState([]);
-  const [editProducts, setEditProducts] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -97,10 +97,19 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
         }
       });
 
-      setEditProducts(existingProducts);
       setNewProducts(nonExistingProducts);
       setValue('newProducts', nonExistingProducts);
-      setValue('editProducts', existingProducts);
+
+      if (existingProducts.length) {
+        const data = [
+          ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
+          ...existingProducts.map(product => {
+            return [product.code, product.name, product.price, product.comments]
+          })
+        ];
+        downloadExcel(data);
+      }
+
       setOpen(true);
     };
   };
@@ -108,7 +117,6 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
   const handleAccept = async (data) => {
     setIsLoading(true);
     !!data?.newProducts?.length && await createBatch(data.newProducts);
-    !!data?.editProducts?.length && await editBatch(data.editProducts);
     setIsLoading(false);
   };
 
@@ -129,7 +137,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
         type="button"
         width="100%"
       >
-        <ButtonContent hidden>Importar</ButtonContent>
+        <ButtonContent hidden>Crear</ButtonContent>
         <ButtonContent visible>
           <Icon name="upload" />
         </ButtonContent>
@@ -208,66 +216,7 @@ const ImportExcel = ({ products, createBatch, editBatch }) => {
                   </TableContainer>
                 </FieldsContainer>
               )}
-              {!!editProducts.length && (
-                <FieldsContainer>
-                  <Label>Productos a modificar</Label>
-                  <TableContainer>
-                    <Table celled compact striped>
-                      <Table.Header fullWidth>
-                        <Table.Row>
-                          {IMPORT_PRODUCTS_COLUMNS
-                            .map((column) => (
-                              <HeaderCell key={column.id}>{column.title}</HeaderCell>
-                            ))}
-                        </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        {editProducts.map((editProduct, index) => (
-                          <Table.Row key={`${editProduct.code}`}>
-                            <Cell width={1}>{editProduct.code}</Cell>
-                            <Controller
-                              name={`editProducts[${index}].name`}
-                              control={control}
-                              render={({ field }) => (
-                                <Cell align="left">
-                                  <Input {...field} height="30px" width="100%" />
-                                </Cell>
-                              )}
-                            />
-                            <Controller
-                              name={`editProducts[${index}].price`}
-                              control={control}
-                              render={({ field }) => (
-                                <Cell width={2}>
-                                  <CurrencyInput
-                                    {...field}
-                                    locale={locale}
-                                    currency={currency}
-                                    onChangeValue={(_, value) => {
-                                      field.onChange(value);
-                                    }}
-                                    InputElement={<Input height="30px" />}
-                                  />
-                                </Cell>
-                              )}
-                            />
-                            <Controller
-                              name={`editProducts[${index}].comments`}
-                              control={control}
-                              render={({ field }) => (
-                                <Cell align="left">
-                                  <Input {...field} height="30px" width="100%" />
-                                </Cell>
-                              )}
-                            />
-                          </Table.Row>
-                        ))}
-                      </Table.Body>
-                    </Table>
-                  </TableContainer>
-                </FieldsContainer>
-              )}
-              {!editProducts.length && !newProducts.length && (
+              {!newProducts.length && (
                 <DataNotFoundContainer>
                   <p>No se encontraron datos.</p>
                 </DataNotFoundContainer>

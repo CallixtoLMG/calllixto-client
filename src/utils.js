@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import * as XLSX from 'xlsx';
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -80,4 +81,11 @@ export const preventSend = (event) => {
   if (event.key === 'Enter') {
     event.preventDefault();
   };
+};
+
+export const downloadExcel = (data) => {
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1');
+  XLSX.writeFile(wb, 'Ejemplo de Tabla.xlsx');
 };
