@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Label, Header as SHeader, Image as SImage, Segment as SSegment } from "semantic-ui-react";
+import { Header as SHeader, Image as SImage, Label as SLabel, Segment as SSegment } from "semantic-ui-react";
 import styled from "styled-components";
 
 const CustomerDataContainer = styled(Flex)`
@@ -21,7 +21,7 @@ const HeaderContainer = styled(Flex)`
 const DataContainer = styled(Flex)`
   flex-direction: column;
   margin: 0 10px 0px 0!important;
-  width: ${({ width }) => width || '200px'} !important;
+  width: ${({ width }) => width} !important;
 `;
 
 const PayMethodContainer = styled(Flex)`
@@ -30,7 +30,7 @@ const PayMethodContainer = styled(Flex)`
 `;
 
 const Title = styled(SHeader)`
-  margin: auto !important;
+  margin: auto 100px 0 0!important;
   color: rgba(235,124,21,255)!important;
 `;
 
@@ -38,27 +38,39 @@ const Divider = styled.div`
   width: 100%;
   height: 3px;
   border-radius: 15px;
-  background-color: rgba(0,152,57,255);
-  margin: 20px 0;
+  border-bottom: 3px solid gray;
+  margin: 10px 0;
 `;
 
 const Sign = styled.div`
-  width: 30%;
+  width: 40%;
   height: 3px;
   color: green;
   border-radius: 15px;
-  background-color: rgba(0,152,57,255);
-  margin-top: 70px;
+  border-bottom: 3px solid gray;
+  margin-top: ${(props) => props.marginTop || "0!important"};
 `;
 
-const SubtleLabel = styled(Label)`
+const SubtleLabel = styled(SLabel)`
   background-color: white !important;
   border: 0.5px solid grey !important;
 `;
 
 const Segment = styled(SSegment)`
-  margin-top: 5px !important;
-  height: 50px !important;
+  min-height: ${(props) => props.minHeight || ""};
+  margin-top: ${(props) => props.marginTop || "5px !important;"}
+  box-shadow: 0 0 0 0 !important;
+  background-color: white !important;
+  border: 0.5px solid grey !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  padding: 8px !important;
+`;
+
+const Comment = styled(SSegment)`
+  width: 100%!important;
+  margin: 0!important;
+  min-height: 60px !important;
   box-shadow: 0 0 0 0 !important;
   background-color: white !important;
   border: 0.5px solid grey !important;
@@ -85,5 +97,12 @@ const PayMethodsContainer = styled(Flex)`
   margin-left: 15px !important;
 `;
 
-export { PayMethodsContainer, ClientDataContainer, CustomerDataContainer, DataContainer, Divider, HeaderContainer, Image, SubtleLabel, Segment, Title, PayMethodContainer, Sign, Header };
+const Label = styled(SLabel)`
+  border: 1px solid rgba(34,36,38,.15)!important; 
+  border-bottom-left-radius: 0!important;
+  border-bottom-right-radius: 0!important;
+  margin: 0!important;
+`;
+
+export { ClientDataContainer, Comment, CustomerDataContainer, DataContainer, Divider, Header, HeaderContainer, Image, Label, PayMethodContainer, PayMethodsContainer, Segment, Sign, SubtleLabel, Title };
 

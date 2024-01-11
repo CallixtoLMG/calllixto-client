@@ -1,6 +1,7 @@
 "use client";
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
-import { Table } from '@/components/common/table';
+import { HeaderCell, Table } from '@/components/common/table';
+import { formatedPhone, getTotalSum, simpleFormatedPrice } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { Flex } from "rebass";
@@ -12,16 +13,14 @@ import {
   Header,
   HeaderContainer,
   Image,
+  Label,
   PayMethodsContainer,
   Segment,
-  Sign,
   SubtleLabel,
   Title
 } from "./styles";
-import { formatedPrice, getTotalSum } from "@/utils";
-import { Label } from "@/components/common/custom";
 
-const PDFfile = ({ budget, seller }) => {
+const PDFfile = ({ budget }) => {
   return (
     <table>
       <thead>
@@ -38,58 +37,71 @@ const PDFfile = ({ budget, seller }) => {
         <tr>
           <td>
             <div style={{ width: '80vw' }}>
+              <ClientDataContainer>
+                <DataContainer flex="2">
+                  <Label>Vendedor/a</Label>
+                  <Segment>VENDEDOR</Segment>
+                </DataContainer>
+                <DataContainer flex="1">
+                  <Label>Fecha</Label>
+                  <Segment>{dayjs(budget?.createdAt).format('DD-MM-YYYY')}</Segment>
+                </DataContainer>
+                <DataContainer flex="1">
+                  <Label>Válido hasta</Label>
+                  <Segment>{dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</Segment>
+                </DataContainer>
+                <DataContainer flex="1">
+                  <Label>Presupuesto N°</Label>
+                  <Segment>{budget?.id}</Segment>
+                </DataContainer>
+              </ClientDataContainer>
               <Divider />
               <CustomerDataContainer>
-                <DataContainer>
+                <DataContainer flex="1">
                   <Label>CUIT</Label>
                   <Segment>CUIT</Segment>
                 </DataContainer>
-                <DataContainer>
+                <DataContainer flex="1">
                   <Label>IVA</Label>
                   <Segment>IVA</Segment>
                 </DataContainer>
-                <DataContainer>
+                <DataContainer flex="1">
                   <Label>Dirección</Label>
                   <Segment>ADDRESS</Segment>
-                </DataContainer>
-                <DataContainer>
+                </DataContainer >
+                <DataContainer flex="1">
                   <Label>Teléfono </Label>
                   <Segment>PHONE</Segment>
-                </DataContainer>
-                <DataContainer>
-                  <Label>Vendedor/a</Label>
-                  <Segment>VENDEDOR</Segment>
                 </DataContainer>
               </CustomerDataContainer>
               <Divider />
               <ClientDataContainer>
-                <DataContainer width="250px">
+                <DataContainer flex="2">
                   <Label>Cliente</Label>
                   <Segment>{(get(budget, "customer.name", ""))}</Segment>
                 </DataContainer>
-                <Flex>
-                  <DataContainer width="120px">
-                    <Label>Fecha</Label>
-                    <Segment>{dayjs(budget?.createdAt).format('DD-MM-YYYY')}</Segment>
-                  </DataContainer>
-                  <DataContainer width="120px">
-                    <Label>Válido hasta</Label>
-                    <Segment>{dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</Segment>
-                  </DataContainer>
-                  <DataContainer width="120px">
-                    <Label>N°</Label>
-                    <Segment>{budget?.id}</Segment>
-                  </DataContainer>
-                </Flex>
+                <DataContainer flex="2">
+                  <Label>Dirección</Label>
+                  <Segment>{(get(budget, "customer.address", ""))}</Segment>
+                </DataContainer>
+                <DataContainer flex="1">
+                  <Label>Teléfono</Label>
+                  <Segment>{formatedPhone(get(budget, "customer.phone.areaCode", ""), get(budget, "customer.phone.number", ""))}</Segment>
+                </DataContainer>
               </ClientDataContainer>
-              <Flex marginTop="20px">
+              <Flex margin="20px 0">
                 <Table
                   headers={PRODUCTS_COLUMNS.filter((products) => !products.hide)}
                   elements={budget?.products}
-                // total={formatedPrice(getTotalSum(budget?.products))}
+                  customRow={
+                    <>
+                      <HeaderCell textAlign="right" colSpan={PRODUCTS_COLUMNS.filter((products) => !products.hide).length - 1}><strong>TOTAL</strong></HeaderCell>
+                      <HeaderCell colSpan="1"><strong>{simpleFormatedPrice(getTotalSum(budget?.products))}</strong></HeaderCell>
+                    </>
+                  }
                 />
               </Flex>
-              <Sign />
+              <Divider />
               <Flex alignItems="flex-start" padding="20px 0" wrap="wrap">
                 <Header as="h3">Formas de pago</Header>
                 <PayMethodsContainer>
@@ -101,17 +113,22 @@ const PDFfile = ({ budget, seller }) => {
                 </PayMethodsContainer>
               </Flex>
               {budget?.comments && (
-                <Flex alignItems="flex-start">
-                  <Header as="h3">Observaciones</Header>
-                  <Flex marginLeft="15px">
-                    <SubtleLabel>{budget.comments}</SubtleLabel>
-                  </Flex>
-                </Flex>
+                <DataContainer width="100%!important;">
+                  <Label>Comentarios</Label>
+                  <Segment marginTop="0!important;" minHeight="60px">{budget.comments}</Segment>
+                </DataContainer>
               )}
             </div>
           </td>
         </tr>
       </tbody>
+      <tfoot>
+        <tr>
+          <td>
+            <div></div>
+          </td>
+        </tr>
+      </tfoot>
     </table>
   )
 }

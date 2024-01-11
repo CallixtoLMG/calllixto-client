@@ -1,14 +1,13 @@
 import { BUDGET_FORM_PRODUCT_COLUMNS, PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, Input, Label, MaskedInput, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Cell } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { PAGES, RULES } from "@/constants";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum, preventSend } from "@/utils";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Box } from "rebass";
 import { Icon, Modal, Popup, Button as SButton, Table, Transition } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
@@ -60,6 +59,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
   }, [watchProducts, calculateTotal]);
 
   const handleCreate = (data) => {
+    console.log(data)
     setIsLoading(true);
     onSubmit(data);
     setTimeout(() => {
@@ -75,13 +75,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
   const handleConfirmChange = (_, { checked }) => {
     setIsConfirmChecked(checked);
 
-    // Abrir el modal si el toggle está confirmado
     if (!isModalOpen && checked) {
       setIsModalOpen(true);
     }
-
     if (checked) {
-      // Puedes realizar acciones aquí cuando el toggle está confirmado.
     }
   };
 
@@ -94,8 +91,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
   };
 
   const handleModalSubmit = (data) => {
-    // Aquí puedes realizar acciones con los datos del modal.
-    // Por ejemplo, podrías actualizar los datos del cliente.
     setValue('customer.id', data.customerId);
     setValue('customer.address', data.customerAddress);
     setValue('customer.phone', data.customerPhone);
@@ -105,94 +100,93 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
   return (
     <>
       <NoPrint>
-
-        <Form onSubmit={handleSubmit(handleCreate)} onKeyDown={preventSend}>
-          {readonly &&
-            <>
-              <Transition visible={isModalOpen} animation='scale' duration={500}>
-                <Modal
-                  closeIcon
-                  open={isModalOpen}
-                  onClose={handleModalClose}
-                >
-                  <Modal.Header>
-                    {!budget.customer.address || !budget.customer.phone ?
-                      "Es necesario tener los siguientes datos del cliente" :
-                      "Desea confirmar el presupuesto?"}
-                  </Modal.Header>
-                  <Modal.Content>
-                    <Form onSubmit={handleSubmit(handleModalSubmit)}>
-                      <FieldsContainer>
-                        <FormField flex="1">
-                          <Label>ID del Cliente</Label>
-                          <Segment  >{budget?.customer.name}</Segment>
-                        </FormField>
-                        <FormField flex="1">
-                          <RuledLabel title="Dirección del Cliente" message={errors?.customerAddress?.message} required />
-                          <Controller
-                            name="customerAddress"
-                            control={control}
-                            rules={RULES.REQUIRED}
-                            defaultValue={watch('customer.address')}
-                            render={({ field }) => <Input {...field} />}
-                          />
-                        </FormField>
-                        <FormField width="200px">
-                          <RuledLabel title="Teléfono del Cliente" message={errors?.customerPhone?.message} required />
-                          {!budget.customer.phone.areaCode ?
-                            (<PhoneContainer>
-                              <Box width="70px">
-                                <Controller
-                                  name="phone.areaCode"
-                                  control={control}
-                                  rules={RULES.PHONE.AREA_CODE}
-                                  render={({ field }) =>
-                                    <MaskedInput
-                                      mask="9999"
-                                      maskChar={null}
-                                      {...field}
-                                      placeholder="Área"
-                                    />
-                                  }
-                                />
-                              </Box>
-                              <Box width="130px">
-                                <Controller
-                                  name="phone.number"
-                                  control={control}
-                                  rules={RULES.PHONE.NUMBER}
-                                  render={({ field }) =>
-                                    <MaskedInput
-                                      mask="99999999"
-                                      maskChar={null}
-                                      {...field}
-                                      placeholder="Número"
-                                    />}
-                                />
-                              </Box>
-                            </PhoneContainer>)
-                            : (<Segment>{budget.customer.phone ? formatedPhone(budget?.customer?.phone?.areaCode, budget?.customer?.phone?.number) : ""}</Segment>)}
-                        </FormField >
-                        <ButtonsContainer width="100%" marginTop="10px">
-                          <Button type="submit" color="green">
-                            Confirmar
-                          </Button>
-                          <Button color="red" onClick={handleModalClose}>
-                            Cancelar
-                          </Button>
-                        </ButtonsContainer>
-                      </FieldsContainer>
-                    </Form>
-                  </Modal.Content>
-                </Modal>
-              </Transition>
-              <Checkbox
-                toggle
-                checked={isConfirmChecked}
-                onChange={handleConfirmChange}
-                label={isConfirmChecked ? "Confirmado" : "Confirmar presupuesto"}
-              />
-            </>}
+        {readonly &&
+          <>
+            <Transition visible={isModalOpen} animation='scale' duration={500}>
+              <Modal
+                closeIcon
+                open={isModalOpen}
+                onClose={handleModalClose}
+              >
+                <Modal.Header>
+                  {!budget.customer.address || !budget.customer.phone ?
+                    "Es necesario tener los siguientes datos del cliente" :
+                    "Desea confirmar el presupuesto?"}
+                </Modal.Header>
+                <Modal.Content>
+                  <Form onSubmit={handleSubmit(handleModalSubmit)}>
+                    <FieldsContainer>
+                      <FormField flex="1">
+                        <Label>ID del Cliente</Label>
+                        <Segment  >{budget?.customer.name}</Segment>
+                      </FormField>
+                      <FormField flex="1">
+                        <RuledLabel title="Dirección del Cliente" message={errors?.customerAddress?.message} required />
+                        <Controller
+                          name="customerAddress"
+                          control={control}
+                          rules={RULES.REQUIRED}
+                          defaultValue={watch('customer.address')}
+                          render={({ field }) => <Input {...field} />}
+                        />
+                      </FormField>
+                      <FormField width="200px">
+                        <RuledLabel title="Teléfono del Cliente" message={errors?.customerPhone?.message} required />
+                        {!budget.customer.phone.areaCode ?
+                          (<PhoneContainer>
+                            <Box width="70px">
+                              <Controller
+                                name="phone.areaCode"
+                                control={control}
+                                rules={RULES.PHONE.AREA_CODE}
+                                render={({ field }) =>
+                                  <MaskedInput
+                                    mask="9999"
+                                    maskChar={null}
+                                    {...field}
+                                    placeholder="Área"
+                                  />
+                                }
+                              />
+                            </Box>
+                            <Box width="130px">
+                              <Controller
+                                name="phone.number"
+                                control={control}
+                                rules={RULES.PHONE.NUMBER}
+                                render={({ field }) =>
+                                  <MaskedInput
+                                    mask="99999999"
+                                    maskChar={null}
+                                    {...field}
+                                    placeholder="Número"
+                                  />}
+                              />
+                            </Box>
+                          </PhoneContainer>)
+                          : (<Segment>{budget.customer.phone ? formatedPhone(budget?.customer?.phone?.areaCode, budget?.customer?.phone?.number) : ""}</Segment>)}
+                      </FormField >
+                      <ButtonsContainer width="100%" marginTop="10px">
+                        <Button type="submit" color="green">
+                          Confirmar
+                        </Button>
+                        <Button color="red" onClick={handleModalClose}>
+                          Cancelar
+                        </Button>
+                      </ButtonsContainer>
+                    </FieldsContainer>
+                  </Form>
+                </Modal.Content>
+              </Modal>
+            </Transition>
+            <Checkbox
+              toggle
+              checked={isConfirmChecked}
+              onChange={handleConfirmChange}
+              label={isConfirmChecked ? "Confirmado" : "Confirmar presupuesto"}
+            />
+          </>}
+        <Form onSubmit={handleSubmit(handleCreate)} >
           <FieldsContainer>
             <FormField width="300px">
               <Label>Vendedor</Label>
@@ -271,7 +265,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               <ProductSearch
                 products={products}
                 onProductSelect={(selectedProduct) => {
-                  setValue("products", [...watchProducts, selectedProduct])
+                  setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1 }])
                 }}
               />
             </FormField>) : ("")}
@@ -327,6 +321,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                               const value = e.target.value;
                               field.onChange(value);
                               calculateTotal();
+                              console.log(errors)
                             }}
                           />
                         )}
