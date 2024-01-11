@@ -1,6 +1,6 @@
 import { BUDGET_FORM_PRODUCT_COLUMNS, PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, Input, Label, MaskedInput, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Cell } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { PAGES, RULES } from "@/constants";
@@ -8,6 +8,7 @@ import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, f
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { Box } from "rebass";
 import { Icon, Modal, Popup, Button as SButton, Table, Transition } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
