@@ -1,7 +1,6 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
-import * as XLSX from 'xlsx';
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -26,6 +25,11 @@ export const formatedPrice = (number) => {
     style: 'currency',
     currency: 'ARS',
   });
+};
+
+export const simpleFormatedPrice = (number) => {
+  let modNumber = Math.round(Number(number));
+  return `$ ${modNumber}`
 };
 
 export const formatProductCodePopup = (code, brand, supplier) => {
@@ -89,3 +93,4 @@ export const downloadExcel = (data) => {
   XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1');
   XLSX.writeFile(wb, 'Ejemplo de Tabla.xlsx');
 };
+

@@ -1,4 +1,4 @@
-import { formatedDateAndHour, formatedPercentage, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { formatedDateAndHour, formatedPercentage, getTotal, getTotalSum, simpleFormatedPrice } from "@/utils";
 
 const BUDGETS_COLUMNS = [
   {
@@ -23,7 +23,7 @@ const BUDGETS_COLUMNS = [
     id: 4,
     title: "Total",
     width: 2,
-    value: (budget) => formatedPrice(getTotalSum(budget.products))
+    value: (budget) => simpleFormatedPrice(getTotalSum(budget.products))
   },
   {
     id: 5,
@@ -36,7 +36,7 @@ const BUDGETS_COLUMNS = [
 const PRODUCTS_COLUMNS = [
   {
     id: 1,
-    title: "Descripción",
+    title: "Nombre",
     align: "left",
     value: (product) => product.name
   },
@@ -50,13 +50,13 @@ const PRODUCTS_COLUMNS = [
     id: 3,
     title: "Precio",
     width: 1,
-    value: (product) => formatedPrice(product.price || 0)
+    value: (product) => simpleFormatedPrice(product.price || 0)
   },
   {
     id: 4,
     title: "Subtotal",
     width: 1,
-    value: (product) => formatedPrice(product.price * product.quantity || 0),
+    value: (product) => simpleFormatedPrice(product.price * product.quantity || 0),
     hide: true,
   },
   {
@@ -69,7 +69,7 @@ const PRODUCTS_COLUMNS = [
     id: 6,
     title: "Importe",
     width: 1,
-    value: (product) => formatedPrice(getTotal(product))
+    value: (product) => simpleFormatedPrice(getTotal(product))
   },
 ];
 
