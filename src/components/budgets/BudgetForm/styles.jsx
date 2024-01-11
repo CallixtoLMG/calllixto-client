@@ -1,4 +1,4 @@
-import { Button as SButton, Checkbox as SCheckbox, Table } from 'semantic-ui-react';
+import { Button as SButton, Table } from 'semantic-ui-react';
 import styled from 'styled-components';
 
 const Button = styled(SButton)({
@@ -8,10 +8,6 @@ const Button = styled(SButton)({
 
 const TotalText = styled.h3`
   margin-left: 0.7rem;
-`;
-
-const Checkbox = styled(SCheckbox)`
-  margin-bottom: 20px;
 `;
 
 const ModTableRow = styled(Table.Row)`
@@ -44,5 +40,5 @@ const WarningMessage = styled.p`
   color: red;
 `;
 
-export { Button, Cell, Checkbox, HeaderCell, ModTableRow, TotalText, WarningMessage };
+export { Button, Cell, HeaderCell, ModTableRow, TotalText, WarningMessage };
 
