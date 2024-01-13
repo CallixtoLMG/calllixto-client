@@ -22,6 +22,7 @@ const CustomerForm = ({ customer, onSubmit, readonly }) => {
   }, [reset]);
 
   const handleForm = (data) => {
+    console.log(data)
     setIsLoading(true);
     onSubmit(data);
     setTimeout(() => {

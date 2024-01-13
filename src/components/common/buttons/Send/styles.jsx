@@ -20,7 +20,8 @@ const ButtonContainer = styled(Flex)`
   width: 180px!important;
   padding: 0!important;
   margin-left: 14px!important;
-  height: 34px!important;
+  height: 36px!important;
 `;
 
-export { ButtonContainer, MailButton, Button, ModalContainer };
+export { Button, ButtonContainer, MailButton, ModalContainer };
+
