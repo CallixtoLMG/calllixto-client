@@ -5,7 +5,7 @@ import { formatedPhone, formatedPrice } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { Flex } from "rebass";
-import { Table } from "semantic-ui-react";
+import { Header, Table } from "semantic-ui-react";
 import {
   ClientDataContainer,
   CustomerDataContainer,
@@ -100,7 +100,7 @@ const PDFfile = ({ budget, total }) => {
                       <Table.Row>
                         <Cell colSpan={PRODUCTS_COLUMNS.length} textAlign="center">
                           <Header as="h4">
-                            No se encontraron ítemsss.
+                            No se encontraron ítems.
                           </Header>
                         </Cell>
                       </Table.Row>
