@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation';
-import { Icon, Button, ButtonContent } from 'semantic-ui-react';
+import { Button, ButtonContent, Icon } from 'semantic-ui-react';
 
 const GoBack = () => {
   const { back } = useRouter();

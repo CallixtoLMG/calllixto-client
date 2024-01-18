@@ -1,7 +1,9 @@
 import {
   Form,
   Button as SButton,
+  Checkbox as SCheckbox,
   Dropdown as SDropdown,
+  Icon as SIcon,
   Input as SInput,
   Label as SLabel,
   Segment as SSegment,
@@ -13,6 +15,12 @@ export const Segment = styled(SSegment)`
   margin: 5px 0!important;
   min-height: 50px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
+`;
+
+export const Checkbox = styled(SCheckbox)`
+  label::after{
+    z-index: 1!important;
+  };
 `;
 
 export const FormField = styled(Form.Field)`
@@ -67,6 +75,10 @@ export const Dropdown = styled(SDropdown)`
 `;
 
 export const Button = styled(SButton)`
-  width: ${({ width }) => width ? `${width} !important` : ''};
+  width: ${({ width }) => width ? `${width}!important` : ''};
   margin: 0 !important;
+`;
+
+export const Icon = styled(SIcon)`
+  align-self: center!important;
 `;

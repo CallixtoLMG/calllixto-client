@@ -3,10 +3,19 @@ import { Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Cell = styled(Table.Cell)`
-  height: 40px!important;
+  height: 35px!important;
   padding: 2px 7px!important;
   z-index: 2;
   text-align: ${({ align }) => align || "center!important"};
+  text-align-last: ${(props) => props.right && "right!important"};
+`;
+
+const TableHeader = styled(Table.Header)`
+  height: 35px!important;
+`;
+
+const TableFooter = styled(Table.Footer)`
+  height: 35px!important;
 `;
 
 const HeaderCell = styled(Table.HeaderCell)`
@@ -46,5 +55,5 @@ const LinkRow = styled(Table.Row)`
   }
 `;
 
-export { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow };
+export { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow, TableFooter, TableHeader };
 

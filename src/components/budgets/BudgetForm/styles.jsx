@@ -22,7 +22,7 @@ const ModTableRow = styled(Table.Row)`
 
 const HeaderCell = styled(Table.HeaderCell)`
   background-color: ${props => props.$header && "#EEEEEE!important"};
-  padding: ${(props) => props.$nonBorder ? "0!important" : "11px!important"};
+  padding: ${(props) => props.$nonBorder ? "0!important" : "0 11px!important"};
   text-align: ${props => props.$right ? "right!important" : "center!important"};
   h3 {
     margin-right: 0.7rem!important;

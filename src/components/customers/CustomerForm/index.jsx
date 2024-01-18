@@ -21,14 +21,11 @@ const CustomerForm = ({ customer, onSubmit, readonly }) => {
     reset(customer || EMPTY_CUSTOMER);
   }, [reset]);
 
-  const handleForm = (data) => {
-    console.log(data)
+  const handleForm = async (data) => {
     setIsLoading(true);
-    onSubmit(data);
-    setTimeout(() => {
-      setIsLoading(false);
-      push(PAGES.CUSTOMERS.BASE);
-    }, 2000);
+    await onSubmit(data);
+    setIsLoading(false);
+    push(PAGES.CUSTOMERS.BASE)
   };
 
   return (

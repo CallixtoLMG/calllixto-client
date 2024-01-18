@@ -8,7 +8,7 @@ const OnlyPrintContainer = styled.div`
       margin-left: -40px;
       margin-right: -40px;
       margin-top: 0;
-      margin-bottom: 15px;
+      margin-bottom: 25px;
     }
 
     @page :first {

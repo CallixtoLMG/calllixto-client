@@ -1,26 +1,25 @@
 "use client";
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
-import { HeaderCell, Table } from '@/components/common/table';
-import { formatedPhone, getTotalSum, simpleFormatedPrice } from "@/utils";
+import { Cell, HeaderCell } from '@/components/common/table';
+import { formatedPhone, formatedPrice } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { Flex } from "rebass";
+import { Table } from "semantic-ui-react";
 import {
   ClientDataContainer,
   CustomerDataContainer,
   DataContainer,
   Divider,
-  Header,
   HeaderContainer,
   Image,
   Label,
-  PayMethodsContainer,
   Segment,
-  SubtleLabel,
+  TableRowHeader,
   Title
 } from "./styles";
 
-const PDFfile = ({ budget }) => {
+const PDFfile = ({ budget, total }) => {
   return (
     <table>
       <thead>
@@ -76,48 +75,69 @@ const PDFfile = ({ budget }) => {
               </CustomerDataContainer>
               <Divider />
               <ClientDataContainer>
-                <DataContainer flex="2">
+                <DataContainer flex="3">
                   <Label>Cliente</Label>
                   <Segment>{(get(budget, "customer.name", ""))}</Segment>
                 </DataContainer>
-                <DataContainer flex="2">
+                <DataContainer flex="3">
                   <Label>Dirección</Label>
                   <Segment>{(get(budget, "customer.address", ""))}</Segment>
                 </DataContainer>
-                <DataContainer flex="1">
+                <DataContainer flex="2">
                   <Label>Teléfono</Label>
                   <Segment>{formatedPhone(get(budget, "customer.phone.areaCode", ""), get(budget, "customer.phone.number", ""))}</Segment>
                 </DataContainer>
               </ClientDataContainer>
               <Flex margin="20px 0">
-                <Table
-                  headers={PRODUCTS_COLUMNS.filter((products) => !products.hide)}
-                  elements={budget?.products}
-                  customRow={
-                    <>
-                      <HeaderCell textAlign="right" colSpan={PRODUCTS_COLUMNS.filter((products) => !products.hide).length - 1}><strong>TOTAL</strong></HeaderCell>
-                      <HeaderCell colSpan="1"><strong>{simpleFormatedPrice(getTotalSum(budget?.products))}</strong></HeaderCell>
-                    </>
-                  }
-                />
+                <Table celled compact striped>
+                  <Table.Body>
+                    <TableRowHeader>
+                      {PRODUCTS_COLUMNS.map((header) => (
+                        <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
+                      ))}
+                    </TableRowHeader>
+                    {budget?.products?.length === 0 ? (
+                      <Table.Row>
+                        <Cell colSpan={PRODUCTS_COLUMNS.length} textAlign="center">
+                          <Header as="h4">
+                            No se encontraron ítemsss.
+                          </Header>
+                        </Cell>
+                      </Table.Row>
+                    ) : (
+                      budget?.products?.map((product) => {
+                        return (
+                          <Table.Row key={product.key}>
+                            {PRODUCTS_COLUMNS.map(header => (
+                              <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                                {header.value(product)}
+                              </Cell>
+                            ))}
+                          </Table.Row>
+                        );
+                      })
+                    )}
+                    <Table.Row>
+                      <Cell right textAlign="right" colSpan={PRODUCTS_COLUMNS.length - 1}><strong>TOTAL</strong></Cell>
+                      <Cell colSpan="1"><strong>{formatedPrice(total)}</strong></Cell>
+                    </Table.Row>
+                  </Table.Body>
+                </Table>
               </Flex>
               <Divider />
-              <Flex alignItems="flex-start" padding="20px 0" wrap="wrap">
-                <Header as="h3">Formas de pago</Header>
-                <PayMethodsContainer>
-                  <SubtleLabel>Efectivo</SubtleLabel>
-                  <SubtleLabel>Transferencia Bancaria</SubtleLabel>
-                  <SubtleLabel>Tarjeta de débito</SubtleLabel>
-                  <SubtleLabel>Tarjeta de crédito</SubtleLabel>
-                  <SubtleLabel>Mercado Pago</SubtleLabel>
-                </PayMethodsContainer>
-              </Flex>
               {budget?.comments && (
-                <DataContainer width="100%!important;">
+                <DataContainer width="100%">
                   <Label>Comentarios</Label>
-                  <Segment marginTop="0!important;" minHeight="60px">{budget.comments}</Segment>
+                  <Segment marginTop="0" minHeight="60px">{budget.comments}</Segment>
                 </DataContainer>
               )}
+              <Divider />
+              <DataContainer width="100%" >
+                <Label >Formas de pago</Label>
+                <Segment marginTop="0">
+                  {budget?.paymentMethods.join(" | ")}
+                </Segment>
+              </DataContainer>
             </div>
           </td>
         </tr>

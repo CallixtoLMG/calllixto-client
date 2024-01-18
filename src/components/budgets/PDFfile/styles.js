@@ -1,9 +1,13 @@
 import { Flex } from "rebass";
-import { Header as SHeader, Image as SImage, Label as SLabel, Segment as SSegment } from "semantic-ui-react";
+import { Header as SHeader, Image as SImage, Label as SLabel, Segment as SSegment, Table } from "semantic-ui-react";
 import styled from "styled-components";
 
 const CustomerDataContainer = styled(Flex)`
   div:last-child { margin: 0!important; };
+`;
+
+const TableRowHeader = styled(Table.Row)`
+  height: 35px!important;
 `;
 
 const ClientDataContainer = styled(Flex)`
@@ -58,7 +62,7 @@ const SubtleLabel = styled(SLabel)`
 
 const Segment = styled(SSegment)`
   min-height: ${(props) => props.minHeight || ""};
-  margin-top: ${(props) => props.marginTop || "5px !important;"}
+  margin-top: ${(props) => props.marginTop || "5px"} !important;
   box-shadow: 0 0 0 0 !important;
   background-color: white !important;
   border: 0.5px solid grey !important;
@@ -98,11 +102,11 @@ const PayMethodsContainer = styled(Flex)`
 `;
 
 const Label = styled(SLabel)`
-  border: 1px solid rgba(34,36,38,.15)!important; 
+  border: 1px solid grey!important; 
   border-bottom-left-radius: 0!important;
   border-bottom-right-radius: 0!important;
   margin: 0!important;
 `;
 
-export { ClientDataContainer, Comment, CustomerDataContainer, DataContainer, Divider, Header, HeaderContainer, Image, Label, PayMethodContainer, PayMethodsContainer, Segment, Sign, SubtleLabel, Title };
+export { ClientDataContainer, Comment, CustomerDataContainer, DataContainer, Divider, Header, HeaderContainer, Image, Label, PayMethodContainer, PayMethodsContainer, Segment, Sign, SubtleLabel, TableRowHeader, Title };
 

@@ -12,10 +12,10 @@ export const baseCreate = async (url, model, message, addCreatedDate = true) => 
     console.error(error);
   }
 
-  if (data.statusOk) {
+  if (data?.statusOk) {
     toast.success(message);
   } else {
-    toast.error(data.message);
+    toast.error(data?.message);
   }
 };
 
@@ -29,10 +29,10 @@ export const baseUpdate = async (url, model, message, addUpdatedDate = true) => 
     console.error(error);
   }
 
-  if (data.statusOk) {
+  if (data?.statusOk) {
     toast.success(message);
   } else {
-    toast.error(data.message);
+    toast.error(data?.message);
   }
 };
 
@@ -46,9 +46,10 @@ export const baseDelete = async (url, message) => {
     console.error(error);
   }
 
-  if (data.statusOk) {
+  if (data?.statusOk) {
     toast.success(message);
   } else {
-    toast.error(data.message);
+    const message = data?.message ?? "Se ha encontrado un error"
+    toast.error(message);
   };
 };

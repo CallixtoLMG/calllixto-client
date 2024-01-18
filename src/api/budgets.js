@@ -1,11 +1,15 @@
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import { baseCreate } from "./base";
 import { METHODS, useAxios } from "./axios";
+import { baseCreate } from "./base";
 
 const BUDGETS_URL = `${CLIENT_ID}${PATHS.BUDGETS}`;
 
 export async function create(budget) {
   baseCreate(BUDGETS_URL, budget, 'Presupuesto creado!');
+};
+
+export async function edit(budget, id) {
+  baseCreate(`${BUDGETS_URL}/${id}`, budget, 'Presupuesto confirmado!');
 };
 
 export function useListBudgets() {
