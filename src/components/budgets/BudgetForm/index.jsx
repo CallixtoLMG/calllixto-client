@@ -1,18 +1,19 @@
 import { BUDGET_FORM_PRODUCT_COLUMNS, PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Button, ButtonsContainer, Dropdown, FieldsContainer, Form, FormField, Input, Label, MaskedInput, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { Cell } from "@/components/common/table";
+import { Button, ButtonsContainer, Checkbox, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { Cell, TableFooter, TableHeader } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { PAGES, RULES } from "@/constants";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Box } from "rebass";
-import { Icon, Modal, Popup, Button as SButton, Table, Transition } from "semantic-ui-react";
+import { Icon, Popup, Button as SButton, Table } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
-import { Checkbox, HeaderCell, TotalText } from "./styles";
+import ModalConfirmation from "./ModalConfirmation";
+import ModalCustomer from "./ModalCustomer";
+import { HeaderCell, TotalText } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -30,11 +31,13 @@ const EMPTY_BUDGET = (user) => ({
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) => {
   const formattedPaymentMethods = budget?.paymentMethods.join(' - ');
   const { push } = useRouter();
+  const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
+  const [customerData, setCustomerData] = useState(budget?.customer);
+  const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [expiration, SetExpiration] = useState(false);
   const [isConfirmChecked, setIsConfirmChecked] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const { control, handleSubmit, setValue, setError, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
+  const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
 
     defaultValues: budget ? {
       ...budget,
@@ -60,7 +63,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
   }, [watchProducts, calculateTotal]);
 
   const handleCreate = (data) => {
-    console.log(data)
     setIsLoading(true);
     onSubmit(data);
     setTimeout(() => {
@@ -73,121 +75,69 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
     reset(EMPTY_BUDGET(user));
   }, [reset, user]);
 
-  const handleConfirmChange = (_, { checked }) => {
-    setIsConfirmChecked(checked);
-
-    if (!isModalOpen && checked) {
-      setIsModalOpen(true);
-    }
-    if (checked) {
-    }
+  const handleCheckboxChange = (e) => {
+    if (!budget?.customer?.address && !budget?.customer?.phone?.areaCode && !budget?.customer?.phone?.number) {
+      setIsModalCustomerOpen(true);
+    } else {
+      setIsModalConfirmationOpen(true);
+    };
   };
 
-  const handleModalOpen = () => {
-    setIsModalOpen(true);
+  const handleModalCustomerClose = (openNextModal, customer) => {
+    setIsModalCustomerOpen(false);
+    if (openNextModal) {
+      setCustomerData(customer)
+      setIsModalConfirmationOpen(true);
+    };
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleModalSubmit = (data) => {
-    setValue('customer.id', data.customerId);
-    setValue('customer.address', data.customerAddress);
-    setValue('customer.phone', data.customerPhone);
-    handleModalClose();
+  const handleModalConfirmationClose = (confirmed) => {
+    setIsModalConfirmationOpen(false);
+    if (confirmed) {
+      setIsConfirmChecked(true);
+    };
   };
 
   return (
     <>
       <NoPrint>
-        {readonly &&
+        {readonly && (
           <>
-            <Transition visible={isModalOpen} animation='scale' duration={500}>
-              <Modal
-                closeIcon
-                open={isModalOpen}
-                onClose={handleModalClose}
-              >
-                <Modal.Header>
-                  {!budget.customer.address || !budget.customer.phone ?
-                    "Es necesario tener los siguientes datos del cliente" :
-                    "Desea confirmar el presupuesto?"}
-                </Modal.Header>
-                <Modal.Content>
-                  <Form onSubmit={handleSubmit(handleModalSubmit)}>
-                    <FieldsContainer>
-                      <FormField flex="1">
-                        <Label>ID del Cliente</Label>
-                        <Segment  >{budget?.customer.name}</Segment>
-                      </FormField>
-                      <FormField flex="1">
-                        <RuledLabel title="Dirección del Cliente" message={errors?.customerAddress?.message} required />
-                        <Controller
-                          name="customerAddress"
-                          control={control}
-                          rules={RULES.REQUIRED}
-                          defaultValue={watch('customer.address')}
-                          render={({ field }) => <Input {...field} />}
-                        />
-                      </FormField>
-                      <FormField width="200px">
-                        <RuledLabel title="Teléfono del Cliente" message={errors?.customerPhone?.message} required />
-                        {!budget.customer.phone.areaCode ?
-                          (<PhoneContainer>
-                            <Box width="70px">
-                              <Controller
-                                name="phone.areaCode"
-                                control={control}
-                                rules={RULES.PHONE.AREA_CODE}
-                                render={({ field }) =>
-                                  <MaskedInput
-                                    mask="9999"
-                                    maskChar={null}
-                                    {...field}
-                                    placeholder="Área"
-                                  />
-                                }
-                              />
-                            </Box>
-                            <Box width="130px">
-                              <Controller
-                                name="phone.number"
-                                control={control}
-                                rules={RULES.PHONE.NUMBER}
-                                render={({ field }) =>
-                                  <MaskedInput
-                                    mask="99999999"
-                                    maskChar={null}
-                                    {...field}
-                                    placeholder="Número"
-                                  />}
-                              />
-                            </Box>
-                          </PhoneContainer>)
-                          : (<Segment>{budget.customer.phone ? formatedPhone(budget?.customer?.phone?.areaCode, budget?.customer?.phone?.number) : ""}</Segment>)}
-                      </FormField >
-                      <ButtonsContainer width="100%" marginTop="10px">
-                        <Button type="submit" color="green">
-                          Confirmar
-                        </Button>
-                        <Button color="red" onClick={handleModalClose}>
-                          Cancelar
-                        </Button>
-                      </ButtonsContainer>
-                    </FieldsContainer>
-                  </Form>
-                </Modal.Content>
-              </Modal>
-            </Transition>
-            <Checkbox
-              toggle
-              checked={isConfirmChecked}
-              onChange={handleConfirmChange}
-              label={isConfirmChecked ? "Confirmado" : "Confirmar presupuesto"}
+            <ModalCustomer
+              budgetId={budget.id}
+              readonly={readonly}
+              isModalOpen={isModalCustomerOpen}
+              onClose={handleModalCustomerClose}
+              customer={budget.customer}
+              setIsConfirmChecked={setIsConfirmChecked}
             />
-          </>}
+            <ModalConfirmation
+              budgetId={budget.id}
+              readonly={readonly}
+              isModalOpen={isModalConfirmationOpen}
+              onClose={handleModalConfirmationClose}
+              customer={customerData}
+            />
+          </>
+        )}
         <Form onSubmit={handleSubmit(handleCreate)} >
+          <FieldsContainer>
+            <FormField width="300px">
+              <Controller
+                name="confirmed"
+                control={control}
+                render={({ field: { value } }) => (
+                  <Checkbox
+                    toggle
+                    checked={isConfirmChecked || value}
+                    readOnly={value}
+                    onChange={handleCheckboxChange}
+                    label={value ? "Confirmado" : "Confirmar presupuesto"}
+                  />
+                )}
+              />
+            </FormField>
+          </FieldsContainer>
           <FieldsContainer>
             <FormField width="300px">
               <Label>Vendedor</Label>
@@ -236,27 +186,29 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               )}
             </FormField>
             <FormField width={5}>
-              <Label>Dirección</Label>
+              <RuledLabel title="Dirección" message={errors?.customer?.address?.message} required={isConfirmChecked} />
               {!readonly ? (
                 <Controller
                   name="customer.address"
                   control={control}
+                  rules={isConfirmChecked && RULES.REQUIRED}
                   render={({ field: { value } }) => <Segment>{value}</Segment>}
                 />
               ) : (
-                <Segment>{budget?.customer?.address}</Segment>
+                <Segment>{customerData?.address}</Segment>
               )}
             </FormField>
             <FormField width="200px">
-              <Label>Teléfono</Label>
+              <RuledLabel title="Teléfono" message={errors?.customer?.phone?.message} required={isConfirmChecked} />
               {!readonly ? (
                 <Controller
                   name="customer.phone"
                   control={control}
+                  rules={isConfirmChecked && RULES.REQUIRED}
                   render={({ field: { value } }) => <Segment>{formatedPhone(value?.areaCode, value?.number)}</Segment>}
                 />
               ) : (
-                <Segment>{formatedPhone(budget?.customer?.phone?.areaCode, budget?.customer?.phone?.number)}</Segment>
+                <Segment>{formatedPhone(customerData?.phone?.areaCode, customerData?.phone?.number)}</Segment>
               )}
             </FormField>
           </FieldsContainer>
@@ -271,13 +223,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               />
             </FormField>) : ("")}
           <Table celled striped compact>
-            <Table.Header>
+            <TableHeader>
               <Table.Row>
                 {BUDGET_FORM_PRODUCT_COLUMNS.map((column) => {
                   if (!column.hide?.(readonly)) return <HeaderCell $header key={column.id} >{column.title}</HeaderCell>;
                 })}
               </Table.Row>
-            </Table.Header>
+            </TableHeader>
             <Table.Body>
               {watchProducts.map((product, index) => (
                 <Table.Row key={`${product.code}-${index}`}>
@@ -372,7 +324,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                 </Table.Row>
               ))}
             </Table.Body>
-            <Table.Footer>
+            <TableFooter>
               <Table.Row>
                 <HeaderCell $right colSpan="5">
                   <TotalText>Total</TotalText>
@@ -382,7 +334,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                 </HeaderCell>
                 {!readonly && <HeaderCell />}
               </Table.Row>
-            </Table.Footer>
+            </TableFooter>
           </Table>
           <FieldsContainer>
             <Label>Comentarios</Label>
@@ -458,9 +410,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                 </FormField>
               </>
             ) : (
-              <FormField>
-                <RuledLabel title="Fecha de vencimiento" message={errors?.expirationOffsetDays?.message} required />
-                <Segment>{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
+              <FormField flex={1}>
+                <Label>Fecha de vencimiento</Label>
+                <Segment>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
               </FormField>
             )}
           </FieldsContainer>
@@ -486,7 +438,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
         }
       </NoPrint >
       <OnlyPrint>
-        <PDFfile budget={budget} />
+        <PDFfile total={total} budget={budget} />
       </OnlyPrint>
     </>
   );

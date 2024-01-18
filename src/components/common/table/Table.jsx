@@ -7,7 +7,7 @@ import { Box, Flex } from 'rebass';
 import { Form, Header, Icon, Input, Popup, Segment, Table } from "semantic-ui-react";
 import styled from "styled-components";
 import Actions from "./Actions";
-import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow } from "./styles";
+import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow, TableHeader } from "./styles";
 
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
@@ -73,13 +73,13 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
         </Segment>
       )}
       <Table celled compact striped>
-        <Table.Header fullWidth>
+        <TableHeader fullWidth>
           <Table.Row>
             {headers.map((header) => (
               <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
             ))}
           </Table.Row>
-        </Table.Header>
+        </TableHeader>
         <Table.Body>
           {filteredElements.length === 0 ? (
             <Table.Row>

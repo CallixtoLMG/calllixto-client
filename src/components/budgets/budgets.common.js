@@ -1,11 +1,19 @@
 import { formatedDateAndHour, formatedPercentage, getTotal, getTotalSum, simpleFormatedPrice } from "@/utils";
+import { Flex } from "rebass";
+import { Icon } from "../common/custom/Semantic";
 
 const BUDGETS_COLUMNS = [
   {
     id: 1,
     title: "Id",
     width: 1,
-    value: (budget) => budget.id
+    align: "left",
+    value: (budget) =>
+      budget.confirmed ?
+        <Flex justifyContent={"space-between"}>
+          {budget.id}&nbsp;<Icon size="small" name="check circle" color="green" />
+        </Flex>
+        : budget.id
   },
   {
     id: 2,

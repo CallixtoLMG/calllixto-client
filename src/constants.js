@@ -79,7 +79,17 @@ const RULES = {
       minLength: { value: 3, message: 'El código de área debe tener 3 o 4 cifras' },
       maxLength: { value: 4, message: 'El código de área debe tener 3 o 4 cifras' },
     },
+    AREA_CODE_REQUIRED: {
+      required: 'Campo requerido',
+      minLength: { value: 3, message: 'El código de área debe tener 3 o 4 cifras' },
+      maxLength: { value: 4, message: 'El código de área debe tener 3 o 4 cifras' },
+    },
     NUMBER: {
+      minLength: { value: 6, message: 'El número completo debe tener 10 cifras' },
+      maxLength: { value: 7, message: 'El número completo debe tener 10 cifras' },
+    },
+    NUMBER_REQUIRED: {
+      required: 'Campo requerido',
       minLength: { value: 6, message: 'El número completo debe tener 10 cifras' },
       maxLength: { value: 7, message: 'El número completo debe tener 10 cifras' },
     }

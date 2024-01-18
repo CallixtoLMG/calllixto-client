@@ -1,12 +1,12 @@
 "use client";
 import { create, useGetBudget } from "@/api/budgets";
-import { useListCustomers } from "@/api/customers";
+import { edit, useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useUserData, useValidateToken } from "@/hooks/userData";
-import { useEffect, useMemo } from "react";
 import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo } from "react";
 
 const CreateBudget = () => {
   useValidateToken();
@@ -46,7 +46,7 @@ const CreateBudget = () => {
 
   return (
     <Loader active={loadingProducts || loadingCustomers || loadingBudget}>
-      <BudgetForm onSubmit={create} products={mappedProducts} customers={mappedCustomers} user={user} budget={budget}/>
+      <BudgetForm onSubmit={create} onSubmitCustomer={edit} products={mappedProducts} customers={mappedCustomers} user={user} budget={budget}/>
     </Loader>
   )
 };

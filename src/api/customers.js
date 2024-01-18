@@ -1,20 +1,20 @@
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { omit } from "lodash";
-import { baseCreate, baseDelete, baseUpdate } from "./base";
 import { METHODS, useAxios } from "./axios";
+import { baseCreate, baseDelete, baseUpdate } from "./base";
 
 const CUSTOMERS_URL = `${CLIENT_ID}${PATHS.CUSTOMERS}`;
 
 export async function create(customer) {
-  baseCreate(CUSTOMERS_URL, customer, 'Cliente creado!');
+  await baseCreate(CUSTOMERS_URL, customer, 'Cliente creado!');
 };
 
 export async function edit(customer) {
-  baseUpdate(`${CUSTOMERS_URL}/${customer.id}`, omit(customer,["id", "createdAt"]), 'Cliente actualizado!');
+  await baseUpdate(`${CUSTOMERS_URL}/${customer.id}`, omit(customer, ["id", "createdAt"]), 'Cliente actualizado!');
 };
 
 export async function deleteCustomer(id) {
-  baseDelete(`${CUSTOMERS_URL}/${id}`, 'Cliente eliminado!');
+  await baseDelete(`${CUSTOMERS_URL}/${id}`, 'Cliente eliminado!');
 };
 
 export function useListCustomers() {
