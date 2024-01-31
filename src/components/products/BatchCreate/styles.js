@@ -7,6 +7,11 @@ const Modal = styled(SModal)`
   height: 90vh!important;
 `;
 
+const ModalActions = styled(SModal.Actions)`
+  display: flex;
+  justify-content: flex-end;
+`;
+
 const ContainerModal = styled(Flex)`
   flex-direction: column!important;
   padding: 30px!important;
@@ -34,5 +39,5 @@ const WarningMessage = styled.p`
   font-size: 10px!important;
 `;
 
-export { ContainerModal, DataNotFoundContainer, Modal, TableContainer, WarningMessage };
+export { ContainerModal, DataNotFoundContainer, Modal, ModalActions, TableContainer, WarningMessage };
 

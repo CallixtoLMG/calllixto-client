@@ -2,7 +2,7 @@ import { Flex } from "rebass";
 import { Button as SButton } from "semantic-ui-react";
 import styled from "styled-components";
 
-const ModalContainer = styled(Flex)`
+const Container = styled(Flex)`
   flex-direction: row;
 `;
 
@@ -16,5 +16,5 @@ const ButtonContainer = styled(Flex)`
   height: 36px!important;
 `;
 
-export { ButtonContainer, MailButton, ModalContainer };
+export { ButtonContainer, Container, MailButton };
 

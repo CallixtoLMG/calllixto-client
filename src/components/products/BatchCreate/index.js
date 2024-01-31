@@ -1,20 +1,24 @@
 import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Cell, HeaderCell } from "@/components/common/table";
+import { downloadExcel } from "@/utils";
 import { useCallback, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
-import { ButtonContent, Icon, Table, Transition } from "semantic-ui-react";
+import { Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { IMPORT_PRODUCTS_COLUMNS } from "../products.common";
-import { ContainerModal, DataNotFoundContainer, Modal, TableContainer } from "./styles";
-import { downloadExcel } from "@/utils";
+import { ContainerModal, DataNotFoundContainer, Modal, ModalActions, TableContainer } from "./styles";
 
-const ImportExcel = ({ products, createBatch }) => {
+const blacklist = [];
+
+const BatchCreate = ({ products, createBatch }) => {
   const { handleSubmit, control, reset, setValue } = useForm();
   const [open, setOpen] = useState(false);
   const [newProducts, setNewProducts] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [existingProducts, setExistingProducts] = useState([]);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const locale = "es-AR";
   const currency = "ARS";
@@ -86,38 +90,58 @@ const ImportExcel = ({ products, createBatch }) => {
 
       parsedData.forEach((product) => {
         const code = String(product.code).toUpperCase();
-        const price = typeof product.price === 'string'
-          ? parseFloat(product.price.replace(/[^\d,]/g, '').replace(',', '.'))
-          : product.price;
-        const formattedProduct = { ...product, code, price };
-        if (existingCodes[code]) {
-          existingProducts.push(formattedProduct);
-        } else {
-          nonExistingProducts.push(formattedProduct);
-        }
+        const isValidCode = /^[a-zA-Z0-9]+$/.test(code);
+        if (isValidCode && code.length >= 5 && code.length <= 30 && !blacklist.some(item => item.code === code)) {
+          const price = typeof product.price === 'string'
+            ? parseFloat(product.price.replace(/[^\d,]/g, '').replace(',', '.'))
+            : product.price;
+          const formattedProduct = { ...product, code, price };
+
+          if (existingCodes[code]) {
+            existingProducts.push(formattedProduct);
+          } else {
+            nonExistingProducts.push(formattedProduct);
+          };
+        };
       });
 
       setNewProducts(nonExistingProducts);
       setValue('newProducts', nonExistingProducts);
 
       if (existingProducts.length) {
-        const data = [
-          ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
-          ...existingProducts.map(product => {
-            return [product.code, product.name, product.price, product.comments]
-          })
-        ];
-        downloadExcel(data);
-      }
-
-      setOpen(true);
+        setShowConfirmationModal(true);
+        setExistingProducts(existingProducts)
+      } else {
+        setOpen(true);
+      };
     };
+  };
+
+  const handleDownloadConfirmation = () => {
+    const data = [
+      ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
+      ...existingProducts.map((product) => [
+        product.code,
+        product.name,
+        product.price,
+        product.comments,
+      ]),
+    ];
+    downloadExcel(data);
+    setShowConfirmationModal(false);
+    setOpen(true);
+  };
+
+  const handleCancelDownloadConfirmation = () => {
+    setShowConfirmationModal(false);
+    setOpen(true);
   };
 
   const handleAccept = async (data) => {
     setIsLoading(true);
     !!data?.newProducts?.length && await createBatch(data.newProducts);
     setIsLoading(false);
+    handleModalClose()
   };
 
   return (
@@ -126,21 +150,16 @@ const ImportExcel = ({ products, createBatch }) => {
         ref={inputRef}
         type="file"
         id="file"
-        accept=".xlsx, .xls"
+        accept=".xlsx, .xls, .xlsm"
         style={{ display: 'none' }}
         onChange={handleFileUpload}
       />
       <Button
-        animated="vertical"
         color="blue"
         onClick={handleClick}
         type="button"
-        width="100%"
       >
-        <ButtonContent hidden>Crear</ButtonContent>
-        <ButtonContent visible>
-          <Icon name="upload" />
-        </ButtonContent>
+        Crear
       </Button>
       <Transition animation="fade" duration={500} visible={open} >
         <Modal
@@ -229,8 +248,35 @@ const ImportExcel = ({ products, createBatch }) => {
           </ContainerModal>
         </Modal>
       </Transition>
+      <Transition animation="fade" duration={500} visible={showConfirmationModal} >
+        <Modal
+          open={showConfirmationModal}
+          onClose={handleCancelDownloadConfirmation}
+          size="small"
+        >
+          <Modal.Header>Confirmar Descarga</Modal.Header>
+          <Modal.Content>
+            <p>
+              Se han encontrado productos existentes en la lista...<br /><br />
+              ¿Deseas descargar un archivo de Excel con estos productos antes de importar nuevos?
+            </p>
+          </Modal.Content>
+          <ModalActions>
+            <Button
+              positive
+              onClick={handleDownloadConfirmation}
+              content="Confirmar"
+            />
+            <Button
+              negative
+              onClick={handleCancelDownloadConfirmation}
+              content="Cancelar"
+            />
+          </ModalActions>
+        </Modal>
+      </Transition>
     </>
   );
 };
 
-export default ImportExcel;
+export default BatchCreate;
