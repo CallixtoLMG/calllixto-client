@@ -43,7 +43,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField width="30%">
-          <RuledLabel title="Proveedor" message={isDirty && !supplierId && !isUpdating  && isSubmitted && 'Campo requerido'} required />
+          <RuledLabel title="Proveedor" message={isDirty && !supplierId && !isUpdating && isSubmitted && 'Campo requerido'} required />
           {!readonly && !isUpdating ? (
             <Dropdown
               required
@@ -91,18 +91,17 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
         </FormField>
       </FieldsContainer>
       <FieldsContainer >
-      <FormField width="20%">
+        <FormField width="20%">
           <RuledLabel title="Código" message={errors?.code?.message} required />
           {!readonly && !isUpdating ? (
             <Controller
               name="code"
               control={control}
-              rules={RULES.REQUIRED_THREE_DIGIT}
+              rules={RULES.REQUIRED_FIVE_DIGIT}
               render={({ field }) => (
                 <Input
                   {...field}
-                  maxLength={3}
-                  placeholder="Código (A12)"
+                  placeholder="Código"
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                   disabled={isUpdating}
                   {...((supplierId || brandId) && { label: { basic: true, content: `${supplierId ?? ''} ${brandId ?? ''}` } })}

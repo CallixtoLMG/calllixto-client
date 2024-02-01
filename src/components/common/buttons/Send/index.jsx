@@ -1,6 +1,6 @@
 import { APIS } from "@/constants";
 import { Button, Icon, Popup } from "semantic-ui-react";
-import { ButtonContainer, MailButton, ModalContainer } from "./styles";
+import { ButtonContainer, Container, MailButton } from "./styles";
 
 const ButtonSend = ({ customerData }) => {
   return (
@@ -14,7 +14,7 @@ const ButtonSend = ({ customerData }) => {
           </Button>
         </ButtonContainer>}
       content={
-        <ModalContainer>
+        <Container>
           {customerData.phone &&
             <Button
               href={`${APIS.WSP((`${customerData.phone.areaCode}${customerData.phone.number}`), customerData.name)}`}
@@ -25,7 +25,7 @@ const ButtonSend = ({ customerData }) => {
               background="rgb(219,68,55)!important" size="tiny" ><Icon name='mail' />Mail
             </MailButton>
           }
-        </ModalContainer>
+        </Container>
       }
       on='click'
     />

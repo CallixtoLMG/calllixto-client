@@ -75,7 +75,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
     reset(EMPTY_BUDGET(user));
   }, [reset, user]);
 
-  const handleCheckboxChange = (e) => {
+  const handleCheckboxChange = (e, { checked }) => {
     if (!budget?.customer?.address && !budget?.customer?.phone?.areaCode && !budget?.customer?.phone?.number) {
       setIsModalCustomerOpen(true);
     } else {
@@ -131,7 +131,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                     toggle
                     checked={isConfirmChecked || value}
                     readOnly={value}
-                    onChange={handleCheckboxChange}
+                    onChange={(e, { checked }) => {
+                      if (!readonly) {
+                        setValue("confirmed", checked);
+                        setIsConfirmChecked(checked);
+                      }
+                      handleCheckboxChange
+                    }}
                     label={value ? "Confirmado" : "Confirmar presupuesto"}
                   />
                 )}
@@ -274,7 +280,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                               const value = e.target.value;
                               field.onChange(value);
                               calculateTotal();
-                              console.log(errors)
                             }}
                           />
                         )}
