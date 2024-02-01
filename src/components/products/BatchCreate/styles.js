@@ -3,13 +3,14 @@ import { Container, Modal as SModal } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Modal = styled(SModal)`
-  width: 90%!important;
-  height: 90vh!important;
+  max-width: 90%!important;
+  max-height: 90vh!important;
 `;
 
 const ModalActions = styled(SModal.Actions)`
   display: flex;
   justify-content: flex-end;
+  column-gap: 15px;
 `;
 
 const ContainerModal = styled(Flex)`

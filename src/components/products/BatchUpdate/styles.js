@@ -10,6 +10,7 @@ const Modal = styled(SModal)`
 const ModalActions = styled(SModal.Actions)`
   display: flex;
   justify-content: flex-end;
+  column-gap: 15px;
 `;
 
 const ContainerModal = styled(Flex)`

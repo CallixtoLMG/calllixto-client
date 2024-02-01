@@ -3,7 +3,6 @@ import { createBatch, deleteProduct, editBatch, useListProducts } from "@/api/pr
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BatchCreate from "@/components/products/BatchCreate";
 import BatchUpdate from "@/components/products/BatchUpdate";
-import ButtonImport from "@/components/products/ButtonImport";
 import ProductsPage from "@/components/products/ProductsPage";
 import { PAGES } from "@/constants";
 import { useRole, useValidateToken } from "@/hooks/userData";
@@ -43,18 +42,14 @@ const Products = () => {
       },
       {
         id: 2,
-        button: <ButtonImport products={products} createBatch={createBatch} editBatch={editBatch} />,
-      },
-      {
-        id: 3,
         button: <BatchCreate products={products} createBatch={createBatch} />,
       },
       {
-        id: 4,
+        id: 3,
         button: <BatchUpdate products={products} editBatch={editBatch} />,
       },
       {
-        id: 5,
+        id: 4,
         icon: 'download',
         color: 'blue',
         onClick: () => downloadExcel(mockData),

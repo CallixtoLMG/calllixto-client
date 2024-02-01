@@ -1,10 +1,10 @@
-import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Cell, HeaderCell } from "@/components/common/table";
 import { downloadExcel } from "@/utils";
 import { useCallback, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
-import { Table, Transition } from "semantic-ui-react";
+import { ButtonContent, Icon, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { IMPORT_PRODUCTS_COLUMNS } from "../products.common";
 import { ContainerModal, DataNotFoundContainer, Modal, ModalActions, TableContainer } from "./styles";
@@ -155,11 +155,18 @@ const BatchCreate = ({ products, createBatch }) => {
         onChange={handleFileUpload}
       />
       <Button
+        animated="vertical"
         color="blue"
         onClick={handleClick}
         type="button"
+        width="100%"
       >
-        Crear
+        <ButtonContent hidden>
+          Crear
+        </ButtonContent>
+        <ButtonContent visible>
+          <Icon name="upload" />
+        </ButtonContent>
       </Button>
       <Transition animation="fade" duration={500} visible={open} >
         <Modal
@@ -240,10 +247,10 @@ const BatchCreate = ({ products, createBatch }) => {
                   <p>No se encontraron datos.</p>
                 </DataNotFoundContainer>
               )}
-              <ButtonsContainer>
+              <ModalActions>
                 <Button disabled={isLoading} loading={isLoading} type="submit" color="green" content="Aceptar" />
                 <Button disabled={isLoading} onClick={() => setOpen(false)} color="red" content="Cancelar" />
-              </ButtonsContainer>
+              </ModalActions>
             </Form>
           </ContainerModal>
         </Modal>
