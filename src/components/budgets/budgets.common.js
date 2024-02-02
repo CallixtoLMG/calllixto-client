@@ -81,16 +81,6 @@ const PRODUCTS_COLUMNS = [
   },
 ];
 
-const BUDGET_FORM_PRODUCT_COLUMNS = [
-  { title: "Nombre", value: "name", id: 1, },
-  { title: "Código", value: "code", id: 2, },
-  { title: "Precio", value: "price", id: 3 },
-  { title: "Cantidad", value: "quantity", id: 4 },
-  { title: "Descuento", value: "discount", id: 5 },
-  { title: "Total", value: "total", id: 6 },
-  { title: "Acciones", value: "actions", id: 7, hide: (readonly) => readonly },
-];
-
 const FILTERS = [
   { value: 'id', placeholder: 'Código' },
   { value: 'customerName', placeholder: 'Cliente', map: 'customer.name' },
@@ -120,6 +110,6 @@ const PAYMENT_METHODS = [{
 },];
 
 export {
-  BUDGETS_COLUMNS, BUDGET_FORM_PRODUCT_COLUMNS, FILTERS, PAYMENT_METHODS, PRODUCTS_COLUMNS
+  BUDGETS_COLUMNS, FILTERS, PAYMENT_METHODS, PRODUCTS_COLUMNS
 };
 

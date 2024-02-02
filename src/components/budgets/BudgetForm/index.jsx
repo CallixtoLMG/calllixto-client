@@ -1,19 +1,18 @@
-import { BUDGET_FORM_PRODUCT_COLUMNS, PAYMENT_METHODS } from "@/components/budgets/budgets.common";
+import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Button, ButtonsContainer, Checkbox, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { Cell, TableFooter, TableHeader } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { PAGES, RULES } from "@/constants";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Icon, Popup, Button as SButton, Table } from "semantic-ui-react";
+import { Icon, Popup } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
-import { HeaderCell, TotalText } from "./styles";
+import { Table } from "@/components/common/table";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -38,7 +37,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
   const [expiration, SetExpiration] = useState(false);
   const [isConfirmChecked, setIsConfirmChecked] = useState(false);
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
-
     defaultValues: budget ? {
       ...budget,
       seller: `${user?.firstName} ${user?.lastName}`
@@ -58,11 +56,24 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
     setValue("products", newProducts);
   }, [watchProducts, setValue]);
 
+  const actions = readonly ? [] : [
+    {
+      id: 1,
+      icon: 'erase',
+      color: 'red',
+      onClick: (element, index) => {
+        deleteProduct(index)
+      },
+      tooltip: 'Eliminar'
+    }
+  ];
+
   useEffect(() => {
     calculateTotal();
   }, [watchProducts, calculateTotal]);
 
   const handleCreate = (data) => {
+    if (!watchProducts.length) return;
     setIsLoading(true);
     onSubmit(data);
     setTimeout(() => {
@@ -97,6 +108,98 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
       setIsConfirmChecked(true);
     };
   };
+
+  const BUDGET_FORM_PRODUCT_COLUMNS = [
+    { title: "Nombre", value: (product) => product.name, id: 1, align: 'left' },
+    {
+      title: "Código",
+      value: (product) => (
+        <>
+          <Popup
+            size="tiny"
+            trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
+            position="top center"
+            on="hover"
+            content={product.brandName}
+          />
+          {'-'}
+          <Popup
+            size="tiny"
+            trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>}
+            position="top center"
+            on="hover"
+            content={product.supplierName}
+          />
+          {'-'}
+          <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
+        </>
+      ),
+      id: 2,
+      width: 2
+    },
+    { title: "Precio", value: (product) => formatedPrice(product.price, product.brand), id: 3, width: 1 },
+    {
+      title: "Cantidad", value: (product, index) => (
+        <>
+          {!readonly ? (
+            <Controller
+              name={`products[${index}].quantity`}
+              control={control}
+              rules={RULES.REQUIRED}
+              render={({ field }) => (
+                <Input
+                  type="number"
+                  min={0}
+                  defaultValue={1}
+                  height="40px"
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    field.onChange(value);
+                    calculateTotal();
+                  }}
+                />
+              )}
+            />
+          ) : (
+            <p>{product?.quantity}</p>
+          )}
+        </>
+      ), id: 4, width: 1
+    },
+    {
+      title: "Descuento",
+      value: (product, index) => (
+        <>
+          {!readonly ? (
+            <Controller
+              name={`products[${index}].discount`}
+              control={control}
+              defaultValue={product.discount || 0}
+              render={({ field }) => (
+                <Input
+                  fluid
+                  type="number"
+                  min={0}
+                  max={100}
+                  height="40px"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    calculateTotal();
+                  }}
+                />
+              )}
+            />
+          ) : (
+            <p>{formatedPercentage(product?.discount)}</p>
+          )}
+        </>
+      ),
+      id: 5,
+      width: 1
+    },
+    { title: "Total", value: (product) => formatedPrice(getTotal(product)), id: 6, width: 2 },
+  ];
 
   return (
     <>
@@ -218,7 +321,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               )}
             </FormField>
           </FieldsContainer>
-          {!readonly ? (
+          {!readonly && (
             <FormField width="300px">
               <RuledLabel title="Agregar producto" message={!watchProducts.length && isSubmitted && isDirty && 'Al menos 1 producto es requerido'} required />
               <ProductSearch
@@ -227,120 +330,15 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1 }])
                 }}
               />
-            </FormField>) : ("")}
-          <Table celled striped compact>
-            <TableHeader>
-              <Table.Row>
-                {BUDGET_FORM_PRODUCT_COLUMNS.map((column) => {
-                  if (!column.hide?.(readonly)) return <HeaderCell $header key={column.id} >{column.title}</HeaderCell>;
-                })}
-              </Table.Row>
-            </TableHeader>
-            <Table.Body>
-              {watchProducts.map((product, index) => (
-                <Table.Row key={`${product.code}-${index}`}>
-                  <Cell align="left">
-                    {product.name}
-                  </Cell>
-                  <Cell width={2}>
-                    <Popup
-                      size="tiny"
-                      trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
-                      position="top center"
-                      on="hover"
-                      content={product.brandName}
-                    />
-                    {'-'}
-                    <Popup
-                      size="tiny"
-                      trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>}
-                      position="top center"
-                      on="hover"
-                      content={product.supplierName}
-                    />
-                    {'-'}
-                    <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
-                  </Cell>
-                  <Cell width={1}>
-                    {formatedPrice(product.price, product.brand)}
-                  </Cell>
-                  <Cell width={1}>
-                    {!readonly ? (
-                      <Controller
-                        name={`products[${index}].quantity`}
-                        control={control}
-                        rules={RULES.REQUIRED}
-                        render={({ field }) => (
-                          <Input
-                            type="number"
-                            min={0}
-                            defaultValue={1}
-                            height="40px"
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              field.onChange(value);
-                              calculateTotal();
-                            }}
-                          />
-                        )}
-                      />
-                    ) : (
-                      <p>{product?.quantity}</p>
-                    )}
-                  </Cell>
-                  <Cell width={1}>
-                    {!readonly ? (
-                      <Controller
-                        name={`products[${index}].discount`}
-                        control={control}
-                        defaultValue={product.discount || 0}
-                        render={({ field }) => (
-                          <Input
-                            fluid
-                            type="number"
-                            min={0}
-                            max={100}
-                            height="40px"
-                            {...field}
-                            onChange={(e) => {
-                              field.onChange(e.target.value);
-                              calculateTotal();
-                            }}
-                          />
-                        )}
-                      />
-                    ) : (
-                      <p>{formatedPercentage(product?.discount)}</p>
-                    )}
-                  </Cell>
-                  <Cell width={2}>
-                    {formatedPrice(getTotal(product))}
-                  </Cell>
-                  {!readonly && (
-                    <Cell width={1}>
-                      <SButton
-                        icon="trash"
-                        color="red"
-                        onClick={() => { deleteProduct(index) }}
-                        type="button"
-                      />
-                    </Cell>
-                  )}
-                </Table.Row>
-              ))}
-            </Table.Body>
-            <TableFooter>
-              <Table.Row>
-                <HeaderCell $right colSpan="5">
-                  <TotalText>Total</TotalText>
-                </HeaderCell>
-                <HeaderCell $nonBorder>
-                  <TotalText>{formatedPrice(total)}</TotalText>
-                </HeaderCell>
-                {!readonly && <HeaderCell />}
-              </Table.Row>
-            </TableFooter>
-          </Table>
+            </FormField>
+          )}
+          <Table
+            mainKey="code"
+            headers={BUDGET_FORM_PRODUCT_COLUMNS}
+            elements={watchProducts}
+            actions={actions}
+            total={formatedPrice(getTotalSum(watchProducts))}
+          />
           <FieldsContainer>
             <Label>Comentarios</Label>
             <Controller
@@ -389,7 +387,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                 <Segment >{formattedPaymentMethods}</Segment>
               )}
             </FormField>
-            {!readonly ? (
+            {!readonly && (
               <>
                 <FormField flex={1} >
                   <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
@@ -409,17 +407,12 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                       />}
                   />
                 </FormField>
-                <FormField flex={1}>
-                  <Label>Fecha de vencimiento</Label>
-                  <Segment>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
-                </FormField>
               </>
-            ) : (
-              <FormField flex={1}>
-                <Label>Fecha de vencimiento</Label>
-                <Segment>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
-              </FormField>
             )}
+            <FormField flex={1}>
+              <Label>Fecha de vencimiento</Label>
+              <Segment>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
+            </FormField>
           </FieldsContainer>
           {!readonly && (
             <SubmitAndRestore

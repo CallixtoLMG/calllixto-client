@@ -55,5 +55,14 @@ const LinkRow = styled(Table.Row)`
   }
 `;
 
-export { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow, TableFooter, TableHeader };
+const TableRow = styled(Table.Row)`
+  position: relative;
+
+  &:hover ${ActionsContainer} {
+    opacity: 0.8;
+    visibility: visible;
+  }
+`;
+
+export { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow, TableFooter, TableHeader, TableRow };
 

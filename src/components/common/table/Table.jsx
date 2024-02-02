@@ -7,7 +7,7 @@ import { Box, Flex } from 'rebass';
 import { Form, Header, Icon, Input, Popup, Segment, Table } from "semantic-ui-react";
 import styled from "styled-components";
 import Actions from "./Actions";
-import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow, TableHeader } from "./styles";
+import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow, TableHeader, TableRow } from "./styles";
 
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
@@ -19,6 +19,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset } = useForm({ defaultValues });
   const [filteredElements, setFilteredElements] = useState(elements);
+  const useFilters = useMemo(() => filters.length > 0, [filters]);
 
   const filter = useCallback((data) => {
     const newElements = elements.filter(element => {
@@ -36,7 +37,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
 
   return (
     <>
-      {filters.length > 0 && (
+      {useFilters && (
         <Segment>
           <Form onSubmit={handleSubmit(filter)}>
             <Flex justifyContent="space-between">
@@ -81,7 +82,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
           </Table.Row>
         </TableHeader>
         <Table.Body>
-          {filteredElements.length === 0 ? (
+          {!elements.length && !filteredElements.length ? (
             <Table.Row>
               <Table.Cell colSpan={headers.length} textAlign="center">
                 <Header as="h4">
@@ -90,13 +91,13 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
               </Table.Cell>
             </Table.Row>
           ) : (
-            filteredElements.map((element) => {
+            (useFilters ? filteredElements : elements).map((element, index) => {
               if (page) {
                 return (
                   <LinkRow key={element[mainKey]} onClick={() => push(page.SHOW(element[mainKey]))}>
                     {headers.map(header => (
                       <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
-                        {header.value(element)}
+                        {header.value(element, index)}
                       </Cell>
                     ))}
                     {!!actions.length && (
@@ -110,18 +111,20 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
                 );
               }
               return (
-                <Table.Row key={element[mainKey]}>
+                <TableRow key={element[mainKey]}>
                   {headers.map(header => (
                     <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
-                      {header.value(element)}
+                      {header.value(element, index)}
                     </Cell>
                   ))}
                   {!!actions.length && (
                     <ActionsContainer>
-                      <Actions actions={actions} />
+                      <InnerActionsContainer>
+                          <Actions actions={actions} element={element} index={index} />
+                        </InnerActionsContainer>
                     </ActionsContainer>
                   )}
-                </Table.Row>
+                </TableRow>
               );
             })
           )}
