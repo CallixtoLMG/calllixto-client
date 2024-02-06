@@ -1,13 +1,13 @@
+import { useUserContext } from "@/User";
 import { edit } from "@/api/budgets";
 import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } from "@/components/common/custom";
-import { useUserData } from "@/hooks/userData";
 import { formatedPhone, now } from "@/utils";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 
 const ModalCustomer = ({ isModalOpen, onClose, customer, budgetId }) => {
-  const user = useUserData();
+  const { userData } = useUserContext();
   const [isLoading, setIsLoading] = useState(false);
   const { handleSubmit } = useForm({
     defaultValues: customer
@@ -23,7 +23,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, budgetId }) => {
   const handleEdit = async () => {
     setIsLoading(true);
     try {
-      const confirmationData = { confirmedBy: `${user.firstName} ${user.lastName}`, confirmedAt: now() };
+      const confirmationData = { confirmedBy: `${userData.firstName} ${userData.lastName}`, confirmedAt: now() };
       await edit(confirmationData, budgetId);
       onClose(true)
     } catch (error) {

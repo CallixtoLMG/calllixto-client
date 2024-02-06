@@ -1,11 +1,12 @@
 "use client";
+import { useUserContext } from "@/User";
 import { createBatch, deleteProduct, editBatch, useListProducts } from "@/api/products";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BatchCreate from "@/components/products/BatchCreate";
 import BatchUpdate from "@/components/products/BatchUpdate";
 import ProductsPage from "@/components/products/ProductsPage";
 import { PAGES } from "@/constants";
-import { useRole, useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel } from "@/utils";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
@@ -20,7 +21,7 @@ const mockData = [
 
 const Products = () => {
   useValidateToken();
-  const role = useRole();
+  const { role } = useUserContext();
   const { products, isLoading } = useListProducts();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();

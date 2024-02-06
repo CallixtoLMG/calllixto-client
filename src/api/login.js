@@ -7,8 +7,7 @@ export async function login(data) {
   if (response.$metadata?.httpStatusCode) {
     const accessToken = response.AuthenticationResult.AccessToken;
     localStorage.setItem("token", accessToken);
-    await getUserData();
-    return true;
+    return getUserData();
   }
   return false;
 };

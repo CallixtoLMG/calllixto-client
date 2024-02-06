@@ -2,16 +2,17 @@
 import { useBreadcrumContext, Loader, useNavActionsContext } from "@/components/layout";
 import { deleteSupplier, useListSuppliers } from "@/api/suppliers";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
-import { useRole, useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks/userData";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
+import { useUserContext } from "@/User";
 
 const Suppliers = () => {
   useValidateToken();
   const { suppliers, isLoading } = useListSuppliers();
-  const role = useRole();
+  const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();

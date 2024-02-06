@@ -5,14 +5,15 @@ import { useListSuppliers } from "@/api/suppliers";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
-import { useRole, useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { useUserContext } from "@/User";
 
 const CreateProduct = () => {
   useValidateToken();
   const { push } = useRouter();
-  const role = useRole();
+  const { role } = useUserContext();
   const { brands, isLoading: isLoadingBrands } = useListBrands();
   const { suppliers, isLoading: isLoadingSuppliers } = useListSuppliers();
   const { setLabels } = useBreadcrumContext();

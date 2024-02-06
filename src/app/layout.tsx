@@ -13,6 +13,7 @@ import { NavActionsProvider } from '@/components/layout';
 import styled from "styled-components";
 import { PAGES } from "@/constants";
 import { usePathname } from "next/navigation";
+import { UserProvider } from "@/User";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -50,25 +51,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             toastOptions={{
               duration: 4000
             }} />
-          <Header />
-          <NavActionsProvider>
-            <BreadcrumProvider>
-              {show && (
-                <NoPrint>
-                  <NavigationContainer>
-                    <BreadcrumbContainer>
-                      <GoBackButton />
-                      <Breadcrumb />
-                    </BreadcrumbContainer>
-                    <NavActions />
-                  </NavigationContainer>
-                </NoPrint>
-              )}
-              <LayoutChildrenContainer>
-                {children}
-              </LayoutChildrenContainer>
-            </BreadcrumProvider>
-          </NavActionsProvider>
+          <UserProvider>
+            <Header />
+            <NavActionsProvider>
+              <BreadcrumProvider>
+                {show && (
+                  <NoPrint>
+                    <NavigationContainer>
+                      <BreadcrumbContainer>
+                        <GoBackButton />
+                        <Breadcrumb />
+                      </BreadcrumbContainer>
+                      <NavActions />
+                    </NavigationContainer>
+                  </NoPrint>
+                )}
+                <LayoutChildrenContainer>
+                  {children}
+                </LayoutChildrenContainer>
+              </BreadcrumProvider>
+            </NavActionsProvider>
+          </UserProvider>
           {/* <Footer /> */}
         </body>
       </StyledComponentsRegistry>

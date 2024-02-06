@@ -4,13 +4,14 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { useRole, useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks/userData";
 import { useEffect } from "react";
+import { useUserContext } from "@/User";
 
 const CreateSupplier = () => {
   useValidateToken();
   const { push } = useRouter();
-  const role = useRole();
+  const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
 

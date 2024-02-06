@@ -8,16 +8,18 @@ import { Controller, useForm } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import { Loader } from "@/components/layout";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "./styled";
+import { useUserContext } from "@/User";
 
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
-  const recovery = false;
   const { handleSubmit, control } = useForm();
   const [isLoading, setIsLoading] = useState(false);
+  const { setUserData } = useUserContext();
   const handleForm = async (data) => {
     setIsLoading(true);
-    const loginSuccess = await onSubmit(data);
-    if (loginSuccess) {
+    const userData = await onSubmit(data);
+    if (userData) {
+      setUserData(userData);
       push(PAGES.PRODUCTS.BASE);
     } else {
       setIsLoading(false);
@@ -72,7 +74,7 @@ const LoginForm = ({ onSubmit }) => {
               Ingresar
             </ModButton>
           </Form>
-          {recovery &&
+          {false &&
             <ModMessage>
               <Link href={PAGES.PRODUCTS.BASE}>Perdiste tu contraseña?</Link>
             </ModMessage>}
