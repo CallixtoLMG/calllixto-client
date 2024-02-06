@@ -1,25 +1,24 @@
 import { useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
-import { Cell, HeaderCell } from "@/components/common/table";
-import { REGEX } from "@/constants";
+import { Table } from "@/components/common/table";
+import { REGEX, RULES } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useCallback, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
-import { ButtonContent, Icon, Table, Transition } from "semantic-ui-react";
+import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
-import { IMPORT_PRODUCTS_COLUMNS } from "../products.common";
-import { ContainerModal, DataNotFoundContainer, Modal, ModalActions, TableContainer } from "./styles";
+import { ContainerModal, Modal, ModalActions, WarningMessage } from "./styles";
 
 const BatchCreate = ({ products, createBatch }) => {
   const { blacklist, isLoading: loadingBlacklist } = useListBanProducts();
-  const { handleSubmit, control, reset, setValue } = useForm();
+  const { handleSubmit, control, reset, setValue, formState: { errors }, watch } = useForm();
   const [open, setOpen] = useState(false);
-  const [newProducts, setNewProducts] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [existingProducts, setExistingProducts] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const watchProducts = watch("newProducts", []);
 
   const locale = "es-AR";
   const currency = "ARS";
@@ -106,7 +105,6 @@ const BatchCreate = ({ products, createBatch }) => {
         };
       });
 
-      setNewProducts(newProducts);
       setValue('newProducts', newProducts);
 
       if (existingProducts.length) {
@@ -116,7 +114,7 @@ const BatchCreate = ({ products, createBatch }) => {
         setOpen(true);
       };
     };
-  },[blacklist, loadingBlacklist]);
+  }, [blacklist, loadingBlacklist, products, reset, setValue]);
 
   const handleDownloadConfirmation = () => {
     const data = [
@@ -144,6 +142,78 @@ const BatchCreate = ({ products, createBatch }) => {
     setIsLoading(false);
     handleModalClose()
   };
+
+  const deleteProduct = useCallback((index) => {
+    const products = [...watchProducts];
+    products.splice(index, 1);
+    setValue("newProducts", products);
+  }, [watchProducts, setValue]);
+
+  const actions = [
+    {
+      id: 1,
+      icon: 'trash',
+      color: 'red',
+      onClick: (element, index) => {
+        deleteProduct(index);
+      },
+      tooltip: 'Eliminar'
+    }
+  ];
+
+  const PRODUCTS_COLUMNS = [
+    {
+      title: "Código",
+      value: (product) => product.code,
+      id: 1,
+      width: 2
+    },
+    {
+      title: "Nombre", value: (product, index) => (
+        <Controller
+          name={`newProducts[${index}].name`}
+          control={control}
+          render={({ field }) => (
+            <Input {...field} height="30px" width="100%" />
+          )}
+        />
+      ), id: 2, align: 'left'
+    },
+    {
+      title: "Precio", value: (product, index) => (
+        <Controller
+          name={`newProducts[${index}].price`}
+          control={control}
+          rules={RULES.REQUIRED_PRICE}
+          render={({ field }) => (
+            <>
+              <CurrencyInput
+                {...field}
+                locale={locale}
+                currency={currency}
+                onChangeValue={(_, value) => {
+                  field.onChange(value);
+                }}
+                InputElement={<Input height="30px" />}
+              />
+              {errors?.newProducts?.[index]?.price && <WarningMessage>Precio requerido</WarningMessage>}
+            </>
+          )}
+        />
+      ), id: 3, width: 3
+    },
+    {
+      title: "Comentarios", value: (product, index) => (
+        <Controller
+          name={`newProducts[${index}].comments`}
+          control={control}
+          render={({ field }) => (
+            <Input {...field} height="30px" width="100%" />
+          )}
+        />
+      ), id: 4, align: 'left'
+    },
+  ];
 
   return (
     <>
@@ -184,78 +254,23 @@ const BatchCreate = ({ products, createBatch }) => {
                   <Segment>{selectedFile}</Segment>
                 </FormField>
               </FieldsContainer>
-              {!!newProducts.length && (
-                <FieldsContainer>
-                  <Label>Nuevos productos</Label>
-                  <TableContainer>
-                    <Table celled compact striped>
-                      <Table.Header fullWidth>
-                        <Table.Row>
-                          {IMPORT_PRODUCTS_COLUMNS
-                            .map((column) => (
-                              <HeaderCell key={column.id}>{column.title}</HeaderCell>
-                            ))}
-                        </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        {newProducts.map((newProduct, index) => (
-                          <Table.Row key={`${newProduct.code}`}>
-                            <Cell width={1}>{newProduct.code}</Cell>
-                            <Controller
-                              name={`newProducts[${index}].name`}
-                              control={control}
-                              render={({ field }) => (
-                                <Cell align="left">
-                                  <Input {...field} height="30px" width="100%" />
-                                </Cell>
-                              )}
-                            />
-                            <Controller
-                              name={`newProducts[${index}].price`}
-                              control={control}
-                              render={({ field }) => (
-                                <Cell width={2}>
-                                  <CurrencyInput
-                                    {...field}
-                                    locale={locale}
-                                    currency={currency}
-                                    onChangeValue={(_, value) => {
-                                      field.onChange(value);
-                                    }}
-                                    InputElement={<Input height="30px" />}
-                                  />
-                                </Cell>
-                              )}
-                            />
-                            <Controller
-                              name={`newProducts[${index}].comments`}
-                              control={control}
-                              render={({ field }) => (
-                                <Cell align="left">
-                                  <Input {...field} height="30px" width="100%" />
-                                </Cell>
-                              )}
-                            />
-                          </Table.Row>
-                        ))}
-                      </Table.Body>
-                    </Table>
-                  </TableContainer>
-                </FieldsContainer>
-              )}
-              {!newProducts.length && (
-                <DataNotFoundContainer>
-                  <p>No se encontraron datos.</p>
-                </DataNotFoundContainer>
-              )}
+              <FieldsContainer>
+                <Label>Nuevos productos</Label>
+                <Table
+                  mainKey="code"
+                  headers={PRODUCTS_COLUMNS}
+                  elements={watchProducts}
+                  actions={actions}
+                />
+              </FieldsContainer>
               <ModalActions>
                 <Button disabled={isLoading} loading={isLoading} type="submit" color="green" content="Aceptar" />
                 <Button disabled={isLoading} onClick={() => setOpen(false)} color="red" content="Cancelar" />
               </ModalActions>
             </Form>
-          </ContainerModal>
-        </Modal>
-      </Transition>
+          </ContainerModal >
+        </Modal >
+      </Transition >
       <Transition animation="fade" duration={500} visible={showConfirmationModal} >
         <Modal
           open={showConfirmationModal}

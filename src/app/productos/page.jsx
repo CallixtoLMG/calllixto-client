@@ -60,7 +60,7 @@ const Products = () => {
       },
       {
         id: 6,
-        icon: 'delete',
+        icon: 'trash',
         color: 'orange',
         onClick: () => setOpen(true),
         text: 'Anular'

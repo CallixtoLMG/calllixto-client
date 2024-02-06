@@ -15,7 +15,7 @@ const CustomersPage = ({ customers = [], onDelete }) => {
   const actions = [
     {
       id: 1,
-      icon: 'delete',
+      icon: 'trash',
       color: 'red',
       onClick: (customer) => {
         setSelectedCustomer(customer);
