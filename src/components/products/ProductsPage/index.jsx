@@ -21,7 +21,7 @@ const ProductsPage = ({ products = [], role, onDelete }) => {
   const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
-      icon: 'erase',
+      icon: 'delete',
       color: 'red',
       onClick: (product) => {
         setSelectedProduct(product);
