@@ -1,10 +1,10 @@
-import { Button } from "@/components/common/custom";
+import { Button, Input, Segment, } from "@/components/common/custom";
 import { get } from "lodash";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from 'rebass';
-import { Form, Header, Icon, Input, Popup, Segment, Table } from "semantic-ui-react";
+import { Form, Header, Icon, Popup, Table } from "semantic-ui-react";
 import styled from "styled-components";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow, TableHeader, TableRow } from "./styles";
@@ -23,12 +23,18 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
 
   const filter = useCallback((data) => {
     const newElements = elements.filter(element => {
-      return filters.every(filter => {
-        return get(element, filter.map ? filter.map : filter.value, '')?.toLowerCase().includes(data[filter.value].toLowerCase());
-      });
+      if (data) {
+        return filters.every(filter => {
+          return get(element, filter.map ? filter.map : filter.value, '')?.toLowerCase().includes(data[filter.value].toLowerCase());
+        });
+      } return elements
     });
     setFilteredElements(newElements);
   }, [elements, filters]);
+
+  useEffect(() => {
+    filter()
+  }, [elements, filter]);
 
   const handleRestore = useCallback(() => {
     reset(defaultValues);
@@ -59,11 +65,11 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
                     key={`filter_${filter.value}`}
                     name={filter.value}
                     control={control}
-                    render={({ field }) => (<Input {...field} placeholder={filter.placeholder} />)}
+                    render={({ field }) => (<Input height="35px" margin="0" {...field} placeholder={filter.placeholder} />)}
                   />
                 )}
               </FiltersContainer>
-              <Button type="submit" width="110px">
+              <Button onClick={handleSubmit(filter)} type="button" width="110px">
                 <Flex justifyContent="space-around">
                   <span>Filtrar</span>
                   <Icon name="search" />
@@ -120,8 +126,8 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
                   {!!actions.length && (
                     <ActionsContainer>
                       <InnerActionsContainer>
-                          <Actions actions={actions} element={element} index={index} />
-                        </InnerActionsContainer>
+                        <Actions actions={actions} element={element} index={index} />
+                      </InnerActionsContainer>
                     </ActionsContainer>
                   )}
                 </TableRow>

@@ -13,7 +13,8 @@ import styled from "styled-components";
 
 export const Segment = styled(SSegment)`
   margin: 5px 0!important;
-  min-height: 50px!important;
+  width: 100%!important;
+  min-height: 30px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
 `;
 
@@ -32,10 +33,10 @@ export const FormField = styled(Form.Field)`
 `;
 
 export const Input = styled(SInput)`
-  margin: 5px 0 !important;
+  margin: ${({ margin }) => margin || "5px 0"} !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
-  height: ${({ height }) => height || '50px'} !important;
+  height: ${({ height }) => height || '40px'} !important;
   width: ${({ width }) => width ? `${width} !important` : ''};
   display: flex!important;
   div.ui.basic.label{
@@ -45,7 +46,7 @@ export const Input = styled(SInput)`
 `;
 
 export const Label = styled(SLabel)`
-  width: 100%!important;
+  width: ${({ width }) => width ? `${width} !important` : '100%!important'};
   margin: 0!important;
 `;
 

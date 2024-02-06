@@ -1,6 +1,7 @@
 "use client";
 import { createBatch, deleteProduct, editBatch, useListProducts } from "@/api/products";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import BanProduct from "@/components/products/BanProduct";
 import BatchCreate from "@/components/products/BatchCreate";
 import BatchUpdate from "@/components/products/BatchUpdate";
 import ProductsPage from "@/components/products/ProductsPage";
@@ -9,7 +10,7 @@ import { useRole, useValidateToken } from "@/hooks/userData";
 import { downloadExcel } from "@/utils";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const mockData = [
   ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
@@ -25,6 +26,7 @@ const Products = () => {
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     setLabels(['Productos']);
@@ -54,13 +56,21 @@ const Products = () => {
         color: 'blue',
         onClick: () => downloadExcel(mockData),
         text: 'Plantilla'
-      }
+      },
+      {
+        id: 6,
+        icon: 'delete',
+        color: 'orange',
+        onClick: () => setOpen(true),
+        text: 'Anular'
+      },
     ] : [];
     setActions(actions);
   }, [products, push, role, setActions]);
 
   return (
     <Loader active={isLoading}>
+      {open && <BanProduct open={open} setOpen={setOpen} />}
       <ProductsPage
         products={products}
         role={role}

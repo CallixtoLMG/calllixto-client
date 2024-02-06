@@ -8,6 +8,8 @@ export const PATHS = {
 };
 
 export const CREATE_BATCH = "batch";
+export const BLACK_LIST = "blacklist";
+export const CLIENT = "clients";
 export const VALIDATE = "validate";
 export const EDIT_BATCH = "transact";
 export const URL = process.env.NEXT_PUBLIC_URL;

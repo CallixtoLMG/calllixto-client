@@ -1,9 +1,9 @@
 "use client";
+import { ModalDelete } from "@/components/common/modals";
+import { Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
-import { Table } from "@/components/common/table";
 import { useCallback, useState } from "react";
-import { ModalDelete } from "@/components/common/modals";
 import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
 
 const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
@@ -17,7 +17,7 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
   const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
-      icon: 'erase',
+      icon: 'delete',
       color: 'red',
       onClick: (supplier) => {
         setSelectedSupplier(supplier);

@@ -1,9 +1,9 @@
 "use client";
-import { PAGES } from "@/constants";
-import { FILTERS, HEADERS } from "../customers.common";
-import { Table } from '@/components/common/table';
 import { ModalDelete } from '@/components/common/modals';
+import { Table } from '@/components/common/table';
+import { PAGES } from "@/constants";
 import { useCallback, useState } from "react";
+import { FILTERS, HEADERS } from "../customers.common";
 
 const CustomersPage = ({ customers = [], onDelete }) => {
   const [showModal, setShowModal] = useState(false);
@@ -15,7 +15,7 @@ const CustomersPage = ({ customers = [], onDelete }) => {
   const actions = [
     {
       id: 1,
-      icon: 'erase',
+      icon: 'delete',
       color: 'red',
       onClick: (customer) => {
         setSelectedCustomer(customer);
