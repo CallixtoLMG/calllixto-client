@@ -14,6 +14,7 @@ const Actions = ({ actions, element, index }) => {
           key={`action_${action.id}`}
           position="top center"
           trigger={<Button
+            type="button"
             icon={action.icon}
             onClick={(event) => handleClick(event, action)}
             color={action.color}

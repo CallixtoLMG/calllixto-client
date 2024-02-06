@@ -1,4 +1,4 @@
-import { Button as SButton, Icon } from "semantic-ui-react";
+import { Icon, Button as SButton } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Button = styled(SButton)`
@@ -14,7 +14,7 @@ export const Restore = ({ isUpdating, isLoading, isDirty, onClick }) => {
       color="brown"
       onClick={onClick}
       >
-      <Icon name={isUpdating ? "undo" : "erase"} />{isUpdating ? "Restaurar" : "Limpiar"}
+      <Icon name={isUpdating ? "undo" : "delete"} />{isUpdating ? "Restaurar" : "Limpiar"}
     </Button>
   )
 }

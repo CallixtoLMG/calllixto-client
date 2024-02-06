@@ -74,14 +74,25 @@ const IMPORT_PRODUCTS_COLUMNS = [
     title: "Comentarios",
     align: "left",
   }
-]
+];
+
+const BAN_PRODUCTS_COLUMNS = [
+  {
+    id: 1,
+    title: "Código",
+    value: (product) =>
+      product.code
+  },
+];
 
 const FILTERS = [
   { value: 'code', placeholder: 'Código' },
   { value: 'name', placeholder: 'Nombre' }
 ];
 
-export {
-  FILTERS, IMPORT_PRODUCTS_COLUMNS, PRODUCT_COLUMNS
-};
+const BAN_FILTERS = [
+  { value: 'code', placeholder: 'Código' },
+];
+
+export { BAN_FILTERS, BAN_PRODUCTS_COLUMNS, FILTERS, IMPORT_PRODUCTS_COLUMNS, PRODUCT_COLUMNS };
 

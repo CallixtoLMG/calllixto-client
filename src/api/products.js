@@ -1,10 +1,11 @@
-import { CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS } from "@/fetchUrls";
+import { BLACK_LIST, CLIENT, CLIENT_ID, CREATE_BATCH, EDIT_BATCH, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { omit } from "lodash";
-import { baseCreate, baseDelete, baseUpdate } from "./base";
 import { METHODS, useAxios } from "./axios";
+import { baseCreate, baseDelete, baseUpdate } from "./base";
 
 const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
+const BAN_PRODUCTS_URL = `${CLIENT_ID}${CLIENT}`;
 
 export async function create(product) {
   baseCreate(PRODUCTS_URL, product, 'Producto creado!');
@@ -35,3 +36,12 @@ export async function createBatch(products) {
 export async function editBatch(products) {
   baseCreate(`${PRODUCTS_URL}/${EDIT_BATCH}`, { update: products.map(product => ({ ...product, updatedAt: now() })) }, 'Productos actualizados!', false);
 }
+
+export function useListBanProducts() {
+  const { response, isLoading } = useAxios({ url: BAN_PRODUCTS_URL, method: METHODS.GET });
+  return { blacklist: response?.client.blacklist, isLoading };
+};
+
+export async function editBanProducts(product) {
+  baseUpdate(`${CLIENT_ID}${BLACK_LIST}`, omit(product, ["createdAt"]), 'Lista actualizada!');
+};

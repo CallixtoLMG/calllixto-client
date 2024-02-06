@@ -1,5 +1,7 @@
+import { useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Cell, HeaderCell } from "@/components/common/table";
+import { REGEX } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useCallback, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
@@ -9,9 +11,8 @@ import * as XLSX from "xlsx";
 import { IMPORT_PRODUCTS_COLUMNS } from "../products.common";
 import { ContainerModal, DataNotFoundContainer, Modal, ModalActions, TableContainer } from "./styles";
 
-const blacklist = [];
-
 const BatchCreate = ({ products, createBatch }) => {
+  const { blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue } = useForm();
   const [open, setOpen] = useState(false);
   const [newProducts, setNewProducts] = useState([]);
@@ -37,11 +38,11 @@ const BatchCreate = ({ products, createBatch }) => {
     setOpen(open);
   };
 
-  const handleFileUpload = (e) => {
+  const handleFileUpload = useCallback((e) => {
     reset();
 
-    const fileName = e.target.files[0]?.name;
-    if (!fileName) {
+    const fileName = e?.target.files[0]?.name;
+    if (!fileName || loadingBlacklist) {
       return;
     };
 
@@ -80,7 +81,7 @@ const BatchCreate = ({ products, createBatch }) => {
       };
 
       let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
-      const nonExistingProducts = [];
+      const newProducts = [];
       const existingProducts = [];
       const existingCodes = {};
 
@@ -90,8 +91,8 @@ const BatchCreate = ({ products, createBatch }) => {
 
       parsedData.forEach((product) => {
         const code = String(product.code).toUpperCase();
-        const isValidCode = /^[a-zA-Z0-9]+$/.test(code);
-        if (isValidCode && code.length >= 5 && code.length <= 30 && !blacklist.some(item => item.code === code)) {
+        const isValidCode = product.code && REGEX.FIVE_DIGIT_CODE.test(code);
+        if (isValidCode && !blacklist.some(item => item === code)) {
           const price = typeof product.price === 'string'
             ? parseFloat(product.price.replace(/[^\d,]/g, '').replace(',', '.'))
             : product.price;
@@ -100,13 +101,13 @@ const BatchCreate = ({ products, createBatch }) => {
           if (existingCodes[code]) {
             existingProducts.push(formattedProduct);
           } else {
-            nonExistingProducts.push(formattedProduct);
+            newProducts.push(formattedProduct);
           };
         };
       });
 
-      setNewProducts(nonExistingProducts);
-      setValue('newProducts', nonExistingProducts);
+      setNewProducts(newProducts);
+      setValue('newProducts', newProducts);
 
       if (existingProducts.length) {
         setShowConfirmationModal(true);
@@ -115,7 +116,7 @@ const BatchCreate = ({ products, createBatch }) => {
         setOpen(true);
       };
     };
-  };
+  },[blacklist, loadingBlacklist]);
 
   const handleDownloadConfirmation = () => {
     const data = [
