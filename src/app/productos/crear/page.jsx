@@ -4,15 +4,11 @@ import { create } from "@/api/products";
 import { useListSuppliers } from "@/api/suppliers";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { PAGES } from "@/constants";
-import { useRole, useValidateToken } from "@/hooks/userData";
-import { useRouter } from "next/navigation";
+import { useValidateToken } from "@/hooks/userData";
 import { useEffect, useMemo } from "react";
 
 const CreateProduct = () => {
   useValidateToken();
-  const { push } = useRouter();
-  const role = useRole();
   const { brands, isLoading: isLoadingBrands } = useListBrands();
   const { suppliers, isLoading: isLoadingSuppliers } = useListSuppliers();
   const { setLabels } = useBreadcrumContext();
@@ -20,16 +16,12 @@ const CreateProduct = () => {
 
   useEffect(() => {
     resetActions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     setLabels(['Productos', 'Crear']);
   }, [setLabels]);
-
-  if (role === "user") {
-    push(PAGES.NOT_FOUND.BASE);
-  };
 
   const mappedBrands = useMemo(() => brands?.map(brand => ({
     ...brand,

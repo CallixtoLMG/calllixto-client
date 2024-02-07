@@ -1,4 +1,5 @@
 "use client";
+import { useUserContext } from "@/User";
 import { deleteBatchProducts } from "@/api/products";
 import { edit, useGetSupplier } from "@/api/suppliers";
 import { ModalDelete } from "@/components/common/modals";
@@ -6,14 +7,14 @@ import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useRole, useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks/userData";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 const Supplier = ({ params }) => {
   useValidateToken();
-  const role = useRole();
+  const { role } = useUserContext();
   const { push } = useRouter();
   const { supplier, isLoading } = useGetSupplier(params.id);
   const [allowUpdate, Toggle] = useAllowUpdate();

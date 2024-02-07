@@ -1,16 +1,17 @@
 "use client";
+import { useUserContext } from "@/User";
 import { useGetBudget } from "@/api/budgets";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
-import { useUserData, useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 const Budget = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
-  const user = useUserData();
+  const { userData } = useUserContext();
   const { budget, isLoading } = useGetBudget(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
@@ -31,7 +32,7 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      <BudgetForm readonly user={user} budget={budget} />
+      <BudgetForm readonly user={userData} budget={budget} />
     </Loader>
   )
 };

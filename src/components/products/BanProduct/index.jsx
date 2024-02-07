@@ -25,7 +25,7 @@ const BanProduct = ({ open, setOpen }) => {
   const actions = [
     {
       id: 1,
-      icon: 'erase',
+      icon: 'trash',
       color: 'red',
       onClick: deleteProduct,
       tooltip: 'Eliminar'
@@ -70,7 +70,7 @@ const BanProduct = ({ open, setOpen }) => {
     if (!isLoading) {
       setValue("products", blacklist)
     }
-  }, [isLoading]);
+  }, [blacklist, isLoading, setValue]);
 
   return (
     <Loader active={isLoading}>

@@ -1,16 +1,17 @@
 "use client";
+import { useUserContext } from "@/User";
 import { create, useGetBudget } from "@/api/budgets";
 import { edit, useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useUserData, useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks/userData";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 const CreateBudget = () => {
   useValidateToken();
-  const user = useUserData();
+  const { userData } = useUserContext();
   const searchParams = useSearchParams();
   const cloneId = searchParams.get('clonar');
 
@@ -23,7 +24,7 @@ const CreateBudget = () => {
 
   useEffect(() => {
     resetActions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ const CreateBudget = () => {
 
   return (
     <Loader active={loadingProducts || loadingCustomers || loadingBudget}>
-      <BudgetForm onSubmit={create} onSubmitCustomer={edit} products={mappedProducts} customers={mappedCustomers} user={user} budget={budget}/>
+      <BudgetForm onSubmit={create} onSubmitCustomer={edit} products={mappedProducts} customers={mappedCustomers} user={userData} budget={budget} />
     </Loader>
   )
 };

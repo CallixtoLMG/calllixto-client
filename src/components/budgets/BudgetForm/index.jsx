@@ -59,7 +59,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
   const actions = readonly ? [] : [
     {
       id: 1,
-      icon: 'erase',
+      icon: 'trash',
       color: 'red',
       onClick: (element, index) => {
         deleteProduct(index)

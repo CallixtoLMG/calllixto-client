@@ -1,9 +1,10 @@
 "use client";
+import { useUserContext } from "@/User";
 import { deleteSupplier, useListSuppliers } from "@/api/suppliers";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { PAGES } from "@/constants";
-import { useRole, useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks/userData";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -11,7 +12,7 @@ import { useEffect } from "react";
 const Suppliers = () => {
   useValidateToken();
   const { suppliers, isLoading } = useListSuppliers();
-  const role = useRole();
+  const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();

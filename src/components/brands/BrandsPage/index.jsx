@@ -17,7 +17,7 @@ const BrandsPage = ({ brands = [], role, onDelete }) => {
   const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
-      icon: 'delete',
+      icon: 'trash',
       color: 'red',
       onClick: (brand) => {
         setSelectedBrand(brand);

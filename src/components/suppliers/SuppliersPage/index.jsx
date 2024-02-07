@@ -17,7 +17,7 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
   const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
-      icon: 'delete',
+      icon: 'trash',
       color: 'red',
       onClick: (supplier) => {
         setSelectedSupplier(supplier);

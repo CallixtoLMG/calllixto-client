@@ -19,7 +19,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
   const { push } = useRouter();
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset } = useForm({ defaultValues });
-  const [filteredElements, setFilteredElements] = useState(elements);
+  const [filteredElements, setFilteredElements] = useState([]);
   const useFilters = useMemo(() => filters.length > 0, [filters]);
 
   const filter = useCallback((data) => {
@@ -28,14 +28,15 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
         return filters.every(filter => {
           return get(element, filter.map ? filter.map : filter.value, '')?.toLowerCase().includes(data[filter.value].toLowerCase());
         });
-      } return elements
+      }
+      return elements;
     });
     setFilteredElements(newElements);
   }, [elements, filters]);
 
   useEffect(() => {
-    filter()
-  }, [elements, filter]);
+    setFilteredElements(elements);
+  }, [elements])
 
   const handleRestore = useCallback(() => {
     reset(defaultValues);
