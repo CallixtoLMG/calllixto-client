@@ -91,10 +91,9 @@ const BatchCreate = ({ products, createBatch }) => {
       parsedData.forEach((product) => {
         const code = String(product.code).toUpperCase();
         const isValidCode = product.code && REGEX.FIVE_DIGIT_CODE.test(code);
-        if (isValidCode && !blacklist.some(item => item === code)) {
-          const price = typeof product.price === 'string'
-            ? parseFloat(product.price.replace(/[^\d,]/g, '').replace(',', '.'))
-            : product.price;
+        const price = parseFloat(product.price);
+
+        if (isValidCode && !blacklist.some(item => item === code) && price > 0) {
           const formattedProduct = { ...product, code, price };
 
           if (existingCodes[code]) {
