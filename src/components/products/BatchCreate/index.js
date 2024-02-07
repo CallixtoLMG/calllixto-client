@@ -1,6 +1,7 @@
 import { useListBanProducts } from "@/api/products";
-import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { Button, FieldsContainer, Form, FormField, Input, Label, Modal, Segment } from "@/components/common/custom";
 import { Cell, HeaderCell } from "@/components/common/table";
+import { Loader } from "@/components/layout";
 import { REGEX } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useCallback, useRef, useState } from "react";
@@ -9,7 +10,7 @@ import { Controller, useForm } from "react-hook-form";
 import { ButtonContent, Icon, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { IMPORT_PRODUCTS_COLUMNS } from "../products.common";
-import { ContainerModal, DataNotFoundContainer, Modal, ModalActions, TableContainer } from "./styles";
+import { ContainerModal, DataNotFoundContainer, ModalActions, TableContainer } from "./styles";
 
 const BatchCreate = ({ products, createBatch }) => {
   const { blacklist, isLoading: loadingBlacklist } = useListBanProducts();
@@ -18,6 +19,7 @@ const BatchCreate = ({ products, createBatch }) => {
   const [newProducts, setNewProducts] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [existingProducts, setExistingProducts] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
@@ -39,7 +41,9 @@ const BatchCreate = ({ products, createBatch }) => {
   };
 
   const handleFileUpload = useCallback((e) => {
+
     reset();
+    setOpen(true);
 
     const fileName = e?.target.files[0]?.name;
     if (!fileName || loadingBlacklist) {
@@ -53,7 +57,7 @@ const BatchCreate = ({ products, createBatch }) => {
     if (!(file instanceof Blob)) {
       return;
     };
-
+    setIsLoading(true)
     reader.readAsBinaryString(file);
     reader.onload = (e) => {
       const data = e.target.result;
@@ -85,7 +89,7 @@ const BatchCreate = ({ products, createBatch }) => {
       const existingProducts = [];
       const existingCodes = {};
 
-      products.forEach((product) => {
+      products?.forEach((product) => {
         existingCodes[product.code.toUpperCase()] = true;
       });
 
@@ -108,15 +112,13 @@ const BatchCreate = ({ products, createBatch }) => {
 
       setNewProducts(newProducts);
       setValue('newProducts', newProducts);
-
+      setIsLoading(false)
       if (existingProducts.length) {
         setShowConfirmationModal(true);
         setExistingProducts(existingProducts)
-      } else {
-        setOpen(true);
-      };
+      }
     };
-  },[blacklist, loadingBlacklist]);
+  }, [blacklist, loadingBlacklist]);
 
   const handleDownloadConfirmation = () => {
     const data = [
@@ -139,10 +141,10 @@ const BatchCreate = ({ products, createBatch }) => {
   };
 
   const handleAccept = async (data) => {
-    setIsLoading(true);
+    setIsUpdating(true);
     !!data?.newProducts?.length && await createBatch(data.newProducts);
-    setIsLoading(false);
     handleModalClose()
+    setIsUpdating(false);
   };
 
   return (
@@ -169,7 +171,9 @@ const BatchCreate = ({ products, createBatch }) => {
           <Icon name="upload" />
         </ButtonContent>
       </Button>
+
       <Transition animation="fade" duration={500} visible={open} >
+
         <Modal
           closeIcon
           open={open}
@@ -177,82 +181,84 @@ const BatchCreate = ({ products, createBatch }) => {
           onOpen={handleModalOpen}
         >
           <ContainerModal>
-            <Form onSubmit={handleSubmit(handleAccept)}>
-              <FieldsContainer>
-                <FormField width={6}>
-                  <Label>Archivo seleccionado:</Label>
-                  <Segment>{selectedFile}</Segment>
-                </FormField>
-              </FieldsContainer>
-              {!!newProducts.length && (
+            <Loader active={true}>
+              <Form onSubmit={handleSubmit(handleAccept)}>
                 <FieldsContainer>
-                  <Label>Nuevos productos</Label>
-                  <TableContainer>
-                    <Table celled compact striped>
-                      <Table.Header fullWidth>
-                        <Table.Row>
-                          {IMPORT_PRODUCTS_COLUMNS
-                            .map((column) => (
-                              <HeaderCell key={column.id}>{column.title}</HeaderCell>
-                            ))}
-                        </Table.Row>
-                      </Table.Header>
-                      <Table.Body>
-                        {newProducts.map((newProduct, index) => (
-                          <Table.Row key={`${newProduct.code}`}>
-                            <Cell width={1}>{newProduct.code}</Cell>
-                            <Controller
-                              name={`newProducts[${index}].name`}
-                              control={control}
-                              render={({ field }) => (
-                                <Cell align="left">
-                                  <Input {...field} height="30px" width="100%" />
-                                </Cell>
-                              )}
-                            />
-                            <Controller
-                              name={`newProducts[${index}].price`}
-                              control={control}
-                              render={({ field }) => (
-                                <Cell width={2}>
-                                  <CurrencyInput
-                                    {...field}
-                                    locale={locale}
-                                    currency={currency}
-                                    onChangeValue={(_, value) => {
-                                      field.onChange(value);
-                                    }}
-                                    InputElement={<Input height="30px" />}
-                                  />
-                                </Cell>
-                              )}
-                            />
-                            <Controller
-                              name={`newProducts[${index}].comments`}
-                              control={control}
-                              render={({ field }) => (
-                                <Cell align="left">
-                                  <Input {...field} height="30px" width="100%" />
-                                </Cell>
-                              )}
-                            />
-                          </Table.Row>
-                        ))}
-                      </Table.Body>
-                    </Table>
-                  </TableContainer>
+                  <FormField width={6}>
+                    <Label>Archivo seleccionado:</Label>
+                    <Segment>{selectedFile}</Segment>
+                  </FormField>
                 </FieldsContainer>
-              )}
-              {!newProducts.length && (
-                <DataNotFoundContainer>
-                  <p>No se encontraron datos.</p>
-                </DataNotFoundContainer>
-              )}
-              <ModalActions>
-                <Button disabled={isLoading} loading={isLoading} type="submit" color="green" content="Aceptar" />
-                <Button disabled={isLoading} onClick={() => setOpen(false)} color="red" content="Cancelar" />
-              </ModalActions>
-            </Form>
+                {!!newProducts.length && (
+                  <FieldsContainer>
+                    <Label>Nuevos productos</Label>
+                    <TableContainer>
+                      <Table celled compact striped>
+                        <Table.Header fullWidth>
+                          <Table.Row>
+                            {IMPORT_PRODUCTS_COLUMNS
+                              .map((column) => (
+                                <HeaderCell key={column.id}>{column.title}</HeaderCell>
+                              ))}
+                          </Table.Row>
+                        </Table.Header>
+                        <Table.Body>
+                          {newProducts.map((newProduct, index) => (
+                            <Table.Row key={`${newProduct.code}`}>
+                              <Cell width={1}>{newProduct.code}</Cell>
+                              <Controller
+                                name={`newProducts[${index}].name`}
+                                control={control}
+                                render={({ field }) => (
+                                  <Cell align="left">
+                                    <Input {...field} height="30px" width="100%" />
+                                  </Cell>
+                                )}
+                              />
+                              <Controller
+                                name={`newProducts[${index}].price`}
+                                control={control}
+                                render={({ field }) => (
+                                  <Cell width={2}>
+                                    <CurrencyInput
+                                      {...field}
+                                      locale={locale}
+                                      currency={currency}
+                                      onChangeValue={(_, value) => {
+                                        field.onChange(value);
+                                      }}
+                                      InputElement={<Input height="30px" />}
+                                    />
+                                  </Cell>
+                                )}
+                              />
+                              <Controller
+                                name={`newProducts[${index}].comments`}
+                                control={control}
+                                render={({ field }) => (
+                                  <Cell align="left">
+                                    <Input {...field} height="30px" width="100%" />
+                                  </Cell>
+                                )}
+                              />
+                            </Table.Row>
+                          ))}
+                        </Table.Body>
+                      </Table>
+                    </TableContainer>
+                  </FieldsContainer>
+                )}
+                {!newProducts.length && (
+                  <DataNotFoundContainer>
+                    <p>No se encontraron datos.</p>
+                  </DataNotFoundContainer>
+                )}
+                <ModalActions >
+                  <Button disabled={isUpdating} loading={isUpdating} type="submit" color="green" content="Aceptar" />
+                  <Button disabled={isUpdating} onClick={() => setOpen(false)} color="red" content="Cancelar" />
+                </ModalActions>
+              </Form>
+            </Loader >
           </ContainerModal>
         </Modal>
       </Transition>
@@ -282,7 +288,7 @@ const BatchCreate = ({ products, createBatch }) => {
             />
           </ModalActions>
         </Modal>
-      </Transition>
+      </Transition >
     </>
   );
 };

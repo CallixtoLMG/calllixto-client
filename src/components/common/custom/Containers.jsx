@@ -13,6 +13,7 @@ export const FieldsContainer = styled(Flex)`
   flex-wrap: wrap;
   column-gap: 20px;
   width: ${({ width }) => width || ''} !important;
+  height: ${({ height }) => height || ''} !important;
 `;
 
 export const ButtonsContainer = styled(Flex)`

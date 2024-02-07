@@ -1,12 +1,13 @@
 "use client";
+import { Input } from "@/components/common/custom";
 import { useEffect, useRef, useState } from 'react';
 import { Flex } from "rebass";
 import { Button, Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
 import { Form } from "./styles";
-import { Input } from "@/components/common/custom";
 
 
-const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoading }) => {
+const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoading, batch }) => {
+  console.log(params)
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
 
@@ -24,7 +25,15 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
   };
 
   const handleDelete = async () => {
-    await onDelete(params);
+    if (batch) {
+      const requestBody = {
+        supplierId: params,
+      };
+      console.log(requestBody)
+      await onDelete({ ...params, body: requestBody });
+    } else {
+      await onDelete(params);
+    };
     setShowModal(false);
   };
 

@@ -3,6 +3,7 @@ import { Container, Modal as SModal } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Modal = styled(SModal)`
+  width: 100%!important;
   max-width: 90%!important;
   max-height: 90vh!important;
 `;
@@ -29,7 +30,7 @@ const DataNotFoundContainer = styled(Container)`
 const TableContainer = styled(Flex)`
   width: 100%;
   margin-top: 5px !important;
-  max-height: 300px;
+  max-height: 50vh;
   overflow-y: auto;
   overflow-x: hidden;
 `;
