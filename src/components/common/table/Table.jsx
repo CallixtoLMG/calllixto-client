@@ -14,8 +14,7 @@ const FiltersContainer = styled(Flex)`
   align-items: center;
 `;
 
-const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
-  console.log(tableHeight)
+const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside, active }) => {
   const { push } = useRouter();
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset } = useForm({ defaultValues });
@@ -43,6 +42,13 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
     setFilteredElements(elements);
   }, [reset, defaultValues, elements]);
 
+  const handleEnterKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit(filter)();
+    }
+  };
+
   return (
     <>
       {useFilters && (
@@ -67,7 +73,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
                     key={`filter_${filter.value}`}
                     name={filter.value}
                     control={control}
-                    render={({ field }) => (<Input height="35px" margin="0" {...field} placeholder={filter.placeholder} />)}
+                    render={({ field }) => (<Input onKeyPress={handleEnterKeyPress} height="35px" margin="0" {...field} placeholder={filter.placeholder} />)}
                   />
                 )}
               </FiltersContainer>
@@ -91,7 +97,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
             </Table.Row>
           </TableHeader>
           <Table.Body>
-            {!elements.length && !filteredElements.length ? (
+            {(useFilters ? !filteredElements.length : !elements.length) ? (
               <Table.Row>
                 <Table.Cell colSpan={headers.length} textAlign="center">
                   <Header as="h4">

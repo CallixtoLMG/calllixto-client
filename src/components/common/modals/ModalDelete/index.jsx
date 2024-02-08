@@ -7,7 +7,6 @@ import { Form } from "./styles";
 
 
 const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoading, batch }) => {
-  console.log(params)
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
 
@@ -29,7 +28,6 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
       const requestBody = {
         supplierId: params,
       };
-      console.log(requestBody)
       await onDelete({ ...params, body: requestBody });
     } else {
       await onDelete(params);

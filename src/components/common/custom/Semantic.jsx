@@ -48,6 +48,7 @@ export const Input = styled(SInput)`
 
 export const Label = styled(SLabel)`
   width: ${({ width }) => width ? width : '100%'} !important;
+  height: fit-content;
   margin: 0!important;
 `;
 
@@ -89,4 +90,5 @@ export const Modal = styled(SModal)`
   width: ${({ width }) => width || '100%'} !important;
   max-width: 90%!important;
   max-height: 90vh!important;
+  min-height: ${({ minHeight }) => minHeight || '100px'} !important;
 `;

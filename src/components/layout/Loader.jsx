@@ -1,10 +1,16 @@
-import React from "react";
 import { Loader as LoaderComp } from "semantic-ui-react";
+import styled from "styled-components";
 
-export const Loader = ({ children, active, message }) => {
+const SLoader = styled(LoaderComp)`
+  &::before {
+    border-color: ${({ greyColor }) => greyColor && "#b2b0b2f5"} !important;
+  };
+`;
+
+export const Loader = ({ children, active, message, greyColor }) => {
   return (
     <>
-      {active ? <LoaderComp active size="large">{message && message}</LoaderComp> : children}
+      {active ? <SLoader greyColor={greyColor} active size="large">{message && message}</SLoader> : children}
     </>
   );
 };
