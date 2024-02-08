@@ -1,4 +1,4 @@
-import { BATCH, BLACK_LIST, CLIENT, CLIENT_ID, EDIT_BATCH, PATHS } from "@/fetchUrls";
+import { BATCH, BLACK_LIST, CLIENT, CLIENT_ID, EDIT_BATCH, PATHS, SUPPLIER } from "@/fetchUrls";
 import { now } from "@/utils";
 import { omit } from "lodash";
 import { METHODS, useAxios } from "./axios";
@@ -46,6 +46,6 @@ export async function editBanProducts(product) {
   await baseUpdate(`${CLIENT_ID}${BLACK_LIST}`, omit(product, ["createdAt"]), 'Lista actualizada!');
 };
 
-export async function deleteBatchProducts() {
-  baseDelete(`${PRODUCTS_URL}/${BATCH}`, 'Productos del proveedor eliminados!');
+export async function deleteBatchProducts(id) {
+  baseDelete(`${PRODUCTS_URL}/${SUPPLIER}/${id}`, 'Productos del proveedor eliminados!');
 };

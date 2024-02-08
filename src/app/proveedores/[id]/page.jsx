@@ -60,7 +60,6 @@ const Supplier = ({ params }) => {
           setShowModal={setOpen}
           title={deleteQuestion(supplier?.name)}
           onDelete={deleteBatchProducts}
-          batch
           params={supplier.id}
         />}
       <SupplierForm supplier={supplier} onSubmit={edit} readonly={!allowUpdate} />
