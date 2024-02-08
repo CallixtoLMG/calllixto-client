@@ -6,6 +6,7 @@ import {
   Icon as SIcon,
   Input as SInput,
   Label as SLabel,
+  Modal as SModal,
   Segment as SSegment,
   TextArea as STextarea
 } from "semantic-ui-react";
@@ -25,9 +26,9 @@ export const Checkbox = styled(SCheckbox)`
 `;
 
 export const FormField = styled(Form.Field)`
-  width: ${({ width }) => width || '200px!important'};
-  min-width: ${({ minWidth }) => minWidth || "200px!important"};
-  flex: ${({ flex }) => flex || 'none!important'};
+  width: ${({ width }) => width || '200px'} !important;
+  min-width: ${({ minWidth }) => minWidth || "200px"} !important;
+  flex: ${({ flex }) => flex || 'none'} !important;
   margin: 0 !important;
   flex-direction: column;
 `;
@@ -37,7 +38,7 @@ export const Input = styled(SInput)`
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   height: ${({ height }) => height || '40px'} !important;
-  width: ${({ width }) => width ? `${width} !important` : ''};
+  width: ${({ width }) => width ? width : ''} !important;
   display: flex!important;
   div.ui.basic.label{
     padding: 1.23rem 7px!important;
@@ -46,7 +47,8 @@ export const Input = styled(SInput)`
 `;
 
 export const Label = styled(SLabel)`
-  width: ${({ width }) => width ? `${width} !important` : '100%!important'};
+  width: ${({ width }) => width ? width : '100%'} !important;
+  height: fit-content;
   margin: 0!important;
 `;
 
@@ -71,15 +73,22 @@ export const Dropdown = styled(SDropdown)`
   };
   i.dropdown.icon {
     height: 50px!important;
-    top: ${({ top }) => top || "15px"}!important};
+    top: ${({ top }) => top || "15px"} !important};
   };
 `;
 
 export const Button = styled(SButton)`
-  width: ${({ width }) => width ? `${width}!important` : ''};
+  width: ${({ width }) => width ? width : ''} !important;
   margin: 0 !important;
 `;
 
 export const Icon = styled(SIcon)`
   align-self: center!important;
+`;
+
+export const Modal = styled(SModal)`
+  width: ${({ width }) => width || '100%'} !important;
+  max-width: 90%!important;
+  max-height: 90vh!important;
+  min-height: ${({ minHeight }) => minHeight || '100px'} !important;
 `;

@@ -1,4 +1,4 @@
-import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { Button, FieldsContainer, Form, FormField, Input, Label, Modal, Segment } from "@/components/common/custom";
 import { Cell, HeaderCell } from "@/components/common/table";
 import { downloadExcel } from "@/utils";
 import { useCallback, useRef, useState } from "react";
@@ -7,7 +7,7 @@ import { Controller, useForm, } from "react-hook-form";
 import { ButtonContent, Icon, Table, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { IMPORT_PRODUCTS_COLUMNS } from "../products.common";
-import { ContainerModal, DataNotFoundContainer, Modal, ModalActions, TableContainer } from "./styles";
+import { ContainerModal, DataNotFoundContainer, ModalActions, TableContainer } from "./styles";
 
 const BatchUpdate = ({ products, editBatch }) => {
   const { handleSubmit, control, reset, setValue } = useForm();

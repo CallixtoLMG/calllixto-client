@@ -16,6 +16,7 @@ const BatchCreate = ({ products, createBatch }) => {
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [existingProducts, setExistingProducts] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const watchProducts = watch("newProducts", []);
@@ -38,7 +39,9 @@ const BatchCreate = ({ products, createBatch }) => {
   };
 
   const handleFileUpload = useCallback((e) => {
+
     reset();
+    setOpen(true);
 
     const fileName = e?.target.files[0]?.name;
     if (!fileName || loadingBlacklist) {
@@ -52,7 +55,7 @@ const BatchCreate = ({ products, createBatch }) => {
     if (!(file instanceof Blob)) {
       return;
     };
-
+    setIsLoading(true)
     reader.readAsBinaryString(file);
     reader.onload = (e) => {
       const data = e.target.result;
@@ -84,7 +87,7 @@ const BatchCreate = ({ products, createBatch }) => {
       const existingProducts = [];
       const existingCodes = {};
 
-      products.forEach((product) => {
+      products?.forEach((product) => {
         existingCodes[product.code.toUpperCase()] = true;
       });
 
@@ -105,13 +108,11 @@ const BatchCreate = ({ products, createBatch }) => {
       });
 
       setValue('newProducts', newProducts);
-
+      setIsLoading(false)
       if (existingProducts.length) {
         setShowConfirmationModal(true);
         setExistingProducts(existingProducts)
-      } else {
-        setOpen(true);
-      };
+      }
     };
   }, [blacklist, loadingBlacklist, products, reset, setValue]);
 
@@ -136,10 +137,10 @@ const BatchCreate = ({ products, createBatch }) => {
   };
 
   const handleAccept = async (data) => {
-    setIsLoading(true);
+    setIsUpdating(true);
     !!data?.newProducts?.length && await createBatch(data.newProducts);
-    setIsLoading(false);
     handleModalClose()
+    setIsUpdating(false);
   };
 
   const deleteProduct = useCallback((index) => {
@@ -238,7 +239,9 @@ const BatchCreate = ({ products, createBatch }) => {
           <Icon name="upload" />
         </ButtonContent>
       </Button>
+
       <Transition animation="fade" duration={500} visible={open} >
+
         <Modal
           closeIcon
           open={open}
@@ -296,7 +299,7 @@ const BatchCreate = ({ products, createBatch }) => {
             />
           </ModalActions>
         </Modal>
-      </Transition>
+      </Transition >
     </>
   );
 };

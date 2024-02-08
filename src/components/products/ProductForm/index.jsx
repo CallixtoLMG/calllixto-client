@@ -26,14 +26,12 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
     reset(product || EMPTY_PRODUCT);
   }, [reset]);
 
-  const handleForm = (data) => {
+  const handleForm = async (data) => {
     data.code = `${supplierId}${brandId}${data.code}`;
     setIsLoading(true);
-    onSubmit(data);
-    setTimeout(() => {
-      setIsLoading(false);
-      push(PAGES.PRODUCTS.BASE);
-    }, 2000);
+    await onSubmit(data);
+    setIsLoading(false);
+    push(PAGES.PRODUCTS.BASE);
   };
 
   const locale = "es-AR";
