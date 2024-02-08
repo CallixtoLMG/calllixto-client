@@ -6,7 +6,7 @@ import { Button, Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-re
 import { Form } from "./styles";
 
 
-const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoading, batch }) => {
+const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoading }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
 
@@ -16,7 +16,7 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
     inputElement?.current?.focus();
     setConfirmationText('');
   }, [showModal]);
-
+  
   const handleConfirmationTextChange = (e) => {
     const text = e.target.value;
     setConfirmationText(text);
@@ -24,14 +24,7 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
   };
 
   const handleDelete = async () => {
-    if (batch) {
-      const requestBody = {
-        supplierId: params,
-      };
-      await onDelete({ ...params, body: requestBody });
-    } else {
-      await onDelete(params);
-    };
+    await onDelete(params);
     setShowModal(false);
   };
 
