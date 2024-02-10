@@ -1,5 +1,5 @@
+import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
-import { Flex, Box } from "rebass";
 
 const BRAND_COLUMNS = [
   {
@@ -31,9 +31,13 @@ const BRAND_COLUMNS = [
   }
 ];
 
-const FILTERS = [{ value: 'name', placeholder: 'Nombre' }];
+const FILTERS = [
+  { value: 'name', placeholder: 'Nombre' },
+  { value: 'id', placeholder: 'Id' },
+];
 
 export {
   BRAND_COLUMNS,
   FILTERS
 };
+
