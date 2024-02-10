@@ -10,16 +10,16 @@ import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, WarningMessage } from "./styles";
 
-const BatchCreate = ({ products, createBatch }) => {
+const BatchImport = ({ products, onSubmit, task }) => {
   const { blacklist, isLoading: loadingBlacklist } = useListBanProducts();
-  const { handleSubmit, control, reset, setValue, formState: { errors }, watch } = useForm();
+  const { handleSubmit, control, reset, setValue, formState: { errors, isDirty }, watch } = useForm();
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [existingProducts, setExistingProducts] = useState([]);
+  const [downloadProducts, setDownloadProducts] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const watchProducts = watch("newProducts", []);
+  const watchProducts = watch("importProducts", []);
 
   const locale = "es-AR";
   const currency = "ARS";
@@ -39,9 +39,7 @@ const BatchCreate = ({ products, createBatch }) => {
   };
 
   const handleFileUpload = useCallback((e) => {
-
     reset();
-    setOpen(true);
 
     const fileName = e?.target.files[0]?.name;
     if (!fileName || loadingBlacklist) {
@@ -83,8 +81,8 @@ const BatchCreate = ({ products, createBatch }) => {
       };
 
       let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
-      const newProducts = [];
-      const existingProducts = [];
+      const importProducts = [];
+      const downloadProducts = [];
       const existingCodes = {};
 
       products?.forEach((product) => {
@@ -99,19 +97,28 @@ const BatchCreate = ({ products, createBatch }) => {
         if (isValidCode && !blacklist.some(item => item === code) && price > 0) {
           const formattedProduct = { ...product, code, price };
 
-          if (existingCodes[code]) {
-            existingProducts.push(formattedProduct);
+          if (task === "Crear") {
+            if (existingCodes[code]) {
+              downloadProducts.push(formattedProduct);
+            } else {
+              importProducts.push(formattedProduct);
+            }
           } else {
-            newProducts.push(formattedProduct);
+            if (existingCodes[code]) {
+              importProducts.push(formattedProduct);
+            } else {
+              downloadProducts.push(formattedProduct);
+            }
           };
         };
       });
 
-      setValue('newProducts', newProducts);
+      // setValue('newProducts', newProducts);
+      setValue('importProducts', importProducts);
       setIsLoading(false)
-      if (existingProducts.length) {
+      if (downloadProducts.length) {
         setShowConfirmationModal(true);
-        setExistingProducts(existingProducts)
+        setDownloadProducts(downloadProducts)
       }
     };
   }, [blacklist, loadingBlacklist, products, reset, setValue]);
@@ -119,13 +126,14 @@ const BatchCreate = ({ products, createBatch }) => {
   const handleDownloadConfirmation = () => {
     const data = [
       ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
-      ...existingProducts.map((product) => [
+      ...downloadProducts.map((product) => [
         product.code,
         product.name,
         product.price,
         product.comments,
       ]),
     ];
+    console.log(data)
     downloadExcel(data);
     setShowConfirmationModal(false);
     setOpen(true);
@@ -138,7 +146,7 @@ const BatchCreate = ({ products, createBatch }) => {
 
   const handleAccept = async (data) => {
     setIsUpdating(true);
-    !!data?.newProducts?.length && await createBatch(data.newProducts);
+    !!data?.importProducts?.length && await onSubmit(data.importProducts);
     handleModalClose()
     setIsUpdating(false);
   };
@@ -146,7 +154,7 @@ const BatchCreate = ({ products, createBatch }) => {
   const deleteProduct = useCallback((index) => {
     const products = [...watchProducts];
     products.splice(index, 1);
-    setValue("newProducts", products);
+    setValue("importProducts", products);
   }, [watchProducts, setValue]);
 
   const actions = [
@@ -171,7 +179,7 @@ const BatchCreate = ({ products, createBatch }) => {
     {
       title: "Nombre", value: (product, index) => (
         <Controller
-          name={`newProducts[${index}].name`}
+          name={`importProducts[${index}].name`}
           control={control}
           render={({ field }) => (
             <Input {...field} height="30px" width="100%" />
@@ -182,7 +190,7 @@ const BatchCreate = ({ products, createBatch }) => {
     {
       title: "Precio", value: (product, index) => (
         <Controller
-          name={`newProducts[${index}].price`}
+          name={`importProducts[${index}].price`}
           control={control}
           rules={RULES.REQUIRED_PRICE}
           render={({ field }) => (
@@ -196,7 +204,7 @@ const BatchCreate = ({ products, createBatch }) => {
                 }}
                 InputElement={<Input height="30px" />}
               />
-              {errors?.newProducts?.[index]?.price && <WarningMessage>Precio requerido</WarningMessage>}
+              {errors?.importProducts?.[index]?.price && <WarningMessage>Precio requerido</WarningMessage>}
             </>
           )}
         />
@@ -205,7 +213,7 @@ const BatchCreate = ({ products, createBatch }) => {
     {
       title: "Comentarios", value: (product, index) => (
         <Controller
-          name={`newProducts[${index}].comments`}
+          name={`importProducts[${index}].comments`}
           control={control}
           render={({ field }) => (
             <Input {...field} height="30px" width="100%" />
@@ -233,7 +241,7 @@ const BatchCreate = ({ products, createBatch }) => {
         width="100%"
       >
         <ButtonContent hidden>
-          Crear
+          {task}
         </ButtonContent>
         <ButtonContent visible>
           <Icon name="upload" />
@@ -259,6 +267,8 @@ const BatchCreate = ({ products, createBatch }) => {
               <FieldsContainer>
                 <Label>Nuevos productos</Label>
                 <Table
+                  deleteButtonInside
+                  tableHeight="50vh"
                   mainKey="code"
                   headers={PRODUCTS_COLUMNS}
                   elements={watchProducts}
@@ -266,8 +276,17 @@ const BatchCreate = ({ products, createBatch }) => {
                 />
               </FieldsContainer>
               <ModalActions>
-                <Button disabled={isLoading} loading={isLoading} type="submit" color="green" content="Aceptar" />
-                <Button disabled={isLoading} onClick={() => setOpen(false)} color="red" content="Cancelar" />
+                <Button
+                  disabled={
+                    task !== "Crear"
+                      ? isLoading || isUpdating || !isDirty
+                      : isLoading || isUpdating
+                  }
+                  loading={isLoading || isUpdating}
+                  type="submit"
+                  color="green"
+                  content="Aceptar" />
+                <Button disabled={isLoading || isUpdating} onClick={() => setOpen(false)} color="red" content="Cancelar" />
               </ModalActions>
             </Form>
           </ContainerModal >
@@ -282,8 +301,8 @@ const BatchCreate = ({ products, createBatch }) => {
           <Modal.Header>Confirmar Descarga</Modal.Header>
           <Modal.Content>
             <p>
-              Se han encontrado productos existentes en la lista...<br /><br />
-              ¿Deseas descargar un archivo de Excel con estos productos antes de importar nuevos?
+              {`Se han encontrado productos ${task === "Crear" ? "" : "no"} existentes en la lista...`}<br /><br />
+              ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
             </p>
           </Modal.Content>
           <ModalActions>
@@ -304,4 +323,4 @@ const BatchCreate = ({ products, createBatch }) => {
   );
 };
 
-export default BatchCreate;
+export default BatchImport;

@@ -3,8 +3,7 @@ import { useUserContext } from "@/User";
 import { createBatch, deleteProduct, editBatch, useListProducts } from "@/api/products";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
-import BatchCreate from "@/components/products/BatchCreate";
-import BatchUpdate from "@/components/products/BatchUpdate";
+import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
@@ -45,11 +44,11 @@ const Products = () => {
       },
       {
         id: 2,
-        button: <BatchCreate products={products} createBatch={createBatch} />,
+        button: <BatchImport products={products} onSubmit={createBatch} task="Crear" />,
       },
       {
         id: 3,
-        button: <BatchUpdate products={products} editBatch={editBatch} />,
+        button: <BatchImport products={products} onSubmit={editBatch} task="Actualizar" />,
       },
       {
         id: 4,
@@ -59,7 +58,7 @@ const Products = () => {
         text: 'Plantilla'
       },
       {
-        id: 6,
+        id: 5,
         icon: 'trash',
         color: 'orange',
         onClick: () => setOpen(true),

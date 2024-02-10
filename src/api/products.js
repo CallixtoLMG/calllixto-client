@@ -30,11 +30,11 @@ export function useGetProduct(code) {
 };
 
 export async function createBatch(products) {
-  baseCreate(`${PRODUCTS_URL}/${BATCH}`, { products: products.map(product => ({ ...product, createdAt: now() })) }, 'Productos creados!', false);
+  await baseCreate(`${PRODUCTS_URL}/${BATCH}`, { products: products.map(product => ({ ...product, createdAt: now() })) }, 'Productos creados!', false);
 };
 
 export async function editBatch(products) {
-  baseCreate(`${PRODUCTS_URL}/${EDIT_BATCH}`, { update: products.map(product => ({ ...product, updatedAt: now() })) }, 'Productos actualizados!', false);
+  await baseCreate(`${PRODUCTS_URL}/${EDIT_BATCH}`, { update: products.map(product => ({ ...product, updatedAt: now() })) }, 'Productos actualizados!', false);
 };
 
 export function useListBanProducts() {
