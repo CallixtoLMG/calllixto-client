@@ -10,7 +10,8 @@ const Cell = styled(STable.Cell)`
   text-align-last: ${(props) => props.right && "right!important"};
 `;
 
-const Contenedor = styled(Flex)`
+const Container = styled(Flex)`
+  margin: 5px 0!important;
   width: 100% !important;
   max-height: ${({ tableHeight }) => tableHeight || ""} !important;
   overflow-y: ${({ tableHeight }) => tableHeight && "auto"} !important;
@@ -78,5 +79,5 @@ const TableRow = styled(STable.Row)`
   }
 `;
 
-export { ActionsContainer, Cell, Contenedor, HeaderCell, InnerActionsContainer, LinkRow, Table, TableFooter, TableHeader, TableRow };
+export { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkRow, Table, TableFooter, TableHeader, TableRow };
 

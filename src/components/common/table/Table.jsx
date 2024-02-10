@@ -7,14 +7,14 @@ import { Box, Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import styled from "styled-components";
 import Actions from "./Actions";
-import { ActionsContainer, Cell, Contenedor, HeaderCell, InnerActionsContainer, LinkRow, Table, TableHeader, TableRow } from "./styles";
+import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkRow, Table, TableHeader, TableRow } from "./styles";
 
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
   align-items: center;
 `;
 
-const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside, active }) => {
+const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
   const { push } = useRouter();
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset } = useForm({ defaultValues });
@@ -87,7 +87,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
           </Form>
         </Segment>
       )}
-      <Contenedor tableHeight={tableHeight}>
+      <Container tableHeight={tableHeight}>
         <Table celled compact striped>
           <TableHeader fullWidth>
             <Table.Row>
@@ -153,7 +153,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
             </Table.Footer>
           )}
         </Table>
-      </Contenedor>
+      </Container>
     </>
   );
 };
