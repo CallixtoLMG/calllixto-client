@@ -113,13 +113,13 @@ const BatchImport = ({ products, onSubmit, task }) => {
         };
       });
 
-      // setValue('newProducts', newProducts);
       setValue('importProducts', importProducts);
       setIsLoading(false)
       if (downloadProducts.length) {
         setShowConfirmationModal(true);
-        setDownloadProducts(downloadProducts)
-      }
+        setDownloadProducts(downloadProducts);
+      };
+      setOpen(true);
     };
   }, [blacklist, loadingBlacklist, products, reset, setValue]);
 
