@@ -118,7 +118,8 @@ const BatchImport = ({ products, onSubmit, task }) => {
       if (downloadProducts.length) {
         setShowConfirmationModal(true);
         setDownloadProducts(downloadProducts);
-      }
+      };
+      setOpen(true);
     };
   }, [blacklist, loadingBlacklist, products, reset, setValue, task]);
 
