@@ -1,21 +1,21 @@
+import { useUserContext } from "@/User";
+import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, edit } from "@/api/budgets";
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Button, ButtonsContainer, Checkbox, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { RULES } from "@/constants";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum, now } from "@/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { Icon, Popup } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
-import { Table } from "@/components/common/table";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, edit } from "@/api/budgets";
-import { useUserContext } from "@/User";
-import { toast } from "react-hot-toast";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -379,7 +379,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   defaultValue={PAYMENT_METHODS.map((method) => method.value)}
                   render={({ field }) => (
                     <Dropdown
-                      minHeight="50px"
+                      minHeight="40px"
                       height="fit-content"
                       name={`paymentMethods`}
                       placeholder='Metodos de pago'

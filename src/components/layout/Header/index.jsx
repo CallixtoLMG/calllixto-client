@@ -1,10 +1,10 @@
 "use client";
+import { useUserContext } from "@/User";
 import { NoPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu } from 'semantic-ui-react';
-import { LogDiv, ModContainer, ModLink, Text } from "./styles";
-import { useUserContext } from "@/User";
+import { Container, LogDiv, ModLink, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -23,7 +23,7 @@ const Header = () => {
     <NoPrint>
       {showHeader &&
         <Menu fixed='top'>
-          <ModContainer>
+          <Container>
             {!userData?.isAuthorized ? (
               <LogDiv>
                 <Menu.Item onClick={handleLogout}><Text>Ingresar</Text></Menu.Item>
@@ -40,7 +40,7 @@ const Header = () => {
                 </LogDiv>
               </>
             )}
-          </ModContainer>
+          </Container>
         </Menu>
       }
     </NoPrint>

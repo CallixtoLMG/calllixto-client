@@ -15,7 +15,7 @@ import styled from "styled-components";
 export const Segment = styled(SSegment)`
   margin: 5px 0!important;
   width: 100%!important;
-  min-height: 30px!important;
+  min-height: 40px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
 `;
 

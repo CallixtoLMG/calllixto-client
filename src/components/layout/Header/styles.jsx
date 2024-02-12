@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Flex } from "rebass";
-import { Container } from "semantic-ui-react";
+import { Container as SContainer } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ModLink = styled(Link)`
@@ -32,8 +32,10 @@ const LogDiv = styled(Flex)`
   };
 `;
 
-const ModContainer = styled(Container)`
+const Container = styled(SContainer)`
+  margin: 0!important;
   height: 60px!important;
+  width: 100%!important;  
   div:last-child {  
     margin-left: auto!important;
     border-left: 1px solid rgba(34,36,38,.1)!important;
@@ -68,5 +70,5 @@ const Text = styled.p`
   };
 `;
 
-export { LogDiv, ModContainer, ModLink, Text };
+export { Container, LogDiv, ModLink, Text };
 

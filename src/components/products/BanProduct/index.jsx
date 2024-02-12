@@ -3,13 +3,13 @@ import { Button, FieldsContainer, Form, FormField, Input, Label, Modal, RuledLab
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { REGEX } from "@/constants";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { Transition } from "semantic-ui-react";
 import { BAN_FILTERS, BAN_PRODUCTS_COLUMNS } from "../products.common";
 import { ModalActions } from "./styles";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-hot-toast";
 
 const BanProduct = ({ open, setOpen }) => {
   const { data: blacklist, isLoading } = useListBanProducts();
@@ -104,8 +104,6 @@ const BanProduct = ({ open, setOpen }) => {
               </FormField>
             </FieldsContainer>
             <FieldsContainer  >
-            </FieldsContainer>
-            <FieldsContainer minHeight="300px" >
               <Label>Productos vedados</Label>
               <Loader greyColor active={isLoading}>
                 <Table
