@@ -1,7 +1,7 @@
 "use client";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BrandsPage from "@/components/brands/BrandsPage";
-import { deleteBrand, useListBrands } from "@/api/brands";
+import { useListBrands } from "@/api/brands";
 import { useValidateToken } from "@/hooks/userData";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,7 @@ import { useUserContext } from "@/User";
 
 const Brands = () => {
   useValidateToken();
-  const { brands, isLoading } = useListBrands();
+  const { data: brands, isLoading, isRefetching } = useListBrands();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -36,12 +36,10 @@ const Brands = () => {
   }, [push, role, setActions]);
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || isRefetching}>
       <BrandsPage
         brands={brands || []}
         role={role}
-        isLoading={isLoading}
-        onDelete={deleteBrand}
       />
     </Loader>
   );

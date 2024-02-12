@@ -3,14 +3,17 @@ import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteSupplier, LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
+import { toast } from "react-hot-toast";
 
 const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar la marca "${name}"?`;
 
@@ -27,11 +30,21 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
     }
   ] : [];
 
-  const handleDelete = useCallback(async () => {
-    setIsLoading(true);
-    await onDelete(selectedSupplier?.id);
-    setIsLoading(false);
-  }, [onDelete, selectedSupplier?.id]);
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      const { data } = await deleteSupplier(selectedSupplier?.id);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
+        toast.success('Marca eliminada!');
+        setShowModal(false);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
 
   return (
     <>
@@ -46,8 +59,8 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
         showModal={showModal}
         setShowModal={setShowModal}
         title={deleteQuestion(selectedSupplier?.name)}
-        onDelete={handleDelete}
-        isLoading={isLoading}
+        onDelete={mutate}
+        isLoading={isPending}
       />
     </>
   )

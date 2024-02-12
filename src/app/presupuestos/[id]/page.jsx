@@ -12,7 +12,7 @@ const Budget = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
   const { userData } = useUserContext();
-  const { budget, isLoading } = useGetBudget(params.id);
+  const { data: budget, isLoading } = useGetBudget(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
 

@@ -1,24 +1,21 @@
 "use client";
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { PAGES, RULES } from "@/constants";
+import { CURRENCY, LOCALE, RULES } from "@/constants";
 import { formatedPrice, preventSend } from "@/utils";
-import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
-const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
-  const { push } = useRouter();
+const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading }) => {
   const { handleSubmit, control, reset, formState: { isDirty, errors, isSubmitted } } = useForm({ defaultValues: product });
   const supplierRef = useRef(null);
   const brandRef = useRef(null);
   const [supplierId, setSupplierId] = useState("");
   const [brandId, setBrandId] = useState("");
   const isUpdating = useMemo(() => !!product?.code, [product]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleReset = useCallback((product) => {
     supplierRef.current.clearValue();
@@ -28,14 +25,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
 
   const handleForm = async (data) => {
     data.code = `${supplierId}${brandId}${data.code}`;
-    setIsLoading(true);
     await onSubmit(data);
-    setIsLoading(false);
-    push(PAGES.PRODUCTS.BASE);
   };
-
-  const locale = "es-AR";
-  const currency = "ARS";
 
   return (
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
@@ -134,8 +125,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly }) => {
               render={({ field }) => (
                 <CurrencyInput
                   value={field.value}
-                  locale={locale}
-                  currency={currency}
+                  locale={LOCALE}
+                  currency={CURRENCY}
                   placeholder="Precio"
                   onChangeValue={(_, value) => {
                     field.onChange(value);

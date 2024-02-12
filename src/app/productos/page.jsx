@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { createBatch, deleteProduct, editBatch, useListProducts } from "@/api/products";
+import { createBatch, editBatch, useListProducts } from "@/api/products";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
@@ -22,7 +22,7 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { products, isLoading } = useListProducts();
+  const { data: products, isLoading } = useListProducts();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -74,7 +74,6 @@ const Products = () => {
       <ProductsPage
         products={products}
         role={role}
-        onDelete={deleteProduct}
       />
     </Loader>
   );

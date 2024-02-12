@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { deleteBatchProducts } from "@/api/products";
-import { edit, useGetSupplier } from "@/api/suppliers";
+import { GET_SUPPLIER_QUERY_KEY, LIST_SUPPLIERS_QUERY_KEY, edit, useGetSupplier } from "@/api/suppliers";
 import { ModalDelete } from "@/components/common/modals";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
@@ -9,19 +9,23 @@ import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { Rules } from "@/visibilityRules";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 const Supplier = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { supplier, isLoading } = useGetSupplier(params.id);
+  const { data: supplier, isLoading, isRefetching } = useGetSupplier(params.id);
   const [allowUpdate, Toggle] = useAllowUpdate();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const { setActions } = useNavActionsContext();
   const [open, setOpen] = useState(false);
+  const queryClient = useQueryClient();
+
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar todos los productos de la marca "${name}"?`;
   useEffect(() => {
     resetActions();
@@ -46,13 +50,29 @@ const Supplier = ({ params }) => {
     setActions(actions);
   }, [role, setActions]);
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (brand) => {
+      const { data } = await edit(brand);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
+        queryClient.invalidateQueries({ queryKey: [GET_SUPPLIER_QUERY_KEY, params.id] });
+        toast.success('Proveedor actualizado!');
+        push(PAGES.SUPPLIERS.BASE);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
+
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);
-    return;
   };
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || isRefetching}>
       {Toggle}
       {open &&
         <ModalDelete
@@ -62,7 +82,7 @@ const Supplier = ({ params }) => {
           onDelete={deleteBatchProducts}
           params={supplier.id}
         />}
-      <SupplierForm supplier={supplier} onSubmit={edit} readonly={!allowUpdate} />
+      <SupplierForm supplier={supplier} onSubmit={mutate} readonly={!allowUpdate} isLoading={isPending} />
     </Loader>
   )
 };

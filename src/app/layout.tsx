@@ -14,6 +14,8 @@ import styled from "styled-components";
 import { PAGES } from "@/constants";
 import { usePathname } from "next/navigation";
 import { UserProvider } from "@/User";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -42,6 +44,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const notShow = [PAGES.LOGIN.BASE, PAGES.BASE, PAGES.NOT_FOUND.BASE];
   const show = !notShow.includes(pathname);
 
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchOnReconnect: false,
+          },
+        },
+      })
+  );
+
   return (
     <html lang="en">
       <StyledComponentsRegistry>
@@ -51,27 +66,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             toastOptions={{
               duration: 4000
             }} />
-          <UserProvider>
-            <Header />
-            <NavActionsProvider>
-              <BreadcrumProvider>
-                {show && (
-                  <NoPrint>
-                    <NavigationContainer>
-                      <BreadcrumbContainer>
-                        <GoBackButton />
-                        <Breadcrumb />
-                      </BreadcrumbContainer>
-                      <NavActions />
-                    </NavigationContainer>
-                  </NoPrint>
-                )}
-                <LayoutChildrenContainer>
-                  {children}
-                </LayoutChildrenContainer>
-              </BreadcrumProvider>
-            </NavActionsProvider>
-          </UserProvider>
+          <QueryClientProvider client={queryClient}>
+            <UserProvider>
+              <Header />
+              <NavActionsProvider>
+                <BreadcrumProvider>
+                  {show && (
+                    <NoPrint>
+                      <NavigationContainer>
+                        <BreadcrumbContainer>
+                          <GoBackButton />
+                          <Breadcrumb />
+                        </BreadcrumbContainer>
+                        <NavActions />
+                      </NavigationContainer>
+                    </NoPrint>
+                  )}
+                  <LayoutChildrenContainer>
+                    {children}
+                  </LayoutChildrenContainer>
+                </BreadcrumProvider>
+              </NavActionsProvider>
+            </UserProvider>
+          </QueryClientProvider>
           {/* <Footer /> */}
         </body>
       </StyledComponentsRegistry>

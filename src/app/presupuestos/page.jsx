@@ -9,7 +9,7 @@ import { PAGES } from "@/constants";
 
 const Budgets = () => {
   useValidateToken();
-  const { budgets, isLoading } = useListBudgets();
+  const { data: budgets, isLoading } = useListBudgets();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();

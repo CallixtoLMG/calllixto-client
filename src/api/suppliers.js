@@ -1,28 +1,69 @@
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import { omit } from "lodash";
-import { METHODS, useAxios } from "./axios";
-import { baseCreate, baseDelete, baseUpdate } from "./base";
+import axios from './axios';
+import { useQuery } from "@tanstack/react-query";
+import { TIME_IN_MS } from "@/constants";
+import { now } from "@/utils";
 
 const SUPPLIER_URL = `${CLIENT_ID}${PATHS.SUPPLIERS}`;
+export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
+export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 
-export async function create(supplier) {
-  baseCreate(SUPPLIER_URL, supplier, 'Proveedor creado!');
+export function create(supplier) {
+  const body = {
+    ...supplier,
+    createdAt: now()
+  }
+  return axios.post(SUPPLIER_URL, body);
 };
 
-export async function edit(supplier) {
-  baseUpdate(`${SUPPLIER_URL}/${supplier.id}`, omit(supplier, ["id", "createdAt"]), 'Proveedor actualizado!');
+export function edit(supplier) {
+  const body = {
+    ...supplier,
+    updatedAt: now()
+  }
+  return axios.put(`${SUPPLIER_URL}/${supplier.id}`, body);
 };
 
-export async function deleteSupplier(id) {
-  baseDelete(`${SUPPLIER_URL}/${id}`, 'Proveedor eliminado!');
+export function deleteSupplier(id) {
+  return axios.delete(`${SUPPLIER_URL}/${id}`);
 };
 
 export function useListSuppliers() {
-  const { response, isLoading } = useAxios({ url: SUPPLIER_URL, method: METHODS.GET });
-  return { suppliers: response?.suppliers, isLoading };
+  const listSuppliers = async () => {
+    try {
+      const { data } = await axios.get(SUPPLIER_URL);
+      return data?.suppliers || [];
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const query = useQuery({
+    queryKey: [LIST_SUPPLIERS_QUERY_KEY],
+    queryFn: () => listSuppliers(),
+    retry: false,
+    staleTime: TIME_IN_MS.ONE_DAY,
+  });
+
+  return query;
 };
 
 export function useGetSupplier(id) {
-  const { response, isLoading } = useAxios({ url: `${SUPPLIER_URL}/${id}`, method: METHODS.GET });
-  return { supplier: response?.supplier, isLoading };
+  const getSupplier = async (id) => {
+    try {
+      const { data } = await axios.get(`${SUPPLIER_URL}/${id}`);
+      return data?.supplier;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const query = useQuery({
+    queryKey: [GET_SUPPLIER_QUERY_KEY, id],
+    queryFn: () => getSupplier(id),
+    retry: false,
+    staleTime: TIME_IN_MS.ONE_DAY,
+  });
+
+  return query;
 };

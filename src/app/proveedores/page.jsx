@@ -11,7 +11,7 @@ import { useEffect } from "react";
 
 const Suppliers = () => {
   useValidateToken();
-  const { suppliers, isLoading } = useListSuppliers();
+  const { data: suppliers, isLoading, isRefetching } = useListSuppliers();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -36,7 +36,7 @@ const Suppliers = () => {
   }, [push, role, setActions]);
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || isRefetching}>
       <SuppliersPage
         suppliers={suppliers}
         role={role}

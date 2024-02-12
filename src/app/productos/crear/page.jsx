@@ -1,18 +1,24 @@
 "use client";
 import { useListBrands } from "@/api/brands";
-import { create } from "@/api/products";
+import { create, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
 import { useListSuppliers } from "@/api/suppliers";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { useValidateToken } from "@/hooks/userData";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
+import { toast } from "react-hot-toast";
+import { PAGES } from "@/constants";
+import { useRouter } from "next/navigation";
 
 const CreateProduct = () => {
   useValidateToken();
-  const { brands, isLoading: isLoadingBrands } = useListBrands();
-  const { suppliers, isLoading: isLoadingSuppliers } = useListSuppliers();
+  const { push } = useRouter();
+  const { data: brands, isLoading: isLoadingBrands } = useListBrands();
+  const { data: suppliers, isLoading: isLoadingSuppliers } = useListSuppliers();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     resetActions();
@@ -37,9 +43,33 @@ const CreateProduct = () => {
     text: supplier.name,
   })), [suppliers]);
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (product) => {
+      const { data } = await create(product);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
+        toast.success('Produto creado!');
+        push(PAGES.PRODUCTS.BASE);
+      } else {
+        toast.error(response.message);
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    }
+  });
+
   return (
     <Loader active={isLoadingBrands || isLoadingSuppliers}>
-      <ProductForm brands={mappedBrands} suppliers={mappedSuppliers} onSubmit={create} />
+      <ProductForm
+        brands={mappedBrands}
+        suppliers={mappedSuppliers}
+        onSubmit={mutate}
+        isLoading={isPending}
+      />
     </Loader>
   )
 };

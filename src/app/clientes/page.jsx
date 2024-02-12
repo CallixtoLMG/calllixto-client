@@ -1,5 +1,5 @@
 "use client";
-import { deleteCustomer, useListCustomers } from "@/api/customers";
+import { useListCustomers } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 const Customers = () => {
   useValidateToken();
-  const { customers, isLoading } = useListCustomers();
+  const { data: customers, isLoading } = useListCustomers();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -33,7 +33,7 @@ const Customers = () => {
 
   return (
     <Loader active={isLoading}>
-      <CustomersPage customers={customers} onDelete={deleteCustomer} />
+      <CustomersPage customers={customers} />
     </Loader>
   );
 };

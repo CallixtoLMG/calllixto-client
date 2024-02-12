@@ -1,35 +1,26 @@
 "use client"
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Form, FormField, Input, Label, MaskedInput, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { PAGES, RULES } from "@/constants";
-import { formatedPhone, preventSend } from "@/utils";
-import { useParams, useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { RULES } from "@/constants";
+import { formatedPhone } from "@/utils";
+import { useParams } from "next/navigation";
+import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box } from "rebass";
 
 const EMPTY_CUSTOMER = { name: '', email: '', phone: { areaCode: '', number: '' }, address: '', comments: '' };
 
-const CustomerForm = ({ customer, onSubmit, readonly }) => {
-  const { push } = useRouter();
+const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
   const params = useParams();
   const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: customer });
   const isUpdating = useMemo(() => !!params.id, [params.id]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleReset = useCallback((customer) => {
     reset(customer || EMPTY_CUSTOMER);
   }, [reset]);
 
-  const handleForm = async (data) => {
-    setIsLoading(true);
-    await onSubmit(data);
-    setIsLoading(false);
-    push(PAGES.CUSTOMERS.BASE)
-  };
-
   return (
-    <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       <FieldsContainer>
         <FormField width="50% !important">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />

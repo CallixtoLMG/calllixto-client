@@ -1,7 +1,7 @@
 import { useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
-import { REGEX, RULES } from "@/constants";
+import { CURRENCY, LOCALE, REGEX, RULES } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useCallback, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
@@ -11,7 +11,7 @@ import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, WarningMessage } from "./styles";
 
 const BatchImport = ({ products, onSubmit, task }) => {
-  const { blacklist, isLoading: loadingBlacklist } = useListBanProducts();
+  const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, formState: { errors, isDirty }, watch } = useForm();
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -21,8 +21,6 @@ const BatchImport = ({ products, onSubmit, task }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const watchProducts = watch("importProducts", []);
 
-  const locale = "es-AR";
-  const currency = "ARS";
   const inputRef = useRef();
 
   const handleClick = useCallback(() => {
@@ -53,7 +51,9 @@ const BatchImport = ({ products, onSubmit, task }) => {
     if (!(file instanceof Blob)) {
       return;
     };
-    setIsLoading(true)
+
+    setIsLoading(true);
+
     reader.readAsBinaryString(file);
     reader.onload = (e) => {
       const data = e.target.result;
@@ -94,7 +94,7 @@ const BatchImport = ({ products, onSubmit, task }) => {
         const isValidCode = product.code && REGEX.FIVE_DIGIT_CODE.test(code);
         const price = parseFloat(product.price);
 
-        if (isValidCode && !blacklist.some(item => item === code) && price > 0) {
+        if (isValidCode && !blacklist?.some(item => item === code) && price > 0) {
           const formattedProduct = { ...product, code, price };
 
           if (task === "Crear") {
@@ -113,15 +113,14 @@ const BatchImport = ({ products, onSubmit, task }) => {
         };
       });
 
-      // setValue('newProducts', newProducts);
       setValue('importProducts', importProducts);
-      setIsLoading(false)
+      setIsLoading(false);
       if (downloadProducts.length) {
         setShowConfirmationModal(true);
-        setDownloadProducts(downloadProducts)
+        setDownloadProducts(downloadProducts);
       }
     };
-  }, [blacklist, loadingBlacklist, products, reset, setValue]);
+  }, [blacklist, loadingBlacklist, products, reset, setValue, task]);
 
   const handleDownloadConfirmation = () => {
     const data = [
@@ -133,7 +132,6 @@ const BatchImport = ({ products, onSubmit, task }) => {
         product.comments,
       ]),
     ];
-    console.log(data)
     downloadExcel(data);
     setShowConfirmationModal(false);
     setOpen(true);
@@ -147,7 +145,7 @@ const BatchImport = ({ products, onSubmit, task }) => {
   const handleAccept = async (data) => {
     setIsUpdating(true);
     !!data?.importProducts?.length && await onSubmit(data.importProducts);
-    handleModalClose()
+    handleModalClose();
     setIsUpdating(false);
   };
 
@@ -197,8 +195,8 @@ const BatchImport = ({ products, onSubmit, task }) => {
             <>
               <CurrencyInput
                 {...field}
-                locale={locale}
-                currency={currency}
+                locale={LOCALE}
+                currency={CURRENCY}
                 onChangeValue={(_, value) => {
                   field.onChange(value);
                 }}

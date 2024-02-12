@@ -1,14 +1,10 @@
-import { useUserContext } from "@/User";
-import { edit } from "@/api/budgets";
 import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } from "@/components/common/custom";
-import { formatedPhone, now } from "@/utils";
-import { useEffect, useRef, useState } from "react";
+import { formatedPhone } from "@/utils";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 
-const ModalCustomer = ({ isModalOpen, onClose, customer, budgetId }) => {
-  const { userData } = useUserContext();
-  const [isLoading, setIsLoading] = useState(false);
+const ModalCustomer = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
   const { handleSubmit } = useForm({
     defaultValues: customer
   });
@@ -19,20 +15,6 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, budgetId }) => {
       inputRef.current?.focus();
     }
   }, [isModalOpen]);
-
-  const handleEdit = async () => {
-    setIsLoading(true);
-    try {
-      const confirmationData = { confirmedBy: `${userData.firstName} ${userData.lastName}`, confirmedAt: now() };
-      await edit(confirmationData, budgetId);
-      onClose(true)
-    } catch (error) {
-      console.error('Error en la edición del presupuesto:', error.message);
-      onClose(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <Transition visible={isModalOpen} animation='scale' duration={500}>
@@ -45,15 +27,15 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, budgetId }) => {
           Desea confirmar el presupuesto?
         </Modal.Header>
         <Modal.Content>
-          <Form onSubmit={handleSubmit(handleEdit)}>
+          <Form onSubmit={handleSubmit(onConfirm)}>
             <FieldsContainer>
               <FormField flex="1">
                 <Label>ID del Cliente</Label>
-                <Segment>{customer.name}</Segment>
+                <Segment>{customer?.name}</Segment>
               </FormField>
               <FormField flex="1">
                 <Label>Dirección del Cliente</Label>
-                <Segment>{customer.address}</Segment>
+                <Segment>{customer?.address}</Segment>
               </FormField>
               <FormField width="200px">
                 <Label>Teléfono del Cliente</Label>

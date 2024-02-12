@@ -1,23 +1,61 @@
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import { METHODS, useAxios } from "./axios";
-import { baseCreate } from "./base";
+import axios from './axios';
+import { useQuery } from "@tanstack/react-query";
+import { TIME_IN_MS } from "@/constants";
+import { now } from "@/utils";
 
 const BUDGETS_URL = `${CLIENT_ID}${PATHS.BUDGETS}`;
+export const LIST_BUDGETS_QUERY_KEY = 'listBudgets';
+export const GET_BUDGET_QUERY_KEY = 'getBudget';
 
-export async function create(budget) {
-  baseCreate(BUDGETS_URL, budget, 'Presupuesto creado!');
+export function create(budget) {
+  const body = {
+    ...budget,
+    createdAt: now(),
+  }
+  return axios.post(BUDGETS_URL, body);
 };
 
-export async function edit(budget, id) {
-  baseCreate(`${BUDGETS_URL}/${id}`, budget, 'Presupuesto confirmado!');
+export function edit(budget, id) {
+  return axios.post(`${BUDGETS_URL}/${id}`, budget);
 };
 
 export function useListBudgets() {
-  const { response, isLoading } = useAxios({ url: BUDGETS_URL, method: METHODS.GET });
-  return { budgets: response?.budgets, isLoading };
+  const listBudgets = async () => {
+    try {
+      const { data } = await axios.get(BUDGETS_URL);
+      return data?.budgets || [];
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const query = useQuery({
+    queryKey: [LIST_BUDGETS_QUERY_KEY],
+    queryFn: () => listBudgets(),
+    retry: false,
+    staleTime: TIME_IN_MS.FIVE_MINUTES,
+  });
+
+  return query;
 };
 
 export function useGetBudget(id) {
-  const { response, isLoading } = useAxios({ url: `${BUDGETS_URL}/${id}`, method: METHODS.GET });
-  return { budget: response?.budget, isLoading };
+  const getBudget = async (id) => {
+    try {
+      const { data } = await axios.get(`${BUDGETS_URL}/${id}`);
+      return data?.budget;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const query = useQuery({
+    queryKey: [GET_BUDGET_QUERY_KEY, id],
+    queryFn: () => getBudget(id),
+    retry: false,
+    staleTime: TIME_IN_MS.FIVE_MINUTES,
+  });
+
+  return query;
 };

@@ -5,12 +5,15 @@ import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
 import { useCallback, useState } from "react";
 import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
+import { toast } from "react-hot-toast";
 
-const ProductsPage = ({ products = [], role, onDelete }) => {
+const ProductsPage = ({ products = [], role }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
 
@@ -31,11 +34,21 @@ const ProductsPage = ({ products = [], role, onDelete }) => {
     }
   ] : [];
 
-  const handleDelete = useCallback(async () => {
-    setIsLoading(true);
-    await onDelete(selectedProduct?.code);
-    setIsLoading(false);
-  }, [onDelete, selectedProduct?.code]);
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      const { data } = await deleteProduct(selectedProduct?.id);
+      return data
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
+        toast.success('Producto eliminado!');
+        setShowModal(false);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
 
   return (
     <>
@@ -51,8 +64,8 @@ const ProductsPage = ({ products = [], role, onDelete }) => {
         showModal={showModal}
         setShowModal={setShowModal}
         title={deleteQuestion(selectedProduct?.name)}
-        onDelete={handleDelete}
-        isLoading={isLoading}
+        onDelete={mutate}
+        isLoading={isPending}
       />
     </>
   )

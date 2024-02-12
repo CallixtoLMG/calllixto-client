@@ -1,37 +1,25 @@
 "use client";
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { PAGES, RULES } from "@/constants";
+import { RULES } from "@/constants";
 import { formatedPhone, preventSend } from "@/utils";
-import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box } from "rebass";
 import { MaskedInput, PhoneContainer } from "./styles";
 
 const EMPTY_SUPPLIER = { id: '', name: '', email: '', phone: { areaCode: '', number: '' }, address: '', comments: '' };
 
-const SupplierForm = ({ supplier, onSubmit, readonly }) => {
-  const { push } = useRouter();
+const SupplierForm = ({ supplier, onSubmit, readonly, isLoading }) => {
   const { handleSubmit, control, reset, formState: { errors, isDirty } } = useForm({ defaultValues: supplier });
   const isUpdating = useMemo(() => !!supplier?.id, [supplier]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleReset = useCallback((supplier) => {
     reset(supplier || EMPTY_SUPPLIER);
   }, [reset]);
 
-  const handleForm = (data) => {
-    setIsLoading(true);
-    onSubmit(data);
-    setTimeout(() => {
-      setIsLoading(false);
-      push(PAGES.SUPPLIERS.BASE);
-    }, 2000);
-  };
-
   return (
-    <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
+    <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField>
           <RuledLabel title="Código" message={errors?.id?.message} required />

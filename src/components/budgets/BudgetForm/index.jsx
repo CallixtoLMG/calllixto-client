@@ -2,10 +2,9 @@ import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Button, ButtonsContainer, Checkbox, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { NoPrint, OnlyPrint } from "@/components/layout";
-import { PAGES, RULES } from "@/constants";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { RULES } from "@/constants";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum, now } from "@/utils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Icon, Popup } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
@@ -13,6 +12,10 @@ import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
 import { Table } from "@/components/common/table";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, edit } from "@/api/budgets";
+import { useUserContext } from "@/User";
+import { toast } from "react-hot-toast";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -27,15 +30,13 @@ const EMPTY_BUDGET = (user) => ({
   expirationOffsetDays: ""
 });
 
-const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) => {
-  const formattedPaymentMethods = budget?.paymentMethods.join(' - ');
-  const { push } = useRouter();
+const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading }) => {
+  const { userData } = useUserContext();
+  const formattedPaymentMethods = useMemo(() => budget?.paymentMethods.join(' - '), [budget]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [expiration, SetExpiration] = useState(false);
-  const [isConfirmChecked, setIsConfirmChecked] = useState(false);
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
       ...budget,
@@ -43,8 +44,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
     } : EMPTY_BUDGET(user),
   });
   const customerRef = useRef(null);
+  const queryClient = useQueryClient();
 
   const watchProducts = watch('products');
+  const watchConfirmed = watch('confirmed');
   const [total, setTotal] = useState(0);
   const calculateTotal = useCallback(() => {
     setTotal(getTotalSum(watchProducts), [watchProducts]);
@@ -74,11 +77,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
 
   const handleCreate = (data) => {
     if (!watchProducts.length) return;
-    setIsLoading(true);
     onSubmit(data);
-    setTimeout(() => {
-      push(PAGES.BUDGETS.BASE);
-    }, 2000);
   };
 
   const handleReset = useCallback(() => {
@@ -86,27 +85,24 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
     reset(EMPTY_BUDGET(user));
   }, [reset, user]);
 
-  const handleCheckboxChange = (e, { checked }) => {
+  const handleCheckboxChange = () => {
     if (!budget?.customer?.address && !budget?.customer?.phone?.areaCode && !budget?.customer?.phone?.number) {
       setIsModalCustomerOpen(true);
-    } else {
-      setIsModalConfirmationOpen(true);
-    };
+      return;
+    }
+    setIsModalConfirmationOpen(true);
   };
 
   const handleModalCustomerClose = (openNextModal, customer) => {
     setIsModalCustomerOpen(false);
     if (openNextModal) {
-      setCustomerData(customer)
+      setCustomerData(customer);
       setIsModalConfirmationOpen(true);
     };
   };
 
-  const handleModalConfirmationClose = (confirmed) => {
+  const handleModalConfirmationClose = () => {
     setIsModalConfirmationOpen(false);
-    if (confirmed) {
-      setIsConfirmChecked(true);
-    };
   };
 
   const BUDGET_FORM_PRODUCT_COLUMNS = [
@@ -146,7 +142,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               name={`products[${index}].quantity`}
               control={control}
               rules={RULES.REQUIRED}
-              render={({ field }) => (
+              render={({ field: { onChange } }) => (
                 <Input
                   type="number"
                   min={0}
@@ -154,7 +150,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                   height="40px"
                   onChange={(e) => {
                     const value = e.target.value;
-                    field.onChange(value);
+                    onChange(value);
                     calculateTotal();
                   }}
                 />
@@ -201,25 +197,41 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
     { title: "Total", value: (product) => formatedPrice(getTotal(product)), id: 6, width: 2 },
   ];
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      const confirmationData = { confirmedBy: `${userData.firstName} ${userData.lastName}`, confirmedAt: now() };
+      const { data } = await edit(confirmationData, budget?.id);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
+        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
+        toast.success('Presupuesto confirmado!');
+        setValue('confirmed', true);
+        setIsModalConfirmationOpen(false);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
+
   return (
     <>
       <NoPrint>
         {readonly && (
           <>
             <ModalCustomer
-              budgetId={budget.id}
-              readonly={readonly}
               isModalOpen={isModalCustomerOpen}
               onClose={handleModalCustomerClose}
               customer={budget.customer}
-              setIsConfirmChecked={setIsConfirmChecked}
             />
             <ModalConfirmation
-              budgetId={budget.id}
-              readonly={readonly}
               isModalOpen={isModalConfirmationOpen}
               onClose={handleModalConfirmationClose}
               customer={customerData}
+              onConfirm={mutate}
+              isLoading={isPending}
             />
           </>
         )}
@@ -229,17 +241,18 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               <Controller
                 name="confirmed"
                 control={control}
-                render={({ field: { value } }) => (
+                render={({ field: { value, onChange, ...rest } }) => (
                   <Checkbox
+                    {...rest}
                     toggle
-                    checked={isConfirmChecked || value}
-                    readOnly={value}
-                    onChange={(e, { checked }) => {
-                      if (!readonly) {
-                        setValue("confirmed", checked);
-                        setIsConfirmChecked(checked);
+                    readOnly={readonly && value}
+                    checked={value}
+                    onChange={() => {
+                      if (readonly) {
+                        handleCheckboxChange();
+                      } else {
+                        onChange(!value);
                       }
-                      handleCheckboxChange
                     }}
                     label={value ? "Confirmado" : "Confirmar presupuesto"}
                   />
@@ -295,12 +308,12 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               )}
             </FormField>
             <FormField width={5}>
-              <RuledLabel title="Dirección" message={errors?.customer?.address?.message} required={isConfirmChecked} />
+              <RuledLabel title="Dirección" message={errors?.customer?.address?.message} required={watchConfirmed} />
               {!readonly ? (
                 <Controller
                   name="customer.address"
                   control={control}
-                  rules={isConfirmChecked && RULES.REQUIRED}
+                  rules={watchConfirmed && RULES.REQUIRED}
                   render={({ field: { value } }) => <Segment>{value}</Segment>}
                 />
               ) : (
@@ -308,12 +321,12 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
               )}
             </FormField>
             <FormField width="200px">
-              <RuledLabel title="Teléfono" message={errors?.customer?.phone?.message} required={isConfirmChecked} />
+              <RuledLabel title="Teléfono" message={errors?.customer?.phone?.message} required={watchConfirmed} />
               {!readonly ? (
                 <Controller
                   name="customer.phone"
                   control={control}
-                  rules={isConfirmChecked && RULES.REQUIRED}
+                  rules={watchConfirmed && RULES.REQUIRED}
                   render={({ field: { value } }) => <Segment>{formatedPhone(value?.areaCode, value?.number)}</Segment>}
                 />
               ) : (
@@ -398,6 +411,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly }) =
                     render={({ field }) =>
                       <Input
                         maxLength={50}
+                        type="number"
                         {...field}
                         placeholder="Cantidad en días(p. ej: 3, 10, 30, etc)"
                         onChange={(e, { value }) => {

@@ -4,11 +4,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Flex } from "rebass";
 import { Button, Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
 import { Form } from "./styles";
+import { useForm } from "react-hook-form";
 
 
-const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoading }) => {
+const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
+  const { handleSubmit } = useForm();
 
   const inputElement = useRef(null);
 
@@ -16,16 +18,11 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
     inputElement?.current?.focus();
     setConfirmationText('');
   }, [showModal]);
-  
+
   const handleConfirmationTextChange = (e) => {
     const text = e.target.value;
     setConfirmationText(text);
     setIsDeleteEnabled(text.toLowerCase() === 'borrar');
-  };
-
-  const handleDelete = async () => {
-    await onDelete(params);
-    setShowModal(false);
   };
 
   return (
@@ -33,7 +30,7 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
       <Modal open={showModal} onClose={() => setShowModal(false)}>
         <Header icon='archive' content={title || ""} />
         <Modal.Actions>
-          <Form>
+          <Form onSubmit={handleSubmit(onDelete)}>
             <Input
               placeholder="Escriba 'borrar' para eliminar"
               type="text"
@@ -47,7 +44,6 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
                 disabled={!isDeleteEnabled || isLoading}
                 loading={isLoading}
                 color='green'
-                onClick={handleDelete}
                 type="submit"
               >
                 <SIcon name='checkmark' />Si

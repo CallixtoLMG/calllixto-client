@@ -8,7 +8,7 @@ import { Modal, Transition } from "semantic-ui-react";
 
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { control, handleSubmit, formState: { isDirty, errors, } } = useForm({
+  const { control, handleSubmit, formState: { errors, } } = useForm({
     defaultValues: customer
   });
 
@@ -51,7 +51,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                 <Controller
                   name="name"
                   control={control}
-                  defaultValue={customer.name}
+                  defaultValue={customer?.name}
                   render={({ field: { value } }) => <Segment>{value}</Segment>}
                 />
               </FormField>
@@ -61,7 +61,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   name="address"
                   control={control}
                   rules={RULES.REQUIRED}
-                  defaultValue={customer.address}
+                  defaultValue={customer?.address}
                   render={({ field }) => <Input {...field} />}
                 />
               </FormField>
@@ -73,7 +73,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                       name="phone.areaCode"
                       control={control}
                       rules={RULES.PHONE.AREA_CODE_REQUIRED}
-                      defaultValue={customer.phone.areaCode}
+                      defaultValue={customer?.phone.areaCode}
                       render={({ field }) =>
                         <MaskedInput
                           mask="9999"
@@ -89,7 +89,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                       name="phone.number"
                       control={control}
                       rules={RULES.PHONE.NUMBER_REQUIRED}
-                      defaultValue={customer.phone.number}
+                      defaultValue={customer?.phone.number}
                       render={({ field }) =>
                         <MaskedInput
                           mask="99999999"
