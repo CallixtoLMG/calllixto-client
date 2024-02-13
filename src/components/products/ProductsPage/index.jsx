@@ -36,7 +36,7 @@ const ProductsPage = ({ products = [], role }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      const { data } = await deleteProduct(selectedProduct?.id);
+      const { data } = await deleteProduct(selectedProduct?.code);
       return data
     },
     onSuccess: (response) => {
