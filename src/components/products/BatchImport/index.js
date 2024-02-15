@@ -12,7 +12,6 @@ import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, WarningMessage } from "./styles";
 
-
 const BatchImport = ({ products, isCreating, task }) => {
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, formState: { errors, isDirty }, watch } = useForm();
@@ -23,12 +22,7 @@ const BatchImport = ({ products, isCreating, task }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const watchProducts = watch("importProducts", []);
   const queryClient = useQueryClient();
-  const {
-    buttonText,
-    onSubmit,
-    otherProperty,
-    processData
-  } = task;
+  const { buttonText, onSubmit, processData } = task;
   const inputRef = useRef();
 
   const handleClick = useCallback(() => {
@@ -105,19 +99,12 @@ const BatchImport = ({ products, isCreating, task }) => {
         if (isValidCode && !blacklist?.some(item => item === code) && price > 0) {
           const formattedProduct = { ...product, code, price };
 
-          if (isCreating) {
-            if (existingCodes[code]) {
-              downloadProducts.push(formattedProduct);
-            } else {
-              importProducts.push(formattedProduct);
-            }
-          } else {
-            if (existingCodes[code]) {
-              importProducts.push(formattedProduct);
-            } else {
-              downloadProducts.push(formattedProduct);
-            }
-          };
+          processData(
+            formattedProduct,
+            existingCodes,
+            downloadProducts,
+            importProducts
+          );
         };
       });
 
@@ -153,7 +140,7 @@ const BatchImport = ({ products, isCreating, task }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (products) => {
-      const { data } = await task.onSubmit(products.importProducts);
+      const { data } = await onSubmit(products.importProducts);
       return data;
     },
     onSuccess: (response) => {
@@ -293,11 +280,7 @@ const BatchImport = ({ products, isCreating, task }) => {
               </FieldsContainer>
               <ModalActions>
                 <Button
-                  disabled={
-                    task !== "Crear"
-                      ? isLoading || isPending || !isDirty
-                      : isLoading || isPending
-                  }
+                  disabled={task.isButtonDisabled(isCreating, isLoading, isPending, isDirty)}
                   loading={isLoading || isPending}
                   type="submit"
                   color="green"
