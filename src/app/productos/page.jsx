@@ -83,7 +83,7 @@ const Products = () => {
       },
     ] : [];
     setActions(actions);
-  }, [products, push, role, setActions]);
+  }, [products, push, role, setActions, isCreating]);
 
   return (
     <Loader active={isLoading}>
