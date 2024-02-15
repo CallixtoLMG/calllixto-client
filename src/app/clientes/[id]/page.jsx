@@ -1,15 +1,14 @@
 "use client";
-import { edit, useGetCustomer } from "@/api/customers";
+import { GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY, edit, useGetCustomer } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
-import { useRouter } from "next/navigation";
-import { useValidateToken } from "@/hooks/userData";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useEffect } from "react";
+import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY } from "../../../api/customers";
 
 const Customer = ({ params }) => {
   useValidateToken();

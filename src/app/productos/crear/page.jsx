@@ -4,12 +4,12 @@ import { create, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
 import { useListSuppliers } from "@/api/suppliers";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
+import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
-import { PAGES } from "@/constants";
-import { useRouter } from "next/navigation";
 
 const CreateProduct = () => {
   useValidateToken();
@@ -51,7 +51,7 @@ const CreateProduct = () => {
     onSuccess: (response) => {
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
-        toast.success('Produto creado!');
+        toast.success('Producto creado!');
         push(PAGES.PRODUCTS.BASE);
       } else {
         toast.error(response.message);

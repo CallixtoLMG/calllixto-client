@@ -1,26 +1,28 @@
-import { useListBanProducts } from "@/api/products";
+import { LIST_PRODUCTS_QUERY_KEY, useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { CURRENCY, LOCALE, REGEX, RULES } from "@/constants";
 import { downloadExcel } from "@/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, WarningMessage } from "./styles";
 
-const BatchImport = ({ products, onSubmit, task }) => {
+const BatchImport = ({ products, isCreating, task }) => {
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, formState: { errors, isDirty }, watch } = useForm();
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
   const [downloadProducts, setDownloadProducts] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const watchProducts = watch("importProducts", []);
-
+  const queryClient = useQueryClient();
+  const { buttonText, onSubmit, processData } = task;
   const inputRef = useRef();
 
   const handleClick = useCallback(() => {
@@ -97,19 +99,12 @@ const BatchImport = ({ products, onSubmit, task }) => {
         if (isValidCode && !blacklist?.some(item => item === code) && price > 0) {
           const formattedProduct = { ...product, code, price };
 
-          if (task === "Crear") {
-            if (existingCodes[code]) {
-              downloadProducts.push(formattedProduct);
-            } else {
-              importProducts.push(formattedProduct);
-            }
-          } else {
-            if (existingCodes[code]) {
-              importProducts.push(formattedProduct);
-            } else {
-              downloadProducts.push(formattedProduct);
-            }
-          };
+          processData(
+            formattedProduct,
+            existingCodes,
+            downloadProducts,
+            importProducts
+          );
         };
       });
 
@@ -143,12 +138,21 @@ const BatchImport = ({ products, onSubmit, task }) => {
     setOpen(true);
   };
 
-  const handleAccept = async (data) => {
-    setIsUpdating(true);
-    !!data?.importProducts?.length && await onSubmit(data.importProducts);
-    handleModalClose();
-    setIsUpdating(false);
-  };
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (products) => {
+      const { data } = await onSubmit(products.importProducts);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
+        toast.success('Por favor funciona');
+        handleModalClose();
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
 
   const deleteProduct = useCallback((index) => {
     const products = [...watchProducts];
@@ -240,7 +244,7 @@ const BatchImport = ({ products, onSubmit, task }) => {
         width="100%"
       >
         <ButtonContent hidden>
-          {task}
+          {buttonText}
         </ButtonContent>
         <ButtonContent visible>
           <Icon name="upload" />
@@ -256,7 +260,7 @@ const BatchImport = ({ products, onSubmit, task }) => {
           onOpen={handleModalOpen}
         >
           <ContainerModal>
-            <Form onSubmit={handleSubmit(handleAccept)}>
+            <Form onSubmit={handleSubmit(mutate)}>
               <FieldsContainer>
                 <FormField width={6}>
                   <Label>Archivo seleccionado:</Label>
@@ -276,16 +280,12 @@ const BatchImport = ({ products, onSubmit, task }) => {
               </FieldsContainer>
               <ModalActions>
                 <Button
-                  disabled={
-                    task !== "Crear"
-                      ? isLoading || isUpdating || !isDirty
-                      : isLoading || isUpdating
-                  }
-                  loading={isLoading || isUpdating}
+                  disabled={task.isButtonDisabled(isCreating, isLoading, isPending, isDirty)}
+                  loading={isLoading || isPending}
                   type="submit"
                   color="green"
                   content="Aceptar" />
-                <Button disabled={isLoading || isUpdating} onClick={() => setOpen(false)} color="red" content="Cancelar" />
+                <Button disabled={isLoading || isPending} onClick={() => setOpen(false)} color="red" content="Cancelar" />
               </ModalActions>
             </Form>
           </ContainerModal >

@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { deleteBatchProducts } from "@/api/products";
+import { LIST_PRODUCTS_QUERY_KEY, deleteBatchProducts } from "@/api/products";
 import { GET_SUPPLIER_QUERY_KEY, LIST_SUPPLIERS_QUERY_KEY, edit, useGetSupplier } from "@/api/suppliers";
 import { ModalDelete } from "@/components/common/modals";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -50,9 +50,9 @@ const Supplier = ({ params }) => {
     setActions(actions);
   }, [role, setActions]);
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async (brand) => {
-      const { data } = await edit(brand);
+  const { mutate: mutateUpdate, isPending: isLoadingUpdate } = useMutation({
+    mutationFn: async (supplier) => {
+      const { data } = await edit(supplier);
       return data;
     },
     onSuccess: (response) => {
@@ -61,6 +61,22 @@ const Supplier = ({ params }) => {
         queryClient.invalidateQueries({ queryKey: [GET_SUPPLIER_QUERY_KEY, params.id] });
         toast.success('Proveedor actualizado!');
         push(PAGES.SUPPLIERS.BASE);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
+
+  const { mutate: mutateDelete, isPending: isLoadingDelete } = useMutation({
+    mutationFn: async () => {
+      const { data } = await deleteBatchProducts(params.id);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
+        toast.success('Lista de productos del proveedor eliminada!');
+        setOpen(false)
       } else {
         toast.error(response.message);
       }
@@ -79,10 +95,11 @@ const Supplier = ({ params }) => {
           showModal={open}
           setShowModal={setOpen}
           title={deleteQuestion(supplier?.name)}
-          onDelete={deleteBatchProducts}
-          params={supplier.id}
+          onDelete={mutateDelete}
+          isLoading={isLoadingDelete}
+
         />}
-      <SupplierForm supplier={supplier} onSubmit={mutate} readonly={!allowUpdate} isLoading={isPending} />
+      <SupplierForm supplier={supplier} onSubmit={mutateUpdate} readonly={!allowUpdate} isLoading={isLoadingUpdate} />
     </Loader>
   )
 };

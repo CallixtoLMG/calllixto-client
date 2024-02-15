@@ -27,6 +27,23 @@ const Products = () => {
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
+  const isCreating = true;
+  const task = (isCreating) => {
+    return {
+      buttonText: isCreating ? "Crear" : "Actualizar",
+      onSubmit: isCreating ? createBatch : editBatch,
+      processData: (formattedProduct, existingCodes, downloadProducts, importProducts) => {
+        if (existingCodes[formattedProduct.code]) {
+          isCreating ? downloadProducts.push(formattedProduct) : importProducts.push(formattedProduct);
+        } else {
+          isCreating ? importProducts.push(formattedProduct) : downloadProducts.push(formattedProduct);
+        }
+      },
+      isButtonDisabled: (isCreating, isLoading, isPending, isDirty) => {
+        return isCreating ? isLoading || isPending || !isDirty : isLoading || isPending;
+      }
+    };
+  };
 
   useEffect(() => {
     setLabels(['Productos']);
@@ -44,11 +61,11 @@ const Products = () => {
       },
       {
         id: 2,
-        button: <BatchImport products={products} onSubmit={createBatch} task="Crear" />,
+        button: <BatchImport products={products} task={task(isCreating)} />,
       },
       {
         id: 3,
-        button: <BatchImport products={products} onSubmit={editBatch} task="Actualizar" />,
+        button: <BatchImport products={products} task={task()} />,
       },
       {
         id: 4,
@@ -66,7 +83,7 @@ const Products = () => {
       },
     ] : [];
     setActions(actions);
-  }, [products, push, role, setActions]);
+  }, [products, push, role, setActions, isCreating]);
 
   return (
     <Loader active={isLoading}>
