@@ -27,6 +27,32 @@ const Products = () => {
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
+  const isCreating = true;
+  const task = isCreating
+  ? {
+      buttonText: "Crear",
+      onSubmit: createBatch,
+      otherProperty: "value",
+      processData: (formattedProduct, existingCodes) => {
+        if (existingCodes[formattedProduct.code]) {
+          downloadProducts.push(formattedProduct);
+        } else {
+          importProducts.push(formattedProduct);
+        }
+      },
+    }
+  : {
+      buttonText: "Actualizar",
+      onSubmit: editBatch,
+      otherProperty: "value",
+      processData: (formattedProduct, existingCodes) => {
+        if (existingCodes[formattedProduct.code]) {
+          importProducts.push(formattedProduct);
+        } else {
+          downloadProducts.push(formattedProduct);
+        }
+      },
+    };
 
   useEffect(() => {
     setLabels(['Productos']);
@@ -44,11 +70,11 @@ const Products = () => {
       },
       {
         id: 2,
-        button: <BatchImport products={products} onSubmit={createBatch} task="Crear" />,
+        button: <BatchImport products={products} task={task} isCreating={isCreating} />,
       },
       {
         id: 3,
-        button: <BatchImport products={products} onSubmit={editBatch} task="Actualizar" />,
+        button: <BatchImport products={products} task={task}/>,
       },
       {
         id: 4,
