@@ -30,16 +30,16 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, onConfirm, isLoading })
           <Form onSubmit={handleSubmit(onConfirm)}>
             <FieldsContainer>
               <FormField flex="1">
-                <Label>ID del Cliente</Label>
-                <Segment>{customer?.name}</Segment>
+                <Label>ID</Label>
+                <Segment height="40px">{customer?.name}</Segment>
               </FormField>
               <FormField flex="1">
-                <Label>Dirección del Cliente</Label>
-                <Segment>{customer?.address}</Segment>
+                <Label>Dirección</Label>
+                <Segment height="40px">{customer?.address}</Segment>
               </FormField>
               <FormField width="200px">
-                <Label>Teléfono del Cliente</Label>
-                <Segment>{formatedPhone(customer?.phone?.areaCode, customer?.phone?.number)}</Segment>
+                <Label>Teléfono</Label>
+                <Segment height="40px">{formatedPhone(customer?.phone?.areaCode, customer?.phone?.number)}</Segment>
               </FormField >
               <ButtonsContainer width="100%" marginTop="10px">
                 <Button

@@ -86,7 +86,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   }, [reset, user]);
 
   const handleCheckboxChange = () => {
-    if (!budget?.customer?.address && !budget?.customer?.phone?.areaCode && !budget?.customer?.phone?.number) {
+    if (!budget?.customer?.address || !budget?.customer?.phone?.areaCode || !budget?.customer?.phone?.number) {
       setIsModalCustomerOpen(true);
       return;
     }
@@ -106,7 +106,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   };
 
   const BUDGET_FORM_PRODUCT_COLUMNS = [
-    { title: "Nombre", value: (product) => product.name, id: 1, align: 'left' },
     {
       title: "Código",
       value: (product) => (
@@ -130,10 +129,11 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
         </>
       ),
-      id: 2,
+      id: 1,
       width: 2
     },
-    { title: "Precio", value: (product) => formatedPrice(product.price, product.brand), id: 3, width: 1 },
+    { title: "Nombre", value: (product) => product.name, id: 2,  width: 10, align: 'left' },
+    { title: "Precio", value: (product) => formatedPrice(product.price, product.brand), id: 3, width: 2 },
     {
       title: "Cantidad", value: (product, index) => (
         <>
@@ -160,7 +160,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             <p>{product?.quantity}</p>
           )}
         </>
-      ), id: 4, width: 1
+      ), id: 4, width: 3
     },
     {
       title: "Descuento",
@@ -192,7 +192,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         </>
       ),
       id: 5,
-      width: 1
+      width: 2
     },
     { title: "Total", value: (product) => formatedPrice(getTotal(product)), id: 6, width: 2 },
   ];

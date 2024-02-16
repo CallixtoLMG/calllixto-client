@@ -1,4 +1,4 @@
-import { formatedDateAndHour, formatedPercentage, formatedPrice, getTotal, getTotalSum, simpleFormatedPrice } from "@/utils";
+import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
 import { Flex } from "rebass";
 import { Icon } from "../common/custom/Semantic";
 
@@ -31,7 +31,7 @@ const BUDGETS_COLUMNS = [
     id: 4,
     title: "Total",
     width: 2,
-    value: (budget) => simpleFormatedPrice(getTotalSum(budget.products))
+    value: (budget) => formatedPricePdf(getTotalSum(budget.products))
   },
   {
     id: 5,
@@ -46,6 +46,7 @@ const PRODUCTS_COLUMNS = [
     id: 1,
     title: "Nombre",
     align: "left",
+    wrap: true,
     value: (product) => product.name
   },
   {
@@ -58,13 +59,13 @@ const PRODUCTS_COLUMNS = [
     id: 3,
     title: "Precio",
     width: 2,
-    value: (product) => formatedPrice(product.price || 0)
+    value: (product) => formatedPricePdf(product.price || 0)
   },
   {
     id: 4,
     title: "Subtotal",
     width: 3,
-    value: (product) => formatedPrice(product.price * product.quantity || 0),
+    value: (product) => formatedPricePdf(product.price * product.quantity || 0),
     hide: true,
   },
   {
@@ -77,7 +78,7 @@ const PRODUCTS_COLUMNS = [
     id: 6,
     title: "Importe",
     width: 1,
-    value: (product) => formatedPrice(getTotal(product))
+    value: (product) => formatedPricePdf(getTotal(product))
   },
 ];
 

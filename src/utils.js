@@ -22,6 +22,14 @@ export const formatedDateOnly = (date) => dayjs(date).format('DD-MM-YYYY');
 
 export const formatedPrice = (number) => {
   let modNumber = Number(number);
+  return modNumber.toLocaleString('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+  });
+};
+
+export const formatedPricePdf = (number) => {
+  let modNumber = Number(number);
   modNumber = Math.ceil(modNumber);
   return modNumber.toLocaleString('es-AR', {
     style: 'currency',

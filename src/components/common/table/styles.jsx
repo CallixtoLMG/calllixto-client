@@ -8,6 +8,7 @@ const Cell = styled(STable.Cell)`
   z-index: 2;
   text-align: ${({ align }) => align || "center!important"};
   text-align-last: ${(props) => props.right && "right!important"};
+  white-space: ${({ wrap }) => wrap || "nowrap"};
 `;
 
 const Container = styled(Flex)`
