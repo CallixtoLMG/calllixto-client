@@ -2,10 +2,10 @@
 import { useUserContext } from "@/User";
 import { Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
+import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
@@ -14,23 +14,27 @@ import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
   const { handleSubmit, control } = useForm();
-  const [isLoading, setIsLoading] = useState(false);
   const { setUserData } = useUserContext();
-  const handleForm = async (data) => {
-    setIsLoading(true);
-    const userData = await onSubmit(data);
-    if (userData) {
-      setUserData(userData);
-      toast.success("Ingreso exitoso!")
-      push(PAGES.PRODUCTS.BASE);
-    } else {
-      toast.error("Los datos ingresados no Los datos ingresados no son correctos!")
-      setIsLoading(false);
-    };
-  };
+
+  const { mutate, isPending, isSuccess } = useMutation({
+    mutationFn: async (dataLogin) => {
+      const data = await onSubmit(dataLogin);
+      return data;
+    },
+    onSuccess: (userData) => {
+      if (userData) {
+        setUserData(userData);
+        push(PAGES.PRODUCTS.BASE);
+        toast.success("Ingreso exitoso!")
+      } else {
+        toast.error("Los datos ingresados no Los datos ingresados no son correctos!");
+        isSuccess(true)
+      }
+    },
+  });
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isPending || isSuccess}>
       <ModGrid >
         <ModGridColumn >
           <ModHeader as='h3'>
@@ -45,7 +49,7 @@ const LoginForm = ({ onSubmit }) => {
               <Text>Ingresa a tu cuenta</Text>
             </div>
           </ModHeader>
-          <Form onSubmit={handleSubmit(handleForm)} size='large'>
+          <Form onSubmit={handleSubmit(mutate)} size='large'>
             <Controller
               name="email"
               control={control}
