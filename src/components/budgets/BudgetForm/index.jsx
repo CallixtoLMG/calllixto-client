@@ -268,10 +268,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   name="seller"
                   control={control}
                   rules={{ required: 'Campo requerido' }}
-                  render={({ field: { value } }) => <Segment>{value}</Segment>}
+                  render={({ field: { value } }) => <Segment height="40px">{value}</Segment>}
                 />
               ) : (
-                <Segment>{budget?.seller}</Segment>
+                <Segment height="40px">{budget?.seller}</Segment>
               )}
             </FormField>
           </FieldsContainer>
@@ -304,7 +304,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   )}
                 />
               ) : (
-                <Segment>{budget?.customer?.name}</Segment>
+                <Segment height="40px">{budget?.customer?.name}</Segment>
               )}
             </FormField>
             <FormField width={5}>
@@ -314,10 +314,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   name="customer.address"
                   control={control}
                   rules={watchConfirmed && RULES.REQUIRED}
-                  render={({ field: { value } }) => <Segment>{value}</Segment>}
+                  render={({ field: { value } }) => <Segment height="40px">{value}</Segment>}
                 />
               ) : (
-                <Segment>{customerData?.address}</Segment>
+                <Segment height="40px">{customerData?.address}</Segment>
               )}
             </FormField>
             <FormField width="200px">
@@ -327,10 +327,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   name="customer.phone"
                   control={control}
                   rules={watchConfirmed && RULES.REQUIRED}
-                  render={({ field: { value } }) => <Segment>{formatedPhone(value?.areaCode, value?.number)}</Segment>}
+                  render={({ field: { value } }) => <Segment height="40px">{formatedPhone(value?.areaCode, value?.number)}</Segment>}
                 />
               ) : (
-                <Segment>{formatedPhone(customerData?.phone?.areaCode, customerData?.phone?.number)}</Segment>
+                <Segment height="40px">{formatedPhone(customerData?.phone?.areaCode, customerData?.phone?.number)}</Segment>
               )}
             </FormField>
           </FieldsContainer>
@@ -397,7 +397,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   )}
                 />
               ) : (
-                <Segment >{formattedPaymentMethods}</Segment>
+                <Segment height="40px">{formattedPaymentMethods}</Segment>
               )}
             </FormField>
             {!readonly && (
@@ -425,7 +425,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             )}
             <FormField flex={1}>
               <Label>Fecha de vencimiento</Label>
-              <Segment>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
+              <Segment height="40px">{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
             </FormField>
           </FieldsContainer>
           {!readonly && (

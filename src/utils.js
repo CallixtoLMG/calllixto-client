@@ -22,9 +22,11 @@ export const formatedDateOnly = (date) => dayjs(date).format('DD-MM-YYYY');
 
 export const formatedPrice = (number) => {
   let modNumber = Number(number);
+  modNumber = Math.ceil(modNumber);
   return modNumber.toLocaleString('es-AR', {
     style: 'currency',
     currency: 'ARS',
+    minimumFractionDigits: 0,
   });
 };
 

@@ -23,16 +23,16 @@ const ProductSearch = ({ products, onProductSelect }) => {
 
   const handleProductSelect = (event, { result }) => {
     onProductSelect(result.value);
-    setSearchQuery(''); 
+    setSearchQuery('');
     setSelectedProduct(result.value);
   };
 
-  const MAX_RESULTS = 5;
+  const MAX_RESULTS = 4;
 
   return (
     <Search
       selectFirstResult
-      minCharacters={1}
+      minCharacters={2}
       searchDelay={1000}
       onSearchChange={handleSearchChange}
       value={selectedProduct ? '' : searchQuery}
@@ -44,7 +44,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
         description: (
           <Container>
             <Text>Código: {formatProductCode(product.code)}</Text>
-            <Text>Precio: {`$ ${product.price}`}</Text>
+            <Text>Precio: {`$ ${product.price.toFixed(2)}`}</Text>
           </Container>
         ),
         value: product,
