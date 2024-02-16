@@ -47,16 +47,16 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
           <Form onSubmit={handleSubmit(handleEdit)}>
             <FieldsContainer>
               <FormField flex="1">
-                <Label>ID del Cliente</Label>
+                <Label>ID</Label>
                 <Controller
                   name="name"
                   control={control}
                   defaultValue={customer?.name}
-                  render={({ field: { value } }) => <Segment>{value}</Segment>}
+                  render={({ field: { value } }) => <Segment height="40px">{value}</Segment>}
                 />
               </FormField>
               <FormField flex="1">
-                <RuledLabel title="Dirección del Cliente" message={errors?.address?.message} required />
+                <RuledLabel title="Dirección" message={errors?.address?.message} required />
                 <Controller
                   name="address"
                   control={control}
@@ -66,7 +66,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                 />
               </FormField>
               <FormField width="200px">
-                <RuledLabel title="Teléfono del Cliente" message={errors?.phone?.areaCode?.message || errors?.phone?.number?.message} required />
+                <RuledLabel title="Teléfono" message={errors?.phone?.areaCode?.message || errors?.phone?.number?.message} required />
                 <PhoneContainer>
                   <Box width="70px">
                     <Controller

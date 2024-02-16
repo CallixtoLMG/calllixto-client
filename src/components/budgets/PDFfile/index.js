@@ -1,7 +1,7 @@
 "use client";
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Cell, HeaderCell } from '@/components/common/table';
-import { formatedPhone, formatedPrice } from "@/utils";
+import { formatedPhone, formatedPricePdf } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { Flex } from "rebass";
@@ -109,7 +109,7 @@ const PDFfile = ({ budget, total }) => {
                         return (
                           <Table.Row key={product.key}>
                             {PRODUCTS_COLUMNS.map(header => (
-                              <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                              <Cell key={`cell_${header.id}`} align={header.align} width={header.width} wrap={header.wrap}>
                                 {header.value(product)}
                               </Cell>
                             ))}
@@ -119,20 +119,16 @@ const PDFfile = ({ budget, total }) => {
                     )}
                     <Table.Row>
                       <Cell right textAlign="right" colSpan={PRODUCTS_COLUMNS.length - 1}><strong>TOTAL</strong></Cell>
-                      <Cell colSpan="1"><strong>{formatedPrice(total)}</strong></Cell>
+                      <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
                     </Table.Row>
                   </Table.Body>
                 </Table>
               </Flex>
-              <Divider />
               {budget?.comments && (
-                <>
-                  <DataContainer width="100%">
-                    <Label>Comentarios</Label>
-                    <Segment marginTop="0" minHeight="60px">{budget.comments}</Segment>
-                  </DataContainer>
-                  <Divider />
-                </>
+                <DataContainer width="100%">
+                  <Label>Comentarios</Label>
+                  <Segment marginTop="0" minHeight="60px">{budget.comments}</Segment>
+                </DataContainer>
               )}
               <DataContainer width="100%" >
                 <Label >Formas de pago</Label>

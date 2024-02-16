@@ -4,7 +4,7 @@ import { Table } from "@/components/common/table";
 import { CURRENCY, LOCALE, REGEX, RULES } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -24,7 +24,7 @@ const BatchImport = ({ products, isCreating }) => {
   const queryClient = useQueryClient();
   const inputRef = useRef();
 
-  const importSettings = (isCreating) => {
+  const importSettings = useMemo(() => {
     return {
       button: isCreating ? "Crear" : "Actualizar",
       toast: isCreating ? "Los productos se han creado con exito!" : "Los productos se han Actualizado con exito! ",
@@ -37,13 +37,11 @@ const BatchImport = ({ products, isCreating }) => {
           isCreating ? importProducts.push(formattedProduct) : downloadProducts.push(formattedProduct);
         }
       },
-      isButtonDisabled: (isLoading, isPending, isDirty) => {
-        return isLoading || isPending || (!isCreating && !isDirty);
+      isButtonDisabled: (isPending) => {
+        return !watchProducts.length || isLoading || isPending || (!isCreating && !isDirty)
       }
     };
-  };
-
-  const task = importSettings(isCreating);
+  }, [isCreating, isLoading, isDirty]);
 
   const handleClick = useCallback(() => {
     inputRef.current.value = null;
@@ -119,7 +117,7 @@ const BatchImport = ({ products, isCreating }) => {
         if (isValidCode && !blacklist?.some(item => item === code) && price > 0) {
           const formattedProduct = { ...product, code, price };
 
-          task.processData(
+          importSettings.processData(
             formattedProduct,
             existingCodes,
             downloadProducts,
@@ -136,7 +134,7 @@ const BatchImport = ({ products, isCreating }) => {
       };
       setOpen(true);
     };
-  }, [blacklist, loadingBlacklist, products, reset, setValue, task]);
+  }, [blacklist, loadingBlacklist, products, reset, setValue, importSettings]);
 
   const handleDownloadConfirmation = () => {
     const data = [
@@ -160,13 +158,13 @@ const BatchImport = ({ products, isCreating }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (products) => {
-      const { data } = await task.onSubmit(products.importProducts);
+      const { data } = await importSettings.onSubmit(products.importProducts);
       return data;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
-        toast.success(task.toast);
+        toast.success(importSettings.toast);
         handleModalClose();
       } else {
         toast.error(response.message);
@@ -264,7 +262,7 @@ const BatchImport = ({ products, isCreating }) => {
         width="100%"
       >
         <ButtonContent hidden>
-          {task.button}
+          {importSettings.button}
         </ButtonContent>
         <ButtonContent visible>
           <Icon name="upload" />
@@ -300,7 +298,7 @@ const BatchImport = ({ products, isCreating }) => {
               </FieldsContainer>
               <ModalActions>
                 <Button
-                  disabled={task.isButtonDisabled(isLoading, isPending, isDirty)}
+                  disabled={importSettings.isButtonDisabled(isPending)}
                   loading={isLoading || isPending}
                   type="submit"
                   color="green"
@@ -320,7 +318,7 @@ const BatchImport = ({ products, isCreating }) => {
           <Modal.Header>Confirmar Descarga</Modal.Header>
           <Modal.Content>
             <p>
-              {`Se han encontrado productos ${task.confirmation} existentes en la lista...`}<br /><br />
+              {`Se han encontrado productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
               ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
             </p>
           </Modal.Content>

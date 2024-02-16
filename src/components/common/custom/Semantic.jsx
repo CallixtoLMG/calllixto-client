@@ -44,7 +44,7 @@ export const Input = styled(SInput)`
   display: flex!important;
   input{
     height: ${({ height }) => height || '40px'} !important;
-    padding: 0 5px!important;
+    padding: 0 14px!important;
     text-align: center!important;
   };
 `;

@@ -24,7 +24,7 @@ const LoginForm = ({ onSubmit }) => {
       toast.success("Ingreso exitoso!")
       push(PAGES.PRODUCTS.BASE);
     } else {
-      toast.error("Los datos ingresados no coinciden con usuario activo!")
+      toast.error("Los datos ingresados no Los datos ingresados no son correctos!")
       setIsLoading(false);
     };
   };

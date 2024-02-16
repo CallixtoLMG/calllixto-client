@@ -40,9 +40,8 @@ const Title = styled(SHeader)`
 
 const Divider = styled.div`
   width: 100%;
-  height: 3px;
-  border-radius: 15px;
-  border-bottom: 3px solid gray;
+  height: 1px;
+  border-bottom: 1px solid gray;
   margin: 10px 0;
 `;
 
@@ -58,17 +57,6 @@ const Sign = styled.div`
 const SubtleLabel = styled(SLabel)`
   background-color: white !important;
   border: 0.5px solid grey !important;
-`;
-
-const Segment = styled(SSegment)`
-  min-height: ${(props) => props.minHeight || ""};
-  margin-top: ${(props) => props.marginTop || "5px"} !important;
-  box-shadow: 0 0 0 0 !important;
-  background-color: white !important;
-  border: 0.5px solid grey !important;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
-  padding: 8px !important;
 `;
 
 const Comment = styled(SSegment)`
@@ -101,11 +89,28 @@ const PayMethodsContainer = styled(Flex)`
   margin-left: 15px !important;
 `;
 
+const Segment = styled(SSegment)`
+  min-height: ${(props) => props.minHeight || ""};
+  margin-top: ${(props) => props.marginTop || "5px"} !important;
+  box-shadow: 0 0 0 0 !important;
+  background-color: white !important;
+  border: 0.5px solid grey !important;
+  border-top-left-radius: 0 !important;
+  border-top-right-radius: 0 !important;
+  height: 25px!important;
+  padding: 0 5px!important;
+  line-height: 22px!important;
+`;
+
 const Label = styled(SLabel)`
-  border: 1px solid grey!important; 
+  border: 0.5px solid grey!important; 
   border-bottom-left-radius: 0!important;
   border-bottom-right-radius: 0!important;
   margin: 0!important;
+  margin-bottom: -1px!important;
+  height: 25px!important;
+  padding: 0 5px!important;
+  line-height: 25px!important;
 `;
 
 export { ClientDataContainer, Comment, CustomerDataContainer, DataContainer, Divider, Header, HeaderContainer, Image, Label, PayMethodContainer, PayMethodsContainer, Segment, Sign, SubtleLabel, TableRowHeader, Title };

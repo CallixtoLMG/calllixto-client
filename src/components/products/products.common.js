@@ -6,6 +6,7 @@ const PRODUCT_COLUMNS = [
   {
     id: 1,
     title: "Código",
+    align: "left",
     width: 2,
     value: (product) =>
       <>
