@@ -26,6 +26,7 @@ const LogDiv = styled(Flex)`
     background-color: #f5f5f5!important;
   };
   a {
+    border-left: 1px solid rgba(34,36,38,.1)!important;
     &:hover {
       background-color: #f5f5f5!important;
     };
@@ -33,15 +34,19 @@ const LogDiv = styled(Flex)`
 `;
 
 const Container = styled(SContainer)`
-  margin: 0!important;
   height: 60px!important;
-  width: 100%!important;  
+  width: 95%!important;  
+  div:first-child{
+    border-left: 1px solid rgba(34,36,38,.1)!important;
+  },
   div:last-child {  
     margin-left: auto!important;
-    border-left: 1px solid rgba(34,36,38,.1)!important;
-    border-right: 1px solid rgba(34,36,38,.1)!important;
-    &:before {
-      width: 0px!important;
+    a{
+      border-left: 1px solid rgba(34,36,38,.1)!important;
+      border-right: 1px solid rgba(34,36,38,.1)!important;
+      &:before {
+        width: 0px!important;
+      };
     };
   };
 `;
@@ -49,7 +54,6 @@ const Container = styled(SContainer)`
 const Text = styled.p`
   display: inline-block;
   position: relative;
-
   &:hover {
     &:after{
       transform: scaleX(1);

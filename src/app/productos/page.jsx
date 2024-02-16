@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { createBatch, editBatch, useListProducts } from "@/api/products";
+import { useListProducts } from "@/api/products";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
@@ -28,22 +28,6 @@ const Products = () => {
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
   const isCreating = true;
-  const task = (isCreating) => {
-    return {
-      buttonText: isCreating ? "Crear" : "Actualizar",
-      onSubmit: isCreating ? createBatch : editBatch,
-      processData: (formattedProduct, existingCodes, downloadProducts, importProducts) => {
-        if (existingCodes[formattedProduct.code]) {
-          isCreating ? downloadProducts.push(formattedProduct) : importProducts.push(formattedProduct);
-        } else {
-          isCreating ? importProducts.push(formattedProduct) : downloadProducts.push(formattedProduct);
-        }
-      },
-      isButtonDisabled: (isCreating, isLoading, isPending, isDirty) => {
-        return isCreating ? isLoading || isPending || !isDirty : isLoading || isPending;
-      }
-    };
-  };
 
   useEffect(() => {
     setLabels(['Productos']);
@@ -61,11 +45,11 @@ const Products = () => {
       },
       {
         id: 2,
-        button: <BatchImport products={products} task={task(isCreating)} />,
+        button: <BatchImport products={products} isCreating={isCreating} />,
       },
       {
         id: 3,
-        button: <BatchImport products={products} task={task()} />,
+        button: <BatchImport products={products} />,
       },
       {
         id: 4,
@@ -83,7 +67,7 @@ const Products = () => {
       },
     ] : [];
     setActions(actions);
-  }, [products, push, role, setActions, isCreating]);
+  }, [products, push, role, setActions]);
 
   return (
     <Loader active={isLoading}>

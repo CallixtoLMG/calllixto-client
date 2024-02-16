@@ -1,4 +1,4 @@
-import { LIST_PRODUCTS_QUERY_KEY, useListBanProducts } from "@/api/products";
+import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { CURRENCY, LOCALE, REGEX, RULES } from "@/constants";
@@ -12,7 +12,7 @@ import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, WarningMessage } from "./styles";
 
-const BatchImport = ({ products, isCreating, task }) => {
+const BatchImport = ({ products, isCreating }) => {
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, formState: { errors, isDirty }, watch } = useForm();
   const [open, setOpen] = useState(false);
@@ -22,8 +22,28 @@ const BatchImport = ({ products, isCreating, task }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const watchProducts = watch("importProducts", []);
   const queryClient = useQueryClient();
-  const { buttonText, onSubmit, processData } = task;
   const inputRef = useRef();
+
+  const importSettings = (isCreating) => {
+    return {
+      button: isCreating ? "Crear" : "Actualizar",
+      toast: isCreating ? "Los productos se han creado con exito!" : "Los productos se han Actualizado con exito! ",
+      confirmation: isCreating ? "" : "no",
+      onSubmit: isCreating ? createBatch : editBatch,
+      processData: (formattedProduct, existingCodes, downloadProducts, importProducts) => {
+        if (existingCodes[formattedProduct.code]) {
+          isCreating ? downloadProducts.push(formattedProduct) : importProducts.push(formattedProduct);
+        } else {
+          isCreating ? importProducts.push(formattedProduct) : downloadProducts.push(formattedProduct);
+        }
+      },
+      isButtonDisabled: (isLoading, isPending, isDirty) => {
+        return isLoading || isPending || (!isCreating && !isDirty);
+      }
+    };
+  };
+
+  const task = importSettings(isCreating);
 
   const handleClick = useCallback(() => {
     inputRef.current.value = null;
@@ -99,7 +119,7 @@ const BatchImport = ({ products, isCreating, task }) => {
         if (isValidCode && !blacklist?.some(item => item === code) && price > 0) {
           const formattedProduct = { ...product, code, price };
 
-          processData(
+          task.processData(
             formattedProduct,
             existingCodes,
             downloadProducts,
@@ -140,13 +160,13 @@ const BatchImport = ({ products, isCreating, task }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (products) => {
-      const { data } = await onSubmit(products.importProducts);
+      const { data } = await task.onSubmit(products.importProducts);
       return data;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
-        toast.success('Por favor funciona');
+        toast.success(task.toast);
         handleModalClose();
       } else {
         toast.error(response.message);
@@ -244,7 +264,7 @@ const BatchImport = ({ products, isCreating, task }) => {
         width="100%"
       >
         <ButtonContent hidden>
-          {buttonText}
+          {task.button}
         </ButtonContent>
         <ButtonContent visible>
           <Icon name="upload" />
@@ -280,7 +300,7 @@ const BatchImport = ({ products, isCreating, task }) => {
               </FieldsContainer>
               <ModalActions>
                 <Button
-                  disabled={task.isButtonDisabled(isCreating, isLoading, isPending, isDirty)}
+                  disabled={task.isButtonDisabled(isLoading, isPending, isDirty)}
                   loading={isLoading || isPending}
                   type="submit"
                   color="green"
@@ -300,7 +320,7 @@ const BatchImport = ({ products, isCreating, task }) => {
           <Modal.Header>Confirmar Descarga</Modal.Header>
           <Modal.Content>
             <p>
-              {`Se han encontrado productos ${task === "Crear" ? "" : "no"} existentes en la lista...`}<br /><br />
+              {`Se han encontrado productos ${task.confirmation} existentes en la lista...`}<br /><br />
               ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
             </p>
           </Modal.Content>
