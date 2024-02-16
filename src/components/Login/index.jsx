@@ -1,14 +1,15 @@
 "use client";
+import { useUserContext } from "@/User";
+import { Loader } from "@/components/layout";
 import { PAGES } from "@/constants";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
-import { Loader } from "@/components/layout";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "./styled";
-import { useUserContext } from "@/User";
 
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
@@ -20,10 +21,12 @@ const LoginForm = ({ onSubmit }) => {
     const userData = await onSubmit(data);
     if (userData) {
       setUserData(userData);
+      toast.success("Ingreso exitoso!")
       push(PAGES.PRODUCTS.BASE);
     } else {
+      toast.error("Los datos ingresados no coinciden con usuario activo!")
       setIsLoading(false);
-    }
+    };
   };
 
   return (

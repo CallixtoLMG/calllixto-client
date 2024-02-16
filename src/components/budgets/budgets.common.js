@@ -1,4 +1,4 @@
-import { formatedDateAndHour, formatedPercentage, getTotal, getTotalSum, simpleFormatedPrice } from "@/utils";
+import { formatedDateAndHour, formatedPercentage, formatedPrice, getTotal, getTotalSum, simpleFormatedPrice } from "@/utils";
 import { Flex } from "rebass";
 import { Icon } from "../common/custom/Semantic";
 
@@ -57,14 +57,14 @@ const PRODUCTS_COLUMNS = [
   {
     id: 3,
     title: "Precio",
-    width: 1,
-    value: (product) => simpleFormatedPrice(product.price || 0)
+    width: 2,
+    value: (product) => formatedPrice(product.price || 0)
   },
   {
     id: 4,
     title: "Subtotal",
-    width: 1,
-    value: (product) => simpleFormatedPrice(product.price * product.quantity || 0),
+    width: 3,
+    value: (product) => formatedPrice(product.price * product.quantity || 0),
     hide: true,
   },
   {
@@ -77,7 +77,7 @@ const PRODUCTS_COLUMNS = [
     id: 6,
     title: "Importe",
     width: 1,
-    value: (product) => simpleFormatedPrice(getTotal(product))
+    value: (product) => formatedPrice(getTotal(product))
   },
 ];
 

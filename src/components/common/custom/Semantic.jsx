@@ -13,6 +13,8 @@ import {
 import styled from "styled-components";
 
 export const Segment = styled(SSegment)`
+  height: ${({ height }) => height && height} !important;
+  padding:${({ height }) => height && "10px"} !important;
   margin: 5px 0!important;
   width: 100%!important;
   min-height: 40px!important;
@@ -40,6 +42,11 @@ export const Input = styled(SInput)`
   height: ${({ height }) => height || '40px'} !important;
   width: ${({ width }) => width ? width : ''} !important;
   display: flex!important;
+  input{
+    height: ${({ height }) => height || '40px'} !important;
+    padding: 0 5px!important;
+    text-align: center!important;
+  };
 `;
 
 export const Label = styled(SLabel)`
