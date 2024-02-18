@@ -10,7 +10,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
-import { ContainerModal, Modal, ModalActions, WarningMessage } from "./styles";
+import { ContainerModal, Header, Modal, ModalActions, ModalHeader, WarningMessage } from "./styles";
 
 const BatchImport = ({ products, isCreating }) => {
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
@@ -27,7 +27,7 @@ const BatchImport = ({ products, isCreating }) => {
   const importSettings = useMemo(() => {
     return {
       button: isCreating ? "Crear" : "Actualizar",
-      toast: isCreating ? "Los productos se han creado con exito!" : "Los productos se han Actualizado con exito! ",
+      toast: isCreating ? "Los productos se han creado con exito!" : "Los productos se han actualizado con exito! ",
       confirmation: isCreating ? "" : "no",
       onSubmit: isCreating ? createBatch : editBatch,
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts) => {
@@ -151,11 +151,6 @@ const BatchImport = ({ products, isCreating }) => {
     setOpen(true);
   };
 
-  const handleCancelDownloadConfirmation = () => {
-    setShowConfirmationModal(false);
-    setOpen(true);
-  };
-
   const { mutate, isPending } = useMutation({
     mutationFn: async (products) => {
       const { data } = await importSettings.onSubmit(products.importProducts);
@@ -269,8 +264,7 @@ const BatchImport = ({ products, isCreating }) => {
         </ButtonContent>
       </Button>
 
-      <Transition animation="fade" duration={500} visible={open} >
-
+      <Transition animation="fade" duration={500} visible={open}>
         <Modal
           closeIcon
           open={open}
@@ -278,64 +272,67 @@ const BatchImport = ({ products, isCreating }) => {
           onOpen={handleModalOpen}
         >
           <ContainerModal>
-            <Form onSubmit={handleSubmit(mutate)}>
-              <FieldsContainer>
-                <FormField width={6}>
-                  <Label>Archivo seleccionado:</Label>
-                  <Segment>{selectedFile}</Segment>
-                </FormField>
-              </FieldsContainer>
-              <FieldsContainer>
-                <Label>Nuevos productos</Label>
-                <Table
-                  deleteButtonInside
-                  tableHeight="50vh"
-                  mainKey="code"
-                  headers={PRODUCTS_COLUMNS}
-                  elements={watchProducts}
-                  actions={actions}
-                />
-              </FieldsContainer>
-              <ModalActions>
-                <Button
-                  disabled={importSettings.isButtonDisabled(isPending)}
-                  loading={isLoading || isPending}
-                  type="submit"
-                  color="green"
-                  content="Aceptar" />
-                <Button disabled={isLoading || isPending} onClick={() => setOpen(false)} color="red" content="Cancelar" />
-              </ModalActions>
-            </Form>
-          </ContainerModal >
-        </Modal >
-      </Transition >
-      <Transition animation="fade" duration={500} visible={showConfirmationModal} >
-        <Modal
-          open={showConfirmationModal}
-          onClose={handleCancelDownloadConfirmation}
-          size="small"
-        >
-          <Modal.Header>Confirmar Descarga</Modal.Header>
-          <Modal.Content>
-            <p>
-              {`Se han encontrado productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
-              ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
-            </p>
-          </Modal.Content>
-          <ModalActions>
-            <Button
-              positive
-              onClick={handleDownloadConfirmation}
-              content="Confirmar"
-            />
-            <Button
-              negative
-              onClick={handleCancelDownloadConfirmation}
-              content="Cancelar"
-            />
-          </ModalActions>
+            {showConfirmationModal ? (
+              <>
+                <ModalHeader> <Header>Confirmar descarga</Header></ModalHeader>
+                <Modal.Content>
+                  <p>
+                    {`Se han encontrado productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
+                    ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
+                  </p>
+                </Modal.Content>
+                <ModalActions>
+                  <Button
+                    positive
+                    onClick={handleDownloadConfirmation}
+                    content="Confirmar"
+                  />
+                  <Button
+                    negative
+                    onClick={() => setShowConfirmationModal(false)}
+                    content="Cancelar"
+                  />
+                </ModalActions>
+              </>
+            ) : (
+              <Form onSubmit={handleSubmit(mutate)}>
+                <FieldsContainer>
+                  <FormField width={6}>
+                    <Label>Archivo seleccionado:</Label>
+                    <Segment>{selectedFile}</Segment>
+                  </FormField>
+                </FieldsContainer>
+                <FieldsContainer>
+                  <Label>Nuevos productos</Label>
+                  <Table
+                    deleteButtonInside
+                    tableHeight="50vh"
+                    mainKey="code"
+                    headers={PRODUCTS_COLUMNS}
+                    elements={watchProducts}
+                    actions={actions}
+                  />
+                </FieldsContainer>
+                <ModalActions>
+                  <Button
+                    disabled={importSettings.isButtonDisabled(isPending)}
+                    loading={isLoading || isPending}
+                    type="submit"
+                    color="green"
+                    content="Aceptar"
+                  />
+                  <Button
+                    disabled={isLoading || isPending}
+                    onClick={() => setOpen(false)}
+                    color="red"
+                    content="Cancelar"
+                  />
+                </ModalActions>
+              </Form>
+            )}
+          </ContainerModal>
         </Modal>
-      </Transition >
+      </Transition>
     </>
   );
 };

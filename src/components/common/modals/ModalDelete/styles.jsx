@@ -1,3 +1,4 @@
+import { Flex } from "rebass";
 import styled from "styled-components";
 
 const Form = styled.form`
@@ -7,5 +8,10 @@ const Form = styled.form`
   column-gap: 10px;
 `;
 
-export { Form };
+const ButtonContainer = styled(Flex)`
+  width: 180px!important;
+  height: 40px!important;
+`;
+
+export { ButtonContainer, Form };
 

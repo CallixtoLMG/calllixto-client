@@ -25,12 +25,14 @@ const LoginForm = ({ onSubmit }) => {
       if (userData) {
         setUserData(userData);
         push(PAGES.PRODUCTS.BASE);
-        toast.success("Ingreso exitoso!")
+        toast.success("Ingreso exitoso!");
       } else {
         toast.error("Los datos ingresados no Los datos ingresados no son correctos!");
-        isSuccess(true)
       }
     },
+    onSettled: () => {
+      isSuccess(true);
+    }
   });
 
   return (
