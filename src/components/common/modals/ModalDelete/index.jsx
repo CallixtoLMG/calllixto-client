@@ -1,10 +1,9 @@
 "use client";
 import { Input } from "@/components/common/custom";
 import { useEffect, useRef, useState } from 'react';
-import { Flex } from "rebass";
-import { Button, Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
-import { Form } from "./styles";
 import { useForm } from "react-hook-form";
+import { Button, Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
+import { ButtonContainer, Form } from "./styles";
 
 
 const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) => {
@@ -27,11 +26,12 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
 
   return (
     <Transition visible={showModal} animation='scale' duration={500}>
-      <Modal open={showModal} onClose={() => setShowModal(false)}>
+      <Modal closeIcon open={showModal} onClose={() => setShowModal(false)}>
         <Header icon='archive' content={title || ""} />
         <Modal.Actions>
           <Form onSubmit={handleSubmit(onDelete)}>
             <Input
+              margin="0"
               placeholder="Escriba 'borrar' para eliminar"
               type="text"
               value={confirmationText}
@@ -39,8 +39,8 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
               ref={inputElement}
               width="220px"
             />
-            <Flex flexDirection="row-reverse">
-              <Button
+            <ButtonContainer flexDirection="row-reverse">
+              <Button fluid
                 disabled={!isDeleteEnabled || isLoading}
                 loading={isLoading}
                 color='green'
@@ -48,10 +48,10 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
               >
                 <SIcon name='checkmark' />Si
               </Button>
-              <Button color='red' onClick={() => setShowModal(false)} disabled={isLoading}>
+              <Button fluid color='red' onClick={() => setShowModal(false)} disabled={isLoading}>
                 <SIcon name='trash' />No
               </Button>
-            </Flex>
+            </ButtonContainer>
           </Form>
         </Modal.Actions>
       </Modal>
