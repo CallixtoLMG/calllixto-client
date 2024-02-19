@@ -12,15 +12,11 @@ const Text = styled.p`
 const ModGrid = styled(Grid)`
   &&& {
     background-color: #C8E3DF!important;
-    height: 100vh; 
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
   };
-`;
-
-const ModMessage = styled(Message)`
-  text-align: center!important;
 `;
 
 const ModButton = styled.button`
@@ -57,5 +53,5 @@ const ModHeader = styled(Header)({
   textAlign: 'center!important'
 });
 
-export { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text };
+export { ModButton, ModGrid, ModGridColumn, ModHeader, Text };
 

@@ -1,39 +1,30 @@
 "use client";
-import { DownloadExcelButton, GoToButton } from "@/components/common/buttons";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
-import { useRouter } from 'next/navigation';
 import { useCallback, useState } from "react";
-import ImportProducts from "../ImportProduct";
 import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
-import { ButtonsContainer } from "@/components/common/custom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
+import { toast } from "react-hot-toast";
 
-const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete }) => {
-  const { push } = useRouter();
+const ProductsPage = ({ products = [], role }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
 
   const mapProductsForTable = useCallback((c) => {
-    return c.map(customer => ({ ...customer, id: customer.code }));
+    return c.map(customer => ({ ...customer, key: customer.code }));
   }, []);
 
   const actions = visibilityRules.canSeeActions ? [
     {
       id: 1,
-      icon: 'edit',
-      color: 'blue',
-      onClick: (product) => { push(PAGES.PRODUCTS.UPDATE(product.id)) },
-      tooltip: 'Editar'
-    },
-    {
-      id: 2,
-      icon: 'erase',
+      icon: 'trash',
       color: 'red',
       onClick: (product) => {
         setSelectedProduct(product);
@@ -43,21 +34,26 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
     }
   ] : [];
 
-  const handleDelete = useCallback(async () => {
-    setIsLoading(true);
-    await onDelete(selectedProduct?.id);
-    setIsLoading(false);
-  }, [onDelete, selectedProduct?.id]);
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      const { data } = await deleteProduct(selectedProduct?.code);
+      return data
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
+        toast.success('Producto eliminado!');
+        setShowModal(false);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
 
   return (
     <>
-      {visibilityRules.canSeeButtons &&
-        <ButtonsContainer>
-          <GoToButton goTo={PAGES.PRODUCTS.CREATE} iconName="add" text="Crear producto" color="green" />
-          <ImportProducts products={products} createBatch={createBatch} editBatch={editBatch} />
-          <DownloadExcelButton />
-        </ButtonsContainer>}
       <Table
+        mainKey="code"
         headers={PRODUCT_COLUMNS}
         elements={mapProductsForTable(products)}
         page={PAGES.PRODUCTS}
@@ -68,8 +64,8 @@ const ProductsPage = ({ products = [], createBatch, editBatch, role, onDelete })
         showModal={showModal}
         setShowModal={setShowModal}
         title={deleteQuestion(selectedProduct?.name)}
-        onDelete={handleDelete}
-        isLoading={isLoading}
+        onDelete={mutate}
+        isLoading={isPending}
       />
     </>
   )

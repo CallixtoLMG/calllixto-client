@@ -1,36 +1,24 @@
 "use client";
-import { GoToButton } from "@/components/common/buttons";
-import { PAGES } from "@/constants";
-import { useRouter } from "next/navigation";
-import { FILTERS, HEADERS } from "../customers.common";
-import { Table } from '@/components/common/table';
 import { ModalDelete } from '@/components/common/modals';
+import { Table } from '@/components/common/table';
+import { PAGES } from "@/constants";
 import { useCallback, useState } from "react";
-import { ButtonsContainer } from "@/components/common/custom";
+import { FILTERS, HEADERS } from "../customers.common";
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { LIST_CUSTOMERS_QUERY_KEY, deleteCustomer } from '@/api/customers';
+import { toast } from 'react-hot-toast';
 
-const CustomersPage = ({ customers = [], onDelete }) => {
-  const { push } = useRouter();
+const CustomersPage = ({ customers = [] }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
 
   const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar el cliente "${name}"?`, []);
-
-  const mapCustomersForTable = useCallback((customer) => {
-    return customer.map((customer, index) => ({ ...customer, key: index + 1 }));
-  }, []);
 
   const actions = [
     {
       id: 1,
-      icon: 'edit',
-      color: 'blue',
-      onClick: (customer) => { push(PAGES.CUSTOMERS.UPDATE(customer.id)) },
-      tooltip: 'Editar'
-    },
-    {
-      id: 2,
-      icon: 'erase',
+      icon: 'trash',
       color: 'red',
       onClick: (customer) => {
         setSelectedCustomer(customer);
@@ -40,24 +28,27 @@ const CustomersPage = ({ customers = [], onDelete }) => {
     }
   ];
 
-  const handleDelete = useCallback(async () => {
-    setIsLoading(true);
-    await onDelete(selectedCustomer.id);
-    setIsLoading(false);
-  }, [selectedCustomer, onDelete]);
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      const { data } = await deleteCustomer(selectedCustomer?.id);
+      return data
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_CUSTOMERS_QUERY_KEY] });
+        toast.success('Cliente eliminado!');
+        setShowModal(false);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
 
   return (
     <>
-      <ButtonsContainer>
-        <GoToButton
-          color="green"
-          text="Crear cliente"
-          iconName="add"
-          goTo={PAGES.CUSTOMERS.CREATE} />
-      </ButtonsContainer>
       <Table
         headers={HEADERS}
-        elements={mapCustomersForTable(customers)}
+        elements={customers.map((customer, index) => ({ ...customer, key: index + 1 }))}
         page={PAGES.CUSTOMERS}
         actions={actions}
         filters={FILTERS}
@@ -66,8 +57,8 @@ const CustomersPage = ({ customers = [], onDelete }) => {
         showModal={showModal}
         setShowModal={setShowModal}
         title={deleteQuestion(selectedCustomer?.name)}
-        onDelete={handleDelete}
-        isLoading={isLoading}
+        onDelete={mutate}
+        isLoading={isPending}
       />
     </>
   );

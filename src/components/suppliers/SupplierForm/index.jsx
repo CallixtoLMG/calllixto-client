@@ -1,37 +1,25 @@
 "use client";
-import { PAGES, RULES } from "@/constants";
-import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
+import { SubmitAndRestore } from "@/components/common/buttons";
+import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { RULES } from "@/constants";
+import { formatedPhone, preventSend } from "@/utils";
+import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box } from "rebass";
 import { MaskedInput, PhoneContainer } from "./styles";
-import { RuledLabel, Form, FieldsContainer, FormField, Input, Label, TextArea, Segment } from "@/components/common/custom";
-import { SubmitAndRestore } from "@/components/common/buttons";
-import { formatedPhone } from "@/utils";
 
 const EMPTY_SUPPLIER = { id: '', name: '', email: '', phone: { areaCode: '', number: '' }, address: '', comments: '' };
 
-const SupplierForm = ({ supplier, onSubmit, readonly }) => {
-  const { push } = useRouter();
+const SupplierForm = ({ supplier, onSubmit, readonly, isLoading }) => {
   const { handleSubmit, control, reset, formState: { errors, isDirty } } = useForm({ defaultValues: supplier });
   const isUpdating = useMemo(() => !!supplier?.id, [supplier]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleReset = useCallback((supplier) => {
     reset(supplier || EMPTY_SUPPLIER);
   }, [reset]);
 
-  const handleForm = (data) => {
-    setIsLoading(true);
-    onSubmit(data);
-    setTimeout(() => {
-      setIsLoading(false);
-      push(PAGES.SUPPLIERS.BASE);
-    }, 2000);
-  };
-
   return (
-    <Form onSubmit={handleSubmit(handleForm)}>
+    <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField>
           <RuledLabel title="Código" message={errors?.id?.message} required />
@@ -54,7 +42,7 @@ const SupplierForm = ({ supplier, onSubmit, readonly }) => {
             <Segment>{supplier?.id}</Segment>
           )}
         </FormField>
-        <FormField width="50%">
+        <FormField width="40%">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
           {!readonly ? (
             <Controller

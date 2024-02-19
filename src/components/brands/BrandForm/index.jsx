@@ -1,34 +1,23 @@
 "use client";
-import { PAGES, RULES } from "@/constants";
-import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Form, FieldsContainer, FormField, Input, Label, RuledLabel, TextArea, Segment } from "@/components/common/custom";
 import { SubmitAndRestore } from "@/components/common/buttons";
+import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { RULES } from "@/constants";
+import { preventSend } from "@/utils";
+import { useCallback, useMemo } from "react";
+import { Controller, useForm } from "react-hook-form";
 
 const EMPTY_BRAND = { name: '', id: '', comments: '' };
 
-const BrandForm = ({ brand, onSubmit, readonly }) => {
-  const { push } = useRouter();
+const BrandForm = ({ brand, onSubmit, readonly, isLoading }) => {
   const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: brand });
   const isUpdating = useMemo(() => !!brand?.id, [brand]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleReset = useCallback((brand) => {
     reset(brand || EMPTY_BRAND);
   }, [reset]);
 
-  const handleForm = (data) => {
-    setIsLoading(true);
-    onSubmit(data);
-    setTimeout(() => {
-      setIsLoading(false);
-      push(PAGES.BRANDS.BASE);
-    }, 2000);
-  };
-
   return (
-    <Form onSubmit={handleSubmit(handleForm)}>
+    <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField>
           <RuledLabel title="Código" message={errors?.id?.message} required />

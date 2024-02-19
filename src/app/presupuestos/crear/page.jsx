@@ -1,40 +1,85 @@
 "use client";
-import { create } from "@/api/budgets";
-import { useListCustomers } from "@/api/customers";
+import { useUserContext } from "@/User";
+import { create, useGetBudget, LIST_BUDGETS_QUERY_KEY } from "@/api/budgets";
+import { edit, useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { Loader, useBreadcrumContext } from "@/components/layout";
-import { useUserData, useValidateToken } from "@/hooks/userData";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useValidateToken } from "@/hooks/userData";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { toast } from "react-hot-toast";
+import { PAGES } from "@/constants";
 
 const CreateBudget = () => {
   useValidateToken();
-  const user = useUserData();
-  const { products = [], isLoading: loadingProducts } = useListProducts();
-  const { customers = [], isLoading: loadingCustomers } = useListCustomers();
+  const { userData } = useUserContext();
+  const searchParams = useSearchParams();
+  const cloneId = searchParams.get('clonar');
+  const { push } = useRouter();
+
+  const { data: products, isLoading: loadingProducts } = useListProducts();
+  const { data: customers, isLoading: loadingCustomers } = useListCustomers();
+  const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
+
   const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    resetActions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLabels(['Presupuestos', 'Crear']);
   }, [setLabels]);
 
-  const mappedProducts = useMemo(() => products.map(product => ({
+  const mappedProducts = useMemo(() => products?.map(product => ({
     ...product,
     key: product.code,
     value: product.name,
     text: product.name,
   })), [products]);
 
-  const mappedCustomers = useMemo(() => customers.map(customer => ({
+  const mappedCustomers = useMemo(() => customers?.map(customer => ({
     ...customer,
     key: customer.name,
     value: customer.name,
     text: customer.name,
   })), [customers]);
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (budget) => {
+      const { data } = await create(budget);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
+        toast.success('Presupuesto creado!');
+        push(PAGES.BUDGETS.BASE);
+      } else {
+        toast.error(response.message);
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    }
+  });
+
   return (
-    <Loader active={loadingProducts || loadingCustomers}>
-      <BudgetForm onSubmit={create} products={mappedProducts} customers={mappedCustomers} user={user} />
+    <Loader active={loadingProducts || loadingCustomers || loadingBudget}>
+      <BudgetForm
+        onSubmit={mutate}
+        onSubmitCustomer={edit}
+        products={mappedProducts}
+        customers={mappedCustomers}
+        user={userData}
+        budget={budget}
+        isLoading={isPending}
+      />
     </Loader>
   )
 };

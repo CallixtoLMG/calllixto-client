@@ -1,29 +1,31 @@
 import { Button, Popup } from "semantic-ui-react";
 
-const Actions = ({ actions, element }) => {
+const Actions = ({ actions, element, index }) => {
   const handleClick = (event, action) => {
     event.stopPropagation();
-    action.onClick(element);
-  }
+    action.onClick(element, index);
+  };
+
   return (
     <>
-      {actions.map((action) => (
+      {actions.map((action, index) => (
         <Popup
           size="mini"
           content={action.tooltip}
           key={`action_${action.id}`}
           position="top center"
           trigger={<Button
+            type="button"
             icon={action.icon}
             onClick={(event) => handleClick(event, action)}
             color={action.color}
             className="circular"
-            size="tiny"
+            size="mini"
           />}
         />
       ))}
     </>
   )
-}
+};
 
 export default Actions;

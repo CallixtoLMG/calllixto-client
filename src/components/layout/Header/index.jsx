@@ -1,15 +1,15 @@
 "use client";
+import { useUserContext } from "@/User";
 import { NoPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { usePathname, useRouter } from 'next/navigation';
 import { Menu } from 'semantic-ui-react';
-import { LogDiv, ModContainer, ModLink, Text } from "./styles";
-import { useTokenValidated } from "@/hooks/userData";
+import { Container, LogDiv, ModLink, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
-  const validToken = useTokenValidated();
+  const { userData } = useUserContext();
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -23,8 +23,8 @@ const Header = () => {
     <NoPrint>
       {showHeader &&
         <Menu fixed='top'>
-          <ModContainer>
-            {!validToken ? (
+          <Container>
+            {!userData?.isAuthorized ? (
               <LogDiv>
                 <Menu.Item onClick={handleLogout}><Text>Ingresar</Text></Menu.Item>
               </LogDiv>
@@ -40,7 +40,7 @@ const Header = () => {
                 </LogDiv>
               </>
             )}
-          </ModContainer>
+          </Container>
         </Menu>
       }
     </NoPrint>

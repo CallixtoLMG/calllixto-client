@@ -1,23 +1,24 @@
 import { formatedPrice, getBrandCode, getProductCode, getSupplierCode } from "@/utils";
+import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
-import { Flex, Box } from "rebass";
 
 const PRODUCT_COLUMNS = [
   {
     id: 1,
     title: "Código",
+    align: "left",
     width: 2,
     value: (product) =>
       <>
         <Popup
           size="tiny"
-          content={product.supplier}
+          content={product.supplierName}
           position="top center"
           trigger={<span>{getSupplierCode(product.code)}</span>}
         />&nbsp;
         <Popup
           size="tiny"
-          content={product.brand}
+          content={product.brandName}
           position="top center"
           trigger={<span>{getBrandCode(product.code)}</span>}
         />&nbsp;
@@ -26,12 +27,6 @@ const PRODUCT_COLUMNS = [
   },
   {
     id: 2,
-    title: "Código Proveedor",
-    width: 1,
-    value: (product) => product.supplierCode || '-'
-  },
-  {
-    id: 3,
     title: "Nombre",
     align: "left",
     value: (product) =>
@@ -52,20 +47,53 @@ const PRODUCT_COLUMNS = [
       </Flex>
   },
   {
-    id: 4,
+    id: 3,
     title: "Precio",
     width: 2,
     value: (product) => formatedPrice(product.price)
   }
 ];
 
+const IMPORT_PRODUCTS_COLUMNS = [
+  {
+    id: 1,
+    title: "Código",
+    width: 2,
+  },
+  {
+    id: 2,
+    title: "Nombre",
+    align: "left",
+  },
+  {
+    id: 3,
+    title: "Precio",
+    width: 2,
+  },
+  {
+    id: 4,
+    title: "Comentarios",
+    align: "left",
+  }
+];
+
+const BAN_PRODUCTS_COLUMNS = [
+  {
+    id: 1,
+    title: "Código",
+    value: (product) =>
+      product.code
+  },
+];
+
 const FILTERS = [
   { value: 'code', placeholder: 'Código' },
-  { value: 'supplierCode', placeholder: 'Código proveedor' },
   { value: 'name', placeholder: 'Nombre' }
 ];
 
-export {
-  PRODUCT_COLUMNS,
-  FILTERS
-};
+const BAN_FILTERS = [
+  { value: 'code', placeholder: 'Código' },
+];
+
+export { BAN_FILTERS, BAN_PRODUCTS_COLUMNS, FILTERS, IMPORT_PRODUCTS_COLUMNS, PRODUCT_COLUMNS };
+

@@ -1,55 +1,83 @@
+import { Button, Input, Segment, } from "@/components/common/custom";
+import { get } from "lodash";
 import { useRouter } from "next/navigation";
-import { Form, Header, Icon, Input, Segment, Table } from "semantic-ui-react";
-import Actions from "./Actions";
-import { ActionsContainer, Cell, HeaderCell, InnerActionsContainer, LinkRow } from "./styles";
-import { Flex } from 'rebass';
-import styled from "styled-components";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useCallback, useMemo, useState } from "react";
-import { Button } from "@/components/common/custom";
+import { Box, Flex } from 'rebass';
+import { Form, Header, Icon, Popup } from "semantic-ui-react";
+import styled from "styled-components";
+import Actions from "./Actions";
+import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkRow, Table, TableHeader, TableRow } from "./styles";
 
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
+  align-items: center;
 `;
 
-const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [] }) => {
+const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
   const { push } = useRouter();
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset } = useForm({ defaultValues });
-  const [filteredElements, setFilteredElements] = useState(elements);
+  const [filteredElements, setFilteredElements] = useState([]);
+  const useFilters = useMemo(() => filters.length > 0, [filters]);
 
   const filter = useCallback((data) => {
     const newElements = elements.filter(element => {
-      return Object.keys(data).every(filter => element[filter]?.toLowerCase().includes(data[filter]?.toLowerCase()));
+      if (data) {
+        return filters.every(filter => {
+          return get(element, filter.map ? filter.map : filter.value, '')?.toLowerCase().includes(data[filter.value].toLowerCase());
+        });
+      }
+      return elements;
     });
     setFilteredElements(newElements);
-  }, [elements]);
+  }, [elements, filters]);
+
+  useEffect(() => {
+    setFilteredElements(elements);
+  }, [elements])
 
   const handleRestore = useCallback(() => {
     reset(defaultValues);
     setFilteredElements(elements);
   }, [reset, defaultValues, elements]);
 
+  const handleEnterKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit(filter)();
+    }
+  };
+
   return (
     <>
-      {filters.length > 0 && (
+      {useFilters && (
         <Segment>
           <Form onSubmit={handleSubmit(filter)}>
             <Flex justifyContent="space-between">
               <FiltersContainer>
-                <Button circular icon type="button" onClick={handleRestore}>
-                  <Icon name="undo" />
-                </Button>
+                <Popup
+                  content="Restaurar filtros"
+                  position="top center"
+                  size="tiny"
+                  trigger={(
+                    <Box>
+                      <Button circular icon type="button" onClick={handleRestore} size="mini">
+                        <Icon name="undo" />
+                      </Button>
+                    </Box>
+                  )}
+                />
                 {filters.map(filter =>
                   <Controller
                     key={`filter_${filter.value}`}
                     name={filter.value}
                     control={control}
-                    render={({ field }) => (<Input {...field} placeholder={filter.placeholder} />)}
+                    render={({ field }) => (<Input onKeyPress={handleEnterKeyPress} height="35px" margin="0" {...field} placeholder={filter.placeholder} />)}
                   />
                 )}
               </FiltersContainer>
-              <Button type="submit" width="110px">
+              <Button onClick={handleSubmit(filter)} type="button" width="110px">
                 <Flex justifyContent="space-around">
                   <span>Filtrar</span>
                   <Icon name="search" />
@@ -59,69 +87,73 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
           </Form>
         </Segment>
       )}
-      <Table celled compact striped>
-        <Table.Header fullWidth>
-          <Table.Row>
-            {headers.map((header) => (
-              <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
-            ))}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {filteredElements.length === 0 ? (
+      <Container tableHeight={tableHeight}>
+        <Table celled compact striped>
+          <TableHeader fullWidth>
             <Table.Row>
-              <Table.Cell colSpan={headers.length} textAlign="center">
-                <Header as="h4">
-                  No se encontraron ítems.
-                </Header>
-              </Table.Cell>
+              {headers.map((header) => (
+                <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
+              ))}
             </Table.Row>
-          ) : (
-            filteredElements.map((element) => {
-              if (page) {
+          </TableHeader>
+          <Table.Body>
+            {(useFilters ? !filteredElements.length : !elements.length) ? (
+              <Table.Row>
+                <Table.Cell colSpan={headers.length} textAlign="center">
+                  <Header as="h4">
+                    No se encontraron ítems.
+                  </Header>
+                </Table.Cell>
+              </Table.Row>
+            ) : (
+              (useFilters ? filteredElements : elements).map((element, index) => {
+                if (page) {
+                  return (
+                    <LinkRow key={element[mainKey]} onClick={() => push(page.SHOW(element[mainKey]))}>
+                      {headers.map(header => (
+                        <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                          {header.value(element, index)}
+                        </Cell>
+                      ))}
+                      {!!actions.length && (
+                        <ActionsContainer deleteButtonInside={deleteButtonInside}>
+                          <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
+                            <Actions actions={actions} element={element} />
+                          </InnerActionsContainer>
+                        </ActionsContainer>
+                      )}
+                    </LinkRow>
+                  );
+                }
                 return (
-                  <LinkRow key={element.key} onClick={() => push(page.SHOW(element.id))}>
+                  <TableRow key={element[mainKey]}>
                     {headers.map(header => (
                       <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
-                        {header.value(element)}
+                        {header.value(element, index)}
                       </Cell>
                     ))}
                     {!!actions.length && (
-                      <ActionsContainer>
-                        <InnerActionsContainer>
-                          <Actions actions={actions} element={element} />
+                      <ActionsContainer deleteButtonInside={deleteButtonInside}>
+                        <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
+                          <Actions actions={actions} element={element} index={index} />
                         </InnerActionsContainer>
                       </ActionsContainer>
                     )}
-                  </LinkRow>
+                  </TableRow>
                 );
-              }
-              return (
-                <Table.Row key={element.key}>
-                  {headers.map(header => (
-                    <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
-                      {header.value(element)}
-                    </Cell>
-                  ))}
-                  {!!actions.length && (
-                    <ActionsContainer>
-                      <Actions actions={actions} />
-                    </ActionsContainer>
-                  )}
-                </Table.Row>
-              );
-            })
+              })
+            )}
+          </Table.Body>
+          {total && (
+            <Table.Footer celled fullWidth>
+              <Table.Row>
+                <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
+                <HeaderCell colSpan="1"><strong>{total}</strong></HeaderCell>
+              </Table.Row>
+            </Table.Footer>
           )}
-        </Table.Body>
-        {total && (
-          <Table.Footer celled fullWidth>
-            <Table.Row>
-              <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
-              <HeaderCell colSpan="1"><strong>{total}</strong></HeaderCell>
-            </Table.Row>
-          </Table.Footer>
-        )}
-      </Table>
+        </Table>
+      </Container>
     </>
   );
 };

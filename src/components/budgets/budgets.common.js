@@ -1,12 +1,19 @@
-import { Cell } from "@/components/common/table";
-import { formatedDate, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum } from "@/utils";
+import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
+import { Flex } from "rebass";
+import { Icon } from "../common/custom/Semantic";
 
 const BUDGETS_COLUMNS = [
   {
     id: 1,
     title: "Id",
     width: 1,
-    value: (budget) => budget.id
+    align: "left",
+    value: (budget) =>
+      budget.confirmed ?
+        <Flex justifyContent={"space-between"}>
+          {budget.id}&nbsp;<Icon size="small" name="check circle" color="green" />
+        </Flex>
+        : budget.id
   },
   {
     id: 2,
@@ -16,32 +23,18 @@ const BUDGETS_COLUMNS = [
   },
   {
     id: 3,
-    title: "Dirección",
-    align: "left",
+    title: "Fecha",
     width: 3,
-    value: (budget) => budget.customer?.address
+    value: (budget) => formatedDateAndHour(budget.createdAt)
   },
   {
     id: 4,
-    title: "Teléfono",
-    align: "left",
-    width: 3,
-    value: (budget) => formatedPhone(budget.customer?.phone?.areaCode, budget.customer?.phone?.number)
-  },
-  {
-    id: 5,
-    title: "Fecha",
-    width: 2,
-    value: (budget) => formatedDate(budget.createdAt)
-  },
-  {
-    id: 5,
     title: "Total",
     width: 2,
-    value: (budget) => formatedPrice(getTotalSum(budget.products))
+    value: (budget) => formatedPricePdf(getTotalSum(budget.products))
   },
   {
-    id: 7,
+    id: 5,
     title: "Vendedor",
     align: "left",
     value: (budget) => budget.seller
@@ -51,8 +44,9 @@ const BUDGETS_COLUMNS = [
 const PRODUCTS_COLUMNS = [
   {
     id: 1,
-    title: "Descripción",
+    title: "Nombre",
     align: "left",
+    wrap: true,
     value: (product) => product.name
   },
   {
@@ -64,14 +58,14 @@ const PRODUCTS_COLUMNS = [
   {
     id: 3,
     title: "Precio",
-    width: 1,
-    value: (product) => formatedPrice(product.price || 0)
+    width: 2,
+    value: (product) => formatedPricePdf(product.price || 0)
   },
   {
     id: 4,
     title: "Subtotal",
-    width: 1,
-    value: (product) => formatedPrice(product.price * product.quantity || 0),
+    width: 3,
+    value: (product) => formatedPricePdf(product.price * product.quantity || 0),
     hide: true,
   },
   {
@@ -84,29 +78,39 @@ const PRODUCTS_COLUMNS = [
     id: 6,
     title: "Importe",
     width: 1,
-    value: (product) => formatedPrice(getTotal(product))
+    value: (product) => formatedPricePdf(getTotal(product))
   },
 ];
 
-const BUDGET_FORM_PRODUCT_COLUMNS = [
-  { title: "Nombre", value: "name", id: 1 },
-  { title: "Precio", value: "price", id: 2 },
-  { title: "Cantidad", value: "quantity", id: 3 },
-  { title: "Subtotal", value: "subtotal", id: 4 },
-  { title: "Desc.", value: "discount", id: 5 },
-  { title: "Total", value: "total", id: 6 },
-  { title: "Acciones", value: "actions", id: 7, hide: (readonly) => readonly },
-];
-
 const FILTERS = [
-  { value: 'customer.name', placeholder: 'Cliente' },
+  { value: 'id', placeholder: 'Código' },
+  { value: 'customerName', placeholder: 'Cliente', map: 'customer.name' },
   { value: 'seller', placeholder: 'Vendedor' },
 ];
 
+const PAYMENT_METHODS = [{
+  text: 'Efectivo',
+  key: "Efectivo",
+  value: "Efectivo",
+}, {
+  text: 'Transferencia Bancaria',
+  key: "Transferencia Bancaria",
+  value: "Transferencia Bancaria",
+}, {
+  text: 'Tarjeta de débito',
+  key: "Tarjeta de débito",
+  value: "Tarjeta de débito",
+}, {
+  text: 'Tarjeta de crédito',
+  key: "Tarjeta de crédito",
+  value: "Tarjeta de crédito",
+}, {
+  text: 'Mercado Pago',
+  key: "Mercado Pago",
+  value: "Mercado Pago",
+},];
+
 export {
-  BUDGETS_COLUMNS,
-  BUDGET_FORM_PRODUCT_COLUMNS,
-  PRODUCTS_COLUMNS,
-  FILTERS
+  BUDGETS_COLUMNS, FILTERS, PAYMENT_METHODS, PRODUCTS_COLUMNS
 };
 

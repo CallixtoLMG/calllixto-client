@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Flex } from "rebass";
-import { Container } from "semantic-ui-react";
+import { Container as SContainer } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ModLink = styled(Link)`
@@ -26,20 +26,27 @@ const LogDiv = styled(Flex)`
     background-color: #f5f5f5!important;
   };
   a {
+    border-left: 1px solid rgba(34,36,38,.1)!important;
     &:hover {
       background-color: #f5f5f5!important;
     };
   };
 `;
 
-const ModContainer = styled(Container)`
+const Container = styled(SContainer)`
   height: 60px!important;
+  width: 95%!important;  
+  div:first-child{
+    border-left: 1px solid rgba(34,36,38,.1)!important;
+  },
   div:last-child {  
     margin-left: auto!important;
-    border-left: 1px solid rgba(34,36,38,.1)!important;
-    border-right: 1px solid rgba(34,36,38,.1)!important;
-    &:before {
-      width: 0px!important;
+    a{
+      border-left: 1px solid rgba(34,36,38,.1)!important;
+      border-right: 1px solid rgba(34,36,38,.1)!important;
+      &:before {
+        width: 0px!important;
+      };
     };
   };
 `;
@@ -47,7 +54,6 @@ const ModContainer = styled(Container)`
 const Text = styled.p`
   display: inline-block;
   position: relative;
-
   &:hover {
     &:after{
       transform: scaleX(1);
@@ -68,5 +74,5 @@ const Text = styled.p`
   };
 `;
 
-export { LogDiv, ModContainer, ModLink, Text };
+export { Container, LogDiv, ModLink, Text };
 

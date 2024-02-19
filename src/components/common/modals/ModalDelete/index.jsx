@@ -1,14 +1,15 @@
 "use client";
-import { useEffect, useRef, useState } from 'react';
-import { Flex } from "rebass";
-import { Button, Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
-import { Form } from "./styles";
 import { Input } from "@/components/common/custom";
+import { useEffect, useRef, useState } from 'react';
+import { useForm } from "react-hook-form";
+import { Button, Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
+import { ButtonContainer, Form } from "./styles";
 
 
-const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoading }) => {
+const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
+  const { handleSubmit } = useForm();
 
   const inputElement = useRef(null);
 
@@ -23,18 +24,14 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
     setIsDeleteEnabled(text.toLowerCase() === 'borrar');
   };
 
-  const handleDelete = async () => {
-    await onDelete(params);
-    setShowModal(false);
-  };
-
   return (
     <Transition visible={showModal} animation='scale' duration={500}>
-      <Modal open={showModal} onClose={() => setShowModal(false)}>
+      <Modal closeIcon open={showModal} onClose={() => setShowModal(false)}>
         <Header icon='archive' content={title || ""} />
         <Modal.Actions>
-          <Form>
+          <Form onSubmit={handleSubmit(onDelete)}>
             <Input
+              margin="0"
               placeholder="Escriba 'borrar' para eliminar"
               type="text"
               value={confirmationText}
@@ -42,20 +39,19 @@ const ModalDelete = ({ params, title, onDelete, showModal, setShowModal, isLoadi
               ref={inputElement}
               width="220px"
             />
-            <Flex flexDirection="row-reverse">
-              <Button
+            <ButtonContainer flexDirection="row-reverse">
+              <Button fluid
                 disabled={!isDeleteEnabled || isLoading}
                 loading={isLoading}
                 color='green'
-                onClick={handleDelete}
                 type="submit"
               >
                 <SIcon name='checkmark' />Si
               </Button>
-              <Button color='red' onClick={() => setShowModal(false)} disabled={isLoading}>
+              <Button fluid color='red' onClick={() => setShowModal(false)} disabled={isLoading}>
                 <SIcon name='trash' />No
               </Button>
-            </Flex>
+            </ButtonContainer>
           </Form>
         </Modal.Actions>
       </Modal>

@@ -1,29 +1,33 @@
 "use client";
 import { useListBrands } from "@/api/brands";
-import { create } from "@/api/products";
+import { create, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
 import { useListSuppliers } from "@/api/suppliers";
-import { Loader, useBreadcrumContext } from "@/components/layout";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
-import { useRole, useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks/userData";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { toast } from "react-hot-toast";
 
 const CreateProduct = () => {
   useValidateToken();
   const { push } = useRouter();
-  const role = useRole();
-  const { brands, isLoading: isLoadingBrands } = useListBrands();
-  const { suppliers, isLoading: isLoadingSuppliers } = useListSuppliers();
+  const { data: brands, isLoading: isLoadingBrands } = useListBrands();
+  const { data: suppliers, isLoading: isLoadingSuppliers } = useListSuppliers();
   const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    resetActions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLabels(['Productos', 'Crear']);
   }, [setLabels]);
-
-  if (role === "user") {
-    push(PAGES.NOT_FOUND.BASE);
-  };
 
   const mappedBrands = useMemo(() => brands?.map(brand => ({
     ...brand,
@@ -39,9 +43,33 @@ const CreateProduct = () => {
     text: supplier.name,
   })), [suppliers]);
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (product) => {
+      const { data } = await create(product);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
+        toast.success('Producto creado!');
+        push(PAGES.PRODUCTS.BASE);
+      } else {
+        toast.error(response.message);
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    }
+  });
+
   return (
     <Loader active={isLoadingBrands || isLoadingSuppliers}>
-      <ProductForm brands={mappedBrands} suppliers={mappedSuppliers} onSubmit={create} />
+      <ProductForm
+        brands={mappedBrands}
+        suppliers={mappedSuppliers}
+        onSubmit={mutate}
+        isLoading={isPending}
+      />
     </Loader>
   )
 };

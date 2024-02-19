@@ -1,72 +1,19 @@
-import { getUserData } from '@/api/userData';
+import { useUserContext } from '@/User';
 import { PAGES } from '@/constants';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-
-export const useRole = () => {
-  const [userData, setUserData] = useState(null);
-  const { push } = useRouter();
-
-  useEffect(() => {
-    async function getData() {
-      const data = await getUserData();
-
-      if (!data.isAuthorized) {
-        push(PAGES.LOGIN.BASE);
-        return;
-      }
-
-      setUserData(data);
-    }
-
-    getData();
-  }, [push]);
-
-  return userData?.roles[0];
-}
+import { useEffect } from 'react';
 
 export const useValidateToken = () => {
   const { push } = useRouter();
+  const { userData } = useUserContext();
 
   useEffect(() => {
     async function getData() {
-      const data = await getUserData();
-      if (!data.isAuthorized) {
+      if (userData.hasOwnProperty('isAuthorized') && !userData.isAuthorized) {
         push(PAGES.LOGIN.BASE);
       }
     }
 
     getData();
-  }, [push]);
-}
-
-export const useTokenValidated = () => {
-  const [userData, setUserData] = useState(null);
-  const { pathname } = useRouter();
-
-  useEffect(() => {
-    async function getData() {
-      const data = await getUserData();
-      setUserData(data);
-    }
-
-    getData();
-  }, [pathname]);
-
-  return userData?.isAuthorized;
-}
-
-export const useUserData = () => {
-  const [userData, setUserData] = useState(null);
-
-  useEffect(() => {
-    async function getData() {
-      const data = await getUserData();
-      setUserData(data);
-    }
-
-    getData();
-  }, []);
-
-  return userData;
+  }, [push, userData]);
 }

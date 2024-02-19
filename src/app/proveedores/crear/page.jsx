@@ -1,28 +1,51 @@
 "use client";
-import { create } from "@/api/suppliers";
-import { useBreadcrumContext } from "@/components/layout";
+import { LIST_SUPPLIERS_QUERY_KEY, create } from "@/api/suppliers";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
+import { useValidateToken } from "@/hooks/userData";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useRole, useValidateToken } from "@/hooks/userData";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "react-hot-toast";
 
 const CreateSupplier = () => {
   useValidateToken();
   const { push } = useRouter();
-  const role = useRole();
   const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    resetActions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     setLabels(['Proveedores', 'Crear']);
   }, [setLabels]);
 
-  if (role === "user") {
-    push(PAGES.NOT_FOUND.BASE);
-  };
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (supplier) => {
+      const { data } = await create(supplier);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
+        toast.success('Proveedor creado!');
+        push(PAGES.SUPPLIERS.BASE);
+      } else {
+        toast.error(response.message);
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    }
+  });
 
   return (
-    <SupplierForm onSubmit={create} />
+    <SupplierForm onSubmit={mutate} isLoading={isPending} />
   )
 };
 

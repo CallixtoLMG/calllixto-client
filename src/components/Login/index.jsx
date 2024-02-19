@@ -1,28 +1,39 @@
 "use client";
-import { PAGES } from "@/constants";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Form } from "semantic-ui-react";
+import { useUserContext } from "@/User";
 import { Loader } from "@/components/layout";
-import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "./styled";
+import { PAGES, RULES } from "@/constants";
+import { useMutation } from "@tanstack/react-query";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Controller, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
+import { Form } from "semantic-ui-react";
+import { ModButton, ModGrid, ModGridColumn, ModHeader, Text } from "./styled";
+import { useState } from "react";
 
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
-  const recovery = false;
   const { handleSubmit, control } = useForm();
+  const { setUserData } = useUserContext();
   const [isLoading, setIsLoading] = useState(false);
-  const handleForm = async (data) => {
-    setIsLoading(true);
-    const loginSuccess = await onSubmit(data);
-    if (loginSuccess) {
-      push(PAGES.PRODUCTS.BASE);
-    } else {
-      setIsLoading(false);
+
+  const { mutate } = useMutation({
+    mutationFn: async (dataLogin) => {
+      setIsLoading(true);
+      const data = await onSubmit(dataLogin);
+      return data;
+    },
+    onSuccess: (userData) => {
+      if (userData) {
+        setUserData(userData);
+        push(PAGES.PRODUCTS.BASE);
+        toast.success("Ingreso exitoso!");
+      } else {
+        toast.error("Los datos ingresados no Los datos ingresados no son correctos!");
+        setIsLoading(false);
+      }
     }
-  };
+  });
 
   return (
     <Loader active={isLoading}>
@@ -40,23 +51,25 @@ const LoginForm = ({ onSubmit }) => {
               <Text>Ingresa a tu cuenta</Text>
             </div>
           </ModHeader>
-          <Form onSubmit={handleSubmit(handleForm)} size='large'>
+          <Form onSubmit={handleSubmit(mutate)} size='large'>
             <Controller
               name="email"
               control={control}
-              render={({ field }) =>
-              (<Form.Input
-                {...field}
-                placeholder='Correo electrónico'
-                fluid
-                icon='user'
-                iconPosition='left'
-              />
+              rules={RULES.REQUIRED}
+              render={({ field }) => (
+                <Form.Input
+                  {...field}
+                  placeholder='Correo electrónico'
+                  fluid
+                  icon='user'
+                  iconPosition='left'
+                />
               )}
             />
             <Controller
               name="password"
               control={control}
+              rules={RULES.REQUIRED}
               render={({ field }) => (
                 <Form.Input
                   {...field}
@@ -72,10 +85,6 @@ const LoginForm = ({ onSubmit }) => {
               Ingresar
             </ModButton>
           </Form>
-          {recovery &&
-            <ModMessage>
-              <Link href={PAGES.PRODUCTS.BASE}>Perdiste tu contraseña?</Link>
-            </ModMessage>}
         </ModGridColumn>
       </ModGrid>
     </Loader>

@@ -1,5 +1,4 @@
-import InputMask from 'react-input-mask';
-import { Input} from "semantic-ui-react";
+import { Input } from "semantic-ui-react";
 import styled from "styled-components";
 
 const CodeInput = styled(Input)`
@@ -19,3 +18,4 @@ const CodeInput = styled(Input)`
 `;
 
 export { CodeInput };
+

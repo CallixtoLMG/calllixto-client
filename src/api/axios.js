@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useEffect, useState } from 'react';
 
 const getToken = () => {
   if (typeof window === 'undefined') return null;
@@ -14,34 +13,4 @@ export const instance = axios.create({
   },
 });
 
-export const useAxios = ({ url, method, body = null }) => {
-  const [response, setResponse] = useState(null);
-  const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = () => {
-      instance[method](url, body)
-        .then((res) => {
-          setResponse(res.data);
-        })
-        .catch((err) => {
-          setError(err);
-        })
-        .finally(() => {
-          setIsLoading(false);
-        });
-    };
-
-    fetchData();
-  }, [method, url, body]);
-
-  return { response, error, isLoading };
-};
-
-export const METHODS = {
-  GET: 'get',
-  POST: 'post',
-  PUT: 'put',
-  DELETE: 'delete'
-}
+export default instance;
