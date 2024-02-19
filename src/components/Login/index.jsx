@@ -1,23 +1,25 @@
 "use client";
 import { useUserContext } from "@/User";
 import { Loader } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { PAGES, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
-import { ModButton, ModGrid, ModGridColumn, ModHeader, ModMessage, Text } from "./styled";
+import { ModButton, ModGrid, ModGridColumn, ModHeader, Text } from "./styled";
+import { useState } from "react";
 
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
   const { handleSubmit, control } = useForm();
   const { setUserData } = useUserContext();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { mutate, isPending, isSuccess } = useMutation({
+  const { mutate } = useMutation({
     mutationFn: async (dataLogin) => {
+      setIsLoading(true);
       const data = await onSubmit(dataLogin);
       return data;
     },
@@ -28,15 +30,13 @@ const LoginForm = ({ onSubmit }) => {
         toast.success("Ingreso exitoso!");
       } else {
         toast.error("Los datos ingresados no Los datos ingresados no son correctos!");
+        setIsLoading(false);
       }
-    },
-    onSettled: () => {
-      isSuccess(true);
     }
   });
 
   return (
-    <Loader active={isPending || isSuccess}>
+    <Loader active={isLoading}>
       <ModGrid >
         <ModGridColumn >
           <ModHeader as='h3'>
@@ -55,19 +55,21 @@ const LoginForm = ({ onSubmit }) => {
             <Controller
               name="email"
               control={control}
-              render={({ field }) =>
-              (<Form.Input
-                {...field}
-                placeholder='Correo electrónico'
-                fluid
-                icon='user'
-                iconPosition='left'
-              />
+              rules={RULES.REQUIRED}
+              render={({ field }) => (
+                <Form.Input
+                  {...field}
+                  placeholder='Correo electrónico'
+                  fluid
+                  icon='user'
+                  iconPosition='left'
+                />
               )}
             />
             <Controller
               name="password"
               control={control}
+              rules={RULES.REQUIRED}
               render={({ field }) => (
                 <Form.Input
                   {...field}
@@ -83,10 +85,6 @@ const LoginForm = ({ onSubmit }) => {
               Ingresar
             </ModButton>
           </Form>
-          {false &&
-            <ModMessage>
-              <Link href={PAGES.PRODUCTS.BASE}>Perdiste tu contraseña?</Link>
-            </ModMessage>}
         </ModGridColumn>
       </ModGrid>
     </Loader>
