@@ -41,7 +41,7 @@ const BatchImport = ({ products, isCreating }) => {
         return !watchProducts.length || isLoading || isPending || (!isCreating && !isDirty)
       }
     };
-  }, [isCreating, isLoading, isDirty]);
+  }, [isCreating, watchProducts, isLoading, isDirty]);
 
   const handleClick = useCallback(() => {
     inputRef.current.value = null;
