@@ -22,7 +22,7 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { data: products, isLoading } = useListProducts();
+  const { data: products, isLoading } = useListProducts({ sort: 'date', order: false });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -67,7 +67,7 @@ const Products = () => {
       },
     ] : [];
     setActions(actions);
-  }, [products, push, role, setActions]);
+  }, [isCreating, products, push, role, setActions]);
 
   return (
     <Loader active={isLoading}>

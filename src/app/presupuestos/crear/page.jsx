@@ -19,7 +19,7 @@ const CreateBudget = () => {
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
 
-  const { data: products, isLoading: loadingProducts } = useListProducts();
+  const { data: products, isLoading: loadingProducts } = useListProducts({ cache: false });
   const { data: customers, isLoading: loadingCustomers } = useListCustomers();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
 
