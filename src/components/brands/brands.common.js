@@ -32,8 +32,8 @@ const BRAND_COLUMNS = [
 ];
 
 const FILTERS = [
-  { value: 'name', placeholder: 'Nombre' },
   { value: 'id', placeholder: 'Id' },
+  { value: 'name', placeholder: 'Nombre' },
 ];
 
 export {

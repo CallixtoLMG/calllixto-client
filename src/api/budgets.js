@@ -34,7 +34,7 @@ export function useListBudgets() {
     queryKey: [LIST_BUDGETS_QUERY_KEY],
     queryFn: () => listBudgets(),
     retry: false,
-    staleTime: TIME_IN_MS.FIVE_MINUTES,
+    staleTime: TIME_IN_MS.ONE_MINUTE,
   });
 
   return query;
@@ -54,7 +54,7 @@ export function useGetBudget(id) {
     queryKey: [GET_BUDGET_QUERY_KEY, id],
     queryFn: () => getBudget(id),
     retry: false,
-    staleTime: TIME_IN_MS.FIVE_MINUTES,
+    staleTime: TIME_IN_MS.ONE_HOUR,
   });
 
   return query;

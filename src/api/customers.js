@@ -42,7 +42,7 @@ export function useListCustomers() {
     queryKey: [LIST_CUSTOMERS_QUERY_KEY],
     queryFn: () => listCustomers(),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: TIME_IN_MS.ONE_HOUR,
   });
 
   return query;
@@ -62,7 +62,7 @@ export function useGetCustomer(id) {
     queryKey: [GET_CUSTOMER_QUERY_KEY, id],
     queryFn: () => getCustomer(id),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: TIME_IN_MS.ONE_HOUR,
   });
 
   return query;

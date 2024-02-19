@@ -42,7 +42,7 @@ export function useListSuppliers() {
     queryKey: [LIST_SUPPLIERS_QUERY_KEY],
     queryFn: () => listSuppliers(),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: TIME_IN_MS.ONE_HOUR,
   });
 
   return query;
@@ -62,7 +62,7 @@ export function useGetSupplier(id) {
     queryKey: [GET_SUPPLIER_QUERY_KEY, id],
     queryFn: () => getSupplier(id),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: TIME_IN_MS.ONE_HOUR,
   });
 
   return query;

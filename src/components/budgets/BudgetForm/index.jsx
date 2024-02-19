@@ -105,97 +105,100 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
     setIsModalConfirmationOpen(false);
   };
 
-  const BUDGET_FORM_PRODUCT_COLUMNS = [
-    {
-      title: "Código",
-      value: (product) => (
-        <>
-          <Popup
-            size="tiny"
-            trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
-            position="top center"
-            on="hover"
-            content={product.brandName}
-          />
-          {'-'}
-          <Popup
-            size="tiny"
-            trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>}
-            position="top center"
-            on="hover"
-            content={product.supplierName}
-          />
-          {'-'}
-          <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
-        </>
-      ),
-      id: 1,
-      width: 2
-    },
-    { title: "Nombre", value: (product) => product.name, id: 2,  width: 10, align: 'left' },
-    { title: "Precio", value: (product) => formatedPrice(product.price, product.brand), id: 3, width: 2 },
-    {
-      title: "Cantidad", value: (product, index) => (
-        <>
-          {!readonly ? (
-            <Controller
-              name={`products[${index}].quantity`}
-              control={control}
-              rules={RULES.REQUIRED}
-              render={({ field: { onChange } }) => (
-                <Input
-                  type="number"
-                  min={0}
-                  defaultValue={1}
-                  height="40px"
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    onChange(value);
-                    calculateTotal();
-                  }}
-                />
-              )}
+  const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
+    return [
+      {
+        title: "Código",
+        value: (product) => (
+          <>
+            <Popup
+              size="tiny"
+              trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
+              position="top center"
+              on="hover"
+              content={product.brandName}
             />
-          ) : (
-            <p>{product?.quantity}</p>
-          )}
-        </>
-      ), id: 4, width: 3
-    },
-    {
-      title: "Descuento",
-      value: (product, index) => (
-        <>
-          {!readonly ? (
-            <Controller
-              name={`products[${index}].discount`}
-              control={control}
-              defaultValue={product.discount || 0}
-              render={({ field }) => (
-                <Input
-                  fluid
-                  type="number"
-                  min={0}
-                  max={100}
-                  height="40px"
-                  {...field}
-                  onChange={(e) => {
-                    field.onChange(e.target.value);
-                    calculateTotal();
-                  }}
-                />
-              )}
+            {'-'}
+            <Popup
+              size="tiny"
+              trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>}
+              position="top center"
+              on="hover"
+              content={product.supplierName}
             />
-          ) : (
-            <p>{formatedPercentage(product?.discount)}</p>
-          )}
-        </>
-      ),
-      id: 5,
-      width: 2
-    },
-    { title: "Total", value: (product) => formatedPrice(getTotal(product)), id: 6, width: 2 },
-  ];
+            {'-'}
+            <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
+          </>
+        ),
+        id: 1,
+        width: 2
+      },
+      { title: "Nombre", value: (product) => product.name, id: 2, width: 10, align: 'left' },
+      { title: "Precio", value: (product) => formatedPrice(product.price, product.brand), id: 3, width: 2 },
+      {
+        title: "Cantidad", value: (product, index) => (
+          <>
+            {!readonly ? (
+              <Controller
+                name={`products[${index}].quantity`}
+                control={control}
+                rules={RULES.REQUIRED}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    type="number"
+                    min={0}
+                    defaultValue={product.quantity}
+                    height="40px"
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value);
+                      calculateTotal();
+                    }}
+                  />
+                )}
+              />
+            ) : (
+              <p>{product?.quantity}</p>
+            )}
+          </>
+        ), id: 4, width: 3
+      },
+      {
+        title: "Descuento",
+        value: (product, index) => (
+          <>
+            {!readonly ? (
+              <Controller
+                name={`products[${index}].discount`}
+                control={control}
+                defaultValue={product.discount || 0}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    fluid
+                    type="number"
+                    min={0}
+                    max={100}
+                    height="40px"
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                      calculateTotal();
+                    }}
+                  />
+                )}
+              />
+            ) : (
+              <p>{formatedPercentage(product?.discount)}</p>
+            )}
+          </>
+        ),
+        id: 5,
+        width: 2
+      },
+      { title: "Total", value: (product) => formatedPrice(getTotal(product)), id: 6, width: 2 },
+    ];
+  }, [control, calculateTotal, readonly]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
@@ -410,9 +413,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                     rules={RULES.REQUIRED_THREE_NUMBERS}
                     render={({ field }) =>
                       <Input
+                        {...field}
                         maxLength={50}
                         type="number"
-                        {...field}
                         placeholder="Cantidad en días(p. ej: 3, 10, 30, etc)"
                         onChange={(e, { value }) => {
                           field.onChange(value);
