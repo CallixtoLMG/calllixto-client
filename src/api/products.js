@@ -31,10 +31,15 @@ export function deleteProduct(id) {
   return axios.delete(`${PRODUCTS_URL}/${id}`);
 };
 
-export function useListProducts() {
-  const listProducts = async () => {
+export function useListProducts({ cache = true, sort, order = true }) {
+  const params = {
+    ...(sort && { sort }),
+    ...(order && { order }),
+  };
+
+  const listProducts = async (params) => {
     try {
-      const { data } = await axios.get(PRODUCTS_URL);
+      const { data } = await axios.get(PRODUCTS_URL, { params });
       return data?.products || [];
     } catch (error) {
       throw error;
@@ -42,10 +47,10 @@ export function useListProducts() {
   };
 
   const query = useQuery({
-    queryKey: [LIST_PRODUCTS_QUERY_KEY],
-    queryFn: () => listProducts(),
+    queryKey: [LIST_PRODUCTS_QUERY_KEY, params],
+    queryFn: () => listProducts(params),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_MINUTE,
+    staleTime: cache ? TIME_IN_MS.ONE_MINUTE : 0,
   });
 
   return query;
