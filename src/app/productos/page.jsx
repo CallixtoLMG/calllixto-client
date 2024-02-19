@@ -22,7 +22,7 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { data: products, isLoading } = useListProducts({ sort: 'date', order: false });
+  const { data: products, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -70,7 +70,7 @@ const Products = () => {
   }, [isCreating, products, push, role, setActions]);
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading | isRefetching}>
       {open && <BanProduct open={open} setOpen={setOpen} />}
       <ProductsPage
         products={products}

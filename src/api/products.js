@@ -32,12 +32,12 @@ export function deleteProduct(id) {
 };
 
 export function useListProducts({ cache = true, sort, order = true }) {
-  const listProducts = async () => {
-    const params = {
-      ...(sort && { sort }),
-      ...(order && { order }),
-    };
+  const params = {
+    ...(sort && { sort }),
+    ...(order && { order }),
+  };
 
+  const listProducts = async (params) => {
     try {
       const { data } = await axios.get(PRODUCTS_URL, { params });
       return data?.products || [];
@@ -47,8 +47,8 @@ export function useListProducts({ cache = true, sort, order = true }) {
   };
 
   const query = useQuery({
-    queryKey: [LIST_PRODUCTS_QUERY_KEY],
-    queryFn: () => listProducts(),
+    queryKey: [LIST_PRODUCTS_QUERY_KEY, params],
+    queryFn: () => listProducts(params),
     retry: false,
     staleTime: cache ? TIME_IN_MS.ONE_MINUTE : 0,
   });

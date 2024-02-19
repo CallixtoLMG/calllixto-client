@@ -7,7 +7,7 @@ const getToken = () => {
 
 export const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_URL,
-  timeout: 6000,
+  timeout: 15000,
   headers: {
     authorization: `Bearer ${getToken()}`
   },
