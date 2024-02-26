@@ -1,7 +1,7 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
-import { CURRENCY, LOCALE, REGEX, RULES } from "@/constants";
+import { CURRENCY, LOCALE, RULES } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -20,6 +20,9 @@ const BatchImport = ({ products, isCreating }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [downloadProducts, setDownloadProducts] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showTremendoModal, setShowTremendoModal] = useState(false); // Estado para controlar la visibilidad del modal 'tremendo';
+  const [isUnprocessedDownloadConfirmed, setIsUnprocessedDownloadConfirmed] = useState(false);
+  const [unprocessedResponse, setUnprocessedResponse] = useState(null);
   const watchProducts = watch("importProducts", []);
   const queryClient = useQueryClient();
   const inputRef = useRef();
@@ -111,10 +114,10 @@ const BatchImport = ({ products, isCreating }) => {
 
       parsedData.forEach((product) => {
         const code = String(product.code).toUpperCase();
-        const isValidCode = product.code && REGEX.FIVE_DIGIT_CODE.test(code);
         const price = parseFloat(product.price);
+        const hasAtLeastOneValue = product.code || product.name || product.price;
 
-        if (isValidCode && !blacklist?.some(item => item === code) && price > 0) {
+        if (hasAtLeastOneValue && !blacklist?.some(item => item === code)) {
           const formattedProduct = { ...product, code, price };
 
           importSettings.processData(
@@ -151,18 +154,51 @@ const BatchImport = ({ products, isCreating }) => {
     setOpen(true);
   };
 
+  const handleUnprocessedDownload = () => {
+    if (isUnprocessedDownloadConfirmed && unprocessedResponse) {
+      const { response } = unprocessedResponse; // Extrae response del estado
+      const data = response.unprocessed.map(product => ({
+        ...product,
+        msg: product.msg || "Mensaje adicional aquí"
+      }));
+
+      const formattedData = [
+        ["Codigo", "Nombre", "Precio", "Comentarios", "Msg"],
+        ...data.map(product => [
+          product.code,
+          product.name,
+          product.price,
+          product.comments,
+          product.msg
+        ])
+      ];
+
+      downloadExcel(formattedData);
+      setIsUnprocessedDownloadConfirmed(false); // Restablece el estado después de la descarga
+      setUnprocessedResponse(null); // Restablece el estado después de la descarga
+    }
+  };
+
   const { mutate, isPending } = useMutation({
     mutationFn: async (products) => {
       const { data } = await importSettings.onSubmit(products.importProducts);
+      console.log(data);
       return data;
     },
     onSuccess: (response) => {
+      console.log(response);
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
         toast.success(importSettings.toast);
         handleModalClose();
       } else {
         toast.error(response.message);
+      }
+
+      // Verificar la propiedad 'unprocessed' en la respuesta
+      if (response.unprocessed) {
+        setShowTremendoModal(true);
+        setUnprocessedResponse({ response }); // Almacena response en el estado
       }
     },
   });
@@ -333,6 +369,27 @@ const BatchImport = ({ products, isCreating }) => {
           </ContainerModal>
         </Modal>
       </Transition>
+      <Modal open={showTremendoModal} onClose={() => setShowTremendoModal(false)}>
+        <Modal.Header>Tremendo</Modal.Header>
+        <Modal.Content>
+          <p>Se han encontrado productos sin procesar.</p>
+          <p>¿Deseas descargar estos productos sin procesar?</p>
+        </Modal.Content>
+        <Modal.Actions>
+          <Button color="green" onClick={() => {
+            setIsUnprocessedDownloadConfirmed(true); // Confirma la descarga
+            handleUnprocessedDownload(); // Llama a handleUnprocessedDownload
+          }}>
+            Descargar
+          </Button>
+          <Button color="red" onClick={() => {
+            setIsUnprocessedDownloadConfirmed(false); // Cancela la descarga
+            setShowTremendoModal(false);
+          }}>
+            Cancelar
+          </Button>
+        </Modal.Actions>
+      </Modal>
     </>
   );
 };
