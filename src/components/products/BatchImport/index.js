@@ -315,7 +315,7 @@ const BatchImport = ({ products, isCreating }) => {
 
           {showConfirmationModal ? (
             <>
-              <ModalHeader> Confirmar descarga</ModalHeader>
+              <ModalHeader> Confirmar descargaa</ModalHeader>
               <Modal.Content>
                 <p>
                   {`Se han encontrado productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
