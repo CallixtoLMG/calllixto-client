@@ -1,7 +1,7 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
-import { CURRENCY, LOCALE, REGEX, RULES } from "@/constants";
+import { CURRENCY, LOCALE, RULES } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -10,7 +10,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
-import { ContainerModal, Header, Modal, ModalActions, ModalHeader, WarningMessage } from "./styles";
+import { ContainerModal, Modal, ModalActions, ModalHeader, WarningMessage } from "./styles";
 
 const BatchImport = ({ products, isCreating }) => {
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
@@ -20,6 +20,12 @@ const BatchImport = ({ products, isCreating }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [downloadProducts, setDownloadProducts] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showUnprocessedModal, setShowUnprocessedModal] = useState(false);
+  const [isUnprocessedDownloadConfirmed, setIsUnprocessedDownloadConfirmed] = useState(false);
+  const [unprocessedResponse, setUnprocessedResponse] = useState(null);
+  const [importedProductsCount, setImportedProductsCount] = useState(0);
+  const [createdProductsCount, setCreatedProductsCount] = useState(0);
+  const [unprocessedProductsCount, setUnprocessedProductsCount] = useState(0);
   const watchProducts = watch("importProducts", []);
   const queryClient = useQueryClient();
   const inputRef = useRef();
@@ -27,7 +33,6 @@ const BatchImport = ({ products, isCreating }) => {
   const importSettings = useMemo(() => {
     return {
       button: isCreating ? "Crear" : "Actualizar",
-      toast: isCreating ? "Los productos se han creado con exito!" : "Los productos se han actualizado con exito! ",
       confirmation: isCreating ? "" : "no",
       onSubmit: isCreating ? createBatch : editBatch,
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts) => {
@@ -111,10 +116,10 @@ const BatchImport = ({ products, isCreating }) => {
 
       parsedData.forEach((product) => {
         const code = String(product.code).toUpperCase();
-        const isValidCode = product.code && REGEX.FIVE_DIGIT_CODE.test(code);
         const price = parseFloat(product.price);
+        const hasAtLeastOneValue = product.code || product.name || product.price;
 
-        if (isValidCode && !blacklist?.some(item => item === code) && price > 0) {
+        if (hasAtLeastOneValue && !blacklist?.some(item => item === code)) {
           const formattedProduct = { ...product, code, price };
 
           importSettings.processData(
@@ -127,6 +132,7 @@ const BatchImport = ({ products, isCreating }) => {
       });
 
       setValue('importProducts', importProducts);
+      setImportedProductsCount(importProducts.length);
       setIsLoading(false);
       if (downloadProducts.length) {
         setShowConfirmationModal(true);
@@ -151,18 +157,53 @@ const BatchImport = ({ products, isCreating }) => {
     setOpen(true);
   };
 
+  const handleUnprocessedDownload = () => {
+    if (isUnprocessedDownloadConfirmed && unprocessedResponse) {
+      const { response } = unprocessedResponse;
+      const data = response.unprocessed.map(product => ({
+        ...product,
+        msg: product.msg || "Este producto tiene errores"
+      }));
+
+      const formattedData = [
+        ["Codigo", "Nombre", "Precio", "Comentarios", "Mensaje de error"],
+        ...data.map(product => [
+          product.code,
+          product.name,
+          product.price,
+          product.comments,
+          product.msg
+        ])
+      ];
+
+      downloadExcel(formattedData);
+      setIsUnprocessedDownloadConfirmed(false);
+      setUnprocessedResponse(null);
+    }
+  };
+
   const { mutate, isPending } = useMutation({
     mutationFn: async (products) => {
       const { data } = await importSettings.onSubmit(products.importProducts);
       return data;
     },
     onSuccess: (response) => {
+      const unprocessedCount = response.unprocessed?.length;
+      const createdCount = importedProductsCount - unprocessedCount;
+      setUnprocessedProductsCount(unprocessedCount);
+      setCreatedProductsCount(createdCount);
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
-        toast.success(importSettings.toast);
+        toast.success(isCreating ?
+          `Productos importados: ${importedProductsCount}.\nProductos creados exitosamente: ${createdCount}.\nProductos sin procesar: ${unprocessedCount}.`
+          : "Los productos se han actualizado con exito!");
         handleModalClose();
       } else {
         toast.error(response.message);
+      }
+      if (response.unprocessed) {
+        setShowUnprocessedModal(true);
+        setUnprocessedResponse({ response });
       }
     },
   });
@@ -271,30 +312,31 @@ const BatchImport = ({ products, isCreating }) => {
           onClose={handleModalClose}
           onOpen={handleModalOpen}
         >
-          <ContainerModal>
-            {showConfirmationModal ? (
-              <>
-                <ModalHeader> <Header>Confirmar descarga</Header></ModalHeader>
-                <Modal.Content>
-                  <p>
-                    {`Se han encontrado productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
-                    ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
-                  </p>
-                </Modal.Content>
-                <ModalActions>
-                  <Button
-                    positive
-                    onClick={handleDownloadConfirmation}
-                    content="Confirmar"
-                  />
-                  <Button
-                    negative
-                    onClick={() => setShowConfirmationModal(false)}
-                    content="Cancelar"
-                  />
-                </ModalActions>
-              </>
-            ) : (
+
+          {showConfirmationModal ? (
+            <>
+              <ModalHeader> Confirmar descarga</ModalHeader>
+              <Modal.Content>
+                <p>
+                  {`Se han encontrado productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
+                  ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
+                </p>
+              </Modal.Content>
+              <ModalActions>
+                <Button
+                  positive
+                  onClick={handleDownloadConfirmation}
+                  content="Confirmar"
+                />
+                <Button
+                  negative
+                  onClick={() => setShowConfirmationModal(false)}
+                  content="Cancelar"
+                />
+              </ModalActions>
+            </>
+          ) : (
+            <ContainerModal>
               <Form onSubmit={handleSubmit(mutate)}>
                 <FieldsContainer>
                   <FormField width={6}>
@@ -329,8 +371,31 @@ const BatchImport = ({ products, isCreating }) => {
                   />
                 </ModalActions>
               </Form>
-            )}
-          </ContainerModal>
+            </ContainerModal>
+          )}
+        </Modal>
+      </Transition>
+      <Transition animation="fade" duration={500} visible={showUnprocessedModal}>
+        <Modal open={showUnprocessedModal} onClose={() => setShowUnprocessedModal(false)}>
+          <ModalHeader>Confirmar descarga</ModalHeader>
+          <Modal.Content>
+            <p>Se han encontrado productos con errores que no pueden ser importados.</p>
+            <p>¿Deseas descargar un archivo de Excel con estos productos?</p>
+          </Modal.Content>
+          <ModalActions>
+            <Button color="green" onClick={() => {
+              setIsUnprocessedDownloadConfirmed(true);
+              handleUnprocessedDownload();
+            }}>
+              Confirmar
+            </Button>
+            <Button color="red" onClick={() => {
+              setIsUnprocessedDownloadConfirmed(false);
+              setShowUnprocessedModal(false);
+            }}>
+              Cancelar
+            </Button>
+          </ModalActions>
         </Modal>
       </Transition>
     </>
