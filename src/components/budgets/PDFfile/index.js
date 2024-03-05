@@ -130,6 +130,7 @@ const PDFfile = ({ budget, total }) => {
                   <Segment marginTop="0" minHeight="60px">{budget.comments}</Segment>
                 </DataContainer>
               )}
+              <Divider borderless/>
               <DataContainer width="100%" >
                 <Label >Formas de pago</Label>
                 <Segment marginTop="0">
