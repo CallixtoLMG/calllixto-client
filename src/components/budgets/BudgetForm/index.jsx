@@ -32,7 +32,7 @@ const EMPTY_BUDGET = (user) => ({
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading }) => {
   const { userData } = useUserContext();
-  const formattedPaymentMethods = useMemo(() => budget?.paymentMethods.join(' - '), [budget]);
+  const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
@@ -339,7 +339,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           </FieldsContainer>
           {!readonly && (
             <FormField width="300px">
-              <RuledLabel title="Agregar producto" message={!watchProducts.length && isSubmitted && isDirty && 'Al menos 1 producto es requerido'} required />
+              <RuledLabel title="Agregar producto" message={!watchProducts?.length && isSubmitted && isDirty && 'Al menos 1 producto es requerido'} required />
               <ProductSearch
                 products={products}
                 onProductSelect={(selectedProduct) => {

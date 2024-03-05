@@ -1,8 +1,8 @@
-import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import axios from './axios';
-import { useQuery } from "@tanstack/react-query";
 import { TIME_IN_MS } from "@/constants";
+import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
+import { useQuery } from "@tanstack/react-query";
+import axios from './axios';
 
 const BUDGETS_URL = `${CLIENT_ID}${PATHS.BUDGETS}`;
 export const LIST_BUDGETS_QUERY_KEY = 'listBudgets';
@@ -55,6 +55,7 @@ export function useGetBudget(id) {
     queryFn: () => getBudget(id),
     retry: false,
     staleTime: TIME_IN_MS.ONE_HOUR,
+    enabled: !!id,
   });
 
   return query;
