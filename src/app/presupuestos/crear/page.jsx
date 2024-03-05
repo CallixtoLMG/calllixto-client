@@ -1,16 +1,16 @@
 "use client";
 import { useUserContext } from "@/User";
-import { create, useGetBudget, LIST_BUDGETS_QUERY_KEY } from "@/api/budgets";
+import { LIST_BUDGETS_QUERY_KEY, create, useGetBudget } from "@/api/budgets";
 import { edit, useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
-import { PAGES } from "@/constants";
 
 const CreateBudget = () => {
   useValidateToken();
@@ -69,6 +69,14 @@ const CreateBudget = () => {
     }
   });
 
+  const clonedBudget = useMemo(() => {
+    if (budget) {
+      const { customer, id, ...clonedBudget } = budget;
+      return clonedBudget;
+    }
+
+  }, [budget]);
+
   return (
     <Loader active={loadingProducts || loadingCustomers || loadingBudget}>
       <BudgetForm
@@ -77,7 +85,7 @@ const CreateBudget = () => {
         products={mappedProducts}
         customers={mappedCustomers}
         user={userData}
-        budget={budget}
+        budget={clonedBudget}
         isLoading={isPending}
       />
     </Loader>

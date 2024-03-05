@@ -134,7 +134,7 @@ const PDFfile = ({ budget, total }) => {
               <DataContainer width="100%" >
                 <Label >Formas de pago</Label>
                 <Segment marginTop="0">
-                  {budget?.paymentMethods.join(" | ")}
+                  {budget?.paymentMethods?.join(" | ")}
                 </Segment>
               </DataContainer>
             </div>
