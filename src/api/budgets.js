@@ -41,9 +41,6 @@ export function useListBudgets() {
 };
 
 export function useGetBudget(id) {
-  if (!id) {
-    return { budget: null, isLoading: false };
-  }
   const getBudget = async (id) => {
     try {
       const { data } = await axios.get(`${BUDGETS_URL}/${id}`);
@@ -58,6 +55,7 @@ export function useGetBudget(id) {
     queryFn: () => getBudget(id),
     retry: false,
     staleTime: TIME_IN_MS.ONE_HOUR,
+    enabled: !!id,
   });
 
   return query;
