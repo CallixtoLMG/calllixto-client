@@ -8,7 +8,6 @@ import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -36,19 +35,19 @@ const Supplier = ({ params }) => {
     setLabels(['Proveedores', supplier?.name]);
   }, [setLabels, supplier]);
 
-  useEffect(() => {
-    const visibilityRules = Rules(role);
-    const actions = visibilityRules.canSeeButtons ? [
-      {
-        id: 1,
-        icon: 'trash',
-        color: 'red',
-        onClick: () => setOpen(true),
-        text: 'Limpiar lista'
-      }
-    ] : [];
-    setActions(actions);
-  }, [role, setActions]);
+  // useEffect(() => {
+  //   const visibilityRules = Rules(role);
+  //   const actions = visibilityRules.canSeeButtons ? [
+  //     {
+  //       id: 1,
+  //       icon: 'trash',
+  //       color: 'red',
+  //       onClick: () => setOpen(true),
+  //       text: 'Limpiar lista'
+  //     }
+  //   ] : [];
+  //   setActions(actions);
+  // }, [role, setActions]);
 
   const { mutate: mutateUpdate, isPending: isLoadingUpdate } = useMutation({
     mutationFn: async (supplier) => {
