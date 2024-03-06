@@ -13,6 +13,7 @@ import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, ModalHeader, WarningMessage } from "./styles";
 
 const BatchImport = ({ products, isCreating }) => {
+  console.log(products)
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, formState: { errors, isDirty }, watch } = useForm();
   const [open, setOpen] = useState(false);
@@ -21,11 +22,8 @@ const BatchImport = ({ products, isCreating }) => {
   const [downloadProducts, setDownloadProducts] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showUnprocessedModal, setShowUnprocessedModal] = useState(false);
-  const [isUnprocessedDownloadConfirmed, setIsUnprocessedDownloadConfirmed] = useState(false);
   const [unprocessedResponse, setUnprocessedResponse] = useState(null);
   const [importedProductsCount, setImportedProductsCount] = useState(0);
-  const [createdProductsCount, setCreatedProductsCount] = useState(0);
-  const [unprocessedProductsCount, setUnprocessedProductsCount] = useState(0);
   const watchProducts = watch("importProducts", []);
   const queryClient = useQueryClient();
   const inputRef = useRef();
@@ -158,13 +156,13 @@ const BatchImport = ({ products, isCreating }) => {
   };
 
   const handleUnprocessedDownload = () => {
-    if (isUnprocessedDownloadConfirmed && unprocessedResponse) {
+    if (unprocessedResponse && unprocessedResponse.response) {
       const { response } = unprocessedResponse;
       const data = response.unprocessed.map(product => ({
         ...product,
         msg: product.msg || "Este producto tiene errores"
       }));
-
+  
       const formattedData = [
         ["Codigo", "Nombre", "Precio", "Comentarios", "Mensaje de error"],
         ...data.map(product => [
@@ -175,10 +173,9 @@ const BatchImport = ({ products, isCreating }) => {
           product.msg
         ])
       ];
-
-      downloadExcel(formattedData);
-      setIsUnprocessedDownloadConfirmed(false);
-      setUnprocessedResponse(null);
+  
+      downloadExcel(formattedData); 
+      setShowUnprocessedModal(false);
     }
   };
 
@@ -190,8 +187,6 @@ const BatchImport = ({ products, isCreating }) => {
     onSuccess: (response) => {
       const unprocessedCount = response.unprocessed?.length;
       const createdCount = importedProductsCount - unprocessedCount;
-      setUnprocessedProductsCount(unprocessedCount);
-      setCreatedProductsCount(createdCount);
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
         toast.success(isCreating ?
@@ -201,9 +196,9 @@ const BatchImport = ({ products, isCreating }) => {
       } else {
         toast.error(response.message);
       }
-      if (response.unprocessed) {
+      if (response.unprocessed && response.unprocessed.length > 0) {
         setShowUnprocessedModal(true);
-        setUnprocessedResponse({ response });
+        setUnprocessedResponse({ response }); 
       }
     },
   });
@@ -384,13 +379,11 @@ const BatchImport = ({ products, isCreating }) => {
           </Modal.Content>
           <ModalActions>
             <Button color="green" onClick={() => {
-              setIsUnprocessedDownloadConfirmed(true);
               handleUnprocessedDownload();
             }}>
               Confirmar
             </Button>
             <Button color="red" onClick={() => {
-              setIsUnprocessedDownloadConfirmed(false);
               setShowUnprocessedModal(false);
             }}>
               Cancelar

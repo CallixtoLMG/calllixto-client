@@ -17,8 +17,22 @@ export const Segment = styled(SSegment)`
   padding:${({ height }) => height && "10px"} !important;
   margin: 5px 0!important;
   width: 100%!important;
-  min-height: 40px!important;
+  min-height: 50px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
+`;
+
+export const Input = styled(SInput)`
+  margin: ${({ margin }) => margin || "5px 0"} !important;
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
+  border-radius: 0.28571429rem;
+  height: ${({ height }) => height || '50px'} !important;
+  width: ${({ width }) => width ? width : ''} !important;
+  display: flex!important;
+  input{
+    height: ${({ height }) => height || '50px'} !important;
+    padding: 0 14px!important;
+    text-align: ${({ center }) => center && 'center'} !important;
+  };
 `;
 
 export const Checkbox = styled(SCheckbox)`
@@ -33,20 +47,6 @@ export const FormField = styled(Form.Field)`
   flex: ${({ flex }) => flex || 'none'} !important;
   margin: 0 !important;
   flex-direction: column;
-`;
-
-export const Input = styled(SInput)`
-  margin: ${({ margin }) => margin || "5px 0"} !important;
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
-  border-radius: 0.28571429rem;
-  height: ${({ height }) => height || '40px'} !important;
-  width: ${({ width }) => width ? width : ''} !important;
-  display: flex!important;
-  input{
-    height: ${({ height }) => height || '40px'} !important;
-    padding: 0 14px!important;
-    text-align: center!important;
-  };
 `;
 
 export const Label = styled(SLabel)`
@@ -66,17 +66,17 @@ export const Dropdown = styled(SDropdown)`
   margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
-  height: ${({ height }) => height || '40px'} !important;
+  height: ${({ height }) => height || '50px'} !important;
   min-height: ${({ minHeight }) => minHeight || 'none'} !important;
   display: flex!important;
   flex-wrap: wrap;
   align-content: center;
   input {
-    height: ${({ height }) => height || '40px'} !important;
+    height: ${({ height }) => height || '50px'} !important;
   };
   i.dropdown.icon {
-    height: 40px!important;
-    top: ${({ top }) => top || "10px"} !important};
+    height: 50px!important;
+    top: ${({ top }) => top || "15px"} !important};
   };
 `;
 
