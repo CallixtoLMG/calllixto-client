@@ -1,7 +1,7 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
-import { CURRENCY, LOCALE, RULES } from "@/constants";
+import { CURRENCY, LOCALE } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -10,12 +10,12 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
-import { ContainerModal, Modal, ModalActions, ModalHeader, WarningMessage } from "./styles";
+import { ContainerModal, Modal, ModalActions, ModalHeader } from "./styles";
 
 const BatchImport = ({ products, isCreating }) => {
-  console.log(products)
+  console.log("productos de la lista:", products)
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
-  const { handleSubmit, control, reset, setValue, formState: { errors, isDirty }, watch } = useForm();
+  const { handleSubmit, control, reset, setValue, formState: { isDirty }, watch } = useForm();
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -28,23 +28,77 @@ const BatchImport = ({ products, isCreating }) => {
   const queryClient = useQueryClient();
   const inputRef = useRef();
 
+  const processData = (formattedProduct, existingCodes, downloadProducts, importProducts, isCreating, products) => {
+    if (existingCodes[formattedProduct.code]) {
+      if (isCreating) {
+        downloadProducts.push(formattedProduct);
+      } else {
+        const existingProduct = products.find(p => p.code === formattedProduct.code);
+        const changes = {};
+        let hasChanges = false;
+  
+        // Revisar cambios específicos en propiedades, excluyendo 'updatedAt'
+        ['name', 'price', 'comments'].forEach(key => {
+          if (existingProduct[key] !== formattedProduct[key]) {
+            hasChanges = true;
+            changes[key] = existingProduct[key]; // Registro del valor anterior
+          }
+        });
+  
+        // Manejar 'updatedAt' apropiadamente
+        if ('updatedAt' in existingProduct) {
+          // Agregar 'updatedAt' del producto existente al registro de cambios solo si hay otros cambios
+          if (hasChanges) {
+            changes['updatedAt'] = existingProduct['updatedAt'];
+          }
+        }
+  
+        if (hasChanges) {
+          if (!existingProduct.previousVersions) {
+            existingProduct.previousVersions = [];
+          }
+          // Incluir 'changes' una sola vez, con 'updatedAt' si es aplicable
+          existingProduct.previousVersions.push(changes);
+  
+          // Preparar el producto actualizado para la importación
+          const updatedProduct = {
+            ...formattedProduct,
+            previousVersions: existingProduct.previousVersions,
+          };
+  
+          // Actualizar 'updatedAt' para reflejar el momento de la actualización actual
+          // updatedProduct['updatedAt'] = new Date().toISOString();
+  
+          importProducts.push(updatedProduct);
+        } else {
+          // Si no hay cambios, simplemente añadir el producto como estaba
+          importProducts.push(formattedProduct);
+        }
+      }
+    } else {
+      // Para productos nuevos o que no coinciden con los existentes
+      isCreating ? importProducts.push(formattedProduct) : downloadProducts.push(formattedProduct);
+    }
+  };
+
   const importSettings = useMemo(() => {
     return {
       button: isCreating ? "Crear" : "Actualizar",
       confirmation: isCreating ? "" : "no",
       onSubmit: isCreating ? createBatch : editBatch,
-      processData: (formattedProduct, existingCodes, downloadProducts, importProducts) => {
-        if (existingCodes[formattedProduct.code]) {
-          isCreating ? downloadProducts.push(formattedProduct) : importProducts.push(formattedProduct);
-        } else {
-          isCreating ? importProducts.push(formattedProduct) : downloadProducts.push(formattedProduct);
-        }
-      },
+      processData: (...args) => processData(...args, isCreating, products),
+      // processData: (formattedProduct, existingCodes, downloadProducts, importProducts) => {
+      //   if (existingCodes[formattedProduct.code]) {
+      //     isCreating ? downloadProducts.push(formattedProduct) : importProducts.push(formattedProduct);
+      //   } else {
+      //     isCreating ? importProducts.push(formattedProduct) : downloadProducts.push(formattedProduct);
+      //   }
+      // },
       isButtonDisabled: (isPending) => {
         return !watchProducts.length || isLoading || isPending || (!isCreating && !isDirty)
       }
     };
-  }, [isCreating, watchProducts, isLoading, isDirty]);
+  }, [isCreating, watchProducts, isLoading, isDirty, products]);
 
   const handleClick = useCallback(() => {
     inputRef.current.value = null;
@@ -162,7 +216,7 @@ const BatchImport = ({ products, isCreating }) => {
         ...product,
         msg: product.msg || "Este producto tiene errores"
       }));
-  
+
       const formattedData = [
         ["Codigo", "Nombre", "Precio", "Comentarios", "Mensaje de error"],
         ...data.map(product => [
@@ -173,15 +227,17 @@ const BatchImport = ({ products, isCreating }) => {
           product.msg
         ])
       ];
-  
-      downloadExcel(formattedData); 
+
+      downloadExcel(formattedData);
       setShowUnprocessedModal(false);
     }
   };
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (products) => {
-      const { data } = await importSettings.onSubmit(products.importProducts);
+    mutationFn: async (e) => {
+      const { data } = await importSettings.onSubmit(e.importProducts);
+      console.log(e.importProducts)
+
       return data;
     },
     onSuccess: (response) => {
@@ -198,7 +254,7 @@ const BatchImport = ({ products, isCreating }) => {
       }
       if (response.unprocessed && response.unprocessed.length > 0) {
         setShowUnprocessedModal(true);
-        setUnprocessedResponse({ response }); 
+        setUnprocessedResponse({ response });
       }
     },
   });
@@ -244,20 +300,16 @@ const BatchImport = ({ products, isCreating }) => {
         <Controller
           name={`importProducts[${index}].price`}
           control={control}
-          rules={RULES.REQUIRED_PRICE}
           render={({ field }) => (
-            <>
-              <CurrencyInput
-                {...field}
-                locale={LOCALE}
-                currency={CURRENCY}
-                onChangeValue={(_, value) => {
-                  field.onChange(value);
-                }}
-                InputElement={<Input height="30px" />}
-              />
-              {errors?.importProducts?.[index]?.price && <WarningMessage>Precio requerido</WarningMessage>}
-            </>
+            <CurrencyInput
+              {...field}
+              locale={LOCALE}
+              currency={CURRENCY}
+              onChangeValue={(_, value) => {
+                field.onChange(value);
+              }}
+              InputElement={<Input height="30px" />}
+            />
           )}
         />
       ), id: 3, width: 3
