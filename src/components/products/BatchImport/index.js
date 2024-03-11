@@ -33,7 +33,7 @@ const BatchImport = ({ products, isCreating }) => {
       if (isCreating) {
         downloadProducts.push(formattedProduct);
       } else {
-        const existingProduct = products.find(p => p.code === formattedProduct.code);
+        const existingProduct = products.find(product => product.code === formattedProduct.code);
         const changes = {};
         let hasChanges = false;
   
@@ -73,12 +73,12 @@ const BatchImport = ({ products, isCreating }) => {
         } else {
           // Si no hay cambios, simplemente añadir el producto como estaba
           importProducts.push(formattedProduct);
-        }
-      }
+        };
+      };
     } else {
       // Para productos nuevos o que no coinciden con los existentes
       isCreating ? importProducts.push(formattedProduct) : downloadProducts.push(formattedProduct);
-    }
+    };
   };
 
   const importSettings = useMemo(() => {
@@ -237,7 +237,6 @@ const BatchImport = ({ products, isCreating }) => {
     mutationFn: async (e) => {
       const { data } = await importSettings.onSubmit(e.importProducts);
       console.log(e.importProducts)
-
       return data;
     },
     onSuccess: (response) => {
@@ -362,7 +361,7 @@ const BatchImport = ({ products, isCreating }) => {
 
           {showConfirmationModal ? (
             <>
-              <ModalHeader> Confirmar descargaa</ModalHeader>
+              <ModalHeader> Confirmar descarga</ModalHeader>
               <Modal.Content>
                 <p>
                   {`Se han encontrado productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
