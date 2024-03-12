@@ -21,7 +21,6 @@ const BatchImport = ({ products, isCreating }) => {
   const [downloadProducts, setDownloadProducts] = useState([]);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showUnprocessedModal, setShowUnprocessedModal] = useState(false);
-  const [isUnprocessedDownloadConfirmed, setIsUnprocessedDownloadConfirmed] = useState(false);
   const [unprocessedResponse, setUnprocessedResponse] = useState(null);
   const [importedProductsCount, setImportedProductsCount] = useState(0);
   const watchProducts = watch("importProducts", []);
@@ -170,7 +169,7 @@ const BatchImport = ({ products, isCreating }) => {
   };
 
   const handleUnprocessedDownload = () => {
-    if (isUnprocessedDownloadConfirmed && unprocessedResponse) {
+    if (unprocessedResponse && unprocessedResponse.response) {
       const { response } = unprocessedResponse;
       const data = response.unprocessed.map(product => ({
         ...product,
@@ -189,8 +188,7 @@ const BatchImport = ({ products, isCreating }) => {
       ];
 
       downloadExcel(formattedData);
-      setIsUnprocessedDownloadConfirmed(false);
-      setUnprocessedResponse(null);
+      setShowUnprocessedModal(false);
     }
   };
 
@@ -211,7 +209,7 @@ const BatchImport = ({ products, isCreating }) => {
       } else {
         toast.error(response.message);
       }
-      if (response.unprocessed) {
+      if (response.unprocessed && response.unprocessed.length > 0) {
         setShowUnprocessedModal(true);
         setUnprocessedResponse({ response });
       }
@@ -392,13 +390,11 @@ const BatchImport = ({ products, isCreating }) => {
           </Modal.Content>
           <ModalActions>
             <Button color="green" onClick={() => {
-              setIsUnprocessedDownloadConfirmed(true);
               handleUnprocessedDownload();
             }}>
               Confirmar
             </Button>
             <Button color="red" onClick={() => {
-              setIsUnprocessedDownloadConfirmed(false);
               setShowUnprocessedModal(false);
             }}>
               Cancelar
