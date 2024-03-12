@@ -86,7 +86,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
             <Controller
               name="code"
               control={control}
-              rules={RULES.REQUIRED_FIVE_DIGIT}
+              rules={RULES.REQUIRED_MAX26_DIGIT_CODE}
               render={({ field }) => (
                 <Input
                   {...field}

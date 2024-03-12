@@ -24,8 +24,6 @@ const BatchImport = ({ products, isCreating }) => {
   const [isUnprocessedDownloadConfirmed, setIsUnprocessedDownloadConfirmed] = useState(false);
   const [unprocessedResponse, setUnprocessedResponse] = useState(null);
   const [importedProductsCount, setImportedProductsCount] = useState(0);
-  const [createdProductsCount, setCreatedProductsCount] = useState(0);
-  const [unprocessedProductsCount, setUnprocessedProductsCount] = useState(0);
   const watchProducts = watch("importProducts", []);
   const queryClient = useQueryClient();
   const inputRef = useRef();
@@ -33,17 +31,23 @@ const BatchImport = ({ products, isCreating }) => {
   const importSettings = useMemo(() => {
     return {
       button: isCreating ? "Crear" : "Actualizar",
-      confirmation: isCreating ? "" : "no",
+      confirmation: isCreating ? "con códigos duplicados o ya" : "no",
       onSubmit: isCreating ? createBatch : editBatch,
-      processData: (formattedProduct, existingCodes, downloadProducts, importProducts) => {
-        if (existingCodes[formattedProduct.code]) {
-          isCreating ? downloadProducts.push(formattedProduct) : importProducts.push(formattedProduct);
+      processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
+        const productCode = formattedProduct.code.toUpperCase();
+        if (productCounts[productCode] > 1) {
+          downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra duplicado" });
+        } else if (existingCodes[productCode] && !isCreating) {
+          importProducts.push(formattedProduct);
+        } else if (!existingCodes[productCode] && isCreating) {
+          importProducts.push(formattedProduct);
         } else {
-          isCreating ? importProducts.push(formattedProduct) : downloadProducts.push(formattedProduct);
+          const msg = isCreating ? "Este producto ya existe" : "Este producto no existe";
+          downloadProducts.push({ ...formattedProduct, msg });
         }
       },
       isButtonDisabled: (isPending) => {
-        return !watchProducts.length || isLoading || isPending || (!isCreating && !isDirty)
+        return !watchProducts.length || isLoading || isPending || (!isCreating && !isDirty);
       }
     };
   }, [isCreating, watchProducts, isLoading, isDirty]);
@@ -109,9 +113,15 @@ const BatchImport = ({ products, isCreating }) => {
       const importProducts = [];
       const downloadProducts = [];
       const existingCodes = {};
+      const productCounts = {};
 
       products?.forEach((product) => {
         existingCodes[product.code.toUpperCase()] = true;
+      });
+
+      parsedData.forEach((product) => {
+        const code = String(product.code).toUpperCase();
+        productCounts[code] = (productCounts[code] || 0) + 1;
       });
 
       parsedData.forEach((product) => {
@@ -126,7 +136,8 @@ const BatchImport = ({ products, isCreating }) => {
             formattedProduct,
             existingCodes,
             downloadProducts,
-            importProducts
+            importProducts,
+            productCounts
           );
         };
       });
@@ -144,12 +155,13 @@ const BatchImport = ({ products, isCreating }) => {
 
   const handleDownloadConfirmation = () => {
     const data = [
-      ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
+      ['Codigo', 'Nombre', 'Precio', 'Comentarios', 'Error'],
       ...downloadProducts.map((product) => [
         product.code,
         product.name,
         product.price,
         product.comments,
+        product.msg || "",
       ]),
     ];
     downloadExcel(data);
@@ -190,8 +202,6 @@ const BatchImport = ({ products, isCreating }) => {
     onSuccess: (response) => {
       const unprocessedCount = response.unprocessed?.length;
       const createdCount = importedProductsCount - unprocessedCount;
-      setUnprocessedProductsCount(unprocessedCount);
-      setCreatedProductsCount(createdCount);
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
         toast.success(isCreating ?
@@ -304,7 +314,6 @@ const BatchImport = ({ products, isCreating }) => {
           <Icon name="upload" />
         </ButtonContent>
       </Button>
-
       <Transition animation="fade" duration={500} visible={open}>
         <Modal
           closeIcon
@@ -312,7 +321,6 @@ const BatchImport = ({ products, isCreating }) => {
           onClose={handleModalClose}
           onOpen={handleModalOpen}
         >
-
           {showConfirmationModal ? (
             <>
               <ModalHeader> Confirmar descargaa</ModalHeader>
