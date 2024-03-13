@@ -4,6 +4,7 @@ import { Table } from "@/components/common/table";
 import { CURRENCY, LOCALE, RULES } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isEmpty } from "lodash";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
@@ -33,15 +34,31 @@ const BatchImport = ({ products, isCreating }) => {
       confirmation: isCreating ? "con códigos duplicados o ya" : "no",
       onSubmit: isCreating ? createBatch : editBatch,
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
-        const productCode = formattedProduct.code.toUpperCase();
+        const productCode = formattedProduct.code;
         if (productCounts[productCode] > 1) {
           downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra duplicado" });
         } else if (existingCodes[productCode] && !isCreating) {
-          importProducts.push(formattedProduct);
+          const oldProduct = existingCodes[productCode];
+          console.log("oldProduct", oldProduct);
+          console.log("formattedProduct", formattedProduct)
+
+          const previousVersion = {};
+          Object.keys(formattedProduct).forEach(key => {
+            console.log("key", key)
+
+            if (formattedProduct[key] !== oldProduct[key]) {
+              previousVersion[key] = oldProduct[key];
+            }
+          });
+          if (Object.keys(previousVersion).length && oldProduct.updatedAt) {
+            previousVersion.updatedAt = oldProduct.updatedAt;
+          };
+          importProducts.push({ ...formattedProduct, previousVersion });
+          console.log("previousVersion 1", previousVersion)
         } else if (!existingCodes[productCode] && isCreating) {
           importProducts.push(formattedProduct);
         } else {
-          const msg = isCreating ? "Este producto ya existe" : "Este producto no existe";
+          const msg = isCreating ? "Este producto ya existe" : "";
           downloadProducts.push({ ...formattedProduct, msg });
         }
       },
@@ -115,22 +132,17 @@ const BatchImport = ({ products, isCreating }) => {
       const productCounts = {};
 
       products?.forEach((product) => {
-        existingCodes[product.code.toUpperCase()] = true;
+        existingCodes[product.code] = product;
       });
 
       parsedData.forEach((product) => {
-        const code = String(product.code).toUpperCase();
-        productCounts[code] = (productCounts[code] || 0) + 1;
-      });
-
-      parsedData.forEach((product) => {
-        const code = String(product.code).toUpperCase();
+        productCounts[product.code] = (productCounts[product.code] || 0) + 1;
+        const code = String(product.code);
         const price = parseFloat(product.price);
         const hasAtLeastOneValue = product.code || product.name || product.price;
 
-        if (hasAtLeastOneValue && !blacklist?.some(item => item === code)) {
+        if (hasAtLeastOneValue && !blacklist?.some(item => item === product.code)) {
           const formattedProduct = { ...product, code, price };
-
           importSettings.processData(
             formattedProduct,
             existingCodes,
@@ -194,10 +206,21 @@ const BatchImport = ({ products, isCreating }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (products) => {
-      const { data } = await importSettings.onSubmit(products.importProducts);
+      //validar si existen productos para validar
+      const productToUpdate = products.importProducts.map((product) => {
+        return product
+      }).filter(product => !isEmpty(product.previousVersion))
+      console.log("productToUpdate", productToUpdate)
+
+      // si tiene cambios recien lo manda
+      //recorro los imporpoduc y le agro previos vers. per o evulaudno objt kyes
+
+      const { data } = await importSettings.onSubmit(productToUpdate);
+      console.log("submit", products.importProducts)
       return data;
     },
     onSuccess: (response) => {
+      console.log("response", response)
       const unprocessedCount = response.unprocessed?.length;
       const createdCount = importedProductsCount - unprocessedCount;
       if (response.statusOk) {
@@ -266,6 +289,7 @@ const BatchImport = ({ products, isCreating }) => {
                 currency={CURRENCY}
                 onChangeValue={(_, value) => {
                   field.onChange(value);
+                  console.log(watchProducts[index])
                 }}
                 InputElement={<Input height="30px" />}
               />
