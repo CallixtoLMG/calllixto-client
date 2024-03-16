@@ -109,7 +109,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
               name="name"
               control={control}
               rules={RULES.REQUIRED}
-              render={({ field }) => <Input {...field} placeholder="Nombre" />}
+              render={({ field }) => <Input height="50px" {...field} placeholder="Nombre" />}
             />
           ) : (
             <Segment>{product?.name}</Segment>
@@ -131,7 +131,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
                   onChangeValue={(_, value) => {
                     field.onChange(value);
                   }}
-                  InputElement={<Input />}
+                  InputElement={<Input height="50px" />}
                 />
               )}
             />
