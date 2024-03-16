@@ -22,6 +22,7 @@ const BatchImport = ({ products, isCreating }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showUnprocessedModal, setShowUnprocessedModal] = useState(false);
   const [unprocessedResponse, setUnprocessedResponse] = useState(null);
+  const [unprocessedProductsCount, setUnprocessedProductsCount] = useState(0);
   const [importedProductsCount, setImportedProductsCount] = useState(0);
   const watchProducts = watch("importProducts", []);
   const queryClient = useQueryClient();
@@ -29,7 +30,7 @@ const BatchImport = ({ products, isCreating }) => {
   const [existingCodes, setExistingCodes] = useState({});
 
   useEffect(() => {
-    const codes = products.reduce((acc, product) => {
+    const codes = products?.reduce((acc, product) => {
       acc[product.code.toUpperCase()] = product;
       return acc;
     }, {});
@@ -37,9 +38,11 @@ const BatchImport = ({ products, isCreating }) => {
     setExistingCodes(codes);
   }, [products]);
 
+
   const importSettings = useMemo(() => {
     return {
       button: isCreating ? "Crear" : "Actualizar",
+      label: isCreating ? "Nuevos productos importados" : "Productos importados para actualizar",
       confirmation: isCreating ? "con códigos duplicados o ya" : "no",
       onSubmit: isCreating ? createBatch : editBatch,
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
@@ -59,7 +62,7 @@ const BatchImport = ({ products, isCreating }) => {
         return !watchProducts.length || isLoading || isPending || (!isCreating && !isDirty);
       }
     };
-  }, [isCreating, watchProducts, isLoading, isDirty, products]); // ver si necesito products ahi
+  }, [isCreating, watchProducts, isLoading, isDirty, products]);
 
 
   const handleClick = useCallback(() => {
@@ -189,49 +192,44 @@ const BatchImport = ({ products, isCreating }) => {
   };
 
   const { mutate, isPending } = useMutation({
-    // mutationFn: async (e) => {
-    //   const { data } = await importSettings.onSubmit(e.importProducts);
-    //   console.log(e.importProducts)
-
-    //   return data;
-    // },
-    mutationFn: async (input) => {
-      // Asumiendo que input es el array de productos desde el formulario
-      let productsToUpdate = [];
-      console.log("input", input)
-      // Solo aplica lógica de previousVersions si NO estás creando nuevos productos
-      if (!isCreating) {
-        productsToUpdate = input.map(product => {
-          const existingProduct = existingCodes[product.code.toUpperCase()];
-
-          // Asumimos que todos los productos aquí son existentes; la lógica de filtrado ya se manejó
-          const changedKeys = ['name', 'price', 'comments'].filter(key => product[key] !== existingProduct[key]);
-
-          if (changedKeys.length > 0) {
-            // Solo si hay cambios, preparar previousVersions
-            const previousVersions = pick(existingProduct, changedKeys);
-            return { ...product, previousVersions };
-          }
-
-          return product;
-        }).filter(product => product.previousVersions); // Mantener solo los productos que tienen cambios
-      } else {
-        // Si estás creando, simplemente procesa todos los productos tal cual
-        productsToUpdate = input;
-      }
-      console.log("productsToUpdate", productsToUpdate)
-
-      if (productsToUpdate.length > 0) {
-        const { data } = await importSettings.onSubmit({ importProducts: productsToUpdate });
-        console.log("data", data)
-
+    mutationFn: async (e) => {
+      if (isCreating) {
+        const { data } = await importSettings.onSubmit(e.importProducts);
         return data;
       } else {
-        console.log("error")
-        throw new Error("No hay productos para procesar.");
-      }
-    },
+        const processedProducts = e.importProducts
+          .map(product => {
+            const existingProduct = existingCodes[product.code.toUpperCase()];
+            let productWithChanges = { code: product.code };
+            let previousVersion = {};
 
+            Object.keys(product).forEach(key => {
+              if (key !== 'code' && product[key] !== undefined && product[key] !== '' && product[key] !== existingProduct[key]) {
+                productWithChanges[key] = product[key];
+                previousVersion[key] = existingProduct[key];
+              }
+            });
+
+            if (existingProduct.updatedAt) {
+              previousVersion['updatedAt'] = existingProduct.updatedAt;
+            }
+
+            if (Object.keys(previousVersion).length > 0) {
+              productWithChanges['previousVersion'] = previousVersion;
+            } else {
+              return null;
+            }
+
+            return productWithChanges;
+          })
+          .filter(product => product !== null);
+
+        if (processedProducts.length > 0) {
+          const { data } = await importSettings.onSubmit(processedProducts);
+          return data;
+        };
+      };
+    },
     onSuccess: (response) => {
       const unprocessedCount = response.unprocessed?.length;
       const createdCount = importedProductsCount - unprocessedCount;
@@ -247,6 +245,7 @@ const BatchImport = ({ products, isCreating }) => {
       if (response.unprocessed && response.unprocessed.length > 0) {
         setShowUnprocessedModal(true);
         setUnprocessedResponse({ response });
+        setUnprocessedProductsCount(response.unprocessed?.length);
       }
     },
   });
@@ -289,7 +288,6 @@ const BatchImport = ({ products, isCreating }) => {
         <Controller
           name={`importProducts[${index}].price`}
           control={control}
-          // rules={RULES.REQUIRED_PRICE}
           render={({ field }) => (
             <>
               <CurrencyInput
@@ -354,7 +352,7 @@ const BatchImport = ({ products, isCreating }) => {
               <ModalHeader> Confirmar descarga</ModalHeader>
               <Modal.Content>
                 <p>
-                  {`Se han encontrado productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
+                  {`Se han encontrado ${downloadProducts.length} productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
                   ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
                 </p>
               </Modal.Content>
@@ -376,12 +374,12 @@ const BatchImport = ({ products, isCreating }) => {
               <Form onSubmit={handleSubmit(mutate)}>
                 <FieldsContainer>
                   <FormField width={6}>
-                    <Label>Archivo seleccionado:</Label>
-                    <Segment>{selectedFile}</Segment>
+                    <Label >Archivo seleccionado:</Label>
+                    <Segment >{selectedFile}</Segment>
                   </FormField>
                 </FieldsContainer>
                 <FieldsContainer>
-                  <Label>Nuevos productos</Label>
+                  <Label>{`${importSettings.label}: ${importedProductsCount} `}</Label>
                   <Table
                     deleteButtonInside
                     tableHeight="50vh"
@@ -415,7 +413,7 @@ const BatchImport = ({ products, isCreating }) => {
         <Modal open={showUnprocessedModal} onClose={() => setShowUnprocessedModal(false)}>
           <ModalHeader>Confirmar descarga</ModalHeader>
           <Modal.Content>
-            <p>Se han encontrado productos con errores que no pueden ser importados.</p>
+            <p> {`Se han encontrado ${unprocessedProductsCount} productos con errores que no pueden ser importados`}.</p>
             <p>¿Deseas descargar un archivo de Excel con estos productos?</p>
           </Modal.Content>
           <ModalActions>
