@@ -1,20 +1,20 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
-import { CURRENCY, LOCALE, RULES } from "@/constants";
+import { CURRENCY, LOCALE } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
-import { ContainerModal, Modal, ModalActions, ModalHeader, WarningMessage } from "./styles";
+import { ContainerModal, Modal, ModalActions, ModalHeader } from "./styles";
 
 const BatchImport = ({ products, isCreating }) => {
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
-  const { handleSubmit, control, reset, setValue, formState: { errors, isDirty }, watch } = useForm();
+  const { handleSubmit, control, reset, setValue, formState: { isDirty }, watch } = useForm();
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,14 +22,27 @@ const BatchImport = ({ products, isCreating }) => {
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [showUnprocessedModal, setShowUnprocessedModal] = useState(false);
   const [unprocessedResponse, setUnprocessedResponse] = useState(null);
+  const [unprocessedProductsCount, setUnprocessedProductsCount] = useState(0);
   const [importedProductsCount, setImportedProductsCount] = useState(0);
   const watchProducts = watch("importProducts", []);
   const queryClient = useQueryClient();
   const inputRef = useRef();
+  const [existingCodes, setExistingCodes] = useState({});
+
+  useEffect(() => {
+    const codes = products?.reduce((acc, product) => {
+      acc[product.code.toUpperCase()] = product;
+      return acc;
+    }, {});
+
+    setExistingCodes(codes);
+  }, [products]);
+
 
   const importSettings = useMemo(() => {
     return {
       button: isCreating ? "Crear" : "Actualizar",
+      label: isCreating ? "Nuevos productos importados" : "Productos importados para actualizar",
       confirmation: isCreating ? "con códigos duplicados o ya" : "no",
       onSubmit: isCreating ? createBatch : editBatch,
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
@@ -49,7 +62,8 @@ const BatchImport = ({ products, isCreating }) => {
         return !watchProducts.length || isLoading || isPending || (!isCreating && !isDirty);
       }
     };
-  }, [isCreating, watchProducts, isLoading, isDirty]);
+  }, [isCreating, watchProducts, isLoading, isDirty, products]);
+
 
   const handleClick = useCallback(() => {
     inputRef.current.value = null;
@@ -66,22 +80,17 @@ const BatchImport = ({ products, isCreating }) => {
 
   const handleFileUpload = useCallback((e) => {
     reset();
-
     const fileName = e?.target.files[0]?.name;
     if (!fileName || loadingBlacklist) {
       return;
     };
-
     setSelectedFile(fileName);
     const reader = new FileReader();
     const file = e.target.files[0];
-
     if (!(file instanceof Blob)) {
       return;
     };
-
     setIsLoading(true);
-
     reader.readAsBinaryString(file);
     reader.onload = (e) => {
       const data = e.target.result;
@@ -89,25 +98,21 @@ const BatchImport = ({ products, isCreating }) => {
       const sheetName = workbook.SheetNames[0];
       const sheet = workbook.Sheets[sheetName];
       const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
-
       const columnMapping = {
         Codigo: "code",
         Nombre: "name",
         Precio: "price",
         Comentarios: "comments",
       };
-
       const transformedHeaders = headersRow.map((header) => {
         return columnMapping[header] || header;
       });
-
       for (let i = 0; i < transformedHeaders.length; i++) {
         sheet[XLSX.utils.encode_cell({ r: 0, c: i })] = {
           v: transformedHeaders[i],
           t: 's',
         };
       };
-
       let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
       const importProducts = [];
       const downloadProducts = [];
@@ -127,10 +132,8 @@ const BatchImport = ({ products, isCreating }) => {
         const code = String(product.code).toUpperCase();
         const price = parseFloat(product.price);
         const hasAtLeastOneValue = product.code || product.name || product.price;
-
         if (hasAtLeastOneValue && !blacklist?.some(item => item === code)) {
           const formattedProduct = { ...product, code, price };
-
           importSettings.processData(
             formattedProduct,
             existingCodes,
@@ -140,7 +143,6 @@ const BatchImport = ({ products, isCreating }) => {
           );
         };
       });
-
       setValue('importProducts', importProducts);
       setImportedProductsCount(importProducts.length);
       setIsLoading(false);
@@ -167,7 +169,6 @@ const BatchImport = ({ products, isCreating }) => {
     setShowConfirmationModal(false);
     setOpen(true);
   };
-
   const handleUnprocessedDownload = () => {
     if (unprocessedResponse && unprocessedResponse.response) {
       const { response } = unprocessedResponse;
@@ -175,7 +176,6 @@ const BatchImport = ({ products, isCreating }) => {
         ...product,
         msg: product.msg || "Este producto tiene errores"
       }));
-
       const formattedData = [
         ["Codigo", "Nombre", "Precio", "Comentarios", "Mensaje de error"],
         ...data.map(product => [
@@ -186,16 +186,50 @@ const BatchImport = ({ products, isCreating }) => {
           product.msg
         ])
       ];
-
       downloadExcel(formattedData);
+      setShowUnprocessedModal(false);
       setShowUnprocessedModal(false);
     }
   };
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (products) => {
-      const { data } = await importSettings.onSubmit(products.importProducts);
-      return data;
+    mutationFn: async (e) => {
+      if (isCreating) {
+        const { data } = await importSettings.onSubmit(e.importProducts);
+        return data;
+      } else {
+        const processedProducts = e.importProducts
+          .map(product => {
+            const existingProduct = existingCodes[product.code.toUpperCase()];
+            let productWithChanges = { code: product.code };
+            let previousVersion = {};
+
+            Object.keys(product).forEach(key => {
+              if (key !== 'code' && product[key] !== undefined && product[key] !== '' && product[key] !== existingProduct[key]) {
+                productWithChanges[key] = product[key];
+                previousVersion[key] = existingProduct[key];
+              }
+            });
+
+            if (existingProduct.updatedAt) {
+              previousVersion['updatedAt'] = existingProduct.updatedAt;
+            }
+
+            if (Object.keys(previousVersion).length > 0) {
+              productWithChanges['previousVersion'] = previousVersion;
+            } else {
+              return null;
+            }
+
+            return productWithChanges;
+          })
+          .filter(product => product !== null);
+
+        if (processedProducts.length > 0) {
+          const { data } = await importSettings.onSubmit(processedProducts);
+          return data;
+        };
+      };
     },
     onSuccess: (response) => {
       const unprocessedCount = response.unprocessed?.length;
@@ -212,16 +246,15 @@ const BatchImport = ({ products, isCreating }) => {
       if (response.unprocessed && response.unprocessed.length > 0) {
         setShowUnprocessedModal(true);
         setUnprocessedResponse({ response });
+        setUnprocessedProductsCount(response.unprocessed?.length);
       }
     },
   });
-
   const deleteProduct = useCallback((index) => {
     const products = [...watchProducts];
     products.splice(index, 1);
     setValue("importProducts", products);
   }, [watchProducts, setValue]);
-
   const actions = [
     {
       id: 1,
@@ -233,7 +266,6 @@ const BatchImport = ({ products, isCreating }) => {
       tooltip: 'Eliminar'
     }
   ];
-
   const PRODUCTS_COLUMNS = [
     {
       title: "Código",
@@ -257,7 +289,6 @@ const BatchImport = ({ products, isCreating }) => {
         <Controller
           name={`importProducts[${index}].price`}
           control={control}
-          rules={RULES.REQUIRED_PRICE}
           render={({ field }) => (
             <>
               <CurrencyInput
@@ -269,7 +300,6 @@ const BatchImport = ({ products, isCreating }) => {
                 }}
                 InputElement={<Input height="30px" />}
               />
-              {errors?.importProducts?.[index]?.price && <WarningMessage>Precio requerido</WarningMessage>}
             </>
           )}
         />
@@ -287,7 +317,6 @@ const BatchImport = ({ products, isCreating }) => {
       ), id: 4, align: 'left'
     },
   ];
-
   return (
     <>
       <input
@@ -321,10 +350,10 @@ const BatchImport = ({ products, isCreating }) => {
         >
           {showConfirmationModal ? (
             <>
-              <ModalHeader> Confirmar descargaa</ModalHeader>
+              <ModalHeader> Confirmar descarga</ModalHeader>
               <Modal.Content>
                 <p>
-                  {`Se han encontrado productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
+                  {`Se han encontrado ${downloadProducts.length} productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
                   ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
                 </p>
               </Modal.Content>
@@ -346,12 +375,12 @@ const BatchImport = ({ products, isCreating }) => {
               <Form onSubmit={handleSubmit(mutate)}>
                 <FieldsContainer>
                   <FormField width={6}>
-                    <Label>Archivo seleccionado:</Label>
-                    <Segment>{selectedFile}</Segment>
+                    <Label >Archivo seleccionado:</Label>
+                    <Segment >{selectedFile}</Segment>
                   </FormField>
                 </FieldsContainer>
                 <FieldsContainer>
-                  <Label>Nuevos productos</Label>
+                  <Label>{`${importSettings.label}: ${importedProductsCount} `}</Label>
                   <Table
                     deleteButtonInside
                     tableHeight="50vh"
@@ -385,7 +414,7 @@ const BatchImport = ({ products, isCreating }) => {
         <Modal open={showUnprocessedModal} onClose={() => setShowUnprocessedModal(false)}>
           <ModalHeader>Confirmar descarga</ModalHeader>
           <Modal.Content>
-            <p>Se han encontrado productos con errores que no pueden ser importados.</p>
+            <p> {`Se han encontrado ${unprocessedProductsCount} productos con errores que no pueden ser importados`}.</p>
             <p>¿Deseas descargar un archivo de Excel con estos productos?</p>
           </Modal.Content>
           <ModalActions>
@@ -405,5 +434,4 @@ const BatchImport = ({ products, isCreating }) => {
     </>
   );
 };
-
 export default BatchImport;

@@ -1,13 +1,13 @@
 "use client";
+import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
-import { useCallback, useState } from "react";
-import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
+import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
+import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
 
 const ProductsPage = ({ products = [], role }) => {
   const visibilityRules = Rules(role);
