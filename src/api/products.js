@@ -3,7 +3,7 @@ import { now } from "@/utils";
 import axios from './axios';
 import { useQuery } from "@tanstack/react-query";
 import { TIME_IN_MS } from "@/constants";
-const { omit } = require('lodash');
+const { omit, chunk } = require('lodash');
 
 const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
 const BAN_PRODUCTS_URL = `${CLIENT_ID}${CLIENT}`;
@@ -76,11 +76,17 @@ export function useGetProduct(id) {
   return query;
 };
 
-export function createBatch(products) {
-  const body = {
-    products: products.map(product => ({ ...product, createdAt: now() }))
-  }
-  return axios.post(`${PRODUCTS_URL}/${BATCH}`, body);
+export async function createBatch(products) {
+  const parsedProducts = products.map(product => ({ ...product, createdAt: now() }));
+
+  const chuncks = chunk(parsedProducts, 1000);
+  const promises = chuncks.map(chunk => axios.post(`${PRODUCTS_URL}/${BATCH}`, { products: chunk }));
+
+  const responses = await Promise.all(promises);
+
+  const data = { statusOk: true, unprocessed: responses.map(response => response.data.unprocessed).flat() };
+
+  return Promise.resolve({ data });
 };
 
 export function editBatch(products) {
