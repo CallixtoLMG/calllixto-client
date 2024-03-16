@@ -232,7 +232,6 @@ const BatchImport = ({ products, isCreating }) => {
       };
     },
     onSuccess: (response) => {
-      console.log({ response });
       const unprocessedCount = response.unprocessed?.length;
       const createdCount = importedProductsCount - unprocessedCount;
       if (response.statusOk) {
