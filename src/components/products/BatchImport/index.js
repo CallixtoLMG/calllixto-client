@@ -13,6 +13,7 @@ import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, ModalHeader } from "./styles";
 
 const BatchImport = ({ products, isCreating }) => {
+  console.log(products?.length)
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, formState: { isDirty }, watch } = useForm();
   const [open, setOpen] = useState(false);
@@ -169,6 +170,7 @@ const BatchImport = ({ products, isCreating }) => {
     setShowConfirmationModal(false);
     setOpen(true);
   };
+
   const handleUnprocessedDownload = () => {
     if (unprocessedResponse && unprocessedResponse.response) {
       const { response } = unprocessedResponse;
@@ -232,6 +234,9 @@ const BatchImport = ({ products, isCreating }) => {
       };
     },
     onSuccess: (response) => {
+      console.log("response", response)
+      console.log("objeto response", { response })
+      console.log("unprocessed", response, unprocessed)
       const unprocessedCount = response.unprocessed?.length;
       const createdCount = importedProductsCount - unprocessedCount;
       if (response.statusOk) {
