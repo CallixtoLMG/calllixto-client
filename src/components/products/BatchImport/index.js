@@ -62,7 +62,7 @@ const BatchImport = ({ products, isCreating }) => {
         return !watchProducts.length || isLoading || isPending || (!isCreating && !isDirty);
       }
     };
-  }, [isCreating, watchProducts, isLoading, isDirty, products]);
+  }, [isCreating, watchProducts, isLoading, isDirty]);
 
 
   const handleClick = useCallback(() => {
@@ -169,6 +169,7 @@ const BatchImport = ({ products, isCreating }) => {
     setShowConfirmationModal(false);
     setOpen(true);
   };
+
   const handleUnprocessedDownload = () => {
     if (unprocessedResponse && unprocessedResponse.response) {
       const { response } = unprocessedResponse;
@@ -187,6 +188,7 @@ const BatchImport = ({ products, isCreating }) => {
         ])
       ];
       downloadExcel(formattedData);
+      setShowUnprocessedModal(false);
       setShowUnprocessedModal(false);
     }
   };
@@ -242,7 +244,7 @@ const BatchImport = ({ products, isCreating }) => {
       } else {
         toast.error(response.message);
       }
-      if (response.unprocessed && response.unprocessed.length > 0) {
+      if (response.unprocessed?.length) {
         setShowUnprocessedModal(true);
         setUnprocessedResponse({ response });
         setUnprocessedProductsCount(response.unprocessed?.length);

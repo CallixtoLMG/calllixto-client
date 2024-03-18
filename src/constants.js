@@ -52,7 +52,7 @@ const REGEX = {
   EMAIL: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,10}))$/,
   TWO_DIGIT_CODE: /^[A-Z0-9]{2}$/,
   THREE_DIGIT_CODE: /^[A-Z0-9]{3}$/,
-  FIVE_DIGIT_CODE: /^[A-Z0-9]{5,30}$/,
+  MAX26_DIGIT_CODE: /^[A-Z0-9]{1,26}$/,
   THREE_NUMBERS_CODE: /^[0-9]{1,3}$/,
 };
 
@@ -67,9 +67,9 @@ const RULES = {
     required: 'Campo requerido',
     pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
   },
-  REQUIRED_FIVE_DIGIT: {
+  REQUIRED_MAX26_DIGIT_CODE: {
     required: 'Campo requerido',
-    pattern: { value: REGEX.FIVE_DIGIT_CODE, message: 'El código debe tener entre 5 y 30 valores alfanuméricos' }
+    pattern: { value: REGEX.MAX26_DIGIT_CODE, message: 'El código debe tener entre 5 y 30 valores alfanuméricos, sumando marca y proveedor' }
   },
   REQUIRED_THREE_NUMBERS: {
     required: 'Campo requerido',
@@ -119,6 +119,6 @@ const LOCALE = 'es-AR';
 const CURRENCY = 'ARS';
 
 export {
-  APIS, PAGES, REGEX, RULES, TIME_IN_MS, LOCALE, CURRENCY
+  APIS, CURRENCY, LOCALE, PAGES, REGEX, RULES, TIME_IN_MS
 };
 
