@@ -42,7 +42,8 @@ const BatchImport = ({ products, isCreating }) => {
   const importSettings = useMemo(() => {
     return {
       button: isCreating ? "Crear" : "Actualizar",
-      label: isCreating ? "Nuevos productos importados" : "Productos importados para actualizar",
+      fileName: isCreating ? "Productos ya existentes" : "Productos no existentes",
+      label: isCreating ? "Nuevos productos" : "Productos para actualizar",
       confirmation: isCreating ? "con códigos duplicados o ya" : "no",
       onSubmit: isCreating ? createBatch : editBatch,
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
@@ -165,7 +166,7 @@ const BatchImport = ({ products, isCreating }) => {
         product.msg || "",
       ]),
     ];
-    downloadExcel(data);
+    downloadExcel(data, importSettings.fileName);
     setShowConfirmationModal(false);
     setOpen(true);
   };
@@ -187,8 +188,7 @@ const BatchImport = ({ products, isCreating }) => {
           product.msg
         ])
       ];
-      downloadExcel(formattedData);
-      setShowUnprocessedModal(false);
+      downloadExcel(formattedData, "Archivo sin procesar");
       setShowUnprocessedModal(false);
     }
   };
@@ -374,23 +374,40 @@ const BatchImport = ({ products, isCreating }) => {
           ) : (
             <ContainerModal>
               <Form onSubmit={handleSubmit(mutate)}>
-                <FieldsContainer>
-                  <FormField width={6}>
-                    <Label >Archivo seleccionado:</Label>
-                    <Segment >{selectedFile}</Segment>
-                  </FormField>
-                </FieldsContainer>
-                <FieldsContainer>
-                  <Label>{`${importSettings.label}: ${importedProductsCount} `}</Label>
-                  <Table
-                    deleteButtonInside
-                    tableHeight="50vh"
-                    mainKey="code"
-                    headers={PRODUCTS_COLUMNS}
-                    elements={watchProducts}
-                    actions={actions}
-                  />
-                </FieldsContainer>
+                {watchProducts.length <= 50 ? (
+                  <>
+                    <FieldsContainer>
+                      <FormField width={6}>
+                        <Label >Archivo seleccionado:</Label>
+                        <Segment >{selectedFile}</Segment>
+                      </FormField>
+                    </FieldsContainer>
+                    <FieldsContainer>
+                      <Label>{`${importSettings.label}: ${importedProductsCount}`}</Label>
+                      <Table
+                        deleteButtonInside
+                        tableHeight="50vh"
+                        mainKey="code"
+                        headers={PRODUCTS_COLUMNS}
+                        elements={watchProducts}
+                        actions={actions}
+                      />
+                    </FieldsContainer>
+                  </>
+                ) : (
+                  <>
+                    <FieldsContainer>
+                      <FormField width={8}>
+                        <Label >Archivo seleccionado:</Label>
+                        <Segment >{selectedFile}</Segment>
+                      </FormField>
+                      <FormField width={7}>
+                        <Label >Cantidad a importar:</Label>
+                        <Segment >{`${importSettings.label}: ${importedProductsCount}`}</Segment>
+                      </FormField>
+                    </FieldsContainer>
+                  </>
+                )}
                 <ModalActions>
                   <Button
                     disabled={importSettings.isButtonDisabled(isPending)}
@@ -410,7 +427,7 @@ const BatchImport = ({ products, isCreating }) => {
             </ContainerModal>
           )}
         </Modal>
-      </Transition>
+      </Transition >
       <Transition animation="fade" duration={500} visible={showUnprocessedModal}>
         <Modal open={showUnprocessedModal} onClose={() => setShowUnprocessedModal(false)}>
           <ModalHeader>Confirmar descarga</ModalHeader>

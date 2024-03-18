@@ -55,7 +55,7 @@ const Products = () => {
         id: 4,
         icon: 'download',
         color: 'blue',
-        onClick: () => downloadExcel(mockData),
+        onClick: () => downloadExcel(mockData, "Ejemplo de tabla"),
         text: 'Plantilla'
       },
       {

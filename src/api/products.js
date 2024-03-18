@@ -1,8 +1,8 @@
+import { TIME_IN_MS } from "@/constants";
 import { BATCH, BLACK_LIST, CLIENT, CLIENT_ID, EDIT_BATCH, PATHS, SUPPLIER } from "@/fetchUrls";
 import { now } from "@/utils";
-import axios from './axios';
 import { useQuery } from "@tanstack/react-query";
-import { TIME_IN_MS } from "@/constants";
+import axios from './axios';
 const { omit, chunk } = require('lodash');
 
 const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
@@ -78,13 +78,25 @@ export function useGetProduct(id) {
 
 export async function createBatch(products) {
   const parsedProducts = products.map(product => ({ ...product, createdAt: now() }));
-
-  const chuncks = chunk(parsedProducts, 1000);
-  const promises = chuncks.map(chunk => axios.post(`${PRODUCTS_URL}/${BATCH}`, { products: chunk }));
+  const chuncks = chunk(parsedProducts, 500);
+  let delay = 0;
+  const delayIncrement = 1000;
+  const promises = chuncks.map(chunk => {
+    delay += delayIncrement;
+    return new Promise(resolve => setTimeout(resolve, delay)).then(() =>
+      axios.post(`${PRODUCTS_URL}/${BATCH}`, { products: chunk }));
+  });
 
   const responses = await Promise.all(promises);
 
-  const data = { statusOk: true, unprocessed: responses.map(response => response.data.unprocessed).flat() };
+  const data = {
+    statusOk: true, unprocessed: responses.map(response => {
+      if (response?.data?.statusOk) {
+        return response.data.unprocessed;
+      }
+      return [];
+    }).flat()
+  };
 
   return Promise.resolve({ data });
 };

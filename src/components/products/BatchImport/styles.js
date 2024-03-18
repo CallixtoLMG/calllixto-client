@@ -26,7 +26,7 @@ const ModalActions = styled(SModal.Actions)`
 const ContainerModal = styled(Flex)`
   flex-direction: column!important;
   padding: 30px!important;
-  width: 100%!important;
+  max-width: 100%!important;
 `;
 
 const WarningMessage = styled.p`
