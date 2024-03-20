@@ -1,6 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
@@ -10,7 +11,7 @@ import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel } from "@/utils";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const mockData = [
   ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
@@ -22,12 +23,23 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { data: products, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false });
+  const { lastEvaluatedKey, setLastEvaluatedKey } = usePaginationContext();
+  const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false, LastEvaluatedKey: lastEvaluatedKey });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
   const isCreating = true;
+ 
+  useEffect(() => {
+    if (data?.LastEvaluatedKey) {
+      setLastEvaluatedKey(data.LastEvaluatedKey);
+    }
+  }, [data, setLastEvaluatedKey]);
+  
+  const { products, LastEvaluatedKey } = useMemo(() => {
+    return { products: data?.products, LastEvaluatedKey: data?.LastEvaluatedKey }
+  }, [data]);
 
   useEffect(() => {
     setLabels(['Productos']);

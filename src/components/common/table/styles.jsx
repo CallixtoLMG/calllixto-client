@@ -12,6 +12,7 @@ const Cell = styled(STable.Cell)`
 `;
 
 const Container = styled(Flex)`
+  flex-direction: column;
   margin: 5px 0!important;
   width: 100% !important;
   max-height: ${({ tableHeight }) => tableHeight || ""} !important;

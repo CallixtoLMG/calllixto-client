@@ -19,9 +19,13 @@ const CreateBudget = () => {
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
 
-  const { data: products, isLoading: loadingProducts } = useListProducts({ cache: false });
+  const { data, isLoading: loadingProducts } = useListProducts({ cache: false });
   const { data: customers, isLoading: loadingCustomers } = useListCustomers();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
+
+  const { products } = useMemo(() => {
+    return { products: data?.products }
+  },[data]);
 
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();

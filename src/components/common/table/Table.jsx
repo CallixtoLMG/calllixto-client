@@ -1,4 +1,5 @@
 import { Button, Input, Segment, } from "@/components/common/custom";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { get } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -20,6 +21,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
   const { handleSubmit, control, reset } = useForm({ defaultValues });
   const [filteredElements, setFilteredElements] = useState([]);
   const useFilters = useMemo(() => filters.length > 0, [filters]);
+  const { currentPage, goToNextPage, goToPreviousPage } = usePaginationContext();
 
   const filter = useCallback((data) => {
     const newElements = elements.filter(element => {
@@ -153,6 +155,11 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
             </Table.Footer>
           )}
         </Table>
+        <Box style={{ alignSelf: "center" }}>
+          <Segment>Página actual: {currentPage}</Segment>
+          <Button onClick={goToPreviousPage}>Anterior</Button>
+          <Button onClick={goToNextPage}>Siguiente</Button>
+        </Box>
       </Container>
     </>
   );

@@ -60,6 +60,7 @@ const ProductsPage = ({ products = [], role }) => {
         actions={actions}
         filters={FILTERS}
       />
+     
       <ModalDelete
         showModal={showModal}
         setShowModal={setShowModal}
