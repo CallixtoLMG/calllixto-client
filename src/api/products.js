@@ -1,8 +1,10 @@
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { TIME_IN_MS } from "@/constants";
 import { BATCH, BLACK_LIST, CLIENT, CLIENT_ID, EDIT_BATCH, PATHS, SUPPLIER } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
+
 const { omit, chunk } = require('lodash');
 
 const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
@@ -31,17 +33,26 @@ export function deleteProduct(id) {
   return axios.delete(`${PRODUCTS_URL}/${id}`);
 };
 
-export function useListProducts({ cache = true, sort, order = true, pageSize, LastEvaluatedKey }) {
+export function useListProducts({ cache = true, sort, order = true, pageSize }) {
+  const { nextKey, addNextKey, currentPage, previousKeys } = usePaginationContext();
+  console.log("previousKeys", previousKeys)
+  console.log("currentPage", currentPage)
+  console.log("previousKeys[currentPage]", previousKeys[currentPage])
+  console.log("nextKey", nextKey)
+
   const params = {
-    pageSize: pageSize || "10",
-    ...(LastEvaluatedKey && { LastEvaluatedKey }),
+    pageSize: pageSize || "6",
+    // ...(nextKey && { LastEvaluatedKey: nextKey }),
+    ...(nextKey && { LastEvaluatedKey: previousKeys[currentPage] }),
     ...(sort && { sort }),
     ...(order && { order }),
   };
 
+
   const listProducts = async (params) => {
     try {
       const { data } = await axios.get(PRODUCTS_URL, { params });
+      addNextKey(data.LastEvaluatedKey);
       return { products: data?.products || [], LastEvaluatedKey: data.LastEvaluatedKey };
     } catch (error) {
       throw error;

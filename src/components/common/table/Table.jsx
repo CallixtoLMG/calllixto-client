@@ -21,7 +21,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
   const { handleSubmit, control, reset } = useForm({ defaultValues });
   const [filteredElements, setFilteredElements] = useState([]);
   const useFilters = useMemo(() => filters.length > 0, [filters]);
-  const { currentPage, goToNextPage, goToPreviousPage } = usePaginationContext();
+  const { goToNextPage, goToPreviousPage, nextKey, previousKeys, currentPage } = usePaginationContext();
 
   const filter = useCallback((data) => {
     const newElements = elements.filter(element => {
@@ -156,9 +156,13 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
           )}
         </Table>
         <Box style={{ alignSelf: "center" }}>
-          <Segment>Página actual: {currentPage}</Segment>
-          <Button onClick={goToPreviousPage}>Anterior</Button>
-          <Button onClick={goToNextPage}>Siguiente</Button>
+          <Segment>Página actual: {Number(currentPage) + 1}</Segment>
+          {previousKeys.length > 0 &&
+            <Button onClick={goToPreviousPage}>Anterior</Button>
+          }
+          {nextKey &&
+            <Button onClick={() => goToNextPage(nextKey)}>Siguiente</Button>
+          }
         </Box>
       </Container>
     </>

@@ -23,8 +23,8 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { lastEvaluatedKey, setLastEvaluatedKey } = usePaginationContext();
-  const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false, LastEvaluatedKey: lastEvaluatedKey });
+  const { setNextKey } = usePaginationContext();
+  const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false});
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -33,12 +33,12 @@ const Products = () => {
  
   useEffect(() => {
     if (data?.LastEvaluatedKey) {
-      setLastEvaluatedKey(data.LastEvaluatedKey);
+      setNextKey(data.LastEvaluatedKey);
     }
-  }, [data, setLastEvaluatedKey]);
+  }, [data, setNextKey]);
   
-  const { products, LastEvaluatedKey } = useMemo(() => {
-    return { products: data?.products, LastEvaluatedKey: data?.LastEvaluatedKey }
+  const { products } = useMemo(() => {
+    return { products: data?.products }
   }, [data]);
 
   useEffect(() => {

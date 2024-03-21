@@ -3,23 +3,30 @@ import { createContext, useContext, useState } from 'react';
 const PaginationContext = createContext();
 
 const PaginationProvider = ({ children }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastEvaluatedKey, setLastEvaluatedKey] = useState(null);
 
-  const goToNextPage = () => {
-    setCurrentPage((prevPage) => prevPage + 1);
-    setLastEvaluatedKey(lastEvaluatedKey)
-    console.log(lastEvaluatedKey)
+  const [previousKeys, setPreviousKeys] = useState([]);
+  const [currentPage, setCurrentPage] = useState(-1);
+  const [nextKey, setNextKey] = useState(null);
+  const goToNextPage = (key) => {
+    if (nextKey) {
+      setCurrentPage(prevState => Math.max(prevState + 1, 0));
+      setPreviousKeys(prevKeys => [...prevKeys, nextKey]);
+      setNextKey(key);
+    }
+
+  };
+  const goToPreviousPage = () => {
+    setCurrentPage(prevState => Math.max(prevState - 1, -1));
+    setNextKey(previousKeys.pop());
+    setPreviousKeys(previousKeys);
   };
 
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prevPage) => prevPage - 1);
-    }
+  const addNextKey = (key) => {
+    setNextKey(key);
   };
 
   return (
-    <PaginationContext.Provider value={{ currentPage, goToNextPage, goToPreviousPage, lastEvaluatedKey, setLastEvaluatedKey }}>
+    <PaginationContext.Provider value={{ goToNextPage, goToPreviousPage, previousKeys, nextKey, setNextKey, addNextKey, currentPage }}>
       {children}
     </PaginationContext.Provider>
   );
