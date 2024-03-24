@@ -33,26 +33,23 @@ export function deleteProduct(id) {
   return axios.delete(`${PRODUCTS_URL}/${id}`);
 };
 
-export function useListProducts({ cache = true, sort, order = true, pageSize }) {
-  const { nextKey, addNextKey, currentPage, previousKeys } = usePaginationContext();
-  console.log("previousKeys", previousKeys)
-  console.log("currentPage", currentPage)
-  console.log("previousKeys[currentPage]", previousKeys[currentPage])
-  console.log("nextKey", nextKey)
+export function useListProducts({ cache = true, sort, order = true, pageSize, }) {
+  const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
-    pageSize: pageSize || "6",
-    // ...(nextKey && { LastEvaluatedKey: nextKey }),
-    ...(nextKey && { LastEvaluatedKey: previousKeys[currentPage] }),
-    ...(sort && { sort }),
+    pageSize: pageSize || "3",
+    ...(!!keys[currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[currentPage])) }),
+    ...(sort && { sort: "name" }),
     ...(order && { order }),
+    ...filters
   };
-
 
   const listProducts = async (params) => {
     try {
       const { data } = await axios.get(PRODUCTS_URL, { params });
-      addNextKey(data.LastEvaluatedKey);
+      if (data?.LastEvaluatedKey) {
+        addKey(data.LastEvaluatedKey);
+      };
       return { products: data?.products || [], LastEvaluatedKey: data.LastEvaluatedKey };
     } catch (error) {
       throw error;

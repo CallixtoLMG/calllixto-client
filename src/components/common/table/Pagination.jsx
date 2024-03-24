@@ -4,29 +4,29 @@ const PaginationContext = createContext();
 
 const PaginationProvider = ({ children }) => {
 
-  const [previousKeys, setPreviousKeys] = useState([]);
-  const [currentPage, setCurrentPage] = useState(-1);
-  const [nextKey, setNextKey] = useState(null);
-  const goToNextPage = (key) => {
-    if (nextKey) {
-      setCurrentPage(prevState => Math.max(prevState + 1, 0));
-      setPreviousKeys(prevKeys => [...prevKeys, nextKey]);
-      setNextKey(key);
-    }
-
+  const [filters, setFilters] = useState({});
+  const [keys, setKeys] = useState([null]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const goToNextPage = () => {
+    setCurrentPage(currentPage + 1);
   };
+
   const goToPreviousPage = () => {
-    setCurrentPage(prevState => Math.max(prevState - 1, -1));
-    setNextKey(previousKeys.pop());
-    setPreviousKeys(previousKeys);
+    setCurrentPage(currentPage - 1);
   };
 
-  const addNextKey = (key) => {
-    setNextKey(key);
+  const addKey = (key) => {
+    if (!keys.includes(key)) {
+      keys.push(key)
+    };
+  };
+
+  const resetKeys = () => {
+    setKeys([null])
   };
 
   return (
-    <PaginationContext.Provider value={{ goToNextPage, goToPreviousPage, previousKeys, nextKey, setNextKey, addNextKey, currentPage }}>
+    <PaginationContext.Provider value={{ goToNextPage, goToPreviousPage, keys, setKeys, addKey, currentPage, resetKeys, filters, setFilters }}>
       {children}
     </PaginationContext.Provider>
   );

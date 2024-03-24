@@ -1,7 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
-import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
@@ -23,20 +22,13 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { setNextKey } = usePaginationContext();
-  const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false});
+  const { data, isLoading, isRefetching } = useListProducts({ sort: 'name', order: false });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
   const isCreating = true;
- 
-  useEffect(() => {
-    if (data?.LastEvaluatedKey) {
-      setNextKey(data.LastEvaluatedKey);
-    }
-  }, [data, setNextKey]);
-  
+
   const { products } = useMemo(() => {
     return { products: data?.products }
   }, [data]);

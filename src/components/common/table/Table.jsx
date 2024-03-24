@@ -1,8 +1,7 @@
 import { Button, Input, Segment, } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
-import { get } from "lodash";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
@@ -15,39 +14,22 @@ const FiltersContainer = styled(Flex)`
   align-items: center;
 `;
 
-const CustomTable = ({ headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
+const CustomTable = ({ onFilter, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
   const { push } = useRouter();
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset } = useForm({ defaultValues });
-  const [filteredElements, setFilteredElements] = useState([]);
   const useFilters = useMemo(() => filters.length > 0, [filters]);
-  const { goToNextPage, goToPreviousPage, nextKey, previousKeys, currentPage } = usePaginationContext();
-
-  const filter = useCallback((data) => {
-    const newElements = elements.filter(element => {
-      if (data) {
-        return filters.every(filter => {
-          return get(element, filter.map ? filter.map : filter.value, '')?.toLowerCase().includes(data[filter.value].toLowerCase());
-        });
-      }
-      return elements;
-    });
-    setFilteredElements(newElements);
-  }, [elements, filters]);
-
-  useEffect(() => {
-    setFilteredElements(elements);
-  }, [elements])
+  const { goToNextPage, goToPreviousPage, currentPage, resetKeys } = usePaginationContext();
 
   const handleRestore = useCallback(() => {
     reset(defaultValues);
-    setFilteredElements(elements);
   }, [reset, defaultValues, elements]);
 
   const handleEnterKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      handleSubmit(filter)();
+      resetKeys()
+      handleSubmit(onFilter)();
     }
   };
 
@@ -55,7 +37,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
     <>
       {useFilters && (
         <Segment>
-          <Form onSubmit={handleSubmit(filter)}>
+          <Form onSubmit={handleSubmit(onFilter)}>
             <Flex justifyContent="space-between">
               <FiltersContainer>
                 <Popup
@@ -79,7 +61,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
                   />
                 )}
               </FiltersContainer>
-              <Button onClick={handleSubmit(filter)} type="button" width="110px">
+              <Button onClick={handleSubmit(onFilter)} type="button" width="110px">
                 <Flex justifyContent="space-around">
                   <span>Filtrar</span>
                   <Icon name="search" />
@@ -99,7 +81,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
             </Table.Row>
           </TableHeader>
           <Table.Body>
-            {(useFilters ? !filteredElements.length : !elements.length) ? (
+            {!elements.length ? (
               <Table.Row>
                 <Table.Cell colSpan={headers.length} textAlign="center">
                   <Header as="h4">
@@ -108,7 +90,7 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
                 </Table.Cell>
               </Table.Row>
             ) : (
-              (useFilters ? filteredElements : elements).map((element, index) => {
+              elements.map((element, index) => {
                 if (page) {
                   return (
                     <LinkRow key={element[mainKey]} onClick={() => push(page.SHOW(element[mainKey]))}>
@@ -157,12 +139,8 @@ const CustomTable = ({ headers = [], elements = [], page, actions = [], total, f
         </Table>
         <Box style={{ alignSelf: "center" }}>
           <Segment>Página actual: {Number(currentPage) + 1}</Segment>
-          {previousKeys.length > 0 &&
-            <Button onClick={goToPreviousPage}>Anterior</Button>
-          }
-          {nextKey &&
-            <Button onClick={() => goToNextPage(nextKey)}>Siguiente</Button>
-          }
+          <Button onClick={goToPreviousPage}>Anterior</Button>
+          <Button onClick={goToNextPage}>Siguiente</Button>
         </Box>
       </Container>
     </>

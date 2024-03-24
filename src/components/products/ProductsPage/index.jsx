@@ -2,6 +2,7 @@
 import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -14,6 +15,18 @@ const ProductsPage = ({ products = [], role }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const queryClient = useQueryClient();
+  const { setFilters } = usePaginationContext();
+
+  const onFilter = (data) => {
+    if (data.code) {
+      setFilters({ ...data, sort: "code" });
+      return;
+    }
+    if (data.name) {
+      setFilters({ ...data, sort: "name" });
+      return;
+    }
+  };
 
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
 
@@ -59,8 +72,9 @@ const ProductsPage = ({ products = [], role }) => {
         page={PAGES.PRODUCTS}
         actions={actions}
         filters={FILTERS}
+        onFilter={onFilter}
       />
-     
+
       <ModalDelete
         showModal={showModal}
         setShowModal={setShowModal}

@@ -31,7 +31,7 @@ const BatchImport = ({ products, isCreating }) => {
 
   useEffect(() => {
     const codes = products?.reduce((acc, product) => {
-      acc[product.code.toUpperCase()] = product;
+      acc[product.code?.toUpperCase()] = product;
       return acc;
     }, {});
 

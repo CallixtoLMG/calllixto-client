@@ -81,15 +81,15 @@ export const formatedPhone = (area, num) => {
 };
 
 export const getSupplierCode = (code) => {
-  return code.slice(0, 2);
+  return code?.slice(0, 2);
 };
 
 export const getBrandCode = (code) => {
-  return code.slice(2, 4);
+  return code?.slice(2, 4);
 };
 
 export const getProductCode = (code) => {
-  return code.slice(4);
+  return code?.slice(4);
 };
 
 export const preventSend = (event) => {
