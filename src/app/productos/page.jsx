@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
@@ -22,16 +22,16 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { data, isLoading, isRefetching } = useListProducts({ sort: 'name', order: false });
+  const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
   const isCreating = true;
 
-  const { products } = useMemo(() => {
-    return { products: data?.products }
-  }, [data]);
+  const products = useMemo(() => {
+    return data?.products
+  }, [data?.products]);
 
   useEffect(() => {
     setLabels(['Productos']);
@@ -74,13 +74,15 @@ const Products = () => {
   }, [isCreating, products, push, role, setActions]);
 
   return (
-    <Loader active={isLoading | isRefetching}>
+    <>
       {open && <BanProduct open={open} setOpen={setOpen} />}
       <ProductsPage
-        products={products}
+        isRefetching={isRefetching}
+        isLoading={isLoading}
+        products={data?.products}
         role={role}
       />
-    </Loader>
+    </>
   );
 };
 

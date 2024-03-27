@@ -3,6 +3,7 @@ import { TIME_IN_MS } from "@/constants";
 import { BATCH, BLACK_LIST, CLIENT, CLIENT_ID, EDIT_BATCH, PATHS, SUPPLIER } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import axios from './axios';
 
 const { omit, chunk } = require('lodash');
@@ -33,24 +34,39 @@ export function deleteProduct(id) {
   return axios.delete(`${PRODUCTS_URL}/${id}`);
 };
 
-export function useListProducts({ cache = true, sort, order = true, pageSize, }) {
-  const { addKey, currentPage, keys, filters } = usePaginationContext();
+export function useListProducts({ cache = true, sort, order = true, pageSize }) {
+
+  const { addKey, currentPage, keys, filters, handleEntityChange, setHasMoreItems } = usePaginationContext();
+
+  useEffect(() => {
+    handleEntityChange("products")
+  }, []);
 
   const params = {
-    pageSize: pageSize || "3",
-    ...(!!keys[currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[currentPage])) }),
-    ...(sort && { sort: "name" }),
+    pageSize: pageSize || "5",
+    ...(keys["products"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["products"][currentPage])) }),
+    ...(sort && { sort }),
     ...(order && { order }),
     ...filters
   };
 
+ 
+
   const listProducts = async (params) => {
+    console.log("params", params)
     try {
       const { data } = await axios.get(PRODUCTS_URL, { params });
-      if (data?.LastEvaluatedKey) {
-        addKey(data.LastEvaluatedKey);
+      console.log(data)
+      const hasMore = data?.LastEvaluatedKey !== undefined;
+      if (data?.LastEvaluatedKey && !data?.products.length < params.pageSize) {
+        setHasMoreItems(true)
+        addKey(data?.LastEvaluatedKey, "products", hasMore);
+      } else {
+        setHasMoreItems(false)
+      }
+      return {
+        products: data?.products || [], LastEvaluatedKey: data.LastEvaluatedKey
       };
-      return { products: data?.products || [], LastEvaluatedKey: data.LastEvaluatedKey };
     } catch (error) {
       throw error;
     }

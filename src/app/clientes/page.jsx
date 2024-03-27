@@ -5,11 +5,11 @@ import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 const Customers = () => {
   useValidateToken();
-  const { data: customers, isLoading } = useListCustomers();
+  const { data, isLoading } = useListCustomers({ sort: 'name', order: false });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -17,6 +17,10 @@ const Customers = () => {
   useEffect(() => {
     setLabels(['Clientes']);
   }, [setLabels]);
+
+  const { customers } = useMemo(() => {
+    return { customers: data?.customers }
+  }, [data]);
 
   useEffect(() => {
     const actions = [

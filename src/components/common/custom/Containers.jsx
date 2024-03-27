@@ -21,7 +21,7 @@ export const ButtonsContainer = styled(Flex)`
   flex-direction: row;
   margin-bottom: 10px !important;
   margin-top: ${({ marginTop }) => marginTop};
-  justify-content: flex-end;
+  justify-content: ${({ center }) => center ? "center" : "flex-end"};
   column-gap: 10px;
   width: ${({ width }) => width};
 `;

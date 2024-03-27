@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Table as STable } from "semantic-ui-react";
+import { Button as SButton, Segment as SSegment, Table as STable } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Cell = styled(STable.Cell)`
@@ -18,13 +18,33 @@ const Container = styled(Flex)`
   max-height: ${({ tableHeight }) => tableHeight || ""} !important;
   overflow-y: ${({ tableHeight }) => tableHeight && "auto"} !important;
   overflow-x: ${({ tableHeight }) => tableHeight && "auto"} !important;
+`;
 
+const PaginationContainer = styled(Flex)`
+  align-self: center;
+  max-height: ${({ height }) => height || ""} !important;
+`;
+
+const PaginationSegment = styled(SSegment)`
+  height:39.5px!important;
+  margin: 0!important;
+  padding: 10px!important;
+`;
+
+const Segment = styled(SSegment)`
+  padding: 10px!important;
+  margin-bottom: 8px!important;
 `;
 
 const Table = styled(STable)`
   max-height: ${({ tableHeight }) => tableHeight || ""} !important;
   overflow-y: auto!important;
   overflow-x: hidden!important;
+`;
+
+export const Button = styled(SButton)`
+  margin: 0 !important;
+  visibility: ${({ hidden }) => hidden && "hidden"} !important;
 `;
 
 const TableHeader = styled(STable.Header)`
@@ -81,5 +101,5 @@ const TableRow = styled(STable.Row)`
   }
 `;
 
-export { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkRow, Table, TableFooter, TableHeader, TableRow };
+export { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
 

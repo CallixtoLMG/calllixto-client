@@ -7,11 +7,11 @@ import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 const Suppliers = () => {
   useValidateToken();
-  const { data: suppliers, isLoading, isRefetching } = useListSuppliers();
+  const { data, isLoading, isRefetching } = useListSuppliers({ sort: 'name', order: false });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -20,6 +20,10 @@ const Suppliers = () => {
   useEffect(() => {
     setLabels(['Proveedores']);
   }, [setLabels]);
+
+  const { suppliers } = useMemo(() => {
+    return { suppliers: data?.suppliers }
+  }, [data]);
 
   useEffect(() => {
     const visibilityRules = Rules(role);

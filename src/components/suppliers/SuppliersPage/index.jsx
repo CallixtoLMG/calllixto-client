@@ -1,21 +1,37 @@
 "use client";
+import { LIST_SUPPLIERS_QUERY_KEY, deleteSupplier } from "@/api/suppliers";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
-import { useState } from "react";
-import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteSupplier, LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
 
 const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const queryClient = useQueryClient();
-
+  const { setFilters, handleEntityChange  } = usePaginationContext();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar la marca "${name}"?`;
+
+  useEffect(() => {
+    handleEntityChange("suppliers")
+  }, []);
+
+  const onFilter = (data) => {
+    if (data.id) {
+      setFilters({ ...data, sort: "id" });
+      return;
+    }
+    if (data.name) {
+      setFilters({ ...data, sort: "name" });
+      return;
+    }
+  };
 
   const actions = visibilityRules.canSeeActions ? [
     {
@@ -54,6 +70,7 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
         page={PAGES.SUPPLIERS}
         actions={actions}
         filters={FILTERS}
+        onFilter={onFilter}
       />
       <ModalDelete
         showModal={showModal}

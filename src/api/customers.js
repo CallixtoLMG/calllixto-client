@@ -1,8 +1,10 @@
-import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import axios from './axios';
-import { useQuery } from "@tanstack/react-query";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { TIME_IN_MS } from "@/constants";
+import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import axios from './axios';
 
 const CUSTOMERS_URL = `${CLIENT_ID}${PATHS.CUSTOMERS}`;
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
@@ -28,21 +30,41 @@ export function deleteCustomer(id) {
   return axios.delete(`${CUSTOMERS_URL}/${id}`);
 };
 
-export function useListCustomers() {
-  const listCustomers = async () => {
+export function useListCustomers({ entityType = 'customers', cache = true, sort, order = true, pageSize, }) {
+  const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
+
+  useEffect(() => {
+    handleEntityChange();
+    // Dependencias del efecto, incluyendo `handleEntityChange` para asegurar su actualización
+  }, [entityType]);
+
+  const params = {
+    pageSize: pageSize || "10",
+    ...(keys[entityType][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[entityType][currentPage])) }),
+    ...(sort && { sort }),
+    ...(order && { order }),
+    ...filters
+  };
+
+  const listCustomers = async (params) => {
     try {
-      const { data } = await axios.get(CUSTOMERS_URL);
-      return data?.customers || [];
+      const { data } = await axios.get(CUSTOMERS_URL, { params });
+      if (data?.LastEvaluatedKey) {
+        addKey(entityType, data.LastEvaluatedKey, true);
+      } else {
+        addKey(entityType, null, false);
+      }
+      return { customers: data?.customers || [], LastEvaluatedKey: data.LastEvaluatedKey }
     } catch (error) {
       throw error;
     }
   };
 
   const query = useQuery({
-    queryKey: [LIST_CUSTOMERS_QUERY_KEY],
-    queryFn: () => listCustomers(),
+    queryKey: [LIST_CUSTOMERS_QUERY_KEY, params],
+    queryFn: () => listCustomers(params),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
+    staleTime: cache ? TIME_IN_MS.ONE_MINUTE : 0,
   });
 
   return query;

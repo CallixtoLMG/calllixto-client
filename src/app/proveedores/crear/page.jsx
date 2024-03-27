@@ -6,7 +6,7 @@ import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateSupplier = () => {

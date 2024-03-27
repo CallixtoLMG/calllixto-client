@@ -46,7 +46,6 @@ const SUPPLIERS_COLUMNS = [
 const FILTERS = [
   { value: 'id', placeholder: 'Id' },
   { value: 'name', placeholder: 'Nombre' },
-  { value: 'address', placeholder: 'Dirección' }
 ];
 
 export { FILTERS, SUPPLIERS_COLUMNS };

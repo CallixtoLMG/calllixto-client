@@ -10,7 +10,7 @@ import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
 import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
 
-const ProductsPage = ({ products = [], role }) => {
+const ProductsPage = ({ products = [], role, isLoading, isRefetching }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -19,11 +19,11 @@ const ProductsPage = ({ products = [], role }) => {
 
   const onFilter = (data) => {
     if (data.code) {
-      setFilters({ ...data, sort: "code" });
+      setFilters({ code: data.code, sort: "code" });
       return;
     }
     if (data.name) {
-      setFilters({ ...data, sort: "name" });
+      setFilters({ name: data.name, sort: "name" });
       return;
     }
   };
@@ -66,6 +66,8 @@ const ProductsPage = ({ products = [], role }) => {
   return (
     <>
       <Table
+        isRefetching={isRefetching}
+        isLoading={isLoading}
         mainKey="code"
         headers={PRODUCT_COLUMNS}
         elements={mapProductsForTable(products)}

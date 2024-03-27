@@ -1,8 +1,10 @@
-import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import { useQuery } from '@tanstack/react-query';
-import axios from './axios';
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { TIME_IN_MS } from "@/constants";
+import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from "react";
+import axios from './axios';
 
 const BRANDS_URL = `${CLIENT_ID}${PATHS.BRANDS}`;
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
@@ -28,21 +30,41 @@ export function deleteBrand(id) {
   return axios.delete(`${BRANDS_URL}/${id}`);
 };
 
-export function useListBrands() {
-  const listBrands = async () => {
+export function useListBrands({ entityType = 'brands', cache = true, sort, order = true, pageSize, }) {
+  const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
+
+  useEffect(() => {
+    handleEntityChange();
+    // Dependencias del efecto, incluyendo `handleEntityChange` para asegurar su actualización
+  }, [entityType]);
+
+  const params = {
+    pageSize: pageSize || "10",
+    ...(keys[entityType][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[entityType][currentPage])) }),
+    ...(sort && { sort }),
+    ...(order && { order }),
+    ...filters
+  };
+
+  const listBrands = async (params) => {
     try {
-      const { data } = await axios.get(BRANDS_URL);
-      return data?.brands || [];
+      const { data } = await axios.get(BRANDS_URL, { params });
+      if (data?.LastEvaluatedKey) {
+        addKey(entityType, data.LastEvaluatedKey, true);
+      } else {
+        addKey(entityType, null, false);
+      }
+      return { brands: data?.brands || [], LastEvaluatedKey: data.LastEvaluatedKey }
     } catch (error) {
       throw error;
     }
   };
 
   const query = useQuery({
-    queryKey: [LIST_BRANDS_QUERY_KEY],
-    queryFn: () => listBrands(),
+    queryKey: [LIST_BRANDS_QUERY_KEY, params],
+    queryFn: () => listBrands(params),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
+    staleTime: cache ? TIME_IN_MS.ONE_MINUTE : 0,
   });
 
   return query;
