@@ -22,17 +22,16 @@ export function edit(budget, id) {
   return axios.post(`${BUDGETS_URL}/${id}`, budget);
 };
 
-export function useListBudgets({ entityType = 'budgets', cache = true, sort, order = true, pageSize, }) {
+export function useListBudgets({ cache = true, sort, order = true, pageSize, }) {
   const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
 
   useEffect(() => {
-    handleEntityChange();
-    // Dependencias del efecto, incluyendo `handleEntityChange` para asegurar su actualización
-  }, [entityType]);
+    handleEntityChange("budgets")
+  }, []);
 
   const params = {
     pageSize: pageSize || "10",
-    ...(keys[entityType][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[entityType][currentPage])) }),
+    ...(keys["budgets"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["budgets"][currentPage])) }),
     ...(sort && { sort }),
     ...(order && { order }),
     ...filters
@@ -41,10 +40,8 @@ export function useListBudgets({ entityType = 'budgets', cache = true, sort, ord
   const listBudgets = async (params) => {
     try {
       const { data } = await axios.get(BUDGETS_URL, { params });
-      if (data?.LastEvaluatedKey) {
-        addKey(entityType, data.LastEvaluatedKey, true);
-      } else {
-        addKey(entityType, null, false);
+      if (data?.LastEvaluatedKey && !data?.products.length < params.pageSize) {
+        addKey(data?.LastEvaluatedKey, "budgets");
       }
       return { budgets: data?.budgets || [], LastEvaluatedKey: data.LastEvaluatedKey }
     } catch (error) {

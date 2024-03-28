@@ -17,13 +17,13 @@ const Suppliers = () => {
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
-  useEffect(() => {
-    setLabels(['Proveedores']);
-  }, [setLabels]);
-
   const { suppliers } = useMemo(() => {
     return { suppliers: data?.suppliers }
   }, [data]);
+
+  useEffect(() => {
+    setLabels(['Proveedores']);
+  }, [setLabels]);
 
   useEffect(() => {
     const visibilityRules = Rules(role);
@@ -42,7 +42,7 @@ const Suppliers = () => {
   return (
     <Loader active={isLoading || isRefetching}>
       <SuppliersPage
-        suppliers={suppliers}
+        suppliers={data?.suppliers}
         role={role}
         isLoading={isLoading}
         onDelete={deleteSupplier}

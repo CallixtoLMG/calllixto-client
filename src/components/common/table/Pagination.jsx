@@ -6,7 +6,6 @@ const PaginationProvider = ({ children }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [activeKey, setActiveKey] = useState();
   const [filters, setFilters] = useState({});
-  const [hasMoreItems, setHasMoreItems] = useState(true);
   const [keys, setKeys] = useState({
     products: [null],
     brands: [null],
@@ -27,18 +26,13 @@ const PaginationProvider = ({ children }) => {
     }
   };
 
-  const addKey = (key, activeKey, hasMoreItems) => {
+  const addKey = (key, activeKey) => {
     const newKeys = [...keys[activeKey]];
     if (!newKeys.includes(key)) {
       newKeys.push(key);
       setKeys({ ...keys, [activeKey]: newKeys });
     }
-    setHasMoreItems(hasMoreItems); // Actualiza basándose en si se espera que haya más items.
   };
-
-  const canGoToNextPage = () => currentPage < keys[activeKey]?.length - 1;
-
-  const canGoToPreviousPage = () => currentPage > 0;
 
   const handleEntityChange = (key) => {
     setCurrentPage(0);
@@ -49,7 +43,7 @@ const PaginationProvider = ({ children }) => {
   const resetPagination = () => {
     setFilters({});
     resetKeys();
-  }
+  };
 
   const resetKeys = () => {
     setKeys({ ...keys, [activeKey]: [null] });
@@ -58,8 +52,6 @@ const PaginationProvider = ({ children }) => {
 
   return (
     <PaginationContext.Provider value={{
-      hasMoreItems,
-      setHasMoreItems,
       handleEntityChange,
       resetPagination,
       goToNextPage,
@@ -68,8 +60,6 @@ const PaginationProvider = ({ children }) => {
       setKeys,
       addKey,
       currentPage,
-      canGoToNextPage,
-      canGoToPreviousPage,
       filters,
       setFilters,
       resetKeys

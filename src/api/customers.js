@@ -30,17 +30,16 @@ export function deleteCustomer(id) {
   return axios.delete(`${CUSTOMERS_URL}/${id}`);
 };
 
-export function useListCustomers({ entityType = 'customers', cache = true, sort, order = true, pageSize, }) {
+export function useListCustomers({ cache = true, sort, order = true, pageSize, }) {
   const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
 
   useEffect(() => {
-    handleEntityChange();
-    // Dependencias del efecto, incluyendo `handleEntityChange` para asegurar su actualización
-  }, [entityType]);
+    handleEntityChange("customers")
+  }, []);
 
   const params = {
     pageSize: pageSize || "10",
-    ...(keys[entityType][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[entityType][currentPage])) }),
+    ...(keys["customers"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["customers"][currentPage])) }),
     ...(sort && { sort }),
     ...(order && { order }),
     ...filters
@@ -49,10 +48,8 @@ export function useListCustomers({ entityType = 'customers', cache = true, sort,
   const listCustomers = async (params) => {
     try {
       const { data } = await axios.get(CUSTOMERS_URL, { params });
-      if (data?.LastEvaluatedKey) {
-        addKey(entityType, data.LastEvaluatedKey, true);
-      } else {
-        addKey(entityType, null, false);
+      if (data?.LastEvaluatedKey && !data?.products.length < params.pageSize) {
+        addKey(data?.LastEvaluatedKey, "customers");
       }
       return { customers: data?.customers || [], LastEvaluatedKey: data.LastEvaluatedKey }
     } catch (error) {

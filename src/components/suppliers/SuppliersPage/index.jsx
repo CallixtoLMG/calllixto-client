@@ -6,7 +6,7 @@ import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
 
@@ -15,12 +15,8 @@ const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const queryClient = useQueryClient();
-  const { setFilters, handleEntityChange  } = usePaginationContext();
+  const { setFilters  } = usePaginationContext();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar la marca "${name}"?`;
-
-  useEffect(() => {
-    handleEntityChange("suppliers")
-  }, []);
 
   const onFilter = (data) => {
     if (data.id) {

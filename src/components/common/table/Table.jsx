@@ -1,4 +1,6 @@
+import { LIST_BRANDS_QUERY_KEY } from "@/api/brands";
 import { LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
+import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { ButtonsContainer, Input } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
@@ -23,7 +25,7 @@ const CustomTable = ({ isRefetching, isLoading, onFilter, headers = [], elements
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset, setValue } = useForm({ defaultValues });
   const useFilters = useMemo(() => filters.length > 0, [filters]);
-  const { hasMoreItems , goToNextPage, goToPreviousPage, canGoToNextPage, canGoToPreviousPage, currentPage, resetKeys, resetPagination } = usePaginationContext();
+  const { goToNextPage, goToPreviousPage, currentPage, resetKeys, resetPagination } = usePaginationContext();
   const queryClient = useQueryClient();
 
   const handleFilterChange = useCallback((changedFilter) => {
@@ -37,6 +39,8 @@ const CustomTable = ({ isRefetching, isLoading, onFilter, headers = [], elements
   const handleRestore = useCallback(() => {
     resetPagination();
     queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
+    queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
+    queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY] });
     resetKeys();
     reset(defaultValues);
   }, [reset, defaultValues, elements,]);
@@ -46,6 +50,8 @@ const CustomTable = ({ isRefetching, isLoading, onFilter, headers = [], elements
       e.preventDefault();
       resetKeys();
       queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
+      queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY] });
       handleSubmit(onFilter)();
     }
   };
@@ -167,9 +173,9 @@ const CustomTable = ({ isRefetching, isLoading, onFilter, headers = [], elements
           </Table>
           <PaginationContainer height="50px">
             <ButtonsContainer width="400px" center >
-              {canGoToPreviousPage() ? <Button onClick={goToPreviousPage}>Anterior</Button> : <Button hidden onClick={goToPreviousPage}>Anterior</Button>}
+              <Button onClick={goToPreviousPage}>Anterior</Button>
               <PaginationSegment height="50px">Página actual: {Number(currentPage) + 1}</PaginationSegment>
-              {canGoToNextPage() && hasMoreItems ? <Button onClick={goToNextPage}>Siguiente</Button> : <Button hidden onClick={goToNextPage}>Siguiente</Button>}
+              <Button onClick={goToNextPage}>Siguiente</Button>
             </ButtonsContainer>
           </PaginationContainer>
         </Container>

@@ -35,7 +35,7 @@ export function useListSuppliers({ cache = true, sort, order = true, pageSize, }
   const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
 
   useEffect(() => {
-    handleEntityChange("products")
+    handleEntityChange("suppliers")
   }, []);
 
   const params = {
@@ -49,8 +49,8 @@ export function useListSuppliers({ cache = true, sort, order = true, pageSize, }
   const listSuppliers = async (params) => {
     try {
       const { data } = await axios.get(SUPPLIER_URL, { params });
-      if (data?.LastEvaluatedKey) {
-        addKey(data.LastEvaluatedKey , "suppliers");
+      if (data?.LastEvaluatedKey && !data?.suppliers.length < params.pageSize) {
+        addKey(data?.LastEvaluatedKey, "suppliers");
       }
       return { suppliers: data?.suppliers || [], LastEvaluatedKey: data.LastEvaluatedKey }
     } catch (error) {

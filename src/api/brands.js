@@ -30,17 +30,16 @@ export function deleteBrand(id) {
   return axios.delete(`${BRANDS_URL}/${id}`);
 };
 
-export function useListBrands({ entityType = 'brands', cache = true, sort, order = true, pageSize, }) {
+export function useListBrands({ cache = true, sort, order = true, pageSize, }) {
   const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
 
   useEffect(() => {
-    handleEntityChange();
-    // Dependencias del efecto, incluyendo `handleEntityChange` para asegurar su actualización
-  }, [entityType]);
+    handleEntityChange("brands")
+  }, []);
 
   const params = {
     pageSize: pageSize || "10",
-    ...(keys[entityType][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[entityType][currentPage])) }),
+    ...(keys["brands"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["brands"][currentPage])) }),
     ...(sort && { sort }),
     ...(order && { order }),
     ...filters
@@ -49,10 +48,8 @@ export function useListBrands({ entityType = 'brands', cache = true, sort, order
   const listBrands = async (params) => {
     try {
       const { data } = await axios.get(BRANDS_URL, { params });
-      if (data?.LastEvaluatedKey) {
-        addKey(entityType, data.LastEvaluatedKey, true);
-      } else {
-        addKey(entityType, null, false);
+      if (data?.LastEvaluatedKey && !data?.brands.length < params.pageSize) {
+        addKey(data?.LastEvaluatedKey, "brands");
       }
       return { brands: data?.brands || [], LastEvaluatedKey: data.LastEvaluatedKey }
     } catch (error) {

@@ -36,7 +36,7 @@ export function deleteProduct(id) {
 
 export function useListProducts({ cache = true, sort, order = true, pageSize }) {
 
-  const { addKey, currentPage, keys, filters, handleEntityChange, setHasMoreItems } = usePaginationContext();
+  const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
 
   useEffect(() => {
     handleEntityChange("products")
@@ -50,23 +50,14 @@ export function useListProducts({ cache = true, sort, order = true, pageSize }) 
     ...filters
   };
 
- 
-
-  const listProducts = async (params) => {
-    console.log("params", params)
+   const listProducts = async (params) => {
     try {
       const { data } = await axios.get(PRODUCTS_URL, { params });
       console.log(data)
-      const hasMore = data?.LastEvaluatedKey !== undefined;
       if (data?.LastEvaluatedKey && !data?.products.length < params.pageSize) {
-        setHasMoreItems(true)
-        addKey(data?.LastEvaluatedKey, "products", hasMore);
-      } else {
-        setHasMoreItems(false)
+        addKey(data?.LastEvaluatedKey, "products");
       }
-      return {
-        products: data?.products || [], LastEvaluatedKey: data.LastEvaluatedKey
-      };
+      return { products: data?.products || [], LastEvaluatedKey: data.LastEvaluatedKey };
     } catch (error) {
       throw error;
     }
