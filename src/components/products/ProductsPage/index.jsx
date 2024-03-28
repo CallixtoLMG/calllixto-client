@@ -15,17 +15,17 @@ const ProductsPage = ({ products = [], role, isLoading, isRefetching }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const queryClient = useQueryClient();
-  const { setFilters } = usePaginationContext();
+  const { resetFilters } = usePaginationContext();
 
   const onFilter = (data) => {
+    const filters = { ...data };
     if (data.code) {
-      setFilters({ code: data.code, sort: "code" });
-      return;
+      filters.sort = "code";
     }
     if (data.name) {
-      setFilters({ name: data.name, sort: "name" });
-      return;
+      filters.sort = "name";
     }
+    resetFilters(filters);
   };
 
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;

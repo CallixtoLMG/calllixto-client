@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useMemo, useState } from 'react';
 
 const PaginationContext = createContext();
 
@@ -14,6 +14,10 @@ const PaginationProvider = ({ children }) => {
     budgets: [null],
   });
 
+  const canGoNext = useMemo(() => {
+    return currentPage < keys[activeKey]?.length - 1
+  }, [currentPage, keys, activeKey]);
+
   const goToNextPage = () => {
     if (currentPage < keys[activeKey].length - 1) {
       setCurrentPage(currentPage + 1);
@@ -28,32 +32,28 @@ const PaginationProvider = ({ children }) => {
 
   const addKey = (key, activeKey) => {
     const newKeys = [...keys[activeKey]];
-    if (!newKeys.includes(key)) {
+    const oldKey = newKeys?.find(k => k?.LSI2 === key?.LSI2 && k?.SK === key?.SK);
+    if (!oldKey) {
       newKeys.push(key);
       setKeys({ ...keys, [activeKey]: newKeys });
     }
   };
 
   const handleEntityChange = (key) => {
-    setCurrentPage(0);
-    setActiveKey(key)
-    setFilters({})
-  };
-
-  const resetPagination = () => {
+    setActiveKey(key);
     setFilters({});
-    resetKeys();
+    setCurrentPage(0);
   };
 
-  const resetKeys = () => {
+  const resetFilters = (filters = {}) => {
     setKeys({ ...keys, [activeKey]: [null] });
+    setFilters(filters);
     setCurrentPage(0);
   };
 
   return (
     <PaginationContext.Provider value={{
       handleEntityChange,
-      resetPagination,
       goToNextPage,
       goToPreviousPage,
       keys,
@@ -62,7 +62,8 @@ const PaginationProvider = ({ children }) => {
       currentPage,
       filters,
       setFilters,
-      resetKeys
+      resetFilters,
+      canGoNext
     }}>
       {children}
     </PaginationContext.Provider>

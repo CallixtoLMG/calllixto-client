@@ -1,10 +1,6 @@
-import { LIST_BRANDS_QUERY_KEY } from "@/api/brands";
-import { LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
-import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { ButtonsContainer, Input } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
-import { useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -25,8 +21,7 @@ const CustomTable = ({ isRefetching, isLoading, onFilter, headers = [], elements
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset, setValue } = useForm({ defaultValues });
   const useFilters = useMemo(() => filters.length > 0, [filters]);
-  const { goToNextPage, goToPreviousPage, currentPage, resetKeys, resetPagination } = usePaginationContext();
-  const queryClient = useQueryClient();
+  const { goToNextPage, goToPreviousPage, currentPage, resetFilters, canGoNext } = usePaginationContext();
 
   const handleFilterChange = useCallback((changedFilter) => {
     filters.forEach(filter => {
@@ -37,73 +32,74 @@ const CustomTable = ({ isRefetching, isLoading, onFilter, headers = [], elements
   }, [filters, setValue]);
 
   const handleRestore = useCallback(() => {
-    resetPagination();
-    queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
-    queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
-    queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY] });
-    resetKeys();
+    resetFilters();
     reset(defaultValues);
-  }, [reset, defaultValues, elements,]);
+  }, [resetFilters, reset, defaultValues]);
 
   const handleEnterKeyPress = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      resetKeys();
-      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
-      queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY] });
       handleSubmit(onFilter)();
     }
   };
 
   return (
     <>
-      {useFilters && (
-        <Segment>
-          <Form onSubmit={handleSubmit(onFilter)}>
-            <Flex justifyContent="space-between">
-              <FiltersContainer>
-                <Popup
-                  content="Restaurar filtros"
-                  position="top center"
-                  size="tiny"
-                  trigger={(
-                    <Box>
-                      <Button circular icon type="button" onClick={handleRestore} size="mini">
-                        <Icon name="undo" />
-                      </Button>
-                    </Box>
-                  )}
-                />
-                {filters.map(filter =>
-                  <Controller
-                    key={`filter_${filter.value}`}
-                    name={filter.value}
-                    control={control}
-                    render={({ field }) => (
-                      <Input
-                        onKeyPress={handleEnterKeyPress}
-                        height="35px"
-                        margin="0"
-                        {...field}
-                        onChange={e => {
-                          handleFilterChange(filter.value);
-                          field.onChange(e);
-                        }}
-                        placeholder={filter.placeholder} />)}
+      <Flex>
+        {useFilters && (
+          <Segment>
+            <Form onSubmit={handleSubmit(onFilter)}>
+              <Flex justifyContent="space-between">
+                <FiltersContainer>
+                  <Popup
+                    content="Restaurar filtros"
+                    position="top center"
+                    size="tiny"
+                    trigger={(
+                      <Box>
+                        <Button circular icon type="button" onClick={handleRestore} size="mini">
+                          <Icon name="undo" />
+                        </Button>
+                      </Box>
+                    )}
                   />
-                )}
-              </FiltersContainer>
-              <Button onClick={handleSubmit(onFilter)} type="button" width="110px">
-                <Flex justifyContent="space-around">
-                  <span>Filtrar</span>
-                  <Icon name="search" />
-                </Flex>
-              </Button>
-            </Flex>
-          </Form>
-        </Segment>
-      )}
+                  {filters.map(filter =>
+                    <Controller
+                      key={`filter_${filter.value}`}
+                      name={filter.value}
+                      control={control}
+                      render={({ field }) => (
+                        <Input
+                          onKeyPress={handleEnterKeyPress}
+                          height="35px"
+                          margin="0"
+                          {...field}
+                          onChange={e => {
+                            handleFilterChange(filter.value);
+                            field.onChange(e);
+                          }}
+                          placeholder={filter.placeholder} />)}
+                    />
+                  )}
+                </FiltersContainer>
+                <Button onClick={handleSubmit(onFilter)} type="button" width="110px">
+                  <Flex justifyContent="space-around">
+                    <span>Filtrar</span>
+                    <Icon name="search" />
+                  </Flex>
+                </Button>
+              </Flex>
+            </Form>
+          </Segment>
+        )}
+        <PaginationContainer height="50px">
+          <ButtonsContainer width="400px" center >
+            <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>
+            <PaginationSegment height="50px">{Number(currentPage) + 1}</PaginationSegment>
+            <Button onClick={goToNextPage} disabled={!canGoNext}>Siguiente</Button>
+          </ButtonsContainer>
+        </PaginationContainer>
+      </Flex>
       <Loader active={isLoading | isRefetching}>
         <Container tableHeight={tableHeight}>
           <Table celled compact striped>
@@ -171,13 +167,6 @@ const CustomTable = ({ isRefetching, isLoading, onFilter, headers = [], elements
               </Table.Footer>
             )}
           </Table>
-          <PaginationContainer height="50px">
-            <ButtonsContainer width="400px" center >
-              <Button onClick={goToPreviousPage}>Anterior</Button>
-              <PaginationSegment height="50px">Página actual: {Number(currentPage) + 1}</PaginationSegment>
-              <Button onClick={goToNextPage}>Siguiente</Button>
-            </ButtonsContainer>
-          </PaginationContainer>
         </Container>
       </Loader>
     </>

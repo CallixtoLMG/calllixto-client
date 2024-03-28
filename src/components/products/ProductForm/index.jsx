@@ -25,7 +25,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
 
   const handleForm = async (data) => {
     data.code = `${supplierId}${brandId}${data.code}`;
-    console.log(data)
     await onSubmit(data);
   };
 

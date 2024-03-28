@@ -30,26 +30,21 @@ export function deleteSupplier(id) {
   return axios.delete(`${SUPPLIER_URL}/${id}`);
 };
 
-export function useListSuppliers({ cache = true, sort, order = true, pageSize, }) {
-
-  const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
-
-  useEffect(() => {
-    handleEntityChange("suppliers")
-  }, []);
+export function useListSuppliers({ sort, order = true, pageSize, }) {
+  const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
     pageSize: pageSize || "5",
     ...(keys["suppliers"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["suppliers"][currentPage])) }),
     ...(sort && { sort }),
-    ...(order && { order }),
+    order,
     ...filters
   };
 
   const listSuppliers = async (params) => {
     try {
       const { data } = await axios.get(SUPPLIER_URL, { params });
-      if (data?.LastEvaluatedKey && !data?.suppliers.length < params.pageSize) {
+      if (data?.LastEvaluatedKey) {
         addKey(data?.LastEvaluatedKey, "suppliers");
       }
       return { suppliers: data?.suppliers || [], LastEvaluatedKey: data.LastEvaluatedKey }
@@ -61,8 +56,6 @@ export function useListSuppliers({ cache = true, sort, order = true, pageSize, }
   const query = useQuery({
     queryKey: [LIST_SUPPLIERS_QUERY_KEY, params],
     queryFn: () => listSuppliers(params),
-    retry: false,
-    staleTime: cache ? TIME_IN_MS.ONE_MINUTE : 0,
   });
 
   return query;

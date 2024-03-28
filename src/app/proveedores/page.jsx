@@ -1,6 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { deleteSupplier, useListSuppliers } from "@/api/suppliers";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { PAGES } from "@/constants";
@@ -11,6 +12,12 @@ import { useEffect, useMemo } from "react";
 
 const Suppliers = () => {
   useValidateToken();
+  const { handleEntityChange } = usePaginationContext();
+
+  useEffect(() => {
+    handleEntityChange("suppliers");
+  }, []);
+
   const { data, isLoading, isRefetching } = useListSuppliers({ sort: 'name', order: false });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();

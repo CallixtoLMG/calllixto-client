@@ -34,26 +34,20 @@ export function deleteProduct(id) {
   return axios.delete(`${PRODUCTS_URL}/${id}`);
 };
 
-export function useListProducts({ cache = true, sort, order = true, pageSize }) {
-
-  const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
-
-  useEffect(() => {
-    handleEntityChange("products")
-  }, []);
+export function useListProducts({ sort, order = true, pageSize }) {
+  const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
-    pageSize: pageSize || "5",
+    pageSize: pageSize || "15",
     ...(keys["products"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["products"][currentPage])) }),
     ...(sort && { sort }),
-    ...(order && { order }),
+    order,
     ...filters
   };
 
-   const listProducts = async (params) => {
+  const listProducts = async (params) => {
     try {
       const { data } = await axios.get(PRODUCTS_URL, { params });
-      console.log(data)
       if (data?.LastEvaluatedKey && !data?.products.length < params.pageSize) {
         addKey(data?.LastEvaluatedKey, "products");
       }
@@ -66,8 +60,6 @@ export function useListProducts({ cache = true, sort, order = true, pageSize }) 
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_QUERY_KEY, params],
     queryFn: () => listProducts(params),
-    retry: false,
-    staleTime: cache ? TIME_IN_MS.ONE_MINUTE : 0,
   });
 
   return query;

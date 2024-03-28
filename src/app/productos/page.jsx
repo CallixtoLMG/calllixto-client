@@ -1,6 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
@@ -22,6 +23,12 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
+  const { handleEntityChange } = usePaginationContext();
+
+  useEffect(() => {
+    handleEntityChange("products");
+  }, []);
+
   const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();

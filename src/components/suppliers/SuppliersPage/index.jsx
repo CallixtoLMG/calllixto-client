@@ -10,23 +10,23 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
 
-const SuppliersPage = ({ suppliers = [], role, onDelete }) => {
+const SuppliersPage = ({ suppliers = [], role }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const queryClient = useQueryClient();
-  const { setFilters  } = usePaginationContext();
+  const { resetFilters  } = usePaginationContext();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar la marca "${name}"?`;
 
   const onFilter = (data) => {
+    const filters = { ...data };
     if (data.id) {
-      setFilters({ ...data, sort: "id" });
-      return;
+      filters.sort = "id";
     }
     if (data.name) {
-      setFilters({ ...data, sort: "name" });
-      return;
+      filters.sort = "name";
     }
+    resetFilters(filters);
   };
 
   const actions = visibilityRules.canSeeActions ? [
