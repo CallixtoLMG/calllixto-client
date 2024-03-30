@@ -13,16 +13,17 @@ const CustomersPage = ({ customers = [] }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
-  const { setFilters } = usePaginationContext();
+  const { resetFilters } = usePaginationContext();
 
   const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar el cliente "${name}"?`, []);
 
   const onFilter = (data) => {
-    if (data.id) {
-      setFilters({ ...data, id: data.id });
-      return;
-    }
-  };
+    const filters = { ...data };
+    if (data.name) {
+      filters.sort = "name";
+    };
+    resetFilters(filters);
+  }
 
   const actions = [
     {
@@ -62,6 +63,7 @@ const CustomersPage = ({ customers = [] }) => {
         actions={actions}
         filters={FILTERS}
         onFilter={onFilter}
+        pag
       />
       <ModalDelete
         showModal={showModal}

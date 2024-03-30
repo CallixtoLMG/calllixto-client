@@ -20,20 +20,44 @@ const Container = styled(Flex)`
   overflow-x: ${({ tableHeight }) => tableHeight && "auto"} !important;
 `;
 
+const HeaderContainer = styled(Flex)`
+  flex-direction: row;
+  width: 100% !important;
+  column-gap: 10px;
+`;
+
 const PaginationContainer = styled(Flex)`
   align-self: center;
   max-height: ${({ height }) => height || ""} !important;
+  flex-direction: row;
+  justify-content: ${({ center }) => center ? "center" : "flex-end"};
+  column-gap: 10px;
+  justify-content: center;
 `;
 
 const PaginationSegment = styled(SSegment)`
-  height:39.5px!important;
+  line-height: 1!important;
+  height:35px!important;
   margin: 0!important;
   padding: 10px!important;
+`;
+
+const FiltersContainer = styled(Flex)`
+  column-gap: 10px;
+  align-items: center;
 `;
 
 const Segment = styled(SSegment)`
   padding: 10px!important;
   margin-bottom: 8px!important;
+  margin-top: 0!important;
+`;
+
+const HeaderSegment = styled(SSegment)`
+  flex: ${({ flex }) => flex || ""} !important;
+  padding: 10px!important;
+  margin-bottom: 8px!important;
+  margin-top: 0!important;
 `;
 
 const Table = styled(STable)`
@@ -42,9 +66,10 @@ const Table = styled(STable)`
   overflow-x: hidden!important;
 `;
 
-export const Button = styled(SButton)`
+const Button = styled(SButton)`
   margin: 0 !important;
   visibility: ${({ hidden }) => hidden && "hidden"} !important;
+  height: 35px!important;
 `;
 
 const TableHeader = styled(STable.Header)`
@@ -101,5 +126,5 @@ const TableRow = styled(STable.Row)`
   }
 `;
 
-export { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
+export { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
 

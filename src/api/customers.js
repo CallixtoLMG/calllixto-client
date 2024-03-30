@@ -3,7 +3,6 @@ import { TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import axios from './axios';
 
 const CUSTOMERS_URL = `${CLIENT_ID}${PATHS.CUSTOMERS}`;
@@ -30,18 +29,14 @@ export function deleteCustomer(id) {
   return axios.delete(`${CUSTOMERS_URL}/${id}`);
 };
 
-export function useListCustomers({ cache = true, sort, order = true, pageSize, }) {
-  const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
-
-  useEffect(() => {
-    handleEntityChange("customers")
-  }, []);
+export function useListCustomers({ sort, order = true, pageSize, }) {
+  const { addKey, currentPage, keys, filters, } = usePaginationContext();
 
   const params = {
-    pageSize: pageSize || "10",
+    pageSize: pageSize || "30",
     ...(keys["customers"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["customers"][currentPage])) }),
     ...(sort && { sort }),
-    ...(order && { order }),
+    order,
     ...filters
   };
 
@@ -60,8 +55,6 @@ export function useListCustomers({ cache = true, sort, order = true, pageSize, }
   const query = useQuery({
     queryKey: [LIST_CUSTOMERS_QUERY_KEY, params],
     queryFn: () => listCustomers(params),
-    retry: false,
-    staleTime: cache ? TIME_IN_MS.ONE_MINUTE : 0,
   });
 
   return query;

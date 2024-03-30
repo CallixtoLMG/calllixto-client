@@ -75,6 +75,7 @@ const ProductsPage = ({ products = [], role, isLoading, isRefetching }) => {
         actions={actions}
         filters={FILTERS}
         onFilter={onFilter}
+        pag
       />
 
       <ModalDelete

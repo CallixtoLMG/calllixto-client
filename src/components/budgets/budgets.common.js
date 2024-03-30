@@ -84,7 +84,7 @@ const PRODUCTS_COLUMNS = [
 
 const FILTERS = [
   { value: 'id', placeholder: 'Código' },
-  { value: 'customerName', placeholder: 'Cliente', map: 'customer.name' },
+  { value: 'customer', placeholder: 'Cliente', map: 'customer.name' },
   { value: 'seller', placeholder: 'Vendedor' },
 ];
 

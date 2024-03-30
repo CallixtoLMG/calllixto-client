@@ -3,7 +3,6 @@ import { TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import axios from './axios';
 
 const SUPPLIER_URL = `${CLIENT_ID}${PATHS.SUPPLIERS}`;
@@ -34,7 +33,7 @@ export function useListSuppliers({ sort, order = true, pageSize, }) {
   const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
-    pageSize: pageSize || "5",
+    pageSize: pageSize || "30",
     ...(keys["suppliers"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["suppliers"][currentPage])) }),
     ...(sort && { sort }),
     order,

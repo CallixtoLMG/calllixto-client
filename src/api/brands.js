@@ -3,7 +3,6 @@ import { TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from "react";
 import axios from './axios';
 
 const BRANDS_URL = `${CLIENT_ID}${PATHS.BRANDS}`;
@@ -30,18 +29,14 @@ export function deleteBrand(id) {
   return axios.delete(`${BRANDS_URL}/${id}`);
 };
 
-export function useListBrands({ cache = true, sort, order = true, pageSize, }) {
-  const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
-
-  useEffect(() => {
-    handleEntityChange("brands")
-  }, []);
+export function useListBrands({ sort, order = true, pageSize, }) {
+  const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
-    pageSize: pageSize || "10",
+    pageSize: pageSize || "30",
     ...(keys["brands"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["brands"][currentPage])) }),
     ...(sort && { sort }),
-    ...(order && { order }),
+    order,
     ...filters
   };
 
@@ -60,8 +55,6 @@ export function useListBrands({ cache = true, sort, order = true, pageSize, }) {
   const query = useQuery({
     queryKey: [LIST_BRANDS_QUERY_KEY, params],
     queryFn: () => listBrands(params),
-    retry: false,
-    staleTime: cache ? TIME_IN_MS.ONE_MINUTE : 0,
   });
 
   return query;

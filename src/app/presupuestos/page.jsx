@@ -1,6 +1,7 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
 import BudgetsPage from "@/components/budgets/BudgetPage";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
@@ -13,6 +14,11 @@ const Budgets = () => {
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
+  const { handleEntityChange } = usePaginationContext();
+
+  useEffect(() => {
+    handleEntityChange("budgets")
+  }, []);
 
   useEffect(() => {
     setLabels(['Presupuestos']);

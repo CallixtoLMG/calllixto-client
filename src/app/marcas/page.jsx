@@ -2,6 +2,7 @@
 import { useUserContext } from "@/User";
 import { useListBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
@@ -16,6 +17,11 @@ const Brands = () => {
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
+  const { handleEntityChange } = usePaginationContext();
+
+  useEffect(() => {
+    handleEntityChange("brands");
+  }, []);
 
   useEffect(() => {
     setLabels(['Marcas']);

@@ -14,21 +14,21 @@ const BrandsPage = ({ brands = [], role }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
-  const { setFilters } = usePaginationContext();
+  const { resetFilters } = usePaginationContext();
   const queryClient = useQueryClient();
 
-  const deleteQuestion = (name) => `¿Está seguro que desea eliminar la marca "${name}"?`;
-
   const onFilter = (data) => {
+    const filters = { ...data };
     if (data.id) {
-      setFilters({ ...data, sort: "id" });
-      return;
+      filters.sort = "id";
     }
     if (data.name) {
-      setFilters({ ...data, sort: "name" });
-      return;
+      filters.sort = "name";
     }
+    resetFilters(filters);
   };
+
+  const deleteQuestion = (name) => `¿Está seguro que desea eliminar la marca "${name}"?`;
 
   const actions = visibilityRules.canSeeActions ? [
     {
@@ -68,6 +68,7 @@ const BrandsPage = ({ brands = [], role }) => {
         actions={actions}
         filters={FILTERS}
         onFilter={onFilter}
+        pag
       />
       <ModalDelete
         showModal={showModal}

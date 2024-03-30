@@ -9,10 +9,10 @@ const ProductSearch = ({ products, onProductSelect }) => {
 
   useEffect(() => {
     setFilteredProducts(products?.filter((product) =>
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.supplierName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product.brandName?.toLowerCase().includes(searchQuery.toLowerCase())
+      product?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product?.code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product?.supplierName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product?.brandName?.toLowerCase().includes(searchQuery.toLowerCase())
     ));
   }, [searchQuery, products]);
 

@@ -67,6 +67,7 @@ const SuppliersPage = ({ suppliers = [], role }) => {
         actions={actions}
         filters={FILTERS}
         onFilter={onFilter}
+        pag
       />
       <ModalDelete
         showModal={showModal}

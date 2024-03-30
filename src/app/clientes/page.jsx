@@ -1,5 +1,6 @@
 "use client";
 import { useListCustomers } from "@/api/customers";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
@@ -12,7 +13,12 @@ const Customers = () => {
   const { data, isLoading } = useListCustomers({ sort: 'name', order: false });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
+  const { handleEntityChange } = usePaginationContext();
   const { push } = useRouter();
+
+  useEffect(() => {
+    handleEntityChange("customers")
+  }, []);
 
   useEffect(() => {
     setLabels(['Clientes']);

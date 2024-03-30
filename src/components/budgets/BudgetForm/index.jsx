@@ -29,7 +29,6 @@ const EMPTY_BUDGET = (user) => ({
   paymentMethods: PAYMENT_METHODS.map((method) => method.value),
   expirationOffsetDays: ""
 });
-
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading }) => {
   const { userData } = useUserContext();
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);

@@ -1,4 +1,4 @@
-import { ButtonsContainer, Input } from "@/components/common/custom";
+import { Input } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
 import { useRouter } from "next/navigation";
@@ -6,17 +6,10 @@ import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
-import styled from "styled-components";
 import Actions from "./Actions";
+import { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
 
-import { ActionsContainer, Button, Cell, Container, HeaderCell, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Segment, Table, TableHeader, TableRow } from "./styles";
-
-const FiltersContainer = styled(Flex)`
-  column-gap: 10px;
-  align-items: center;
-`;
-
-const CustomTable = ({ isRefetching, isLoading, onFilter, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
+const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
   const { push } = useRouter();
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset, setValue } = useForm({ defaultValues });
@@ -45,14 +38,20 @@ const CustomTable = ({ isRefetching, isLoading, onFilter, headers = [], elements
 
   return (
     <>
-      <Flex>
+      <HeaderContainer>
         {useFilters && (
-          <Segment>
+          <HeaderSegment flex="75%">
             <Form onSubmit={handleSubmit(onFilter)}>
               <Flex justifyContent="space-between">
                 <FiltersContainer>
                   <Popup
-                    content="Restaurar filtros"
+                    content={
+                      <>
+                        Restaurar filtros
+                        <br />
+                        y página.
+                      </>
+                    }
                     position="top center"
                     size="tiny"
                     trigger={(
@@ -90,16 +89,17 @@ const CustomTable = ({ isRefetching, isLoading, onFilter, headers = [], elements
                 </Button>
               </Flex>
             </Form>
-          </Segment>
+          </HeaderSegment>
         )}
-        <PaginationContainer height="50px">
-          <ButtonsContainer width="400px" center >
-            <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>
-            <PaginationSegment height="50px">{Number(currentPage) + 1}</PaginationSegment>
-            <Button onClick={goToNextPage} disabled={!canGoNext}>Siguiente</Button>
-          </ButtonsContainer>
-        </PaginationContainer>
-      </Flex>
+        {pag &&
+          <HeaderSegment flex="25%">
+            <PaginationContainer >
+              <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>
+              <PaginationSegment >{Number(currentPage) + 1}</PaginationSegment>
+              <Button onClick={goToNextPage} disabled={!canGoNext}>Siguiente</Button>
+            </PaginationContainer>
+          </HeaderSegment>}
+      </HeaderContainer>
       <Loader active={isLoading | isRefetching}>
         <Container tableHeight={tableHeight}>
           <Table celled compact striped>

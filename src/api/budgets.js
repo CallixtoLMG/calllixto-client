@@ -3,7 +3,6 @@ import { TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
 import axios from './axios';
 
 const BUDGETS_URL = `${CLIENT_ID}${PATHS.BUDGETS}`;
@@ -22,18 +21,15 @@ export function edit(budget, id) {
   return axios.post(`${BUDGETS_URL}/${id}`, budget);
 };
 
-export function useListBudgets({ cache = true, sort, order = true, pageSize, }) {
-  const { addKey, currentPage, keys, filters, handleEntityChange } = usePaginationContext();
+export function useListBudgets({ sort, order = true, pageSize, }) {
+  const { addKey, currentPage, keys, filters, } = usePaginationContext();
 
-  useEffect(() => {
-    handleEntityChange("budgets")
-  }, []);
 
   const params = {
-    pageSize: pageSize || "10",
+    pageSize: pageSize || "30",
     ...(keys["budgets"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["budgets"][currentPage])) }),
     ...(sort && { sort }),
-    ...(order && { order }),
+    order,
     ...filters
   };
 
@@ -52,8 +48,6 @@ export function useListBudgets({ cache = true, sort, order = true, pageSize, }) 
   const query = useQuery({
     queryKey: [LIST_BUDGETS_QUERY_KEY, params],
     queryFn: () => listBudgets(params),
-    retry: false,
-    staleTime: cache ? TIME_IN_MS.ONE_MINUTE : 0,
   });
 
   return query;
