@@ -44,7 +44,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
         description: (
           <Container>
             <Text>Código: {formatProductCode(product.code)}</Text>
-            <Text>Precio: {`$ ${product.price.toFixed(2)}`}</Text>
+            <Text>Precio: {`$ ${product?.price?.toFixed(2)}`}</Text>
           </Container>
         ),
         value: product,
