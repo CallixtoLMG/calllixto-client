@@ -29,7 +29,7 @@ const Products = () => {
     handleEntityChange("products");
   }, []);
 
-  const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false });
+  const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false, attributes: ["name", "price", "code"] });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();

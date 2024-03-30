@@ -34,11 +34,12 @@ export function deleteProduct(id) {
   return axios.delete(`${PRODUCTS_URL}/${id}`);
 };
 
-export function useListProducts({ sort, order = true, pageSize }) {
+export function useListProducts({ sort, order = true, pageSize, attributes = [] }) {
   const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
-    pageSize: pageSize || 30,
+    attributes: encodeURIComponent(JSON.stringify(attributes)),
+    pageSize: pageSize || "30",
     ...(keys["products"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["products"][currentPage])) }),
     ...(sort && { sort }),
     order,
