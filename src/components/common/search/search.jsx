@@ -36,8 +36,8 @@ const ProductSearch = ({ products, onProductSelect }) => {
       searchDelay={1000}
       onSearchChange={handleSearchChange}
       value={selectedProduct ? '' : searchQuery}
-      noResultsMessage={"No se encontró producto"}
-      placeholder='Nombre, código, marca, proveedor'
+      noResultsMessage="No se encontró producto"
+      placeholder="Nombre, código, marca, proveedor"
       results={filteredProducts?.slice(0, MAX_RESULTS).map((product) => ({
         key: product.code,
         title: product.name,

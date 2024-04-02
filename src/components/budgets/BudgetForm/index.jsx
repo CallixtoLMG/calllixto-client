@@ -134,7 +134,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         id: 1,
         width: 2
       },
-      { title: "Nombre", value: (product) => product.name, id: 2, width: 10, align: 'left' },
+      { title: "Nombre", value: (product) => product.name, id: 2, width: 8, align: 'left' },
       {
         title: "Precio",
         value: (product) => (
@@ -151,7 +151,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         ),
         id: 3,
         width: 2,
-        align: 'right'
       },
       {
         title: "Cantidad", value: (product, index) => (
@@ -182,7 +181,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
               <p>{product?.quantity}</p>
             )}
           </>
-        ), id: 4, width: 3
+        ),
+        id: 4,
+        width: 1
       },
       {
         title: "Descuento",
@@ -216,7 +217,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           </>
         ),
         id: 5,
-        width: 2
+        width: 1
       },
       {
         title: "Total",
@@ -233,7 +234,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           </Flex>
         ),
         id: 6,
-        width: 3
+        width: 2
       },
     ];
   }, [control, calculateTotal, readonly]);
