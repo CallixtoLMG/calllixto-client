@@ -10,6 +10,7 @@ const { omit, chunk } = require('lodash');
 const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
 const BAN_PRODUCTS_URL = `${CLIENT_ID}${CLIENT}`;
 export const LIST_PRODUCTS_QUERY_KEY = 'listProducts';
+export const LIST_ALL_PRODUCTS_QUERY_KEY = 'listAllProducts';
 export const GET_PRODUCT_QUERY_KEY = 'getProduct';
 export const LIST_BANNED_PRODUCTS_QUERY_KEY = 'listBannedProducts';
 
@@ -33,10 +34,11 @@ export function deleteProduct(id) {
   return axios.delete(`${PRODUCTS_URL}/${id}`);
 };
 
-export function useListProducts({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE }) {
+export function useListProducts({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
   const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
+    attributes: encodeURIComponent(JSON.stringify(attributes)),
     pageSize,
     ...(keys[ENTITIES.PRODUCTS][currentPage] && {
       LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[ENTITIES.PRODUCTS][currentPage]))
@@ -61,6 +63,44 @@ export function useListProducts({ sort, order = true, pageSize = DEFAULT_PAGE_SI
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_QUERY_KEY, params],
     queryFn: () => listProducts(params),
+  });
+
+  return query;
+};
+
+export function useListAllProducts() {
+  const listProducts = async () => {
+    try {
+      let products = [];
+      let LastEvaluatedKey;
+
+      do {
+        const params = {
+          pageSize: 1000,
+          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(LastEvaluatedKey)) }),
+          attributes: ['code', 'name', 'price']
+        };
+
+        const { data } = await axios.get(PRODUCTS_URL, { params });
+
+        if (data.statusOk) {
+          products = [...products, ...data.products];
+        }
+
+        LastEvaluatedKey = data?.LastEvaluatedKey;
+
+      } while (LastEvaluatedKey);
+
+      return { products };
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const query = useQuery({
+    queryKey: [LIST_ALL_PRODUCTS_QUERY_KEY],
+    queryFn: () => listProducts(),
+    staleTime: TIME_IN_MS.FIVE_MINUTES,
   });
 
   return query;
