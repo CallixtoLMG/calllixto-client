@@ -34,7 +34,6 @@ const Products = () => {
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
-  const isCreating = true;
 
   const products = useMemo(() => {
     return data?.products
@@ -56,11 +55,11 @@ const Products = () => {
       },
       {
         id: 2,
-        button: <BatchImport products={products} isCreating={isCreating} />,
+        button: <BatchImport isCreating />,
       },
       {
         id: 3,
-        button: <BatchImport products={products} />,
+        button: <BatchImport />,
       },
       {
         id: 4,
@@ -78,7 +77,7 @@ const Products = () => {
       },
     ] : [];
     setActions(actions);
-  }, [isCreating, products, push, role, setActions]);
+  }, [products, push, role, setActions]);
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListBanProducts } from "@/api/products";
+import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListBanProducts, useListAllProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { CURRENCY, LOCALE } from "@/constants";
@@ -12,7 +12,9 @@ import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, ModalHeader } from "./styles";
 
-const BatchImport = ({ products, isCreating }) => {
+const BatchImport = ({ isCreating }) => {
+  const { data, isLoading: loadingProducts } = useListAllProducts();
+  const products = useMemo(() => data?.products, [data?.products]);
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, formState: { isDirty }, watch } = useForm();
   const [open, setOpen] = useState(false);
@@ -82,7 +84,7 @@ const BatchImport = ({ products, isCreating }) => {
   const handleFileUpload = useCallback((e) => {
     reset();
     const fileName = e?.target.files[0]?.name;
-    if (!fileName || loadingBlacklist) {
+    if (!fileName || loadingBlacklist || loadingProducts) {
       return;
     };
     setSelectedFile(fileName);
