@@ -6,7 +6,7 @@ import { Button, ButtonsContainer, Checkbox, Dropdown, FieldsContainer, Form, Fo
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { RULES } from "@/constants";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, formatedPrice, getTotal, getTotalSum, now } from "@/utils";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, getTotal, getTotalSum, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -16,6 +16,8 @@ import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
+import { Flex } from "rebass";
+import CurrencyFormat from 'react-currency-format';
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -133,7 +135,24 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         width: 2
       },
       { title: "Nombre", value: (product) => product.name, id: 2, width: 10, align: 'left' },
-      { title: "Precio", value: (product) => formatedPrice(product.price, product.brand), id: 3, width: 2 },
+      {
+        title: "Precio",
+        value: (product) => (
+          <Flex justifyContent="space-between">
+            $
+            <CurrencyFormat
+              displayType="text"
+              thousandSeparator={true}
+              fixedDecimalScale={true}
+              decimalScale={2}
+              value={product.price}
+            />
+          </Flex>
+        ),
+        id: 3,
+        width: 2,
+        align: 'right'
+      },
       {
         title: "Cantidad", value: (product, index) => (
           <>
@@ -199,7 +218,23 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         id: 5,
         width: 2
       },
-      { title: "Total", value: (product) => formatedPrice(getTotal(product)), id: 6, width: 2 },
+      {
+        title: "Total",
+        value: (product) => (
+          <Flex justifyContent="space-between">
+            $
+            <CurrencyFormat
+              displayType="text"
+              thousandSeparator={true}
+              fixedDecimalScale={true}
+              decimalScale={2}
+              value={getTotal(product)}
+            />
+          </Flex>
+        ),
+        id: 6,
+        width: 3
+      },
     ];
   }, [control, calculateTotal, readonly]);
 
@@ -356,7 +391,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             headers={BUDGET_FORM_PRODUCT_COLUMNS}
             elements={watchProducts}
             actions={actions}
-            total={formatedPrice(getTotalSum(watchProducts))}
+            total={getTotalSum(watchProducts)}
           />
           <FieldsContainer>
             <Label>Comentarios</Label>

@@ -8,6 +8,7 @@ import { Box, Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
+import CurrencyFormat from 'react-currency-format';
 
 const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
   const { push } = useRouter();
@@ -158,11 +159,24 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
                 })
               )}
             </Table.Body>
-            {total && (
+            {total > 0 && (
               <Table.Footer celled fullWidth>
                 <Table.Row>
                   <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
-                  <HeaderCell colSpan="1"><strong>{total}</strong></HeaderCell>
+                  <HeaderCell colSpan="1">
+                    <strong>
+                      <Flex justifyContent="space-between">
+                        $
+                        <CurrencyFormat
+                          displayType="text"
+                          thousandSeparator={true}
+                          fixedDecimalScale={true}
+                          decimalScale={2}
+                          value={total}
+                        />
+                      </Flex>
+                    </strong>
+                  </HeaderCell>
                 </Table.Row>
               </Table.Footer>
             )}

@@ -21,8 +21,7 @@ export const formatedDateAndHour = (date) => dayjs(date).format('DD-MM-YYYY - hh
 export const formatedDateOnly = (date) => dayjs(date).format('DD-MM-YYYY');
 
 export const formatedPrice = (number) => {
-  let modNumber = Number(number);
-  return modNumber.toLocaleString('es-AR', {
+  return Number(number).toLocaleString('es-AR', {
     style: 'currency',
     currency: 'ARS',
   });

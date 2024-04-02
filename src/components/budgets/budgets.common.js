@@ -10,8 +10,8 @@ const BUDGETS_COLUMNS = [
     align: "left",
     value: (budget) =>
       budget.confirmed ?
-        <Flex justifyContent={"space-between"}>
-          {budget.id}&nbsp;<Icon size="small" name="check circle" color="green" />
+        <Flex justifyContent="space-between">
+          {budget.id}<Icon size="small" name="check circle" color="green" />
         </Flex>
         : budget.id
   },
