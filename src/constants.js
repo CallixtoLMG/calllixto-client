@@ -115,7 +115,18 @@ const TIME_IN_MS = {
   ONE_HOUR: 3600000,
 }
 
+const DEFAULT_PAGE_SIZE = 30;
+
+
+const ENTITIES = {
+  CUSTOMERS: 'customers',
+  SUPPLIERS: 'suppliers',
+  BRANDS: 'brands',
+  PRODUCTS: 'products',
+  BUDGETS: 'budgets',
+};
+
 export {
-  APIS, PAGES, REGEX, RULES, TIME_IN_MS
+  APIS, PAGES, REGEX, RULES, TIME_IN_MS, DEFAULT_PAGE_SIZE, ENTITIES
 };
 

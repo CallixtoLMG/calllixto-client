@@ -6,7 +6,7 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
-import { PAGES } from "@/constants";
+import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel } from "@/utils";
 import { Rules } from "@/visibilityRules";
@@ -26,7 +26,7 @@ const Products = () => {
   const { handleEntityChange } = usePaginationContext();
 
   useEffect(() => {
-    handleEntityChange("products");
+    handleEntityChange(ENTITIES.PRODUCTS);
   }, []);
 
   const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false });

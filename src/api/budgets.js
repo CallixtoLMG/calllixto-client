@@ -1,5 +1,5 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
-import { TIME_IN_MS } from "@/constants";
+import { DEFAULT_PAGE_SIZE, TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -21,12 +21,12 @@ export function edit(budget, id) {
   return axios.post(`${BUDGETS_URL}/${id}`, budget);
 };
 
-export function useListBudgets({ sort, order = true, pageSize, }) {
+export function useListBudgets({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE }) {
   const { addKey, currentPage, keys, filters, } = usePaginationContext();
 
 
   const params = {
-    pageSize: pageSize || "30",
+    pageSize,
     ...(keys["budgets"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["budgets"][currentPage])) }),
     ...(sort && { sort }),
     order,
@@ -36,7 +36,7 @@ export function useListBudgets({ sort, order = true, pageSize, }) {
   const listBudgets = async (params) => {
     try {
       const { data } = await axios.get(BUDGETS_URL, { params });
-      if (data?.LastEvaluatedKey && !data?.products.length < params.pageSize) {
+      if (data?.LastEvaluatedKey) {
         addKey(data?.LastEvaluatedKey, "budgets");
       }
       return { budgets: data?.budgets || [], LastEvaluatedKey: data.LastEvaluatedKey }

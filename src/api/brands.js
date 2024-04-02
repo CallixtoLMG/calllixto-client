@@ -1,5 +1,5 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
-import { TIME_IN_MS } from "@/constants";
+import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from '@tanstack/react-query';
@@ -29,12 +29,14 @@ export function deleteBrand(id) {
   return axios.delete(`${BRANDS_URL}/${id}`);
 };
 
-export function useListBrands({ sort, order = true, pageSize, }) {
+export function useListBrands({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE }) {
   const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
-    pageSize: pageSize || "30",
-    ...(keys["brands"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["brands"][currentPage])) }),
+    pageSize,
+    ...(keys[ENTITIES.BRANDS][currentPage] && {
+      LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[ENTITIES.BRANDS][currentPage]))
+    }),
     ...(sort && { sort }),
     order,
     ...filters
@@ -43,8 +45,8 @@ export function useListBrands({ sort, order = true, pageSize, }) {
   const listBrands = async (params) => {
     try {
       const { data } = await axios.get(BRANDS_URL, { params });
-      if (data?.LastEvaluatedKey && !data?.brands.length < params.pageSize) {
-        addKey(data?.LastEvaluatedKey, "brands");
+      if (data?.LastEvaluatedKey) {
+        addKey(data?.LastEvaluatedKey, ENTITIES.BRANDS);
       }
       return { brands: data?.brands || [], LastEvaluatedKey: data.LastEvaluatedKey }
     } catch (error) {

@@ -1,3 +1,4 @@
+import { ENTITIES } from '@/constants';
 import { createContext, useContext, useMemo, useState } from 'react';
 
 const PaginationContext = createContext();
@@ -7,11 +8,11 @@ const PaginationProvider = ({ children }) => {
   const [activeKey, setActiveKey] = useState();
   const [filters, setFilters] = useState({});
   const [keys, setKeys] = useState({
-    products: [null],
-    brands: [null],
-    suppliers: [null],
-    customers: [null],
-    budgets: [null],
+    [ENTITIES.PRODUCTS]: [null],
+    [ENTITIES.BRANDS]: [null],
+    [ENTITIES.SUPPLIERS]: [null],
+    [ENTITIES.CUSTOMERS]: [null],
+    [ENTITIES.BUDGETS]: [null],
   });
 
   const canGoNext = useMemo(() => {

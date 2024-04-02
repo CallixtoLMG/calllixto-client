@@ -4,7 +4,7 @@ import { useListBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
@@ -20,7 +20,7 @@ const Brands = () => {
   const { handleEntityChange } = usePaginationContext();
 
   useEffect(() => {
-    handleEntityChange("brands");
+    handleEntityChange(ENTITIES.BRANDS);
   }, []);
 
   useEffect(() => {

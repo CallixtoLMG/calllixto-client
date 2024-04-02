@@ -4,7 +4,7 @@ import { deleteSupplier, useListSuppliers } from "@/api/suppliers";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
-import { PAGES } from "@/constants";
+import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
@@ -15,7 +15,7 @@ const Suppliers = () => {
   const { handleEntityChange } = usePaginationContext();
 
   useEffect(() => {
-    handleEntityChange("suppliers");
+    handleEntityChange(ENTITIES.SUPPLIERS);
   }, []);
 
   const { data, isLoading, isRefetching } = useListSuppliers({ sort: 'name', order: false });

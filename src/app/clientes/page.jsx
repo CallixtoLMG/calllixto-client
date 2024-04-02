@@ -3,7 +3,7 @@ import { useListCustomers } from "@/api/customers";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
@@ -17,7 +17,7 @@ const Customers = () => {
   const { push } = useRouter();
 
   useEffect(() => {
-    handleEntityChange("customers")
+    handleEntityChange(ENTITIES.CUSTOMERS)
   }, []);
 
   useEffect(() => {
