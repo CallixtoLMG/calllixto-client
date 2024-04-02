@@ -115,10 +115,7 @@ const TIME_IN_MS = {
   ONE_HOUR: 3600000,
 }
 
-const LOCALE = 'es-AR';
-const CURRENCY = 'ARS';
-
 export {
-  APIS, CURRENCY, LOCALE, PAGES, REGEX, RULES, TIME_IN_MS
+  APIS, PAGES, REGEX, RULES, TIME_IN_MS
 };
 

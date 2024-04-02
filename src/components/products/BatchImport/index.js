@@ -1,16 +1,15 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
-import { CURRENCY, LOCALE } from "@/constants";
 import { downloadExcel } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { CurrencyInput } from "react-currency-mask";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, ModalHeader } from "./styles";
+import CurrencyFormat from 'react-currency-format';
 
 const BatchImport = ({ products, isCreating }) => {
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
@@ -290,18 +289,20 @@ const BatchImport = ({ products, isCreating }) => {
         <Controller
           name={`importProducts[${index}].price`}
           control={control}
-          render={({ field }) => (
-            <>
-              <CurrencyInput
-                {...field}
-                locale={LOCALE}
-                currency={CURRENCY}
-                onChangeValue={(_, value) => {
-                  field.onChange(value);
-                }}
-                InputElement={<Input height="30px" />}
-              />
-            </>
+          render={({ field: { onChange, value } }) => (
+            <CurrencyFormat
+              displayType="input"
+              thousandSeparator={true}
+              decimalScale={2}
+              allowNegative={false}
+              prefix="$ "
+              customInput={Input}
+              onValueChange={value => {
+                onChange(value.floatValue);
+              }}
+              value={value || 0}
+              placeholder="Precio"
+            />
           )}
         />
       ), id: 3, width: 3

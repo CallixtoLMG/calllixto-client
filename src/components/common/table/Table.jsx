@@ -56,7 +56,7 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
                     size="tiny"
                     trigger={(
                       <Box>
-                        <Button circular icon type="button" onClick={handleRestore} size="mini">
+                        <Button circular icon type="button" onClick={handleRestore}>
                           <Icon name="undo" />
                         </Button>
                       </Box>
