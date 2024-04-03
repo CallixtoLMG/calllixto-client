@@ -10,7 +10,7 @@ import { useEffect, useMemo } from "react";
 
 const Customers = () => {
   useValidateToken();
-  const { data, isLoading } = useListCustomers();
+  const { data, isLoading } = useListCustomers({});
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { handleEntityChange } = usePaginationContext();
