@@ -1,7 +1,7 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListBanProducts, useListAllProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
-import { downloadExcel } from "@/utils";
+import { downloadExcel, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -154,7 +154,7 @@ const BatchImport = ({ isCreating }) => {
       };
       setOpen(true);
     };
-  }, [blacklist, loadingBlacklist, products, reset, setValue, importSettings]);
+  }, [blacklist, loadingBlacklist, loadingProducts, products, reset, setValue, importSettings]);
 
   const handleDownloadConfirmation = () => {
     const data = [
@@ -219,6 +219,7 @@ const BatchImport = ({ isCreating }) => {
 
             if (Object.keys(previousVersion).length > 0) {
               productWithChanges['previousVersion'] = previousVersion;
+              productWithChanges.updatedAt = now();
             } else {
               return null;
             }

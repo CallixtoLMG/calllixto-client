@@ -151,11 +151,28 @@ export async function createBatch(products) {
   return Promise.resolve({ data });
 };
 
-export function editBatch(products) {
-  const body = {
-    update: products.map(product => ({ ...product, updatedAt: now() }))
-  }
-  return axios.post(`${PRODUCTS_URL}/${EDIT_BATCH}`, body);
+export async function editBatch(products) {
+  const chuncks = chunk(products, 100);
+  let delay = 0;
+  const delayIncrement = 1000;
+  const promises = chuncks.map(chunk => {
+    delay += delayIncrement;
+    return new Promise(resolve => setTimeout(resolve, delay)).then(() =>
+      axios.post(`${PRODUCTS_URL}/${EDIT_BATCH}`, { products: chunk }));
+  });
+
+  const responses = await Promise.all(promises);
+
+  const data = {
+    statusOk: true, unprocessed: responses.map(response => {
+      if (response?.data?.statusOk) {
+        return response.data.unprocessed;
+      }
+      return [];
+    }).flat()
+  };
+
+  return Promise.resolve({ data });
 };
 
 export function useListBanProducts() {
