@@ -20,7 +20,7 @@ const CreateBudget = () => {
   const { push } = useRouter();
 
   const { data: productsData, isLoading: loadingProducts } = useListAllProducts();
-  const { data: customersData, isLoading: loadingCustomers } = useListCustomers({ order: true });
+  const { data: customersData, isLoading: loadingCustomers } = useListCustomers({});
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
 
   const { products } = useMemo(() => {

@@ -18,7 +18,7 @@ const Suppliers = () => {
     handleEntityChange(ENTITIES.SUPPLIERS);
   }, []);
 
-  const { data, isLoading, isRefetching } = useListSuppliers({ sort: 'name', order: false });
+  const { data, isLoading, isRefetching } = useListSuppliers({});
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
