@@ -145,7 +145,7 @@ export async function createBatch(products) {
         return response.data.unprocessed;
       }
       return [];
-    }).flat()
+    }).flat().filter(item => item)
   };
 
   return Promise.resolve({ data });
@@ -158,7 +158,7 @@ export async function editBatch(products) {
   const promises = chuncks.map(chunk => {
     delay += delayIncrement;
     return new Promise(resolve => setTimeout(resolve, delay)).then(() =>
-      axios.post(`${PRODUCTS_URL}/${EDIT_BATCH}`, { products: chunk }));
+      axios.post(`${PRODUCTS_URL}/${EDIT_BATCH}`, { update: chunk }));
   });
 
   const responses = await Promise.all(promises);
@@ -169,7 +169,7 @@ export async function editBatch(products) {
         return response.data.unprocessed;
       }
       return [];
-    }).flat()
+    }).flat().filter(item => item)
   };
 
   return Promise.resolve({ data });

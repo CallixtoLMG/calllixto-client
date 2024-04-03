@@ -15,7 +15,7 @@ const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts } = useListAllProducts();
   const products = useMemo(() => data?.products, [data?.products]);
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
-  const { handleSubmit, control, reset, setValue, formState: { isDirty }, watch } = useForm();
+  const { handleSubmit, control, reset, setValue, watch } = useForm();
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,10 +61,10 @@ const BatchImport = ({ isCreating }) => {
         }
       },
       isButtonDisabled: (isPending) => {
-        return !watchProducts.length || isLoading || isPending || (!isCreating && !isDirty);
+        return !watchProducts.length || isLoading || isPending;
       }
     };
-  }, [isCreating, watchProducts, isLoading, isDirty]);
+  }, [isCreating, watchProducts, isLoading]);
 
 
   const handleClick = useCallback(() => {
@@ -177,7 +177,7 @@ const BatchImport = ({ isCreating }) => {
       const { response } = unprocessedResponse;
       const data = response.unprocessed.map(product => ({
         ...product,
-        msg: product.msg || "Este producto tiene errores"
+        msg: product?.msg || "Este producto tiene errores"
       }));
       const formattedData = [
         ["Codigo", "Nombre", "Precio", "Comentarios", "Mensaje de error"],
