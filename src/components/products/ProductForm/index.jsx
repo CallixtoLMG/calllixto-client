@@ -4,8 +4,8 @@ import { Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, S
 import { RULES } from "@/constants";
 import { formatedPrice, preventSend } from "@/utils";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
 import CurrencyFormat from 'react-currency-format';
+import { Controller, useForm } from "react-hook-form";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
@@ -116,12 +116,11 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
           )}
         </FormField>
         <FormField width="20%">
-          <RuledLabel title="Precio" message={errors?.price?.message} required />
+          <RuledLabel title="Precio" />
           {!readonly ? (
             <Controller
               name="price"
               control={control}
-              rules={RULES.REQUIRED_PRICE}
               render={({ field: { onChange, value } }) => (
                 <CurrencyFormat
                   displayType="input"

@@ -9,7 +9,7 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
-import { ContainerModal, Modal, ModalActions, ModalHeader } from "./styles";
+import { ContainerModal, Modal, ModalActions, ModalHeader, WaitMsg } from "./styles";
 
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts } = useListAllProducts();
@@ -38,7 +38,6 @@ const BatchImport = ({ isCreating }) => {
 
     setExistingCodes(codes);
   }, [products]);
-
 
   const importSettings = useMemo(() => {
     return {
@@ -413,6 +412,7 @@ const BatchImport = ({ isCreating }) => {
                   </>
                 )}
                 <ModalActions>
+                  {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
                   <Button
                     disabled={importSettings.isButtonDisabled(isPending)}
                     loading={isLoading || isPending}
