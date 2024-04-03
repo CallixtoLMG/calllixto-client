@@ -80,7 +80,7 @@ export const Dropdown = styled(SDropdown)`
   };
   i.dropdown.icon {
     height: 50px!important;
-    top: ${({ top }) => top || "15px"} !important};
+    top: ${({ top }) => top || "15px"} !important;
   };
 `;
 
