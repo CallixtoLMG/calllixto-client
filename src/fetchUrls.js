@@ -1,10 +1,12 @@
+import { ENTITIES } from "./constants";
+
 export const PATHS = {
-  BUDGETS: "budgets",
-  CUSTOMERS: "customers",
-  PRODUCTS: "products",
+  BUDGETS: ENTITIES.BUDGETS,
+  CUSTOMERS: ENTITIES.CUSTOMERS,
+  PRODUCTS: ENTITIES.PRODUCTS,
   LOGIN: "login",
-  BRANDS: "brands",
-  SUPPLIERS: "suppliers"
+  BRANDS: ENTITIES.BRANDS,
+  SUPPLIERS: ENTITIES.SUPPLIERS
 };
 
 export const BATCH = "batch";

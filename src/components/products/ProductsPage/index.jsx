@@ -2,6 +2,7 @@
 import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,11 +10,23 @@ import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
 import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
 
-const ProductsPage = ({ products = [], role }) => {
+const ProductsPage = ({ products = [], role, isLoading, isRefetching }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const queryClient = useQueryClient();
+  const { resetFilters } = usePaginationContext();
+
+  const onFilter = (data) => {
+    const filters = { ...data };
+    if (data.code) {
+      filters.sort = "code";
+    }
+    if (data.name) {
+      filters.sort = "name";
+    }
+    resetFilters(filters);
+  };
 
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
 
@@ -53,13 +66,18 @@ const ProductsPage = ({ products = [], role }) => {
   return (
     <>
       <Table
+        isRefetching={isRefetching}
+        isLoading={isLoading}
         mainKey="code"
         headers={PRODUCT_COLUMNS}
         elements={mapProductsForTable(products)}
         page={PAGES.PRODUCTS}
         actions={actions}
         filters={FILTERS}
+        onFilter={onFilter}
+        pag
       />
+
       <ModalDelete
         showModal={showModal}
         setShowModal={setShowModal}

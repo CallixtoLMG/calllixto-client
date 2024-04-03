@@ -19,6 +19,7 @@ export const Segment = styled(SSegment)`
   width: 100%!important;
   min-height: 50px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
+  overflow: auto;
 `;
 
 export const Input = styled(SInput)`
@@ -33,6 +34,9 @@ export const Input = styled(SInput)`
     padding: 0 14px!important;
     text-align: ${({ center }) => center && 'center'} !important;
   };
+  div{
+    line-height: 190%!important;
+  }
 `;
 
 export const Checkbox = styled(SCheckbox)`
@@ -76,7 +80,7 @@ export const Dropdown = styled(SDropdown)`
   };
   i.dropdown.icon {
     height: 50px!important;
-    top: ${({ top }) => top || "15px"} !important};
+    top: ${({ top }) => top || "15px"} !important;
   };
 `;
 

@@ -1,6 +1,7 @@
-import { formatedPrice, getBrandCode, getProductCode, getSupplierCode } from "@/utils";
+import { getBrandCode, getProductCode, getSupplierCode } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
+import CurrencyFormat from 'react-currency-format';
 
 const PRODUCT_COLUMNS = [
   {
@@ -50,7 +51,18 @@ const PRODUCT_COLUMNS = [
     id: 3,
     title: "Precio",
     width: 2,
-    value: (product) => formatedPrice(product.price)
+    value: (product) => (
+      <Flex justifyContent="space-between">
+        $
+        <CurrencyFormat
+          displayType="text"
+          thousandSeparator={true}
+          fixedDecimalScale={true}
+          decimalScale={2}
+          value={product.price}
+        />
+      </Flex>
+    ),
   }
 ];
 

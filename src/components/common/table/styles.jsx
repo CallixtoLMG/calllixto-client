@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Table as STable } from "semantic-ui-react";
+import { Button as SButton, Segment as SSegment, Table as STable } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Cell = styled(STable.Cell)`
@@ -12,18 +12,64 @@ const Cell = styled(STable.Cell)`
 `;
 
 const Container = styled(Flex)`
+  flex-direction: column;
   margin: 5px 0!important;
   width: 100% !important;
   max-height: ${({ tableHeight }) => tableHeight || ""} !important;
   overflow-y: ${({ tableHeight }) => tableHeight && "auto"} !important;
   overflow-x: ${({ tableHeight }) => tableHeight && "auto"} !important;
+`;
 
+const HeaderContainer = styled(Flex)`
+  flex-direction: row;
+  width: 100% !important;
+  column-gap: 10px;
+`;
+
+const PaginationContainer = styled(Flex)`
+  align-self: center;
+  max-height: ${({ height }) => height || ""} !important;
+  flex-direction: row;
+  justify-content: ${({ center }) => center ? "center" : "flex-end"};
+  column-gap: 10px;
+  justify-content: center;
+`;
+
+const PaginationSegment = styled(SSegment)`
+  line-height: 1!important;
+  height:35px!important;
+  margin: 0!important;
+  padding: 10px!important;
+`;
+
+const FiltersContainer = styled(Flex)`
+  column-gap: 10px;
+  align-items: center;
+`;
+
+const Segment = styled(SSegment)`
+  padding: 10px!important;
+  margin-bottom: 8px!important;
+  margin-top: 0!important;
+`;
+
+const HeaderSegment = styled(SSegment)`
+  flex: ${({ flex }) => flex || ""} !important;
+  padding: 10px!important;
+  margin-bottom: 8px!important;
+  margin-top: 0!important;
 `;
 
 const Table = styled(STable)`
   max-height: ${({ tableHeight }) => tableHeight || ""} !important;
   overflow-y: auto!important;
   overflow-x: hidden!important;
+`;
+
+const Button = styled(SButton)`
+  margin: 0 !important;
+  visibility: ${({ hidden }) => hidden && "hidden"} !important;
+  height: 35px!important;
 `;
 
 const TableHeader = styled(STable.Header)`
@@ -80,5 +126,5 @@ const TableRow = styled(STable.Row)`
   }
 `;
 
-export { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkRow, Table, TableFooter, TableHeader, TableRow };
+export { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
 

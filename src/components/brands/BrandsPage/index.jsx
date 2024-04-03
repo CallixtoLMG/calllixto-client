@@ -1,19 +1,32 @@
 "use client";
+import { LIST_BRANDS_QUERY_KEY, deleteBrand } from "@/api/brands";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
 import { Rules } from "@/visibilityRules";
-import { useState } from "react";
-import { BRAND_COLUMNS, FILTERS } from "../brands.common";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteBrand, LIST_BRANDS_QUERY_KEY } from "@/api/brands";
+import { useState } from "react";
 import { toast } from "react-hot-toast";
+import { BRAND_COLUMNS, FILTERS } from "../brands.common";
 
 const BrandsPage = ({ brands = [], role }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
+  const { resetFilters } = usePaginationContext();
   const queryClient = useQueryClient();
+
+  const onFilter = (data) => {
+    const filters = { ...data };
+    if (data.id) {
+      filters.sort = "id";
+    }
+    if (data.name) {
+      filters.sort = "name";
+    }
+    resetFilters(filters);
+  };
 
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar la marca "${name}"?`;
 
@@ -54,6 +67,8 @@ const BrandsPage = ({ brands = [], role }) => {
         page={PAGES.BRANDS}
         actions={actions}
         filters={FILTERS}
+        onFilter={onFilter}
+        pag
       />
       <ModalDelete
         showModal={showModal}

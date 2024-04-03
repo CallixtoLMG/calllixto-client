@@ -1,21 +1,32 @@
 "use client";
 import { useUserContext } from "@/User";
 import { deleteSupplier, useListSuppliers } from "@/api/suppliers";
+import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
-import { PAGES } from "@/constants";
+import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 const Suppliers = () => {
   useValidateToken();
-  const { data: suppliers, isLoading, isRefetching } = useListSuppliers();
+  const { handleEntityChange } = usePaginationContext();
+
+  useEffect(() => {
+    handleEntityChange(ENTITIES.SUPPLIERS);
+  }, []);
+
+  const { data, isLoading, isRefetching } = useListSuppliers({ sort: 'name', order: false });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
+
+  const { suppliers } = useMemo(() => {
+    return { suppliers: data?.suppliers }
+  }, [data]);
 
   useEffect(() => {
     setLabels(['Proveedores']);
@@ -38,7 +49,7 @@ const Suppliers = () => {
   return (
     <Loader active={isLoading || isRefetching}>
       <SuppliersPage
-        suppliers={suppliers}
+        suppliers={data?.suppliers}
         role={role}
         isLoading={isLoading}
         onDelete={deleteSupplier}

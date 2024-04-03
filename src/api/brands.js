@@ -1,8 +1,9 @@
+import { usePaginationContext } from "@/components/common/table/Pagination";
+import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
+import { now } from "@/utils";
 import { useQuery } from '@tanstack/react-query';
 import axios from './axios';
-import { TIME_IN_MS } from "@/constants";
-import { now } from "@/utils";
 
 const BRANDS_URL = `${CLIENT_ID}${PATHS.BRANDS}`;
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
@@ -28,21 +29,34 @@ export function deleteBrand(id) {
   return axios.delete(`${BRANDS_URL}/${id}`);
 };
 
-export function useListBrands() {
-  const listBrands = async () => {
+export function useListBrands({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE }) {
+  const { addKey, currentPage, keys, filters } = usePaginationContext();
+
+  const params = {
+    pageSize,
+    ...(keys[ENTITIES.BRANDS][currentPage] && {
+      LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[ENTITIES.BRANDS][currentPage]))
+    }),
+    ...(sort && { sort }),
+    order,
+    ...filters
+  };
+
+  const listBrands = async (params) => {
     try {
-      const { data } = await axios.get(BRANDS_URL);
-      return data?.brands || [];
+      const { data } = await axios.get(BRANDS_URL, { params });
+      if (data?.LastEvaluatedKey) {
+        addKey(data?.LastEvaluatedKey, ENTITIES.BRANDS);
+      }
+      return { brands: data?.brands || [], LastEvaluatedKey: data.LastEvaluatedKey }
     } catch (error) {
       throw error;
     }
   };
 
   const query = useQuery({
-    queryKey: [LIST_BRANDS_QUERY_KEY],
-    queryFn: () => listBrands(),
-    retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
+    queryKey: [LIST_BRANDS_QUERY_KEY, params],
+    queryFn: () => listBrands(params),
   });
 
   return query;

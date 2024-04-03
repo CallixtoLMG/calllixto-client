@@ -1,8 +1,9 @@
+import { usePaginationContext } from "@/components/common/table/Pagination";
+import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import axios from './axios';
-import { useQuery } from "@tanstack/react-query";
-import { TIME_IN_MS } from "@/constants";
 import { now } from "@/utils";
+import { useQuery } from "@tanstack/react-query";
+import axios from './axios';
 
 const CUSTOMERS_URL = `${CLIENT_ID}${PATHS.CUSTOMERS}`;
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
@@ -28,21 +29,34 @@ export function deleteCustomer(id) {
   return axios.delete(`${CUSTOMERS_URL}/${id}`);
 };
 
-export function useListCustomers() {
-  const listCustomers = async () => {
+export function useListCustomers({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE }) {
+  const { addKey, currentPage, keys, filters, } = usePaginationContext();
+
+  const params = {
+    pageSize,
+    ...(keys[ENTITIES.CUSTOMERS][currentPage] && {
+      LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[ENTITIES.CUSTOMERS][currentPage]))
+    }),
+    ...(sort && { sort }),
+    order,
+    ...filters
+  };
+
+  const listCustomers = async (params) => {
     try {
-      const { data } = await axios.get(CUSTOMERS_URL);
-      return data?.customers || [];
+      const { data } = await axios.get(CUSTOMERS_URL, { params });
+      if (data?.LastEvaluatedKey) {
+        addKey(data?.LastEvaluatedKey, ENTITIES.CUSTOMERS);
+      }
+      return { customers: data?.customers || [], LastEvaluatedKey: data.LastEvaluatedKey }
     } catch (error) {
       throw error;
     }
   };
 
   const query = useQuery({
-    queryKey: [LIST_CUSTOMERS_QUERY_KEY],
-    queryFn: () => listCustomers(),
-    retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
+    queryKey: [LIST_CUSTOMERS_QUERY_KEY, params],
+    queryFn: () => listCustomers(params),
   });
 
   return query;

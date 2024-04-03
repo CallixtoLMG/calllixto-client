@@ -1,10 +1,10 @@
 "use client";
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { CURRENCY, LOCALE, RULES } from "@/constants";
+import { RULES } from "@/constants";
 import { formatedPrice, preventSend } from "@/utils";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { CurrencyInput } from "react-currency-mask";
+import CurrencyFormat from 'react-currency-format';
 import { Controller, useForm } from "react-hook-form";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
@@ -116,22 +116,24 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
           )}
         </FormField>
         <FormField width="20%">
-          <RuledLabel title="Precio" message={errors?.price?.message} required />
+          <RuledLabel title="Precio" />
           {!readonly ? (
             <Controller
               name="price"
               control={control}
-              rules={RULES.REQUIRED_PRICE}
-              render={({ field }) => (
-                <CurrencyInput
-                  value={field.value}
-                  locale={LOCALE}
-                  currency={CURRENCY}
-                  placeholder="Precio"
-                  onChangeValue={(_, value) => {
-                    field.onChange(value);
+              render={({ field: { onChange, value } }) => (
+                <CurrencyFormat
+                  displayType="input"
+                  thousandSeparator={true}
+                  decimalScale={2}
+                  allowNegative={false}
+                  prefix="$ "
+                  customInput={Input}
+                  onValueChange={value => {
+                    onChange(value.floatValue);
                   }}
-                  InputElement={<Input height="50px" />}
+                  value={value || 0}
+                  placeholder="Precio"
                 />
               )}
             />

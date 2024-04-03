@@ -15,6 +15,9 @@ const Search = styled(SSearch)`
   input {
     height: ${({ height }) => height || '50px'} !important;
   };
+  .results {
+    width: 300px !important;
+  }
 `;
 
 const Text = styled.p`

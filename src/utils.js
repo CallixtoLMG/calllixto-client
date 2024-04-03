@@ -21,8 +21,7 @@ export const formatedDateAndHour = (date) => dayjs(date).format('DD-MM-YYYY - hh
 export const formatedDateOnly = (date) => dayjs(date).format('DD-MM-YYYY');
 
 export const formatedPrice = (number) => {
-  let modNumber = Number(number);
-  return modNumber.toLocaleString('es-AR', {
+  return Number(number).toLocaleString('es-AR', {
     style: 'currency',
     currency: 'ARS',
   });
@@ -81,15 +80,15 @@ export const formatedPhone = (area, num) => {
 };
 
 export const getSupplierCode = (code) => {
-  return code.slice(0, 2);
+  return code?.slice(0, 2);
 };
 
 export const getBrandCode = (code) => {
-  return code.slice(2, 4);
+  return code?.slice(2, 4);
 };
 
 export const getProductCode = (code) => {
-  return code.slice(4);
+  return code?.slice(4);
 };
 
 export const preventSend = (event) => {
@@ -98,10 +97,10 @@ export const preventSend = (event) => {
   };
 };
 
-export const downloadExcel = (data) => {
+export const downloadExcel = (data, fileName) => {
   const ws = XLSX.utils.aoa_to_sheet(data);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Sheet 1');
-  XLSX.writeFile(wb, 'Ejemplo de Tabla.xlsx');
+  XLSX.writeFile(wb, `${fileName}.xlsx`);
 };
 

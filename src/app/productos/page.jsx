@@ -1,16 +1,17 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { usePaginationContext } from "@/components/common/table/Pagination";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
-import { PAGES } from "@/constants";
+import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel } from "@/utils";
 import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const mockData = [
   ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
@@ -22,12 +23,21 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { data: products, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false });
+  const { handleEntityChange } = usePaginationContext();
+
+  useEffect(() => {
+    handleEntityChange(ENTITIES.PRODUCTS);
+  }, []);
+
+  const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false, attributes: ["name", "price", "code"] });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
-  const isCreating = true;
+
+  const products = useMemo(() => {
+    return data?.products
+  }, [data?.products]);
 
   useEffect(() => {
     setLabels(['Productos']);
@@ -45,17 +55,17 @@ const Products = () => {
       },
       {
         id: 2,
-        button: <BatchImport products={products} isCreating={isCreating} />,
+        button: <BatchImport isCreating />,
       },
       {
         id: 3,
-        button: <BatchImport products={products} />,
+        button: <BatchImport />,
       },
       {
         id: 4,
         icon: 'download',
         color: 'blue',
-        onClick: () => downloadExcel(mockData),
+        onClick: () => downloadExcel(mockData, "Ejemplo de tabla"),
         text: 'Plantilla'
       },
       {
@@ -67,16 +77,18 @@ const Products = () => {
       },
     ] : [];
     setActions(actions);
-  }, [isCreating, products, push, role, setActions]);
+  }, [products, push, role, setActions]);
 
   return (
-    <Loader active={isLoading | isRefetching}>
+    <>
       {open && <BanProduct open={open} setOpen={setOpen} />}
       <ProductsPage
-        products={products}
+        isRefetching={isRefetching}
+        isLoading={isLoading}
+        products={data?.products}
         role={role}
       />
-    </Loader>
+    </>
   );
 };
 

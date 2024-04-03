@@ -45,6 +45,5 @@ export const HEADERS = [
 ];
 
 export const FILTERS = [
-  { value: 'name', placeholder: 'Nombre' },
-  { value: 'address', placeholder: 'Dirección' }
+  { value: 'id', placeholder: 'Nombre' },
 ];

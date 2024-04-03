@@ -14,8 +14,8 @@ import { toast } from "react-hot-toast";
 const CreateProduct = () => {
   useValidateToken();
   const { push } = useRouter();
-  const { data: brands, isLoading: isLoadingBrands } = useListBrands();
-  const { data: suppliers, isLoading: isLoadingSuppliers } = useListSuppliers();
+  const { data: brands, isLoading: isLoadingBrands } = useListBrands({ sort: 'name', order: false });
+  const { data: suppliers, isLoading: isLoadingSuppliers } = useListSuppliers({ sort: 'name', order: false });
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const queryClient = useQueryClient();
@@ -29,14 +29,14 @@ const CreateProduct = () => {
     setLabels(['Productos', 'Crear']);
   }, [setLabels]);
 
-  const mappedBrands = useMemo(() => brands?.map(brand => ({
+  const mappedBrands = useMemo(() => brands?.brands?.map(brand => ({
     ...brand,
     key: brand.id,
     value: brand.name,
     text: brand.name,
   })), [brands]);
 
-  const mappedSuppliers = useMemo(() => suppliers?.map(supplier => ({
+  const mappedSuppliers = useMemo(() => suppliers?.suppliers?.map(supplier => ({
     ...supplier,
     key: supplier.id,
     value: supplier.name,

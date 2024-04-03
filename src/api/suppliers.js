@@ -1,8 +1,9 @@
+import { usePaginationContext } from "@/components/common/table/Pagination";
+import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import axios from './axios';
-import { useQuery } from "@tanstack/react-query";
-import { TIME_IN_MS } from "@/constants";
 import { now } from "@/utils";
+import { useQuery } from "@tanstack/react-query";
+import axios from './axios';
 
 const SUPPLIER_URL = `${CLIENT_ID}${PATHS.SUPPLIERS}`;
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
@@ -28,21 +29,34 @@ export function deleteSupplier(id) {
   return axios.delete(`${SUPPLIER_URL}/${id}`);
 };
 
-export function useListSuppliers() {
-  const listSuppliers = async () => {
+export function useListSuppliers({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE }) {
+  const { addKey, currentPage, keys, filters } = usePaginationContext();
+
+  const params = {
+    pageSize,
+    ...(keys[ENTITIES.SUPPLIERS][currentPage] && {
+      LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[ENTITIES.SUPPLIERS][currentPage]))
+    }),
+    ...(sort && { sort }),
+    order,
+    ...filters
+  };
+
+  const listSuppliers = async (params) => {
     try {
-      const { data } = await axios.get(SUPPLIER_URL);
-      return data?.suppliers || [];
+      const { data } = await axios.get(SUPPLIER_URL, { params });
+      if (data?.LastEvaluatedKey) {
+        addKey(data?.LastEvaluatedKey, ENTITIES.SUPPLIERS);
+      }
+      return { suppliers: data?.suppliers || [], LastEvaluatedKey: data.LastEvaluatedKey }
     } catch (error) {
       throw error;
     }
   };
 
   const query = useQuery({
-    queryKey: [LIST_SUPPLIERS_QUERY_KEY],
-    queryFn: () => listSuppliers(),
-    retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
+    queryKey: [LIST_SUPPLIERS_QUERY_KEY, params],
+    queryFn: () => listSuppliers(params),
   });
 
   return query;
