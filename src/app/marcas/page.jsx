@@ -12,7 +12,7 @@ import { useEffect, useMemo } from "react";
 
 const Brands = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListBrands({ sort: 'name', order: false });
+  const { data, isLoading, isRefetching } = useListBrands();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
