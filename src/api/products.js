@@ -76,9 +76,8 @@ export function useListAllProducts() {
 
       do {
         const params = {
-          pageSize: 1000,
           ...(LastEvaluatedKey && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(LastEvaluatedKey)) }),
-          attributes: ['code', 'name', 'price']
+          attributes: encodeURIComponent(JSON.stringify(['code', 'name', 'price', 'brandName', 'supplierName'])),
         };
 
         const { data } = await axios.get(PRODUCTS_URL, { params });
