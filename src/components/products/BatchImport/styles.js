@@ -12,6 +12,12 @@ const ModalHeader = styled(SModal.Header)`
  margin-bottom: 20px;
 `;
 
+const WaitMsg = styled.p`
+  font-size: 14px!important;
+  margin: 0!important;
+  align-content: center;
+`;
+
 const Header = styled(SHeader)`
 padding:5px!important;
 border-bottom: groove!important;
@@ -21,6 +27,13 @@ const ModalActions = styled(SModal.Actions)`
   display: flex;
   justify-content: flex-end;
   column-gap: 15px;
+
+  p {
+    width: auto !important;
+    flex: auto;
+    text-align: -webkit-center;
+    margin-left: 90px!important;
+  }
 `;
 
 const ContainerModal = styled(Flex)`
@@ -29,11 +42,5 @@ const ContainerModal = styled(Flex)`
   max-width: 100%!important;
 `;
 
-const WarningMessage = styled.p`
-  margin-left: 5px!important;
-  color: red;
-  font-size: 10px!important;
-`;
-
-export { ContainerModal, Header, Modal, ModalActions, ModalHeader, WarningMessage };
+export { ContainerModal, Header, Modal, ModalActions, ModalHeader, WaitMsg };
 
