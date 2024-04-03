@@ -1,15 +1,15 @@
-import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListBanProducts, useListAllProducts } from "@/api/products";
+import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListAllProducts, useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { downloadExcel, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import CurrencyFormat from 'react-currency-format';
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { ButtonContent, Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, ModalHeader } from "./styles";
-import CurrencyFormat from 'react-currency-format';
 
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts } = useListAllProducts();
@@ -122,7 +122,7 @@ const BatchImport = ({ isCreating }) => {
       const productCounts = {};
 
       products?.forEach((product) => {
-        existingCodes[product.code.toUpperCase()] = true;
+        existingCodes[product?.code?.toUpperCase()] = true;
       });
 
       parsedData.forEach((product) => {
