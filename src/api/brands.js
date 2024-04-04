@@ -8,6 +8,7 @@ import axios from './axios';
 const BRANDS_URL = `${CLIENT_ID}${PATHS.BRANDS}`;
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 export const GET_BRAND_QUERY_KEY = 'getBrand';
+export const LIST_ALL_BRANDS_QUERY_KEY = 'listAllBrands';
 
 export function create(brand) {
   const body = {
@@ -57,6 +58,44 @@ export function useListBrands({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE
   const query = useQuery({
     queryKey: [LIST_BRANDS_QUERY_KEY, params],
     queryFn: () => listBrands(params),
+  });
+
+  return query;
+};
+
+export function useListAllBrands() {
+  const listBrands = async () => {
+    try {
+      let brands = [];
+      let LastEvaluatedKey;
+
+      do {
+        const params = {
+          pageSize: 1000,
+          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(LastEvaluatedKey)) }),
+          attributes: ['code', 'name']
+        };
+
+        const { data } = await axios.get(BRANDS_URL, { params });
+
+        if (data.statusOk) {
+          brands = [...brands, ...data.brands];
+        }
+
+        LastEvaluatedKey = data?.LastEvaluatedKey;
+
+      } while (LastEvaluatedKey);
+
+      return { brands };
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const query = useQuery({
+    queryKey: [LIST_ALL_BRANDS_QUERY_KEY],
+    queryFn: () => listBrands(),
+    staleTime: TIME_IN_MS.FIVE_MINUTES,
   });
 
   return query;
