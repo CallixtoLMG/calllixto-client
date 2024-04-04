@@ -12,7 +12,10 @@ import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, ModalHeader, WaitMsg } from "./styles";
 
 const BatchImport = ({ isCreating }) => {
-  const { data, isLoading: loadingProducts } = useListAllProducts();
+  const [fetchProducts, setFetchProducts] = useState(false);
+  const [startFileProcessing, setStartFileProcessing] = useState(false);
+  const { data, isLoading: loadingProducts } = useListAllProducts(fetchProducts);
+  console.log("data:", data);
   const products = useMemo(() => data?.products, [data?.products]);
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, watch } = useForm();
@@ -29,6 +32,77 @@ const BatchImport = ({ isCreating }) => {
   const queryClient = useQueryClient();
   const inputRef = useRef();
   const [existingCodes, setExistingCodes] = useState({});
+
+
+
+  // const processFile = useCallback((fileData) => {
+  //   reader.onload = (fileData) => {
+  //     const data = fileData.target.result;
+  //     const workbook = XLSX.read(data, { type: "binary" });
+  //     const sheetName = workbook.SheetNames[0];
+  //     const sheet = workbook.Sheets[sheetName];
+  //     const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
+  //     const columnMapping = {
+  //       Codigo: "code",
+  //       Nombre: "name",
+  //       Precio: "price",
+  //       Comentarios: "comments",
+  //     };
+  //     const transformedHeaders = headersRow.map((header) => {
+  //       return columnMapping[header] || header;
+  //     });
+  //     for (let i = 0; i < transformedHeaders.length; i++) {
+  //       sheet[XLSX.utils.encode_cell({ r: 0, c: i })] = {
+  //         v: transformedHeaders[i],
+  //         t: 's',
+  //       };
+  //     };
+  //     let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
+  //     const importProducts = [];
+  //     const downloadProducts = [];
+  //     const existingCodes = {};
+  //     const productCounts = {};
+
+  //     products?.forEach((product) => {
+  //       existingCodes[product?.code?.toUpperCase()] = true;
+  //     });
+
+  //     parsedData.forEach((product) => {
+  //       const code = String(product.code).toUpperCase();
+  //       productCounts[code] = (productCounts[code] || 0) + 1;
+  //     });
+
+  //     parsedData.forEach((product) => {
+  //       const code = String(product.code).toUpperCase();
+  //       const price = parseFloat(product.price);
+  //       const hasAtLeastOneValue = product.code || product.name || product.price;
+  //       if (hasAtLeastOneValue && !blacklist?.some(item => item === code)) {
+  //         const formattedProduct = { ...product, code, price };
+  //         importSettings.processData(
+  //           formattedProduct,
+  //           existingCodes,
+  //           downloadProducts,
+  //           importProducts,
+  //           productCounts
+  //         );
+  //       };
+  //     });
+  //     setValue('importProducts', importProducts);
+  //     setImportedProductsCount(importProducts.length);
+  //     setIsLoading(false);
+  //     if (downloadProducts.length) {
+  //       setShowConfirmationModal(true);
+  //       setDownloadProducts(downloadProducts);
+  //     };
+  //     setOpen(true);
+  //   };
+  //   // Aquí va toda la lógica que estaba dentro de `reader.onload`
+  //   // Asegúrate de adaptarla para usar `fileData` como el contenido del archivo
+  //   console.log(fileData); // Esta línea es solo un placeholder, reemplázala con tu lógica
+  //   // No olvides incluir todas las dependencias necesarias como argumentos de useCallback
+  // }, [blacklist, loadingBlacklist, loadingProducts, products, reset, setValue, importSettings]);
+
+
 
   useEffect(() => {
     const codes = products?.reduce((acc, product) => {
@@ -65,34 +139,14 @@ const BatchImport = ({ isCreating }) => {
     };
   }, [isCreating, watchProducts, isLoading]);
 
+  const processFile = useCallback((file) => {
+    console.log("file", file)
+    if (!file) return;
 
-  const handleClick = useCallback(() => {
-    inputRef.current.value = null;
-    inputRef?.current?.click();
-  }, [inputRef]);
-
-  const handleModalClose = () => {
-    setOpen(false);
-  };
-
-  const handleModalOpen = () => {
-    setOpen(open);
-  };
-
-  const handleFileUpload = useCallback((e) => {
-    reset();
-    const fileName = e?.target.files[0]?.name;
-    if (!fileName || loadingBlacklist || loadingProducts) {
-      return;
-    };
-    setSelectedFile(fileName);
-    const reader = new FileReader();
-    const file = e.target.files[0];
-    if (!(file instanceof Blob)) {
-      return;
-    };
     setIsLoading(true);
+    const reader = new FileReader();
     reader.readAsBinaryString(file);
+
     reader.onload = (e) => {
       const data = e.target.result;
       const workbook = XLSX.read(data, { type: "binary" });
@@ -144,6 +198,7 @@ const BatchImport = ({ isCreating }) => {
           );
         };
       });
+      console.log("antes de los Archivo procesado");
       setValue('importProducts', importProducts);
       setImportedProductsCount(importProducts.length);
       setIsLoading(false);
@@ -151,9 +206,125 @@ const BatchImport = ({ isCreating }) => {
         setShowConfirmationModal(true);
         setDownloadProducts(downloadProducts);
       };
-      setOpen(true);
+      console.log("Archivo procesado");
+      setOpen(true); // Intenta abrir el modal aquí
+      console.log("Intentando abrir el modal");
+      setIsLoading(false);
+    };
+
+    useEffect(() => {
+      if (!loadingProducts && startFileProcessing && selectedFile) {
+        processFile(selectedFile);
+        setStartFileProcessing(false); // Resetea el estado para evitar procesamientos repetidos
+      }
+    }, [loadingProducts, startFileProcessing, selectedFile, processFile]);
+
+    reader.onerror = (error) => {
+      console.log('Error reading file:', error);
+      setIsLoading(false);
     };
   }, [blacklist, loadingBlacklist, loadingProducts, products, reset, setValue, importSettings]);
+
+
+  const handleClick = useCallback(() => {
+    inputRef.current.value = null;
+    inputRef?.current?.click();
+  }, [inputRef]);
+
+  const handleModalClose = () => {
+    setOpen(false);
+  };
+
+  const handleModalOpen = () => {
+    console.log(fetchProducts);
+    setOpen(open);
+  };
+
+  const handleFileUpload = useCallback((e) => {
+    const file = e.target.files[0];
+    if (file && !(loadingBlacklist || loadingProducts)) {
+      setSelectedFile(file); // Guarda el archivo seleccionado en lugar del nombre
+      setFetchProducts(true);
+      setStartFileProcessing(true); // Prepara para procesar el archivo
+    }
+  }, [loadingBlacklist, loadingProducts]);
+
+  // const handleFileUpload = useCallback((e) => {
+  //   reset();
+  //   setFetchProducts(true);
+  //   const fileName = e?.target.files[0]?.name;
+  //   if (!fileName || loadingBlacklist || loadingProducts) {
+  //     return;
+  //   };
+  //   setSelectedFile(fileName);
+  //   const reader = new FileReader();
+  //   const file = e.target.files[0];
+  //   if (!(file instanceof Blob)) {
+  //     return;
+  //   };
+  //   setIsLoading(true);
+  //   reader.readAsBinaryString(file);
+  //   // reader.onload = (e) => {
+  //   //   const data = e.target.result;
+  //   //   const workbook = XLSX.read(data, { type: "binary" });
+  //   //   const sheetName = workbook.SheetNames[0];
+  //   //   const sheet = workbook.Sheets[sheetName];
+  //   //   const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
+  //   //   const columnMapping = {
+  //   //     Codigo: "code",
+  //   //     Nombre: "name",
+  //   //     Precio: "price",
+  //   //     Comentarios: "comments",
+  //   //   };
+  //   //   const transformedHeaders = headersRow.map((header) => {
+  //   //     return columnMapping[header] || header;
+  //   //   });
+  //   //   for (let i = 0; i < transformedHeaders.length; i++) {
+  //   //     sheet[XLSX.utils.encode_cell({ r: 0, c: i })] = {
+  //   //       v: transformedHeaders[i],
+  //   //       t: 's',
+  //   //     };
+  //   //   };
+  //   //   let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
+  //   //   const importProducts = [];
+  //   //   const downloadProducts = [];
+  //   //   const existingCodes = {};
+  //   //   const productCounts = {};
+
+  //   //   products?.forEach((product) => {
+  //   //     existingCodes[product?.code?.toUpperCase()] = true;
+  //   //   });
+
+  //   //   parsedData.forEach((product) => {
+  //   //     const code = String(product.code).toUpperCase();
+  //   //     productCounts[code] = (productCounts[code] || 0) + 1;
+  //   //   });
+
+  //   //   parsedData.forEach((product) => {
+  //   //     const code = String(product.code).toUpperCase();
+  //   //     const price = parseFloat(product.price);
+  //   //     const hasAtLeastOneValue = product.code || product.name || product.price;
+  //   //     if (hasAtLeastOneValue && !blacklist?.some(item => item === code)) {
+  //   //       const formattedProduct = { ...product, code, price };
+  //   //       importSettings.processData(
+  //   //         formattedProduct,
+  //   //         existingCodes,
+  //   //         downloadProducts,
+  //   //         importProducts,
+  //   //         productCounts
+  //   //       );
+  //   //     };
+  //   //   });
+  //   //   setValue('importProducts', importProducts);
+  //   //   setImportedProductsCount(importProducts.length);
+  //   //   setIsLoading(false);
+  //   //   if (downloadProducts.length) {
+  //   //     setShowConfirmationModal(true);
+  //   //     setDownloadProducts(downloadProducts);
+  //   //   };
+  //   //   setOpen(true);
+  //   // };
+  // }, [blacklist, loadingBlacklist, loadingProducts, products, reset, setValue, importSettings]);
 
   const handleDownloadConfirmation = () => {
     const data = [
