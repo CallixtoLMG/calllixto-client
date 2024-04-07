@@ -12,7 +12,7 @@ import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, ModalHeader, WaitMsg } from "./styles";
 
 const BatchImport = ({ isCreating }) => {
-  const { data, isLoading: loadingProducts } = useListAllProducts();
+  const { data, isLoading: loadingProducts, refetch } = useListAllProducts(false);
   const products = useMemo(() => data?.products, [data?.products]);
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, watch } = useForm();
@@ -79,81 +79,101 @@ const BatchImport = ({ isCreating }) => {
     setOpen(open);
   };
 
-  const handleFileUpload = useCallback((e) => {
+  const handleFileUpload = async (e) => {
     reset();
-    const fileName = e?.target.files[0]?.name;
-    if (!fileName || loadingBlacklist || loadingProducts) {
-      return;
-    };
-    setSelectedFile(fileName);
-    const reader = new FileReader();
-    const file = e.target.files[0];
-    if (!(file instanceof Blob)) {
-      return;
-    };
-    setIsLoading(true);
-    reader.readAsBinaryString(file);
-    reader.onload = (e) => {
-      const data = e.target.result;
-      const workbook = XLSX.read(data, { type: "binary" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
-      const columnMapping = {
-        Codigo: "code",
-        Nombre: "name",
-        Precio: "price",
-        Comentarios: "comments",
-      };
-      const transformedHeaders = headersRow.map((header) => {
-        return columnMapping[header] || header;
-      });
-      for (let i = 0; i < transformedHeaders.length; i++) {
-        sheet[XLSX.utils.encode_cell({ r: 0, c: i })] = {
-          v: transformedHeaders[i],
-          t: 's',
-        };
-      };
-      let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
-      const importProducts = [];
-      const downloadProducts = [];
-      const existingCodes = {};
-      const productCounts = {};
+    const file = e?.target.files[0];
+    if (!file) return;
+    setIsLoading(true); // Muestra el indicador de carga
+    try {
+      await refetch();
+      setSelectedFile(file.name);
 
-      products?.forEach((product) => {
-        existingCodes[product?.code?.toUpperCase()] = true;
-      });
-
-      parsedData.forEach((product) => {
-        const code = String(product.code).toUpperCase();
-        productCounts[code] = (productCounts[code] || 0) + 1;
-      });
-
-      parsedData.forEach((product) => {
-        const code = String(product.code).toUpperCase();
-        const price = parseFloat(product.price);
-        const hasAtLeastOneValue = product.code || product.name || product.price;
-        if (hasAtLeastOneValue && !blacklist?.some(item => item === code)) {
-          const formattedProduct = { ...product, code, price };
-          importSettings.processData(
-            formattedProduct,
-            existingCodes,
-            downloadProducts,
-            importProducts,
-            productCounts
-          );
-        };
-      });
-      setValue('importProducts', importProducts);
-      setImportedProductsCount(importProducts.length);
-      setIsLoading(false);
-      if (downloadProducts.length) {
-        setShowConfirmationModal(true);
-        setDownloadProducts(downloadProducts);
+      // Crear FileReader para leer el archivo
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const data = event.target.result;
+          // Espera a que processFile termine su ejecución
+          await processFile(data, products);
+          // Después de procesar el archivo, abre el modal
+          setOpen(true);
+        } catch (error) {
+          console.error("Error processing file:", error);
+        }
       };
-      setOpen(true);
+      reader.readAsBinaryString(file);
+    } catch (error) {
+      console.error("Error al cargar los datos necesarios:", error);
+    }
+    finally {
+      setIsLoading(false); // Oculta el indicador de carga una vez que todo ha terminado
+    }
+  };
+
+  const processFile = async (data, updatedProducts) => {
+    const workbook = XLSX.read(data, { type: "binary" });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
+    const columnMapping = {
+      Codigo: "code",
+      Nombre: "name",
+      Precio: "price",
+      Comentarios: "comments",
     };
-  }, [blacklist, loadingBlacklist, loadingProducts, products, reset, setValue, importSettings]);
+    const transformedHeaders = headersRow.map(header => columnMapping[header] || header);
+    for (let i = 0; i < transformedHeaders.length; i++) {
+      sheet[XLSX.utils.encode_cell({ r: 0, c: i })] = {
+        v: transformedHeaders[i],
+        t: 's',
+      };
+    };
+    let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
+    const importProducts = [];
+    const downloadProducts = [];
+    const productCounts = {};
+
+    // Asumiendo que 'updatedProducts' ahora tiene los datos más recientes
+    const updatedExistingCodes = updatedProducts?.reduce((acc, product) => {
+      acc[product.code.toUpperCase()] = product;
+      return acc;
+    }, {});
+
+    parsedData.forEach(product => {
+      const code = String(product.code).toUpperCase();
+      productCounts[code] = (productCounts[code] || 0) + 1;
+    });
+
+    parsedData.forEach(product => {
+      const code = String(product.code).toUpperCase();
+      const formattedProduct = {
+        code,
+        name: product.name,
+        price: parseFloat(product.price),
+        comments: product.comments
+      };
+
+      // Asegúrate de que updatedExistingCodes y la clave existen antes de intentar acceder
+      if (productCounts[code] > 1) {
+        downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra duplicado" });
+      } else if (updatedExistingCodes && updatedExistingCodes[code] && !isCreating) {
+        importProducts.push(formattedProduct);
+      } else if (updatedExistingCodes && !updatedExistingCodes[code] && isCreating) {
+        importProducts.push(formattedProduct);
+      } else {
+        const msg = isCreating ? "Este producto ya existe" : "Este producto no existe";
+        downloadProducts.push({ ...formattedProduct, msg });
+      }
+    });
+
+    // Actualiza el estado con los productos importados y los productos para descargar
+    setValue('importProducts', importProducts);
+    setImportedProductsCount(importProducts.length);
+    if (downloadProducts.length) {
+      setShowConfirmationModal(true);
+      setDownloadProducts(downloadProducts);
+    }
+  };
 
   const handleDownloadConfirmation = () => {
     const data = [

@@ -68,7 +68,7 @@ export function useListProducts({ sort, order = true, pageSize = DEFAULT_PAGE_SI
   return query;
 };
 
-export function useListAllProducts() {
+export function useListAllProducts(enabled = false) {
   const listProducts = async () => {
     try {
       let products = [];
@@ -101,6 +101,7 @@ export function useListAllProducts() {
     queryKey: [LIST_ALL_PRODUCTS_QUERY_KEY],
     queryFn: () => listProducts(),
     staleTime: TIME_IN_MS.FIVE_MINUTES,
+    enabled,
   });
 
   return query;
