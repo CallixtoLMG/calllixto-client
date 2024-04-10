@@ -1,6 +1,7 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListAllProducts, useListBanProducts } from "@/api/products";
 import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
+import { Loader } from "@/components/layout";
 import { downloadExcel, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -12,7 +13,7 @@ import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, ModalHeader, WaitMsg } from "./styles";
 
 const BatchImport = ({ isCreating }) => {
-  const { data, isLoading: loadingProducts } = useListAllProducts();
+  const { data, isLoading: loadingProducts, refetch } = useListAllProducts({});
   const products = useMemo(() => data?.products, [data?.products]);
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, watch } = useForm();
@@ -65,7 +66,6 @@ const BatchImport = ({ isCreating }) => {
     };
   }, [isCreating, watchProducts, isLoading]);
 
-
   const handleClick = useCallback(() => {
     inputRef.current.value = null;
     inputRef?.current?.click();
@@ -79,81 +79,98 @@ const BatchImport = ({ isCreating }) => {
     setOpen(open);
   };
 
-  const handleFileUpload = useCallback((e) => {
+  const handleFileUpload = async (e) => {
     reset();
-    const fileName = e?.target.files[0]?.name;
-    if (!fileName || loadingBlacklist || loadingProducts) {
-      return;
-    };
-    setSelectedFile(fileName);
-    const reader = new FileReader();
-    const file = e.target.files[0];
-    if (!(file instanceof Blob)) {
-      return;
-    };
+    const file = e?.target.files[0];
+    if (!file || loadingBlacklist || loadingProducts) return;
+    setOpen(true);
     setIsLoading(true);
-    reader.readAsBinaryString(file);
-    reader.onload = (e) => {
-      const data = e.target.result;
-      const workbook = XLSX.read(data, { type: "binary" });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
-      const columnMapping = {
-        Codigo: "code",
-        Nombre: "name",
-        Precio: "price",
-        Comentarios: "comments",
+    try {
+      const response = await refetch();
+      const updatedProducts = response.data.products;
+      setSelectedFile(file.name);
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        try {
+          const data = event.target.result;
+          await processFile(data, updatedProducts);
+        } catch (error) {
+          console.error("Error processing file:", error);
+        }
       };
-      const transformedHeaders = headersRow.map((header) => {
-        return columnMapping[header] || header;
-      });
-      for (let i = 0; i < transformedHeaders.length; i++) {
-        sheet[XLSX.utils.encode_cell({ r: 0, c: i })] = {
-          v: transformedHeaders[i],
-          t: 's',
-        };
-      };
-      let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
-      const importProducts = [];
-      const downloadProducts = [];
-      const existingCodes = {};
-      const productCounts = {};
-
-      products?.forEach((product) => {
-        existingCodes[product?.code?.toUpperCase()] = true;
-      });
-
-      parsedData.forEach((product) => {
-        const code = String(product.code).toUpperCase();
-        productCounts[code] = (productCounts[code] || 0) + 1;
-      });
-
-      parsedData.forEach((product) => {
-        const code = String(product.code).toUpperCase();
-        const price = parseFloat(product.price);
-        const hasAtLeastOneValue = product.code || product.name || product.price;
-        if (hasAtLeastOneValue && !blacklist?.some(item => item === code)) {
-          const formattedProduct = { ...product, code, price };
-          importSettings.processData(
-            formattedProduct,
-            existingCodes,
-            downloadProducts,
-            importProducts,
-            productCounts
-          );
-        };
-      });
-      setValue('importProducts', importProducts);
-      setImportedProductsCount(importProducts.length);
+      reader.readAsBinaryString(file);
+    } catch (error) {
+      console.error("Error al cargar los datos necesarios:", error);
+    }
+    finally {
       setIsLoading(false);
-      if (downloadProducts.length) {
-        setShowConfirmationModal(true);
-        setDownloadProducts(downloadProducts);
-      };
-      setOpen(true);
+    }
+  };
+
+  const processFile = async (data, updatedProducts) => {
+    const workbook = XLSX.read(data, { type: "binary" });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
+    const columnMapping = {
+      Codigo: "code",
+      Nombre: "name",
+      Precio: "price",
+      Comentarios: "comments",
     };
-  }, [blacklist, loadingBlacklist, loadingProducts, products, reset, setValue, importSettings]);
+    const transformedHeaders = headersRow.map(header => columnMapping[header] || header);
+    for (let i = 0; i < transformedHeaders.length; i++) {
+      sheet[XLSX.utils.encode_cell({ r: 0, c: i })] = {
+        v: transformedHeaders[i],
+        t: 's',
+      };
+    };
+    let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
+    const importProducts = [];
+    const downloadProducts = [];
+    const productCounts = {};
+
+    const updatedExistingCodes = updatedProducts?.reduce((acc, product) => {
+      acc[product.code.toUpperCase()] = product;
+      return acc;
+    }, {});
+
+    parsedData.forEach(product => {
+      const code = String(product.code).toUpperCase();
+      productCounts[code] = (productCounts[code] || 0) + 1;
+    });
+
+    parsedData.forEach(product => {
+      const code = String(product.code).toUpperCase();
+      const hasAtLeastOneValue = product.code || product.name || product.price;
+      if (hasAtLeastOneValue && !blacklist?.some(item => item === code)) {
+        const formattedProduct = {
+          code,
+          name: product.name,
+          price: parseFloat(product.price),
+          comments: product.comments
+        };
+
+        if (productCounts[code] > 1) {
+          downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra duplicado" });
+        } else if (updatedExistingCodes && updatedExistingCodes[code] && !isCreating) {
+          importProducts.push(formattedProduct);
+        } else if (updatedExistingCodes && !updatedExistingCodes[code] && isCreating) {
+          importProducts.push(formattedProduct);
+        } else {
+          const msg = isCreating ? "Este producto ya existe" : "Este producto no existe";
+          downloadProducts.push({ ...formattedProduct, msg });
+        }
+      }
+    });
+
+    setValue('importProducts', importProducts);
+    setImportedProductsCount(importProducts.length);
+    if (downloadProducts.length) {
+      setShowConfirmationModal(true);
+      setDownloadProducts(downloadProducts);
+    }
+  };
 
   const handleDownloadConfirmation = () => {
     const data = [
@@ -204,25 +221,21 @@ const BatchImport = ({ isCreating }) => {
             const existingProduct = existingCodes[product.code.toUpperCase()];
             let productWithChanges = { code: product.code };
             let previousVersion = {};
-
             Object.keys(product).forEach(key => {
               if (key !== 'code' && product[key] !== undefined && product[key] !== '' && product[key] !== existingProduct[key]) {
                 productWithChanges[key] = product[key];
                 previousVersion[key] = existingProduct[key];
               }
             });
-
             if (existingProduct.updatedAt) {
               previousVersion['updatedAt'] = existingProduct.updatedAt;
             }
-
             if (Object.keys(previousVersion).length > 0) {
               productWithChanges['previousVersion'] = previousVersion;
               productWithChanges.updatedAt = now();
             } else {
               return null;
             }
-
             return productWithChanges;
           })
           .filter(product => product !== null);
@@ -252,11 +265,13 @@ const BatchImport = ({ isCreating }) => {
       }
     },
   });
+
   const deleteProduct = useCallback((index) => {
     const products = [...watchProducts];
     products.splice(index, 1);
     setValue("importProducts", products);
   }, [watchProducts, setValue]);
+
   const actions = [
     {
       id: 1,
@@ -268,6 +283,7 @@ const BatchImport = ({ isCreating }) => {
       tooltip: 'Eliminar'
     }
   ];
+
   const PRODUCTS_COLUMNS = [
     {
       title: "Código",
@@ -321,6 +337,7 @@ const BatchImport = ({ isCreating }) => {
       ), id: 4, align: 'left'
     },
   ];
+
   return (
     <>
       <input
@@ -354,81 +371,85 @@ const BatchImport = ({ isCreating }) => {
         >
           {showConfirmationModal ? (
             <>
-              <ModalHeader> Confirmar descarga</ModalHeader>
-              <Modal.Content>
-                <p>
-                  {`Se han encontrado ${downloadProducts.length} productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
-                  ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
-                </p>
-              </Modal.Content>
-              <ModalActions>
-                <Button
-                  positive
-                  onClick={handleDownloadConfirmation}
-                  content="Confirmar"
-                />
-                <Button
-                  negative
-                  onClick={() => setShowConfirmationModal(false)}
-                  content="Cancelar"
-                />
-              </ModalActions>
-            </>
-          ) : (
-            <ContainerModal>
-              <Form onSubmit={handleSubmit(mutate)}>
-                {watchProducts.length <= 50 ? (
-                  <>
-                    <FieldsContainer>
-                      <FormField width={6}>
-                        <Label >Archivo seleccionado:</Label>
-                        <Segment >{selectedFile}</Segment>
-                      </FormField>
-                    </FieldsContainer>
-                    <FieldsContainer>
-                      <Label>{`${importSettings.label}: ${importedProductsCount}`}</Label>
-                      <Table
-                        deleteButtonInside
-                        tableHeight="50vh"
-                        mainKey="code"
-                        headers={PRODUCTS_COLUMNS}
-                        elements={watchProducts}
-                        actions={actions}
-                      />
-                    </FieldsContainer>
-                  </>
-                ) : (
-                  <>
-                    <FieldsContainer>
-                      <FormField width={8}>
-                        <Label >Archivo seleccionado:</Label>
-                        <Segment >{selectedFile}</Segment>
-                      </FormField>
-                      <FormField width={7}>
-                        <Label >Cantidad a importar:</Label>
-                        <Segment >{`${importSettings.label}: ${importedProductsCount}`}</Segment>
-                      </FormField>
-                    </FieldsContainer>
-                  </>
-                )}
+              <Loader active={loadingProducts || isLoading}>
+                <ModalHeader> Confirmar descarga</ModalHeader>
+                <Modal.Content>
+                  <p>
+                    {`Se han encontrado ${downloadProducts.length} productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
+                    ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
+                  </p>
+                </Modal.Content>
                 <ModalActions>
-                  {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
                   <Button
-                    disabled={importSettings.isButtonDisabled(isPending)}
-                    loading={isLoading || isPending}
-                    type="submit"
-                    color="green"
-                    content="Aceptar"
+                    positive
+                    onClick={handleDownloadConfirmation}
+                    content="Confirmar"
                   />
                   <Button
-                    disabled={isLoading || isPending}
-                    onClick={() => setOpen(false)}
-                    color="red"
+                    negative
+                    onClick={() => setShowConfirmationModal(false)}
                     content="Cancelar"
                   />
                 </ModalActions>
-              </Form>
-            </ContainerModal>
+              </Loader>
+            </>
+          ) : (
+            <Loader active={loadingProducts || isLoading}>
+              <ContainerModal>
+                <Form onSubmit={handleSubmit(mutate)}>
+                  {watchProducts.length <= 50 ? (
+                    <>
+                      <FieldsContainer>
+                        <FormField width={6}>
+                          <Label >Archivo seleccionado:</Label>
+                          <Segment >{selectedFile}</Segment>
+                        </FormField>
+                      </FieldsContainer>
+                      <FieldsContainer>
+                        <Label>{`${importSettings.label}: ${importedProductsCount}`}</Label>
+                        <Table
+                          deleteButtonInside
+                          tableHeight="50vh"
+                          mainKey="code"
+                          headers={PRODUCTS_COLUMNS}
+                          elements={watchProducts}
+                          actions={actions}
+                        />
+                      </FieldsContainer>
+                    </>
+                  ) : (
+                    <>
+                      <FieldsContainer>
+                        <FormField width={8}>
+                          <Label >Archivo seleccionado:</Label>
+                          <Segment >{selectedFile}</Segment>
+                        </FormField>
+                        <FormField width={7}>
+                          <Label >Cantidad a importar:</Label>
+                          <Segment >{`${importSettings.label}: ${importedProductsCount}`}</Segment>
+                        </FormField>
+                      </FieldsContainer>
+                    </>
+                  )}
+                  <ModalActions>
+                    {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
+                    <Button
+                      disabled={importSettings.isButtonDisabled(isPending)}
+                      loading={isLoading || isPending}
+                      type="submit"
+                      color="green"
+                      content="Aceptar"
+                    />
+                    <Button
+                      disabled={isLoading || isPending}
+                      onClick={() => setOpen(false)}
+                      color="red"
+                      content="Cancelar"
+                    />
+                  </ModalActions>
+                </Form>
+              </ContainerModal>
+            </Loader>
           )}
         </Modal>
       </Transition >

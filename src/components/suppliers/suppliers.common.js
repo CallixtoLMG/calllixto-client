@@ -2,6 +2,8 @@ import { formatedPhone } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 
+const ATTRIBUTES = { ID: "id", NAME: "name", };
+
 const SUPPLIERS_COLUMNS = [
   {
     id: 1,
@@ -48,5 +50,5 @@ const FILTERS = [
   { value: 'name', placeholder: 'Nombre' },
 ];
 
-export { FILTERS, SUPPLIERS_COLUMNS };
+export { ATTRIBUTES, FILTERS, SUPPLIERS_COLUMNS };
 

@@ -39,7 +39,7 @@ const BanProduct = ({ open, setOpen }) => {
   };
 
   const handleAddProduct = (value) => {
-    if (REGEX.FIVE_DIGIT_CODE.test(value)) {
+    if (REGEX.MAX26_DIGIT_CODE.test(value)) {
       if (!watchProducts.includes(value)) {
         const updatedProducts = [...watchProducts, value];
         setValue("products", updatedProducts, { shouldDirty: true });
