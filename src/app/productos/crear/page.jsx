@@ -14,8 +14,8 @@ import { toast } from "react-hot-toast";
 const CreateProduct = () => {
   useValidateToken();
   const { push } = useRouter();
-  const { data: brands, isLoading: isLoadingBrands } = useListAllBrands({});
-  const { data: suppliers, isLoading: isLoadingSuppliers } = useListAllSuppliers({});
+  const { data: brands, isLoading: isLoadingBrands } = useListAllBrands({ attributes: ["name", "id"] });
+  const { data: suppliers, isLoading: isLoadingSuppliers } = useListAllSuppliers({ attributes: ["name", "id"] });
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const queryClient = useQueryClient();

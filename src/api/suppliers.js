@@ -63,7 +63,7 @@ export function useListSuppliers({ sort, order = true, pageSize = DEFAULT_PAGE_S
   return query;
 };
 
-export function useListAllSuppliers() {
+export function useListAllSuppliers({attributes = []}) {
   const listSuppliers = async () => {
     try {
       let suppliers = [];
@@ -71,14 +71,14 @@ export function useListAllSuppliers() {
 
       do {
         const params = {
-          pageSize: 1000,
+          attributes: encodeURIComponent(JSON.stringify(attributes)),
           ...(LastEvaluatedKey && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(LastEvaluatedKey)) }),
-          attributes: ['code', 'name']
         };
 
         const { data } = await axios.get(SUPPLIER_URL, { params });
 
         if (data.statusOk) {
+          // Asumimos que el servidor filtra los atributos de acuerdo a lo especificado
           suppliers = [...suppliers, ...data.suppliers];
         }
 
@@ -93,7 +93,7 @@ export function useListAllSuppliers() {
   };
 
   const query = useQuery({
-    queryKey: [LIST_ALL_SUPPLIER_QUERY_KEY],
+    queryKey: [LIST_ALL_SUPPLIER_QUERY_KEY, attributes], // Incluir attributes para la clave de caché
     queryFn: () => listSuppliers(),
     staleTime: TIME_IN_MS.FIVE_MINUTES,
   });

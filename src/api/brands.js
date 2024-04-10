@@ -63,7 +63,7 @@ export function useListBrands({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE
   return query;
 };
 
-export function useListAllBrands() {
+export function useListAllBrands({ attributes = [] }) {
   const listBrands = async () => {
     try {
       let brands = [];
@@ -71,9 +71,8 @@ export function useListAllBrands() {
 
       do {
         const params = {
-          pageSize: 1000,
           ...(LastEvaluatedKey && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(LastEvaluatedKey)) }),
-          attributes: ['code', 'name']
+          attributes: encodeURIComponent(JSON.stringify(attributes))
         };
 
         const { data } = await axios.get(BRANDS_URL, { params });
@@ -93,7 +92,7 @@ export function useListAllBrands() {
   };
 
   const query = useQuery({
-    queryKey: [LIST_ALL_BRANDS_QUERY_KEY],
+    queryKey: [LIST_ALL_BRANDS_QUERY_KEY, attributes],
     queryFn: () => listBrands(),
     staleTime: TIME_IN_MS.FIVE_MINUTES,
   });
