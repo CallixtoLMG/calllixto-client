@@ -1,7 +1,9 @@
 import { getBrandCode, getProductCode, getSupplierCode } from "@/utils";
+import CurrencyFormat from 'react-currency-format';
 import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
-import CurrencyFormat from 'react-currency-format';
+
+const ATTRIBUTES = { CODE: "code", NAME: "name", PRICE: "price" };
 
 const PRODUCT_COLUMNS = [
   {
@@ -107,5 +109,5 @@ const BAN_FILTERS = [
   { value: 'code', placeholder: 'Código' },
 ];
 
-export { BAN_FILTERS, BAN_PRODUCTS_COLUMNS, FILTERS, IMPORT_PRODUCTS_COLUMNS, PRODUCT_COLUMNS };
+export { ATTRIBUTES, BAN_FILTERS, BAN_PRODUCTS_COLUMNS, FILTERS, IMPORT_PRODUCTS_COLUMNS, PRODUCT_COLUMNS };
 

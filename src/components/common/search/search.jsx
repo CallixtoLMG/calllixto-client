@@ -10,9 +10,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
   useEffect(() => {
     setFilteredProducts(products?.filter((product) =>
       product?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product?.code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product?.supplierName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product?.brandName?.toLowerCase().includes(searchQuery.toLowerCase())
+      product?.code?.toLowerCase().includes(searchQuery.toLowerCase()) 
     ));
   }, [searchQuery, products]);
 
@@ -37,7 +35,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
       onSearchChange={handleSearchChange}
       value={selectedProduct ? '' : searchQuery}
       noResultsMessage="No se encontró producto"
-      placeholder="Nombre, código, marca, proveedor"
+      placeholder="Nombre, código"
       results={filteredProducts?.slice(0, MAX_RESULTS).map((product) => ({
         key: product.code,
         title: product.name,
