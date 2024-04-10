@@ -13,7 +13,7 @@ import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, ModalHeader, WaitMsg } from "./styles";
 
 const BatchImport = ({ isCreating }) => {
-  const { data, isLoading: loadingProducts, refetch } = useListAllProducts(false);
+  const { data, isLoading: loadingProducts, refetch } = useListAllProducts();
   const products = useMemo(() => data?.products, [data?.products]);
   const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
   const { handleSubmit, control, reset, setValue, watch } = useForm();
