@@ -68,7 +68,7 @@ export function useListProducts({ sort, order = true, pageSize = DEFAULT_PAGE_SI
   return query;
 };
 
-export function useListAllProducts(enabled = false) {
+export function useListAllProducts({ attributes = [], enabled = false } = {}) {
   const listProducts = async () => {
     try {
       let products = [];
@@ -76,8 +76,8 @@ export function useListAllProducts(enabled = false) {
 
       do {
         const params = {
+          attributes: encodeURIComponent(JSON.stringify(attributes)),
           ...(LastEvaluatedKey && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(LastEvaluatedKey)) }),
-          attributes: encodeURIComponent(JSON.stringify(['code', 'name', 'price', 'brandName', 'supplierName'])),
         };
 
         const { data } = await axios.get(PRODUCTS_URL, { params });
@@ -97,7 +97,7 @@ export function useListAllProducts(enabled = false) {
   };
 
   const query = useQuery({
-    queryKey: [LIST_ALL_PRODUCTS_QUERY_KEY],
+    queryKey: [LIST_ALL_PRODUCTS_QUERY_KEY, attributes],
     queryFn: () => listProducts(),
     staleTime: TIME_IN_MS.FIVE_MINUTES,
     enabled,
