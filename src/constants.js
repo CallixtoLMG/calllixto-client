@@ -106,14 +106,15 @@ const RULES = {
     required: 'Campo requerido',
     min: { value: 1, message: 'El campo debe ser mayor a 0' }
   }
-}
+};
 
 const TIME_IN_MS = {
   THREE_SECONDS: 3000,
   ONE_MINUTE: 60000,
   FIVE_MINUTES: 300000,
   ONE_HOUR: 3600000,
-}
+  FOUR_HOURS: 14400000,
+};
 
 const DEFAULT_PAGE_SIZE = 30;
 
@@ -127,6 +128,6 @@ const ENTITIES = {
 };
 
 export {
-  APIS, PAGES, REGEX, RULES, TIME_IN_MS, DEFAULT_PAGE_SIZE, ENTITIES
+  APIS, DEFAULT_PAGE_SIZE, ENTITIES, PAGES, REGEX, RULES, TIME_IN_MS
 };
 

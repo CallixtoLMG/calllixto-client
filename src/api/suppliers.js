@@ -78,7 +78,6 @@ export function useListAllSuppliers({attributes = []}) {
         const { data } = await axios.get(SUPPLIER_URL, { params });
 
         if (data.statusOk) {
-          // Asumimos que el servidor filtra los atributos de acuerdo a lo especificado
           suppliers = [...suppliers, ...data.suppliers];
         }
 
@@ -93,9 +92,9 @@ export function useListAllSuppliers({attributes = []}) {
   };
 
   const query = useQuery({
-    queryKey: [LIST_ALL_SUPPLIER_QUERY_KEY, attributes], // Incluir attributes para la clave de caché
+    queryKey: [LIST_ALL_SUPPLIER_QUERY_KEY, attributes], 
     queryFn: () => listSuppliers(),
-    staleTime: TIME_IN_MS.FIVE_MINUTES,
+    staleTime: TIME_IN_MS.FOUR_HOURS,
   });
 
   return query;
