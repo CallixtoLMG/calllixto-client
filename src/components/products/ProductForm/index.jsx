@@ -1,10 +1,9 @@
 "use client";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { RULES } from "@/constants";
 import { formatedPrice, preventSend } from "@/utils";
 import { useCallback, useMemo, useRef, useState } from "react";
-import CurrencyFormat from 'react-currency-format';
 import { Controller, useForm } from "react-hook-form";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
@@ -122,7 +121,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
               name="price"
               control={control}
               render={({ field: { onChange, value } }) => (
-                <CurrencyFormat
+                <CurrencyFormatInput
+                  height="50px"
                   displayType="input"
                   thousandSeparator={true}
                   decimalScale={2}

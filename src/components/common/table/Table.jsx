@@ -1,4 +1,4 @@
-import { Input } from "@/components/common/custom";
+import { CurrencyFormatInput, Input } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,6 @@ import { Box, Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
-import CurrencyFormat from 'react-currency-format';
 
 const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
   const { push } = useRouter();
@@ -167,7 +166,7 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
                     <strong>
                       <Flex justifyContent="space-between">
                         $
-                        <CurrencyFormat
+                        <CurrencyFormatInput
                           displayType="text"
                           thousandSeparator={true}
                           fixedDecimalScale={true}
