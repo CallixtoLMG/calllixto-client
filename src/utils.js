@@ -27,6 +27,13 @@ export const formatedPrice = (number) => {
   });
 };
 
+export function encodeUri(value) {
+  if (value !== undefined && value !== null) {
+    return encodeURIComponent(JSON.stringify(value));
+  }
+  return undefined;
+};
+
 export const formatedPricePdf = (number) => {
   let modNumber = Number(number);
   modNumber = Math.ceil(modNumber);

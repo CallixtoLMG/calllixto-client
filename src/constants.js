@@ -1,3 +1,5 @@
+import { encodeUri } from "@/utils";
+
 const PAGES = {
   BASE: "/",
   CUSTOMERS: {
@@ -44,8 +46,8 @@ const PAGES = {
 };
 
 const APIS = {
-  MAIL: (email, name) => `mailto:${email}?Subject=${encodeURIComponent(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
-  WSP: (phone, name) => `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
+  MAIL: (email, name) => `mailto:${email}?Subject=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
+  WSP: (phone, name) => `https://api.whatsapp.com/send?phone=${phone}&text=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
 };
 
 const REGEX = {
