@@ -30,6 +30,7 @@ const BatchImport = ({ isCreating }) => {
   const queryClient = useQueryClient();
   const inputRef = useRef();
   const [existingCodes, setExistingCodes] = useState({});
+  const totalProducts = importedProductsCount + downloadProducts.length;
 
   useEffect(() => {
     const codes = products?.reduce((acc, product) => {
@@ -375,7 +376,7 @@ const BatchImport = ({ isCreating }) => {
                 <ModalHeader> Confirmar descarga</ModalHeader>
                 <Modal.Content>
                   <p>
-                    {`Se han encontrado ${downloadProducts.length} productos ${importSettings.confirmation} existentes en la lista...`}<br /><br />
+                    {`Se han encontrado ${downloadProducts.length} productos (de ${totalProducts}) ${importSettings.confirmation} existentes en la lista...`}<br /><br />
                     ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
                   </p>
                 </Modal.Content>
