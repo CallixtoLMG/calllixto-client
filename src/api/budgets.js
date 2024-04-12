@@ -1,10 +1,9 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { DEFAULT_PAGE_SIZE, TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import { now } from "@/utils";
+import { encodeUri, now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-
 const BUDGETS_URL = `${CLIENT_ID}${PATHS.BUDGETS}`;
 export const LIST_BUDGETS_QUERY_KEY = 'listBudgets';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
@@ -27,7 +26,7 @@ export function useListBudgets({ sort, order = true, pageSize = DEFAULT_PAGE_SIZ
 
   const params = {
     pageSize,
-    ...(keys["budgets"][currentPage] && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys["budgets"][currentPage])) }),
+    ...(keys["budgets"][currentPage] && { LastEvaluatedKey: encodeUri(JSON.stringify(keys["budgets"][currentPage])) }),
     ...(sort && { sort }),
     order,
     ...filters
