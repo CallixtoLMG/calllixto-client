@@ -1,7 +1,7 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import { now } from "@/utils";
+import { encodeUri, now } from "@/utils";
 import { useQuery } from '@tanstack/react-query';
 import axios from './axios';
 
@@ -36,7 +36,7 @@ export function useListBrands({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE
   const params = {
     pageSize,
     ...(keys[ENTITIES.BRANDS][currentPage] && {
-      LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[ENTITIES.BRANDS][currentPage]))
+      LastEvaluatedKey: encodeUri(JSON.stringify(keys[ENTITIES.BRANDS][currentPage]))
     }),
     ...(sort && { sort }),
     order,
@@ -71,8 +71,8 @@ export function useListAllBrands({ attributes = [] }) {
 
       do {
         const params = {
-          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(LastEvaluatedKey)) }),
-          attributes: encodeURIComponent(JSON.stringify(attributes))
+          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(JSON.stringify(LastEvaluatedKey)) }),
+          attributes: encodeUri(JSON.stringify(attributes))
         };
 
         const { data } = await axios.get(BRANDS_URL, { params });

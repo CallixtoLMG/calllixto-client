@@ -1,10 +1,9 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
 import { CLIENT_ID, PATHS } from "@/fetchUrls";
-import { now } from "@/utils";
+import { encodeUri, now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-
 const CUSTOMERS_URL = `${CLIENT_ID}${PATHS.CUSTOMERS}`;
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
@@ -35,7 +34,7 @@ export function useListCustomers({ sort, order = true, pageSize = DEFAULT_PAGE_S
   const params = {
     pageSize,
     ...(keys[ENTITIES.CUSTOMERS][currentPage] && {
-      LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[ENTITIES.CUSTOMERS][currentPage]))
+      LastEvaluatedKey: encodeUri(JSON.stringify(keys[ENTITIES.CUSTOMERS][currentPage]))
     }),
     ...(sort && { sort }),
     order,

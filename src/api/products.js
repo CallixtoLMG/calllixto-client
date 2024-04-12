@@ -1,10 +1,9 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
 import { BATCH, BLACK_LIST, CLIENT, CLIENT_ID, EDIT_BATCH, PATHS, SUPPLIER } from "@/fetchUrls";
-import { now } from "@/utils";
+import { encodeUri, now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-
 const { omit, chunk } = require('lodash');
 
 const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
@@ -38,10 +37,10 @@ export function useListProducts({ sort, order = true, pageSize = DEFAULT_PAGE_SI
   const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
-    attributes: encodeURIComponent(JSON.stringify(attributes)),
+    attributes: encodeUri(JSON.stringify(attributes)),
     pageSize,
     ...(keys[ENTITIES.PRODUCTS][currentPage] && {
-      LastEvaluatedKey: encodeURIComponent(JSON.stringify(keys[ENTITIES.PRODUCTS][currentPage]))
+      LastEvaluatedKey: encodeUri(JSON.stringify(keys[ENTITIES.PRODUCTS][currentPage]))
     }),
     ...(sort && { sort }),
     order,
@@ -76,8 +75,8 @@ export function useListAllProducts({ attributes = [], enabled = false } = {}) {
 
       do {
         const params = {
-          attributes: encodeURIComponent(JSON.stringify(attributes)),
-          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeURIComponent(JSON.stringify(LastEvaluatedKey)) }),
+          attributes: encodeUri(JSON.stringify(attributes)),
+          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(JSON.stringify(LastEvaluatedKey)) }),
         };
 
         const { data } = await axios.get(PRODUCTS_URL, { params });
