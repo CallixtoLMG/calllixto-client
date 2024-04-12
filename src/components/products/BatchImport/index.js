@@ -1,11 +1,10 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListAllProducts, useListBanProducts } from "@/api/products";
-import { Button, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { Button, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { downloadExcel, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import CurrencyFormat from 'react-currency-format';
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { ButtonContent, Icon, Transition } from "semantic-ui-react";
@@ -309,7 +308,8 @@ const BatchImport = ({ isCreating }) => {
           name={`importProducts[${index}].price`}
           control={control}
           render={({ field: { onChange, value } }) => (
-            <CurrencyFormat
+            <CurrencyFormatInput
+              height="30px"
               displayType="input"
               thousandSeparator={true}
               decimalScale={2}

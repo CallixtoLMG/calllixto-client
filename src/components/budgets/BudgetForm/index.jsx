@@ -2,7 +2,7 @@ import { useUserContext } from "@/User";
 import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, edit } from "@/api/budgets";
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Button, ButtonsContainer, Checkbox, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { RULES } from "@/constants";
@@ -11,13 +11,12 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import { Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
-import { Flex } from "rebass";
-import CurrencyFormat from 'react-currency-format';
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -138,9 +137,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
       {
         title: "Precio",
         value: (product) => (
-          <Flex justifyContent="space-between">
+          <Flex alignItems="center" justifyContent="space-between">
             $
-            <CurrencyFormat
+            <CurrencyFormatInput
               displayType="text"
               thousandSeparator={true}
               fixedDecimalScale={true}
@@ -222,9 +221,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
       {
         title: "Total",
         value: (product) => (
-          <Flex justifyContent="space-between">
+          <Flex alignItems="center" justifyContent="space-between">
             $
-            <CurrencyFormat
+            <CurrencyFormatInput
               displayType="text"
               thousandSeparator={true}
               fixedDecimalScale={true}

@@ -1,3 +1,4 @@
+import CurrencyFormat from 'react-currency-format';
 import InputMask from 'react-input-mask';
 import styled from "styled-components";
 
@@ -13,4 +14,10 @@ export const MaskedInput = styled(InputMask)`
         -webkit-appearance: none;
       };
   };
+`;
+
+export const CurrencyFormatInput = styled(CurrencyFormat)`
+  height: ${({ height }) => height || '30px'} !important;
+  align-items: center;
+  align-content: center;
 `;
