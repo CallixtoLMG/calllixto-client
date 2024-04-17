@@ -1,26 +1,40 @@
 "use client"
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, Label, MaskedInput, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { FieldsContainer, Form, FormField, Icon, Input, Label, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { RULES } from "@/constants";
-import { formatedPhone } from "@/utils";
 import { useParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Box } from "rebass";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 
-const EMPTY_CUSTOMER = { name: '', email: '', phone: { areaCode: '', number: '' }, address: '', comments: '' };
+const EMPTY_CUSTOMER = { name: '', email: '', phoneNumbers: [], addresses: [], comments: '' };
 
 const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
   const params = useParams();
-  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: customer });
+  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({
+    defaultValues: {
+      ...customer,
+      phoneNumbers: customer?.phoneNumbers.length ? customer.phoneNumbers : [{ areaCode: '', number: '' }]
+    }
+  });
+  console.log(errors)
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "phoneNumbers"
+  });
+
   const isUpdating = useMemo(() => !!params.id, [params.id]);
 
   const handleReset = useCallback((customer) => {
     reset(customer || EMPTY_CUSTOMER);
   }, [reset]);
 
+  const handleCreate = (data) => {
+    console.log(data)
+    // onSubmit(data);
+  };
+
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(handleCreate)}>
       <FieldsContainer>
         <FormField width="50% !important">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
@@ -37,44 +51,59 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
-        <FormField flex="none" width="200px">
-          <Label>Teléfono</Label>
-          {!readonly ? (
+        {fields.map((item, index) => (
+          <FormField flex="none" width="200px" key={item.id}>
+            <RuledLabel dele title={`Teléfono ${index + 1}`} message={errors?.phoneNumbers?.find(n => n.type === `hola${index}`)?.message} >
+              hola
+              {!readonly && (
+                <Icon circular name="erase" color="red" size="small" onClick={() => remove(index)} />
+              )}
+            </RuledLabel>
             <PhoneContainer>
-              <Box width="70px">
-                <Controller
-                  name="phone.areaCode"
-                  control={control}
-                  rules={RULES.PHONE.AREA_CODE}
-                  render={({ field }) =>
-                    <MaskedInput
+              <Controller
+                name={`phoneNumbers[${index}]`}
+                control={control}
+                rules={{ validate: { [`hola${index}`]: (value) => value.areaCode.length + value.number.length === 10 || "numero debe tener 10 caracteres" } }}
+                render={({ field: { value, onChange, ...props } }) => (
+                  <>
+                    <Input
+                      width="35%"
+                      {...props}
                       mask="9999"
                       maskChar={null}
-                      {...field}
                       placeholder="Área"
+                      value={value.areaCode}
+                      onChange={(e) => {
+                        onChange({
+                          ...value,
+                          areaCode: e.target.value
+                        })
+                      }}
                     />
-                  }
-                />
-              </Box>
-              <Box width="130px">
-                <Controller
-                  name="phone.number"
-                  control={control}
-                  rules={RULES.PHONE.NUMBER}
-                  render={({ field }) =>
-                    <MaskedInput
-                      mask="99999999"
+                    <Input
+                      width="65%"
+                      {...props}
+                      mask="9999999"
                       maskChar={null}
-                      {...field}
                       placeholder="Número"
-                    />}
-                />
-              </Box>
+                      value={value.number}
+                      onChange={(e) => {
+                        onChange({
+                          ...value,
+                          number: e.target.value
+                        })
+                      }}
+                    />
+                  </>
+                )}
+              />
             </PhoneContainer>
-          ) : (
-            <Segment>{formatedPhone(customer?.phone?.areaCode, customer?.phone?.number)}</Segment>
-          )}
-        </FormField>
+
+          </FormField>
+        ))}
+        {!readonly && (
+          <Icon circular name="add" color="green" size="small" onClick={() => append({ areaCode: '', number: '' })} />
+        )}
         <FormField flex="1">
           <RuledLabel title="Email" message={errors?.email?.message} />
           {!readonly ? (
@@ -92,12 +121,12 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
           <Label>Dirección</Label>
           {!readonly ? (
             <Controller
-              name="address"
+              name="addresses"
               control={control}
               render={({ field }) => <Input {...field} placeholder="Dirección" />}
             />
           ) : (
-            <Segment>{customer?.address}</Segment>
+            <Segment>{customer?.addresses}</Segment>
           )}
         </FormField>
       </FieldsContainer>

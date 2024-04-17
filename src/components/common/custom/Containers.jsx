@@ -27,5 +27,6 @@ export const ButtonsContainer = styled(Flex)`
 `;
 
 export const PhoneContainer = styled(Flex)`
+  width: 100%;
   column-gap: 10px;
 `;

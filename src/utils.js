@@ -81,10 +81,25 @@ export const getTotalSum = (products) => {
   return products?.reduce((a, b) => a + getTotal(b), 0);
 };
 
-export const formatedPhone = (area, num) => {
-  if (!num || !area) return '';
-  return `+54 ${area} ${num}`;
+export const formatedPhone = (phoneNumbers) => { // VER 
+  if (!phoneNumbers || phoneNumbers.length === 0) return '';
+  return phoneNumbers.map(phone => `+54 ${phone.areaCode} ${phone.number}`).join(', ');
 };
+
+export const formatPhoneForDisplay = (phoneNumbers) => {
+  if (!phoneNumbers || phoneNumbers.length === 0) return { primaryPhone: '', additionalPhones: null };
+  
+  const primaryPhone = `+54 ${phoneNumbers[0].areaCode} ${phoneNumbers[0].number}`;
+
+  const additionalPhones = phoneNumbers.length > 1
+    ? phoneNumbers.slice(1).map(phone => (
+        <div key={`${phone.areaCode}-${phone.number}`}>{`+54 ${phone.areaCode} ${phone.number}`}</div>
+      ))
+    : null;
+
+  return { primaryPhone, additionalPhones };
+};
+
 
 export const getSupplierCode = (code) => {
   return code?.slice(0, 2);
