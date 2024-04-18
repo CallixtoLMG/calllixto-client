@@ -7,7 +7,7 @@ const Label = styled(SLabel)`
   margin: 0!important;
 `;
 
-export const RuledLabel = ({ title, message, required, dele }) => {
+export const RuledLabel = ({ title, message, required, dele, readonly }) => {
   return (
     <Label>
       <Flex justifyContent="space-between">
@@ -15,15 +15,14 @@ export const RuledLabel = ({ title, message, required, dele }) => {
           {title}
           {required && <span style={{ color: message ? 'red' : 'teal' }}> *</span>}
         </span>
-        {dele && <>
+        {!readonly && dele && (
           <Popup
             size="mini"
             position="top center"
             content="Borrar teléfono"
             trigger={<Icon circular name="erase" color="red" size="small" onClick={dele} />}
           />
-        </>
-        }
+        )}
         {message && (
           <Popup
             position="top center"

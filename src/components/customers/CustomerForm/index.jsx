@@ -36,7 +36,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
   return (
     <Form onSubmit={handleSubmit(handleCreate)}>
       <FieldsContainer>
-        <FormField width="50% !important">
+        <FormField flex="2">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
           {!readonly ? (
             <Controller
@@ -49,23 +49,65 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
             <Segment>{customer?.name}</Segment>
           )}
         </FormField>
+        <FormField flex="3">
+          <RuledLabel title="Email" message={errors?.email?.message} />
+          {!readonly ? (
+            <Controller
+              name="email"
+              control={control}
+              rules={RULES.EMAIL}
+              render={({ field }) => <Input {...field} placeholder="nombre@mail.com" />}
+            />
+          ) : (
+            <Segment>{customer?.email}</Segment>
+          )}
+        </FormField>
+        <FormField flex="3">
+          <Label>Dirección</Label>
+          {!readonly ? (
+            <Controller
+              name="addresses"
+              control={control}
+              render={({ field }) => <Input {...field} placeholder="Dirección" />}
+            />
+          ) : (
+            <Segment>{customer?.addresses}</Segment>
+          )}
+        </FormField>
       </FieldsContainer>
       <FieldsContainer>
         {fields.map((item, index) => (
           <FormField flex="none" width="200px" key={item.id}>
-            <RuledLabel dele title={`Teléfono ${index + 1}`} message={errors?.phoneNumbers?.find(n => n.type === `hola${index}`)?.message} >
-              hola
+            <RuledLabel
+              dele={!readonly ? () => remove(index) : undefined}
+              readonly={readonly}
+              title={`Teléfono ${index + 1}`}
+              message={errors?.phoneNumbers?.find(n => n.type === `hola${index}`)?.message} >
               {!readonly && (
                 <Icon circular name="erase" color="red" size="small" onClick={() => remove(index)} />
               )}
             </RuledLabel>
-            <PhoneContainer>
+            <PhoneContainer wrap>
               <Controller
                 name={`phoneNumbers[${index}]`}
                 control={control}
                 rules={{ validate: { [`hola${index}`]: (value) => value.areaCode.length + value.number.length === 10 || "numero debe tener 10 caracteres" } }}
                 render={({ field: { value, onChange, ...props } }) => (
                   <>
+                   <Input
+                      width="100%"
+                      {...props}
+                      mask="9999"
+                      maskChar={null}
+                      placeholder="Refencia"
+                      value={value.ref}
+                      onChange={(e) => {
+                        onChange({
+                          ...value,
+                          ref: e.target.value
+                        })
+                      }}
+                    />
                     <Input
                       width="35%"
                       {...props}
@@ -81,7 +123,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                       }}
                     />
                     <Input
-                      width="65%"
+                      width="60%"
                       {...props}
                       mask="9999999"
                       maskChar={null}
@@ -104,31 +146,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
         {!readonly && (
           <Icon circular name="add" color="green" size="small" onClick={() => append({ areaCode: '', number: '' })} />
         )}
-        <FormField flex="1">
-          <RuledLabel title="Email" message={errors?.email?.message} />
-          {!readonly ? (
-            <Controller
-              name="email"
-              control={control}
-              rules={RULES.EMAIL}
-              render={({ field }) => <Input {...field} placeholder="nombre@mail.com" />}
-            />
-          ) : (
-            <Segment>{customer?.email}</Segment>
-          )}
-        </FormField>
-        <FormField flex="1">
-          <Label>Dirección</Label>
-          {!readonly ? (
-            <Controller
-              name="addresses"
-              control={control}
-              render={({ field }) => <Input {...field} placeholder="Dirección" />}
-            />
-          ) : (
-            <Segment>{customer?.addresses}</Segment>
-          )}
-        </FormField>
+        
       </FieldsContainer>
       <FieldsContainer>
         <Label>Comentarios</Label>
