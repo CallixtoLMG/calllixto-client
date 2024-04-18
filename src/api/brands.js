@@ -36,7 +36,7 @@ export function useListBrands({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE
   const params = {
     pageSize,
     ...(keys[ENTITIES.BRANDS][currentPage] && {
-      LastEvaluatedKey: encodeUri(JSON.stringify(keys[ENTITIES.BRANDS][currentPage]))
+      LastEvaluatedKey: encodeUri(keys[ENTITIES.BRANDS][currentPage])
     }),
     ...(sort && { sort }),
     order,
@@ -71,8 +71,8 @@ export function useListAllBrands({ attributes = [] }) {
 
       do {
         const params = {
-          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(JSON.stringify(LastEvaluatedKey)) }),
-          attributes: encodeUri(JSON.stringify(attributes))
+          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(LastEvaluatedKey) }),
+          attributes: encodeUri(attributes)
         };
 
         const { data } = await axios.get(BRANDS_URL, { params });

@@ -1,50 +1,63 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
-import { BATCH, BLACK_LIST, CLIENT, CLIENT_ID, EDIT_BATCH, PATHS, SUPPLIER } from "@/fetchUrls";
+import {
+  BATCH,
+  BLACK_LIST,
+  CLIENT,
+  CLIENT_ID,
+  EDIT_BATCH,
+  PATHS,
+  SUPPLIER,
+} from "@/fetchUrls";
 import { encodeUri, now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import axios from './axios';
-const { omit, chunk } = require('lodash');
+import axios from "./axios";
+const { omit, chunk } = require("lodash");
 
 const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
 const BAN_PRODUCTS_URL = `${CLIENT_ID}${CLIENT}`;
-export const LIST_PRODUCTS_QUERY_KEY = 'listProducts';
-export const LIST_ALL_PRODUCTS_QUERY_KEY = 'listAllProducts';
-export const GET_PRODUCT_QUERY_KEY = 'getProduct';
-export const LIST_BANNED_PRODUCTS_QUERY_KEY = 'listBannedProducts';
+export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
+export const LIST_ALL_PRODUCTS_QUERY_KEY = "listAllProducts";
+export const GET_PRODUCT_QUERY_KEY = "getProduct";
+export const LIST_BANNED_PRODUCTS_QUERY_KEY = "listBannedProducts";
 
 export function create(product) {
   const body = {
     ...product,
-    createdAt: now()
-  }
+    createdAt: now(),
+  };
   return axios.post(PRODUCTS_URL, body);
-};
+}
 
 export function edit(product) {
   const body = {
-    ...omit(product, 'id'),
-    updatedAt: now()
-  }
+    ...omit(product, "id"),
+    updatedAt: now(),
+  };
   return axios.put(`${PRODUCTS_URL}/${product.code}`, body);
-};
+}
 
 export function deleteProduct(id) {
   return axios.delete(`${PRODUCTS_URL}/${id}`);
-};
+}
 
-export function useListProducts({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
+export function useListProducts({
+  sort,
+  order = true,
+  pageSize = DEFAULT_PAGE_SIZE,
+  attributes = [],
+}) {
   const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
-    attributes: encodeUri(JSON.stringify(attributes)),
+    attributes: encodeUri(attributes),
     pageSize,
     ...(keys[ENTITIES.PRODUCTS][currentPage] && {
-      LastEvaluatedKey: encodeUri(JSON.stringify(keys[ENTITIES.PRODUCTS][currentPage]))
+      LastEvaluatedKey: encodeUri(keys[ENTITIES.PRODUCTS][currentPage]),
     }),
     ...(sort && { sort }),
     order,
-    ...filters
+    ...filters,
   };
 
   const listProducts = async (params) => {
@@ -53,7 +66,10 @@ export function useListProducts({ sort, order = true, pageSize = DEFAULT_PAGE_SI
       if (data?.LastEvaluatedKey) {
         addKey(data?.LastEvaluatedKey, ENTITIES.PRODUCTS);
       }
-      return { products: data?.products || [], LastEvaluatedKey: data.LastEvaluatedKey };
+      return {
+        products: data?.products || [],
+        LastEvaluatedKey: data.LastEvaluatedKey,
+      };
     } catch (error) {
       throw error;
     }
@@ -65,7 +81,7 @@ export function useListProducts({ sort, order = true, pageSize = DEFAULT_PAGE_SI
   });
 
   return query;
-};
+}
 
 export function useListAllProducts({ attributes = [], enabled = false } = {}) {
   const listProducts = async () => {
@@ -75,8 +91,10 @@ export function useListAllProducts({ attributes = [], enabled = false } = {}) {
 
       do {
         const params = {
-          attributes: encodeUri(JSON.stringify(attributes)),
-          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(JSON.stringify(LastEvaluatedKey)) }),
+          attributes: encodeUri(attributes),
+          ...(LastEvaluatedKey && {
+            LastEvaluatedKey: encodeUri(LastEvaluatedKey),
+          }),
         };
 
         const { data } = await axios.get(PRODUCTS_URL, { params });
@@ -86,7 +104,6 @@ export function useListAllProducts({ attributes = [], enabled = false } = {}) {
         }
 
         LastEvaluatedKey = data?.LastEvaluatedKey;
-
       } while (LastEvaluatedKey);
 
       return { products };
@@ -103,7 +120,7 @@ export function useListAllProducts({ attributes = [], enabled = false } = {}) {
   });
 
   return query;
-};
+}
 
 export function useGetProduct(id) {
   const getProduct = async (id) => {
@@ -123,56 +140,69 @@ export function useGetProduct(id) {
   });
 
   return query;
-};
+}
 
 export async function createBatch(products) {
-  const parsedProducts = products.map(product => ({ ...product, createdAt: now() }));
+  const parsedProducts = products.map((product) => ({
+    ...product,
+    createdAt: now(),
+  }));
   const chuncks = chunk(parsedProducts, 500);
-  let delay = 0;
-  const delayIncrement = 1000;
-  const promises = chuncks.map(chunk => {
-    delay += delayIncrement;
-    return new Promise(resolve => setTimeout(resolve, delay)).then(() =>
-      axios.post(`${PRODUCTS_URL}/${BATCH}`, { products: chunk }));
+  let i = 25;
+  const promises = chuncks.map((chunk) => {
+    const delay = Math.min(25000, 2 ** Math.log(i) * 100 + Math.random() * 100);
+    i += i / 2
+    return new Promise((resolve) => setTimeout(resolve, delay)).then(() => {
+      return axios.post(`${PRODUCTS_URL}/${BATCH}`, { products: chunk });
+    });
   });
 
   const responses = await Promise.all(promises);
 
   const data = {
-    statusOk: true, unprocessed: responses.map(response => {
-      if (response?.data?.statusOk) {
-        return response.data.unprocessed;
-      }
-      return [];
-    }).flat().filter(item => item)
+    statusOk: true,
+    unprocessed: responses
+      .map((response) => {
+        if (response?.data?.statusOk) {
+          return response.data.unprocessed;
+        }
+        return [];
+      })
+      .flat()
+      .filter((item) => item),
   };
 
   return Promise.resolve({ data });
-};
+}
 
 export async function editBatch(products) {
   const chuncks = chunk(products, 100);
   let delay = 0;
   const delayIncrement = 1000;
-  const promises = chuncks.map(chunk => {
+  const promises = chuncks.map((chunk) => {
     delay += delayIncrement;
-    return new Promise(resolve => setTimeout(resolve, delay)).then(() =>
-      axios.post(`${PRODUCTS_URL}/${EDIT_BATCH}`, { update: chunk }));
+    return new Promise((resolve) => setTimeout(resolve, delay)).then(() =>
+      axios.post(`${PRODUCTS_URL}/${EDIT_BATCH}`, { update: chunk }),
+    );
   });
 
   const responses = await Promise.all(promises);
 
   const data = {
-    statusOk: true, unprocessed: responses.map(response => {
-      if (response?.data?.statusOk) {
-        return response.data.unprocessed;
-      }
-      return [];
-    }).flat().filter(item => item)
+    statusOk: true,
+    unprocessed: responses
+      .map((response) => {
+        if (response?.data?.statusOk) {
+          return response.data.unprocessed;
+        }
+        return [];
+      })
+      .flat()
+      .filter((item) => item),
   };
 
   return Promise.resolve({ data });
-};
+}
 
 export function useListBanProducts() {
   const listBannedProducts = async () => {
@@ -192,12 +222,12 @@ export function useListBanProducts() {
   });
 
   return query;
-};
+}
 
 export function editBanProducts(products) {
   return axios.put(`${CLIENT_ID}${BLACK_LIST}`, products);
-};
+}
 
 export function deleteBatchProducts(id) {
   return axios.delete(`${PRODUCTS_URL}/${SUPPLIER}/${id}`);
-};
+}

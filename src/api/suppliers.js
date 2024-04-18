@@ -36,7 +36,7 @@ export function useListSuppliers({ sort, order = true, pageSize = DEFAULT_PAGE_S
   const params = {
     pageSize,
     ...(keys[ENTITIES.SUPPLIERS][currentPage] && {
-      LastEvaluatedKey: encodeUri(JSON.stringify(keys[ENTITIES.SUPPLIERS][currentPage]))
+      LastEvaluatedKey: encodeUri(keys[ENTITIES.SUPPLIERS][currentPage])
     }),
     ...(sort && { sort }),
     order,
@@ -71,8 +71,8 @@ export function useListAllSuppliers({attributes = []}) {
 
       do {
         const params = {
-          attributes: encodeUri(JSON.stringify(attributes)),
-          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(JSON.stringify(LastEvaluatedKey)) }),
+          attributes: encodeUri(attributes),
+          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(LastEvaluatedKey) }),
         };
 
         const { data } = await axios.get(SUPPLIER_URL, { params });
