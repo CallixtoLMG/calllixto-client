@@ -26,7 +26,7 @@ export function useListBudgets({ sort, order = true, pageSize = DEFAULT_PAGE_SIZ
 
   const params = {
     pageSize,
-    ...(keys["budgets"][currentPage] && { LastEvaluatedKey: encodeUri(JSON.stringify(keys["budgets"][currentPage])) }),
+    ...(keys["budgets"][currentPage] && { LastEvaluatedKey: encodeUri(keys["budgets"][currentPage]) }),
     ...(sort && { sort }),
     order,
     ...filters

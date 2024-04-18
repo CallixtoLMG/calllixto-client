@@ -40,7 +40,7 @@ export const HEADERS = [
     id: 4,
     title: "Teléfono",
     width: 3,
-    value: (customer) => formatedPhone(customer.phone.areaCode, customer.phone.number)
+    value: (customer) => formatedPhone(customer?.phone?.areaCode, customer?.phone?.number)
   },
 ];
 
