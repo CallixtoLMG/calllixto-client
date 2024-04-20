@@ -7,7 +7,7 @@ const Label = styled(SLabel)`
   margin: 0!important;
 `;
 
-export const RuledLabel = ({ title, message, required, dele, readonly }) => {
+export const RuledLabel = ({ title, message, required, dele, readonly, popupMsg }) => {
   return (
     <Label>
       <Flex justifyContent="space-between">
@@ -19,7 +19,7 @@ export const RuledLabel = ({ title, message, required, dele, readonly }) => {
           <Popup
             size="mini"
             position="top center"
-            content="Borrar teléfono"
+            content={popupMsg}
             trigger={<Icon circular name="erase" color="red" size="small" onClick={dele} />}
           />
         )}

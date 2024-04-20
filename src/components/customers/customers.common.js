@@ -1,4 +1,4 @@
-import { formatPhoneForDisplay } from "@/utils";
+import { formatAddressForDisplay, formatPhoneForDisplay } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 
@@ -34,7 +34,28 @@ export const HEADERS = [
     title: "Direccion",
     width: 4,
     align: "left",
-    value: (customer) => customer.addresses
+    // value: (customer) => "hola"
+    // value: (customer) => customer.addresses
+    value: (customer) => {
+      const { primaryAddress, additionalAddress } = formatAddressForDisplay(customer.addresses || []);
+      return (
+        <Flex justifyContent="space-between">
+          {primaryAddress}
+          {additionalAddress && (
+            <Popup
+              size="mini"
+              content={<div>{additionalAddress}</div>}
+              position="top center"
+              trigger={
+                <Box marginX="5px">
+                  <Icon name="info circle" color="orange" />
+                </Box>
+              }
+            />
+          )}
+        </Flex>
+      );
+    }
   },
   {
     id: 4,
