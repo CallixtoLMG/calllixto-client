@@ -3,7 +3,7 @@ import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 import { CurrencyFormatInput } from "../common/custom";
 
-const ATTRIBUTES = { CODE: "code", NAME: "name", PRICE: "price" };
+const ATTRIBUTES = { CODE: "code", NAME: "name", PRICE: "price", COMMENTS: "comments" };
 
 const PRODUCT_COLUMNS = [
   {
