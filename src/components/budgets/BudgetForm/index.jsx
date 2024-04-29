@@ -11,12 +11,13 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Flex } from "rebass";
+import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
+import { Container } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -133,7 +134,24 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         id: 1,
         width: 2
       },
-      { title: "Nombre", value: (product) => product.name, id: 2, width: 8, align: 'left' },
+      {
+        title: "Nombre",
+        value: (product) => (
+          <Container>{product.name}
+            {product.comments && (
+              <Popup
+                size="mini"
+                content={product.comments}
+                position="top center"
+                trigger={
+                  <Box marginX="5px">
+                    <Icon name="info circle" color="orange" />
+                  </Box>
+                }
+              />)}
+          </Container>
+        ), id: 2, width: 8, align: 'left'
+      },
       {
         title: "Precio",
         value: (product) => (

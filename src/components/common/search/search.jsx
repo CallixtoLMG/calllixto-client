@@ -42,7 +42,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
         key: product.code,
         title: product.name,
         description: (
-          <Container flexDir="column">
+          <Container marginTop="5px" flexDir="column">
             <Text>Código: {formatProductCode(product.code)}</Text>
             <Container flexDir="row">
               <Text>Precio: {`$ ${product?.price?.toFixed(2)}`}</Text>

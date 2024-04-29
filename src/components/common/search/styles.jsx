@@ -3,8 +3,8 @@ import { Search as SSearch } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Container = styled(Flex)`
-  flex-direction: ${({flexDir}) => flexDir};
-  margin-top: 7px!important;
+  flex-direction: ${({ flexDir }) => flexDir};
+  margin-top: ${({ marginTop }) => marginTop} !important;
   place-content: space-between;
 `;
 
