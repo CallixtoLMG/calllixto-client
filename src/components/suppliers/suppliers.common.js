@@ -25,7 +25,7 @@ const SUPPLIERS_COLUMNS = [
             position="top center"
             trigger={
               <Box marginX="5px">
-                <Icon name="info circle" color="orange" />
+                <Icon name="list ul" size="small" color="orange" />
               </Box>
             }
           />

@@ -22,7 +22,7 @@ export const HEADERS = [
             position="top center"
             trigger={
               <Box marginX="5px">
-                <Icon name="info circle" color="orange" />
+                <Icon name="list ul" size="small" color="orange" />
               </Box>
             }
           />
@@ -34,8 +34,6 @@ export const HEADERS = [
     title: "Direccion",
     width: 4,
     align: "left",
-    // value: (customer) => "hola"
-    // value: (customer) => customer.addresses
     value: (customer) => {
       const { primaryAddress, additionalAddress } = formatAddressForDisplay(customer.addresses || []);
       return (
@@ -48,7 +46,7 @@ export const HEADERS = [
               position="top center"
               trigger={
                 <Box marginX="5px">
-                  <Icon name="info circle" color="orange" />
+                  <Icon name="list ul" size="small" color="orange" />
                 </Box>
               }
             />
@@ -73,7 +71,7 @@ export const HEADERS = [
               position="top center"
               trigger={
                 <Box marginX="5px">
-                  <Icon name="info circle" color="orange" />
+                  <Icon name="list ul" size="small" color="orange" />
                 </Box>
               }
             />

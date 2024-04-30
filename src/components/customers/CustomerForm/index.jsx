@@ -1,12 +1,12 @@
 "use client"
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { CurrencyFormatInput, FieldsContainer, Form, FormField, Icon, Input, Label, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { RULES } from "@/constants";
 import { useParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
-
+import { Icon } from "./styles";
 
 const EMPTY_CUSTOMER = { name: '', email: '', phoneNumbers: [], addresses: [], comments: '' };
 
@@ -202,9 +202,6 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
               popupMsg={"Borrar dirección"}
               dele={!readonly ? () => removeAddress(index) : undefined}
               title={`Dirección ${index + 1}`}>
-              {!readonly && (
-                <Icon circular name="erase" color="red" size="small" onClick={() => removeAddress(index)} />
-              )}
             </RuledLabel>
             {!readonly ? (
               <Controller

@@ -8,7 +8,8 @@ const Label = styled(SLabel)`
 `;
 
 const Icon = styled(SIcon)`
-align-self: center;
+  align-self: center;
+  cursor: ${({ pointer }) => pointer && "pointer"} !important;
 `;
 
 export const RuledLabel = ({ title, message, required, dele, readonly, popupMsg }) => {
@@ -31,7 +32,7 @@ export const RuledLabel = ({ title, message, required, dele, readonly, popupMsg 
             size="mini"
             position="top center"
             content={popupMsg}
-            trigger={<Icon name="erase" color="red" size="small" onClick={dele} />}
+            trigger={<Icon pointer name="trash" color="red" size="small" onClick={dele} />}
           />
         )}
       </Flex>
