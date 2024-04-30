@@ -6,7 +6,7 @@ import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, Fiel
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { RULES } from "@/constants";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPhone, getTotal, getTotalSum, now } from "@/utils";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, getTotalSum, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -45,7 +45,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   });
   const customerRef = useRef(null);
   const queryClient = useQueryClient();
-
   const watchProducts = watch('products');
   const watchConfirmed = watch('confirmed');
   const [total, setTotal] = useState(0);
@@ -338,8 +337,8 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                         field.onChange(value);
                         const customer = customers.find((opt) => opt.value === value);
                         setValue('customer.id', customer?.id);
-                        setValue('customer.address', customer?.address ?? '');
-                        setValue('customer.phone', customer?.phone ?? '')
+                        setValue('customer.address', customer?.addresses[0].address ?? '');
+                        setValue('customer.phone', customer?.phoneNumbers[0] ?? '')
                       }}
                     />
                   )}
@@ -358,7 +357,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   render={({ field: { value } }) => <Segment >{value}</Segment>}
                 />
               ) : (
-                <Segment >{customerData?.address}</Segment>
+                <Segment >{customerData?.addresses[0]?.address}</Segment>
               )}
             </FormField>
             <FormField width="200px">
@@ -368,10 +367,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   name="customer.phone"
                   control={control}
                   rules={watchConfirmed && RULES.REQUIRED}
-                  render={({ field: { value } }) => <Segment >{formatedPhone(value?.areaCode, value?.number)}</Segment>}
+                  render={({ field: { value } }) => <Segment >{formatedSimplePhone(value)}</Segment>}
                 />
               ) : (
-                <Segment >{formatedPhone(customerData?.phone?.areaCode, customerData?.phone?.number)}</Segment>
+                <Segment >{formatedSimplePhone(customerData?.phoneNumbers[0])}</Segment>
               )}
             </FormField>
           </FieldsContainer>

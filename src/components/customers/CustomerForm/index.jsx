@@ -11,7 +11,6 @@ import { Popup } from "semantic-ui-react";
 const EMPTY_CUSTOMER = { name: '', email: '', phoneNumbers: [], addresses: [], comments: '' };
 
 const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
-  console.log(customer);
   const params = useParams();
   const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({
     defaultValues: {
@@ -39,23 +38,21 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
   const filterEmptyFields = data => {
     const filteredData = { ...data };
 
-    // Filtra y limpia teléfonos
     if (filteredData.phoneNumbers) {
       filteredData.phoneNumbers = filteredData.phoneNumbers
         .map(phone => ({
           ...phone,
-          areaCode: phone.areaCode.trim(),  // Asegura que no enviará espacios extra
+          areaCode: phone.areaCode.trim(),
           number: phone.number.trim(),
-          ref: phone.ref?.trim()  // Uso de optional chaining por si ref no está definido
+          ref: phone.ref?.trim()
         }))
-        .filter(phone => phone.areaCode && phone.number)  // Solo incluye teléfonos con código de área y número
+        .filter(phone => phone.areaCode && phone.number)
         .map(phone => {
-          if (!phone.ref) delete phone.ref;  // Elimina 'ref' si está vacío
+          if (!phone.ref) delete phone.ref;
           return phone;
         });
     }
 
-    // Filtra y limpia direcciones
     if (filteredData.addresses) {
       filteredData.addresses = filteredData.addresses
         .map(address => ({
@@ -63,9 +60,9 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
           address: address.address.trim(),
           ref: address.ref?.trim()
         }))
-        .filter(address => address.address)  // Solo incluye direcciones con campo 'address' lleno
+        .filter(address => address.address)
         .map(address => {
-          if (!address.ref) delete address.ref;  // Elimina 'ref' si está vacío
+          if (!address.ref) delete address.ref;
           return address;
         });
     }
@@ -75,7 +72,6 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
 
   const handleCreate = (data) => {
     const cleanedData = filterEmptyFields(data);
-    console.log(cleanedData)
     onSubmit(cleanedData);
   };
 
@@ -109,22 +105,18 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
           )}
         </FormField>
       </FieldsContainer>
-      {console.log(errors)}
       <FieldsContainer>
         {phoneFields.map((item, index) => (
           <FormField flex="none" width="200px" key={item.id}>
             <RuledLabel
-            
               title={`Teléfono ${index + 1}`}
-              message={errors?.phoneNumbers?.[index]?.areaCode || errors?.phoneNumbers?.[index]?.number}
+              message={errors?.phoneNumbers?.[index]?.message}
               popupMsg="Borrar teléfono"
               dele={!readonly ? () => removePhone(index) : undefined}
               readonly={readonly}
             >
-              {!readonly && (
-                <Icon circular name="erase" color="red" size="small" onClick={() => removePhone(index)} />
-              )}
             </RuledLabel>
+            {console.log(errors)}
             <PhoneContainer wrap>
               {!readonly ? (
                 <Controller
@@ -132,16 +124,26 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                   control={control}
                   rules={{
                     validate: {
-                      correctLength: (value) => (value.areaCode.length + value.number.length === 10) || "El número debe tener 10 caracteres"
+                      correctLength: (value) => {
+                        const areaCode = value.areaCode || '';
+                        const number = value.number || '';
+                        console.log(areaCode.length + number.length)
+                        return (areaCode.length + number.length === 10) || "El número debe tener 10 carácteres";
+                      }
                     }
                   }}
-                  render={({ field: { value, onChange, ...props } }) => (
+                  render={({ field: { value, onChange }, fieldState: { error } }) => (
                     <>
                       <Input
                         width="100%"
                         placeholder="Referencia"
                         value={value.ref}
-                        onChange={(e) => onChange({ ...value, ref: e.target.value })}
+                        onChange={(e) => {
+                          onChange({
+                            ...value,
+                            ref: e.target.value
+                          })
+                        }}
                       />
                       <CurrencyFormatInput
                         height="50px"
@@ -149,7 +151,13 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                         width="35%"
                         placeholder="Área"
                         value={value.areaCode}
-                        onChange={(e) => onChange({ ...value, areaCode: e.target.value })}
+                        onChange={(e) => {
+                          const formattedValue = e.target.value.replace(/[^0-9]/g, '');
+                          onChange({
+                            ...value,
+                            areaCode: formattedValue
+                          });
+                        }}
                       />
                       <CurrencyFormatInput
                         height="50px"
@@ -157,7 +165,13 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                         width="60%"
                         placeholder="Número"
                         value={value.number}
-                        onChange={(e) => onChange({ ...value, number: e.target.value })}
+                        onChange={(e) => {
+                          const formattedValue = e.target.value.replace(/[^0-9]/g, '');
+                          onChange({
+                            ...value,
+                            number: formattedValue
+                          });
+                        }}
                       />
                     </>
                   )}

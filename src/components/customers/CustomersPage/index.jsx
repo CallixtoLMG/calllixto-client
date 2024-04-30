@@ -10,7 +10,6 @@ import { toast } from 'react-hot-toast';
 import { FILTERS, HEADERS } from "../customers.common";
 
 const CustomersPage = ({ customers = [] }) => {
-  console.log(customers)
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
