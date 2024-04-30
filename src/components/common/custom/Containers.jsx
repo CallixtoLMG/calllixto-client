@@ -27,5 +27,7 @@ export const ButtonsContainer = styled(Flex)`
 `;
 
 export const PhoneContainer = styled(Flex)`
+  flex-wrap: ${({ wrap }) => wrap &&  'wrap'};
+  width: 100%;
   column-gap: 10px;
 `;

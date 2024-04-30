@@ -81,9 +81,42 @@ export const getTotalSum = (products) => {
   return products?.reduce((a, b) => a + getTotal(b), 0);
 };
 
-export const formatedPhone = (area, num) => {
-  if (!num || !area) return '';
-  return `+54 ${area} ${num}`;
+export const formatedSimplePhone = (phoneNumbers) => { // VER 
+  if (!phoneNumbers) return '';
+  return `+54 ${phoneNumbers.areaCode} ${phoneNumbers.number}`;
+};
+
+export const formatedPhone = (phoneNumbers) => { // VER 
+  if (!phoneNumbers || phoneNumbers.length === 0) return '';
+  return phoneNumbers.map(phone => `+54 ${phone.areaCode} ${phone.number}`).join(', ');
+};
+
+export const formatPhoneForDisplay = (phoneNumbers) => {
+  if (!phoneNumbers || phoneNumbers.length === 0) return { primaryPhone: '', additionalPhones: null };
+
+  const primaryPhone = `+54 ${phoneNumbers[0].areaCode} ${phoneNumbers[0].number}`;
+
+  const additionalPhones = phoneNumbers.length > 1
+    ? phoneNumbers.slice(1).map(phone => (
+      <div key={`${phone.areaCode}-${phone.number}`}> {phone.ref ? `${phone.ref}:` : "Contacto: "} {`+54 ${phone.areaCode} ${phone.number}`}</div>
+    ))
+    : null;
+
+  return { primaryPhone, additionalPhones };
+};
+
+export const formatAddressForDisplay = (addresses) => {
+  if (!addresses || addresses.length === 0) return { primaryAddress: '', additionalAddress: null };
+
+  const primaryAddress = addresses[0].address;
+
+  const additionalAddress = addresses.length > 1
+    ? addresses.slice(1).map(address => (
+      <div key={`${address.ref}-${address.address}`}>{address.ref ? `${address.ref}: ` : "Direccion: "}{address.address}</div>
+    ))
+    : null;
+
+  return { primaryAddress, additionalAddress };
 };
 
 export const getSupplierCode = (code) => {
