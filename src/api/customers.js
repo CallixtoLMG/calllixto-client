@@ -34,7 +34,7 @@ export function useListCustomers({ sort, order = true, pageSize = DEFAULT_PAGE_S
   const params = {
     pageSize,
     ...(keys[ENTITIES.CUSTOMERS][currentPage] && {
-      LastEvaluatedKey: encodeUri(JSON.stringify(keys[ENTITIES.CUSTOMERS][currentPage]))
+      LastEvaluatedKey: encodeUri(keys[ENTITIES.CUSTOMERS][currentPage])
     }),
     ...(sort && { sort }),
     order,
