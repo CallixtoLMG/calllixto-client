@@ -22,7 +22,7 @@ export const HEADERS = [
             position="top center"
             trigger={
               <Box marginX="5px">
-                <Icon name="info circle" color="orange" />
+                <Icon name="info circle" color="yellow" />
               </Box>
             }
           />
@@ -46,7 +46,7 @@ export const HEADERS = [
               position="top center"
               trigger={
                 <Box marginX="5px">
-                  <Icon name="list ul" color="orange" />
+                  <Icon name="list ul" color="yellow" />
                 </Box>
               }
             />
@@ -71,7 +71,7 @@ export const HEADERS = [
               position="top center"
               trigger={
                 <Box marginX="5px">
-                  <Icon name="list ul" color="orange" />
+                  <Icon name="list ul" color="yellow" />
                 </Box>
               }
             />
