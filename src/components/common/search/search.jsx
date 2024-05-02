@@ -1,5 +1,7 @@
 import { formatProductCode } from "@/utils";
 import { useEffect, useState } from 'react';
+import { Box } from "rebass";
+import { Icon, Popup } from "semantic-ui-react";
 import { Container, Search, Text } from "./styles";
 
 const ProductSearch = ({ products, onProductSelect }) => {
@@ -10,7 +12,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
   useEffect(() => {
     setFilteredProducts(products?.filter((product) =>
       product?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product?.code?.toLowerCase().includes(searchQuery.toLowerCase()) 
+      product?.code?.toLowerCase().includes(searchQuery.toLowerCase())
     ));
   }, [searchQuery, products]);
 
@@ -40,9 +42,22 @@ const ProductSearch = ({ products, onProductSelect }) => {
         key: product.code,
         title: product.name,
         description: (
-          <Container>
+          <Container marginTop="5px" flexDir="column">
             <Text>Código: {formatProductCode(product.code)}</Text>
-            <Text>Precio: {`$ ${product?.price?.toFixed(2)}`}</Text>
+            <Container flexDir="row">
+              <Text>Precio: {`$ ${product?.price?.toFixed(2)}`}</Text>
+              {product.comments && (
+                <Popup
+                  size="mini"
+                  content={product.comments}
+                  position="top center"
+                  trigger={
+                    <Box marginX="5px">
+                      <Icon name="info circle" color="yellow" />
+                    </Box>
+                  }
+                />)}
+            </Container>
           </Container>
         ),
         value: product,
