@@ -145,7 +145,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                 position="top center"
                 trigger={
                   <Box marginX="5px">
-                    <Icon name="info circle" color="orange" />
+                    <Icon name="info circle" color="yellow" />
                   </Box>
                 }
               />)}
