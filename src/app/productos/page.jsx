@@ -71,10 +71,10 @@ const Products = () => {
       },
       {
         id: 5,
-        icon: 'trash',
-        color: 'orange',
+        icon: 'ban',
+        color: 'red',
         onClick: () => setOpen(true),
-        text: 'Anular'
+        text: 'Bloquear'
       },
     ] : [];
     setActions(actions);

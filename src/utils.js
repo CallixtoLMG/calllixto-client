@@ -81,13 +81,13 @@ export const getTotalSum = (products) => {
   return products?.reduce((a, b) => a + getTotal(b), 0);
 };
 
-export const formatedSimplePhone = (phoneNumbers) => { // VER 
+export const formatedSimplePhone = (phoneNumbers) => {
   if (!phoneNumbers) return '';
   return `+54 ${phoneNumbers.areaCode} ${phoneNumbers.number}`;
 };
 
-export const formatedPhone = (phoneNumbers) => { // VER 
-  if (!phoneNumbers || phoneNumbers.length === 0) return '';
+export const formatedPhone = (phoneNumbers) => {
+  if (phoneNumbers?.length === 0) return '';
   return phoneNumbers.map(phone => `+54 ${phone.areaCode} ${phone.number}`).join(', ');
 };
 
