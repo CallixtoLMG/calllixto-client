@@ -337,7 +337,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                         field.onChange(value);
                         const customer = customers.find((opt) => opt.value === value);
                         setValue('customer.id', customer?.id);
-                        setValue('customer.address', customer?.addresses[0].address ?? '');
+                        setValue('customer.address', customer?.addresses[0]?.address ?? '');
                         setValue('customer.phone', customer?.phoneNumbers[0] ?? '')
                       }}
                     />

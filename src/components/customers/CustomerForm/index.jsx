@@ -41,30 +41,27 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
     if (filteredData.phoneNumbers) {
       filteredData.phoneNumbers = filteredData.phoneNumbers
         .map(phone => ({
-          ...phone,
           areaCode: phone.areaCode.trim(),
           number: phone.number.trim(),
-          ref: phone.ref?.trim()
+          ref: phone.ref ? phone.ref.trim() : undefined
         }))
-        .filter(phone => phone.areaCode && phone.number)
-        .map(phone => {
-          if (!phone.ref) delete phone.ref;
-          return phone;
-        });
+        .filter(phone => phone.areaCode && phone.number);
     }
 
     if (filteredData.addresses) {
       filteredData.addresses = filteredData.addresses
-        .map(address => ({
-          ...address,
-          address: address.address.trim(),
-          ref: address.ref?.trim()
-        }))
-        .filter(address => address.address)
         .map(address => {
-          if (!address.ref) delete address.ref;
-          return address;
-        });
+          const cleanedAddress = {
+            ...address,
+            address: address.address.trim(),
+            ref: address.ref?.trim() || undefined
+          };
+          if (!cleanedAddress.ref) {
+            delete cleanedAddress.ref;
+          }
+          return cleanedAddress;
+        })
+        .filter(address => address.address);
     }
 
     return filteredData;
@@ -112,11 +109,10 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
               title={`Teléfono ${index + 1}`}
               message={errors?.phoneNumbers?.[index]?.message}
               popupMsg="Borrar teléfono"
-              dele={!readonly ? () => removePhone(index) : undefined}
+              onDelete={!readonly ? () => removePhone(index) : undefined}
               readonly={readonly}
             >
             </RuledLabel>
-            {console.log(errors)}
             <PhoneContainer wrap>
               {!readonly ? (
                 <Controller
@@ -125,10 +121,12 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                   rules={{
                     validate: {
                       correctLength: (value) => {
-                        const areaCode = value.areaCode || '';
-                        const number = value.number || '';
-                        console.log(areaCode.length + number.length)
-                        return (areaCode.length + number.length === 10) || "El número debe tener 10 carácteres";
+                        if (value.areaCode || value.number) {
+                          const areaCode = value.areaCode.replace(/[^0-9]/g, '');
+                          const number = value.number.replace(/[^0-9]/g, '');
+                          return (areaCode.length + number.length === 10) || "El número debe tener 10 caracteres";
+                        }
+                        return true;
                       }
                     }
                   }}
@@ -200,7 +198,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
           <FormField width="30%" key={item.id}>
             <RuledLabel
               popupMsg={"Borrar dirección"}
-              dele={!readonly ? () => removeAddress(index) : undefined}
+              onDelete={!readonly ? () => removeAddress(index) : undefined}
               title={`Dirección ${index + 1}`}>
             </RuledLabel>
             {!readonly ? (

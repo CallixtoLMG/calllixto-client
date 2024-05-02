@@ -12,7 +12,7 @@ const Icon = styled(SIcon)`
   cursor: ${({ pointer }) => pointer && "pointer"} !important;
 `;
 
-export const RuledLabel = ({ title, message, required, dele, readonly, popupMsg }) => {
+export const RuledLabel = ({ title, message, required, onDelete, readonly, popupMsg }) => {
   return (
     <Label>
       <Flex justifyContent="space-between">
@@ -27,12 +27,12 @@ export const RuledLabel = ({ title, message, required, dele, readonly, popupMsg 
             trigger={<Icon name="exclamation circle" color="red" />}
           />
         )}
-        {!readonly && dele && (
+        {!readonly && onDelete && (
           <Popup
             size="mini"
             position="top center"
             content={popupMsg}
-            trigger={<Icon pointer name="trash" color="red" size="small" onClick={dele} />}
+            trigger={<Icon pointer name="trash" color="red" size="small" onClick={onDelete} />}
           />
         )}
       </Flex>
