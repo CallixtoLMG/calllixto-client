@@ -3,7 +3,7 @@ import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 import { CurrencyFormatInput } from "../common/custom";
 
-const ATTRIBUTES = { CODE: "code", NAME: "name", PRICE: "price" };
+const ATTRIBUTES = { CODE: "code", NAME: "name", PRICE: "price", COMMENTS: "comments", BRANDNAME: "brandName", SUPPLIERNAME: "supplierName" };
 
 const PRODUCT_COLUMNS = [
   {
@@ -42,7 +42,7 @@ const PRODUCT_COLUMNS = [
             position="top center"
             trigger={
               <Box marginX="5px">
-                <Icon name="list ul" size="small" color="orange" />
+                <Icon name="info circle" color="yellow" />
               </Box>
             }
           />
