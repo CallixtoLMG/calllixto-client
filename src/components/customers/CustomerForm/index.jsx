@@ -1,28 +1,81 @@
 "use client"
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, Label, MaskedInput, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { RULES } from "@/constants";
-import { formatedPhone } from "@/utils";
 import { useParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Box } from "rebass";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Popup } from "semantic-ui-react";
+import { Icon } from "./styles";
 
-const EMPTY_CUSTOMER = { name: '', email: '', phone: { areaCode: '', number: '' }, address: '', comments: '' };
+const EMPTY_CUSTOMER = { name: '', email: '', phoneNumbers: [], addresses: [], comments: '' };
 
 const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
   const params = useParams();
-  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: customer });
+  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({
+    defaultValues: {
+      ...customer,
+      phoneNumbers: customer?.phoneNumbers.length ? customer.phoneNumbers : [{ areaCode: '', number: '', ref: "" }],
+      addresses: customer?.addresses?.length ? customer.addresses : [{ address: '', ref: '' }],
+    }
+  });
+  const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
+    control,
+    name: "phoneNumbers"
+  });
+
+  const { fields: addressFields, append: appendAddress, remove: removeAddress } = useFieldArray({
+    control,
+    name: "addresses"
+  });
+
   const isUpdating = useMemo(() => !!params.id, [params.id]);
 
   const handleReset = useCallback((customer) => {
     reset(customer || EMPTY_CUSTOMER);
   }, [reset]);
 
+  const filterEmptyFields = data => {
+    const filteredData = { ...data };
+
+    if (filteredData.phoneNumbers) {
+      filteredData.phoneNumbers = filteredData.phoneNumbers
+        .map(phone => ({
+          areaCode: phone.areaCode.trim(),
+          number: phone.number.trim(),
+          ref: phone.ref ? phone.ref.trim() : undefined
+        }))
+        .filter(phone => phone.areaCode && phone.number);
+    }
+
+    if (filteredData.addresses) {
+      filteredData.addresses = filteredData.addresses
+        .map(address => {
+          const cleanedAddress = {
+            ...address,
+            address: address.address.trim(),
+            ref: address.ref?.trim() || undefined
+          };
+          if (!cleanedAddress.ref) {
+            delete cleanedAddress.ref;
+          }
+          return cleanedAddress;
+        })
+        .filter(address => address.address);
+    }
+
+    return filteredData;
+  };
+
+  const handleCreate = (data) => {
+    const cleanedData = filterEmptyFields(data);
+    onSubmit(cleanedData);
+  };
+
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(handleCreate)}>
       <FieldsContainer>
-        <FormField width="50% !important">
+        <FormField flex="2">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
           {!readonly ? (
             <Controller
@@ -35,47 +88,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
             <Segment>{customer?.name}</Segment>
           )}
         </FormField>
-      </FieldsContainer>
-      <FieldsContainer>
-        <FormField flex="none" width="200px">
-          <Label>Teléfono</Label>
-          {!readonly ? (
-            <PhoneContainer>
-              <Box width="70px">
-                <Controller
-                  name="phone.areaCode"
-                  control={control}
-                  rules={RULES.PHONE.AREA_CODE}
-                  render={({ field }) =>
-                    <MaskedInput
-                      mask="9999"
-                      maskChar={null}
-                      {...field}
-                      placeholder="Área"
-                    />
-                  }
-                />
-              </Box>
-              <Box width="130px">
-                <Controller
-                  name="phone.number"
-                  control={control}
-                  rules={RULES.PHONE.NUMBER}
-                  render={({ field }) =>
-                    <MaskedInput
-                      mask="99999999"
-                      maskChar={null}
-                      {...field}
-                      placeholder="Número"
-                    />}
-                />
-              </Box>
-            </PhoneContainer>
-          ) : (
-            <Segment>{formatedPhone(customer?.phone?.areaCode, customer?.phone?.number)}</Segment>
-          )}
-        </FormField>
-        <FormField flex="1">
+        <FormField flex="3">
           <RuledLabel title="Email" message={errors?.email?.message} />
           {!readonly ? (
             <Controller
@@ -88,18 +101,150 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
             <Segment>{customer?.email}</Segment>
           )}
         </FormField>
-        <FormField flex="1">
-          <Label>Dirección</Label>
-          {!readonly ? (
-            <Controller
-              name="address"
-              control={control}
-              render={({ field }) => <Input {...field} placeholder="Dirección" />}
-            />
-          ) : (
-            <Segment>{customer?.address}</Segment>
-          )}
-        </FormField>
+      </FieldsContainer>
+      <FieldsContainer>
+        {phoneFields.map((item, index) => (
+          <FormField flex="none" width="200px" key={item.id}>
+            <RuledLabel
+              title={`Teléfono ${index + 1}`}
+              message={errors?.phoneNumbers?.[index]?.message}
+              popupMsg="Borrar teléfono"
+              onDelete={!readonly ? () => removePhone(index) : undefined}
+              readonly={readonly}
+            >
+            </RuledLabel>
+            <PhoneContainer wrap>
+              {!readonly ? (
+                <Controller
+                  name={`phoneNumbers[${index}]`}
+                  control={control}
+                  rules={{
+                    validate: {
+                      correctLength: (value) => {
+                        if (value.areaCode || value.number) {
+                          const areaCode = value.areaCode.replace(/[^0-9]/g, '');
+                          const number = value.number.replace(/[^0-9]/g, '');
+                          return (areaCode.length + number.length === 10) || "El número debe tener 10 caracteres";
+                        }
+                        return true;
+                      }
+                    }
+                  }}
+                  render={({ field: { value, onChange }, fieldState: { error } }) => (
+                    <>
+                      <Input
+                        width="100%"
+                        placeholder="Referencia"
+                        value={value.ref}
+                        onChange={(e) => {
+                          onChange({
+                            ...value,
+                            ref: e.target.value
+                          })
+                        }}
+                      />
+                      <CurrencyFormatInput
+                        shadow
+                        height="50px"
+                        format="####"
+                        width="35%"
+                        placeholder="Área"
+                        value={value.areaCode}
+                        onChange={(e) => {
+                          const formattedValue = e.target.value.replace(/[^0-9]/g, '');
+                          onChange({
+                            ...value,
+                            areaCode: formattedValue
+                          });
+                        }}
+                      />
+                      <CurrencyFormatInput
+                        shadow
+                        height="50px"
+                        format="#######"
+                        width="60%"
+                        placeholder="Número"
+                        value={value.number}
+                        onChange={(e) => {
+                          const formattedValue = e.target.value.replace(/[^0-9]/g, '');
+                          onChange({
+                            ...value,
+                            number: formattedValue
+                          });
+                        }}
+                      />
+                    </>
+                  )}
+                />
+              ) : (
+                <>
+                  <Segment>{customer?.phoneNumbers[index].ref}</Segment>
+                  <Segment width="35%">{customer?.phoneNumbers[index].areaCode}</Segment>
+                  <Segment width="60%">{customer?.phoneNumbers[index].number}</Segment>
+                </>
+              )}
+            </PhoneContainer>
+          </FormField>
+        ))}
+        {!readonly && (
+          <Popup
+            size="mini"
+            position="top center"
+            content="Agregar Teléfono"
+            trigger={<Icon circular name="add" color="green" size="small" onClick={() => appendPhone({ areaCode: '', number: '' })} />}
+          />
+        )}
+      </FieldsContainer>
+      <FieldsContainer>
+        {addressFields.map((item, index) => (
+          <FormField width="30%" key={item.id}>
+            <RuledLabel
+              popupMsg={"Borrar dirección"}
+              onDelete={!readonly ? () => removeAddress(index) : undefined}
+              title={`Dirección ${index + 1}`}>
+            </RuledLabel>
+            {!readonly ? (
+              <Controller
+                name={`addresses[${index}]`}
+                control={control}
+                render={({ field: { value, onChange, } }) => (
+                  <>
+                    <Input
+                      placeholder="Refencia"
+                      value={value.ref}
+                      onChange={(e) => {
+                        onChange({
+                          ...value,
+                          ref: e.target.value
+                        })
+                      }}
+                    />
+                    <Input
+                      value={value.address}
+                      placeholder="Dirección"
+                      onChange={(e) => {
+                        onChange({
+                          ...value,
+                          address: e.target.value
+                        })
+                      }} />
+                  </>)}
+              />
+            ) : (
+              <>
+                <Segment>{customer?.addresses[index].ref}</Segment>
+                <Segment>{customer?.addresses[index].address}</Segment>
+              </>
+            )}
+          </FormField>))}
+        {!readonly && (
+          <Popup
+            size="mini"
+            position="top center"
+            content="Agregar dirección"
+            trigger={<Icon circular name="add" color="green" size="small" onClick={() => appendAddress({ address: '', ref: '' })} />}
+          />
+        )}
       </FieldsContainer>
       <FieldsContainer>
         <Label>Comentarios</Label>

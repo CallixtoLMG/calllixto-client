@@ -16,7 +16,7 @@ export const Segment = styled(SSegment)`
   height: ${({ height }) => height && height} !important;
   padding:${({ height }) => height && "10px"} !important;
   margin: 5px 0!important;
-  width: 100%!important;
+  width: ${({ width }) => width ? width : "100%"} !important;
   min-height: 50px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
   overflow: auto;

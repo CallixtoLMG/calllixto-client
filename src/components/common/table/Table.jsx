@@ -164,7 +164,7 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
                   <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
                   <HeaderCell colSpan="1">
                     <strong>
-                      <Flex justifyContent="space-between">
+                      <Flex alignItems="center" justifyContent="space-between">
                         $
                         <CurrencyFormatInput
                           displayType="text"
