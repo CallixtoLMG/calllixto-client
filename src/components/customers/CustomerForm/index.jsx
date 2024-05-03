@@ -144,6 +144,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                         }}
                       />
                       <CurrencyFormatInput
+                        shadow
                         height="50px"
                         format="####"
                         width="35%"
@@ -158,6 +159,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                         }}
                       />
                       <CurrencyFormatInput
+                        shadow
                         height="50px"
                         format="#######"
                         width="60%"
