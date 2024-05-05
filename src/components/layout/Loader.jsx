@@ -3,14 +3,14 @@ import styled from "styled-components";
 
 const SLoader = styled(LoaderComp)`
   &::before {
-    border-color: ${({ greyColor }) => greyColor && "#b2b0b2f5"} !important;
+    border-color: ${({ grayColor }) => grayColor && "#b2b0b2f5"} !important;
   };
 `;
 
-export const Loader = ({ children, active, message, greyColor }) => {
+export const Loader = ({ children, active, message, grayColor }) => {
   return (
     <>
-      {active ? <SLoader greyColor={greyColor} active size="large">{message && message}</SLoader> : children}
+      {active ? <SLoader grayColor={grayColor} active size="large">{message && message}</SLoader> : children}
     </>
   );
 };

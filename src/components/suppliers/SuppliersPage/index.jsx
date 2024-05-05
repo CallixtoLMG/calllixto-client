@@ -10,12 +10,12 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
 
-const SuppliersPage = ({ suppliers = [], role }) => {
+const SuppliersPage = ({ suppliers = [], role, isLoading, isRefetching }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const queryClient = useQueryClient();
-  const { resetFilters  } = usePaginationContext();
+  const { resetFilters } = usePaginationContext();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar la marca "${name}"?`;
 
   const onFilter = (data) => {
@@ -61,6 +61,8 @@ const SuppliersPage = ({ suppliers = [], role }) => {
   return (
     <>
       <Table
+        isLoading={isLoading}
+        isRefetching={isRefetching}
         headers={SUPPLIERS_COLUMNS}
         elements={suppliers}
         page={PAGES.SUPPLIERS}

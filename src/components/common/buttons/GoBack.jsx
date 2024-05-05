@@ -9,7 +9,7 @@ const GoBack = () => {
   return (
     <Button
       animated
-      color="grey"
+      color="gray"
       onClick={handleClick}
       type="button"
     >

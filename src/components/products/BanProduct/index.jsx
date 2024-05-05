@@ -105,7 +105,7 @@ const BanProduct = ({ open, setOpen }) => {
             </FieldsContainer>
             <FieldsContainer  >
               <Label>Productos vedados</Label>
-              <Loader greyColor active={isLoading}>
+              <Loader grayColor active={isLoading}>
                 <Table
                   deleteButtonInside
                   tableHeight="40vh"

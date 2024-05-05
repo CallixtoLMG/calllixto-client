@@ -56,7 +56,7 @@ const Sign = styled.div`
 
 const SubtleLabel = styled(SLabel)`
   background-color: white !important;
-  border: 0.5px solid grey !important;
+  border: 0.5px solid gray !important;
 `;
 
 const Comment = styled(SSegment)`
@@ -65,7 +65,7 @@ const Comment = styled(SSegment)`
   min-height: 60px !important;
   box-shadow: 0 0 0 0 !important;
   background-color: white !important;
-  border: 0.5px solid grey !important;
+  border: 0.5px solid gray !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   padding: 8px !important;
@@ -94,7 +94,7 @@ const Segment = styled(SSegment)`
   margin-top: ${(props) => props.marginTop || "5px"} !important;
   box-shadow: 0 0 0 0 !important;
   background-color: white !important;
-  border: 0.5px solid grey !important;
+  border: 0.5px solid gray !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   height: 25px!important;
@@ -103,7 +103,7 @@ const Segment = styled(SSegment)`
 `;
 
 const Label = styled(SLabel)`
-  border: 0.5px solid grey!important; 
+  border: 0.5px solid gray!important; 
   border-bottom-left-radius: 0!important;
   border-bottom-right-radius: 0!important;
   margin: 0!important;
