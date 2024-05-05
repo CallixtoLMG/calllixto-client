@@ -87,7 +87,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   }, [reset, user]);
 
   const handleCheckboxChange = () => {
-    if (!budget?.customer?.address || !budget?.customer?.phone?.areaCode || !budget?.customer?.phone?.number) {
+    if (!budget?.customer?.addresses[0] || !budget?.customer?.phoneNumbers[0]?.areaCode || !budget?.customer?.phoneNumbers[0]?.number) {
       setIsModalCustomerOpen(true);
       return;
     }

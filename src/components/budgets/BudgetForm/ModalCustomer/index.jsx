@@ -61,7 +61,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   name="address"
                   control={control}
                   rules={RULES.REQUIRED}
-                  defaultValue={customer?.address}
+                  defaultValue={customer?.addresses[0]?.address}
                   render={({ field }) => <Input {...field} />}
                 />
               </FormField>
@@ -73,7 +73,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                       name="phone.areaCode"
                       control={control}
                       rules={RULES.PHONE.AREA_CODE_REQUIRED}
-                      defaultValue={customer?.phone?.areaCode}
+                      defaultValue={customer?.phoneNumbers[0]?.areaCode}
                       render={({ field }) =>
                         <MaskedInput
                           mask="9999"
@@ -89,7 +89,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                       name="phone.number"
                       control={control}
                       rules={RULES.PHONE.NUMBER_REQUIRED}
-                      defaultValue={customer?.phone?.number}
+                      defaultValue={customer?.phoneNumbers[0]?.number}
                       render={({ field }) =>
                         <MaskedInput
                           mask="99999999"
