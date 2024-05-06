@@ -41,7 +41,7 @@ const Title = styled(SHeader)`
 const Divider = styled.div`
   width: 100%;
   height: 1px;
-  border-bottom: ${({ borderless }) => borderless ? "0px solid gray" : " 1px solid gray"} !important;
+  border-bottom: ${({ borderless }) => borderless ? "0px solid grey" : " 1px solid grey"} !important;
   margin: 10px 0;
 `;
 
@@ -50,13 +50,13 @@ const Sign = styled.div`
   height: 3px;
   color: green;
   border-radius: 15px;
-  border-bottom: 3px solid gray;
+  border-bottom: 3px solid grey;
   margin-top: ${(props) => props.marginTop || "0!important"};
 `;
 
 const SubtleLabel = styled(SLabel)`
   background-color: white !important;
-  border: 0.5px solid gray !important;
+  border: 0.5px solid grey !important;
 `;
 
 const Comment = styled(SSegment)`
@@ -65,7 +65,7 @@ const Comment = styled(SSegment)`
   min-height: 60px !important;
   box-shadow: 0 0 0 0 !important;
   background-color: white !important;
-  border: 0.5px solid gray !important;
+  border: 0.5px solid grey !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   padding: 8px !important;
@@ -94,7 +94,7 @@ const Segment = styled(SSegment)`
   margin-top: ${(props) => props.marginTop || "5px"} !important;
   box-shadow: 0 0 0 0 !important;
   background-color: white !important;
-  border: 0.5px solid gray !important;
+  border: 0.5px solid grey !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
   height: 25px!important;
@@ -103,7 +103,7 @@ const Segment = styled(SSegment)`
 `;
 
 const Label = styled(SLabel)`
-  border: 0.5px solid gray!important; 
+  border: 0.5px solid grey!important; 
   border-bottom-left-radius: 0!important;
   border-bottom-right-radius: 0!important;
   margin: 0!important;
