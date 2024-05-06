@@ -88,7 +88,7 @@ export const formatedSimplePhone = (phoneNumbers) => {
 
 export const formatedPhone = (phoneNumbers) => {
   if (phoneNumbers?.length === 0) return '';
-  return phoneNumbers.map(phone => `+54 ${phone.areaCode} ${phone.number}`).join(', ');
+  return phoneNumbers?.map(phone => `+54 ${phone.areaCode} ${phone.number}`).join(', ');
 };
 
 export const formatPhoneForDisplay = (phoneNumbers) => {
