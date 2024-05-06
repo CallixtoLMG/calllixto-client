@@ -31,8 +31,8 @@ const Header = () => {
             ) : (
               <>
                 {Object.values(PAGES).filter(page => !!page.NAME).map(page => (
-                  <ModLink key={page.BASE} $destacar={pathname.includes(page.BASE)} href={page.BASE}>
-                    <Menu.Item><Text $destacar={pathname.includes(page.BASE)}>{page.NAME}</Text></Menu.Item>
+                  <ModLink key={page.BASE} destacar={pathname.includes(page.BASE)} href={page.BASE}>
+                    <Menu.Item><Text destacar={pathname.includes(page.BASE)}>{page.NAME}</Text></Menu.Item>
                   </ModLink>
                 ))}
                 <LogDiv>

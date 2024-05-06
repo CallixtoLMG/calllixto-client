@@ -12,22 +12,23 @@ export const FieldsContainer = styled(Flex)`
   justify-content: ${({ justifyContent }) => justifyContent};
   flex-wrap: wrap;
   column-gap: 20px;
-  width: ${({ width }) => width || ''} !important;
-  min-height: ${({ minHeight }) => minHeight || ''} !important;
-  height: ${({ height }) => height || ''} !important;
+  row-gap: 20px;
+  width: ${({ width = 'auto' }) => width} !important;
+  min-height: ${({ minHeight = 'auto' }) => minHeight} !important;
+  height: ${({ height = 'auto' }) => height} !important;
 `;
 
 export const ButtonsContainer = styled(Flex)`
-  flex-direction: row;
-  margin-bottom: 10px !important;
-  margin-top: ${({ marginTop }) => marginTop};
-  justify-content: ${({ center }) => center ? "center" : "flex-end"};
-  column-gap: 10px;
-  width: ${({ width }) => width};
+flex-direction: row;
+margin-bottom: 10px !important;
+margin-top: ${({ marginTop }) => (marginTop ? marginTop : '0')};
+justify-content: ${({ center }) => (center ? 'center' : 'flex-end')};
+column-gap: 10px;
+width: ${({ width }) => (width ? width : 'auto')};
 `;
 
 export const PhoneContainer = styled(Flex)`
-  flex-wrap: ${({ wrap }) => wrap &&  'wrap'};
+  flex-wrap: ${({ wrap }) => wrap && 'wrap'};
   width: 100%;
   column-gap: 10px;
 `;

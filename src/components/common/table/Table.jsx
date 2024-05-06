@@ -4,7 +4,7 @@ import { Loader } from "@/components/layout";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Box, Flex } from 'rebass';
+import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
@@ -44,8 +44,8 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
 
   return (
     <>
-      <HeaderContainer>
-        {useFilters && (
+      {useFilters && (
+        <HeaderContainer>
           <HeaderSegment flex="75%">
             <Form onSubmit={handleSubmit(onFilter)}>
               <Flex justifyContent="space-between">
@@ -61,11 +61,9 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
                     position="top center"
                     size="tiny"
                     trigger={(
-                      <Box>
-                        <Button circular icon type="button" onClick={handleRestore}>
-                          <Icon name="undo" />
-                        </Button>
-                      </Box>
+                      <Button circular icon type="button" onClick={handleRestore}>
+                        <Icon name="undo" />
+                      </Button>
                     )}
                   />
                   {filters.map(filter =>
@@ -87,7 +85,7 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
                     />
                   )}
                 </FiltersContainer>
-                <Button onClick={handleSubmit(onFilter)} type="button" width="110px">
+                <Button marginLeft="10px" onClick={handleSubmit(onFilter)} type="button" width="110px">
                   <Flex justifyContent="space-around">
                     <span>Filtrar</span>
                     <Icon name="search" />
@@ -96,16 +94,17 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
               </Flex>
             </Form>
           </HeaderSegment>
-        )}
-        {pag &&
-          <HeaderSegment flex="25%">
-            <PaginationContainer >
-              <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>
-              <PaginationSegment >{Number(currentPage) + 1}</PaginationSegment>
-              <Button onClick={goToNextPage} disabled={!canGoNext}>Siguiente</Button>
-            </PaginationContainer>
-          </HeaderSegment>}
-      </HeaderContainer>
+
+          {pag &&
+            <HeaderSegment flex="25%">
+              <PaginationContainer >
+                <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>
+                <PaginationSegment >{Number(currentPage) + 1}</PaginationSegment>
+                <Button onClick={goToNextPage} disabled={!canGoNext}>Siguiente</Button>
+              </PaginationContainer>
+            </HeaderSegment>}
+        </HeaderContainer>
+      )}
       <Container tableHeight={tableHeight}>
         <Table celled compact striped>
           <TableHeader fullWidth>
@@ -189,7 +188,7 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
             </Table.Footer>
           )}
         </Table>
-      </Container>
+      </Container >
     </>
   );
 };
