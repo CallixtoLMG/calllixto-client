@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Icon, Popup, Label as SLabel } from "semantic-ui-react";
+import { Popup, Icon as SIcon, Label as SLabel } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Label = styled(SLabel)`
@@ -7,7 +7,12 @@ const Label = styled(SLabel)`
   margin: 0!important;
 `;
 
-export const RuledLabel = ({ title, message, required }) => {
+const Icon = styled(SIcon)`
+  align-self: center;
+  cursor: ${({ pointer }) => pointer && "pointer"} !important;
+`;
+
+export const RuledLabel = ({ title, message, required, onDelete, readonly, popupMsg }) => {
   return (
     <Label>
       <Flex justifyContent="space-between">
@@ -20,6 +25,14 @@ export const RuledLabel = ({ title, message, required }) => {
             position="top center"
             content={message}
             trigger={<Icon name="exclamation circle" color="red" />}
+          />
+        )}
+        {!readonly && onDelete && (
+          <Popup
+            size="mini"
+            position="top center"
+            content={popupMsg}
+            trigger={<Icon pointer name="trash" color="red" size="small" onClick={onDelete} />}
           />
         )}
       </Flex>

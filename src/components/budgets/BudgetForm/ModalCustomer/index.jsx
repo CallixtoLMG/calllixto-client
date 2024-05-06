@@ -1,15 +1,28 @@
 import { edit } from "@/api/customers";
-import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Input, Label, MaskedInput, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
+import { Button, ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
 import { RULES } from "@/constants";
 import { useEffect, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { Box } from "rebass";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { control, handleSubmit, formState: { errors, } } = useForm({
-    defaultValues: customer
+    defaultValues: {
+      ...customer,
+      phoneNumbers: customer?.phoneNumbers.length ? customer.phoneNumbers : [{ areaCode: '', number: '', ref: "" }],
+      addresses: customer?.addresses?.length ? customer.addresses : [{ address: '', ref: '' }],
+    }
+  });
+
+  const { fields: phoneFields } = useFieldArray({
+    control,
+    name: "phoneNumbers"
+  });
+
+  const { fields: addressFields } = useFieldArray({
+    control,
+    name: "addresses"
   });
 
   const inputRef = useRef(null);
@@ -55,52 +68,87 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   render={({ field: { value } }) => <Segment height="40px">{value}</Segment>}
                 />
               </FormField>
-              <FormField flex="1">
-                <RuledLabel title="Dirección" message={errors?.address?.message} required />
-                <Controller
-                  name="address"
-                  control={control}
-                  rules={RULES.REQUIRED}
-                  defaultValue={customer?.addresses[0]?.address}
-                  render={({ field }) => <Input {...field} />}
-                />
-              </FormField>
-              <FormField width="200px">
-                <RuledLabel title="Teléfono" message={errors?.phone?.areaCode?.message || errors?.phone?.number?.message} required />
-                <PhoneContainer>
-                  <Box width="70px">
+              {addressFields.map((item, index) => (
+                <FormField flex="1" key={item.id}>
+                  <RuledLabel title="Dirección" message={errors?.address?.message} required />
+                  <Controller
+                    name={`addresses[${index}]`}
+                    control={control}
+                    rules={RULES.REQUIRED}
+                    defaultValue={customer?.addresses[0]?.address}
+                    render={({ field: { value, onChange, } }) => (
+                      <Input
+                        value={value.address}
+                        placeholder="Dirección"
+                        onChange={(e) => {
+                          onChange({
+                            ...value,
+                            address: e.target.value
+                          })
+                        }}
+                      />
+                    )}
+                  />
+                </FormField>))}
+              {phoneFields.map((item, index) => (
+                <FormField width="200px" key={item.id}>
+                  <RuledLabel title="Teléfono" message={errors?.phone?.areaCode?.message || errors?.phone?.number?.message} required />
+                  <PhoneContainer>
                     <Controller
-                      name="phone.areaCode"
+                      name={`phoneNumbers[${index}]`}
                       control={control}
-                      rules={RULES.PHONE.AREA_CODE_REQUIRED}
+                      rules={{
+                        validate: {
+                          correctLength: (value) => {
+                            if (value.areaCode || value.number) {
+                              const areaCode = value.areaCode.replace(/[^0-9]/g, '');
+                              const number = value.number.replace(/[^0-9]/g, '');
+                              return (areaCode.length + number.length === 10) || "El número debe tener 10 caracteres";
+                            }
+                            return true;
+                          }
+                        }
+                      }}
                       defaultValue={customer?.phoneNumbers[0]?.areaCode}
-                      render={({ field }) =>
-                        <MaskedInput
-                          mask="9999"
-                          maskChar={null}
-                          {...field}
-                          placeholder="Área"
-                        />
-                      }
+                      render={({ field: { value, onChange }, fieldState: { error } }) => (
+                        <>
+                          <CurrencyFormatInput
+                            marginTop="5px"
+                            shadow
+                            height="50px"
+                            format="####"
+                            width="35%"
+                            placeholder="Área"
+                            value={value.areaCode}
+                            onChange={(e) => {
+                              const formattedValue = e.target.value.replace(/[^0-9]/g, '');
+                              onChange({
+                                ...value,
+                                areaCode: formattedValue
+                              });
+                            }}
+                          />
+                          <CurrencyFormatInput
+                            marginTop="5px"
+                            shadow
+                            height="50px"
+                            format="#######"
+                            width="60%"
+                            placeholder="Número"
+                            value={value.number}
+                            onChange={(e) => {
+                              const formattedValue = e.target.value.replace(/[^0-9]/g, '');
+                              onChange({
+                                ...value,
+                                number: formattedValue
+                              });
+                            }}
+                          />
+                        </>
+                      )}
                     />
-                  </Box>
-                  <Box width="130px">
-                    <Controller
-                      name="phone.number"
-                      control={control}
-                      rules={RULES.PHONE.NUMBER_REQUIRED}
-                      defaultValue={customer?.phoneNumbers[0]?.number}
-                      render={({ field }) =>
-                        <MaskedInput
-                          mask="99999999"
-                          maskChar={null}
-                          {...field}
-                          placeholder="Número"
-                        />}
-                    />
-                  </Box>
-                </PhoneContainer>
-              </FormField >
+                  </PhoneContainer>
+                </FormField >))}
               <ButtonsContainer width="100%" marginTop="10px">
                 <Button
                   disabled={isLoading}
