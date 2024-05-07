@@ -93,7 +93,6 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
               </Flex>
             </Form>
           </HeaderSegment>
-        )}
         {pag &&
           <HeaderSegment flex="25%">
             <PaginationContainer >
@@ -103,6 +102,7 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
             </PaginationContainer>
           </HeaderSegment>}
       </HeaderContainer>
+      )}
       <Container tableHeight={tableHeight}>
         <Table celled compact striped>
           <TableHeader fullWidth>
