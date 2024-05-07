@@ -20,7 +20,6 @@ export const Segment = styled(SSegment)`
   min-height: 50px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
   overflow: auto;
-  // align-content: ${({ alignContent }) => alignContent && alignContent} !important;
   align-content: center;
 `;
 
