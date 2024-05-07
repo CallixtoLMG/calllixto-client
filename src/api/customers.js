@@ -28,10 +28,11 @@ export function deleteCustomer(id) {
   return axios.delete(`${CUSTOMERS_URL}/${id}`);
 };
 
-export function useListCustomers({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE }) {
+export function useListCustomers({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
   const { addKey, currentPage, keys, filters, } = usePaginationContext();
 
   const params = {
+    attributes: encodeUri(attributes),
     pageSize,
     ...(keys[ENTITIES.CUSTOMERS][currentPage] && {
       LastEvaluatedKey: encodeUri(keys[ENTITIES.CUSTOMERS][currentPage])
@@ -54,7 +55,7 @@ export function useListCustomers({ sort, order = true, pageSize = DEFAULT_PAGE_S
   };
 
   const query = useQuery({
-    queryKey: [LIST_CUSTOMERS_QUERY_KEY, params],
+    queryKey: [LIST_CUSTOMERS_QUERY_KEY, params, attributes],
     queryFn: () => listCustomers(params),
   });
 

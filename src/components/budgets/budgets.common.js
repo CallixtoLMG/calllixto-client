@@ -2,6 +2,8 @@ import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, ge
 import { Flex } from "rebass";
 import { Icon } from "../common/custom/Semantic";
 
+const ATTRIBUTES = { ID: "id", CUSTOMER: "customer", CREATEDAT: "createdAt", CONFIRMED: "confirmed", SELLER: "seller", PRODUCTS: "products" };
+
 const BUDGETS_COLUMNS = [
   {
     id: 1,
@@ -110,7 +112,5 @@ const PAYMENT_METHODS = [{
   value: "Mercado Pago",
 },];
 
-export {
-  BUDGETS_COLUMNS, FILTERS, PAYMENT_METHODS, PRODUCTS_COLUMNS
-};
+export { ATTRIBUTES, BUDGETS_COLUMNS, FILTERS, PAYMENT_METHODS, PRODUCTS_COLUMNS };
 

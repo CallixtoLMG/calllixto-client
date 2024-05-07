@@ -30,10 +30,11 @@ export function deleteBrand(id) {
   return axios.delete(`${BRANDS_URL}/${id}`);
 };
 
-export function useListBrands({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE }) {
+export function useListBrands({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
   const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
+    attributes: encodeUri(attributes),
     pageSize,
     ...(keys[ENTITIES.BRANDS][currentPage] && {
       LastEvaluatedKey: encodeUri(keys[ENTITIES.BRANDS][currentPage])
@@ -56,7 +57,7 @@ export function useListBrands({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE
   };
 
   const query = useQuery({
-    queryKey: [LIST_BRANDS_QUERY_KEY, params],
+    queryKey: [LIST_BRANDS_QUERY_KEY, params, attributes],
     queryFn: () => listBrands(params),
   });
 

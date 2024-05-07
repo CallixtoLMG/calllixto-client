@@ -30,10 +30,11 @@ export function deleteSupplier(id) {
   return axios.delete(`${SUPPLIER_URL}/${id}`);
 };
 
-export function useListSuppliers({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE }) {
+export function useListSuppliers({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
   const { addKey, currentPage, keys, filters } = usePaginationContext();
 
   const params = {
+    attributes: encodeUri(attributes),
     pageSize,
     ...(keys[ENTITIES.SUPPLIERS][currentPage] && {
       LastEvaluatedKey: encodeUri(keys[ENTITIES.SUPPLIERS][currentPage])
@@ -56,7 +57,7 @@ export function useListSuppliers({ sort, order = true, pageSize = DEFAULT_PAGE_S
   };
 
   const query = useQuery({
-    queryKey: [LIST_SUPPLIERS_QUERY_KEY, params],
+    queryKey: [LIST_SUPPLIERS_QUERY_KEY, params, attributes],
     queryFn: () => listSuppliers(params),
   });
 
