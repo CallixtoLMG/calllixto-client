@@ -41,7 +41,7 @@ const Title = styled(SHeader)`
 const Divider = styled.div`
   width: 100%;
   height: 1px;
-  border-bottom: ${({ borderless }) => borderless ? "0px solid gray" : " 1px solid gray"} !important;
+  border-bottom: ${({ borderless }) => borderless ? "0px solid grey" : " 1px solid grey"} !important;
   margin: 10px 0;
 `;
 
@@ -50,7 +50,7 @@ const Sign = styled.div`
   height: 3px;
   color: green;
   border-radius: 15px;
-  border-bottom: 3px solid gray;
+  border-bottom: 3px solid grey;
   margin-top: ${(props) => props.marginTop || "0!important"};
 `;
 

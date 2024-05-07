@@ -2,7 +2,7 @@
 import { useListBudgets } from "@/api/budgets";
 import BudgetsPage from "@/components/budgets/BudgetPage";
 import { usePaginationContext } from "@/components/common/table/Pagination";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
@@ -42,9 +42,7 @@ const Budgets = () => {
   }, [push, setActions]);
 
   return (
-    <Loader active={isLoading}>
-      <BudgetsPage budgets={budgets} />
-    </Loader>
+    <BudgetsPage isLoading={isLoading} budgets={budgets} />
   )
 };
 

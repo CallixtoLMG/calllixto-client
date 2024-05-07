@@ -10,7 +10,7 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { BRAND_COLUMNS, FILTERS } from "../brands.common";
 
-const BrandsPage = ({ brands = [], role }) => {
+const BrandsPage = ({ brands = [], role, isLoading, isRefetching }) => {
   const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
@@ -62,6 +62,8 @@ const BrandsPage = ({ brands = [], role }) => {
   return (
     <>
       <Table
+        isLoading={isLoading}
+        isRefetching={isRefetching}
         headers={BRAND_COLUMNS}
         elements={brands}
         page={PAGES.BRANDS}

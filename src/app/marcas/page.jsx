@@ -3,7 +3,7 @@ import { useUserContext } from "@/User";
 import { useListBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { usePaginationContext } from "@/components/common/table/Pagination";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { Rules } from "@/visibilityRules";
@@ -46,12 +46,12 @@ const Brands = () => {
   }, [push, role, setActions]);
 
   return (
-    <Loader active={isLoading || isRefetching}>
-      <BrandsPage
-        brands={brands || []}
-        role={role}
-      />
-    </Loader>
+    <BrandsPage
+      isLoading={isLoading}
+      isRefetching={isRefetching}
+      brands={brands || []}
+      role={role}
+    />
   );
 };
 

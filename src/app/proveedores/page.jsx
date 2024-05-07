@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { deleteSupplier, useListSuppliers } from "@/api/suppliers";
 import { usePaginationContext } from "@/components/common/table/Pagination";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
@@ -47,14 +47,13 @@ const Suppliers = () => {
   }, [push, role, setActions]);
 
   return (
-    <Loader active={isLoading || isRefetching}>
-      <SuppliersPage
-        suppliers={data?.suppliers}
-        role={role}
-        isLoading={isLoading}
-        onDelete={deleteSupplier}
-      />
-    </Loader>
+    <SuppliersPage
+      isLoading={isLoading}
+      isRefetching={isRefetching}
+      suppliers={data?.suppliers}
+      role={role}
+      onDelete={deleteSupplier}
+    />
   );
 };
 

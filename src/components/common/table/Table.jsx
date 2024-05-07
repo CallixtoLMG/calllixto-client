@@ -3,7 +3,7 @@ import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
 import { handleEnterKeyPress } from '@/utils';
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
@@ -11,6 +11,12 @@ import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
 const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
   const { push } = useRouter();
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   const defaultValues = useMemo(() => filters.reduce((acc, filter) => ({ ...acc, [filter.value]: '' }), {}), [filters]);
   const { handleSubmit, control, reset, setValue } = useForm({ defaultValues });
   const useFilters = useMemo(() => filters.length > 0, [filters]);
@@ -87,40 +93,58 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
               </Flex>
             </Form>
           </HeaderSegment>
-          {pag &&
-            <HeaderSegment flex="25%">
-              <PaginationContainer >
-                <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>
-                <PaginationSegment >{Number(currentPage) + 1}</PaginationSegment>
-                <Button onClick={goToNextPage} disabled={!canGoNext}>Siguiente</Button>
-              </PaginationContainer>
-            </HeaderSegment>}
-        </HeaderContainer>
+        {pag &&
+          <HeaderSegment flex="25%">
+            <PaginationContainer >
+              <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>
+              <PaginationSegment >{Number(currentPage) + 1}</PaginationSegment>
+              <Button onClick={goToNextPage} disabled={!canGoNext}>Siguiente</Button>
+            </PaginationContainer>
+          </HeaderSegment>}
+      </HeaderContainer>
       )}
-      <Loader active={isLoading | isRefetching}>
-        <Container tableHeight={tableHeight}>
-          <Table celled compact striped>
-            <TableHeader fullWidth>
-              <Table.Row>
-                {headers.map((header) => (
-                  <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
-                ))}
-              </Table.Row>
-            </TableHeader>
-            <Table.Body>
-              {!elements.length ? (
-                <Table.Row>
-                  <Table.Cell colSpan={headers.length} textAlign="center">
-                    <Header as="h4">
-                      No se encontraron ítems.
-                    </Header>
-                  </Table.Cell>
-                </Table.Row>
-              ) : (
-                elements.map((element, index) => {
-                  if (page) {
+      <Container tableHeight={tableHeight}>
+        <Table celled compact striped>
+          <TableHeader fullWidth>
+            <Table.Row>
+              {headers.map((header) => (
+                <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
+              ))}
+            </Table.Row>
+          </TableHeader>
+          {hydrated && (
+            <Loader active={isLoading | isRefetching}>
+              <Table.Body>
+                {!elements.length ? (
+                  <Table.Row>
+                    <Table.Cell colSpan={headers.length} textAlign="center">
+                      <Header as="h4">
+                        No se encontraron ítems.
+                      </Header>
+                    </Table.Cell>
+                  </Table.Row>
+                ) : (
+                  elements.map((element, index) => {
+                    if (page) {
+                      return (
+                        <LinkRow key={element[mainKey]} onClick={() => push(page.SHOW(element[mainKey]))}>
+                          {headers.map(header => (
+                            <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                              {header.value(element, index)}
+                            </Cell>
+                          ))}
+                          {!!actions.length && (
+                            <ActionsContainer deleteButtonInside={deleteButtonInside}>
+                              <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
+                                <Actions actions={actions} element={element} />
+                              </InnerActionsContainer>
+                            </ActionsContainer>
+                          )}
+                        </LinkRow>
+                      );
+                    }
                     return (
-                      <LinkRow key={element[mainKey]} onClick={() => push(page.SHOW(element[mainKey]))}>
+                      <TableRow key={element[mainKey]}>
                         {headers.map(header => (
                           <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
                             {header.value(element, index)}
@@ -129,56 +153,40 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
                         {!!actions.length && (
                           <ActionsContainer deleteButtonInside={deleteButtonInside}>
                             <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
-                              <Actions actions={actions} element={element} />
+                              <Actions actions={actions} element={element} index={index} />
                             </InnerActionsContainer>
                           </ActionsContainer>
                         )}
-                      </LinkRow>
+                      </TableRow>
                     );
-                  }
-                  return (
-                    <TableRow key={element[mainKey]}>
-                      {headers.map(header => (
-                        <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
-                          {header.value(element, index)}
-                        </Cell>
-                      ))}
-                      {!!actions.length && (
-                        <ActionsContainer deleteButtonInside={deleteButtonInside}>
-                          <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
-                            <Actions actions={actions} element={element} index={index} />
-                          </InnerActionsContainer>
-                        </ActionsContainer>
-                      )}
-                    </TableRow>
-                  );
-                })
-              )}
-            </Table.Body>
-            {total > 0 && (
-              <Table.Footer celled fullWidth>
-                <Table.Row>
-                  <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
-                  <HeaderCell colSpan="1">
-                    <strong>
-                      <Flex alignItems="center" justifyContent="space-between">
-                        $
-                        <CurrencyFormatInput
-                          displayType="text"
-                          thousandSeparator={true}
-                          fixedDecimalScale={true}
-                          decimalScale={2}
-                          value={total}
-                        />
-                      </Flex>
-                    </strong>
-                  </HeaderCell>
-                </Table.Row>
-              </Table.Footer>
-            )}
-          </Table>
-        </Container>
-      </Loader>
+                  })
+                )}
+              </Table.Body>
+            </Loader>
+          )}
+          {total > 0 && (
+            <Table.Footer celled fullWidth>
+              <Table.Row>
+                <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
+                <HeaderCell colSpan="1">
+                  <strong>
+                    <Flex alignItems="center" justifyContent="space-between">
+                      $
+                      <CurrencyFormatInput
+                        displayType="text"
+                        thousandSeparator={true}
+                        fixedDecimalScale={true}
+                        decimalScale={2}
+                        value={total}
+                      />
+                    </Flex>
+                  </strong>
+                </HeaderCell>
+              </Table.Row>
+            </Table.Footer>
+          )}
+        </Table>
+      </Container>
     </>
   );
 };

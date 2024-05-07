@@ -5,7 +5,7 @@ import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { BUDGETS_COLUMNS, FILTERS } from "../budgets.common";
 
-const BudgetsPage = ({ budgets }) => {
+const BudgetsPage = ({ budgets, isLoading }) => {
   const { push } = useRouter();
   const { resetFilters } = usePaginationContext();
 
@@ -35,6 +35,7 @@ const BudgetsPage = ({ budgets }) => {
 
   return (
     <Table
+      isLoading={isLoading}
       headers={BUDGETS_COLUMNS}
       elements={budgets}
       page={PAGES.BUDGETS}

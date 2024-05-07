@@ -2,7 +2,7 @@
 import { useListCustomers } from "@/api/customers";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import CustomersPage from "@/components/customers/CustomersPage";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
@@ -40,11 +40,8 @@ const Customers = () => {
     ];
     setActions(actions);
   }, [push, setActions]);
-
   return (
-    <Loader active={isLoading}>
-      <CustomersPage customers={customers} />
-    </Loader>
+    <CustomersPage isLoading={isLoading} customers={customers} />
   );
 };
 
