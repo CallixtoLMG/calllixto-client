@@ -3,6 +3,7 @@ import { Button, FieldsContainer, Form, FormField, Input, Label, Modal, RuledLab
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { REGEX } from "@/constants";
+import { handleEnterKeyPress } from '@/utils';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -54,12 +55,11 @@ const BanProduct = ({ open, setOpen }) => {
     }
   };
 
-  const handleEnterKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleAddProduct(e.target.value.toUpperCase());
-    }
+  const handleAdd = (e) => {
+    handleAddProduct(e.target.value.toUpperCase());
   };
+  
+  const onKeyPress = (e) => handleEnterKeyPress(e, handleAdd);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (products) => {
@@ -99,7 +99,7 @@ const BanProduct = ({ open, setOpen }) => {
                   height="30px"
                   type="text"
                   placeholder="Código"
-                  onKeyPress={handleEnterKeyPress}
+                  onKeyPress={onKeyPress}
                 />
               </FormField>
             </FieldsContainer>
