@@ -94,7 +94,7 @@ export const formatedPhone = (phoneNumbers) => {
 export const formatPhoneForDisplay = (phoneNumbers) => {
   if (!phoneNumbers || phoneNumbers.length === 0) return { primaryPhone: '', additionalPhones: null };
 
-  const primaryPhone = `+54 ${phoneNumbers[0].areaCode} ${phoneNumbers[0].number}`;
+  const primaryPhone = `+54 ${phoneNumbers[0]?.areaCode} ${phoneNumbers[0]?.number}`;
 
   const additionalPhones = phoneNumbers.length > 1
     ? phoneNumbers.slice(1).map(phone => (
@@ -108,7 +108,7 @@ export const formatPhoneForDisplay = (phoneNumbers) => {
 export const formatAddressForDisplay = (addresses) => {
   if (!addresses || addresses.length === 0) return { primaryAddress: '', additionalAddress: null };
 
-  const primaryAddress = addresses[0].address;
+  const primaryAddress = addresses[0]?.address;
 
   const additionalAddress = addresses.length > 1
     ? addresses.slice(1).map(address => (
