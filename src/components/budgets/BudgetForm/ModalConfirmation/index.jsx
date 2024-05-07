@@ -1,5 +1,5 @@
 import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } from "@/components/common/custom";
-import { formatedPhone } from "@/utils";
+import { formatedSimplePhone } from "@/utils";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
@@ -31,15 +31,15 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, onConfirm, isLoading })
             <FieldsContainer>
               <FormField flex="1">
                 <Label>ID</Label>
-                <Segment height="40px">{customer?.name}</Segment>
+                <Segment alignContent="center" height="40px">{customer?.name}</Segment>
               </FormField>
               <FormField flex="1">
                 <Label>Dirección</Label>
-                <Segment height="40px">{customer?.address}</Segment>
+                <Segment alignContent="center" height="40px">{customer?.addresses[0]?.address}</Segment>
               </FormField>
               <FormField width="200px">
                 <Label>Teléfono</Label>
-                <Segment height="40px">{formatedPhone(customer?.phone?.areaCode, customer?.phone?.number)}</Segment>
+                <Segment alignContent="center" height="40px">{formatedSimplePhone(customer?.phoneNumbers[0])}</Segment>
               </FormField >
               <ButtonsContainer width="100%" marginTop="10px">
                 <Button

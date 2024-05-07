@@ -22,4 +22,5 @@ export const CurrencyFormatInput = styled(CurrencyFormat)`
   height: ${({ height = '30px' }) => height} !important;
   align-items: center;
   align-content: center;
+  margin-top: ${({ marginTop }) => `${marginTop}!important`}
 `;

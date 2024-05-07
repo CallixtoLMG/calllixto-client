@@ -178,9 +178,9 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                 />
               ) : (
                 <>
-                  <Segment>{customer?.phoneNumbers[index].ref}</Segment>
-                  <Segment width="35%">{customer?.phoneNumbers[index].areaCode}</Segment>
-                  <Segment width="60%">{customer?.phoneNumbers[index].number}</Segment>
+                  <Segment>{customer?.phoneNumbers[index]?.ref}</Segment>
+                  <Segment width="35%">{customer?.phoneNumbers[index]?.areaCode}</Segment>
+                  <Segment width="60%">{customer?.phoneNumbers[index]?.number}</Segment>
                 </>
               )}
             </PhoneContainer>
@@ -227,13 +227,15 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                           ...value,
                           address: e.target.value
                         })
-                      }} />
-                  </>)}
+                      }}
+                    />
+                  </>
+                )}
               />
             ) : (
               <>
-                <Segment>{customer?.addresses[index].ref}</Segment>
-                <Segment>{customer?.addresses[index].address}</Segment>
+                <Segment>{customer?.addresses[index]?.ref}</Segment>
+                <Segment>{customer?.addresses[index]?.address}</Segment>
               </>
             )}
           </FormField>))}
