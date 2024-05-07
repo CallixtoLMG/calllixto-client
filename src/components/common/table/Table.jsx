@@ -1,14 +1,14 @@
 import { CurrencyFormatInput, Input } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
+import { handleEnterKeyPress } from '@/utils';
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Box, Flex } from 'rebass';
+import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
-
 const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
@@ -35,17 +35,16 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
     reset(defaultValues);
   }, [resetFilters, reset, defaultValues]);
 
-  const handleEnterKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSubmit(onFilter)();
-    }
+  const handleFilter = (e) => {
+    handleSubmit(onFilter)();
   };
+
+  const onKeyPress = (e) => handleEnterKeyPress(e, handleFilter);
 
   return (
     <>
-      <HeaderContainer>
-        {useFilters && (
+      {useFilters && (
+        <HeaderContainer>
           <HeaderSegment flex="75%">
             <Form onSubmit={handleSubmit(onFilter)}>
               <Flex justifyContent="space-between">
@@ -61,11 +60,9 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
                     position="top center"
                     size="tiny"
                     trigger={(
-                      <Box>
-                        <Button circular icon type="button" onClick={handleRestore}>
-                          <Icon name="undo" />
-                        </Button>
-                      </Box>
+                      <Button circular icon type="button" onClick={handleRestore}>
+                        <Icon name="undo" />
+                      </Button>
                     )}
                   />
                   {filters.map(filter =>
@@ -75,7 +72,7 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
                       control={control}
                       render={({ field }) => (
                         <Input
-                          onKeyPress={handleEnterKeyPress}
+                          onKeyPress={onKeyPress}
                           height="35px"
                           margin="0"
                           {...field}
@@ -87,7 +84,7 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
                     />
                   )}
                 </FiltersContainer>
-                <Button onClick={handleSubmit(onFilter)} type="button" width="110px">
+                <Button marginLeft="10px" onClick={handleSubmit(onFilter)} type="button" width="110px">
                   <Flex justifyContent="space-around">
                     <span>Filtrar</span>
                     <Icon name="search" />

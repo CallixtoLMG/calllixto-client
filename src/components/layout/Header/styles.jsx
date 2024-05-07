@@ -9,7 +9,7 @@ const ModLink = styled(Link)`
   align-items: center;
   transition: all 0.2s ease-in-out;
   font-size: 15px;
-  background-color: ${props => props.$destacar && "#f5f5f5"};
+  background-color: ${({ destacar }) => (destacar ? '#f5f5f5' : 'transparent')};
 
   &:hover {
     background-color: #f5f5f5;
@@ -21,7 +21,7 @@ const LogDiv = styled(Flex)`
   align-items: center;
   transition: all 0.2s ease-in-out;
   font-size: 15px;
-  background-color: ${props => props.$destacar && "#f5f5f5"};
+  background-color: ${({ destacar }) => (destacar ? '#f5f5f5' : 'transparent')};
   &:hover {
     background-color: #f5f5f5!important;
   };
@@ -64,7 +64,7 @@ const Text = styled.p`
     content: '';
     position: absolute;
     width: 100%;
-    transform: ${props => props.$destacar ? "scaleX(1)" : "scaleX(0)"};
+    transform: ${({ destacar }) => (destacar ? "scaleX(1)" : "scaleX(0)")};
     height: 2px;
     bottom: -2px;
     left: 0;

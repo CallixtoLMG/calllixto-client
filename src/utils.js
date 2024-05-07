@@ -144,3 +144,10 @@ export const downloadExcel = (data, fileName) => {
   XLSX.writeFile(wb, `${fileName}.xlsx`);
 };
 
+export const handleEnterKeyPress = (e, action) => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    action(e);
+  }
+};
+

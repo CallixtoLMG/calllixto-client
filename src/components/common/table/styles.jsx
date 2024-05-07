@@ -6,16 +6,17 @@ const Cell = styled(STable.Cell)`
   height: 35px!important;
   padding: 2px 7px!important;
   z-index: 2;
-  text-align: ${({ align }) => align || "center!important"};
-  text-align-last: ${(props) => props.right && "right!important"};
-  white-space: ${({ wrap }) => wrap || "nowrap"};
+  text-align: ${({ align = 'center' }) => `${align}!important`};
+  text-align-last: ${({ align = 'center', right = false }) =>
+    right ? 'right!important' : `${align}!important`};
+    white-space: ${({ wrap = 'nowrap' }) => `${wrap}`};
 `;
 
 const Container = styled(Flex)`
   flex-direction: column;
   margin: 5px 0!important;
   width: 100% !important;
-  max-height: ${({ tableHeight }) => tableHeight || ""} !important;
+  max-height: ${({ tableHeight = 'none' }) => `${tableHeight}!important`};
   overflow-y: ${({ tableHeight }) => tableHeight && "auto"} !important;
   overflow-x: ${({ tableHeight }) => tableHeight && "auto"} !important;
 `;
@@ -28,11 +29,10 @@ const HeaderContainer = styled(Flex)`
 
 const PaginationContainer = styled(Flex)`
   align-self: center;
-  max-height: ${({ height }) => height || ""} !important;
+  max-height: ${({ height = 'none' }) => `${height}!important`};
   flex-direction: row;
   justify-content: ${({ center }) => center ? "center" : "flex-end"};
   column-gap: 10px;
-  justify-content: center;
 `;
 
 const PaginationSegment = styled(SSegment)`
@@ -54,20 +54,20 @@ const Segment = styled(SSegment)`
 `;
 
 const HeaderSegment = styled(SSegment)`
-  flex: ${({ flex }) => flex || ""} !important;
-  padding: 10px!important;
-  margin-bottom: 8px!important;
-  margin-top: 0!important;
+  flex: ${({ flex = 'none' }) => `${flex}!important`};
+  padding: 10px !important;
+  margin-bottom: 8px !important;
+  margin-top: 0 !important;
 `;
 
 const Table = styled(STable)`
-  max-height: ${({ tableHeight }) => tableHeight || ""} !important;
+  max-height: ${({ tableHeight = "none" }) => `${tableHeight}!important`};
   overflow-y: auto!important;
   overflow-x: hidden!important;
 `;
 
 const Button = styled(SButton)`
-  margin: 0 !important;
+  margin: ${({ marginLeft = "0" }) => `0 0 0 ${marginLeft}!important`};
   visibility: ${({ hidden }) => hidden && "hidden"} !important;
   height: 35px!important;
 `;
@@ -82,7 +82,7 @@ const TableFooter = styled(STable.Footer)`
 
 const HeaderCell = styled(STable.HeaderCell)`
   background-color: #EEEEEE!important;
-  text-align: ${({ textAlign }) => textAlign || 'center'} !important;
+  text-align: ${({ textAlign = "center" }) => `${textAlign}!important`};
 `;
 
 const ActionsContainer = styled.td`
