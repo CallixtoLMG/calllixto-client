@@ -2,7 +2,6 @@ import { LIST_BANNED_PRODUCTS_QUERY_KEY, editBanProducts, useListBanProducts } f
 import { Button, FieldsContainer, Form, FormField, Input, Label, Modal, RuledLabel } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
-import { REGEX } from "@/constants";
 import { handleEnterKeyPress } from '@/utils';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
@@ -40,25 +39,34 @@ const BanProduct = ({ open, setOpen }) => {
   };
 
   const handleAddProduct = (value) => {
-    if (REGEX.MAX26_DIGIT_CODE.test(value)) {
-      if (!watchProducts.includes(value)) {
-        const updatedProducts = [...watchProducts, value];
-        setValue("products", updatedProducts, { shouldDirty: true });
-        setErrorFlag(false);
+    const newCodes = value.split(',').map(code => code.trim().toUpperCase());
+
+    let validProducts = [];
+    let errorMessage = "";
+
+    newCodes.forEach(code => {
+      if (!watchProducts.includes(code) && !validProducts.includes(code)) {
+        validProducts.push(code);
       } else {
-        setErrorFlag(true);
-        setErrorFlagMsg("El producto ingresado ya se encuentra en la lista!");
+        errorMessage = `El producto ${code} ya se encuentra en la lista!`;
       }
+    });
+
+    if (validProducts.length > 0) {
+      const updatedProducts = [...watchProducts, ...validProducts];
+      setValue("products", updatedProducts, { shouldDirty: true });
+      setErrorFlag(false);
     } else {
       setErrorFlag(true);
-      setErrorFlagMsg("El código debe tener entre 5 y 30 carácteres alfanumericos en mayúscula!")
+      setErrorFlagMsg(errorMessage);
     }
   };
 
   const handleAdd = (e) => {
-    handleAddProduct(e.target.value.toUpperCase());
+    handleAddProduct(e.target.value);
+    e.target.value = '';
   };
-  
+
   const onKeyPress = (e) => handleEnterKeyPress(e, handleAdd);
 
   const { mutate, isPending } = useMutation({
@@ -69,7 +77,7 @@ const BanProduct = ({ open, setOpen }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_BANNED_PRODUCTS_QUERY_KEY] });
-        toast.success('Lista negra actualizada!');
+        toast.success('Lista de productos bloquedos actualizada!');
         handleModalClose();
       } else {
         toast.error(response.message);
