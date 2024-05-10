@@ -9,7 +9,7 @@ import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
-const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
+const CustomTable = ({ onBanRestoreFilters, pag, isRefetching, isLoading, onFilter, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
 
@@ -33,7 +33,8 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
   const handleRestore = useCallback(() => {
     resetFilters();
     reset(defaultValues);
-  }, [resetFilters, reset, defaultValues]);
+    onBanRestoreFilters();
+  }, [resetFilters, reset, defaultValues, onBanRestoreFilters]);
 
   const handleFilter = (e) => {
     handleSubmit(onFilter)();
@@ -93,15 +94,15 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
               </Flex>
             </Form>
           </HeaderSegment>
-        {pag &&
-          <HeaderSegment flex="25%">
-            <PaginationContainer >
-              <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>
-              <PaginationSegment >{Number(currentPage) + 1}</PaginationSegment>
-              <Button onClick={goToNextPage} disabled={!canGoNext}>Siguiente</Button>
-            </PaginationContainer>
-          </HeaderSegment>}
-      </HeaderContainer>
+          {pag &&
+            <HeaderSegment flex="25%">
+              <PaginationContainer >
+                <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>
+                <PaginationSegment >{Number(currentPage) + 1}</PaginationSegment>
+                <Button onClick={goToNextPage} disabled={!canGoNext}>Siguiente</Button>
+              </PaginationContainer>
+            </HeaderSegment>}
+        </HeaderContainer>
       )}
       <Container tableHeight={tableHeight}>
         <Table celled compact striped>

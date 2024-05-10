@@ -17,11 +17,13 @@ const BanProduct = ({ open, setOpen }) => {
   const watchProducts = watch('products');
   const [errorFlag, setErrorFlag] = useState(false);
   const [errorFlagMsg, setErrorFlagMsg] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const queryClient = useQueryClient();
 
   const deleteProduct = useCallback((element) => {
     const newProducts = watchProducts.filter(product => product !== element.code);
     setValue("products", newProducts, { shouldDirty: true });
+    setFilteredProducts(newProducts);
   }, [watchProducts, setValue]);
 
   const actions = [
@@ -55,6 +57,7 @@ const BanProduct = ({ open, setOpen }) => {
     if (validProducts.length > 0) {
       const updatedProducts = [...watchProducts, ...validProducts];
       setValue("products", updatedProducts, { shouldDirty: true });
+      setFilteredProducts(updatedProducts);
       setErrorFlag(false);
     } else {
       setErrorFlag(true);
@@ -87,9 +90,31 @@ const BanProduct = ({ open, setOpen }) => {
 
   useEffect(() => {
     if (!isLoading) {
-      setValue("products", blacklist)
+      setValue("products", blacklist);
+      setFilteredProducts(blacklist);
     }
   }, [blacklist, isLoading, setValue]);
+
+  const onFilter = useCallback((filterValues) => {
+    const normalizedFilterValues = Object.fromEntries(
+      Object.entries(filterValues).map(([key, value]) => [key, value.toLowerCase()])
+    );
+
+    const filtered = watchProducts.filter(product => {
+      for (const [key, value] of Object.entries(normalizedFilterValues)) {
+        if (value && !product.toLowerCase().includes(value)) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    setFilteredProducts(filtered);
+  }, [watchProducts]);
+
+  const handleBanRestoreFilters = () => {
+    setFilteredProducts(watchProducts);
+  };
 
   return (
     <Transition animation="fade" duration={500} visible={open}>
@@ -119,9 +144,11 @@ const BanProduct = ({ open, setOpen }) => {
                   tableHeight="40vh"
                   mainKey="code"
                   headers={BAN_PRODUCTS_COLUMNS}
-                  elements={watchProducts?.map(p => ({ code: p }))}
+                  elements={filteredProducts?.map(p => ({ code: p }))}
                   actions={actions}
                   filters={BAN_FILTERS}
+                  onFilter={onFilter}
+                  onBanRestoreFilters={handleBanRestoreFilters}
                 ></Table>
               </Loader >
             </FieldsContainer>
