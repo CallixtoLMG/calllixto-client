@@ -40,37 +40,33 @@ const BanProduct = ({ open, setOpen }) => {
     setOpen(false);
   };
 
-  const handleAddProduct = (value) => {
-    const newCodes = value.split(',').map(code => code.trim().toUpperCase());
+  const handleAddProduct = (event) => {
+    const value = event.target.value;
+    const newCodes = value.split(',').map(code => code.trim().toUpperCase()).filter(code => !!code);
 
-    let validProducts = [];
-    let errorMessage = "";
-
-    newCodes.forEach(code => {
-      if (!watchProducts.includes(code) && !validProducts.includes(code)) {
-        validProducts.push(code);
-      } else {
-        errorMessage = `El producto ${code} ya se encuentra en la lista!`;
+    const error = newCodes.some(code => {
+      if (code.includes(' ')) {
+        toast.error(`El código [${code}] contiene espacios no permitidos`);
+        return true;
       }
     });
 
+    if (error) {
+      return;
+    }
+
+    const validProducts = newCodes.filter(code => !watchProducts.includes(code) && !blacklist.includes(code));
     if (validProducts.length > 0) {
       const updatedProducts = [...watchProducts, ...validProducts];
       setValue("products", updatedProducts, { shouldDirty: true });
       setFilteredProducts(updatedProducts);
       setErrorFlag(false);
-    } else {
-      setErrorFlag(true);
-      setErrorFlagMsg(errorMessage);
     }
+
+    event.target.value = '';
   };
 
-  const handleAdd = (e) => {
-    handleAddProduct(e.target.value);
-    e.target.value = '';
-  };
-
-  const onKeyPress = (e) => handleEnterKeyPress(e, handleAdd);
+  const onKeyPress = (e) => handleEnterKeyPress(e, handleAddProduct);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (products) => {
@@ -95,26 +91,10 @@ const BanProduct = ({ open, setOpen }) => {
     }
   }, [blacklist, isLoading, setValue]);
 
-  const onFilter = useCallback((filterValues) => {
-    const normalizedFilterValues = Object.fromEntries(
-      Object.entries(filterValues).map(([key, value]) => [key, value.toLowerCase()])
-    );
-
-    const filtered = watchProducts.filter(product => {
-      for (const [key, value] of Object.entries(normalizedFilterValues)) {
-        if (value && !product.toLowerCase().includes(value)) {
-          return false;
-        }
-      }
-      return true;
-    });
-
+  const onFilter = useCallback((filter) => {
+    const filtered = watchProducts.filter(product => product.toLowerCase().includes(filter.code.toLowerCase()));
     setFilteredProducts(filtered);
   }, [watchProducts]);
-
-  const handleBanRestoreFilters = () => {
-    setFilteredProducts(watchProducts);
-  };
 
   return (
     <Transition animation="fade" duration={500} visible={open}>
@@ -148,7 +128,7 @@ const BanProduct = ({ open, setOpen }) => {
                   actions={actions}
                   filters={BAN_FILTERS}
                   onFilter={onFilter}
-                  onBanRestoreFilters={handleBanRestoreFilters}
+                  onManuallyRestore={() => setFilteredProducts(watchProducts)}
                 ></Table>
               </Loader >
             </FieldsContainer>

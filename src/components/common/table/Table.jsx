@@ -9,7 +9,7 @@ import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
-const CustomTable = ({ onBanRestoreFilters, pag, isRefetching, isLoading, onFilter, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
+const CustomTable = ({ pag, isRefetching, isLoading, onFilter, onManuallyRestore, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
 
@@ -33,8 +33,8 @@ const CustomTable = ({ onBanRestoreFilters, pag, isRefetching, isLoading, onFilt
   const handleRestore = useCallback(() => {
     resetFilters();
     reset(defaultValues);
-    onBanRestoreFilters();
-  }, [resetFilters, reset, defaultValues, onBanRestoreFilters]);
+    onManuallyRestore && onManuallyRestore();
+  }, [resetFilters, reset, defaultValues, onManuallyRestore]);
 
   const handleFilter = (e) => {
     handleSubmit(onFilter)();
