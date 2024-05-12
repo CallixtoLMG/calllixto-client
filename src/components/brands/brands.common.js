@@ -1,7 +1,7 @@
 import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 
-const ATTRIBUTES = { ID: "id", NAME: "name" };
+const ATTRIBUTES = { ID: "id", NAME: "name", COMMENT: "comments" };
 
 const BRAND_COLUMNS = [
   {

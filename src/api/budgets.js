@@ -20,11 +20,12 @@ export function edit(budget, id) {
   return axios.post(`${BUDGETS_URL}/${id}`, budget);
 };
 
-export function useListBudgets({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE }) {
+export function useListBudgets({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
   const { addKey, currentPage, keys, filters, } = usePaginationContext();
 
 
   const params = {
+    attributes: encodeUri(attributes),
     pageSize,
     ...(keys["budgets"][currentPage] && { LastEvaluatedKey: encodeUri(keys["budgets"][currentPage]) }),
     ...(sort && { sort }),
@@ -45,7 +46,7 @@ export function useListBudgets({ sort, order = true, pageSize = DEFAULT_PAGE_SIZ
   };
 
   const query = useQuery({
-    queryKey: [LIST_BUDGETS_QUERY_KEY, params],
+    queryKey: [LIST_BUDGETS_QUERY_KEY, params, attributes],
     queryFn: () => listBudgets(params),
   });
 

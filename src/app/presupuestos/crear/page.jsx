@@ -4,14 +4,16 @@ import { LIST_BUDGETS_QUERY_KEY, create, useGetBudget } from "@/api/budgets";
 import { edit, useListCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
+import { ATTRIBUTES as CUSTOMERATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ATTRIBUTES } from "@/components/products/products.common";
+import { ATTRIBUTES as PRODUCTSATTRIBUTES } from "@/components/products/products.common";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
+
 const CreateBudget = () => {
   useValidateToken();
   const { userData } = useUserContext();
@@ -19,8 +21,8 @@ const CreateBudget = () => {
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
 
-  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({ attributes: [ATTRIBUTES.CODE, ATTRIBUTES.PRICE, ATTRIBUTES.NAME, ATTRIBUTES.COMMENTS], enabled: true });
-  const { data: customersData, isLoading: loadingCustomers } = useListCustomers({});
+  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({ attributes: [PRODUCTSATTRIBUTES.CODE, PRODUCTSATTRIBUTES.PRICE, PRODUCTSATTRIBUTES.NAME, PRODUCTSATTRIBUTES.COMMENTS], enabled: true });
+  const { data: customersData, isLoading: loadingCustomers } = useListCustomers({ attributes: [CUSTOMERATTRIBUTES.ADDRESS, CUSTOMERATTRIBUTES.PHONE, CUSTOMERATTRIBUTES.ID, CUSTOMERATTRIBUTES.NAME] });
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
 
   const { products } = useMemo(() => {
