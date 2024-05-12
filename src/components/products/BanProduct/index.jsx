@@ -2,7 +2,6 @@ import { LIST_BANNED_PRODUCTS_QUERY_KEY, editBanProducts, useListBanProducts } f
 import { Button, FieldsContainer, Form, FormField, Input, Label, Modal, RuledLabel } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
-import { REGEX } from "@/constants";
 import { handleEnterKeyPress } from '@/utils';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
@@ -18,11 +17,13 @@ const BanProduct = ({ open, setOpen }) => {
   const watchProducts = watch('products');
   const [errorFlag, setErrorFlag] = useState(false);
   const [errorFlagMsg, setErrorFlagMsg] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const queryClient = useQueryClient();
 
   const deleteProduct = useCallback((element) => {
     const newProducts = watchProducts.filter(product => product !== element.code);
     setValue("products", newProducts, { shouldDirty: true });
+    setFilteredProducts(newProducts);
   }, [watchProducts, setValue]);
 
   const actions = [
@@ -39,27 +40,33 @@ const BanProduct = ({ open, setOpen }) => {
     setOpen(false);
   };
 
-  const handleAddProduct = (value) => {
-    if (REGEX.MAX26_DIGIT_CODE.test(value)) {
-      if (!watchProducts.includes(value)) {
-        const updatedProducts = [...watchProducts, value];
-        setValue("products", updatedProducts, { shouldDirty: true });
-        setErrorFlag(false);
-      } else {
-        setErrorFlag(true);
-        setErrorFlagMsg("El producto ingresado ya se encuentra en la lista!");
+  const handleAddProduct = (event) => {
+    const value = event.target.value;
+    const newCodes = value.split(',').map(code => code.trim().toUpperCase()).filter(code => !!code);
+
+    const error = newCodes.some(code => {
+      if (code.includes(' ')) {
+        toast.error(`El código [${code}] contiene espacios en blanco, no permitidos!`);
+        return true;
       }
-    } else {
-      setErrorFlag(true);
-      setErrorFlagMsg("El código debe tener entre 5 y 30 carácteres alfanumericos en mayúscula!")
+    });
+
+    if (error) {
+      return;
     }
+
+    const validProducts = newCodes.filter(code => !watchProducts.includes(code) && !blacklist.includes(code));
+    if (validProducts.length > 0) {
+      const updatedProducts = [...watchProducts, ...validProducts];
+      setValue("products", updatedProducts, { shouldDirty: true });
+      setFilteredProducts(updatedProducts);
+      setErrorFlag(false);
+    }
+
+    event.target.value = '';
   };
 
-  const handleAdd = (e) => {
-    handleAddProduct(e.target.value.toUpperCase());
-  };
-  
-  const onKeyPress = (e) => handleEnterKeyPress(e, handleAdd);
+  const onKeyPress = (e) => handleEnterKeyPress(e, handleAddProduct);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (products) => {
@@ -69,7 +76,7 @@ const BanProduct = ({ open, setOpen }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_BANNED_PRODUCTS_QUERY_KEY] });
-        toast.success('Lista negra actualizada!');
+        toast.success('Lista de productos bloquedos actualizada!');
         handleModalClose();
       } else {
         toast.error(response.message);
@@ -79,9 +86,15 @@ const BanProduct = ({ open, setOpen }) => {
 
   useEffect(() => {
     if (!isLoading) {
-      setValue("products", blacklist)
+      setValue("products", blacklist);
+      setFilteredProducts(blacklist);
     }
   }, [blacklist, isLoading, setValue]);
+
+  const onFilter = useCallback((filter) => {
+    const filtered = watchProducts.filter(product => product.toLowerCase().includes(filter.code.toLowerCase()));
+    setFilteredProducts(filtered);
+  }, [watchProducts]);
 
   return (
     <Transition animation="fade" duration={500} visible={open}>
@@ -111,9 +124,11 @@ const BanProduct = ({ open, setOpen }) => {
                   tableHeight="40vh"
                   mainKey="code"
                   headers={BAN_PRODUCTS_COLUMNS}
-                  elements={watchProducts?.map(p => ({ code: p }))}
+                  elements={filteredProducts?.map(p => ({ code: p }))}
                   actions={actions}
                   filters={BAN_FILTERS}
+                  onFilter={onFilter}
+                  onManuallyRestore={() => setFilteredProducts(watchProducts)}
                 ></Table>
               </Loader >
             </FieldsContainer>
