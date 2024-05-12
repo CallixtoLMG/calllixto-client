@@ -1,8 +1,8 @@
-import { formatedPhone } from "@/utils";
+import { formatAddressForDisplay, formatPhoneForDisplay } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 
-const ATTRIBUTES = { ID: "id", NAME: "name", };
+const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESS: "addresses", PHONE: "phoneNumbers", COMMENT: "comments" };
 
 const SUPPLIERS_COLUMNS = [
   {
@@ -35,13 +35,27 @@ const SUPPLIERS_COLUMNS = [
   {
     id: 3,
     title: "Dirección",
-    value: (supplier) => supplier.address
+    value: (supplier) => {
+      const { primaryAddress } = formatAddressForDisplay(supplier.addresses || []);
+      return (
+        <Flex justifyContent="space-between">
+          {primaryAddress}
+        </Flex>
+      );
+    }
   },
   {
     id: 4,
     title: "Teléfono",
     width: 3,
-    value: (supplier) => formatedPhone(supplier.phone?.areaCode, supplier.phone?.number)
+    value: (customer) => {
+      const { primaryPhone } = formatPhoneForDisplay(customer.phoneNumbers);
+      return (
+        <Flex justifyContent="space-between">
+          {primaryPhone}
+        </Flex>
+      );
+    }
   },
 ];
 

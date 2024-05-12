@@ -2,6 +2,7 @@
 import { useListCustomers } from "@/api/customers";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import CustomersPage from "@/components/customers/CustomersPage";
+import { ATTRIBUTES } from "@/components/customers/customers.common";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
@@ -10,7 +11,7 @@ import { useEffect, useMemo } from "react";
 
 const Customers = () => {
   useValidateToken();
-  const { data, isLoading } = useListCustomers({});
+  const { data, isLoading } = useListCustomers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESS, ATTRIBUTES.PHONE, ATTRIBUTES.COMMENT] });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { handleEntityChange } = usePaginationContext();

@@ -93,7 +93,6 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, headers = [], ele
               </Flex>
             </Form>
           </HeaderSegment>
-
           {pag &&
             <HeaderSegment flex="25%">
               <PaginationContainer >

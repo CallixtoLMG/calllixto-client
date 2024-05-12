@@ -1,7 +1,7 @@
 "use client";
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Cell, HeaderCell } from '@/components/common/table';
-import { formatedPhone, formatedPricePdf } from "@/utils";
+import { formatedPricePdf, formatedSimplePhone } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { Flex } from "rebass";
@@ -39,7 +39,7 @@ const PDFfile = ({ budget, total }) => {
               <ClientDataContainer>
                 <DataContainer flex="2">
                   <Label>Vendedor/a</Label>
-                  <Segment>VENDEDOR</Segment>
+                  <Segment>{budget?.seller}</Segment>
                 </DataContainer>
                 <DataContainer flex="1">
                   <Label>Fecha</Label>
@@ -81,11 +81,11 @@ const PDFfile = ({ budget, total }) => {
                 </DataContainer>
                 <DataContainer flex="3">
                   <Label>Dirección</Label>
-                  <Segment>{(get(budget, "customer.address", ""))}</Segment>
+                  <Segment>{(get(budget, "customer.addresses[0].address", ""))}</Segment>
                 </DataContainer>
                 <DataContainer flex="2">
                   <Label>Teléfono</Label>
-                  <Segment>{formatedPhone(get(budget, "customer.phone.areaCode", ""), get(budget, "customer.phone.number", ""))}</Segment>
+                  <Segment>{formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))}</Segment>
                 </DataContainer>
               </ClientDataContainer>
               <Flex margin="20px 0">

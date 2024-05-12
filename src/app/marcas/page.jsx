@@ -2,6 +2,7 @@
 import { useUserContext } from "@/User";
 import { useListBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
+import { ATTRIBUTES } from "@/components/brands/brands.common";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ENTITIES, PAGES } from "@/constants";
@@ -12,7 +13,7 @@ import { useEffect, useMemo } from "react";
 
 const Brands = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListBrands({});
+  const { data, isLoading, isRefetching } = useListBrands({ attributes: [ATTRIBUTES.NAME, ATTRIBUTES.ID, ATTRIBUTES.COMMENT] });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
