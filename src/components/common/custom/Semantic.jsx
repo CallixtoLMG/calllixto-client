@@ -13,26 +13,27 @@ import {
 import styled from "styled-components";
 
 export const Segment = styled(SSegment)`
-  height: ${({ height }) => height && height} !important;
+  height: ${({ height = 'auto' }) => height} !important;
   padding:${({ height }) => height && "10px"} !important;
   margin: 5px 0!important;
-  width: ${({ width }) => width ? width : "100%"} !important;
+  width: ${({ width = '100%' }) => width} !important;
   min-height: 50px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
   overflow: auto;
+  align-content: center;
 `;
 
 export const Input = styled(SInput)`
-  margin: ${({ margin }) => margin || "5px 0"} !important;
+  margin: ${({ margin = "5px 0" }) => margin} !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
-  height: ${({ height }) => height || '50px'} !important;
-  width: ${({ width }) => width ? width : ''} !important;
+  height: ${({ height = '50px' }) => height} !important;
+  width: ${({ width = '100%' }) => `${width}!important`};
   display: flex!important;
   input{
     height: ${({ height }) => height || '50px'} !important;
     padding: 0 14px!important;
-    text-align: ${({ center }) => center && 'center'} !important;
+    text-align: ${({ center }) => (center ? 'center' : 'left')} !important;
   };
   div{
     line-height: 190%!important;
@@ -46,9 +47,9 @@ export const Checkbox = styled(SCheckbox)`
 `;
 
 export const FormField = styled(Form.Field)`
-  width: ${({ width }) => width || '200px'} !important;
-  min-width: ${({ minWidth }) => minWidth || "200px"} !important;
-  flex: ${({ flex }) => flex || 'none'} !important;
+  width: ${({ width = '200px' }) => `${width}!important`};
+  min-width: ${({ minWidth = '200px' }) => `${minWidth}!important`};
+  flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: 0 !important;
   flex-direction: column;
 `;
@@ -70,17 +71,17 @@ export const Dropdown = styled(SDropdown)`
   margin: 5px 0 !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
-  height: ${({ height }) => height || '50px'} !important;
-  min-height: ${({ minHeight }) => minHeight || 'none'} !important;
+  height: ${({ height = "50px" }) => `${height}!important`} ;
+  min-height: ${({ minHeight = "none" }) => `${minHeight}!important`} ;
   display: flex!important;
   flex-wrap: wrap;
   align-content: center;
   input {
-    height: ${({ height }) => height || '50px'} !important;
+    height: ${({ height = "50px" }) => `${height}!important`} ;
   };
   i.dropdown.icon {
     height: 50px!important;
-    top: ${({ top }) => top || "15px"} !important;
+    top: ${({ top = "15px" }) => `${top}!important`} ;
   };
 `;
 
@@ -94,8 +95,8 @@ export const Icon = styled(SIcon)`
 `;
 
 export const Modal = styled(SModal)`
-  width: ${({ width }) => width || '100%'} !important;
+  width: ${({ width = '100%' }) => `${width}!important`} ;
   max-width: 90%!important;
   max-height: 90vh!important;
-  min-height: ${({ minHeight }) => minHeight || '100px'} !important;
+  min-height: ${({ minHeight = '100px' }) => `${minHeight}!important`} ;
 `;

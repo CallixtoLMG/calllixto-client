@@ -9,7 +9,7 @@ import { useCallback, useState } from "react";
 import { toast } from 'react-hot-toast';
 import { FILTERS, HEADERS } from "../customers.common";
 
-const CustomersPage = ({ customers = [] }) => {
+const CustomersPage = ({ customers = [], isLoading }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
@@ -57,6 +57,7 @@ const CustomersPage = ({ customers = [] }) => {
   return (
     <>
       <Table
+        isLoading={isLoading}
         headers={HEADERS}
         elements={customers.map((customer, index) => ({ ...customer, key: index + 1 }))}
         page={PAGES.CUSTOMERS}
