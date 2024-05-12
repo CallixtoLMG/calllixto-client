@@ -12,7 +12,7 @@ export const FieldsContainer = styled(Flex)`
   justify-content: ${({ justifyContent }) => justifyContent};
   flex-wrap: wrap;
   column-gap: 20px;
-  row-gap: 20px;
+  row-gap: ${({ rowGap = 'auto' }) => rowGap} !important;
   width: ${({ width = 'auto' }) => width} !important;
   min-height: ${({ minHeight = 'auto' }) => minHeight} !important;
   height: ${({ height = 'auto' }) => height} !important;
