@@ -500,8 +500,8 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             <Button onClick={() => window.print()} color="blue">
               <Icon name="download" />Descargar PDF
             </Button>
-            {(budget?.customer?.phone || budget?.customer?.email) && (
-              <SendButton customerData={budget?.customer} />
+            {(budget?.customer?.phoneNumbers || budget?.customer?.email) && (
+              <SendButton customerData={customerData} />
             )}
           </ButtonsContainer>
         )
