@@ -46,7 +46,7 @@ const BanProduct = ({ open, setOpen }) => {
 
     const error = newCodes.some(code => {
       if (code.includes(' ')) {
-        toast.error(`El código [${code}] contiene espacios no permitidos`);
+        toast.error(`El código [${code}] contiene espacios en blanco, no permitidos!`);
         return true;
       }
     });
