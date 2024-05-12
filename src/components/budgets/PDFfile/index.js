@@ -39,7 +39,7 @@ const PDFfile = ({ budget, total }) => {
               <ClientDataContainer>
                 <DataContainer flex="2">
                   <Label>Vendedor/a</Label>
-                  <Segment>{budget.seller}</Segment>
+                  <Segment>{budget?.seller}</Segment>
                 </DataContainer>
                 <DataContainer flex="1">
                   <Label>Fecha</Label>
