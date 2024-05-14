@@ -102,7 +102,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
           )}
         </FormField>
       </FieldsContainer>
-      <FieldsContainer>
+      <FieldsContainer rowGap ="20px">
         {phoneFields.map((item, index) => (
           <FormField flex="none" width="200px" key={item.id}>
             <RuledLabel
@@ -195,7 +195,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
           />
         )}
       </FieldsContainer>
-      <FieldsContainer>
+      <FieldsContainer rowGap ="20px">
         {addressFields.map((item, index) => (
           <FormField width="30%" key={item.id}>
             <RuledLabel
