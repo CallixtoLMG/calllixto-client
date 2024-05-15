@@ -1,13 +1,13 @@
 "use client";
-import { edit, useGetBrand, LIST_BRANDS_QUERY_KEY, GET_BRAND_QUERY_KEY } from "@/api/brands";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { PAGES, TIME_IN_MS } from "@/constants";
-import { useRouter } from "next/navigation";
-import { useValidateToken } from "@/hooks/userData";
+import { GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY, edit, useGetBrand } from "@/api/brands";
 import BrandForm from "@/components/brands/BrandForm";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useEffect, useState } from "react";
+import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 
 const Brand = ({ params }) => {
@@ -38,6 +38,7 @@ const Brand = ({ params }) => {
         queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_BRAND_QUERY_KEY, params.id] });
         toast.success('Marca actualizada!');
+        push(PAGES.BRANDS.BASE);
       } else {
         toast.error(response.message);
       }

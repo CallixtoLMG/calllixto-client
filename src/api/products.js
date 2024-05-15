@@ -4,7 +4,6 @@ import {
   BATCH,
   BLACK_LIST,
   CLIENT,
-  CLIENT_ID,
   EDIT_BATCH,
   PATHS,
   SUPPLIER,
@@ -14,8 +13,8 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "./axios";
 const { omit, chunk } = require("lodash");
 
-const PRODUCTS_URL = `${CLIENT_ID}${PATHS.PRODUCTS}`;
-const BAN_PRODUCTS_URL = `${CLIENT_ID}${CLIENT}`;
+const PRODUCTS_URL = `${PATHS.PRODUCTS}`;
+const BAN_PRODUCTS_URL = `${CLIENT}`;
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_ALL_PRODUCTS_QUERY_KEY = "listAllProducts";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
@@ -207,7 +206,9 @@ export async function editBatch(products) {
 export function useListBanProducts() {
   const listBannedProducts = async () => {
     try {
+      console.log("hola")
       const { data } = await axios.get(BAN_PRODUCTS_URL);
+      console.log("data", axios.get())
       return data?.client?.blacklist || [];
     } catch (error) {
       throw error;
@@ -225,7 +226,7 @@ export function useListBanProducts() {
 }
 
 export function editBanProducts(products) {
-  return axios.put(`${CLIENT_ID}${BLACK_LIST}`, products);
+  return axios.put(`${BLACK_LIST}`, products);
 }
 
 export function deleteBatchProducts(id) {

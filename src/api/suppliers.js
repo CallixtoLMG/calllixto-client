@@ -1,11 +1,11 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
-import { CLIENT_ID, PATHS } from "@/fetchUrls";
+import { PATHS } from "@/fetchUrls";
 import { encodeUri, now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
 
-const SUPPLIER_URL = `${CLIENT_ID}${PATHS.SUPPLIERS}`;
+const SUPPLIER_URL = `${PATHS.SUPPLIERS}`;
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_ALL_SUPPLIER_QUERY_KEY = 'listAllSuppliers';
@@ -64,7 +64,7 @@ export function useListSuppliers({ sort, order = true, pageSize = DEFAULT_PAGE_S
   return query;
 };
 
-export function useListAllSuppliers({attributes = []}) {
+export function useListAllSuppliers({ attributes = [] }) {
   const listSuppliers = async () => {
     try {
       let suppliers = [];
@@ -93,7 +93,7 @@ export function useListAllSuppliers({attributes = []}) {
   };
 
   const query = useQuery({
-    queryKey: [LIST_ALL_SUPPLIER_QUERY_KEY, attributes], 
+    queryKey: [LIST_ALL_SUPPLIER_QUERY_KEY, attributes],
     queryFn: () => listSuppliers(),
     staleTime: TIME_IN_MS.FOUR_HOURS,
   });

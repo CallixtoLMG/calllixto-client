@@ -1,11 +1,12 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
-import { CLIENT_ID, PATHS } from "@/fetchUrls";
+import { PATHS } from "@/fetchUrls";
 import { encodeUri, now } from "@/utils";
 import { useQuery } from '@tanstack/react-query';
 import axios from './axios';
 
-const BRANDS_URL = `${CLIENT_ID}${PATHS.BRANDS}`;
+const BRANDS_URL = `${PATHS.BRANDS}`;
+
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 export const GET_BRAND_QUERY_KEY = 'getBrand';
 export const LIST_ALL_BRANDS_QUERY_KEY = 'listAllBrands';
@@ -95,7 +96,7 @@ export function useListAllBrands({ attributes = [] }) {
   const query = useQuery({
     queryKey: [LIST_ALL_BRANDS_QUERY_KEY, attributes],
     queryFn: () => listBrands(),
-    staleTime: TIME_IN_MS.FOUR_HOURS,
+    // staleTime: TIME_IN_MS.FOUR_HOURS,
   });
 
   return query;
