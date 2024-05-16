@@ -206,9 +206,7 @@ export async function editBatch(products) {
 export function useListBanProducts() {
   const listBannedProducts = async () => {
     try {
-      console.log("hola")
       const { data } = await axios.get(BAN_PRODUCTS_URL);
-      console.log("data", axios.get())
       return data?.client?.blacklist || [];
     } catch (error) {
       throw error;
