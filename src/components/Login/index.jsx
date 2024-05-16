@@ -5,11 +5,11 @@ import { PAGES, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, Text } from "./styled";
-import { useState } from "react";
 
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
@@ -24,8 +24,10 @@ const LoginForm = ({ onSubmit }) => {
       return data;
     },
     onSuccess: (userData) => {
-      if (userData) {
+      if (userData.clientId === "callixto") {
         setUserData(userData);
+        push(PAGES.BASE);
+      } else if (userData) {
         push(PAGES.PRODUCTS.BASE);
         toast.success("Ingreso exitoso!");
       } else {
