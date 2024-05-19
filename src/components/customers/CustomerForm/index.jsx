@@ -1,7 +1,8 @@
-"use client"
+"use client";
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { RULES } from "@/constants";
+import _ from 'lodash';
 import { useParams } from "next/navigation";
 import { useCallback, useMemo } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -10,15 +11,17 @@ import { Icon } from "./styles";
 
 const EMPTY_CUSTOMER = { name: '', email: '', phoneNumbers: [], addresses: [], comments: '' };
 
-const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
+const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly }) => {
   const params = useParams();
   const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({
     defaultValues: {
+      ...EMPTY_CUSTOMER,
       ...customer,
-      phoneNumbers: customer?.phoneNumbers.length ? customer.phoneNumbers : [{ areaCode: '', number: '', ref: "" }],
+      phoneNumbers: customer?.phoneNumbers?.length ? customer.phoneNumbers : [{ areaCode: '', number: '', ref: "" }],
       addresses: customer?.addresses?.length ? customer.addresses : [{ address: '', ref: '' }],
     }
   });
+
   const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
     control,
     name: "phoneNumbers"
@@ -35,35 +38,62 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
     reset(customer || EMPTY_CUSTOMER);
   }, [reset]);
 
+  const trimStringFields = obj => {
+    return _.mapValues(obj, value => {
+      if (typeof value === 'string') {
+        return value.trim();
+      }
+      if (Array.isArray(value)) {
+        return value.map(trimStringFields);
+      }
+      if (_.isObject(value) && !_.isEmpty(value)) {
+        return trimStringFields(value);
+      }
+      return value;
+    });
+  };
+  
   const filterEmptyFields = data => {
-    const filteredData = { ...data };
-
-    if (filteredData.phoneNumbers) {
+    const cleanedData = trimStringFields(data);
+  
+    const removeEmpty = obj => {
+      return _.omitBy(obj, value =>
+        _.isUndefined(value) || (_.isString(value) && value === '') ||
+        (_.isArray(value) && value.length === 0) ||
+        (_.isObject(value) && _.isEmpty(value))
+      );
+    };
+  
+    let filteredData = removeEmpty(cleanedData);
+  
+    // Ensure phoneNumbers and addresses are always arrays
+    if (!filteredData.phoneNumbers) {
+      filteredData.phoneNumbers = [];
+    }
+  
+    if (!filteredData.addresses) {
+      filteredData.addresses = [];
+    }
+  
+    if (filteredData.phoneNumbers.length > 0) {
       filteredData.phoneNumbers = filteredData.phoneNumbers
-        .map(phone => ({
-          areaCode: phone.areaCode.trim(),
-          number: phone.number.trim(),
-          ref: phone.ref ? phone.ref.trim() : undefined
-        }))
         .filter(phone => phone.areaCode && phone.number);
     }
-
-    if (filteredData.addresses) {
+  
+    if (filteredData.addresses.length > 0) {
       filteredData.addresses = filteredData.addresses
-        .map(address => {
-          const cleanedAddress = {
-            ...address,
-            address: address.address.trim(),
-            ref: address.ref?.trim() || undefined
-          };
-          if (!cleanedAddress.ref) {
-            delete cleanedAddress.ref;
-          }
-          return cleanedAddress;
-        })
+        .map(address => removeEmpty(address))
         .filter(address => address.address);
     }
-
+  
+    if (!filteredData.phoneNumbers) {
+      filteredData.phoneNumbers = [];
+    }
+  
+    if (!filteredData.addresses) {
+      filteredData.addresses = [];
+    }
+  
     return filteredData;
   };
 
@@ -102,7 +132,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
           )}
         </FormField>
       </FieldsContainer>
-      <FieldsContainer rowGap ="20px">
+      <FieldsContainer rowGap="20px">
         {phoneFields.map((item, index) => (
           <FormField flex="none" width="200px" key={item.id}>
             <RuledLabel
@@ -135,7 +165,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                       <Input
                         width="100%"
                         placeholder="Referencia"
-                        value={value.ref}
+                        value={value.ref || ''}
                         onChange={(e) => {
                           onChange({
                             ...value,
@@ -149,7 +179,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                         format="####"
                         width="35%"
                         placeholder="Área"
-                        value={value.areaCode}
+                        value={value.areaCode || ''}
                         onChange={(e) => {
                           const formattedValue = e.target.value.replace(/[^0-9]/g, '');
                           onChange({
@@ -164,7 +194,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                         format="#######"
                         width="60%"
                         placeholder="Número"
-                        value={value.number}
+                        value={value.number || ''}
                         onChange={(e) => {
                           const formattedValue = e.target.value.replace(/[^0-9]/g, '');
                           onChange({
@@ -191,11 +221,11 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
             size="mini"
             position="top center"
             content="Agregar Teléfono"
-            trigger={<Icon circular name="add" color="green" size="small" onClick={() => appendPhone({ areaCode: '', number: '' })} />}
+            trigger={<Icon circular name="add" color="green" size="small" onClick={() => appendPhone({ areaCode: '', number: '', ref: '' })} />}
           />
         )}
       </FieldsContainer>
-      <FieldsContainer rowGap ="20px">
+      <FieldsContainer rowGap="20px">
         {addressFields.map((item, index) => (
           <FormField width="30%" key={item.id}>
             <RuledLabel
@@ -210,8 +240,8 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                 render={({ field: { value, onChange, } }) => (
                   <>
                     <Input
-                      placeholder="Refencia"
-                      value={value.ref}
+                      placeholder="Referencia"
+                      value={value.ref || ''}
                       onChange={(e) => {
                         onChange({
                           ...value,
@@ -220,7 +250,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
                       }}
                     />
                     <Input
-                      value={value.address}
+                      value={value.address || ''}
                       placeholder="Dirección"
                       onChange={(e) => {
                         onChange({
@@ -260,6 +290,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, readonly }) => {
               placeholder="Comentarios"
               disabled={readonly}
               readonly
+              value={field.value || ''}
             />
           )}
         />
