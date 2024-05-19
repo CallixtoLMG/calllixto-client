@@ -16,9 +16,22 @@ const Search = styled(SSearch)`
   input {
     height: ${({ height = '50px' }) => `${height}!important`} ;
   };
-  .results {
-    width: 300px !important;
-  }
+  div.results.transition.visible {
+    width: 900px !important;
+    display: grid!important;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto;
+    gap: 5px;
+    padding: 5px;
+    div.result {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px;
+      border: 1px solid rgba(34,36,38,.15)!important;
+      border-radius: 0.28571429rem!important;
+    };
+  };
 `;
 
 const Text = styled.p`

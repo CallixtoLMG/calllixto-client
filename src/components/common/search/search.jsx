@@ -27,7 +27,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
     setSelectedProduct(result.value);
   };
 
-  const MAX_RESULTS = 4;
+  const MAX_RESULTS = 16;
 
   return (
     <Search
