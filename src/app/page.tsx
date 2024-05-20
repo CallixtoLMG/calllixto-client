@@ -4,14 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { Dropdown, DropdownProps } from 'semantic-ui-react';
 import { Container, Subtitle, Title } from "./styles";
 
-// Definir el tipo para las opciones del dropdown
 interface DropdownOption {
   key: number;
   text: string;
   value: string;
 }
 
-// Función para obtener los clientes de Callixto
 const getCallixtoClients = (): DropdownOption[] => {
   if (typeof window === 'undefined') return [];
 
@@ -36,7 +34,6 @@ const getCallixtoClients = (): DropdownOption[] => {
 
 const Home: React.FC = () => {
   const [clientList, setClientList] = useState<DropdownOption[]>([]);
-  const [selectedClient, setSelectedClient] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -47,7 +44,6 @@ const Home: React.FC = () => {
 
   const handleClientChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     const selectedValue = data.value as string;
-    setSelectedClient(selectedValue);
     updateInstanceBaseURL(selectedValue);
   };
 
@@ -62,9 +58,6 @@ const Home: React.FC = () => {
         placeholder='Elegir cliente'
         onChange={handleClientChange}
       />
-      {selectedClient && (
-        <p>Cliente seleccionado: {selectedClient}</p>
-      )}
     </Container>
   );
 };
