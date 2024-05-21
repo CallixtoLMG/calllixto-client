@@ -9,7 +9,7 @@ const Container = styled(Flex)`
 `;
 
 const Search = styled(SSearch)`
-  margin: 5px 0 !important;
+  margin-top: 5px !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   height: ${({ height = '50px' }) => `${height}!important`} ;
@@ -17,12 +17,12 @@ const Search = styled(SSearch)`
     height: ${({ height = '50px' }) => `${height}!important`} ;
   };
   div.results.transition.visible {
-    width: 900px !important;
+    width: 80vw !important;
     display: grid!important;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: auto;
-    gap: 5px;
-    padding: 5px;
+    gap: 8px;
+    padding: 8px;
     div.result {
       display: flex;
       flex-direction: column;
