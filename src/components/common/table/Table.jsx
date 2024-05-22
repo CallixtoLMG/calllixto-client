@@ -187,7 +187,7 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, onManuallyRestore
             </Table.Footer>
           )}
         </Table>
-      </Container>
+      </Container >
     </>
   );
 };
