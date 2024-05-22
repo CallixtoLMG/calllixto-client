@@ -16,9 +16,8 @@ const Header = () => {
   const visibilityRules = Rules(role);
 
   const handleClientChange = (event, data) => {
-    const selectedValue = data.value;
     const userData = JSON.parse(sessionStorage.getItem("userData"));
-    sessionStorage.setItem("userData", JSON.stringify({ ...userData, selectedClientId: selectedValue }));
+    sessionStorage.setItem("userData", JSON.stringify({ ...userData, selectedClientId: data.value }));
     location.reload();
   };
 

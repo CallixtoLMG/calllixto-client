@@ -96,7 +96,7 @@ export function useListAllBrands({ attributes = [] }) {
   const query = useQuery({
     queryKey: [LIST_ALL_BRANDS_QUERY_KEY, attributes],
     queryFn: () => listBrands(),
-    // staleTime: TIME_IN_MS.FOUR_HOURS,
+    staleTime: TIME_IN_MS.FOUR_HOURS,
   });
 
   return query;

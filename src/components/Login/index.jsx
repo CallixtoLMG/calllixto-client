@@ -26,7 +26,7 @@ const LoginForm = ({ onSubmit }) => {
     onSuccess: (userData) => {
       if (userData.clientId === "callixto") {
         setUserData(userData);
-        push(PAGES.BASE);
+        push(PAGES.PRODUCTS.BASE);
       } else if (userData) {
         push(PAGES.PRODUCTS.BASE);
         toast.success("Ingreso exitoso!");
