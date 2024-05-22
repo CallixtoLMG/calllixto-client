@@ -3,22 +3,24 @@ import { SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { RULES } from "@/constants";
 import { formatedPrice, preventSend } from "@/utils";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading }) => {
   const { handleSubmit, control, reset, formState: { isDirty, errors, isSubmitted } } = useForm({ defaultValues: product });
-  const supplierRef = useRef(null);
-  const brandRef = useRef(null);
   const [supplierId, setSupplierId] = useState("");
   const [brandId, setBrandId] = useState("");
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [selectedBrand, setSelectedBrand] = useState(null);
   const isUpdating = useMemo(() => !!product?.code, [product]);
 
   const handleReset = useCallback((product) => {
-    supplierRef.current.clearValue();
-    brandRef.current.clearValue();
+    setSelectedSupplier(null);
+    setSelectedBrand(null);
+    setSupplierId("");
+    setBrandId("");
     reset(product || EMPTY_PRODUCT);
   }, [reset]);
 
@@ -43,10 +45,11 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
               noResultsMessage="Sin resultados!"
               options={suppliers}
               clearable
-              ref={supplierRef}
+              value={selectedSupplier}
               onChange={(e, { value }) => {
-                const selectedSupplier = suppliers.find((supplier) => supplier.name === value);
-                setSupplierId(selectedSupplier?.id);
+                const supplier = suppliers.find((supplier) => supplier.name === value);
+                setSupplierId(supplier?.id || "");
+                setSelectedSupplier(value);
               }}
             />
           ) : (
@@ -66,11 +69,11 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
               noResultsMessage="Sin resultados!"
               options={brands}
               clearable
-              ref={brandRef}
-              disabled={isUpdating}
+              value={selectedBrand}
               onChange={(e, { value }) => {
-                const brandSelected = brands.find((brand) => brand.name === value)
-                setBrandId(brandSelected?.id);
+                const brand = brands.find((brand) => brand.name === value);
+                setBrandId(brand?.id || "");
+                setSelectedBrand(value);
               }}
             />
           ) : (
@@ -78,7 +81,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
           )}
         </FormField>
       </FieldsContainer>
-      <FieldsContainer >
+      <FieldsContainer>
         <FormField width="20%">
           <RuledLabel title="Código" message={errors?.code?.message} required />
           {!readonly && !isUpdating ? (
@@ -101,7 +104,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
             <Segment>{product?.code}</Segment>
           )}
         </FormField>
-        <FormField flex="1" >
+        <FormField flex="1">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
           {!readonly ? (
             <Controller
@@ -143,7 +146,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
-        <Label >Comentarios</Label>
+        <Label>Comentarios</Label>
         <Controller
           name="comments"
           control={control}
@@ -166,7 +169,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
         onClick={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : null)}
       />
     </Form>
-  )
+  );
 };
 
 export default ProductForm;
