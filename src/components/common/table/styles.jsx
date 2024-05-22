@@ -33,6 +33,7 @@ const PaginationContainer = styled(Flex)`
   flex-direction: row;
   justify-content: ${({ center }) => center ? "center" : "flex-end"};
   column-gap: 10px;
+  justify-content: center;
 `;
 
 const PaginationSegment = styled(SSegment)`

@@ -1,15 +1,26 @@
 "use client";
 import { useUserContext } from "@/User";
 import { NoPrint } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";
+import { Rules } from "@/visibilityRules";
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu } from 'semantic-ui-react';
+import { Flex } from "rebass";
+import { Dropdown, Menu } from 'semantic-ui-react';
 import { Container, LogDiv, ModLink, Text } from "./styles";
 
 const Header = () => {
+
   const pathname = usePathname();
   const { push } = useRouter();
-  const { userData } = useUserContext();
+  const { userData, role } = useUserContext();
+  const visibilityRules = Rules(role);
+
+  const handleClientChange = (event, data) => {
+    const selectedValue = data.value;
+    const userData = JSON.parse(sessionStorage.getItem("userData"));
+    sessionStorage.setItem("userData", JSON.stringify({ ...userData, selectedClientId: selectedValue }));
+    location.reload();
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -25,22 +36,45 @@ const Header = () => {
         <Menu fixed='top'>
           <Container>
             {!userData?.isAuthorized ? (
-              <LogDiv>
-                <Menu.Item onClick={handleLogout}><Text>Ingresar</Text></Menu.Item>
-              </LogDiv>
+              <Flex>
+                <LogDiv>
+                  <Menu.Item onClick={handleLogout}><Text>Ingresar</Text></Menu.Item>
+                </LogDiv>
+              </Flex>
             ) : (
               <>
-                {Object.values(PAGES).filter(page => !!page.NAME).map(page => (
-                  <ModLink key={page.BASE} destacar={pathname.includes(page.BASE)} href={page.BASE}>
-                    <Menu.Item><Text destacar={pathname.includes(page.BASE)}>{page.NAME}</Text></Menu.Item>
-                  </ModLink>
-                ))}
-                <LogDiv>
-                  <Menu.Item onClick={handleLogout}><Text>Cerrar sesión</Text></Menu.Item>
-                </LogDiv>
+                <Flex>
+                  {Object.values(PAGES).filter(page => !!page.NAME).map(page => (
+                    <ModLink key={page.BASE} destacar={pathname.includes(page.BASE)} href={page.BASE}>
+                      <Menu.Item><Text destacar={pathname.includes(page.BASE)}>{page.NAME}</Text></Menu.Item>
+                    </ModLink>
+                  ))}
+                </Flex>
+                <Flex>
+                  {visibilityRules.canSeeClientSelect &&
+                    <LogDiv padding="8px">
+                      <Dropdown
+                        search
+                        selection
+                        defaultValue={userData.selectedClientId || DEFAULT_SELECTED_CLIENT}
+                        options={userData.callixtoClients.map((client) =>
+                        ({
+                          key: client,
+                          text: client,
+                          value: client,
+                        }))}
+                        onChange={handleClientChange}
+                      />
+                    </LogDiv>
+                  }
+                  <LogDiv>
+                    <Menu.Item onClick={handleLogout}><Text>Cerrar sesión</Text></Menu.Item>
+                  </LogDiv>
+                </Flex>
               </>
             )}
           </Container>
+
         </Menu>
       }
     </NoPrint>

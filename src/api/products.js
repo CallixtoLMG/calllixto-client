@@ -78,7 +78,6 @@ export function useListProducts({
     queryKey: [LIST_PRODUCTS_QUERY_KEY, params],
     queryFn: () => listProducts(params),
   });
-
   return query;
 }
 

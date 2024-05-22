@@ -20,6 +20,7 @@ export const Rules = (role) => {
       return {
         canSeeButtons: true,
         canSeeActions: true,
+        canSeeClientSelect:true,
       };
   };
 };
