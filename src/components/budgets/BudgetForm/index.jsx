@@ -399,13 +399,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
               <ProductSearch
                 products={products}
                 onProductSelect={(selectedProduct) => {
-                  setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1 }]);
+                  setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1, key:Date.now().toString(36) + selectedProduct.code}]);
                 }}
               />
             </FormField>
           )}
           <Table
-            mainKey="code"
+            mainKey="key"
             headers={BUDGET_FORM_PRODUCT_COLUMNS}
             elements={watchProducts}
             actions={actions}
@@ -438,6 +438,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   defaultValue={PAYMENT_METHODS.map((method) => method.value)}
                   render={({ field }) => (
                     <Dropdown
+                      minHeight="50px"
                       min
                       height="fit-content"
                       name={`paymentMethods`}
@@ -472,7 +473,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                         {...field}
                         maxLength={50}
                         type="number"
-                        placeholder="Cantidad en días(p. ej: 3, 10, 30, etc)"
+                        placeholder="Cant. en días(p. ej: 3, 10, etc)"
                         onChange={(e) => {
                           field.onChange(e.target.value);
                           SetExpiration(e.target.value);
