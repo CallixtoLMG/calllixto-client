@@ -9,16 +9,29 @@ const Container = styled(Flex)`
 `;
 
 const Search = styled(SSearch)`
-  margin: 5px 0 !important;
+  margin-top: 5px !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   height: ${({ height = '50px' }) => `${height}!important`} ;
   input {
     height: ${({ height = '50px' }) => `${height}!important`} ;
   };
-  .results {
-    width: 300px !important;
-  }
+  div.results.transition.visible {
+    width: 80vw !important;
+    display: grid!important;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto;
+    gap: 8px;
+    padding: 8px;
+    div.result {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 10px;
+      border: 1px solid rgba(34,36,38,.15)!important;
+      border-radius: 0.28571429rem!important;
+    };
+  };
 `;
 
 const Text = styled.p`
