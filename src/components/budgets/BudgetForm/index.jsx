@@ -8,7 +8,7 @@ import { NoPrint, OnlyPrint } from "@/components/layout";
 import { RULES } from "@/constants";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, getTotalSum, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Box, Flex } from "rebass";
@@ -31,6 +31,7 @@ const EMPTY_BUDGET = (user) => ({
   paymentMethods: PAYMENT_METHODS.map((method) => method.value),
   expirationOffsetDays: ""
 });
+
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading }) => {
   const { userData } = useUserContext();
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
@@ -44,11 +45,12 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
       seller: `${user?.firstName} ${user?.lastName}`
     } : EMPTY_BUDGET(user),
   });
-  const customerRef = useRef(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
   const watchProducts = watch('products');
   const watchConfirmed = watch('confirmed');
   const [total, setTotal] = useState(0);
+
   const calculateTotal = useCallback(() => {
     setTotal(getTotalSum(watchProducts), [watchProducts]);
   }, [setTotal, watchProducts]);
@@ -65,7 +67,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
       icon: 'trash',
       color: 'red',
       onClick: (element, index) => {
-        deleteProduct(index)
+        deleteProduct(index);
       },
       tooltip: 'Eliminar'
     }
@@ -81,7 +83,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   };
 
   const handleReset = useCallback(() => {
-    customerRef.current.clearValue();
+    setSelectedCustomer(null);
     reset(EMPTY_BUDGET(user));
   }, [reset, user]);
 
@@ -98,7 +100,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
     if (openNextModal) {
       setCustomerData(customer);
       setIsModalConfirmationOpen(true);
-    };
+    }
   };
 
   const handleModalConfirmationClose = () => {
@@ -184,7 +186,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                     type="number"
                     min={0}
                     defaultValue={product.quantity}
-
                     onChange={(e) => {
                       const value = e.target.value;
                       field.onChange(value);
@@ -219,7 +220,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                     type="number"
                     min={0}
                     max={100}
-
                     onChange={(e) => {
                       field.onChange(e.target.value);
                       calculateTotal();
@@ -350,13 +350,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                       minCharacters={2}
                       noResultsMessage="No se ha encontrado cliente!"
                       options={customers}
-                      ref={customerRef}
+                      value={selectedCustomer}
                       onChange={(e, { value }) => {
                         field.onChange(value);
                         const customer = customers.find((opt) => opt.value === value);
                         setValue('customer.id', customer?.id);
                         setValue('customer.address', customer?.addresses[0]?.address ?? '');
-                        setValue('customer.phone', customer?.phoneNumbers[0] ?? '')
+                        setValue('customer.phone', customer?.phoneNumbers[0] ?? '');
+                        setSelectedCustomer(value);
                       }}
                     />
                   )}
@@ -398,7 +399,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
               <ProductSearch
                 products={products}
                 onProductSelect={(selectedProduct) => {
-                  setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1 }])
+                  setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1 }]);
                 }}
               />
             </FormField>
@@ -472,9 +473,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                         maxLength={50}
                         type="number"
                         placeholder="Cantidad en días(p. ej: 3, 10, 30, etc)"
-                        onChange={(e, { value }) => {
-                          field.onChange(value);
-                          SetExpiration(value);
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          SetExpiration(e.target.value);
                         }}
                       />}
                   />
@@ -504,8 +505,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
               <SendButton customerData={customerData} />
             )}
           </ButtonsContainer>
-        )
-        }
+        )}
       </NoPrint >
       <OnlyPrint>
         <PDFfile total={total} budget={budget} />
