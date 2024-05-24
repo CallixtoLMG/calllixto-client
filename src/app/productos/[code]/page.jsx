@@ -1,13 +1,15 @@
 "use client";
+import { useUserContext } from "@/User";
 import { GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, edit, useGetProduct } from "@/api/products";
-import { useBreadcrumContext, Loader, useNavActionsContext } from "@/components/layout";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
-import { useRouter } from "next/navigation";
-import { useValidateToken } from "@/hooks/userData";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useEffect } from "react";
+import { useValidateToken } from "@/hooks/userData";
+import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 
 const Product = ({ params }) => {
@@ -18,6 +20,8 @@ const Product = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const queryClient = useQueryClient();
+  const { role } = useUserContext();
+  const visibilityRules = Rules(role);
 
   useEffect(() => {
     resetActions();
@@ -51,7 +55,7 @@ const Product = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      {Toggle}
+      {visibilityRules.canSeeActions && Toggle}
       <ProductForm product={product} onSubmit={mutate} readonly={!allowUpdate} isLoading={isPending} />
     </Loader>
   )

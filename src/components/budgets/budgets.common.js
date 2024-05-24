@@ -42,7 +42,7 @@ const BUDGETS_COLUMNS = [
           thousandSeparator={true}
           fixedDecimalScale={true}
           decimalScale={2}
-          value={formatedPricePdf(getTotalSum(budget.products))}
+          value={(getTotalSum(budget.products))}
         />
       </Flex>
     )

@@ -17,16 +17,16 @@ import { toast } from "react-hot-toast";
 const Supplier = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
+  const visibilityRules = Rules(role);  // Define visibilityRules here once
   const { push } = useRouter();
   const { data: supplier, isLoading, isRefetching } = useGetSupplier(params.id);
   const [allowUpdate, Toggle] = useAllowUpdate();
   const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
-  const { setActions } = useNavActionsContext();
+  const { resetActions, setActions } = useNavActionsContext();  // Combine useNavActionsContext into a single destructuring assignment
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
-
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar todos los productos de la marca "${name}"?`;
+
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -37,7 +37,6 @@ const Supplier = ({ params }) => {
   }, [setLabels, supplier]);
 
   useEffect(() => {
-    const visibilityRules = Rules(role);
     const actions = visibilityRules.canSeeButtons ? [
       {
         id: 1,
@@ -48,7 +47,7 @@ const Supplier = ({ params }) => {
       }
     ] : [];
     setActions(actions);
-  }, [role, setActions]);
+  }, [visibilityRules.canSeeButtons, setActions]);
 
   const { mutate: mutateUpdate, isPending: isLoadingUpdate } = useMutation({
     mutationFn: async (supplier) => {
@@ -76,7 +75,7 @@ const Supplier = ({ params }) => {
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
         toast.success('Lista de productos del proveedor eliminada!');
-        setOpen(false)
+        setOpen(false);
       } else {
         toast.error(response.message);
       }
@@ -89,7 +88,7 @@ const Supplier = ({ params }) => {
 
   return (
     <Loader active={isLoading || isRefetching}>
-      {Toggle}
+      {visibilityRules.canSeeActions && Toggle}
       {open &&
         <ModalDelete
           showModal={open}
@@ -97,11 +96,10 @@ const Supplier = ({ params }) => {
           title={deleteQuestion(supplier?.name)}
           onDelete={mutateDelete}
           isLoading={isLoadingDelete}
-
         />}
       <SupplierForm supplier={supplier} onSubmit={mutateUpdate} readonly={!allowUpdate} isLoading={isLoadingUpdate} />
     </Loader>
-  )
+  );
 };
 
 export default Supplier;

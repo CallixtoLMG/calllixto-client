@@ -187,8 +187,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                     min={0}
                     defaultValue={product.quantity}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      field.onChange(value);
+                      let value = e.target.value;
+                      value = value.replace(/\D/g, '');
+                      if (value !== '') {
+                        field.onChange(Number(value));
+                      } else {
+                        field.onChange(0);
+                      };
                       calculateTotal();
                     }}
                   />
@@ -221,7 +226,15 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                     min={0}
                     max={100}
                     onChange={(e) => {
-                      field.onChange(e.target.value);
+                      let value = e.target.value;
+                      value = value.replace(/\D/g, '');
+                      value = Number(value);
+                      if (value < 0) {
+                        value = 0;
+                      } else if (value > 100) {
+                        value = 100;
+                      };
+                      field.onChange(value);
                       calculateTotal();
                     }}
                   />
@@ -367,7 +380,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
               )}
             </FormField>
             <FormField width={5}>
-              <RuledLabel title="Dirección" message={errors?.customer?.address?.message} required={watchConfirmed} />
+              <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.address?.message} required={watchConfirmed} />
               {!readonly ? (
                 <Controller
                   name="customer.address"
@@ -399,7 +412,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
               <ProductSearch
                 products={products}
                 onProductSelect={(selectedProduct) => {
-                  setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1, key:Date.now().toString(36) + selectedProduct.code}]);
+                  setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1, discount: 0, key: Date.now().toString(36) + selectedProduct.code }]);
                 }}
               />
             </FormField>
@@ -462,7 +475,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             </FormField>
             {!readonly && (
               <>
-                <FormField flex={1} >
+                <FormField flex={1}>
                   <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
                   <Controller
                     name="expirationOffsetDays"
@@ -472,11 +485,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                       <Input
                         {...field}
                         maxLength={50}
-                        type="number"
-                        placeholder="Cant. en días(p. ej: 3, 10, etc)"
+                        type="text"
+                        placeholder="Cant. en días (p. ej: 3, 10, etc)"
                         onChange={(e) => {
-                          field.onChange(e.target.value);
-                          SetExpiration(e.target.value);
+                          let value = e.target.value;
+                          value = value.replace(/\D/g, '');
+                          field.onChange(value);
+                          SetExpiration(value);
                         }}
                       />}
                   />
@@ -485,7 +500,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             )}
             <FormField flex={1}>
               <Label>Fecha de vencimiento</Label>
-              <Segment >{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
+
+              {!readonly ? (
+                <Segment >{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
+              ) : (
+                <Segment >{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
+              )}
+
+
             </FormField>
           </FieldsContainer>
           {!readonly && (
