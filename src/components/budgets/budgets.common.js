@@ -1,5 +1,6 @@
 import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
 import { Flex } from "rebass";
+import { CurrencyFormatInput } from "../common/custom";
 import { Icon } from "../common/custom/Semantic";
 
 const ATTRIBUTES = { ID: "id", CUSTOMER: "customer", CREATEDAT: "createdAt", CONFIRMED: "confirmed", SELLER: "seller", PRODUCTS: "products" };
@@ -33,7 +34,18 @@ const BUDGETS_COLUMNS = [
     id: 4,
     title: "Total",
     width: 2,
-    value: (budget) => formatedPricePdf(getTotalSum(budget.products))
+    value: (budget) => (
+      <Flex alignItems="center" justifyContent="space-between">
+        $
+        <CurrencyFormatInput
+          displayType="text"
+          thousandSeparator={true}
+          fixedDecimalScale={true}
+          decimalScale={2}
+          value={formatedPricePdf(getTotalSum(budget.products))}
+        />
+      </Flex>
+    )
   },
   {
     id: 5,
