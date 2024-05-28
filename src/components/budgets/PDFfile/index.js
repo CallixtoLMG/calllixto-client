@@ -58,19 +58,19 @@ const PDFfile = ({ budget, total, client }) => {
               <CustomerDataContainer>
                 <DataContainer flex="1">
                   <Label>CUIT</Label>
-                  <Segment>{client.cuil}</Segment>
+                  <Segment>{client?.cuil}</Segment>
                 </DataContainer>
                 <DataContainer flex="1">
                   <Label>IVA</Label>
-                  <Segment>{client.iva}</Segment>
+                  <Segment>{client?.iva}</Segment>
                 </DataContainer>
                 <DataContainer flex="1">
                   <Label>Dirección</Label>
-                  <Segment>{client.addresses?.[0].address}</Segment>
+                  <Segment>{client?.addresses?.[0].address}</Segment>
                 </DataContainer >
                 <DataContainer flex="1">
                   <Label>Teléfono </Label>
-                  <Segment>{formatedSimplePhone(client.phoneNumbers?.[0])}</Segment>
+                  <Segment>{formatedSimplePhone(client?.phoneNumbers?.[0])}</Segment>
                 </DataContainer>
               </CustomerDataContainer>
               <Divider />
