@@ -1,4 +1,3 @@
-import { useUserContext } from "@/User";
 import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, edit } from "@/api/budgets";
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
@@ -33,7 +32,6 @@ const EMPTY_BUDGET = (user) => ({
 });
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading }) => {
-  const { userData } = useUserContext();
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
@@ -271,7 +269,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      const confirmationData = { confirmedBy: `${userData.firstName} ${userData.lastName}`, confirmedAt: now() };
+      const confirmationData = { confirmedBy: `${user.firstName} ${user.lastName}`, confirmedAt: now() };
       const { data } = await edit(confirmationData, budget?.id);
       return data;
     },
@@ -287,7 +285,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
       }
     },
   });
-
+  
   return (
     <>
       <NoPrint>
@@ -532,7 +530,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         )}
       </NoPrint >
       <OnlyPrint>
-        <PDFfile total={total} budget={budget} />
+        <PDFfile total={total} budget={budget} client={user.client?.metadata} />
       </OnlyPrint>
     </>
   );

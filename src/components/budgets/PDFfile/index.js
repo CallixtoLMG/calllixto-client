@@ -19,7 +19,7 @@ import {
   Title
 } from "./styles";
 
-const PDFfile = ({ budget, total }) => {
+const PDFfile = ({ budget, total, client }) => {
   return (
     <table>
       <thead>
@@ -58,19 +58,19 @@ const PDFfile = ({ budget, total }) => {
               <CustomerDataContainer>
                 <DataContainer flex="1">
                   <Label>CUIT</Label>
-                  <Segment>CUIT</Segment>
+                  <Segment>{client.cuil}</Segment>
                 </DataContainer>
                 <DataContainer flex="1">
                   <Label>IVA</Label>
-                  <Segment>IVA</Segment>
+                  <Segment>{client.iva}</Segment>
                 </DataContainer>
                 <DataContainer flex="1">
                   <Label>Dirección</Label>
-                  <Segment>ADDRESS</Segment>
+                  <Segment>{client.addresses?.[0].address}</Segment>
                 </DataContainer >
                 <DataContainer flex="1">
                   <Label>Teléfono </Label>
-                  <Segment>PHONE</Segment>
+                  <Segment>{formatedSimplePhone(client.phoneNumbers?.[0])}</Segment>
                 </DataContainer>
               </CustomerDataContainer>
               <Divider />
@@ -130,7 +130,7 @@ const PDFfile = ({ budget, total }) => {
                   <Segment marginTop="0" minHeight="60px">{budget.comments}</Segment>
                 </DataContainer>
               )}
-              <Divider borderless/>
+              <Divider borderless />
               <DataContainer width="100%" >
                 <Label >Formas de pago</Label>
                 <Segment marginTop="0">
