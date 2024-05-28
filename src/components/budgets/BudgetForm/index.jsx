@@ -48,6 +48,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   const watchProducts = watch('products');
   const watchConfirmed = watch('confirmed');
   const [total, setTotal] = useState(0);
+  
+  const cleanValue = (value) => {
+    return value.replace(/,/g, '');
+  };
+
+  const removeDecimal = (value) => {
+    return value.replace(/\./g, '');
+  };
 
   const calculateTotal = useCallback(() => {
     setTotal(getTotalSum(watchProducts), [watchProducts]);
@@ -185,17 +193,20 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                 render={({ field: { onChange, ...rest } }) => (
                   <CurrencyFormatInput
                     {...rest}
+                    height="35px"
+                    shadow
                     thousandSeparator={true}
                     decimalScale={1}
                     displayType="input"
                     onFocus={(e) => e.target.select()}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      if (value < 0) {
-                        onChange(Math.abs(value));
+                      const rawValue = e.target.value;
+                      const cleanedValue = cleanValue(rawValue);
+                      if (cleanedValue < 0) {
+                        onChange(Math.abs(cleanedValue));
                         return;
                       }
-                      onChange(value);
+                      onChange(cleanedValue);
                       calculateTotal();
                     }}
                   />
@@ -227,7 +238,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                     type="number"
                     onFocus={(e) => e.target.select()}
                     onChange={(e) => {
-                      const value = e.target.value;
+                      let value = removeDecimal(e.target.value);
                       if (value > 100) return;
                       if (value < 0) {
                         onChange(Math.abs(value));
@@ -285,7 +296,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
       }
     },
   });
-  
+
   return (
     <>
       <NoPrint>
