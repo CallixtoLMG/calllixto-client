@@ -133,12 +133,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           </>
         ),
         id: 1,
-        width: 2
+        width: 1,
+        align: 'left'
       },
       {
         title: "Nombre",
         value: (product) => (
-          <Container>{product.name}
+          <Container>
+            {product.name}
             {product.comments && (
               <Popup
                 size="mini"
@@ -149,9 +151,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                     <Icon name="info circle" color="yellow" />
                   </Box>
                 }
-              />)}
+              />
+            )}
           </Container>
-        ), id: 2, width: 8, align: 'left'
+        ),
+        id: 2,
+        width: 7,
+        align: 'left'
       },
       {
         title: "Precio",
@@ -178,22 +184,20 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                 name={`products[${index}].quantity`}
                 control={control}
                 rules={RULES.REQUIRED}
-                render={({ field }) => (
-                  <Input
-                    center
-                    height="35px"
-                    {...field}
-                    type="number"
-                    min={0}
-                    defaultValue={product.quantity}
+                render={({ field: { onChange, ...rest } }) => (
+                  <CurrencyFormatInput
+                    {...rest}
+                    thousandSeparator={true}
+                    decimalScale={1}
+                    displayType="input"
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => {
-                      let value = e.target.value;
-                      value = value.replace(/\D/g, '');
-                      if (value !== '') {
-                        field.onChange(Number(value));
-                      } else {
-                        field.onChange(0);
-                      };
+                      const value = e.target.value;
+                      if (value < 0) {
+                        onChange(Math.abs(value));
+                        return;
+                      }
+                      onChange(value);
                       calculateTotal();
                     }}
                   />
@@ -205,7 +209,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           </>
         ),
         id: 4,
-        width: 1
+        width: 2
       },
       {
         title: "Descuento",
@@ -216,25 +220,22 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                 name={`products[${index}].discount`}
                 control={control}
                 defaultValue={product.discount || 0}
-                render={({ field }) => (
+                render={({ field: { onChange, ...rest } }) => (
                   <Input
+                    {...rest}
                     height="35px"
                     center
-                    {...field}
                     fluid
                     type="number"
-                    min={0}
-                    max={100}
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => {
-                      let value = e.target.value;
-                      value = value.replace(/\D/g, '');
-                      value = Number(value);
+                      const value = e.target.value;
+                      if (value > 100) return;
                       if (value < 0) {
-                        value = 0;
-                      } else if (value > 100) {
-                        value = 100;
-                      };
-                      field.onChange(value);
+                        onChange(Math.abs(value));
+                        return;
+                      }
+                      onChange(value);
                       calculateTotal();
                     }}
                   />
@@ -263,7 +264,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           </Flex>
         ),
         id: 6,
-        width: 2
+        width: 3
       },
     ];
   }, [control, calculateTotal, readonly]);

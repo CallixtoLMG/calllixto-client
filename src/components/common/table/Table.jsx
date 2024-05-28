@@ -165,7 +165,7 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, onManuallyRestore
               </Table.Body>
             </Loader>
           )}
-          {total > 0 && (
+          {total !== undefined && (
             <Table.Footer celled fullWidth>
               <Table.Row>
                 <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
