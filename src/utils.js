@@ -81,6 +81,17 @@ export const getTotalSum = (products) => {
   return products?.reduce((a, b) => a + getTotal(b), 0);
 };
 
+export const getTotalSumWithDiscount = (products, discount = 0) => {
+  const totalSum = products?.reduce((a, b) => a + getTotal(b), 0);
+  const discountedTotal = totalSum - (totalSum * (discount / 100));
+  return discountedTotal;
+};
+
+export const getTotalSumWithDiscountt = (products, discount = 0) => {
+  const discountedTotal = products - (products * (discount / 100));
+  return discountedTotal;
+};
+
 export const formatedSimplePhone = (phoneNumbers) => {
   if (!phoneNumbers) return '';
   return `+54 ${phoneNumbers.areaCode} ${phoneNumbers.number}`;

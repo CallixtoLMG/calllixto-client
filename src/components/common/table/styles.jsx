@@ -86,6 +86,10 @@ const HeaderCell = styled(STable.HeaderCell)`
   text-align: ${({ textAlign = "center" }) => `${textAlign}!important`};
 `;
 
+const FooterCell = styled(STable.HeaderCell)`
+padding: 5px 7px !important;
+`;
+
 const ActionsContainer = styled.td`
   position: absolute;
   right: 0;
@@ -127,5 +131,5 @@ const TableRow = styled(STable.Row)`
   }
 `;
 
-export { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
+export { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
 

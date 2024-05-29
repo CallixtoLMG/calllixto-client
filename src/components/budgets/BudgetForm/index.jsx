@@ -40,15 +40,17 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
       ...budget,
-      seller: `${user?.firstName} ${user?.lastName}`
+      seller: `${user?.firstName} ${user?.lastName}`,
+      globalDiscount: 0,
     } : EMPTY_BUDGET(user),
   });
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
   const watchProducts = watch('products');
+  const watchGlobalDiscount = watch('globalDiscount', 0);
   const watchConfirmed = watch('confirmed');
   const [total, setTotal] = useState(0);
-  
+
   const cleanValue = (value) => {
     return value.replace(/,/g, '');
   };
@@ -58,8 +60,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   };
 
   const calculateTotal = useCallback(() => {
-    setTotal(getTotalSum(watchProducts), [watchProducts]);
-  }, [setTotal, watchProducts]);
+    const totalSum = getTotalSum(watchProducts);
+    const discountedTotal = totalSum - (totalSum * (watchGlobalDiscount / 100));
+    setTotal(discountedTotal);
+  }, [watchProducts, watchGlobalDiscount]);
+
+  useEffect(() => {
+    calculateTotal();
+  }, [watchProducts, calculateTotal]);
 
   const deleteProduct = useCallback((index) => {
     const newProducts = [...watchProducts];
@@ -432,7 +440,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             headers={BUDGET_FORM_PRODUCT_COLUMNS}
             elements={watchProducts}
             actions={actions}
-            total={getTotalSum(watchProducts)}
+            total={total}
+            globalDiscount={readonly ? budget.globalDiscount : watchGlobalDiscount}
+            setGlobalDiscount={(value) => setValue('globalDiscount', value)}
+            readOnly={readonly}
           />
           <FieldsContainer>
             <Label>Comentarios</Label>
@@ -510,14 +521,11 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             )}
             <FormField flex={1}>
               <Label>Fecha de vencimiento</Label>
-
               {!readonly ? (
                 <Segment >{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
               ) : (
                 <Segment >{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
               )}
-
-
             </FormField>
           </FieldsContainer>
           {!readonly && (

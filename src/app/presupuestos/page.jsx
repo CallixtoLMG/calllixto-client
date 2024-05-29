@@ -11,7 +11,7 @@ import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
   useValidateToken();
-  const { data, isLoading } = useListBudgets({ sort: 'date', order: false, attributes: [ATTRIBUTES.ID, ATTRIBUTES.PRODUCTS, ATTRIBUTES.CUSTOMER, ATTRIBUTES.CREATEDAT, ATTRIBUTES.CONFIRMED, ATTRIBUTES.SELLER] });
+  const { data, isLoading } = useListBudgets({ sort: 'date', order: false, attributes: [ATTRIBUTES.DISCOUNT, ATTRIBUTES.ID, ATTRIBUTES.PRODUCTS, ATTRIBUTES.CUSTOMER, ATTRIBUTES.CREATEDAT, ATTRIBUTES.CONFIRMED, ATTRIBUTES.SELLER] });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();

@@ -1,9 +1,9 @@
-import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
+import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSumWithDiscount } from "@/utils";
 import { Flex } from "rebass";
 import { CurrencyFormatInput } from "../common/custom";
 import { Icon } from "../common/custom/Semantic";
 
-const ATTRIBUTES = { ID: "id", CUSTOMER: "customer", CREATEDAT: "createdAt", CONFIRMED: "confirmed", SELLER: "seller", PRODUCTS: "products" };
+const ATTRIBUTES = { ID: "id", CUSTOMER: "customer", CREATEDAT: "createdAt", CONFIRMED: "confirmed", SELLER: "seller", PRODUCTS: "products", DISCOUNT: "globalDiscount" };
 
 const BUDGETS_COLUMNS = [
   {
@@ -42,7 +42,7 @@ const BUDGETS_COLUMNS = [
           thousandSeparator={true}
           fixedDecimalScale={true}
           decimalScale={2}
-          value={(getTotalSum(budget.products))}
+          value={(getTotalSumWithDiscount(budget.products, budget.globalDiscount))}
         />
       </Flex>
     )
