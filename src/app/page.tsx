@@ -3,6 +3,7 @@ import React from 'react';
 import { Container, Subtitle, Title } from "./styles";
 
 const Home: React.FC = () => {
+
   return (
     <Container>
       <Title>Bienvenido a Callixto!</Title>
@@ -10,4 +11,5 @@ const Home: React.FC = () => {
     </Container>
   );
 };
+
 export default Home;

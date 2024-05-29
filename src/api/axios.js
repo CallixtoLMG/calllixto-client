@@ -1,12 +1,32 @@
+import { DEFAULT_SELECTED_CLIENT } from "@/constants";
 import axios from 'axios';
 
 const getToken = () => {
   if (typeof window === 'undefined') return null;
   return localStorage.getItem('token');
-}
+};
+
+const getClientId = () => {
+  if (typeof window === 'undefined') return null;
+
+  const userDataString = sessionStorage.getItem("userData");
+  if (!userDataString) return null;
+
+  try {
+    const userData = JSON.parse(userDataString);
+
+    if (userData.clientId === "callixto") {
+      return userData.selectedClientId || DEFAULT_SELECTED_CLIENT
+    }
+    return userData.clientId;
+  } catch (e) {
+    console.error("Error parsing userData from sessionStorage:", e);
+    return null;
+  };
+};
 
 export const instance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_URL,
+  baseURL: `${process.env.NEXT_PUBLIC_URL}${getClientId()}`,
   timeout: 15000,
   headers: {
     authorization: `Bearer ${getToken()}`

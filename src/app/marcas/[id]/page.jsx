@@ -42,6 +42,7 @@ const Brand = ({ params }) => {
         queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_BRAND_QUERY_KEY, params.id] });
         toast.success('Marca actualizada!');
+        push(PAGES.BRANDS.BASE);
       } else {
         toast.error(response.message);
       }

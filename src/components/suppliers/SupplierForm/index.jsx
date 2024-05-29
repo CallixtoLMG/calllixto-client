@@ -95,6 +95,7 @@ const SupplierForm = ({ supplier, onSubmit, readonly, isLoading }) => {
                   render={({ field: { value, onChange }, fieldState: { error } }) => (
                     <>
                       <CurrencyFormatInput
+                        marginTop="5px"
                         shadow
                         height="50px"
                         format="####"
@@ -110,6 +111,7 @@ const SupplierForm = ({ supplier, onSubmit, readonly, isLoading }) => {
                         }}
                       />
                       <CurrencyFormatInput
+                        marginTop="5px"
                         shadow
                         height="50px"
                         format="#######"

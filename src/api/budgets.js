@@ -1,10 +1,12 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { DEFAULT_PAGE_SIZE, TIME_IN_MS } from "@/constants";
-import { CLIENT_ID, PATHS } from "@/fetchUrls";
+import { PATHS } from "@/fetchUrls";
 import { encodeUri, now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-const BUDGETS_URL = `${CLIENT_ID}${PATHS.BUDGETS}`;
+
+const BUDGETS_URL = `${PATHS.BUDGETS}`;
+
 export const LIST_BUDGETS_QUERY_KEY = 'listBudgets';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 

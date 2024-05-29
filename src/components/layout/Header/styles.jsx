@@ -18,6 +18,7 @@ const ModLink = styled(Link)`
 
 const LogDiv = styled(Flex)`
   position: relative;
+  padding: ${({ padding = "0" }) => padding}!important;
   align-items: center;
   transition: all 0.2s ease-in-out;
   font-size: 15px;
@@ -34,20 +35,16 @@ const LogDiv = styled(Flex)`
 `;
 
 const Container = styled(SContainer)`
+  display: flex;
   height: 60px!important;
-  width: 95%!important;  
-  div:first-child{
-    border-left: 1px solid rgba(34,36,38,.1)!important;
-  },
+  width: 95%!important;
+
+  div:first-of-type {
+    border-left: 1px solid rgba(34,36,38,.1);
+  };
+
   div:last-child {  
     margin-left: auto!important;
-    a{
-      border-left: 1px solid rgba(34,36,38,.1)!important;
-      border-right: 1px solid rgba(34,36,38,.1)!important;
-      &:before {
-        width: 0px!important;
-      };
-    };
   };
 `;
 
