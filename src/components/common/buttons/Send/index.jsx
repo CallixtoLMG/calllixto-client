@@ -17,7 +17,7 @@ const ButtonSend = ({ customerData }) => {
         <Container>
           {customerData.phoneNumbers &&
             <Button
-              href={`${APIS.WSP((`${customerData.phoneNumbers?.areaCode}${customerData.phoneNumbers?.number}`), customerData.name)}`}
+              href={`${APIS.WSP((`${customerData.phoneNumbers[0]?.areaCode}${customerData.phoneNumbers[0]?.number}`), customerData.name)}`}
               color='green' size="tiny"><Icon name='whatsapp' />WhatsApp</Button>}
           {customerData.email &&
             <MailButton
