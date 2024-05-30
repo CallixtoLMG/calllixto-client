@@ -1,7 +1,7 @@
 import { CurrencyFormatInput, Input } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
-import { formatedPercentage, getTotalSumWithDiscountt, handleEnterKeyPress } from '@/utils';
+import { formatedPercentage, handleEnterKeyPress, removeDecimal } from '@/utils';
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -9,7 +9,7 @@ import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
-const CustomTable = ({ readOnly, pag, isRefetching, isLoading, onFilter, onManuallyRestore, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside, globalDiscount, setGlobalDiscount }) => {
+const CustomTable = ({ showTotal, readOnly, pag, isRefetching, isLoading, onFilter, onManuallyRestore, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside, globalDiscount, setGlobalDiscount }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
 
@@ -165,58 +165,61 @@ const CustomTable = ({ readOnly, pag, isRefetching, isLoading, onFilter, onManua
               </Table.Body>
             </Loader>
           )}
-          {total !== undefined && (
+          {showTotal && (
             <Table.Footer celled fullWidth>
               <Table.Row>
-                {!!total &&
-                  <>
-                    <FooterCell textAlign="right" colSpan={headers.length - 2}><strong>TOTAL</strong></FooterCell>
-                    {!readOnly && !!total ? (
-                      <FooterCell colSpan="1">
+                <>
+                  <FooterCell textAlign="right" colSpan={3}></FooterCell>
+                  <FooterCell textAlign="center" colSpan={headers.length - 5}><strong>TOTAL</strong></FooterCell>
+                  {!readOnly ? (
+                    <FooterCell colSpan="1">
                       <Controller
                         name="globalDiscount"
                         control={control}
-                        render={({ field }) => (
+                        render={({ field: { onChange, ...rest } }) => (
                           <Input
-                            {...field}
+                            {...rest}
                             height="35px"
                             type="number"
                             center
                             fluid
-                            value={field.value}
                             defaultValue={0}
                             onFocus={(e) => e.target.select()}
                             onChange={(e) => {
-                              const value = Math.max(0, Math.min(100, e.target.value));
+                              let value = removeDecimal(e.target.value);
+                              if (value > 100) return;
+                              if (value < 0) {
+                                onChange(Math.abs(value));
+                                return;
+                              }
                               setGlobalDiscount(value);
-                              field.onChange(value);
+                              onChange(value);
                             }}
                           />
                         )}
                       />
                     </FooterCell>) : (
-                      <FooterCell textAlign="center" colSpan="1">
-                        {formatedPercentage(globalDiscount)}
-                      </FooterCell>
-                    )
-                    }
-                    <FooterCell colSpan="1">
-                      <strong>
-                        <Flex alignItems="center" justifyContent="space-between">
-                          $
-                          <CurrencyFormatInput
-                            height="35px"
-                            displayType="text"
-                            thousandSeparator={true}
-                            fixedDecimalScale={true}
-                            decimalScale={2}
-                            value={!readOnly ? total : getTotalSumWithDiscountt(total, globalDiscount)}
-                          />
-                        </Flex>
-                      </strong>
+                    <FooterCell textAlign="center" colSpan="1">
+                      {formatedPercentage(globalDiscount)}
                     </FooterCell>
-                  </>
-                }
+                  )
+                  }
+                  <FooterCell colSpan="1">
+                    <strong>
+                      <Flex alignItems="center" justifyContent="space-between">
+                        $
+                        <CurrencyFormatInput
+                          height="35px"
+                          displayType="text"
+                          thousandSeparator={true}
+                          fixedDecimalScale={true}
+                          decimalScale={2}
+                          value={total}
+                        />
+                      </Flex>
+                    </strong>
+                  </FooterCell>
+                </>
               </Table.Row>
             </Table.Footer>
           )}

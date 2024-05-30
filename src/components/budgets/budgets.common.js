@@ -1,4 +1,4 @@
-import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSumWithDiscount } from "@/utils";
+import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
 import { Flex } from "rebass";
 import { CurrencyFormatInput } from "../common/custom";
 import { Icon } from "../common/custom/Semantic";
@@ -42,7 +42,7 @@ const BUDGETS_COLUMNS = [
           thousandSeparator={true}
           fixedDecimalScale={true}
           decimalScale={2}
-          value={(getTotalSumWithDiscount(budget.products, budget.globalDiscount))}
+          value={(getTotalSum(budget.products, budget.globalDiscount))}
         />
       </Flex>
     )

@@ -5,7 +5,7 @@ import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, Fiel
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { RULES } from "@/constants";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, getTotalSum, now } from "@/utils";
+import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, getTotalSum, now, removeDecimal } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -39,9 +39,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   const [expiration, SetExpiration] = useState(false);
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
+      globalDiscount: 0,
       ...budget,
       seller: `${user?.firstName} ${user?.lastName}`,
-      globalDiscount: 0,
     } : EMPTY_BUDGET(user),
   });
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -51,13 +51,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   const watchConfirmed = watch('confirmed');
   const [total, setTotal] = useState(0);
 
-  const cleanValue = (value) => {
-    return value.replace(/,/g, '');
-  };
 
-  const removeDecimal = (value) => {
-    return value.replace(/\./g, '');
-  };
 
   const calculateTotal = useCallback(() => {
     const totalSum = getTotalSum(watchProducts);
@@ -441,9 +435,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             elements={watchProducts}
             actions={actions}
             total={total}
-            globalDiscount={readonly ? budget.globalDiscount : watchGlobalDiscount}
+            globalDiscount={watchGlobalDiscount}
             setGlobalDiscount={(value) => setValue('globalDiscount', value)}
             readOnly={readonly}
+            showTotal={!!watchProducts.length}
           />
           <FieldsContainer>
             <Label>Comentarios</Label>

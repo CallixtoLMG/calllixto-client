@@ -87,7 +87,7 @@ const HeaderCell = styled(STable.HeaderCell)`
 `;
 
 const FooterCell = styled(STable.HeaderCell)`
-padding: 5px 7px !important;
+  padding: 5px 7px !important;
 `;
 
 const ActionsContainer = styled.td`
