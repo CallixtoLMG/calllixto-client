@@ -119,7 +119,7 @@ const PDFfile = ({ budget, total, client }) => {
                     )}
                     <Table.Row>
                       <Cell right textAlign="right" colSpan={PRODUCTS_COLUMNS.length - 2}><strong>TOTAL</strong></Cell>
-                      <Cell colSpan="1"><strong>{formatedPercentage(budget.globalDiscount)}</strong></Cell>
+                      <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
                       <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
                     </Table.Row>
                   </Table.Body>
