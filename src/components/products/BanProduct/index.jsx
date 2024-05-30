@@ -96,6 +96,8 @@ const BanProduct = ({ open, setOpen }) => {
     setFilteredProducts(filtered);
   }, [watchProducts]);
 
+  const hasChanges = filteredProducts.length !== blacklist.length || filteredProducts.some(p => !blacklist.includes(p));
+
   return (
     <Transition animation="fade" duration={500} visible={open}>
       <Modal width="500px"
@@ -133,7 +135,7 @@ const BanProduct = ({ open, setOpen }) => {
               </Loader >
             </FieldsContainer>
             <ModalActions>
-              <Button disabled={isPending || !isDirty} loading={isPending} type="submit" color="green" content="Aceptar" />
+              <Button disabled={isPending || (!isDirty && !hasChanges)} loading={isPending} type="submit" color="green" content="Aceptar" />
               <Button disabled={isPending} onClick={() => setOpen(false)} color="red" content="Cancelar" />
             </ModalActions>
           </Form>
