@@ -37,7 +37,7 @@ const PDFfile = ({ budget, total, client }) => {
           <td>
             <div style={{ width: '80vw' }}>
               <ClientDataContainer>
-                <DataContainer flex="2">
+                <DataContainer width="250px">
                   <Label>Vendedor/a</Label>
                   <Segment>{budget?.seller}</Segment>
                 </DataContainer>
@@ -56,34 +56,42 @@ const PDFfile = ({ budget, total, client }) => {
               </ClientDataContainer>
               <Divider />
               <CustomerDataContainer>
-                <DataContainer flex="1">
-                  <Label>CUIT</Label>
-                  <Segment>{client?.cuil}</Segment>
-                </DataContainer>
-                <DataContainer flex="1">
-                  <Label>IVA</Label>
-                  <Segment>{client?.iva}</Segment>
-                </DataContainer>
-                <DataContainer flex="1">
-                  <Label>Dirección</Label>
-                  <Segment>{client?.addresses?.[0].address}</Segment>
-                </DataContainer >
-                <DataContainer flex="1">
-                  <Label>Teléfono </Label>
-                  <Segment>{formatedSimplePhone(client?.phoneNumbers?.[0])}</Segment>
-                </DataContainer>
+                <Flex>
+                  <DataContainer width="250px">
+                    <Label>CUIT</Label>
+                    <Segment>{client?.cuil}</Segment>
+                  </DataContainer>
+                  <DataContainer flex="1">
+                    <Label>IVA</Label>
+                    <Segment>{client?.iva}</Segment>
+                  </DataContainer>
+                </Flex>
+                <Flex>
+                  <DataContainer width="250px">
+                    <Label>Dirección</Label>
+                    <Segment>{client?.addresses?.[0].address}</Segment>
+                  </DataContainer >
+                  <DataContainer flex="1">
+                    <Label>Teléfonos</Label>
+                    <Segment flexHeight>
+                      <Flex flexDirection="column">
+                        {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')}
+                      </Flex>
+                    </Segment>
+                  </DataContainer>
+                </Flex>
               </CustomerDataContainer>
               <Divider />
               <ClientDataContainer>
-                <DataContainer flex="3">
+                <DataContainer width="250px">
                   <Label>Cliente</Label>
                   <Segment>{(get(budget, "customer.name", ""))}</Segment>
                 </DataContainer>
-                <DataContainer flex="3">
+                <DataContainer flex="1">
                   <Label>Dirección</Label>
                   <Segment>{(get(budget, "customer.addresses[0].address", ""))}</Segment>
                 </DataContainer>
-                <DataContainer flex="2">
+                <DataContainer flex="1">
                   <Label>Teléfono</Label>
                   <Segment>{formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))}</Segment>
                 </DataContainer>

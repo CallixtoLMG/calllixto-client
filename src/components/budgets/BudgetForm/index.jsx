@@ -51,12 +51,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   const watchConfirmed = watch('confirmed');
   const [total, setTotal] = useState(0);
 
-
-
   const calculateTotal = useCallback(() => {
-    const totalSum = getTotalSum(watchProducts);
-    const discountedTotal = totalSum - (totalSum * (watchGlobalDiscount / 100));
-    setTotal(discountedTotal);
+    const totalSum = getTotalSum(watchProducts, watchGlobalDiscount);
+    setTotal(totalSum);
   }, [watchProducts, watchGlobalDiscount]);
 
   useEffect(() => {

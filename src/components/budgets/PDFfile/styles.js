@@ -4,6 +4,8 @@ import styled from "styled-components";
 
 const CustomerDataContainer = styled(Flex)`
   div:last-child { margin: 0!important; };
+  flex-direction: column;
+  row-gap: 10px;
 `;
 
 const TableRowHeader = styled(Table.Row)`
@@ -97,20 +99,20 @@ const Segment = styled(SSegment)`
   border: 0.5px solid grey !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
-  height: 25px!important;
+  height: 30px!important;
   padding: 0 5px!important;
-  line-height: 22px!important;
+  line-height: 28px!important;
 `;
 
 const Label = styled(SLabel)`
-  border: 0.5px solid grey!important; 
+  border: 0.5px solid grey!important;
   border-bottom-left-radius: 0!important;
   border-bottom-right-radius: 0!important;
   margin: 0!important;
   margin-bottom: -1px!important;
-  height: 25px!important;
+  height: 30px!important;
   padding: 0 5px!important;
-  line-height: 25px!important;
+  line-height: 30px!important;
 `;
 
 export { ClientDataContainer, Comment, CustomerDataContainer, DataContainer, Divider, Header, HeaderContainer, Image, Label, PayMethodContainer, PayMethodsContainer, Segment, Sign, SubtleLabel, TableRowHeader, Title };
