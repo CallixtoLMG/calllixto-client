@@ -1,5 +1,6 @@
 import { formatProductCode } from "@/utils";
-import { useEffect, useState } from 'react';
+import debounce from 'lodash/debounce';
+import { useCallback, useEffect, useState } from 'react';
 import { Box } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 import { Container, Search, Text } from "./styles";
@@ -9,12 +10,17 @@ const ProductSearch = ({ products, onProductSelect }) => {
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
+  const debouncedSearch = useCallback(debounce((query) => {
+    const queryWords = query.toLowerCase().split(' ').filter(Boolean);
+    setFilteredProducts(products?.filter((product) => {
+      const name = product?.name?.toLowerCase() || '';
+      const code = product?.code?.toLowerCase() || '';
+      return queryWords.every(word => name.includes(word) || code.includes(word));
+    }));
+  }, 300), [products]);
   useEffect(() => {
-    setFilteredProducts(products?.filter((product) =>
-      product?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product?.code?.toLowerCase().includes(searchQuery.toLowerCase())
-    ));
-  }, [searchQuery, products]);
+    debouncedSearch(searchQuery);
+  }, [searchQuery, debouncedSearch]);
 
   const handleSearchChange = (event, { value }) => {
     setSearchQuery(value);
