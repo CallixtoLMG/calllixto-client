@@ -10,16 +10,24 @@ const ProductSearch = ({ products, onProductSelect }) => {
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const debouncedSearch = useCallback(debounce((query) => {
-    const queryWords = query.toLowerCase().split(' ').filter(Boolean);
-    setFilteredProducts(products?.filter((product) => {
-      const name = product?.name?.toLowerCase() || '';
-      const code = product?.code?.toLowerCase() || '';
-      return queryWords.every(word => name.includes(word) || code.includes(word));
-    }));
-  }, 300), [products]);
+  const debouncedSearch = useCallback(
+    debounce((query) => {
+      const queryWords = query.toLowerCase().split(' ').filter(Boolean);
+      setFilteredProducts(products?.filter((product) => {
+        const productName = product?.name?.toLowerCase();
+        const productCode = product?.code?.toLowerCase();
+        
+        return queryWords.every(word => productName?.includes(word)) ||
+               queryWords.every(word => productCode?.includes(word));
+      }));
+    }, 500), [products]
+  );
+
   useEffect(() => {
     debouncedSearch(searchQuery);
+    return () => {
+      debouncedSearch.cancel();
+    };
   }, [searchQuery, debouncedSearch]);
 
   const handleSearchChange = (event, { value }) => {
