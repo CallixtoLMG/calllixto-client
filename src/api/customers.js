@@ -1,10 +1,12 @@
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
-import { CLIENT_ID, PATHS } from "@/fetchUrls";
+import { PATHS } from "@/fetchUrls";
 import { encodeUri, now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-const CUSTOMERS_URL = `${CLIENT_ID}${PATHS.CUSTOMERS}`;
+
+const CUSTOMERS_URL = `${PATHS.CUSTOMERS}`;
+
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 

@@ -2,21 +2,38 @@ import { URL, VALIDATE } from "@/fetchUrls";
 import axios from "axios";
 
 export async function getUserData() {
-  let data = sessionStorage.getItem("userData");
+  let dataString = sessionStorage.getItem("userData");
+  let data = null;
+
+  if (dataString) {
+    try {
+      data = JSON.parse(dataString);
+    } catch (e) {
+      console.error("Error parsing userData from sessionStorage:", e);
+      sessionStorage.removeItem("userData");
+    }
+  }
 
   if (data?.isAuthorized) {
     return data;
-  };
+  }
 
-  const { data: response} = await axios({
-    url: `${URL}${VALIDATE}`,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      authorization: `Bearer ${localStorage.getItem("token")}`
+  try {
+    const response = await axios({
+      url: `${URL}${VALIDATE}`,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
+
+    if (response.data) {
+      sessionStorage.setItem("userData", JSON.stringify(response.data));
+      return response.data;
     }
-  });
-
-  sessionStorage.setItem("userData", response);
-  return response;
+  } catch (e) {
+    console.error("Error fetching userData from server:", e);
+    return null;
+  }
 };
