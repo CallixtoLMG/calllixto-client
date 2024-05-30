@@ -10,7 +10,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const { control, handleSubmit, formState: { errors, } } = useForm({
     defaultValues: {
       ...customer,
-      phoneNumbers: customer?.phoneNumbers.length ? customer.phoneNumbers : [{ areaCode: '', number: '', ref: "" }],
+      phoneNumbers: customer?.phoneNumbers.length ? customer.phoneNumbers : [{ areaCode: '', number: '', ref: '' }],
       addresses: customer?.addresses?.length ? customer.addresses : [{ address: '', ref: '' }],
     }
   });

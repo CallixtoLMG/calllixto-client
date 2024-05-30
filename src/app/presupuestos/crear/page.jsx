@@ -21,7 +21,7 @@ const CreateBudget = () => {
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
 
-  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({ attributes: [PRODUCTSATTRIBUTES.CODE, PRODUCTSATTRIBUTES.PRICE, PRODUCTSATTRIBUTES.NAME, PRODUCTSATTRIBUTES.COMMENTS], enabled: true });
+  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({ attributes: [PRODUCTSATTRIBUTES.CODE, PRODUCTSATTRIBUTES.PRICE, PRODUCTSATTRIBUTES.NAME, PRODUCTSATTRIBUTES.COMMENTS, PRODUCTSATTRIBUTES.BRANDNAME, PRODUCTSATTRIBUTES.SUPPLIERNAME], enabled: true });
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers({ attributes: [CUSTOMERATTRIBUTES.ADDRESS, CUSTOMERATTRIBUTES.PHONE, CUSTOMERATTRIBUTES.ID, CUSTOMERATTRIBUTES.NAME] });
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
 

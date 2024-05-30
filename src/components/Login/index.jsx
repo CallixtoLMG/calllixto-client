@@ -31,7 +31,7 @@ const LoginForm = ({ onSubmit }) => {
         push(PAGES.PRODUCTS.BASE);
         toast.success("Ingreso exitoso!");
       } else {
-        toast.error("Los datos ingresados no Los datos ingresados no son correctos!");
+        toast.error("Los datos ingresados no son correctos!");
         setIsLoading(false);
       }
     }

@@ -1,4 +1,3 @@
-import { useUserContext } from "@/User";
 import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, edit } from "@/api/budgets";
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
@@ -8,7 +7,7 @@ import { NoPrint, OnlyPrint } from "@/components/layout";
 import { RULES } from "@/constants";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, getTotalSum, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Box, Flex } from "rebass";
@@ -31,8 +30,8 @@ const EMPTY_BUDGET = (user) => ({
   paymentMethods: PAYMENT_METHODS.map((method) => method.value),
   expirationOffsetDays: ""
 });
+
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading }) => {
-  const { userData } = useUserContext();
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
@@ -44,11 +43,20 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
       seller: `${user?.firstName} ${user?.lastName}`
     } : EMPTY_BUDGET(user),
   });
-  const customerRef = useRef(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
   const watchProducts = watch('products');
   const watchConfirmed = watch('confirmed');
   const [total, setTotal] = useState(0);
+  
+  const cleanValue = (value) => {
+    return value.replace(/,/g, '');
+  };
+
+  const removeDecimal = (value) => {
+    return value.replace(/\./g, '');
+  };
+
   const calculateTotal = useCallback(() => {
     setTotal(getTotalSum(watchProducts), [watchProducts]);
   }, [setTotal, watchProducts]);
@@ -65,7 +73,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
       icon: 'trash',
       color: 'red',
       onClick: (element, index) => {
-        deleteProduct(index)
+        deleteProduct(index);
       },
       tooltip: 'Eliminar'
     }
@@ -81,7 +89,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   };
 
   const handleReset = useCallback(() => {
-    customerRef.current.clearValue();
+    setSelectedCustomer(null);
     reset(EMPTY_BUDGET(user));
   }, [reset, user]);
 
@@ -98,7 +106,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
     if (openNextModal) {
       setCustomerData(customer);
       setIsModalConfirmationOpen(true);
-    };
+    }
   };
 
   const handleModalConfirmationClose = () => {
@@ -131,12 +139,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           </>
         ),
         id: 1,
-        width: 2
+        width: 1,
+        align: 'left'
       },
       {
         title: "Nombre",
         value: (product) => (
-          <Container>{product.name}
+          <Container>
+            {product.name}
             {product.comments && (
               <Popup
                 size="mini"
@@ -147,9 +157,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                     <Icon name="info circle" color="yellow" />
                   </Box>
                 }
-              />)}
+              />
+            )}
           </Container>
-        ), id: 2, width: 8, align: 'left'
+        ),
+        id: 2,
+        width: 7,
+        align: 'left'
       },
       {
         title: "Precio",
@@ -176,18 +190,23 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                 name={`products[${index}].quantity`}
                 control={control}
                 rules={RULES.REQUIRED}
-                render={({ field }) => (
-                  <Input
-                    center
+                render={({ field: { onChange, ...rest } }) => (
+                  <CurrencyFormatInput
+                    {...rest}
                     height="35px"
-                    {...field}
-                    type="number"
-                    min={0}
-                    defaultValue={product.quantity}
-
+                    shadow
+                    thousandSeparator={true}
+                    decimalScale={1}
+                    displayType="input"
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      field.onChange(value);
+                      const rawValue = e.target.value;
+                      const cleanedValue = cleanValue(rawValue);
+                      if (cleanedValue < 0) {
+                        onChange(Math.abs(cleanedValue));
+                        return;
+                      }
+                      onChange(cleanedValue);
                       calculateTotal();
                     }}
                   />
@@ -199,7 +218,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           </>
         ),
         id: 4,
-        width: 1
+        width: 2
       },
       {
         title: "Descuento",
@@ -210,18 +229,22 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                 name={`products[${index}].discount`}
                 control={control}
                 defaultValue={product.discount || 0}
-                render={({ field }) => (
+                render={({ field: { onChange, ...rest } }) => (
                   <Input
+                    {...rest}
                     height="35px"
                     center
-                    {...field}
                     fluid
                     type="number"
-                    min={0}
-                    max={100}
-
+                    onFocus={(e) => e.target.select()}
                     onChange={(e) => {
-                      field.onChange(e.target.value);
+                      let value = removeDecimal(e.target.value);
+                      if (value > 100) return;
+                      if (value < 0) {
+                        onChange(Math.abs(value));
+                        return;
+                      }
+                      onChange(value);
                       calculateTotal();
                     }}
                   />
@@ -250,14 +273,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           </Flex>
         ),
         id: 6,
-        width: 2
+        width: 3
       },
     ];
   }, [control, calculateTotal, readonly]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      const confirmationData = { confirmedBy: `${userData.firstName} ${userData.lastName}`, confirmedAt: now() };
+      const confirmationData = { confirmedBy: `${user.firstName} ${user.lastName}`, confirmedAt: now() };
       const { data } = await edit(confirmationData, budget?.id);
       return data;
     },
@@ -350,13 +373,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                       minCharacters={2}
                       noResultsMessage="No se ha encontrado cliente!"
                       options={customers}
-                      ref={customerRef}
+                      value={selectedCustomer}
                       onChange={(e, { value }) => {
                         field.onChange(value);
                         const customer = customers.find((opt) => opt.value === value);
                         setValue('customer.id', customer?.id);
                         setValue('customer.address', customer?.addresses[0]?.address ?? '');
-                        setValue('customer.phone', customer?.phoneNumbers[0] ?? '')
+                        setValue('customer.phone', customer?.phoneNumbers[0] ?? '');
+                        setSelectedCustomer(value);
                       }}
                     />
                   )}
@@ -366,7 +390,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
               )}
             </FormField>
             <FormField width={5}>
-              <RuledLabel title="Dirección" message={errors?.customer?.address?.message} required={watchConfirmed} />
+              <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.address?.message} required={watchConfirmed} />
               {!readonly ? (
                 <Controller
                   name="customer.address"
@@ -398,13 +422,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
               <ProductSearch
                 products={products}
                 onProductSelect={(selectedProduct) => {
-                  setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1 }])
+                  setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1, discount: 0, key: Date.now().toString(36) + selectedProduct.code }]);
                 }}
               />
             </FormField>
           )}
           <Table
-            mainKey="code"
+            mainKey="key"
             headers={BUDGET_FORM_PRODUCT_COLUMNS}
             elements={watchProducts}
             actions={actions}
@@ -437,6 +461,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   defaultValue={PAYMENT_METHODS.map((method) => method.value)}
                   render={({ field }) => (
                     <Dropdown
+                      minHeight="50px"
                       min
                       height="fit-content"
                       name={`paymentMethods`}
@@ -460,7 +485,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             </FormField>
             {!readonly && (
               <>
-                <FormField flex={1} >
+                <FormField flex={1}>
                   <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
                   <Controller
                     name="expirationOffsetDays"
@@ -470,9 +495,11 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                       <Input
                         {...field}
                         maxLength={50}
-                        type="number"
-                        placeholder="Cantidad en días(p. ej: 3, 10, 30, etc)"
-                        onChange={(e, { value }) => {
+                        type="text"
+                        placeholder="Cant. en días (p. ej: 3, 10, etc)"
+                        onChange={(e) => {
+                          let value = e.target.value;
+                          value = value.replace(/\D/g, '');
                           field.onChange(value);
                           SetExpiration(value);
                         }}
@@ -483,7 +510,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             )}
             <FormField flex={1}>
               <Label>Fecha de vencimiento</Label>
-              <Segment >{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
+
+              {!readonly ? (
+                <Segment >{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
+              ) : (
+                <Segment >{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
+              )}
+
+
             </FormField>
           </FieldsContainer>
           {!readonly && (
@@ -504,11 +538,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
               <SendButton customerData={customerData} />
             )}
           </ButtonsContainer>
-        )
-        }
+        )}
       </NoPrint >
       <OnlyPrint>
-        <PDFfile total={total} budget={budget} />
+        <PDFfile total={total} budget={budget} client={user.client?.metadata} />
       </OnlyPrint>
     </>
   );
