@@ -77,8 +77,18 @@ export const getTotal = (product) => {
   return product.price * product.quantity * (1 - (product.discount / 100)) || 0;
 };
 
-export const getTotalSum = (products) => {
-  return products?.reduce((a, b) => a + getTotal(b), 0);
+export const cleanValue = (value) => {
+  return value.replace(/,/g, '');
+};
+
+export const removeDecimal = (value) => {
+  return value.replace(/\./g, '');
+};
+
+export const getTotalSum = (products, discount = 0) => {
+  const totalSum = products?.reduce((a, b) => a + getTotal(b), 0);
+  const discountedTotal = totalSum - (totalSum * (discount / 100));
+  return discountedTotal;
 };
 
 export const formatedSimplePhone = (phoneNumbers) => {
