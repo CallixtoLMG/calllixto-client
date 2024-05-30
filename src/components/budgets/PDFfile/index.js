@@ -1,7 +1,7 @@
 "use client";
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Cell, HeaderCell } from '@/components/common/table';
-import { formatedPricePdf, formatedSimplePhone } from "@/utils";
+import { formatedPercentage, formatedPricePdf, formatedSimplePhone } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { Flex } from "rebass";
@@ -118,7 +118,8 @@ const PDFfile = ({ budget, total, client }) => {
                       })
                     )}
                     <Table.Row>
-                      <Cell right textAlign="right" colSpan={PRODUCTS_COLUMNS.length - 1}><strong>TOTAL</strong></Cell>
+                      <Cell right textAlign="right" colSpan={PRODUCTS_COLUMNS.length - 2}><strong>TOTAL</strong></Cell>
+                      <Cell colSpan="1"><strong>{formatedPercentage(budget.globalDiscount)}</strong></Cell>
                       <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
                     </Table.Row>
                   </Table.Body>

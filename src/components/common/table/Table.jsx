@@ -1,15 +1,15 @@
 import { CurrencyFormatInput, Input } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
-import { handleEnterKeyPress } from '@/utils';
+import { formatedPercentage, handleEnterKeyPress, removeDecimal } from '@/utils';
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
-import { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
-const CustomTable = ({ pag, isRefetching, isLoading, onFilter, onManuallyRestore, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside }) => {
+import { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
+const CustomTable = ({ showTotal, readOnly, pag, isRefetching, isLoading, onFilter, onManuallyRestore, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside, globalDiscount, setGlobalDiscount }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
 
@@ -165,24 +165,61 @@ const CustomTable = ({ pag, isRefetching, isLoading, onFilter, onManuallyRestore
               </Table.Body>
             </Loader>
           )}
-          {total !== undefined && (
+          {showTotal && (
             <Table.Footer celled fullWidth>
               <Table.Row>
-                <HeaderCell textAlign="right" colSpan={headers.length - 1}><strong>TOTAL</strong></HeaderCell>
-                <HeaderCell colSpan="1">
-                  <strong>
-                    <Flex alignItems="center" justifyContent="space-between">
-                      $
-                      <CurrencyFormatInput
-                        displayType="text"
-                        thousandSeparator={true}
-                        fixedDecimalScale={true}
-                        decimalScale={2}
-                        value={total}
+                <>
+                  <FooterCell textAlign="right" colSpan={3}></FooterCell>
+                  <FooterCell textAlign="center" colSpan={headers.length - 5}><strong>TOTAL</strong></FooterCell>
+                  {!readOnly ? (
+                    <FooterCell colSpan="1">
+                      <Controller
+                        name="globalDiscount"
+                        control={control}
+                        render={({ field: { onChange, ...rest } }) => (
+                          <Input
+                            {...rest}
+                            height="35px"
+                            type="number"
+                            center
+                            fluid
+                            defaultValue={0}
+                            onFocus={(e) => e.target.select()}
+                            onChange={(e) => {
+                              let value = removeDecimal(e.target.value);
+                              if (value > 100) return;
+                              if (value < 0) {
+                                onChange(Math.abs(value));
+                                return;
+                              }
+                              setGlobalDiscount(value);
+                              onChange(value);
+                            }}
+                          />
+                        )}
                       />
-                    </Flex>
-                  </strong>
-                </HeaderCell>
+                    </FooterCell>) : (
+                    <FooterCell textAlign="center" colSpan="1">
+                      {formatedPercentage(globalDiscount)}
+                    </FooterCell>
+                  )
+                  }
+                  <FooterCell colSpan="1">
+                    <strong>
+                      <Flex alignItems="center" justifyContent="space-between">
+                        $
+                        <CurrencyFormatInput
+                          height="35px"
+                          displayType="text"
+                          thousandSeparator={true}
+                          fixedDecimalScale={true}
+                          decimalScale={2}
+                          value={total}
+                        />
+                      </Flex>
+                    </strong>
+                  </FooterCell>
+                </>
               </Table.Row>
             </Table.Footer>
           )}
