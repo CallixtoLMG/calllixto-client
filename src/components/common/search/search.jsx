@@ -9,21 +9,23 @@ const ProductSearch = ({ products, onProductSelect }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((query) => {
       const queryWords = query.toLowerCase().split(' ').filter(Boolean);
       setFilteredProducts(products?.filter((product) => {
-        const productName = product?.name?.toLowerCase();
-        const productCode = product?.code?.toLowerCase();
-        
-        return queryWords.every(word => productName?.includes(word)) ||
-               queryWords.every(word => productCode?.includes(word));
+        const name = product?.name?.toLowerCase();
+        const code = product?.code?.toLowerCase();
+        return queryWords.every(word => name?.includes(word)) || code?.includes(query.toLowerCase());
       }));
-    }, 500), [products]
+      setLoading(false);
+    }, 300), [products]
   );
 
   useEffect(() => {
+    setLoading(true);
     debouncedSearch(searchQuery);
     return () => {
       debouncedSearch.cancel();
@@ -48,6 +50,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
       selectFirstResult
       minCharacters={2}
       searchDelay={1000}
+      loading={loading}
       onSearchChange={handleSearchChange}
       value={selectedProduct ? '' : searchQuery}
       noResultsMessage="No se encontró producto"
