@@ -69,7 +69,7 @@ export const formatProductCode = (code) => {
   return `${firstPart}-${secondPart}-${thirdPart}`
 };
 
-export const formatedPercentage = (number) => {
+export const formatedPercentage = (number = 0) => {
   return number + " %"
 }
 
