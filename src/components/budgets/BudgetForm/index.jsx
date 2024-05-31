@@ -5,18 +5,18 @@ import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, Fiel
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { RULES } from "@/constants";
-import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, getTotalSum, now, removeDecimal } from "@/utils";
+import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, now, removeDecimal } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Box, Flex } from "rebass";
-import { CardGroup, Icon, Message, MessageHeader, Popup } from "semantic-ui-react";
+import { Icon, Message, MessageList, Popup } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
-import { Container } from "./styles";
+import { Container, MessageHeader, MessageItem } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -71,28 +71,45 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         });
         setValue('products', newProducts);
         toast((t) => (
-          <Box width="100%">
+          <Box width="100%" position="relative">
             <Message info>
-              <MessageHeader>Tuvimos que actualizar el presupuesto por los siguientes cambios:</MessageHeader>
+              <MessageHeader>Es necesario actualizar el presupuesto por los siguientes cambios:</MessageHeader>
             </Message>
             {!!outdatedProducts.length && (
-              <Box>
-                <p>Los siguentes productos actualizaron el precio</p>
-                <CardGroup items={outdatedProducts.map(p => ({ description: `${p.code} - ${p.name} - ${p.price}` }))} />
-              </Box>
+              <Message>
+                <MessageHeader>Productos con precio actualizado:</MessageHeader>
+                <MessageList>
+                  {outdatedProducts.map(p => {
+                    const oldPrice = budget.products.find(op => op.code === p.code);
+                    return (
+                      <MessageItem key={p.code}>
+                        {`${p.code} | ${p.name} | `}
+                        <span style={{ color: 'red' }}>{formatedPrice(oldPrice.price)}</span>
+                        {' -> '}
+                        <span style={{ color: 'green' }}>{`${formatedPrice(p.price)}.`}</span>
+                      </MessageItem>
+                    );
+                  })}
+                </MessageList>
+              </Message>
             )}
             {!!budgetProducts.length && (
-              <Box>
-                <p>Los siguentes productos se eliminaron porque ya no están disponibles</p>
-                <CardGroup items={budgetProducts.map(p => ({ description: `${p.code} - ${p.name}` }))} />
-              </Box>
+              <Message>
+                <MessageHeader>Productos ya no disponibles:</MessageHeader>
+                <MessageList>
+                  {budgetProducts.map(p => (
+                    <MessageItem key={p.code}>{`${p.code} | ${p.name} | ${formatedPrice(p.price)}.`}</MessageItem>
+                  ))}
+                </MessageList>
+              </Message>
             )}
-            <Flex marginTop="15px" justifyContent="flex-end">
-              <Button onClick={() => toast.dismiss(t.id)}>Cerrar</Button>
-            </Flex>
-          </Box>
+            <Icon circular inverted size="tiny" color="red" name="close" onClick={() => toast.dismiss(t.id)} style={{ position: 'absolute', top: '5px', right: '0px', cursor: 'pointer' }} />
+          </Box >
         ), {
-          duration: 10000
+          duration: 10000,
+          style: {
+            maxWidth: '80vw',
+          },
         });
       }
     }
