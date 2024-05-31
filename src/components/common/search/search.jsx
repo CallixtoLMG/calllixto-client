@@ -1,5 +1,6 @@
 import { formatProductCode } from "@/utils";
-import { useEffect, useState } from 'react';
+import debounce from 'lodash/debounce';
+import { useCallback, useEffect, useState } from 'react';
 import { Box } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 import { Container, Search, Text } from "./styles";
@@ -8,13 +9,28 @@ const ProductSearch = ({ products, onProductSelect }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSearch = useCallback(
+    debounce((query) => {
+      const queryWords = query.toLowerCase().split(' ').filter(Boolean);
+      setFilteredProducts(products?.filter((product) => {
+        const name = product?.name?.toLowerCase();
+        const code = product?.code?.toLowerCase();
+        return queryWords.every(word => name?.includes(word)) || code?.includes(query.toLowerCase());
+      }));
+      setLoading(false);
+    }, 300), [products]
+  );
 
   useEffect(() => {
-    setFilteredProducts(products?.filter((product) =>
-      product?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      product?.code?.toLowerCase().includes(searchQuery.toLowerCase())
-    ));
-  }, [searchQuery, products]);
+    setLoading(true);
+    debouncedSearch(searchQuery);
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [searchQuery, debouncedSearch]);
 
   const handleSearchChange = (event, { value }) => {
     setSearchQuery(value);
@@ -34,6 +50,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
       selectFirstResult
       minCharacters={2}
       searchDelay={1000}
+      loading={loading}
       onSearchChange={handleSearchChange}
       value={selectedProduct ? '' : searchQuery}
       noResultsMessage="No se encontró producto"
