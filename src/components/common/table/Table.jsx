@@ -51,13 +51,7 @@ const CustomTable = ({ showTotal, readOnly, pag, isRefetching, isLoading, onFilt
               <Flex justifyContent="space-between">
                 <FiltersContainer>
                   <Popup
-                    content={
-                      <>
-                        Restaurar filtros
-                        <br />
-                        y página.
-                      </>
-                    }
+                    content="Restaurar filtros"
                     position="top center"
                     size="tiny"
                     trigger={(
@@ -87,7 +81,6 @@ const CustomTable = ({ showTotal, readOnly, pag, isRefetching, isLoading, onFilt
                 </FiltersContainer>
                 <Button marginLeft="10px" onClick={handleSubmit(onFilter)} type="button" width="110px">
                   <Flex justifyContent="space-around">
-                    <span>Filtrar</span>
                     <Icon name="search" />
                   </Flex>
                 </Button>
