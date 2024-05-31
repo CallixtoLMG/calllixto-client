@@ -11,7 +11,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Box, Flex } from "rebass";
-import { Icon, Popup } from "semantic-ui-react";
+import { CardGroup, Icon, Message, MessageHeader, Popup } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
@@ -31,7 +31,7 @@ const EMPTY_BUDGET = (user) => ({
   expirationOffsetDays: ""
 });
 
-const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading }) => {
+const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading, isCloning }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
@@ -39,17 +39,64 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   const [expiration, SetExpiration] = useState(false);
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
-      globalDiscount: 0,
       ...budget,
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
   });
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
-  const watchProducts = watch('products');
-  const watchGlobalDiscount = watch('globalDiscount', 0);
-  const watchConfirmed = watch('confirmed');
+  const [watchProducts, watchGlobalDiscount, watchConfirmed] = watch(['products', 'globalDiscount', 'confirmed']);
   const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    if (isCloning) {
+      let budgetProducts = [...budget.products];
+      const outdatedProducts = products.filter(product => {
+        const budgetProduct = budgetProducts.find(budgetProduct => budgetProduct.code === product.code);
+        if (budgetProduct) {
+          budgetProducts = budgetProducts.filter(budgetProduct => budgetProduct.code !== product.code);
+          return budgetProduct.price !== product.price;
+        }
+        return false;
+      });
+      if (outdatedProducts.length || budgetProducts.length) {
+        let newProducts = [...watchProducts];
+        newProducts = newProducts.filter(product => !budgetProducts.some(budgetProduct => budgetProduct.code === product.code));
+        newProducts = newProducts.map(product => {
+          const outdatedProduct = outdatedProducts.find(outdatedProduct => outdatedProduct.code === product.code);
+          if (outdatedProduct) {
+            return { ...product, price: outdatedProduct.price };
+          }
+          return product;
+        });
+        setValue('products', newProducts);
+        toast((t) => (
+          <Box width="100%">
+            <Message info>
+              <MessageHeader>Tuvimos que actualizar el presupuesto por los siguientes cambios:</MessageHeader>
+            </Message>
+            {!!outdatedProducts.length && (
+              <Box>
+                <p>Los siguentes productos actualizaron el precio</p>
+                <CardGroup items={outdatedProducts.map(p => ({ description: `${p.code} - ${p.name} - ${p.price}` }))} />
+              </Box>
+            )}
+            {!!budgetProducts.length && (
+              <Box>
+                <p>Los siguentes productos se eliminaron porque ya no están disponibles</p>
+                <CardGroup items={budgetProducts.map(p => ({ description: `${p.code} - ${p.name}` }))} />
+              </Box>
+            )}
+            <Flex marginTop="15px" justifyContent="flex-end">
+              <Button onClick={() => toast.dismiss(t.id)}>Cerrar</Button>
+            </Flex>
+          </Box>
+        ), {
+          duration: 10000
+        });
+      }
+    }
+  }, [budget, isCloning, products]);
 
   const calculateTotal = useCallback(() => {
     const totalSum = getTotalSum(watchProducts, watchGlobalDiscount);
@@ -432,7 +479,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             elements={watchProducts}
             actions={actions}
             total={total}
-            globalDiscount={watchGlobalDiscount}
+            globalDiscount={watchGlobalDiscount || 0}
             setGlobalDiscount={(value) => setValue('globalDiscount', value)}
             readOnly={readonly}
             showTotal={!!watchProducts.length}

@@ -84,7 +84,6 @@ const CreateBudget = () => {
       const { customer, id, ...clonedBudget } = budget;
       return clonedBudget;
     }
-
   }, [budget]);
 
   return (
@@ -96,6 +95,7 @@ const CreateBudget = () => {
         customers={mappedCustomers}
         user={userData}
         budget={clonedBudget}
+        isCloning={!!clonedBudget}
         isLoading={isPending}
       />
     </Loader>

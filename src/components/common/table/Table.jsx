@@ -183,7 +183,7 @@ const CustomTable = ({ showTotal, readOnly, pag, isRefetching, isLoading, onFilt
                             type="number"
                             center
                             fluid
-                            defaultValue={0}
+                            defaultValue={globalDiscount}
                             onFocus={(e) => e.target.select()}
                             onChange={(e) => {
                               let value = removeDecimal(e.target.value);
