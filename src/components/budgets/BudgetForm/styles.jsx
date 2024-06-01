@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Icon as SIcon, MessageHeader as SMessageHeader, MessageItem as SMessageItem } from "semantic-ui-react";
+import { Icon as SIcon, MessageHeader as SMessageHeader, MessageItem as SMessageItem, MessageList as SMessageList } from "semantic-ui-react";
 import styled from 'styled-components';
 
 const Container = styled(Flex)`
@@ -22,6 +22,10 @@ const Icon = styled(SIcon)`
     background: #e8e8e8!important;
   }
 `;
+const MessageList = styled(SMessageList)`
+  max-height: 160px;
+  overflow-y: auto;
+`;
 
-export { Container, Icon, MessageHeader, MessageItem };
+export { Container, Icon, MessageHeader, MessageItem, MessageList };
 

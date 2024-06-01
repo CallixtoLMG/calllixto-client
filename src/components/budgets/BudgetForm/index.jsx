@@ -11,12 +11,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Box, Flex } from "rebass";
-import { Message, MessageList, Modal, Popup, Transition } from "semantic-ui-react";
+import { Message, Modal, Popup, Transition } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
-import { Container, Icon, MessageHeader, MessageItem } from "./styles";
+import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -350,7 +350,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         )}
         <Transition visible={isUpdateModalOpen} animation='scale' duration={500}>
           <Modal closeOnDimmerClick={false} open={isUpdateModalOpen} onClose={handleUpdateModalClose} size="large">
-            <Modal.Header>Actualización de presupuesto requerida</Modal.Header>
+            <Modal.Header>Es necesario actualizar los presupuestos debido a los siguientes cambios</Modal.Header>
             <Modal.Content>
               {!!outdatedProducts.length && (
                 <Message>
