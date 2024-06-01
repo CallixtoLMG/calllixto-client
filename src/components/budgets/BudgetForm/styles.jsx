@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { MessageHeader as SMessageHeader, MessageItem as SMessageItem } from "semantic-ui-react";
+import { Icon as SIcon, MessageHeader as SMessageHeader, MessageItem as SMessageItem } from "semantic-ui-react";
 import styled from 'styled-components';
 
 const Container = styled(Flex)`
@@ -15,5 +15,13 @@ const MessageItem = styled(SMessageItem)`
   font-size: 13px!important;
 `;
 
-export { Container, MessageHeader, MessageItem };
+const Icon = styled(SIcon)`
+  scale: 1.2!important;
+  border-radius: 2px!important;
+  &:hover {
+    background: #e8e8e8!important;
+  }
+`;
+
+export { Container, Icon, MessageHeader, MessageItem };
 

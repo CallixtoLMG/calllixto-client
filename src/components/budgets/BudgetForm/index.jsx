@@ -11,12 +11,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Box, Flex } from "rebass";
-import { Icon, Message, MessageList, Popup } from "semantic-ui-react";
+import { Message, MessageList, Modal, Popup, Transition } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
-import { Container, MessageHeader, MessageItem } from "./styles";
+import { Container, Icon, MessageHeader, MessageItem } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -36,6 +36,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [outdatedProducts, setOutdatedProducts] = useState([]);
+  const [removedProducts, setRemovedProducts] = useState([]);
   const [expiration, SetExpiration] = useState(false);
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
@@ -70,47 +73,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           return product;
         });
         setValue('products', newProducts);
-        toast((t) => (
-          <Box width="100%" position="relative">
-            <Message info>
-              <MessageHeader>Es necesario actualizar el presupuesto por los siguientes cambios:</MessageHeader>
-            </Message>
-            {!!outdatedProducts.length && (
-              <Message>
-                <MessageHeader>Productos con precio actualizado:</MessageHeader>
-                <MessageList>
-                  {outdatedProducts.map(p => {
-                    const oldPrice = budget.products.find(op => op.code === p.code);
-                    return (
-                      <MessageItem key={p.code}>
-                        {`${p.code} | ${p.name} | `}
-                        <span style={{ color: 'red' }}>{formatedPrice(oldPrice.price)}</span>
-                        {' -> '}
-                        <span style={{ color: 'green' }}>{`${formatedPrice(p.price)}.`}</span>
-                      </MessageItem>
-                    );
-                  })}
-                </MessageList>
-              </Message>
-            )}
-            {!!budgetProducts.length && (
-              <Message>
-                <MessageHeader>Productos ya no disponibles:</MessageHeader>
-                <MessageList>
-                  {budgetProducts.map(p => (
-                    <MessageItem key={p.code}>{`${p.code} | ${p.name} | ${formatedPrice(p.price)}.`}</MessageItem>
-                  ))}
-                </MessageList>
-              </Message>
-            )}
-            <Icon circular inverted size="tiny" color="red" name="close" onClick={() => toast.dismiss(t.id)} style={{ position: 'absolute', top: '5px', right: '0px', cursor: 'pointer' }} />
-          </Box >
-        ), {
-          duration: 10000,
-          style: {
-            maxWidth: '80vw',
-          },
-        });
+        setOutdatedProducts(outdatedProducts);
+        setRemovedProducts(budgetProducts);
+        setIsUpdateModalOpen(true);
       }
     }
   }, [budget, isCloning, products]);
@@ -174,6 +139,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
 
   const handleModalConfirmationClose = () => {
     setIsModalConfirmationOpen(false);
+  };
+
+  const handleUpdateModalClose = () => {
+    setIsUpdateModalOpen(false);
   };
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
@@ -379,6 +348,44 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             />
           </>
         )}
+        <Transition visible={isUpdateModalOpen} animation='scale' duration={500}>
+          <Modal closeOnDimmerClick={false} open={isUpdateModalOpen} onClose={handleUpdateModalClose} size="large">
+            <Modal.Header>Actualización de presupuesto requerida</Modal.Header>
+            <Modal.Content>
+              {!!outdatedProducts.length && (
+                <Message>
+                  <MessageHeader>Productos con precio actualizado</MessageHeader>
+                  <MessageList>
+                    {outdatedProducts.map(p => {
+                      const oldPrice = budget.products.find(op => op.code === p.code);
+                      return (
+                        <MessageItem key={p.code}>
+                          {`${p.code} | ${p.name} | `}
+                          <span style={{ color: 'red' }}>{formatedPrice(oldPrice.price)}</span>
+                          {' -> '}
+                          <span style={{ color: 'green' }}>{`${formatedPrice(p.price)}.`}</span>
+                        </MessageItem>
+                      );
+                    })}
+                  </MessageList>
+                </Message>
+              )}
+              {!!removedProducts.length && (
+                <Message>
+                  <MessageHeader>Productos no disponibles</MessageHeader>
+                  <MessageList>
+                    {removedProducts.map(p => (
+                      <MessageItem key={p.code}>{`${p.code} | ${p.name} | ${formatedPrice(p.price)}.`}</MessageItem>
+                    ))}
+                  </MessageList>
+                </Message>
+              )}
+            </Modal.Content>
+            <Modal.Actions>
+              <Button color="green" onClick={handleUpdateModalClose}>Okey!</Button>
+            </Modal.Actions>
+          </Modal>
+        </Transition>
         <Form onSubmit={handleSubmit(handleCreate)} >
           <FieldsContainer>
             <FormField width="300px">
