@@ -17,20 +17,17 @@ const Budget = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const { role } = useUserContext();
-  
+
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [resetActions]);
 
   useEffect(() => {
-    setLabels(['Presupuestos', budget && budget?.id]);
+    if (budget) {
+      setLabels(['Presupuestos', budget.id]);
+    }
   }, [setLabels, budget]);
-
-  if (!isLoading && !budget) {
-    push(PAGES.NOT_FOUND.BASE);
-    return;
-  };
 
   useEffect(() => {
     if (budget) {
@@ -48,11 +45,16 @@ const Budget = ({ params }) => {
     }
   }, [budget, push, role, setActions]);
 
+  if (!isLoading && !budget) {
+    push(PAGES.NOT_FOUND.BASE);
+    return;
+  };
+
   return (
     <Loader active={isLoading}>
       <BudgetForm readonly user={userData} budget={budget} />
     </Loader>
-  )
+  );
 };
 
 export default Budget;
