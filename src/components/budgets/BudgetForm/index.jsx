@@ -27,11 +27,14 @@ const EMPTY_BUDGET = (user) => ({
   },
   products: [],
   comments: '',
+  confirmed: false,
+  globalDiscount: 0,
   paymentMethods: PAYMENT_METHODS.map((method) => method.value),
-  expirationOffsetDays: ""
+  expirationOffsetDays: ''
 });
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading }) => {
+  console.log("budget", budget)
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
@@ -39,11 +42,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   const [expiration, SetExpiration] = useState(false);
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
-      globalDiscount: 0,
+      globalDiscount: budget?.globalDiscount,
       ...budget,
+      confirmed: budget?.confirmed,
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
+
   });
+  console.log(budget)
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
   const watchProducts = watch('products');

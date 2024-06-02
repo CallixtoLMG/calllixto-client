@@ -24,11 +24,9 @@ const LoginForm = ({ onSubmit }) => {
       return data;
     },
     onSuccess: (userData) => {
-      if (userData.clientId === "callixto") {
+      if (userData) {
         setUserData(userData);
-        push(PAGES.PRODUCTS.BASE);
-      } else if (userData) {
-        push(PAGES.PRODUCTS.BASE);
+        push(PAGES.BUDGETS.BASE);
         toast.success("Ingreso exitoso!");
       } else {
         toast.error("Los datos ingresados no son correctos!");
