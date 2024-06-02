@@ -5,18 +5,18 @@ import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, Fiel
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { RULES } from "@/constants";
-import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, getTotalSum, now, removeDecimal } from "@/utils";
+import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, now, removeDecimal } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Box, Flex } from "rebass";
-import { Icon, Popup } from "semantic-ui-react";
+import { Message, Modal, Popup, Transition } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
-import { Container } from "./styles";
+import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -31,25 +31,54 @@ const EMPTY_BUDGET = (user) => ({
   expirationOffsetDays: ""
 });
 
-const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading }) => {
+const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading, isCloning }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [outdatedProducts, setOutdatedProducts] = useState([]);
+  const [removedProducts, setRemovedProducts] = useState([]);
   const [expiration, SetExpiration] = useState(false);
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
-      globalDiscount: 0,
       ...budget,
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
   });
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
-  const watchProducts = watch('products');
-  const watchGlobalDiscount = watch('globalDiscount', 0);
-  const watchConfirmed = watch('confirmed');
+  const [watchProducts, watchGlobalDiscount, watchConfirmed] = watch(['products', 'globalDiscount', 'confirmed']);
   const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    if (isCloning) {
+      let budgetProducts = [...budget.products];
+      const outdatedProducts = products.filter(product => {
+        const budgetProduct = budgetProducts.find(budgetProduct => budgetProduct.code === product.code);
+        if (budgetProduct) {
+          budgetProducts = budgetProducts.filter(budgetProduct => budgetProduct.code !== product.code);
+          return budgetProduct.price !== product.price;
+        }
+        return false;
+      });
+      if (outdatedProducts.length || budgetProducts.length) {
+        let newProducts = [...watchProducts];
+        newProducts = newProducts.filter(product => !budgetProducts.some(budgetProduct => budgetProduct.code === product.code));
+        newProducts = newProducts.map(product => {
+          const outdatedProduct = outdatedProducts.find(outdatedProduct => outdatedProduct.code === product.code);
+          if (outdatedProduct) {
+            return { ...product, price: outdatedProduct.price };
+          }
+          return product;
+        });
+        setValue('products', newProducts);
+        setOutdatedProducts(outdatedProducts);
+        setRemovedProducts(budgetProducts);
+        setIsUpdateModalOpen(true);
+      }
+    }
+  }, [budget, isCloning, products]);
 
   const calculateTotal = useCallback(() => {
     const totalSum = getTotalSum(watchProducts, watchGlobalDiscount);
@@ -110,6 +139,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
 
   const handleModalConfirmationClose = () => {
     setIsModalConfirmationOpen(false);
+  };
+
+  const handleUpdateModalClose = () => {
+    setIsUpdateModalOpen(false);
   };
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
@@ -315,6 +348,44 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             />
           </>
         )}
+        <Transition visible={isUpdateModalOpen} animation='scale' duration={500}>
+          <Modal closeOnDimmerClick={false} open={isUpdateModalOpen} onClose={handleUpdateModalClose} size="large">
+            <Modal.Header>Es necesario actualizar los presupuestos debido a los siguientes cambios</Modal.Header>
+            <Modal.Content>
+              {!!outdatedProducts.length && (
+                <Message>
+                  <MessageHeader>Productos con precio actualizado</MessageHeader>
+                  <MessageList>
+                    {outdatedProducts.map(p => {
+                      const oldPrice = budget.products.find(op => op.code === p.code);
+                      return (
+                        <MessageItem key={p.code}>
+                          {`${p.code} | ${p.name} | `}
+                          <span style={{ color: 'red' }}>{formatedPrice(oldPrice.price)}</span>
+                          {' -> '}
+                          <span style={{ color: 'green' }}>{`${formatedPrice(p.price)}.`}</span>
+                        </MessageItem>
+                      );
+                    })}
+                  </MessageList>
+                </Message>
+              )}
+              {!!removedProducts.length && (
+                <Message>
+                  <MessageHeader>Productos no disponibles</MessageHeader>
+                  <MessageList>
+                    {removedProducts.map(p => (
+                      <MessageItem key={p.code}>{`${p.code} | ${p.name} | ${formatedPrice(p.price)}.`}</MessageItem>
+                    ))}
+                  </MessageList>
+                </Message>
+              )}
+            </Modal.Content>
+            <Modal.Actions>
+              <Button color="green" onClick={handleUpdateModalClose}>Okey!</Button>
+            </Modal.Actions>
+          </Modal>
+        </Transition>
         <Form onSubmit={handleSubmit(handleCreate)} >
           <FieldsContainer>
             <FormField width="300px">
@@ -432,7 +503,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             elements={watchProducts}
             actions={actions}
             total={total}
-            globalDiscount={watchGlobalDiscount}
+            globalDiscount={watchGlobalDiscount || 0}
             setGlobalDiscount={(value) => setValue('globalDiscount', value)}
             readOnly={readonly}
             showTotal={!!watchProducts.length}
