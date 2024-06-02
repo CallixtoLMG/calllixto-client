@@ -26,7 +26,7 @@ const PDFfile = ({ budget, total, client }) => {
         <tr>
           <td>
             <HeaderContainer>
-              <Title as="h1">MADERERA LAS TAPIAS</Title>
+              <Title as="h2">MADERERA LAS TAPIAS</Title>
               <Image src="/Las Tapias.png" alt="Maderera logo" />
             </HeaderContainer>
           </td>
