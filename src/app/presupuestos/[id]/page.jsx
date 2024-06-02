@@ -21,7 +21,7 @@ const Budget = ({ params }) => {
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetActions]);
+  }, []);
 
   useEffect(() => {
     if (budget) {
