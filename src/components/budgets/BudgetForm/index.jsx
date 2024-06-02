@@ -34,7 +34,6 @@ const EMPTY_BUDGET = (user) => ({
 });
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading }) => {
-  console.log("budget", budget)
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
