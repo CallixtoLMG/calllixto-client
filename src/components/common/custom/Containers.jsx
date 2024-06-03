@@ -11,7 +11,7 @@ export const Form = styled(SForm)`
 export const FieldsContainer = styled(Flex)`
   justify-content: ${({ justifyContent }) => justifyContent};
   flex-wrap: wrap;
-  column-gap: 20px;
+  column-gap: ${({ columnGap = '20px' }) => columnGap };
   row-gap: ${({ rowGap = 'auto' }) => rowGap} !important;
   width: ${({ width = 'auto' }) => width} !important;
   min-height: ${({ minHeight = 'auto' }) => minHeight} !important;

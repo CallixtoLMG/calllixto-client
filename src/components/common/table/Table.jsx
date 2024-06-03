@@ -113,7 +113,7 @@ const CustomTable = ({ showTotal, readOnly, pag, isRefetching, isLoading, onFilt
                   <Table.Row>
                     <Table.Cell colSpan={headers.length} textAlign="center">
                       <Header as="h4">
-                        No se encontraron ítems.
+                        No se encontraron ítems
                       </Header>
                     </Table.Cell>
                   </Table.Row>

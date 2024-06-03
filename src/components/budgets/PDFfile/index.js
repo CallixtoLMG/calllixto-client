@@ -108,7 +108,7 @@ const PDFfile = ({ budget, total, client }) => {
                       <Table.Row>
                         <Cell colSpan={PRODUCTS_COLUMNS.length} textAlign="center">
                           <Header as="h4">
-                            No se encontraron ítems.
+                            No se encontraron ítems
                           </Header>
                         </Cell>
                       </Table.Row>
