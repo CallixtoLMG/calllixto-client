@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { LIST_BUDGETS_QUERY_KEY, create, useGetBudget } from "@/api/budgets";
-import { edit, useListCustomers } from "@/api/customers";
+import { edit, useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { ATTRIBUTES as CUSTOMERATTRIBUTES } from "@/components/customers/customers.common";
@@ -22,7 +22,7 @@ const CreateBudget = () => {
   const { push } = useRouter();
 
   const { data: productsData, isLoading: loadingProducts } = useListAllProducts({ attributes: [PRODUCTSATTRIBUTES.CODE, PRODUCTSATTRIBUTES.PRICE, PRODUCTSATTRIBUTES.NAME, PRODUCTSATTRIBUTES.COMMENTS, PRODUCTSATTRIBUTES.BRANDNAME, PRODUCTSATTRIBUTES.SUPPLIERNAME], enabled: true });
-  const { data: customersData, isLoading: loadingCustomers } = useListCustomers({ attributes: [CUSTOMERATTRIBUTES.ADDRESS, CUSTOMERATTRIBUTES.PHONE, CUSTOMERATTRIBUTES.ID, CUSTOMERATTRIBUTES.NAME] });
+  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({ attributes: [CUSTOMERATTRIBUTES.ADDRESS, CUSTOMERATTRIBUTES.PHONE, CUSTOMERATTRIBUTES.ID, CUSTOMERATTRIBUTES.NAME] });
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
 
   const { products } = useMemo(() => {

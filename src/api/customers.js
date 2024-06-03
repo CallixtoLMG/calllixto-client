@@ -8,6 +8,7 @@ import axios from './axios';
 const CUSTOMERS_URL = `${PATHS.CUSTOMERS}`;
 
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
+export const LIST__ALL_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 
 export function create(customer) {
@@ -59,6 +60,43 @@ export function useListCustomers({ sort, order = true, pageSize = DEFAULT_PAGE_S
   const query = useQuery({
     queryKey: [LIST_CUSTOMERS_QUERY_KEY, params, attributes],
     queryFn: () => listCustomers(params),
+  });
+
+  return query;
+};
+
+export function useListAllCustomers({ attributes = [] }) {
+  const listCustomers = async () => {
+    try {
+      let customers = [];
+      let LastEvaluatedKey;
+
+      do {
+        const params = {
+          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(LastEvaluatedKey) }),
+          attributes: encodeUri(attributes)
+        };
+
+        const { data } = await axios.get(CUSTOMERS_URL, { params });
+
+        if (data.statusOk) {
+          customers = [...customers, ...data.customers];
+        }
+
+        LastEvaluatedKey = data?.LastEvaluatedKey;
+
+      } while (LastEvaluatedKey);
+
+      return { customers };
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const query = useQuery({
+    queryKey: [LIST__ALL_CUSTOMERS_QUERY_KEY, attributes],
+    queryFn: () => listCustomers(),
+    staleTime: TIME_IN_MS.FOUR_HOURS,
   });
 
   return query;
