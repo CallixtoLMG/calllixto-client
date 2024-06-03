@@ -48,7 +48,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
       confirmed: isCloning ? false : budget?.confirmed,
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
-
   });
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
