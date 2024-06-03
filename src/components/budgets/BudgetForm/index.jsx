@@ -27,8 +27,10 @@ const EMPTY_BUDGET = (user) => ({
   },
   products: [],
   comments: '',
+  confirmed: false,
+  globalDiscount: 0,
   paymentMethods: PAYMENT_METHODS.map((method) => method.value),
-  expirationOffsetDays: ""
+  expirationOffsetDays: ''
 });
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading, isCloning }) => {
@@ -43,6 +45,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
       ...budget,
+      confirmed: isCloning ? false : budget?.confirmed,
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
   });
@@ -350,7 +353,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         )}
         <Transition visible={isUpdateModalOpen} animation='scale' duration={500}>
           <Modal closeOnDimmerClick={false} open={isUpdateModalOpen} onClose={handleUpdateModalClose} size="large">
-            <Modal.Header>Es necesario actualizar los presupuestos debido a los siguientes cambios</Modal.Header>
+            <Modal.Header>Se actualizó el presupuesto ya que algunos productos sufrieron modificaciones</Modal.Header>
             <Modal.Content>
               {!!outdatedProducts.length && (
                 <Message>

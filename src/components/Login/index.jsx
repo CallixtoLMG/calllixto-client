@@ -26,7 +26,7 @@ const LoginForm = ({ onSubmit }) => {
     onSuccess: (userData) => {
       if (userData) {
         setUserData(userData);
-        push(PAGES.PRODUCTS.BASE);
+        push(PAGES.BUDGETS.BASE);
         toast.success("Ingreso exitoso!");
       } else {
         toast.error("Los datos ingresados no son correctos!");
