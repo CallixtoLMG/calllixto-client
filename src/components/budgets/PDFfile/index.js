@@ -4,6 +4,7 @@ import { Cell, HeaderCell } from '@/components/common/table';
 import { formatedPercentage, formatedPricePdf, formatedSimplePhone } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
+import { useMemo } from "react";
 import { Flex } from "rebass";
 import { Header, Table } from "semantic-ui-react";
 import {
@@ -19,7 +20,13 @@ import {
   Title
 } from "./styles";
 
-const PDFfile = ({ budget, total, client }) => {
+const PDFfile = ({ budget, total, client, dispatch }) => {
+  const clientPdf = useMemo(() => dispatch === "client");
+  const dispatchPdf = useMemo(() => dispatch === "dispatch");
+  const DISPATCH_PRODUCTS_COLUMNS = dispatchPdf ?
+    PRODUCTS_COLUMNS.filter(column => column.dispatch) :
+    PRODUCTS_COLUMNS;
+
   return (
     <table>
       <thead>
@@ -54,33 +61,37 @@ const PDFfile = ({ budget, total, client }) => {
                   <Segment>{budget?.id}</Segment>
                 </DataContainer>
               </ClientDataContainer>
-              <Divider />
-              <CustomerDataContainer>
-                <Flex>
-                  <DataContainer width="250px">
-                    <Label>CUIT</Label>
-                    <Segment>{client?.cuil}</Segment>
-                  </DataContainer>
-                  <DataContainer flex="1">
-                    <Label>IVA</Label>
-                    <Segment>{client?.iva}</Segment>
-                  </DataContainer>
-                </Flex>
-                <Flex>
-                  <DataContainer width="250px">
-                    <Label>Dirección</Label>
-                    <Segment>{client?.addresses?.[0].address}</Segment>
-                  </DataContainer >
-                  <DataContainer flex="1">
-                    <Label>Teléfonos</Label>
-                    <Segment flexHeight>
-                      <Flex flexDirection="column">
-                        {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')}
-                      </Flex>
-                    </Segment>
-                  </DataContainer>
-                </Flex>
-              </CustomerDataContainer>
+              {clientPdf &&
+                <>
+                  <Divider />
+                  <CustomerDataContainer>
+                    <Flex>
+                      <DataContainer width="250px">
+                        <Label>CUIT</Label>
+                        <Segment>{client?.cuil}</Segment>
+                      </DataContainer>
+                      <DataContainer flex="1">
+                        <Label>IVA</Label>
+                        <Segment>{client?.iva}</Segment>
+                      </DataContainer>
+                    </Flex>
+                    <Flex>
+                      <DataContainer width="250px">
+                        <Label>Dirección</Label>
+                        <Segment>{client?.addresses?.[0].address}</Segment>
+                      </DataContainer >
+                      <DataContainer flex="1">
+                        <Label>Teléfonos</Label>
+                        <Segment flexHeight>
+                          <Flex flexDirection="column">
+                            {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')}
+                          </Flex>
+                        </Segment>
+                      </DataContainer>
+                    </Flex>
+                  </CustomerDataContainer>
+                </>
+              }
               <Divider />
               <ClientDataContainer>
                 <DataContainer width="250px">
@@ -100,7 +111,7 @@ const PDFfile = ({ budget, total, client }) => {
                 <Table celled compact striped>
                   <Table.Body>
                     <TableRowHeader>
-                      {PRODUCTS_COLUMNS.map((header) => (
+                      {(dispatchPdf ? DISPATCH_PRODUCTS_COLUMNS : PRODUCTS_COLUMNS.filter(p => !p.hide)).map((header) => (
                         <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
                       ))}
                     </TableRowHeader>
@@ -116,7 +127,7 @@ const PDFfile = ({ budget, total, client }) => {
                       budget?.products?.map((product) => {
                         return (
                           <Table.Row key={product.key}>
-                            {PRODUCTS_COLUMNS.map(header => (
+                            {(dispatchPdf ? DISPATCH_PRODUCTS_COLUMNS : PRODUCTS_COLUMNS.filter(p => !p.hide)).map(header => (
                               <Cell key={`cell_${header.id}`} align={header.align} width={header.width} wrap={header.wrap}>
                                 {header.value(product)}
                               </Cell>
@@ -125,11 +136,12 @@ const PDFfile = ({ budget, total, client }) => {
                         );
                       })
                     )}
-                    <Table.Row>
-                      <Cell right textAlign="right" colSpan={PRODUCTS_COLUMNS.length - 2}><strong>TOTAL</strong></Cell>
-                      <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
-                      <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
-                    </Table.Row>
+                    {!dispatchPdf &&
+                      <Table.Row>
+                        <Cell right textAlign="right" colSpan={PRODUCTS_COLUMNS.length - 3}><strong>TOTAL</strong></Cell>
+                        <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
+                        <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
+                      </Table.Row>}
                   </Table.Body>
                 </Table>
               </Flex>
@@ -139,13 +151,17 @@ const PDFfile = ({ budget, total, client }) => {
                   <Segment marginTop="0" minHeight="60px">{budget.comments}</Segment>
                 </DataContainer>
               )}
-              <Divider borderless />
-              <DataContainer width="100%" >
-                <Label >Formas de pago</Label>
-                <Segment marginTop="0">
-                  {budget?.paymentMethods?.join(" | ")}
-                </Segment>
-              </DataContainer>
+              {!dispatchPdf &&
+                <>
+                  <Divider borderless />
+                  <DataContainer width="100%" >
+                    <Label >Formas de pago</Label>
+                    <Segment marginTop="0">
+                      {budget?.paymentMethods?.join(" | ")}
+                    </Segment>
+                  </DataContainer>
+                </>
+              }
             </div>
           </td>
         </tr>

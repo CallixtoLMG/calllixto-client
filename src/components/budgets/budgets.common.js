@@ -61,11 +61,13 @@ const PRODUCTS_COLUMNS = [
     title: "Nombre",
     align: "left",
     wrap: true,
+    dispatch: true,
     value: (product) => product.name
   },
   {
     id: 2,
     title: "Cant",
+    dispatch: true,
     width: 1,
     value: (product) => product.quantity || 0
   },
@@ -80,7 +82,6 @@ const PRODUCTS_COLUMNS = [
     title: "Subtotal",
     width: 3,
     value: (product) => formatedPricePdf(product.price * product.quantity || 0),
-    hide: true,
   },
   {
     id: 5,
@@ -93,6 +94,15 @@ const PRODUCTS_COLUMNS = [
     title: "Importe",
     width: 1,
     value: (product) => formatedPricePdf(getTotal(product))
+  },
+  {
+    id: 7,
+    title: "Comentario",
+    width: 7,
+    wrap: true,
+    dispatch: true,
+    hide: true,
+    value: (product) => product.dispatchComment
   },
 ];
 
