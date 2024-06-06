@@ -16,6 +16,7 @@ export const FieldsContainer = styled(Flex)`
   width: ${({ width = 'auto' }) => width} !important;
   min-height: ${({ minHeight = 'auto' }) => minHeight} !important;
   height: ${({ height = 'auto' }) => height} !important;
+  align-items: ${({ alignItems = 'auto' }) => alignItems} !important;
 `;
 
 export const ButtonsContainer = styled(Flex)`

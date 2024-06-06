@@ -5,9 +5,9 @@ import { Table } from "@/components/common/table";
 import { RULES } from "@/constants";
 import _ from 'lodash';
 import { useParams } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { Button } from "semantic-ui-react";
+import { Button, Icon, Popup } from "semantic-ui-react";
 
 const EMPTY_CUSTOMER = { name: '', email: '', phoneNumbers: [], addresses: [], comments: '' };
 
@@ -19,6 +19,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
       ...customer,
     }
   });
+  const [phoneToAdd, setPhoneToAdd] = useState({ ref: '', areaCode: '', number: '' });
 
   const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
     control,
@@ -45,6 +46,10 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
     onSubmit(data);
   };
 
+  const updatePhoneToAdd = useCallback((field, value) => {
+    setPhoneToAdd({ ...phoneToAdd, [field]: value });
+  }, [phoneToAdd]);
+
   return (
     <Form onSubmit={handleSubmit(handleCreate)}>
       <FieldsContainer>
@@ -63,7 +68,50 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
         </FormField>
       </FieldsContainer>
       <FieldsContainer columnGap="50px">
-        <FormField width="33%" style={{ position: 'relative'}}>
+        <FormField width="33%" style={{ position: 'relative' }}>
+          <Popup
+            trigger={
+              <Button
+                type="button"
+                color="green"
+                icon="add"
+              />
+            }
+            on='click'
+            position='top left'>
+            <FieldsContainer width="800px" alignItems="center">
+              <FormField flex="1">
+                <Label>Referencia</Label>
+                <Input
+                  placeholder="Referencia"
+                  height="35px"
+                  value={phoneToAdd.ref}
+                  onChange={(e) => updatePhoneToAdd('ref', e.target.value)}
+                />
+              </FormField>
+              <FormField flex="1">
+                <Label>Área</Label>
+                <Input
+                  placeholder="Área"
+                  height="35px"
+                  value={phoneToAdd.areaCode}
+                  onChange={(e) => updatePhoneToAdd('areaCode', e.target.value)}
+                />
+              </FormField>
+              <FormField flex="1">
+                <Label>Número</Label>
+                <Input
+                  placeholder="Número"
+                  height="35px"
+                  value={phoneToAdd.number}
+                  onChange={(e) => updatePhoneToAdd('number', e.target.value)}
+                />
+              </FormField>
+              <Button color="green" onClick={() => appendPhone(phoneToAdd)}>
+                <Icon name="add" />Agregar
+              </Button>
+            </FieldsContainer>
+          </Popup>
           <Table
             headers={[
               {
@@ -96,15 +144,8 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
             ] : []}
             elements={phoneFields}
           />
-          <Button
-            onClick={() => {}}
-            type="button"
-            color="green"
-            icon="add"
-            style={{ position: 'absolute', top: '10px', left: '-45px' }}
-          />
         </FormField>
-        <FormField flex="1" style={{ position: 'relative'}}>
+        <FormField flex="1" style={{ position: 'relative' }}>
           <Table
             headers={[
               {
@@ -139,7 +180,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
             style={{ position: 'absolute', top: '10px', left: '-45px' }}
           />
         </FormField>
-        <FormField flex="1" style={{ position: 'relative'}}>
+        <FormField flex="1" style={{ position: 'relative' }}>
           <Table
             headers={[
               {
