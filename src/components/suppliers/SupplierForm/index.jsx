@@ -188,7 +188,6 @@ const SupplierForm = ({ supplier, onSubmit, readonly, isLoading }) => {
               maxLength="2000"
               placeholder="Comentarios"
               disabled={readonly}
-              readonly
             />
           )}
         />

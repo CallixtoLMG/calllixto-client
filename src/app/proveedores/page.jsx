@@ -30,7 +30,7 @@ const Suppliers = () => {
   }, [data]);
 
   useEffect(() => {
-    setLabels(['Proveedores']);
+    setLabels([PAGES.SUPPLIERS.NAME]);
   }, [setLabels]);
 
   useEffect(() => {

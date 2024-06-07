@@ -42,7 +42,7 @@ const CreateBudget = () => {
   }, []);
 
   useEffect(() => {
-    setLabels(['Presupuestos', 'Crear']);
+    setLabels([PAGES.BUDGETS.NAME, 'Crear']);
   }, [setLabels]);
 
   const mappedProducts = useMemo(() => products?.map(product => ({

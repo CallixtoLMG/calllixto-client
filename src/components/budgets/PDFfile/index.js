@@ -1,6 +1,7 @@
 "use client";
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Cell, HeaderCell } from '@/components/common/table';
+import { BUDGET_PDF_FORMAT } from "@/constants";
 import { formatedPercentage, formatedPricePdf, formatedSimplePhone } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
@@ -20,9 +21,9 @@ import {
   Title
 } from "./styles";
 
-const PDFfile = ({ budget, total, client, dispatch }) => {
-  const clientPdf = useMemo(() => dispatch === "client");
-  const dispatchPdf = useMemo(() => dispatch === "dispatch");
+const PDFfile = ({ budget, total, client, printPdfMode }) => {
+  const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT);
+  const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH);
   const DISPATCH_PRODUCTS_COLUMNS = dispatchPdf ?
     PRODUCTS_COLUMNS.filter(column => column.dispatch) :
     PRODUCTS_COLUMNS;

@@ -22,7 +22,7 @@ const Customers = () => {
   }, []);
 
   useEffect(() => {
-    setLabels(['Clientes']);
+    setLabels([PAGES.CUSTOMERS.NAME]);
   }, [setLabels]);
 
   const { customers } = useMemo(() => {

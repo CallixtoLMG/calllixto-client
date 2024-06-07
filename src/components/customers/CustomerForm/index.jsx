@@ -289,7 +289,6 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
               maxLength="2000"
               placeholder="Comentarios"
               disabled={readonly}
-              readonly
               value={field.value || ''}
             />
           )}

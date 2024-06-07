@@ -6,19 +6,15 @@ import { Button, Modal, Transition } from "semantic-ui-react";
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const { control, handleSubmit, formState: { isDirty }, reset, setValue } = useForm({
     defaultValues: {
-      comment: ""
+      comment: product?.dispatchComment
     }
   });
 
   useEffect(() => {
-    if (!isModalOpen) {
-      reset();
-    }
-  }, [isModalOpen, reset]);
-
-  useEffect(() => {
     if (isModalOpen) {
       reset({ comment: product?.dispatchComment || "" });
+    } else {
+      reset();
     }
   }, [isModalOpen, product, reset]);
 
@@ -30,7 +26,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         onClose={() => onClose(false)}
       >
         <Modal.Header>
-          Agregar comentario para despacho
+          Comentario para remito
         </Modal.Header>
         <Modal.Content>
           <FieldsContainer>
@@ -45,16 +41,15 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
           </FieldsContainer>
           <Form onSubmit={handleSubmit(onAddComment)}>
             <FieldsContainer>
-              <FormField flex="3">
+              <FormField flex="1">
                 <Label>Comentario</Label>
                 <Controller
                   name="comment"
                   control={control}
                   render={({ field }) => (
                     <Input
-                    height="65px"
-                    as={TextArea}
-                    readonly
+                      height="65px"
+                      as={TextArea}
                       {...field}
                       placeholder="Comentario"
                     />

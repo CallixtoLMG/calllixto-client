@@ -4,7 +4,7 @@ import { SubmitAndRestore } from "@/components/common/buttons";
 import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
-import { RULES } from "@/constants";
+import { PAGES, RULES } from "@/constants";
 import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, now, removeDecimal } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -34,11 +34,11 @@ const EMPTY_BUDGET = (user) => ({
   expirationOffsetDays: ''
 });
 
-const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading, isCloning, dispatch }) => {
+const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading, isCloning, printPdfMode }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
-  const [productDispatchComment, setProductDispatchComment] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
@@ -124,7 +124,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   };
 
   const handleOpenCommentModal = useCallback((product, index) => {
-    setProductDispatchComment({ ...product, index });
+    setSelectedProduct({ ...product, index });
     setIsModalCommentOpen(true);
   }, []);
 
@@ -140,14 +140,8 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
     setIsModalConfirmationOpen(false);
   };
 
-  const handleModalCommentClose = (updated, data) => {
+  const handleModalCommentClose = () => {
     setIsModalCommentOpen(false);
-    if (updated) {
-      const updatedProducts = watchProducts.map((product) =>
-        product.code === data.code ? { ...product, comments: data.comments } : product
-      );
-      setValue('products', updatedProducts);
-    }
   };
 
   const handleUpdateModalClose = () => {
@@ -170,13 +164,13 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
       onClick: (element, index) => {
         handleOpenCommentModal(element, index);
       },
-      tooltip: 'Agregar o modificar comentario'
+      tooltip: 'Comentario para remito'
     },
   ];
 
   const onAddComment = async (data) => {
     const newProducts = [...watchProducts];
-    newProducts[productDispatchComment.index].dispatchComment = data.comment;
+    newProducts[selectedProduct.index].dispatchComment = data.comment;
     setValue("products", newProducts)
     setIsModalCommentOpen(false)
   };
@@ -215,14 +209,14 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         value: (product) => (
           <Container>
             {product.name}
-            <Flex>
+            <Flex ml="7px">
               {product.comments && (
                 <Popup
                   size="mini"
                   content={product.comments}
                   position="top center"
                   trigger={
-                    <Box ml="5px">
+                    <Box>
                       <Icon name="info circle" color="yellow" />
                     </Box>
                   }
@@ -234,8 +228,8 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   content={product.dispatchComment}
                   position="top center"
                   trigger={
-                    <Box ml={!product.comments ? "7px" : "3px"}>
-                      <Icon name="chat" color="orange" />
+                    <Box >
+                      <Icon name="truck" color="orange" />
                     </Box>
                   }
                 />
@@ -403,7 +397,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           onAddComment={onAddComment}
           isModalOpen={isModalCommentOpen}
           onClose={handleModalCommentClose}
-          product={productDispatchComment}
+          product={selectedProduct}
         />
         <Transition visible={isUpdateModalOpen} animation='scale' duration={500}>
           <Modal closeOnDimmerClick={false} open={isUpdateModalOpen} onClose={handleUpdateModalClose} size="large">
@@ -494,7 +488,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   render={({ field }) => (
                     <Dropdown
                       name={`customer`}
-                      placeholder='Clientes'
+                      placeholder={PAGES.CUSTOMERS.NAME}
                       search
                       selection
                       minCharacters={2}
@@ -576,7 +570,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   maxLength="2000"
                   placeholder="Comentarios"
                   disabled={readonly}
-                  readonly
                 />
               )}
             />
@@ -660,7 +653,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
 
       </NoPrint >
       <OnlyPrint>
-        <PDFfile total={total} budget={budget} client={user.client?.metadata} dispatch={dispatch} />
+        <PDFfile total={total} budget={budget} client={user.client?.metadata} printPdfMode={printPdfMode} />
       </OnlyPrint>
     </>
   );

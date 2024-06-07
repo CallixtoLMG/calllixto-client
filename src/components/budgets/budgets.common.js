@@ -55,7 +55,7 @@ const BUDGETS_COLUMNS = [
   },
 ];
 
-const PRODUCTS_COLUMNS = [
+const PRODUCTS_COLUMNS = (state) => [
   {
     id: 1,
     title: "Nombre",

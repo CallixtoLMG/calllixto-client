@@ -33,7 +33,7 @@ const Supplier = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels(['Proveedores', supplier?.name]);
+    setLabels([PAGES.SUPPLIERS.NAME, supplier?.name]);
   }, [setLabels, supplier]);
 
   useEffect(() => {
