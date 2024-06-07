@@ -24,9 +24,7 @@ import {
 const PDFfile = ({ budget, total, client, printPdfMode }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH);
-  const DISPATCH_PRODUCTS_COLUMNS = dispatchPdf ?
-    PRODUCTS_COLUMNS.filter(column => column.dispatch) :
-    PRODUCTS_COLUMNS;
+  const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf), [dispatchPdf]);
 
   return (
     <table>
@@ -35,6 +33,7 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
           <td>
             <HeaderContainer>
               <Title as="h2">MADERERA LAS TAPIAS</Title>
+              <Title as="h3">Remito  </Title>
               <Image src="/Las Tapias.png" alt="Maderera logo" />
             </HeaderContainer>
           </td>
@@ -112,13 +111,13 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                 <Table celled compact striped>
                   <Table.Body>
                     <TableRowHeader>
-                      {(dispatchPdf ? DISPATCH_PRODUCTS_COLUMNS : PRODUCTS_COLUMNS.filter(p => !p.hide)).map((header) => (
+                      {filteredColumns.map((header) => (
                         <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
                       ))}
                     </TableRowHeader>
                     {budget?.products?.length === 0 ? (
                       <Table.Row>
-                        <Cell colSpan={PRODUCTS_COLUMNS.length} textAlign="center">
+                        <Cell colSpan={filteredColumns.length - 2} textAlign="center">
                           <Header as="h4">
                             No se encontraron ítems.
                           </Header>
@@ -128,9 +127,9 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                       budget?.products?.map((product) => {
                         return (
                           <Table.Row key={product.key}>
-                            {(dispatchPdf ? DISPATCH_PRODUCTS_COLUMNS : PRODUCTS_COLUMNS.filter(p => !p.hide)).map(header => (
+                            {filteredColumns.map(header => (
                               <Cell key={`cell_${header.id}`} align={header.align} width={header.width} wrap={header.wrap}>
-                                {header.value(product)}
+                                {header?.value(product)}
                               </Cell>
                             ))}
                           </Table.Row>
@@ -139,7 +138,7 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                     )}
                     {!dispatchPdf &&
                       <Table.Row>
-                        <Cell right textAlign="right" colSpan={PRODUCTS_COLUMNS.length - 3}><strong>TOTAL</strong></Cell>
+                        <Cell right textAlign="right" colSpan={filteredColumns.length - 2}><strong>TOTAL</strong></Cell>
                         <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
                         <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
                       </Table.Row>}
