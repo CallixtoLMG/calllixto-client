@@ -55,52 +55,57 @@ const BUDGETS_COLUMNS = [
   },
 ];
 
-const PRODUCTS_COLUMNS = (dispatchPdf) => [
-  {
-    id: 1,
-    title: "Nombre",
-    align: "left",
-    wrap: true,
-    value: (product) => product.name
-  },
-  {
-    id: 2,
-    title: "Cant",
-    width: 1,
-    value: (product) => product.quantity || 0
-  },
-  !dispatchPdf && {
-    id: 3,
-    title: "Precio",
-    width: 2,
-    value: (product) => formatedPricePdf(product.price || 0)
-  },
-  !dispatchPdf && {
-    id: 4,
-    title: "Subtotal",
-    width: 3,
-    value: (product) => formatedPricePdf(product.price * product.quantity || 0),
-  },
-  !dispatchPdf && {
-    id: 5,
-    title: "Desc.",
-    width: 1,
-    value: (product) => formatedPercentage(product.discount || 0)
-  },
-  !dispatchPdf && {
-    id: 6,
-    title: "Importe",
-    width: 1,
-    value: (product) => formatedPricePdf(getTotal(product))
-  },
-  dispatchPdf && {
-    id: 7,
-    title: "Comentario",
-    width: 7,
-    wrap: true,
-    value: (product) => product.dispatchComment
-  }
-].filter(Boolean);
+const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
+  const includeDiscount = budget?.products?.some(product => product.discount);
+  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatchComment);
+
+  return [
+    {
+      id: 1,
+      title: "Nombre",
+      align: "left",
+      wrap: true,
+      value: (product) => product.name
+    },
+    {
+      id: 2,
+      title: "Cant",
+      width: 1,
+      value: (product) => product.quantity || 0
+    },
+    !dispatchPdf && {
+      id: 3,
+      title: "Precio",
+      width: 2,
+      value: (product) => formatedPricePdf(product.price || 0)
+    },
+    !dispatchPdf && includeDiscount && {
+      id: 4,
+      title: "Subtotal",
+      width: 3,
+      value: (product) => formatedPricePdf(product.price * product.quantity || 0),
+    },
+    !dispatchPdf && includeDiscount && {
+      id: 5,
+      title: "Desc.",
+      width: 1,
+      value: (product) => formatedPercentage(product.discount || 0)
+    },
+    !dispatchPdf && {
+      id: 6,
+      title: "Importe",
+      width: 1,
+      value: (product) => formatedPricePdf(getTotal(product))
+    },
+    includeDispatchComment && {
+      id: 7,
+      title: "Comentario",
+      width: 7,
+      wrap: true,
+      value: (product) => product.dispatchComment
+    }
+  ].filter(Boolean);
+};
 
 const FILTERS = [
   { value: 'id', placeholder: 'Código' },

@@ -141,7 +141,7 @@ const Budget = ({ params }) => {
 
   if (!isLoading && !budget) {
     push(PAGES.NOT_FOUND.BASE);
-    return null;
+    return;
   };
 
   return (

@@ -4,18 +4,14 @@ import { Controller, useForm } from "react-hook-form";
 import { Button, Modal, Transition } from "semantic-ui-react";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
-  const { control, handleSubmit, formState: { isDirty }, reset, setValue } = useForm({
+  const { control, handleSubmit, formState: { isDirty }, reset } = useForm({
     defaultValues: {
       comment: product?.dispatchComment
     }
   });
 
   useEffect(() => {
-    if (isModalOpen) {
-      reset({ comment: product?.dispatchComment || "" });
-    } else {
-      reset();
-    }
+    reset(isModalOpen ? { comment: product?.dispatchComment || "" } : {});
   }, [isModalOpen, product, reset]);
 
   return (
@@ -25,9 +21,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         open={isModalOpen}
         onClose={() => onClose(false)}
       >
-        <Modal.Header>
-          Comentario para remito
-        </Modal.Header>
+        <Modal.Header>Comentario para remito</Modal.Header>
         <Modal.Content>
           <FieldsContainer>
             <FormField flex="1">
@@ -48,9 +42,9 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
                   control={control}
                   render={({ field }) => (
                     <Input
+                      {...field}
                       height="65px"
                       as={TextArea}
-                      {...field}
                       placeholder="Comentario"
                     />
                   )}

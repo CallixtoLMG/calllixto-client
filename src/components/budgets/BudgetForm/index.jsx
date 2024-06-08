@@ -273,7 +273,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                     height="35px"
                     shadow
                     thousandSeparator={true}
-                    decimalScale={1}
+                    decimalScale={2}
                     displayType="input"
                     onFocus={(e) => e.target.select()}
                     onChange={(e) => {
