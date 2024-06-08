@@ -22,9 +22,9 @@ import {
 } from "./styles";
 
 const PDFfile = ({ budget, total, client, printPdfMode }) => {
-  const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT);
-  const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH);
-  const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf), [dispatchPdf]);
+  const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
+  const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
+  const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
 
   return (
     <table>
@@ -33,7 +33,7 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
           <td>
             <HeaderContainer>
               <Title as="h2">MADERERA LAS TAPIAS</Title>
-              <Title as="h3">Remito  </Title>
+              {dispatchPdf && <Title as="h3">Remito</Title>}
               <Image src="/Las Tapias.png" alt="Maderera logo" />
             </HeaderContainer>
           </td>
@@ -115,33 +115,31 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                         <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
                       ))}
                     </TableRowHeader>
-                    {budget?.products?.length === 0 ? (
-                      <Table.Row>
-                        <Cell colSpan={filteredColumns.length - 2} textAlign="center">
-                          <Header as="h4">
-                            No se encontraron ítems.
-                          </Header>
-                        </Cell>
-                      </Table.Row>
-                    ) : (
-                      budget?.products?.map((product) => {
-                        return (
-                          <Table.Row key={product.key}>
-                            {filteredColumns.map(header => (
-                              <Cell key={`cell_${header.id}`} align={header.align} width={header.width} wrap={header.wrap}>
-                                {header?.value(product)}
-                              </Cell>
-                            ))}
+                    {budget?.products?.map((product) => {
+                      return (
+                        <Table.Row key={product.key}>
+                          {filteredColumns.map(header => (
+                            <Cell key={`cell_${header.id}`} align={header.align} width={header.width} wrap={header.wrap}>
+                              {header?.value(product)}
+                            </Cell>
+                          ))}
+                        </Table.Row>
+                      );
+                    })}
+                    {!dispatchPdf && (
+                      <>
+                        {!!budget?.globalDiscount &&
+                          <Table.Row>
+                            <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
+                            <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
                           </Table.Row>
-                        );
-                      })
+                        }
+                        <Table.Row>
+                          <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
+                          <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
+                        </Table.Row>
+                      </>
                     )}
-                    {!dispatchPdf &&
-                      <Table.Row>
-                        <Cell right textAlign="right" colSpan={filteredColumns.length - 2}><strong>TOTAL</strong></Cell>
-                        <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
-                        <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
-                      </Table.Row>}
                   </Table.Body>
                 </Table>
               </Flex>
