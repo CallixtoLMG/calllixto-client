@@ -18,10 +18,8 @@ const MessageItem = styled(SMessageItem)`
 const Icon = styled(SIcon)`
   scale: 1.2!important;
   border-radius: 2px!important;
-  &:hover {
-    background: #e8e8e8!important;
-  }
 `;
+
 const MessageList = styled(SMessageList)`
   max-height: 160px;
   overflow-y: auto;

@@ -1,9 +1,11 @@
 "use client";
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Cell, HeaderCell } from '@/components/common/table';
+import { BUDGET_PDF_FORMAT } from "@/constants";
 import { formatedPercentage, formatedPricePdf, formatedSimplePhone } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
+import { useMemo } from "react";
 import { Flex } from "rebass";
 import { Header, Table } from "semantic-ui-react";
 import {
@@ -19,7 +21,11 @@ import {
   Title
 } from "./styles";
 
-const PDFfile = ({ budget, total, client }) => {
+const PDFfile = ({ budget, total, client, printPdfMode }) => {
+  const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
+  const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
+  const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
+
   return (
     <table>
       <thead>
@@ -27,6 +33,7 @@ const PDFfile = ({ budget, total, client }) => {
           <td>
             <HeaderContainer>
               <Title as="h2">MADERERA LAS TAPIAS</Title>
+              {dispatchPdf && <Title as="h3">Remito</Title>}
               <Image src="/Las Tapias.png" alt="Maderera logo" />
             </HeaderContainer>
           </td>
@@ -54,33 +61,37 @@ const PDFfile = ({ budget, total, client }) => {
                   <Segment>{budget?.id}</Segment>
                 </DataContainer>
               </ClientDataContainer>
-              <Divider />
-              <CustomerDataContainer>
-                <Flex>
-                  <DataContainer width="250px">
-                    <Label>CUIT</Label>
-                    <Segment>{client?.cuil}</Segment>
-                  </DataContainer>
-                  <DataContainer flex="1">
-                    <Label>IVA</Label>
-                    <Segment>{client?.iva}</Segment>
-                  </DataContainer>
-                </Flex>
-                <Flex>
-                  <DataContainer width="250px">
-                    <Label>Dirección</Label>
-                    <Segment>{client?.addresses?.[0].address}</Segment>
-                  </DataContainer >
-                  <DataContainer flex="1">
-                    <Label>Teléfonos</Label>
-                    <Segment flexHeight>
-                      <Flex flexDirection="column">
-                        {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')}
-                      </Flex>
-                    </Segment>
-                  </DataContainer>
-                </Flex>
-              </CustomerDataContainer>
+              {clientPdf &&
+                <>
+                  <Divider />
+                  <CustomerDataContainer>
+                    <Flex>
+                      <DataContainer width="250px">
+                        <Label>CUIT</Label>
+                        <Segment>{client?.cuil}</Segment>
+                      </DataContainer>
+                      <DataContainer flex="1">
+                        <Label>IVA</Label>
+                        <Segment>{client?.iva}</Segment>
+                      </DataContainer>
+                    </Flex>
+                    <Flex>
+                      <DataContainer width="250px">
+                        <Label>Dirección</Label>
+                        <Segment>{client?.addresses?.[0].address}</Segment>
+                      </DataContainer >
+                      <DataContainer flex="1">
+                        <Label>Teléfonos</Label>
+                        <Segment flexHeight>
+                          <Flex flexDirection="column">
+                            {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')}
+                          </Flex>
+                        </Segment>
+                      </DataContainer>
+                    </Flex>
+                  </CustomerDataContainer>
+                </>
+              }
               <Divider />
               <ClientDataContainer>
                 <DataContainer width="250px">
@@ -100,36 +111,35 @@ const PDFfile = ({ budget, total, client }) => {
                 <Table celled compact striped>
                   <Table.Body>
                     <TableRowHeader>
-                      {PRODUCTS_COLUMNS.map((header) => (
+                      {filteredColumns.map((header) => (
                         <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
                       ))}
                     </TableRowHeader>
-                    {budget?.products?.length === 0 ? (
-                      <Table.Row>
-                        <Cell colSpan={PRODUCTS_COLUMNS.length} textAlign="center">
-                          <Header as="h4">
-                            No se encontraron ítems.
-                          </Header>
-                        </Cell>
-                      </Table.Row>
-                    ) : (
-                      budget?.products?.map((product) => {
-                        return (
-                          <Table.Row key={product.key}>
-                            {PRODUCTS_COLUMNS.map(header => (
-                              <Cell key={`cell_${header.id}`} align={header.align} width={header.width} wrap={header.wrap}>
-                                {header.value(product)}
-                              </Cell>
-                            ))}
+                    {budget?.products?.map((product) => {
+                      return (
+                        <Table.Row key={product.key}>
+                          {filteredColumns.map(header => (
+                            <Cell key={`cell_${header.id}`} align={header.align} width={header.width} wrap={header.wrap}>
+                              {header?.value(product)}
+                            </Cell>
+                          ))}
+                        </Table.Row>
+                      );
+                    })}
+                    {!dispatchPdf && (
+                      <>
+                        {!!budget?.globalDiscount &&
+                          <Table.Row>
+                            <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
+                            <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
                           </Table.Row>
-                        );
-                      })
+                        }
+                        <Table.Row>
+                          <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
+                          <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
+                        </Table.Row>
+                      </>
                     )}
-                    <Table.Row>
-                      <Cell right textAlign="right" colSpan={PRODUCTS_COLUMNS.length - 2}><strong>TOTAL</strong></Cell>
-                      <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
-                      <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
-                    </Table.Row>
                   </Table.Body>
                 </Table>
               </Flex>
@@ -139,13 +149,17 @@ const PDFfile = ({ budget, total, client }) => {
                   <Segment marginTop="0" minHeight="60px">{budget.comments}</Segment>
                 </DataContainer>
               )}
-              <Divider borderless />
-              <DataContainer width="100%" >
-                <Label >Formas de pago</Label>
-                <Segment marginTop="0">
-                  {budget?.paymentMethods?.join(" | ")}
-                </Segment>
-              </DataContainer>
+              {!dispatchPdf &&
+                <>
+                  <Divider borderless />
+                  <DataContainer width="100%" >
+                    <Label >Formas de pago</Label>
+                    <Segment marginTop="0">
+                      {budget?.paymentMethods?.join(" | ")}
+                    </Segment>
+                  </DataContainer>
+                </>
+              }
             </div>
           </td>
         </tr>

@@ -29,7 +29,7 @@ const Brand = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels(['Marcas', brand?.name]);
+    setLabels([PAGES.BRANDS.NAME, brand?.name]);
   }, [setLabels, brand]);
 
   const { mutate, isPending } = useMutation({
