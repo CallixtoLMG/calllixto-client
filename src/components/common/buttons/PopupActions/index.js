@@ -2,14 +2,14 @@ import { NoPrint } from '@/components/layout';
 import { ButtonContent, Icon, Popup } from 'semantic-ui-react';
 import { Button, ButtonContainer, Container } from "./styles";
 
-const BreadcrumActions = ({ title, color, button, icon }) => {
+const PopupActions = ({ title, color, buttons, icon, animated = true, position = "bottom center" }) => {
   return (
 
     <Popup
-      position='bottom center'
+      position={position}
       trigger={
         <ButtonContainer>
-          <Button animated='vertical' fluid color={color}>
+          <Button {...animated && { animated: 'vertical' }} fluid color={color}>
             <ButtonContent hidden>{title}</ButtonContent>
             <ButtonContent visible>
               <Icon name={icon} />
@@ -20,7 +20,7 @@ const BreadcrumActions = ({ title, color, button, icon }) => {
       content={
         <NoPrint>
           <Container>
-            {button}
+            {buttons?.map(button => button)}
           </Container>
         </NoPrint>
       }
@@ -29,5 +29,5 @@ const BreadcrumActions = ({ title, color, button, icon }) => {
   );
 };
 
-export default BreadcrumActions
+export default PopupActions
   ;
