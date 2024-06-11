@@ -17,7 +17,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
       ...EMPTY_CUSTOMER,
       ...customer,
     }
-  }); 
+  });
 
   const [phoneToAdd, setPhoneToAdd] = useState({ ref: '', areaCode: '', number: '' });
   const [addressToAdd, setAddressToAdd] = useState({ ref: '', address: '' });
@@ -72,6 +72,11 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
   };
 
   const updateFieldToAdd = (setter, field, value) => {
+    if (field === 'areaCode' || field === 'number') {
+      if (!/^\d*$/.test(value)) {
+        return;
+      }
+    }
     setter(prev => ({ ...prev, [field]: value }));
   };
 
