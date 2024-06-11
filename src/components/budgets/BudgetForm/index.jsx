@@ -1,10 +1,10 @@
 import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, edit } from "@/api/budgets";
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
-import { SendButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { SubmitAndRestore } from "@/components/common/buttons";
+import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
-import { RULES } from "@/constants";
+import { PAGES, RULES } from "@/constants";
 import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, now, removeDecimal } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -14,6 +14,7 @@ import { Box, Flex } from "rebass";
 import { Message, Modal, Popup, Transition } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
+import ModalComment from "./ModalComment";
 import ModalConfirmation from "./ModalConfirmation";
 import ModalCustomer from "./ModalCustomer";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
@@ -27,22 +28,27 @@ const EMPTY_BUDGET = (user) => ({
   },
   products: [],
   comments: '',
+  confirmed: false,
+  globalDiscount: 0,
   paymentMethods: PAYMENT_METHODS.map((method) => method.value),
-  expirationOffsetDays: ""
+  expirationOffsetDays: ''
 });
 
-const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading, isCloning }) => {
+const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading, isCloning, printPdfMode }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [customerData, setCustomerData] = useState(budget?.customer);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [expiration, SetExpiration] = useState(false);
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
       ...budget,
+      confirmed: isCloning ? false : budget?.confirmed,
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
   });
@@ -95,18 +101,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
     setValue("products", newProducts);
   }, [watchProducts, setValue]);
 
-  const actions = readonly ? [] : [
-    {
-      id: 1,
-      icon: 'trash',
-      color: 'red',
-      onClick: (element, index) => {
-        deleteProduct(index);
-      },
-      tooltip: 'Eliminar'
-    }
-  ];
-
   useEffect(() => {
     calculateTotal();
   }, [watchProducts, calculateTotal]);
@@ -129,6 +123,11 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
     setIsModalConfirmationOpen(true);
   };
 
+  const handleOpenCommentModal = useCallback((product, index) => {
+    setSelectedProduct({ ...product, index });
+    setIsModalCommentOpen(true);
+  }, []);
+
   const handleModalCustomerClose = (openNextModal, customer) => {
     setIsModalCustomerOpen(false);
     if (openNextModal) {
@@ -141,8 +140,39 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
     setIsModalConfirmationOpen(false);
   };
 
+  const handleModalCommentClose = () => {
+    setIsModalCommentOpen(false);
+  };
+
   const handleUpdateModalClose = () => {
     setIsUpdateModalOpen(false);
+  };
+
+  const actions = readonly ? [] : [
+    {
+      id: 1,
+      icon: 'trash',
+      color: 'red',
+      onClick: (element, index) => {
+        deleteProduct(index);
+      },
+      tooltip: 'Eliminar'
+    }, {
+      id: 2,
+      icon: 'add',
+      color: 'green',
+      onClick: (element, index) => {
+        handleOpenCommentModal(element, index);
+      },
+      tooltip: 'Comentario para remito'
+    },
+  ];
+
+  const onAddComment = async (data) => {
+    const newProducts = [...watchProducts];
+    newProducts[selectedProduct.index].dispatchComment = data.comment;
+    setValue("products", newProducts)
+    setIsModalCommentOpen(false)
   };
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
@@ -179,22 +209,37 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
         value: (product) => (
           <Container>
             {product.name}
-            {product.comments && (
-              <Popup
-                size="mini"
-                content={product.comments}
-                position="top center"
-                trigger={
-                  <Box marginX="5px">
-                    <Icon name="info circle" color="yellow" />
-                  </Box>
-                }
-              />
-            )}
+            <Flex ml="7px">
+              {product.comments && (
+                <Popup
+                  size="mini"
+                  content={product.comments}
+                  position="top center"
+                  trigger={
+                    <Box>
+                      <Icon name="info circle" color="yellow" />
+                    </Box>
+                  }
+                />
+              )}
+              {product.dispatchComment && (
+                <Popup
+                  size="mini"
+                  content={product.dispatchComment}
+                  position="top center"
+                  trigger={
+                    <Box >
+                      <Icon name="truck" color="orange" />
+                    </Box>
+                  }
+                />
+              )}
+            </Flex>
           </Container>
         ),
         id: 2,
         width: 7,
+        wrap: true,
         align: 'left'
       },
       {
@@ -228,7 +273,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                     height="35px"
                     shadow
                     thousandSeparator={true}
-                    decimalScale={1}
+                    decimalScale={2}
                     displayType="input"
                     onFocus={(e) => e.target.select()}
                     onChange={(e) => {
@@ -348,9 +393,15 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             />
           </>
         )}
+        <ModalComment
+          onAddComment={onAddComment}
+          isModalOpen={isModalCommentOpen}
+          onClose={handleModalCommentClose}
+          product={selectedProduct}
+        />
         <Transition visible={isUpdateModalOpen} animation='scale' duration={500}>
           <Modal closeOnDimmerClick={false} open={isUpdateModalOpen} onClose={handleUpdateModalClose} size="large">
-            <Modal.Header>Es necesario actualizar los presupuestos debido a los siguientes cambios</Modal.Header>
+            <Modal.Header>Se actualizó el presupuesto ya que algunos productos sufrieron modificaciones</Modal.Header>
             <Modal.Content>
               {!!outdatedProducts.length && (
                 <Message>
@@ -437,7 +488,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   render={({ field }) => (
                     <Dropdown
                       name={`customer`}
-                      placeholder='Clientes'
+                      placeholder={PAGES.CUSTOMERS.NAME}
                       search
                       selection
                       minCharacters={2}
@@ -519,7 +570,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   maxLength="2000"
                   placeholder="Comentarios"
                   disabled={readonly}
-                  readonly
                 />
               )}
             />
@@ -600,19 +650,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
             />
           )}
         </Form >
-        {readonly && (
-          <ButtonsContainer marginTop="15px">
-            <Button onClick={() => window.print()} color="blue">
-              <Icon name="download" />Descargar PDF
-            </Button>
-            {(budget?.customer?.phoneNumbers || budget?.customer?.email) && (
-              <SendButton customerData={customerData} />
-            )}
-          </ButtonsContainer>
-        )}
+
       </NoPrint >
       <OnlyPrint>
-        <PDFfile total={total} budget={budget} client={user.client?.metadata} />
+        <PDFfile total={total} budget={budget} client={user.client?.metadata} printPdfMode={printPdfMode} />
       </OnlyPrint>
     </>
   );

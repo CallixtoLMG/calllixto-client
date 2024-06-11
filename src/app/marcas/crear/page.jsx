@@ -1,13 +1,13 @@
 "use client";
 import { LIST_BRANDS_QUERY_KEY, create } from "@/api/brands";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BrandForm from "@/components/brands/BrandForm";
-import { useValidateToken } from "@/hooks/userData";
-import { useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
+import { useValidateToken } from "@/hooks/userData";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
+import { toast } from "react-hot-toast";
 
 const CreateBrand = () => {
   useValidateToken();
@@ -22,7 +22,7 @@ const CreateBrand = () => {
   }, []);
 
   useEffect(() => {
-    setLabels(['Marcas', 'Crear']);
+    setLabels([PAGES.BRANDS.NAME, 'Crear']);
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({

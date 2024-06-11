@@ -29,7 +29,7 @@ const Customer = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels(['Clientes', customer?.name]);
+    setLabels([PAGES.CUSTOMERS.NAME, customer?.name]);
   }, [customer, setLabels]);
 
   const { mutate, isPending } = useMutation({

@@ -1,7 +1,7 @@
 "use client";
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { RULES } from "@/constants";
+import { PAGES, RULES } from "@/constants";
 import { formatedPrice, preventSend } from "@/utils";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -38,7 +38,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
             <Dropdown
               required
               name="supplier"
-              placeholder='Proveedores'
+              placeholder={PAGES.SUPPLIERS.NAME}
               search
               selection
               minCharacters={2}
@@ -62,7 +62,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
             <Dropdown
               required
               name="brand"
-              placeholder='Marcas'
+              placeholder={PAGES.BRANDS.NAME}
               search
               selection
               minCharacters={2}
@@ -156,7 +156,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
               maxLength="2000"
               placeholder="Comentarios"
               disabled={readonly}
-              readonly
             />
           )}
         />

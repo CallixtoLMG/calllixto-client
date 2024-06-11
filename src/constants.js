@@ -120,7 +120,6 @@ const TIME_IN_MS = {
 
 const DEFAULT_PAGE_SIZE = 30;
 
-
 const ENTITIES = {
   CUSTOMERS: 'customers',
   SUPPLIERS: 'suppliers',
@@ -131,7 +130,13 @@ const ENTITIES = {
 
 const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
 
+const BUDGET_PDF_FORMAT= {
+  DISPATCH: "dispatch",
+  CLIENT: "client",
+  INTERNAL: "internal",
+ };
+
 export {
-  APIS, DEFAULT_PAGE_SIZE, DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES, REGEX, RULES, TIME_IN_MS
+  APIS, BUDGET_PDF_FORMAT, DEFAULT_PAGE_SIZE, DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES, REGEX, RULES, TIME_IN_MS
 };
 

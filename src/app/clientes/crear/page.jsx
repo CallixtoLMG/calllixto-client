@@ -2,12 +2,12 @@
 import { LIST_CUSTOMERS_QUERY_KEY, create } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { PAGES } from "@/constants";
 
 const CreateCustomer = () => {
   useValidateToken();
@@ -18,11 +18,11 @@ const CreateCustomer = () => {
 
   useEffect(() => {
     resetActions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    setLabels(['Clientes', 'Crear']);
+    setLabels([PAGES.CUSTOMERS.NAME, 'Crear']);
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({

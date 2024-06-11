@@ -25,7 +25,7 @@ const Brands = () => {
   }, []);
 
   useEffect(() => {
-    setLabels(['Marcas']);
+    setLabels([PAGES.BRANDS.NAME]);
   }, [setLabels]);
 
   const { brands } = useMemo(() => {

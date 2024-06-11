@@ -4,7 +4,7 @@ import BudgetsPage from "@/components/budgets/BudgetPage";
 import { ATTRIBUTES } from "@/components/budgets/budgets.common";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
@@ -18,11 +18,11 @@ const Budgets = () => {
   const { handleEntityChange } = usePaginationContext();
 
   useEffect(() => {
-    handleEntityChange("budgets")
+    handleEntityChange(ENTITIES.BUDGETS)
   }, []);
 
   useEffect(() => {
-    setLabels(['Presupuestos']);
+    setLabels([PAGES.BUDGETS.NAME]);
   }, [setLabels]);
 
   const { budgets } = useMemo(() => {

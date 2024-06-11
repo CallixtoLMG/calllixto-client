@@ -21,7 +21,7 @@ const HeaderContainer = styled(Flex)`
   flex-direction: row!important;
   justify-content: space-between;
   width: 100%;
-  padding: 20px 20px 10px 20px;
+  padding: 45px 15px 10px 15px!important;
 `;
 
 const DataContainer = styled(Flex)`
@@ -75,7 +75,6 @@ const Comment = styled(SSegment)`
 
 const Image = styled(SImage)`
   &&& {
-    // width: 200px!important;
     height: 50px!important;
   };
 `;

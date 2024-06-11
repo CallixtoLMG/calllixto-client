@@ -22,7 +22,7 @@ const CreateSupplier = () => {
   }, []);
 
   useEffect(() => {
-    setLabels(['Proveedores', 'Crear']);
+    setLabels([PAGES.SUPPLIERS.NAME, 'Crear']);
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({

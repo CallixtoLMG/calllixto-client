@@ -3,12 +3,12 @@ import { Button as SButton } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Container = styled(Flex)`
-  flex-direction: row;
+  flex-direction: column;
+  gap: 3px!important;
 `;
 
-const MailButton = styled(SButton)`
-  background-color: ${(props) => props.background || 'inherit'};
-  color: white!important;
+const Button = styled(SButton)`
+  margin: 0!important;
 `;
 
 const ButtonContainer = styled(Flex)`
@@ -16,5 +16,5 @@ const ButtonContainer = styled(Flex)`
   height: 36px!important;
 `;
 
-export { ButtonContainer, Container, MailButton };
+export { Button, ButtonContainer, Container };
 
