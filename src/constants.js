@@ -1,6 +1,6 @@
 import { encodeUri } from "@/utils";
 
-const PAGES = {
+export const PAGES = {
   BASE: "/",
   CUSTOMERS: {
     BASE: "/clientes",
@@ -45,12 +45,12 @@ const PAGES = {
   },
 };
 
-const APIS = {
+export const APIS = {
   MAIL: (email, name) => `mailto:${email}?Subject=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
   WSP: (phone, name) => `https://api.whatsapp.com/send?phone=${phone}&text=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
 };
 
-const REGEX = {
+export const REGEX = {
   EMAIL: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,10}))$/,
   TWO_DIGIT_CODE: /^[A-Z0-9]{2}$/,
   THREE_DIGIT_CODE: /^[A-Z0-9]{3}$/,
@@ -58,7 +58,7 @@ const REGEX = {
   THREE_NUMBERS_CODE: /^[0-9]{1,3}$/,
 };
 
-const RULES = {
+export const RULES = {
   REQUIRED: {
     required: 'Campo requerido'
   },
@@ -110,7 +110,7 @@ const RULES = {
   }
 };
 
-const TIME_IN_MS = {
+export const TIME_IN_MS = {
   THREE_SECONDS: 3000,
   ONE_MINUTE: 60000,
   FIVE_MINUTES: 300000,
@@ -118,9 +118,9 @@ const TIME_IN_MS = {
   FOUR_HOURS: 14400000,
 };
 
-const DEFAULT_PAGE_SIZE = 30;
+export const DEFAULT_PAGE_SIZE = 30;
 
-const ENTITIES = {
+export const ENTITIES = {
   CUSTOMERS: 'customers',
   SUPPLIERS: 'suppliers',
   BRANDS: 'brands',
@@ -128,15 +128,51 @@ const ENTITIES = {
   BUDGETS: 'budgets',
 };
 
-const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
+export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
 
-const BUDGET_PDF_FORMAT= {
+export const BUDGET_PDF_FORMAT= {
   DISPATCH: "dispatch",
   CLIENT: "client",
   INTERNAL: "internal",
  };
 
-export {
-  APIS, BUDGET_PDF_FORMAT, DEFAULT_PAGE_SIZE, DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES, REGEX, RULES, TIME_IN_MS
-};
+ export const BUDGET_STATES = {
+  CONFIRMED: {
+    id: 'CONFIRMED',
+    title: 'Confirmado',
+    color: 'green',
+    icon: 'check',
+  },
+  PENDING: {
+    id: 'PENDING',
+    title: 'Pendiente',
+    color: 'orange',
+    icon: 'hourglass half',
+  },
+  DRAFT: {
+    id: 'DRAFT',
+    title: 'Borrador',
+    color: 'teal',
+    icon: 'erase',
+  },
+  EXPIRED: {
+    id: 'EXPIRED',
+    title: 'Expirado',
+    color: 'red',
+    icon: 'expired',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivo',
+    color: 'grey',
+    icon: 'ban',
+  },
+ }
 
+ export const FILTER_TYPES = {
+  TEXT: 'text',
+  SELECT: 'select',
+  DATE: 'date',
+  NUMBER: 'number',
+  CHECKBOX: 'checkbox',
+ }

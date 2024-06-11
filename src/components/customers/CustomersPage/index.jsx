@@ -64,7 +64,7 @@ const CustomersPage = ({ customers = [], isLoading }) => {
         actions={actions}
         filters={FILTERS}
         onFilter={onFilter}
-        pag
+        usePagination
       />
       <ModalDelete
         showModal={showModal}

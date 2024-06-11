@@ -20,7 +20,10 @@ const BudgetsPage = ({ budgets, isLoading }) => {
     if (data.seller) {
       filters.sort = "seller";
     }
-    resetFilters(filters);
+    if (data.state === 'ALL') {
+      delete filters.state;
+    }
+    resetFilters({ filters });
   };
 
   const actions = [
@@ -42,7 +45,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
       actions={actions}
       filters={FILTERS}
       onFilter={onFilter}
-      pag
+      usePagination
     />
   )
 };

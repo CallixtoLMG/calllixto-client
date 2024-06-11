@@ -165,7 +165,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, readonly, isLoading
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}
-        onClick={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : null)}
+        onReset={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : null)}
       />
     </Form>
   );

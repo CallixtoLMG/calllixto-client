@@ -1,6 +1,6 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
-import BudgetsPage from "@/components/budgets/BudgetPage";
+import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { ATTRIBUTES } from "@/components/budgets/budgets.common";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -11,7 +11,7 @@ import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
   useValidateToken();
-  const { data, isLoading } = useListBudgets({ sort: 'date', order: false, attributes: [ATTRIBUTES.DISCOUNT, ATTRIBUTES.ID, ATTRIBUTES.PRODUCTS, ATTRIBUTES.CUSTOMER, ATTRIBUTES.CREATEDAT, ATTRIBUTES.CONFIRMED, ATTRIBUTES.SELLER] });
+  const { data, isLoading } = useListBudgets({ sort: 'date', order: false, attributes: ATTRIBUTES });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();

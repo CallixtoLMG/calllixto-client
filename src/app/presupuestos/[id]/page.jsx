@@ -5,7 +5,7 @@ import BudgetForm from "@/components/budgets/BudgetForm";
 import { BreadcrumActions } from "@/components/common/buttons";
 import { Button, Icon } from "@/components/common/custom";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { APIS, BUDGET_PDF_FORMAT, PAGES } from "@/constants";
+import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -146,7 +146,12 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      <BudgetForm readonly user={userData} budget={budget} printPdfMode={printPdfMode} />
+      <BudgetForm
+        readonly={!budget?.state === BUDGET_STATES.DRAFT.id}
+        user={userData}
+        budget={budget}
+        printPdfMode={printPdfMode}
+      />
     </Loader>
   );
 };

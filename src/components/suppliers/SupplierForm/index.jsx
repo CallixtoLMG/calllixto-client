@@ -197,7 +197,7 @@ const SupplierForm = ({ supplier, onSubmit, readonly, isLoading }) => {
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}
-        onClick={() => handleReset(isUpdating ? { ...EMPTY_SUPPLIER, ...supplier } : null)}
+        onReset={() => handleReset(isUpdating ? { ...EMPTY_SUPPLIER, ...supplier } : null)}
       />
     </Form >
   )

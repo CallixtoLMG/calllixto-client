@@ -74,7 +74,7 @@ const BrandForm = ({ brand, onSubmit, readonly, isLoading }) => {
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}
-        onClick={() => handleReset(isUpdating ? { ...EMPTY_BRAND, ...brand } : null)}
+        onReset={() => handleReset(isUpdating ? { ...EMPTY_BRAND, ...brand } : null)}
       />
     </Form>
   )

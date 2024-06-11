@@ -52,10 +52,10 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
       return value;
     });
   };
-  
+
   const filterEmptyFields = data => {
     const cleanedData = trimStringFields(data);
-  
+
     const removeEmpty = obj => {
       return _.omitBy(obj, value =>
         _.isUndefined(value) || (_.isString(value) && value === '') ||
@@ -63,37 +63,37 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
         (_.isObject(value) && _.isEmpty(value))
       );
     };
-  
+
     let filteredData = removeEmpty(cleanedData);
-  
+
     // Ensure phoneNumbers and addresses are always arrays
     if (!filteredData.phoneNumbers) {
       filteredData.phoneNumbers = [];
     }
-  
+
     if (!filteredData.addresses) {
       filteredData.addresses = [];
     }
-  
+
     if (filteredData.phoneNumbers.length > 0) {
       filteredData.phoneNumbers = filteredData.phoneNumbers
         .filter(phone => phone.areaCode && phone.number);
     }
-  
+
     if (filteredData.addresses.length > 0) {
       filteredData.addresses = filteredData.addresses
         .map(address => removeEmpty(address))
         .filter(address => address.address);
     }
-  
+
     if (!filteredData.phoneNumbers) {
       filteredData.phoneNumbers = [];
     }
-  
+
     if (!filteredData.addresses) {
       filteredData.addresses = [];
     }
-  
+
     return filteredData;
   };
 
@@ -299,7 +299,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}
-        onClick={() => handleReset(isUpdating ? { ...EMPTY_CUSTOMER, ...customer } : null)}
+        onReset={() => handleReset(isUpdating ? { ...EMPTY_CUSTOMER, ...customer } : null)}
       />
     </Form>
   )

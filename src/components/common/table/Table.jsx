@@ -1,4 +1,4 @@
-import { CurrencyFormatInput, Input } from "@/components/common/custom";
+import { CurrencyFormatInput, Dropdown, Input } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
 import { formatedPercentage, handleEnterKeyPress, removeDecimal } from '@/utils';
@@ -9,7 +9,8 @@ import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
-const CustomTable = ({ showTotal, readOnly, pag, isRefetching, isLoading, onFilter, onManuallyRestore, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside, globalDiscount, setGlobalDiscount }) => {
+import { FILTER_TYPES } from "@/constants";
+const CustomTable = ({ showTotal, readOnly, usePagination, isRefetching, isLoading, onFilter, onManuallyRestore, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside, globalDiscount, setGlobalDiscount }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
 
@@ -65,17 +66,39 @@ const CustomTable = ({ showTotal, readOnly, pag, isRefetching, isLoading, onFilt
                       key={`filter_${filter.value}`}
                       name={filter.value}
                       control={control}
-                      render={({ field }) => (
-                        <Input
-                          onKeyPress={onKeyPress}
-                          height="35px"
-                          margin="0"
-                          {...field}
-                          onChange={e => {
-                            handleFilterChange(filter.value);
-                            field.onChange(e);
-                          }}
-                          placeholder={filter.placeholder} />)}
+                      render={({ field: { onChange, value, ...rest} }) => {
+                        if (filter.type === FILTER_TYPES.SELECT) {
+                          return (
+                            <Dropdown
+                              {...rest}
+                              min
+                              height="fit-content"
+                              selection
+                              fluid
+                              options={filter.options}
+                              value={value.key}
+                              defaultValue={filter.defaultValue}
+                              onChange={(e, { value }) => {
+                                onChange(value);
+                                handleFilter();
+                              }}
+                            />
+                          )
+                        }
+                        return (
+                          <Input
+                            {...rest}
+                            onKeyPress={onKeyPress}
+                            height="35px"
+                            margin="0"
+                            onChange={e => {
+                              handleFilterChange(filter.value);
+                              onChange(e);
+                            }}
+                            placeholder={filter.placeholder}
+                          />
+                        )
+                      }}
                     />
                   )}
                 </FiltersContainer>
@@ -87,7 +110,7 @@ const CustomTable = ({ showTotal, readOnly, pag, isRefetching, isLoading, onFilt
               </Flex>
             </Form>
           </HeaderSegment>
-          {pag &&
+          {usePagination &&
             <HeaderSegment flex="25%">
               <PaginationContainer >
                 <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>

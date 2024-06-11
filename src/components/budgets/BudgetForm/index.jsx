@@ -4,7 +4,7 @@ import { SubmitAndRestore } from "@/components/common/buttons";
 import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
-import { PAGES, RULES } from "@/constants";
+import { BUDGET_STATES, PAGES, RULES } from "@/constants";
 import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, now, removeDecimal } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -54,7 +54,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   });
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
-  const [watchProducts, watchGlobalDiscount, watchConfirmed] = watch(['products', 'globalDiscount', 'confirmed']);
+  const [watchProducts, watchGlobalDiscount, watchConfirmed, watchState] = watch(['products', 'globalDiscount', 'confirmed', 'state']);
   const [total, setTotal] = useState(0);
 
   useEffect(() => {
@@ -644,9 +644,24 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           {!readonly && (
             <SubmitAndRestore
               show={!readonly}
-              isLoading={isLoading}
+              isLoading={isLoading && watchState === BUDGET_STATES.PENDING.id}
+              disabled={isLoading}
               isDirty={isDirty}
-              onClick={handleReset}
+              onReset={handleReset}
+              color={watchConfirmed ? BUDGET_STATES.CONFIRMED.color : BUDGET_STATES.PENDING.color}
+              onSubmit={() => { setValue('state', BUDGET_STATES.PENDING.id); }}
+              icon={watchConfirmed ? BUDGET_STATES.CONFIRMED.icon : BUDGET_STATES.PENDING.icon}
+              text={watchConfirmed ? BUDGET_STATES.CONFIRMED.title : BUDGET_STATES.PENDING.title}
+              extraButton={
+                <Button
+                  disabled={isLoading || !isDirty}
+                  loading={(isLoading && watchState === BUDGET_STATES.DRAFT.id)}
+                  type="submit"
+                  onClick={() => setValue('state', BUDGET_STATES.DRAFT.id)}
+                  color="teal">
+                  <Icon name="erase" />Borrador
+                </Button>
+              }
             />
           )}
         </Form >

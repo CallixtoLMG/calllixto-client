@@ -1,9 +1,19 @@
 import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
-import { Flex } from "rebass";
+import { Flex, Box } from "rebass";
 import { CurrencyFormatInput } from "../common/custom";
-import { Icon } from "../common/custom/Semantic";
+import { Icon, Label } from "semantic-ui-react";
+import { BUDGET_STATES, FILTER_TYPES } from "@/constants";
 
-const ATTRIBUTES = { ID: "id", CUSTOMER: "customer", CREATEDAT: "createdAt", CONFIRMED: "confirmed", SELLER: "seller", PRODUCTS: "products", DISCOUNT: "globalDiscount" };
+const ATTRIBUTES = {
+  ID: "id",
+  CUSTOMER: "customer",
+  CREATEDAT: "createdAt",
+  CONFIRMED: "confirmed",
+  SELLER: "seller",
+  PRODUCTS: "products",
+  DISCOUNT: "globalDiscount",
+  STATE: "state"
+};
 
 const BUDGETS_COLUMNS = [
   {
@@ -12,11 +22,13 @@ const BUDGETS_COLUMNS = [
     width: 1,
     align: "left",
     value: (budget) =>
-      budget.confirmed ?
-        <Flex justifyContent="space-between">
-          {budget.id}<Icon size="small" name="check circle" color="green" />
-        </Flex>
-        : budget.id
+      <Flex justifyContent="space-between">
+        <Box width="25px">
+          <Label ribbon color={BUDGET_STATES[budget.state.toUpperCase()]?.color}>
+            {budget.id}
+          </Label>
+        </Box>
+      </Flex>
   },
   {
     id: 2,
@@ -108,6 +120,22 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
 };
 
 const FILTERS = [
+  {
+    value: 'state',
+    type: FILTER_TYPES.SELECT,
+    options: [
+      {
+        key: 'ALL', value: 'ALL', text: 'Todos'
+      },
+      ...Object.keys(BUDGET_STATES).map(key => (
+        {
+          key,
+          text: <Flex alignItems="center" justifyContent="space-between">{BUDGET_STATES[key].title}&nbsp;<Label color={BUDGET_STATES[key].color} circular empty /></Flex>,
+          value: key
+        }))
+    ],
+    defaultValue: 'ALL'
+  },
   { value: 'id', placeholder: 'Código' },
   { value: 'customer', placeholder: 'Cliente', map: 'customer.name' },
   { value: 'seller', placeholder: 'Vendedor' },

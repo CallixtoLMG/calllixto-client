@@ -70,7 +70,7 @@ const BrandsPage = ({ brands = [], role, isLoading, isRefetching }) => {
         actions={actions}
         filters={FILTERS}
         onFilter={onFilter}
-        pag
+        usePagination
       />
       <ModalDelete
         showModal={showModal}
