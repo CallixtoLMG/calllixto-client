@@ -23,7 +23,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
     if (data.state === 'ALL') {
       delete filters.state;
     }
-    resetFilters({ filters });
+    resetFilters(filters);
   };
 
   const actions = [
