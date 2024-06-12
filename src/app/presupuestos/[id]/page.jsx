@@ -1,14 +1,18 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useGetBudget } from "@/api/budgets";
+import { useListAllCustomers } from "@/api/customers";
+import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { BreadcrumActions } from "@/components/common/buttons";
 import { Button, Icon } from "@/components/common/custom";
+import { ATTRIBUTES as CUSTOMERATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { ATTRIBUTES as PRODUCTSATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const PrintButton = ({ onClick, color, iconName, text }) => (
   <Button
@@ -32,11 +36,58 @@ const Budget = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
   const { userData } = useUserContext();
-  const { data: budget, isLoading } = useGetBudget(params.id);
+  const { data: budget, isLoading: loadingBudget } = useGetBudget(params.id);
+
+  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({
+    attributes: [
+      PRODUCTSATTRIBUTES.CODE,
+      PRODUCTSATTRIBUTES.PRICE,
+      PRODUCTSATTRIBUTES.NAME,
+      PRODUCTSATTRIBUTES.COMMENTS,
+      PRODUCTSATTRIBUTES.BRANDNAME,
+      PRODUCTSATTRIBUTES.SUPPLIERNAME
+    ],
+    enabled: budget?.state === BUDGET_STATES.DRAFT.id
+  });
+
+  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({
+    attributes: [
+      CUSTOMERATTRIBUTES.ADDRESS,
+      CUSTOMERATTRIBUTES.PHONE,
+      CUSTOMERATTRIBUTES.ID,
+      CUSTOMERATTRIBUTES.NAME
+    ],
+    enabled: budget?.state === BUDGET_STATES.DRAFT.id
+  });
+
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const { role } = useUserContext();
   const [printPdfMode, setPrintPdfMode] = useState(BUDGET_PDF_FORMAT.CLIENT);
+
+  const { products } = useMemo(() => {
+    return { products: productsData?.products }
+  }, [productsData]);
+  console.log("products", products)
+
+  const { customers } = useMemo(() => {
+    return { customers: customersData?.customers }
+  }, [customersData]);
+  console.log("customers", customers)
+
+  const mappedProducts = useMemo(() => products?.map(product => ({
+    ...product,
+    key: product.code,
+    value: product.name,
+    text: product.name,
+  })), [products]);
+
+  const mappedCustomers = useMemo(() => customers?.map(customer => ({
+    ...customer,
+    key: customer.name,
+    value: customer.name,
+    text: customer.name,
+  })), [customers]);
 
   useEffect(() => {
     resetActions();
@@ -139,17 +190,19 @@ const Budget = ({ params }) => {
     }
   }, [budget, push, role, setActions]);
 
-  if (!isLoading && !budget) {
+  if (!loadingBudget && !budget) {
     push(PAGES.NOT_FOUND.BASE);
     return;
   };
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={loadingProducts || loadingCustomers || loadingBudget}>
       <BudgetForm
-        readonly={!budget?.state === BUDGET_STATES.DRAFT.id}
+        readonly={budget?.state.toUpperCase() !== BUDGET_STATES.DRAFT.id}
         user={userData}
         budget={budget}
+        products={mappedProducts}
+        customers={mappedCustomers}
         printPdfMode={printPdfMode}
       />
     </Loader>
