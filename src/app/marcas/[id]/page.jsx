@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
+import BrandView from "../../../components/brands/BrandView";
 
 const Brand = ({ params }) => {
   useValidateToken();
@@ -56,7 +57,11 @@ const Brand = ({ params }) => {
   return (
     <Loader active={isLoading || isRefetching}>
       {visibilityRules.canSeeActions && Toggle}
-      <BrandForm brand={brand} onSubmit={mutate} readonly={!allowUpdate} isLoading={isPending} />
+      {allowUpdate ? (
+        <BrandForm brand={brand} onSubmit={mutate} isLoading={isPending} isUpdating />
+      ) : (
+        <BrandView brand={brand} />
+      )}
     </Loader>
   )
 };

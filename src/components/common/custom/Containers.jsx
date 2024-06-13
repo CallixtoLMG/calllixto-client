@@ -8,6 +8,11 @@ export const Form = styled(SForm)`
   row-gap: 15px !important;
 `;
 
+export const ViewContainer = styled(Flex)`
+  flex-direction: column;
+  row-gap: 15px;
+`;
+
 export const FieldsContainer = styled(Flex)`
   justify-content: ${({ justifyContent }) => justifyContent};
   flex-wrap: wrap;

@@ -11,6 +11,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
+import ProductView from "../../../components/products/ProductView";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -56,7 +57,11 @@ const Product = ({ params }) => {
   return (
     <Loader active={isLoading}>
       {visibilityRules.canSeeActions && Toggle}
-      <ProductForm product={product} onSubmit={mutate} readonly={!allowUpdate} isLoading={isPending} />
+      {allowUpdate ? (
+        <ProductForm product={product} onSubmit={mutate} isUpdating isLoading={isPending} />
+      ) : (
+        <ProductView product={product} />
+      )}
     </Loader>
   )
 };

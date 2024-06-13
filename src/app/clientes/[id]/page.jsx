@@ -2,6 +2,7 @@
 import { useUserContext } from "@/User";
 import { GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY, edit, useGetCustomer } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
+import CustomerView from "@/components/customers/CustomerView";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
@@ -56,12 +57,16 @@ const Customer = ({ params }) => {
   return (
     <Loader active={isLoading}>
       {visibilityRules.canSeeActions && Toggle}
-      <CustomerForm
-        customer={customer}
-        onSubmit={mutate}
-        isLoading={isPending}
-        readonly={!allowUpdate}
-      />
+      {allowUpdate ? (
+        <CustomerForm
+          customer={customer}
+          onSubmit={mutate}
+          isLoading={isPending}
+          readonly={!allowUpdate}
+        />
+      ) : (
+        <CustomerView customer={customer} />
+      )}
     </Loader>
   );
 };
