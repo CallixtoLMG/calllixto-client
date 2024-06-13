@@ -1,4 +1,3 @@
-"use client";
 import { Table } from '@/components/common/table';
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";

@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useGetBudget } from "@/api/budgets";
 import PDFfile from "@/components/budgets/PDFfile";
 import { Loader } from "@/components/layout";

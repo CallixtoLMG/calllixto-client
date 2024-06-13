@@ -1,4 +1,3 @@
-"use client";
 import { LIST_CUSTOMERS_QUERY_KEY, deleteCustomer } from '@/api/customers';
 import { ModalDelete } from '@/components/common/modals';
 import { Table } from '@/components/common/table';

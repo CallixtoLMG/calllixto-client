@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from 'react';

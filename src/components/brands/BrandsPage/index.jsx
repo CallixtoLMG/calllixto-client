@@ -1,4 +1,3 @@
-"use client";
 import { LIST_BRANDS_QUERY_KEY, deleteBrand } from "@/api/brands";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";

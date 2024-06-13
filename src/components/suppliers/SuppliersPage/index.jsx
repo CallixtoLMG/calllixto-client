@@ -1,4 +1,3 @@
-"use client";
 import { LIST_SUPPLIERS_QUERY_KEY, deleteSupplier } from "@/api/suppliers";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
