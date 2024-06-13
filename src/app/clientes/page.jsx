@@ -11,7 +11,7 @@ import { useEffect, useMemo } from "react";
 
 const Customers = () => {
   useValidateToken();
-  const { data, isLoading } = useListCustomers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESS, ATTRIBUTES.PHONES, ATTRIBUTES.EMAILS,  ATTRIBUTES.COMMENT] });
+  const { data, isLoading } = useListCustomers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESSES, ATTRIBUTES.PHONES, ATTRIBUTES.EMAILS,  ATTRIBUTES.COMMENT] });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { handleEntityChange } = usePaginationContext();

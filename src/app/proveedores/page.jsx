@@ -7,9 +7,9 @@ import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { ATTRIBUTES } from "@/components/suppliers/suppliers.common";
 import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
 import { RULES } from "@/roles";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Suppliers = () => {
   useValidateToken();
@@ -19,7 +19,7 @@ const Suppliers = () => {
     handleEntityChange(ENTITIES.SUPPLIERS);
   }, []);
 
-  const { data, isLoading, isRefetching } = useListSuppliers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESS, ATTRIBUTES.PHONE, ATTRIBUTES.COMMENT] });
+  const { data, isLoading, isRefetching } = useListSuppliers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESSES, ATTRIBUTES.PHONES, ATTRIBUTES.COMMENT] });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();

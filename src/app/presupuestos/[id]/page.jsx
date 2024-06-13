@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useGetBudget } from "@/api/budgets";
+import { editBudget, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
@@ -24,7 +24,7 @@ const PrintButton = ({ onClick, color, iconName, text }) => (
   </Button>
 );
 
-const SendButton = ({ href, color, iconName, text, target="_blank" }) => (
+const SendButton = ({ href, color, iconName, text, target = "_blank" }) => (
   <a href={href} target={target}>
     <Button width="100%" color={color} size="tiny">
       {iconName && <Icon name={iconName} />}{text}
@@ -52,8 +52,8 @@ const Budget = ({ params }) => {
 
   const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({
     attributes: [
-      CUSTOMERATTRIBUTES.ADDRESS,
-      CUSTOMERATTRIBUTES.PHONE,
+      CUSTOMERATTRIBUTES.ADDRESSES,
+      CUSTOMERATTRIBUTES.PHONES,
       CUSTOMERATTRIBUTES.ID,
       CUSTOMERATTRIBUTES.NAME
     ],
@@ -216,6 +216,7 @@ const Budget = ({ params }) => {
         products={mappedProducts}
         customers={mappedCustomers}
         printPdfMode={printPdfMode}
+        onSubmit={(budget) => editBudget(budget)}
       />
     </Loader>
   );

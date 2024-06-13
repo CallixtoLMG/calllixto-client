@@ -2,7 +2,7 @@ import { formatAddressForDisplay, formatPhoneForDisplay } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 
-export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESS: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value' };
+export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value' };
 
 export const HEADERS = [
   {

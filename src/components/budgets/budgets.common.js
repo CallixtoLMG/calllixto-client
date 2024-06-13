@@ -1,8 +1,8 @@
-import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
-import { Flex, Box } from "rebass";
-import { CurrencyFormatInput } from "../common/custom";
-import { Icon, Label } from "semantic-ui-react";
 import { BUDGET_STATES, FILTER_TYPES } from "@/constants";
+import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
+import { Box, Flex } from "rebass";
+import { Label } from "semantic-ui-react";
+import { CurrencyFormatInput } from "../common/custom";
 
 const ATTRIBUTES = {
   ID: "id",
@@ -22,13 +22,11 @@ const BUDGETS_COLUMNS = [
     width: 1,
     align: "left",
     value: (budget) =>
-      <Flex justifyContent="space-between">
-        <Box width="25px">
-          <Label ribbon color={BUDGET_STATES[budget.state.toUpperCase()]?.color}>
-            {budget.id}
-          </Label>
-        </Box>
-      </Flex>
+      <Box width="60px">
+        <Label ribbon color={BUDGET_STATES[budget.state.toUpperCase()]?.color}>
+          {budget.id}
+        </Label>
+      </Box>
   },
   {
     id: 2,

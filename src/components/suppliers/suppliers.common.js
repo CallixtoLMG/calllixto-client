@@ -2,7 +2,7 @@ import { formatAddressForDisplay, formatPhoneForDisplay } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 
-const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESS: "addresses", PHONE: "phoneNumbers", COMMENT: "comments" };
+const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments" };
 
 const SUPPLIERS_COLUMNS = [
   {
