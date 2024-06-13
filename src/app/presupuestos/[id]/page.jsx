@@ -96,7 +96,8 @@ const Budget = ({ params }) => {
 
   useEffect(() => {
     if (budget) {
-      setLabels([PAGES.BUDGETS.NAME, budget.id]);
+      const stateTitle = BUDGET_STATES[budget.state]?.title || "No definido";
+      setLabels([PAGES.BUDGETS.NAME, budget.id, stateTitle]);
     }
   }, [setLabels, budget]);
 

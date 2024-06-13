@@ -68,7 +68,7 @@ export const TextArea = styled(STextarea)`
 `;
 
 export const Dropdown = styled(SDropdown)`
-  margin: 5px 0 !important;
+  margin: ${({ margin = "5px 0" }) => `${margin}!important;`}
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
   height: ${({ height = "50px" }) => `${height}!important`} ;

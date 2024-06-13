@@ -7,9 +7,8 @@ const Cell = styled(STable.Cell)`
   padding: 2px 7px!important;
   z-index: 2;
   text-align: ${({ align = 'center' }) => `${align}!important`};
-  text-align-last: ${({ align = 'center', right = false }) =>
-    right ? 'right!important' : `${align}!important`};
-    white-space: ${({ wrap = 'nowrap' }) => `${wrap}`};
+  text-align-last: ${({ align = 'center', right = false }) => right ? 'right!important' : `${align}!important`};
+  white-space: ${({ wrap = 'nowrap' }) => `${wrap}`};
 `;
 
 const Container = styled(Flex)`
@@ -72,6 +71,7 @@ const Button = styled(SButton)`
   margin: ${({ marginLeft = "0" }) => `0 0 0 ${marginLeft}!important`};
   visibility: ${({ hidden }) => hidden && "hidden"} !important;
   height: 35px!important;
+  align-self: center;
 `;
 
 const TableHeader = styled(STable.Header)`

@@ -1,6 +1,7 @@
 import { CurrencyFormatInput, Dropdown, Input } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
+import { FILTER_TYPES } from "@/constants";
 import { formatedPercentage, handleEnterKeyPress, removeDecimal } from '@/utils';
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -9,7 +10,6 @@ import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
-import { FILTER_TYPES } from "@/constants";
 const CustomTable = ({ showTotal, readOnly, usePagination, isRefetching, isLoading, onFilter, onManuallyRestore, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside, globalDiscount, setGlobalDiscount }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
@@ -71,6 +71,8 @@ const CustomTable = ({ showTotal, readOnly, usePagination, isRefetching, isLoadi
                           return (
                             <Dropdown
                               {...rest}
+                              margin="0"
+                              top="10px"
                               min
                               height="fit-content"
                               selection
