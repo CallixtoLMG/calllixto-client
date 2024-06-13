@@ -17,7 +17,7 @@ const Actions = ({ actions, element, index }) => {
           trigger={<Button
             type="button"
             icon={action.icon}
-            onClick={(event) => handleClick(event, action)}
+            onClick={(event) => handleClick(event, action, index)}
             color={action.color}
             className="circular"
             size="mini"

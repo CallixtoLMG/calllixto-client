@@ -2,10 +2,10 @@
 import { useListAllBrands } from "@/api/brands";
 import { create, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
 import { useListAllSuppliers } from "@/api/suppliers";
-import { ATTRIBUTES as BRANDSATTRIBUTES } from "@/components/brands/brands.common";
+import { ATTRIBUTES as BRANDS_ATTRIBUTES } from "@/components/brands/brands.common";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { ATTRIBUTES as SUPPLIERSATTRIBUTES } from "@/components/suppliers/suppliers.common";
+import { ATTRIBUTES as SUPPLIERS_ATTRIBUTES } from "@/components/suppliers/suppliers.common";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -16,8 +16,8 @@ import { toast } from "react-hot-toast";
 const CreateProduct = () => {
   useValidateToken();
   const { push } = useRouter();
-  const { data: brands, isLoading: isLoadingBrands } = useListAllBrands({ attributes: [BRANDSATTRIBUTES.NAME, BRANDSATTRIBUTES.ID] });
-  const { data: suppliers, isLoading: isLoadingSuppliers } = useListAllSuppliers({ attributes: [SUPPLIERSATTRIBUTES.NAME, SUPPLIERSATTRIBUTES.ID] });
+  const { data: brands, isLoading: isLoadingBrands } = useListAllBrands({ attributes: [BRANDS_ATTRIBUTES.NAME, BRANDS_ATTRIBUTES.ID] });
+  const { data: suppliers, isLoading: isLoadingSuppliers } = useListAllSuppliers({ attributes: [SUPPLIERS_ATTRIBUTES.NAME, SUPPLIERS_ATTRIBUTES.ID] });
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const queryClient = useQueryClient();

@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import * as XLSX from "xlsx";
+import { REGEX } from "./constants";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -159,5 +160,13 @@ export const handleEnterKeyPress = (e, action) => {
     e.preventDefault();
     action(e);
   }
+};
+
+export const validateEmail = (email) => {
+  return REGEX.EMAIL.test(email);
+};
+
+export const validatePhone = (phone) => {
+  return phone?.areaCode?.length + phone?.number?.length === 10;
 };
 

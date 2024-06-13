@@ -1,15 +1,18 @@
 "use client";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { Table } from "@/components/common/table";
 import { RULES } from "@/constants";
-import _ from 'lodash';
 import { useParams } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { Popup } from "semantic-ui-react";
-import { Icon } from "./styles";
+import { Button, Icon, Popup } from "semantic-ui-react";
+import { validateEmail, validatePhone } from "@/utils";
 
 const EMPTY_CUSTOMER = { name: '', email: '', phoneNumbers: [], addresses: [], comments: '' };
+const EMPTY_PHONE = { ref: '', areaCode: '', number: '' };
+const EMPTY_ADDRESS = { ref: '', address: '' };
+const EMPTY_EMAIL = { ref: '', email: '' };
 
 const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly }) => {
   const params = useParams();
@@ -17,10 +20,13 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
     defaultValues: {
       ...EMPTY_CUSTOMER,
       ...customer,
-      phoneNumbers: customer?.phoneNumbers?.length ? customer.phoneNumbers : [{ areaCode: '', number: '', ref: "" }],
-      addresses: customer?.addresses?.length ? customer.addresses : [{ address: '', ref: '' }],
     }
   });
+
+  const [phoneToAdd, setPhoneToAdd] = useState(EMPTY_PHONE);
+  const [addressToAdd, setAddressToAdd] = useState(EMPTY_ADDRESS);
+  const [emailToAdd, setEmailToAdd] = useState(EMPTY_EMAIL);
+  const [error, setError] = useState();
 
   const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
     control,
@@ -32,80 +38,61 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
     name: "addresses"
   });
 
+  const { fields: emailsFields, append: appendEmail, remove: removeEmail } = useFieldArray({
+    control,
+    name: "emails"
+  });
+
   const isUpdating = useMemo(() => !!params.id, [params.id]);
 
   const handleReset = useCallback((customer) => {
     reset(customer || EMPTY_CUSTOMER);
   }, [reset]);
 
-  const trimStringFields = obj => {
-    return _.mapValues(obj, value => {
-      if (typeof value === 'string') {
-        return value.trim();
-      }
-      if (Array.isArray(value)) {
-        return value.map(trimStringFields);
-      }
-      if (_.isObject(value) && !_.isEmpty(value)) {
-        return trimStringFields(value);
-      }
-      return value;
-    });
-  };
-
-  const filterEmptyFields = data => {
-    const cleanedData = trimStringFields(data);
-
-    const removeEmpty = obj => {
-      return _.omitBy(obj, value =>
-        _.isUndefined(value) || (_.isString(value) && value === '') ||
-        (_.isArray(value) && value.length === 0) ||
-        (_.isObject(value) && _.isEmpty(value))
-      );
-    };
-
-    let filteredData = removeEmpty(cleanedData);
-
-    // Ensure phoneNumbers and addresses are always arrays
-    if (!filteredData.phoneNumbers) {
-      filteredData.phoneNumbers = [];
-    }
-
-    if (!filteredData.addresses) {
-      filteredData.addresses = [];
-    }
-
-    if (filteredData.phoneNumbers.length > 0) {
-      filteredData.phoneNumbers = filteredData.phoneNumbers
-        .filter(phone => phone.areaCode && phone.number);
-    }
-
-    if (filteredData.addresses.length > 0) {
-      filteredData.addresses = filteredData.addresses
-        .map(address => removeEmpty(address))
-        .filter(address => address.address);
-    }
-
-    if (!filteredData.phoneNumbers) {
-      filteredData.phoneNumbers = [];
-    }
-
-    if (!filteredData.addresses) {
-      filteredData.addresses = [];
-    }
-
-    return filteredData;
-  };
-
   const handleCreate = (data) => {
-    const cleanedData = filterEmptyFields(data);
-    onSubmit(cleanedData);
+    onSubmit(data);
+  };
+
+  const updateFieldToAdd = (setter, field, value) => {
+    if ((field === 'areaCode' || field === 'number') && !/^\d*$/.test(value)) {
+      return;
+    }
+    setter(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleAddPhone = () => {
+    if (!validatePhone(phoneToAdd)) {
+      setError({ phone: 'El área y el número deben sumar 10 dígitos.' });
+      return;
+    }
+    appendPhone(phoneToAdd);
+    setPhoneToAdd(EMPTY_PHONE);
+    setError();
+  };
+
+  const handleAddAddress = () => {
+    if (!addressToAdd.address) {
+      setError({ address: 'La dirección es requerida.' });
+      return;
+    }
+    appendAddress(addressToAdd);
+    setAddressToAdd(EMPTY_ADDRESS);
+  };
+
+  const handleAddEmail = () => {
+    if (!validateEmail(emailToAdd.email)) {
+      setError({ email: 'El correo electrónico no es válido.' });
+      return;
+    }
+    appendEmail(emailToAdd);
+    setEmailToAdd(EMPTY_EMAIL);
+    setError();
   };
 
   return (
     <Form onSubmit={handleSubmit(handleCreate)}>
       <FieldsContainer>
-        <FormField flex="2">
+        <FormField width="33%">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
           {!readonly ? (
             <Controller
@@ -118,165 +105,156 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
             <Segment>{customer?.name}</Segment>
           )}
         </FormField>
-        <FormField flex="3">
-          <RuledLabel title="Email" message={errors?.email?.message} />
-          {!readonly ? (
-            <Controller
-              name="email"
-              control={control}
-              rules={RULES.EMAIL}
-              render={({ field }) => <Input {...field} placeholder="nombre@mail.com" />}
-            />
-          ) : (
-            <Segment>{customer?.email}</Segment>
-          )}
-        </FormField>
       </FieldsContainer>
-      <FieldsContainer rowGap="20px">
-        {phoneFields.map((item, index) => (
-          <FormField flex="none" width="200px" key={item.id}>
-            <RuledLabel
-              title={`Teléfono ${index + 1}`}
-              message={errors?.phoneNumbers?.[index]?.message}
-              popupMsg="Borrar teléfono"
-              onDelete={!readonly ? () => removePhone(index) : undefined}
-              readonly={readonly}
-            >
-            </RuledLabel>
-            <PhoneContainer wrap>
-              {!readonly ? (
-                <Controller
-                  name={`phoneNumbers[${index}]`}
-                  control={control}
-                  rules={{
-                    validate: {
-                      correctLength: (value) => {
-                        if (value.areaCode || value.number) {
-                          const areaCode = value.areaCode.replace(/[^0-9]/g, '');
-                          const number = value.number.replace(/[^0-9]/g, '');
-                          return (areaCode.length + number.length === 10) || "El número debe tener 10 caracteres";
-                        }
-                        return true;
-                      }
-                    }
-                  }}
-                  render={({ field: { value, onChange }, fieldState: { error } }) => (
-                    <>
-                      <Input
-                        width="100%"
-                        placeholder="Referencia"
-                        value={value.ref || ''}
-                        onChange={(e) => {
-                          onChange({
-                            ...value,
-                            ref: e.target.value
-                          })
-                        }}
-                      />
-                      <CurrencyFormatInput
-                        shadow
-                        height="50px"
-                        format="####"
-                        width="35%"
-                        placeholder="Área"
-                        value={value.areaCode || ''}
-                        onChange={(e) => {
-                          const formattedValue = e.target.value.replace(/[^0-9]/g, '');
-                          onChange({
-                            ...value,
-                            areaCode: formattedValue
-                          });
-                        }}
-                      />
-                      <CurrencyFormatInput
-                        shadow
-                        height="50px"
-                        format="#######"
-                        width="60%"
-                        placeholder="Número"
-                        value={value.number || ''}
-                        onChange={(e) => {
-                          const formattedValue = e.target.value.replace(/[^0-9]/g, '');
-                          onChange({
-                            ...value,
-                            number: formattedValue
-                          });
-                        }}
-                      />
-                    </>
-                  )}
+      <FieldsContainer columnGap="50px">
+        <FormField width="33%" style={{ position: 'relative' }}>
+          <Popup
+            trigger={
+              <Button type="button" color="green"><Icon name="add" /> Teléfono</Button>
+            }
+            on='click'
+            onClose={() => {
+              setPhoneToAdd(EMPTY_PHONE);
+              setError();
+            }}
+            position='top left'>
+            <FieldsContainer width="60vw" alignItems="center" rowGap="5px">
+              <FormField flex="1">
+                <Label>Referencia</Label>
+                <Input
+                  placeholder="Referencia"
+                  height="35px"
+                  value={phoneToAdd.ref}
+                  onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'ref', e.target.value)}
                 />
-              ) : (
-                <>
-                  <Segment>{customer?.phoneNumbers[index]?.ref}</Segment>
-                  <Segment width="35%">{customer?.phoneNumbers[index]?.areaCode}</Segment>
-                  <Segment width="60%">{customer?.phoneNumbers[index]?.number}</Segment>
-                </>
-              )}
-            </PhoneContainer>
-          </FormField>
-        ))}
-        {!readonly && (
-          <Popup
-            size="mini"
-            position="top center"
-            content="Agregar Teléfono"
-            trigger={<Icon circular name="add" color="green" size="small" onClick={() => appendPhone({ areaCode: '', number: '', ref: '' })} />}
+              </FormField>
+              <FormField flex="1">
+                <RuledLabel title="Área" message={error?.phone} required />
+                <Input
+                  maxLength="4"
+                  placeholder="Área"
+                  height="35px"
+                  value={phoneToAdd.areaCode}
+                  onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'areaCode', e.target.value)}
+                />
+              </FormField>
+              <FormField flex="1">
+                <RuledLabel title="Número" message={error?.phone} required />
+                <Input
+                  maxLength="7"
+                  placeholder="Número"
+                  height="35px"
+                  value={phoneToAdd.number}
+                  onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'number', e.target.value)}
+                />
+              </FormField>
+              <Button color="green" onClick={handleAddPhone}>
+                <Icon name="add" />Agregar
+              </Button>
+            </FieldsContainer>
+          </Popup>
+          <Table
+            headers={[
+              { id: 1, title: 'Referencia', align: "left", value: (phone) => phone.ref },
+              { id: 2, title: 'Área', align: "left", value: (phone) => phone.areaCode },
+              { id: 3, title: 'Número', align: "left", value: (phone) => phone.number }
+            ]}
+            actions={!readonly ? [
+              { id: 1, icon: 'trash', color: 'red', onClick: (phone, index) => removePhone(index), tooltip: 'Eliminar' }
+            ] : []}
+            elements={phoneFields}
           />
-        )}
-      </FieldsContainer>
-      <FieldsContainer rowGap="20px">
-        {addressFields.map((item, index) => (
-          <FormField width="30%" key={item.id}>
-            <RuledLabel
-              popupMsg={"Borrar dirección"}
-              onDelete={!readonly ? () => removeAddress(index) : undefined}
-              title={`Dirección ${index + 1}`}>
-            </RuledLabel>
-            {!readonly ? (
-              <Controller
-                name={`addresses[${index}]`}
-                control={control}
-                render={({ field: { value, onChange, } }) => (
-                  <>
-                    <Input
-                      placeholder="Referencia"
-                      value={value.ref || ''}
-                      onChange={(e) => {
-                        onChange({
-                          ...value,
-                          ref: e.target.value
-                        })
-                      }}
-                    />
-                    <Input
-                      value={value.address || ''}
-                      placeholder="Dirección"
-                      onChange={(e) => {
-                        onChange({
-                          ...value,
-                          address: e.target.value
-                        })
-                      }}
-                    />
-                  </>
-                )}
-              />
-            ) : (
-              <>
-                <Segment>{customer?.addresses[index]?.ref}</Segment>
-                <Segment>{customer?.addresses[index]?.address}</Segment>
-              </>
-            )}
-          </FormField>))}
-        {!readonly && (
+        </FormField>
+        <FormField flex="1" style={{ position: 'relative' }}>
           <Popup
-            size="mini"
-            position="top center"
-            content="Agregar dirección"
-            trigger={<Icon circular name="add" color="green" size="small" onClick={() => appendAddress({ address: '', ref: '' })} />}
+            trigger={
+              <Button type="button" color="green"><Icon name="add" /> Dirección</Button>
+            }
+            on='click'
+            onClose={() => {
+              setAddressToAdd(EMPTY_ADDRESS);
+            }}
+            position='top left'>
+            <FieldsContainer width="45vw" alignItems="center">
+              <FormField flex="1">
+                <Label>Referencia</Label>
+                <Input
+                  placeholder="Referencia"
+                  height="35px"
+                  value={addressToAdd.ref}
+                  onChange={(e) => updateFieldToAdd(setAddressToAdd, 'ref', e.target.value)}
+                />
+              </FormField>
+              <FormField flex="2">
+                <RuledLabel title="Dirección" message={error?.address} required />
+                <Input
+                  placeholder="Dirección"
+                  height="35px"
+                  value={addressToAdd.address}
+                  onChange={(e) => updateFieldToAdd(setAddressToAdd, 'address', e.target.value)}
+                />
+              </FormField>
+              <Button color="green" onClick={handleAddAddress}>
+                <Icon name="add" />Agregar
+              </Button>
+            </FieldsContainer>
+          </Popup>
+          <Table
+            headers={[
+              { id: 1, title: 'Referencia', align: "left", value: (address) => address.ref },
+              { id: 2, title: 'Dirección', align: "left", value: (address) => address.address }
+            ]}
+            actions={!readonly ? [
+              { id: 1, icon: 'trash', color: 'red', onClick: (address, index) => removeAddress(index), tooltip: 'Eliminar' }
+            ] : []}
+            elements={addressFields}
           />
-        )}
+        </FormField>
+        <FormField flex="1" style={{ position: 'relative' }}>
+          <Popup
+            trigger={
+              <Button type="button" color="green"><Icon name="add" /> Email</Button>
+            }
+            on='click'
+            onClose={() => {
+              setEmailToAdd(EMPTY_EMAIL);
+            }}
+            position='top left'>
+            <FieldsContainer width="50vw" alignItems="center">
+              <FormField flex="1">
+                <Label>Referencia</Label>
+                <Input
+                  placeholder="Referencia"
+                  height="35px"
+                  value={emailToAdd.ref}
+                  onChange={(e) => updateFieldToAdd(setEmailToAdd, 'ref', e.target.value)}
+                />
+              </FormField>
+              <FormField flex="2">
+                <RuledLabel title="Email" message={error?.email} required />
+                <Input
+                  placeholder="Email"
+                  height="35px"
+                  value={emailToAdd.email}
+                  onChange={(e) => updateFieldToAdd(setEmailToAdd, 'email', e.target.value)}
+                />
+              </FormField>
+              <Button color="green" onClick={handleAddEmail}>
+                <Icon name="add" />Agregar
+              </Button>
+            </FieldsContainer>
+          </Popup>
+          <Table
+            headers={[
+              { id: 1, title: 'Referencia', align: "left", value: (email) => email.ref },
+              { id: 2, title: 'Email', align: "left", value: (email) => email.email }
+            ]}
+            actions={!readonly ? [
+              { id: 1, icon: 'trash', color: 'red', onClick: (email, index) => removeEmail(index), tooltip: 'Eliminar' }
+            ] : []}
+            elements={emailsFields}
+          />
+        </FormField>
       </FieldsContainer>
       <FieldsContainer>
         <Label>Comentarios</Label>
@@ -302,7 +280,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
         onReset={() => handleReset(isUpdating ? { ...EMPTY_CUSTOMER, ...customer } : null)}
       />
     </Form>
-  )
+  );
 };
 
 export default CustomerForm;
