@@ -70,51 +70,53 @@ export const ContactFields = ({ readonly }) => {
   return (
     <FieldsContainer columnGap="50px">
       <FormField width="33%" style={{ position: 'relative' }}>
-        <Popup
-          trigger={
-            <Button type="button" color="green"><Icon name="add" /> Teléfono</Button>
-          }
-          on='click'
-          onClose={() => {
-            setPhoneToAdd(EMPTY_PHONE);
-            setError();
-          }}
-          position='top left'>
-          <FieldsContainer width="60vw" alignItems="center" rowGap="5px">
-            <FormField flex="1">
-              <Label>Referencia</Label>
-              <Input
-                placeholder="Referencia"
-                height="35px"
-                value={phoneToAdd.ref}
-                onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'ref', e.target.value)}
-              />
-            </FormField>
-            <FormField flex="1">
-              <RuledLabel title="Área" message={error?.phone} required />
-              <Input
-                maxLength="4"
-                placeholder="Área"
-                height="35px"
-                value={phoneToAdd.areaCode}
-                onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'areaCode', e.target.value)}
-              />
-            </FormField>
-            <FormField flex="1">
-              <RuledLabel title="Número" message={error?.phone} required />
-              <Input
-                maxLength="7"
-                placeholder="Número"
-                height="35px"
-                value={phoneToAdd.number}
-                onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'number', e.target.value)}
-              />
-            </FormField>
-            <Button color="green" onClick={handleAddPhone}>
-              <Icon name="add" />Agregar
-            </Button>
-          </FieldsContainer>
-        </Popup>
+        {!readonly && (
+          <Popup
+            trigger={
+              <Button type="button" color="green"><Icon name="add" /> Teléfono</Button>
+            }
+            on='click'
+            onClose={() => {
+              setPhoneToAdd(EMPTY_PHONE);
+              setError();
+            }}
+            position='top left'>
+            <FieldsContainer width="60vw" alignItems="center" rowGap="5px">
+              <FormField flex="1">
+                <Label>Referencia</Label>
+                <Input
+                  placeholder="Referencia"
+                  height="35px"
+                  value={phoneToAdd.ref}
+                  onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'ref', e.target.value)}
+                />
+              </FormField>
+              <FormField flex="1">
+                <RuledLabel title="Área" message={error?.phone} required />
+                <Input
+                  maxLength="4"
+                  placeholder="Área"
+                  height="35px"
+                  value={phoneToAdd.areaCode}
+                  onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'areaCode', e.target.value)}
+                />
+              </FormField>
+              <FormField flex="1">
+                <RuledLabel title="Número" message={error?.phone} required />
+                <Input
+                  maxLength="7"
+                  placeholder="Número"
+                  height="35px"
+                  value={phoneToAdd.number}
+                  onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'number', e.target.value)}
+                />
+              </FormField>
+              <Button color="green" onClick={handleAddPhone}>
+                <Icon name="add" />Agregar
+              </Button>
+            </FieldsContainer>
+          </Popup>
+        )}
         <Table
           headers={[
             { id: 1, title: 'Referencia', align: "left", value: (phone) => phone.ref },
@@ -128,39 +130,41 @@ export const ContactFields = ({ readonly }) => {
         />
       </FormField>
       <FormField flex="1" style={{ position: 'relative' }}>
-        <Popup
-          trigger={
-            <Button type="button" color="green"><Icon name="add" /> Dirección</Button>
-          }
-          on='click'
-          onClose={() => {
-            setAddressToAdd(EMPTY_ADDRESS);
-          }}
-          position='top left'>
-          <FieldsContainer width="45vw" alignItems="center">
-            <FormField flex="1">
-              <Label>Referencia</Label>
-              <Input
-                placeholder="Referencia"
-                height="35px"
-                value={addressToAdd.ref}
-                onChange={(e) => updateFieldToAdd(setAddressToAdd, 'ref', e.target.value)}
-              />
-            </FormField>
-            <FormField flex="2">
-              <RuledLabel title="Dirección" message={error?.address} required />
-              <Input
-                placeholder="Dirección"
-                height="35px"
-                value={addressToAdd.address}
-                onChange={(e) => updateFieldToAdd(setAddressToAdd, 'address', e.target.value)}
-              />
-            </FormField>
-            <Button color="green" onClick={handleAddAddress}>
-              <Icon name="add" />Agregar
-            </Button>
-          </FieldsContainer>
-        </Popup>
+        {!readonly && (
+          <Popup
+            trigger={
+              <Button type="button" color="green"><Icon name="add" /> Dirección</Button>
+            }
+            on='click'
+            onClose={() => {
+              setAddressToAdd(EMPTY_ADDRESS);
+            }}
+            position='top left'>
+            <FieldsContainer width="45vw" alignItems="center">
+              <FormField flex="1">
+                <Label>Referencia</Label>
+                <Input
+                  placeholder="Referencia"
+                  height="35px"
+                  value={addressToAdd.ref}
+                  onChange={(e) => updateFieldToAdd(setAddressToAdd, 'ref', e.target.value)}
+                />
+              </FormField>
+              <FormField flex="2">
+                <RuledLabel title="Dirección" message={error?.address} required />
+                <Input
+                  placeholder="Dirección"
+                  height="35px"
+                  value={addressToAdd.address}
+                  onChange={(e) => updateFieldToAdd(setAddressToAdd, 'address', e.target.value)}
+                />
+              </FormField>
+              <Button color="green" onClick={handleAddAddress}>
+                <Icon name="add" />Agregar
+              </Button>
+            </FieldsContainer>
+          </Popup>
+        )}
         <Table
           headers={[
             { id: 1, title: 'Referencia', align: "left", value: (address) => address.ref },
@@ -173,39 +177,41 @@ export const ContactFields = ({ readonly }) => {
         />
       </FormField>
       <FormField flex="1" style={{ position: 'relative' }}>
-        <Popup
-          trigger={
-            <Button type="button" color="green"><Icon name="add" /> Email</Button>
-          }
-          on='click'
-          onClose={() => {
-            setEmailToAdd(EMPTY_EMAIL);
-          }}
-          position='top left'>
-          <FieldsContainer width="50vw" alignItems="center">
-            <FormField flex="1">
-              <Label>Referencia</Label>
-              <Input
-                placeholder="Referencia"
-                height="35px"
-                value={emailToAdd.ref}
-                onChange={(e) => updateFieldToAdd(setEmailToAdd, 'ref', e.target.value)}
-              />
-            </FormField>
-            <FormField flex="2">
-              <RuledLabel title="Email" message={error?.email} required />
-              <Input
-                placeholder="Email"
-                height="35px"
-                value={emailToAdd.email}
-                onChange={(e) => updateFieldToAdd(setEmailToAdd, 'email', e.target.value)}
-              />
-            </FormField>
-            <Button color="green" onClick={handleAddEmail}>
-              <Icon name="add" />Agregar
-            </Button>
-          </FieldsContainer>
-        </Popup>
+        {!readonly && (
+          <Popup
+            trigger={
+              <Button type="button" color="green"><Icon name="add" /> Email</Button>
+            }
+            on='click'
+            onClose={() => {
+              setEmailToAdd(EMPTY_EMAIL);
+            }}
+            position='top left'>
+            <FieldsContainer width="50vw" alignItems="center">
+              <FormField flex="1">
+                <Label>Referencia</Label>
+                <Input
+                  placeholder="Referencia"
+                  height="35px"
+                  value={emailToAdd.ref}
+                  onChange={(e) => updateFieldToAdd(setEmailToAdd, 'ref', e.target.value)}
+                />
+              </FormField>
+              <FormField flex="2">
+                <RuledLabel title="Email" message={error?.email} required />
+                <Input
+                  placeholder="Email"
+                  height="35px"
+                  value={emailToAdd.email}
+                  onChange={(e) => updateFieldToAdd(setEmailToAdd, 'email', e.target.value)}
+                />
+              </FormField>
+              <Button color="green" onClick={handleAddEmail}>
+                <Icon name="add" />Agregar
+              </Button>
+            </FieldsContainer>
+          </Popup>
+        )}
         <Table
           headers={[
             { id: 1, title: 'Referencia', align: "left", value: (email) => email.ref },
