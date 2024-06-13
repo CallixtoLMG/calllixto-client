@@ -7,8 +7,12 @@ import { useParams } from "next/navigation";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { Button, Icon, Popup } from "semantic-ui-react";
+import { validateEmail, validatePhone } from "@/utils";
 
 const EMPTY_CUSTOMER = { name: '', email: '', phoneNumbers: [], addresses: [], comments: '' };
+const EMPTY_PHONE = { ref: '', areaCode: '', number: '' };
+const EMPTY_ADDRESS = { ref: '', address: '' };
+const EMPTY_EMAIL = { ref: '', email: '' };
 
 const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly }) => {
   const params = useParams();
@@ -19,32 +23,10 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
     }
   });
 
-  const [phoneToAdd, setPhoneToAdd] = useState({ ref: '', areaCode: '', number: '' });
-  const [addressToAdd, setAddressToAdd] = useState({ ref: '', address: '' });
-  const [emailToAdd, setEmailToAdd] = useState({ ref: '', email: '' });
-  const [phoneErrors, setPhoneErrors] = useState({ areaCode: '', number: '', totalLength: '' });
-  const [emailErrors, setEmailErrors] = useState({ email: '' });
-
-  const validateEmail = (email) => {
-    let errors = { email: '' };
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    if (!emailPattern.test(email.email)) {
-      errors.email = 'El correo electrónico no es válido.';
-    }
-    return errors;
-  };
-
-  const validatePhone = (phone) => {
-    let errors = { areaCode: '', number: '' };
-    const totalLengthValid = phone.areaCode.length + phone.number.length === 10;
-
-    if (!totalLengthValid) {
-      errors.areaCode = 'El área y el número deben sumar 10 dígitos.';
-      errors.number = 'El área y el número deben sumar 10 dígitos.';
-    }
-    return errors;
-  };
+  const [phoneToAdd, setPhoneToAdd] = useState(EMPTY_PHONE);
+  const [addressToAdd, setAddressToAdd] = useState(EMPTY_ADDRESS);
+  const [emailToAdd, setEmailToAdd] = useState(EMPTY_EMAIL);
+  const [error, setError] = useState();
 
   const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
     control,
@@ -72,46 +54,39 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
   };
 
   const updateFieldToAdd = (setter, field, value) => {
-    if (field === 'areaCode' || field === 'number') {
-      if (!/^\d*$/.test(value)) {
-        return;
-      }
+    if ((field === 'areaCode' || field === 'number') && !/^\d*$/.test(value)) {
+      return;
     }
     setter(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleAddItem = (item, validate, setErrors, append, resetItem, resetErrors) => {
-    const errors = validate(item);
-    if (Object.values(errors).some(error => error)) {
-      setErrors(errors);
+  const handleAddPhone = () => {
+    if (!validatePhone(phoneToAdd)) {
+      setError({ phone: 'El área y el número deben sumar 10 dígitos.' });
       return;
     }
-    append(item);
-    resetItem();
-    resetErrors();
-  };
-
-  const handleAddPhone = () => {
-    handleAddItem(phoneToAdd, validatePhone, setPhoneErrors, appendPhone,
-      () => setPhoneToAdd({ ref: '', areaCode: '', number: '' }),
-      () => setPhoneErrors({ areaCode: '', number: '' }));
+    appendPhone(phoneToAdd);
+    setPhoneToAdd(EMPTY_PHONE);
+    setError();
   };
 
   const handleAddAddress = () => {
-    handleAddItem(addressToAdd, () => ({}), () => { }, appendAddress,
-      () => setAddressToAdd({ ref: '', address: '' }),
-      () => { });
+    if (!addressToAdd.address) {
+      setError({ address: 'La dirección es requerida.' });
+      return;
+    }
+    appendAddress(addressToAdd);
+    setAddressToAdd(EMPTY_ADDRESS);
   };
 
   const handleAddEmail = () => {
-    const errors = validateEmail(emailToAdd);
-    if (errors.email) {
-      setEmailErrors(errors);
+    if (!validateEmail(emailToAdd.email)) {
+      setError({ email: 'El correo electrónico no es válido.' });
       return;
     }
     appendEmail(emailToAdd);
-    setEmailToAdd({ ref: '', email: '' });
-    setEmailErrors({ email: '' });
+    setEmailToAdd(EMPTY_EMAIL);
+    setError();
   };
 
   return (
@@ -139,8 +114,8 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
             }
             on='click'
             onClose={() => {
-              setPhoneToAdd({ ref: '', areaCode: '', number: '' });
-              setPhoneErrors({ areaCode: '', number: '' });
+              setPhoneToAdd(EMPTY_PHONE);
+              setError();
             }}
             position='top left'>
             <FieldsContainer width="60vw" alignItems="center" rowGap="5px">
@@ -154,7 +129,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
                 />
               </FormField>
               <FormField flex="1">
-                <RuledLabel title="Área" message={phoneErrors.areaCode} required />
+                <RuledLabel title="Área" message={error?.phone} required />
                 <Input
                   maxLength="4"
                   placeholder="Área"
@@ -164,7 +139,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
                 />
               </FormField>
               <FormField flex="1">
-                <RuledLabel title="Número" message={phoneErrors.number} required />
+                <RuledLabel title="Número" message={error?.phone} required />
                 <Input
                   maxLength="7"
                   placeholder="Número"
@@ -197,7 +172,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
             }
             on='click'
             onClose={() => {
-              setAddressToAdd({ ref: '', address: '' });
+              setAddressToAdd(EMPTY_ADDRESS);
             }}
             position='top left'>
             <FieldsContainer width="45vw" alignItems="center">
@@ -211,7 +186,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
                 />
               </FormField>
               <FormField flex="2">
-                <Label>Dirección</Label>
+                <RuledLabel title="Dirección" message={error?.address} required />
                 <Input
                   placeholder="Dirección"
                   height="35px"
@@ -242,7 +217,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
             }
             on='click'
             onClose={() => {
-              setEmailToAdd({ ref: '', email: '' });
+              setEmailToAdd(EMPTY_EMAIL);
             }}
             position='top left'>
             <FieldsContainer width="50vw" alignItems="center">
@@ -256,7 +231,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, readonly
                 />
               </FormField>
               <FormField flex="2">
-                <RuledLabel title="Email" message={emailErrors.email} required />
+                <RuledLabel title="Email" message={error?.email} required />
                 <Input
                   placeholder="Email"
                   height="35px"

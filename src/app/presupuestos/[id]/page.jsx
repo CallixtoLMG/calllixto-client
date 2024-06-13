@@ -78,7 +78,7 @@ const Budget = ({ params }) => {
             <SendButton
               key={`${APIS.WSP(`${areaCode}${number}`)}`}
               href={`${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`}
-              text={`${ref} - ${areaCode} ${number}`}
+              text={`${ref ? `${ref} - ` : ''}${areaCode} ${number}`}
             />
           )),
           color: 'green',
@@ -90,7 +90,7 @@ const Budget = ({ params }) => {
             <SendButton
               key={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
               href={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
-              text={`${ref} - ${email}`}
+              text={`${ref ? `${ref} - ` : ''}${email}`}
             />
           )),
           color: 'red',

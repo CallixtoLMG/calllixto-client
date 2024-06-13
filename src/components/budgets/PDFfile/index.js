@@ -115,27 +115,17 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                         <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
                       ))}
                     </TableRowHeader>
-                    {budget?.products?.length === 0 ? (
-                      <Table.Row>
-                        <Cell colSpan={PRODUCTS_COLUMNS.length} textAlign="center">
-                          <Header as="h4">
-                            No se encontraron ítems.
-                          </Header>
-                        </Cell>
-                      </Table.Row>
-                    ) : (
-                      budget?.products?.map((product) => {
-                        return (
-                          <Table.Row key={product.key}>
-                            {filteredColumns.map(header => (
-                              <Cell key={`cell_${header.id}`} align={header.align} width={header.width} wrap={header.wrap}>
-                                {header?.value(product)}
-                              </Cell>
-                            ))}
-                          </Table.Row>
-                        );
-                      })
-                    )}
+                    {budget?.products?.map((product) => {
+                      return (
+                        <Table.Row key={product.key}>
+                          {filteredColumns.map(header => (
+                            <Cell key={`cell_${header.id}`} align={header.align} width={header.width} wrap={header.wrap}>
+                              {header?.value(product)}
+                            </Cell>
+                          ))}
+                        </Table.Row>
+                      );
+                    })}
                     {!dispatchPdf && (
                       <>
                         {!!budget?.globalDiscount &&

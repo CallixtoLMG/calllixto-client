@@ -20,7 +20,7 @@ const PopupActions = ({ title, color, buttons, icon, animated = true, position =
       content={
         <NoPrint>
           <Container>
-            {buttons?.map(button => button)}
+            {buttons}
           </Container>
         </NoPrint>
       }

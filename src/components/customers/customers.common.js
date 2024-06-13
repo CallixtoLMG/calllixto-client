@@ -2,7 +2,7 @@ import { formatAddressForDisplay, formatPhoneForDisplay } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 
-export const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESS: "addresses", PHONE: "phoneNumbers", COMMENT: "comments", KEY: "key", TEXT: "text", VALUE: "value" };
+export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESS: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value' };
 
 export const HEADERS = [
   {
@@ -12,8 +12,8 @@ export const HEADERS = [
   },
   {
     id: 2,
-    title: "Nombre",
-    align: "left",
+    title: 'Nombre',
+    align: 'left',
     value: (customer) =>
       <Flex justifyContent="space-between">
         {customer.name}
