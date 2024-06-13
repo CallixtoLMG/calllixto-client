@@ -7,9 +7,9 @@ import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { ATTRIBUTES } from "@/components/suppliers/suppliers.common";
 import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { Rules } from "@/visibilityRules";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { RULES } from "@/roles";
 
 const Suppliers = () => {
   useValidateToken();
@@ -25,17 +25,12 @@ const Suppliers = () => {
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
-  const { suppliers } = useMemo(() => {
-    return { suppliers: data?.suppliers }
-  }, [data]);
-
   useEffect(() => {
     setLabels([PAGES.SUPPLIERS.NAME]);
   }, [setLabels]);
 
   useEffect(() => {
-    const visibilityRules = Rules(role);
-    const actions = visibilityRules.canSeeButtons ? [
+    const actions = RULES.canCreate[role] ? [
       {
         id: 1,
         icon: 'add',

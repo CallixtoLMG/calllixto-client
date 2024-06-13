@@ -10,7 +10,7 @@ import { ATTRIBUTES } from "@/components/products/products.common";
 import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel } from "@/utils";
-import { Rules } from "@/visibilityRules";
+import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -45,8 +45,7 @@ const Products = () => {
   }, [setLabels]);
 
   useEffect(() => {
-    const visibilityRules = Rules(role);
-    const actions = visibilityRules.canSeeButtons ? [
+    const actions = RULES.canCreate[role] ? [
       {
         id: 1,
         icon: 'add',

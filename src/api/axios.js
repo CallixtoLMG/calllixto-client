@@ -1,5 +1,6 @@
 import { DEFAULT_SELECTED_CLIENT } from "@/constants";
 import axios from 'axios';
+import { isCallixtoUser } from "../roles";
 
 const getToken = () => {
   if (typeof window === 'undefined') return null;
@@ -15,7 +16,7 @@ const getClientId = () => {
   try {
     const userData = JSON.parse(userDataString);
 
-    if (userData.clientId === "callixto") {
+    if (isCallixtoUser(userData.clientId)) {
       return userData.selectedClientId || DEFAULT_SELECTED_CLIENT
     }
     return userData.clientId;
