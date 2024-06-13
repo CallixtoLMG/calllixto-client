@@ -1,6 +1,6 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
-import BudgetsPage from "@/components/budgets/BudgetPage";
+import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { ATTRIBUTES } from "@/components/budgets/budgets.common";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";

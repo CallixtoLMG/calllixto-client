@@ -93,7 +93,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
         />
       </FieldsContainer>
       <SubmitAndRestore
-        show
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}

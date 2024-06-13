@@ -79,7 +79,7 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                       <DataContainer width="250px">
                         <Label>Dirección</Label>
                         <Segment>{client?.addresses?.[0].address}</Segment>
-                      </DataContainer >
+                      </DataContainer>
                       <DataContainer flex="1">
                         <Label>Teléfonos</Label>
                         <Segment flexHeight>
@@ -112,7 +112,7 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                   <Table.Body>
                     <TableRowHeader>
                       {filteredColumns.map((header) => (
-                        <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
+                        <HeaderCell key={`header_${header.id}`}>{header.title}</HeaderCell>
                       ))}
                     </TableRowHeader>
                     {budget?.products?.map((product) => {
@@ -152,7 +152,7 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
               {!dispatchPdf &&
                 <>
                   <Divider borderless />
-                  <DataContainer width="100%" >
+                  <DataContainer width="100%">
                     <Label >Formas de pago</Label>
                     <Segment marginTop="0">
                       {budget?.paymentMethods?.join(" | ")}

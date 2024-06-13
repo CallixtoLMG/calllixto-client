@@ -1,0 +1,187 @@
+import { CurrencyFormatInput, FieldsContainer, ViewContainer, FormField, Label, Segment } from "@/components/common/custom";
+import { Table } from "@/components/common/table";
+import { NoPrint, OnlyPrint } from "@/components/layout";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, now, getTotalSum } from "@/utils";
+import { useMemo } from "react";
+import { Box, Flex } from "rebass";
+import { Popup } from "semantic-ui-react";
+import PDFfile from "../PDFfile";
+import { Container, Icon } from "./styles";
+
+const BudgetView = ({ budget, user, printPdfMode }) => {
+  const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
+  const total = useMemo(() => getTotalSum(budget?.products, budget?.globalDiscount), [budget]);
+
+  const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
+    return [
+      {
+        title: "Código",
+        value: (product) => (
+          <>
+            <Popup
+              size="tiny"
+              trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
+              position="top center"
+              on="hover"
+              content={product.brandName}
+            />
+            -
+            <Popup
+              size="tiny"
+              trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>}
+              position="top center"
+              on="hover"
+              content={product.supplierName}
+            />
+            -
+            <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
+          </>
+        ),
+        id: 1,
+        width: 1,
+        align: 'left'
+      },
+      {
+        title: "Nombre",
+        value: (product) => (
+          <Container>
+            {product.name}
+            <Flex ml="7px">
+              {product.comments && (
+                <Popup
+                  size="mini"
+                  content={product.comments}
+                  position="top center"
+                  trigger={
+                    <Box>
+                      <Icon name="info circle" color="yellow" />
+                    </Box>
+                  }
+                />
+              )}
+              {product.dispatchComment && (
+                <Popup
+                  size="mini"
+                  content={product.dispatchComment}
+                  position="top center"
+                  trigger={
+                    <Box >
+                      <Icon name="truck" color="orange" />
+                    </Box>
+                  }
+                />
+              )}
+            </Flex>
+          </Container>
+        ),
+        id: 2,
+        width: 7,
+        wrap: true,
+        align: 'left'
+      },
+      {
+        title: "Precio",
+        value: (product) => (
+          <Flex alignItems="center" justifyContent="space-between">
+            $
+            <CurrencyFormatInput
+              displayType="text"
+              thousandSeparator={true}
+              fixedDecimalScale={true}
+              decimalScale={2}
+              value={product.price}
+            />
+          </Flex>
+        ),
+        id: 3,
+        width: 2,
+      },
+      {
+        title: "Cantidad", value: (product, index) => <p>{product?.quantity}</p>,
+        id: 4,
+        width: 2
+      },
+      {
+        title: "Descuento",
+        value: (product, index) => <p>{formatedPercentage(product?.discount)}</p>,
+        id: 5,
+        width: 1
+      },
+      {
+        title: "Total",
+        value: (product) => (
+          <Flex alignItems="center" justifyContent="space-between">
+            $
+            <CurrencyFormatInput
+              displayType="text"
+              thousandSeparator={true}
+              fixedDecimalScale={true}
+              decimalScale={2}
+              value={getTotal(product)}
+            />
+          </Flex>
+        ),
+        id: 6,
+        width: 3
+      },
+    ];
+  }, []);
+
+  return (
+    <>
+      <NoPrint>
+        <ViewContainer>
+          <FieldsContainer>
+            <FormField width="300px">
+              <Label>Vendedor</Label>
+              <Segment>{budget?.seller}</Segment>
+            </FormField>
+          </FieldsContainer>
+          <FieldsContainer>
+            <FormField width="300px">
+              <Label>Cliente</Label>
+              <Segment>{budget?.customer?.name}</Segment>
+            </FormField>
+            <FormField width={5}>
+              <Label>Dirección</Label>
+              <Segment>{budget?.customer?.addresses[0]?.address}</Segment>
+            </FormField>
+            <FormField width="200px">
+              <Label>Teléfono</Label>
+              <Segment>{formatedSimplePhone(budget?.customer?.phoneNumbers[0])}</Segment>
+            </FormField>
+          </FieldsContainer>
+          <Table
+            mainKey="key"
+            headers={BUDGET_FORM_PRODUCT_COLUMNS}
+            elements={budget?.products}
+            total={total}
+            globalDiscount={budget?.globalDiscount || 0}
+            setGlobalDiscount={(value) => setValue('globalDiscount', value)}
+            showTotal={!!budget?.products.length}
+            readOnly
+          />
+          <FieldsContainer>
+            <Label>Comentarios</Label>
+            <Segment>{budget?.comments}</Segment>
+          </FieldsContainer>
+          <FieldsContainer>
+            <FormField flex={3}>
+              <Label>Métodos de pago</Label>
+              <Segment>{formattedPaymentMethods}</Segment>
+            </FormField>
+            <FormField flex={1}>
+              <Label>Fecha de vencimiento</Label>
+              <Segment>{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
+            </FormField>
+          </FieldsContainer>
+        </ViewContainer>
+      </NoPrint>
+      <OnlyPrint>
+        <PDFfile total={total} budget={budget} client={user.client?.metadata} printPdfMode={printPdfMode} />
+      </OnlyPrint>
+    </>
+  );
+};
+
+export default BudgetView;

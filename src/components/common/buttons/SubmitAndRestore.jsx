@@ -7,20 +7,17 @@ const ButtonsContainer = styled(Flex)`
   column-gap: 20px;
 `;
 
-export const SubmitAndRestore = ({ show, isUpdating, isLoading, isDirty, onClick }) => {
+export const SubmitAndRestore = ({ isUpdating, isLoading, isDirty, onClick }) => {
   return (
-    <>
-      {show && (
-        <ButtonsContainer>
-          <SubmitButton isUpdating={isUpdating} isLoading={isLoading} isDirty={isDirty} />
-          <RestoreButton
-            isUpdating={isUpdating}
-            isLoading={isLoading}
-            isDirty={isDirty}
-            onClick={onClick}
-          />
-        </ButtonsContainer>
-      )}</>
+    <ButtonsContainer>
+      <SubmitButton isUpdating={isUpdating} isLoading={isLoading} isDirty={isDirty} />
+      <RestoreButton
+        isUpdating={isUpdating}
+        isLoading={isLoading}
+        isDirty={isDirty}
+        onClick={onClick}
+      />
+    </ButtonsContainer>
   )
 }
 

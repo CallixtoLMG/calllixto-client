@@ -20,8 +20,9 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
   }, [reset]);
 
   const handleCreate = (data) => {
-    const cleanedData = filterEmptyFields(data);
-    onSubmit(cleanedData);
+    data.phoneNumbers = [];
+    data.addresses = [];
+    onSubmit(data);
   };
 
   return (
@@ -53,7 +54,6 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
         />
       </FieldsContainer>
       <SubmitAndRestore
-        show
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}

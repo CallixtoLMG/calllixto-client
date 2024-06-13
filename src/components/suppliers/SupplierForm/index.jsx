@@ -64,7 +64,6 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
         />
       </FieldsContainer>
       <SubmitAndRestore
-        show
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}

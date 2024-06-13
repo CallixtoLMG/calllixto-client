@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 
-const ModalCustomer = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
+const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
   const { handleSubmit } = useForm({
     defaultValues: customer
   });
@@ -65,4 +65,4 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, onConfirm, isLoading })
     </Transition>)
 };
 
-export default ModalCustomer;
+export default ModalConfirmation;

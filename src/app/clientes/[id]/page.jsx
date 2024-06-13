@@ -62,7 +62,7 @@ const Customer = ({ params }) => {
           customer={customer}
           onSubmit={mutate}
           isLoading={isPending}
-          readonly={!allowUpdate}
+          isUpdating
         />
       ) : (
         <CustomerView customer={customer} />
