@@ -7,7 +7,7 @@ import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { Rules } from "@/visibilityRules";
+import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
@@ -33,8 +33,7 @@ const Brands = () => {
   }, [data]);
 
   useEffect(() => {
-    const visibilityRules = Rules(role);
-    const actions = visibilityRules.canSeeButtons ? [
+    const actions = RULES.canCreate[role] ? [
       {
         id: 1,
         icon: 'add',
