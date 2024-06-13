@@ -1,4 +1,3 @@
-"use client";
 import { Input } from "@/components/common/custom";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";

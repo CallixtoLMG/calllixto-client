@@ -23,7 +23,7 @@ export function edit(budget, id) {
 };
 
 export function useListBudgets({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
-  const { addKey, currentPage, keys, filters, } = usePaginationContext();
+  const { addKey, currentPage, keys, filters } = usePaginationContext();
 
 
   const params = {

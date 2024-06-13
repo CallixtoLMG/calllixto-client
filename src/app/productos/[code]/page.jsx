@@ -6,7 +6,6 @@ import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -20,8 +19,6 @@ const Product = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const queryClient = useQueryClient();
-  const { role } = useUserContext();
-  const visibilityRules = Rules(role);
 
   useEffect(() => {
     resetActions();
@@ -55,7 +52,7 @@ const Product = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      {visibilityRules.canSeeActions && Toggle}
+      {Toggle}
       <ProductForm product={product} onSubmit={mutate} readonly={!allowUpdate} isLoading={isPending} />
     </Loader>
   )

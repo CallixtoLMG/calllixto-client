@@ -1,17 +1,15 @@
-"use client";
 import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
-import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
 import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
+import { RULES } from "@/roles";
 
 const ProductsPage = ({ products = [], role, isLoading, isRefetching }) => {
-  const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const queryClient = useQueryClient();
@@ -34,7 +32,7 @@ const ProductsPage = ({ products = [], role, isLoading, isRefetching }) => {
     return c.map(customer => ({ ...customer, key: customer.code }));
   }, []);
 
-  const actions = visibilityRules.canSeeActions ? [
+  const actions = RULES.canRemove[role] ? [
     {
       id: 1,
       icon: 'trash',

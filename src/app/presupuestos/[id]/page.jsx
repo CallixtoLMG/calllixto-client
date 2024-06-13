@@ -4,7 +4,7 @@ import { useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { BreadcrumActions } from "@/components/common/buttons";
+import { PopupActions } from "@/components/common/buttons";
 import { Button, Icon } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -24,10 +24,10 @@ const PrintButton = ({ onClick, color, iconName, text }) => (
   </Button>
 );
 
-const SendButton = ({ href, color, iconName, text, target = "_blank" }) => (
+const SendButton = ({ href, color, iconName, text, target="_blank" }) => (
   <a href={href} target={target}>
     <Button width="100%" color={color} size="tiny">
-      <Icon name={iconName} /> {text}
+      {iconName && <Icon name={iconName} />}{text}
     </Button>
   </a>
 );
@@ -125,57 +125,68 @@ const Budget = ({ params }) => {
       ];
 
       const sendButtons = [
-        {
-          href: `${APIS.WSP(`${budget?.customer?.phoneNumbers[0]?.areaCode}${budget?.customer?.phoneNumbers[0]?.number}`, budget?.customer?.name)}`,
+        ...(budget?.customer?.phoneNumbers?.length ? [{
+          buttons: budget?.customer?.phoneNumbers.map(({ ref, areaCode, number }) => (
+            <SendButton
+              key={`${APIS.WSP(`${areaCode}${number}`)}`}
+              href={`${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`}
+              text={`${ref ? `${ref} - ` : ''}${areaCode} ${number}`}
+            />
+          )),
           color: 'green',
           iconName: 'whatsapp',
           text: 'WhatsApp'
-        },
-        {
-          href: `${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`,
+        }] : []),
+        ...(budget?.customer?.emails?.length ? [{
+          buttons: budget?.customer?.emails?.map(({ ref, email }) => (
+            <SendButton
+              key={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
+              href={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
+              text={`${ref ? `${ref} - ` : ''}${email}`}
+            />
+          )),
           color: 'red',
           iconName: 'mail',
           text: 'Mail'
-        }
+        }] : [])
       ];
 
       const actions = [
         {
           id: 1,
-          button: <BreadcrumActions title="PDFs" icon="download" color="blue"
-            button={
-              <>
-                {printButtons.map(({ mode, color, iconName, text }) => (
-                  <PrintButton
-                    key={mode}
-                    onClick={() => {
-                      setPrintPdfMode(mode);
-                      setTimeout(window.print);
-                    }}
-                    color={color}
-                    iconName={iconName}
-                    text={text}
-                  />
-                ))}
-              </>
+          button: <PopupActions title="PDFs" icon="download" color="blue"
+            buttons={
+              printButtons.map(({ mode, color, iconName, text }) => (
+                <PrintButton
+                  key={mode}
+                  onClick={() => {
+                    setPrintPdfMode(mode);
+                    setTimeout(window.print);
+                  }}
+                  color={color}
+                  iconName={iconName}
+                  text={text}
+                />
+              ))
             }
           />
         },
         {
           id: 2,
-          button: <BreadcrumActions title="Enviar" icon="send" color="blue"
-            button={
-              <>
-                {sendButtons.map(({ href, color, iconName, text }) => (
-                  <SendButton
-                    key={iconName}
-                    href={href}
-                    color={color}
-                    iconName={iconName}
-                    text={text}
-                  />
-                ))}
-              </>
+          button: <PopupActions title="Enviar" icon="send" color="blue"
+            buttons={
+              [...sendButtons.map(({ href, color, iconName, text, buttons }) => (
+                <PopupActions
+                  animated={false}
+                  key={iconName}
+                  href={href}
+                  color={color}
+                  iconName={iconName}
+                  title={text}
+                  buttons={buttons}
+                  position="right center"
+                />
+              ))]
             }
           />
         },

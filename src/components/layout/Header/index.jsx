@@ -1,19 +1,16 @@
-"use client";
 import { useUserContext } from "@/User";
 import { NoPrint } from "@/components/layout";
 import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";
-import { Rules } from "@/visibilityRules";
 import { usePathname, useRouter } from 'next/navigation';
 import { Flex } from "rebass";
 import { Dropdown, Menu } from 'semantic-ui-react';
 import { Container, LogDiv, ModLink, Text } from "./styles";
+import { isCallixtoUser } from "@/roles";
 
 const Header = () => {
-
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const visibilityRules = Rules(role);
 
   const handleClientChange = (event, data) => {
     const userData = JSON.parse(sessionStorage.getItem("userData"));
@@ -50,7 +47,7 @@ const Header = () => {
                   ))}
                 </Flex>
                 <Flex>
-                  {visibilityRules.canSeeClientSelect &&
+                  {isCallixtoUser(role) &&
                     <LogDiv padding="8px">
                       <Dropdown
                         search

@@ -8,16 +8,14 @@ import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+import { RULES } from "@/roles";
 
 const Supplier = ({ params }) => {
   useValidateToken();
-  const { role } = useUserContext();
-  const visibilityRules = Rules(role);  // Define visibilityRules here once
   const { push } = useRouter();
   const { data: supplier, isLoading, isRefetching } = useGetSupplier(params.id);
   const [allowUpdate, Toggle] = useAllowUpdate();
@@ -25,6 +23,7 @@ const Supplier = ({ params }) => {
   const { resetActions, setActions } = useNavActionsContext();  // Combine useNavActionsContext into a single destructuring assignment
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
+  const { role } = useUserContext();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar todos los productos de la marca "${name}"?`;
 
   useEffect(() => {
@@ -37,7 +36,7 @@ const Supplier = ({ params }) => {
   }, [setLabels, supplier]);
 
   useEffect(() => {
-    const actions = visibilityRules.canSeeButtons ? [
+    const actions = RULES.canRemove[role] ? [
       {
         id: 1,
         icon: 'trash',
@@ -47,7 +46,7 @@ const Supplier = ({ params }) => {
       }
     ] : [];
     setActions(actions);
-  }, [visibilityRules.canSeeButtons, setActions]);
+  }, [role, setActions]);
 
   const { mutate: mutateUpdate, isPending: isLoadingUpdate } = useMutation({
     mutationFn: async (supplier) => {
@@ -88,7 +87,7 @@ const Supplier = ({ params }) => {
 
   return (
     <Loader active={isLoading || isRefetching}>
-      {visibilityRules.canSeeActions && Toggle}
+      {Toggle}
       {open &&
         <ModalDelete
           showModal={open}

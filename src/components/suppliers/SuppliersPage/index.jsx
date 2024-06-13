@@ -1,17 +1,15 @@
-"use client";
 import { LIST_SUPPLIERS_QUERY_KEY, deleteSupplier } from "@/api/suppliers";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
-import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
+import { RULES } from "@/roles";
 
 const SuppliersPage = ({ suppliers = [], role, isLoading, isRefetching }) => {
-  const visibilityRules = Rules(role);
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const queryClient = useQueryClient();
@@ -29,7 +27,7 @@ const SuppliersPage = ({ suppliers = [], role, isLoading, isRefetching }) => {
     resetFilters(filters);
   };
 
-  const actions = visibilityRules.canSeeActions ? [
+  const actions = RULES.canRemove[role] ? [
     {
       id: 1,
       icon: 'trash',
