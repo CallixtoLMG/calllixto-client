@@ -1,4 +1,3 @@
-"use client";
 import { useUserContext } from "@/User";
 import { NoPrint } from "@/components/layout";
 import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";

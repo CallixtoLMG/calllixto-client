@@ -1,4 +1,3 @@
-"use client";
 import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
 import { ModalDelete } from "@/components/common/modals";
 import { Table } from "@/components/common/table";
