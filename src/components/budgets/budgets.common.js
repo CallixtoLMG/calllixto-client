@@ -57,7 +57,7 @@ const BUDGETS_COLUMNS = [
 
 const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
   const includeDiscount = budget?.products?.some(product => product.discount);
-  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatchComment);
+  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatch?.comment);
 
   return [
     {
@@ -65,13 +65,13 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       title: "Nombre",
       align: "left",
       wrap: true,
-      value: (product) => product.name
+      value: (product) => product.dispatch?.name || product.name
     },
     {
       id: 2,
       title: "Cant",
       width: 1,
-      value: (product) => product.quantity || 0
+      value: (product) => product.dispatch?.quantity || product.quantity
     },
     !dispatchPdf && {
       id: 3,
@@ -102,7 +102,7 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       title: "Comentario",
       width: 7,
       wrap: true,
-      value: (product) => product.dispatchComment
+      value: (product) => product.dispatch?.comment
     }
   ].filter(Boolean);
 };
