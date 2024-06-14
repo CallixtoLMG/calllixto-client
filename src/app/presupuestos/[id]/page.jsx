@@ -3,7 +3,7 @@ import { useUserContext } from "@/User";
 import { useGetBudget, edit } from "@/api/budgets";
 import { Button, Checkbox, Icon } from "@/components/common/custom";
 import { Loader, NoPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { APIS, BUDGET_PDF_FORMAT, PAGES } from "@/constants";
+import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -15,6 +15,10 @@ import { Box } from "rebass";
 import { now } from "@/utils";
 import toast from "react-hot-toast";
 import { PopupActions } from "@/components/common/buttons";
+import { useListAllProducts } from "@/api/products";
+import { useListAllCustomers } from "@/api/customers";
+import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
+import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 
 const PrintButton = ({ onClick, color, iconName, text }) => (
   <Button
@@ -38,26 +42,24 @@ const Budget = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
   const { userData } = useUserContext();
-  const { data: budget, isLoading: loadingBudget } = useGetBudget(params.id);
-
+  const { data: budget, isLoading } = useGetBudget(params.id);
   const { data: productsData, isLoading: loadingProducts } = useListAllProducts({
     attributes: [
-      PRODUCTSATTRIBUTES.CODE,
-      PRODUCTSATTRIBUTES.PRICE,
-      PRODUCTSATTRIBUTES.NAME,
-      PRODUCTSATTRIBUTES.COMMENTS,
-      PRODUCTSATTRIBUTES.BRANDNAME,
-      PRODUCTSATTRIBUTES.SUPPLIERNAME
+      PRODUCT_ATTRIBUTES.CODE,
+      PRODUCT_ATTRIBUTES.PRICE,
+      PRODUCT_ATTRIBUTES.NAME,
+      PRODUCT_ATTRIBUTES.COMMENTS,
+      PRODUCT_ATTRIBUTES.BRANDNAME,
+      PRODUCT_ATTRIBUTES.SUPPLIERNAME
     ],
     enabled: budget?.state === BUDGET_STATES.DRAFT.id
   });
-
   const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({
     attributes: [
-      CUSTOMERATTRIBUTES.ADDRESSES,
-      CUSTOMERATTRIBUTES.PHONES,
-      CUSTOMERATTRIBUTES.ID,
-      CUSTOMERATTRIBUTES.NAME
+      CUSTOMERS_ATTRIBUTES.ADDRESSES,
+      CUSTOMERS_ATTRIBUTES.PHONES,
+      CUSTOMERS_ATTRIBUTES.ID,
+      CUSTOMERS_ATTRIBUTES.NAME
     ],
     enabled: budget?.state === BUDGET_STATES.DRAFT.id
   });
@@ -73,15 +75,8 @@ const Budget = ({ params }) => {
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [confirmed, setConfirmed] = useState();
 
-  const { products } = useMemo(() => {
-    return { products: productsData?.products }
-  }, [productsData]);
-  console.log("products", products)
-
-  const { customers } = useMemo(() => {
-    return { customers: customersData?.customers }
-  }, [customersData]);
-  console.log("customers", customers)
+  const products = useMemo(() => productsData?.products, [productsData]);
+  const customers = useMemo(() => customersData?.customers, [customersData]);
 
   const mappedProducts = useMemo(() => products?.map(product => ({
     ...product,
@@ -115,9 +110,9 @@ const Budget = ({ params }) => {
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
       ].filter(Boolean));
       setCustomerData(budget.customer);
-      setConfirmed(budget.state === 'CONFIRMED');
+      setConfirmed(budget.state === BUDGET_STATES.CONFIRMED.id);
     }
-  }, [setLabels, budget, isLoading, push]);
+  }, [setLabels, budget, push, isLoading]);
 
   useEffect(() => {
     if (budget) {
@@ -242,7 +237,12 @@ const Budget = ({ params }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      const confirmationData = { confirmedBy: `${userData.firstName} ${userData.lastName}`, confirmedAt: now() };
+      const confirmationData = {
+        confirmedBy: `${userData.firstName} ${userData.lastName}`,
+        confirmedAt: now(),
+        confirmed: true,
+        state: BUDGET_STATES.CONFIRMED.id
+      };
       const { data } = await edit(confirmationData, budget?.id);
       return data;
     },
@@ -261,29 +261,31 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      <NoPrint>
-        <Box marginBottom={15}>
-          <Checkbox
-            toggle
-            checked={confirmed}
-            onChange={handleCheckboxChange}
-            label={confirmed ? "Confirmado" : "Confirmar presupuesto"}
-            disabled={budget?.state === 'CONFIRMED'}
+      {!budget?.confirmed && (
+        <NoPrint>
+          <Box marginBottom={15}>
+            <Checkbox
+              toggle
+              checked={confirmed}
+              onChange={handleCheckboxChange}
+              label={confirmed ? "Confirmado" : "Confirmar presupuesto"}
+              disabled={budget?.state === BUDGET_STATES.CONFIRMED.id || budget?.state === BUDGET_STATES.INACTIVE.id}
+            />
+          </Box>
+          <ModalCustomer
+            isModalOpen={isModalCustomerOpen}
+            onClose={handleModalCustomerClose}
+            customer={customerData}
           />
-        </Box>
-        <ModalCustomer
-          isModalOpen={isModalCustomerOpen}
-          onClose={handleModalCustomerClose}
-          customer={customerData}
-        />
-        <ModalConfirmation
-          isModalOpen={isModalConfirmationOpen}
-          onClose={handleModalConfirmationClose}
-          customer={customerData}
-          onConfirm={mutate}
-          isLoading={isPending}
-        />
-      </NoPrint>
+          <ModalConfirmation
+            isModalOpen={isModalConfirmationOpen}
+            onClose={handleModalConfirmationClose}
+            customer={customerData}
+            onConfirm={mutate}
+            isLoading={isPending}
+          />
+        </NoPrint>
+      )}
       <BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />
     </Loader>
   );

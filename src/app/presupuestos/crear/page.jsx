@@ -20,17 +20,13 @@ const CreateBudget = () => {
   const searchParams = useSearchParams();
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
+
   const { data: productsData, isLoading: loadingProducts } = useListAllProducts({ attributes: [PRODUCTS_ATTRIBUTES.CODE, PRODUCTS_ATTRIBUTES.PRICE, PRODUCTS_ATTRIBUTES.NAME, PRODUCTS_ATTRIBUTES.COMMENTS, PRODUCTS_ATTRIBUTES.BRANDNAME, PRODUCTS_ATTRIBUTES.SUPPLIERNAME], enabled: true });
-  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({ attributes: [CUSTOMERS_ATTRIBUTES.ADDRESSES, CUSTOMERS_ATTRIBUTES.PHONES, CUSTOMERS_ATTRIBUTES.ID, CUSTOMERS_ATTRIBUTES.NAME] });
+  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({ attributes: [CUSTOMERS_ATTRIBUTES.ADDRESSES, CUSTOMERS_ATTRIBUTES.PHONES, CUSTOMERS_ATTRIBUTES.ID, CUSTOMERS_ATTRIBUTES.NAME], enabled: true });
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
 
-  const { products } = useMemo(() => {
-    return { products: productsData?.products }
-  }, [productsData]);
-
-  const { customers } = useMemo(() => {
-    return { customers: customersData?.customers }
-  }, [customersData]);
+  const products = useMemo(() => productsData?.products, [productsData]);
+  const customers = useMemo(() => customersData?.customers, [customersData]);
 
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();

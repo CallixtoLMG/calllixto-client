@@ -5,9 +5,7 @@ import { useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 
 const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
-  const { handleSubmit } = useForm({
-    defaultValues: customer
-  });
+  const { handleSubmit } = useForm({ defaultValues: customer });
 
   const inputRef = useRef(null);
   useEffect(() => {

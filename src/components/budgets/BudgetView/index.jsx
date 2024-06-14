@@ -142,7 +142,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
               <Label>Cliente</Label>
               <Segment>{budget?.customer?.name}</Segment>
             </FormField>
-            <FormField width={5}>
+            <FormField flex="1">
               <Label>Dirección</Label>
               <Segment>{budget?.customer?.addresses[0]?.address}</Segment>
             </FormField>
@@ -158,7 +158,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
             total={total}
             globalDiscount={budget?.globalDiscount || 0}
             setGlobalDiscount={(value) => setValue('globalDiscount', value)}
-            showTotal={!!budget?.products.length}
+            showTotal={!!budget?.products?.length}
             readOnly
           />
           <FieldsContainer>
