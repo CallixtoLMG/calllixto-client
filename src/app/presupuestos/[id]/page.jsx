@@ -1,18 +1,20 @@
 "use client";
 import { useUserContext } from "@/User";
-import { edit, useGetBudget } from "@/api/budgets";
-import { useListAllCustomers } from "@/api/customers";
-import { useListAllProducts } from "@/api/products";
-import BudgetForm from "@/components/budgets/BudgetForm";
-import { PopupActions } from "@/components/common/buttons";
-import { Button, Icon } from "@/components/common/custom";
-import { ATTRIBUTES as CUSTOMERATTRIBUTES } from "@/components/customers/customers.common";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ATTRIBUTES as PRODUCTSATTRIBUTES } from "@/components/products/products.common";
-import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
+import { useGetBudget, edit } from "@/api/budgets";
+import { Button, Checkbox, Icon } from "@/components/common/custom";
+import { Loader, NoPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { APIS, BUDGET_PDF_FORMAT, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import BudgetView from "@/components/budgets/BudgetView";
+import ModalCustomer from "@/components/budgets/ModalCustomer";
+import ModalConfirmation from "@/components/budgets/ModalConfirmation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Box } from "rebass";
+import { now } from "@/utils";
+import toast from "react-hot-toast";
+import { PopupActions } from "@/components/common/buttons";
 
 const PrintButton = ({ onClick, color, iconName, text }) => (
   <Button
@@ -63,7 +65,13 @@ const Budget = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const { role } = useUserContext();
+  const queryClient = useQueryClient();
   const [printPdfMode, setPrintPdfMode] = useState(BUDGET_PDF_FORMAT.CLIENT);
+  const [customerData, setCustomerData] = useState();
+  const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
+  const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
+  const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
+  const [confirmed, setConfirmed] = useState();
 
   const { products } = useMemo(() => {
     return { products: productsData?.products }
@@ -95,15 +103,21 @@ const Budget = ({ params }) => {
   }, []);
 
   useEffect(() => {
+    if (!isLoading && !budget) {
+      push(PAGES.NOT_FOUND.BASE);
+      return;
+    }
     if (budget) {
       const stateTitle = BUDGET_STATES[budget.state]?.title || "No definido";
-      const stateColor = BUDGET_STATES[budget.state]?.color || "grey"; 
+      const stateColor = BUDGET_STATES[budget.state]?.color || "grey";
       setLabels([
         PAGES.BUDGETS.NAME,
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
-      ].filter(Boolean)); 
+      ].filter(Boolean));
+      setCustomerData(budget.customer);
+      setConfirmed(budget.state === 'CONFIRMED');
     }
-  }, [setLabels, budget]);
+  }, [setLabels, budget, isLoading, push]);
 
   useEffect(() => {
     if (budget) {
@@ -206,22 +220,71 @@ const Budget = ({ params }) => {
     }
   }, [budget, push, role, setActions]);
 
-  if (!loadingBudget && !budget) {
-    push(PAGES.NOT_FOUND.BASE);
-    return;
+  const handleCheckboxChange = () => {
+    if (!customerHasInfo) {
+      setIsModalCustomerOpen(true);
+      return;
+    }
+    setIsModalConfirmationOpen(true);
   };
 
+  const handleModalCustomerClose = (openNextModal, customer) => {
+    setIsModalCustomerOpen(false);
+    if (openNextModal) {
+      setCustomerData(customer);
+      setIsModalConfirmationOpen(true);
+    }
+  };
+
+  const handleModalConfirmationClose = () => {
+    setIsModalConfirmationOpen(false);
+  };
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      const confirmationData = { confirmedBy: `${userData.firstName} ${userData.lastName}`, confirmedAt: now() };
+      const { data } = await edit(confirmationData, budget?.id);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
+        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
+        toast.success('Presupuesto confirmado!');
+        setConfirmed(true);
+        setIsModalConfirmationOpen(false);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
+
   return (
-    <Loader active={loadingProducts || loadingCustomers || loadingBudget}>
-      <BudgetForm
-        readonly={budget?.state.toUpperCase() !== BUDGET_STATES.DRAFT.id}
-        user={userData}
-        budget={budget}
-        products={mappedProducts}
-        customers={mappedCustomers}
-        printPdfMode={printPdfMode}
-        onSubmit={(budget) => edit(budget)}
-      />
+    <Loader active={isLoading}>
+      <NoPrint>
+        <Box marginBottom={15}>
+          <Checkbox
+            toggle
+            checked={confirmed}
+            onChange={handleCheckboxChange}
+            label={confirmed ? "Confirmado" : "Confirmar presupuesto"}
+            disabled={budget?.state === 'CONFIRMED'}
+          />
+        </Box>
+        <ModalCustomer
+          isModalOpen={isModalCustomerOpen}
+          onClose={handleModalCustomerClose}
+          customer={customerData}
+        />
+        <ModalConfirmation
+          isModalOpen={isModalConfirmationOpen}
+          onClose={handleModalConfirmationClose}
+          customer={customerData}
+          onConfirm={mutate}
+          isLoading={isPending}
+        />
+      </NoPrint>
+      <BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />
     </Loader>
   );
 };

@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 import { RULES } from "@/roles";
+import SupplierView from "@/components/suppliers/SupplierView";
 
 const Supplier = ({ params }) => {
   useValidateToken();
@@ -96,7 +97,11 @@ const Supplier = ({ params }) => {
           onDelete={mutateDelete}
           isLoading={isLoadingDelete}
         />}
-      <SupplierForm supplier={supplier} onSubmit={mutateUpdate} readonly={!allowUpdate} isLoading={isLoadingUpdate} />
+      {allowUpdate ? (
+        <SupplierForm supplier={supplier} onSubmit={mutateUpdate} isLoading={isLoadingUpdate} isUpdating />
+      ) : (
+        <SupplierView supplier={supplier} />
+      )}
     </Loader>
   );
 };

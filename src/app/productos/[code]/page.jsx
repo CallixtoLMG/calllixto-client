@@ -1,5 +1,4 @@
 "use client";
-import { useUserContext } from "@/User";
 import { GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, edit, useGetProduct } from "@/api/products";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
@@ -10,6 +9,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
+import ProductView from "../../../components/products/ProductView";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -53,7 +53,11 @@ const Product = ({ params }) => {
   return (
     <Loader active={isLoading}>
       {Toggle}
-      <ProductForm product={product} onSubmit={mutate} readonly={!allowUpdate} isLoading={isPending} />
+      {allowUpdate ? (
+        <ProductForm product={product} onSubmit={mutate} isUpdating isLoading={isPending} />
+      ) : (
+        <ProductView product={product} />
+      )}
     </Loader>
   )
 };
