@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { editBudget, useGetBudget } from "@/api/budgets";
+import { edit, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
@@ -97,7 +97,11 @@ const Budget = ({ params }) => {
   useEffect(() => {
     if (budget) {
       const stateTitle = BUDGET_STATES[budget.state]?.title || "No definido";
-      setLabels([PAGES.BUDGETS.NAME, budget.id, stateTitle]);
+      const stateColor = BUDGET_STATES[budget.state]?.color || "grey"; 
+      setLabels([
+        PAGES.BUDGETS.NAME,
+        budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
+      ].filter(Boolean)); 
     }
   }, [setLabels, budget]);
 
@@ -216,7 +220,7 @@ const Budget = ({ params }) => {
         products={mappedProducts}
         customers={mappedCustomers}
         printPdfMode={printPdfMode}
-        onSubmit={(budget) => editBudget(budget)}
+        onSubmit={(budget) => edit(budget)}
       />
     </Loader>
   );

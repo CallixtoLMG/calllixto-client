@@ -56,7 +56,6 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   const queryClient = useQueryClient();
   const [watchProducts, watchGlobalDiscount, watchConfirmed, watchState] = watch(['products', 'globalDiscount', 'confirmed', 'state']);
   const [total, setTotal] = useState(0);
-
   useEffect(() => {
     if (isCloning) {
       let budgetProducts = [...budget.products];
@@ -438,30 +437,31 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           </Modal>
         </Transition>
         <Form onSubmit={handleSubmit(handleCreate)} >
-          <FieldsContainer>
-            <FormField width="300px">
-              <Controller
-                name="confirmed"
-                control={control}
-                render={({ field: { value, onChange, ...rest } }) => (
-                  <Checkbox
-                    {...rest}
-                    toggle
-                    readOnly={readonly && value}
-                    checked={value}
-                    onChange={() => {
-                      if (readonly) {
-                        handleCheckboxChange();
-                      } else {
-                        onChange(!value);
-                      }
-                    }}
-                    label={value ? "Confirmado" : "Confirmar presupuesto"}
-                  />
-                )}
-              />
-            </FormField>
-          </FieldsContainer>
+          {budget?.state !== BUDGET_STATES.CONFIRMED.id &&
+            <FieldsContainer>
+              <FormField width="300px">
+                <Controller
+                  name="confirmed"
+                  control={control}
+                  render={({ field: { value, onChange, ...rest } }) => (
+                    <Checkbox
+                      {...rest}
+                      toggle
+                      readOnly={readonly && value}
+                      checked={value}
+                      onChange={() => {
+                        if (readonly) {
+                          handleCheckboxChange();
+                        } else {
+                          onChange(!value);
+                        }
+                      }}
+                      label={value ? "Confirmado" : "Confirmar presupuesto"}
+                    />
+                  )}
+                />
+              </FormField>
+            </FieldsContainer>}
           <FieldsContainer>
             <FormField width="300px">
               <Label>Vendedor</Label>

@@ -15,7 +15,7 @@ import styled from "styled-components";
 export const Segment = styled(SSegment)`
   height: ${({ height = 'auto' }) => height} !important;
   padding:${({ height }) => height && "10px"} !important;
-  margin: 5px 0!important;
+  margin: 5px 0 0 0!important;
   width: ${({ width = '100%' }) => width} !important;
   min-height: 50px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
@@ -41,6 +41,14 @@ export const Input = styled(SInput)`
 `;
 
 export const Checkbox = styled(SCheckbox)`
+  &&& {
+    input:focus:checked~label:before {
+    background-color: rgba(32,186,68,255)!important;
+    }
+  };
+  label::before{
+    background-color: rgba(243,112,28,255)!important;
+  };
   label::after{
     z-index: 1!important;
   };
