@@ -1,6 +1,6 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { RULES } from "@/constants";
+import { PAGES, RULES } from "@/constants";
 import { preventSend } from "@/utils";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -8,7 +8,7 @@ import { Controller, useForm } from "react-hook-form";
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
-  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: product });
+  const { handleSubmit, control, reset, formState: { isDirty, errors, isSubmitted } } = useForm({ defaultValues: product });
   const [supplier, setSupplier] = useState();
   const [brand, setBrand] = useState();
 
@@ -19,7 +19,9 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   }, [reset]);
 
   const handleForm = async (data) => {
-    data.code = `${supplierId}${brandId}${data.code}`;
+    if (!isUpdating) {
+      data.code = `${supplier.id}${brand.id}${data.code}`;
+    }
     await onSubmit(data);
   };
 
@@ -27,18 +29,71 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField width="30%">
-          <Label>Proveedor</Label>
-          <Segment disabled>{product?.supplierName}</Segment>
+          <RuledLabel title="Proveedor" message={!isUpdating && isDirty && isSubmitted && !supplier && 'Campo requerido'} required />
+          {!isUpdating ? (
+            <Dropdown
+              required
+              name="supplier"
+              placeholder={PAGES.SUPPLIERS.NAME}
+              search
+              selection
+              minCharacters={2}
+              noResultsMessage="Sin resultados!"
+              options={suppliers}
+              clearable
+              value={supplier?.name}
+              onChange={(e, { value }) => {
+                const supplier = suppliers.find((supplier) => supplier.name === value);
+                setSupplier(supplier);
+              }}
+            />
+          ) : (
+            <Segment disabled>{product?.supplierName}</Segment>
+          )}
         </FormField>
         <FormField width="30%">
-          <Label>Marca</Label>
-          <Segment disabled>{product?.brandName}</Segment>
+          <RuledLabel title="Marca" message={!isUpdating && isDirty && isSubmitted && !brand && 'Campo requerido'} required />
+          {!isUpdating ? (
+            <Dropdown
+              required
+              name="brand"
+              placeholder={PAGES.BRANDS.NAME}
+              search
+              selection
+              minCharacters={2}
+              noResultsMessage="Sin resultados!"
+              options={brands}
+              clearable
+              value={brand?.name}
+              onChange={(e, { value }) => {
+                const brand = brands.find((brand) => brand.name === value);
+                setBrand(brand);
+              }}
+              disabled={isUpdating}
+            />
+          ) : (
+            <Segment disabled>{product?.brandName}</Segment>
+          )}
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
         <FormField width="20%">
-          <Label>Código</Label>
-          <Segment disabled>{product?.code}</Segment>
+          <RuledLabel title="Código" message={errors?.code?.message} required />
+          <Controller
+            name="code"
+            control={control}
+            rules={RULES.REQUIRED_MAX26_DIGIT_CODE}
+            render={({ field }) => (
+              <Input
+                {...field}
+                placeholder="Código"
+                onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                disabled={isUpdating}
+                {...((supplier || brand) && { label: { basic: true, content: `${supplier?.id ?? ''} ${brand?.id ?? ''}` } })}
+                labelPosition='left'
+              />
+            )}
+          />
         </FormField>
         <FormField flex="1">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
