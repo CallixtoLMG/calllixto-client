@@ -1,5 +1,6 @@
 "use client";
 import { FieldsContainer, FormField, Label, Segment, ViewContainer } from "@/components/common/custom";
+import { ContactView } from "@/components/common/form";
 
 const CustomerView = ({ customer }) => {
   return (
@@ -10,6 +11,7 @@ const CustomerView = ({ customer }) => {
           <Segment>{customer?.name}</Segment>
         </FormField>
       </FieldsContainer>
+      <ContactView {...customer} />
       <FieldsContainer>
         <Label>Comentarios</Label>
         <Segment>{customer?.comments}</Segment>

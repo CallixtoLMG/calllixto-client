@@ -52,7 +52,7 @@ const Customer = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      {visibilityRules.canSeeActions && Toggle}
+      {Toggle}
       {allowUpdate ? (
         <CustomerForm
           customer={customer}
