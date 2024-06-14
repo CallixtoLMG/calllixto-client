@@ -11,7 +11,7 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
   const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: brand });
 
   const handleReset = useCallback((brand) => {
-    reset(brand || EMPTY_BRAND);
+    reset(brand);
   }, [reset]);
 
   return (
@@ -62,7 +62,7 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}
-        onReset={() => handleReset(isUpdating ? { ...EMPTY_BRAND, ...brand } : null)}
+        onReset={() => handleReset(isUpdating ? { ...EMPTY_BRAND, ...brand } : EMPTY_BRAND)}
       />
     </Form>
   )
