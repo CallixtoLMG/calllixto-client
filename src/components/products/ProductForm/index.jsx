@@ -1,25 +1,21 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { PAGES, RULES } from "@/constants";
-import { formatedPrice, preventSend } from "@/utils";
+import { RULES } from "@/constants";
+import { preventSend } from "@/utils";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
-  const { handleSubmit, control, reset, formState: { isDirty, errors, isSubmitted } } = useForm({ defaultValues: product });
-  const [supplierId, setSupplierId] = useState("");
-  const [brandId, setBrandId] = useState("");
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const [selectedBrand, setSelectedBrand] = useState(null);
+  const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: product });
+  const [supplier, setSupplier] = useState();
+  const [brand, setBrand] = useState();
 
   const handleReset = useCallback((product) => {
-    setSelectedSupplier(null);
-    setSelectedBrand(null);
-    setSupplierId("");
-    setBrandId("");
-    reset(product || EMPTY_PRODUCT);
+    setSupplier(null);
+    setBrand(null);
+    reset(product);
   }, [reset]);
 
   const handleForm = async (data) => {
@@ -95,7 +91,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}
-        onReset={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : null)}
+        onReset={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT)}
       />
     </Form>
   );
