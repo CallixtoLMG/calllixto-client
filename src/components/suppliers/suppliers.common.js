@@ -36,10 +36,22 @@ const SUPPLIERS_COLUMNS = [
     id: 3,
     title: "Dirección",
     value: (supplier) => {
-      const { primaryAddress } = formatAddressForDisplay(supplier.addresses || []);
+      const { primaryAddress, additionalAddress } = formatAddressForDisplay(supplier.addresses || []);
       return (
         <Flex justifyContent="space-between">
           {primaryAddress}
+          {additionalAddress && (
+            <Popup
+              size="mini"
+              content={<div>{additionalAddress}</div>}
+              position="top center"
+              trigger={
+                <Box marginX="5px">
+                  <Icon name="list ul" color="yellow" />
+                </Box>
+              }
+            />
+          )}
         </Flex>
       );
     }
@@ -48,11 +60,23 @@ const SUPPLIERS_COLUMNS = [
     id: 4,
     title: "Teléfono",
     width: 3,
-    value: (customer) => {
-      const { primaryPhone } = formatPhoneForDisplay(customer.phoneNumbers);
+    value: (supplier) => {
+      const { primaryPhone, additionalPhones } = formatPhoneForDisplay(supplier.phoneNumbers);
       return (
         <Flex justifyContent="space-between">
           {primaryPhone}
+          {additionalPhones && (
+            <Popup
+              size="mini"
+              content={<div>{additionalPhones}</div>}
+              position="top center"
+              trigger={
+                <Box marginX="5px">
+                  <Icon name="list ul" color="yellow" />
+                </Box>
+              }
+            />
+          )}
         </Flex>
       );
     }
