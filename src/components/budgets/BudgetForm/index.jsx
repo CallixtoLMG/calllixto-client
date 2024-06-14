@@ -8,7 +8,7 @@ import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formate
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
-import { Message, Modal, Popup, Transition } from "semantic-ui-react";
+import { List, ListItem, Message, Modal, Popup, Transition } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalComment from "./ModalComment";
@@ -99,7 +99,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
   }, [reset, user]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
-    setSelectedProduct({ ...product, index });
+    setSelectedProduct({ ...product });
     setIsModalCommentOpen(true);
   }, []);
 
@@ -132,9 +132,15 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
   ];
 
   const onAddComment = async (data) => {
+    const { comment, name, quantity } = data;
     const newProducts = [...watchProducts];
-    newProducts[selectedProduct.index].dispatchComment = data.comment;
-    setValue("products", newProducts)
+    const product = newProducts.find(p => p.code === selectedProduct.code);
+    product.dispatch = {
+      ...(comment && { comment }),
+      ...(name && { name }),
+      ...(quantity && { quantity })
+    };
+    setValue("products", newProducts);
     setIsModalCommentOpen(false)
   };
 
@@ -185,10 +191,16 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
                   }
                 />
               )}
-              {product.dispatchComment && (
+              {(product.dispatch?.comment || product.dispatch?.name || product.dispatch?.quantity) && (
                 <Popup
                   size="mini"
-                  content={product.dispatchComment}
+                  content={
+                    <List>
+                      {product.dispatch?.name && <ListItem>Nombre Remito: <b>{product.dispatch.name}</b></ListItem>}
+                      {product.dispatch?.comment && <ListItem>Comentario Remito: <b>{product.dispatch.comment}</b></ListItem>}
+                      {product.dispatch?.quantity && <ListItem>Cantidad Remito: <b>{product.dispatch.quantity}</b></ListItem>}
+                    </List>
+                  }
                   position="top center"
                   trigger={
                     <Box>
