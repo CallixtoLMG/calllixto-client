@@ -68,12 +68,10 @@ const Budget = ({ params }) => {
   const { products } = useMemo(() => {
     return { products: productsData?.products }
   }, [productsData]);
-  console.log("products", products)
 
   const { customers } = useMemo(() => {
     return { customers: customersData?.customers }
   }, [customersData]);
-  console.log("customers", customers)
 
   const mappedProducts = useMemo(() => products?.map(product => ({
     ...product,

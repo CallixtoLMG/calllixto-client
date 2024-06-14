@@ -42,16 +42,16 @@ export const Input = styled(SInput)`
 
 export const Checkbox = styled(SCheckbox)`
   &&& {
-    input:focus:checked~label:before {
-    background-color: rgba(32,186,68,255)!important;
+    input:focus:checked ~ label:before {
+      background-color: ${({ coloredLabel }) => coloredLabel ? 'rgba(32,186,68,255)' : ''} !important;
     }
-  };
-  label::before{
-    background-color: rgba(243,112,28,255)!important;
-  };
-  label::after{
-    z-index: 1!important;
-  };
+  }
+  label::before {
+    background-color: ${({ coloredLabel }) => coloredLabel ? 'rgba(243,112,28,255)' : ''} !important;
+  }
+  label::after {
+    z-index: 1 !important;
+  }
 `;
 
 export const FormField = styled(Form.Field)`

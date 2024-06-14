@@ -445,6 +445,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
                   control={control}
                   render={({ field: { value, onChange, ...rest } }) => (
                     <Checkbox
+                      coloredLabel
                       {...rest}
                       toggle
                       readOnly={readonly && value}
