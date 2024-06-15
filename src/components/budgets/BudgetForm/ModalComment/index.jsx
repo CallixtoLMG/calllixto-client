@@ -1,7 +1,7 @@
 import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, Segment, TextArea } from "@/components/common/custom";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Modal, Transition } from "semantic-ui-react";
+import { Button, Message, Modal, Transition } from "semantic-ui-react";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const { control, handleSubmit, formState: { isDirty }, reset } = useForm();
@@ -33,6 +33,9 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
               <Segment>{product?.quantity}</Segment>
             </FormField>
           </FieldsContainer>
+          <Message info>
+            <p>Los campos <b>Nombre</b> y <b>Cantidad</b> sobreescriben al nombre y a la cantidad a mostrar <b>SOLO</b> para el PDF de remito.</p>
+          </Message>
           <Form onSubmit={handleSubmit(onAddComment)}>
             <FieldsContainer>
               <FormField flex="1">
