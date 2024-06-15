@@ -1,5 +1,6 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { ControlledComments } from "@/components/common/form";
 import { PAGES, RULES } from "@/constants";
 import { preventSend } from "@/utils";
 import { useCallback, useState } from "react";
@@ -130,17 +131,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
       </FieldsContainer>
       <FieldsContainer>
         <Label>Comentarios</Label>
-        <Controller
-          name="comments"
-          control={control}
-          render={({ field }) => (
-            <TextArea
-              {...field}
-              maxLength="2000"
-              placeholder="Comentarios"
-            />
-          )}
-        />
+        <ControlledComments control={control} />
       </FieldsContainer>
       <SubmitAndRestore
         isUpdating={isUpdating}

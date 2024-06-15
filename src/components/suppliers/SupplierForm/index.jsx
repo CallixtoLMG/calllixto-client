@@ -1,10 +1,10 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, TextArea } from "@/components/common/custom";
+import { FieldsContainer, Form, FormField, Input, Label, RuledLabel } from "@/components/common/custom";
 import { RULES } from "@/constants";
 import { preventSend } from "@/utils";
 import { useCallback, } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { ContactFields } from "@/components/common/form/ContactFields";
+import { ContactFields, ControlledComments } from "@/components/common/form";
 
 const EMPTY_SUPPLIER = { id: '', name: '', emails: [], phoneNumbers: [], addresses: [], comments: '' };
 
@@ -51,17 +51,7 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
         <ContactFields />
         <FieldsContainer>
           <Label >Comentarios</Label>
-          <Controller
-            name="comments"
-            control={control}
-            render={({ field }) => (
-              <TextArea
-                {...field}
-                maxLength="2000"
-                placeholder="Comentarios"
-              />
-            )}
-          />
+          <ControlledComments control={control} />
         </FieldsContainer>
         <SubmitAndRestore
           isUpdating={isUpdating}

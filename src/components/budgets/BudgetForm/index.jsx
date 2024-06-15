@@ -13,6 +13,7 @@ import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
+import { ControlledComments } from "@/components/common/form";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -442,17 +443,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
           />
           <FieldsContainer>
             <Label>Comentarios</Label>
-            <Controller
-              name="comments"
-              control={control}
-              render={({ field }) => (
-                <TextArea
-                  {...field}
-                  maxLength="2000"
-                  placeholder="Comentarios"
-                />
-              )}
-            />
+            <ControlledComments control={control} />
           </FieldsContainer>
           <FieldsContainer>
             <FormField flex={3}>

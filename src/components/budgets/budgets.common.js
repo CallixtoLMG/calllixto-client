@@ -3,6 +3,7 @@ import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, ge
 import { Box, Flex } from "rebass";
 import { Label } from "semantic-ui-react";
 import { Price } from "@/components/common/custom";
+import { CommentTooltip } from "../common/tooltips";
 
 const ATTRIBUTES = {
   ID: "id",
@@ -32,7 +33,11 @@ const BUDGETS_COLUMNS = [
     id: 2,
     title: "Cliente",
     align: "left",
-    value: (budget) => budget.customer.name
+    value: (budget) =>
+      <Flex justifyContent="space-between">
+        {budget.customer.name}
+        {budget.comments && <CommentTooltip comment={budget.comments} />}
+      </Flex>
   },
   {
     id: 3,
