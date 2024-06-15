@@ -19,7 +19,7 @@ import {
   TableRowHeader,
   Title
 } from "./styles";
-import { CurrencyFormatInput } from "@/components/common/custom";
+import { Price } from "@/components/common/custom";
 
 const PDFfile = ({ budget, total, client, printPdfMode }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
@@ -138,16 +138,7 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                           <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
                           <Cell colSpan="1">
                             <strong>
-                              <Flex alignItems="center" justifyContent="space-between">
-                                $
-                                <CurrencyFormatInput
-                                  displayType="text"
-                                  thousandSeparator={true}
-                                  fixedDecimalScale={true}
-                                  decimalScale={2}
-                                  value={total}
-                                />
-                              </Flex>
+                              <Price value={total} />
                             </strong>
                           </Cell>
                         </Table.Row>

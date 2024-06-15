@@ -1,6 +1,6 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES } from "@/constants";
@@ -220,18 +220,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
       },
       {
         title: "Precio",
-        value: (product) => (
-          <Flex alignItems="center" justifyContent="space-between">
-            $
-            <CurrencyFormatInput
-              displayType="text"
-              thousandSeparator={true}
-              fixedDecimalScale={true}
-              decimalScale={2}
-              value={product.price}
-            />
-          </Flex>
-        ),
+        value: (product) => <Price value={product.price} />,
         id: 3,
         width: 2,
       },
@@ -301,18 +290,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
       },
       {
         title: "Total",
-        value: (product) => (
-          <Flex alignItems="center" justifyContent="space-between">
-            $
-            <CurrencyFormatInput
-              displayType="text"
-              thousandSeparator={true}
-              fixedDecimalScale={true}
-              decimalScale={2}
-              value={getTotal(product)}
-            />
-          </Flex>
-        ),
+        value: (product) => <Price value={getTotal(product)} />,
         id: 6,
         width: 3
       },

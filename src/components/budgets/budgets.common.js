@@ -2,7 +2,7 @@ import { BUDGET_STATES, FILTER_TYPES } from "@/constants";
 import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Label } from "semantic-ui-react";
-import { CurrencyFormatInput } from "../common/custom";
+import { Price } from "@/components/common/custom";
 
 const ATTRIBUTES = {
   ID: "id",
@@ -44,18 +44,7 @@ const BUDGETS_COLUMNS = [
     id: 4,
     title: "Total",
     width: 2,
-    value: (budget) => (
-      <Flex alignItems="center" justifyContent="space-between">
-        $
-        <CurrencyFormatInput
-          displayType="text"
-          thousandSeparator={true}
-          fixedDecimalScale={true}
-          decimalScale={2}
-          value={(getTotalSum(budget.products, budget.globalDiscount))}
-        />
-      </Flex>
-    )
+    value: (budget) => <Price value={(getTotalSum(budget.products, budget.globalDiscount))} />
   },
   {
     id: 5,
@@ -87,33 +76,13 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       id: 3,
       title: "Precio",
       width: 2,
-      value: (product) =>
-        <Flex alignItems="center" justifyContent="space-between">
-          $
-          <CurrencyFormatInput
-            displayType="text"
-            thousandSeparator={true}
-            fixedDecimalScale={true}
-            decimalScale={2}
-            value={product.price}
-          />
-        </Flex>
+      value: (product) => <Price value={product.price} />
     },
     !dispatchPdf && includeDiscount && {
       id: 4,
       title: "Subtotal",
       width: 2,
-      value: (product) =>
-        <Flex alignItems="center" justifyContent="space-between">
-          $
-          <CurrencyFormatInput
-            displayType="text"
-            thousandSeparator={true}
-            fixedDecimalScale={true}
-            decimalScale={2}
-            value={formatedPricePdf(product.price * product.quantity || 0)}
-          />
-        </Flex>
+      value: (product) => <Price value={formatedPricePdf(product.price * product.quantity || 0)} />
     },
     !dispatchPdf && includeDiscount && {
       id: 5,
@@ -125,17 +94,7 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       id: 6,
       title: "Importe",
       width: 2,
-      value: (product) =>
-        <Flex alignItems="center" justifyContent="space-between">
-          $
-          <CurrencyFormatInput
-            displayType="text"
-            thousandSeparator={true}
-            fixedDecimalScale={true}
-            decimalScale={2}
-            value={getTotal(product)}
-          />
-        </Flex>
+      value: (product) => <Price value={getTotal(product)} />
     },
     includeDispatchComment && {
       id: 7,

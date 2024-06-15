@@ -1,4 +1,4 @@
-import { CurrencyFormatInput, Dropdown, Input } from "@/components/common/custom";
+import { Dropdown, Input, Price } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
 import { FILTER_TYPES } from "@/constants";
@@ -245,17 +245,7 @@ const CustomTable = ({
                   }
                   <FooterCell colSpan="1">
                     <strong>
-                      <Flex alignItems="center" justifyContent="space-between">
-                        $
-                        <CurrencyFormatInput
-                          height="35px"
-                          displayType="text"
-                          thousandSeparator={true}
-                          fixedDecimalScale={true}
-                          decimalScale={2}
-                          value={total}
-                        />
-                      </Flex>
+                      <Price value={total} />
                     </strong>
                   </FooterCell>
                 </>

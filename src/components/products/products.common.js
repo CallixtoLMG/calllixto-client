@@ -1,10 +1,10 @@
 import { getBrandCode, getProductCode, getSupplierCode } from "@/utils";
 import { Flex } from "rebass";
 import { Popup } from "semantic-ui-react";
-import { CurrencyFormatInput } from "../common/custom";
+import { Price } from "@/components/common/custom";
 import { CommentTooltip } from "@/components/common/tooltips";
 
-const ATTRIBUTES = { CODE: "code", NAME: "name", PRICE: "price", COMMENTS: "comments", BRANDNAME: "brandName", SUPPLIERNAME: "supplierName" };
+const ATTRIBUTES = { CODE: "code", NAME: "name", PRICE: "price", COMMENTS: "comments", BRAND_NAME: "brandName", SUPPLIER_NAME: "supplierName" };
 
 const PRODUCT_COLUMNS = [
   {
@@ -43,18 +43,7 @@ const PRODUCT_COLUMNS = [
     id: 3,
     title: "Precio",
     width: 2,
-    value: (product) => (
-      <Flex alignItems="center" justifyContent="space-between">
-        $
-        <CurrencyFormatInput
-          displayType="text"
-          thousandSeparator={true}
-          fixedDecimalScale={true}
-          decimalScale={2}
-          value={product.price}
-        />
-      </Flex>
-    ),
+    value: (product) => <Price value={product.price} />,
   }
 ];
 
