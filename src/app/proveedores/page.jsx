@@ -17,6 +17,7 @@ const Suppliers = () => {
 
   useEffect(() => {
     handleEntityChange(ENTITIES.SUPPLIERS);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { data, isLoading, isRefetching } = useListSuppliers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESSES, ATTRIBUTES.PHONES, ATTRIBUTES.COMMENT] });

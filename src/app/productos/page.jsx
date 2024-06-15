@@ -28,6 +28,7 @@ const Products = () => {
 
   useEffect(() => {
     handleEntityChange(ENTITIES.PRODUCTS);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false, attributes: [ATTRIBUTES.NAME, ATTRIBUTES.PRICE, ATTRIBUTES.CODE, ATTRIBUTES.COMMENTS, ATTRIBUTES.BRANDNAME, ATTRIBUTES.SUPPLIERNAME] });

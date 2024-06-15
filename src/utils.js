@@ -102,7 +102,7 @@ export const formatedPhone = (phoneNumbers) => {
   return phoneNumbers?.map(phone => `+54 ${phone.areaCode} ${phone.number}`).join(', ');
 };
 
-export const formatPhoneForDisplay = (phoneNumbers) => {
+export const getPhonesForDisplay = (phoneNumbers) => {
   if (!phoneNumbers || phoneNumbers.length === 0) return { primaryPhone: '', additionalPhones: null };
 
   const primaryPhone = `+54 ${phoneNumbers[0]?.areaCode} ${phoneNumbers[0]?.number}`;
@@ -112,7 +112,7 @@ export const formatPhoneForDisplay = (phoneNumbers) => {
   return { primaryPhone, additionalPhones };
 };
 
-export const formatAddressForDisplay = (addresses) => {
+export const getAddressesForDisplay = (addresses) => {
   if (!addresses || addresses.length === 0) return { primaryAddress: '', additionalAddress: null };
 
   const primaryAddress = addresses[0]?.address;

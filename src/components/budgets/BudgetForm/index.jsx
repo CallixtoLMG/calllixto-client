@@ -72,6 +72,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
         setIsUpdateModalOpen(true);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [budget, isCloning, products]);
 
   const calculateTotal = useCallback(() => {

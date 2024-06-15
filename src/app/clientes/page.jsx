@@ -19,6 +19,7 @@ const Customers = () => {
 
   useEffect(() => {
     handleEntityChange(ENTITIES.CUSTOMERS)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

@@ -1,7 +1,8 @@
 import { getBrandCode, getProductCode, getSupplierCode } from "@/utils";
-import { Box, Flex } from "rebass";
-import { Icon, Popup } from "semantic-ui-react";
+import { Flex } from "rebass";
+import { Popup } from "semantic-ui-react";
 import { CurrencyFormatInput } from "../common/custom";
+import { CommentTooltip } from "@/components/common/tooltips";
 
 const ATTRIBUTES = { CODE: "code", NAME: "name", PRICE: "price", COMMENTS: "comments", BRANDNAME: "brandName", SUPPLIERNAME: "supplierName" };
 
@@ -35,18 +36,7 @@ const PRODUCT_COLUMNS = [
     value: (product) =>
       <Flex justifyContent="space-between">
         {product.name}
-        {product.comments && (
-          <Popup
-            size="mini"
-            content={product.comments}
-            position="top center"
-            trigger={
-              <Box marginX="5px">
-                <Icon name="info circle" color="yellow" />
-              </Box>
-            }
-          />
-        )}
+        {product.comments && <CommentTooltip comment={product.comments} />}
       </Flex>
   },
   {

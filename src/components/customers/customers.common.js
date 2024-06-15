@@ -1,6 +1,6 @@
-import { formatAddressForDisplay, formatPhoneForDisplay, formatedSimplePhone } from "@/utils";
+import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
 import { Box, Flex } from "rebass";
-import { Icon, List, ListItem, Popup } from "semantic-ui-react";
+import { CommentTooltip, AddressesTooltip, PhonesTooltip } from "../common/tooltips";
 
 export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value' };
 
@@ -12,18 +12,7 @@ export const HEADERS = [
     value: (customer) =>
       <Flex justifyContent="space-between">
         {customer.name}
-        {customer.comments && (
-          <Popup
-            size="mini"
-            content={customer.comments}
-            position="top center"
-            trigger={
-              <Box marginX="5px">
-                <Icon name="info circle" color="yellow" />
-              </Box>
-            }
-          />
-        )}
+        {customer.comments && <CommentTooltip comment={customer.comments} />}
       </Flex>
   },
   {
@@ -32,30 +21,11 @@ export const HEADERS = [
     width: 4,
     align: "left",
     value: (customer) => {
-      const { primaryAddress, additionalAddresses } = formatAddressForDisplay(customer.addresses || []);
+      const { primaryAddress, additionalAddresses } = getAddressesForDisplay(customer.addresses || []);
       return (
         <Flex justifyContent="space-between">
           {primaryAddress}
-          {additionalAddresses && (
-            <Popup
-              size="mini"
-              content={
-                <List>
-                  {additionalAddresses.map(address => (
-                    <ListItem key={`${address.ref}-${address.address}`}>
-                      {address.ref ? `${address.ref}: ` : "Dirección: "}<b>{address.address}</b>
-                    </ListItem>
-                  ))}
-                </List>
-              }
-              position="top center"
-              trigger={
-                <Box marginX="5px">
-                  <Icon name="list ul" color="yellow" />
-                </Box>
-              }
-            />
-          )}
+          {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
         </Flex>
       );
     }
@@ -65,30 +35,11 @@ export const HEADERS = [
     title: "Teléfono",
     width: 3,
     value: (customer) => {
-      const { primaryPhone, additionalPhones } = formatPhoneForDisplay(customer.phoneNumbers);
+      const { primaryPhone, additionalPhones } = getPhonesForDisplay(customer.phoneNumbers);
       return (
         <Flex justifyContent="space-between">
           {primaryPhone}
-          {additionalPhones && (
-            <Popup
-              size="mini"
-              content={
-                <List>
-                  {additionalPhones.map(phone => (
-                    <ListItem key={`${phone.areaCode}-${phone.number}`}>
-                      {phone.ref ? `${phone.ref}:` : "Contacto: "}<b>{formatedSimplePhone(phone)}</b>
-                    </ListItem>
-                  ))}
-                </List>
-              }
-              position="top center"
-              trigger={
-                <Box marginX="5px">
-                  <Icon name="list ul" color="yellow" />
-                </Box>
-              }
-            />
-          )}
+          {additionalPhones && <PhonesTooltip phones={additionalPhones} />}
         </Flex>
       );
     }
