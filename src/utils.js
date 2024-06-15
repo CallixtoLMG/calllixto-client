@@ -45,11 +45,6 @@ export const formatedPricePdf = (number) => {
   });
 };
 
-export const simpleFormatedPrice = (number) => {
-  let modNumber = Math.round(Number(number));
-  return `$ ${modNumber}`
-};
-
 export const formatProductCodePopup = (code, brand, supplier) => {
   const firstPart = code ? code?.substring(0, 2) : "";
   const secondPart = code ? code?.substring(2, 4) : "";
@@ -95,11 +90,6 @@ export const getTotalSum = (products, discount = 0) => {
 export const formatedSimplePhone = (phoneNumbers) => {
   if (!phoneNumbers) return '';
   return `+54 ${phoneNumbers.areaCode} ${phoneNumbers.number}`;
-};
-
-export const formatedPhone = (phoneNumbers) => {
-  if (phoneNumbers?.length === 0) return '';
-  return phoneNumbers?.map(phone => `+54 ${phone.areaCode} ${phone.number}`).join(', ');
 };
 
 export const getPhonesForDisplay = (phoneNumbers) => {
@@ -161,4 +151,3 @@ export const validateEmail = (email) => {
 export const validatePhone = (phone) => {
   return phone?.areaCode?.length + phone?.number?.length === 10;
 };
-
