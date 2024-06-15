@@ -1,6 +1,6 @@
-import { formatAddressForDisplay, formatPhoneForDisplay } from "@/utils";
+import { formatAddressForDisplay, formatPhoneForDisplay, formatedSimplePhone } from "@/utils";
 import { Box, Flex } from "rebass";
-import { Icon, Popup } from "semantic-ui-react";
+import { Icon, List, ListItem, Popup } from "semantic-ui-react";
 
 const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments" };
 
@@ -36,14 +36,22 @@ const SUPPLIERS_COLUMNS = [
     id: 3,
     title: "Dirección",
     value: (supplier) => {
-      const { primaryAddress, additionalAddress } = formatAddressForDisplay(supplier.addresses || []);
+      const { primaryAddress, additionalAddresses } = formatAddressForDisplay(supplier.addresses || []);
       return (
         <Flex justifyContent="space-between">
           {primaryAddress}
-          {additionalAddress && (
+          {additionalAddresses && (
             <Popup
               size="mini"
-              content={<div>{additionalAddress}</div>}
+              content={
+                <List>
+                  {additionalAddresses.map(address => (
+                    <ListItem key={`${address.ref}-${address.address}`}>
+                      {address.ref ? `${address.ref}: ` : "Dirección: "}<b>{address.address}</b>
+                    </ListItem>
+                  ))}
+                </List>
+              }
               position="top center"
               trigger={
                 <Box marginX="5px">
@@ -68,7 +76,15 @@ const SUPPLIERS_COLUMNS = [
           {additionalPhones && (
             <Popup
               size="mini"
-              content={<div>{additionalPhones}</div>}
+              content={
+                <List>
+                  {additionalPhones.map(phone => (
+                    <ListItem key={`${phone.areaCode}-${phone.number}`}>
+                      {phone.ref ? `${phone.ref}:` : "Contacto: "}<b>{formatedSimplePhone(phone)}</b>
+                    </ListItem>
+                  ))}
+                </List>
+              }
               position="top center"
               trigger={
                 <Box marginX="5px">
