@@ -1,24 +1,25 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useGetBudget, edit } from "@/api/budgets";
+import { edit, useGetBudget } from "@/api/budgets";
+import { useListAllCustomers } from "@/api/customers";
+import { useListAllProducts } from "@/api/products";
+import BudgetForm from "@/components/budgets/BudgetForm";
+import BudgetView from "@/components/budgets/BudgetView";
+import ModalConfirmation from "@/components/budgets/ModalConfirmation";
+import ModalCustomer from "@/components/budgets/ModalCustomer";
+import { PopupActions } from "@/components/common/buttons";
 import { Button, Checkbox, Icon } from "@/components/common/custom";
+import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, NoPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
+import { now } from "@/utils";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import BudgetView from "@/components/budgets/BudgetView";
-import ModalCustomer from "@/components/budgets/ModalCustomer";
-import ModalConfirmation from "@/components/budgets/ModalConfirmation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Box } from "rebass";
-import { now } from "@/utils";
 import toast from "react-hot-toast";
-import { PopupActions } from "@/components/common/buttons";
-import { useListAllProducts } from "@/api/products";
-import { useListAllCustomers } from "@/api/customers";
-import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
-import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
+import { Box } from "rebass";
 
 const PrintButton = ({ onClick, color, iconName, text }) => (
   <Button
@@ -75,22 +76,21 @@ const Budget = ({ params }) => {
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [confirmed, setConfirmed] = useState();
 
-  const products = useMemo(() => productsData?.products, [productsData]);
-  const customers = useMemo(() => customersData?.customers, [customersData]);
-
-  const mappedProducts = useMemo(() => products?.map(product => ({
+  const products = useMemo(() => productsData?.products?.map(product => ({
     ...product,
     key: product.code,
     value: product.name,
     text: product.name,
-  })), [products]);
+  })),
+    [productsData]);
 
-  const mappedCustomers = useMemo(() => customers?.map(customer => ({
+  const customers = useMemo(() => customersData?.customers?.map(customer => ({
     ...customer,
     key: customer.name,
     value: customer.name,
     text: customer.name,
-  })), [customers]);
+  }))
+    , [customersData]);
 
   useEffect(() => {
     resetActions();
@@ -103,8 +103,8 @@ const Budget = ({ params }) => {
       return;
     }
     if (budget) {
-      const stateTitle = BUDGET_STATES[budget.state]?.title || "No definido";
-      const stateColor = BUDGET_STATES[budget.state]?.color || "grey";
+      const stateTitle = BUDGET_STATES[budget.state.toUpperCase()]?.title || "No definido";
+      const stateColor = BUDGET_STATES[budget.state.toUpperCase()]?.color || "grey";
       setLabels([
         PAGES.BUDGETS.NAME,
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
@@ -261,7 +261,7 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      {!budget?.confirmed && (
+      {!budget?.confirmed && budget?.state !== BUDGET_STATES.DRAFT.id && (
         <NoPrint>
           <Box marginBottom={15}>
             <Checkbox
@@ -286,7 +286,17 @@ const Budget = ({ params }) => {
           />
         </NoPrint>
       )}
-      <BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />
+      {budget?.state === BUDGET_STATES.DRAFT.id ?
+        (<BudgetForm
+          onSubmit={mutate}
+          products={products}
+          customers={customers}
+          user={userData}
+          budget={budget}
+          isLoading={isPending}
+        />) :
+        (<BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />)
+      }
     </Loader>
   );
 };
