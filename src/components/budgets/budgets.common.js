@@ -122,7 +122,10 @@ const FILTERS = [
       ...Object.keys(BUDGET_STATES).map(key => (
         {
           key,
-          text: <Flex alignItems="center" justifyContent="space-between">{BUDGET_STATES[key].title}&nbsp;<Label color={BUDGET_STATES[key].color} circular empty /></Flex>,
+          text:
+            <Flex alignItems="center" justifyContent="space-between">
+              {BUDGET_STATES[key].title}&nbsp;<Label color={BUDGET_STATES[key].color} circular empty />
+            </Flex>,
           value: key
         }))
     ],

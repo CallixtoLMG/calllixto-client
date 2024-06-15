@@ -1,5 +1,5 @@
 "use client";
-import { FieldsContainer, ViewContainer, FormField, Label, RuledLabel, Segment } from "@/components/common/custom";
+import { FieldsContainer, ViewContainer, FormField, Label, Segment } from "@/components/common/custom";
 import { formatedPrice } from "@/utils";
 
 const ProductView = ({ product }) => {

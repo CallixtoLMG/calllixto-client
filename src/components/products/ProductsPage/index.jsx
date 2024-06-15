@@ -75,7 +75,6 @@ const ProductsPage = ({ products = [], role, isLoading, isRefetching }) => {
         onFilter={onFilter}
         usePagination
       />
-
       <ModalDelete
         showModal={showModal}
         setShowModal={setShowModal}
