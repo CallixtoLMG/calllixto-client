@@ -240,13 +240,12 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
                 displayType="input"
                 onFocus={(e) => e.target.select()}
                 onChange={(e) => {
-                  const rawValue = e.target.value;
-                  const cleanedValue = cleanValue(rawValue);
-                  if (cleanedValue < 0) {
-                    onChange(Math.abs(cleanedValue));
+                  const value = e.target.value;
+                  if (value < 0) {
+                    onChange(Math.abs(value));
                     return;
                   }
-                  onChange(cleanedValue);
+                  onChange(value);
                   calculateTotal();
                 }}
               />
