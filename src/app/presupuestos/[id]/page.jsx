@@ -103,8 +103,8 @@ const Budget = ({ params }) => {
       return;
     }
     if (budget) {
-      const stateTitle = BUDGET_STATES[budget.state]?.title || "No definido";
-      const stateColor = BUDGET_STATES[budget.state]?.color || "grey";
+      const stateTitle = BUDGET_STATES[budget.state]?.title || BUDGET_STATES.INACTIVE.title;
+      const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([
         PAGES.BUDGETS.NAME,
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null

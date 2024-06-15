@@ -7,11 +7,6 @@ export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHON
 export const HEADERS = [
   {
     id: 1,
-    width: 1,
-    value: (customer) => customer.key
-  },
-  {
-    id: 2,
     title: 'Nombre',
     align: 'left',
     value: (customer) =>
@@ -32,7 +27,7 @@ export const HEADERS = [
       </Flex>
   },
   {
-    id: 3,
+    id: 2,
     title: "Direccion",
     width: 4,
     align: "left",
@@ -66,7 +61,7 @@ export const HEADERS = [
     }
   },
   {
-    id: 4,
+    id: 3,
     title: "Teléfono",
     width: 3,
     value: (customer) => {

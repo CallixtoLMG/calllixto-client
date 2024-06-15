@@ -6,6 +6,7 @@ import { PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useValidateToken } from "@/hooks/userData";
 import { useUserContext } from "@/User";
+import { getTotalSum } from "@/utils";
 
 const PDF = ({ params }) => {
   useValidateToken();
@@ -20,7 +21,7 @@ const PDF = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      <PDFfile budget={budget} client={userData?.client?.metadata} />
+      <PDFfile budget={budget} client={userData?.client?.metadata} total={getTotalSum(budget?.products)} />
     </Loader>
   )
 };

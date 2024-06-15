@@ -1,12 +1,14 @@
 import { Table } from '@/components/common/table';
 import { usePaginationContext } from "@/components/common/table/Pagination";
-import { PAGES } from "@/constants";
+import { BUDGET_STATES, PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { BUDGETS_COLUMNS, FILTERS } from "../budgets.common";
+import { useState } from 'react';
 
 const BudgetsPage = ({ budgets, isLoading }) => {
   const { push } = useRouter();
   const { resetFilters } = usePaginationContext();
+  const [selectedStateColor, setSelectedStateColor] = useState();
 
   const onFilter = (data) => {
     const filters = { ...data };
@@ -22,6 +24,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
     if (data.state === 'ALL') {
       delete filters.state;
     }
+    setSelectedStateColor(Object.values(BUDGET_STATES).find(state => state.id === filters.state)?.color);
     resetFilters(filters);
   };
 
@@ -45,6 +48,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
       filters={FILTERS}
       onFilter={onFilter}
       usePagination
+      color={selectedStateColor}
     />
   )
 };

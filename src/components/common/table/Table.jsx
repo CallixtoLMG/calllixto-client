@@ -10,7 +10,28 @@ import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
-const CustomTable = ({ showTotal, readOnly, usePagination, isRefetching, isLoading, onFilter, onManuallyRestore, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside, globalDiscount, setGlobalDiscount }) => {
+
+const CustomTable = ({
+  showTotal,
+  readOnly,
+  usePagination,
+  isRefetching,
+  isLoading,
+  onFilter,
+  onManuallyRestore,
+  headers = [],
+  elements = [],
+  page,
+  actions = [],
+  total,
+  filters = [],
+  mainKey = 'id',
+  tableHeight,
+  deleteButtonInside,
+  globalDiscount,
+  setGlobalDiscount,
+  color
+}) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
 
@@ -123,7 +144,7 @@ const CustomTable = ({ showTotal, readOnly, usePagination, isRefetching, isLoadi
         </HeaderContainer>
       )}
       <Container tableHeight={tableHeight}>
-        <Table celled compact striped>
+        <Table celled compact striped color={color}>
           <TableHeader fullWidth>
             <Table.Row>
               {headers.map((header) => (
