@@ -1,4 +1,4 @@
-import { CurrencyFormatInput, FieldsContainer, ViewContainer, FormField, Label, Segment } from "@/components/common/custom";
+import { FieldsContainer, ViewContainer, FormField, Label, Segment, Price } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, now, getTotalSum } from "@/utils";
@@ -81,18 +81,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
       },
       {
         title: "Precio",
-        value: (product) => (
-          <Flex alignItems="center" justifyContent="space-between">
-            $
-            <CurrencyFormatInput
-              displayType="text"
-              thousandSeparator={true}
-              fixedDecimalScale={true}
-              decimalScale={2}
-              value={product.price}
-            />
-          </Flex>
-        ),
+        value: (product) => <Price value={product.price} />,
         id: 3,
         width: 2,
       },
@@ -109,18 +98,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
       },
       {
         title: "Total",
-        value: (product) => (
-          <Flex alignItems="center" justifyContent="space-between">
-            $
-            <CurrencyFormatInput
-              displayType="text"
-              thousandSeparator={true}
-              fixedDecimalScale={true}
-              decimalScale={2}
-              value={getTotal(product)}
-            />
-          </Flex>
-        ),
+        value: (product) => <Price value={getTotal(product)} />,
         id: 6,
         width: 3
       },

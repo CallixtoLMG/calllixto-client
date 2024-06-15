@@ -1,6 +1,6 @@
-import { formatAddressForDisplay, formatPhoneForDisplay } from "@/utils";
-import { Box, Flex } from "rebass";
-import { Icon, Popup } from "semantic-ui-react";
+import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
+import { Flex } from "rebass";
+import { PhonesTooltip, AddressesTooltip, CommentTooltip } from "@/components/common/tooltips";
 
 const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments" };
 
@@ -18,40 +18,18 @@ const SUPPLIERS_COLUMNS = [
     value: (supplier) =>
       <Flex justifyContent="space-between">
         {supplier.name}
-        {supplier.comments && (
-          <Popup
-            size="mini"
-            content={supplier.comments}
-            position="top center"
-            trigger={
-              <Box marginX="5px">
-                <Icon name="info circle" color="yellow" />
-              </Box>
-            }
-          />
-        )}
+        {supplier.comments && <CommentTooltip comment={supplier.comments} />}
       </Flex>
   },
   {
     id: 3,
     title: "Dirección",
     value: (supplier) => {
-      const { primaryAddress, additionalAddress } = formatAddressForDisplay(supplier.addresses || []);
+      const { primaryAddress, additionalAddresses } = getAddressesForDisplay(supplier.addresses || []);
       return (
         <Flex justifyContent="space-between">
           {primaryAddress}
-          {additionalAddress && (
-            <Popup
-              size="mini"
-              content={<div>{additionalAddress}</div>}
-              position="top center"
-              trigger={
-                <Box marginX="5px">
-                  <Icon name="list ul" color="yellow" />
-                </Box>
-              }
-            />
-          )}
+          {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
         </Flex>
       );
     }
@@ -61,22 +39,11 @@ const SUPPLIERS_COLUMNS = [
     title: "Teléfono",
     width: 3,
     value: (supplier) => {
-      const { primaryPhone, additionalPhones } = formatPhoneForDisplay(supplier.phoneNumbers);
+      const { primaryPhone, additionalPhones } = getPhonesForDisplay(supplier.phoneNumbers);
       return (
         <Flex justifyContent="space-between">
           {primaryPhone}
-          {additionalPhones && (
-            <Popup
-              size="mini"
-              content={<div>{additionalPhones}</div>}
-              position="top center"
-              trigger={
-                <Box marginX="5px">
-                  <Icon name="list ul" color="yellow" />
-                </Box>
-              }
-            />
-          )}
+          {additionalPhones && <PhonesTooltip phones={additionalPhones} />}
         </Flex>
       );
     }

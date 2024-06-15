@@ -4,6 +4,7 @@ import { RULES } from "@/constants";
 import { preventSend } from "@/utils";
 import { useCallback, useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { ControlledComments } from "../../common/form";
 
 const EMPTY_BRAND = { name: '', id: '', comments: '' };
 
@@ -46,17 +47,7 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
       </FieldsContainer>
       <FieldsContainer>
         <Label>Comentarios</Label>
-        <Controller
-          name="comments"
-          control={control}
-          render={({ field }) => (
-            <TextArea
-              {...field}
-              maxLength="2000"
-              placeholder="Comentarios"
-            />
-          )}
-        />
+        <ControlledComments control={control} />
       </FieldsContainer>
       <SubmitAndRestore
         isUpdating={isUpdating}

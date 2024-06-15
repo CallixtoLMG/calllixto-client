@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import { get } from "lodash";
 import { useMemo } from "react";
 import { Flex } from "rebass";
-import { Header, Table } from "semantic-ui-react";
+import { Table } from "semantic-ui-react";
 import {
   ClientDataContainer,
   CustomerDataContainer,
@@ -19,6 +19,7 @@ import {
   TableRowHeader,
   Title
 } from "./styles";
+import { Price } from "@/components/common/custom";
 
 const PDFfile = ({ budget, total, client, printPdfMode }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
@@ -135,7 +136,11 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                         }
                         <Table.Row>
                           <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
-                          <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
+                          <Cell colSpan="1">
+                            <strong>
+                              <Price value={total} />
+                            </strong>
+                          </Cell>
                         </Table.Row>
                       </>
                     )}

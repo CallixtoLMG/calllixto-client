@@ -50,8 +50,8 @@ const Budget = ({ params }) => {
       PRODUCT_ATTRIBUTES.PRICE,
       PRODUCT_ATTRIBUTES.NAME,
       PRODUCT_ATTRIBUTES.COMMENTS,
-      PRODUCT_ATTRIBUTES.BRANDNAME,
-      PRODUCT_ATTRIBUTES.SUPPLIERNAME
+      PRODUCT_ATTRIBUTES.BRAND_NAME,
+      PRODUCT_ATTRIBUTES.SUPPLIER_NAME
     ],
     enabled: budget?.state === BUDGET_STATES.DRAFT.id
   });
@@ -103,8 +103,8 @@ const Budget = ({ params }) => {
       return;
     }
     if (budget) {
-      const stateTitle = BUDGET_STATES[budget.state.toUpperCase()]?.title || "No definido";
-      const stateColor = BUDGET_STATES[budget.state.toUpperCase()]?.color || "grey";
+      const stateTitle = BUDGET_STATES[budget.state]?.title || BUDGET_STATES.INACTIVE.title;
+      const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([
         PAGES.BUDGETS.NAME,
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
@@ -270,6 +270,10 @@ const Budget = ({ params }) => {
               onChange={handleCheckboxChange}
               label={confirmed ? "Confirmado" : "Confirmar presupuesto"}
               disabled={budget?.state === BUDGET_STATES.CONFIRMED.id || budget?.state === BUDGET_STATES.INACTIVE.id}
+              customColors={{
+                false: 'orange',
+                true: 'green'
+              }}
             />
           </Box>
           <ModalCustomer

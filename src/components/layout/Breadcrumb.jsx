@@ -39,7 +39,7 @@ const Breadcrumb = () => {
             label?.id && label?.title && (
               <span>
                 {label.id}{' '}
-                <Label size='small' tag color={label.color}>
+                <Label pointing="left" color={label.color}>
                   {label.title}
                 </Label>
               </span>

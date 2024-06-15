@@ -1,4 +1,4 @@
-import { CurrencyFormatInput, Dropdown, Input } from "@/components/common/custom";
+import { Dropdown, Input, Price } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { Loader } from "@/components/layout";
 import { FILTER_TYPES } from "@/constants";
@@ -10,7 +10,28 @@ import { Flex } from 'rebass';
 import { Form, Header, Icon, Popup } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, HeaderContainer, HeaderSegment, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Table, TableHeader, TableRow } from "./styles";
-const CustomTable = ({ showTotal, readOnly, usePagination, isRefetching, isLoading, onFilter, onManuallyRestore, headers = [], elements = [], page, actions = [], total, filters = [], mainKey = 'id', tableHeight, deleteButtonInside, globalDiscount, setGlobalDiscount }) => {
+
+const CustomTable = ({
+  showTotal,
+  readOnly,
+  usePagination,
+  isRefetching,
+  isLoading,
+  onFilter,
+  onManuallyRestore,
+  headers = [],
+  elements = [],
+  page,
+  actions = [],
+  total,
+  filters = [],
+  mainKey = 'id',
+  tableHeight,
+  deleteButtonInside,
+  globalDiscount,
+  setGlobalDiscount,
+  color
+}) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
 
@@ -123,7 +144,7 @@ const CustomTable = ({ showTotal, readOnly, usePagination, isRefetching, isLoadi
         </HeaderContainer>
       )}
       <Container tableHeight={tableHeight}>
-        <Table celled compact striped>
+        <Table celled compact striped color={color}>
           <TableHeader fullWidth>
             <Table.Row>
               {headers.map((header) => (
@@ -224,17 +245,7 @@ const CustomTable = ({ showTotal, readOnly, usePagination, isRefetching, isLoadi
                   }
                   <FooterCell colSpan="1">
                     <strong>
-                      <Flex alignItems="center" justifyContent="space-between">
-                        $
-                        <CurrencyFormatInput
-                          height="35px"
-                          displayType="text"
-                          thousandSeparator={true}
-                          fixedDecimalScale={true}
-                          decimalScale={2}
-                          value={total}
-                        />
-                      </Flex>
+                      <Price value={total} />
                     </strong>
                   </FooterCell>
                 </>

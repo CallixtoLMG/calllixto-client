@@ -2,7 +2,8 @@ import { BUDGET_STATES, FILTER_TYPES } from "@/constants";
 import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Label } from "semantic-ui-react";
-import { CurrencyFormatInput } from "../common/custom";
+import { Price } from "@/components/common/custom";
+import { CommentTooltip } from "../common/tooltips";
 
 const ATTRIBUTES = {
   ID: "id",
@@ -32,7 +33,11 @@ const BUDGETS_COLUMNS = [
     id: 2,
     title: "Cliente",
     align: "left",
-    value: (budget) => budget.customer.name
+    value: (budget) =>
+      <Flex justifyContent="space-between">
+        {budget.customer.name}
+        {budget.comments && <CommentTooltip comment={budget.comments} />}
+      </Flex>
   },
   {
     id: 3,
@@ -44,18 +49,7 @@ const BUDGETS_COLUMNS = [
     id: 4,
     title: "Total",
     width: 2,
-    value: (budget) => (
-      <Flex alignItems="center" justifyContent="space-between">
-        $
-        <CurrencyFormatInput
-          displayType="text"
-          thousandSeparator={true}
-          fixedDecimalScale={true}
-          decimalScale={2}
-          value={(getTotalSum(budget.products, budget.globalDiscount))}
-        />
-      </Flex>
-    )
+    value: (budget) => <Price value={(getTotalSum(budget.products, budget.globalDiscount))} />
   },
   {
     id: 5,
@@ -67,7 +61,7 @@ const BUDGETS_COLUMNS = [
 
 const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
   const includeDiscount = budget?.products?.some(product => product.discount);
-  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatchComment);
+  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatch?.comment);
 
   return [
     {
@@ -75,25 +69,25 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       title: "Nombre",
       align: "left",
       wrap: true,
-      value: (product) => product.name
+      value: (product) => product.dispatch?.name || product.name
     },
     {
       id: 2,
       title: "Cant",
       width: 1,
-      value: (product) => product.quantity || 0
+      value: (product) => product.dispatch?.quantity || product.quantity
     },
     !dispatchPdf && {
       id: 3,
       title: "Precio",
       width: 2,
-      value: (product) => formatedPricePdf(product.price || 0)
+      value: (product) => <Price value={product.price} />
     },
     !dispatchPdf && includeDiscount && {
       id: 4,
       title: "Subtotal",
-      width: 3,
-      value: (product) => formatedPricePdf(product.price * product.quantity || 0),
+      width: 2,
+      value: (product) => <Price value={formatedPricePdf(product.price * product.quantity || 0)} />
     },
     !dispatchPdf && includeDiscount && {
       id: 5,
@@ -104,15 +98,15 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
     !dispatchPdf && {
       id: 6,
       title: "Importe",
-      width: 1,
-      value: (product) => formatedPricePdf(getTotal(product))
+      width: 2,
+      value: (product) => <Price value={getTotal(product)} />
     },
     includeDispatchComment && {
       id: 7,
       title: "Comentario",
       width: 7,
       wrap: true,
-      value: (product) => product.dispatchComment
+      value: (product) => product.dispatch?.comment
     }
   ].filter(Boolean);
 };
@@ -128,7 +122,10 @@ const FILTERS = [
       ...Object.keys(BUDGET_STATES).map(key => (
         {
           key,
-          text: <Flex alignItems="center" justifyContent="space-between">{BUDGET_STATES[key].title}&nbsp;<Label color={BUDGET_STATES[key].color} circular empty /></Flex>,
+          text:
+            <Flex alignItems="center" justifyContent="space-between">
+              {BUDGET_STATES[key].title}&nbsp;<Label color={BUDGET_STATES[key].color} circular empty />
+            </Flex>,
           value: key
         }))
     ],

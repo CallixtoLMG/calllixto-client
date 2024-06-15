@@ -1,6 +1,6 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, TextArea } from "@/components/common/custom";
-import { ContactFields } from "@/components/common/form";
+import { ContactFields, ControlledComments } from "@/components/common/form";
 import { RULES } from "@/constants";
 import { useCallback } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -41,18 +41,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
         <ContactFields />
         <FieldsContainer>
           <Label>Comentarios</Label>
-          <Controller
-            name="comments"
-            control={control}
-            render={({ field }) => (
-              <TextArea
-                {...field}
-                maxLength="2000"
-                placeholder="Comentarios"
-                value={field.value || ''}
-              />
-            )}
-          />
+          <ControlledComments control={control} />
         </FieldsContainer>
         <SubmitAndRestore
           isUpdating={isUpdating}

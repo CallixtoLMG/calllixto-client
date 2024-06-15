@@ -1,9 +1,8 @@
 import { formatProductCode } from "@/utils";
 import debounce from 'lodash/debounce';
 import { useCallback, useEffect, useState } from 'react';
-import { Box } from "rebass";
-import { Icon, Popup } from "semantic-ui-react";
 import { Container, Search, Text } from "./styles";
+import { CommentTooltip } from "../tooltips";
 
 const ProductSearch = ({ products, onProductSelect }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -63,17 +62,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
             <Text>Código: {formatProductCode(product.code)}</Text>
             <Container flexDir="row">
               <Text>Precio: {`$ ${product?.price?.toFixed(2)}`}</Text>
-              {product.comments && (
-                <Popup
-                  size="mini"
-                  content={product.comments}
-                  position="top center"
-                  trigger={
-                    <Box marginX="5px">
-                      <Icon name="info circle" color="yellow" />
-                    </Box>
-                  }
-                />)}
+              {product.comments && <CommentTooltip comment={product.comments} />}
             </Container>
           </Container>
         ),

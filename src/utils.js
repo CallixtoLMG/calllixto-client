@@ -45,11 +45,6 @@ export const formatedPricePdf = (number) => {
   });
 };
 
-export const simpleFormatedPrice = (number) => {
-  let modNumber = Math.round(Number(number));
-  return `$ ${modNumber}`
-};
-
 export const formatProductCodePopup = (code, brand, supplier) => {
   const firstPart = code ? code?.substring(0, 2) : "";
   const secondPart = code ? code?.substring(2, 4) : "";
@@ -97,37 +92,24 @@ export const formatedSimplePhone = (phoneNumbers) => {
   return `+54 ${phoneNumbers.areaCode} ${phoneNumbers.number}`;
 };
 
-export const formatedPhone = (phoneNumbers) => {
-  if (phoneNumbers?.length === 0) return '';
-  return phoneNumbers?.map(phone => `+54 ${phone.areaCode} ${phone.number}`).join(', ');
-};
-
-export const formatPhoneForDisplay = (phoneNumbers) => {
+export const getPhonesForDisplay = (phoneNumbers) => {
   if (!phoneNumbers || phoneNumbers.length === 0) return { primaryPhone: '', additionalPhones: null };
 
   const primaryPhone = `+54 ${phoneNumbers[0]?.areaCode} ${phoneNumbers[0]?.number}`;
+  if (phoneNumbers.length === 1) return { primaryPhone, additionalPhones: null };
 
-  const additionalPhones = phoneNumbers.length > 1
-    ? phoneNumbers.slice(1).map(phone => (
-      <div key={`${phone.areaCode}-${phone.number}`}> {phone.ref ? `${phone.ref}:` : "Contacto: "} {`+54 ${phone.areaCode} ${phone.number}`}</div>
-    ))
-    : null;
-
+  const additionalPhones = phoneNumbers.slice(1);
   return { primaryPhone, additionalPhones };
 };
 
-export const formatAddressForDisplay = (addresses) => {
+export const getAddressesForDisplay = (addresses) => {
   if (!addresses || addresses.length === 0) return { primaryAddress: '', additionalAddress: null };
 
   const primaryAddress = addresses[0]?.address;
+  if (addresses.length === 1) return { primaryAddress, additionalAddress: null };
 
-  const additionalAddress = addresses.length > 1
-    ? addresses.slice(1).map(address => (
-      <div key={`${address.ref}-${address.address}`}>{address.ref ? `${address.ref}: ` : "Direccion: "}{address.address}</div>
-    ))
-    : null;
-
-  return { primaryAddress, additionalAddress };
+  const additionalAddresses = addresses.slice(1);
+  return { primaryAddress, additionalAddresses };
 };
 
 export const getSupplierCode = (code) => {
@@ -169,4 +151,3 @@ export const validateEmail = (email) => {
 export const validatePhone = (phone) => {
   return phone?.areaCode?.length + phone?.number?.length === 10;
 };
-

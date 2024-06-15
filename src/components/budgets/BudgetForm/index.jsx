@@ -1,6 +1,6 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment, TextArea } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES } from "@/constants";
@@ -8,11 +8,12 @@ import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formate
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
-import { Message, Modal, Popup, Transition } from "semantic-ui-react";
+import { List, ListItem, Message, Modal, Popup, Transition } from "semantic-ui-react";
 import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
+import { ControlledComments } from "@/components/common/form";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -72,6 +73,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
         setIsUpdateModalOpen(true);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [budget, isCloning, products]);
 
   const calculateTotal = useCallback(() => {
@@ -99,7 +101,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
   }, [reset, user]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
-    setSelectedProduct({ ...product, index });
+    setSelectedProduct({ ...product });
     setIsModalCommentOpen(true);
   }, []);
 
@@ -132,9 +134,15 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
   ];
 
   const onAddComment = async (data) => {
+    const { comment, name, quantity } = data;
     const newProducts = [...watchProducts];
-    newProducts[selectedProduct.index].dispatchComment = data.comment;
-    setValue("products", newProducts)
+    const product = newProducts.find(p => p.code === selectedProduct.code);
+    product.dispatch = {
+      ...(comment && { comment }),
+      ...(name && { name }),
+      ...(quantity && { quantity })
+    };
+    setValue("products", newProducts);
     setIsModalCommentOpen(false)
   };
 
@@ -185,10 +193,16 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
                   }
                 />
               )}
-              {product.dispatchComment && (
+              {(product.dispatch?.comment || product.dispatch?.name || product.dispatch?.quantity) && (
                 <Popup
                   size="mini"
-                  content={product.dispatchComment}
+                  content={
+                    <List>
+                      {product.dispatch?.name && <ListItem>Nombre Remito: <b>{product.dispatch.name}</b></ListItem>}
+                      {product.dispatch?.comment && <ListItem>Comentario Remito: <b>{product.dispatch.comment}</b></ListItem>}
+                      {product.dispatch?.quantity && <ListItem>Cantidad Remito: <b>{product.dispatch.quantity}</b></ListItem>}
+                    </List>
+                  }
                   position="top center"
                   trigger={
                     <Box>
@@ -207,18 +221,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
       },
       {
         title: "Precio",
-        value: (product) => (
-          <Flex alignItems="center" justifyContent="space-between">
-            $
-            <CurrencyFormatInput
-              displayType="text"
-              thousandSeparator={true}
-              fixedDecimalScale={true}
-              decimalScale={2}
-              value={product.price}
-            />
-          </Flex>
-        ),
+        value: (product) => <Price value={product.price} />,
         id: 3,
         width: 2,
       },
@@ -238,13 +241,12 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
                 displayType="input"
                 onFocus={(e) => e.target.select()}
                 onChange={(e) => {
-                  const rawValue = e.target.value;
-                  const cleanedValue = cleanValue(rawValue);
-                  if (cleanedValue < 0) {
-                    onChange(Math.abs(cleanedValue));
+                  const value = e.target.value;
+                  if (value < 0) {
+                    onChange(Math.abs(value));
                     return;
                   }
-                  onChange(cleanedValue);
+                  onChange(value);
                   calculateTotal();
                 }}
               />
@@ -288,18 +290,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
       },
       {
         title: "Total",
-        value: (product) => (
-          <Flex alignItems="center" justifyContent="space-between">
-            $
-            <CurrencyFormatInput
-              displayType="text"
-              thousandSeparator={true}
-              fixedDecimalScale={true}
-              decimalScale={2}
-              value={getTotal(product)}
-            />
-          </Flex>
-        ),
+        value: (product) => <Price value={getTotal(product)} />,
         id: 6,
         width: 3
       },
@@ -368,6 +359,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
                       onChange(!value);
                     }}
                     label={value ? "Confirmado" : "Confirmar presupuesto"}
+                    customColors={{
+                      false: 'orange',
+                      true: 'green'
+                    }}
                   />
                 )}
               />
@@ -448,17 +443,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
           />
           <FieldsContainer>
             <Label>Comentarios</Label>
-            <Controller
-              name="comments"
-              control={control}
-              render={({ field }) => (
-                <TextArea
-                  {...field}
-                  maxLength="2000"
-                  placeholder="Comentarios"
-                />
-              )}
-            />
+            <ControlledComments control={control} />
           </FieldsContainer>
           <FieldsContainer>
             <FormField flex={3}>

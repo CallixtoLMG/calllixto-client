@@ -89,7 +89,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </PaginationProvider>
             </UserProvider>
           </QueryClientProvider>
-          {/* <Footer /> */}
         </body>
       </StyledComponentsRegistry>
     </html>

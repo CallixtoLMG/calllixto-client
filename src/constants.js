@@ -35,7 +35,7 @@ export const PAGES = {
     CREATE: "/presupuestos/crear",
     CLONE: (id) => `/presupuestos/crear?clonar=${id}`,
     SHOW: (id) => `/presupuestos/${id}`,
-    NAME: 'Presupuestos'
+    NAME: 'Ventas'
   },
   LOGIN: {
     BASE: "/login"
