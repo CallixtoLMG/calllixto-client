@@ -380,6 +380,10 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
                       onChange(!value);
                     }}
                     label={value ? "Confirmado" : "Confirmar presupuesto"}
+                    customColors={{
+                      false: 'orange',
+                      true: 'green'
+                    }}
                   />
                 )}
               />

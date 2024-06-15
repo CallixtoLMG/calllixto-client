@@ -10,7 +10,7 @@ import {
   Segment as SSegment,
   TextArea as STextarea
 } from "semantic-ui-react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 export const Segment = styled(SSegment)`
   height: ${({ height = 'auto' }) => height} !important;
@@ -41,17 +41,19 @@ export const Input = styled(SInput)`
 `;
 
 export const Checkbox = styled(SCheckbox)`
-  &&& {
-    input:focus:checked~label:before {
-    background-color: rgba(32,186,68,255)!important;
-    }
-  };
-  label::before{
-    background-color: rgba(243,112,28,255)!important;
-  };
-  label::after{
-    z-index: 1!important;
-  };
+  ${({ customColors }) => customColors && css`
+    &&& {
+      input:focus:checked~label:before {
+      background-color: ${customColors.true}!important;
+      }
+    };
+    label::before{
+      background-color: ${customColors.false}!important;
+    };
+    label::after{
+      z-index: 1!important;
+    };
+  `};
 `;
 
 export const FormField = styled(Form.Field)`
@@ -76,7 +78,7 @@ export const TextArea = styled(STextarea)`
 `;
 
 export const Dropdown = styled(SDropdown)`
-  margin: ${({ margin = "5px 0" }) => `${margin}!important;`}
+  margin: ${({ margin = "5px 0" }) => `${margin}!important;`};
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
   height: ${({ height = "50px" }) => `${height}!important`} ;

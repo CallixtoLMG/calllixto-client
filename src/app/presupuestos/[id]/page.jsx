@@ -270,6 +270,10 @@ const Budget = ({ params }) => {
               onChange={handleCheckboxChange}
               label={confirmed ? "Confirmado" : "Confirmar presupuesto"}
               disabled={budget?.state === BUDGET_STATES.CONFIRMED.id || budget?.state === BUDGET_STATES.INACTIVE.id}
+              customColors={{
+                false: 'orange',
+                true: 'green'
+              }}
             />
           </Box>
           <ModalCustomer
