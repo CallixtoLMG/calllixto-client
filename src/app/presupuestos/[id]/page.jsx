@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { edit, useGetBudget } from "@/api/budgets";
+import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, edit, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
@@ -53,7 +53,7 @@ const Budget = ({ params }) => {
       PRODUCT_ATTRIBUTES.BRAND_NAME,
       PRODUCT_ATTRIBUTES.SUPPLIER_NAME
     ],
-    enabled: budget?.state === BUDGET_STATES.DRAFT.id
+    enabled: budget?.state.toUpperCase() === BUDGET_STATES.DRAFT.id
   });
   const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({
     attributes: [
@@ -113,7 +113,6 @@ const Budget = ({ params }) => {
       setConfirmed(budget.state === BUDGET_STATES.CONFIRMED.id);
     }
   }, [setLabels, budget, push, isLoading]);
-
   useEffect(() => {
     if (budget) {
       const printButtons = [
@@ -252,7 +251,8 @@ const Budget = ({ params }) => {
         queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto confirmado!');
         setConfirmed(true);
-        setIsModalConfirmationOpen(false);
+        setIsModalConfirmationOpen(false); 
+        push(PAGES.BUDGETS.BASE); 
       } else {
         toast.error(response.message);
       }
@@ -298,6 +298,7 @@ const Budget = ({ params }) => {
           user={userData}
           budget={budget}
           isLoading={isPending}
+          draft
         />) :
         (<BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />)
       }

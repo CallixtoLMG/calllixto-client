@@ -1,7 +1,7 @@
-import { FieldsContainer, ViewContainer, FormField, Label, Segment, Price } from "@/components/common/custom";
+import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, now, getTotalSum } from "@/utils";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, getTotalSum } from "@/utils";
 import { useMemo } from "react";
 import { Box, Flex } from "rebass";
 import { Popup } from "semantic-ui-react";

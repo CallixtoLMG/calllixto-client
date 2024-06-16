@@ -1,14 +1,22 @@
 import { formatProductCode } from "@/utils";
 import debounce from 'lodash/debounce';
-import { useCallback, useEffect, useState } from 'react';
-import { Container, Search, Text } from "./styles";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { CommentTooltip } from "../tooltips";
+import { Container, Search, Text } from "./styles";
 
-const ProductSearch = ({ products, onProductSelect }) => {
+const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    clear: () => {
+      setSearchQuery('');
+      setSelectedProduct(null);
+      setFilteredProducts(products);
+    }
+  }));
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
@@ -71,6 +79,6 @@ const ProductSearch = ({ products, onProductSelect }) => {
       onResultSelect={handleProductSelect}
     />
   );
-};
+});
 
 export default ProductSearch;

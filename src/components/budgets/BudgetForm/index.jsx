@@ -1,11 +1,12 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { ControlledComments } from "@/components/common/form";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES } from "@/constants";
-import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, removeDecimal } from "@/utils";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, removeDecimal } from "@/utils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
 import { List, ListItem, Message, Modal, Popup, Transition } from "semantic-ui-react";
@@ -13,7 +14,6 @@ import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
-import { ControlledComments } from "@/components/common/form";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -30,22 +30,31 @@ const EMPTY_BUDGET = (user) => ({
   expirationOffsetDays: ''
 });
 
-const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, isCloning, printPdfMode }) => {
+const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, isCloning, printPdfMode, draft }) => {
+  console.log("budget", budget)
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [expiration, SetExpiration] = useState(false);
-  const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
+  const { control, handleSubmit, setValue, getValues, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: budget ? {
       ...budget,
       confirmed: isCloning ? false : budget?.confirmed,
       seller: `${user?.firstName} ${user?.lastName}`,
+      customer: draft ? budget.customer : null,
     } : EMPTY_BUDGET(user),
   });
-  const [watchProducts, watchGlobalDiscount, watchConfirmed, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'confirmed', 'customer', 'state']);
+  const [watchProducts, watchGlobalDiscount, watchConfirmed, watchCustomer] = watch(['products', 'globalDiscount', 'confirmed', 'customer', 'state']);
   const [total, setTotal] = useState(0);
+  const productSearchRef = useRef(null);
+  const [loadingState, setLoadingState] = useState(null);
+
+  const resetLoadingState = () => {
+    setLoadingState(null);
+  };
+
   useEffect(() => {
     if (isCloning) {
       let budgetProducts = [...budget.products];
@@ -88,17 +97,63 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
   }, [watchProducts, setValue]);
 
   useEffect(() => {
+    if (draft && budget && budget.customer) {
+      setValue('customer', budget.customer);
+    }
+  }, [draft, budget, setValue]);
+
+  useEffect(() => {
+    if (draft && budget && budget.customer) {
+      setValue('customer', budget.customer);
+    }
+  }, [draft, budget, setValue]);
+
+  useEffect(() => {
     calculateTotal();
   }, [watchProducts, calculateTotal]);
 
-  const handleCreate = (data) => {
+  const handleCreate = async (data, state) => {
     if (!watchProducts.length) return;
-    onSubmit({ ...data, state: 'pending' });
+
+    const { seller, products, customer, confirmed, globalDiscount, expirationOffsetDays, paymentMethods, comments } = data;
+
+    const formData = {
+      seller,
+      products,
+      customer,
+      confirmed,
+      globalDiscount,
+      expirationOffsetDays,
+      paymentMethods,
+      comments,
+      state
+    };
+
+    await onSubmit(formData);
+  };
+
+  const handleDraft = async () => {
+    setValue('state', BUDGET_STATES.DRAFT.id);
+    setLoadingState(BUDGET_STATES.DRAFT.id);
+    const data = getValues();
+    await handleCreate(data, BUDGET_STATES.DRAFT.id);
+    resetLoadingState();
+  };
+
+  const handlePending = async (data) => {
+    setValue('state', BUDGET_STATES.PENDING.id);
+    setLoadingState(BUDGET_STATES.PENDING.id);
+    await handleCreate(data, BUDGET_STATES.PENDING.id);
+    resetLoadingState();
   };
 
   const handleReset = useCallback(() => {
     reset(EMPTY_BUDGET(user));
-  }, [reset, user]);
+    setValue('customer', null);
+    if (productSearchRef.current) {
+      productSearchRef.current.clear();
+    }
+  }, [reset, user, productSearchRef]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct({ ...product });
@@ -344,7 +399,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
             </Modal.Actions>
           </Modal>
         </Transition>
-        <Form onSubmit={handleSubmit(handleCreate)} >
+        <Form onSubmit={handleSubmit(handlePending)}>
           <FieldsContainer>
             <FormField width="300px">
               <Controller
@@ -393,10 +448,11 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
                     selection
                     minCharacters={2}
                     noResultsMessage="No se ha encontrado cliente!"
-                    options={customers}
+                    options={customers.map(customer => ({ key: customer.id, value: customer.id, text: customer.name }))}
+                    value={draft ? budget?.customer?.id : field.value?.id || ''}
                     onChange={(e, { value }) => {
-                      field.onChange(value);
-                      const customer = customers.find((opt) => opt.value === value);
+                      const customer = customers.find((opt) => opt.id === value);
+                      field.onChange(customer);
                       setValue('customer', customer);
                     }}
                   />
@@ -425,6 +481,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
           <FormField width="300px">
             <RuledLabel title="Agregar producto" message={!watchProducts?.length && isSubmitted && isDirty && 'Al menos 1 producto es requerido'} required />
             <ProductSearch
+              ref={productSearchRef}
               products={products}
               onProductSelect={(selectedProduct) => {
                 setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1, discount: 0, key: Date.now().toString(36) + selectedProduct.code }]);
@@ -479,20 +536,27 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
               <Controller
                 name="expirationOffsetDays"
                 control={control}
-                rules={RULES.REQUIRED_THREE_NUMBERS}
-                render={({ field }) =>
+                rules={{
+                  ...RULES.REQUIRED_THREE_NUMBERS,
+                  validate: value => value <= 365 || 'El valor debe ser menor o igual a 365'
+                }}
+                render={({ field }) => (
                   <Input
                     {...field}
-                    maxLength={50}
+                    maxLength={3}
                     type="text"
                     placeholder="Cant. en días (p. ej: 3, 10, etc)"
                     onChange={(e) => {
                       let value = e.target.value;
                       value = value.replace(/\D/g, '');
+                      if (parseInt(value, 10) > 365) {
+                        value = '365';
+                      };
                       field.onChange(value);
                       SetExpiration(value);
                     }}
-                  />}
+                  />
+                )}
               />
             </FormField>
             <FormField flex={1}>
@@ -501,20 +565,20 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
             </FormField>
           </FieldsContainer>
           <SubmitAndRestore
-            isLoading={isLoading && watchState === BUDGET_STATES.PENDING.id}
+            isLoading={loadingState === BUDGET_STATES.PENDING.id}
             disabled={isLoading}
             isDirty={isDirty}
             onReset={handleReset}
             color={watchConfirmed ? BUDGET_STATES.CONFIRMED.color : BUDGET_STATES.PENDING.color}
-            onSubmit={() => { setValue('state', BUDGET_STATES.PENDING.id); }}
+            onSubmit={handleSubmit(handlePending)}
             icon={watchConfirmed ? BUDGET_STATES.CONFIRMED.icon : BUDGET_STATES.PENDING.icon}
             text={watchConfirmed ? BUDGET_STATES.CONFIRMED.title : BUDGET_STATES.PENDING.title}
             extraButton={
               <Button
                 disabled={isLoading || !isDirty}
-                loading={(isLoading && watchState === BUDGET_STATES.DRAFT.id)}
-                type="submit"
-                onClick={() => setValue('state', BUDGET_STATES.DRAFT.id)}
+                loading={loadingState === BUDGET_STATES.DRAFT.id}
+                type="button"
+                onClick={handleDraft}
                 color="teal">
                 <Icon name="erase" />Borrador
               </Button>
