@@ -1,13 +1,13 @@
-import styled from "styled-components";
-import { SubmitButton, RestoreButton } from "@/components/common/buttons";
+import { RestoreButton, SubmitButton } from "@/components/common/buttons";
 import { Flex } from "rebass";
+import styled from "styled-components";
 
 const ButtonsContainer = styled(Flex)`
   align-self: flex-end;
   column-gap: 20px;
 `;
 
-export const SubmitAndRestore = ({ isUpdating, isLoading, isDirty, onReset, extraButton, disabled, onSubmit = () => {}, color, icon, text }) => {
+export const SubmitAndRestore = ({ draft, isUpdating, isLoading, isDirty, onReset, extraButton, disabled, onSubmit = () => { }, color, icon, text }) => {
   return (
     <ButtonsContainer>
       <RestoreButton
@@ -21,7 +21,7 @@ export const SubmitAndRestore = ({ isUpdating, isLoading, isDirty, onReset, extr
       <SubmitButton
         isUpdating={isUpdating}
         isLoading={isLoading}
-        isDirty={isDirty}
+        isDirty={draft ? true : isDirty}
         onClick={onSubmit}
         disabled={disabled}
         color={color}

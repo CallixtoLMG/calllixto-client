@@ -31,7 +31,6 @@ const EMPTY_BUDGET = (user) => ({
 });
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, isCloning, printPdfMode, draft }) => {
-  console.log("budget", budget)
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
@@ -128,7 +127,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
       comments,
       state
     };
-
+    
     await onSubmit(formData);
   };
 
@@ -448,7 +447,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
                     selection
                     minCharacters={2}
                     noResultsMessage="No se ha encontrado cliente!"
-                    options={customers.map(customer => ({ key: customer.id, value: customer.id, text: customer.name }))}
+                    options={customers?.map(customer => ({ key: customer.id, value: customer.id, text: customer.name }))}
                     value={draft ? budget?.customer?.id : field.value?.id || ''}
                     onChange={(e, { value }) => {
                       const customer = customers.find((opt) => opt.id === value);
@@ -565,6 +564,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
             </FormField>
           </FieldsContainer>
           <SubmitAndRestore
+            draft={draft}
             isLoading={loadingState === BUDGET_STATES.PENDING.id}
             disabled={isLoading}
             isDirty={isDirty}

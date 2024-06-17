@@ -1,9 +1,9 @@
+import { validateEmail, validatePhone } from "@/utils";
+import { useState } from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { Button, Icon, Popup } from "semantic-ui-react";
 import { FieldsContainer, FormField, Input, Label, RuledLabel } from '../custom';
 import { Table } from '../table';
-import { useState } from "react";
-import { validateEmail, validatePhone } from "@/utils";
-import { useFieldArray, useFormContext } from "react-hook-form";
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "./form.common";
 
 const EMPTY_PHONE = { ref: '', areaCode: '', number: '' };
@@ -44,6 +44,13 @@ export const ContactFields = () => {
       setError({ phone: 'El área y el número deben sumar 10 dígitos.' });
       return;
     }
+    const phoneExists = phoneFields.some(
+      (phone) => phone.areaCode === phoneToAdd.areaCode && phone.number === phoneToAdd.number
+    );
+    if (phoneExists) {
+      setError({ phone: 'El teléfono ya existe.' });
+      return;
+    }
     appendPhone(phoneToAdd);
     setPhoneToAdd(EMPTY_PHONE);
     setError();
@@ -54,13 +61,28 @@ export const ContactFields = () => {
       setError({ address: 'La dirección es requerida.' });
       return;
     }
+    const addressExists = addressFields.some(
+      (address) => address.address === addressToAdd.address
+    );
+    if (addressExists) {
+      setError({ address: 'La dirección ya existe.' });
+      return;
+    }
     appendAddress(addressToAdd);
     setAddressToAdd(EMPTY_ADDRESS);
+    setError();
   };
 
   const handleAddEmail = () => {
     if (!validateEmail(emailToAdd.email)) {
       setError({ email: 'El correo electrónico no es válido.' });
+      return;
+    }
+    const emailExists = emailsFields.some(
+      (email) => email.email === emailToAdd.email
+    );
+    if (emailExists) {
+      setError({ email: 'El correo electrónico ya existe.' });
       return;
     }
     appendEmail(emailToAdd);
