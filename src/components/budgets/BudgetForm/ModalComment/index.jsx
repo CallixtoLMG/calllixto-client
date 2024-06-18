@@ -7,7 +7,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const { control, handleSubmit, formState: { isDirty }, reset } = useForm();
 
   useEffect(() => {
-    reset(product?.dispatch ? product.dispatch : {});
+    reset(product ? product : {});
   }, [isModalOpen, product, reset]);
 
   return (
@@ -38,12 +38,12 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
               <FormField flex="1">
                 <Label>Nombre Remito</Label>
                 <Controller
-                  name="name"
+                  name="dispatch.name"
                   control={control}
                   render={({ field }) => (
                     <Input
                       {...field}
-                      placeholder="Comentario"
+                      placeholder="Nombre remito"
                     />
                   )}
                 />
@@ -51,7 +51,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
               <FormField flex="1">
                 <Label>Comentario</Label>
                 <Controller
-                  name="comment"
+                  name="dispatch.comment"
                   control={control}
                   render={({ field }) => (
                     <Input
@@ -64,7 +64,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
               <FormField>
                 <Label>Cantidad Remito</Label>
                 <Controller
-                  name="quantity"
+                  name="dispatch.quantity"
                   control={control}
                   render={({ field: { onChange, ...rest } }) => (
                     <CurrencyFormatInput

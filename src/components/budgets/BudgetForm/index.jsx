@@ -124,7 +124,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   };
 
   const handleOpenCommentModal = useCallback((product, index) => {
-    setSelectedProduct({ ...product });
+    setSelectedProduct({ ...product, index });
     setIsModalCommentOpen(true);
   }, []);
 
@@ -169,9 +169,9 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
   ];
 
   const onAddComment = async (data) => {
-    const { comment, name, quantity } = data;
+    const { index, dispatch: { comment, name, quantity } } = data;
     const newProducts = [...watchProducts];
-    const product = newProducts.find(p => p.code === selectedProduct.code);
+    const product = newProducts[index];
     product.dispatch = {
       ...(comment && { comment }),
       ...(name && { name }),
