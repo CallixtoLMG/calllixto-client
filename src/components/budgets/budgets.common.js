@@ -1,8 +1,8 @@
+import { Price } from "@/components/common/custom";
 import { BUDGET_STATES, FILTER_TYPES } from "@/constants";
 import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Label } from "semantic-ui-react";
-import { Price } from "@/components/common/custom";
 import { CommentTooltip } from "../common/tooltips";
 
 const ATTRIBUTES = {
@@ -61,7 +61,7 @@ const BUDGETS_COLUMNS = [
 
 const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
   const includeDiscount = budget?.products?.some(product => product.discount);
-  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatch?.comment);
+  const includeDispatchComment = dispatchPdf;
 
   return [
     {
@@ -106,7 +106,7 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       title: "Comentario",
       width: 7,
       wrap: true,
-      value: (product) => product.dispatch?.comment
+      value: (product) => product.dispatch?.comment || '' 
     }
   ].filter(Boolean);
 };

@@ -4,7 +4,7 @@ import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form,
 import { ControlledComments } from "@/components/common/form";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
-import { BUDGET_STATES, PAGES, RULES } from "@/constants";
+import { BUDGET_STATES, PAGES, RULES, TIME_IN_DAYS } from "@/constants";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -32,6 +32,7 @@ const EMPTY_BUDGET = (user) => ({
 
 const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, isCloning, printPdfMode, draft }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
@@ -45,7 +46,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
       customer: draft ? budget.customer : null,
     } : EMPTY_BUDGET(user),
   });
-  const [watchProducts, watchGlobalDiscount, watchConfirmed, watchCustomer] = watch(['products', 'globalDiscount', 'confirmed', 'customer', 'state']);
+  const [watchProducts, watchGlobalDiscount, watchConfirmed, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'confirmed', 'customer', 'state']);
   const [total, setTotal] = useState(0);
   const productSearchRef = useRef(null);
   const [loadingState, setLoadingState] = useState(null);
@@ -111,6 +112,12 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
     calculateTotal();
   }, [watchProducts, calculateTotal]);
 
+  useEffect(() => {
+    if (draft && budget && budget.customer) {
+      setSelectedCustomer(budget.customer.id);
+    }
+  }, [draft, budget]);
+
   const handleCreate = async (data, state) => {
     if (!watchProducts.length) return;
 
@@ -127,9 +134,24 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
       comments,
       state
     };
-    
+
     await onSubmit(formData);
   };
+
+  const currentState = useMemo(() => {
+    if (watchConfirmed) {
+      return {
+        color: BUDGET_STATES.CONFIRMED.color,
+        icon: BUDGET_STATES.CONFIRMED.icon,
+        title: BUDGET_STATES.CONFIRMED.title
+      };
+    }
+    return {
+      color: BUDGET_STATES.PENDING.color,
+      icon: BUDGET_STATES.PENDING.icon,
+      title: BUDGET_STATES.PENDING.title
+    };
+  }, [watchConfirmed]);
 
   const handleDraft = async () => {
     setValue('state', BUDGET_STATES.DRAFT.id);
@@ -448,11 +470,12 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
                     minCharacters={2}
                     noResultsMessage="No se ha encontrado cliente!"
                     options={customers?.map(customer => ({ key: customer.id, value: customer.id, text: customer.name }))}
-                    value={draft ? budget?.customer?.id : field.value?.id || ''}
+                    value={field.value?.id || selectedCustomer}
                     onChange={(e, { value }) => {
                       const customer = customers.find((opt) => opt.id === value);
                       field.onChange(customer);
                       setValue('customer', customer);
+                      setSelectedCustomer(value);
                     }}
                   />
                 )}
@@ -549,7 +572,7 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
                       let value = e.target.value;
                       value = value.replace(/\D/g, '');
                       if (parseInt(value, 10) > 365) {
-                        value = '365';
+                        value = TIME_IN_DAYS.YEAR;
                       };
                       field.onChange(value);
                       SetExpiration(value);
@@ -565,22 +588,22 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, isLoading, is
           </FieldsContainer>
           <SubmitAndRestore
             draft={draft}
-            isLoading={loadingState === BUDGET_STATES.PENDING.id}
+            isLoading={isLoading && watchState !== BUDGET_STATES.DRAFT.id}
             disabled={isLoading}
             isDirty={isDirty}
             onReset={handleReset}
-            color={watchConfirmed ? BUDGET_STATES.CONFIRMED.color : BUDGET_STATES.PENDING.color}
+            color={currentState.color}
             onSubmit={handleSubmit(handlePending)}
-            icon={watchConfirmed ? BUDGET_STATES.CONFIRMED.icon : BUDGET_STATES.PENDING.icon}
-            text={watchConfirmed ? BUDGET_STATES.CONFIRMED.title : BUDGET_STATES.PENDING.title}
+            icon={currentState.icon}
+            text={currentState.title}
             extraButton={
               <Button
                 disabled={isLoading || !isDirty}
-                loading={loadingState === BUDGET_STATES.DRAFT.id}
+                loading={isLoading && watchState !== BUDGET_STATES.PENDING.id}
                 type="button"
                 onClick={handleDraft}
-                color="teal">
-                <Icon name="erase" />Borrador
+                color={BUDGET_STATES.DRAFT.color}>
+                <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
               </Button>
             }
           />

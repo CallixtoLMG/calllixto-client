@@ -118,6 +118,10 @@ export const TIME_IN_MS = {
   FOUR_HOURS: 14400000,
 };
 
+export const TIME_IN_DAYS = {
+  YEAR: '365',
+};
+
 export const DEFAULT_PAGE_SIZE = 30;
 
 export const ENTITIES = {
@@ -130,13 +134,13 @@ export const ENTITIES = {
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
 
-export const BUDGET_PDF_FORMAT= {
+export const BUDGET_PDF_FORMAT = {
   DISPATCH: "dispatch",
   CLIENT: "client",
   INTERNAL: "internal",
- };
+};
 
- export const BUDGET_STATES = {
+export const BUDGET_STATES = {
   CONFIRMED: {
     id: 'CONFIRMED',
     title: 'Confirmado',
@@ -167,12 +171,12 @@ export const BUDGET_PDF_FORMAT= {
     color: 'grey',
     icon: 'ban',
   },
- }
+};
 
- export const FILTER_TYPES = {
+export const FILTER_TYPES = {
   TEXT: 'text',
   SELECT: 'select',
   DATE: 'date',
   NUMBER: 'number',
   CHECKBOX: 'checkbox',
- }
+};
