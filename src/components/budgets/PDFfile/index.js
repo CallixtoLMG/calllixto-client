@@ -2,12 +2,12 @@
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Cell, HeaderCell } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT } from "@/constants";
-import { formatedPercentage, formatedPricePdf, formatedSimplePhone } from "@/utils";
+import { formatedPercentage, formatedSimplePhone } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { useMemo } from "react";
 import { Flex } from "rebass";
-import { Header, Table } from "semantic-ui-react";
+import { Table } from "semantic-ui-react";
 import {
   ClientDataContainer,
   CustomerDataContainer,
@@ -20,6 +20,7 @@ import {
   TableRowHeader,
   Title
 } from "./styles";
+import { CurrencyFormatInput } from "@/components/common/custom";
 
 const PDFfile = ({ budget, total, client, printPdfMode }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
@@ -131,12 +132,28 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                         {!!budget?.globalDiscount &&
                           <Table.Row>
                             <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
-                            <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
+                            <Cell colSpan="1"><strong>
+                              {formatedPercentage(budget?.globalDiscount)}
+                            </strong></Cell>
                           </Table.Row>
                         }
                         <Table.Row>
                           <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
-                          <Cell colSpan="1"><strong>{formatedPricePdf(total)}</strong></Cell>
+                          <Cell colSpan="1">
+                            <strong>
+                              <Flex alignItems="center" justifyContent="space-between">
+                                $
+                                <CurrencyFormatInput
+                                  height="35px"
+                                  displayType="text"
+                                  thousandSeparator={true}
+                                  fixedDecimalScale={true}
+                                  decimalScale={2}
+                                  value={total}
+                                />
+                              </Flex>
+                            </strong>
+                          </Cell>
                         </Table.Row>
                       </>
                     )}

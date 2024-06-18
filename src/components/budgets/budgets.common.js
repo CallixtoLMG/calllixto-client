@@ -1,4 +1,4 @@
-import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
+import { formatedDateAndHour, formatedPercentage, getTotal, getTotalSum } from "@/utils";
 import { Flex } from "rebass";
 import { CurrencyFormatInput } from "../common/custom";
 import { Icon } from "../common/custom/Semantic";
@@ -77,13 +77,35 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       id: 3,
       title: "Precio",
       width: 2,
-      value: (product) => formatedPricePdf(product.price || 0)
+      value: (product) =>
+        <Flex alignItems="center" justifyContent="space-between">
+          $
+          <CurrencyFormatInput
+            height="35px"
+            displayType="text"
+            thousandSeparator={true}
+            fixedDecimalScale={true}
+            decimalScale={2}
+            value={product.price}
+          />
+        </Flex>
     },
     !dispatchPdf && includeDiscount && {
       id: 4,
       title: "Subtotal",
       width: 3,
-      value: (product) => formatedPricePdf(product.price * product.quantity || 0),
+      value: (product) =>
+        <Flex alignItems="center" justifyContent="space-between">
+          $
+          <CurrencyFormatInput
+            height="35px"
+            displayType="text"
+            thousandSeparator={true}
+            fixedDecimalScale={true}
+            decimalScale={2}
+            value={product.price * product.quantity || 0}
+          />
+        </Flex>
     },
     !dispatchPdf && includeDiscount && {
       id: 5,
@@ -95,7 +117,18 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       id: 6,
       title: "Importe",
       width: 1,
-      value: (product) => formatedPricePdf(getTotal(product))
+      value: (product) =>
+        <Flex alignItems="center" justifyContent="space-between">
+          $
+          <CurrencyFormatInput
+            height="35px"
+            displayType="text"
+            thousandSeparator={true}
+            fixedDecimalScale={true}
+            decimalScale={2}
+            value={getTotal(product)}
+          />
+        </Flex>
     },
     includeDispatchComment && {
       id: 7,

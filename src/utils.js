@@ -34,16 +34,6 @@ export function encodeUri(value) {
   return undefined;
 };
 
-export const formatedPricePdf = (number) => {
-  let modNumber = Number(number);
-  modNumber = Math.ceil(modNumber);
-  return modNumber.toLocaleString('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    minimumFractionDigits: 0,
-  });
-};
-
 export const simpleFormatedPrice = (number) => {
   let modNumber = Math.round(Number(number));
   return `$ ${modNumber}`
