@@ -65,13 +65,13 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       title: "Nombre",
       align: "left",
       wrap: true,
-      value: (product) => product.dispatch?.name || product.name
+      value: (product) => dispatchPdf ? product.dispatch?.name || product.name : product.name
     },
     {
       id: 2,
       title: "Cant",
       width: 1,
-      value: (product) => product.dispatch?.quantity || product.quantity
+      value: (product) => dispatchPdf ? product.dispatch?.quantity || product.quantity : product.quantity
     },
     !dispatchPdf && {
       id: 3,
