@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
+import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import { PAGES, RULES } from "@/constants";
 import { preventSend } from "@/utils";
@@ -30,7 +30,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField width="30%">
-          <RuledLabel title="Proveedor" message={!isUpdating && isDirty && isSubmitted && !supplier && 'Campo requerido'} required />
+          <RuledLabel title="Proveedor" message={!isUpdating && isDirty && isSubmitted && !supplier && 'Campo requerido.'} required />
           {!isUpdating ? (
             <Dropdown
               required
@@ -53,7 +53,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           )}
         </FormField>
         <FormField width="30%">
-          <RuledLabel title="Marca" message={!isUpdating && isDirty && isSubmitted && !brand && 'Campo requerido'} required />
+          <RuledLabel title="Marca" message={!isUpdating && isDirty && isSubmitted && !brand && 'Campo requerido.'} required />
           {!isUpdating ? (
             <Dropdown
               required

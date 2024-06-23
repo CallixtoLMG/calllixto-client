@@ -60,21 +60,21 @@ export const REGEX = {
 
 export const RULES = {
   REQUIRED: {
-    required: 'Campo requerido'
+    required: 'Campo requerido.'
   },
   REQUIRED_PRODUCT: (value) => ({
-    required: value !== false ? 'Campo requerido' : 'Es necesario elegir un producto',
+    required: value !== false ? 'Campo requerido.' : 'Es necesario elegir un producto',
   }),
   REQUIRED_TWO_DIGIT: {
-    required: 'Campo requerido',
+    required: 'Campo requerido.',
     pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
   },
   REQUIRED_MAX26_DIGIT_CODE: {
-    required: 'Campo requerido',
+    required: 'Campo requerido.',
     pattern: { value: REGEX.MAX26_DIGIT_CODE, message: 'El código debe tener entre 5 y 30 valores alfanuméricos(- y _ habilitados), sumando marca y proveedor' }
   },
   REQUIRED_THREE_NUMBERS: {
-    required: 'Campo requerido',
+    required: 'Campo requerido.',
     pattern: { value: REGEX.THREE_NUMBERS_CODE, message: 'El valor puede ser hasta un máximo de 3 números' }
   },
   PHONE: {
@@ -83,7 +83,7 @@ export const RULES = {
       maxLength: { value: 4, message: 'El código de área debe tener 3 o 4 cifras' },
     },
     AREA_CODE_REQUIRED: {
-      required: 'Campo requerido',
+      required: 'Campo requerido.',
       minLength: { value: 3, message: 'El código de área debe tener 3 o 4 cifras' },
       maxLength: { value: 4, message: 'El código de área debe tener 3 o 4 cifras' },
     },
@@ -92,7 +92,7 @@ export const RULES = {
       maxLength: { value: 7, message: 'El número completo debe tener 10 cifras' },
     },
     NUMBER_REQUIRED: {
-      required: 'Campo requerido',
+      required: 'Campo requerido.',
       minLength: { value: 6, message: 'El número completo debe tener 10 cifras' },
       maxLength: { value: 7, message: 'El número completo debe tener 10 cifras' },
     }
@@ -101,11 +101,11 @@ export const RULES = {
     pattern: { value: REGEX.EMAIL, message: 'El email no es válido' }
   },
   REQUIRED_PRICE: {
-    required: 'Campo requerido',
+    required: 'Campo requerido.',
     min: { value: 0.01, message: 'El precio debe ser mayor a 0' }
   },
   REQUIRED_POSITIVE: {
-    required: 'Campo requerido',
+    required: 'Campo requerido.',
     min: { value: 1, message: 'El campo debe ser mayor a 0' }
   }
 };
