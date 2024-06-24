@@ -28,11 +28,11 @@ const Header = () => {
   const routesWithoutHeader = [PAGES.LOGIN.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
   const shortcutMapping = {
-    [PAGES.CUSTOMERS.SHORTKEY]: () => push(PAGES.CUSTOMERS.BASE),
-    [PAGES.SUPPLIERS.SHORTKEY]: () => push(PAGES.SUPPLIERS.BASE),
-    [PAGES.BRANDS.SHORTKEY]: () => push(PAGES.BRANDS.BASE),
-    [PAGES.PRODUCTS.SHORTKEY]: () => push(PAGES.PRODUCTS.BASE),
-    [PAGES.BUDGETS.SHORTKEY]: () => push(PAGES.BUDGETS.BASE),
+    [PAGES.CUSTOMERS.SHORTKEYS]: () => push(PAGES.CUSTOMERS.BASE),
+    [PAGES.SUPPLIERS.SHORTKEYS]: () => push(PAGES.SUPPLIERS.BASE),
+    [PAGES.BRANDS.SHORTKEYS]: () => push(PAGES.BRANDS.BASE),
+    [PAGES.PRODUCTS.SHORTKEYS]: () => push(PAGES.PRODUCTS.BASE),
+    [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
   };
   useKeyboardShortcuts(shortcutMapping);
 

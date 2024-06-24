@@ -5,7 +5,7 @@ import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { ATTRIBUTES } from "@/components/suppliers/suppliers.common";
-import { ENTITIES, PAGES, SHORTKEY } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -44,7 +44,7 @@ const Suppliers = () => {
     setActions(actions);
   }, [push, role, setActions]);
 
-  useKeyboardShortcuts(() => push(PAGES.SUPPLIERS.CREATE), SHORTKEY.ENTER);
+  useKeyboardShortcuts(() => push(PAGES.SUPPLIERS.CREATE), SHORTKEYS.ENTER);
 
   return (
     <SuppliersPage

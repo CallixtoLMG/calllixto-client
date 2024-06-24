@@ -5,7 +5,7 @@ import BrandsPage from "@/components/brands/BrandsPage";
 import { ATTRIBUTES } from "@/components/brands/brands.common";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES, SHORTKEY } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -47,7 +47,7 @@ const Brands = () => {
     setActions(actions);
   }, [push, role, setActions]);
 
-  useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEY.ENTER);
+  useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEYS.ENTER);
   
   return (
     <BrandsPage

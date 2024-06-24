@@ -1,4 +1,4 @@
-import { SHORTKEY } from "@/constants";
+import { SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from 'next/navigation';
 import { Button, ButtonContent, Icon } from 'semantic-ui-react';
@@ -9,7 +9,7 @@ const GoBack = () => {
     back();
   };
 
-  useKeyboardShortcuts(handleClick, SHORTKEY.BACKSPACE)
+  useKeyboardShortcuts(handleClick, SHORTKEYS.BACKSPACE)
   
   return (
     <Button

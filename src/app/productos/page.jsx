@@ -7,7 +7,7 @@ import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
 import { ATTRIBUTES } from "@/components/products/products.common";
-import { ENTITIES, PAGES, SHORTKEY } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -81,7 +81,7 @@ const Products = () => {
     setActions(actions);
   }, [products, push, role, setActions]);
 
-  useKeyboardShortcuts(() => push(PAGES.PRODUCTS.CREATE), SHORTKEY.ENTER);
+  useKeyboardShortcuts(() => push(PAGES.PRODUCTS.CREATE), SHORTKEYS.ENTER);
 
   return (
     <>

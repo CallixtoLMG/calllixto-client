@@ -11,7 +11,8 @@ export const useKeyboardShortcuts = (shortcuts, key) => {
           event.preventDefault();
           action = shortcuts;
         }
-      } else if (typeof shortcuts === 'object') {
+      }
+      if (typeof shortcuts === 'object') {
         const keyCombo = `${event.ctrlKey ? 'Control+' : ''}${event.key}`;
         action = shortcuts[keyCombo];
       }

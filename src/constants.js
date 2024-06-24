@@ -8,7 +8,7 @@ export const PAGES = {
     UPDATE: (code) => `/clientes/${code}?update=true`,
     SHOW: (id) => `/clientes/${id}`,
     NAME: 'Clientes',
-    SHORTKEY: 'Control+1'
+    SHORTKEYS: 'Control+1'
   },
   SUPPLIERS: {
     BASE: "/proveedores",
@@ -16,7 +16,7 @@ export const PAGES = {
     UPDATE: (id) => `/proveedores/${id}?update=true`,
     SHOW: (id) => `/proveedores/${id}`,
     NAME: 'Proveedores',
-    SHORTKEY: 'Control+2'
+    SHORTKEYS: 'Control+2'
   },
   BRANDS: {
     BASE: "/marcas",
@@ -24,7 +24,7 @@ export const PAGES = {
     UPDATE: (id) => `/marcas/${id}?update=true`,
     SHOW: (id) => `/marcas/${id}`,
     NAME: 'Marcas',
-    SHORTKEY: 'Control+3'
+    SHORTKEYS: 'Control+3'
   },
   PRODUCTS: {
     BASE: "/productos",
@@ -32,7 +32,7 @@ export const PAGES = {
     UPDATE: (code) => `/productos/${code}?update=true`,
     SHOW: (code) => `/productos/${code}`,
     NAME: 'Productos',
-    SHORTKEY: 'Control+4'
+    SHORTKEYS: 'Control+4'
   },
   BUDGETS: {
     BASE: "/presupuestos",
@@ -40,7 +40,7 @@ export const PAGES = {
     CLONE: (id) => `/presupuestos/crear?clonar=${id}`,
     SHOW: (id) => `/presupuestos/${id}`,
     NAME: 'Ventas',
-    SHORTKEY: 'Control+5'
+    SHORTKEYS: 'Control+5'
   },
   LOGIN: {
     BASE: "/login"
@@ -186,7 +186,7 @@ export const FILTER_TYPES = {
   CHECKBOX: 'checkbox',
 };
 
-export const SHORTKEY = {
+export const SHORTKEYS = {
   ENTER: "Control+Enter",
   BACKSPACE: "Control+Backspace",
   RIGHT_ARROW: "Control+ArrowRight",
