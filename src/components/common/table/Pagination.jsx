@@ -1,4 +1,5 @@
-import { ENTITIES } from '@/constants';
+import { ENTITIES, SHORTKEY } from '@/constants';
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { createContext, useContext, useMemo, useState } from 'react';
 
 const PaginationContext = createContext();
@@ -51,6 +52,12 @@ const PaginationProvider = ({ children }) => {
     setFilters(filters);
     setCurrentPage(0);
   };
+
+  const shortcutMapping = {
+    [SHORTKEY.LEFT_ARROW]: () => goToPreviousPage(),
+    [SHORTKEY.RIGHT_ARROW]: () => goToNextPage(),
+  };
+  useKeyboardShortcuts(shortcutMapping);
 
   return (
     <PaginationContext.Provider value={{

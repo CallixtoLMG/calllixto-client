@@ -1,11 +1,12 @@
 import { useUserContext } from "@/User";
 import { NoPrint } from "@/components/layout";
 import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from 'next/navigation';
 import { Flex } from "rebass";
 import { Dropdown, Menu } from 'semantic-ui-react';
 import { Container, LogDiv, ModLink, Text } from "./styles";
-import { isCallixtoUser } from "@/roles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -26,6 +27,15 @@ const Header = () => {
 
   const routesWithoutHeader = [PAGES.LOGIN.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
+  const shortcutMapping = {
+    [PAGES.CUSTOMERS.SHORTKEY]: () => push(PAGES.CUSTOMERS.BASE),
+    [PAGES.SUPPLIERS.SHORTKEY]: () => push(PAGES.SUPPLIERS.BASE),
+    [PAGES.BRANDS.SHORTKEY]: () => push(PAGES.BRANDS.BASE),
+    [PAGES.PRODUCTS.SHORTKEY]: () => push(PAGES.PRODUCTS.BASE),
+    [PAGES.BUDGETS.SHORTKEY]: () => push(PAGES.BUDGETS.BASE),
+  };
+  useKeyboardShortcuts(shortcutMapping);
+
   return (
     <NoPrint>
       {showHeader &&

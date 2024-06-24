@@ -4,7 +4,8 @@ import { usePaginationContext } from "@/components/common/table/Pagination";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { ATTRIBUTES } from "@/components/customers/customers.common";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEY } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
@@ -42,6 +43,9 @@ const Customers = () => {
     ];
     setActions(actions);
   }, [push, setActions]);
+
+  useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEY.ENTER);
+
   return (
     <CustomersPage isLoading={isLoading} customers={customers} />
   );

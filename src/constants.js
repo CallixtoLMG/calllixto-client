@@ -7,35 +7,40 @@ export const PAGES = {
     CREATE: "/clientes/crear",
     UPDATE: (code) => `/clientes/${code}?update=true`,
     SHOW: (id) => `/clientes/${id}`,
-    NAME: 'Clientes'
+    NAME: 'Clientes',
+    SHORTKEY: 'Control+1'
   },
   SUPPLIERS: {
     BASE: "/proveedores",
     CREATE: "/proveedores/crear",
     UPDATE: (id) => `/proveedores/${id}?update=true`,
     SHOW: (id) => `/proveedores/${id}`,
-    NAME: 'Proveedores'
+    NAME: 'Proveedores',
+    SHORTKEY: 'Control+2'
   },
   BRANDS: {
     BASE: "/marcas",
     CREATE: "/marcas/crear",
     UPDATE: (id) => `/marcas/${id}?update=true`,
     SHOW: (id) => `/marcas/${id}`,
-    NAME: 'Marcas'
+    NAME: 'Marcas',
+    SHORTKEY: 'Control+3'
   },
   PRODUCTS: {
     BASE: "/productos",
     CREATE: "/productos/crear",
     UPDATE: (code) => `/productos/${code}?update=true`,
     SHOW: (code) => `/productos/${code}`,
-    NAME: 'Productos'
+    NAME: 'Productos',
+    SHORTKEY: 'Control+4'
   },
   BUDGETS: {
     BASE: "/presupuestos",
     CREATE: "/presupuestos/crear",
     CLONE: (id) => `/presupuestos/crear?clonar=${id}`,
     SHOW: (id) => `/presupuestos/${id}`,
-    NAME: 'Ventas'
+    NAME: 'Ventas',
+    SHORTKEY: 'Control+5'
   },
   LOGIN: {
     BASE: "/login"
@@ -179,4 +184,11 @@ export const FILTER_TYPES = {
   DATE: 'date',
   NUMBER: 'number',
   CHECKBOX: 'checkbox',
+};
+
+export const SHORTKEY = {
+  ENTER: "Control+Enter",
+  BACKSPACE: "Control+Backspace",
+  RIGHT_ARROW: "Control+ArrowRight",
+  LEFT_ARROW: "Control+ArrowLeft",
 };
