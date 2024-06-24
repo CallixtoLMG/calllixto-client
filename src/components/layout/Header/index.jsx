@@ -1,11 +1,12 @@
 import { useUserContext } from "@/User";
+import { KeyboardShortcuts } from "@/components/common/modals";
 import { NoPrint } from "@/components/layout";
 import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";
+import { isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from 'next/navigation';
 import { Flex } from "rebass";
 import { Dropdown, Menu } from 'semantic-ui-react';
 import { Container, LogDiv, ModLink, Text } from "./styles";
-import { isCallixtoUser } from "@/roles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -47,6 +48,7 @@ const Header = () => {
                   ))}
                 </Flex>
                 <Flex>
+                    <KeyboardShortcuts/>
                   {isCallixtoUser(role) &&
                     <LogDiv padding="8px">
                       <Dropdown
