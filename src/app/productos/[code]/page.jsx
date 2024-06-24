@@ -1,6 +1,6 @@
 "use client";
 import { GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, edit, useGetProduct } from "@/api/products";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, NoPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
@@ -17,9 +17,8 @@ const Product = ({ params }) => {
   const { data: product, isLoading } = useGetProduct(params.code);
   const [allowUpdate, Toggle] = useAllowUpdate();
   const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
+  const { resetActions, setActions } = useNavActionsContext();
   const queryClient = useQueryClient();
-
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -50,9 +49,26 @@ const Product = ({ params }) => {
     push(PAGES.NOT_FOUND.BASE);
   };
 
+  useEffect(() => {
+    if (product) {
+      const actions = [
+        {
+          id: 4,
+          icon: 'download',
+          color: 'blue',
+          onClick: () => setTimeout(window.print),
+          text: 'Código'
+        },
+      ];
+      setActions(actions);
+    }
+  }, [product, setActions]);
+
   return (
     <Loader active={isLoading}>
-      {Toggle}
+      <NoPrint>
+        {Toggle}
+      </NoPrint>
       {allowUpdate ? (
         <ProductForm product={product} onSubmit={mutate} isUpdating isLoading={isPending} />
       ) : (
