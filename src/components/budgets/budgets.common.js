@@ -1,5 +1,5 @@
 import { Price } from "@/components/common/custom";
-import { BUDGET_STATES, FILTER_TYPES } from "@/constants";
+import { BUDGET_STATES } from "@/constants";
 import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Label } from "semantic-ui-react";

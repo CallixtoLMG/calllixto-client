@@ -172,11 +172,3 @@ export const BUDGET_STATES = {
     icon: 'ban',
   },
 };
-
-export const FILTER_TYPES = {
-  TEXT: 'text',
-  SELECT: 'select',
-  DATE: 'date',
-  NUMBER: 'number',
-  CHECKBOX: 'checkbox',
-};
