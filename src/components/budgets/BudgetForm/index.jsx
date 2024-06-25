@@ -34,14 +34,13 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [expiration, setExpiration] = useState(false);
-  const [isDraft, setIsDraft] = useState(false);
-  const { control, handleSubmit, setValue, getValues, watch, reset, trigger, setError, clearErrors, formState: { isDirty, errors, isSubmitted } } = useForm({
+  const { control, handleSubmit, setValue, getValues, watch, reset, trigger, setError, clearErrors, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
       ...budget,
       confirmed: isCloning ? false : budget?.confirmed,
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
-    mode: 'onChange',
+    mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
   const [watchProducts, watchGlobalDiscount, watchConfirmed, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'confirmed', 'customer', 'state']);
@@ -140,7 +139,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   };
 
   const handleDraft = async () => {
-    setIsDraft(true);
     setValue('state', BUDGET_STATES.DRAFT.id);
     const isProductsValid = validateProducts();
     const isValid = await trigger();
@@ -149,8 +147,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       const values = getValues();
       await handleCreate(values, BUDGET_STATES.DRAFT.id);
     }
-
-    setIsDraft(false);
   };
 
   const handleReset = useCallback(() => {
@@ -348,18 +344,22 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               <Controller
                 name="customer"
                 control={control}
-                rules={RULES.REQUIRED}
+                rules={{ validate: value => value?.id ? true : "Campo requerido." }}
                 render={({ field }) => (
                   <Dropdown
                     placeholder={PAGES.CUSTOMERS.NAME}
                     search
-                    clearable={!draft}
+                    clearable
                     selection
                     minCharacters={2}
                     noResultsMessage="No se ha encontrado cliente!"
                     options={customerOptions}
                     value={field.value?.id}
                     onChange={(e, { value }) => {
+                      if (!value) {
+                        field.onChange(null);
+                        return;
+                      };
                       const customer = customers.find(opt => opt.id === value);
                       field.onChange(customer);
                     }}
@@ -368,7 +368,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               />
             </FormField>
             <FormField flex={1}>
-              <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.addresses[0]?.message} required={watchConfirmed} />
+              <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.addresses?.[0]?.message} required={watchConfirmed} />
               <Controller
                 name="customer.addresses[0]"
                 control={control}
@@ -388,8 +388,10 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             </FormField>
           </FieldsContainer>
           <FormField width="300px">
-            <RuledLabel title="Agregar producto" message={!watchProducts?.length && isSubmitted && 'Al menos 1 producto es requerido.'} required />
-            <Controller name="products" control={control} rules={{ validate: value => value && value.length > 0 }}
+            <RuledLabel title="Agregar producto" message={errors?.products?.message} required />
+            <Controller name="products"
+              control={control}
+              rules={{ validate: value => value?.length ? true : 'Al menos 1 producto es requerido.' }}
               render={({ field: { onChange, value } }) => (
                 <ProductSearch ref={productSearchRef} products={products} onProductSelect={(selectedProduct) => {
                   onChange([...value, {
@@ -429,9 +431,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               />
             </FormField>
             <FormField flex={1}>
-              <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required={!isDraft} />
+              <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
               <Controller name="expirationOffsetDays" control={control}
-                rules={!isDraft && RULES.REQUIRED}
+                rules={RULES.REQUIRED}
                 render={({ field }) => (
                   <Input {...field} maxLength={3} type="text" placeholder="Cant. en días (p. ej: 3, 10, etc)"
                     onChange={(e) => {
