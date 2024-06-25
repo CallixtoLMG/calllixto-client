@@ -1,13 +1,20 @@
-import { Table } from '@/components/common/table';
+import { Filters, Table } from '@/components/common/table';
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { BUDGET_STATES, PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { BUDGETS_COLUMNS, FILTERS } from "../budgets.common";
+import { BUDGETS_COLUMNS } from "../budgets.common";
 import { useState } from 'react';
+import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { Form } from 'semantic-ui-react';
+import { Input } from '@/components/common/custom';
+
+const EMPTY_FILTERS = { id: '', customer: '', seller: '' };
 
 const BudgetsPage = ({ budgets, isLoading }) => {
   const { push } = useRouter();
   const { resetFilters } = usePaginationContext();
+  const methods = useForm();
+  const { handleSubmit, control, reset } = methods;
   const [selectedStateColor, setSelectedStateColor] = useState();
 
   const onFilter = (data) => {
@@ -38,18 +45,66 @@ const BudgetsPage = ({ budgets, isLoading }) => {
     },
   ];
 
+  const onRestoreFilters = () => {
+    reset(EMPTY_FILTERS);
+    onFilter(EMPTY_FILTERS);
+  }
+
   return (
-    <Table
-      isLoading={isLoading}
-      headers={BUDGETS_COLUMNS}
-      elements={budgets}
-      page={PAGES.BUDGETS}
-      actions={actions}
-      filters={FILTERS}
-      onFilter={onFilter}
-      usePagination
-      color={selectedStateColor}
-    />
+    <>
+      <FormProvider {...methods}>
+        <Form onSubmit={handleSubmit(onFilter)}>
+          <Filters onRestoreFilters={onRestoreFilters}>
+            <Controller
+              name="id"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  height="35px"
+                  margin="0"
+                  placeholder="Id"
+                />
+              )}
+            />
+            <Controller
+              name="customer"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  height="35px"
+                  margin="0"
+                  placeholder="Cliente"
+                />
+              )}
+            />
+            <Controller
+              name="seller"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  height="35px"
+                  margin="0"
+                  placeholder="Vendedor"
+                />
+              )}
+            />
+          </Filters>
+        </Form>
+      </FormProvider>
+      <Table
+        isLoading={isLoading}
+        headers={BUDGETS_COLUMNS}
+        elements={budgets}
+        page={PAGES.BUDGETS}
+        actions={actions}
+        color={selectedStateColor}
+        showPagination
+      />
+    </>
+
   )
 };
 

@@ -106,35 +106,10 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       title: "Comentario",
       width: 7,
       wrap: true,
-      value: (product) => product.dispatch?.comment || '' 
+      value: (product) => product.dispatch?.comment || ''
     }
   ].filter(Boolean);
 };
-
-const FILTERS = [
-  {
-    value: 'state',
-    type: FILTER_TYPES.SELECT,
-    options: [
-      {
-        key: 'ALL', value: 'ALL', text: 'Todos'
-      },
-      ...Object.keys(BUDGET_STATES).map(key => (
-        {
-          key,
-          text:
-            <Flex alignItems="center" justifyContent="space-between">
-              {BUDGET_STATES[key].title}&nbsp;<Label color={BUDGET_STATES[key].color} circular empty />
-            </Flex>,
-          value: key
-        }))
-    ],
-    defaultValue: 'ALL'
-  },
-  { value: 'id', placeholder: 'Código' },
-  { value: 'customer', placeholder: 'Cliente', map: 'customer.name' },
-  { value: 'seller', placeholder: 'Vendedor' },
-];
 
 const PAYMENT_METHODS = [{
   text: 'Efectivo',
@@ -158,5 +133,5 @@ const PAYMENT_METHODS = [{
   value: "Mercado Pago",
 },];
 
-export { ATTRIBUTES, BUDGETS_COLUMNS, FILTERS, PAYMENT_METHODS, PRODUCTS_COLUMNS };
+export { ATTRIBUTES, BUDGETS_COLUMNS, PAYMENT_METHODS, PRODUCTS_COLUMNS };
 
