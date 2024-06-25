@@ -50,10 +50,5 @@ const SUPPLIERS_COLUMNS = [
   },
 ];
 
-const FILTERS = [
-  { value: 'id', placeholder: 'Id' },
-  { value: 'name', placeholder: 'Nombre' },
-];
-
-export { ATTRIBUTES, FILTERS, SUPPLIERS_COLUMNS };
+export { ATTRIBUTES, SUPPLIERS_COLUMNS };
 
