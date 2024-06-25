@@ -277,7 +277,7 @@ const Budget = ({ params }) => {
   });
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || loadingProducts || loadingCustomers}>
       {!budget?.confirmed && budget?.state !== BUDGET_STATES.DRAFT.id && (
         <NoPrint>
           <Box marginBottom={15}>
