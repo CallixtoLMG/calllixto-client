@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { BUDGETS_COLUMNS } from "../budgets.common";
 import { useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { Form } from 'semantic-ui-react';
-import { Dropdown, Input, Label } from '@/components/common/custom';
+import { Form, Label } from 'semantic-ui-react';
+import { Dropdown, Input } from '@/components/common/custom';
 import { Flex } from 'rebass';
 
 const DEFAULT_STATE = { key: 'ALL', value: 'ALL', text: 'Todos' };
@@ -72,9 +72,9 @@ const BudgetsPage = ({ budgets, isLoading }) => {
               render={({ field: { onChange, value, ...rest } }) => (
                 <Dropdown
                   {...rest}
+                  width="500px"
                   margin="0"
                   top="10px"
-                  min
                   height="fit-content"
                   selection
                   fluid
