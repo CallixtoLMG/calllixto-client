@@ -1,19 +1,26 @@
 import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
 import { ModalDelete } from "@/components/common/modals";
-import { Table } from "@/components/common/table";
+import { Filters, Table } from "@/components/common/table";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
-import { FILTERS, PRODUCT_COLUMNS } from "../products.common";
+import { PRODUCT_COLUMNS } from "../products.common";
 import { RULES } from "@/roles";
+import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Form } from "semantic-ui-react";
+import { Input } from "@/components/common/custom";
 
-const ProductsPage = ({ products = [], role, isLoading, isRefetching }) => {
+const EMPTY_FILTERS = { code: '', name: '' };
+
+const ProductsPage = ({ products = [], role, isLoading }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const queryClient = useQueryClient();
   const { resetFilters } = usePaginationContext();
+  const methods = useForm();
+  const { handleSubmit, control, reset } = methods;
 
   const onFilter = (data) => {
     const filters = { ...data };
@@ -26,7 +33,7 @@ const ProductsPage = ({ products = [], role, isLoading, isRefetching }) => {
     resetFilters(filters);
   };
 
-  const deleteQuestion = (name) => `¿Está seguro que desea eliminar el producto "${name}"?`;
+  const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar el producto "${name}"?`, []);
 
   const mapProductsForTable = useCallback((c) => {
     return c.map(customer => ({ ...customer, key: customer.code }));
@@ -61,19 +68,51 @@ const ProductsPage = ({ products = [], role, isLoading, isRefetching }) => {
     },
   });
 
+  const onRestoreFilters = () => {
+    reset(EMPTY_FILTERS);
+    onFilter(EMPTY_FILTERS);
+  }
+
   return (
     <>
+      <FormProvider {...methods}>
+        <Form onSubmit={handleSubmit(onFilter)}>
+          <Filters onRestoreFilters={onRestoreFilters}>
+            <Controller
+              name="code"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  height="35px"
+                  margin="0"
+                  placeholder="Código"
+                />
+              )}
+            />
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  height="35px"
+                  margin="0"
+                  placeholder="Nombre"
+                />
+              )}
+            />
+          </Filters>
+        </Form>
+      </FormProvider>
       <Table
-        isRefetching={isRefetching}
         isLoading={isLoading}
         mainKey="code"
         headers={PRODUCT_COLUMNS}
         elements={mapProductsForTable(products)}
         page={PAGES.PRODUCTS}
         actions={actions}
-        filters={FILTERS}
-        onFilter={onFilter}
-        usePagination
+        showPagination
       />
       <ModalDelete
         showModal={showModal}

@@ -79,14 +79,9 @@ const BAN_PRODUCTS_COLUMNS = [
   },
 ];
 
-const FILTERS = [
-  { value: 'code', placeholder: 'Código' },
-  { value: 'name', placeholder: 'Nombre' }
-];
-
 const BAN_FILTERS = [
   { value: 'code', placeholder: 'Código' },
 ];
 
-export { ATTRIBUTES, BAN_FILTERS, BAN_PRODUCTS_COLUMNS, FILTERS, IMPORT_PRODUCTS_COLUMNS, PRODUCT_COLUMNS };
+export { ATTRIBUTES, BAN_FILTERS, BAN_PRODUCTS_COLUMNS, IMPORT_PRODUCTS_COLUMNS, PRODUCT_COLUMNS };
 
