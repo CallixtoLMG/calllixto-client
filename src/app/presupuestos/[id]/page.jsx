@@ -261,10 +261,7 @@ const Budget = ({ params }) => {
 
   const { mutate: mutateEdit, isPending: isPendingEdit } = useMutation({
     mutationFn: async (budget) => {
-      console.log("budget", { ...budget, id: params.id, })
-
       const { data } = await edit({ ...budget, id: params.id });
-      console.log(data)
       return data;
     },
     onSuccess: (response) => {
