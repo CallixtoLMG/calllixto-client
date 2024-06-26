@@ -81,4 +81,7 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
   );
 });
 
+// Asignar displayName al componente
+ProductSearch.displayName = 'ProductSearch';
+
 export default ProductSearch;
