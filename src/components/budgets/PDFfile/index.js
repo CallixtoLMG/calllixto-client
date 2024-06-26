@@ -1,12 +1,12 @@
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Cell, HeaderCell } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT } from "@/constants";
-import { formatedPercentage, formatedPricePdf, formatedSimplePhone } from "@/utils";
+import { formatedPercentage, formatedSimplePhone, getTotalSum } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { useMemo } from "react";
-import { Flex } from "rebass";
-import { Table } from "semantic-ui-react";
+import { Flex, Box } from "rebass";
+import { List, Table } from "semantic-ui-react";
 import {
   ClientDataContainer,
   CustomerDataContainer,
@@ -25,6 +25,11 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
+  const comments = useMemo(() => {
+    const dispatchComments = budget?.products.filter(product => product.dispatch)
+      .map(product => `${product?.dispatch?.name || product?.name}${product.dispatch?.comment ? ` - ${product.dispatch?.comment}` : ''} - ${product.dispatch?.quantity || product.quantity}`);
+    return dispatchComments;
+  }, [budget?.products]);
 
   return (
     <table>
@@ -128,12 +133,24 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                     })}
                     {!dispatchPdf && (
                       <>
-                        {!!budget?.globalDiscount &&
-                          <Table.Row>
-                            <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
-                            <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
-                          </Table.Row>
-                        }
+                        {!!budget?.globalDiscount && (
+                          <>
+                            <Table.Row>
+                              <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
+                              <Cell colSpan="1">
+                                <strong>
+                                  <Price value={getTotalSum(budget?.products)} />
+                                </strong>
+                              </Cell>
+                            </Table.Row>
+                            <Table.Row>
+                              <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
+                              <Cell colSpan="1"><strong>
+                                {formatedPercentage(budget?.globalDiscount)}
+                              </strong></Cell>
+                            </Table.Row>
+                          </>
+                        )}
                         <Table.Row>
                           <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
                           <Cell colSpan="1">
@@ -147,10 +164,22 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                   </Table.Body>
                 </Table>
               </Flex>
-              {budget?.comments && (
+              {(!!comments?.length || budget?.comments) && (
                 <DataContainer width="100%">
                   <Label>Comentarios</Label>
-                  <Segment marginTop="0" minHeight="60px">{budget.comments}</Segment>
+                  <Segment marginTop="0" height="fit-content" padding="5px">
+                    {budget?.comments}
+                    {!!comments.length && !dispatchPdf && (
+                      <Box marginTop="2px">
+                        <strong>Despacho:</strong>
+                        <List style={{ margin: '0' }}>
+                          {comments.map((comment, index) => (
+                            <List.Item key={index}>{comment}</List.Item>
+                          ))}
+                        </List>
+                      </Box>
+                    )}
+                  </Segment>
                 </DataContainer>
               )}
               {!dispatchPdf &&

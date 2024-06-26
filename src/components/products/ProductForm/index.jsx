@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
+import { Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import { PAGES, RULES } from "@/constants";
 import { preventSend } from "@/utils";
@@ -125,6 +125,15 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 value={value || 0}
                 placeholder="Precio"
               />
+            )}
+          />
+        </FormField>
+        <FormField>
+          <Controller
+            name="editablePrice"
+            control={control}
+            render={({ field: { value, onChange, ...rest } }) => (
+              <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Precio editable" />
             )}
           />
         </FormField>
