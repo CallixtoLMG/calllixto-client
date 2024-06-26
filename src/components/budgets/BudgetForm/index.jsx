@@ -198,6 +198,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => [
     {
+      id: 1,
       title: "Código",
       value: (product) => (
         <>
@@ -208,11 +209,28 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
         </>
       ),
-      id: 1,
       width: 1,
       align: 'left'
     },
     {
+      id: 2,
+      title: "Cantidad", value: (product, index) => (
+        <Controller name={`products[${index}].quantity`} control={control} rules={RULES.REQUIRED}
+          render={({ field: { onChange, ...rest } }) => (
+            <CurrencyFormatInput {...rest} height="35px" shadow thousandSeparator={true} decimalScale={2} displayType="input"
+              onFocus={(e) => e.target.select()} onChange={(e) => {
+                const value = e.target.value;
+                onChange(value < 0 ? Math.abs(value) : value);
+                calculateTotal();
+              }}
+            />
+          )}
+        />
+      ),
+      width: 2
+    },
+    {
+      id: 3,
       title: "Nombre",
       value: (product) => (
         <Container>
@@ -233,30 +251,39 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </Flex>
         </Container>
       ),
-      id: 2,
       width: 7,
       wrap: true,
       align: 'left'
     },
-    { title: "Precio", value: (product) => <Price value={product.price} />, id: 3, width: 2 },
     {
-      title: "Cantidad", value: (product, index) => (
-        <Controller name={`products[${index}].quantity`} control={control} rules={RULES.REQUIRED}
-          render={({ field: { onChange, ...rest } }) => (
-            <CurrencyFormatInput {...rest} height="35px" shadow thousandSeparator={true} decimalScale={2} displayType="input"
-              onFocus={(e) => e.target.select()} onChange={(e) => {
-                const value = e.target.value;
-                onChange(value < 0 ? Math.abs(value) : value);
+      id: 4,
+      title: "Precio",
+      value: (product, index) => product?.editablePrice ?
+        <Controller
+          name={`products[${index}].price`}
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <CurrencyFormatInput
+              height="35px"
+              displayType="input"
+              thousandSeparator={true}
+              decimalScale={2}
+              allowNegative={false}
+              prefix="$ "
+              customInput={Input}
+              onValueChange={value => {
+                onChange(value.floatValue);
                 calculateTotal();
               }}
+              value={value || 0}
+              placeholder="Precio"
             />
           )}
-        />
-      ),
-      id: 4,
+        /> : <Price value={product.price} />,
       width: 2
     },
     {
+      id: 5,
       title: "Descuento",
       value: (product, index) => (
         <Controller name={`products[${index}].discount`} control={control} defaultValue={product.discount || 0}
@@ -269,7 +296,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           )}
         />
       ),
-      id: 5,
       width: 1
     },
     { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 6, width: 3 },
