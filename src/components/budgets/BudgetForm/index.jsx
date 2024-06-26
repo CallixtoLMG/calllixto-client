@@ -4,6 +4,7 @@ import {
   Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment
 } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
+import ProductSearch from "@/components/common/search/search";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES, TIME_IN_DAYS } from "@/constants";
@@ -14,7 +15,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
 import { List, ListItem, Message, Modal, Popup, Transition } from "semantic-ui-react";
-import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
