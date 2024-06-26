@@ -43,7 +43,7 @@ export const formatedPricePdf = (number) => {
     currency: 'ARS',
     minimumFractionDigits: 0,
   });
-};
+}
 
 export const formatProductCodePopup = (code, brand, supplier) => {
   const firstPart = code ? code?.substring(0, 2) : "";

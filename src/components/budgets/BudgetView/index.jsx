@@ -42,6 +42,11 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
         align: 'left'
       },
       {
+        title: "Cantidad", value: (product, index) => <p>{product?.quantity}</p>,
+        id: 2,
+        width: 2
+      },
+      {
         title: "Nombre",
         value: (product) => (
           <Container>
@@ -74,7 +79,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
             </Flex>
           </Container>
         ),
-        id: 2,
+        id: 3,
         width: 7,
         wrap: true,
         align: 'left'
@@ -82,13 +87,8 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
       {
         title: "Precio",
         value: (product) => <Price value={product.price} />,
-        id: 3,
-        width: 2,
-      },
-      {
-        title: "Cantidad", value: (product, index) => <p>{product?.quantity}</p>,
         id: 4,
-        width: 2
+        width: 2,
       },
       {
         title: "Descuento",

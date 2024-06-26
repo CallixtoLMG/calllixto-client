@@ -4,7 +4,15 @@ import { Popup } from "semantic-ui-react";
 import { Price } from "@/components/common/custom";
 import { CommentTooltip } from "@/components/common/tooltips";
 
-const ATTRIBUTES = { CODE: "code", NAME: "name", PRICE: "price", COMMENTS: "comments", BRAND_NAME: "brandName", SUPPLIER_NAME: "supplierName" };
+const ATTRIBUTES = {
+  CODE: "code",
+  NAME: "name",
+  PRICE: "price",
+  COMMENTS: "comments",
+  BRAND_NAME: "brandName",
+  SUPPLIER_NAME: "supplierName",
+  EDITABLE_PRICE: "editablePrice",
+};
 
 const PRODUCT_COLUMNS = [
   {

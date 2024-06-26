@@ -100,8 +100,8 @@ const Segment = styled(SSegment)`
   border: 0.5px solid grey !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
-  height: 30px!important;
-  padding: 0 5px!important;
+  height:  ${({ height = '30px' }) => height} !important;
+  padding: ${({ padding = '0 5px' }) => padding} !important;
   line-height: 28px!important;
   `;
 
