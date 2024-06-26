@@ -7,7 +7,7 @@ const KeyboardShortcuts = () => {
 
   return (
     <>
-      <HelpIcon size='large' name='question circle' color='orange' onClick={() => setOpen(true)} />
+      <HelpIcon size='large' name='keyboard' color='orange' onClick={() => setOpen(true)} />
       <Transition visible={open} animation='scale' duration={500}>
         <Modal open={open} onClose={() => setOpen(false)}>
           <StyledModalHeader icon='keyboard' content='Accesos rápidos del teclado' />
