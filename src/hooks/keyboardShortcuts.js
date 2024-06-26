@@ -6,14 +6,14 @@ export const useKeyboardShortcuts = (shortcuts, key) => {
       let action;
 
       if (typeof shortcuts === 'function') {
-        const keyCombo = `${event.ctrlKey ? 'Control+' : ''}${event.key}`;
+        const keyCombo = `${event.ctrlKey ? 'Control+' : ''}${event.altKey ? 'Alt+' : ''}${event.key}`;
         if (keyCombo === key) {
           event.preventDefault();
           action = shortcuts;
         }
       }
       if (typeof shortcuts === 'object') {
-        const keyCombo = `${event.ctrlKey ? 'Control+' : ''}${event.key}`;
+        const keyCombo = `${event.ctrlKey ? 'Control+' : ''}${event.altKey ? 'Alt+' : ''}${event.key}`;
         action = shortcuts[keyCombo];
       }
 

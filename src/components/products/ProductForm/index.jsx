@@ -1,7 +1,8 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
-import { PAGES, RULES } from "@/constants";
+import { PAGES, RULES, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -14,8 +15,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   const [brand, setBrand] = useState();
 
   const handleReset = useCallback((product) => {
-    setSupplier(null);
-    setBrand(null);
+    setSupplier({ name: "", id: "" });
+    setBrand({ name: "", id: "" });
     reset(product);
   }, [reset]);
 
@@ -25,6 +26,9 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     }
     await onSubmit(data);
   };
+
+  useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT), SHORTKEYS.DELETE);
 
   return (
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
@@ -90,7 +94,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 placeholder="Código"
                 onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                 disabled={isUpdating}
-                {...((supplier || brand) && { label: { basic: true, content: `${supplier?.id ?? ''} ${brand?.id ?? ''}` } })}
+                {...((supplier?.id || brand?.id) && { label: { basic: true, content: `${supplier?.id ?? ''} ${brand?.id ?? ''}` } })}
                 labelPosition='left'
               />
             )}

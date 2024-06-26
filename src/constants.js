@@ -188,7 +188,9 @@ export const FILTER_TYPES = {
 
 export const SHORTKEYS = {
   ENTER: "Control+Enter",
+  ALT_ENTER: "Control+Alt+Enter",
   BACKSPACE: "Control+Backspace",
   RIGHT_ARROW: "Control+ArrowRight",
   LEFT_ARROW: "Control+ArrowLeft",
+  DELETE: "Control+Delete",
 };
