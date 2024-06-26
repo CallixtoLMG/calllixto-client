@@ -21,24 +21,31 @@ import {
   Title
 } from "./styles";
 
-const PDFfile = ({ budget, total, client, printPdfMode }) => {
+const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
-
+  console.log(client)
   return (
     <table>
       <thead>
         <tr>
           <td>
             <HeaderContainer>
-              <Title color as="h2">MADERERA LAS TAPIAS</Title>
               <Flex flexDirection="column" alignSelf="center!important">
-                <Title as="h5">X</Title>
-                <Title as="h6">DOCUMENTO NO VALIDO COMO FACTURA</Title>
-                {dispatchPdf && <Title as="h5">Remito</Title>}
+                <Title as="h3">N° {budget?.id}</Title>
+                <Title as="h6">{client?.name || "Razon Social"}</Title>
+                <Title as="h6">CUIT: {client?.cuil || "CUIT"}</Title>
               </Flex>
-              <Image src="/Las Tapias.png" alt="Maderera logo" />
+              <Flex flexDirection="column" alignSelf="center!important">
+                {dispatchPdf ? <Title as="h2">Remito</Title> :
+                  <>
+                    <Title as="h3">X</Title>
+                    <Title as="h6">DOCUMENTO NO VALIDO COMO FACTURA</Title>
+                  </>
+                }
+              </Flex>
+              <Image src={`/clients/${id}.png`} alt="Logo empresa" />
             </HeaderContainer>
           </td>
         </tr>
@@ -51,24 +58,25 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
               <ClientDataContainer>
                 <DataContainer flex="1">
                   <HeaderLabel>Vendedor/a: {budget?.seller}</HeaderLabel>
-                  <HeaderLabel>Presupuesto N° {budget?.id}</HeaderLabel>
                 </DataContainer>
                 <DataContainer flex="1">
-                  <HeaderLabel>Fecha :{dayjs(budget?.createdAt).format('DD-MM-YYYY')}</HeaderLabel>
+                  <HeaderLabel>Fecha: {dayjs(budget?.createdAt).format('DD-MM-YYYY')}</HeaderLabel>
+                </DataContainer>
+                <DataContainer flex="1">
                   <HeaderLabel>Válido hasta: {dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</HeaderLabel>
                 </DataContainer>
               </ClientDataContainer>
               {clientPdf &&
                 <>
-                  <Divider />
                   <ClientDataContainer>
                     <DataContainer flex="1">
-                      <HeaderLabel>Dirección: {client?.addresses?.[0].address || "Calle Bananita Dolca al 1900"}</HeaderLabel>
-                      <HeaderLabel>Teléfonos: {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ') || "51313151351 | 51313151351"}</HeaderLabel>
+                      <HeaderLabel>Dirección: {client?.addresses?.[0].address || "-"}</HeaderLabel>
                     </DataContainer>
                     <DataContainer flex="1">
-                      <HeaderLabel>CUIT: {client?.cuil || "51313151351"}</HeaderLabel>
-                      <HeaderLabel>IVA: {client?.iva || "51313151351"}</HeaderLabel>
+                      <HeaderLabel>Teléfonos: {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ') || "-"}</HeaderLabel>
+                    </DataContainer>
+                    <DataContainer flex="1">
+                      <HeaderLabel>IVA: {client?.iva || "Condición IVA"}</HeaderLabel>
                     </DataContainer>
                   </ClientDataContainer>
                 </>
@@ -77,6 +85,8 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
               <ClientDataContainer>
                 <DataContainer flex="1">
                   <HeaderLabel>Cliente: {(get(budget, "customer.name", ""))}</HeaderLabel>
+                </DataContainer>
+                <DataContainer flex="1">
                   <HeaderLabel>Dirección: {(get(budget, "customer.addresses[0].address", ""))}</HeaderLabel>
                 </DataContainer>
                 <DataContainer flex="1">
@@ -127,7 +137,7 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
               {budget?.comments && (
                 <DataContainer width="100%">
                   <Label>Comentarios</Label>
-                  <Segment marginTop="0" minHeight="60px">{budget.comments}</Segment>
+                  <Segment marginTop="0">{budget.comments}</Segment>
                 </DataContainer>
               )}
               {!dispatchPdf &&

@@ -156,7 +156,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
         </ViewContainer>
       </NoPrint>
       <OnlyPrint>
-        <PDFfile total={total} budget={budget} client={user.client?.metadata} printPdfMode={printPdfMode} />
+        <PDFfile total={total} budget={budget} client={user.client?.metadata} id={user.client?.id} printPdfMode={printPdfMode} />
       </OnlyPrint>
     </>
   );

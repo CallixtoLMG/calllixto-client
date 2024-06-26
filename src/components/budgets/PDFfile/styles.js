@@ -108,7 +108,7 @@ const Segment = styled(SSegment)`
 const HeaderLabel = styled(SLabel)`
   background-color: white!important;
   margin: 0!important;
-  line-height: 7px!important;
+  padding: 3px 0!important;
 `;
 
 const Label = styled(SLabel)`

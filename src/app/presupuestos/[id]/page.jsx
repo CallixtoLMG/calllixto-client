@@ -163,25 +163,37 @@ const Budget = ({ params }) => {
         }] : [])
       ];
 
+      const scrollToTopAndPrint = () => {
+        window.scrollTo(0, 0);
+        setTimeout(() => {
+          window.print();
+        }, 500); 
+      };
+
       const actions = [
         {
           id: 1,
-          button: <PopupActions title="PDFs" icon="download" color="blue"
-            buttons={
-              printButtons.map(({ mode, color, iconName, text }) => (
-                <PrintButton
-                  key={mode}
-                  onClick={() => {
-                    setPrintPdfMode(mode);
-                    setTimeout(window.print);
-                  }}
-                  color={color}
-                  iconName={iconName}
-                  text={text}
-                />
-              ))
-            }
-          />
+          button: (
+            <PopupActions
+              title="PDFs"
+              icon="download"
+              color="blue"
+              buttons={
+                printButtons.map(({ mode, color, iconName, text }) => (
+                  <PrintButton
+                    key={mode}
+                    onClick={() => {
+                      setPrintPdfMode(mode);
+                      setTimeout(scrollToTopAndPrint, 0);
+                    }}
+                    color={color}
+                    iconName={iconName}
+                    text={text}
+                  />
+                ))
+              }
+            />
+          )
         },
         {
           id: 2,
