@@ -1,7 +1,8 @@
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
+import { Price } from "@/components/common/custom";
 import { Cell, HeaderCell } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT } from "@/constants";
-import { formatedPercentage, formatedPricePdf, formatedSimplePhone } from "@/utils";
+import { formatedPercentage, formatedSimplePhone } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { useMemo } from "react";
@@ -9,17 +10,16 @@ import { Flex } from "rebass";
 import { Table } from "semantic-ui-react";
 import {
   ClientDataContainer,
-  CustomerDataContainer,
   DataContainer,
   Divider,
   HeaderContainer,
+  HeaderLabel,
   Image,
   Label,
   Segment,
   TableRowHeader,
   Title
 } from "./styles";
-import { Price } from "@/components/common/custom";
 
 const PDFfile = ({ budget, total, client, printPdfMode }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
@@ -32,8 +32,12 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
         <tr>
           <td>
             <HeaderContainer>
-              <Title as="h2">MADERERA LAS TAPIAS</Title>
-              {dispatchPdf && <Title as="h3">Remito</Title>}
+              <Title color as="h2">MADERERA LAS TAPIAS</Title>
+              <Flex flexDirection="column" alignSelf="center!important">
+                <Title as="h5">X</Title>
+                <Title as="h6">DOCUMENTO NO VALIDO COMO FACTURA</Title>
+                {dispatchPdf && <Title as="h5">Remito</Title>}
+              </Flex>
               <Image src="/Las Tapias.png" alt="Maderera logo" />
             </HeaderContainer>
           </td>
@@ -43,70 +47,43 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
         <tr>
           <td>
             <div style={{ width: '80vw' }}>
+              <Divider />
               <ClientDataContainer>
-                <DataContainer width="250px">
-                  <Label>Vendedor/a</Label>
-                  <Segment>{budget?.seller}</Segment>
+                <DataContainer flex="1">
+                  <HeaderLabel>Vendedor/a: {budget?.seller}</HeaderLabel>
+                  <HeaderLabel>Presupuesto N° {budget?.id}</HeaderLabel>
                 </DataContainer>
                 <DataContainer flex="1">
-                  <Label>Fecha</Label>
-                  <Segment>{dayjs(budget?.createdAt).format('DD-MM-YYYY')}</Segment>
-                </DataContainer>
-                <DataContainer flex="1">
-                  <Label>Válido hasta</Label>
-                  <Segment>{dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</Segment>
-                </DataContainer>
-                <DataContainer flex="1">
-                  <Label>Presupuesto N°</Label>
-                  <Segment>{budget?.id}</Segment>
+                  <HeaderLabel>Fecha :{dayjs(budget?.createdAt).format('DD-MM-YYYY')}</HeaderLabel>
+                  <HeaderLabel>Válido hasta: {dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</HeaderLabel>
                 </DataContainer>
               </ClientDataContainer>
               {clientPdf &&
                 <>
                   <Divider />
-                  <CustomerDataContainer>
-                    <Flex>
-                      <DataContainer width="250px">
-                        <Label>CUIT</Label>
-                        <Segment>{client?.cuil}</Segment>
-                      </DataContainer>
-                      <DataContainer flex="1">
-                        <Label>IVA</Label>
-                        <Segment>{client?.iva}</Segment>
-                      </DataContainer>
-                    </Flex>
-                    <Flex>
-                      <DataContainer width="250px">
-                        <Label>Dirección</Label>
-                        <Segment>{client?.addresses?.[0].address}</Segment>
-                      </DataContainer>
-                      <DataContainer flex="1">
-                        <Label>Teléfonos</Label>
-                        <Segment flexHeight>
-                          <Flex flexDirection="column">
-                            {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')}
-                          </Flex>
-                        </Segment>
-                      </DataContainer>
-                    </Flex>
-                  </CustomerDataContainer>
+                  <ClientDataContainer>
+                    <DataContainer flex="1">
+                      <HeaderLabel>Dirección: {client?.addresses?.[0].address || "Calle Bananita Dolca al 1900"}</HeaderLabel>
+                      <HeaderLabel>Teléfonos: {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ') || "51313151351 | 51313151351"}</HeaderLabel>
+                    </DataContainer>
+                    <DataContainer flex="1">
+                      <HeaderLabel>CUIT: {client?.cuil || "51313151351"}</HeaderLabel>
+                      <HeaderLabel>IVA: {client?.iva || "51313151351"}</HeaderLabel>
+                    </DataContainer>
+                  </ClientDataContainer>
                 </>
               }
               <Divider />
               <ClientDataContainer>
-                <DataContainer width="250px">
-                  <Label>Cliente</Label>
-                  <Segment>{(get(budget, "customer.name", ""))}</Segment>
+                <DataContainer flex="1">
+                  <HeaderLabel>Cliente: {(get(budget, "customer.name", ""))}</HeaderLabel>
+                  <HeaderLabel>Dirección: {(get(budget, "customer.addresses[0].address", ""))}</HeaderLabel>
                 </DataContainer>
                 <DataContainer flex="1">
-                  <Label>Dirección</Label>
-                  <Segment>{(get(budget, "customer.addresses[0].address", ""))}</Segment>
-                </DataContainer>
-                <DataContainer flex="1">
-                  <Label>Teléfono</Label>
-                  <Segment>{formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))}</Segment>
+                  <HeaderLabel>Teléfono: {formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))}</HeaderLabel>
                 </DataContainer>
               </ClientDataContainer>
+              <Divider />
               <Flex margin="20px 0">
                 <Table celled compact striped>
                   <Table.Body>
