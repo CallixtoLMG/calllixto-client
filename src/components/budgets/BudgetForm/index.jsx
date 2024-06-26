@@ -52,17 +52,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
         key: customer.id, value: customer.id, text: customer.name,
       }))
     ;
-  const validateProducts = () => {
-    const values = getValues();
-    if (values.products.length === 0) {
-      setError('products', { type: 'manual', message: 'Al menos 1 producto es requerido.' });
-      return false;
-    } else {
-      clearErrors('products');
-      return true;
-    }
-  };
-
   useEffect(() => {
     if (isCloning) {
       let budgetProducts = [...budget.products];
@@ -106,18 +95,18 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   useEffect(() => {
     calculateTotal();
   }, [watchProducts, calculateTotal]);
-
+  
   const handleCreate = async (data, state) => {
-    if (!watchProducts.length) return;
-
-    const { seller, products, customer, confirmed, globalDiscount, expirationOffsetDays, paymentMethods, comments } = data;
-
-    const formData = {
-      seller, products, customer: { id: customer.id, name: customer.name }, confirmed, globalDiscount,
-      expirationOffsetDays, paymentMethods, comments, state
+    setValue('state', state);
+    const isvalid = validateCustomer();
+    if (isvalid) {
+      const { seller, products, customer, confirmed, globalDiscount, expirationOffsetDays, paymentMethods, comments } = data;
+      const formData = {
+        seller, products, customer: { id: customer.id, name: customer.name }, confirmed, globalDiscount,
+        expirationOffsetDays, paymentMethods, comments, state
+      };
+      await onSubmit(formData);
     };
-
-    await onSubmit(formData);
   };
 
   const currentState = useMemo(() => {
@@ -127,26 +116,19 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     return BUDGET_STATES.PENDING;
   }, [watchConfirmed]);
 
-  const handlePending = async (data) => {
-    setValue('state', BUDGET_STATES.PENDING.id);
-    const isProductsValid = validateProducts();
-    const isValid = await trigger();
-
-    if (isValid && isProductsValid) {
-      const values = getValues();
-      await handleCreate(values, BUDGET_STATES.PENDING.id);
+  const validateCustomer = () => {
+    const customer = getValues("customer");
+    if (watchConfirmed && (!customer.addresses.length || !customer.phoneNumbers.length)) {
+      if (!customer.addresses.length) {
+        setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
+      };
+      if (!customer.phoneNumbers.length) {
+        setError('customer.phoneNumbers', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
+      };
+      return false;
     }
-  };
-
-  const handleDraft = async () => {
-    setValue('state', BUDGET_STATES.DRAFT.id);
-    const isProductsValid = validateProducts();
-    const isValid = await trigger();
-
-    if (isValid && isProductsValid) {
-      const values = getValues();
-      await handleCreate(values, BUDGET_STATES.DRAFT.id);
-    }
+    clearErrors('customer');
+    return true;
   };
 
   const handleReset = useCallback(() => {
@@ -317,7 +299,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             </Modal.Actions>
           </Modal>
         </Transition>
-        <Form onSubmit={handleSubmit(handlePending)}>
+        <Form onSubmit={handleSubmit((data) => handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id))}>
           <FieldsContainer>
             <FormField width="300px">
               <Controller name="confirmed" control={control}
@@ -356,6 +338,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                     options={customerOptions}
                     value={field.value?.id}
                     onChange={(e, { value }) => {
+                      clearErrors(["customer"])
                       if (!value) {
                         field.onChange(null);
                         return;
@@ -368,23 +351,12 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               />
             </FormField>
             <FormField flex={1}>
-              <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.addresses?.[0]?.message} required={watchConfirmed} />
-              <Controller
-                name="customer.addresses[0]"
-                control={control}
-                rules={watchConfirmed && RULES.REQUIRED}
-                render={({ field: { value } }) => (
-                  <Segment>{watchCustomer?.addresses[0]?.address}</Segment>
-                )}
-              />
+              <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.addresses?.message} required={watchConfirmed} />
+              <Segment>{watchCustomer?.addresses[0]?.address}</Segment>
             </FormField>
             <FormField width="200px">
-              <RuledLabel title="Teléfono" message={watchConfirmed && errors?.customer?.phoneNumbers?.[0]?.message} required={watchConfirmed} />
-              <Controller name="customer.phoneNumbers[0]" control={control} rules={watchConfirmed && RULES.REQUIRED}
-                render={({ field: { value } }) => (
-                  <Segment>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
-                )}
-              />
+              <RuledLabel title="Teléfono" message={watchConfirmed && errors?.customer?.phoneNumbers?.message} required={watchConfirmed} />
+              <Segment>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
             </FormField>
           </FieldsContainer>
           <FormField width="300px">
@@ -454,11 +426,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </FieldsContainer>
           <SubmitAndRestore draft={draft} isLoading={isLoading && watchState !== BUDGET_STATES.DRAFT.id}
             disabled={isLoading} isDirty={isDirty} onReset={handleReset}
-            color={currentState.color} onSubmit={handleSubmit(handlePending)}
+            color={currentState.color} onSubmit={handleSubmit((data) => handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id))}
             icon={currentState.icon} text={currentState.title}
             extraButton={
-              <Button disabled={isLoading || !isDirty} loading={isLoading && watchState !== BUDGET_STATES.PENDING.id}
-                type="button" onClick={handleSubmit(handleDraft)} color={BUDGET_STATES.DRAFT.color}>
+              <Button disabled={isLoading || !isDirty || watchConfirmed} loading={isLoading && watchState !== BUDGET_STATES.PENDING.id}
+                type="button" onClick={handleSubmit((data) => handleCreate(data, BUDGET_STATES.DRAFT.id))} color={BUDGET_STATES.DRAFT.color}>
                 <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
               </Button>
             }
