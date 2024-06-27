@@ -163,25 +163,37 @@ const Budget = ({ params }) => {
         }] : [])
       ];
 
+      const scrollToTopAndPrint = () => {
+        window.scrollTo(0, 0);
+        setTimeout(() => {
+          window.print();
+        }, 500); 
+      };
+
       const actions = [
         {
           id: 1,
-          button: <PopupActions title="PDFs" icon="download" color="blue"
-            buttons={
-              printButtons.map(({ mode, color, iconName, text }) => (
-                <PrintButton
-                  key={mode}
-                  onClick={() => {
-                    setPrintPdfMode(mode);
-                    setTimeout(window.print);
-                  }}
-                  color={color}
-                  iconName={iconName}
-                  text={text}
-                />
-              ))
-            }
-          />
+          button: (
+            <PopupActions
+              title="PDFs"
+              icon="download"
+              color="blue"
+              buttons={
+                printButtons.map(({ mode, color, iconName, text }) => (
+                  <PrintButton
+                    key={mode}
+                    onClick={() => {
+                      setPrintPdfMode(mode);
+                      setTimeout(scrollToTopAndPrint, 0);
+                    }}
+                    color={color}
+                    iconName={iconName}
+                    text={text}
+                  />
+                ))
+              }
+            />
+          )
         },
         {
           id: 2,
@@ -261,10 +273,7 @@ const Budget = ({ params }) => {
 
   const { mutate: mutateEdit, isPending: isPendingEdit } = useMutation({
     mutationFn: async (budget) => {
-      console.log("budget", { ...budget, id: params.id, })
-
       const { data } = await edit({ ...budget, id: params.id });
-      console.log(data)
       return data;
     },
     onSuccess: (response) => {
@@ -280,7 +289,7 @@ const Budget = ({ params }) => {
   });
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || loadingProducts || loadingCustomers}>
       {!budget?.confirmed && budget?.state !== BUDGET_STATES.DRAFT.id && (
         <NoPrint>
           <Box marginBottom={15}>

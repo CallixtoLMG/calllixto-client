@@ -1,5 +1,5 @@
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
-import { Box, Flex } from "rebass";
+import { Flex } from "rebass";
 import { CommentTooltip, AddressesTooltip, PhonesTooltip } from "../common/tooltips";
 
 export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value' };
@@ -44,8 +44,4 @@ export const HEADERS = [
       );
     }
   }
-];
-
-export const FILTERS = [
-  { value: 'id', placeholder: 'Nombre' },
 ];

@@ -1,5 +1,7 @@
 import { ENTITIES } from '@/constants';
 import { createContext, useContext, useMemo, useState } from 'react';
+import { PaginationContainer, PaginationSegment } from './styles';
+import { Button } from 'semantic-ui-react';
 
 const PaginationContext = createContext();
 
@@ -79,5 +81,17 @@ const usePaginationContext = () => {
   return context;
 };
 
-export { PaginationProvider, usePaginationContext };
+const Paginator = () => {
+  const { goToNextPage, goToPreviousPage, currentPage, canGoNext } = usePaginationContext();
+
+  return (
+    <PaginationContainer>
+      <Button onClick={goToPreviousPage} disabled={currentPage === 0}>Anterior</Button>
+      <PaginationSegment>{Number(currentPage) + 1}</PaginationSegment>
+      <Button onClick={goToNextPage} disabled={!canGoNext}>Siguiente</Button>
+    </PaginationContainer>
+  )
+}
+
+export { PaginationProvider, usePaginationContext, Paginator };
 
