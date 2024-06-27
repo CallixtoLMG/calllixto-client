@@ -1,16 +1,13 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import {
-  Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment
-} from "@/components/common/custom";
+import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
-import { BUDGET_STATES, PAGES, RULES, TIME_IN_DAYS } from "@/constants";
-import {
-  actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, removeDecimal
-} from "@/utils";
+import { BUDGET_STATES, PAGES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
@@ -95,7 +92,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   useEffect(() => {
     calculateTotal();
   }, [watchProducts, calculateTotal]);
-  
+
   const handleCreate = async (data, state) => {
     setValue('state', state);
     const isvalid = validateCustomer();
@@ -108,6 +105,8 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       await onSubmit(formData);
     };
   };
+
+
 
   const currentState = useMemo(() => {
     if (watchConfirmed) {
@@ -282,6 +281,18 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     },
     { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 6, width: 3 },
   ], [control, calculateTotal]);
+
+  const handleDraft = async (data) => {
+    await handleCreate(data, BUDGET_STATES.DRAFT.id);
+  };
+
+  const handleConfirm = async (data) => {
+    await handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
+  };
+
+  useKeyboardShortcuts(() => handleSubmit(handleDraft)(), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => handleSubmit(handleConfirm)(), SHORTKEYS.ALT_ENTER);
+  useKeyboardShortcuts(() => handleReset(), SHORTKEYS.DELETE);
 
   return (
     <>
