@@ -1,4 +1,5 @@
-import { ENTITIES } from '@/constants';
+import { ENTITIES, SHORTKEYS } from '@/constants';
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { createContext, useContext, useMemo, useState } from 'react';
 import { PaginationContainer, PaginationSegment } from './styles';
 import { Button } from 'semantic-ui-react';
@@ -53,6 +54,12 @@ const PaginationProvider = ({ children }) => {
     setFilters(filters);
     setCurrentPage(0);
   };
+
+  const shortcutMapping = {
+    [SHORTKEYS.LEFT_ARROW]: () => goToPreviousPage(),
+    [SHORTKEYS.RIGHT_ARROW]: () => goToNextPage(),
+  };
+  useKeyboardShortcuts(shortcutMapping);
 
   return (
     <PaginationContext.Provider value={{

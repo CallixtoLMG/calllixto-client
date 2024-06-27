@@ -1,4 +1,4 @@
-import { Button as SButton, Icon } from "semantic-ui-react";
+import { Icon, Button as SButton } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Button = styled(SButton)`
