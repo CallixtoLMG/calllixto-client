@@ -53,8 +53,8 @@ const Product = ({ params }) => {
     if (product) {
       const actions = [
         {
-          id: 4,
-          icon: 'download',
+          id: 1,
+          icon: 'barcode',
           color: 'blue',
           onClick: () => setTimeout(window.print),
           text: 'Código'
