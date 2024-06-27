@@ -17,21 +17,37 @@ const KeyboardShortcuts = () => {
                 <StyledListIcon name='keyboard' />
                 <StyledListContent>
                   <StyledListHeader>Control + 1,2,3,4,5</StyledListHeader>
-                  <List.Description>Me desplazo por las distintas pestañas de la web.</List.Description>
+                  <List.Description>Me desplazo por las distintas pestañas de la página.</List.Description>
                 </StyledListContent>
               </List.Item>
               <List.Item>
                 <StyledListIcon name='keyboard' />
                 <StyledListContent>
                   <StyledListHeader>Control + enter</StyledListHeader>
-                  <List.Description>En cada página principal, nos lleva a crear un nuevo elemento.</List.Description>
+                  <List.Description>En cada página principal, nos lleva a la creación de un nuevo elemento.</List.Description>
+                  <List.Description>Durante la creación de un nuevo elemento, lo confirma.</List.Description>
+                  <List.Description>Durante la creación de un presupuesto, establece un borrador.</List.Description>
+                </StyledListContent>
+              </List.Item>
+              <List.Item>
+                <StyledListIcon name='keyboard' />
+                <StyledListContent>
+                  <StyledListHeader>Control + alt + enter</StyledListHeader>
+                  <List.Description>Durante la creación de un presupuesto, lo confirma o establece en pendiente.</List.Description>
+                </StyledListContent>
+              </List.Item>
+              <List.Item>
+                <StyledListIcon name='keyboard' />
+                <StyledListContent>
+                  <StyledListHeader>Control + suprimir</StyledListHeader>
+                  <List.Description>Durante la creación de un elemento, limpia el formulario.</List.Description>
                 </StyledListContent>
               </List.Item>
               <List.Item>
                 <StyledListIcon name='keyboard' />
                 <StyledListContent>
                   <StyledListHeader>Control + flecha derecha o flecha izquierda</StyledListHeader>
-                  <List.Description>Nos permite desplazarnos en la tabla, si hay más de una página.</List.Description>
+                  <List.Description>Nos permite desplazarnos en la tablas, si hay más de una página.</List.Description>
                 </StyledListContent>
               </List.Item>
               <List.Item>
