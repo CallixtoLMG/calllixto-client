@@ -5,7 +5,8 @@ import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { ATTRIBUTES } from "@/components/suppliers/suppliers.common";
-import { ENTITIES, PAGES } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
@@ -20,7 +21,7 @@ const Suppliers = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { data, isLoading, isRefetching } = useListSuppliers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESSES, ATTRIBUTES.PHONES, ATTRIBUTES.COMMENT] });
+  const { data, isLoading } = useListSuppliers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESSES, ATTRIBUTES.PHONES, ATTRIBUTES.COMMENT] });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -43,10 +44,11 @@ const Suppliers = () => {
     setActions(actions);
   }, [push, role, setActions]);
 
+  useKeyboardShortcuts(() => push(PAGES.SUPPLIERS.CREATE), SHORTKEYS.ENTER);
+
   return (
     <SuppliersPage
       isLoading={isLoading}
-      isRefetching={isRefetching}
       suppliers={data?.suppliers}
       role={role}
       onDelete={deleteSupplier}

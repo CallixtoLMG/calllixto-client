@@ -4,7 +4,8 @@ import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { ATTRIBUTES } from "@/components/budgets/budgets.common";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
@@ -42,6 +43,8 @@ const Budgets = () => {
     ];
     setActions(actions);
   }, [push, setActions]);
+
+  useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 
   return (
     <BudgetsPage isLoading={isLoading} budgets={budgets} />

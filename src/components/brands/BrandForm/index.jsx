@@ -1,8 +1,9 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, TextArea } from "@/components/common/custom";
-import { RULES } from "@/constants";
+import { FieldsContainer, Form, FormField, Input, Label, RuledLabel } from "@/components/common/custom";
+import { RULES, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ControlledComments } from "../../common/form";
 
@@ -14,6 +15,13 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
   const handleReset = useCallback((brand) => {
     reset(brand);
   }, [reset]);
+
+  const handleCreate = (data) => {
+    onSubmit(data);
+  };
+
+  useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_BRAND, ...brand } : EMPTY_BRAND), SHORTKEYS.DELETE);
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>

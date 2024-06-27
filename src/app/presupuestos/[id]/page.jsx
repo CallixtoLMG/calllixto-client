@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, edit, useGetBudget } from "@/api/budgets";
+import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, confirmBudget, edit, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
@@ -164,25 +164,37 @@ const Budget = ({ params }) => {
         }] : [])
       ];
 
+      const scrollToTopAndPrint = () => {
+        window.scrollTo(0, 0);
+        setTimeout(() => {
+          window.print();
+        }, 500); 
+      };
+
       const actions = [
         {
           id: 1,
-          button: <PopupActions title="PDFs" icon="download" color="blue"
-            buttons={
-              printButtons.map(({ mode, color, iconName, text }) => (
-                <PrintButton
-                  key={mode}
-                  onClick={() => {
-                    setPrintPdfMode(mode);
-                    setTimeout(window.print);
-                  }}
-                  color={color}
-                  iconName={iconName}
-                  text={text}
-                />
-              ))
-            }
-          />
+          button: (
+            <PopupActions
+              title="PDFs"
+              icon="download"
+              color="blue"
+              buttons={
+                printButtons.map(({ mode, color, iconName, text }) => (
+                  <PrintButton
+                    key={mode}
+                    onClick={() => {
+                      setPrintPdfMode(mode);
+                      setTimeout(scrollToTopAndPrint, 0);
+                    }}
+                    color={color}
+                    iconName={iconName}
+                    text={text}
+                  />
+                ))
+              }
+            />
+          )
         },
         {
           id: 2,
@@ -243,7 +255,7 @@ const Budget = ({ params }) => {
         confirmed: true,
         state: BUDGET_STATES.CONFIRMED.id
       };
-      const { data } = await edit(confirmationData, budget?.id);
+      const { data } = await confirmBudget(confirmationData, budget?.id);
       return data;
     },
     onSuccess: (response) => {
@@ -252,8 +264,25 @@ const Budget = ({ params }) => {
         queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto confirmado!');
         setConfirmed(true);
-        setIsModalConfirmationOpen(false); 
-        push(PAGES.BUDGETS.BASE); 
+        setIsModalConfirmationOpen(false);
+        push(PAGES.BUDGETS.BASE);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
+
+  const { mutate: mutateEdit, isPending: isPendingEdit } = useMutation({
+    mutationFn: async (budget) => {
+      const { data } = await edit({ ...budget, id: params.id });
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
+        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
+        toast.success('Presupuesto actualizado!');
+        push(PAGES.BUDGETS.BASE);
       } else {
         toast.error(response.message);
       }
@@ -261,7 +290,7 @@ const Budget = ({ params }) => {
   });
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || loadingProducts || loadingCustomers}>
       {!budget?.confirmed && budget?.state !== BUDGET_STATES.DRAFT.id && (
         <NoPrint>
           <Box marginBottom={15}>
@@ -293,13 +322,14 @@ const Budget = ({ params }) => {
       )}
       {budget?.state === BUDGET_STATES.DRAFT.id ?
         (<BudgetForm
-          onSubmit={mutate}
+          onSubmit={mutateEdit}
           products={products}
           customers={customers}
           user={userData}
           budget={budget}
-          isLoading={isPending}
+          isLoading={isPendingEdit}
           draft
+          printPdfMode={printPdfMode}
         />) :
         (<BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />)
       }

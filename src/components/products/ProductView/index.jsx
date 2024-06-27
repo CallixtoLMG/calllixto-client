@@ -1,5 +1,5 @@
 "use client";
-import { FieldsContainer, FormField, Label, Segment, ViewContainer } from "@/components/common/custom";
+import { Checkbox, FieldsContainer, FormField, Label, Segment, ViewContainer } from "@/components/common/custom";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { formatedPrice } from "@/utils";
 import JsBarcode from 'jsbarcode';
@@ -48,7 +48,10 @@ const ProductView = ({ product }) => {
               <Label>Precio</Label>
               <Segment>{formatedPrice(product?.price)}</Segment>
             </FormField>
-          </FieldsContainer>
+            <FormField>
+          <Checkbox toggle checked={product?.editablePrice} label="Precio editable" disabled />
+        </FormField>
+      </FieldsContainer>
           <FieldsContainer>
             <Label>Comentarios</Label>
             <Segment>{product?.comments}</Segment>

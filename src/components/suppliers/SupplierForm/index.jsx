@@ -1,10 +1,11 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Form, FormField, Input, Label, RuledLabel } from "@/components/common/custom";
-import { RULES } from "@/constants";
+import { ContactFields, ControlledComments } from "@/components/common/form";
+import { RULES, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback, } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { ContactFields, ControlledComments } from "@/components/common/form";
 
 const EMPTY_SUPPLIER = { id: '', name: '', emails: [], phoneNumbers: [], addresses: [], comments: '' };
 
@@ -16,6 +17,13 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
   const handleReset = useCallback((supplier) => {
     reset(supplier);
   }, [reset]);
+
+  const handleCreate = (data) => {
+    onSubmit(data);
+  };
+
+  useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_SUPPLIER, ...supplier } : EMPTY_SUPPLIER), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>

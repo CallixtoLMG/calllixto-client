@@ -1,30 +1,35 @@
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
+import { Price } from "@/components/common/custom";
 import { Cell, HeaderCell } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT } from "@/constants";
-import { formatedPercentage, formatedPricePdf, formatedSimplePhone } from "@/utils";
+import { formatedPercentage, formatedSimplePhone, getTotalSum } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { useMemo } from "react";
-import { Flex } from "rebass";
-import { Table } from "semantic-ui-react";
+import { Box, Flex } from "rebass";
+import { List, Table } from "semantic-ui-react";
 import {
   ClientDataContainer,
-  CustomerDataContainer,
   DataContainer,
   Divider,
   HeaderContainer,
+  HeaderLabel,
   Image,
   Label,
   Segment,
   TableRowHeader,
   Title
 } from "./styles";
-import { Price } from "@/components/common/custom";
 
-const PDFfile = ({ budget, total, client, printPdfMode }) => {
+const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
+  const comments = useMemo(() => {
+    const dispatchComments = budget?.products.filter(product => product.dispatch)
+      .map(product => `${product?.dispatch?.name || product?.name}${product.dispatch?.comment ? ` - ${product.dispatch?.comment}` : ''} - ${product.dispatch?.quantity || product.quantity}`);
+    return dispatchComments;
+  }, [budget?.products]);
 
   return (
     <table>
@@ -32,9 +37,20 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
         <tr>
           <td>
             <HeaderContainer>
-              <Title as="h2">MADERERA LAS TAPIAS</Title>
-              {dispatchPdf && <Title as="h3">Remito</Title>}
-              <Image src="/Las Tapias.png" alt="Maderera logo" />
+              <Flex flexDirection="column" alignSelf="center!important">
+                <Title as="h3">N° {budget?.id}</Title>
+                <Title as="h6">{client?.name || "Razon Social"}</Title>
+                <Title as="h6">CUIT: {client?.cuil || "CUIT"}</Title>
+              </Flex>
+              <Flex flexDirection="column" alignSelf="center!important">
+                {dispatchPdf ? <Title as="h2">Remito</Title> :
+                  <>
+                    <Title as="h3">X</Title>
+                    <Title as="h6">DOCUMENTO NO VALIDO COMO FACTURA</Title>
+                  </>
+                }
+              </Flex>
+              <Image src={`/clients/${id}.png`} alt="Logo empresa" />
             </HeaderContainer>
           </td>
         </tr>
@@ -43,70 +59,46 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
         <tr>
           <td>
             <div style={{ width: '80vw' }}>
+              <Divider />
               <ClientDataContainer>
-                <DataContainer width="250px">
-                  <Label>Vendedor/a</Label>
-                  <Segment>{budget?.seller}</Segment>
+                <DataContainer flex="1">
+                  <HeaderLabel>Vendedor/a: {budget?.seller}</HeaderLabel>
                 </DataContainer>
                 <DataContainer flex="1">
-                  <Label>Fecha</Label>
-                  <Segment>{dayjs(budget?.createdAt).format('DD-MM-YYYY')}</Segment>
+                  <HeaderLabel>Fecha: {dayjs(budget?.createdAt).format('DD-MM-YYYY')}</HeaderLabel>
                 </DataContainer>
                 <DataContainer flex="1">
-                  <Label>Válido hasta</Label>
-                  <Segment>{dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</Segment>
-                </DataContainer>
-                <DataContainer flex="1">
-                  <Label>Presupuesto N°</Label>
-                  <Segment>{budget?.id}</Segment>
+                  <HeaderLabel>Válido hasta: {dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</HeaderLabel>
                 </DataContainer>
               </ClientDataContainer>
               {clientPdf &&
                 <>
-                  <Divider />
-                  <CustomerDataContainer>
-                    <Flex>
-                      <DataContainer width="250px">
-                        <Label>CUIT</Label>
-                        <Segment>{client?.cuil}</Segment>
-                      </DataContainer>
-                      <DataContainer flex="1">
-                        <Label>IVA</Label>
-                        <Segment>{client?.iva}</Segment>
-                      </DataContainer>
-                    </Flex>
-                    <Flex>
-                      <DataContainer width="250px">
-                        <Label>Dirección</Label>
-                        <Segment>{client?.addresses?.[0].address}</Segment>
-                      </DataContainer>
-                      <DataContainer flex="1">
-                        <Label>Teléfonos</Label>
-                        <Segment flexHeight>
-                          <Flex flexDirection="column">
-                            {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')}
-                          </Flex>
-                        </Segment>
-                      </DataContainer>
-                    </Flex>
-                  </CustomerDataContainer>
+                  <ClientDataContainer>
+                    <DataContainer flex="1">
+                      <HeaderLabel>Dirección: {client?.addresses?.[0].address || "-"}</HeaderLabel>
+                    </DataContainer>
+                    <DataContainer flex="1">
+                      <HeaderLabel>Teléfonos: {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ') || "-"}</HeaderLabel>
+                    </DataContainer>
+                    <DataContainer flex="1">
+                      <HeaderLabel>IVA: {client?.iva || "Condición IVA"}</HeaderLabel>
+                    </DataContainer>
+                  </ClientDataContainer>
                 </>
               }
               <Divider />
               <ClientDataContainer>
-                <DataContainer width="250px">
-                  <Label>Cliente</Label>
-                  <Segment>{(get(budget, "customer.name", ""))}</Segment>
+                <DataContainer flex="1">
+                  <HeaderLabel>Cliente: {(get(budget, "customer.name", ""))}</HeaderLabel>
                 </DataContainer>
                 <DataContainer flex="1">
-                  <Label>Dirección</Label>
-                  <Segment>{(get(budget, "customer.addresses[0].address", ""))}</Segment>
+                  <HeaderLabel>Dirección: {(get(budget, "customer.addresses[0].address", ""))}</HeaderLabel>
                 </DataContainer>
                 <DataContainer flex="1">
-                  <Label>Teléfono</Label>
-                  <Segment>{formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))}</Segment>
+                  <HeaderLabel>Teléfono: {formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))}</HeaderLabel>
                 </DataContainer>
               </ClientDataContainer>
+              <Divider />
               <Flex margin="20px 0">
                 <Table celled compact striped>
                   <Table.Body>
@@ -128,12 +120,24 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                     })}
                     {!dispatchPdf && (
                       <>
-                        {!!budget?.globalDiscount &&
-                          <Table.Row>
-                            <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
-                            <Cell colSpan="1"><strong>{formatedPercentage(budget?.globalDiscount)}</strong></Cell>
-                          </Table.Row>
-                        }
+                        {!!budget?.globalDiscount && (
+                          <>
+                            <Table.Row>
+                              <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
+                              <Cell colSpan="1">
+                                <strong>
+                                  <Price value={getTotalSum(budget?.products)} />
+                                </strong>
+                              </Cell>
+                            </Table.Row>
+                            <Table.Row>
+                              <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
+                              <Cell colSpan="1"><strong>
+                                {formatedPercentage(budget?.globalDiscount)}
+                              </strong></Cell>
+                            </Table.Row>
+                          </>
+                        )}
                         <Table.Row>
                           <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
                           <Cell colSpan="1">
@@ -147,10 +151,22 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
                   </Table.Body>
                 </Table>
               </Flex>
-              {budget?.comments && (
+              {(!!comments?.length || budget?.comments) && (
                 <DataContainer width="100%">
                   <Label>Comentarios</Label>
-                  <Segment marginTop="0" minHeight="60px">{budget.comments}</Segment>
+                  <Segment marginTop="0" height="fit-content" padding="5px">
+                    {budget?.comments}
+                    {!!comments.length && !dispatchPdf && (
+                      <Box marginTop="2px">
+                        <strong>Despacho:</strong>
+                        <List style={{ margin: '0' }}>
+                          {comments.map((comment, index) => (
+                            <List.Item key={index}>{comment}</List.Item>
+                          ))}
+                        </List>
+                      </Box>
+                    )}
+                  </Segment>
                 </DataContainer>
               )}
               {!dispatchPdf &&
@@ -177,5 +193,5 @@ const PDFfile = ({ budget, total, client, printPdfMode }) => {
       </tfoot>
     </table>
   )
-}
+};
 export default PDFfile;

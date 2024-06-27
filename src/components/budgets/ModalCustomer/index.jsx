@@ -46,7 +46,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
         onClose={() => onClose(false)}
       >
         <Modal.Header>
-          Es necesario completar los sigueintes datos del cliente
+          Es necesario completar los siguientes datos del cliente
         </Modal.Header>
         <Modal.Content>
           <Form onSubmit={handleSubmit(handleEdit)}>

@@ -81,17 +81,18 @@ export const Dropdown = styled(SDropdown)`
   margin: ${({ margin = "5px 0" }) => `${margin}!important;`};
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
-  height: ${({ height = "50px" }) => `${height}!important`} ;
-  min-height: ${({ minHeight = "none" }) => `${minHeight}!important`} ;
+  height: ${({ height = "50px" }) => `${height}!important`};
+  min-height: ${({ minHeight = "none" }) => `${minHeight}!important`};
   display: flex!important;
   flex-wrap: wrap;
   align-content: center;
+  width: ${({ width = "100%" }) => `${width}!important`};
   input {
-    height: ${({ height = "50px" }) => `${height}!important`} ;
+    height: ${({ height = "50px" }) => `${height}!important`};
   };
   i.dropdown.icon {
     height: 50px!important;
-    top: ${({ top = "15px" }) => `${top}!important`} ;
+    top: ${({ top = "15px" }) => `${top}!important`};
   };
 `;
 

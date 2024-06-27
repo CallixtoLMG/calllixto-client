@@ -22,13 +22,7 @@ const BRAND_COLUMNS = [
   }
 ];
 
-const FILTERS = [
-  { value: 'id', placeholder: 'Id' },
-  { value: 'name', placeholder: 'Nombre' },
-];
-
 export {
   ATTRIBUTES, BRAND_COLUMNS,
-  FILTERS
 };
 

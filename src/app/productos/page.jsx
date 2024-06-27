@@ -7,10 +7,11 @@ import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
 import { ATTRIBUTES } from "@/components/products/products.common";
-import { ENTITIES, PAGES } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
-import { downloadExcel } from "@/utils";
 import { RULES } from "@/roles";
+import { downloadExcel } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
@@ -31,7 +32,7 @@ const Products = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { data, isLoading, isRefetching } = useListProducts({ sort: 'date', order: false, attributes: [ATTRIBUTES.NAME, ATTRIBUTES.PRICE, ATTRIBUTES.CODE, ATTRIBUTES.COMMENTS, ATTRIBUTES.BRAND_NAME, ATTRIBUTES.SUPPLIER_NAME] });
+  const { data, isLoading } = useListProducts({ sort: 'date', order: false, attributes: [ATTRIBUTES.NAME, ATTRIBUTES.PRICE, ATTRIBUTES.CODE, ATTRIBUTES.COMMENTS, ATTRIBUTES.BRAND_NAME, ATTRIBUTES.SUPPLIER_NAME] });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -80,11 +81,12 @@ const Products = () => {
     setActions(actions);
   }, [products, push, role, setActions]);
 
+  useKeyboardShortcuts(() => push(PAGES.PRODUCTS.CREATE), SHORTKEYS.ENTER);
+
   return (
     <>
       {open && <BanProduct open={open} setOpen={setOpen} />}
       <ProductsPage
-        isRefetching={isRefetching}
         isLoading={isLoading}
         products={data?.products}
         role={role}
