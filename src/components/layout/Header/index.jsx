@@ -1,4 +1,5 @@
 import { useUserContext } from "@/User";
+import { KeyboardShortcuts } from "@/components/common/modals";
 import { NoPrint } from "@/components/layout";
 import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -57,6 +58,7 @@ const Header = () => {
                   ))}
                 </Flex>
                 <Flex>
+                    <KeyboardShortcuts/>
                   {isCallixtoUser(role) &&
                     <LogDiv padding="8px">
                       <Dropdown
