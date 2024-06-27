@@ -92,7 +92,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   useEffect(() => {
     calculateTotal();
   }, [watchProducts, calculateTotal]);
-  
+
   const handleCreate = async (data, state) => {
     setValue('state', state);
     const isvalid = validateCustomer();
@@ -105,6 +105,8 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       await onSubmit(formData);
     };
   };
+
+
 
   const currentState = useMemo(() => {
     if (watchConfirmed) {
@@ -280,7 +282,17 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 6, width: 3 },
   ], [control, calculateTotal]);
 
-  useKeyboardShortcuts(() => handleReset()(), SHORTKEYS.DELETE);
+  const handleDraft = async (data) => {
+    await handleCreate(data, BUDGET_STATES.DRAFT.id);
+  };
+
+  const handleConfirm = async (data) => {
+    await handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
+  };
+
+  useKeyboardShortcuts(() => handleSubmit(handleDraft)(), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => handleSubmit(handleConfirm)(), SHORTKEYS.ALT_ENTER);
+  useKeyboardShortcuts(() => handleReset(), SHORTKEYS.DELETE);
 
   return (
     <>
