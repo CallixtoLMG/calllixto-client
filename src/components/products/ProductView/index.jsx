@@ -1,5 +1,5 @@
 "use client";
-import { FieldsContainer, ViewContainer, FormField, Label, Segment } from "@/components/common/custom";
+import { FieldsContainer, ViewContainer, FormField, Label, Segment, Checkbox } from "@/components/common/custom";
 import { formatedPrice } from "@/utils";
 
 const ProductView = ({ product }) => {
@@ -27,6 +27,9 @@ const ProductView = ({ product }) => {
         <FormField width="20%">
           <Label>Precio</Label>
           <Segment>{formatedPrice(product?.price)}</Segment>
+        </FormField>
+        <FormField>
+          <Checkbox toggle checked={product?.editablePrice} label="Precio editable" disabled />
         </FormField>
       </FieldsContainer>
       <FieldsContainer>

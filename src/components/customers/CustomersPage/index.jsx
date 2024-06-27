@@ -1,18 +1,24 @@
 import { LIST_CUSTOMERS_QUERY_KEY, deleteCustomer } from '@/api/customers';
 import { ModalDelete } from '@/components/common/modals';
-import { Table } from '@/components/common/table';
+import { Filters, Table } from '@/components/common/table';
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from "react";
 import { toast } from 'react-hot-toast';
-import { FILTERS, HEADERS } from "../customers.common";
+import { HEADERS } from "../customers.common";
+import { Controller, Form, FormProvider, useForm } from 'react-hook-form';
+import { Input } from '@/components/common/custom';
+
+const EMPTY_FILTERS = { id: '' };
 
 const CustomersPage = ({ customers = [], isLoading }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
   const queryClient = useQueryClient();
   const { resetFilters } = usePaginationContext();
+  const methods = useForm();
+  const { handleSubmit, control, reset } = methods;
 
   const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar el cliente "${name}"?`, []);
 
@@ -53,17 +59,38 @@ const CustomersPage = ({ customers = [], isLoading }) => {
     },
   });
 
+  const onRestoreFilters = () => {
+    reset(EMPTY_FILTERS);
+    onFilter(EMPTY_FILTERS);
+  }
+
   return (
     <>
+      <FormProvider {...methods}>
+        <Form onSubmit={handleSubmit(onFilter)}>
+          <Filters onRestoreFilters={onRestoreFilters}>
+            <Controller
+              name="id"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  height="35px"
+                  margin="0"
+                  placeholder="Nombre"
+                />
+              )}
+            />
+          </Filters>
+        </Form>
+      </FormProvider>
       <Table
         isLoading={isLoading}
         headers={HEADERS}
         elements={customers.map((customer, index) => ({ ...customer, key: index + 1 }))}
         page={PAGES.CUSTOMERS}
         actions={actions}
-        filters={FILTERS}
-        onFilter={onFilter}
-        usePagination
+        showPagination
       />
       <ModalDelete
         showModal={showModal}

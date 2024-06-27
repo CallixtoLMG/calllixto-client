@@ -2,6 +2,7 @@ import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
+import ProductSearch from "@/components/common/search/search";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
@@ -11,7 +12,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
 import { List, ListItem, Message, Modal, Popup, Transition } from "semantic-ui-react";
-import ProductSearch from "../../common/search/search";
 import PDFfile from "../PDFfile";
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
@@ -26,72 +26,29 @@ const EMPTY_BUDGET = (user) => ({
 
 const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoading, isCloning, printPdfMode, draft }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [expiration, setExpiration] = useState(false);
-  const [isDraft, setIsDraft] = useState(false);
-  const [hasSubmitted, setHasSubmitted] = useState(false);
-  const { control, handleSubmit, setValue, getValues, watch, reset, trigger, setError, clearErrors, formState: { isDirty, errors, isSubmitted } } = useForm({
+  const { control, handleSubmit, setValue, getValues, watch, reset, trigger, setError, clearErrors, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
       ...budget,
       confirmed: isCloning ? false : budget?.confirmed,
       seller: `${user?.firstName} ${user?.lastName}`,
-      customer: draft ? budget.customer : null,
     } : EMPTY_BUDGET(user),
-    mode: 'onChange',
+    mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-
   const [watchProducts, watchGlobalDiscount, watchConfirmed, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'confirmed', 'customer', 'state']);
   const [total, setTotal] = useState(0);
   const productSearchRef = useRef(null);
-  const emptyCustomerOption = { id: '', name: 'Ninguno', addresses: [], phoneNumbers: [] };
-  const customerOptions = [
-    { key: emptyCustomerOption.id, value: emptyCustomerOption.id, text: emptyCustomerOption.name },
-    ...customers
-      .filter(customer => customer.id && customer.name) // Filtra clientes con ID y nombre válidos
+  const customerOptions =
+    customers.filter(customer => customer.id && customer.name)
       .map(customer => ({
         key: customer.id, value: customer.id, text: customer.name,
       }))
-  ];
-
-  const validateProducts = () => {
-    const values = getValues();
-    if (values.products.length === 0) {
-      setError('products', { type: 'manual', message: 'Al menos 1 producto es requerido.' });
-      return false;
-    } else {
-      clearErrors('products');
-      return true;
-    }
-  };
-
-  useEffect(() => {
-    if (draft && budget && budget.customer) {
-      const customer = customers.find(c => c.id === budget.customer.id);
-      if (customer) {
-        setValue('customer.id', customer.id);
-        setValue('customer.name', customer.name);
-        setValue('customer.addresses[0]', customer.addresses.length > 0 ? customer.addresses[0].address : '');
-        setValue('customer.phoneNumbers[0]', customer.phoneNumbers.length > 0 ? customer.phoneNumbers[0].number : '');
-        setSelectedCustomer(customer);
-      }
-    }
-  }, [draft, budget, customers, setValue]);
-
-  useEffect(() => {
-    if (selectedCustomer) {
-      setValue('customer.addresses[0]', selectedCustomer.addresses?.length > 0 ? selectedCustomer.addresses[0].address : '');
-      setValue('customer.phoneNumbers[0]', selectedCustomer.phoneNumbers?.length > 0 ? selectedCustomer.phoneNumbers[0].number : '');
-    } else {
-      setValue('customer.addresses[0]', '');
-      setValue('customer.phoneNumbers[0]', '');
-    }
-  }, [selectedCustomer, setValue]);
-
+    ;
   useEffect(() => {
     if (isCloning) {
       let budgetProducts = [...budget.products];
@@ -133,57 +90,20 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   }, [watchProducts, setValue]);
 
   useEffect(() => {
-    if (draft && budget && budget.customer) {
-      setValue('customer', budget.customer);
-    }
-  }, [draft, budget, setValue]);
-
-  useEffect(() => {
-    if (selectedCustomer) {
-      setValue('customer.addresses[0]', selectedCustomer?.addresses[0]?.address ?? '');
-      setValue('customer.phoneNumbers[0]', selectedCustomer?.phoneNumbers[0] ?? '');
-    } else {
-      setValue('customer.addresses[0]', '');
-      setValue('customer.phoneNumbers[0]', '');
-    }
-  }, [selectedCustomer, setValue]);
-
-  useEffect(() => {
     calculateTotal();
   }, [watchProducts, calculateTotal]);
-
-  useEffect(() => {
-    if (draft && budget && budget.customer) {
-      setSelectedCustomer(budget.customer.id);
-    }
-  }, [draft, budget]);
-
-  useEffect(() => {
-    if (!isDirty) {
-      setSelectedCustomer(null);
-    }
-  }, [isDirty]);
-
-  useEffect(() => {
-    const subscription = watch((value) => {
-      if (!value.customer) {
-        setSelectedCustomer(null);
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
-
+  
   const handleCreate = async (data, state) => {
-    if (!watchProducts.length) return;
-
-    const { seller, products, customer, confirmed, globalDiscount, expirationOffsetDays, paymentMethods, comments } = data;
-
-    const formData = {
-      seller, products, customer, confirmed, globalDiscount,
-      expirationOffsetDays, paymentMethods, comments, state
+    setValue('state', state);
+    const isvalid = validateCustomer();
+    if (isvalid) {
+      const { seller, products, customer, confirmed, globalDiscount, expirationOffsetDays, paymentMethods, comments } = data;
+      const formData = {
+        seller, products, customer: { id: customer.id, name: customer.name }, confirmed, globalDiscount,
+        expirationOffsetDays, paymentMethods, comments, state
+      };
+      await onSubmit(formData);
     };
-
-    await onSubmit(formData);
   };
 
   const currentState = useMemo(() => {
@@ -193,45 +113,31 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     return BUDGET_STATES.PENDING;
   }, [watchConfirmed]);
 
-  const handlePending = async (data) => {
-    setHasSubmitted(true);
-    setValue('state', BUDGET_STATES.PENDING.id);
-    const isProductsValid = validateProducts();
-    const isValid = await trigger();
-
-    if (isValid && isProductsValid) {
-      const values = getValues();
-      await handleCreate(values, BUDGET_STATES.PENDING.id);
+  const validateCustomer = () => {
+    const customer = getValues("customer");
+    if (watchConfirmed && (!customer.addresses.length || !customer.phoneNumbers.length)) {
+      if (!customer.addresses.length) {
+        setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
+      };
+      if (!customer.phoneNumbers.length) {
+        setError('customer.phoneNumbers', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
+      };
+      return false;
     }
-  };
-
-  const handleDraft = async () => {
-    setIsDraft(true);
-    setHasSubmitted(true);
-    setValue('state', BUDGET_STATES.DRAFT.id);
-    const isProductsValid = validateProducts();
-    const isValid = await trigger();
-
-    if (isValid && isProductsValid) {
-      const values = getValues();
-      await handleCreate(values, BUDGET_STATES.DRAFT.id);
-    }
-
-    setIsDraft(false);
+    clearErrors('customer');
+    return true;
   };
 
   const handleReset = useCallback(() => {
     reset(EMPTY_BUDGET(user));
     setValue('customer', null);
-    setSelectedCustomer(null);
-    setHasSubmitted(false)
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
   }, [reset, user, setValue]);
 
-  const handleOpenCommentModal = useCallback((product) => {
-    setSelectedProduct({ ...product });
+  const handleOpenCommentModal = useCallback((product, index) => {
+    setSelectedProduct({ ...product, index });
     setIsModalCommentOpen(true);
   }, []);
 
@@ -257,9 +163,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   ];
 
   const onAddComment = async (data) => {
-    const { comment, name, quantity } = data;
+    const { index, dispatch: { comment, name, quantity } } = data;
     const newProducts = [...watchProducts];
-    const product = newProducts.find(p => p.code === selectedProduct.code);
+    const product = newProducts[index];
     product.dispatch = {
       ...(comment && { comment }),
       ...(name && { name }),
@@ -271,6 +177,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => [
     {
+      id: 1,
       title: "Código",
       value: (product) => (
         <>
@@ -281,11 +188,28 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
         </>
       ),
-      id: 1,
       width: 1,
       align: 'left'
     },
     {
+      id: 2,
+      title: "Cantidad", value: (product, index) => (
+        <Controller name={`products[${index}].quantity`} control={control} rules={RULES.REQUIRED}
+          render={({ field: { onChange, ...rest } }) => (
+            <CurrencyFormatInput {...rest} height="35px" shadow thousandSeparator={true} decimalScale={2} displayType="input"
+              onFocus={(e) => e.target.select()} onChange={(e) => {
+                const value = e.target.value;
+                onChange(value < 0 ? Math.abs(value) : value);
+                calculateTotal();
+              }}
+            />
+          )}
+        />
+      ),
+      width: 2
+    },
+    {
+      id: 3,
       title: "Nombre",
       value: (product) => (
         <Container>
@@ -306,30 +230,39 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </Flex>
         </Container>
       ),
-      id: 2,
       width: 7,
       wrap: true,
       align: 'left'
     },
-    { title: "Precio", value: (product) => <Price value={product.price} />, id: 3, width: 2 },
     {
-      title: "Cantidad", value: (product, index) => (
-        <Controller name={`products[${index}].quantity`} control={control} rules={RULES.REQUIRED}
-          render={({ field: { onChange, ...rest } }) => (
-            <CurrencyFormatInput {...rest} height="35px" shadow thousandSeparator={true} decimalScale={2} displayType="input"
-              onFocus={(e) => e.target.select()} onChange={(e) => {
-                const value = e.target.value;
-                onChange(value < 0 ? Math.abs(value) : value);
+      id: 4,
+      title: "Precio",
+      value: (product, index) => product?.editablePrice ?
+        <Controller
+          name={`products[${index}].price`}
+          control={control}
+          render={({ field: { onChange, value } }) => (
+            <CurrencyFormatInput
+              height="35px"
+              displayType="input"
+              thousandSeparator={true}
+              decimalScale={2}
+              allowNegative={false}
+              prefix="$ "
+              customInput={Input}
+              onValueChange={value => {
+                onChange(value.floatValue);
                 calculateTotal();
               }}
+              value={value || 0}
+              placeholder="Precio"
             />
           )}
-        />
-      ),
-      id: 4,
+        /> : <Price value={product.price} />,
       width: 2
     },
     {
+      id: 5,
       title: "Descuento",
       value: (product, index) => (
         <Controller name={`products[${index}].discount`} control={control} defaultValue={product.discount || 0}
@@ -342,7 +275,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           )}
         />
       ),
-      id: 5,
       width: 1
     },
     { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 6, width: 3 },
@@ -392,7 +324,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             </Modal.Actions>
           </Modal>
         </Transition>
-        <Form onSubmit={handleSubmit(handlePending)}>
+        <Form onSubmit={handleSubmit((data) => handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id))}>
           <FieldsContainer>
             <FormField width="300px">
               <Controller name="confirmed" control={control}
@@ -415,67 +347,48 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </FieldsContainer>
           <FieldsContainer>
             <FormField width="300px">
-              <RuledLabel title="Cliente" message={errors?.customer?.name?.message} required />
+              <RuledLabel title="Cliente" message={errors?.customer?.message} required />
               <Controller
-                name="customer.name"
+                name="customer"
                 control={control}
-                rules={RULES.REQUIRED}
+                rules={{ validate: value => value?.id ? true : "Campo requerido." }}
                 render={({ field }) => (
                   <Dropdown
                     placeholder={PAGES.CUSTOMERS.NAME}
                     search
+                    clearable
                     selection
                     minCharacters={2}
                     noResultsMessage="No se ha encontrado cliente!"
                     options={customerOptions}
-                    value={selectedCustomer?.id || field.value || ''}
+                    value={field.value?.id}
                     onChange={(e, { value }) => {
-                      if (value === '') {
-                        setValue('customer.id', emptyCustomerOption.id);
-                        setValue('customer.name', emptyCustomerOption.name);
-                        setValue('customer.addresses[0]', '');
-                        setValue('customer.phoneNumbers[0]', '');
-                        setSelectedCustomer(emptyCustomerOption);
-                      } else {
-                        field.onChange(value);
-                        const customer = customers.find(opt => opt.id === value);
-                        if (customer) {
-                          setValue('customer.id', customer.id);
-                          setValue('customer.name', customer.name);
-                          setValue('customer.addresses[0]', customer.addresses.length > 0 ? customer.addresses[0].address : '');
-                          setValue('customer.phoneNumbers[0]', customer.phoneNumbers.length > 0 ? customer.phoneNumbers[0].number : '');
-                          setSelectedCustomer(customer);
-                        }
-                      }
+                      clearErrors(["customer"])
+                      if (!value) {
+                        field.onChange(null);
+                        return;
+                      };
+                      const customer = customers.find(opt => opt.id === value);
+                      field.onChange(customer);
                     }}
                   />
                 )}
               />
             </FormField>
             <FormField flex={1}>
-              <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.addresses[0]?.message} required={watchConfirmed} />
-              <Controller
-                name="customer.addresses[0]"
-                control={control}
-                rules={watchConfirmed && RULES.REQUIRED}
-                render={({ field: { value } }) => (
-                  <Segment>{draft ? (selectedCustomer?.addresses?.length > 0 ? selectedCustomer.addresses[0].address : '') : value || ''}</Segment>
-                )}
-              />
+              <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.addresses?.message} required={watchConfirmed} />
+              <Segment>{watchCustomer?.addresses[0]?.address}</Segment>
             </FormField>
             <FormField width="200px">
-              <RuledLabel title="Teléfono" message={watchConfirmed && errors?.customer?.phoneNumbers?.[0]?.message} required={watchConfirmed} />
-              <Controller name="customer.phoneNumbers[0]" control={control} rules={watchConfirmed && RULES.REQUIRED}
-                render={({ field: { value } }) => (
-                  <Segment>{value ? formatedSimplePhone(value) : ''}</Segment>
-                )}
-              />
+              <RuledLabel title="Teléfono" message={watchConfirmed && errors?.customer?.phoneNumbers?.message} required={watchConfirmed} />
+              <Segment>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
             </FormField>
           </FieldsContainer>
           <FormField width="300px">
-
-            <RuledLabel title="Agregar producto" message={!watchProducts?.length && hasSubmitted && 'Al menos 1 producto es requerido.'} required />
-            <Controller name="products" control={control} rules={{ validate: value => value && value.length > 0 }}
+            <RuledLabel title="Agregar producto" message={errors?.products?.message} required />
+            <Controller name="products"
+              control={control}
+              rules={{ validate: value => value?.length ? true : 'Al menos 1 producto es requerido.' }}
               render={({ field: { onChange, value } }) => (
                 <ProductSearch ref={productSearchRef} products={products} onProductSelect={(selectedProduct) => {
                   onChange([...value, {
@@ -515,12 +428,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               />
             </FormField>
             <FormField flex={1}>
-              <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required={!isDraft} />
+              <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
               <Controller name="expirationOffsetDays" control={control}
-                rules={{
-                  required: !isDraft && "Este campo es requerido",
-                  validate: value => isDraft || value <= 365 || 'El valor debe ser menor o igual a 365'
-                }}
+                rules={RULES.REQUIRED}
                 render={({ field }) => (
                   <Input {...field} maxLength={3} type="text" placeholder="Cant. en días (p. ej: 3, 10, etc)"
                     onChange={(e) => {
@@ -541,11 +451,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </FieldsContainer>
           <SubmitAndRestore draft={draft} isLoading={isLoading && watchState !== BUDGET_STATES.DRAFT.id}
             disabled={isLoading} isDirty={isDirty} onReset={handleReset}
-            color={currentState.color} onSubmit={handleSubmit(handlePending)}
+            color={currentState.color} onSubmit={handleSubmit((data) => handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id))}
             icon={currentState.icon} text={currentState.title}
             extraButton={
-              <Button disabled={isLoading || !isDirty} loading={isLoading && watchState !== BUDGET_STATES.PENDING.id}
-                type="button" onClick={handleDraft} color={BUDGET_STATES.DRAFT.color}>
+              <Button disabled={isLoading || !isDirty || watchConfirmed} loading={isLoading && watchState !== BUDGET_STATES.PENDING.id}
+                type="button" onClick={handleSubmit((data) => handleCreate(data, BUDGET_STATES.DRAFT.id))} color={BUDGET_STATES.DRAFT.color}>
                 <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
               </Button>
             }

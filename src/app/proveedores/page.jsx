@@ -21,7 +21,7 @@ const Suppliers = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { data, isLoading, isRefetching } = useListSuppliers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESSES, ATTRIBUTES.PHONES, ATTRIBUTES.COMMENT] });
+  const { data, isLoading } = useListSuppliers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESSES, ATTRIBUTES.PHONES, ATTRIBUTES.COMMENT] });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -49,7 +49,6 @@ const Suppliers = () => {
   return (
     <SuppliersPage
       isLoading={isLoading}
-      isRefetching={isRefetching}
       suppliers={data?.suppliers}
       role={role}
       onDelete={deleteSupplier}
