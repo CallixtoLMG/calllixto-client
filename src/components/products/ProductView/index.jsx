@@ -7,7 +7,6 @@ import { useEffect, useRef } from 'react';
 import { Barcode, ProductCode, ProductName, SubContainer } from "./styles";
 
 const ProductView = ({ product }) => {
-
   const barcodeRef = useRef(null);
 
   useEffect(() => {
