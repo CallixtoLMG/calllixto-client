@@ -4,6 +4,7 @@ import { NoPrint, OnlyPrint } from "@/components/layout";
 import { formatedPrice } from "@/utils";
 import JsBarcode from 'jsbarcode';
 import { useEffect, useRef } from 'react';
+import { Barcode, ProductCode, ProductName, SubContainer } from "./styles";
 
 const ProductView = ({ product }) => {
 
@@ -16,7 +17,6 @@ const ProductView = ({ product }) => {
         lineColor: "#000",
         width: 2,
         height: 100,
-        displayValue: true
       });
     }
   }, [product]);
@@ -49,9 +49,9 @@ const ProductView = ({ product }) => {
               <Segment>{formatedPrice(product?.price)}</Segment>
             </FormField>
             <FormField>
-          <Checkbox toggle checked={product?.editablePrice} label="Precio editable" disabled />
-        </FormField>
-      </FieldsContainer>
+              <Checkbox toggle checked={product?.editablePrice} label="Precio editable" disabled />
+            </FormField>
+          </FieldsContainer>
           <FieldsContainer>
             <Label>Comentarios</Label>
             <Segment>{product?.comments}</Segment>
@@ -59,11 +59,11 @@ const ProductView = ({ product }) => {
         </ViewContainer >
       </NoPrint>
       <OnlyPrint>
-        <FieldsContainer>
-          <FormField flex="1">
-            <svg ref={barcodeRef}></svg>
-          </FormField>
-        </FieldsContainer>
+        <SubContainer>
+          <ProductName>{product.name}</ProductName>
+          <Barcode ref={barcodeRef}></Barcode>
+          <ProductCode>{product.code}</ProductCode>
+        </SubContainer>
       </OnlyPrint>
     </>
   );
