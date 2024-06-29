@@ -138,7 +138,6 @@ const PAYMENT_METHODS = [
     key: "Mercado Pago",
     value: "Mercado Pago",
   },
-  ,
   {
     text: 'Dólares',
     key: "Dólares",

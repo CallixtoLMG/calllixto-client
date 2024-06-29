@@ -130,11 +130,10 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
 
   const handleReset = useCallback(() => {
     reset(EMPTY_BUDGET(user));
-    setValue('customer', null);
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [reset, user, setValue]);
+  }, [reset, user]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));
@@ -393,7 +392,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                 name="customer"
                 control={control}
                 rules={{ validate: value => value?.id ? true : "Campo requerido." }}
-                render={({ field }) => (
+                render={({ field: { onChange, value } }) => (
                   <Dropdown
                     placeholder={PAGES.CUSTOMERS.NAME}
                     search
@@ -402,15 +401,15 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                     minCharacters={2}
                     noResultsMessage="No se han encontrado resultados!"
                     options={customerOptions}
-                    value={field.value?.id}
+                    value={value?.id || null}
                     onChange={(e, { value }) => {
-                      clearErrors(["customer"])
+                      clearErrors(["customer"]);
                       if (!value) {
-                        field.onChange(null);
+                        onChange(null);
                         return;
                       };
                       const customer = customers.find(opt => opt.id === value);
-                      field.onChange(customer);
+                      onChange(customer);
                     }}
                   />
                 )}
@@ -418,11 +417,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             </FormField>
             <FormField flex={1}>
               <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.addresses?.message} required={watchConfirmed} />
-              <Segment>{watchCustomer?.addresses[0]?.address}</Segment>
+              <Segment placeholder>{watchCustomer?.addresses[0]?.address}</Segment>
             </FormField>
             <FormField width="200px">
               <RuledLabel title="Teléfono" message={watchConfirmed && errors?.customer?.phoneNumbers?.message} required={watchConfirmed} />
-              <Segment>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
+              <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
             </FormField>
           </FieldsContainer>
           <FormField width="300px">
@@ -472,20 +471,16 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                 name="paymentMethods"
                 control={control}
                 rules={RULES.REQUIRED}
-                defaultValue={PAYMENT_METHODS.map((method) => method.value)}
                 render={({ field: { onChange, ...rest } }) => (
                   <Dropdown
                     {...rest}
                     minHeight="50px"
                     height="fit-content"
-                    name="paymentMethods"
                     placeholder='Métodos de pago'
                     multiple
                     selection
-                    fluid
-                    minCharacters={2}
-                    noResultsMessage="No se han encontrado resultados!"
                     options={PAYMENT_METHODS}
+                    defaultValue={PAYMENT_METHODS.map(({ value }) => value)}
                     onChange={(e, { value }) => onChange(value)}
                   />
                 )}
@@ -513,13 +508,23 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               <Segment>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
             </FormField>
           </FieldsContainer>
-          <SubmitAndRestore draft={draft} isLoading={isLoading && watchState !== BUDGET_STATES.DRAFT.id}
-            disabled={isLoading} isDirty={isDirty} onReset={handleReset}
-            color={currentState.color} onSubmit={handleSubmit((data) => handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id))}
+          <SubmitAndRestore
+            draft={draft}
+            isLoading={isLoading && watchState !== BUDGET_STATES.DRAFT.id}
+            disabled={isLoading}
+            isDirty={isDirty}
+            onReset={handleReset}
+            color={currentState.color}
+            onSubmit={handleSubmit((data) => handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id))}
             icon={currentState.icon} text={currentState.title}
             extraButton={
-              <Button disabled={isLoading || !isDirty || watchConfirmed} loading={isLoading && watchState !== BUDGET_STATES.PENDING.id}
-                type="button" onClick={handleSubmit((data) => handleCreate(data, BUDGET_STATES.DRAFT.id))} color={BUDGET_STATES.DRAFT.color}>
+              <Button
+                disabled={isLoading || !isDirty || watchConfirmed}
+                loading={isLoading && watchState === BUDGET_STATES.DRAFT.id}
+                type="button"
+                onClick={handleSubmit((data) => handleCreate(data, BUDGET_STATES.DRAFT.id))}
+                color={BUDGET_STATES.DRAFT.color}
+              >
                 <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
               </Button>
             }

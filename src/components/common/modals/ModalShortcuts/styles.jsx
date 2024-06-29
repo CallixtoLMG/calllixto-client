@@ -19,6 +19,7 @@ const HelpIcon = styled(SIcon)`
   cursor: pointer;
   display: flex !important;
   align-self: center;
+  margin-right: 10px !important;
 `;
 
 const StyledListContent = styled(SList.Content)`
