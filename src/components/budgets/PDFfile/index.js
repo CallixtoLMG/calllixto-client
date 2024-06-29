@@ -25,11 +25,7 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
-  const comments = useMemo(() => {
-    const dispatchComments = budget?.products.filter(product => product.dispatch)
-      .map(product => `${product?.dispatch?.name || product?.name}${product.dispatch?.comment ? ` - ${product.dispatch?.comment}` : ''} - ${product.dispatch?.quantity || product.quantity}`);
-    return dispatchComments;
-  }, [budget?.products]);
+  const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment).map(product => product.dispatchComment), [budget?.products]);
 
   return (
     <table>

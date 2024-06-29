@@ -1,7 +1,7 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
-import { PAGES, RULES, SHORTKEYS } from "@/constants";
+import { MEASSURE_UNITS, PAGES, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback, useState } from "react";
@@ -10,9 +10,12 @@ import { Controller, useForm } from "react-hook-form";
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
-  const { handleSubmit, control, reset, formState: { isDirty, errors, isSubmitted } } = useForm({ defaultValues: product });
+  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted } } = useForm({ defaultValues: { ...product, fractionConfig: {
+    unit: MEASSURE_UNITS.MT.value,
+  } } });
   const [supplier, setSupplier] = useState();
   const [brand, setBrand] = useState();
+  const [watchFractionable] = watch(["fractionConfig.active"]);
 
   const handleReset = useCallback((product) => {
     setSupplier({ name: "", id: "" });
@@ -141,6 +144,35 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             )}
           />
         </FormField>
+      </FieldsContainer>
+      <FieldsContainer>
+        <FormField>
+          <Controller
+            name="fractionConfig.active"
+            control={control}
+            render={({ field: { value, onChange, ...rest } }) => (
+              <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Producto Fraccionable" />
+            )}
+          />
+        </FormField>
+        {watchFractionable && (
+          <FormField>
+            <Label>Unidad de Medida</Label>
+            <Controller
+              name="fractionConfig.unit"
+              control={control}
+              render={({ field: { onChange, ...rest } }) => (
+                <Dropdown
+                  {...rest}
+                  selection
+                  options={Object.values(MEASSURE_UNITS)}
+                  defaultValue={Object.values(MEASSURE_UNITS)[0].value}
+                  onChange={(e, { value }) => onChange(value)}
+                />
+              )}
+            />
+          </FormField>
+        )}
       </FieldsContainer>
       <FieldsContainer>
         <Label>Comentarios</Label>

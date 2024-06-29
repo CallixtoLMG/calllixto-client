@@ -70,8 +70,14 @@ export const formatedPercentage = (number = 0) => {
 }
 
 export const getTotal = (product) => {
-  return product.price * product.quantity * (1 - (product.discount / 100)) || 0;
+  const price = getPrice(product);
+  return price * product.quantity * (1 - (product.discount / 100)) || 0;
 };
+
+export const getPrice = (product) => {
+  const { editablePrice, fractionConfig, price} = product;
+  return editablePrice || !fractionConfig?.active ? price : fractionConfig?.value * price;
+}
 
 export const cleanValue = (value) => {
   return value.replace(/,/g, '');

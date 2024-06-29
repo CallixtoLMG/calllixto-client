@@ -1,5 +1,6 @@
 "use client";
 import { FieldsContainer, ViewContainer, FormField, Label, Segment, Checkbox } from "@/components/common/custom";
+import { MEASSURE_UNITS } from "@/constants";
 import { formatedPrice } from "@/utils";
 
 const ProductView = ({ product }) => {
@@ -31,6 +32,17 @@ const ProductView = ({ product }) => {
         <FormField>
           <Checkbox toggle checked={product?.editablePrice} label="Precio editable" disabled />
         </FormField>
+      </FieldsContainer>
+      <FieldsContainer>
+        <FormField>
+          <Checkbox toggle checked={product?.fractionConfig?.active} label="Producto fraccionable" disabled />
+        </FormField>
+        {product?.fractionConfig?.unit && (
+          <FormField>
+            <Label>Unidad de Medida</Label>
+            <Segment>{MEASSURE_UNITS[product.fractionConfig.unit.toUpperCase()].text}</Segment>
+          </FormField>
+        )}
       </FieldsContainer>
       <FieldsContainer>
         <Label>Comentarios</Label>

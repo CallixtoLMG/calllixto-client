@@ -194,3 +194,16 @@ export const SHORTKEYS = {
   LEFT_ARROW: "Control+ArrowLeft",
   DELETE: "Control+Delete",
 };
+
+export const MEASSURE_UNITS = {
+  MT: {
+    key: 'mt',
+    value: 'mt',
+    text: 'Metros',
+  },
+  KG: {
+    key: 'kg',
+    value: 'kg',
+    text: 'Kilogramos',
+  },
+};

@@ -33,61 +33,17 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
               <Segment>{product?.quantity}</Segment>
             </FormField>
           </FieldsContainer>
-          <Message info>
-            <p>Los campos <b>Nombre</b> y <b>Cantidad</b> sobreescriben al nombre y a la cantidad a mostrar <b>SOLO</b> para el PDF de remito.</p>
-          </Message>
           <Form onSubmit={handleSubmit(onAddComment)}>
             <FieldsContainer>
               <FormField flex="1">
-                <Label>Nombre Remito</Label>
-                <Controller
-                  name="dispatch.name"
-                  control={control}
-                  render={({ field }) => (
-                    <Input
-                      {...field}
-                      placeholder="Nombre remito"
-                    />
-                  )}
-                />
-              </FormField>
-              <FormField flex="1">
                 <Label>Comentario</Label>
                 <Controller
-                  name="dispatch.comment"
+                  name="dispatchComment"
                   control={control}
                   render={({ field }) => (
                     <Input
                       {...field}
                       placeholder="Comentario"
-                    />
-                  )}
-                />
-              </FormField>
-              <FormField>
-                <Label>Cantidad Remito</Label>
-                <Controller
-                  name="dispatch.quantity"
-                  control={control}
-                  render={({ field: { onChange, ...rest } }) => (
-                    <CurrencyFormatInput
-                      {...rest}
-                      height="50px"
-                      marginTop="5px"
-                      shadow
-                      thousandSeparator={true}
-                      decimalScale={2}
-                      displayType="number"
-                      placeholder="Cantidad"
-                      onFocus={(e) => e.target.select()}
-                      onChange={(e) => {
-                        const value = e.target.value;
-                        if (value < 0) {
-                          onChange(Math.abs(value));
-                          return;
-                        }
-                        onChange(value);
-                      }}
                     />
                   )}
                 />

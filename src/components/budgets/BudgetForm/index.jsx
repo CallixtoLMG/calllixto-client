@@ -7,7 +7,7 @@ import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, removeDecimal } from "@/utils";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
@@ -47,8 +47,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     customers.filter(customer => customer.id && customer.name)
       .map(customer => ({
         key: customer.id, value: customer.id, text: customer.name,
-      }))
-    ;
+      }));
   useEffect(() => {
     if (isCloning) {
       let budgetProducts = [...budget.products];
@@ -106,8 +105,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     };
   };
 
-
-
   const currentState = useMemo(() => {
     if (watchConfirmed) {
       return BUDGET_STATES.CONFIRMED;
@@ -139,7 +136,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   }, [reset, user, setValue]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
-    setSelectedProduct({ ...product, index });
+    setSelectedProduct(() => ({ ...product, index }));
     setIsModalCommentOpen(true);
   }, []);
 
@@ -159,20 +156,15 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       id: 2,
       icon: 'add',
       color: 'green',
-      onClick: (element) => handleOpenCommentModal(element),
+      onClick: (element, index) => handleOpenCommentModal(element, index),
       tooltip: 'Comentario para remito'
     },
   ];
 
-  const onAddComment = async (data) => {
-    const { index, dispatch: { comment, name, quantity } } = data;
+  const onAddComment = async ({ index, dispatchComment }) => {
     const newProducts = [...watchProducts];
     const product = newProducts[index];
-    product.dispatch = {
-      ...(comment && { comment }),
-      ...(name && { name }),
-      ...(quantity && { quantity })
-    };
+    product.dispatchComment = dispatchComment;
     setValue("products", newProducts);
     setIsModalCommentOpen(false);
   };
@@ -200,8 +192,8 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           render={({ field: { onChange, ...rest } }) => (
             <CurrencyFormatInput {...rest} height="35px" shadow thousandSeparator={true} decimalScale={2} displayType="input"
               onFocus={(e) => e.target.select()} onChange={(e) => {
-                const value = e.target.value;
-                onChange(value < 0 ? Math.abs(value) : value);
+                const value = Math.abs(e.target.value);
+                onChange(value);
                 calculateTotal();
               }}
             />
@@ -220,14 +212,8 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             {product.comments && (
               <Popup size="mini" content={product.comments} position="top center" trigger={<Box><Icon name="info circle" color="yellow" /></Box>} />
             )}
-            {(product.dispatch?.comment || product.dispatch?.name || product.dispatch?.quantity) && (
-              <Popup size="mini" content={
-                <List>
-                  {product.dispatch?.name && <ListItem>Nombre Remito: <b>{product.dispatch.name}</b></ListItem>}
-                  {product.dispatch?.comment && <ListItem>Comentario Remito: <b>{product.dispatch.comment}</b></ListItem>}
-                  {product.dispatch?.quantity && <ListItem>Cantidad Remito: <b>{product.dispatch.quantity}</b></ListItem>}
-                </List>
-              } position="top center" trigger={<Box><Icon name="truck" color="orange" /></Box>} />
+            {product.dispatchComment && (
+              <Popup size="mini" content={product.dispatchComment} position="top center" trigger={<Box><Icon name="truck" color="orange" /></Box>} />
             )}
           </Flex>
         </Container>
@@ -238,8 +224,42 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     },
     {
       id: 4,
+      title: "Medida", value: (product, index) => (
+        <>
+          {product.fractionConfig?.active ? (
+            <Flex alignItems="center">
+              <Controller name={`products[${index}].fractionConfig.value`} control={control}
+                render={({ field: { onChange, ...rest } }) => (
+                  <CurrencyFormatInput
+                    {...rest}
+                    height="35px"
+                    shadow
+                    thousandSeparator={true}
+                    decimalScale={2}
+                    displayType="number"
+                    onFocus={(e) => e.target.select()} onChange={(e) => {
+                      const value = Math.abs(e.target.value);
+                      onChange(value);
+                      setValue(`products[${index}].fractionConfig.price`, value * product.price);
+                      calculateTotal();
+                    }}
+                  />
+                )}
+              />
+              <Box mx="5px">{` ${product.fractionConfig.unit}`}</Box>
+            </Flex>
+          ) : (
+            ''
+          )}
+        </>
+      ),
+      width: 2
+    },
+    {
+      id: 5,
       title: "Precio",
-      value: (product, index) => product?.editablePrice ?
+      value: (product, index) => {
+        return product.editablePrice ?
         <Controller
           name={`products[${index}].price`}
           control={control}
@@ -260,18 +280,20 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               placeholder="Precio"
             />
           )}
-        /> : <Price value={product.price} />,
+        /> : <Price value={getPrice(product)} />
+      },
       width: 2
     },
     {
-      id: 5,
+      id: 6,
       title: "Descuento",
       value: (product, index) => (
         <Controller name={`products[${index}].discount`} control={control} defaultValue={product.discount || 0}
           render={({ field: { onChange, ...rest } }) => (
             <Input {...rest} height="35px" center fluid type="number" onFocus={(e) => e.target.select()} onChange={(e) => {
-              let value = removeDecimal(e.target.value);
-              onChange(value < 0 ? Math.abs(value) : value <= 100 ? value : 100);
+              const value = Math.abs(removeDecimal(e.target.value));
+              if (value > 100) return;
+              onChange(value);
               calculateTotal();
             }} />
           )}
@@ -280,7 +302,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       width: 1
     },
     { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 6, width: 3 },
-  ], [control, calculateTotal]);
+  ], [control, calculateTotal, setValue]);
 
   const handleDraft = async (data) => {
     await handleCreate(data, BUDGET_STATES.DRAFT.id);
@@ -404,7 +426,16 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               render={({ field: { onChange, value } }) => (
                 <ProductSearch ref={productSearchRef} products={products} onProductSelect={(selectedProduct) => {
                   onChange([...value, {
-                    ...selectedProduct, quantity: 1, discount: 0, key: Date.now().toString(36) + selectedProduct.code
+                    ...selectedProduct,
+                    quantity: 1,
+                    discount: 0,
+                    key: Date.now().toString(36),
+                    ...(selectedProduct.fractionConfig?.active && {
+                      fractionConfig: {
+                        ...selectedProduct.fractionConfig,
+                        value: 1,
+                        price: selectedProduct.price,
+                      } })
                   }]);
                 }} />
               )}

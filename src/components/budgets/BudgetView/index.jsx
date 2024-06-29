@@ -1,7 +1,7 @@
 import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getTotal, getTotalSum } from "@/utils";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum } from "@/utils";
 import { useMemo } from "react";
 import { Box, Flex } from "rebass";
 import { Popup } from "semantic-ui-react";
@@ -50,7 +50,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
         title: "Nombre",
         value: (product) => (
           <Container>
-            {product.name}
+            {product.name} {product.fractionConfig?.active && `x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}`}
             <Flex ml="7px">
               {product.comments && (
                 <Popup
@@ -86,7 +86,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
       },
       {
         title: "Precio",
-        value: (product) => <Price value={product.price} />,
+        value: (product) =>  <Price value={getPrice(product)} />,
         id: 4,
         width: 2,
       },

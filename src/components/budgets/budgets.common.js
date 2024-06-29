@@ -1,6 +1,6 @@
 import { Price } from "@/components/common/custom";
 import { BUDGET_STATES } from "@/constants";
-import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getTotal, getTotalSum } from "@/utils";
+import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getPrice, getTotal, getTotalSum } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Label } from "semantic-ui-react";
 import { CommentTooltip } from "../common/tooltips";
@@ -13,7 +13,8 @@ const ATTRIBUTES = {
   SELLER: "seller",
   PRODUCTS: "products",
   DISCOUNT: "globalDiscount",
-  STATE: "state"
+  STATE: "state",
+  FRACTION_CONFIG: "fractionConfig",
 };
 
 const BUDGETS_COLUMNS = [
@@ -61,33 +62,33 @@ const BUDGETS_COLUMNS = [
 
 const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
   const includeDiscount = budget?.products?.some(product => product.discount);
-  const includeDispatchComment = dispatchPdf;
+  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatchComment);
 
   return [
     {
       id: 1,
       title: "Cant",
       width: 1,
-      value: (product) => dispatchPdf ? product.dispatch?.quantity || product.quantity : product.quantity
+      value: (product) => product.quantity
     },
     {
       id: 2,
       title: "Nombre",
       align: "left",
       wrap: true,
-      value: (product) => dispatchPdf ? product.dispatch?.name || product.name : product.name
+      value: (product) => `${product.name} ${product.fractionConfig?.active ? ` x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}` : ''}`
     },
     !dispatchPdf && {
       id: 3,
       title: "Precio",
       width: 2,
-      value: (product) => <Price value={product.price} />
+      value: (product) => <Price value={getPrice(product)} />
     },
     !dispatchPdf && includeDiscount && {
       id: 4,
       title: "Subtotal",
       width: 2,
-      value: (product) => <Price value={formatedPricePdf(product.price * product.quantity || 0)} />
+      value: (product) => <Price value={getPrice(product) * product.quantity} />
     },
     !dispatchPdf && includeDiscount && {
       id: 5,
@@ -106,7 +107,7 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       title: "Comentario",
       width: 7,
       wrap: true,
-      value: (product) => product.dispatch?.comment || ''
+      value: (product) => product.dispatchComment
     }
   ].filter(Boolean);
 };
