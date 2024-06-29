@@ -30,7 +30,6 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
         <Modal.Actions>
           <Form onSubmit={handleSubmit(onDelete)}>
             <Input
-              margin="0"
               placeholder="Escriba 'borrar' para eliminar"
               type="text"
               value={confirmationText}

@@ -81,7 +81,6 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
                 <Input
                   {...field}
                   height="35px"
-                  margin="0"
                   placeholder="Id"
                 />
               )}
@@ -93,7 +92,6 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
                 <Input
                   {...field}
                   height="35px"
-                  margin="0"
                   placeholder="Nombre"
                 />
               )}

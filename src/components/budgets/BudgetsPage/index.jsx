@@ -3,22 +3,21 @@ import { usePaginationContext } from "@/components/common/table/Pagination";
 import { BUDGET_STATES, PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { BUDGETS_COLUMNS } from "../budgets.common";
-import { useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { Form, Label } from 'semantic-ui-react';
 import { Dropdown, Input } from '@/components/common/custom';
 import { Flex } from 'rebass';
 
 const DEFAULT_STATE = { key: 'ALL', value: 'ALL', text: 'Todos' };
-const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: DEFAULT_STATE };
+const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: DEFAULT_STATE.value };
 const STATE_OPTIONS = [
   DEFAULT_STATE,
-  ...Object.keys(BUDGET_STATES).map(key => (
+  ...Object.entries(BUDGET_STATES).map(([key, value]) => (
     {
       key,
       text: (
         <Flex alignItems="center" justifyContent="space-between">
-          {BUDGET_STATES[key].title}&nbsp;<Label color={BUDGET_STATES[key].color} circular empty />
+          {value.title}&nbsp;<Label color={value.color} circular empty />
         </Flex>
       ),
       value: key
@@ -29,24 +28,24 @@ const BudgetsPage = ({ budgets, isLoading }) => {
   const { push } = useRouter();
   const { resetFilters } = usePaginationContext();
   const methods = useForm();
-  const { handleSubmit, control, reset, getValues } = methods;
-  const [selectedStateColor, setSelectedStateColor] = useState();
+  const { handleSubmit, control, reset, setValue, watch, resetField } = methods;
+  const [watchState] = watch(['state']);
 
   const onFilter = (data) => {
     const filters = { ...data };
-    if (data.code) {
+    if (data.id) {
       filters.sort = "id";
+      setValue('state', DEFAULT_STATE.value);
     }
     if (data.customer) {
       filters.sort = "customer";
+      if (data.state === DEFAULT_STATE.value) {
+        setValue('state', BUDGET_STATES.PENDING.id);
+      }
     }
     if (data.seller) {
       filters.sort = "seller";
     }
-    if (data.state === 'ALL') {
-      delete filters.state;
-    }
-    setSelectedStateColor(Object.values(BUDGET_STATES).find(state => state.id === filters.state)?.color);
     resetFilters(filters);
   };
 
@@ -73,19 +72,20 @@ const BudgetsPage = ({ budgets, isLoading }) => {
             <Controller
               name="state"
               control={control}
-              render={({ field: { onChange, value, ...rest } }) => (
+              render={({ field: { onChange, ...rest } }) => (
                 <Dropdown
                   {...rest}
                   width="500px"
-                  margin="0"
                   top="10px"
                   height="fit-content"
                   selection
-                  fluid
                   options={STATE_OPTIONS}
-                  defaultValue={STATE_OPTIONS[0].value}
-                  value={value?.key}
+                  defaultValue={STATE_OPTIONS[0].key}
                   onChange={(e, { value }) => {
+                    if (value === DEFAULT_STATE.value) {
+                      resetField('customer');
+                      resetField('seller');
+                    }
                     onChange(value);
                     handleSubmit(onFilter)();
                   }}
@@ -99,7 +99,6 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                 <Input
                   {...field}
                   height="35px"
-                  margin="0"
                   placeholder="Id"
                 />
               )}
@@ -111,7 +110,6 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                 <Input
                   {...field}
                   height="35px"
-                  margin="0"
                   placeholder="Cliente"
                 />
               )}
@@ -123,7 +121,6 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                 <Input
                   {...field}
                   height="35px"
-                  margin="0"
                   placeholder="Vendedor"
                 />
               )}
@@ -137,7 +134,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
         elements={budgets}
         page={PAGES.BUDGETS}
         actions={actions}
-        color={selectedStateColor}
+        color={BUDGET_STATES[watchState]?.color}
         showPagination
       />
     </>

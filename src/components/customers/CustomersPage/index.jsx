@@ -76,7 +76,6 @@ const CustomersPage = ({ customers = [], isLoading }) => {
                 <Input
                   {...field}
                   height="35px"
-                  margin="0"
                   placeholder="Nombre"
                 />
               )}
