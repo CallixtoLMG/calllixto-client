@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button, Icon, List, Modal, Transition } from 'semantic-ui-react';
+import { Button, Icon, List, Modal, Popup, Transition } from 'semantic-ui-react';
 import { HelpIcon, StyledListContent, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader } from "./styles";
 
 const KeyboardShortcuts = () => {
@@ -7,7 +7,12 @@ const KeyboardShortcuts = () => {
 
   return (
     <>
-      <HelpIcon size='large' name='keyboard' color='orange' onClick={() => setOpen(true)} />
+      <Popup
+        content='Accesos rápidos'
+        trigger={<HelpIcon size='large' name='keyboard' color='blue' onClick={() => setOpen(true)} />}
+        position='bottom right'
+        size='tiny'
+      />
       <Transition visible={open} animation='scale' duration={500}>
         <Modal open={open} onClose={() => setOpen(false)}>
           <StyledModalHeader icon='keyboard' content='Accesos rápidos del teclado' />

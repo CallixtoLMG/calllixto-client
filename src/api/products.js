@@ -81,7 +81,7 @@ export function useListProducts({
   return query;
 }
 
-export function useListAllProducts({ attributes = [], enabled = false } = {}) {
+export function useListAllProducts({ attributes = [], enabled = false, code } = {}) {
   const listProducts = async () => {
     try {
       let products = [];
@@ -89,6 +89,7 @@ export function useListAllProducts({ attributes = [], enabled = false } = {}) {
 
       do {
         const params = {
+          code,
           attributes: encodeUri(attributes),
           ...(LastEvaluatedKey && {
             LastEvaluatedKey: encodeUri(LastEvaluatedKey),

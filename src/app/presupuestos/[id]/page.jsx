@@ -113,6 +113,7 @@ const Budget = ({ params }) => {
       setConfirmed(budget.state === BUDGET_STATES.CONFIRMED.id);
     }
   }, [setLabels, budget, push, isLoading]);
+  
   useEffect(() => {
     if (budget) {
       const printButtons = [
