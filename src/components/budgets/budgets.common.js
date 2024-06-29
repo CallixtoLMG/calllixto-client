@@ -112,27 +112,39 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
   ].filter(Boolean);
 };
 
-const PAYMENT_METHODS = [{
-  text: 'Efectivo',
-  key: "Efectivo",
-  value: "Efectivo",
-}, {
-  text: 'Transferencia Bancaria',
-  key: "Transferencia Bancaria",
-  value: "Transferencia Bancaria",
-}, {
-  text: 'Tarjeta de débito',
-  key: "Tarjeta de débito",
-  value: "Tarjeta de débito",
-}, {
-  text: 'Tarjeta de crédito',
-  key: "Tarjeta de crédito",
-  value: "Tarjeta de crédito",
-}, {
-  text: 'Mercado Pago',
-  key: "Mercado Pago",
-  value: "Mercado Pago",
-},];
+const PAYMENT_METHODS = [
+  {
+    text: 'Efectivo',
+    key: "Efectivo",
+    value: "Efectivo",
+  },
+  {
+    text: 'Transferencia Bancaria',
+    key: "Transferencia Bancaria",
+    value: "Transferencia Bancaria",
+  },
+  {
+    text: 'Tarjeta de débito',
+    key: "Tarjeta de débito",
+    value: "Tarjeta de débito",
+  },
+  {
+    text: 'Tarjeta de crédito',
+    key: "Tarjeta de crédito",
+    value: "Tarjeta de crédito",
+  },
+  {
+    text: 'Mercado Pago',
+    key: "Mercado Pago",
+    value: "Mercado Pago",
+  },
+  ,
+  {
+    text: 'Dólares',
+    key: "Dólares",
+    value: "Dólares",
+  }
+];
 
 export { ATTRIBUTES, BUDGETS_COLUMNS, PAYMENT_METHODS, PRODUCTS_COLUMNS };
 

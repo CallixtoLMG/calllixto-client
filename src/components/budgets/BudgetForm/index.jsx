@@ -400,7 +400,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                     clearable
                     selection
                     minCharacters={2}
-                    noResultsMessage="No se ha encontrado cliente!"
+                    noResultsMessage="No se han encontrado resultados!"
                     options={customerOptions}
                     value={field.value?.id}
                     onChange={(e, { value }) => {
@@ -467,21 +467,26 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </FieldsContainer>
           <FieldsContainer>
             <FormField flex={3}>
-              <Label>Metodos de pago</Label>
-              <Controller name={`paymentMethods`} control={control} rules={{ required: true }}
+              <Label>Métodos de pago</Label>
+              <Controller
+                name="paymentMethods"
+                control={control}
+                rules={RULES.REQUIRED}
                 defaultValue={PAYMENT_METHODS.map((method) => method.value)}
-                render={({ field }) => (
+                render={({ field: { onChange, ...rest } }) => (
                   <Dropdown
+                    {...rest}
                     minHeight="50px"
                     height="fit-content"
-                    name={`paymentMethods`}
-                    placeholder='Metodos de pago'
+                    name="paymentMethods"
+                    placeholder='Métodos de pago'
                     multiple
                     selection
                     fluid
                     minCharacters={2}
-                    noResultsMessage="No se ha encontrado metodo!" options={PAYMENT_METHODS}
-                    value={field.value} onChange={(e, { value }) => field.onChange(value)}
+                    noResultsMessage="No se han encontrado resultados!"
+                    options={PAYMENT_METHODS}
+                    onChange={(e, { value }) => onChange(value)}
                   />
                 )}
               />
