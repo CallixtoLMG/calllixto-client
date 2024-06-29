@@ -36,6 +36,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
     if (data.id) {
       filters.sort = "id";
       setValue('state', DEFAULT_STATE.value);
+      delete filters.state;
     }
     if (data.customer) {
       filters.sort = "customer";
@@ -45,6 +46,9 @@ const BudgetsPage = ({ budgets, isLoading }) => {
     }
     if (data.seller) {
       filters.sort = "seller";
+      if (data.state === DEFAULT_STATE.value) {
+        setValue('state', BUDGET_STATES.PENDING.id);
+      }
     }
     resetFilters(filters);
   };
@@ -82,6 +86,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                   options={STATE_OPTIONS}
                   defaultValue={STATE_OPTIONS[0].key}
                   onChange={(e, { value }) => {
+                    resetField('id');
                     if (value === DEFAULT_STATE.value) {
                       resetField('customer');
                       resetField('seller');
@@ -95,33 +100,48 @@ const BudgetsPage = ({ budgets, isLoading }) => {
             <Controller
               name="id"
               control={control}
-              render={({ field }) => (
+              render={({ field: { onChange, ...rest } }) => (
                 <Input
-                  {...field}
+                  {...rest}
                   height="35px"
                   placeholder="Id"
+                  onChange={(e) => {
+                    resetField('customer');
+                    resetField('seller');
+                    onChange(e.target.value);
+                  }}
                 />
               )}
             />
             <Controller
               name="customer"
               control={control}
-              render={({ field }) => (
+              render={({ field: { onChange, ...rest } }) => (
                 <Input
-                  {...field}
+                  {...rest}
                   height="35px"
                   placeholder="Cliente"
+                  onChange={(e) => {
+                    resetField('id');
+                    resetField('seller');
+                    onChange(e.target.value);
+                  }}
                 />
               )}
             />
             <Controller
               name="seller"
               control={control}
-              render={({ field }) => (
+              render={({ field: { onChange, ...rest} }) => (
                 <Input
-                  {...field}
+                  {...rest}
                   height="35px"
                   placeholder="Vendedor"
+                  onChange={(e) => {
+                    resetField('customer');
+                    resetField('id');
+                    onChange(e.target.value);
+                  }}
                 />
               )}
             />
