@@ -1,15 +1,17 @@
 "use client";
 import { GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, edit, useGetProduct } from "@/api/products";
-import { Loader, NoPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import ProductView from "../../../components/products/ProductView";
+import { SubContainer, Barcode, ProductCode, ProductName } from "@/components/products/ProductView/styles";
+import JsBarcode from "jsbarcode";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -63,16 +65,37 @@ const Product = ({ params }) => {
       setActions(actions);
     }
   }, [product, setActions]);
+  const barcodeRef = useRef(null);
+
+  useEffect(() => {
+    if (product?.code && barcodeRef.current) {
+      JsBarcode(barcodeRef.current, product.code, {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 2,
+        height: 100,
+      });
+    }
+  }, [product]);
 
   return (
     <Loader active={isLoading}>
       <NoPrint>
         {Toggle}
+        {allowUpdate ? (
+          <ProductForm product={product} onSubmit={mutate} isUpdating isLoading={isPending} />
+        ) : (
+          <ProductView product={product} />
+        )}
       </NoPrint>
-      {allowUpdate ? (
-        <ProductForm product={product} onSubmit={mutate} isUpdating isLoading={isPending} />
-      ) : (
-        <ProductView product={product} />
+      {product && (
+        <OnlyPrint>
+          <SubContainer>
+            <ProductName>{product.name}</ProductName>
+            <Barcode ref={barcodeRef}></Barcode>
+            <ProductCode>{product.code}</ProductCode>
+          </SubContainer>
+        </OnlyPrint>
       )}
     </Loader>
   )
