@@ -10,9 +10,13 @@ import { Controller, useForm } from "react-hook-form";
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
-  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted } } = useForm({ defaultValues: { ...product, fractionConfig: {
-    unit: MEASSURE_UNITS.MT.value,
-  } } });
+  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted } } = useForm({
+    defaultValues: {
+      fractionConfig: {
+        unit: MEASSURE_UNITS.MT.value,
+      }, ...product,
+    }
+  });
   const [supplier, setSupplier] = useState();
   const [brand, setBrand] = useState();
   const [watchFractionable] = watch(["fractionConfig.active"]);

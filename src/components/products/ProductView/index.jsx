@@ -37,7 +37,7 @@ const ProductView = ({ product }) => {
         <FormField>
           <Checkbox toggle checked={product?.fractionConfig?.active} label="Producto fraccionable" disabled />
         </FormField>
-        {product?.fractionConfig?.unit && (
+        {product?.fractionConfig?.active && (
           <FormField>
             <Label>Unidad de Medida</Label>
             <Segment>{MEASSURE_UNITS[product.fractionConfig.unit.toUpperCase()].text}</Segment>
