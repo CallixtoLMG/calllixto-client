@@ -7,6 +7,7 @@ import { Header } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, Container, FooterCell, HeaderCell, InnerActionsContainer, LinkRow, Table, TableHeader, TableRow } from "./styles";
 import { Paginator } from "./Pagination";
+import { Flex } from "rebass";
 
 const CustomTable = ({
   showTotal,
@@ -103,22 +104,21 @@ const CustomTable = ({
                   <FooterCell textAlign="center" colSpan={headers.length - 5}><strong>TOTAL</strong></FooterCell>
                   {!readOnly ? (
                     <FooterCell colSpan="1">
-                      <Input
-                        height="35px"
-                        type="number"
-                        center
-                        fluid
-                        defaultValue={globalDiscount}
-                        onFocus={(e) => e.target.select()}
-                        onChange={(e) => {
-                          let value = removeDecimal(e.target.value);
-                          if (value > 100) return;
-                          if (value < 0) {
-                            return;
-                          }
-                          setGlobalDiscount(value);
-                        }}
-                      />
+                      <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>
+                        <Input
+                          height="35px"
+                          type="number"
+                          value={globalDiscount}
+                          onFocus={(e) => e.target.select()}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            if (value > 100) return;
+                            if (value < 0) return;
+                            setGlobalDiscount(value);
+                          }}
+                        />
+                        %
+                      </Flex>
                     </FooterCell>) : (
                     <FooterCell textAlign="center" colSpan="1">
                       {formatedPercentage(globalDiscount)}

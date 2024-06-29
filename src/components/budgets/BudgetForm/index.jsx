@@ -11,10 +11,11 @@ import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, f
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
-import { List, ListItem, Message, Modal, Popup, Transition } from "semantic-ui-react";
+import { GridColumn, Message, Modal, Popup, Transition } from "semantic-ui-react";
 import PDFfile from "../PDFfile";
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
+import { v4 as uuid } from 'uuid';
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -218,7 +219,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </Flex>
         </Container>
       ),
-      width: 7,
+      width: 6,
       wrap: true,
       align: 'left'
     },
@@ -234,7 +235,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                     {...rest}
                     height="35px"
                     shadow
-                    thousandSeparator={true}
                     decimalScale={2}
                     displayType="number"
                     onFocus={(e) => e.target.select()} onChange={(e) => {
@@ -260,27 +260,28 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       title: "Precio",
       value: (product, index) => {
         return product.editablePrice ?
-        <Controller
-          name={`products[${index}].price`}
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <CurrencyFormatInput
-              height="35px"
-              displayType="input"
-              thousandSeparator={true}
-              decimalScale={2}
-              allowNegative={false}
-              prefix="$ "
-              customInput={Input}
-              onValueChange={value => {
-                onChange(value.floatValue);
-                calculateTotal();
-              }}
-              value={value || 0}
-              placeholder="Precio"
-            />
-          )}
-        /> : <Price value={getPrice(product)} />
+          <Controller
+            name={`products[${index}].price`}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>$
+                <CurrencyFormatInput
+                  height="35px"
+                  displayType="input"
+                  thousandSeparator={true}
+                  decimalScale={2}
+                  allowNegative={false}
+                  customInput={Input}
+                  onValueChange={value => {
+                    onChange(value.floatValue);
+                    calculateTotal();
+                  }}
+                  value={value || 0}
+                  placeholder="Precio"
+                />
+              </Flex>
+            )}
+          /> : <Price value={getPrice(product)} />
       },
       width: 2
     },
@@ -288,16 +289,22 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       id: 6,
       title: "Descuento",
       value: (product, index) => (
-        <Controller name={`products[${index}].discount`} control={control} defaultValue={product.discount || 0}
-          render={({ field: { onChange, ...rest } }) => (
-            <Input {...rest} height="35px" center fluid type="number" onFocus={(e) => e.target.select()} onChange={(e) => {
-              const value = Math.abs(removeDecimal(e.target.value));
-              if (value > 100) return;
-              onChange(value);
-              calculateTotal();
-            }} />
-          )}
-        />
+        <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>
+          <Controller name={`products[${index}].discount`} control={control} defaultValue={product.discount || 0}
+            render={({ field: { onChange, ...rest } }) => (
+              <Input
+                {...rest}
+                height="35px"
+                type="number"
+                onFocus={(e) => e.target.select()} onChange={(e) => {
+                  const value = Math.abs(removeDecimal(e.target.value));
+                  if (value > 100) return;
+                  onChange(value);
+                  calculateTotal();
+                }} />
+            )}
+          /> %
+        </Flex>
       ),
       width: 1
     },
@@ -422,28 +429,37 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             <RuledLabel title="Agregar producto" message={errors?.products?.message} required />
             <Controller name="products"
               control={control}
-              rules={{ validate: value => value?.length ? true : 'Al menos 1 producto es requerido.' }}
+              rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
               render={({ field: { onChange, value } }) => (
-                <ProductSearch ref={productSearchRef} products={products} onProductSelect={(selectedProduct) => {
-                  onChange([...value, {
-                    ...selectedProduct,
-                    quantity: 1,
-                    discount: 0,
-                    key: Date.now().toString(36),
-                    ...(selectedProduct.fractionConfig?.active && {
-                      fractionConfig: {
-                        ...selectedProduct.fractionConfig,
-                        value: 1,
-                        price: selectedProduct.price,
-                      } })
-                  }]);
-                }} />
+                <ProductSearch
+                  ref={productSearchRef}
+                  products={products}
+                  onProductSelect={(selectedProduct) => {
+                    onChange([...watchProducts, {
+                      ...selectedProduct,
+                      quantity: 1,
+                      discount: 0,
+                      key: uuid(),
+                      ...(selectedProduct.fractionConfig?.active && {
+                        fractionConfig: {
+                          ...selectedProduct.fractionConfig,
+                          value: 1,
+                          price: selectedProduct.price,
+                        }
+                      })
+                    }]);
+                  }} />
               )}
             />
           </FormField>
-          <Table mainKey="key" headers={BUDGET_FORM_PRODUCT_COLUMNS} elements={watchProducts}
-            actions={actions} total={total} globalDiscount={watchGlobalDiscount || 0}
-            setGlobalDiscount={(value) => setValue('globalDiscount', value)} showTotal={!!watchProducts.length}
+          <Table
+            mainKey="key"
+            headers={BUDGET_FORM_PRODUCT_COLUMNS} elements={watchProducts}
+            actions={actions}
+            total={total}
+            globalDiscount={watchGlobalDiscount || 0}
+            setGlobalDiscount={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
+            showTotal={!!watchProducts.length}
           />
           <FieldsContainer>
             <Label>Comentarios</Label>

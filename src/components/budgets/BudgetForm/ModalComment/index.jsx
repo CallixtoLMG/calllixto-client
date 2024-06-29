@@ -1,13 +1,13 @@
-import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, Segment, TextArea } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Message, Modal, Transition } from "semantic-ui-react";
+import { Button, Modal, Transition } from "semantic-ui-react";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const { control, handleSubmit, formState: { isDirty }, reset } = useForm();
 
   useEffect(() => {
-    reset(product ? product : {});
+    reset({ dispatchComment: '', ...product });
   }, [isModalOpen, product, reset]);
 
   return (
