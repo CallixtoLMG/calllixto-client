@@ -1,16 +1,16 @@
 import { LIST_BRANDS_QUERY_KEY, deleteBrand } from "@/api/brands";
+import { Input } from "@/components/common/custom";
 import { ModalDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
+import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import { toast } from "react-hot-toast";
-import { BRAND_COLUMNS } from "../brands.common";
-import { RULES } from "@/roles";
 import { Controller, FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
-import { Input } from "@/components/common/custom";
+import { BRAND_COLUMNS } from "../brands.common";
 
 const EMPTY_FILTERS = { id: '', name: '' };
 
@@ -79,6 +79,7 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
               control={control}
               render={({ field }) => (
                 <Input
+                  marginBottom
                   {...field}
                   height="35px"
                   placeholder="Id"
@@ -91,6 +92,7 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
               render={({ field }) => (
                 <Input
                   {...field}
+                  marginBottom
                   height="35px"
                   placeholder="Nombre"
                 />

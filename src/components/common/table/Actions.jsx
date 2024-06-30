@@ -13,7 +13,7 @@ const Actions = ({ actions, element, index }) => {
           size="mini"
           content={action.tooltip}
           key={`action_${action.id}`}
-          position="top center"
+          position="top right"
           trigger={<Button
             type="button"
             icon={action.icon}

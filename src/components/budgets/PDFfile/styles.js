@@ -93,14 +93,13 @@ const PayMethodsContainer = styled(Flex)`
 `;
 
 const Segment = styled(SSegment)`
-  min-height: ${(props) => props.minHeight || ""};
-  margin-top: ${(props) => props.marginTop || "5px"} !important;
+  min-height: ${({ minHeight }) => minHeight || ""};
+  margin-top: ${({ marginTop }) => marginTop || "5px"} !important;
   box-shadow: 0 0 0 0 !important;
   background-color: white !important;
   border: 0.5px solid grey !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
-  height:  ${({ height = '30px' }) => height} !important;
   padding: ${({ padding = '0 5px' }) => padding} !important;
   line-height: 28px!important;
   `;

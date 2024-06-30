@@ -5,8 +5,8 @@ const OnlyPrintContainer = styled.div`
   @media print {
     display: block;
     @page {
-      margin-left: -60px;
-      margin-right: -60px;
+      margin-left: 0px;
+      margin-right: 0px;
       margin-top: 0;
       margin-bottom: 25px;
     }

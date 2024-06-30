@@ -14,7 +14,6 @@ const Cell = styled(STable.Cell)`
 const Container = styled(Flex)`
   box-shadow: 0 1px 2px 0 rgba(34, 36, 38, .15) !important;
   flex-direction: column;
-  margin: 15px 0!important;
   width: 100% !important;
   max-height: ${({ tableHeight = 'none' }) => `${tableHeight}!important`};
   overflow-y: ${({ tableHeight }) => tableHeight && "auto"} !important;

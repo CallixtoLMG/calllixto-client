@@ -1,16 +1,16 @@
 import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
+import { Input } from "@/components/common/custom";
 import { ModalDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
+import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import { toast } from "react-hot-toast";
-import { PRODUCT_COLUMNS } from "../products.common";
-import { RULES } from "@/roles";
 import { Controller, FormProvider, useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
-import { Input } from "@/components/common/custom";
+import { PRODUCT_COLUMNS } from "../products.common";
 
 const EMPTY_FILTERS = { code: '', name: '' };
 
@@ -84,6 +84,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
               render={({ field }) => (
                 <Input
                   {...field}
+                  marginBottom
                   height="35px"
                   placeholder="Código"
                 />
@@ -95,6 +96,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
               render={({ field }) => (
                 <Input
                   {...field}
+                  marginBottom
                   height="35px"
                   placeholder="Nombre"
                 />

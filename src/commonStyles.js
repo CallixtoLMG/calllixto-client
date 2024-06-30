@@ -7,6 +7,7 @@ const MainContainer = styled(Flex)`
 `;
 
 const SubContainer = styled(Flex)`
+  row-gap: 15px;
   margin: 85px 20px 20px 20px!important;
   flex-direction: column;
   width: 90%!important;

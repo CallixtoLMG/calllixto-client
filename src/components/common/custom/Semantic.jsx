@@ -24,7 +24,7 @@ export const Segment = styled(SSegment)`
 `;
 
 export const Input = styled(SInput)`
-  margin: ${({ margin = "5px 0" }) => margin} !important;
+  margin: ${({ marginBottom }) => marginBottom ? "5px 0" : "5px 0 0 0"} !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   height: ${({ height = '50px' }) => height} !important;
@@ -60,7 +60,7 @@ export const FormField = styled(Form.Field)`
   width: ${({ width = '200px' }) => `${width}!important`};
   min-width: ${({ minWidth = '200px' }) => `${minWidth}!important`};
   flex: ${({ flex = 'none' }) => `${flex}!important`};
-  margin: 0 !important;
+  margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
 `;
 
@@ -71,7 +71,7 @@ export const Label = styled(SLabel)`
 `;
 
 export const TextArea = styled(STextarea)`
-  margin: 5px 0 !important;
+  margin: 5px 0 0 0!important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem;
   resize: ${({ resize = "none" }) => `${resize}!important`};
@@ -79,7 +79,7 @@ export const TextArea = styled(STextarea)`
 
 export const Dropdown = styled(SDropdown)`
   min-width: ${({ minWidth }) => `${minWidth}!important;`};
-  margin: ${({ margin = "5px 0" }) => `${margin}!important;`};
+  margin: ${({ margin = "5px 0 0 0" }) => `${margin}!important;`};
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
   height: ${({ height = "50px" }) => `${height}!important`};

@@ -164,13 +164,6 @@ const Budget = ({ params }) => {
         }] : [])
       ];
 
-      const scrollToTopAndPrint = () => {
-        window.scrollTo(0, 0);
-        setTimeout(() => {
-          window.print();
-        }, 500); 
-      };
-
       const actions = [
         {
           id: 1,
@@ -185,7 +178,7 @@ const Budget = ({ params }) => {
                     key={mode}
                     onClick={() => {
                       setPrintPdfMode(mode);
-                      setTimeout(scrollToTopAndPrint, 0);
+                      setTimeout(window.print);
                     }}
                     color={color}
                     iconName={iconName}

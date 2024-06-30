@@ -32,7 +32,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [expiration, setExpiration] = useState(false);
-  const { control, handleSubmit, setValue, getValues, watch, reset, trigger, setError, clearErrors, formState: { isDirty, errors } } = useForm({
+  const { control, handleSubmit, setValue, getValues, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
       ...budget,
       confirmed: isCloning ? false : budget?.confirmed,
@@ -130,11 +130,12 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
 
   const handleReset = useCallback(() => {
     if (draft || isCloning) {
-      reset(budget ? {
+      reset({
+        ...EMPTY_BUDGET(user),
         ...budget,
         confirmed: isCloning ? false : budget?.confirmed,
         seller: `${user?.firstName} ${user?.lastName}`,
-      } : EMPTY_BUDGET(user));
+      });
     } else {
       reset({
         ...EMPTY_BUDGET(user),
@@ -147,6 +148,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       productSearchRef.current.clear();
     }
   }, [reset, user, draft, isCloning, budget]);
+
+  const handleOpenCommentModal = useCallback((product, index) => {
+    setSelectedProduct(() => ({ ...product, index }));
+    setIsModalCommentOpen(true);
+  }, []);
 
   const handleModalCommentClose = () => setIsModalCommentOpen(false);
 
@@ -198,7 +204,12 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       title: "Cantidad", value: (product, index) => (
         <Controller name={`products[${index}].quantity`} control={control} rules={RULES.REQUIRED}
           render={({ field: { onChange, ...rest } }) => (
-            <CurrencyFormatInput {...rest} height="35px" shadow thousandSeparator={true} decimalScale={2} displayType="input"
+            <CurrencyFormatInput
+              {...rest}
+              height="35px"
+              shadow
+              decimalScale={2}
+              displayType="input"
               onFocus={(e) => e.target.select()} onChange={(e) => {
                 const value = Math.abs(e.target.value);
                 onChange(value);
@@ -279,6 +290,8 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                   decimalScale={2}
                   allowNegative={false}
                   customInput={Input}
+                  marginBottom
+                  textAlignLast="right"
                   onValueChange={value => {
                     onChange(value.floatValue);
                     calculateTotal();
@@ -301,6 +314,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             render={({ field: { onChange, ...rest } }) => (
               <Input
                 {...rest}
+                marginBottom
                 height="35px"
                 type="number"
                 onFocus={(e) => e.target.select()} onChange={(e) => {
@@ -313,7 +327,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           /> %
         </Flex>
       ),
-      width: 1
+      width: 2
     },
     { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 6, width: 3 },
   ], [control, calculateTotal, setValue]);
@@ -521,6 +535,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             isLoading={isLoading && watchState !== BUDGET_STATES.DRAFT.id}
             disabled={isLoading}
             isDirty={isDirty}
+            isUpdating={draft || isCloning}
             onReset={handleReset}
             color={currentState.color}
             onSubmit={handleSubmit((data) => handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id))}

@@ -1,14 +1,14 @@
 import { LIST_CUSTOMERS_QUERY_KEY, deleteCustomer } from '@/api/customers';
+import { Input } from '@/components/common/custom';
 import { ModalDelete } from '@/components/common/modals';
 import { Filters, Table } from '@/components/common/table';
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from "react";
+import { Controller, Form, FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { HEADERS } from "../customers.common";
-import { Controller, Form, FormProvider, useForm } from 'react-hook-form';
-import { Input } from '@/components/common/custom';
 
 const EMPTY_FILTERS = { id: '' };
 
@@ -74,6 +74,7 @@ const CustomersPage = ({ customers = [], isLoading }) => {
               control={control}
               render={({ field }) => (
                 <Input
+                  marginBottom
                   {...field}
                   height="35px"
                   placeholder="Nombre"

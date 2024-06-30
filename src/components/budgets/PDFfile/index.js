@@ -55,7 +55,7 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
       <tbody>
         <tr>
           <td>
-            <div style={{ width: '80vw' }}>
+            <div style={{ width: '90vw' }}>
               <Divider />
               <ClientDataContainer>
                 <DataContainer flex="1">
@@ -151,7 +151,9 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
               {(!!comments?.length || budget?.comments) && (
                 <DataContainer width="100%">
                   <Label>Comentarios</Label>
-                  <Segment marginTop="0" height="fit-content" padding="5px">
+                  <Segment
+                    marginTop="0"
+                    padding="5px">
                     {budget?.comments}
                     {!!comments.length && !dispatchPdf && (
                       <Box marginTop="2px">

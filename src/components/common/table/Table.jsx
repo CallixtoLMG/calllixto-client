@@ -105,6 +105,8 @@ const CustomTable = ({
                     <FooterCell colSpan="1">
                       <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>
                         <Input
+                          marginBottom
+                          center
                           height="35px"
                           type="number"
                           value={globalDiscount}
