@@ -27,6 +27,7 @@ export const Input = styled(SInput)`
   margin: ${({ marginBottom }) => marginBottom ? "5px 0" : "5px 0 0 0"} !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
+ max-width: ${({ maxWidth }) => maxWidth && `200px!important;`};
   height: ${({ height = '50px' }) => height} !important;
   width: ${({ width = '100%' }) => `${width}!important`};
   display: flex!important;
@@ -79,6 +80,7 @@ export const TextArea = styled(STextarea)`
 
 export const Dropdown = styled(SDropdown)`
   min-width: ${({ minWidth }) => `${minWidth}!important;`};
+  max-width: ${({ maxWidth }) => maxWidth && `200px!important;`};
   margin: ${({ margin = "5px 0 0 0" }) => `${margin}!important;`};
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;

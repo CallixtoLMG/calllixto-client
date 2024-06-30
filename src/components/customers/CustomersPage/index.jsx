@@ -75,6 +75,7 @@ const CustomersPage = ({ customers = [], isLoading }) => {
               render={({ field }) => (
                 <Input
                   marginBottom
+                  maxWidth
                   {...field}
                   height="35px"
                   placeholder="Nombre"

@@ -1,10 +1,10 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
 import { Table } from "@/components/common/table";
-import { NoPrint, OnlyPrint } from "@/components/layout";
+import { Loader, NoPrint, OnlyPrint } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, removeDecimal } from "@/utils";
@@ -27,10 +27,13 @@ const EMPTY_BUDGET = (user) => ({
 
 const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoading, isCloning, printPdfMode, draft }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
+  const hasShownModal = useRef(false);
+  const [isTableLoading, setIsTableLoading] = useState(false);
+  const [shouldShowModal, setShouldShowModal] = useState(false);
+  const [temporaryProducts, setTemporaryProducts] = useState([]);
   const [expiration, setExpiration] = useState(false);
   const { control, handleSubmit, setValue, getValues, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
@@ -49,8 +52,10 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       .map(customer => ({
         key: customer.id, value: customer.id, text: customer.name,
       }));
+
   useEffect(() => {
-    if (isCloning) {
+    if (isCloning && !hasShownModal.current) {
+      setIsTableLoading(true);
       let budgetProducts = [...budget.products];
       const outdatedProducts = products.filter(product => {
         const budgetProduct = budgetProducts.find(budgetProduct => budgetProduct.code === product.code);
@@ -70,13 +75,27 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           }
           return product;
         });
-        setValue('products', newProducts);
+        setTemporaryProducts(newProducts);
         setOutdatedProducts(outdatedProducts);
         setRemovedProducts(budgetProducts);
-        setIsUpdateModalOpen(true);
+        setShouldShowModal(true);
+        hasShownModal.current = true;
+      } else {
+        setIsTableLoading(false);
       }
     }
   }, [budget, isCloning, products, watchProducts, setValue]);
+
+  const handleConfirmUpdate = () => {
+    setValue('products', temporaryProducts);
+    setShouldShowModal(false);
+    setIsTableLoading(false);
+  };
+
+  const handleCancelUpdate = () => {
+    setShouldShowModal(false);
+    setIsTableLoading(false);
+  };
 
   const calculateTotal = useCallback(() => {
     const totalSum = getTotalSum(watchProducts, watchGlobalDiscount);
@@ -155,8 +174,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   }, []);
 
   const handleModalCommentClose = () => setIsModalCommentOpen(false);
-
-  const handleUpdateModalClose = () => setIsUpdateModalOpen(false);
 
   const actions = [
     {
@@ -348,9 +365,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     <>
       <NoPrint>
         <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={handleModalCommentClose} product={selectedProduct} />
-        <Transition visible={isUpdateModalOpen} animation='scale' duration={500}>
-          <Modal closeOnDimmerClick={false} open={isUpdateModalOpen} onClose={handleUpdateModalClose} size="large">
-            <Modal.Header>Se actualizó el presupuesto ya que algunos productos sufrieron modificaciones</Modal.Header>
+        <Transition visible={shouldShowModal} animation='scale' duration={500}>
+          <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={handleCancelUpdate} size="large">
+            <Modal.Header>Desea actualizar el presupuesto, ya que algunos productos sufrieron modificaciones?</Modal.Header>
             <Modal.Content>
               {!!outdatedProducts.length && (
                 <Message>
@@ -382,7 +399,10 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               )}
             </Modal.Content>
             <Modal.Actions>
-              <Button color="green" onClick={handleUpdateModalClose}>Okey!</Button>
+              <ButtonsContainer>
+                <Button color="red" onClick={handleCancelUpdate}>Cancelar</Button>
+                <Button color="green" onClick={handleConfirmUpdate}>Confirmar</Button>
+              </ButtonsContainer>
             </Modal.Actions>
           </Modal>
         </Transition>
@@ -473,15 +493,18 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               )}
             />
           </FormField>
-          <Table
-            mainKey="key"
-            headers={BUDGET_FORM_PRODUCT_COLUMNS} elements={watchProducts}
-            actions={actions}
-            total={total}
-            globalDiscount={watchGlobalDiscount || 0}
-            setGlobalDiscount={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
-            showTotal={!!watchProducts.length}
-          />
+          <Loader active={isTableLoading}>
+            <Table
+              mainKey="key"
+              headers={BUDGET_FORM_PRODUCT_COLUMNS}
+              elements={watchProducts}
+              actions={actions}
+              total={total}
+              globalDiscount={watchGlobalDiscount || 0}
+              setGlobalDiscount={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
+              showTotal={!isTableLoading && !!watchProducts.length}
+            />
+          </Loader>
           <FieldsContainer>
             <Label>Comentarios</Label>
             <ControlledComments control={control} />

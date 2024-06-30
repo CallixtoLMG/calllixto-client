@@ -9,12 +9,13 @@ const MainContainer = styled(Flex)`
 `;
 
 const HeaderSegment = styled(SSegment)`
+  display: flex;
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   padding: 5px 10px !important;
   margin: 0 !important;
-  justify-content: flex-end!important;
   column-gap: 10px;
   align-content: center;
+  justify-content: space-between;
 `;
 
 const Filters = ({ children, onRestoreFilters }) => {
@@ -33,10 +34,12 @@ const Filters = ({ children, onRestoreFilters }) => {
             )}
           />
           {children}
+        </FiltersContainer>
+        <Flex alignSelf="center">
           <Button circular icon type="submit">
             <Icon name="search" />
           </Button>
-        </FiltersContainer>
+        </Flex>
       </HeaderSegment>
       <HeaderSegment >
         <Paginator />
