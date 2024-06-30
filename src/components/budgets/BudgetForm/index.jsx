@@ -11,11 +11,11 @@ import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, f
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
-import { GridColumn, Message, Modal, Popup, Transition } from "semantic-ui-react";
+import { Message, Modal, Popup, Transition } from "semantic-ui-react";
+import { v4 as uuid } from 'uuid';
 import PDFfile from "../PDFfile";
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
-import { v4 as uuid } from 'uuid';
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -129,16 +129,24 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   };
 
   const handleReset = useCallback(() => {
-    reset(EMPTY_BUDGET(user));
+    if (draft || isCloning) {
+      reset(budget ? {
+        ...budget,
+        confirmed: isCloning ? false : budget?.confirmed,
+        seller: `${user?.firstName} ${user?.lastName}`,
+      } : EMPTY_BUDGET(user));
+    } else {
+      reset({
+        ...EMPTY_BUDGET(user),
+        confirmed: false,
+        seller: `${user?.firstName} ${user?.lastName}`,
+      });
+    }
+
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [reset, user]);
-
-  const handleOpenCommentModal = useCallback((product, index) => {
-    setSelectedProduct(() => ({ ...product, index }));
-    setIsModalCommentOpen(true);
-  }, []);
+  }, [reset, user, draft, isCloning, budget]);
 
   const handleModalCommentClose = () => setIsModalCommentOpen(false);
 

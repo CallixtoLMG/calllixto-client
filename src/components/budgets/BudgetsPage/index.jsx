@@ -1,12 +1,12 @@
+import { Dropdown, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { BUDGET_STATES, PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
-import { BUDGETS_COLUMNS } from "../budgets.common";
 import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { Form, Label } from 'semantic-ui-react';
-import { Dropdown, Input } from '@/components/common/custom';
 import { Flex } from 'rebass';
+import { Form, Label } from 'semantic-ui-react';
+import { BUDGETS_COLUMNS } from "../budgets.common";
 
 const DEFAULT_STATE = { key: 'ALL', value: 'ALL', text: 'Todos' };
 const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: DEFAULT_STATE.value };
@@ -79,7 +79,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
               render={({ field: { onChange, ...rest } }) => (
                 <Dropdown
                   {...rest}
-                  width="500px"
+                  minWidth="unset"
                   top="10px"
                   height="fit-content"
                   selection

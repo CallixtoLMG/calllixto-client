@@ -1,48 +1,44 @@
 import { Flex } from 'rebass';
-import { FiltersContainer } from './styles';
 import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
-import { Paginator } from './Pagination';
 import styled from 'styled-components';
+import { Paginator } from './Pagination';
+import { FiltersContainer } from './styles';
 
 const MainContainer = styled(Flex)`
-  flex-direction: row;
-  width: 100% !important;
   column-gap: 10px;
 `;
 
 const HeaderSegment = styled(SSegment)`
   flex: ${({ flex = 'none' }) => `${flex}!important`};
-  padding: 10px !important;
+  padding: 5px 10px !important;
   margin: 0 !important;
   justify-content: flex-end!important;
+  column-gap: 10px;
+  align-content: center;
 `;
 
 const Filters = ({ children, onRestoreFilters }) => {
   return (
     <MainContainer>
       <HeaderSegment flex="1">
-        <Flex justifyContent="space-between">
-          <FiltersContainer>
-            <Popup
-              content="Restaurar filtros"
-              position="top center"
-              size="tiny"
-              trigger={(
-                <Button circular icon type="button" onClick={onRestoreFilters}>
-                  <Icon name="undo" />
-                </Button>
-              )}
-            />
-            {children}
-          </FiltersContainer>
-          <Button marginLeft="10px" type="submit" width="110px">
-            <Flex justifyContent="space-around">
-              <Icon name="search" />
-            </Flex>
+        <FiltersContainer>
+          <Popup
+            content="Restaurar filtros"
+            position="top center"
+            size="tiny"
+            trigger={(
+              <Button circular icon type="button" onClick={onRestoreFilters}>
+                <Icon name="undo" />
+              </Button>
+            )}
+          />
+          {children}
+          <Button circular icon type="submit">
+            <Icon name="search" />
           </Button>
-        </Flex>
+        </FiltersContainer>
       </HeaderSegment>
-      <HeaderSegment>
+      <HeaderSegment >
         <Paginator />
       </HeaderSegment>
     </MainContainer>

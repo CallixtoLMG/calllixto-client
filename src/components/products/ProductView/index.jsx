@@ -1,11 +1,19 @@
 "use client";
-import { FieldsContainer, ViewContainer, FormField, Label, Segment, Checkbox } from "@/components/common/custom";
+import { Checkbox, FieldsContainer, FormField, Label, Segment, ViewContainer } from "@/components/common/custom";
 import { MEASSURE_UNITS } from "@/constants";
 import { formatedPrice } from "@/utils";
 
 const ProductView = ({ product }) => {
   return (
     <ViewContainer>
+      <FieldsContainer>
+      <FormField width="250px">
+          <Checkbox toggle checked={product?.fractionConfig?.active} label="Producto fraccionable" disabled />
+        </FormField>
+        <FormField >
+          <Checkbox toggle checked={product?.editablePrice} label="Precio editable" disabled />
+        </FormField>
+      </FieldsContainer>
       <FieldsContainer>
         <FormField width="30%">
           <Label>Proveedor</Label>
@@ -28,14 +36,6 @@ const ProductView = ({ product }) => {
         <FormField width="20%">
           <Label>Precio</Label>
           <Segment>{formatedPrice(product?.price)}</Segment>
-        </FormField>
-        <FormField>
-          <Checkbox toggle checked={product?.editablePrice} label="Precio editable" disabled />
-        </FormField>
-      </FieldsContainer>
-      <FieldsContainer>
-        <FormField>
-          <Checkbox toggle checked={product?.fractionConfig?.active} label="Producto fraccionable" disabled />
         </FormField>
         {product?.fractionConfig?.active && (
           <FormField>

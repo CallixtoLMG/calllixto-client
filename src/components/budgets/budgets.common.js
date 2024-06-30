@@ -1,6 +1,6 @@
 import { Price } from "@/components/common/custom";
 import { BUDGET_STATES } from "@/constants";
-import { formatedDateAndHour, formatedPercentage, formatedPricePdf, getPrice, getTotal, getTotalSum } from "@/utils";
+import { formatedDateAndHour, formatedPercentage, getPrice, getTotal, getTotalSum } from "@/utils";
 import { Box, Flex } from "rebass";
 import { Label } from "semantic-ui-react";
 import { CommentTooltip } from "../common/tooltips";

@@ -78,6 +78,7 @@ export const TextArea = styled(STextarea)`
 `;
 
 export const Dropdown = styled(SDropdown)`
+  min-width: ${({ minWidth }) => `${minWidth}!important;`};
   margin: ${({ margin = "5px 0" }) => `${margin}!important;`};
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
@@ -88,6 +89,7 @@ export const Dropdown = styled(SDropdown)`
   align-content: center;
   width: ${({ width = "100%" }) => `${width}!important`};
   input {
+  min-width; ${({ minWidth }) => `${minWidth}!important;`};
     height: ${({ height = "50px" }) => `${height}!important`};
   };
   i.dropdown.icon {

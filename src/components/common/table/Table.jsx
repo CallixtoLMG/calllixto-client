@@ -1,13 +1,12 @@
 import { Input, Price } from "@/components/common/custom";
 import { Loader } from "@/components/layout";
-import { formatedPercentage, removeDecimal } from '@/utils';
+import { formatedPercentage } from '@/utils';
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Flex } from "rebass";
 import { Header } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, Container, FooterCell, HeaderCell, InnerActionsContainer, LinkRow, Table, TableHeader, TableRow } from "./styles";
-import { Paginator } from "./Pagination";
-import { Flex } from "rebass";
 
 const CustomTable = ({
   showTotal,
@@ -136,7 +135,6 @@ const CustomTable = ({
           )}
         </Table>
       </Container>
-      {showPagination && <Paginator />}
     </>
   );
 };

@@ -40,6 +40,7 @@ const PaginationSegment = styled(SSegment)`
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
   align-items: center;
+  flex-direction: row!important;
 `;
 
 const Segment = styled(SSegment)`

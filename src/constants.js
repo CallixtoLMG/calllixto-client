@@ -207,3 +207,8 @@ export const MEASSURE_UNITS = {
     text: 'Kilogramos',
   },
 };
+
+export const PRODUCTS_HELP = {
+  FRACTIONABLE_PRODUCT: "Precio editable: ...",
+  EDITABLE_PRICE: "Producto fraccioanble: ...",
+};

@@ -1,11 +1,13 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
-import { MEASSURE_UNITS, PAGES, RULES, SHORTKEYS } from "@/constants";
+import { MEASSURE_UNITS, PAGES, PRODUCTS_HELP, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { Flex } from "rebass";
+import { Icon, Popup } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
@@ -13,10 +15,14 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted } } = useForm({
     defaultValues: {
       fractionConfig: {
+        active: false,
         unit: MEASSURE_UNITS.MT.value,
-      }, ...product,
+      },
+      editablePrice: false,
+      ...product,
     }
   });
+  console.log(isUpdating)
   const [supplier, setSupplier] = useState();
   const [brand, setBrand] = useState();
   const [watchFractionable] = watch(["fractionConfig.active"]);
@@ -24,8 +30,17 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   const handleReset = useCallback((product) => {
     setSupplier({ name: "", id: "" });
     setBrand({ name: "", id: "" });
-    reset(product);
-  }, [reset]);
+
+    if (isUpdating) {
+      reset(product);
+    } else {
+      reset({
+        ...product,
+        fractionConfig: { active: false, unit: MEASSURE_UNITS.MT.value },
+        editablePrice: false
+      });
+    }
+  }, [reset, isUpdating]);
 
   const handleForm = async (data) => {
     if (!isUpdating) {
@@ -39,6 +54,39 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   return (
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
+      <FieldsContainer>
+        <FormField width="250px">
+          <Controller
+            name="fractionConfig.active"
+            control={control}
+            render={({ field: { value, onChange, ...rest } }) => (
+              <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Producto Fraccionable" />
+            )}
+          />
+        </FormField>
+        <FormField>
+          <Controller
+            name="editablePrice"
+            control={control}
+            render={({ field: { value, onChange, ...rest } }) => (
+              <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Precio editable" />
+            )}
+          />
+        </FormField>
+        <FormField>
+          <Popup
+            content={
+              <Flex flexDirection="column" >
+                <p>{PRODUCTS_HELP.FRACTIONABLE_PRODUCT}</p>
+                <p>{PRODUCTS_HELP.EDITABLE_PRICE}</p>
+              </Flex>}
+            trigger={<Icon size="small" circular inverted color="orange" name="question"></Icon>}
+            position='right center'
+            size='tiny'
+          />
+
+        </FormField>
+      </FieldsContainer>
       <FieldsContainer>
         <FormField width="30%">
           <RuledLabel title="Proveedor" message={!isUpdating && isDirty && isSubmitted && !supplier && 'Campo requerido.'} required />
@@ -136,26 +184,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 value={value || 0}
                 placeholder="Precio"
               />
-            )}
-          />
-        </FormField>
-        <FormField>
-          <Controller
-            name="editablePrice"
-            control={control}
-            render={({ field: { value, onChange, ...rest } }) => (
-              <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Precio editable" />
-            )}
-          />
-        </FormField>
-      </FieldsContainer>
-      <FieldsContainer>
-        <FormField>
-          <Controller
-            name="fractionConfig.active"
-            control={control}
-            render={({ field: { value, onChange, ...rest } }) => (
-              <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Producto Fraccionable" />
             )}
           />
         </FormField>
