@@ -84,7 +84,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  marginBottom
+                  $marginBottom
                   height="35px"
                   placeholder="Código"
                 />
@@ -96,7 +96,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  marginBottom
+                  $marginBottom
                   height="35px"
                   placeholder="Nombre"
                 />

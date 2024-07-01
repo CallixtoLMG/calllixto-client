@@ -3,7 +3,7 @@ import { SubmitAndRestore } from "@/components/common/buttons";
 import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
-import { Table } from "@/components/common/table";
+import { Table, Total } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -41,7 +41,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  const [watchProducts, watchGlobalDiscount, watchConfirmed, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'confirmed', 'customer', 'state']);
+  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchConfirmed, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'additionalCharge', 'confirmed', 'customer', 'state']);
   const [total, setTotal] = useState(0);
   const productSearchRef = useRef(null);
   const customerOptions =
@@ -49,6 +49,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       .map(customer => ({
         key: customer.id, value: customer.id, text: customer.name,
       }));
+
   useEffect(() => {
     if (isCloning) {
       let budgetProducts = [...budget.products];
@@ -207,7 +208,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             <CurrencyFormatInput
               {...rest}
               height="35px"
-              shadow
+              $shadow
               decimalScale={2}
               displayType="input"
               onFocus={(e) => e.target.select()} onChange={(e) => {
@@ -252,7 +253,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                   <CurrencyFormatInput
                     {...rest}
                     height="35px"
-                    shadow
+                    $shadow
                     decimalScale={2}
                     displayType="number"
                     onFocus={(e) => e.target.select()} onChange={(e) => {
@@ -290,7 +291,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                   decimalScale={2}
                   allowNegative={false}
                   customInput={Input}
-                  marginBottom
+                  $marginBottom
                   textAlignLast="right"
                   onValueChange={value => {
                     onChange(value.floatValue);
@@ -314,7 +315,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             render={({ field: { onChange, ...rest } }) => (
               <Input
                 {...rest}
-                marginBottom
+                $marginBottom
                 height="35px"
                 type="number"
                 onFocus={(e) => e.target.select()} onChange={(e) => {
@@ -391,7 +392,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             <FormField width="300px">
               <Controller name="confirmed" control={control}
                 render={({ field: { value, onChange, ...rest } }) => (
-                  <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)}
+                  <Checkbox
+                    {...rest}
+                    toggle
+                    checked={value}
+                    onChange={() => onChange(!value)}
                     label={value ? "Confirmado" : "Confirmar presupuesto"}
                     customColors={{ false: 'orange', true: 'green' }}
                   />
@@ -475,12 +480,16 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </FormField>
           <Table
             mainKey="key"
-            headers={BUDGET_FORM_PRODUCT_COLUMNS} elements={watchProducts}
+            headers={BUDGET_FORM_PRODUCT_COLUMNS}
+            elements={watchProducts}
             actions={actions}
+          />
+          <Total
             total={total}
-            globalDiscount={watchGlobalDiscount || 0}
-            setGlobalDiscount={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
-            showTotal={!!watchProducts.length}
+            globalDiscount={watchGlobalDiscount}
+            onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
+            additionalCharge={watchAdditionalCharge}
+            onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
           />
           <FieldsContainer>
             <Label>Comentarios</Label>

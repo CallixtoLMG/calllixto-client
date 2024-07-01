@@ -80,7 +80,7 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  marginBottom
+                  $marginBottom
                   height="35px"
                   placeholder="Id"
                 />
@@ -92,7 +92,7 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
               render={({ field }) => (
                 <Input
                   {...field}
-                  marginBottom
+                  $marginBottom
                   height="35px"
                   placeholder="Nombre"
                 />

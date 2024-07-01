@@ -45,7 +45,7 @@ const Title = styled(SHeader)`
 const Divider = styled.div`
   width: 100%;
   height: 1px;
-  border-bottom: ${({ borderless }) => borderless ? "0px solid grey" : " 1px solid grey"} !important;
+  border-bottom: ${({ $borderless }) => $borderless ? "0px solid grey" : " 1px solid grey"} !important;
   margin: 3px 0;
 `;
 

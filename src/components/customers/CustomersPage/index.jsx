@@ -74,8 +74,8 @@ const CustomersPage = ({ customers = [], isLoading }) => {
               control={control}
               render={({ field }) => (
                 <Input
-                  marginBottom
                   {...field}
+                  $marginBottom
                   height="35px"
                   placeholder="Nombre"
                 />

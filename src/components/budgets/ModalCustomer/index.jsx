@@ -112,7 +112,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                           <>
                             <CurrencyFormatInput
                               marginTop="5px"
-                              shadow
+                              $shadow
                               height="50px"
                               format="####"
                               width="35%"
@@ -128,7 +128,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                             />
                             <CurrencyFormatInput
                               marginTop="5px"
-                              shadow
+                              $shadow
                               height="50px"
                               format="#######"
                               width="60%"

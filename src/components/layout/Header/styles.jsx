@@ -9,8 +9,7 @@ const ModLink = styled(Link)`
   align-items: center;
   transition: all 0.2s ease-in-out;
   font-size: 15px;
-  background-color: ${({ destacar }) => (destacar ? '#f5f5f5' : 'transparent')};
-
+  background-color: ${({ $active }) => ($active ? '#f5f5f5' : 'transparent')};
   &:hover {
     background-color: #f5f5f5;
   };
@@ -22,7 +21,6 @@ const LogDiv = styled(Flex)`
   align-items: center;
   transition: all 0.2s ease-in-out;
   font-size: 15px;
-  background-color: ${({ destacar }) => (destacar ? '#f5f5f5' : 'transparent')};
   &:hover {
     background-color: #f5f5f5!important;
   };
@@ -43,7 +41,7 @@ const Container = styled(SContainer)`
     border-left: 1px solid rgba(34,36,38,.1);
   };
 
-  div:last-child {  
+  div:last-child {
     margin-left: auto!important;
   };
 `;
@@ -61,7 +59,7 @@ const Text = styled.p`
     content: '';
     position: absolute;
     width: 100%;
-    transform: ${({ destacar }) => (destacar ? "scaleX(1)" : "scaleX(0)")};
+    transform: ${({ $active }) => ($active ? "scaleX(1)" : "scaleX(0)")};
     height: 2px;
     bottom: -2px;
     left: 0;

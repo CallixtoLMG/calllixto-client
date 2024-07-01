@@ -113,7 +113,7 @@ const Budget = ({ params }) => {
       setConfirmed(budget.state === BUDGET_STATES.CONFIRMED.id);
     }
   }, [setLabels, budget, push, isLoading]);
-  
+
   useEffect(() => {
     if (budget) {
       const printButtons = [
@@ -286,7 +286,7 @@ const Budget = ({ params }) => {
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
       {!budget?.confirmed && budget?.state !== BUDGET_STATES.DRAFT.id && (
         <NoPrint>
-          <Box marginBottom={15}>
+          <Box mb={15}>
             <Checkbox
               toggle
               checked={confirmed}

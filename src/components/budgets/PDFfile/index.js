@@ -108,7 +108,7 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
                       return (
                         <Table.Row key={product.key}>
                           {filteredColumns.map(header => (
-                            <Cell key={`cell_${header.id}`} align={header.align} width={header.width} wrap={header.wrap}>
+                            <Cell key={`cell_${header.id}`} align={header.align} width={header.width} $wrap={header.wrap}>
                               {header?.value(product)}
                             </Cell>
                           ))}
@@ -120,7 +120,7 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
                         {!!budget?.globalDiscount && (
                           <>
                             <Table.Row>
-                              <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
+                              <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
                               <Cell colSpan="1">
                                 <strong>
                                   <Price value={getTotalSum(budget?.products)} />
@@ -128,7 +128,7 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
                               </Cell>
                             </Table.Row>
                             <Table.Row>
-                              <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
+                              <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
                               <Cell colSpan="1"><strong>
                                 {formatedPercentage(budget?.globalDiscount)}
                               </strong></Cell>
@@ -136,7 +136,7 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
                           </>
                         )}
                         <Table.Row>
-                          <Cell right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
+                          <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
                           <Cell colSpan="1">
                             <strong>
                               <Price value={total} />
@@ -170,7 +170,7 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
               )}
               {!dispatchPdf &&
                 <>
-                  <Divider borderless />
+                  <Divider $borderless />
                   <DataContainer width="100%">
                     <Label >Formas de pago</Label>
                     <Segment marginTop="0">
