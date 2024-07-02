@@ -48,7 +48,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     reValidateMode: 'onChange',
   });
   const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state']);
-  const [total, setTotal] = useState(0);
+  const [subtotal, setSubtotal] = useState(0);
   const productSearchRef = useRef(null);
   const customerOptions =
     customers.filter(customer => customer.id && customer.name)
@@ -101,9 +101,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   };
 
   const calculateTotal = useCallback(() => {
-    const totalSum = getTotalSum(watchProducts, watchGlobalDiscount);
-    setTotal(totalSum);
-  }, [watchProducts, watchGlobalDiscount]);
+    const totalSum = getTotalSum(watchProducts);
+    setSubtotal(totalSum);
+  }, [watchProducts]);
 
   const deleteProduct = useCallback((index) => {
     const newProducts = [...watchProducts];
@@ -346,7 +346,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       ),
       width: 2
     },
-    { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 6, width: 3 },
+    { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 7, width: 3 },
   ], [control, calculateTotal, setValue]);
 
   const handleDraft = async (data) => {
@@ -503,7 +503,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               actions={actions}
             />
             <Total
-              total={total}
+              subtotal={subtotal}
               globalDiscount={watchGlobalDiscount}
               onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
               additionalCharge={watchAdditionalCharge}
@@ -583,7 +583,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
         </Form>
       </NoPrint>
       <OnlyPrint>
-        <PDFfile total={total} budget={budget} client={user.client?.metadata} printPdfMode={printPdfMode} />
+        <PDFfile subtotal={subtotal} budget={budget} client={user.client?.metadata} printPdfMode={printPdfMode} />
       </OnlyPrint>
     </>
   );
