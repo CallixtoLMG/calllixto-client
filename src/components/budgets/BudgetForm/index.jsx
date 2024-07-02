@@ -495,7 +495,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               )}
             />
           </FormField>
-          <Loader>
+          <Loader active={isTableLoading}>
             <Table
               mainKey="key"
               headers={BUDGET_FORM_PRODUCT_COLUMNS}
