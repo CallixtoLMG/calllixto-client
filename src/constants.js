@@ -178,7 +178,7 @@ export const BUDGET_STATES = {
   },
   INACTIVE: {
     id: 'INACTIVE',
-    title: 'Inactivo',
+    title: 'Indefinido',
     color: 'grey',
     icon: 'ban',
   }
