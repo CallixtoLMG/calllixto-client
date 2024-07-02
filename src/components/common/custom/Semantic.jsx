@@ -76,6 +76,8 @@ export const TextArea = styled(STextarea)`
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem;
   resize: ${({ resize = "none" }) => `${resize}!important`};
+  width: ${({ width }) => `${width}!important`};
+  padding: ${({ padding }) => `${padding}!important`}
 `;
 
 export const Dropdown = styled(SDropdown)`

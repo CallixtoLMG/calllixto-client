@@ -1,10 +1,11 @@
 "use client";
 import { useUserContext } from "@/User";
-import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, confirmBudget, edit, useGetBudget } from "@/api/budgets";
+import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import BudgetView from "@/components/budgets/BudgetView";
+import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import { PopupActions } from "@/components/common/buttons";
@@ -14,7 +15,7 @@ import { Loader, NoPrint, useBreadcrumContext, useNavActionsContext } from "@/co
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { isBudgetConfirmed, now } from "@/utils";
+import { isBudgetCancelled, isBudgetConfirmed, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -64,7 +65,6 @@ const Budget = ({ params }) => {
     ],
     enabled: budget?.state === BUDGET_STATES.DRAFT.id
   });
-
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const { role } = useUserContext();
@@ -74,6 +74,7 @@ const Budget = ({ params }) => {
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
+  const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
 
   const products = useMemo(() => productsData?.products?.map(product => ({
     ...product,
@@ -213,7 +214,14 @@ const Budget = ({ params }) => {
           onClick: () => { push(PAGES.BUDGETS.CLONE(budget.id)) },
           text: 'Clonar'
         },
-      ];
+        budget.state === BUDGET_STATES.CONFIRMED.id && {
+          id: 4,
+          icon: 'ban',
+          color: 'red',
+          onClick: () => setIsModalCancelOpen(true),
+          text: 'Anular'
+        },
+      ].filter(Boolean);
       setActions(actions);
     }
   }, [budget, push, role, setActions]);
@@ -238,6 +246,10 @@ const Budget = ({ params }) => {
     setIsModalConfirmationOpen(false);
   };
 
+  const handleModalCancelClose = () => {
+    setIsModalCancelOpen(false);
+  };
+
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
       const confirmationData = {
@@ -253,6 +265,29 @@ const Budget = ({ params }) => {
         queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto confirmado!');
         setIsModalConfirmationOpen(false);
+        push(PAGES.BUDGETS.BASE);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
+
+  const { mutate: mutateCancel, isPending: isPendingCancel } = useMutation({
+    mutationFn: async (cancelReason) => {
+      const cancelData = {
+        cancelledBy: `${userData.firstName} ${userData.lastName}`,
+        cancelledAt: now(),
+        cancelledMsg: cancelReason,
+      };
+      const { data } = await cancelBudget(cancelData, budget?.id);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
+        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
+        toast.success('Presupuesto anulado!');
+        setIsModalCancelOpen(false);
         push(PAGES.BUDGETS.BASE);
       } else {
         toast.error(response.message);
@@ -279,7 +314,7 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      {!isBudgetConfirmed(budget?.state) && budget?.state !== BUDGET_STATES.DRAFT.id && (
+      {!isBudgetConfirmed(budget?.state) && budget?.state !== BUDGET_STATES.DRAFT.id && !isBudgetCancelled(budget?.state) && (
         <NoPrint>
           <Box mb={15}>
             <Checkbox
@@ -319,7 +354,13 @@ const Budget = ({ params }) => {
           draft
           printPdfMode={printPdfMode}
         />) :
-        (<BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />)
+        (<><BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />
+          <ModalCancel
+            isModalOpen={isModalCancelOpen}
+            onClose={handleModalCancelClose}
+            onConfirm={mutateCancel}
+            isLoading={isPendingCancel}
+          /></>)
       }
     </Loader>
   );

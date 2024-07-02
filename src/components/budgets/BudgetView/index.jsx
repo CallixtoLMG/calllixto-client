@@ -1,12 +1,12 @@
 import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { Table, Total } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum } from "@/utils";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetCancelled } from "@/utils";
 import { useMemo } from "react";
 import { Box, Flex } from "rebass";
 import { Popup } from "semantic-ui-react";
 import PDFfile from "../PDFfile";
-import { Container, Icon } from "./styles";
+import { Container, Icon, Message, MessageHeader } from "./styles";
 
 const BudgetView = ({ budget, user, printPdfMode }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
@@ -86,7 +86,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
       },
       {
         title: "Precio",
-        value: (product) =>  <Price value={getPrice(product)} />,
+        value: (product) => <Price value={getPrice(product)} />,
         id: 4,
         width: 2,
       },
@@ -109,6 +109,12 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
     <>
       <NoPrint>
         <ViewContainer>
+          {isBudgetCancelled(budget?.state) && <FieldsContainer>
+            <Message negative >
+              <MessageHeader>Motivo de anulación</MessageHeader>
+              <p>{budget?.cancelledMsg}</p>
+            </Message>
+          </FieldsContainer>}
           <FieldsContainer>
             <FormField width="300px">
               <Label>Vendedor</Label>

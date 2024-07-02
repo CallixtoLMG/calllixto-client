@@ -2,7 +2,7 @@ import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Price } from "@/components/common/custom";
 import { Cell, HeaderCell } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT } from "@/constants";
-import { formatedPercentage, formatedSimplePhone, getTotalSum } from "@/utils";
+import { formatedPercentage, formatedSimplePhone, getTotalSum, isBudgetCancelled } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { useMemo } from "react";
@@ -36,6 +36,7 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
             <HeaderContainer>
               <Flex flexDirection="column" alignSelf="center!important">
                 <Title as="h3">N° {budget?.id}</Title>
+                {isBudgetCancelled(budget?.state) && <Title as="h3">(Anulado)</Title>}
                 <Title as="h6">{client?.name || "Razon Social"}</Title>
                 <Title as="h6">CUIT: {client?.cuil || "CUIT"}</Title>
               </Flex>
@@ -131,6 +132,24 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
                               <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
                               <Cell colSpan="1"><strong>
                                 {formatedPercentage(budget?.globalDiscount)}
+                              </strong></Cell>
+                            </Table.Row>
+                          </>
+                        )}
+                        {!!budget?.additionalCharge && (
+                          <>
+                            <Table.Row>
+                              <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
+                              <Cell colSpan="1">
+                                <strong>
+                                  <Price value={getTotalSum(budget?.products)} />
+                                </strong>
+                              </Cell>
+                            </Table.Row>
+                            <Table.Row>
+                              <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>RECARGO</strong></Cell>
+                              <Cell colSpan="1"><strong>
+                                {formatedPercentage(budget?.additionalCharge)}
                               </strong></Cell>
                             </Table.Row>
                           </>

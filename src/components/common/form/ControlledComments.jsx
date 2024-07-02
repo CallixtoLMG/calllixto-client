@@ -1,5 +1,5 @@
+import { TextArea } from "@/components/common/custom";
 import { Controller } from "react-hook-form";
-import { TextArea } from "../custom";
 
 export const ControlledComments = ({ control }) => {
   return (

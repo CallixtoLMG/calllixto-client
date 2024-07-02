@@ -1,5 +1,5 @@
 import { Flex } from "rebass";
-import { Icon as SIcon, MessageHeader as SMessageHeader, MessageItem as SMessageItem, MessageList as SMessageList } from "semantic-ui-react";
+import { Icon as SIcon, Message as SMessage, MessageHeader as SMessageHeader, MessageItem as SMessageItem, MessageList as SMessageList } from "semantic-ui-react";
 import styled from 'styled-components';
 
 const Container = styled(Flex)`
@@ -9,6 +9,10 @@ const Container = styled(Flex)`
 
 const MessageHeader = styled(SMessageHeader)`
   font-size: 15px!important;
+`;
+
+const Message = styled(SMessage)`
+  width: 100%;
 `;
 
 const MessageItem = styled(SMessageItem)`
@@ -25,5 +29,5 @@ const MessageList = styled(SMessageList)`
   overflow-y: auto;
 `;
 
-export { Container, Icon, MessageHeader, MessageItem, MessageList };
+export { Container, Icon, Message, MessageHeader, MessageItem, MessageList };
 
