@@ -1,4 +1,4 @@
-export { default as BreadcrumActions } from './BreadcrumActions';
+export { default as PopupActions } from './PopupActions';
 export { default as GoBackButton } from './GoBack';
 export { default as RestoreButton } from './Restore';
 export { default as SubmitButton } from './Submit';

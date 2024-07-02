@@ -65,7 +65,7 @@ export function useListCustomers({ sort, order = true, pageSize = DEFAULT_PAGE_S
   return query;
 };
 
-export function useListAllCustomers({ attributes = [] }) {
+export function useListAllCustomers({ attributes = [],  enabled = false }) {
   const listCustomers = async () => {
     try {
       let customers = [];
@@ -97,6 +97,7 @@ export function useListAllCustomers({ attributes = [] }) {
     queryKey: [LIST__ALL_CUSTOMERS_QUERY_KEY, attributes],
     queryFn: () => listCustomers(),
     staleTime: TIME_IN_MS.FOUR_HOURS,
+    enabled
   });
 
   return query;

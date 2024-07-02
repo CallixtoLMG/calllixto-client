@@ -1,22 +1,28 @@
-"use client";
 import { LIST_SUPPLIERS_QUERY_KEY, deleteSupplier } from "@/api/suppliers";
+import { Input } from "@/components/common/custom";
 import { ModalDelete } from "@/components/common/modals";
-import { Table } from "@/components/common/table";
+import { Filters, Table } from "@/components/common/table";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
-import { Rules } from "@/visibilityRules";
+import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { FILTERS, SUPPLIERS_COLUMNS } from "../suppliers.common";
+import { Form } from "semantic-ui-react";
+import { SUPPLIERS_COLUMNS } from "../suppliers.common";
 
-const SuppliersPage = ({ suppliers = [], role, isLoading, isRefetching }) => {
-  const visibilityRules = Rules(role);
+const EMPTY_FILTERS = { id: '', name: '' };
+
+const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const queryClient = useQueryClient();
   const { resetFilters } = usePaginationContext();
-  const deleteQuestion = (name) => `¿Está seguro que desea eliminar la marca "${name}"?`;
+  const methods = useForm();
+  const { handleSubmit, control, reset } = methods;
+
+  const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar la marca "${name}"?`, []);
 
   const onFilter = (data) => {
     const filters = { ...data };
@@ -29,7 +35,7 @@ const SuppliersPage = ({ suppliers = [], role, isLoading, isRefetching }) => {
     resetFilters(filters);
   };
 
-  const actions = visibilityRules.canSeeActions ? [
+  const actions = RULES.canRemove[role] ? [
     {
       id: 1,
       icon: 'trash',
@@ -58,18 +64,52 @@ const SuppliersPage = ({ suppliers = [], role, isLoading, isRefetching }) => {
     },
   });
 
+  const onRestoreFilters = () => {
+    reset(EMPTY_FILTERS);
+    onFilter(EMPTY_FILTERS);
+  }
+
   return (
     <>
+      <FormProvider {...methods}>
+        <Form onSubmit={handleSubmit(onFilter)}>
+          <Filters onRestoreFilters={onRestoreFilters}>
+            <Controller
+              name="id"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  $marginBottom
+                  maxWidth
+                  height="35px"
+                  placeholder="Id"
+                />
+              )}
+            />
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  $marginBottom
+                  maxWidth
+                  height="35px"
+                  placeholder="Nombre"
+                />
+              )}
+            />
+          </Filters>
+        </Form>
+      </FormProvider>
       <Table
         isLoading={isLoading}
-        isRefetching={isRefetching}
         headers={SUPPLIERS_COLUMNS}
         elements={suppliers}
         page={PAGES.SUPPLIERS}
         actions={actions}
-        filters={FILTERS}
-        onFilter={onFilter}
-        pag
+        showPagination
       />
       <ModalDelete
         showModal={showModal}

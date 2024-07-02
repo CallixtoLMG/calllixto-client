@@ -5,11 +5,12 @@ import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { ATTRIBUTES } from "@/components/suppliers/suppliers.common";
-import { ENTITIES, PAGES } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
-import { Rules } from "@/visibilityRules";
+import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 
 const Suppliers = () => {
   useValidateToken();
@@ -17,25 +18,21 @@ const Suppliers = () => {
 
   useEffect(() => {
     handleEntityChange(ENTITIES.SUPPLIERS);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { data, isLoading, isRefetching } = useListSuppliers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESS, ATTRIBUTES.PHONE, ATTRIBUTES.COMMENT] });
+  const { data, isLoading } = useListSuppliers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESSES, ATTRIBUTES.PHONES, ATTRIBUTES.COMMENT] });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
-
-  const { suppliers } = useMemo(() => {
-    return { suppliers: data?.suppliers }
-  }, [data]);
 
   useEffect(() => {
     setLabels([PAGES.SUPPLIERS.NAME]);
   }, [setLabels]);
 
   useEffect(() => {
-    const visibilityRules = Rules(role);
-    const actions = visibilityRules.canSeeButtons ? [
+    const actions = RULES.canCreate[role] ? [
       {
         id: 1,
         icon: 'add',
@@ -47,10 +44,11 @@ const Suppliers = () => {
     setActions(actions);
   }, [push, role, setActions]);
 
+  useKeyboardShortcuts(() => push(PAGES.SUPPLIERS.CREATE), SHORTKEYS.ENTER);
+
   return (
     <SuppliersPage
       isLoading={isLoading}
-      isRefetching={isRefetching}
       suppliers={data?.suppliers}
       role={role}
       onDelete={deleteSupplier}

@@ -7,9 +7,10 @@ const MainContainer = styled(Flex)`
 `;
 
 const SubContainer = styled(Flex)`
+  row-gap: 15px;
   margin: 85px 20px 20px 20px!important;
   flex-direction: column;
-  width: 80%!important;
+  width: 90%!important;
   max-width: 1600px!important;
   padding-top: 50px!important;
 `;
@@ -17,3 +18,4 @@ const SubContainer = styled(Flex)`
 export {
   MainContainer, SubContainer
 };
+

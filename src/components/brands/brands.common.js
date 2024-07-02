@@ -1,5 +1,5 @@
-import { Box, Flex } from "rebass";
-import { Icon, Popup } from "semantic-ui-react";
+import { Flex } from "rebass";
+import { CommentTooltip } from "@/components/common/tooltips";
 
 const ATTRIBUTES = { ID: "id", NAME: "name", COMMENT: "comments" };
 
@@ -17,29 +17,12 @@ const BRAND_COLUMNS = [
     value: (brand) =>
       <Flex justifyContent="space-between">
         {brand.name}
-        {brand.comments && (
-          <Popup
-            size="mini"
-            content={brand.comments}
-            position="top center"
-            trigger={
-              <Box marginX="5px">
-                <Icon name="info circle" color="yellow" />
-              </Box>
-            }
-          />
-        )}
+        {brand.comments && <CommentTooltip comment={brand.comments} />}
       </Flex>
   }
 ];
 
-const FILTERS = [
-  { value: 'id', placeholder: 'Id' },
-  { value: 'name', placeholder: 'Nombre' },
-];
-
 export {
   ATTRIBUTES, BRAND_COLUMNS,
-  FILTERS
 };
 

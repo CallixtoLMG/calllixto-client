@@ -21,7 +21,7 @@ const HeaderContainer = styled(Flex)`
   flex-direction: row!important;
   justify-content: space-between;
   width: 100%;
-  padding: 45px 15px 10px 15px!important;
+  padding: 20px 10px 0px 10px!important;
 `;
 
 const DataContainer = styled(Flex)`
@@ -36,15 +36,17 @@ const PayMethodContainer = styled(Flex)`
 `;
 
 const Title = styled(SHeader)`
-  margin: auto 100px 0 0!important;
-  color: rgba(235,124,21,255)!important;
+  margin: 0!important;
+  color: ${({ color }) => color ? "rgba(235,124,21,255)" : "black"}!important;
+  align-content: center;
+  align-self: center;
 `;
 
 const Divider = styled.div`
   width: 100%;
   height: 1px;
-  border-bottom: ${({ borderless }) => borderless ? "0px solid grey" : " 1px solid grey"} !important;
-  margin: 10px 0;
+  border-bottom: ${({ $borderless }) => $borderless ? "0px solid grey" : " 1px solid grey"} !important;
+  margin: 3px 0;
 `;
 
 const Sign = styled.div`
@@ -75,7 +77,7 @@ const Comment = styled(SSegment)`
 
 const Image = styled(SImage)`
   &&& {
-    height: 50px!important;
+    height: 40px!important;
   };
 `;
 
@@ -91,16 +93,21 @@ const PayMethodsContainer = styled(Flex)`
 `;
 
 const Segment = styled(SSegment)`
-  min-height: ${(props) => props.minHeight || ""};
-  margin-top: ${(props) => props.marginTop || "5px"} !important;
+  min-height: ${({ minHeight }) => minHeight || ""};
+  margin-top: ${({ marginTop }) => marginTop || "5px"} !important;
   box-shadow: 0 0 0 0 !important;
   background-color: white !important;
   border: 0.5px solid grey !important;
   border-top-left-radius: 0 !important;
   border-top-right-radius: 0 !important;
-  height:  ${({ height = '30px' }) => height} !important;
   padding: ${({ padding = '0 5px' }) => padding} !important;
   line-height: 28px!important;
+  `;
+
+const HeaderLabel = styled(SLabel)`
+  background-color: white!important;
+  margin: 0!important;
+  padding: 3px 0!important;
 `;
 
 const Label = styled(SLabel)`
@@ -114,5 +121,5 @@ const Label = styled(SLabel)`
   line-height: 30px!important;
 `;
 
-export { ClientDataContainer, Comment, CustomerDataContainer, DataContainer, Divider, Header, HeaderContainer, Image, Label, PayMethodContainer, PayMethodsContainer, Segment, Sign, SubtleLabel, TableRowHeader, Title };
+export { ClientDataContainer, Comment, CustomerDataContainer, DataContainer, Divider, Header, HeaderContainer, HeaderLabel, Image, Label, PayMethodContainer, PayMethodsContainer, Segment, Sign, SubtleLabel, TableRowHeader, Title };
 

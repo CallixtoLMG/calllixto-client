@@ -1,19 +1,18 @@
-"use client";
 import { useUserContext } from "@/User";
+import { KeyboardShortcuts } from "@/components/common/modals";
 import { NoPrint } from "@/components/layout";
 import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";
-import { Rules } from "@/visibilityRules";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from 'next/navigation';
 import { Flex } from "rebass";
 import { Dropdown, Menu } from 'semantic-ui-react';
 import { Container, LogDiv, ModLink, Text } from "./styles";
 
 const Header = () => {
-
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const visibilityRules = Rules(role);
 
   const handleClientChange = (event, data) => {
     const userData = JSON.parse(sessionStorage.getItem("userData"));
@@ -29,6 +28,15 @@ const Header = () => {
 
   const routesWithoutHeader = [PAGES.LOGIN.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
+  const shortcutMapping = {
+    [PAGES.CUSTOMERS.SHORTKEYS]: () => push(PAGES.CUSTOMERS.BASE),
+    [PAGES.SUPPLIERS.SHORTKEYS]: () => push(PAGES.SUPPLIERS.BASE),
+    [PAGES.BRANDS.SHORTKEYS]: () => push(PAGES.BRANDS.BASE),
+    [PAGES.PRODUCTS.SHORTKEYS]: () => push(PAGES.PRODUCTS.BASE),
+    [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
+  };
+  useKeyboardShortcuts(shortcutMapping);
+
   return (
     <NoPrint>
       {showHeader &&
@@ -44,13 +52,14 @@ const Header = () => {
               <>
                 <Flex>
                   {Object.values(PAGES).filter(page => !!page.NAME).map(page => (
-                    <ModLink key={page.BASE} destacar={pathname.includes(page.BASE)} href={page.BASE}>
-                      <Menu.Item><Text destacar={pathname.includes(page.BASE)}>{page.NAME}</Text></Menu.Item>
+                    <ModLink key={page.BASE} $active={pathname.includes(page.BASE)} href={page.BASE}>
+                      <Menu.Item><Text $active={pathname.includes(page.BASE)}>{page.NAME}</Text></Menu.Item>
                     </ModLink>
                   ))}
                 </Flex>
                 <Flex>
-                  {visibilityRules.canSeeClientSelect &&
+                    <KeyboardShortcuts/>
+                  {isCallixtoUser(role) &&
                     <LogDiv padding="8px">
                       <Dropdown
                         search

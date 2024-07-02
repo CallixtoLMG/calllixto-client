@@ -1,12 +1,11 @@
 "use client";
-import { useUserContext } from "@/User";
 import { GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY, edit, useGetCustomer } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
+import CustomerView from "@/components/customers/CustomerView";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -17,11 +16,9 @@ const Customer = ({ params }) => {
   const { push } = useRouter();
   const queryClient = useQueryClient();
   const { data: customer, isLoading } = useGetCustomer(params.id);
-  const [allowUpdate, Toggle] = useAllowUpdate();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const { role } = useUserContext();
-  const visibilityRules = Rules(role);
+  const [allowUpdate, Toggle] = useAllowUpdate();
 
   useEffect(() => {
     resetActions();
@@ -55,13 +52,17 @@ const Customer = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      {visibilityRules.canSeeActions && Toggle}
-      <CustomerForm
-        customer={customer}
-        onSubmit={mutate}
-        isLoading={isPending}
-        readonly={!allowUpdate}
-      />
+      {Toggle}
+      {allowUpdate ? (
+        <CustomerForm
+          customer={customer}
+          onSubmit={mutate}
+          isLoading={isPending}
+          isUpdating
+        />
+      ) : (
+        <CustomerView customer={customer} />
+      )}
     </Loader>
   );
 };

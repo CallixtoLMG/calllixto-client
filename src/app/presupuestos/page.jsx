@@ -1,17 +1,18 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
-import BudgetsPage from "@/components/budgets/BudgetPage";
+import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { ATTRIBUTES } from "@/components/budgets/budgets.common";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
   useValidateToken();
-  const { data, isLoading } = useListBudgets({ sort: 'date', order: false, attributes: [ATTRIBUTES.DISCOUNT, ATTRIBUTES.ID, ATTRIBUTES.PRODUCTS, ATTRIBUTES.CUSTOMER, ATTRIBUTES.CREATEDAT, ATTRIBUTES.CONFIRMED, ATTRIBUTES.SELLER] });
+  const { data, isLoading } = useListBudgets({ sort: 'date', order: false, attributes: ATTRIBUTES });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -19,6 +20,7 @@ const Budgets = () => {
 
   useEffect(() => {
     handleEntityChange(ENTITIES.BUDGETS)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -41,6 +43,8 @@ const Budgets = () => {
     ];
     setActions(actions);
   }, [push, setActions]);
+
+  useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 
   return (
     <BudgetsPage isLoading={isLoading} budgets={budgets} />

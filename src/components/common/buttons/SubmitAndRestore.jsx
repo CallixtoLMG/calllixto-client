@@ -1,26 +1,34 @@
-import styled from "styled-components";
-import { SubmitButton, RestoreButton } from "@/components/common/buttons";
+import { RestoreButton, SubmitButton } from "@/components/common/buttons";
 import { Flex } from "rebass";
+import styled from "styled-components";
 
 const ButtonsContainer = styled(Flex)`
   align-self: flex-end;
   column-gap: 20px;
 `;
 
-export const SubmitAndRestore = ({ show, isUpdating, isLoading, isDirty, onClick }) => {
+export const SubmitAndRestore = ({ draft, isUpdating, isLoading, isDirty, onReset, extraButton, disabled, onSubmit = () => { }, color, icon, text }) => {
   return (
-    <>
-      {show && (
-        <ButtonsContainer>
-          <SubmitButton isUpdating={isUpdating} isLoading={isLoading} isDirty={isDirty} />
-          <RestoreButton
-            isUpdating={isUpdating}
-            isLoading={isLoading}
-            isDirty={isDirty}
-            onClick={onClick}
-          />
-        </ButtonsContainer>
-      )}</>
+    <ButtonsContainer>
+      <RestoreButton
+        isUpdating={isUpdating}
+        isLoading={isLoading}
+        isDirty={isDirty}
+        onClick={onReset}
+        disabled={disabled}
+      />
+      {extraButton && extraButton}
+      <SubmitButton
+        isUpdating={isUpdating}
+        isLoading={isLoading}
+        isDirty={draft ? true : isDirty}
+        onClick={onSubmit}
+        disabled={disabled}
+        color={color}
+        icon={icon}
+        text={text}
+      />
+    </ButtonsContainer>
   )
 }
 

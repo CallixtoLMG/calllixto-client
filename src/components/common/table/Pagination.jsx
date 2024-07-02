@@ -1,5 +1,8 @@
-import { ENTITIES } from '@/constants';
+import { ENTITIES, SHORTKEYS } from '@/constants';
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { createContext, useContext, useMemo, useState } from 'react';
+import { Button, Icon } from 'semantic-ui-react';
+import { PaginationContainer, PaginationSegment } from './styles';
 
 const PaginationContext = createContext();
 
@@ -52,6 +55,12 @@ const PaginationProvider = ({ children }) => {
     setCurrentPage(0);
   };
 
+  const shortcutMapping = {
+    [SHORTKEYS.LEFT_ARROW]: () => goToPreviousPage(),
+    [SHORTKEYS.RIGHT_ARROW]: () => goToNextPage(),
+  };
+  useKeyboardShortcuts(shortcutMapping);
+
   return (
     <PaginationContext.Provider value={{
       handleEntityChange,
@@ -79,5 +88,21 @@ const usePaginationContext = () => {
   return context;
 };
 
-export { PaginationProvider, usePaginationContext };
+const Paginator = () => {
+  const { goToNextPage, goToPreviousPage, currentPage, canGoNext } = usePaginationContext();
+
+  return (
+    <PaginationContainer>
+      <Button circular icon onClick={goToPreviousPage} disabled={currentPage === 0}>
+        <Icon name="arrow left" />
+      </Button>
+      <PaginationSegment>{Number(currentPage) + 1}</PaginationSegment>
+      <Button circular icon onClick={goToNextPage} disabled={!canGoNext}>
+        <Icon name="arrow right" />
+      </Button>
+    </PaginationContainer>
+  )
+}
+
+export { PaginationProvider, Paginator, usePaginationContext };
 

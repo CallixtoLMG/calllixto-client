@@ -4,14 +4,15 @@ import { usePaginationContext } from "@/components/common/table/Pagination";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { ATTRIBUTES } from "@/components/customers/customers.common";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 const Customers = () => {
   useValidateToken();
-  const { data, isLoading } = useListCustomers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESS, ATTRIBUTES.PHONE, ATTRIBUTES.COMMENT] });
+  const { data, isLoading } = useListCustomers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESSES, ATTRIBUTES.PHONES, ATTRIBUTES.EMAILS,  ATTRIBUTES.COMMENT] });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { handleEntityChange } = usePaginationContext();
@@ -19,6 +20,7 @@ const Customers = () => {
 
   useEffect(() => {
     handleEntityChange(ENTITIES.CUSTOMERS)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -41,6 +43,9 @@ const Customers = () => {
     ];
     setActions(actions);
   }, [push, setActions]);
+
+  useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);
+
   return (
     <CustomersPage isLoading={isLoading} customers={customers} />
   );

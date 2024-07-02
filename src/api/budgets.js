@@ -18,12 +18,24 @@ export function create(budget) {
   return axios.post(BUDGETS_URL, body);
 };
 
-export function edit(budget, id) {
-  return axios.post(`${BUDGETS_URL}/${id}`, budget);
+export function confirmBudget(budget, id) {
+  return axios.put(`${BUDGETS_URL}/${id}/confirm`, budget);
+};
+
+export function cancelBudget(budget, id) {
+  return axios.put(`${BUDGETS_URL}/${id}/cancel`, budget);
+};
+
+export function edit(budget) {
+  const body = {
+    ...budget,
+    updatedAt: now(),
+  };
+  return axios.put(`${BUDGETS_URL}/${budget.id}`, body);
 };
 
 export function useListBudgets({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
-  const { addKey, currentPage, keys, filters, } = usePaginationContext();
+  const { addKey, currentPage, keys, filters } = usePaginationContext();
 
 
   const params = {

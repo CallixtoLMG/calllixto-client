@@ -1,16 +1,15 @@
 "use client";
-import { useUserContext } from "@/User";
 import { GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY, edit, useGetBrand } from "@/api/brands";
 import BrandForm from "@/components/brands/BrandForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
+import BrandView from "../../../components/brands/BrandView";
 
 const Brand = ({ params }) => {
   useValidateToken();
@@ -20,8 +19,6 @@ const Brand = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const queryClient = useQueryClient();
-  const { role } = useUserContext();
-  const visibilityRules = Rules(role);
 
   useEffect(() => {
     resetActions();
@@ -55,8 +52,12 @@ const Brand = ({ params }) => {
 
   return (
     <Loader active={isLoading || isRefetching}>
-      {visibilityRules.canSeeActions && Toggle}
-      <BrandForm brand={brand} onSubmit={mutate} readonly={!allowUpdate} isLoading={isPending} />
+      {Toggle}
+      {allowUpdate ? (
+        <BrandForm brand={brand} onSubmit={mutate} isLoading={isPending} isUpdating />
+      ) : (
+        <BrandView brand={brand} />
+      )}
     </Loader>
   )
 };

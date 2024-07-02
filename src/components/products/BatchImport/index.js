@@ -403,7 +403,7 @@ const BatchImport = ({ isCreating }) => {
                       <FieldsContainer>
                         <FormField width={6}>
                           <Label >Archivo seleccionado:</Label>
-                          <Segment >{selectedFile}</Segment>
+                          <Segment>{selectedFile}</Segment>
                         </FormField>
                       </FieldsContainer>
                       <FieldsContainer>
@@ -423,11 +423,11 @@ const BatchImport = ({ isCreating }) => {
                       <FieldsContainer>
                         <FormField width={8}>
                           <Label >Archivo seleccionado:</Label>
-                          <Segment >{selectedFile}</Segment>
+                          <Segment>{selectedFile}</Segment>
                         </FormField>
                         <FormField width={7}>
                           <Label >Cantidad a importar:</Label>
-                          <Segment >{`${importSettings.label}: ${importedProductsCount}`}</Segment>
+                          <Segment>{`${importSettings.label}: ${importedProductsCount}`}</Segment>
                         </FormField>
                       </FieldsContainer>
                     </>

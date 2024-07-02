@@ -1,80 +1,67 @@
-"use client";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { RULES } from "@/constants";
+import { FieldsContainer, Form, FormField, Input, Label, RuledLabel } from "@/components/common/custom";
+import { RULES, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { ControlledComments } from "../../common/form";
 
 const EMPTY_BRAND = { name: '', id: '', comments: '' };
 
-const BrandForm = ({ brand, onSubmit, readonly, isLoading }) => {
+const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
   const { handleSubmit, control, reset, formState: { isDirty, errors } } = useForm({ defaultValues: brand });
-  const isUpdating = useMemo(() => !!brand?.id, [brand]);
 
   const handleReset = useCallback((brand) => {
-    reset(brand || EMPTY_BRAND);
+    reset(brand);
   }, [reset]);
+
+  const handleCreate = (data) => {
+    onSubmit(data);
+  };
+
+  useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_BRAND, ...brand } : EMPTY_BRAND), SHORTKEYS.DELETE);
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField>
           <RuledLabel title="Código" message={errors?.id?.message} required />
-          {!readonly ? (
-            <Controller
-              name="id"
-              control={control}
-              rules={RULES.REQUIRED_TWO_DIGIT}
-              render={({ field }) => (
-                <Input
-                  placeholder="Código (A1)"
-                  {...field}
-                  disabled={isUpdating}
-                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                  maxLength={2}
-                />
-              )}
-            />
-          ) : (
-            <Segment>{brand?.id}</Segment>
-          )}
+          <Controller
+            name="id"
+            control={control}
+            rules={RULES.REQUIRED_TWO_DIGIT}
+            render={({ field }) => (
+              <Input
+                placeholder="Código (A1)"
+                {...field}
+                disabled={isUpdating}
+                onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                maxLength={2}
+              />
+            )}
+          />
         </FormField>
         <FormField width="50%">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
-          {!readonly ? (
-            <Controller
-              name="name"
-              control={control}
-              rules={RULES.REQUIRED}
-              render={({ field }) => <Input {...field} placeholder="Nombre" />}
-            />
-          ) : (
-            <Segment>{brand?.name}</Segment>
-          )}
+          <Controller
+            name="name"
+            control={control}
+            rules={RULES.REQUIRED}
+            render={({ field }) => <Input {...field} placeholder="Nombre" />}
+          />
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
         <Label>Comentarios</Label>
-        <Controller
-          name="comments"
-          control={control}
-          render={({ field }) => (
-            <TextArea
-              {...field}
-              maxLength="2000"
-              placeholder="Comentarios"
-              disabled={readonly}
-            />
-          )}
-        />
+        <ControlledComments control={control} />
       </FieldsContainer>
       <SubmitAndRestore
-        show={!readonly}
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}
-        onClick={() => handleReset(isUpdating ? { ...EMPTY_BRAND, ...brand } : null)}
+        onReset={() => handleReset(isUpdating ? { ...EMPTY_BRAND, ...brand } : EMPTY_BRAND)}
       />
     </Form>
   )

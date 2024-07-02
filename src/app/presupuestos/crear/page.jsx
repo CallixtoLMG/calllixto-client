@@ -4,9 +4,9 @@ import { LIST_BUDGETS_QUERY_KEY, create, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { ATTRIBUTES as CUSTOMERATTRIBUTES } from "@/components/customers/customers.common";
+import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ATTRIBUTES as PRODUCTSATTRIBUTES } from "@/components/products/products.common";
+import { ATTRIBUTES as PRODUCTS_ATTRIBUTES } from "@/components/products/products.common";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -20,17 +20,13 @@ const CreateBudget = () => {
   const searchParams = useSearchParams();
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
-  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({ attributes: [PRODUCTSATTRIBUTES.CODE, PRODUCTSATTRIBUTES.PRICE, PRODUCTSATTRIBUTES.NAME, PRODUCTSATTRIBUTES.COMMENTS, PRODUCTSATTRIBUTES.BRANDNAME, PRODUCTSATTRIBUTES.SUPPLIERNAME], enabled: true });
-  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({ attributes: [CUSTOMERATTRIBUTES.ADDRESS, CUSTOMERATTRIBUTES.PHONE, CUSTOMERATTRIBUTES.ID, CUSTOMERATTRIBUTES.NAME] });
+
+  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({ attributes: PRODUCTS_ATTRIBUTES, enabled: true });
+  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({ attributes: [CUSTOMERS_ATTRIBUTES.ADDRESSES, CUSTOMERS_ATTRIBUTES.PHONES, CUSTOMERS_ATTRIBUTES.ID, CUSTOMERS_ATTRIBUTES.NAME], enabled: true });
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
 
-  const { products } = useMemo(() => {
-    return { products: productsData?.products }
-  }, [productsData]);
-
-  const { customers } = useMemo(() => {
-    return { customers: customersData?.customers }
-  }, [customersData]);
+  const products = useMemo(() => productsData?.products, [productsData]);
+  const customers = useMemo(() => customersData?.customers, [customersData]);
 
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();

@@ -1,15 +1,22 @@
 import { formatProductCode } from "@/utils";
 import debounce from 'lodash/debounce';
-import { useCallback, useEffect, useState } from 'react';
-import { Box } from "rebass";
-import { Icon, Popup } from "semantic-ui-react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { CommentTooltip } from "../tooltips";
 import { Container, Search, Text } from "./styles";
 
-const ProductSearch = ({ products, onProductSelect }) => {
+const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    clear: () => {
+      setSearchQuery('');
+      setSelectedProduct(null);
+      setFilteredProducts(products);
+    }
+  }));
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
@@ -63,17 +70,7 @@ const ProductSearch = ({ products, onProductSelect }) => {
             <Text>Código: {formatProductCode(product.code)}</Text>
             <Container flexDir="row">
               <Text>Precio: {`$ ${product?.price?.toFixed(2)}`}</Text>
-              {product.comments && (
-                <Popup
-                  size="mini"
-                  content={product.comments}
-                  position="top center"
-                  trigger={
-                    <Box marginX="5px">
-                      <Icon name="info circle" color="yellow" />
-                    </Box>
-                  }
-                />)}
+              {product.comments && <CommentTooltip comment={product.comments} />}
             </Container>
           </Container>
         ),
@@ -82,6 +79,9 @@ const ProductSearch = ({ products, onProductSelect }) => {
       onResultSelect={handleProductSelect}
     />
   );
-};
+});
+
+// Asignar displayName al componente
+ProductSearch.displayName = 'ProductSearch';
 
 export default ProductSearch;

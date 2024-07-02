@@ -10,12 +10,12 @@ import {
   Segment as SSegment,
   TextArea as STextarea
 } from "semantic-ui-react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 export const Segment = styled(SSegment)`
   height: ${({ height = 'auto' }) => height} !important;
   padding:${({ height }) => height && "10px"} !important;
-  margin: 5px 0!important;
+  margin: 5px 0 0 0!important;
   width: ${({ width = '100%' }) => width} !important;
   min-height: 50px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
@@ -24,9 +24,10 @@ export const Segment = styled(SSegment)`
 `;
 
 export const Input = styled(SInput)`
-  margin: ${({ margin = "5px 0" }) => margin} !important;
+  margin: ${({ $marginBottom }) => $marginBottom ? "5px 0" : "5px 0 0 0"} !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
+ max-width: ${({ maxWidth }) => maxWidth && `200px!important;`};
   height: ${({ height = '50px' }) => height} !important;
   width: ${({ width = '100%' }) => `${width}!important`};
   display: flex!important;
@@ -41,16 +42,26 @@ export const Input = styled(SInput)`
 `;
 
 export const Checkbox = styled(SCheckbox)`
-  label::after{
-    z-index: 1!important;
-  };
+  ${({ customColors }) => customColors && css`
+    &&& {
+      input:focus:checked~label:before {
+      background-color: ${customColors.true}!important;
+      }
+    };
+    label::before{
+      background-color: ${customColors.false}!important;
+    };
+    label::after{
+      z-index: 1!important;
+    };
+  `};
 `;
 
 export const FormField = styled(Form.Field)`
   width: ${({ width = '200px' }) => `${width}!important`};
   min-width: ${({ minWidth = '200px' }) => `${minWidth}!important`};
   flex: ${({ flex = 'none' }) => `${flex}!important`};
-  margin: 0 !important;
+  margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
 `;
 
@@ -61,27 +72,33 @@ export const Label = styled(SLabel)`
 `;
 
 export const TextArea = styled(STextarea)`
-  margin: 5px 0 !important;
+  margin: 5px 0 0 0!important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem;
   resize: ${({ resize = "none" }) => `${resize}!important`};
+  width: ${({ width }) => `${width}!important`};
+  padding: ${({ padding }) => `${padding}!important`}
 `;
 
 export const Dropdown = styled(SDropdown)`
-  margin: 5px 0 !important;
+  min-width: ${({ minWidth }) => `${minWidth}!important;`};
+  max-width: ${({ maxWidth }) => maxWidth && `200px!important;`};
+  margin: ${({ margin = "5px 0 0 0" }) => `${margin}!important;`};
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
-  height: ${({ height = "50px" }) => `${height}!important`} ;
-  min-height: ${({ minHeight = "none" }) => `${minHeight}!important`} ;
+  height: ${({ height = "50px" }) => `${height}!important`};
+  min-height: ${({ minHeight = "none" }) => `${minHeight}!important`};
   display: flex!important;
   flex-wrap: wrap;
   align-content: center;
+  width: ${({ width = "100%" }) => `${width}!important`};
   input {
-    height: ${({ height = "50px" }) => `${height}!important`} ;
+    min-width: ${({ minWidth }) => `${minWidth}!important;`};
+    height: ${({ height = "50px" }) => `${height}!important`};
   };
   i.dropdown.icon {
     height: 50px!important;
-    top: ${({ top = "15px" }) => `${top}!important`} ;
+    top: ${({ top = "15px" }) => `${top}!important`};
   };
 `;
 

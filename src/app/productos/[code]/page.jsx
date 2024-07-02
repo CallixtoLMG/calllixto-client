@@ -1,16 +1,17 @@
 "use client";
-import { useUserContext } from "@/User";
 import { GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, edit, useGetProduct } from "@/api/products";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { Rules } from "@/visibilityRules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
+import ProductView from "../../../components/products/ProductView";
+import { SubContainer, Barcode, ProductCode, ProductName } from "@/components/products/ProductView/styles";
+import JsBarcode from "jsbarcode";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -18,11 +19,8 @@ const Product = ({ params }) => {
   const { data: product, isLoading } = useGetProduct(params.code);
   const [allowUpdate, Toggle] = useAllowUpdate();
   const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
+  const { resetActions, setActions } = useNavActionsContext();
   const queryClient = useQueryClient();
-  const { role } = useUserContext();
-  const visibilityRules = Rules(role);
-
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -53,10 +51,52 @@ const Product = ({ params }) => {
     push(PAGES.NOT_FOUND.BASE);
   };
 
+  useEffect(() => {
+    if (product) {
+      const actions = [
+        {
+          id: 1,
+          icon: 'barcode',
+          color: 'blue',
+          onClick: () => setTimeout(window.print),
+          text: 'Código'
+        },
+      ];
+      setActions(actions);
+    }
+  }, [product, setActions]);
+  const barcodeRef = useRef(null);
+
+  useEffect(() => {
+    if (product?.code && barcodeRef.current) {
+      JsBarcode(barcodeRef.current, product.code, {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 2,
+        height: 100,
+      });
+    }
+  }, [product]);
+
   return (
     <Loader active={isLoading}>
-      {visibilityRules.canSeeActions && Toggle}
-      <ProductForm product={product} onSubmit={mutate} readonly={!allowUpdate} isLoading={isPending} />
+      <NoPrint>
+        {Toggle}
+        {allowUpdate ? (
+          <ProductForm product={product} onSubmit={mutate} isUpdating isLoading={isPending} />
+        ) : (
+          <ProductView product={product} />
+        )}
+      </NoPrint>
+      {product && (
+        <OnlyPrint>
+          <SubContainer>
+            <ProductName>{product.name}</ProductName>
+            <Barcode ref={barcodeRef}></Barcode>
+            <ProductCode>{product.code}</ProductCode>
+          </SubContainer>
+        </OnlyPrint>
+      )}
     </Loader>
   )
 };

@@ -1,64 +1,64 @@
-import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, edit } from "@/api/budgets";
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Button, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, TextArea } from "@/components/common/custom";
-import { Table } from "@/components/common/table";
-import { NoPrint, OnlyPrint } from "@/components/layout";
-import { PAGES, RULES } from "@/constants";
-import { actualDate, cleanValue, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedPrice, formatedSimplePhone, getTotal, getTotalSum, now, removeDecimal } from "@/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { ControlledComments } from "@/components/common/form";
+import ProductSearch from "@/components/common/search/search";
+import { Table, Total } from "@/components/common/table";
+import { Loader, NoPrint, OnlyPrint } from "@/components/layout";
+import { BUDGET_STATES, PAGES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, removeDecimal, isBudgetDraft } from "@/utils";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
 import { Box, Flex } from "rebass";
-import { List, ListItem, Message, Modal, Popup, Transition } from "semantic-ui-react";
-import ProductSearch from "../../common/search/search";
+import { Message, Modal, Popup, Transition } from "semantic-ui-react";
+import { v4 as uuid } from 'uuid';
 import PDFfile from "../PDFfile";
 import ModalComment from "./ModalComment";
-import ModalConfirmation from "./ModalConfirmation";
-import ModalCustomer from "./ModalCustomer";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
-  customer: {
-    name: '',
-    address: '',
-    phone: ''
-  },
+  customer: { name: '', addresses: [], phoneNumbers: [] },
   products: [],
   comments: '',
-  confirmed: false,
   globalDiscount: 0,
+  additionalCharge: 0,
   paymentMethods: PAYMENT_METHODS.map((method) => method.value),
   expirationOffsetDays: ''
 });
 
-const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isLoading, isCloning, printPdfMode }) => {
-  const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
-  const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
-  const [customerData, setCustomerData] = useState(budget?.customer);
+const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoading, isCloning, printPdfMode, draft }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
-  const [expiration, SetExpiration] = useState(false);
-  const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors, isSubmitted } } = useForm({
+  const hasShownModal = useRef(false);
+  const [isTableLoading, setIsTableLoading] = useState(false);
+  const [shouldShowModal, setShouldShowModal] = useState(false);
+  const [temporaryProducts, setTemporaryProducts] = useState([]);
+  const [expiration, setExpiration] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const { control, handleSubmit, setValue, getValues, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
       ...budget,
-      confirmed: isCloning ? false : budget?.confirmed,
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
   });
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const queryClient = useQueryClient();
-  const [watchProducts, watchGlobalDiscount, watchConfirmed] = watch(['products', 'globalDiscount', 'confirmed']);
-  const [total, setTotal] = useState(0);
+  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state']);
+  const [subtotal, setSubtotal] = useState(0);
+  const productSearchRef = useRef(null);
+  const customerOptions =
+    customers.filter(customer => customer.id && customer.name)
+      .map(customer => ({
+        key: customer.id, value: customer.id, text: customer.name,
+      }));
 
   useEffect(() => {
-    if (isCloning) {
+    if (isCloning && !hasShownModal.current) {
+      setIsTableLoading(true);
       let budgetProducts = [...budget.products];
       const outdatedProducts = products.filter(product => {
         const budgetProduct = budgetProducts.find(budgetProduct => budgetProduct.code === product.code);
@@ -78,22 +78,32 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
           }
           return product;
         });
-        setValue('products', newProducts);
+        setTemporaryProducts(newProducts);
         setOutdatedProducts(outdatedProducts);
         setRemovedProducts(budgetProducts);
-        setIsUpdateModalOpen(true);
+        setShouldShowModal(true);
+        hasShownModal.current = true;
+      } else {
+        setIsTableLoading(false);
       }
     }
-  }, [budget, isCloning, products]);
+  }, [budget, isCloning, products, watchProducts, setValue]);
+
+  const handleConfirmUpdate = () => {
+    setValue('products', temporaryProducts);
+    setShouldShowModal(false);
+    setIsTableLoading(false);
+  };
+
+  const handleCancelUpdate = () => {
+    setShouldShowModal(false);
+    setIsTableLoading(false);
+  };
 
   const calculateTotal = useCallback(() => {
-    const totalSum = getTotalSum(watchProducts, watchGlobalDiscount);
-    setTotal(totalSum);
-  }, [watchProducts, watchGlobalDiscount]);
-
-  useEffect(() => {
-    calculateTotal();
-  }, [watchProducts, calculateTotal]);
+    const totalSum = getTotalSum(watchProducts);
+    setSubtotal(totalSum);
+  }, [watchProducts]);
 
   const deleteProduct = useCallback((index) => {
     const newProducts = [...watchProducts];
@@ -105,315 +115,259 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
     calculateTotal();
   }, [watchProducts, calculateTotal]);
 
-  const handleCreate = (data) => {
-    if (!watchProducts.length) return;
-    onSubmit(data);
+  const handleCreate = async (data, state) => {
+    const isvalid = validateCustomer();
+    if (isvalid) {
+      const { seller, products, customer, globalDiscount, expirationOffsetDays, paymentMethods, comments, additionalCharge } = data;
+      const formData = {
+        seller, products, customer: { id: customer.id, name: customer.name }, globalDiscount,
+        expirationOffsetDays, paymentMethods, comments, state, additionalCharge
+      };
+      await onSubmit(formData);
+    };
+  };
+
+  const currentState = useMemo(() => {
+    if (isBudgetConfirmed(watchState)) {
+      return BUDGET_STATES.CONFIRMED;
+    }
+    return BUDGET_STATES.PENDING;
+  }, [watchState]);
+
+  const validateCustomer = () => {
+    const customer = getValues("customer");
+    if (isBudgetConfirmed(watchState) && (!customer.addresses.length || !customer.phoneNumbers.length)) {
+      if (!customer.addresses.length) {
+        setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
+      };
+      if (!customer.phoneNumbers.length) {
+        setError('customer.phoneNumbers', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
+      };
+      return false;
+    }
+    clearErrors('customer');
+    return true;
   };
 
   const handleReset = useCallback(() => {
-    setSelectedCustomer(null);
-    reset(EMPTY_BUDGET(user));
-  }, [reset, user]);
-
-  const handleCheckboxChange = () => {
-    if (!budget?.customer?.addresses[0] || !budget?.customer?.phoneNumbers[0]?.areaCode || !budget?.customer?.phoneNumbers[0]?.number) {
-      setIsModalCustomerOpen(true);
-      return;
+    if (draft || isCloning) {
+      reset({
+        ...EMPTY_BUDGET(user),
+        ...budget,
+        seller: `${user?.firstName} ${user?.lastName}`,
+      });
+    } else {
+      reset({
+        ...EMPTY_BUDGET(user),
+        seller: `${user?.firstName} ${user?.lastName}`,
+      });
     }
-    setIsModalConfirmationOpen(true);
-  };
+
+    if (productSearchRef.current) {
+      productSearchRef.current.clear();
+    }
+  }, [reset, user, draft, isCloning, budget]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
-    setSelectedProduct({ ...product, index });
+    setSelectedProduct(() => ({ ...product, index }));
     setIsModalCommentOpen(true);
   }, []);
 
-  const handleModalCustomerClose = (openNextModal, customer) => {
-    setIsModalCustomerOpen(false);
-    if (openNextModal) {
-      setCustomerData(customer);
-      setIsModalConfirmationOpen(true);
-    }
-  };
+  const handleModalCommentClose = () => setIsModalCommentOpen(false);
 
-  const handleModalConfirmationClose = () => {
-    setIsModalConfirmationOpen(false);
-  };
-
-  const handleModalCommentClose = () => {
-    setIsModalCommentOpen(false);
-  };
-
-  const handleUpdateModalClose = () => {
-    setIsUpdateModalOpen(false);
-  };
-
-  const actions = readonly ? [] : [
+  const actions = [
     {
       id: 1,
       icon: 'trash',
       color: 'red',
-      onClick: (element, index) => {
-        deleteProduct(index);
-      },
+      onClick: (element, index) => deleteProduct(index),
       tooltip: 'Eliminar'
-    }, {
+    },
+    {
       id: 2,
       icon: 'add',
       color: 'green',
-      onClick: (element, index) => {
-        handleOpenCommentModal(element, index);
-      },
+      onClick: (element, index) => handleOpenCommentModal(element, index),
       tooltip: 'Comentario para remito'
     },
   ];
 
-  const onAddComment = async (data) => {
-    const { index, dispatch: { comment, name, quantity } } = data;
+  const onAddComment = async ({ index, dispatchComment }) => {
     const newProducts = [...watchProducts];
     const product = newProducts[index];
-    product.dispatch = {
-      ...(comment && { comment }),
-      ...(name && { name }),
-      ...(quantity && { quantity })
-    };
+    product.dispatchComment = dispatchComment;
     setValue("products", newProducts);
-    setIsModalCommentOpen(false)
+    setIsModalCommentOpen(false);
   };
 
-  const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
-    return [
-      {
-        title: "Código",
-        value: (product) => (
-          <>
-            <Popup
-              size="tiny"
-              trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
-              position="top center"
-              on="hover"
-              content={product.brandName}
-            />
-            {'-'}
-            <Popup
-              size="tiny"
-              trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>}
-              position="top center"
-              on="hover"
-              content={product.supplierName}
-            />
-            {'-'}
-            <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
-          </>
-        ),
-        id: 1,
-        width: 1,
-        align: 'left'
-      },
-      {
-        title: "Nombre",
-        value: (product) => (
-          <Container>
-            {product.name}
-            <Flex ml="7px">
-              {product.comments && (
-                <Popup
-                  size="mini"
-                  content={product.comments}
-                  position="top center"
-                  trigger={
-                    <Box>
-                      <Icon name="info circle" color="yellow" />
-                    </Box>
-                  }
-                />
-              )}
-              {(product.dispatch?.comment || product.dispatch?.name || product.dispatch?.quantity) && (
-                <Popup
-                  size="mini"
-                  content={
-                    <List>
-                      {product.dispatch?.name && <ListItem>Nombre Remito: <b>{product.dispatch.name}</b></ListItem>}
-                      {product.dispatch?.comment && <ListItem>Comentario Remito: <b>{product.dispatch.comment}</b></ListItem>}
-                      {product.dispatch?.quantity && <ListItem>Cantidad Remito: <b>{product.dispatch.quantity}</b></ListItem>}
-                    </List>
-                  }
-                  position="top center"
-                  trigger={
-                    <Box >
-                      <Icon name="truck" color="orange" />
-                    </Box>
-                  }
-                />
-              )}
-            </Flex>
-          </Container>
-        ),
-        id: 2,
-        width: 7,
-        wrap: true,
-        align: 'left'
-      },
-      {
-        title: "Precio",
-        value: (product) => (
-          <Flex alignItems="center" justifyContent="space-between">
-            $
+  const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => [
+    {
+      id: 1,
+      title: "Código",
+      value: (product) => (
+        <>
+          <Popup size="tiny" trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>} position="top center" on="hover" content={product.brandName} />
+          {'-'}
+          <Popup size="tiny" trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>} position="top center" on="hover" content={product.supplierName} />
+          {'-'}
+          <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
+        </>
+      ),
+      width: 1,
+      align: 'left'
+    },
+    {
+      id: 2,
+      title: "Cantidad", value: (product, index) => (
+        <Controller name={`products[${index}].quantity`} control={control} rules={RULES.REQUIRED}
+          render={({ field: { onChange, ...rest } }) => (
             <CurrencyFormatInput
-              displayType="text"
-              thousandSeparator={true}
-              fixedDecimalScale={true}
+              {...rest}
+              height="35px"
+              $shadow
               decimalScale={2}
-              value={product.price}
+              displayType="input"
+              onFocus={(e) => e.target.select()} onChange={(e) => {
+                const value = Math.abs(e.target.value);
+                onChange(value);
+                calculateTotal();
+              }}
             />
+          )}
+        />
+      ),
+      width: 2
+    },
+    {
+      id: 3,
+      title: "Nombre",
+      value: (product) => (
+        <Container>
+          {product.name}
+          <Flex ml="7px">
+            {product.comments && (
+              <Popup size="mini" content={product.comments} position="top center" trigger={<Box><Icon name="info circle" color="yellow" /></Box>} />
+            )}
+            {product.dispatchComment && (
+              <Popup size="mini" content={product.dispatchComment} position="top center" trigger={<Box><Icon name="truck" color="orange" /></Box>} />
+            )}
           </Flex>
-        ),
-        id: 3,
-        width: 2,
-      },
-      {
-        title: "Cantidad", value: (product, index) => (
-          <>
-            {!readonly ? (
-              <Controller
-                name={`products[${index}].quantity`}
-                control={control}
-                rules={RULES.REQUIRED}
+        </Container>
+      ),
+      width: 6,
+      wrap: true,
+      align: 'left'
+    },
+    {
+      id: 4,
+      title: "Medida", value: (product, index) => (
+        <>
+          {product.fractionConfig?.active ? (
+            <Flex alignItems="center">
+              <Controller name={`products[${index}].fractionConfig.value`} control={control}
                 render={({ field: { onChange, ...rest } }) => (
                   <CurrencyFormatInput
                     {...rest}
                     height="35px"
-                    shadow
-                    thousandSeparator={true}
+                    $shadow
                     decimalScale={2}
-                    displayType="input"
-                    onFocus={(e) => e.target.select()}
-                    onChange={(e) => {
-                      const rawValue = e.target.value;
-                      const cleanedValue = cleanValue(rawValue);
-                      if (cleanedValue < 0) {
-                        onChange(Math.abs(cleanedValue));
-                        return;
-                      }
-                      onChange(cleanedValue);
-                      calculateTotal();
-                    }}
-                  />
-                )}
-              />
-            ) : (
-              <p>{product?.quantity}</p>
-            )}
-          </>
-        ),
-        id: 4,
-        width: 2
-      },
-      {
-        title: "Descuento",
-        value: (product, index) => (
-          <>
-            {!readonly ? (
-              <Controller
-                name={`products[${index}].discount`}
-                control={control}
-                defaultValue={product.discount || 0}
-                render={({ field: { onChange, ...rest } }) => (
-                  <Input
-                    {...rest}
-                    height="35px"
-                    center
-                    fluid
-                    type="number"
-                    onFocus={(e) => e.target.select()}
-                    onChange={(e) => {
-                      let value = removeDecimal(e.target.value);
-                      if (value > 100) return;
-                      if (value < 0) {
-                        onChange(Math.abs(value));
-                        return;
-                      }
+                    displayType="number"
+                    onFocus={(e) => e.target.select()} onChange={(e) => {
+                      const value = Math.abs(e.target.value);
                       onChange(value);
+                      setValue(`products[${index}].fractionConfig.price`, value * product.price);
                       calculateTotal();
                     }}
                   />
                 )}
               />
-            ) : (
-              <p>{formatedPercentage(product?.discount)}</p>
+              <Box mx="5px">{` ${product.fractionConfig.unit}`}</Box>
+            </Flex>
+          ) : (
+            ''
+          )}
+        </>
+      ),
+      width: 2
+    },
+    {
+      id: 5,
+      title: "Precio",
+      value: (product, index) => {
+        return product.editablePrice ?
+          <Controller
+            name={`products[${index}].price`}
+            control={control}
+            render={({ field: { onChange, value } }) => (
+              <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>$
+                <CurrencyFormatInput
+                  height="35px"
+                  displayType="input"
+                  thousandSeparator={true}
+                  decimalScale={2}
+                  allowNegative={false}
+                  customInput={Input}
+                  $marginBottom
+                  textAlignLast="right"
+                  onValueChange={value => {
+                    onChange(value.floatValue);
+                    calculateTotal();
+                  }}
+                  value={value || 0}
+                  placeholder="Precio"
+                />
+              </Flex>
             )}
-          </>
-        ),
-        id: 5,
-        width: 1
+          /> : <Price value={getPrice(product)} />
       },
-      {
-        title: "Total",
-        value: (product) => (
-          <Flex alignItems="center" justifyContent="space-between">
-            $
-            <CurrencyFormatInput
-              displayType="text"
-              thousandSeparator={true}
-              fixedDecimalScale={true}
-              decimalScale={2}
-              value={getTotal(product)}
-            />
-          </Flex>
-        ),
-        id: 6,
-        width: 3
-      },
-    ];
-  }, [control, calculateTotal, readonly]);
+      width: 2
+    },
+    {
+      id: 6,
+      title: "Descuento",
+      value: (product, index) => (
+        <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>
+          <Controller name={`products[${index}].discount`} control={control} defaultValue={product.discount || 0}
+            render={({ field: { onChange, ...rest } }) => (
+              <Input
+                {...rest}
+                $marginBottom
+                height="35px"
+                type="number"
+                onFocus={(e) => e.target.select()} onChange={(e) => {
+                  const value = Math.abs(removeDecimal(e.target.value));
+                  if (value > 100) return;
+                  onChange(value);
+                  calculateTotal();
+                }} />
+            )}
+          /> %
+        </Flex>
+      ),
+      width: 2
+    },
+    { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 7, width: 3 },
+  ], [control, calculateTotal, setValue]);
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
-      const confirmationData = { confirmedBy: `${user.firstName} ${user.lastName}`, confirmedAt: now() };
-      const { data } = await edit(confirmationData, budget?.id);
-      return data;
-    },
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
-        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
-        toast.success('Presupuesto confirmado!');
-        setValue('confirmed', true);
-        setIsModalConfirmationOpen(false);
-      } else {
-        toast.error(response.message);
-      }
-    },
-  });
+  const handleDraft = async (data) => {
+    await handleCreate(data, BUDGET_STATES.DRAFT.id);
+  };
+
+  const handleConfirm = async (data) => {
+    await handleCreate(data, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
+  };
+
+  useKeyboardShortcuts(() => handleSubmit(handleDraft)(), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => handleSubmit(handleConfirm)(), SHORTKEYS.ALT_ENTER);
+  useKeyboardShortcuts(() => handleReset(), SHORTKEYS.DELETE);
 
   return (
     <>
       <NoPrint>
-        {readonly && (
-          <>
-            <ModalCustomer
-              isModalOpen={isModalCustomerOpen}
-              onClose={handleModalCustomerClose}
-              customer={budget.customer}
-            />
-            <ModalConfirmation
-              isModalOpen={isModalConfirmationOpen}
-              onClose={handleModalConfirmationClose}
-              customer={customerData}
-              onConfirm={mutate}
-              isLoading={isPending}
-            />
-          </>
-        )}
-        <ModalComment
-          onAddComment={onAddComment}
-          isModalOpen={isModalCommentOpen}
-          onClose={handleModalCommentClose}
-          product={selectedProduct}
-        />
-        <Transition visible={isUpdateModalOpen} animation='scale' duration={500}>
-          <Modal closeOnDimmerClick={false} open={isUpdateModalOpen} onClose={handleUpdateModalClose} size="large">
-            <Modal.Header>Se actualizó el presupuesto ya que algunos productos sufrieron modificaciones</Modal.Header>
+        <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={handleModalCommentClose} product={selectedProduct} />
+        <Transition visible={shouldShowModal} animation='scale' duration={500}>
+          <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={handleCancelUpdate} size="large">
+            <Modal.Header>Desea actualizar el presupuesto, ya que algunos productos sufrieron modificaciones?</Modal.Header>
             <Modal.Content>
               {!!outdatedProducts.length && (
                 <Message>
@@ -445,227 +399,191 @@ const BudgetForm = ({ onSubmit, products, customers, budget, user, readonly, isL
               )}
             </Modal.Content>
             <Modal.Actions>
-              <Button color="green" onClick={handleUpdateModalClose}>Okey!</Button>
+              <ButtonsContainer>
+                <Button color="red" onClick={handleCancelUpdate}>Cancelar</Button>
+                <Button color="green" onClick={handleConfirmUpdate}>Confirmar</Button>
+              </ButtonsContainer>
             </Modal.Actions>
           </Modal>
         </Transition>
-        <Form onSubmit={handleSubmit(handleCreate)} >
+        <Form onSubmit={handleSubmit(handleConfirm)}>
           <FieldsContainer>
             <FormField width="300px">
-              <Controller
-                name="confirmed"
-                control={control}
-                render={({ field: { value, onChange, ...rest } }) => (
-                  <Checkbox
-                    {...rest}
-                    toggle
-                    readOnly={readonly && value}
-                    checked={value}
-                    onChange={() => {
-                      if (readonly) {
-                        handleCheckboxChange();
-                      } else {
-                        onChange(!value);
-                      }
-                    }}
-                    label={value ? "Confirmado" : "Confirmar presupuesto"}
-                  />
-                )}
+              <Checkbox
+                toggle
+                checked={isConfirmed}
+                onChange={() => {
+                  setIsConfirmed(!isConfirmed);
+                  setValue('state', isConfirmed ? BUDGET_STATES.PENDING.id : BUDGET_STATES.CONFIRMED.id);
+                }}
+                label={isConfirmed ? "Confirmado" : "Confirmar presupuesto"}
+                customColors={{ false: 'orange', true: 'green' }}
               />
             </FormField>
           </FieldsContainer>
           <FieldsContainer>
             <FormField width="300px">
               <Label>Vendedor</Label>
-              {!readonly ? (
-                <Controller
-                  name="seller"
-                  control={control}
-                  rules={{ required: 'Campo requerido' }}
-                  render={({ field: { value } }) => <Segment >{value}</Segment>}
-                />
-              ) : (
-                <Segment >{budget?.seller}</Segment>
-              )}
-            </FormField>
-          </FieldsContainer>
-          <FieldsContainer>
-            <FormField width="300px">
-              <RuledLabel title="Cliente" message={errors?.customer?.name?.message} required />
-              {!readonly ? (
-                <Controller
-                  name={`customer.name`}
-                  control={control}
-                  rules={RULES.REQUIRED}
-                  render={({ field }) => (
-                    <Dropdown
-                      name={`customer`}
-                      placeholder={PAGES.CUSTOMERS.NAME}
-                      search
-                      selection
-                      minCharacters={2}
-                      noResultsMessage="No se ha encontrado cliente!"
-                      options={customers}
-                      value={selectedCustomer}
-                      onChange={(e, { value }) => {
-                        field.onChange(value);
-                        const customer = customers.find((opt) => opt.value === value);
-                        setValue('customer.id', customer?.id);
-                        setValue('customer.address', customer?.addresses[0]?.address ?? '');
-                        setValue('customer.phone', customer?.phoneNumbers[0] ?? '');
-                        setSelectedCustomer(value);
-                      }}
-                    />
-                  )}
-                />
-              ) : (
-                <Segment >{budget?.customer?.name}</Segment>
-              )}
-            </FormField>
-            <FormField width={5}>
-              <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.address?.message} required={watchConfirmed} />
-              {!readonly ? (
-                <Controller
-                  name="customer.address"
-                  control={control}
-                  rules={watchConfirmed && RULES.REQUIRED}
-                  render={({ field: { value } }) => <Segment >{value}</Segment>}
-                />
-              ) : (
-                <Segment >{customerData?.addresses[0]?.address}</Segment>
-              )}
-            </FormField>
-            <FormField width="200px">
-              <RuledLabel title="Teléfono" message={errors?.customer?.phone?.message} required={watchConfirmed} />
-              {!readonly ? (
-                <Controller
-                  name="customer.phone"
-                  control={control}
-                  rules={watchConfirmed && RULES.REQUIRED}
-                  render={({ field: { value } }) => <Segment >{formatedSimplePhone(value)}</Segment>}
-                />
-              ) : (
-                <Segment >{formatedSimplePhone(customerData?.phoneNumbers[0])}</Segment>
-              )}
-            </FormField>
-          </FieldsContainer>
-          {!readonly && (
-            <FormField width="300px">
-              <RuledLabel title="Agregar producto" message={!watchProducts?.length && isSubmitted && isDirty && 'Al menos 1 producto es requerido'} required />
-              <ProductSearch
-                products={products}
-                onProductSelect={(selectedProduct) => {
-                  setValue("products", [...watchProducts, { ...selectedProduct, quantity: 1, discount: 0, key: Date.now().toString(36) + selectedProduct.code }]);
-                }}
+              <Controller name="seller" control={control} rules={RULES.REQUIRED}
+                render={({ field: { value } }) => <Segment>{value}</Segment>}
               />
             </FormField>
-          )}
-          <Table
-            mainKey="key"
-            headers={BUDGET_FORM_PRODUCT_COLUMNS}
-            elements={watchProducts}
-            actions={actions}
-            total={total}
-            globalDiscount={watchGlobalDiscount || 0}
-            setGlobalDiscount={(value) => setValue('globalDiscount', value)}
-            readOnly={readonly}
-            showTotal={!!watchProducts.length}
-          />
+          </FieldsContainer>
           <FieldsContainer>
-            <Label>Comentarios</Label>
-            <Controller
-              name="comments"
+            <FormField width="300px">
+              <RuledLabel title="Cliente" message={errors?.customer?.message} required />
+              <Controller
+                name="customer"
+                control={control}
+                rules={{ validate: value => value?.id ? true : "Campo requerido." }}
+                render={({ field: { onChange, value } }) => (
+                  <Dropdown
+                    placeholder={PAGES.CUSTOMERS.NAME}
+                    search
+                    clearable
+                    selection
+                    minCharacters={2}
+                    noResultsMessage="No se han encontrado resultados!"
+                    options={customerOptions}
+                    value={value?.id || null}
+                    onChange={(e, { value }) => {
+                      clearErrors(["customer"]);
+                      if (!value) {
+                        onChange(null);
+                        return;
+                      };
+                      const customer = customers.find(opt => opt.id === value);
+                      onChange(customer);
+                    }}
+                  />
+                )}
+              />
+            </FormField>
+            <FormField flex={1}>
+              <RuledLabel title="Dirección" message={isBudgetConfirmed(watchState) && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState)} />
+              <Segment placeholder>{watchCustomer?.addresses[0]?.address}</Segment>
+            </FormField>
+            <FormField width="200px">
+              <RuledLabel title="Teléfono" message={isBudgetConfirmed(watchState) && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
+              <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
+            </FormField>
+          </FieldsContainer>
+          <FormField width="300px">
+            <RuledLabel title="Agregar producto" message={errors?.products?.message} required />
+            <Controller name="products"
               control={control}
-              render={({ field }) => (
-                <TextArea
-                  {...field}
-                  maxLength="2000"
-                  placeholder="Comentarios"
-                  disabled={readonly}
-                />
+              rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
+              render={({ field: { onChange, value } }) => (
+                <ProductSearch
+                  ref={productSearchRef}
+                  products={products}
+                  onProductSelect={(selectedProduct) => {
+                    onChange([...watchProducts, {
+                      ...selectedProduct,
+                      quantity: 1,
+                      discount: 0,
+                      key: uuid(),
+                      ...(selectedProduct.fractionConfig?.active && {
+                        fractionConfig: {
+                          ...selectedProduct.fractionConfig,
+                          value: 1,
+                          price: selectedProduct.price,
+                        }
+                      })
+                    }]);
+                  }} />
               )}
             />
+          </FormField>
+          <Loader active={isTableLoading}>
+            <Table
+              mainKey="key"
+              headers={BUDGET_FORM_PRODUCT_COLUMNS}
+              elements={watchProducts}
+              actions={actions}
+            />
+            <Total
+              subtotal={subtotal}
+              globalDiscount={watchGlobalDiscount}
+              onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
+              additionalCharge={watchAdditionalCharge}
+              onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
+            />
+          </Loader>
+          <FieldsContainer>
+            <Label>Comentarios</Label>
+            <ControlledComments control={control} />
           </FieldsContainer>
           <FieldsContainer>
             <FormField flex={3}>
-              <Label>Metodos de pago</Label>
-              {!readonly ? (
-                <Controller
-                  name={`paymentMethods`}
-                  control={control}
-                  rules={{ required: true }}
-                  defaultValue={PAYMENT_METHODS.map((method) => method.value)}
-                  render={({ field }) => (
-                    <Dropdown
-                      minHeight="50px"
-                      min
-                      height="fit-content"
-                      name={`paymentMethods`}
-                      placeholder='Metodos de pago'
-                      multiple
-                      selection
-                      fluid
-                      minCharacters={2}
-                      noResultsMessage="No se ha encontrado metodo!"
-                      options={PAYMENT_METHODS}
-                      value={field.value}
-                      onChange={(e, { value }) => {
-                        field.onChange(value);
-                      }}
-                    />
-                  )}
-                />
-              ) : (
-                <Segment >{formattedPaymentMethods}</Segment>
-              )}
-            </FormField>
-            {!readonly && (
-              <>
-                <FormField flex={1}>
-                  <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
-                  <Controller
-                    name="expirationOffsetDays"
-                    control={control}
-                    rules={RULES.REQUIRED_THREE_NUMBERS}
-                    render={({ field }) =>
-                      <Input
-                        {...field}
-                        maxLength={50}
-                        type="text"
-                        placeholder="Cant. en días (p. ej: 3, 10, etc)"
-                        onChange={(e) => {
-                          let value = e.target.value;
-                          value = value.replace(/\D/g, '');
-                          field.onChange(value);
-                          SetExpiration(value);
-                        }}
-                      />}
+              <Label>Métodos de pago</Label>
+              <Controller
+                name="paymentMethods"
+                control={control}
+                rules={RULES.REQUIRED}
+                render={({ field: { onChange, ...rest } }) => (
+                  <Dropdown
+                    {...rest}
+                    minHeight="50px"
+                    height="fit-content"
+                    placeholder='Métodos de pago'
+                    multiple
+                    selection
+                    options={PAYMENT_METHODS}
+                    defaultValue={PAYMENT_METHODS.map(({ value }) => value)}
+                    onChange={(e, { value }) => onChange(value)}
                   />
-                </FormField>
-              </>
-            )}
+                )}
+              />
+            </FormField>
+            <FormField flex={1}>
+              <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
+              <Controller name="expirationOffsetDays" control={control}
+                rules={RULES.REQUIRED}
+                render={({ field }) => (
+                  <Input {...field} maxLength={3} type="text" placeholder="Cant. en días (p. ej: 3, 10, etc)"
+                    onChange={(e) => {
+                      let value = e.target.value;
+                      value = value.replace(/\D/g, '');
+                      if (parseInt(value, 10) > 365) value = TIME_IN_DAYS.YEAR;
+                      field.onChange(value);
+                      setExpiration(value);
+                    }}
+                  />
+                )}
+              />
+            </FormField>
             <FormField flex={1}>
               <Label>Fecha de vencimiento</Label>
-              {!readonly ? (
-                <Segment >{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
-              ) : (
-                <Segment >{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
-              )}
+              <Segment>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
             </FormField>
           </FieldsContainer>
-          {!readonly && (
-            <SubmitAndRestore
-              show={!readonly}
-              isLoading={isLoading}
-              isDirty={isDirty}
-              onClick={handleReset}
-            />
-          )}
-        </Form >
-
-      </NoPrint >
+          <SubmitAndRestore
+            draft={draft}
+            isLoading={isLoading && !isBudgetDraft(watchState)}
+            disabled={isLoading}
+            isDirty={isDirty}
+            isUpdating={draft || isCloning}
+            onReset={handleReset}
+            color={currentState.color}
+            onSubmit={handleSubmit(handleConfirm)}
+            icon={currentState.icon} text={currentState.title}
+            extraButton={
+              <Button
+                disabled={isLoading || !isDirty || isBudgetDraft(watchState)}
+                loading={isLoading && watchState === BUDGET_STATES.DRAFT.id}
+                type="button"
+                onClick={handleSubmit(handleDraft)}
+                color={BUDGET_STATES.DRAFT.color}
+              >
+                <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
+              </Button>
+            }
+          />
+        </Form>
+      </NoPrint>
       <OnlyPrint>
-        <PDFfile total={total} budget={budget} client={user.client?.metadata} printPdfMode={printPdfMode} />
+        <PDFfile subtotal={subtotal} budget={budget} client={user.client?.metadata} printPdfMode={printPdfMode} />
       </OnlyPrint>
     </>
   );

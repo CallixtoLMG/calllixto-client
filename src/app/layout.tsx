@@ -1,5 +1,4 @@
 "use client";
-// import { Footer } from "@/components/layout";
 import { UserProvider } from "@/User";
 import { GoBackButton } from "@/components/common/buttons";
 import { PaginationProvider } from "@/components/common/table/Pagination";
@@ -90,7 +89,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </PaginationProvider>
             </UserProvider>
           </QueryClientProvider>
-          {/* <Footer /> */}
         </body>
       </StyledComponentsRegistry>
     </html>

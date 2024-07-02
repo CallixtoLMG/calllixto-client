@@ -2,6 +2,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import * as XLSX from "xlsx";
+import { BUDGET_STATES, REGEX } from "./constants";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -34,10 +35,15 @@ export function encodeUri(value) {
   return undefined;
 };
 
-export const simpleFormatedPrice = (number) => {
-  let modNumber = Math.round(Number(number));
-  return `$ ${modNumber}`
-};
+export const formatedPricePdf = (number) => {
+  let modNumber = Number(number);
+  modNumber = Math.ceil(modNumber);
+  return modNumber.toLocaleString('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    minimumFractionDigits: 0,
+  });
+}
 
 export const formatProductCodePopup = (code, brand, supplier) => {
   const firstPart = code ? code?.substring(0, 2) : "";
@@ -64,8 +70,14 @@ export const formatedPercentage = (number = 0) => {
 }
 
 export const getTotal = (product) => {
-  return product.price * product.quantity * (1 - (product.discount / 100)) || 0;
+  const price = getPrice(product);
+  return price * product.quantity * (1 - (product.discount / 100)) || 0;
 };
+
+export const getPrice = (product) => {
+  const { editablePrice, fractionConfig, price} = product;
+  return editablePrice || !fractionConfig?.active ? price : fractionConfig?.value * price;
+}
 
 export const cleanValue = (value) => {
   return value.replace(/,/g, '');
@@ -81,42 +93,34 @@ export const getTotalSum = (products, discount = 0) => {
   return discountedTotal;
 };
 
+export const getSubtotal = (total, discountOrCharge) => {
+  const subtotal = total + (total * (discountOrCharge / 100));
+  return subtotal;
+};
+
 export const formatedSimplePhone = (phoneNumbers) => {
   if (!phoneNumbers) return '';
   return `+54 ${phoneNumbers.areaCode} ${phoneNumbers.number}`;
 };
 
-export const formatedPhone = (phoneNumbers) => {
-  if (phoneNumbers?.length === 0) return '';
-  return phoneNumbers?.map(phone => `+54 ${phone.areaCode} ${phone.number}`).join(', ');
-};
-
-export const formatPhoneForDisplay = (phoneNumbers) => {
+export const getPhonesForDisplay = (phoneNumbers) => {
   if (!phoneNumbers || phoneNumbers.length === 0) return { primaryPhone: '', additionalPhones: null };
 
   const primaryPhone = `+54 ${phoneNumbers[0]?.areaCode} ${phoneNumbers[0]?.number}`;
+  if (phoneNumbers.length === 1) return { primaryPhone, additionalPhones: null };
 
-  const additionalPhones = phoneNumbers.length > 1
-    ? phoneNumbers.slice(1).map(phone => (
-      <div key={`${phone.areaCode}-${phone.number}`}> {phone.ref ? `${phone.ref}:` : "Contacto: "} {`+54 ${phone.areaCode} ${phone.number}`}</div>
-    ))
-    : null;
-
+  const additionalPhones = phoneNumbers.slice(1);
   return { primaryPhone, additionalPhones };
 };
 
-export const formatAddressForDisplay = (addresses) => {
+export const getAddressesForDisplay = (addresses) => {
   if (!addresses || addresses.length === 0) return { primaryAddress: '', additionalAddress: null };
 
   const primaryAddress = addresses[0]?.address;
+  if (addresses.length === 1) return { primaryAddress, additionalAddress: null };
 
-  const additionalAddress = addresses.length > 1
-    ? addresses.slice(1).map(address => (
-      <div key={`${address.ref}-${address.address}`}>{address.ref ? `${address.ref}: ` : "Direccion: "}{address.address}</div>
-    ))
-    : null;
-
-  return { primaryAddress, additionalAddress };
+  const additionalAddresses = addresses.slice(1);
+  return { primaryAddress, additionalAddresses };
 };
 
 export const getSupplierCode = (code) => {
@@ -151,3 +155,22 @@ export const handleEnterKeyPress = (e, action) => {
   }
 };
 
+export const validateEmail = (email) => {
+  return REGEX.EMAIL.test(email);
+};
+
+export const validatePhone = (phone) => {
+  return phone?.areaCode?.length + phone?.number?.length === 10;
+};
+
+export const isBudgetDraft = (status) => {
+  return status === BUDGET_STATES.DRAFT.id;
+};
+
+export const isBudgetConfirmed = (status) => {
+  return status === BUDGET_STATES.CONFIRMED.id;
+};
+
+export const isBudgetCancelled = (status) => {
+  return status === BUDGET_STATES.CANCELLED.id;
+};

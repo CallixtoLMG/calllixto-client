@@ -1,8 +1,8 @@
-import { formatAddressForDisplay, formatPhoneForDisplay } from "@/utils";
-import { Box, Flex } from "rebass";
-import { Icon, Popup } from "semantic-ui-react";
+import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
+import { Flex } from "rebass";
+import { PhonesTooltip, AddressesTooltip, CommentTooltip } from "@/components/common/tooltips";
 
-const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESS: "addresses", PHONE: "phoneNumbers", COMMENT: "comments" };
+const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments" };
 
 const SUPPLIERS_COLUMNS = [
   {
@@ -18,28 +18,18 @@ const SUPPLIERS_COLUMNS = [
     value: (supplier) =>
       <Flex justifyContent="space-between">
         {supplier.name}
-        {supplier.comments && (
-          <Popup
-            size="mini"
-            content={supplier.comments}
-            position="top center"
-            trigger={
-              <Box marginX="5px">
-                <Icon name="info circle" color="yellow" />
-              </Box>
-            }
-          />
-        )}
+        {supplier.comments && <CommentTooltip comment={supplier.comments} />}
       </Flex>
   },
   {
     id: 3,
     title: "Dirección",
     value: (supplier) => {
-      const { primaryAddress } = formatAddressForDisplay(supplier.addresses || []);
+      const { primaryAddress, additionalAddresses } = getAddressesForDisplay(supplier.addresses || []);
       return (
         <Flex justifyContent="space-between">
           {primaryAddress}
+          {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
         </Flex>
       );
     }
@@ -48,21 +38,17 @@ const SUPPLIERS_COLUMNS = [
     id: 4,
     title: "Teléfono",
     width: 3,
-    value: (customer) => {
-      const { primaryPhone } = formatPhoneForDisplay(customer.phoneNumbers);
+    value: (supplier) => {
+      const { primaryPhone, additionalPhones } = getPhonesForDisplay(supplier.phoneNumbers);
       return (
         <Flex justifyContent="space-between">
           {primaryPhone}
+          {additionalPhones && <PhonesTooltip phones={additionalPhones} />}
         </Flex>
       );
     }
   },
 ];
 
-const FILTERS = [
-  { value: 'id', placeholder: 'Id' },
-  { value: 'name', placeholder: 'Nombre' },
-];
-
-export { ATTRIBUTES, FILTERS, SUPPLIERS_COLUMNS };
+export { ATTRIBUTES, SUPPLIERS_COLUMNS };
 
