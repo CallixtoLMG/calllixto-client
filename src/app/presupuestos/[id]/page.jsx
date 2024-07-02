@@ -15,7 +15,7 @@ import { Loader, NoPrint, useBreadcrumContext, useNavActionsContext } from "@/co
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { isBudgetCancelled, isBudgetConfirmed, now } from "@/utils";
+import { isBudgetCancelled, isBudgetConfirmed, isBudgetDraft, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -54,7 +54,7 @@ const Budget = ({ params }) => {
       PRODUCT_ATTRIBUTES.BRAND_NAME,
       PRODUCT_ATTRIBUTES.SUPPLIER_NAME
     ],
-    enabled: budget?.state.toUpperCase() === BUDGET_STATES.DRAFT.id
+    enabled: isBudgetDraft(budget?.state)
   });
   const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({
     attributes: [
