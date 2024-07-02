@@ -22,7 +22,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
       ...product,
     }
   });
-  console.log(isUpdating)
   const [supplier, setSupplier] = useState();
   const [brand, setBrand] = useState();
   const [watchFractionable] = watch(["fractionConfig.active"]);

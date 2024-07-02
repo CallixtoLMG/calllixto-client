@@ -7,7 +7,7 @@ import { Table, Total } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, removeDecimal } from "@/utils";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
@@ -20,7 +20,10 @@ import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styl
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
   customer: { name: '', addresses: [], phoneNumbers: [] },
-  products: [], comments: '', confirmed: false, globalDiscount: 0,
+  products: [],
+  comments: '',
+  globalDiscount: 0,
+  additionalCharge: 0,
   paymentMethods: PAYMENT_METHODS.map((method) => method.value),
   expirationOffsetDays: ''
 });
@@ -32,16 +35,16 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [expiration, setExpiration] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
   const { control, handleSubmit, setValue, getValues, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
       ...budget,
-      confirmed: isCloning ? false : budget?.confirmed,
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchConfirmed, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'additionalCharge', 'confirmed', 'customer', 'state']);
+  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state']);
   const [total, setTotal] = useState(0);
   const productSearchRef = useRef(null);
   const customerOptions =
@@ -95,28 +98,27 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   }, [watchProducts, calculateTotal]);
 
   const handleCreate = async (data, state) => {
-    setValue('state', state);
     const isvalid = validateCustomer();
     if (isvalid) {
-      const { seller, products, customer, confirmed, globalDiscount, expirationOffsetDays, paymentMethods, comments } = data;
+      const { seller, products, customer, globalDiscount, expirationOffsetDays, paymentMethods, comments, additionalCharge } = data;
       const formData = {
-        seller, products, customer: { id: customer.id, name: customer.name }, confirmed, globalDiscount,
-        expirationOffsetDays, paymentMethods, comments, state
+        seller, products, customer: { id: customer.id, name: customer.name }, globalDiscount,
+        expirationOffsetDays, paymentMethods, comments, state, additionalCharge
       };
       await onSubmit(formData);
     };
   };
 
   const currentState = useMemo(() => {
-    if (watchConfirmed) {
+    if (isBudgetConfirmed(watchState)) {
       return BUDGET_STATES.CONFIRMED;
     }
     return BUDGET_STATES.PENDING;
-  }, [watchConfirmed]);
+  }, [watchState]);
 
   const validateCustomer = () => {
     const customer = getValues("customer");
-    if (watchConfirmed && (!customer.addresses.length || !customer.phoneNumbers.length)) {
+    if (isBudgetConfirmed(watchState) && (!customer.addresses.length || !customer.phoneNumbers.length)) {
       if (!customer.addresses.length) {
         setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
@@ -134,13 +136,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       reset({
         ...EMPTY_BUDGET(user),
         ...budget,
-        confirmed: isCloning ? false : budget?.confirmed,
         seller: `${user?.firstName} ${user?.lastName}`,
       });
     } else {
       reset({
         ...EMPTY_BUDGET(user),
-        confirmed: false,
         seller: `${user?.firstName} ${user?.lastName}`,
       });
     }
@@ -338,7 +338,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   };
 
   const handleConfirm = async (data) => {
-    await handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
+    await handleCreate(data, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleDraft)(), SHORTKEYS.ENTER);
@@ -387,20 +387,18 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             </Modal.Actions>
           </Modal>
         </Transition>
-        <Form onSubmit={handleSubmit((data) => handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id))}>
+        <Form onSubmit={handleSubmit(handleConfirm)}>
           <FieldsContainer>
             <FormField width="300px">
-              <Controller name="confirmed" control={control}
-                render={({ field: { value, onChange, ...rest } }) => (
-                  <Checkbox
-                    {...rest}
-                    toggle
-                    checked={value}
-                    onChange={() => onChange(!value)}
-                    label={value ? "Confirmado" : "Confirmar presupuesto"}
-                    customColors={{ false: 'orange', true: 'green' }}
-                  />
-                )}
+              <Checkbox
+                toggle
+                checked={isConfirmed}
+                onChange={() => {
+                  setIsConfirmed(!isConfirmed);
+                  setValue('state', isConfirmed ? BUDGET_STATES.PENDING.id : BUDGET_STATES.CONFIRMED.id);
+                }}
+                label={isConfirmed ? "Confirmado" : "Confirmar presupuesto"}
+                customColors={{ false: 'orange', true: 'green' }}
               />
             </FormField>
           </FieldsContainer>
@@ -443,11 +441,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               />
             </FormField>
             <FormField flex={1}>
-              <RuledLabel title="Dirección" message={watchConfirmed && errors?.customer?.addresses?.message} required={watchConfirmed} />
+              <RuledLabel title="Dirección" message={isBudgetConfirmed(watchState) && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState)} />
               <Segment placeholder>{watchCustomer?.addresses[0]?.address}</Segment>
             </FormField>
             <FormField width="200px">
-              <RuledLabel title="Teléfono" message={watchConfirmed && errors?.customer?.phoneNumbers?.message} required={watchConfirmed} />
+              <RuledLabel title="Teléfono" message={isBudgetConfirmed(watchState) && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
               <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
             </FormField>
           </FieldsContainer>
@@ -547,14 +545,14 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             isUpdating={draft || isCloning}
             onReset={handleReset}
             color={currentState.color}
-            onSubmit={handleSubmit((data) => handleCreate(data, watchConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id))}
+            onSubmit={handleSubmit(handleConfirm)}
             icon={currentState.icon} text={currentState.title}
             extraButton={
               <Button
-                disabled={isLoading || !isDirty || watchConfirmed}
+                disabled={isLoading || !isDirty || isBudgetConfirmed(watchState)}
                 loading={isLoading && watchState === BUDGET_STATES.DRAFT.id}
                 type="button"
-                onClick={handleSubmit((data) => handleCreate(data, BUDGET_STATES.DRAFT.id))}
+                onClick={handleSubmit(handleDraft)}
                 color={BUDGET_STATES.DRAFT.color}
               >
                 <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}

@@ -19,7 +19,7 @@ export function create(budget) {
 };
 
 export function confirmBudget(budget, id) {
-  return axios.post(`${BUDGETS_URL}/${id}`, budget);
+  return axios.put(`${BUDGETS_URL}/${id}/confirm`, budget);
 };
 
 export function edit(budget) {
