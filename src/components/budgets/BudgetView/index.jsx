@@ -1,5 +1,5 @@
 import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
-import { Table } from "@/components/common/table";
+import { Table, Total } from "@/components/common/table";
 import { NoPrint, OnlyPrint } from "@/components/layout";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum } from "@/utils";
 import { useMemo } from "react";
@@ -133,12 +133,8 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
             mainKey="key"
             headers={BUDGET_FORM_PRODUCT_COLUMNS}
             elements={budget?.products}
-            total={total}
-            globalDiscount={budget?.globalDiscount || 0}
-            setGlobalDiscount={(value) => setValue('globalDiscount', value)}
-            showTotal={!!budget?.products?.length}
-            readOnly
           />
+          <Total total={total} globalDiscount={budget?.globalDiscount} additionalCharge={budget?.additionalCharge} />
           <FieldsContainer>
             <Label>Comentarios</Label>
             <Segment>{budget?.comments}</Segment>

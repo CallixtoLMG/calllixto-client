@@ -11,7 +11,7 @@ export const useAllowUpdate = () => {
   const button = (
     <>
       {RULES.canUpdate[role] && (
-        <Box marginBottom={15}>
+        <Box mb={15}>
           <Checkbox
             toggle checked={allowUpdate}
             onChange={(e, value) => setAllowUpdate(value.checked)} label="Actualizar"

@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import * as XLSX from "xlsx";
-import { REGEX } from "./constants";
+import { BUDGET_STATES, REGEX } from "./constants";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -157,3 +157,7 @@ export const validateEmail = (email) => {
 export const validatePhone = (phone) => {
   return phone?.areaCode?.length + phone?.number?.length === 10;
 };
+
+export const isBudgetConfirmed = (status) => {
+  return status === BUDGET_STATES.CONFIRMED.id;
+}

@@ -74,9 +74,9 @@ const CustomersPage = ({ customers = [], isLoading }) => {
               control={control}
               render={({ field }) => (
                 <Input
-                  marginBottom
                   maxWidth
                   {...field}
+                  $marginBottom
                   height="35px"
                   placeholder="Nombre"
                 />

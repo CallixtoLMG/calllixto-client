@@ -14,7 +14,7 @@ import { Loader, NoPrint, useBreadcrumContext, useNavActionsContext } from "@/co
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { now } from "@/utils";
+import { isBudgetConfirmed, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -74,7 +74,6 @@ const Budget = ({ params }) => {
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
-  const [confirmed, setConfirmed] = useState();
 
   const products = useMemo(() => productsData?.products?.map(product => ({
     ...product,
@@ -110,10 +109,9 @@ const Budget = ({ params }) => {
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
       ].filter(Boolean));
       setCustomerData(budget.customer);
-      setConfirmed(budget.state === BUDGET_STATES.CONFIRMED.id);
     }
   }, [setLabels, budget, push, isLoading]);
-  
+
   useEffect(() => {
     if (budget) {
       const printButtons = [
@@ -245,8 +243,6 @@ const Budget = ({ params }) => {
       const confirmationData = {
         confirmedBy: `${userData.firstName} ${userData.lastName}`,
         confirmedAt: now(),
-        confirmed: true,
-        state: BUDGET_STATES.CONFIRMED.id
       };
       const { data } = await confirmBudget(confirmationData, budget?.id);
       return data;
@@ -256,7 +252,6 @@ const Budget = ({ params }) => {
         queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto confirmado!');
-        setConfirmed(true);
         setIsModalConfirmationOpen(false);
         push(PAGES.BUDGETS.BASE);
       } else {
@@ -284,15 +279,15 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      {!budget?.confirmed && budget?.state !== BUDGET_STATES.DRAFT.id && (
+      {!isBudgetConfirmed(budget?.state) && budget?.state !== BUDGET_STATES.DRAFT.id && (
         <NoPrint>
-          <Box marginBottom={15}>
+          <Box mb={15}>
             <Checkbox
               toggle
-              checked={confirmed}
+              checked={isBudgetConfirmed(budget?.state)}
               onChange={handleCheckboxChange}
-              label={confirmed ? "Confirmado" : "Confirmar presupuesto"}
-              disabled={budget?.state === BUDGET_STATES.CONFIRMED.id || budget?.state === BUDGET_STATES.INACTIVE.id}
+              label={isBudgetConfirmed(budget?.state) ? "Confirmado" : "Confirmar presupuesto"}
+              disabled={isBudgetConfirmed(budget?.state) || budget?.state === BUDGET_STATES.INACTIVE.id}
               customColors={{
                 false: 'orange',
                 true: 'green'

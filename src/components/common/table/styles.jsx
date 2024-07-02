@@ -7,8 +7,8 @@ const Cell = styled(STable.Cell)`
   padding: 2px 7px!important;
   z-index: 2;
   text-align: ${({ align = 'center' }) => `${align}!important`};
-  text-align-last: ${({ align = 'center', right = false }) => right ? 'right!important' : `${align}!important`};
-  white-space: ${({ wrap = 'nowrap' }) => `${wrap}`};
+  text-align-last: ${({ align = 'center', $right  }) => $right ? 'right!important' : `${align}!important`};
+  white-space: ${({ $wrap }) => $wrap ? 'wrap' : 'nowrap'}!important;
 `;
 
 const Container = styled(Flex)`
