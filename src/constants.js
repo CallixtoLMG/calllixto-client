@@ -215,6 +215,6 @@ export const MEASSURE_UNITS = {
 };
 
 export const PRODUCTS_HELP = {
-  FRACTIONABLE_PRODUCT: "Precio editable: ...",
-  EDITABLE_PRICE: "Producto fraccioanble: ...",
+  FRACTIONABLE_PRODUCT: "Al activar esta opción los precios pueden ser editables desde la creación de un presupuesto.",
+  EDITABLE_PRICE: "Al activar esta opción se pueden fraccionar los productos desde la creación de un presupuesto.",
 };
