@@ -93,6 +93,11 @@ export const getTotalSum = (products, discount = 0) => {
   return discountedTotal;
 };
 
+export const getSubtotal = (total, discountOrCharge) => {
+  const subtotal = total + (total * (discountOrCharge / 100));
+  return subtotal;
+};
+
 export const formatedSimplePhone = (phoneNumbers) => {
   if (!phoneNumbers) return '';
   return `+54 ${phoneNumbers.areaCode} ${phoneNumbers.number}`;

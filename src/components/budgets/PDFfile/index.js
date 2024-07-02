@@ -21,7 +21,7 @@ import {
   Title
 } from "./styles";
 
-const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
+const PDFfile = ({ budget, subtotal, client, printPdfMode, id }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
@@ -158,7 +158,7 @@ const PDFfile = ({ budget, total, client, printPdfMode, id }) => {
                           <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
                           <Cell colSpan="1">
                             <strong>
-                              <Price value={total} />
+                              <Price value={subtotal} />
                             </strong>
                           </Cell>
                         </Table.Row>
