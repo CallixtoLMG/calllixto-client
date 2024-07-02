@@ -22,6 +22,10 @@ export function confirmBudget(budget, id) {
   return axios.put(`${BUDGETS_URL}/${id}/confirm`, budget);
 };
 
+export function cancelBudget(budget, id) {
+  return axios.put(`${BUDGETS_URL}/${id}/cancel`, budget);
+};
+
 export function edit(budget) {
   const body = {
     ...budget,
