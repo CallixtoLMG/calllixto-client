@@ -55,35 +55,38 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField width="250px">
-          <Controller
-            name="fractionConfig.active"
-            control={control}
-            render={({ field: { value, onChange, ...rest } }) => (
-              <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Producto Fraccionable" />
-            )}
-          />
+          <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>
+            <Controller
+              name="fractionConfig.active"
+              control={control}
+              render={({ field: { value, onChange, ...rest } }) => (
+                <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Producto Fraccionable" />
+              )}
+            />
+            <Popup
+              content={PRODUCTS_HELP.FRACTIONABLE_PRODUCT}
+              position='right center'
+              size='tiny'
+              trigger={<Icon size="tiny" circular inverted color="orange" name="question"></Icon>}
+            />
+          </Flex>
         </FormField>
         <FormField>
-          <Controller
-            name="editablePrice"
-            control={control}
-            render={({ field: { value, onChange, ...rest } }) => (
-              <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Precio editable" />
-            )}
-          />
-        </FormField>
-        <FormField>
-          <Popup
-            content={
-              <Flex flexDirection="column" >
-                <p>{PRODUCTS_HELP.FRACTIONABLE_PRODUCT}</p>
-                <p>{PRODUCTS_HELP.EDITABLE_PRICE}</p>
-              </Flex>}
-            trigger={<Icon size="small" circular inverted color="orange" name="question"></Icon>}
-            position='right center'
-            size='tiny'
-          />
-
+          <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>
+            <Controller
+              name="editablePrice"
+              control={control}
+              render={({ field: { value, onChange, ...rest } }) => (
+                <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Precio editable" />
+              )}
+            />
+            <Popup
+              content={PRODUCTS_HELP.EDITABLE_PRICE}
+              position='right center'
+              size='tiny'
+              trigger={<Icon size="tiny" circular inverted color="orange" name="question"></Icon>}
+            />
+          </Flex>
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
