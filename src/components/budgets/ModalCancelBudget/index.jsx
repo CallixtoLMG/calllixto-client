@@ -1,4 +1,4 @@
-import { Button, ButtonsContainer, FieldsContainer, TextArea } from "@/components/common/custom";
+import { Button, ButtonsContainer, FieldsContainer, Label, TextArea } from "@/components/common/custom";
 import { useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
 import { ModalContent } from "./styles";
@@ -9,14 +9,15 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
     <Transition visible={isModalOpen} animation='scale' duration={500}>
       <Modal open={isModalOpen} onClose={() => onClose(false)}>
         <Modal.Header>
-          Desea confirmar el presupuesto?
+          Desea anular la venta?
         </Modal.Header>
         <ModalContent>
           <FieldsContainer width="100%">
+            <Label>Motivo</Label>
             <TextArea
               padding="10px"
               width="100%"
-              placeholder="Motivo de cancelación..."
+              placeholder="Motivo de anulación..."
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
             />
@@ -27,17 +28,17 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
             <Button
               disabled={isLoading}
               type="button"
-              color="red"
+              color="grey"
               onClick={() => onClose(false)}>
               Cancelar
             </Button>
             <Button
-              color="green"
+              color="red"
               onClick={() => onConfirm(cancelReason)}
               disabled={!cancelReason || isLoading}
               loading={isLoading}
             >
-              Confirmar
+              Anular
             </Button>
           </ButtonsContainer>
         </Modal.Actions>

@@ -15,7 +15,7 @@ import { Loader, NoPrint, useBreadcrumContext, useNavActionsContext } from "@/co
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { isBudgetConfirmed, now } from "@/utils";
+import { isBudgetCancelled, isBudgetConfirmed, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -216,10 +216,10 @@ const Budget = ({ params }) => {
         },
         budget.state === BUDGET_STATES.CONFIRMED.id && {
           id: 4,
-          icon: 'delete',
+          icon: 'ban',
           color: 'red',
           onClick: () => setIsModalCancelOpen(true),
-          text: 'Cancelar'
+          text: 'Anular'
         },
       ].filter(Boolean);
       setActions(actions);
@@ -286,7 +286,7 @@ const Budget = ({ params }) => {
       if (response.statusOk) {
         queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
-        toast.success('Presupuesto cancelado!');
+        toast.success('Presupuesto anulado!');
         setIsModalCancelOpen(false);
         push(PAGES.BUDGETS.BASE);
       } else {
@@ -314,7 +314,7 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      {!isBudgetConfirmed(budget?.state) && budget?.state !== BUDGET_STATES.DRAFT.id && (
+      {!isBudgetConfirmed(budget?.state) && budget?.state !== BUDGET_STATES.DRAFT.id && !isBudgetCancelled(budget?.state) && (
         <NoPrint>
           <Box mb={15}>
             <Checkbox

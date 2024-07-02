@@ -160,4 +160,8 @@ export const validatePhone = (phone) => {
 
 export const isBudgetConfirmed = (status) => {
   return status === BUDGET_STATES.CONFIRMED.id;
-}
+};
+
+export const isBudgetCancelled = (status) => {
+  return status === BUDGET_STATES.CANCELLED.id;
+};

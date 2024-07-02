@@ -164,6 +164,12 @@ export const BUDGET_STATES = {
     color: 'teal',
     icon: 'erase',
   },
+  CANCELLED: {
+    id: 'CANCELLED',
+    title: 'Anulado',
+    color: 'red',
+    icon: 'ban',
+  },
   EXPIRED: {
     id: 'EXPIRED',
     title: 'Expirado',
@@ -175,13 +181,7 @@ export const BUDGET_STATES = {
     title: 'Inactivo',
     color: 'grey',
     icon: 'ban',
-  },
-  CANCELLED: {
-    id: 'CANCELLED',
-    title: 'Cancelado',
-    color: 'red',
-    icon: 'ban',
-  },
+  }
 };
 
 export const FILTER_TYPES = {
