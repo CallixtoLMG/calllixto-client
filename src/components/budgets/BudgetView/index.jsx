@@ -10,7 +10,7 @@ import { Container, Icon, Message, MessageHeader } from "./styles";
 
 const BudgetView = ({ budget, user, printPdfMode }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
-  const total = useMemo(() => getTotalSum(budget?.products, budget?.globalDiscount), [budget]);
+  const subtotal = useMemo(() => getTotalSum(budget?.products), [budget]);
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
@@ -140,7 +140,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
             headers={BUDGET_FORM_PRODUCT_COLUMNS}
             elements={budget?.products}
           />
-          <Total total={total} globalDiscount={budget?.globalDiscount} additionalCharge={budget?.additionalCharge} />
+          <Total readOnly subtotal={subtotal} globalDiscount={budget?.globalDiscount} additionalCharge={budget?.additionalCharge} />
           <FieldsContainer>
             <Label>Comentarios</Label>
             <Segment>{budget?.comments}</Segment>
@@ -158,7 +158,7 @@ const BudgetView = ({ budget, user, printPdfMode }) => {
         </ViewContainer>
       </NoPrint>
       <OnlyPrint>
-        <PDFfile total={total} budget={budget} client={user.client?.metadata} id={user.client?.id} printPdfMode={printPdfMode} />
+        <PDFfile subtotal={subtotal} budget={budget} client={user.client?.metadata} id={user.client?.id} printPdfMode={printPdfMode} />
       </OnlyPrint>
     </>
   );

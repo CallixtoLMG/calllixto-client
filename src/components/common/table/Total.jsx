@@ -1,4 +1,4 @@
-import { getSubtotal } from '@/utils';
+import { formatedPercentage, getSubtotal } from '@/utils';
 import { useMemo } from "react";
 import { Flex } from 'rebass';
 import {
@@ -11,6 +11,7 @@ import { Input, Price } from '../custom';
 import { Cell } from './styles';
 
 export const Total = ({
+  readOnly,
   subtotal = 0,
   globalDiscount = 0,
   onGlobalDiscountChange = () => { },
@@ -33,30 +34,32 @@ export const Total = ({
               <Label ribbon color="olive">Descuento</Label>
             </Cell>
             <Cell>
-              <Flex alignItems="center" justifyContent="flex-end" style={{ gridColumnGap: '10px' }}>
-                <Input
-                  $marginBottom
-                  width="75px"
-                  center
-                  height="35px"
-                  type="number"
-                  value={globalDiscount}
-                  onFocus={(e) => e.target.select()}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value > 100) {
-                      onGlobalDiscountChange(100);
-                      return;
-                    };
-                    if (value < 0) {
-                      onGlobalDiscountChange(0);
-                      return;
-                    };
-                    onGlobalDiscountChange(value);
-                  }}
-                />
-                %
-              </Flex>
+              {!readOnly ?
+                <Flex alignItems="center" justifyContent="flex-end" style={{ gridColumnGap: '10px' }}>
+                  <Input
+                    $marginBottom
+                    width="75px"
+                    center
+                    height="35px"
+                    type="number"
+                    value={globalDiscount}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value > 100) {
+                        onGlobalDiscountChange(100);
+                        return;
+                      };
+                      if (value < 0) {
+                        onGlobalDiscountChange(0);
+                        return;
+                      };
+                      onGlobalDiscountChange(value);
+                    }}
+                  />
+                  %
+                </Flex>
+                : <>{formatedPercentage(globalDiscount)}</>}
             </Cell>
           </TableRow>
           <TableRow>
@@ -68,30 +71,32 @@ export const Total = ({
               <Label ribbon color="pink">Recargo</Label>
             </Cell>
             <Cell>
-              <Flex alignItems="center" justifyContent="flex-end" style={{ gridColumnGap: '10px' }}>
-                <Input
-                  $marginBottom
-                  width="75px"
-                  center
-                  height="35px"
-                  type="number"
-                  value={additionalCharge}
-                  onFocus={(e) => e.target.select()}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (value > 100) {
-                      onAdditionalChargeChange(100);
-                      return;
-                    };
-                    if (value < 0) {
-                      onAdditionalChargeChange(0);
-                      return;
-                    };
-                    onAdditionalChargeChange(value);
-                  }}
-                />
-                %
-              </Flex>
+              {!readOnly ?
+                <Flex alignItems="center" justifyContent="flex-end" style={{ gridColumnGap: '10px' }}>
+                  <Input
+                    $marginBottom
+                    width="75px"
+                    center
+                    height="35px"
+                    type="number"
+                    value={additionalCharge}
+                    onFocus={(e) => e.target.select()}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value > 100) {
+                        onAdditionalChargeChange(100);
+                        return;
+                      };
+                      if (value < 0) {
+                        onAdditionalChargeChange(0);
+                        return;
+                      };
+                      onAdditionalChargeChange(value);
+                    }}
+                  />
+                  %
+                </Flex>
+                : <>{formatedPercentage(additionalCharge)}</>}
             </Cell>
           </TableRow>
           <TableRow>

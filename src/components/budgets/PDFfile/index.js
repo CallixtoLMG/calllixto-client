@@ -2,7 +2,7 @@ import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Price } from "@/components/common/custom";
 import { Cell, HeaderCell } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT } from "@/constants";
-import { formatedPercentage, formatedSimplePhone, getTotalSum, isBudgetCancelled } from "@/utils";
+import { formatedPercentage, formatedSimplePhone, getSubtotal, isBudgetCancelled } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { useMemo } from "react";
@@ -27,6 +27,8 @@ const PDFfile = ({ budget, subtotal, client, printPdfMode, id }) => {
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment)
     .map(product => `${product.name} - ${product.dispatchComment}`), [budget?.products]);
+  const subtotalAfterDiscount = useMemo(() => getSubtotal(subtotal, -budget.globalDiscount), [subtotal, budget]);
+  const finalTotal = useMemo(() => getSubtotal(subtotalAfterDiscount, budget.additionalCharge), [subtotalAfterDiscount, budget]);
 
   return (
     <table>
@@ -124,7 +126,7 @@ const PDFfile = ({ budget, subtotal, client, printPdfMode, id }) => {
                               <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
                               <Cell colSpan="1">
                                 <strong>
-                                  <Price value={getTotalSum(budget?.products)} />
+                                  <Price value={subtotal} />
                                 </strong>
                               </Cell>
                             </Table.Row>
@@ -142,7 +144,7 @@ const PDFfile = ({ budget, subtotal, client, printPdfMode, id }) => {
                               <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
                               <Cell colSpan="1">
                                 <strong>
-                                  <Price value={getTotalSum(budget?.products)} />
+                                  <Price value={subtotalAfterDiscount} />
                                 </strong>
                               </Cell>
                             </Table.Row>
@@ -158,7 +160,7 @@ const PDFfile = ({ budget, subtotal, client, printPdfMode, id }) => {
                           <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
                           <Cell colSpan="1">
                             <strong>
-                              <Price value={subtotal} />
+                              <Price value={finalTotal} />
                             </strong>
                           </Cell>
                         </Table.Row>
