@@ -21,7 +21,7 @@ const PDF = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      <PDFfile budget={budget} client={userData?.client?.metadata} total={getTotalSum(budget?.products)} />
+      <PDFfile budget={budget} client={userData?.client?.metadata} subtotal={getTotalSum(budget?.products)} />
     </Loader>
   )
 };

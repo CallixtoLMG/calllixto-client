@@ -163,6 +163,10 @@ export const validatePhone = (phone) => {
   return phone?.areaCode?.length + phone?.number?.length === 10;
 };
 
+export const isBudgetDraft = (status) => {
+  return status === BUDGET_STATES.DRAFT.id;
+};
+
 export const isBudgetConfirmed = (status) => {
   return status === BUDGET_STATES.CONFIRMED.id;
 };

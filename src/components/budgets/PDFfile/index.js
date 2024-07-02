@@ -21,14 +21,14 @@ import {
   Title
 } from "./styles";
 
-const PDFfile = ({ budget, subtotal, client, printPdfMode, id }) => {
+const PDFfile = ({ budget, subtotal = 0, client, printPdfMode, id }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment)
     .map(product => `${product.name} - ${product.dispatchComment}`), [budget?.products]);
-  const subtotalAfterDiscount = useMemo(() => getSubtotal(subtotal, -budget.globalDiscount), [subtotal, budget]);
-  const finalTotal = useMemo(() => getSubtotal(subtotalAfterDiscount, budget.additionalCharge), [subtotalAfterDiscount, budget]);
+  const subtotalAfterDiscount = useMemo(() => getSubtotal(subtotal, -budget?.globalDiscount || 0), [subtotal, budget]);
+  const finalTotal = useMemo(() => getSubtotal(subtotalAfterDiscount, budget?.additionalCharge || 0), [subtotalAfterDiscount, budget]);
 
   return (
     <table>

@@ -25,7 +25,7 @@ const BUDGETS_COLUMNS = [
     align: "left",
     value: (budget) =>
       <Box width="60px">
-        <Label ribbon color={BUDGET_STATES[budget.state.toUpperCase()]?.color}>
+        <Label ribbon color={BUDGET_STATES[budget?.state]?.color}>
           {budget.id}
         </Label>
       </Box>
