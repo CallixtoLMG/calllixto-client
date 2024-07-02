@@ -81,6 +81,7 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
                 <Input
                   {...field}
                   $marginBottom
+                  maxWidth
                   height="35px"
                   placeholder="Id"
                 />
@@ -93,6 +94,7 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
                 <Input
                   {...field}
                   $marginBottom
+                  maxWidth
                   height="35px"
                   placeholder="Nombre"
                 />

@@ -74,6 +74,7 @@ const CustomersPage = ({ customers = [], isLoading }) => {
               control={control}
               render={({ field }) => (
                 <Input
+                  maxWidth
                   {...field}
                   $marginBottom
                   height="35px"

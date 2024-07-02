@@ -79,6 +79,7 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
               control={control}
               render={({ field }) => (
                 <Input
+                  maxWidth
                   {...field}
                   $marginBottom
                   height="35px"
@@ -93,6 +94,7 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
                 <Input
                   {...field}
                   $marginBottom
+                  maxWidth
                   height="35px"
                   placeholder="Nombre"
                 />

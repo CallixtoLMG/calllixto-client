@@ -85,6 +85,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
                 <Input
                   {...field}
                   $marginBottom
+                  maxWidth
                   height="35px"
                   placeholder="Código"
                 />
@@ -97,6 +98,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
                 <Input
                   {...field}
                   $marginBottom
+                  maxWidth
                   height="35px"
                   placeholder="Nombre"
                 />

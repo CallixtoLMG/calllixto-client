@@ -38,7 +38,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
               name="name"
               control={control}
               rules={RULES.REQUIRED}
-              render={({ field }) => <Input {...field} placeholder="Nombre" onKeyPress={preventSend} />}
+              render={({ field }) => <Input  {...field} placeholder="Nombre" onKeyPress={preventSend} />}
             />
           </FormField>
         </FieldsContainer>
