@@ -167,13 +167,19 @@ export const BUDGET_STATES = {
   EXPIRED: {
     id: 'EXPIRED',
     title: 'Expirado',
-    color: 'red',
+    color: 'brown',
     icon: 'expired',
   },
   INACTIVE: {
     id: 'INACTIVE',
     title: 'Inactivo',
     color: 'grey',
+    icon: 'ban',
+  },
+  CANCELLED: {
+    id: 'CANCELLED',
+    title: 'Cancelado',
+    color: 'red',
     icon: 'ban',
   },
 };

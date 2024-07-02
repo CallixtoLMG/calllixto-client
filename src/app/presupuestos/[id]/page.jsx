@@ -1,10 +1,11 @@
 "use client";
 import { useUserContext } from "@/User";
-import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, confirmBudget, edit, useGetBudget } from "@/api/budgets";
+import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import BudgetView from "@/components/budgets/BudgetView";
+import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import { PopupActions } from "@/components/common/buttons";
@@ -64,7 +65,6 @@ const Budget = ({ params }) => {
     ],
     enabled: budget?.state === BUDGET_STATES.DRAFT.id
   });
-
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const { role } = useUserContext();
@@ -74,6 +74,7 @@ const Budget = ({ params }) => {
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
+  const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
 
   const products = useMemo(() => productsData?.products?.map(product => ({
     ...product,
@@ -213,7 +214,14 @@ const Budget = ({ params }) => {
           onClick: () => { push(PAGES.BUDGETS.CLONE(budget.id)) },
           text: 'Clonar'
         },
-      ];
+        budget.state === BUDGET_STATES.CONFIRMED.id && {
+          id: 4,
+          icon: 'delete',
+          color: 'red',
+          onClick: () => setIsModalCancelOpen(true),
+          text: 'Cancelar'
+        },
+      ].filter(Boolean);
       setActions(actions);
     }
   }, [budget, push, role, setActions]);
@@ -238,6 +246,10 @@ const Budget = ({ params }) => {
     setIsModalConfirmationOpen(false);
   };
 
+  const handleModalCancelClose = () => {
+    setIsModalCancelOpen(false);
+  };
+
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
       const confirmationData = {
@@ -253,6 +265,29 @@ const Budget = ({ params }) => {
         queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto confirmado!');
         setIsModalConfirmationOpen(false);
+        push(PAGES.BUDGETS.BASE);
+      } else {
+        toast.error(response.message);
+      }
+    },
+  });
+
+  const { mutate: mutateCancel, isPending: isPendingCancel } = useMutation({
+    mutationFn: async (cancelReason) => {
+      const cancelData = {
+        cancelledBy: `${userData.firstName} ${userData.lastName}`,
+        cancelledAt: now(),
+        cancelledMsg: cancelReason,
+      };
+      const { data } = await cancelBudget(cancelData, budget?.id);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
+        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
+        toast.success('Presupuesto cancelado!');
+        setIsModalCancelOpen(false);
         push(PAGES.BUDGETS.BASE);
       } else {
         toast.error(response.message);
@@ -319,7 +354,13 @@ const Budget = ({ params }) => {
           draft
           printPdfMode={printPdfMode}
         />) :
-        (<BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />)
+        (<><BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />
+          <ModalCancel
+            isModalOpen={isModalCancelOpen}
+            onClose={handleModalCancelClose}
+            onConfirm={mutateCancel}
+            isLoading={isPendingCancel}
+          /></>)
       }
     </Loader>
   );
