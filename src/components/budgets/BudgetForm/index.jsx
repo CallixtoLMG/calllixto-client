@@ -7,7 +7,7 @@ import { Table, Total } from "@/components/common/table";
 import { Loader, NoPrint, OnlyPrint } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, removeDecimal, isBudgetDraft } from "@/utils";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Box, Flex } from "rebass";
@@ -570,7 +570,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             icon={currentState.icon} text={currentState.title}
             extraButton={
               <Button
-                disabled={isLoading || !isDirty || isBudgetDraft(watchState)}
+                disabled={isLoading || !isDirty || isBudgetConfirmed(watchState)}
                 loading={isLoading && watchState === BUDGET_STATES.DRAFT.id}
                 type="button"
                 onClick={handleSubmit(handleDraft)}

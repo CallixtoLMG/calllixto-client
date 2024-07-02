@@ -12,7 +12,7 @@ const OnlyPrintContainer = styled.div`
     }
 
     @page :first {
-      margin-top: -125px;
+      margin-top: -80px;
     }
   }
 `;

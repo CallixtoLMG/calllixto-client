@@ -10,6 +10,7 @@ export const CurrencyFormatInput = styled(CurrencyFormat)`
   align-content: center;
   text-align-last: ${({ textAlignLast }) => textAlignLast} !important;
   margin-top: ${({ marginTop }) => `${marginTop}!important`};
+  margin: ${({ $marginBottom }) => $marginBottom & "5px 0"} !important;
 `;
 
 export const Price = ({ value }) => {
