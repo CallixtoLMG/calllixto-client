@@ -62,7 +62,7 @@ const BUDGETS_COLUMNS = [
 
 const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
   const includeDiscount = budget?.products?.some(product => product.discount);
-  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatchComment);
+  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatchCommen || product?.dispatch?.comment);
 
   return [
     {
@@ -107,7 +107,7 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       title: "Comentario",
       width: 7,
       wrap: true,
-      value: (product) => product.dispatchComment
+      value: (product) => product.dispatchComment || product?.dispatch?.comment
     }
   ].filter(Boolean);
 };

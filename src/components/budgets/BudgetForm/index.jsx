@@ -248,8 +248,8 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             {product.comments && (
               <Popup size="mini" content={product.comments} position="top center" trigger={<Box><Icon name="info circle" color="yellow" /></Box>} />
             )}
-            {product.dispatchComment && (
-              <Popup size="mini" content={product.dispatchComment} position="top center" trigger={<Box><Icon name="truck" color="orange" /></Box>} />
+            {product.dispatchComment || product?.dispatch?.comment && (
+              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Box><Icon name="truck" color="orange" /></Box>} />
             )}
           </Flex>
         </Container>
