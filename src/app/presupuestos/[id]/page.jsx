@@ -3,15 +3,16 @@ import { useUserContext } from "@/User";
 import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
+import { useDolarExangeRate } from "@/api/external";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import BudgetView from "@/components/budgets/BudgetView";
 import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import { PopupActions } from "@/components/common/buttons";
-import { Button, Checkbox, Icon } from "@/components/common/custom";
+import { Button, Checkbox, Icon, Input, Label } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
-import { Loader, NoPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
@@ -20,7 +21,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { Box } from "rebass";
+import { Flex } from "rebass";
+import { FormField } from "semantic-ui-react";
+import PDFfile from "@/components/budgets/PDFfile";
 
 const PrintButton = ({ onClick, color, iconName, text }) => (
   <Button
@@ -69,12 +72,21 @@ const Budget = ({ params }) => {
   const { resetActions, setActions } = useNavActionsContext();
   const { role } = useUserContext();
   const queryClient = useQueryClient();
+  const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
+  const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
   const [printPdfMode, setPrintPdfMode] = useState(BUDGET_PDF_FORMAT.CLIENT);
   const [customerData, setCustomerData] = useState();
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
+  const [dolarRate, setDolarRate] = useState(dolar);
+
+  useEffect(() => {
+    if (dolar && showDolarExangeRate) {
+      setDolarRate(dolar);
+    }
+  }, [dolar, showDolarExangeRate]);
 
   const products = useMemo(() => productsData?.products?.map(product => ({
     ...product,
@@ -314,54 +326,89 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      {!isBudgetConfirmed(budget?.state) && budget?.state !== BUDGET_STATES.DRAFT.id && !isBudgetCancelled(budget?.state) && (
-        <NoPrint>
-          <Box mb={15}>
+      <NoPrint>
+        <Flex justifyContent="space-between">
+          {!isBudgetConfirmed(budget?.state) && budget?.state !== BUDGET_STATES.DRAFT.id && !isBudgetCancelled(budget?.state) && (
+            <>
+              <Checkbox
+                toggle
+                checked={isBudgetConfirmed(budget?.state)}
+                onChange={handleCheckboxChange}
+                label={isBudgetConfirmed(budget?.state) ? "Confirmado" : "Confirmar presupuesto"}
+                disabled={isBudgetConfirmed(budget?.state) || budget?.state === BUDGET_STATES.INACTIVE.id}
+                customColors={{
+                  false: 'orange',
+                  true: 'green'
+                }}
+              />
+              <ModalCustomer
+                isModalOpen={isModalCustomerOpen}
+                onClose={handleModalCustomerClose}
+                customer={customerData}
+              />
+              <ModalConfirmation
+                isModalOpen={isModalConfirmationOpen}
+                onClose={handleModalConfirmationClose}
+                customer={customerData}
+                onConfirm={mutate}
+                isLoading={isPending}
+              />
+            </>
+          )}
+          <Flex alignItems="center" width="450px" style={{ gridColumnGap: '10px' }}>
             <Checkbox
               toggle
-              checked={isBudgetConfirmed(budget?.state)}
-              onChange={handleCheckboxChange}
-              label={isBudgetConfirmed(budget?.state) ? "Confirmado" : "Confirmar presupuesto"}
-              disabled={isBudgetConfirmed(budget?.state) || budget?.state === BUDGET_STATES.INACTIVE.id}
-              customColors={{
-                false: 'orange',
-                true: 'green'
-              }}
+              checked={showDolarExangeRate}
+              onChange={() => setShowDolarExangeRate(prev => !prev)}
+              label={"Imprimir con cotización en dólares"}
             />
-          </Box>
-          <ModalCustomer
-            isModalOpen={isModalCustomerOpen}
-            onClose={handleModalCustomerClose}
-            customer={customerData}
+            {showDolarExangeRate && (
+              <FormField>
+                <Label>Cotización</Label>
+                <Input
+                  height="35px"
+                  width="150px"
+                  value={dolarRate}
+                  onChange={(e) => setDolarRate(e.target.value)}
+                />
+              </FormField>
+            )}
+          </Flex>
+        </Flex>
+        {budget?.state === BUDGET_STATES.DRAFT.id ? (
+          <BudgetForm
+            onSubmit={mutateEdit}
+            products={products}
+            customers={customers}
+            user={userData}
+            budget={budget}
+            isLoading={isPendingEdit}
+            draft
+            printPdfMode={printPdfMode}
           />
-          <ModalConfirmation
-            isModalOpen={isModalConfirmationOpen}
-            onClose={handleModalConfirmationClose}
-            customer={customerData}
-            onConfirm={mutate}
-            isLoading={isPending}
-          />
-        </NoPrint>
-      )}
-      {budget?.state === BUDGET_STATES.DRAFT.id ?
-        (<BudgetForm
-          onSubmit={mutateEdit}
-          products={products}
-          customers={customers}
-          user={userData}
+        ) : (
+          <>
+            <BudgetView
+              budget={{ ...budget, customer: customerData }}
+            />
+            <ModalCancel
+              isModalOpen={isModalCancelOpen}
+              onClose={handleModalCancelClose}
+              onConfirm={mutateCancel}
+              isLoading={isPendingCancel}
+            />
+          </>
+        )}
+      </NoPrint>
+      <OnlyPrint>
+        <PDFfile
           budget={budget}
-          isLoading={isPendingEdit}
-          draft
+          client={userData}
+          id={userData.client?.id}
           printPdfMode={printPdfMode}
-        />) :
-        (<><BudgetView budget={{ ...budget, customer: customerData }} user={userData} printPdfMode={printPdfMode} />
-          <ModalCancel
-            isModalOpen={isModalCancelOpen}
-            onClose={handleModalCancelClose}
-            onConfirm={mutateCancel}
-            isLoading={isPendingCancel}
-          /></>)
-      }
+          dolarExchangeRate={showDolarExangeRate && dolarRate}
+        />
+      </OnlyPrint>
     </Loader>
   );
 };

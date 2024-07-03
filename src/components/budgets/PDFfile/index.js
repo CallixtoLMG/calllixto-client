@@ -2,7 +2,7 @@ import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Price } from "@/components/common/custom";
 import { Cell, HeaderCell } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT } from "@/constants";
-import { formatedPercentage, formatedSimplePhone, getSubtotal, isBudgetCancelled } from "@/utils";
+import { formatedPercentage, formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { useMemo } from "react";
@@ -21,12 +21,13 @@ import {
   Title
 } from "./styles";
 
-const PDFfile = ({ budget, subtotal = 0, client, printPdfMode, id }) => {
+const PDFfile = ({ budget, client, printPdfMode, id, dolarExchangeRate = 0 }) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
+  const subtotal = useMemo(() => getTotalSum(budget?.products), [budget]);
   const subtotalAfterDiscount = useMemo(() => getSubtotal(subtotal, -budget?.globalDiscount || 0), [subtotal, budget]);
   const finalTotal = useMemo(() => getSubtotal(subtotalAfterDiscount, budget?.additionalCharge || 0), [subtotalAfterDiscount, budget]);
 
@@ -196,6 +197,17 @@ const PDFfile = ({ budget, subtotal = 0, client, printPdfMode, id }) => {
                     <Label >Formas de pago</Label>
                     <Segment marginTop="0">
                       {budget?.paymentMethods?.join(" | ")}
+                    </Segment>
+                  </DataContainer>
+                </>
+              }
+              {!!dolarExchangeRate &&
+                <>
+                  <Divider $borderless />
+                  <DataContainer width="100%">
+                    <Label>Cotización en USD</Label>
+                    <Segment marginTop="0">
+                      <Price value={finalTotal / parseInt(dolarExchangeRate)} />
                     </Segment>
                   </DataContainer>
                 </>
