@@ -28,7 +28,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
   const { push } = useRouter();
   const { resetFilters } = usePaginationContext();
   const methods = useForm();
-  const { handleSubmit, control, reset, setValue, watch, resetField } = methods;
+  const { handleSubmit, control, reset, setValue, watch } = methods;
   const [watchState] = watch(['state']);
 
   const onFilter = (data) => {
@@ -87,10 +87,10 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                   options={STATE_OPTIONS}
                   defaultValue={STATE_OPTIONS[0].key}
                   onChange={(e, { value }) => {
-                    resetField('id');
+                    setValue('id', '');
                     if (value === DEFAULT_STATE.value) {
-                      resetField('customer');
-                      resetField('seller');
+                      setValue('customer', '');
+                      setValue('seller', '');
                     }
                     onChange(value);
                     handleSubmit(onFilter)();
@@ -109,8 +109,8 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                   height="35px"
                   placeholder="Id"
                   onChange={(e) => {
-                    resetField('customer');
-                    resetField('seller');
+                    setValue('customer', '');
+                    setValue('seller', '');
                     onChange(e.target.value);
                   }}
                 />
@@ -127,8 +127,9 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                   height="35px"
                   placeholder="Cliente"
                   onChange={(e) => {
-                    resetField('id');
-                    resetField('seller');
+                    console.log('hola!')
+                    setValue('id', '');
+                    setValue('seller', '');
                     onChange(e.target.value);
                   }}
                 />
@@ -137,7 +138,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
             <Controller
               name="seller"
               control={control}
-              render={({ field: { onChange, ...rest} }) => (
+              render={({ field: { onChange, ...rest } }) => (
                 <Input
                   {...rest}
                   $marginBottom
@@ -145,8 +146,8 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                   height="35px"
                   placeholder="Vendedor"
                   onChange={(e) => {
-                    resetField('customer');
-                    resetField('id');
+                    setValue('id', '');
+                    setValue('customer', '');
                     onChange(e.target.value);
                   }}
                 />
