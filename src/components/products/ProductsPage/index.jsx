@@ -20,7 +20,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const queryClient = useQueryClient();
   const { resetFilters } = usePaginationContext();
   const methods = useForm();
-  const { handleSubmit, control, reset } = methods;
+  const { handleSubmit, control, reset, setValue, resetField } = methods;
 
   const onFilter = (data) => {
     const filters = { ...data };
@@ -81,26 +81,34 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
             <Controller
               name="code"
               control={control}
-              render={({ field }) => (
+              render={({ field: { onChange, ...rest } }) => (
                 <Input
-                  {...field}
+                  {...rest}
                   $marginBottom
                   maxWidth
                   height="35px"
                   placeholder="Código"
+                  onChange={(e) => {
+                    setValue('name', '');
+                    onChange(e.target.value);
+                  }}
                 />
               )}
             />
             <Controller
               name="name"
               control={control}
-              render={({ field }) => (
+              render={({ field: { onChange, ...rest } }) => (
                 <Input
-                  {...field}
+                  {...rest}
                   $marginBottom
                   maxWidth
                   height="35px"
                   placeholder="Nombre"
+                  onChange={(e) => {
+                    setValue('code', '');
+                    onChange(e.target.value);
+                  }}
                 />
               )}
             />

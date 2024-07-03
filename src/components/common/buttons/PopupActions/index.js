@@ -4,7 +4,6 @@ import { Button, ButtonContainer, Container } from "./styles";
 
 const PopupActions = ({ title, color, buttons, icon, animated = true, position = "bottom center" }) => {
   return (
-
     <Popup
       position={position}
       trigger={
@@ -24,7 +23,7 @@ const PopupActions = ({ title, color, buttons, icon, animated = true, position =
           </Container>
         </NoPrint>
       }
-      on='click'
+      on="click"
     />
   );
 };

@@ -127,7 +127,6 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                   height="35px"
                   placeholder="Cliente"
                   onChange={(e) => {
-                    console.log('hola!')
                     setValue('id', '');
                     setValue('seller', '');
                     onChange(e.target.value);

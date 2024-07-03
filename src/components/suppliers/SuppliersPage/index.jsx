@@ -20,7 +20,7 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
   const queryClient = useQueryClient();
   const { resetFilters } = usePaginationContext();
   const methods = useForm();
-  const { handleSubmit, control, reset } = methods;
+  const { handleSubmit, control, reset, setValue } = methods;
 
   const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar la marca "${name}"?`, []);
 
@@ -77,26 +77,34 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
             <Controller
               name="id"
               control={control}
-              render={({ field }) => (
+              render={({ field: { onChange, ...rest} }) => (
                 <Input
-                  {...field}
+                  {...rest}
                   $marginBottom
                   maxWidth
                   height="35px"
                   placeholder="Id"
+                  onChange={(e) => {
+                    setValue('name', '');
+                    onChange(e.target.value);
+                  }}
                 />
               )}
             />
             <Controller
               name="name"
               control={control}
-              render={({ field }) => (
+              render={({ field: { onChange, ...rest} }) => (
                 <Input
-                  {...field}
+                  {...rest}
                   $marginBottom
                   maxWidth
                   height="35px"
                   placeholder="Nombre"
+                  onChange={(e) => {
+                    setValue('id', '');
+                    onChange(e.target.value);
+                  }}
                 />
               )}
             />

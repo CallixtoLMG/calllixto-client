@@ -24,13 +24,13 @@ const PaginationProvider = ({ children }) => {
 
   const goToNextPage = () => {
     if (currentPage < keys[activeKey].length - 1) {
-      setCurrentPage(currentPage + 1);
+      setCurrentPage(prev => prev + 1);
     }
   };
 
   const goToPreviousPage = () => {
     if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
+      setCurrentPage(prev => prev - 1);
     }
   };
 
@@ -93,11 +93,11 @@ const Paginator = () => {
 
   return (
     <PaginationContainer>
-      <Button circular icon onClick={goToPreviousPage} disabled={currentPage === 0}>
+      <Button type="button" circular icon onClick={goToPreviousPage} disabled={currentPage === 0}>
         <Icon name="arrow left" />
       </Button>
       <PaginationSegment>{Number(currentPage) + 1}</PaginationSegment>
-      <Button circular icon onClick={goToNextPage} disabled={!canGoNext}>
+      <Button type="button" circular icon onClick={goToNextPage} disabled={!canGoNext}>
         <Icon name="arrow right" />
       </Button>
     </PaginationContainer>
