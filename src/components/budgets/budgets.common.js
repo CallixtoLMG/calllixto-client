@@ -62,7 +62,7 @@ const BUDGETS_COLUMNS = [
 
 const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
   const includeDiscount = budget?.products?.some(product => product.discount);
-  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatchCommen || product?.dispatch?.comment);
+  const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatchComment || product.dispatch?.comment);
 
   return [
     {
