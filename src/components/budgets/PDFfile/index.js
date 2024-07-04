@@ -1,23 +1,21 @@
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Price } from "@/components/common/custom";
-import { Cell, HeaderCell } from '@/components/common/table';
+import { Table, Total } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT } from "@/constants";
-import { formatedPercentage, formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled } from "@/utils";
+import { formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { forwardRef, useMemo } from "react";
 import { Box, Flex } from "rebass";
-import { List, Table } from "semantic-ui-react";
+import { List } from "semantic-ui-react";
 import {
-  ClientDataContainer,
   DataContainer,
   Divider,
-  HeaderContainer,
   HeaderLabel,
   Image,
   Label,
+  SectionContainer,
   Segment,
-  TableRowHeader,
   Title
 } from "./styles";
 
@@ -32,134 +30,53 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   const finalTotal = useMemo(() => getSubtotal(subtotalAfterDiscount, budget?.additionalCharge || 0), [subtotalAfterDiscount, budget]);
 
   return (
-    <Box ref={ref} padding="40px">
-      <HeaderContainer>
-        <Flex flexDirection="column" alignSelf="center!important">
-          <Title as="h3">N° {budget?.id}</Title>
-          {isBudgetCancelled(budget?.state) && <Title as="h3">(Anulado)</Title>}
-          <Title as="h6">{client?.name || "Razon Social"}</Title>
-          <Title as="h6">CUIT: {client?.cuil || "CUIT"}</Title>
-        </Flex>
-        <Flex flexDirection="column" alignSelf="center!important">
-          {dispatchPdf ? <Title as="h2">Remito</Title> :
-            <>
-              <Title as="h3">X</Title>
-              <Title as="h6">DOCUMENTO NO VALIDO COMO FACTURA</Title>
-            </>
-          }
-        </Flex>
-        <Image src={`/clients/${id}.png`} alt="Logo empresa" />
-      </HeaderContainer>
-      <Divider />
-      <ClientDataContainer>
-        <DataContainer flex="1">
-          <HeaderLabel>Vendedor/a: {budget?.seller}</HeaderLabel>
-        </DataContainer>
-        <DataContainer flex="1">
-          <HeaderLabel>Fecha: {dayjs(budget?.createdAt).format('DD-MM-YYYY')}</HeaderLabel>
-        </DataContainer>
-        <DataContainer flex="1">
-          <HeaderLabel>Válido hasta: {dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</HeaderLabel>
-        </DataContainer>
-      </ClientDataContainer>
-      {clientPdf &&
-        <>
-          <ClientDataContainer>
-            <DataContainer flex="1">
-              <HeaderLabel>Dirección: {client?.addresses?.[0].address || "-"}</HeaderLabel>
-            </DataContainer>
-            <DataContainer flex="1">
-              <HeaderLabel>Teléfonos: {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ') || "-"}</HeaderLabel>
-            </DataContainer>
-            <DataContainer flex="1">
-              <HeaderLabel>IVA: {client?.iva || "Condición IVA"}</HeaderLabel>
-            </DataContainer>
-          </ClientDataContainer>
-        </>
-      }
-      <Divider />
-      <ClientDataContainer>
-        <DataContainer flex="1">
-          <HeaderLabel>Cliente: {(get(budget, "customer.name", ""))}</HeaderLabel>
-        </DataContainer>
-        <DataContainer flex="1">
-          <HeaderLabel>Dirección: {(get(budget, "customer.addresses[0].address", ""))}</HeaderLabel>
-        </DataContainer>
-        <DataContainer flex="1">
-          <HeaderLabel>Teléfono: {formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))}</HeaderLabel>
-        </DataContainer>
-      </ClientDataContainer>
-      <Divider />
-      <Flex margin="20px 0">
-        <Table celled compact striped>
-          <Table.Body>
-            <TableRowHeader>
-              {filteredColumns.map((header) => (
-                <HeaderCell key={`header_${header.id}`}>{header.title}</HeaderCell>
-              ))}
-            </TableRowHeader>
-            {budget?.products?.map((product) => {
-              return (
-                <Table.Row key={product.key}>
-                  {filteredColumns.map(header => (
-                    <Cell key={`cell_${header.id}`} align={header.align} width={header.width} $wrap={header.wrap}>
-                      {header?.value(product)}
-                    </Cell>
-                  ))}
-                </Table.Row>
-              );
-            })}
-            {!dispatchPdf && (
+    <Flex ref={ref} padding="40px" flexDirection="column" style={{ gridRowGap: '20px' }}>
+      <Box>
+        <Flex alignItems="center" justifyContent="space-between" marginBottom="10px">
+          <Flex flexDirection="column">
+            <Title as="h2" cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
+            <Title as="h4">{client?.name || "Razon Social"}</Title>
+            <Title as="h4">CUIT: {client?.cuil || "CUIT"}</Title>
+          </Flex>
+          <Flex flexDirection="column">
+            {dispatchPdf ? <Title as="h2">Remito</Title> :
               <>
-                {!!budget?.globalDiscount && (
-                  <>
-                    <Table.Row>
-                      <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
-                      <Cell colSpan="1">
-                        <strong>
-                          <Price value={subtotal} />
-                        </strong>
-                      </Cell>
-                    </Table.Row>
-                    <Table.Row>
-                      <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
-                      <Cell colSpan="1"><strong>
-                        {formatedPercentage(budget?.globalDiscount)}
-                      </strong></Cell>
-                    </Table.Row>
-                  </>
-                )}
-                {!!budget?.additionalCharge && (
-                  <>
-                    <Table.Row>
-                      <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
-                      <Cell colSpan="1">
-                        <strong>
-                          <Price value={subtotalAfterDiscount} />
-                        </strong>
-                      </Cell>
-                    </Table.Row>
-                    <Table.Row>
-                      <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>RECARGO</strong></Cell>
-                      <Cell colSpan="1"><strong>
-                        {formatedPercentage(budget?.additionalCharge)}
-                      </strong></Cell>
-                    </Table.Row>
-                  </>
-                )}
-                <Table.Row>
-                  <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
-                  <Cell colSpan="1">
-                    <strong>
-                      <Price value={finalTotal} />
-                    </strong>
-                  </Cell>
-                </Table.Row>
+                <Title as="h2">X</Title>
+                <Title as="h5">DOCUMENTO NO VALIDO COMO FACTURA</Title>
               </>
-            )}
-          </Table.Body>
-        </Table>
-      </Flex>
+            }
+          </Flex>
+          <Image src={`/clients/${id}.png`} alt="Logo empresa" />
+        </Flex>
+        <Divider />
+        <SectionContainer>
+          <HeaderLabel>Vendedor/a: {budget?.seller}</HeaderLabel>
+          <HeaderLabel>Fecha: {dayjs(budget?.createdAt).format('DD-MM-YYYY')}</HeaderLabel>
+          <HeaderLabel>Válido hasta: {dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</HeaderLabel>
+        </SectionContainer>
+        {true &&
+          <SectionContainer>
+            <HeaderLabel>Dirección: {client?.addresses?.[0].address || "-"}</HeaderLabel>
+            <HeaderLabel>Teléfonos: {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ') || "-"}</HeaderLabel>
+            <HeaderLabel>IVA: {client?.iva || "Condición IVA"}</HeaderLabel>
+          </SectionContainer>
+        }
+        <Divider />
+        <SectionContainer>
+          <HeaderLabel>Cliente: {(get(budget, "customer.name", ""))}</HeaderLabel>
+          <HeaderLabel>Dirección: {(get(budget, "customer.addresses[0].address", ""))}</HeaderLabel>
+          <HeaderLabel>Teléfono: {formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))}</HeaderLabel>
+        </SectionContainer>
+        <Divider />
+      </Box>
+      <Table
+        mainKey="key"
+        headers={filteredColumns}
+        elements={budget?.products}
+      />
+      {!dispatchPdf && (
+        <Total subtotal={subtotal} globalDiscount={budget?.globalDiscount} additionalCharge={budget?.additionalCharge} />
+      )}
       {(!!comments?.length || budget?.comments) && (
         <DataContainer width="100%">
           <Label>Comentarios</Label>
@@ -181,28 +98,22 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         </DataContainer>
       )}
       {!dispatchPdf &&
-        <>
-          <Divider $borderless />
-          <DataContainer width="100%">
-            <Label >Formas de pago</Label>
-            <Segment marginTop="0">
-              {budget?.paymentMethods?.join(" | ")}
-            </Segment>
-          </DataContainer>
-        </>
+        <DataContainer width="100%">
+          <Label >Formas de pago</Label>
+          <Segment marginTop="0">
+            {budget?.paymentMethods?.join(" | ")}
+          </Segment>
+        </DataContainer>
       }
       {!!dolarExchangeRate &&
-        <>
-          <Divider $borderless />
-          <DataContainer width="100%">
-            <Label>Cotización en USD</Label>
-            <Segment marginTop="0">
-              <Price value={finalTotal / parseInt(dolarExchangeRate)} />
-            </Segment>
-          </DataContainer>
-        </>
+        <DataContainer width="100%">
+          <Label>Cotización en USD</Label>
+          <Segment marginTop="0">
+            <Price value={finalTotal / parseInt(dolarExchangeRate)} />
+          </Segment>
+        </DataContainer>
       }
-    </Box>
+    </Flex>
   )
 });
 PDFfile.displayName = 'PDFfile';
