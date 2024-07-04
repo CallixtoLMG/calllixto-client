@@ -19,11 +19,12 @@ import { useValidateToken } from "@/hooks/userData";
 import { isBudgetCancelled, isBudgetConfirmed, isBudgetDraft, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { Flex } from "rebass";
 import { FormField } from "semantic-ui-react";
 import PDFfile from "@/components/budgets/PDFfile";
+import { useReactToPrint } from "react-to-print";
 
 const PrintButton = ({ onClick, color, iconName, text }) => (
   <Button
@@ -81,6 +82,7 @@ const Budget = ({ params }) => {
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
   const [dolarRate, setDolarRate] = useState(dolar);
+  const printRef = useRef();
 
   useEffect(() => {
     if (dolar && showDolarExangeRate) {
@@ -124,6 +126,11 @@ const Budget = ({ params }) => {
       setCustomerData(budget.customer);
     }
   }, [setLabels, budget, push, isLoading]);
+
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    removeAfterPrint: true,
+  });
 
   useEffect(() => {
     if (budget) {
@@ -189,7 +196,7 @@ const Budget = ({ params }) => {
                     key={mode}
                     onClick={() => {
                       setPrintPdfMode(mode);
-                      setTimeout(window.print);
+                      setTimeout(handlePrint);
                     }}
                     color={color}
                     iconName={iconName}
@@ -402,6 +409,7 @@ const Budget = ({ params }) => {
       </NoPrint>
       <OnlyPrint>
         <PDFfile
+          ref={printRef}
           budget={budget}
           client={userData}
           id={userData.client?.id}
