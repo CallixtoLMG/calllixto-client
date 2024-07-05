@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 const SectionContainer = styled(Flex)`
   justify-content: space-between;
-  min-height: 35px;
+  min-height: ${({ minHeight = '40px' }) => minHeight};
   align-items: center;
 
   & > * {
@@ -14,15 +14,20 @@ const SectionContainer = styled(Flex)`
 
 const DataContainer = styled(Flex)`
   flex-direction: column;
+  grid-row-gap: 5px;
   width: ${({ width }) => width} !important;
 `;
 
 const Title = styled(SHeader)`
   margin: 0!important;
-  color: ${({ color }) => color ? "rgba(235,124,21,255)" : "black"}!important;
+  color: ${({ color }) => color ? "rgba(235,124,21,255)" : "black"} !important;
   align-content: center;
-  align-self: center;
-  text-decoration: ${({ cancelled }) => cancelled ? 'line-through' : 'none' } ;
+  align-self: ${({ alignSelf }) => alignSelf || "center"} !important;
+  text-align: ${({ textAlign }) => textAlign || "left"} !important;
+  text-decoration: ${({ cancelled }) => cancelled ? 'line-through' : 'none' };
+  width: ${({ width }) => width || "auto"}!important;
+  font-weight: ${({ slim }) => slim ? 'normal' : "bold"} !important;
+  min-height: ${({ minHeight }) => minHeight || ""};
 `;
 
 const Divider = styled.div`
@@ -37,35 +42,5 @@ const Image = styled(SImage)`
   };
 `;
 
-const Segment = styled(SSegment)`
-  min-height: ${({ minHeight }) => minHeight || ""};
-  margin-top: ${({ marginTop }) => marginTop || "5px"} !important;
-  box-shadow: 0 0 0 0 !important;
-  background-color: white !important;
-  border: 0.5px solid grey !important;
-  border-top-left-radius: 0 !important;
-  border-top-right-radius: 0 !important;
-  padding: ${({ padding = '0 5px' }) => padding} !important;
-  line-height: 28px!important;
-  `;
-
-const HeaderLabel = styled(SLabel)`
-  background-color: white!important;
-  margin: 0!important;
-  padding: 3px 0!important;
-  font-size: 14px!important;
-`;
-
-const Label = styled(SLabel)`
-  border: 0.5px solid grey!important;
-  border-bottom-left-radius: 0!important;
-  border-bottom-right-radius: 0!important;
-  margin: 0!important;
-  margin-bottom: -1px!important;
-  height: 30px!important;
-  padding: 0 5px!important;
-  line-height: 30px!important;
-`;
-
-export { DataContainer, Divider, HeaderLabel, Image, Label, SectionContainer, Segment, Title };
+export { DataContainer, Divider, Image, SectionContainer, Title };
 

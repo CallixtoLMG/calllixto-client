@@ -15,6 +15,7 @@ import { Message, Modal, Popup, Transition } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
+import { CommentTooltip } from "@/components/common/tooltips";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -243,12 +244,10 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       value: (product) => (
         <Container>
           {product.name}
-          <Flex ml="7px">
-            {product.comments && (
-              <Popup size="mini" content={product.comments} position="top center" trigger={<Box><Icon name="info circle" color="yellow" /></Box>} />
-            )}
-            {product.dispatchComment || product?.dispatch?.comment && (
-              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Box><Icon name="truck" color="orange" /></Box>} />
+          <Flex mx="3px" style={{ gridColumnGap: '3px' }}>
+            {product.comments && <CommentTooltip comment={product.comments} />}
+            {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
+              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name="truck" color="orange" />} />
             )}
           </Flex>
         </Container>

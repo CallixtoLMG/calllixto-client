@@ -6,6 +6,7 @@ import { useMemo } from "react";
 import { Box, Flex } from "rebass";
 import { Popup } from "semantic-ui-react";
 import { Container, Icon, Message, MessageHeader } from "./styles";
+import { CommentTooltip } from "@/components/common/tooltips";
 
 const BudgetView = ({ budget }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
@@ -51,27 +52,13 @@ const BudgetView = ({ budget }) => {
           <Container>
             {product.name} {product.fractionConfig?.active && `x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}`}
             <Flex ml="7px">
-              {product.comments && (
-                <Popup
-                  size="mini"
-                  content={product.comments}
-                  position="top center"
-                  trigger={
-                    <Box>
-                      <Icon name="info circle" color="yellow" />
-                    </Box>
-                  }
-                />
-              )}
+              {product.comments && <CommentTooltip comment={product.comments} />}
               {product.dispatchComment && (
                 <Popup
                   size="mini"
                   content={product.dispatchComment}
                   position="top center"
-                  trigger={
-                    <Box >
-                      <Icon name="truck" color="orange" />
-                    </Box>
+                  trigger={<Icon name="truck" color="orange" />
                   }
                 />
               )}
