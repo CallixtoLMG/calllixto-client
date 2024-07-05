@@ -96,43 +96,46 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
           showAllways={false}
         />
       )}
-      {!!dolarExchangeRate && !dispatchPdf && (
-        <DataContainer width="100%">
-          <Title as="h4" alignSelf="left" slim>Cotización en USD</Title>
-          <Divider />
-          <Title as="h4" alignSelf="left" width="fit-content" minHeight="30px">
-            <Price value={finalTotal / parseInt(dolarExchangeRate)} />
-          </Title>
-        </DataContainer>
-      )}
-      {(!!comments?.length || budget?.comments) && (
-        <DataContainer width="100%">
-          <Title as="h4" alignSelf="left" slim>Comentarios</Title>
-          <Divider />
-          <Title as="h4" alignSelf="left" minHeight="30px">
-            {budget?.comments}
-            {!!comments.length && !dispatchPdf && (
-              <Box marginTop="2px">
-                <strong>Envío:</strong>
-                <List style={{ margin: '0' }}>
-                  {comments.map((comment, index) => (
-                    <List.Item key={index}>{comment}</List.Item>
-                  ))}
-                </List>
-              </Box>
-            )}
-          </Title>
-        </DataContainer>
-      )}
-      {!dispatchPdf &&
-        <DataContainer width="100%">
-          <Title as="h4" alignSelf="left" slim>Formas de Pago</Title>
-          <Divider />
-          <Title as="h4" alignSelf="left" minHeight="30px">
-            {budget?.paymentMethods?.join(" | ")}
-          </Title>
-        </DataContainer>
-      }
+      <Box height="10px" />
+      <Flex flexDirection="column" style={{ gridRowGap: '25px' }}>
+        {!!dolarExchangeRate && !dispatchPdf && (
+          <DataContainer width="100%">
+            <Title as="h4" alignSelf="left" slim>Cotización en USD</Title>
+            <Divider />
+            <Title as="h4" alignSelf="left" width="fit-content" minHeight="30px">
+              <Price value={finalTotal / parseInt(dolarExchangeRate)} />
+            </Title>
+          </DataContainer>
+        )}
+        {(!!comments?.length || budget?.comments) && (
+          <DataContainer width="100%">
+            <Title as="h4" alignSelf="left" slim>Comentarios</Title>
+            <Divider />
+            <Title as="h4" alignSelf="left" minHeight="30px">
+              {budget?.comments}
+              {!!comments.length && !dispatchPdf && (
+                <Box marginTop="2px">
+                  <strong>Envío:</strong>
+                  <List style={{ margin: '0' }}>
+                    {comments.map((comment, index) => (
+                      <List.Item key={index}>{comment}</List.Item>
+                    ))}
+                  </List>
+                </Box>
+              )}
+            </Title>
+          </DataContainer>
+        )}
+        {!dispatchPdf &&
+          <DataContainer width="100%">
+            <Title as="h4" alignSelf="left" slim>Formas de Pago</Title>
+            <Divider />
+            <Title as="h4" alignSelf="left" minHeight="30px">
+              {budget?.paymentMethods?.join(" | ")}
+            </Title>
+          </DataContainer>
+        }
+      </Flex>
     </Flex>
   )
 });
