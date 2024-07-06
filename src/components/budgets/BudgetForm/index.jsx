@@ -4,6 +4,7 @@ import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, Fiel
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
+import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
 import { BUDGET_STATES, PAGES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -15,7 +16,6 @@ import { Message, Modal, Popup, Transition } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
-import { CommentTooltip } from "@/components/common/tooltips";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -405,7 +405,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       </Transition>
       <Form onSubmit={handleSubmit(handleConfirm)}>
         <FieldsContainer>
-          <FormField width="300px">
+          <FormField margin="5px 0 0 0" width="300px">
             <Checkbox
               toggle
               checked={isConfirmed}

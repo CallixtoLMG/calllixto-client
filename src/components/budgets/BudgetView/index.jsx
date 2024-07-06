@@ -1,12 +1,11 @@
 import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { Table, Total } from "@/components/common/table";
-import { NoPrint } from "@/components/layout";
+import { CommentTooltip } from "@/components/common/tooltips";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetCancelled } from "@/utils";
 import { useMemo } from "react";
-import { Box, Flex } from "rebass";
+import { Flex } from "rebass";
 import { Popup } from "semantic-ui-react";
 import { Container, Icon, Message, MessageHeader } from "./styles";
-import { CommentTooltip } from "@/components/common/tooltips";
 
 const BudgetView = ({ budget }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);

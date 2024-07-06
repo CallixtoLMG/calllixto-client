@@ -2,15 +2,16 @@
 import { useUserContext } from "@/User";
 import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
-import { useListAllProducts } from "@/api/products";
 import { useDolarExangeRate } from "@/api/external";
+import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import BudgetView from "@/components/budgets/BudgetView";
 import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
+import PDFfile from "@/components/budgets/PDFfile";
 import { PopupActions } from "@/components/common/buttons";
-import { Button, Checkbox, Icon, Input, Label } from "@/components/common/custom";
+import { Button, Checkbox, CurrencyFormatInput, Icon, Label } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
@@ -19,12 +20,12 @@ import { useValidateToken } from "@/hooks/userData";
 import { isBudgetCancelled, isBudgetConfirmed, isBudgetDraft, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { Flex } from "rebass";
-import { FormField } from "semantic-ui-react";
-import PDFfile from "@/components/budgets/PDFfile";
 import { useReactToPrint } from "react-to-print";
+import { Flex } from "rebass";
+import { Container as SContainer, Input as SInput } from "semantic-ui-react";
+import styled from "styled-components";
 
 const PrintButton = ({ onClick, color, iconName, text }) => (
   <Button
@@ -43,6 +44,56 @@ const SendButton = ({ href, color, iconName, text, target = "_blank" }) => (
     </Button>
   </a>
 );
+
+const Container = styled(SContainer)`
+  &&&{
+    display:flex!important;
+    margin-bottom:${({ mb }) => mb ? "0" : "10px"}!important;
+    height:${({ height }) => height ? "0" : "30px"}!important;
+    justify-content:${({ justifyContent }) => justifyContent ? "space-between" : "flex-end"}!important;
+  }
+`;
+
+const CheckboxContainer = styled(SContainer)`
+  &&&{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items: center!important;
+    width: 100%!important;
+    max-width: 350px!important;
+    column-gap: 5px!important;
+    margin:0!important;
+  }
+`;
+
+const DolarContainer = styled(SContainer)`
+  &&&{
+    visibility: ${({ show }) => (show ? 'visible' : 'hidden')}!important;
+    display:flex!important;
+    width:fit-content;
+    color:red!important;
+    gap: 5px!important;
+    margin:0!important;
+  }
+`;
+
+const Input = styled(SInput)`
+  margin: 0!important;
+  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
+  border-radius: 0.28571429rem;
+  max-width: ${({ maxWidth }) => maxWidth && `200px!important;`};
+  height: ${({ height = '50px' }) => height} !important;
+  width: ${({ width = '100%' }) => `${width}!important`};
+  display: flex!important;
+  input{
+    height: ${({ height }) => height || '50px'} !important;
+    padding: 0 14px!important;
+    text-align: ${({ center }) => (center ? 'center' : 'left')} !important;
+  };
+  div{
+    line-height: 190%!important;
+  }
+`;
 
 const Budget = ({ params }) => {
   useValidateToken();
@@ -334,10 +385,15 @@ const Budget = ({ params }) => {
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
       <NoPrint>
-        <Flex justifyContent="space-between">
-          {!isBudgetConfirmed(budget?.state) && budget?.state !== BUDGET_STATES.DRAFT.id && !isBudgetCancelled(budget?.state) && (
+        <Container
+          mb={isBudgetDraft(budget?.state)}
+          height={isBudgetDraft(budget?.state)}
+          justifyContent={!isBudgetConfirmed(budget?.state)}
+        >
+          {!isBudgetConfirmed(budget?.state) && !isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
             <>
               <Checkbox
+                center
                 toggle
                 checked={isBudgetConfirmed(budget?.state)}
                 onChange={handleCheckboxChange}
@@ -362,26 +418,34 @@ const Budget = ({ params }) => {
               />
             </>
           )}
-          <Flex alignItems="center" width="450px" style={{ gridColumnGap: '10px' }}>
-            <Checkbox
-              toggle
-              checked={showDolarExangeRate}
-              onChange={() => setShowDolarExangeRate(prev => !prev)}
-              label={"Imprimir con cotización en dólares"}
-            />
-            {showDolarExangeRate && (
-              <FormField>
-                <Label>Cotización</Label>
-                <Input
-                  height="35px"
-                  width="150px"
-                  value={dolarRate}
-                  onChange={(e) => setDolarRate(e.target.value)}
+          {!isBudgetDraft(budget?.state) &&
+            <Flex mb="10px" height="30px" >
+              <CheckboxContainer>
+                <Checkbox
+                  toggle
+                  checked={showDolarExangeRate}
+                  onChange={() => setShowDolarExangeRate(prev => !prev)}
+                  label={"Cotizar en dólares"}
                 />
-              </FormField>
-            )}
-          </Flex>
-        </Flex>
+                <DolarContainer show={showDolarExangeRate}>
+                  <Label height="25px" width="fit-content">Cambio</Label>
+                  <CurrencyFormatInput
+                    height="25px"
+                    displayType="input"
+                    thousandSeparator={true}
+                    decimalScale={2}
+                    allowNegative={false}
+                    width="80px"
+                    prefix="$ "
+                    customInput={Input}
+                    onChange={(e) => setDolarRate(e.target.value)}
+                    value={dolarRate}
+                    placeholder="Precio"
+                  />
+                </DolarContainer>
+              </CheckboxContainer>
+            </Flex>}
+        </Container>
         {budget?.state === BUDGET_STATES.DRAFT.id ? (
           <BudgetForm
             onSubmit={mutateEdit}
@@ -417,7 +481,7 @@ const Budget = ({ params }) => {
           dolarExchangeRate={showDolarExangeRate && dolarRate}
         />
       </OnlyPrint>
-    </Loader>
+    </Loader >
   );
 };
 

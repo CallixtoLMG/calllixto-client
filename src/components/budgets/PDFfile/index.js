@@ -2,7 +2,8 @@ import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Price } from "@/components/common/custom";
 import { Table, Total } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/constants";
-import { expirationDate, formatedDateOnly, formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, now } from "@/utils";
+import { expirationDate, formatedDateOnly, formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft } from "@/utils";
+import dayjs from "dayjs";
 import { get } from "lodash";
 import { forwardRef, useMemo } from "react";
 import { Box, Flex } from "rebass";
@@ -14,10 +15,9 @@ import {
   SectionContainer,
   Title
 } from "./styles";
-import dayjs from "dayjs";
 
 const Field = ({ label, value, ...rest }) => (
-  <Flex style={{ gridColumnGap: '5px' }} {...rest}>
+  <Flex style={{ height: "15px", gridColumnGap: '5px' }} {...rest}>
     <Title as="h4" width="100px" textAlign="right" slim>{label} |</Title>
     <Title as="h4">{value?.toUpperCase() || '-'}</Title>
   </Flex>
@@ -37,8 +37,8 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   return (
     <Flex ref={ref} padding="30px" flexDirection="column" style={{ gridRowGap: '15px' }}>
       <Box>
-        <Flex alignItems="center" justifyContent="space-between" marginBottom="10px">
-          <Flex flexDirection="column">
+        <Flex alignItems="center" marginBottom="15px">
+          <Flex width="33%" flexDirection="column">
             <Title as="h3" cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
             {clientPdf && (
               <>
@@ -48,7 +48,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
               </>
             )}
           </Flex>
-          <Flex flexDirection="column">
+          <Flex width="33%" flexDirection="column">
             {isBudgetCancelled(budget?.state) && <Title as="h2">{BUDGET_STATES.CANCELLED.title.toUpperCase()}</Title>}
             {isBudgetDraft(budget?.state) && <Title as="h2">{BUDGET_STATES.DRAFT.title.toUpperCase()}</Title>}
             {dispatchPdf && <Title as="h2">REMITO</Title>}
@@ -60,10 +60,10 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             )}
             {internal && <Title as="h2">INTERNO</Title>}
           </Flex>
-          {clientPdf ? <Image src={`/clients/${id}.png`} alt="Logo empresa" /> : <Box></Box>}
+          {clientPdf ? <Image src={`/clients/${id}.png`} alt="Logo empresa" /> : <Box width="110px"></Box>}
         </Flex>
         <Divider />
-        <SectionContainer minHeight="70px">
+        <SectionContainer minHeight="50px">
           <Flex flexDirection="column" style={{ gridRowGap: '10px' }} flex="2">
             <Field label="Vendedor/a" value={budget?.seller} />
             <Field label="Teléfonos" value={client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')} />
@@ -74,8 +74,10 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
           </Flex>
         </SectionContainer>
         <Divider />
-        <SectionContainer>
+        <SectionContainer minHeight="25px">
           <Field label="Cliente" value={(get(budget, "customer.name", ""))} />
+        </SectionContainer>
+        <SectionContainer minHeight="25px">
           <Field label="Dirección" value={(get(budget, "customer.addresses[0].address", ""))} />
           <Field label="Teléfono" value={formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))} />
         </SectionContainer>

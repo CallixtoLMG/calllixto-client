@@ -1,10 +1,10 @@
 import { Flex } from "rebass";
-import { Header as SHeader, Image as SImage, Label as SLabel, Segment as SSegment, Table } from "semantic-ui-react";
+import { Header as SHeader, Image as SImage } from "semantic-ui-react";
 import styled from "styled-components";
 
 const SectionContainer = styled(Flex)`
   justify-content: space-between;
-  min-height: ${({ minHeight = '40px' }) => minHeight};
+  min-height: ${({ minHeight = '35px' }) => minHeight};
   align-items: center;
 
   & > * {
@@ -38,7 +38,8 @@ const Divider = styled.div`
 
 const Image = styled(SImage)`
   &&& {
-    height: 40px!important;
+    height: 70px!important;
+    width:33%!important;
   };
 `;
 

@@ -42,7 +42,13 @@ export const Input = styled(SInput)`
 `;
 
 export const Checkbox = styled(SCheckbox)`
+  height: ${({ height }) => height} !important;
+  align-self: ${({ center }) => center && "center!important"};
   ${({ customColors }) => customColors && css`
+  label{ 
+    display:flex;
+    aling-self:center;
+  };
     &&& {
       input:focus:checked~label:before {
       background-color: ${customColors.true}!important;
@@ -67,8 +73,9 @@ export const FormField = styled(Form.Field)`
 
 export const Label = styled(SLabel)`
   width: ${({ width }) => width ? width : '100%'} !important;
-  height: fit-content;
-  margin: 0!important;
+  height: ${({ height }) => height ? height : 'fit-content'} !important;
+  margin: ${({ margin }) => margin ? margin : '0'} !important;
+  align-content: center;
 `;
 
 export const TextArea = styled(STextarea)`
