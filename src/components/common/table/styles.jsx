@@ -7,7 +7,7 @@ const Cell = styled(STable.Cell)`
   padding: 2px 7px!important;
   z-index: 2;
   text-align: ${({ align = 'center' }) => `${align}!important`};
-  text-align-last: ${({ align = 'center', $right  }) => $right ? 'right!important' : `${align}!important`};
+  text-align-last: ${({ align = 'center', $right }) => $right ? 'right!important' : `${align}!important`};
   white-space: ${({ $wrap }) => $wrap ? 'wrap' : 'nowrap'}!important;
 `;
 
@@ -100,16 +100,6 @@ const InnerActionsContainer = styled(Flex)`
   column-gap: 3px;
 `;
 
-const LinkRow = styled(STable.Row)`
-  cursor: pointer;
-  position: relative;
-
-  &:hover ${ActionsContainer} {
-    opacity: 0.8;
-    visibility: visible;
-  }
-`;
-
 const TableRow = styled(STable.Row)`
   position: relative;
 
@@ -119,5 +109,17 @@ const TableRow = styled(STable.Row)`
   }
 `;
 
-export { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
+const LinkCell = styled(STable.Cell)`
+  height: 35px!important;
+  padding: 2px 7px!important;
+  cursor: pointer;
+  position: relative;
+
+  &:hover ${ActionsContainer} {
+    opacity: 0.8;
+    visibility: visible;
+  }
+`;
+
+export { LinkCell, ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, InnerActionsContainer, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
 

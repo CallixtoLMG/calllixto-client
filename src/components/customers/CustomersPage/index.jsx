@@ -91,7 +91,6 @@ const CustomersPage = ({ customers = [], isLoading }) => {
         elements={customers.map((customer, index) => ({ ...customer, key: index + 1 }))}
         page={PAGES.CUSTOMERS}
         actions={actions}
-        showPagination
       />
       <ModalDelete
         showModal={showModal}

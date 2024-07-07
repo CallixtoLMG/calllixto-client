@@ -117,7 +117,6 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
         elements={brands}
         page={PAGES.BRANDS}
         actions={actions}
-        showPagination
       />
       <ModalDelete
         showModal={showModal}

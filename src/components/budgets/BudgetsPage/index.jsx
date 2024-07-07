@@ -162,7 +162,6 @@ const BudgetsPage = ({ budgets, isLoading }) => {
         page={PAGES.BUDGETS}
         actions={actions}
         color={BUDGET_STATES[watchState]?.color}
-        showPagination
       />
     </>
 

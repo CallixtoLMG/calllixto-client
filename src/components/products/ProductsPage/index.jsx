@@ -6,10 +6,10 @@ import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Form } from "semantic-ui-react";
+import { Button, Form, Icon } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
 
 const EMPTY_FILTERS = { code: '', name: '' };
@@ -17,12 +17,13 @@ const EMPTY_FILTERS = { code: '', name: '' };
 const ProductsPage = ({ products = [], role, isLoading }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState({});
   const queryClient = useQueryClient();
   const { resetFilters } = usePaginationContext();
   const methods = useForm();
-  const { handleSubmit, control, reset, setValue, resetField } = methods;
+  const { handleSubmit, control, reset, setValue } = methods;
 
-  const onFilter = (data) => {
+  const onFilter = useCallback((data) => {
     const filters = { ...data };
     if (data.code) {
       filters.sort = "code";
@@ -31,7 +32,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
       filters.sort = "name";
     }
     resetFilters(filters);
-  };
+  }, [resetFilters]);
 
   const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar el producto "${name}"?`, []);
 
@@ -68,10 +69,36 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     },
   });
 
-  const onRestoreFilters = () => {
+  const onRestoreFilters = useCallback(() => {
     reset(EMPTY_FILTERS);
     onFilter(EMPTY_FILTERS);
-  }
+  }, [reset, onFilter]);
+
+  const onSelectionChange = useCallback((selected) => {
+    if (selectedProducts[selected]) {
+      const productsCopy = { ...selectedProducts };
+      delete productsCopy[selected];
+      setSelectedProducts(productsCopy);
+    } else {
+      setSelectedProducts(prev => ({ ...prev, [selected]: true }));
+    }
+  }, [selectedProducts]);
+
+  const selectionActions = useMemo(() => {
+    if (RULES.canRemove[role]) {
+      return [
+        <Button
+          onClick={() => console.log(selectedProducts)}
+          color="red"
+          size="tiny"
+          key={1}
+        >
+          <Icon name="trash" /> Borrar
+        </Button>
+      ];
+    }
+    return [];
+  }, [role, selectedProducts]);
 
   return (
     <>
@@ -122,7 +149,10 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
         elements={mapProductsForTable(products)}
         page={PAGES.PRODUCTS}
         actions={actions}
-        showPagination
+        selectable
+        selection={selectedProducts}
+        onSelectionChange={onSelectionChange}
+        selectionActions={selectionActions}
       />
       <ModalDelete
         showModal={showModal}

@@ -117,7 +117,6 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
         elements={suppliers}
         page={PAGES.SUPPLIERS}
         actions={actions}
-        showPagination
       />
       <ModalDelete
         showModal={showModal}
