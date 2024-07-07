@@ -1,217 +1,151 @@
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Price } from "@/components/common/custom";
-import { Cell, HeaderCell } from '@/components/common/table';
-import { BUDGET_PDF_FORMAT } from "@/constants";
-import { formatedPercentage, formatedSimplePhone, getSubtotal, isBudgetCancelled } from "@/utils";
+import { Table, Total } from '@/components/common/table';
+import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/constants";
+import { expirationDate, formatedDateOnly, formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
-import { useMemo } from "react";
+import { forwardRef, useMemo } from "react";
 import { Box, Flex } from "rebass";
-import { List, Table } from "semantic-ui-react";
+import { List } from "semantic-ui-react";
 import {
-  ClientDataContainer,
   DataContainer,
   Divider,
-  HeaderContainer,
-  HeaderLabel,
   Image,
-  Label,
-  Segment,
-  TableRowHeader,
+  SectionContainer,
   Title
 } from "./styles";
 
-const PDFfile = ({ budget, subtotal = 0, client, printPdfMode, id }) => {
+const Field = ({ label, value, ...rest }) => (
+  <Flex style={{ height: "15px", gridColumnGap: '5px' }} {...rest}>
+    <Title as="h4" width="100px" textAlign="right" slim>{label} |</Title>
+    <Title as="h4">{value?.toUpperCase() || '-'}</Title>
+  </Flex>
+);
+
+const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0 }, ref) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
+  const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL, [printPdfMode]);
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
+  const subtotal = useMemo(() => getTotalSum(budget?.products), [budget]);
   const subtotalAfterDiscount = useMemo(() => getSubtotal(subtotal, -budget?.globalDiscount || 0), [subtotal, budget]);
   const finalTotal = useMemo(() => getSubtotal(subtotalAfterDiscount, budget?.additionalCharge || 0), [subtotalAfterDiscount, budget]);
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <td>
-            <HeaderContainer>
-              <Flex flexDirection="column" alignSelf="center!important">
-                <Title as="h3">N° {budget?.id}</Title>
-                {isBudgetCancelled(budget?.state) && <Title as="h3">(Anulado)</Title>}
-                <Title as="h6">{client?.name || "Razon Social"}</Title>
-                <Title as="h6">CUIT: {client?.cuil || "CUIT"}</Title>
+    <Flex ref={ref} padding="30px" flexDirection="column" style={{ gridRowGap: '15px' }}>
+      <Box>
+        <Flex alignItems="center" marginBottom="15px" justifyContent="space-between">
+          <Flex flexDirection="column" width="150px">
+            <Title as="h3" cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
+            {clientPdf && (
+              <>
+                <Title as="h4">{client?.name?.toUpperCase() || "Razon Social"}</Title>
+                <Title as="h4">CUIT: {client?.cuil?.toUpperCase() || "CUIT"}</Title>
+                <Title as="h4">{client?.iva || "Condición IVA"}</Title>
+              </>
+            )}
+          </Flex>
+          <Flex flexDirection="column" flex="1">
+            {isBudgetCancelled(budget?.state) && <Title as="h2">{BUDGET_STATES.CANCELLED.title.toUpperCase()}</Title>}
+            {isBudgetDraft(budget?.state) && <Title as="h2">{BUDGET_STATES.DRAFT.title.toUpperCase()}</Title>}
+            {dispatchPdf && <Title as="h2">REMITO</Title>}
+            {clientPdf && (
+              <Flex flexDirection="column" style={{ gridRowGap: '10px' }}>
+                <Title as="h2">X</Title>
+                <Title as="h5">DOCUMENTO NO VÁLIDO COMO FACTURA</Title>
               </Flex>
-              <Flex flexDirection="column" alignSelf="center!important">
-                {dispatchPdf ? <Title as="h2">Remito</Title> :
-                  <>
-                    <Title as="h3">X</Title>
-                    <Title as="h6">DOCUMENTO NO VALIDO COMO FACTURA</Title>
-                  </>
-                }
-              </Flex>
-              <Image src={`/clients/${id}.png`} alt="Logo empresa" />
-            </HeaderContainer>
-          </td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <div style={{ width: '90vw' }}>
-              <Divider />
-              <ClientDataContainer>
-                <DataContainer flex="1">
-                  <HeaderLabel>Vendedor/a: {budget?.seller}</HeaderLabel>
-                </DataContainer>
-                <DataContainer flex="1">
-                  <HeaderLabel>Fecha: {dayjs(budget?.createdAt).format('DD-MM-YYYY')}</HeaderLabel>
-                </DataContainer>
-                <DataContainer flex="1">
-                  <HeaderLabel>Válido hasta: {dayjs(budget?.createdAt).add(10, 'day').format('DD-MM-YYYY')}</HeaderLabel>
-                </DataContainer>
-              </ClientDataContainer>
-              {clientPdf &&
-                <>
-                  <ClientDataContainer>
-                    <DataContainer flex="1">
-                      <HeaderLabel>Dirección: {client?.addresses?.[0].address || "-"}</HeaderLabel>
-                    </DataContainer>
-                    <DataContainer flex="1">
-                      <HeaderLabel>Teléfonos: {client?.phoneNumbers?.map(formatedSimplePhone).join(' | ') || "-"}</HeaderLabel>
-                    </DataContainer>
-                    <DataContainer flex="1">
-                      <HeaderLabel>IVA: {client?.iva || "Condición IVA"}</HeaderLabel>
-                    </DataContainer>
-                  </ClientDataContainer>
-                </>
-              }
-              <Divider />
-              <ClientDataContainer>
-                <DataContainer flex="1">
-                  <HeaderLabel>Cliente: {(get(budget, "customer.name", ""))}</HeaderLabel>
-                </DataContainer>
-                <DataContainer flex="1">
-                  <HeaderLabel>Dirección: {(get(budget, "customer.addresses[0].address", ""))}</HeaderLabel>
-                </DataContainer>
-                <DataContainer flex="1">
-                  <HeaderLabel>Teléfono: {formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))}</HeaderLabel>
-                </DataContainer>
-              </ClientDataContainer>
-              <Divider />
-              <Flex margin="20px 0">
-                <Table celled compact striped>
-                  <Table.Body>
-                    <TableRowHeader>
-                      {filteredColumns.map((header) => (
-                        <HeaderCell key={`header_${header.id}`}>{header.title}</HeaderCell>
-                      ))}
-                    </TableRowHeader>
-                    {budget?.products?.map((product) => {
-                      return (
-                        <Table.Row key={product.key}>
-                          {filteredColumns.map(header => (
-                            <Cell key={`cell_${header.id}`} align={header.align} width={header.width} $wrap={header.wrap}>
-                              {header?.value(product)}
-                            </Cell>
-                          ))}
-                        </Table.Row>
-                      );
-                    })}
-                    {!dispatchPdf && (
-                      <>
-                        {!!budget?.globalDiscount && (
-                          <>
-                            <Table.Row>
-                              <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
-                              <Cell colSpan="1">
-                                <strong>
-                                  <Price value={subtotal} />
-                                </strong>
-                              </Cell>
-                            </Table.Row>
-                            <Table.Row>
-                              <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>DESCUENTO GLOBAL</strong></Cell>
-                              <Cell colSpan="1"><strong>
-                                {formatedPercentage(budget?.globalDiscount)}
-                              </strong></Cell>
-                            </Table.Row>
-                          </>
-                        )}
-                        {!!budget?.additionalCharge && (
-                          <>
-                            <Table.Row>
-                              <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>SUB TOTAL</strong></Cell>
-                              <Cell colSpan="1">
-                                <strong>
-                                  <Price value={subtotalAfterDiscount} />
-                                </strong>
-                              </Cell>
-                            </Table.Row>
-                            <Table.Row>
-                              <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>RECARGO</strong></Cell>
-                              <Cell colSpan="1"><strong>
-                                {formatedPercentage(budget?.additionalCharge)}
-                              </strong></Cell>
-                            </Table.Row>
-                          </>
-                        )}
-                        <Table.Row>
-                          <Cell $right textAlign="right" colSpan={filteredColumns.length - 1}><strong>TOTAL</strong></Cell>
-                          <Cell colSpan="1">
-                            <strong>
-                              <Price value={finalTotal} />
-                            </strong>
-                          </Cell>
-                        </Table.Row>
-                      </>
-                    )}
-                  </Table.Body>
-                </Table>
-              </Flex>
-              {(!!comments?.length || budget?.comments) && (
-                <DataContainer width="100%">
-                  <Label>Comentarios</Label>
-                  <Segment
-                    marginTop="0"
-                    padding="5px">
-                    {budget?.comments}
-                    {!!comments.length && !dispatchPdf && (
-                      <Box marginTop="2px">
-                        <strong>Envío:</strong>
-                        <List style={{ margin: '0' }}>
-                          {comments.map((comment, index) => (
-                            <List.Item key={index}>{comment}</List.Item>
-                          ))}
-                        </List>
-                      </Box>
-                    )}
-                  </Segment>
-                </DataContainer>
+            )}
+            {internal && <Title as="h2">INTERNO</Title>}
+          </Flex>
+          <Box width="150px">
+            {clientPdf && <Image src={`/clients/${id}.png`} alt="Logo empresa"/>}
+          </Box>
+        </Flex>
+        <Divider />
+        <SectionContainer minHeight="50px">
+          <Flex flexDirection="column" style={{ gridRowGap: '10px' }} flex="2">
+            <Field label="Vendedor/a" value={budget?.seller} />
+            <Field label="Teléfonos" value={client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')} />
+          </Flex>
+          <Flex flexDirection="column" style={{ gridRowGap: '10px' }}>
+            <Field label="Fecha" value={dayjs().format('DD-MM-YYYY')} />
+            <Field label="Válido hasta" value={formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))} />
+          </Flex>
+        </SectionContainer>
+        <Divider />
+        <SectionContainer minHeight="50px">
+          <Flex flexDirection="column" style={{ gridRowGap: '10px' }} flex="2">
+            <Field label="Cliente" value={(get(budget, "customer.name", ""))} />
+            <Field label="Dirección" value={(get(budget, "customer.addresses[0].address", ""))} />
+          </Flex>
+          <Flex flexDirection="column" style={{ gridRowGap: '10px' }}>
+            <Box />
+            <Field label="Teléfono" value={formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))} />
+          </Flex>
+        </SectionContainer>
+        <Divider />
+      </Box>
+      <Table
+        mainKey="key"
+        headers={filteredColumns}
+        elements={budget?.products}
+        basic
+      />
+      {!dispatchPdf && (
+        <Total
+          subtotal={subtotal}
+          globalDiscount={budget?.globalDiscount}
+          additionalCharge={budget?.additionalCharge}
+          readOnly
+          showAllways={false}
+        />
+      )}
+      <Box height="10px" />
+      <Flex flexDirection="column" style={{ gridRowGap: '25px' }}>
+        {!!dolarExchangeRate && !dispatchPdf && (
+          <DataContainer width="100%">
+            <Title as="h4" alignSelf="left" slim>Cotización en USD</Title>
+            <Divider />
+            <Title as="h4" alignSelf="left" width="fit-content" minHeight="30px">
+              <Price value={finalTotal / parseInt(dolarExchangeRate)} />
+            </Title>
+          </DataContainer>
+        )}
+        {(!!comments?.length || budget?.comments) && (
+          <DataContainer width="100%">
+            <Title as="h4" alignSelf="left" slim>Comentarios</Title>
+            <Divider />
+            <Title as="h4" alignSelf="left" minHeight="30px">
+              {budget?.comments}
+              {!!comments.length && !dispatchPdf && (
+                <Box marginTop="2px">
+                  <strong>Envío:</strong>
+                  <List style={{ margin: '0' }}>
+                    {comments.map((comment, index) => (
+                      <List.Item key={index}>{comment}</List.Item>
+                    ))}
+                  </List>
+                </Box>
               )}
-              {!dispatchPdf &&
-                <>
-                  <Divider $borderless />
-                  <DataContainer width="100%">
-                    <Label >Formas de pago</Label>
-                    <Segment marginTop="0">
-                      {budget?.paymentMethods?.join(" | ")}
-                    </Segment>
-                  </DataContainer>
-                </>
-              }
-            </div>
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td>
-            <div></div>
-          </td>
-        </tr>
-      </tfoot>
-    </table>
+            </Title>
+          </DataContainer>
+        )}
+        {!dispatchPdf &&
+          <DataContainer width="100%">
+            <Title as="h4" alignSelf="left" slim>Formas de Pago</Title>
+            <Divider />
+            <Title as="h4" alignSelf="left" minHeight="30px">
+              {budget?.paymentMethods?.join(" | ")}
+            </Title>
+          </DataContainer>
+        }
+      </Flex>
+    </Flex>
   )
-};
+});
+PDFfile.displayName = 'PDFfile';
+
 export default PDFfile;

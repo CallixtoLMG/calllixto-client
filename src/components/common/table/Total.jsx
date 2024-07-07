@@ -1,14 +1,15 @@
+import { Divider, Title } from '@/components/budgets/PDFfile/styles';
 import { formatedPercentage, getSubtotal } from '@/utils';
 import { useMemo } from "react";
 import { Flex } from 'rebass';
-import {
-  Label,
-  Table,
-  TableBody,
-  TableRow,
-} from 'semantic-ui-react';
 import { Input, Price } from '../custom';
-import { Cell } from './styles';
+
+const Field = ({ label, children }) => (
+  <Flex justifyContent="space-between" height="30px">
+    <Title as="h4" slim width="100px" textAlign="right">{label}</Title>
+    <Title as="h4">{children}</Title>
+  </Flex>
+)
 
 export const Total = ({
   readOnly,
@@ -17,96 +18,89 @@ export const Total = ({
   onGlobalDiscountChange = () => { },
   additionalCharge = 0,
   onAdditionalChargeChange = () => { },
+  showAllways = true
 }) => {
   const subtotalAfterDiscount = useMemo(() => getSubtotal(subtotal, -globalDiscount), [subtotal, globalDiscount]);
   const finalTotal = useMemo(() => getSubtotal(subtotalAfterDiscount, additionalCharge), [subtotalAfterDiscount, additionalCharge]);
 
   return (
-    <Flex ml="auto">
-      <Table celled>
-        <TableBody>
-          <TableRow>
-            <Cell width={1} align="right">Sub total</Cell>
-            <Cell><Price value={subtotal} /></Cell>
-          </TableRow>
-          <TableRow>
-            <Cell align="left">
-              <Label ribbon color="olive">Descuento</Label>
-            </Cell>
-            <Cell>
-              {!readOnly ?
-                <Flex alignItems="center" justifyContent="flex-end" style={{ gridColumnGap: '10px' }}>
-                  <Input
-                    $marginBottom
-                    width="75px"
-                    center
-                    height="35px"
-                    type="number"
-                    value={globalDiscount}
-                    onFocus={(e) => e.target.select()}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value > 100) {
-                        onGlobalDiscountChange(100);
-                        return;
-                      };
-                      if (value < 0) {
-                        onGlobalDiscountChange(0);
-                        return;
-                      };
-                      onGlobalDiscountChange(value);
-                    }}
-                  />
-                  %
-                </Flex>
-                : <>{formatedPercentage(globalDiscount)}</>}
-            </Cell>
-          </TableRow>
-          <TableRow>
-            <Cell align="right">Sub total</Cell>
-            <Cell><Price value={subtotalAfterDiscount} /></Cell>
-          </TableRow>
-          <TableRow>
-            <Cell align="left">
-              <Label ribbon color="pink">Recargo</Label>
-            </Cell>
-            <Cell>
-              {!readOnly ?
-                <Flex alignItems="center" justifyContent="flex-end" style={{ gridColumnGap: '10px' }}>
-                  <Input
-                    $marginBottom
-                    width="75px"
-                    center
-                    height="35px"
-                    type="number"
-                    value={additionalCharge}
-                    onFocus={(e) => e.target.select()}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value > 100) {
-                        onAdditionalChargeChange(100);
-                        return;
-                      };
-                      if (value < 0) {
-                        onAdditionalChargeChange(0);
-                        return;
-                      };
-                      onAdditionalChargeChange(value);
-                    }}
-                  />
-                  %
-                </Flex>
-                : <>{formatedPercentage(additionalCharge)}</>}
-            </Cell>
-          </TableRow>
-          <TableRow>
-            <Cell align="right">
-              <b>Total</b>
-            </Cell>
-            <Cell><b><Price value={finalTotal} /></b></Cell>
-          </TableRow>
-        </TableBody>
-      </Table>
+    <Flex ml="auto" flexDirection="column" style={{ gridRowGap: readOnly ? "0" : '5px' }} width="250px">
+      {(showAllways || !!globalDiscount) && (
+        <>
+          <Field label="Sub total"><Price value={subtotal} /></Field>
+          <Divider />
+          <Field label="Descuento">
+            {!readOnly ?
+              <Flex alignItems="center" justifyContent="flex-end" style={{ gridColumnGap: '10px' }}>
+                <Input
+                  $marginBottom
+                  width="80px"
+                  center
+                  height="30px"
+                  type="number"
+                  value={globalDiscount}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value > 100) {
+                      onGlobalDiscountChange(100);
+                      return;
+                    };
+                    if (value < 0) {
+                      onGlobalDiscountChange(0);
+                      return;
+                    };
+                    onGlobalDiscountChange(value);
+                  }}
+                />
+                %
+              </Flex>
+              : <>{formatedPercentage(globalDiscount)}</>
+            }
+          </Field>
+          <Divider />
+        </>
+      )}
+      {(showAllways || !!additionalCharge) && (
+        <>
+          <Field label="Sub total"><Price value={subtotalAfterDiscount} /></Field>
+          <Divider />
+          <Field label="Recargo">
+            {!readOnly ?
+              <Flex alignItems="center" justifyContent="flex-end" style={{ gridColumnGap: '10px' }}>
+                <Input
+                  $marginBottom
+                  width="80px"
+                  center
+                  height="30px"
+                  type="number"
+                  value={additionalCharge}
+                  onFocus={(e) => e.target.select()}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value > 100) {
+                      onAdditionalChargeChange(100);
+                      return;
+                    };
+                    if (value < 0) {
+                      onAdditionalChargeChange(0);
+                      return;
+                    };
+                    onAdditionalChargeChange(value);
+                  }}
+                />
+                %
+              </Flex>
+              : <>{formatedPercentage(additionalCharge)}</>
+            }
+          </Field>
+          <Divider />
+        </>
+      )}
+      <Flex justifyContent="space-between" height="30px">
+        <Title as="h4" width="100px" textAlign="right">TOTAL</Title>
+        <Title as="h3"><Price value={finalTotal} /></Title>
+      </Flex>
     </Flex>
   );
 };

@@ -174,3 +174,7 @@ export const isBudgetConfirmed = (status) => {
 export const isBudgetCancelled = (status) => {
   return status === BUDGET_STATES.CANCELLED.id;
 };
+
+export const isBudgetPending = (status) => {
+  return status === BUDGET_STATES.PENDING.id;
+};

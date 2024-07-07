@@ -2,7 +2,7 @@
 import { useGetBudget } from "@/api/budgets";
 import PDFfile from "@/components/budgets/PDFfile";
 import { Loader } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { BUDGET_PDF_FORMAT, PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useValidateToken } from "@/hooks/userData";
 import { useUserContext } from "@/User";
@@ -21,7 +21,12 @@ const PDF = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      <PDFfile budget={budget} client={userData?.client?.metadata} subtotal={getTotalSum(budget?.products)} />
+      <PDFfile
+        budget={budget}
+        client={userData?.client?.metadata}
+        subtotal={getTotalSum(budget?.products)}
+        printPdfMode={BUDGET_PDF_FORMAT.CLIENT}
+      />
     </Loader>
   )
 };

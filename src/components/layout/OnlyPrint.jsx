@@ -5,14 +5,12 @@ const OnlyPrintContainer = styled.div`
   @media print {
     display: block;
     @page {
-      margin-left: 0px;
-      margin-right: 0px;
-      margin-top: 0;
-      margin-bottom: 25px;
+      margin-bottom: 30px;
+      margin-top: 30px;
     }
-
     @page :first {
-      margin-top: -80px;
+      margin-top: 0px;
+      margin-bottom: 30px;
     }
   }
 `;

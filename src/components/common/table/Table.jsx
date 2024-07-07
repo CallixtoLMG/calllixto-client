@@ -14,7 +14,8 @@ const CustomTable = ({
   mainKey = 'id',
   tableHeight,
   deleteButtonInside,
-  color
+  color,
+  basic
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
@@ -25,11 +26,11 @@ const CustomTable = ({
 
   return (
     <Container tableHeight={tableHeight}>
-      <Table celled compact striped color={color}>
+      <Table celled compact striped={!basic} color={color}>
         <TableHeader fullWidth>
           <Table.Row>
             {headers.map((header) => (
-              <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
+              <HeaderCell key={`header_${header.id}`} basic={basic}>{header.title}</HeaderCell>
             ))}
           </Table.Row>
         </TableHeader>
