@@ -45,7 +45,7 @@ export const Checkbox = styled(SCheckbox)`
   height: ${({ height }) => height} !important;
   align-self: ${({ center }) => center && "center!important"};
   ${({ customColors }) => customColors && css`
-  label{ 
+  label{
     display:flex;
     aling-self:center;
   };
@@ -76,6 +76,15 @@ export const Label = styled(SLabel)`
   height: ${({ height }) => height ? height : 'fit-content'} !important;
   margin: ${({ margin }) => margin ? margin : '0'} !important;
   align-content: center;
+`;
+
+export const ActionLabel = styled(SLabel)`
+  width: ${({ width }) => width ? width : '100%'} !important;
+  height: ${({ height }) => height ? height : 'fit-content'} !important;
+  margin: ${({ margin }) => margin ? margin : '0'} !important;
+  align-content: center;
+  cursor: pointer;
+  user-select: none;
 `;
 
 export const TextArea = styled(STextarea)`

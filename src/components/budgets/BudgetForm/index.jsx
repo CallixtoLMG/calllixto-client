@@ -1,6 +1,6 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { ActionLabel, Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
@@ -24,7 +24,7 @@ const EMPTY_BUDGET = (user) => ({
   comments: '',
   globalDiscount: 0,
   additionalCharge: 0,
-  paymentMethods: PAYMENT_METHODS.map((method) => method.value),
+  paymentMethods: PAYMENT_METHODS,
   expirationOffsetDays: ''
 });
 
@@ -518,18 +518,39 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               name="paymentMethods"
               control={control}
               rules={RULES.REQUIRED}
-              render={({ field: { onChange, ...rest } }) => (
-                <Dropdown
-                  {...rest}
-                  minHeight="50px"
-                  height="fit-content"
-                  placeholder='Métodos de pago'
-                  multiple
-                  selection
-                  options={PAYMENT_METHODS}
-                  defaultValue={PAYMENT_METHODS.map(({ value }) => value)}
-                  onChange={(e, { value }) => onChange(value)}
-                />
+              render={({ field: { onChange, value } }) => (
+                <Flex marginTop="5px" flexDirection="column">
+                  <ActionLabel
+                    color={watchPvalueayments.length === PAYMENT_METHODS.length && 'blue'}
+                    width="fit-content"
+                    onClick={() => {
+                      if (value.length === PAYMENT_METHODS.length) {
+                        onChange([]);
+                      } else {
+                        onChange(PAYMENT_METHODS);
+                      }
+                    }}
+                  >
+                    Todos
+                  </ActionLabel>
+                  <Flex marginTop="5px" style={{ gridColumnGap: '5px' }} flexWrap="wrap">
+                    {PAYMENT_METHODS.map(text => (
+                      <ActionLabel
+                        key={text}
+                        style={{ margin: '0 5px' }}
+                        color={value.includes(text) && 'blue'} width="fit-content"
+                        onClick={() => {
+                          if (value.includes(text)) {
+                            onChange(value.filter(payment => payment !== text));
+                          } else {
+                            onChange([...value, text]);
+                          }
+                        }}
+                      >{text}
+                      </ActionLabel>
+                    ))}
+                  </Flex>
+                </Flex>
               )}
             />
           </FormField>
