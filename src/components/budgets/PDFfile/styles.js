@@ -38,8 +38,7 @@ const Divider = styled.div`
 
 const Image = styled(SImage)`
   &&& {
-    height: 70px!important;
-    width:33%!important;
+    height: 50px!important;
   };
 `;
 

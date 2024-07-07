@@ -17,13 +17,13 @@ import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext }
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { isBudgetCancelled, isBudgetConfirmed, isBudgetDraft, now } from "@/utils";
+import { isBudgetCancelled, isBudgetConfirmed, isBudgetDraft, isBudgetPending, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Flex } from "rebass";
+import { Flex, Box } from "rebass";
 import { Container as SContainer, Input as SInput } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -44,15 +44,6 @@ const SendButton = ({ href, color, iconName, text, target = "_blank" }) => (
     </Button>
   </a>
 );
-
-const Container = styled(SContainer)`
-  &&&{
-    display:flex!important;
-    margin-bottom:${({ mb }) => mb ? "0" : "10px"}!important;
-    height:${({ height }) => height ? "0" : "30px"}!important;
-    justify-content:${({ justifyContent }) => justifyContent ? "space-between" : "flex-end"}!important;
-  }
-`;
 
 const CheckboxContainer = styled(SContainer)`
   &&&{
@@ -385,12 +376,8 @@ const Budget = ({ params }) => {
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
       <NoPrint>
-        <Container
-          mb={isBudgetDraft(budget?.state)}
-          height={isBudgetDraft(budget?.state)}
-          justifyContent={!isBudgetConfirmed(budget?.state)}
-        >
-          {!isBudgetConfirmed(budget?.state) && !isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
+        <Flex justifyContent="space-between">
+          {isBudgetPending(budget?.state) ? (
             <>
               <Checkbox
                 center
@@ -417,15 +404,15 @@ const Budget = ({ params }) => {
                 isLoading={isPending}
               />
             </>
-          )}
-          {!isBudgetDraft(budget?.state) &&
+          ) : <Box />}
+          {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
             <Flex mb="10px" height="30px" >
               <CheckboxContainer>
                 <Checkbox
                   toggle
                   checked={showDolarExangeRate}
                   onChange={() => setShowDolarExangeRate(prev => !prev)}
-                  label={"Cotizar en dólares"}
+                  label="Cotizar en dólares"
                 />
                 <DolarContainer show={showDolarExangeRate}>
                   <Label height="25px" width="fit-content">Cambio</Label>
@@ -444,9 +431,11 @@ const Budget = ({ params }) => {
                   />
                 </DolarContainer>
               </CheckboxContainer>
-            </Flex>}
-        </Container>
-        {budget?.state === BUDGET_STATES.DRAFT.id ? (
+            </Flex>
+          )}
+        </Flex>
+
+        {isBudgetDraft(budget?.state) ? (
           <BudgetForm
             onSubmit={mutateEdit}
             products={products}

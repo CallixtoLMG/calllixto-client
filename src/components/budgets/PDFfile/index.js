@@ -37,8 +37,8 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   return (
     <Flex ref={ref} padding="30px" flexDirection="column" style={{ gridRowGap: '15px' }}>
       <Box>
-        <Flex alignItems="center" marginBottom="15px">
-          <Flex width="33%" flexDirection="column">
+        <Flex alignItems="center" marginBottom="15px" justifyContent="space-between">
+          <Flex flexDirection="column" width="150px">
             <Title as="h3" cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
             {clientPdf && (
               <>
@@ -48,7 +48,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
               </>
             )}
           </Flex>
-          <Flex width="33%" flexDirection="column">
+          <Flex flexDirection="column" flex="1">
             {isBudgetCancelled(budget?.state) && <Title as="h2">{BUDGET_STATES.CANCELLED.title.toUpperCase()}</Title>}
             {isBudgetDraft(budget?.state) && <Title as="h2">{BUDGET_STATES.DRAFT.title.toUpperCase()}</Title>}
             {dispatchPdf && <Title as="h2">REMITO</Title>}
@@ -60,7 +60,9 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             )}
             {internal && <Title as="h2">INTERNO</Title>}
           </Flex>
-          {clientPdf ? <Image src={`/clients/${id}.png`} alt="Logo empresa" /> : <Box width="110px"></Box>}
+          <Box width="150px">
+            {clientPdf && <Image src={`/clients/${id}.png`} alt="Logo empresa"/>}
+          </Box>
         </Flex>
         <Divider />
         <SectionContainer minHeight="50px">
@@ -74,12 +76,15 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
           </Flex>
         </SectionContainer>
         <Divider />
-        <SectionContainer minHeight="25px">
-          <Field label="Cliente" value={(get(budget, "customer.name", ""))} />
-        </SectionContainer>
-        <SectionContainer minHeight="25px">
-          <Field label="Dirección" value={(get(budget, "customer.addresses[0].address", ""))} />
-          <Field label="Teléfono" value={formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))} />
+        <SectionContainer minHeight="50px">
+          <Flex flexDirection="column" style={{ gridRowGap: '10px' }} flex="2">
+            <Field label="Cliente" value={(get(budget, "customer.name", ""))} />
+            <Field label="Dirección" value={(get(budget, "customer.addresses[0].address", ""))} />
+          </Flex>
+          <Flex flexDirection="column" style={{ gridRowGap: '10px' }}>
+            <Box />
+            <Field label="Teléfono" value={formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))} />
+          </Flex>
         </SectionContainer>
         <Divider />
       </Box>
