@@ -1,6 +1,6 @@
 import { Loader } from "@/components/layout";
 import { useRouter } from "next/navigation";
-import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
+import { Button, Checkbox, Header } from "semantic-ui-react";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, Table, TableHeader, TableRow, LinkCell } from "./styles";
 import { useEffect, useMemo, useState } from "react";
@@ -16,14 +16,13 @@ const CustomTable = ({
   tableHeight,
   deleteButtonInside,
   color,
-  selectable,
   selection,
   onSelectionChange,
   selectionActions = [],
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
-  const isSelectable = useMemo(() => selectable && !!selectionActions.length, [selectable, selectionActions]);
+  const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
 
   useEffect(() => {
     setHydrated(true);

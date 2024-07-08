@@ -93,7 +93,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           size="tiny"
           key={1}
         >
-          <Icon name="trash" /> Borrar
+          <Icon name="trash" /> Eliminar Productos
         </Button>
       ];
     }
@@ -149,7 +149,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
         elements={mapProductsForTable(products)}
         page={PAGES.PRODUCTS}
         actions={actions}
-        selectable
         selection={selectedProducts}
         onSelectionChange={onSelectionChange}
         selectionActions={selectionActions}
