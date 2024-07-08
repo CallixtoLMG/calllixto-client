@@ -418,14 +418,16 @@ const Budget = ({ params }) => {
                   <Label height="25px" width="fit-content">Cambio</Label>
                   <CurrencyFormatInput
                     height="25px"
-                    displayType="input"
+                    displayType="number"
                     thousandSeparator={true}
                     decimalScale={2}
                     allowNegative={false}
                     width="80px"
                     prefix="$ "
                     customInput={Input}
-                    onChange={(e) => setDolarRate(e.target.value)}
+                    onValueChange={value => {
+                      setDolarRate(value.floatValue);
+                    }}
                     value={dolarRate}
                     placeholder="Precio"
                   />
