@@ -521,7 +521,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               render={({ field: { onChange, value } }) => (
                 <Flex marginTop="5px" flexDirection="column">
                   <ActionLabel
-                    color={watchPvalueayments.length === PAYMENT_METHODS.length && 'blue'}
+                    color={value.length === PAYMENT_METHODS.length && 'blue'}
                     width="fit-content"
                     onClick={() => {
                       if (value.length === PAYMENT_METHODS.length) {
