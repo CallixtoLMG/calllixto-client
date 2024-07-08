@@ -1,5 +1,4 @@
 import { Icon, Popup } from 'semantic-ui-react';
-import { Box } from 'rebass';
 
 export const CommentTooltip = ({ comment }) => {
   return (

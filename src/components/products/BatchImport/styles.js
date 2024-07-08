@@ -1,6 +1,6 @@
-import { Flex } from "rebass";
 import { Header as SHeader, Modal as SModal } from "semantic-ui-react";
 import styled from "styled-components";
+import { Flex } from "@/components/common/custom";
 
 const Modal = styled(SModal)`
   width: 100%!important;

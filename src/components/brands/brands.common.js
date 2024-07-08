@@ -1,4 +1,4 @@
-import { Flex } from "rebass";
+import { Flex } from '@/components/common/custom';
 import { CommentTooltip } from "@/components/common/tooltips";
 
 const ATTRIBUTES = { ID: "id", NAME: "name", COMMENT: "comments" };

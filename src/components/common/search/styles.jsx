@@ -1,6 +1,6 @@
-import { Flex } from "rebass";
 import { Search as SSearch } from "semantic-ui-react";
 import styled from "styled-components";
+import { Flex } from '@/components/common/custom';
 
 const Container = styled(Flex)`
   flex-direction: ${({ flexDir }) => flexDir};

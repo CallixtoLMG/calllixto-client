@@ -1,8 +1,8 @@
 import { Checkbox } from "@/components/common/custom";
 import { useState } from "react";
-import { Box } from "rebass";
 import { RULES } from "@/roles";
 import { useUserContext } from "@/User";
+import { Box } from "@/components/common/custom";
 
 export const useAllowUpdate = () => {
   const { role } = useUserContext();
@@ -11,7 +11,7 @@ export const useAllowUpdate = () => {
   const button = (
     <>
       {RULES.canUpdate[role] && (
-        <Box mb={15}>
+        <Box marginBottom="15px">
           <Checkbox
             toggle checked={allowUpdate}
             onChange={(e, value) => setAllowUpdate(value.checked)} label="Actualizar"

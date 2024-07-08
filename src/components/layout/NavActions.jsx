@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from 'react';
 import { Button, ButtonContent, Icon } from 'semantic-ui-react';
-import { Flex, Box } from 'rebass';
 import styled from 'styled-components';
+import { Box, Flex } from '@/components/common/custom';
 
 const ActionsContainer = styled(Flex)`
   column-gap: 10px;

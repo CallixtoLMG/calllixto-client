@@ -1,5 +1,5 @@
-import { Flex } from "rebass";
 import styled from "styled-components";
+import { Flex } from '@/components/common/custom';
 
 const MainContainer = styled(Flex)`
   justify-content: center!important;

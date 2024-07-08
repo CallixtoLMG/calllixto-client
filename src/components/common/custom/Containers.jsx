@@ -1,6 +1,6 @@
-import { Flex } from "rebass";
 import { Form as SForm } from "semantic-ui-react";
 import styled from "styled-components";
+import { Flex } from "./Flex";
 
 export const Form = styled(SForm)`
   display: flex !important;

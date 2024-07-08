@@ -1,6 +1,6 @@
-import { Flex } from "rebass";
 import { Popup as SPopup } from "semantic-ui-react";
 import styled from "styled-components";
+import { Flex } from "@/components/common/custom";
 
 const ButtonContainer = styled(Flex)`
   padding: 0!important;

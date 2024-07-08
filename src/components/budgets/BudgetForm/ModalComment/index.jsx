@@ -19,7 +19,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
       >
         <Modal.Header>Comentario para remito</Modal.Header>
         <Modal.Content>
-          <FieldsContainer my={15}>
+          <FieldsContainer marginTop="15px" marginBottom="15px">
             <FormField flex="1">
               <Label>Código</Label>
               <Segment>{product?.code}</Segment>

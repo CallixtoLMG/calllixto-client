@@ -1,4 +1,4 @@
-import { Flex } from 'rebass';
+import { Flex } from '@/components/common/custom';
 import styled from 'styled-components';
 
 const MainContainer = styled(Flex)`

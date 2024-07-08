@@ -1,6 +1,6 @@
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
-import { Flex } from "rebass";
 import { PhonesTooltip, AddressesTooltip, CommentTooltip } from "@/components/common/tooltips";
+import { Flex } from "@/components/common/custom";
 
 const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments" };
 

@@ -1,8 +1,8 @@
-import { Flex } from 'rebass';
 import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { Paginator } from './Pagination';
 import { FiltersContainer } from './styles';
+import { Flex } from '@/components/common/custom';
 
 const MainContainer = styled(Flex)`
   column-gap: 10px;

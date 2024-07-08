@@ -11,7 +11,7 @@ import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
 import { PopupActions } from "@/components/common/buttons";
-import { Button, Checkbox, CurrencyFormatInput, Icon, Label } from "@/components/common/custom";
+import { Button, Checkbox, CurrencyFormatInput, Icon, Label, Flex, Box } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
@@ -23,7 +23,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Flex, Box } from "rebass";
 import { Container as SContainer, Input as SInput } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -404,9 +403,9 @@ const Budget = ({ params }) => {
                 isLoading={isPending}
               />
             </>
-          ) : <Box />}
+          ) : <Box/>}
           {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-            <Flex mb="10px" height="30px" >
+            <Flex marginBottom="10px" height="30px" >
               <CheckboxContainer>
                 <Checkbox
                   toggle

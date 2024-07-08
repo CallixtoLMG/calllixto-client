@@ -1,6 +1,6 @@
-import { Flex } from "rebass";
 import { Icon as SIcon, MessageHeader as SMessageHeader, MessageItem as SMessageItem, MessageList as SMessageList } from "semantic-ui-react";
 import styled from 'styled-components';
+import { Flex } from '@/components/common/custom';
 
 const Container = styled(Flex)`
   flex-direction: row;

@@ -1,6 +1,6 @@
 import { RestoreButton, SubmitButton } from "@/components/common/buttons";
-import { Flex } from "rebass";
 import styled from "styled-components";
+import { Flex } from '@/components/common/custom';
 
 const ButtonsContainer = styled(Flex)`
   align-self: flex-end;
