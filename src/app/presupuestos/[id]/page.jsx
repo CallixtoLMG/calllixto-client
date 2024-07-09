@@ -11,7 +11,7 @@ import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
 import { PopupActions } from "@/components/common/buttons";
-import { Button, Checkbox, CurrencyFormatInput, Icon, Label, Flex, Box } from "@/components/common/custom";
+import { Box, Button, Checkbox, CurrencyFormatInput, Flex, Icon, Label } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
@@ -50,7 +50,7 @@ const CheckboxContainer = styled(SContainer)`
     flex-direction:row!important;
     align-items: center!important;
     width: 100%!important;
-    max-width: 350px!important;
+    max-width: 370px!important;
     column-gap: 5px!important;
     margin:0!important;
   }
@@ -375,7 +375,7 @@ const Budget = ({ params }) => {
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
       <NoPrint>
-        <Flex justifyContent="space-between">
+        <Flex margin="0 0 15px 0!important" justifyContent="space-between">
           {isBudgetPending(budget?.state) ? (
             <>
               <Checkbox
@@ -405,7 +405,7 @@ const Budget = ({ params }) => {
             </>
           ) : <Box/>}
           {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-            <Flex marginBottom="10px" height="30px" >
+            <Flex height="21px" >
               <CheckboxContainer>
                 <Checkbox
                   toggle
@@ -414,14 +414,14 @@ const Budget = ({ params }) => {
                   label="Cotizar en dólares"
                 />
                 <DolarContainer show={showDolarExangeRate}>
-                  <Label height="25px" width="fit-content">Cambio</Label>
+                  <Label padding="0 9px" height="21px" width="fit-content">Cambio</Label>
                   <CurrencyFormatInput
-                    height="25px"
+                    height="21px"
                     displayType="input"
                     thousandSeparator={true}
                     decimalScale={2}
                     allowNegative={false}
-                    width="80px"
+                    width="100px"
                     prefix="$ "
                     customInput={Input}
                     onChange={(e) => setDolarRate(e.target.value)}

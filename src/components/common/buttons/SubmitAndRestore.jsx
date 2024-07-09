@@ -1,10 +1,10 @@
 import { RestoreButton, SubmitButton } from "@/components/common/buttons";
-import styled from "styled-components";
 import { Flex } from '@/components/common/custom';
+import styled from "styled-components";
 
 const ButtonsContainer = styled(Flex)`
   align-self: flex-end;
-  column-gap: 20px;
+  column-gap: 15px;
 `;
 
 export const SubmitAndRestore = ({ draft, isUpdating, isLoading, isDirty, onReset, extraButton, disabled, onSubmit = () => { }, color, icon, text }) => {

@@ -1,8 +1,8 @@
 import { validateEmail, validatePhone } from "@/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Button, Icon, Popup } from "semantic-ui-react";
-import { FieldsContainer, FormField, Input, Label, RuledLabel, Flex } from '../custom';
+import { Icon, Popup } from "semantic-ui-react";
+import { Button, FieldsContainer, Flex, FormField, Input, Label, RuledLabel } from '../custom';
 import { Table } from '../table';
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "./form.common";
 

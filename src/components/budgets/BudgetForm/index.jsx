@@ -1,6 +1,6 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { ActionLabel, Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment, Flex, Box, FlexColumn } from "@/components/common/custom";
+import { ActionLabel, Box, Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
@@ -506,7 +506,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
           />
         </Loader>
-        <FieldsContainer>
+        <FieldsContainer rowGap="5px!important">
           <Label>Comentarios</Label>
           <ControlledComments control={control} />
         </FieldsContainer>
@@ -518,7 +518,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               control={control}
               rules={RULES.REQUIRED}
               render={({ field: { onChange, value } }) => (
-                <FlexColumn marginTop="5px">
+                <FlexColumn >
                   <ActionLabel
                     color={value.length === PAYMENT_METHODS.length && 'blue'}
                     width="fit-content"

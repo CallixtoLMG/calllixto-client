@@ -1,6 +1,6 @@
+import { Flex } from '@/components/common/custom';
 import { Search as SSearch } from "semantic-ui-react";
 import styled from "styled-components";
-import { Flex } from '@/components/common/custom';
 
 const Container = styled(Flex)`
   flex-direction: ${({ flexDir }) => flexDir};
@@ -9,7 +9,6 @@ const Container = styled(Flex)`
 `;
 
 const Search = styled(SSearch)`
-  margin-top: 5px !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   height: ${({ height = '50px' }) => `${height}!important`} ;

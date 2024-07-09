@@ -1,7 +1,7 @@
 import { Divider, Title } from '@/components/budgets/PDFfile/styles';
 import { formatedPercentage, getSubtotal } from '@/utils';
 import { useMemo } from "react";
-import { Input, Price, Flex, FlexColumn } from '../custom';
+import { Flex, FlexColumn, Input, Price } from '../custom';
 
 const Field = ({ label, children }) => (
   <Flex justifyContent="space-between" height="30px">

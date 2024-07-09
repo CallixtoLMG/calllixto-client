@@ -1,4 +1,4 @@
-import { Dropdown, Input, Flex } from '@/components/common/custom';
+import { Dropdown, Flex, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { BUDGET_STATES, PAGES } from "@/constants";
@@ -78,7 +78,6 @@ const BudgetsPage = ({ budgets, isLoading }) => {
               render={({ field: { onChange, ...rest } }) => (
                 <Dropdown
                   {...rest}
-                  margin="0"
                   maxWidth
                   top="10px"
                   height="fit-content"

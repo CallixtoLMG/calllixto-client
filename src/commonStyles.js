@@ -1,5 +1,5 @@
-import styled from "styled-components";
 import { Flex } from '@/components/common/custom';
+import styled from "styled-components";
 
 const MainContainer = styled(Flex)`
   justify-content: center!important;
@@ -8,7 +8,7 @@ const MainContainer = styled(Flex)`
 
 const SubContainer = styled(Flex)`
   row-gap: 15px;
-  margin: 85px 20px 20px 20px!important;
+  margin: 80px 20px 20px 20px!important;
   flex-direction: column;
   width: 90%!important;
   max-width: 1600px!important;
