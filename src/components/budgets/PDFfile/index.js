@@ -41,7 +41,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <Title as="h3" cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
             {clientPdf && (
               <>
-                <Title as="h4">{client?.name?.toUpperCase() || "Razon Social"}</Title>
+                <Title as="h4">{client?.name?.toUpperCase() || "Maderera Las Tapias"}</Title>
                 <Title as="h4">CUIT: {client?.cuil?.toUpperCase() || "CUIT"}</Title>
                 <Title as="h4">{client?.iva || "Condición IVA"}</Title>
               </>

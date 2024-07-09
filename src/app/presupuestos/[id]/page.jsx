@@ -426,7 +426,9 @@ const Budget = ({ params }) => {
                     width="100px"
                     prefix="$ "
                     customInput={Input}
-                    onChange={(e) => setDolarRate(e.target.value)}
+                    onValueChange={value => {
+                      setDolarRate(value.floatValue);
+                    }}
                     value={dolarRate}
                     placeholder="Precio"
                   />
@@ -465,7 +467,7 @@ const Budget = ({ params }) => {
         <PDFfile
           ref={printRef}
           budget={budget}
-          client={userData}
+          client={userData?.client?.metadata}
           id={userData.client?.id}
           printPdfMode={printPdfMode}
           dolarExchangeRate={showDolarExangeRate && dolarRate}
