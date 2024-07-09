@@ -1,11 +1,12 @@
+import { Flex } from '@/components/common/custom';
 import { Header as SHeader, Image as SImage } from "semantic-ui-react";
 import styled from "styled-components";
-import { Flex } from '@/components/common/custom';
 
 const SectionContainer = styled(Flex)`
+  flex-direction: ${({ flexDirection }) => flexDirection};
   justify-content: space-between;
   min-height: ${({ minHeight = '35px' }) => minHeight};
-  align-items: center;
+  align-items: ${({ alignItems = "center" }) => alignItems};
 
   & > * {
     flex: 1;
@@ -24,7 +25,7 @@ const Title = styled(SHeader)`
   align-content: center;
   align-self: ${({ alignSelf }) => alignSelf || "center"} !important;
   text-align: ${({ textAlign }) => textAlign || "left"} !important;
-  text-decoration: ${({ cancelled }) => cancelled ? 'line-through' : 'none' };
+  text-decoration: ${({ cancelled }) => cancelled ? 'line-through' : 'none'};
   width: ${({ width }) => width || "auto"}!important;
   font-weight: ${({ slim }) => slim ? 'normal' : "bold"} !important;
   min-height: ${({ minHeight }) => minHeight || ""};

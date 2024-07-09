@@ -186,6 +186,7 @@ export const ContactFields = () => {
           </FieldsContainer>
         </Popup>
         <Table
+          $wrap
           headers={ADDRESS_TABLE_HEADERS}
           actions={[
             { id: 1, icon: 'trash', color: 'red', onClick: (address, index) => removeAddress(index), tooltip: 'Eliminar' }
@@ -230,6 +231,7 @@ export const ContactFields = () => {
           </FieldsContainer>
         </Popup>
         <Table
+          $wrap={true}
           headers={EMAIL_TABLE_HEADERS}
           actions={[
             { id: 1, icon: 'trash', color: 'red', onClick: (email, index) => removeEmail(index), tooltip: 'Eliminar' }

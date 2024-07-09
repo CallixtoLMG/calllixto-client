@@ -1,5 +1,5 @@
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
-import { Price, Flex, Box, FlexColumn } from "@/components/common/custom";
+import { Box, Flex, FlexColumn, Price } from "@/components/common/custom";
 import { Table, Total } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/constants";
 import { expirationDate, formatedDateOnly, formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft } from "@/utils";
@@ -16,7 +16,7 @@ import {
 } from "./styles";
 
 const Field = ({ label, value, ...rest }) => (
-  <Flex height="15px" columnGap="5px" {...rest}>
+  <Flex columnGap="5px" {...rest}>
     <Title as="h4" width="100px" textAlign="right" slim>{label} |</Title>
     <Title as="h4">{value?.toUpperCase() || '-'}</Title>
   </Flex>
@@ -64,26 +64,21 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
           </Box>
         </Flex>
         <Divider />
-        <SectionContainer minHeight="50px">
-          <FlexColumn rowGap="10px" flex="2">
-            <Field label="Vendedor/a" value={budget?.seller} />
-            <Field label="Teléfonos" value={client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')} />
-          </FlexColumn>
-          <FlexColumn rowGap="10px">
-            <Field label="Fecha" value={dayjs().format('DD-MM-YYYY')} />
-            <Field label="Válido hasta" value={formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))} />
-          </FlexColumn>
+        <SectionContainer alignItems="left" flexDirection="column" minHeight="50px">
+          <Field label="Vendedor/a" value={budget?.seller} />
+          <Flex>
+            <Field flex="1" label="Teléfonos" value={client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')} />
+            <Field flex="1" label="Fecha" value={dayjs().format('DD-MM-YYYY')} />
+            <Field flex="1" label="Válido hasta" value={formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))} />
+          </Flex>
         </SectionContainer>
         <Divider />
-        <SectionContainer minHeight="50px">
-          <FlexColumn rowGap="10px" flex="2">
-            <Field label="Cliente" value={(get(budget, "customer.name", ""))} />
-            <Field label="Dirección" value={(get(budget, "customer.addresses[0].address", ""))} />
-          </FlexColumn>
-          <FlexColumn rowGap="10px">
-            <Box />
-            <Field label="Teléfono" value={formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))} />
-          </FlexColumn>
+        <SectionContainer alignItems="left" flexDirection="column" minHeight="50px">
+          <Field width="100%" label="Cliente" value={(get(budget, "customer.name", ""))} />
+          <Flex >
+            <Field width="fit-content" label="Dirección" value={(get(budget, "customer.addresses[0].address", ""))} />
+            <Field width="fit-content" label="Teléfono" value={formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))} />
+          </Flex>
         </SectionContainer>
         <Divider />
       </Box>

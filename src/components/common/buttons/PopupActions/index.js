@@ -1,15 +1,14 @@
 import { NoPrint } from '@/components/layout';
 import { ButtonContent, Icon, Popup } from 'semantic-ui-react';
-import { Button, ButtonsContainer } from '../../custom';
-import { Container } from "./styles";
+import { Button, ButtonsContainer, Flex } from '../../custom';
 
-const PopupActions = ({ title, color, buttons, icon, animated = true, position = "bottom center" }) => {
+const PopupActions = ({ width, title, color, buttons, icon, animated = true, position = "bottom center" }) => {
   return (
     <Popup
       position={position}
       trigger={
         <ButtonsContainer>
-          <Button width="90px"  {...animated && { animated: 'vertical' }} fluid color={color}>
+          <Button width={width} {...animated && { animated: 'vertical' }} color={color}>
             <ButtonContent hidden>{title}</ButtonContent>
             <ButtonContent visible>
               <Icon name={icon} />
@@ -19,9 +18,9 @@ const PopupActions = ({ title, color, buttons, icon, animated = true, position =
       }
       content={
         <NoPrint>
-          <Container>
+          <Flex rowGap="5px" flexDirection="column">
             {buttons}
-          </Container>
+          </Flex>
         </NoPrint>
       }
       on="click"

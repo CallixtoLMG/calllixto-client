@@ -30,18 +30,18 @@ const PrintButton = ({ onClick, color, iconName, text }) => (
   <Button
     onClick={onClick}
     color={color}
-    size="tiny"
-  >
-    <Icon name={iconName} /> {text}
+    size="tiny">
+    <Icon name={iconName} />{text}
   </Button>
 );
 
-const SendButton = ({ href, color, iconName, text, target = "_blank" }) => (
+const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) => (
   <a href={href} target={target}>
     <Button
+      width={width}
       color={color}
       size="tiny">
-      {iconName && <Icon name={iconName} />}{text}
+      <Icon name={iconName} />{text}
     </Button>
   </a>
 );
@@ -230,6 +230,7 @@ const Budget = ({ params }) => {
           id: 1,
           button: (
             <PopupActions
+              width="90px"
               title="PDFs"
               icon="download"
               color="blue"
@@ -252,10 +253,11 @@ const Budget = ({ params }) => {
         },
         {
           id: 2,
-          button: <PopupActions title="Enviar" icon="send" color="blue"
+          button: <PopupActions width="90px" title="Enviar" icon="send" color="blue"
             buttons={
-              [...sendButtons.map(({ href, color, iconName, text, buttons }) => (
+              [...sendButtons.map(({ href, color, iconName, text, buttons, width }) => (
                 <PopupActions
+                  width="120px"
                   animated={false}
                   key={iconName}
                   href={href}
@@ -377,7 +379,7 @@ const Budget = ({ params }) => {
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
       <NoPrint>
-        <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) ? "0" :"0 0 15px 0!important"} justifyContent="space-between">
+        <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) ? "0" : "0 0 15px 0!important"} justifyContent="space-between">
           {isBudgetPending(budget?.state) ? (
             <>
               <Checkbox

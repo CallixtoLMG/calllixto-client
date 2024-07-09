@@ -15,7 +15,8 @@ const CustomTable = ({
   tableHeight,
   deleteButtonInside,
   color,
-  basic
+  basic,
+  $wrap
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
@@ -51,7 +52,7 @@ const CustomTable = ({
                     return (
                       <LinkRow key={element[mainKey]} onClick={() => push(page.SHOW(element[mainKey]))}>
                         {headers.map(header => (
-                          <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                          <Cell $wrap={$wrap} key={`cell_${header.id}`} align={header.align} width={header.width}>
                             {header.value(element, index)}
                           </Cell>
                         ))}
@@ -68,7 +69,7 @@ const CustomTable = ({
                   return (
                     <TableRow key={element[mainKey]}>
                       {headers.map(header => (
-                        <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                        <Cell $wrap={$wrap} key={`cell_${header.id}`} align={header.align} width={header.width}>
                           {header.value(element, index)}
                         </Cell>
                       ))}
