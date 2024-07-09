@@ -25,12 +25,13 @@ export const FieldsContainer = styled(Flex)`
 `;
 
 export const ButtonsContainer = styled(Flex)`
-flex-direction: row;
-margin-bottom: 10px !important;
-margin-top: ${({ marginTop }) => (marginTop ? marginTop : '0')};
-justify-content: ${({ center }) => (center ? 'center' : 'flex-end')};
-column-gap: 15px;
-width: ${({ width }) => (width ? width : 'auto')};
+  flex-direction: row;
+  margin-top: ${({ marginTop }) => (marginTop ? marginTop : '0')};
+  justify-content: ${({ center }) => (center ? 'center' : 'flex-end')};
+  column-gap: 5px;
+  width: ${({ width }) => (width ? width : 'auto')}!important;
+  padding: 0!important;
+  height: ${({ height = 'auto' }) => height} !important;
 `;
 
 export const PhoneContainer = styled(Flex)`

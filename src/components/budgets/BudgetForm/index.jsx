@@ -1,6 +1,6 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { ActionLabel, Box, Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { ActionLabel, Box, Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
@@ -404,7 +404,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       </Transition>
       <Form onSubmit={handleSubmit(handleConfirm)}>
         <FieldsContainer>
-          <FormField margin="5px 0 0 0" width="300px">
+          <FormField width="300px">
             <Checkbox
               toggle
               checked={isConfirmed}
@@ -518,7 +518,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               control={control}
               rules={RULES.REQUIRED}
               render={({ field: { onChange, value } }) => (
-                <FlexColumn >
+                <Flex flexDirection="column" rowGap="5px" >
                   <ActionLabel
                     color={value.length === PAYMENT_METHODS.length && 'blue'}
                     width="fit-content"
@@ -532,12 +532,12 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                   >
                     Todos
                   </ActionLabel>
-                  <Flex marginTop="5px" columnGap="5px" flexWrap="wrap">
+                  <Flex columnGap="5px" wrap="wrap" rowGap="5px">
                     {PAYMENT_METHODS.map(text => (
                       <ActionLabel
+                        width="fit-content"
                         key={text}
-                        style={{ margin: '0 5px' }}
-                        color={value.includes(text) && 'blue'} width="fit-content"
+                        color={value.includes(text) && 'blue'}
                         onClick={() => {
                           if (value.includes(text)) {
                             onChange(value.filter(payment => payment !== text));
@@ -549,7 +549,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                       </ActionLabel>
                     ))}
                   </Flex>
-                </FlexColumn>
+                </Flex>
               )}
             />
           </FormField>

@@ -88,6 +88,7 @@ export const ActionLabel = styled(SLabel)`
   align-content: center;
   cursor: pointer;
   user-select: none;
+  text-wrap: nowrap;
 `;
 
 export const TextArea = styled(STextarea)`
@@ -105,7 +106,7 @@ export const Dropdown = styled(SDropdown)`
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
   height: ${({ height = "50px" }) => `${height}!important`};
-  min-height: ${({ minHeight = "none" }) => `${minHeight}!important`};
+  min-height: ${({ minHeight }) => `${minHeight}!important`};
   display: flex!important;
   flex-wrap: wrap;
   align-content: center;
@@ -124,7 +125,7 @@ export const Button = styled(SButton)`
   display:flex;
   width: ${({ width = "120px" }) => width && width} !important;
   margin: 0 !important;
-  height: 35px!important;
+  height: ${({ height = "35px" }) => height && height} !important;
   text-wrap: nowrap;
 `;
 

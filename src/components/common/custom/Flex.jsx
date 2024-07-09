@@ -24,6 +24,7 @@ export const Flex = styled(Common)`
   justify-content: ${({ justifyContent }) => justifyContent};
   align-self: ${({ alignSelf }) => alignSelf};
   flex-wrap: ${({ wrap }) => wrap};
+  flex-direction: ${({ flexDirection = "row" }) => flexDirection};
 `;
 
 export const FlexColumn = styled(Flex)`

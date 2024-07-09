@@ -80,7 +80,8 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                   {...rest}
                   maxWidth
                   top="10px"
-                  height="fit-content"
+                  height="35px"
+                  minHeight="35px"
                   selection
                   options={STATE_OPTIONS}
                   defaultValue={STATE_OPTIONS[0].key}

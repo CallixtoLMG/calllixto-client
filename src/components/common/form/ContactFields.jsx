@@ -96,7 +96,7 @@ export const ContactFields = () => {
       <FormField width="33%">
         <Popup
           trigger={
-            <Flex marginBottom="5px">
+            <Flex>
               <Button type="button" color="green"><Icon name="add" /> Teléfono</Button>
             </Flex>
           }
@@ -152,7 +152,7 @@ export const ContactFields = () => {
       <FormField flex="1">
         <Popup
           trigger={
-            <Flex marginBottom="5px">
+            <Flex >
               <Button type="button" color="green"><Icon name="add" /> Dirección</Button>
             </Flex>
           }
@@ -196,7 +196,7 @@ export const ContactFields = () => {
       <FormField flex="1">
         <Popup
           trigger={
-            <Flex marginBottom="5px">
+            <Flex >
               <Button type="button" color="green"><Icon name="add" /> Email</Button>
             </Flex>
           }

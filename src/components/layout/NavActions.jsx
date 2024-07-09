@@ -1,10 +1,10 @@
+import { Box, Button, Flex } from '@/components/common/custom';
 import { createContext, useContext, useState } from 'react';
-import { Button, ButtonContent, Icon } from 'semantic-ui-react';
+import { ButtonContent, Icon } from 'semantic-ui-react';
 import styled from 'styled-components';
-import { Box, Flex } from '@/components/common/custom';
 
 const ActionsContainer = styled(Flex)`
-  column-gap: 10px;
+  column-gap: 5px;
 `;
 
 const NavActionsContext = createContext();
@@ -35,9 +35,10 @@ const NavActions = () => {
       {actions.map(action => {
         const { id, icon, color, onClick, text, button } = action;
         return (
-          <Box key={`action_${id}`} width="90px">
+          <Box key={`action_${id}`} >
             {button ? button : (
               <Button
+                width="90px"
                 animated="vertical"
                 color={color}
                 onClick={onClick}
@@ -57,4 +58,5 @@ const NavActions = () => {
   );
 };
 
-export { NavActionsProvider, useNavActionsContext, NavActions };
+export { NavActions, NavActionsProvider, useNavActionsContext };
+

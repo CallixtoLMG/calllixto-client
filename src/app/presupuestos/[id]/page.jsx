@@ -38,7 +38,9 @@ const PrintButton = ({ onClick, color, iconName, text }) => (
 
 const SendButton = ({ href, color, iconName, text, target = "_blank" }) => (
   <a href={href} target={target}>
-    <Button width="100%" color={color} size="tiny">
+    <Button
+      color={color}
+      size="tiny">
       {iconName && <Icon name={iconName} />}{text}
     </Button>
   </a>
@@ -375,7 +377,7 @@ const Budget = ({ params }) => {
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
       <NoPrint>
-        <Flex margin="0 0 15px 0!important" justifyContent="space-between">
+        <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) ? "0" :"0 0 15px 0!important"} justifyContent="space-between">
           {isBudgetPending(budget?.state) ? (
             <>
               <Checkbox
@@ -403,7 +405,7 @@ const Budget = ({ params }) => {
                 isLoading={isPending}
               />
             </>
-          ) : <Box/>}
+          ) : <Box />}
           {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
             <Flex height="21px" >
               <CheckboxContainer>

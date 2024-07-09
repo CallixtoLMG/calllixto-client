@@ -1,5 +1,5 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListAllProducts, useListBanProducts } from "@/api/products";
-import { Button, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { Button, CurrencyFormatInput, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { downloadExcel, now } from "@/utils";
@@ -350,11 +350,11 @@ const BatchImport = ({ isCreating }) => {
         onChange={handleFileUpload}
       />
       <Button
+        width="90px"
         animated="vertical"
         color="blue"
         onClick={handleClick}
         type="button"
-        width="100%"
       >
         <ButtonContent hidden>
           {importSettings.button}
@@ -381,16 +381,18 @@ const BatchImport = ({ isCreating }) => {
                   </p>
                 </Modal.Content>
                 <ModalActions>
-                  <Button
-                    positive
-                    onClick={handleDownloadConfirmation}
-                    content="Confirmar"
-                  />
-                  <Button
-                    negative
-                    onClick={() => setShowConfirmationModal(false)}
-                    content="Cancelar"
-                  />
+                  <Flex columnGap="5px" >
+                    <Button
+                      positive
+                      onClick={handleDownloadConfirmation}
+                      content="Confirmar"
+                    />
+                    <Button
+                      negative
+                      onClick={() => setShowConfirmationModal(false)}
+                      content="Cancelar"
+                    />
+                  </Flex>
                 </ModalActions>
               </Loader>
             </>
@@ -406,7 +408,7 @@ const BatchImport = ({ isCreating }) => {
                           <Segment>{selectedFile}</Segment>
                         </FormField>
                       </FieldsContainer>
-                      <FieldsContainer>
+                      <FieldsContainer rowGap="5px">
                         <Label>{`${importSettings.label}: ${importedProductsCount}`}</Label>
                         <Table
                           deleteButtonInside
@@ -427,26 +429,28 @@ const BatchImport = ({ isCreating }) => {
                         </FormField>
                         <FormField width={7}>
                           <Label >Cantidad a importar:</Label>
-                          <Segment>{`${importSettings.label}: ${importedProductsCount}`}</Segment>
+                          <Segment>{`${importSettings.label} hola: ${importedProductsCount}`}</Segment>
                         </FormField>
                       </FieldsContainer>
                     </>
                   )}
                   <ModalActions>
                     {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
-                    <Button
-                      disabled={importSettings.isButtonDisabled(isPending)}
-                      loading={isLoading || isPending}
-                      type="submit"
-                      color="green"
-                      content="Aceptar"
-                    />
-                    <Button
-                      disabled={isLoading || isPending}
-                      onClick={() => setOpen(false)}
-                      color="red"
-                      content="Cancelar"
-                    />
+                    <Flex columnGap="5px">
+                      <Button
+                        disabled={importSettings.isButtonDisabled(isPending)}
+                        loading={isLoading || isPending}
+                        type="submit"
+                        color="green"
+                        content="Aceptar"
+                      />
+                      <Button
+                        disabled={isLoading || isPending}
+                        onClick={() => setOpen(false)}
+                        color="red"
+                        content="Cancelar"
+                      />
+                    </Flex>
                   </ModalActions>
                 </Form>
               </ContainerModal>

@@ -1,4 +1,4 @@
-import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer, Flex } from "@/components/common/custom";
+import { FieldsContainer, Flex, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetCancelled } from "@/utils";
@@ -123,7 +123,7 @@ const BudgetView = ({ budget }) => {
         elements={budget?.products}
       />
       <Total readOnly subtotal={subtotal} globalDiscount={budget?.globalDiscount} additionalCharge={budget?.additionalCharge} />
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px" >
         <Label>Comentarios</Label>
         <Segment>{budget?.comments}</Segment>
       </FieldsContainer>
