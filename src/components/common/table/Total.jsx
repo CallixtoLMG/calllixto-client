@@ -1,8 +1,7 @@
 import { Divider, Title } from '@/components/budgets/PDFfile/styles';
 import { formatedPercentage, getSubtotal } from '@/utils';
 import { useMemo } from "react";
-import { Flex } from 'rebass';
-import { Input, Price } from '../custom';
+import { Flex, FlexColumn, Input, Price } from '../custom';
 
 const Field = ({ label, children }) => (
   <Flex justifyContent="space-between" height="30px">
@@ -15,23 +14,23 @@ export const Total = ({
   readOnly,
   subtotal = 0,
   globalDiscount = 0,
-  onGlobalDiscountChange = () => { },
+  onGlobalDiscountChange = () => {},
   additionalCharge = 0,
-  onAdditionalChargeChange = () => { },
+  onAdditionalChargeChange = () => {},
   showAllways = true
 }) => {
   const subtotalAfterDiscount = useMemo(() => getSubtotal(subtotal, -globalDiscount), [subtotal, globalDiscount]);
   const finalTotal = useMemo(() => getSubtotal(subtotalAfterDiscount, additionalCharge), [subtotalAfterDiscount, additionalCharge]);
 
   return (
-    <Flex ml="auto" flexDirection="column" style={{ gridRowGap: readOnly ? "0" : '5px' }} width="250px">
+    <FlexColumn marginLeft="auto" rowGap={readOnly ? "0" : '5px'} width="250px">
       {(showAllways || !!globalDiscount) && (
         <>
           <Field label="Sub total"><Price value={subtotal} /></Field>
           <Divider />
           <Field label="Descuento">
             {!readOnly ?
-              <Flex alignItems="center" justifyContent="flex-end" style={{ gridColumnGap: '10px' }}>
+              <Flex alignItems="center" justifyContent="flex-end" columnGap="10px">
                 <Input
                   $marginBottom
                   width="80px"
@@ -67,7 +66,7 @@ export const Total = ({
           <Divider />
           <Field label="Recargo">
             {!readOnly ?
-              <Flex alignItems="center" justifyContent="flex-end" style={{ gridColumnGap: '10px' }}>
+              <Flex alignItems="center" justifyContent="flex-end" columnGap="10px">
                 <Input
                   $marginBottom
                   width="80px"
@@ -101,6 +100,6 @@ export const Total = ({
         <Title as="h4" width="100px" textAlign="right">TOTAL</Title>
         <Title as="h3"><Price value={finalTotal} /></Title>
       </Flex>
-    </Flex>
+    </FlexColumn>
   );
 };

@@ -1,6 +1,6 @@
-import { Flex } from "rebass";
 import { Button as SButton, Segment as SSegment, Table as STable } from "semantic-ui-react";
 import styled from "styled-components";
+import { Flex } from '@/components/common/custom';
 
 const Cell = styled(STable.Cell)`
   height: 37px!important;

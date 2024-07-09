@@ -1,9 +1,8 @@
-import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, Flex, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetCancelled } from "@/utils";
 import { useMemo } from "react";
-import { Flex } from "rebass";
 import { Popup } from "semantic-ui-react";
 import { Container, Icon, Message, MessageHeader } from "./styles";
 
@@ -50,7 +49,7 @@ const BudgetView = ({ budget }) => {
         value: (product) => (
           <Container>
             {product.name} {product.fractionConfig?.active && `x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}`}
-            <Flex ml="7px">
+            <Flex marginLeft="7px">
               {product.comments && <CommentTooltip comment={product.comments} />}
               {product.dispatchComment && (
                 <Popup
@@ -124,7 +123,7 @@ const BudgetView = ({ budget }) => {
         elements={budget?.products}
       />
       <Total readOnly subtotal={subtotal} globalDiscount={budget?.globalDiscount} additionalCharge={budget?.additionalCharge} />
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px" >
         <Label>Comentarios</Label>
         <Segment>{budget?.comments}</Segment>
       </FieldsContainer>

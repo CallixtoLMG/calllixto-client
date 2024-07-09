@@ -1,6 +1,6 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { ActionLabel, Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { ActionLabel, Box, Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
@@ -11,7 +11,6 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Box, Flex } from "rebass";
 import { Message, Modal, Popup, Transition } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import ModalComment from "./ModalComment";
@@ -244,7 +243,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       value: (product) => (
         <Container>
           {product.name}
-          <Flex mx="3px" style={{ gridColumnGap: '3px' }}>
+          <Flex marginLeft="3px" marginRight="3px" columnGap="3px">
             {product.comments && <CommentTooltip comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
               <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name="truck" color="orange" />} />
@@ -279,7 +278,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                   />
                 )}
               />
-              <Box mx="5px">{` ${product.fractionConfig.unit}`}</Box>
+              <Box marginRight="5px" marginLeft="5px">{` ${product.fractionConfig.unit}`}</Box>
             </Flex>
           ) : (
             ''
@@ -297,7 +296,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             name={`products[${index}].price`}
             control={control}
             render={({ field: { onChange, value } }) => (
-              <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>$
+              <Flex alignItems="center" columnGap="5px">$
                 <CurrencyFormatInput
                   height="35px"
                   displayType="input"
@@ -324,7 +323,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       id: 6,
       title: "Descuento",
       value: (product, index) => (
-        <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>
+        <Flex alignItems="center" columnGap="5px">
           <Controller name={`products[${index}].discount`} control={control} defaultValue={product.discount || 0}
             render={({ field: { onChange, ...rest } }) => (
               <Input
@@ -405,7 +404,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       </Transition>
       <Form onSubmit={handleSubmit(handleConfirm)}>
         <FieldsContainer>
-          <FormField margin="5px 0 0 0" width="300px">
+          <FormField width="300px">
             <Checkbox
               toggle
               checked={isConfirmed}
@@ -507,7 +506,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
           />
         </Loader>
-        <FieldsContainer>
+        <FieldsContainer rowGap="5px!important">
           <Label>Comentarios</Label>
           <ControlledComments control={control} />
         </FieldsContainer>
@@ -519,7 +518,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               control={control}
               rules={RULES.REQUIRED}
               render={({ field: { onChange, value } }) => (
-                <Flex marginTop="5px" flexDirection="column">
+                <Flex flexDirection="column" rowGap="5px" >
                   <ActionLabel
                     color={value.length === PAYMENT_METHODS.length && 'blue'}
                     width="fit-content"
@@ -533,12 +532,12 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                   >
                     Todos
                   </ActionLabel>
-                  <Flex marginTop="5px" style={{ gridColumnGap: '5px' }} flexWrap="wrap">
+                  <Flex columnGap="5px" wrap="wrap" rowGap="5px">
                     {PAYMENT_METHODS.map(text => (
                       <ActionLabel
+                        width="fit-content"
                         key={text}
-                        style={{ margin: '0 5px' }}
-                        color={value.includes(text) && 'blue'} width="fit-content"
+                        color={value.includes(text) && 'blue'}
                         onClick={() => {
                           if (value.includes(text)) {
                             onChange(value.filter(payment => payment !== text));

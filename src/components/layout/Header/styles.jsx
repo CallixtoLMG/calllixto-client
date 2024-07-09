@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { Flex } from "rebass";
 import { Container as SContainer } from "semantic-ui-react";
 import styled from "styled-components";
+import { Flex } from "@/components/common/custom";
 
 const ModLink = styled(Link)`
   display:flex;

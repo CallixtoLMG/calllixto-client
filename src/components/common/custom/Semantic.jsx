@@ -15,7 +15,7 @@ import styled, { css } from "styled-components";
 export const Segment = styled(SSegment)`
   height: ${({ height = 'auto' }) => height} !important;
   padding:${({ height }) => height && "10px"} !important;
-  margin: 5px 0 0 0!important;
+  margin: ${({ margin = "0" }) => margin} !important;
   width: ${({ width = '100%' }) => width} !important;
   min-height: 50px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
@@ -24,7 +24,7 @@ export const Segment = styled(SSegment)`
 `;
 
 export const Input = styled(SInput)`
-  margin: ${({ $marginBottom }) => $marginBottom ? "5px 0" : "5px 0 0 0"} !important;
+  margin: ${({ $marginBottom }) => $marginBottom && "5px 0"} !important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
   max-width: ${({ maxWidth }) => maxWidth && `200px!important;`};
@@ -64,17 +64,20 @@ export const Checkbox = styled(SCheckbox)`
 `;
 
 export const FormField = styled(Form.Field)`
+  display:flex;
   width: ${({ width = '200px' }) => `${width}!important`};
   min-width: ${({ minWidth = '200px' }) => `${minWidth}!important`};
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
+  row-gap: 5px!important;
 `;
 
 export const Label = styled(SLabel)`
   width: ${({ width }) => width ? width : '100%'} !important;
   height: ${({ height }) => height ? height : 'fit-content'} !important;
   margin: ${({ margin }) => margin ? margin : '0'} !important;
+  padding: ${({ padding }) => padding && padding} !important;
   align-content: center;
 `;
 
@@ -85,10 +88,10 @@ export const ActionLabel = styled(SLabel)`
   align-content: center;
   cursor: pointer;
   user-select: none;
+  text-wrap: nowrap;
 `;
 
 export const TextArea = styled(STextarea)`
-  margin: 5px 0 0 0!important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem;
   resize: ${({ resize = "none" }) => `${resize}!important`};
@@ -99,11 +102,11 @@ export const TextArea = styled(STextarea)`
 export const Dropdown = styled(SDropdown)`
   min-width: ${({ minWidth }) => `${minWidth}!important;`};
   max-width: ${({ maxWidth }) => maxWidth && `200px!important;`};
-  margin: ${({ margin = "5px 0 0 0" }) => `${margin}!important;`};
+  margin: ${({ margin }) => `${margin}!important;`};
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
   border-radius: 0.28571429rem!important;
   height: ${({ height = "50px" }) => `${height}!important`};
-  min-height: ${({ minHeight = "none" }) => `${minHeight}!important`};
+  min-height: ${({ minHeight }) => `${minHeight}!important`};
   display: flex!important;
   flex-wrap: wrap;
   align-content: center;
@@ -119,8 +122,11 @@ export const Dropdown = styled(SDropdown)`
 `;
 
 export const Button = styled(SButton)`
-  width: ${({ width }) => width ? width : ''} !important;
+  display:flex;
+  width: ${({ width = "120px" }) => width && width} !important;
   margin: 0 !important;
+  height: ${({ height = "35px" }) => height && height} !important;
+  text-wrap: nowrap;
 `;
 
 export const Icon = styled(SIcon)`

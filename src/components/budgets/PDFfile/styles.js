@@ -1,6 +1,6 @@
-import { Flex } from "rebass";
 import { Header as SHeader, Image as SImage } from "semantic-ui-react";
 import styled from "styled-components";
+import { Flex } from '@/components/common/custom';
 
 const SectionContainer = styled(Flex)`
   justify-content: space-between;

@@ -111,8 +111,8 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                         render={({ field: { value, onChange }, fieldState: { error } }) => (
                           <>
                             <CurrencyFormatInput
-                              marginTop="5px"
                               $shadow
+                              $marginY
                               height="50px"
                               format="####"
                               width="35%"
@@ -127,7 +127,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                               }}
                             />
                             <CurrencyFormatInput
-                              marginTop="5px"
+                              $marginY
                               $shadow
                               height="50px"
                               format="#######"

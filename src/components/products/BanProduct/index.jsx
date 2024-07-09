@@ -1,16 +1,16 @@
 import { LIST_BANNED_PRODUCTS_QUERY_KEY, editBanProducts, useListBanProducts } from "@/api/products";
-import { Button, FieldsContainer, Form, FormField, Input, Label, Modal } from "@/components/common/custom";
+import { Button, FieldsContainer, Flex, Form, FormField, Input, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { handleEnterKeyPress } from '@/utils';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { isEqual, sortBy } from 'lodash';
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Transition } from "semantic-ui-react";
 import { BAN_FILTERS, BAN_PRODUCTS_COLUMNS } from "../products.common";
 import { ModalActions } from "./styles";
-import { isEqual, sortBy } from 'lodash';
 
 const BanProduct = ({ open, setOpen }) => {
   const { data: blacklist, isLoading } = useListBanProducts();
@@ -105,7 +105,7 @@ const BanProduct = ({ open, setOpen }) => {
                 />
               </FormField>
             </FieldsContainer>
-            <FieldsContainer  >
+            <FieldsContainer rowGap="5px"  >
               <Label>Productos vedados</Label>
               <Loader greyColor active={isLoading}>
                 <Table
@@ -124,8 +124,10 @@ const BanProduct = ({ open, setOpen }) => {
               </Loader >
             </FieldsContainer>
             <ModalActions>
-              <Button disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))} loading={isPending} type="submit" color="green" content="Aceptar" />
-              <Button disabled={isPending} onClick={() => setOpen(false)} color="red" content="Cancelar" />
+              <Flex columnGap="5px">
+                <Button disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))} loading={isPending} type="submit" color="green" content="Aceptar" />
+                <Button disabled={isPending} onClick={() => setOpen(false)} color="red" content="Cancelar" />
+              </Flex>
             </ModalActions>
           </Form>
         </Modal.Content>

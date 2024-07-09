@@ -11,7 +11,7 @@ import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
 import { PopupActions } from "@/components/common/buttons";
-import { Button, Checkbox, CurrencyFormatInput, Icon, Label } from "@/components/common/custom";
+import { Box, Button, Checkbox, CurrencyFormatInput, Flex, Icon, Label } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
@@ -23,7 +23,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Flex, Box } from "rebass";
 import { Container as SContainer, Input as SInput } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -39,7 +38,9 @@ const PrintButton = ({ onClick, color, iconName, text }) => (
 
 const SendButton = ({ href, color, iconName, text, target = "_blank" }) => (
   <a href={href} target={target}>
-    <Button width="100%" color={color} size="tiny">
+    <Button
+      color={color}
+      size="tiny">
       {iconName && <Icon name={iconName} />}{text}
     </Button>
   </a>
@@ -51,7 +52,7 @@ const CheckboxContainer = styled(SContainer)`
     flex-direction:row!important;
     align-items: center!important;
     width: 100%!important;
-    max-width: 350px!important;
+    max-width: 370px!important;
     column-gap: 5px!important;
     margin:0!important;
   }
@@ -376,7 +377,7 @@ const Budget = ({ params }) => {
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
       <NoPrint>
-        <Flex justifyContent="space-between">
+        <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) ? "0" :"0 0 15px 0!important"} justifyContent="space-between">
           {isBudgetPending(budget?.state) ? (
             <>
               <Checkbox
@@ -406,7 +407,7 @@ const Budget = ({ params }) => {
             </>
           ) : <Box />}
           {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-            <Flex mb="10px" height="30px" >
+            <Flex height="21px" >
               <CheckboxContainer>
                 <Checkbox
                   toggle
@@ -415,14 +416,14 @@ const Budget = ({ params }) => {
                   label="Cotizar en dólares"
                 />
                 <DolarContainer show={showDolarExangeRate}>
-                  <Label height="25px" width="fit-content">Cambio</Label>
+                  <Label padding="0 9px" height="21px" width="fit-content">Cambio</Label>
                   <CurrencyFormatInput
-                    height="25px"
-                    displayType="number"
+                    height="21px"
+                    displayType="input"
                     thousandSeparator={true}
                     decimalScale={2}
                     allowNegative={false}
-                    width="80px"
+                    width="100px"
                     prefix="$ "
                     customInput={Input}
                     onValueChange={value => {

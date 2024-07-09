@@ -1,7 +1,6 @@
 import { getBrandCode, getProductCode, getSupplierCode } from "@/utils";
-import { Flex } from "rebass";
 import { Popup } from "semantic-ui-react";
-import { Price } from "@/components/common/custom";
+import { Price, Flex } from "@/components/common/custom";
 import { CommentTooltip } from "@/components/common/tooltips";
 
 const ATTRIBUTES = {
