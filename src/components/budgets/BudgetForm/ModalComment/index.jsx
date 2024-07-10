@@ -50,7 +50,6 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
                   />
                 </FormField>
               </FieldsContainer>
-
             </Form>
           </Flex>
         </Modal.Content>
@@ -58,7 +57,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
           <ButtonsContainer>
             <Button
               disabled={!isDirty}
-              type="submit"
+              onClick={handleSubmit(onAddComment)}
               color="green"
             >
               Confirmar
