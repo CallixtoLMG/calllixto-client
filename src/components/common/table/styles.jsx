@@ -1,9 +1,9 @@
-import { Flex } from "rebass";
+import { Flex } from '@/components/common/custom';
 import { Button as SButton, Segment as SSegment, Table as STable } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Cell = styled(STable.Cell)`
-  height: 35px!important;
+  height: 37px!important;
   padding: 2px 7px!important;
   z-index: 2;
   text-align: ${({ align = 'center' }) => `${align}!important`};
@@ -12,7 +12,6 @@ const Cell = styled(STable.Cell)`
 `;
 
 const Container = styled(Flex)`
-  box-shadow: 0 1px 2px 0 rgba(34, 36, 38, .15) !important;
   flex-direction: column;
   width: 100% !important;
   max-height: ${({ tableHeight = 'none' }) => `${tableHeight}!important`};
@@ -70,8 +69,11 @@ const TableFooter = styled(STable.Footer)`
 `;
 
 const HeaderCell = styled(STable.HeaderCell)`
-  background-color: #EEEEEE!important;
+  background-color: ${({ basic }) => !basic && '#EEEEEE!important'};
   text-align: ${({ textAlign = "center" }) => `${textAlign}!important`};
+  width: ${({ width }) => width}!important;
+  padding: ${({ padding }) => padding}!important;
+  max-height: ${({ maxhHeight }) => maxhHeight}!important;
 `;
 
 const FooterCell = styled(STable.HeaderCell)`
@@ -121,5 +123,5 @@ const LinkCell = styled(STable.Cell)`
   }
 `;
 
-export { LinkCell, ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, InnerActionsContainer, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
+export { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
 

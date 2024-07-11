@@ -5,9 +5,9 @@ import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from 'next/navigation';
-import { Flex } from "rebass";
 import { Dropdown, Menu } from 'semantic-ui-react';
 import { Container, LogDiv, ModLink, Text } from "./styles";
+import { Flex } from '@/components/common/custom';
 
 const Header = () => {
   const pathname = usePathname();

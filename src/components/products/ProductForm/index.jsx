@@ -1,12 +1,11 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
+import { Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, Flex } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import { MEASSURE_UNITS, PAGES, PRODUCTS_HELP, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Flex } from "rebass";
 import { Icon, Popup } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
@@ -55,7 +54,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer>
         <FormField width="250px">
-          <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>
+          <Flex alignItems="center" columnGap="5px">
             <Controller
               name="fractionConfig.active"
               control={control}
@@ -72,7 +71,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           </Flex>
         </FormField>
         <FormField>
-          <Flex alignItems="center" style={{ gridColumnGap: '5px' }}>
+          <Flex alignItems="center" columnGap="5px">
             <Controller
               name="editablePrice"
               control={control}
@@ -185,6 +184,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 }}
                 value={value || 0}
                 placeholder="Precio"
+                $marginY
               />
             )}
           />

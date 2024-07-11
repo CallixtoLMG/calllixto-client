@@ -1,11 +1,13 @@
 import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
-import { Input } from "@/components/common/custom";
+import { Flex, Input } from "@/components/common/custom";
 import { ModalDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { usePaginationContext } from "@/components/common/table/Pagination";
+import { NoPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import JsBarcode from 'jsbarcode';
 import { useCallback, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -22,6 +24,34 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const { resetFilters } = usePaginationContext();
   const methods = useForm();
   const { handleSubmit, control, reset, setValue } = methods;
+
+  const printBarcodes = (selectedProducts) => {
+    // Crear un contenedor para los códigos de barras
+    const container = document.createElement('div');
+
+    // Crear elementos de imagen para cada producto seleccionado y generar el código de barras
+    Object.keys(selectedProducts).forEach(code => {
+      const barcodeElement = document.createElement('img');
+      JsBarcode(barcodeElement, code, {
+        format: "CODE128",
+        lineColor: "#000",
+        width: 2,
+        height: 80,
+        displayValue: false,
+        fit: true
+      });
+      container.appendChild(barcodeElement);
+    });
+
+    // Añadir el contenedor al cuerpo del documento
+    document.body.appendChild(container);
+
+    // Imprimir la página
+    window.print();
+
+    // Eliminar el contenedor después de imprimir
+    document.body.removeChild(container);
+  };
 
   const onFilter = useCallback((data) => {
     const filters = { ...data };
@@ -84,84 +114,114 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     }
   }, [selectedProducts]);
 
+  const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
+    mutationFn: async () => {
+      const productCodes = Object.keys(selectedProducts);
+      const deletePromises = productCodes.map(code => deleteProduct(code));
+      await Promise.all(deletePromises);
+      return productCodes.length;
+    },
+    onSuccess: (deletedCount) => {
+      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
+      toast.success(`${deletedCount} productos eliminados!`);
+      setSelectedProducts({});
+    },
+    onError: (error) => {
+      toast.error(`Error al eliminar productos: ${error.message}`);
+    }
+  });
+
   const selectionActions = useMemo(() => {
     if (RULES.canRemove[role]) {
       return [
         <Button
-          onClick={() => console.log(selectedProducts)}
+          onClick={() => deleteSelectedProducts()}
           color="red"
           size="tiny"
           key={1}
         >
           <Icon name="trash" /> Eliminar Productos
+        </Button>,
+        <Button
+          onClick={() => printBarcodes(selectedProducts)}
+          color="blue"
+          size="tiny"
+          key={2}
+        >
+          <Icon name="barcode" /> Descargar Códigos
         </Button>
       ];
     }
     return [];
-  }, [role, selectedProducts]);
+  }, [role, selectedProducts, deleteSelectedProducts]);
 
   return (
-    <>
-      <FormProvider {...methods}>
-        <Form onSubmit={handleSubmit(onFilter)}>
-          <Filters onRestoreFilters={onRestoreFilters}>
-            <Controller
-              name="code"
-              control={control}
-              render={({ field: { onChange, ...rest } }) => (
-                <Input
-                  {...rest}
-                  $marginBottom
-                  maxWidth
-                  height="35px"
-                  placeholder="Código"
-                  onChange={(e) => {
-                    setValue('name', '');
-                    onChange(e.target.value);
-                  }}
-                />
-              )}
-            />
-            <Controller
-              name="name"
-              control={control}
-              render={({ field: { onChange, ...rest } }) => (
-                <Input
-                  {...rest}
-                  $marginBottom
-                  maxWidth
-                  height="35px"
-                  placeholder="Nombre"
-                  onChange={(e) => {
-                    setValue('code', '');
-                    onChange(e.target.value);
-                  }}
-                />
-              )}
-            />
-          </Filters>
-        </Form>
-      </FormProvider>
-      <Table
-        isLoading={isLoading}
-        mainKey="code"
-        headers={PRODUCT_COLUMNS}
-        elements={mapProductsForTable(products)}
-        page={PAGES.PRODUCTS}
-        actions={actions}
-        selection={selectedProducts}
-        onSelectionChange={onSelectionChange}
-        selectionActions={selectionActions}
-      />
-      <ModalDelete
-        showModal={showModal}
-        setShowModal={setShowModal}
-        title={deleteQuestion(selectedProduct?.name)}
-        onDelete={mutate}
-        isLoading={isPending}
-      />
-    </>
-  )
+
+    <NoPrint>
+      <Flex flexDirection="column" rowGap="15px">
+        <FormProvider {...methods}>
+          <Form onSubmit={handleSubmit(onFilter)}>
+            <Filters onRestoreFilters={onRestoreFilters}>
+              <Controller
+                name="code"
+                control={control}
+                render={({ field: { onChange, ...rest } }) => (
+                  <Input
+                    {...rest}
+                    $marginBottom
+                    maxWidth
+                    height="35px"
+                    placeholder="Código"
+                    onChange={(e) => {
+                      setValue('name', '');
+                      onChange(e.target.value);
+                    }}
+                  />
+                )}
+              />
+              <Controller
+                name="name"
+                control={control}
+                render={({ field: { onChange, ...rest } }) => (
+                  <Input
+                    {...rest}
+                    $marginBottom
+                    maxWidth
+                    height="35px"
+                    placeholder="Nombre"
+                    onChange={(e) => {
+                      setValue('code', '');
+                      onChange(e.target.value);
+                    }}
+                  />
+                )}
+              />
+            </Filters>
+          </Form>
+
+        </FormProvider>
+        <Table
+          isLoading={isLoading || deleteIsPending}
+          mainKey="code"
+          headers={PRODUCT_COLUMNS}
+          elements={mapProductsForTable(products)}
+          page={PAGES.PRODUCTS}
+          actions={actions}
+          selection={selectedProducts}
+          onSelectionChange={onSelectionChange}
+          selectionActions={selectionActions}
+        />
+        <ModalDelete
+          showModal={showModal}
+          setShowModal={setShowModal}
+          title={deleteQuestion(selectedProduct?.name)}
+          onDelete={mutate}
+          isLoading={isPending || deleteIsPending}
+        />
+      </Flex>
+    </NoPrint>
+
+  );
 };
 
 export default ProductsPage;

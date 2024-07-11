@@ -1,12 +1,6 @@
-import { Flex } from "rebass";
+import { Flex } from "@/components/common/custom";
 import { Popup as SPopup } from "semantic-ui-react";
 import styled from "styled-components";
-
-const ButtonContainer = styled(Flex)`
-  padding: 0!important;
-  height: 36px!important;
-  max-width: 90px!important;
-`;
 
 const PopupContent = styled(Flex)`
   flex-direction : row;
@@ -19,6 +13,6 @@ const Popup = styled(SPopup)`
 `;
 
 export {
-  ButtonContainer, Popup, PopupContent
+  Popup, PopupContent
 };
 

@@ -1,10 +1,9 @@
-import { Dropdown, Input } from '@/components/common/custom';
+import { Dropdown, Flex, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { BUDGET_STATES, PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { Controller, FormProvider, useForm } from 'react-hook-form';
-import { Flex } from 'rebass';
 import { Form, Label } from 'semantic-ui-react';
 import { BUDGETS_COLUMNS } from "../budgets.common";
 
@@ -79,10 +78,10 @@ const BudgetsPage = ({ budgets, isLoading }) => {
               render={({ field: { onChange, ...rest } }) => (
                 <Dropdown
                   {...rest}
-                  margin="0"
                   maxWidth
                   top="10px"
-                  height="fit-content"
+                  height="35px"
+                  minHeight="35px"
                   selection
                   options={STATE_OPTIONS}
                   defaultValue={STATE_OPTIONS[0].key}

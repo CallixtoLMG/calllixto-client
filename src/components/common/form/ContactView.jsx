@@ -1,4 +1,4 @@
-import { FieldsContainer, FormField} from '../custom';
+import { FieldsContainer, FormField } from '../custom';
 import { Table } from '../table';
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from './form.common';
 
@@ -13,12 +13,14 @@ export const ContactView = ({ phoneNumbers = [], addresses = [], emails = [] }) 
       </FormField>
       <FormField flex="1">
         <Table
+          $wrap
           headers={ADDRESS_TABLE_HEADERS}
           elements={addresses}
         />
       </FormField>
       <FormField flex="1">
         <Table
+          $wrap
           headers={EMAIL_TABLE_HEADERS}
           elements={emails}
         />

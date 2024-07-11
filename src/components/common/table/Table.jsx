@@ -1,10 +1,10 @@
 import { Loader } from "@/components/layout";
 import { useRouter } from "next/navigation";
-import { Button, Checkbox, Header } from "semantic-ui-react";
-import Actions from "./Actions";
-import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, Table, TableHeader, TableRow, LinkCell } from "./styles";
 import { useEffect, useMemo, useState } from "react";
+import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
 import { PopupActions } from "../buttons";
+import Actions from "./Actions";
+import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
 
 const CustomTable = ({
   isLoading,
@@ -19,6 +19,8 @@ const CustomTable = ({
   selection,
   onSelectionChange,
   selectionActions = [],
+  basic,
+  $wrap
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
@@ -30,22 +32,22 @@ const CustomTable = ({
 
   return (
     <Container tableHeight={tableHeight}>
-      <Table celled compact striped color={color} definition={isSelectable}>
+      <Table celled compact striped={!basic} color={color} definition={isSelectable}>
         <TableHeader fullWidth>
           <Table.Row>
             {isSelectable && (
-              <HeaderCell>
+              <HeaderCell width="65px" padding="0">
                 {!!Object.keys(selection).length && (
                   <PopupActions
                     position="right center"
-                    trigger={<Button icon="bolt" circular color="yellow" size="mini" />}
+                    trigger={<Button icon circular color="yellow" size="mini"> <Icon name="cog" /> </Button>}
                     buttons={selectionActions}
                   />
                 )}
               </HeaderCell>
             )}
             {headers.map((header) => (
-              <HeaderCell key={`header_${header.id}`} >{header.title}</HeaderCell>
+              <HeaderCell key={`header_${header.id}`} basic={basic}>{header.title}</HeaderCell>
             ))}
           </Table.Row>
         </TableHeader>
@@ -94,7 +96,7 @@ const CustomTable = ({
                   return (
                     <TableRow key={element[mainKey]}>
                       {headers.map(header => (
-                        <Cell key={`cell_${header.id}`} align={header.align} width={header.width}>
+                        <Cell $wrap={$wrap} key={`cell_${header.id}`} align={header.align} width={header.width}>
                           {header.value(element, index)}
                         </Cell>
                       ))}

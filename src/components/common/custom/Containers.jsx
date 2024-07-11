@@ -1,6 +1,6 @@
-import { Flex } from "rebass";
 import { Form as SForm } from "semantic-ui-react";
 import styled from "styled-components";
+import { Flex } from "./Flex";
 
 export const Form = styled(SForm)`
   display: flex !important;
@@ -16,7 +16,7 @@ export const ViewContainer = styled(Flex)`
 export const FieldsContainer = styled(Flex)`
   justify-content: ${({ justifyContent }) => justifyContent};
   flex-wrap: wrap;
-  column-gap: ${({ columnGap = '20px' }) => columnGap };
+  column-gap: ${({ columnGap = '15px' }) => columnGap } !important;
   row-gap: ${({ rowGap = 'auto' }) => rowGap} !important;
   width: ${({ width = 'auto' }) => width} !important;
   min-height: ${({ minHeight = 'auto' }) => minHeight} !important;
@@ -25,16 +25,17 @@ export const FieldsContainer = styled(Flex)`
 `;
 
 export const ButtonsContainer = styled(Flex)`
-flex-direction: row;
-margin-bottom: 10px !important;
-margin-top: ${({ marginTop }) => (marginTop ? marginTop : '0')};
-justify-content: ${({ center }) => (center ? 'center' : 'flex-end')};
-column-gap: 10px;
-width: ${({ width }) => (width ? width : 'auto')};
+  flex-direction: row;
+  margin-top: ${({ marginTop }) => (marginTop ? marginTop : '0')};
+  justify-content: ${({ center }) => (center ? 'center' : 'flex-end')};
+  column-gap: 5px;
+  width: ${({ width }) => (width ? width : 'auto')}!important;
+  padding: 0!important;
+  height: ${({ height = 'auto' }) => height} !important;
 `;
 
 export const PhoneContainer = styled(Flex)`
   flex-wrap: ${({ wrap }) => wrap && 'wrap'};
   width: 100%;
-  column-gap: 10px;
+  column-gap: 15px;
 `;

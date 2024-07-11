@@ -1,6 +1,7 @@
 "use client";
+import { Button } from "@/components/common/custom";
 import { useRouter } from 'next/navigation';
-import { Button, Header, Icon } from 'semantic-ui-react';
+import { Header, Icon } from 'semantic-ui-react';
 import { MainContainer } from "./styles";
 
 const NotFound = () => {

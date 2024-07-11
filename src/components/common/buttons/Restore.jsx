@@ -1,10 +1,5 @@
-import { Icon, Button as SButton } from "semantic-ui-react";
-import styled from "styled-components";
-
-const Button = styled(SButton)`
-  width: 120px!important;
-  padding: 10px 0!important;
-`;
+import { Button } from "@/components/common/custom";
+import { Icon } from "semantic-ui-react";
 
 export const Restore = ({ isUpdating, isLoading, isDirty, onClick, disabled }) => {
   return (

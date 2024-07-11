@@ -1,14 +1,14 @@
-import { Button } from "@/components/common/custom";
+import { Button, ButtonsContainer } from "@/components/common/custom";
 import { ButtonContent, Icon } from "semantic-ui-react";
 import BatchCreate from "../BatchCreate";
 import BatchUpdate from "../BatchUpdate";
-import { ButtonContainer, Popup, PopupContent } from "./styles";
+import { Popup, PopupContent } from "./styles";
 
 const ButtonImport = ({ products, createBatch, editBatch }) => {
   return (
     <Popup
       trigger={
-        <ButtonContainer>
+        <ButtonsContainer>
           <Button
             animated="vertical"
             color="blue"
@@ -21,7 +21,7 @@ const ButtonImport = ({ products, createBatch, editBatch }) => {
               <Icon name="upload" />
             </ButtonContent>
           </Button>
-        </ButtonContainer>}
+        </ButtonsContainer>}
       content={
         <PopupContent>
           <BatchCreate products={products} createBatch={createBatch} />

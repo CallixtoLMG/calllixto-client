@@ -1,11 +1,12 @@
 import { validateEmail, validatePhone } from "@/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Flex } from "rebass";
-import { Button, Icon, Popup } from "semantic-ui-react";
-import { FieldsContainer, FormField, Input, Label, RuledLabel } from '../custom';
+import { Icon, Popup } from "semantic-ui-react";
+import { Button, FieldsContainer, Flex, FormField, Input, Label, RuledLabel } from '../custom';
 import { Table } from '../table';
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "./form.common";
+
+
 const EMPTY_PHONE = { ref: '', areaCode: '', number: '' };
 const EMPTY_ADDRESS = { ref: '', address: '' };
 const EMPTY_EMAIL = { ref: '', email: '' };
@@ -95,7 +96,9 @@ export const ContactFields = () => {
       <FormField width="33%">
         <Popup
           trigger={
-            <Flex mb="5px"><Button type="button" color="green"><Icon name="add" /> Teléfono</Button></Flex>
+            <Flex>
+              <Button type="button" color="green"><Icon name="add" /> Teléfono</Button>
+            </Flex>
           }
           on='click'
           onClose={() => {
@@ -149,7 +152,9 @@ export const ContactFields = () => {
       <FormField flex="1">
         <Popup
           trigger={
-            <Flex mb="5px"><Button type="button" color="green"><Icon name="add" /> Dirección</Button></Flex>
+            <Flex >
+              <Button type="button" color="green"><Icon name="add" /> Dirección</Button>
+            </Flex>
           }
           on='click'
           onClose={() => {
@@ -181,6 +186,7 @@ export const ContactFields = () => {
           </FieldsContainer>
         </Popup>
         <Table
+          $wrap
           headers={ADDRESS_TABLE_HEADERS}
           actions={[
             { id: 1, icon: 'trash', color: 'red', onClick: (address, index) => removeAddress(index), tooltip: 'Eliminar' }
@@ -191,7 +197,9 @@ export const ContactFields = () => {
       <FormField flex="1">
         <Popup
           trigger={
-            <Flex mb="5px"><Button type="button" color="green"><Icon name="add" /> Email</Button></Flex>
+            <Flex >
+              <Button type="button" color="green"><Icon name="add" /> Email</Button>
+            </Flex>
           }
           on='click'
           onClose={() => {
@@ -223,6 +231,7 @@ export const ContactFields = () => {
           </FieldsContainer>
         </Popup>
         <Table
+          $wrap={true}
           headers={EMAIL_TABLE_HEADERS}
           actions={[
             { id: 1, icon: 'trash', color: 'red', onClick: (email, index) => removeEmail(index), tooltip: 'Eliminar' }

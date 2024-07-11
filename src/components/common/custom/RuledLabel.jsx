@@ -1,6 +1,6 @@
-import { Flex } from "rebass";
 import { Popup, Icon as SIcon, Label as SLabel } from "semantic-ui-react";
 import styled from "styled-components";
+import { Flex } from '@/components/common/custom';
 
 const Label = styled(SLabel)`
   width: 100%!important;

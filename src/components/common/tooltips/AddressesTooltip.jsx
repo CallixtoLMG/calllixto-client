@@ -1,5 +1,5 @@
-import { Box } from "rebass";
 import { Icon, List, ListItem, Popup } from "semantic-ui-react";
+import { Box } from "@/components/common/custom";
 
 export const AddressesTooltip = ({ addresses }) => {
   return (
@@ -16,7 +16,7 @@ export const AddressesTooltip = ({ addresses }) => {
       }
       position="top center"
       trigger={
-        <Box marginX="5px">
+        <Box marginLeft="5px" marginRight="5px">
           <Icon name="list ul" color="yellow" />
         </Box>
       }
