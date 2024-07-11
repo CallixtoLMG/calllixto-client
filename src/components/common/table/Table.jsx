@@ -1,7 +1,7 @@
 import { Loader } from "@/components/layout";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
+import { Button, Checkbox, Dropdown, Header, Icon } from "semantic-ui-react";
 import { PopupActions } from "../buttons";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
@@ -20,7 +20,8 @@ const CustomTable = ({
   onSelectionChange,
   selectionActions = [],
   basic,
-  $wrap
+  $wrap,
+  clearSelection // Recibir clearSelection como prop
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
@@ -30,20 +31,65 @@ const CustomTable = ({
     setHydrated(true);
   }, []);
 
+  const handleToggleAll = () => {
+    const someSelected = Object.keys(selection).length > 0;
+    elements.forEach(element => onSelectionChange(element[mainKey], !someSelected));
+  };
+
+  const dropdownOptions = [
+    {
+      key: 'all',
+      text: 'Seleccionar todo',
+      onClick: () => {
+        elements.forEach(element => {
+          if (!selection[element[mainKey]]) {
+            onSelectionChange(element[mainKey], true);
+          }
+        });
+      }
+    },
+    {
+      key: 'none',
+      text: 'Deseleccionar todo',
+      onClick: () => {
+        elements.forEach(element => {
+          if (selection[element[mainKey]]) {
+            onSelectionChange(element[mainKey], false);
+          }
+        });
+      }
+    }
+  ];
+
   return (
     <Container tableHeight={tableHeight}>
+      <Button onClick={clearSelection} color="red">Deseleccionar Todo</Button>
       <Table celled compact striped={!basic} color={color} definition={isSelectable}>
         <TableHeader fullWidth>
           <Table.Row>
             {isSelectable && (
               <HeaderCell width="65px" padding="0">
+                <Checkbox
+                  indeterminate={Object.keys(selection).length > 0 && Object.keys(selection).length < elements.length}
+                  checked={Object.keys(selection).length === elements.length}
+                  onChange={handleToggleAll}
+                />
                 {!!Object.keys(selection).length && (
                   <PopupActions
                     position="right center"
-                    trigger={<Button icon circular color="yellow" size="mini"> <Icon name="cog" /> </Button>}
+                    trigger={<Button icon circular color="yellow" size="mini"><Icon name="cog" /></Button>}
                     buttons={selectionActions}
                   />
                 )}
+                <Dropdown
+                  icon="caret down"
+                  floating
+                  labeled
+                  button
+                  className='icon'
+                  options={dropdownOptions}
+                  trigger={<></>}
+                />
               </HeaderCell>
             )}
             {headers.map((header) => (

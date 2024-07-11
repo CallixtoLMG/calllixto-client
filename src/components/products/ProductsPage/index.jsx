@@ -1,57 +1,103 @@
 import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
 import { Flex, Input } from "@/components/common/custom";
-import { ModalDelete } from "@/components/common/modals";
+import { ModalDelete, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { usePaginationContext } from "@/components/common/table/Pagination";
-import { NoPrint } from "@/components/layout";
+import { NoPrint, OnlyPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import JsBarcode from 'jsbarcode';
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Button, Form, Icon } from "semantic-ui-react";
+import styled, { createGlobalStyle } from 'styled-components';
 import { PRODUCT_COLUMNS } from "../products.common";
 
 const EMPTY_FILTERS = { code: '', name: '' };
 
+const GlobalStyles = createGlobalStyle`
+  @media print {
+    .ui.popup {
+      display: none !important;
+    }
+  }
+`;
+
+const Container = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+`;
+
+const SubContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid #000;
+  text-align: center;
+  page-break-inside: avoid;
+  height: 300px !important;
+  padding: 0px !important;
+`;
+
+const ProductName = styled.p`
+  margin: 0;
+  font-size: 16px;
+  padding-top: 3px !important;
+  height: 50px !important;
+`;
+
+const ProductCode = styled.p`
+  margin: 0;
+  font-size: 16px;
+  flex: 1 0 5% !important;
+  padding: 3px !important;
+`;
+
+const Barcode = styled.img`
+  flex: 1 0 60%;
+  width: 100%;
+  height: 80px !important;
+  padding: 0 3px !important;
+`;
+
 const ProductsPage = ({ products = [], role, isLoading }) => {
   const [showModal, setShowModal] = useState(false);
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState({});
+  const [shouldPrint, setShouldPrint] = useState(false);
   const queryClient = useQueryClient();
   const { resetFilters } = usePaginationContext();
   const methods = useForm();
   const { handleSubmit, control, reset, setValue } = methods;
 
-  const printBarcodes = (selectedProducts) => {
-    // Crear un contenedor para los códigos de barras
-    const container = document.createElement('div');
-
-    // Crear elementos de imagen para cada producto seleccionado y generar el código de barras
+  const generateBarcodes = useCallback(() => {
     Object.keys(selectedProducts).forEach(code => {
-      const barcodeElement = document.createElement('img');
-      JsBarcode(barcodeElement, code, {
-        format: "CODE128",
-        lineColor: "#000",
-        width: 2,
-        height: 80,
-        displayValue: false,
-        fit: true
-      });
-      container.appendChild(barcodeElement);
+      const barcodeElement = document.getElementById(`barcode-${code}`);
+      if (barcodeElement) {
+        JsBarcode(barcodeElement, code, {
+          format: "CODE128",
+          lineColor: "#000",
+          width: 2,
+          height: 80,
+          displayValue: false,
+          fit: true
+        });
+      }
     });
+  }, [selectedProducts]);
 
-    // Añadir el contenedor al cuerpo del documento
-    document.body.appendChild(container);
-
-    // Imprimir la página
-    window.print();
-
-    // Eliminar el contenedor después de imprimir
-    document.body.removeChild(container);
-  };
+  useEffect(() => {
+    if (shouldPrint) {
+      generateBarcodes();
+      setTimeout(() => {
+        window.print();
+        setShouldPrint(false);
+      }, 500);
+    }
+  }, [shouldPrint, generateBarcodes]);
 
   const onFilter = useCallback((data) => {
     const filters = { ...data };
@@ -86,7 +132,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
       const { data } = await deleteProduct(selectedProduct?.code);
-      return data
+      return data;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -104,15 +150,24 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     onFilter(EMPTY_FILTERS);
   }, [reset, onFilter]);
 
-  const onSelectionChange = useCallback((selected) => {
-    if (selectedProducts[selected]) {
+  const onSelectionChange = useCallback((selected, isSelected = null) => {
+    if (isSelected === null) {
+      // Toggle selection
+      isSelected = !selectedProducts[selected];
+    }
+  
+    if (isSelected) {
+      setSelectedProducts(prev => ({ ...prev, [selected]: true }));
+    } else {
       const productsCopy = { ...selectedProducts };
       delete productsCopy[selected];
       setSelectedProducts(productsCopy);
-    } else {
-      setSelectedProducts(prev => ({ ...prev, [selected]: true }));
     }
   }, [selectedProducts]);
+  
+  const clearSelection = () => {
+    setSelectedProducts({});
+  };
 
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
     mutationFn: async () => {
@@ -131,11 +186,30 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     }
   });
 
+  const handleBarcodePrint = async () => {
+    $('.ui.popup').popup('hide'); // Esconder el popup de Semantic UI
+    setShouldPrint(true);
+  };
+
+  const handleDeleteProducts = () => {
+    setShowConfirmDeleteModal(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowConfirmDeleteModal(false);
+    deleteSelectedProducts();
+  };
+
+  const selectedProductDetails = Object.keys(selectedProducts).map(code => {
+    const product = products.find(product => product.code === code);
+    return { code: product?.code, name: product?.name, price: product?.price };
+  });
+
   const selectionActions = useMemo(() => {
     if (RULES.canRemove[role]) {
       return [
         <Button
-          onClick={() => deleteSelectedProducts()}
+          onClick={handleDeleteProducts}
           color="red"
           size="tiny"
           key={1}
@@ -143,7 +217,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           <Icon name="trash" /> Eliminar Productos
         </Button>,
         <Button
-          onClick={() => printBarcodes(selectedProducts)}
+          onClick={handleBarcodePrint}
           color="blue"
           size="tiny"
           key={2}
@@ -153,74 +227,92 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
       ];
     }
     return [];
-  }, [role, selectedProducts, deleteSelectedProducts]);
+  }, [role, selectedProducts, handleDeleteProducts, handleBarcodePrint]);
 
   return (
-
-    <NoPrint>
-      <Flex flexDirection="column" rowGap="15px">
-        <FormProvider {...methods}>
-          <Form onSubmit={handleSubmit(onFilter)}>
-            <Filters onRestoreFilters={onRestoreFilters}>
-              <Controller
-                name="code"
-                control={control}
-                render={({ field: { onChange, ...rest } }) => (
-                  <Input
-                    {...rest}
-                    $marginBottom
-                    maxWidth
-                    height="35px"
-                    placeholder="Código"
-                    onChange={(e) => {
-                      setValue('name', '');
-                      onChange(e.target.value);
-                    }}
-                  />
-                )}
-              />
-              <Controller
-                name="name"
-                control={control}
-                render={({ field: { onChange, ...rest } }) => (
-                  <Input
-                    {...rest}
-                    $marginBottom
-                    maxWidth
-                    height="35px"
-                    placeholder="Nombre"
-                    onChange={(e) => {
-                      setValue('code', '');
-                      onChange(e.target.value);
-                    }}
-                  />
-                )}
-              />
-            </Filters>
-          </Form>
-
-        </FormProvider>
-        <Table
-          isLoading={isLoading || deleteIsPending}
-          mainKey="code"
-          headers={PRODUCT_COLUMNS}
-          elements={mapProductsForTable(products)}
-          page={PAGES.PRODUCTS}
-          actions={actions}
-          selection={selectedProducts}
-          onSelectionChange={onSelectionChange}
-          selectionActions={selectionActions}
-        />
-        <ModalDelete
-          showModal={showModal}
-          setShowModal={setShowModal}
-          title={deleteQuestion(selectedProduct?.name)}
-          onDelete={mutate}
-          isLoading={isPending || deleteIsPending}
-        />
-      </Flex>
-    </NoPrint>
-
+    <>
+      <GlobalStyles />
+      <NoPrint>
+        <Flex flexDirection="column" rowGap="15px">
+          <FormProvider {...methods}>
+            <Form onSubmit={handleSubmit(onFilter)}>
+              <Filters onRestoreFilters={onRestoreFilters}>
+                <Controller
+                  name="code"
+                  control={control}
+                  render={({ field: { onChange, ...rest } }) => (
+                    <Input
+                      {...rest}
+                      $marginBottom
+                      maxWidth
+                      height="35px"
+                      placeholder="Código"
+                      onChange={(e) => {
+                        setValue('name', '');
+                        onChange(e.target.value);
+                      }}
+                    />
+                  )}
+                />
+                <Controller
+                  name="name"
+                  control={control}
+                  render={({ field: { onChange, ...rest } }) => (
+                    <Input
+                      {...rest}
+                      $marginBottom
+                      maxWidth
+                      height="35px"
+                      placeholder="Nombre"
+                      onChange={(e) => {
+                        setValue('code', '');
+                        onChange(e.target.value);
+                      }}
+                    />
+                  )}
+                />
+              </Filters>
+            </Form>
+          </FormProvider>
+          <Table
+            isLoading={isLoading}
+            mainKey="code"
+            headers={PRODUCT_COLUMNS}
+            elements={mapProductsForTable(products)}
+            page={PAGES.PRODUCTS}
+            actions={actions}
+            selection={selectedProducts}
+            onSelectionChange={onSelectionChange}
+            selectionActions={selectionActions}
+            clearSelection={clearSelection} // Pasar clearSelection como prop
+          />
+          <ModalDelete
+            showModal={showModal}
+            setShowModal={setShowModal}
+            title={deleteQuestion(selectedProduct?.name)}
+            onDelete={mutate}
+            isLoading={isPending}
+          />
+        </Flex>
+      </NoPrint>
+      <OnlyPrint>
+        <Container>
+          {Object.keys(selectedProducts).map((code) => (
+            <SubContainer key={code}>
+              <ProductName>{products.find(product => product.code === code)?.name}</ProductName>
+              <Barcode id={`barcode-${code}`}></Barcode>
+              <ProductCode>{code}</ProductCode>
+            </SubContainer>
+          ))}
+        </Container>
+      </OnlyPrint>
+      <ModalMultiDelete
+        open={showConfirmDeleteModal}
+        onClose={() => setShowConfirmDeleteModal(false)}
+        onConfirm={handleConfirmDelete}
+        products={selectedProductDetails}
+      />
+    </>
   );
 };
 
