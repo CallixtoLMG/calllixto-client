@@ -1,10 +1,11 @@
 import { Loader } from "@/components/layout";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Checkbox, Dropdown, Header, Icon } from "semantic-ui-react";
+import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
 import { PopupActions } from "../buttons";
+import { Dropdown } from "../custom";
 import Actions from "./Actions";
-import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
+import { ActionsContainer, Cell, CheckboxContainer, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
 
 const CustomTable = ({
   isLoading,
@@ -32,8 +33,17 @@ const CustomTable = ({
   }, []);
 
   const handleToggleAll = () => {
-    const someSelected = Object.keys(selection).length > 0;
-    elements.forEach(element => onSelectionChange(element[mainKey], !someSelected));
+    const allSelected = Object.keys(selection).length === elements.length;
+
+    if (allSelected) {
+      clearSelection();
+    } else {
+      elements.forEach(element => {
+        if (!selection[element[mainKey]]) {
+          onSelectionChange(element[mainKey], true);
+        }
+      });
+    }
   };
 
   const dropdownOptions = [
@@ -52,57 +62,62 @@ const CustomTable = ({
       key: 'none',
       text: 'Deseleccionar todo',
       onClick: () => {
-        elements.forEach(element => {
-          if (selection[element[mainKey]]) {
-            onSelectionChange(element[mainKey], false);
-          }
-        });
+        clearSelection()
       }
     }
   ];
 
   return (
     <Container tableHeight={tableHeight}>
-      <Button onClick={clearSelection} color="red">Deseleccionar Todo</Button>
       <Table celled compact striped={!basic} color={color} definition={isSelectable}>
         <TableHeader fullWidth>
-          <Table.Row>
+          <TableRow>
             {isSelectable && (
               <HeaderCell width="65px" padding="0">
-                <Checkbox
-                  indeterminate={Object.keys(selection).length > 0 && Object.keys(selection).length < elements.length}
-                  checked={Object.keys(selection).length === elements.length}
-                  onChange={handleToggleAll}
-                />
-                {!!Object.keys(selection).length && (
-                  <PopupActions
-                    position="right center"
-                    trigger={<Button icon circular color="yellow" size="mini"><Icon name="cog" /></Button>}
-                    buttons={selectionActions}
+                <CheckboxContainer>
+                  <Checkbox
+                    indeterminate={Object.keys(selection).length > 0 && Object.keys(selection).length < elements.length}
+                    checked={Object.keys(selection).length === elements.length}
+                    onChange={handleToggleAll}
                   />
-                )}
-                <Dropdown
-                  icon="caret down"
-                  floating
-                  labeled
-                  button
-                  className='icon'
-                  options={dropdownOptions}
-                  trigger={<></>}
-                />
+                  <Dropdown
+                    padding="3px"
+                    bgColor="rgb(238, 238, 238)"
+                    hideBorder
+                    width="fit-content"
+                    margin="0"
+                    height="30px"
+                    icon="caret down"
+                    button
+                    className='icon'
+                    options={dropdownOptions}
+                    trigger={<></>}
+                  />
+                </CheckboxContainer>
               </HeaderCell>
             )}
             {headers.map((header) => (
               <HeaderCell key={`header_${header.id}`} basic={basic}>{header.title}</HeaderCell>
             ))}
-          </Table.Row>
+            {isSelectable && !!Object.keys(selection).length && (
+              <ActionsContainer header >
+                <InnerActionsContainer header>
+                  <PopupActions
+                    position="right center"
+                    trigger={<Button icon circular color="yellow" size="mini"><Icon name="cog" /></Button>}
+                    buttons={selectionActions}
+                  />
+                </InnerActionsContainer>
+              </ActionsContainer>
+            )}
+          </TableRow>
         </TableHeader>
         {hydrated && (
           <Loader active={isLoading}>
             <Table.Body>
               {!elements.length ? (
                 <Table.Row>
-                  <Cell colSpan={headers.length} textAlign="center">
+                  <Cell colSpan={headers.length + (isSelectable ? 2 : 1)} textAlign="center">
                     <Header as="h4">
                       No se encontraron ítems
                     </Header>
@@ -129,7 +144,7 @@ const CustomTable = ({
                             {header.value(element, index)}
                           </LinkCell>
                         ))}
-                        {!!actions.length && (
+                        {!!selectionActions.length && (
                           <ActionsContainer deleteButtonInside={deleteButtonInside}>
                             <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
                               <Actions actions={actions} element={element} />

@@ -83,19 +83,26 @@ const FooterCell = styled(STable.HeaderCell)`
 const ActionsContainer = styled.td`
   position: absolute;
   right: 0;
-  top: 50%;
-  transform: ${({ deleteButtonInside }) => deleteButtonInside ? 'translateY(-50%)' : "translateY(-50%) translateX(calc(100%))"} !important;
-  transition: all 0.1s ease-in-out;
-  opacity: 0;
-  visibility: hidden;
-  border: none !important;
+  top: ${({ header }) => header ? "0px" : "50%"};
+  transform: ${({ deleteButtonInside, header }) => {
+    if (deleteButtonInside) return 'translateY(-50%)';
+    return header ? 'translateX(calc(100%))' : "translateY(-50%) translateX(calc(100%))";
+  }} !important;
+  transition: all 0.1s ease-in-out!important;
+  opacity: ${({ header }) => header ? "1" : "0"};
+  visibility: ${({ header }) => header ? "visible" : "hidden"};
+  border: none!important;
+  padding: ${({ header }) => header && "0!important"};
   padding-left: 5px !important;
 `;
 
 const InnerActionsContainer = styled(Flex)`
   border: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "1px solid #d4d4d5"} !important;
-  background-color: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "#f7f7f7"} !important;
-  padding: ${({ deleteButtonInside }) => deleteButtonInside ? '0' : "5px"} !important;
+  background - color: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "#f7f7f7"} !important;
+  padding: ${({ deleteButtonInside, header }) => {
+    if (deleteButtonInside) return '0';
+    return header ? '8px 5px' : '5px';
+  }} !important;
   border-radius: 10px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
@@ -103,25 +110,34 @@ const InnerActionsContainer = styled(Flex)`
 `;
 
 const TableRow = styled(STable.Row)`
-  position: relative;
+position: relative;
 
   &:hover ${ActionsContainer} {
-    opacity: 0.8;
-    visibility: visible;
-  }
+  opacity: 0.8;
+  visibility: visible;
+}
 `;
 
 const LinkCell = styled(STable.Cell)`
-  height: 35px!important;
-  padding: 2px 7px!important;
-  cursor: pointer;
-  position: relative;
+height: 35px!important;
+padding: 2px 7px!important;
+cursor: pointer;
+position: relative;
 
   &:hover ${ActionsContainer} {
-    opacity: 0.8;
-    visibility: visible;
-  }
+  opacity: 0.8;
+  visibility: visible;
+}
 `;
 
-export { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
+const CheckboxContainer = styled(Flex)`
+  position: relative;
+  align-items: center;
+  border-radius: 5px;
+  padding: 3px;
+  justify-content: center;
+  left: 10px;
+`;
+
+export { ActionsContainer, Button, Cell, CheckboxContainer, Container, FiltersContainer, FooterCell, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
 

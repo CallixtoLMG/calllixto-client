@@ -12,18 +12,10 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Button, Form, Icon } from "semantic-ui-react";
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 import { PRODUCT_COLUMNS } from "../products.common";
 
 const EMPTY_FILTERS = { code: '', name: '' };
-
-const GlobalStyles = createGlobalStyle`
-  @media print {
-    .ui.popup {
-      display: none !important;
-    }
-  }
-`;
 
 const Container = styled.div`
   display: grid;
@@ -187,7 +179,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   });
 
   const handleBarcodePrint = async () => {
-    $('.ui.popup').popup('hide'); // Esconder el popup de Semantic UI
     setShouldPrint(true);
   };
 
@@ -231,7 +222,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
 
   return (
     <>
-      <GlobalStyles />
       <NoPrint>
         <Flex flexDirection="column" rowGap="15px">
           <FormProvider {...methods}>
@@ -284,7 +274,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
             selection={selectedProducts}
             onSelectionChange={onSelectionChange}
             selectionActions={selectionActions}
-            clearSelection={clearSelection} // Pasar clearSelection como prop
+            clearSelection={clearSelection} 
           />
           <ModalDelete
             showModal={showModal}
@@ -295,7 +285,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           />
         </Flex>
       </NoPrint>
-      <OnlyPrint>
+      <OnlyPrint firstPageMarginTop="-95px">
         <Container>
           {Object.keys(selectedProducts).map((code) => (
             <SubContainer key={code}>

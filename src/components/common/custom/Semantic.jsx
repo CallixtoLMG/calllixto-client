@@ -100,11 +100,13 @@ export const TextArea = styled(STextarea)`
 `;
 
 export const Dropdown = styled(SDropdown)`
+  padding: ${({ padding }) => `${padding}!important`};
   min-width: ${({ minWidth }) => `${minWidth}!important;`};
   max-width: ${({ maxWidth }) => maxWidth && `200px!important;`};
   margin: ${({ margin }) => `${margin}!important;`};
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
-  border-radius: 0.28571429rem!important;
+  box-shadow: ${({ hideBorder }) => hideBorder ? "none" : "0 1px 2px 0 rgba(34,36,38,.15) !important"};
+  border-radius: ${({ hideBorder }) => hideBorder ? "0" : "0.28571429rem !important"};
+  background-color: ${({ bgColor }) => `${bgColor}!important`};
   height: ${({ height = "50px" }) => `${height}!important`};
   min-height: ${({ minHeight }) => `${minHeight}!important`};
   display: flex!important;
