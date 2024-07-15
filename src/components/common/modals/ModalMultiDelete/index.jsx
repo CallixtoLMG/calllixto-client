@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button, Header, Icon as SIcon, Table, Transition } from 'semantic-ui-react';
 import { Cell, HeaderCell } from "../../table";
-import { Form, Modal, ModalContent, TableRow } from "./styles";
+import { Form, Modal, ModalContent } from "./styles";
 
 const ConfirmDeleteModal = ({ open, onClose, onConfirm, products, isLoading }) => {
   const [confirmationText, setConfirmationText] = useState('');
@@ -31,19 +31,19 @@ const ConfirmDeleteModal = ({ open, onClose, onConfirm, products, isLoading }) =
         <ModalContent>
           <Table celled>
             <Table.Header>
-              <TableRow>
+              <Table.Row>
                 <HeaderCell width="20%" >Código</HeaderCell>
                 <HeaderCell>Nombre</HeaderCell>
                 <HeaderCell width="20%">Precio</HeaderCell>
-              </TableRow>
+              </Table.Row>
             </Table.Header>
             <Table.Body>
               {products.map(product => (
-                <TableRow key={product.code}>
+                <Table.Row key={`${product.code}${product.name}`}>
                   <Cell align="left" >{product.code}</Cell>
                   <Cell align="left" $wrap>{product.name}</Cell>
                   <Cell><Price value={formatedPrice(product.price)} /></Cell>
-                </TableRow>
+                </Table.Row>
               ))}
             </Table.Body>
           </Table>

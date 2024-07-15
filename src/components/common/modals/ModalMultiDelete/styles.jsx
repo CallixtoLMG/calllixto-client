@@ -1,4 +1,4 @@
-import { Modal as SModal, Table } from "semantic-ui-react";
+import { Modal as SModal } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Form = styled.form`
@@ -13,15 +13,12 @@ const ModalContent = styled(SModal.Content)`
   overflow: auto;
 `;
 
-const TableRow = styled(Table.Row)`
-
-`;
-
 const Modal = styled(SModal)`
   width: 100%!important;
   max-width: 80%!important;
   max-height: 90vh!important;
+  z-index: 2000!important;
 `;
 
-export { Form, Modal, ModalContent, TableRow };
+export { Form, Modal, ModalContent };
 

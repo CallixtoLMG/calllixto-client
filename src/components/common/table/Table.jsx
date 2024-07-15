@@ -22,12 +22,12 @@ const CustomTable = ({
   selectionActions = [],
   basic,
   $wrap,
-  clearSelection // Recibir clearSelection como prop
+  clearSelection
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
-
+  
   useEffect(() => {
     setHydrated(true);
   }, []);
@@ -74,25 +74,26 @@ const CustomTable = ({
           <TableRow>
             {isSelectable && (
               <HeaderCell width="65px" padding="0">
-                <CheckboxContainer>
+                <CheckboxContainer selection={Object.keys(selection).length}>
                   <Checkbox
                     indeterminate={Object.keys(selection).length > 0 && Object.keys(selection).length < elements.length}
-                    checked={Object.keys(selection).length === elements.length}
+                    checked={!isLoading && Object.keys(selection).length === elements.length}
                     onChange={handleToggleAll}
                   />
-                  <Dropdown
-                    padding="3px"
-                    bgColor="rgb(238, 238, 238)"
-                    hideBorder
-                    width="fit-content"
-                    margin="0"
-                    height="30px"
-                    icon="caret down"
-                    button
-                    className='icon'
-                    options={dropdownOptions}
-                    trigger={<></>}
-                  />
+                  {!!Object.keys(selection).length &&
+                    <Dropdown
+                      padding="3px"
+                      bgColor="rgb(238, 238, 238)"
+                      hideBorder
+                      width="fit-content"
+                      margin="0"
+                      height="30px"
+                      icon="caret down"
+                      button
+                      className='icon'
+                      options={dropdownOptions}
+                      trigger={<></>}
+                    />}
                 </CheckboxContainer>
               </HeaderCell>
             )}

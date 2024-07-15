@@ -1,4 +1,5 @@
 import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
+import { BarCodeContainer, BarCodeSubContainer, Barcode, ProductCode, ProductName } from "@/commonStyles";
 import { Flex, Input } from "@/components/common/custom";
 import { ModalDelete, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
@@ -12,47 +13,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Button, Form, Icon } from "semantic-ui-react";
-import styled from 'styled-components';
 import { PRODUCT_COLUMNS } from "../products.common";
-
 const EMPTY_FILTERS = { code: '', name: '' };
-
-const Container = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-`;
-
-const SubContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: 1px solid #000;
-  text-align: center;
-  page-break-inside: avoid;
-  height: 300px !important;
-  padding: 0px !important;
-`;
-
-const ProductName = styled.p`
-  margin: 0;
-  font-size: 16px;
-  padding-top: 3px !important;
-  height: 50px !important;
-`;
-
-const ProductCode = styled.p`
-  margin: 0;
-  font-size: 16px;
-  flex: 1 0 5% !important;
-  padding: 3px !important;
-`;
-
-const Barcode = styled.img`
-  flex: 1 0 60%;
-  width: 100%;
-  height: 80px !important;
-  padding: 0 3px !important;
-`;
 
 const ProductsPage = ({ products = [], role, isLoading }) => {
   const [showModal, setShowModal] = useState(false);
@@ -144,7 +106,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
 
   const onSelectionChange = useCallback((selected, isSelected = null) => {
     if (isSelected === null) {
-      // Toggle selection
       isSelected = !selectedProducts[selected];
     }
   
@@ -226,7 +187,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
         <Flex flexDirection="column" rowGap="15px">
           <FormProvider {...methods}>
             <Form onSubmit={handleSubmit(onFilter)}>
-              <Filters onRestoreFilters={onRestoreFilters}>
+              <Filters clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
                 <Controller
                   name="code"
                   control={control}
@@ -265,7 +226,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
             </Form>
           </FormProvider>
           <Table
-            isLoading={isLoading}
+            isLoading={isLoading || deleteIsPending}
             mainKey="code"
             headers={PRODUCT_COLUMNS}
             elements={mapProductsForTable(products)}
@@ -286,15 +247,15 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
         </Flex>
       </NoPrint>
       <OnlyPrint firstPageMarginTop="-95px">
-        <Container>
+        <BarCodeContainer>
           {Object.keys(selectedProducts).map((code) => (
-            <SubContainer key={code}>
+            <BarCodeSubContainer key={code}>
               <ProductName>{products.find(product => product.code === code)?.name}</ProductName>
               <Barcode id={`barcode-${code}`}></Barcode>
               <ProductCode>{code}</ProductCode>
-            </SubContainer>
+            </BarCodeSubContainer>
           ))}
-        </Container>
+        </BarCodeContainer>
       </OnlyPrint>
       <ModalMultiDelete
         open={showConfirmDeleteModal}

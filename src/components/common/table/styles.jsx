@@ -131,12 +131,12 @@ position: relative;
 `;
 
 const CheckboxContainer = styled(Flex)`
-  position: relative;
+  position: ${({ selection }) => selection ? "relative" : "static"} ;
   align-items: center;
   border-radius: 5px;
   padding: 3px;
   justify-content: center;
-  left: 10px;
+  left: ${({ selection }) => selection ? "11px" : "10px"} ;
 `;
 
 export { ActionsContainer, Button, Cell, CheckboxContainer, Container, FiltersContainer, FooterCell, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };

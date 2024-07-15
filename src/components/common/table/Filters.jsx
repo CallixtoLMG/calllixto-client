@@ -1,8 +1,8 @@
+import { Flex } from '@/components/common/custom';
 import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { Paginator } from './Pagination';
 import { FiltersContainer } from './styles';
-import { Flex } from '@/components/common/custom';
 
 const MainContainer = styled(Flex)`
   column-gap: 10px;
@@ -18,7 +18,7 @@ const HeaderSegment = styled(SSegment)`
   justify-content: space-between;
 `;
 
-const Filters = ({ children, onRestoreFilters }) => {
+const Filters = ({ children, onRestoreFilters, clearSelection }) => {
   return (
     <MainContainer>
       <HeaderSegment flex="1">
@@ -42,7 +42,7 @@ const Filters = ({ children, onRestoreFilters }) => {
         </Flex>
       </HeaderSegment>
       <HeaderSegment >
-        <Paginator />
+        <Paginator clearSelection={clearSelection} />
       </HeaderSegment>
     </MainContainer>
   )

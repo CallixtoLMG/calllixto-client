@@ -88,21 +88,21 @@ const usePaginationContext = () => {
   return context;
 };
 
-const Paginator = () => {
+const Paginator = ({ clearSelection }) => {
   const { goToNextPage, goToPreviousPage, currentPage, canGoNext } = usePaginationContext();
 
   return (
     <PaginationContainer>
-      <Button type="button" circular icon onClick={goToPreviousPage} disabled={currentPage === 0}>
+      <Button type="button" circular icon onClick={() => { goToPreviousPage(), clearSelection() }} disabled={currentPage === 0}>
         <Icon name="arrow left" />
       </Button>
       <PaginationSegment>{Number(currentPage) + 1}</PaginationSegment>
-      <Button type="button" circular icon onClick={goToNextPage} disabled={!canGoNext}>
+      <Button type="button" circular icon onClick={() => { goToNextPage(), clearSelection() }} disabled={!canGoNext}>
         <Icon name="arrow right" />
       </Button>
     </PaginationContainer>
   )
-}
+};
 
 export { PaginationProvider, Paginator, usePaginationContext };
 
