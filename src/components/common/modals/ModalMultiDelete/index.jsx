@@ -1,12 +1,11 @@
-import { ButtonsContainer, Input, Price } from "@/components/common/custom";
-import { formatedPrice } from "@/utils";
+import { ButtonsContainer, Input } from "@/components/common/custom";
+import { Table } from "@/components/common/table";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Header, Icon as SIcon, Table, Transition } from 'semantic-ui-react';
-import { Cell, HeaderCell } from "../../table";
+import { Button, Header, Icon as SIcon, Transition } from 'semantic-ui-react';
 import { Form, Modal, ModalContent } from "./styles";
 
-const ConfirmDeleteModal = ({ open, onClose, onConfirm, products, isLoading }) => {
+const ConfirmDeleteModal = ({ open, onClose, onConfirm, products, isLoading, title, icon, headers }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
   const { handleSubmit } = useForm();
@@ -27,26 +26,13 @@ const ConfirmDeleteModal = ({ open, onClose, onConfirm, products, isLoading }) =
   return (
     <Transition visible={open} animation='scale' duration={500}>
       <Modal closeIcon open={open} onClose={onClose}>
-        <Header icon='trash' content="Estás seguro de que desea eliminar estos productos?" ></Header>
+        <Header icon={icon} content={title} ></Header>
         <ModalContent>
-          <Table celled>
-            <Table.Header>
-              <Table.Row>
-                <HeaderCell width="20%" >Código</HeaderCell>
-                <HeaderCell>Nombre</HeaderCell>
-                <HeaderCell width="20%">Precio</HeaderCell>
-              </Table.Row>
-            </Table.Header>
-            <Table.Body>
-              {products.map(product => (
-                <Table.Row key={`${product.code}${product.name}`}>
-                  <Cell align="left" >{product.code}</Cell>
-                  <Cell align="left" $wrap>{product.name}</Cell>
-                  <Cell><Price value={formatedPrice(product.price)} /></Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table>
+          <Table
+            isLoading={isLoading}
+            headers={headers}
+            elements={products}
+          />
         </ModalContent>
         <Modal.Actions>
           <Form onSubmit={handleSubmit(onConfirm)}>

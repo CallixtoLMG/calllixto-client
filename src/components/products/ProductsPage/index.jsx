@@ -46,10 +46,12 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   useEffect(() => {
     if (shouldPrint) {
       generateBarcodes();
-      setTimeout(() => {
+      const printTimeout = setTimeout(() => {
         window.print();
         setShouldPrint(false);
       }, 500);
+
+      return () => clearTimeout(printTimeout);
     }
   }, [shouldPrint, generateBarcodes]);
 
@@ -104,22 +106,34 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     onFilter(EMPTY_FILTERS);
   }, [reset, onFilter]);
 
-  const onSelectionChange = useCallback((selected, isSelected = null) => {
-    if (isSelected === null) {
-      isSelected = !selectedProducts[selected];
-    }
-  
-    if (isSelected) {
-      setSelectedProducts(prev => ({ ...prev, [selected]: true }));
-    } else {
-      const productsCopy = { ...selectedProducts };
-      delete productsCopy[selected];
-      setSelectedProducts(productsCopy);
-    }
-  }, [selectedProducts]);
-  
+  const onSelectionChange = useCallback((selectedKey, isSelected = null) => {
+    setSelectedProducts(prev => {
+      const updatedSelection = { ...prev };
+      if (isSelected === null) {
+        isSelected = !prev[selectedKey];
+      }
+      if (isSelected) {
+        const selectedProduct = products.find(product => product.code === selectedKey);
+        if (selectedProduct) {
+          updatedSelection[selectedKey] = { code: selectedProduct.code, name: selectedProduct.name, price: selectedProduct.price, comments: selectedProduct.comments, supplierName: selectedProduct.supplierName, brandName: selectedProduct.brandName };
+        }
+      } else {
+        delete updatedSelection[selectedKey];
+      }
+      return updatedSelection;
+    });
+  }, [products]);
+
   const clearSelection = () => {
     setSelectedProducts({});
+  };
+
+  const selectAll = () => {
+    products.forEach(product => {
+      if (!selectedProducts[product.code]) {
+        setSelectedProducts(prev => ({ ...prev, [product.code]: { code: product.code, name: product.name, price: product.price, comments: product.comments, supplierName: product.supplierName, brandName: product.brandName } }));
+      }
+    });
   };
 
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
@@ -151,11 +165,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     setShowConfirmDeleteModal(false);
     deleteSelectedProducts();
   };
-
-  const selectedProductDetails = Object.keys(selectedProducts).map(code => {
-    const product = products.find(product => product.code === code);
-    return { code: product?.code, name: product?.name, price: product?.price };
-  });
 
   const selectionActions = useMemo(() => {
     if (RULES.canRemove[role]) {
@@ -235,7 +244,8 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
             selection={selectedProducts}
             onSelectionChange={onSelectionChange}
             selectionActions={selectionActions}
-            clearSelection={clearSelection} 
+            clearSelection={clearSelection}
+            selectAll={selectAll}
           />
           <ModalDelete
             showModal={showModal}
@@ -261,7 +271,11 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
         open={showConfirmDeleteModal}
         onClose={() => setShowConfirmDeleteModal(false)}
         onConfirm={handleConfirmDelete}
-        products={selectedProductDetails}
+        products={Object.values(selectedProducts)}
+        icon="trash"
+        title="Estás seguro de que desea eliminar estos productos?"
+        isLoading={isLoading || deleteIsPending}
+        headers={PRODUCT_COLUMNS}
       />
     </>
   );

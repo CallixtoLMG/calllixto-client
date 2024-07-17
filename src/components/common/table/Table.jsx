@@ -22,12 +22,13 @@ const CustomTable = ({
   selectionActions = [],
   basic,
   $wrap,
-  clearSelection
+  clearSelection, 
+  selectAll
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
-  
+
   useEffect(() => {
     setHydrated(true);
   }, []);
@@ -38,11 +39,7 @@ const CustomTable = ({
     if (allSelected) {
       clearSelection();
     } else {
-      elements.forEach(element => {
-        if (!selection[element[mainKey]]) {
-          onSelectionChange(element[mainKey], true);
-        }
-      });
+      selectAll();
     }
   };
 

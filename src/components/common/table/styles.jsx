@@ -82,7 +82,8 @@ const FooterCell = styled(STable.HeaderCell)`
 
 const ActionsContainer = styled.td`
   position: absolute;
-  right: 0;
+  right: ${({ header }) => header ? "auto" : "0"};
+  left: ${({ header }) => header ? "-100px" : "auto"};
   top: ${({ header }) => header ? "0px" : "50%"};
   transform: ${({ deleteButtonInside, header }) => {
     if (deleteButtonInside) return 'translateY(-50%)';
@@ -98,14 +99,12 @@ const ActionsContainer = styled.td`
 
 const InnerActionsContainer = styled(Flex)`
   border: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "1px solid #d4d4d5"} !important;
-  background - color: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "#f7f7f7"} !important;
+  background-color: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "#f7f7f7"} !important;
   padding: ${({ deleteButtonInside, header }) => {
     if (deleteButtonInside) return '0';
     return header ? '8px 5px' : '5px';
   }} !important;
-  border-radius: 10px;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  border-radius: ${({ header }) => header ? "10px 0 0 10px" : "0 10px 10px 0"};
   column-gap: 3px;
 `;
 

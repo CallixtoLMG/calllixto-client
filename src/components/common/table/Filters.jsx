@@ -42,7 +42,7 @@ const Filters = ({ children, onRestoreFilters, clearSelection }) => {
         </Flex>
       </HeaderSegment>
       <HeaderSegment >
-        <Paginator clearSelection={clearSelection} />
+        <Paginator onGoPreviousPage={clearSelection} onGoNextPage={clearSelection} />
       </HeaderSegment>
     </MainContainer>
   )

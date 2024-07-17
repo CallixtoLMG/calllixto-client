@@ -6,14 +6,14 @@ const OnlyPrintContainer = styled.div`
     display: block;
  
     @page {
-      margin-top: ${({ marginTop = "30px" }) => marginTop && marginTop};
+      margin-top: ${({ marginTop = "30px" }) => marginTop};
       margin-bottom: 25px;
       margin-left: 30px;
       margin-right: 30px;
     }
 
     @page :first {
-      margin-top: ${({ firstPageMarginTop = "30px" }) => firstPageMarginTop && firstPageMarginTop};
+      margin-top: ${({ firstPageMarginTop = "30px" }) => firstPageMarginTop};
       margin-bottom: 25px;
       margin-left: 30px;
       margin-right: 30px;

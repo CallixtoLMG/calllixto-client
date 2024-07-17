@@ -161,7 +161,7 @@ export const ContactFields = () => {
             setAddressToAdd(EMPTY_ADDRESS);
           }}
           position='top left'>
-          <FieldsContainer width="45vw" alignItems="center">
+          <FieldsContainer width="45vw" alignItems="center" rowGap="5px">
             <FormField flex="1">
               <Label>Referencia</Label>
               <Input
@@ -206,7 +206,7 @@ export const ContactFields = () => {
             setEmailToAdd(EMPTY_EMAIL);
           }}
           position='top left'>
-          <FieldsContainer width="50vw" alignItems="center">
+          <FieldsContainer width="50vw" alignItems="center" rowGap="5px">
             <FormField flex="1">
               <Label>Referencia</Label>
               <Input
