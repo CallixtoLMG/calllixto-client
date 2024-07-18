@@ -17,7 +17,7 @@ import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext }
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { isBudgetCancelled, isBudgetConfirmed, isBudgetDraft, isBudgetPending, now } from "@/utils";
+import { isBudgetCancelled, isBudgetConfirmed, isBudgetDraft, isBudgetPending, isBudgetExpired, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -376,19 +376,20 @@ const Budget = ({ params }) => {
     },
   });
 
+  console.log({ budget: budget?.state  })
+
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
       <NoPrint>
         <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) ? "0" : "0 0 15px 0!important"} justifyContent="space-between">
-          {isBudgetPending(budget?.state) ? (
+          {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
             <>
               <Checkbox
                 center
                 toggle
                 checked={isBudgetConfirmed(budget?.state)}
                 onChange={handleCheckboxChange}
-                label={isBudgetConfirmed(budget?.state) ? "Confirmado" : "Confirmar presupuesto"}
-                disabled={isBudgetConfirmed(budget?.state) || budget?.state === BUDGET_STATES.INACTIVE.id}
+                label="Confirmar presupuesto"
                 customColors={{
                   false: 'orange',
                   true: 'green'
@@ -439,7 +440,6 @@ const Budget = ({ params }) => {
             </Flex>
           )}
         </Flex>
-
         {isBudgetDraft(budget?.state) ? (
           <BudgetForm
             onSubmit={mutateEdit}
