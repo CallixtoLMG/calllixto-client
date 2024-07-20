@@ -3,7 +3,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
 import { PopupActions } from "../buttons";
-import { Dropdown } from "../custom";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, CheckboxContainer, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
 
@@ -17,52 +16,30 @@ const CustomTable = ({
   tableHeight,
   deleteButtonInside,
   color,
-  selection,
+  selection = {},
   onSelectionChange,
   selectionActions = [],
   basic,
   $wrap,
-  clearSelection, 
+  clearSelection,
   selectAll
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
+  const allSelected = useMemo(() => Object.keys(selection)?.length === elements.length, [selection, elements]);
 
   useEffect(() => {
     setHydrated(true);
   }, []);
 
   const handleToggleAll = () => {
-    const allSelected = Object.keys(selection).length === elements.length;
-
     if (allSelected) {
       clearSelection();
     } else {
       selectAll();
     }
   };
-
-  const dropdownOptions = [
-    {
-      key: 'all',
-      text: 'Seleccionar todo',
-      onClick: () => {
-        elements.forEach(element => {
-          if (!selection[element[mainKey]]) {
-            onSelectionChange(element[mainKey], true);
-          }
-        });
-      }
-    },
-    {
-      key: 'none',
-      text: 'Deseleccionar todo',
-      onClick: () => {
-        clearSelection()
-      }
-    }
-  ];
 
   return (
     <Container tableHeight={tableHeight}>
@@ -71,35 +48,21 @@ const CustomTable = ({
           <TableRow>
             {isSelectable && (
               <HeaderCell width="65px" padding="0">
-                <CheckboxContainer selection={Object.keys(selection).length}>
+                <CheckboxContainer>
                   <Checkbox
-                    indeterminate={Object.keys(selection).length > 0 && Object.keys(selection).length < elements.length}
-                    checked={!isLoading && Object.keys(selection).length === elements.length}
+                    indeterminate={!!Object.keys(selection).length && !allSelected}
+                    checked={!isLoading && allSelected}
                     onChange={handleToggleAll}
                   />
-                  {!!Object.keys(selection).length &&
-                    <Dropdown
-                      padding="3px"
-                      bgColor="rgb(238, 238, 238)"
-                      hideBorder
-                      width="fit-content"
-                      margin="0"
-                      height="30px"
-                      icon="caret down"
-                      button
-                      className='icon'
-                      options={dropdownOptions}
-                      trigger={<></>}
-                    />}
                 </CheckboxContainer>
               </HeaderCell>
             )}
             {headers.map((header) => (
               <HeaderCell key={`header_${header.id}`} basic={basic}>{header.title}</HeaderCell>
             ))}
-            {isSelectable && !!Object.keys(selection).length && (
-              <ActionsContainer header >
-                <InnerActionsContainer header>
+            {!!Object.keys(selection).length && (
+              <ActionsContainer $header>
+                <InnerActionsContainer $header>
                   <PopupActions
                     position="right center"
                     trigger={<Button icon circular color="yellow" size="mini"><Icon name="cog" /></Button>}
@@ -111,7 +74,7 @@ const CustomTable = ({
           </TableRow>
         </TableHeader>
         {hydrated && (
-          <Loader active={isLoading}>
+          <Loader active={isLoading} $greyColor>
             <Table.Body>
               {!elements.length ? (
                 <Table.Row>
@@ -130,7 +93,7 @@ const CustomTable = ({
                           <Cell>
                             <Checkbox
                               checked={!!selection[element[mainKey]]}
-                              onChange={() => onSelectionChange(element[mainKey])}
+                              onChange={() => onSelectionChange(element)}
                             />
                           </Cell>
                         )}

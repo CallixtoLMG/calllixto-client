@@ -78,7 +78,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
               render={({ field: { onChange, ...rest } }) => (
                 <Dropdown
                   {...rest}
-                  maxWidth
+                  $maxWidth
                   top="10px"
                   height="35px"
                   minHeight="35px"
@@ -104,7 +104,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                 <Input
                   {...rest}
                   $marginBottom
-                  maxWidth
+                  $maxWidth
                   height="35px"
                   placeholder="Id"
                   onChange={(e) => {
@@ -121,7 +121,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
               render={({ field: { onChange, ...rest } }) => (
                 <Input
                   {...rest}
-                  maxWidth
+                  $maxWidth
                   $marginBottom
                   height="35px"
                   placeholder="Cliente"
@@ -140,7 +140,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                 <Input
                   {...rest}
                   $marginBottom
-                  maxWidth
+                  $maxWidth
                   height="35px"
                   placeholder="Vendedor"
                   onChange={(e) => {

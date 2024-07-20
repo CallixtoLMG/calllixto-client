@@ -1,4 +1,4 @@
-import { Grid, Header, Message } from "semantic-ui-react";
+import { Grid, Header } from "semantic-ui-react";
 import { styled } from "styled-components";
 
 const Text = styled.p`

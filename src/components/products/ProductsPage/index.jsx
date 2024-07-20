@@ -14,6 +14,7 @@ import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Button, Form, Icon } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
+
 const EMPTY_FILTERS = { code: '', name: '' };
 
 const ProductsPage = ({ products = [], role, isLoading }) => {
@@ -66,12 +67,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     resetFilters(filters);
   }, [resetFilters]);
 
-  const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar el producto "${name}"?`, []);
-
-  const mapProductsForTable = useCallback((c) => {
-    return c.map(customer => ({ ...customer, key: customer.code }));
-  }, []);
-
   const actions = RULES.canRemove[role] ? [
     {
       id: 1,
@@ -106,89 +101,68 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     onFilter(EMPTY_FILTERS);
   }, [reset, onFilter]);
 
-  const onSelectionChange = useCallback((selectedKey, isSelected = null) => {
-    setSelectedProducts(prev => {
-      const updatedSelection = { ...prev };
-      if (isSelected === null) {
-        isSelected = !prev[selectedKey];
-      }
-      if (isSelected) {
-        const selectedProduct = products.find(product => product.code === selectedKey);
-        if (selectedProduct) {
-          updatedSelection[selectedKey] = { code: selectedProduct.code, name: selectedProduct.name, price: selectedProduct.price, comments: selectedProduct.comments, supplierName: selectedProduct.supplierName, brandName: selectedProduct.brandName };
-        }
-      } else {
-        delete updatedSelection[selectedKey];
-      }
-      return updatedSelection;
-    });
-  }, [products]);
+  const onSelectionChange = useCallback(selected => {
+    const isSelected = !!selectedProducts[selected.code];
+    if (isSelected) {
+      const newProducts = { ...selectedProducts };
+      delete newProducts[selected.code];
+      setSelectedProducts(newProducts);
+    } else {
+      setSelectedProducts(prev => ({ ...prev, [selected.code]: selected }));
+    }
+  }, [selectedProducts]);
 
   const clearSelection = () => {
     setSelectedProducts({});
   };
 
   const selectAll = () => {
-    products.forEach(product => {
-      if (!selectedProducts[product.code]) {
-        setSelectedProducts(prev => ({ ...prev, [product.code]: { code: product.code, name: product.name, price: product.price, comments: product.comments, supplierName: product.supplierName, brandName: product.brandName } }));
-      }
-    });
+    const newProducts = products.reduce((acc, product) => acc[product.code] ? acc : { ...acc, [product.code]: product }, {});
+    setSelectedProducts(newProducts);
   };
 
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
     mutationFn: async () => {
-      const productCodes = Object.keys(selectedProducts);
-      const deletePromises = productCodes.map(code => deleteProduct(code));
+      const deletePromises = Object.keys(selectedProducts).map(code => deleteProduct(code));
       await Promise.all(deletePromises);
-      return productCodes.length;
+      return deletePromises.length;
     },
     onSuccess: (deletedCount) => {
       queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
       toast.success(`${deletedCount} productos eliminados!`);
       setSelectedProducts({});
+      setShowConfirmDeleteModal(false);
     },
     onError: (error) => {
       toast.error(`Error al eliminar productos: ${error.message}`);
     }
   });
 
-  const handleBarcodePrint = async () => {
-    setShouldPrint(true);
-  };
-
-  const handleDeleteProducts = () => {
-    setShowConfirmDeleteModal(true);
-  };
-
-  const handleConfirmDelete = () => {
-    setShowConfirmDeleteModal(false);
-    deleteSelectedProducts();
-  };
-
   const selectionActions = useMemo(() => {
+    const actions = [
+      <Button
+        key={2}
+        onClick={() => setShouldPrint(true)}
+        color="blue"
+        size="tiny"
+      >
+        <Icon name="barcode" /> Descargar Códigos
+      </Button>
+    ];
     if (RULES.canRemove[role]) {
-      return [
+      actions.unshift(
         <Button
-          onClick={handleDeleteProducts}
+          key={1}
+          onClick={() => setShowConfirmDeleteModal(true)}
           color="red"
           size="tiny"
-          key={1}
         >
           <Icon name="trash" /> Eliminar Productos
-        </Button>,
-        <Button
-          onClick={handleBarcodePrint}
-          color="blue"
-          size="tiny"
-          key={2}
-        >
-          <Icon name="barcode" /> Descargar Códigos
         </Button>
-      ];
+      )
     }
-    return [];
-  }, [role, selectedProducts, handleDeleteProducts, handleBarcodePrint]);
+    return actions;
+  }, [role]);
 
   return (
     <>
@@ -204,7 +178,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
                     <Input
                       {...rest}
                       $marginBottom
-                      maxWidth
+                      $maxWidth
                       height="35px"
                       placeholder="Código"
                       onChange={(e) => {
@@ -221,7 +195,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
                     <Input
                       {...rest}
                       $marginBottom
-                      maxWidth
+                      $maxWidth
                       height="35px"
                       placeholder="Nombre"
                       onChange={(e) => {
@@ -238,7 +212,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
             isLoading={isLoading || deleteIsPending}
             mainKey="code"
             headers={PRODUCT_COLUMNS}
-            elements={mapProductsForTable(products)}
+            elements={products.map(p => ({ ...p, key: p.code }))}
             page={PAGES.PRODUCTS}
             actions={actions}
             selection={selectedProducts}
@@ -250,7 +224,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           <ModalDelete
             showModal={showModal}
             setShowModal={setShowModal}
-            title={deleteQuestion(selectedProduct?.name)}
+            title={`¿Está seguro que desea eliminar el producto "${selectedProduct?.name}"?`}
             onDelete={mutate}
             isLoading={isPending}
           />
@@ -270,11 +244,11 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
       <ModalMultiDelete
         open={showConfirmDeleteModal}
         onClose={() => setShowConfirmDeleteModal(false)}
-        onConfirm={handleConfirmDelete}
-        products={Object.values(selectedProducts)}
+        onConfirm={deleteSelectedProducts}
+        elements={Object.values(selectedProducts)}
         icon="trash"
-        title="Estás seguro de que desea eliminar estos productos?"
-        isLoading={isLoading || deleteIsPending}
+        title="Estás seguro de que desea eliminar estos productos PERMANENTEMENTE?"
+        isLoading={deleteIsPending}
         headers={PRODUCT_COLUMNS}
       />
     </>

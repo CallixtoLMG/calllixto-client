@@ -82,29 +82,29 @@ const FooterCell = styled(STable.HeaderCell)`
 
 const ActionsContainer = styled.td`
   position: absolute;
-  right: ${({ header }) => header ? "auto" : "0"};
-  left: ${({ header }) => header ? "-100px" : "auto"};
-  top: ${({ header }) => header ? "0px" : "50%"};
-  transform: ${({ deleteButtonInside, header }) => {
+  right: ${({ $header }) => $header ? "auto" : "0"};
+  left: ${({ $header }) => $header ? "-100px" : "auto"};
+  top: ${({ $header }) => $header ? "0px" : "50%"};
+  transform: ${({ deleteButtonInside, $header }) => {
     if (deleteButtonInside) return 'translateY(-50%)';
-    return header ? 'translateX(calc(100%))' : "translateY(-50%) translateX(calc(100%))";
+    return $header ? 'translateX(calc(100%))' : "translateY(-50%) translateX(calc(100%))";
   }} !important;
   transition: all 0.1s ease-in-out!important;
-  opacity: ${({ header }) => header ? "1" : "0"};
-  visibility: ${({ header }) => header ? "visible" : "hidden"};
+  opacity: ${({ $header }) => $header ? "1" : "0"};
+  visibility: ${({ $header }) => $header ? "visible" : "hidden"};
   border: none!important;
-  padding: ${({ header }) => header && "0!important"};
+  padding: ${({ $header }) => $header && "0!important"};
   padding-left: 5px !important;
 `;
 
 const InnerActionsContainer = styled(Flex)`
   border: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "1px solid #d4d4d5"} !important;
   background-color: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "#f7f7f7"} !important;
-  padding: ${({ deleteButtonInside, header }) => {
+  padding: ${({ deleteButtonInside, $header }) => {
     if (deleteButtonInside) return '0';
-    return header ? '8px 5px' : '5px';
+    return $header ? '8px 5px' : '5px';
   }} !important;
-  border-radius: ${({ header }) => header ? "10px 0 0 10px" : "0 10px 10px 0"};
+  border-radius: ${({ $header }) => $header ? "10px 0 0 10px" : "0 10px 10px 0"};
   column-gap: 3px;
 `;
 
@@ -135,7 +135,6 @@ const CheckboxContainer = styled(Flex)`
   border-radius: 5px;
   padding: 3px;
   justify-content: center;
-  left: ${({ selection }) => selection ? "11px" : "10px"} ;
 `;
 
 export { ActionsContainer, Button, Cell, CheckboxContainer, Container, FiltersContainer, FooterCell, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };

@@ -81,7 +81,7 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
                 <Input
                   {...rest}
                   $marginBottom
-                  maxWidth
+                  $maxWidth
                   height="35px"
                   placeholder="Id"
                   onChange={(e) => {
@@ -98,7 +98,7 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
                 <Input
                   {...rest}
                   $marginBottom
-                  maxWidth
+                  $maxWidth
                   height="35px"
                   placeholder="Nombre"
                   onChange={(e) => {

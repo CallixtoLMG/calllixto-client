@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { Button, Header, Icon as SIcon, Transition } from 'semantic-ui-react';
 import { Form, Modal, ModalContent } from "./styles";
 
-const ConfirmDeleteModal = ({ open, onClose, onConfirm, products, isLoading, title, icon, headers }) => {
+const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title, icon, headers }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
   const { handleSubmit } = useForm();
@@ -29,9 +29,9 @@ const ConfirmDeleteModal = ({ open, onClose, onConfirm, products, isLoading, tit
         <Header icon={icon} content={title} ></Header>
         <ModalContent>
           <Table
-            isLoading={isLoading}
             headers={headers}
-            elements={products}
+            elements={elements}
+            mainKey="code"
           />
         </ModalContent>
         <Modal.Actions>
@@ -45,14 +45,14 @@ const ConfirmDeleteModal = ({ open, onClose, onConfirm, products, isLoading, tit
               ref={inputElement}
               width="220px"
             />
-            <ButtonsContainer width="180px">
+            <ButtonsContainer>
               <Button
                 height="40px"
                 color='red'
                 onClick={onClose}
                 disabled={isLoading}
               >
-                <SIcon name='trash' />No
+                <SIcon name='times' />Cancelar
               </Button>
               <Button
                 height="40px"
@@ -61,7 +61,7 @@ const ConfirmDeleteModal = ({ open, onClose, onConfirm, products, isLoading, tit
                 color='green'
                 type="submit"
               >
-                <SIcon name='checkmark' />Si
+                <SIcon name='trash' />Aceptar
               </Button>
             </ButtonsContainer>
           </Form>
@@ -71,4 +71,4 @@ const ConfirmDeleteModal = ({ open, onClose, onConfirm, products, isLoading, tit
   );
 };
 
-export default ConfirmDeleteModal;
+export default ModalMultiDelete;

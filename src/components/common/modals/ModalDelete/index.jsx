@@ -26,7 +26,7 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
   return (
     <Transition visible={showModal} animation='scale' duration={500}>
       <Modal closeIcon open={showModal} onClose={() => setShowModal(false)}>
-        <Header icon='archive' content={title || ""} />
+        <Header icon='trash' content={title || ""} />
         <Modal.Actions>
           <Form onSubmit={handleSubmit(onDelete)}>
             <Input
@@ -38,7 +38,13 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
               ref={inputElement}
               width="220px"
             />
-            <ButtonsContainer width="180px">
+            <ButtonsContainer>
+              <Button
+                height="40px"
+                color='red'
+                onClick={() => setShowModal(false)} disabled={isLoading}>
+                <SIcon name='times' />Cancelar
+              </Button>
               <Button
                 height="40px"
                 disabled={!isDeleteEnabled || isLoading}
@@ -46,13 +52,7 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
                 color='green'
                 type="submit"
               >
-                <SIcon name='checkmark' />Si
-              </Button>
-              <Button
-                height="40px"
-                color='red'
-                onClick={() => setShowModal(false)} disabled={isLoading}>
-                <SIcon name='trash' />No
+                <SIcon name='trash' />Aceptar
               </Button>
             </ButtonsContainer>
           </Form>
