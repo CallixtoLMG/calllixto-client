@@ -25,9 +25,9 @@ const Title = styled(SHeader)`
   align-content: center;
   align-self: ${({ alignSelf = "center" }) => alignSelf} !important;
   text-align: ${({ textAlign }) => textAlign || "left"} !important;
-  text-decoration: ${({ cancelled }) => cancelled ? 'line-through' : 'none'};
+  text-decoration: ${({ $cancelled }) => $cancelled ? 'line-through' : 'none'};
   width: ${({ width }) => width || "auto"}!important;
-  font-weight: ${({ slim }) => slim ? 'normal' : "bold"} !important;
+  font-weight: ${({ $slim }) => $slim ? 'normal' : "bold"} !important;
   min-height: ${({ minHeight }) => minHeight || ""};
 `;
 

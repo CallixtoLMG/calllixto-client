@@ -5,7 +5,7 @@ import { Flex, FlexColumn, Input, Price } from '../custom';
 
 const Field = ({ label, children }) => (
   <Flex justifyContent="space-between" height="30px">
-    <Title as="h4" slim width="100px" textAlign="right">{label}</Title>
+    <Title as="h4" $slim width="100px" textAlign="right">{label}</Title>
     <Title as="h4">{children}</Title>
   </Flex>
 )
