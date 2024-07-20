@@ -22,5 +22,9 @@ const OnlyPrintContainer = styled.div`
 `;
 
 export const OnlyPrint = ({ children, marginTop, firstPageMarginTop }) => {
-  return <OnlyPrintContainer marginTop={marginTop} firstPageMarginTop={firstPageMarginTop}>{children}</OnlyPrintContainer>
+  return (
+    <OnlyPrintContainer marginTop={marginTop} firstPageMarginTop={firstPageMarginTop}>
+      {children}
+    </OnlyPrintContainer>
+  )
 };
