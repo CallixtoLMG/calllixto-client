@@ -3,6 +3,7 @@ import styled from "styled-components";
 const Common = styled.div`
   height: ${({ height = 'auto' }) => height};
   width: ${({ width = 'auto' }) => width};
+  min-width: ${({ minWidth = 'auto' }) => minWidth};
   margin: ${({ margin = '0' }) => margin};
   margin-bottom: ${({ marginBottom = '0' }) => marginBottom};
   margin-top: ${({ marginTop = '0' }) => marginTop};

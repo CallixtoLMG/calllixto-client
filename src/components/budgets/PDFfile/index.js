@@ -16,7 +16,7 @@ import {
 } from "./styles";
 
 const Field = ({ label, value, ...rest }) => (
-  <Flex columnGap="5px" {...rest}>
+  <Flex columnGap="5px" minWidth="300px" {...rest}>
     <Title as="h4" width="100px" textAlign="right" $slim>{label} |</Title>
     <Title as="h4">{value?.toUpperCase() || '-'}</Title>
   </Flex>
@@ -65,18 +65,22 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         </Flex>
         <Divider />
         <SectionContainer alignItems="left" flexDirection="column" minHeight="50px">
-          <Field label="Vendedor/a" value={budget?.seller} />
+          <Flex>
+            <Field label="Vendedor/a" value={budget?.seller} flex="1" />
+            <Field label="Fecha" value={dayjs().format('DD-MM-YYYY')} />
+          </Flex>
           <Flex>
             <Field flex="1" label="Teléfonos" value={client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')} />
-            <Field flex="1" label="Fecha" value={dayjs().format('DD-MM-YYYY')} />
-            <Field flex="1" label="Válido hasta" value={formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))} />
+            <Field label="Válido hasta" value={formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))} />
           </Flex>
         </SectionContainer>
         <Divider />
         <SectionContainer alignItems="left" flexDirection="column" minHeight="50px">
-          <Field width="100%" label="Cliente" value={(get(budget, "customer.name", ""))} />
           <Flex >
-            <Field width="fit-content" label="Dirección" value={(get(budget, "customer.addresses[0].address", ""))} />
+            <Field width="100%" label="Cliente" value={(get(budget, "customer.name", ""))} />
+          </Flex>
+          <Flex>
+            <Field flex="1" width="fit-content" label="Dirección" value={(get(budget, "customer.addresses[0].address", ""))} />
             <Field width="fit-content" label="Teléfono" value={formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))} />
           </Flex>
         </SectionContainer>
@@ -88,15 +92,17 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         elements={budget?.products}
         basic
       />
-      {!dispatchPdf && (
-        <Total
-          subtotal={subtotal}
-          globalDiscount={budget?.globalDiscount}
-          additionalCharge={budget?.additionalCharge}
-          readOnly
-          showAllways={false}
-        />
-      )}
+      {
+        !dispatchPdf && (
+          <Total
+            subtotal={subtotal}
+            globalDiscount={budget?.globalDiscount}
+            additionalCharge={budget?.additionalCharge}
+            readOnly
+            showAllways={false}
+          />
+        )
+      }
       <Box height="10px" />
       <FlexColumn rowGap="25px">
         {!!dolarExchangeRate && !dispatchPdf && (
@@ -137,7 +143,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
           </DataContainer>
         }
       </FlexColumn>
-    </FlexColumn>
+    </FlexColumn >
   )
 });
 PDFfile.displayName = 'PDFfile';
