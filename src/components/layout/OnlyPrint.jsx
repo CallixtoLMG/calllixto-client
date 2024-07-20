@@ -4,7 +4,7 @@ const OnlyPrintContainer = styled.div`
   display: none;
   @media print {
     display: block;
- 
+
     @page {
       margin-top: ${({ marginTop = "30px" }) => marginTop};
       margin-bottom: 25px;

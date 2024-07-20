@@ -465,7 +465,7 @@ const Budget = ({ params }) => {
           </>
         )}
       </NoPrint>
-      <OnlyPrint marginTop="-60px">
+      <OnlyPrint marginTop="60px">
         <PDFfile
           ref={printRef}
           budget={budget}

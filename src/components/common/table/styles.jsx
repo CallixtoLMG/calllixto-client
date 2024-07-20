@@ -9,6 +9,7 @@ const Cell = styled(STable.Cell)`
   text-align: ${({ align = 'center' }) => `${align}!important`};
   text-align-last: ${({ align = 'center', $right }) => $right ? 'right!important' : `${align}!important`};
   white-space: ${({ $wrap }) => $wrap ? 'wrap' : 'nowrap'}!important;
+  border-bottom: ${({ $basic }) => $basic && '1px solid black'};
 `;
 
 const Container = styled(Flex)`
@@ -51,6 +52,7 @@ const Table = styled(STable)`
   max-height: ${({ tableHeight = "none" }) => `${tableHeight}!important`};
   overflow-y: auto!important;
   overflow-x: hidden!important;
+  border: 1px solid black;
 `;
 
 const Button = styled(SButton)`
@@ -64,20 +66,12 @@ const TableHeader = styled(STable.Header)`
   height: 35px!important;
 `;
 
-const TableFooter = styled(STable.Footer)`
-  height: 35px!important;
-`;
-
 const HeaderCell = styled(STable.HeaderCell)`
-  background-color: ${({ basic }) => !basic && '#EEEEEE!important'};
+  background-color: ${({ $basic }) => !$basic && '#EEEEEE!important'};
   text-align: ${({ textAlign = "center" }) => `${textAlign}!important`};
   width: ${({ width }) => width}!important;
   padding: ${({ padding }) => padding}!important;
   max-height: ${({ maxhHeight }) => maxhHeight}!important;
-`;
-
-const FooterCell = styled(STable.HeaderCell)`
-  padding: 5px 7px !important;
 `;
 
 const ActionsContainer = styled.td`
@@ -109,24 +103,24 @@ const InnerActionsContainer = styled(Flex)`
 `;
 
 const TableRow = styled(STable.Row)`
-position: relative;
+  position: relative;
 
   &:hover ${ActionsContainer} {
-  opacity: 0.8;
-  visibility: visible;
-}
+    opacity: 0.8;
+    visibility: visible;
+  }
 `;
 
 const LinkCell = styled(STable.Cell)`
-height: 35px!important;
-padding: 2px 7px!important;
-cursor: pointer;
-position: relative;
+  height: 35px!important;
+  padding: 2px 7px!important;
+  cursor: pointer;
+  position: relative;
 
   &:hover ${ActionsContainer} {
-  opacity: 0.8;
-  visibility: visible;
-}
+    opacity: 0.8;
+    visibility: visible;
+  }
 `;
 
 const CheckboxContainer = styled(Flex)`
@@ -137,5 +131,5 @@ const CheckboxContainer = styled(Flex)`
   justify-content: center;
 `;
 
-export { ActionsContainer, Button, Cell, CheckboxContainer, Container, FiltersContainer, FooterCell, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
+export { ActionsContainer, Button, Cell, CheckboxContainer, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableHeader, TableRow };
 

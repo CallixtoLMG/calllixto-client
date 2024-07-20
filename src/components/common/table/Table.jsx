@@ -58,7 +58,7 @@ const CustomTable = ({
               </HeaderCell>
             )}
             {headers.map((header) => (
-              <HeaderCell key={`header_${header.id}`} basic={basic}>{header.title}</HeaderCell>
+              <HeaderCell key={`header_${header.id}`} $basic={basic}>{header.title}</HeaderCell>
             ))}
             {!!Object.keys(selection).length && (
               <ActionsContainer $header>
@@ -90,7 +90,7 @@ const CustomTable = ({
                     return (
                       <TableRow key={element[mainKey]}>
                         {isSelectable && (
-                          <Cell>
+                          <Cell $basic={basic}>
                             <Checkbox
                               checked={!!selection[element[mainKey]]}
                               onChange={() => onSelectionChange(element)}
@@ -118,7 +118,13 @@ const CustomTable = ({
                   return (
                     <TableRow key={element[mainKey]}>
                       {headers.map(header => (
-                        <Cell $wrap={$wrap} key={`cell_${header.id}`} align={header.align} width={header.width}>
+                        <Cell
+                          key={`cell_${header.id}`}
+                          align={header.align}
+                          width={header.width}
+                          $wrap={$wrap}
+                          $basic={basic}
+                        >
                           {header.value(element, index)}
                         </Cell>
                       ))}
