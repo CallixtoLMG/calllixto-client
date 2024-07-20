@@ -17,7 +17,7 @@ import {
 
 const Field = ({ label, value, ...rest }) => (
   <Flex columnGap="5px" {...rest}>
-    <Title as="h4" width="100px" textAlign="right" slim>{label} |</Title>
+    <Title as="h4" width="100px" textAlign="right" $slim>{label} |</Title>
     <Title as="h4">{value?.toUpperCase() || '-'}</Title>
   </Flex>
 );
@@ -38,7 +38,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
       <Box>
         <Flex alignItems="center" marginBottom="15px" justifyContent="space-between">
           <FlexColumn width="150px">
-            <Title as="h3" cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
+            <Title as="h3" $cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
             {clientPdf && (
               <>
                 <Title as="h4">{client?.name?.toUpperCase() || "Maderera Las Tapias"}</Title>
@@ -101,7 +101,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
       <FlexColumn rowGap="25px">
         {!!dolarExchangeRate && !dispatchPdf && (
           <DataContainer width="100%">
-            <Title as="h4" alignSelf="left" slim>Cotización en USD</Title>
+            <Title as="h4" alignSelf="left" $slim>Cotización en USD</Title>
             <Divider />
             <Title as="h4" alignSelf="left" width="fit-content" minHeight="30px">
               <Price value={finalTotal / parseInt(dolarExchangeRate)} />
@@ -110,7 +110,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         )}
         {(!!comments?.length || budget?.comments) && (
           <DataContainer width="100%">
-            <Title as="h4" alignSelf="left" slim>Comentarios</Title>
+            <Title as="h4" alignSelf="left" $slim>Comentarios</Title>
             <Divider />
             <Title as="h4" alignSelf="left" minHeight="30px">
               {budget?.comments}
@@ -129,7 +129,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         )}
         {!dispatchPdf &&
           <DataContainer width="100%">
-            <Title as="h4" alignSelf="left" slim>Formas de Pago</Title>
+            <Title as="h4" alignSelf="left" $slim>Formas de Pago</Title>
             <Divider />
             <Title as="h4" alignSelf="left" minHeight="30px">
               {budget?.paymentMethods?.join(" | ")}

@@ -23,7 +23,7 @@ const Title = styled(SHeader)`
   margin: 0!important;
   color: ${({ color }) => color ? "rgba(235,124,21,255)" : "black"} !important;
   align-content: center;
-  align-self: ${({ alignSelf }) => alignSelf || "center"} !important;
+  align-self: ${({ alignSelf = "center" }) => alignSelf} !important;
   text-align: ${({ textAlign }) => textAlign || "left"} !important;
   text-decoration: ${({ cancelled }) => cancelled ? 'line-through' : 'none'};
   width: ${({ width }) => width || "auto"}!important;

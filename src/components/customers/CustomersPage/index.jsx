@@ -74,7 +74,7 @@ const CustomersPage = ({ customers = [], isLoading }) => {
               control={control}
               render={({ field }) => (
                 <Input
-                  maxWidth
+                  $maxWidth
                   {...field}
                   $marginBottom
                   height="35px"
@@ -91,7 +91,6 @@ const CustomersPage = ({ customers = [], isLoading }) => {
         elements={customers.map((customer, index) => ({ ...customer, key: index + 1 }))}
         page={PAGES.CUSTOMERS}
         actions={actions}
-        showPagination
       />
       <ModalDelete
         showModal={showModal}

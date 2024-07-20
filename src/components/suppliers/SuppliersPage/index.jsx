@@ -81,7 +81,7 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
                 <Input
                   {...rest}
                   $marginBottom
-                  maxWidth
+                  $maxWidth
                   height="35px"
                   placeholder="Id"
                   onChange={(e) => {
@@ -98,7 +98,7 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
                 <Input
                   {...rest}
                   $marginBottom
-                  maxWidth
+                  $maxWidth
                   height="35px"
                   placeholder="Nombre"
                   onChange={(e) => {
@@ -117,7 +117,6 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
         elements={suppliers}
         page={PAGES.SUPPLIERS}
         actions={actions}
-        showPagination
       />
       <ModalDelete
         showModal={showModal}

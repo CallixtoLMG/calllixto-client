@@ -73,7 +73,7 @@ const Input = styled(SInput)`
   margin: 0!important;
   box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
   border-radius: 0.28571429rem;
-  max-width: ${({ maxWidth }) => maxWidth && `200px!important;`};
+  max-width: ${({ $maxWidth }) => $maxWidth && `200px!important;`};
   height: ${({ height = '50px' }) => height} !important;
   width: ${({ width = '100%' }) => `${width}!important`};
   display: flex!important;
@@ -465,7 +465,7 @@ const Budget = ({ params }) => {
           </>
         )}
       </NoPrint>
-      <OnlyPrint>
+      <OnlyPrint marginTop="60px">
         <PDFfile
           ref={printRef}
           budget={budget}

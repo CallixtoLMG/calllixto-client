@@ -9,6 +9,7 @@ const Cell = styled(STable.Cell)`
   text-align: ${({ align = 'center' }) => `${align}!important`};
   text-align-last: ${({ align = 'center', $right }) => $right ? 'right!important' : `${align}!important`};
   white-space: ${({ $wrap }) => $wrap ? 'wrap' : 'nowrap'}!important;
+  border-bottom: ${({ $basic }) => $basic && '1px solid black'};
 `;
 
 const Container = styled(Flex)`
@@ -51,6 +52,7 @@ const Table = styled(STable)`
   max-height: ${({ tableHeight = "none" }) => `${tableHeight}!important`};
   overflow-y: auto!important;
   overflow-x: hidden!important;
+  border: 1px solid black;
 `;
 
 const Button = styled(SButton)`
@@ -64,49 +66,40 @@ const TableHeader = styled(STable.Header)`
   height: 35px!important;
 `;
 
-const TableFooter = styled(STable.Footer)`
-  height: 35px!important;
-`;
-
 const HeaderCell = styled(STable.HeaderCell)`
-  background-color: ${({ basic }) => !basic && '#EEEEEE!important'};
+  background-color: ${({ $basic }) => !$basic && '#EEEEEE!important'};
   text-align: ${({ textAlign = "center" }) => `${textAlign}!important`};
-`;
-
-const FooterCell = styled(STable.HeaderCell)`
-  padding: 5px 7px !important;
+  width: ${({ width }) => width}!important;
+  padding: ${({ padding }) => padding}!important;
+  max-height: ${({ maxhHeight }) => maxhHeight}!important;
 `;
 
 const ActionsContainer = styled.td`
   position: absolute;
-  right: 0;
-  top: 50%;
-  transform: ${({ deleteButtonInside }) => deleteButtonInside ? 'translateY(-50%)' : "translateY(-50%) translateX(calc(100%))"} !important;
-  transition: all 0.1s ease-in-out;
-  opacity: 0;
-  visibility: hidden;
-  border: none !important;
+  right: ${({ $header }) => $header ? "auto" : "0"};
+  left: ${({ $header }) => $header ? "-100px" : "auto"};
+  top: ${({ $header }) => $header ? "0px" : "50%"};
+  transform: ${({ deleteButtonInside, $header }) => {
+    if (deleteButtonInside) return 'translateY(-50%)';
+    return $header ? 'translateX(calc(100%))' : "translateY(-50%) translateX(calc(100%))";
+  }} !important;
+  transition: all 0.1s ease-in-out!important;
+  opacity: ${({ $header }) => $header ? "1" : "0"};
+  visibility: ${({ $header }) => $header ? "visible" : "hidden"};
+  border: none!important;
+  padding: ${({ $header }) => $header && "0!important"};
   padding-left: 5px !important;
 `;
 
 const InnerActionsContainer = styled(Flex)`
   border: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "1px solid #d4d4d5"} !important;
   background-color: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "#f7f7f7"} !important;
-  padding: ${({ deleteButtonInside }) => deleteButtonInside ? '0' : "5px"} !important;
-  border-radius: 10px;
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
+  padding: ${({ deleteButtonInside, $header }) => {
+    if (deleteButtonInside) return '0';
+    return $header ? '8px 5px' : '5px';
+  }} !important;
+  border-radius: ${({ $header }) => $header ? "10px 0 0 10px" : "0 10px 10px 0"};
   column-gap: 3px;
-`;
-
-const LinkRow = styled(STable.Row)`
-  cursor: pointer;
-  position: relative;
-
-  &:hover ${ActionsContainer} {
-    opacity: 0.8;
-    visibility: visible;
-  }
 `;
 
 const TableRow = styled(STable.Row)`
@@ -118,5 +111,25 @@ const TableRow = styled(STable.Row)`
   }
 `;
 
-export { ActionsContainer, Button, Cell, Container, FiltersContainer, FooterCell, HeaderCell, InnerActionsContainer, LinkRow, PaginationContainer, PaginationSegment, Segment, Table, TableFooter, TableHeader, TableRow };
+const LinkCell = styled(STable.Cell)`
+  height: 35px!important;
+  padding: 2px 7px!important;
+  cursor: pointer;
+  position: relative;
+
+  &:hover ${ActionsContainer} {
+    opacity: 0.8;
+    visibility: visible;
+  }
+`;
+
+const CheckboxContainer = styled(Flex)`
+  position: ${({ selection }) => selection ? "relative" : "static"} ;
+  align-items: center;
+  border-radius: 5px;
+  padding: 3px;
+  justify-content: center;
+`;
+
+export { ActionsContainer, Button, Cell, CheckboxContainer, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableHeader, TableRow };
 

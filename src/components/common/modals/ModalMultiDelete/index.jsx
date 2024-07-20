@@ -1,21 +1,21 @@
-import { Button, ButtonsContainer, Input } from "@/components/common/custom";
+import { ButtonsContainer, Input } from "@/components/common/custom";
+import { Table } from "@/components/common/table";
 import { useEffect, useRef, useState } from 'react';
-import { useForm } from "react-hook-form";
-import { Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
-import { Form } from "./styles";
+import { useForm } from 'react-hook-form';
+import { Button, Header, Icon as SIcon, Transition } from 'semantic-ui-react';
+import { Form, Modal, ModalContent } from "./styles";
 
-
-const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) => {
+const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title, icon, headers }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(false);
   const { handleSubmit } = useForm();
-
   const inputElement = useRef(null);
 
   useEffect(() => {
     inputElement?.current?.focus();
     setConfirmationText('');
-  }, [showModal]);
+    setIsDeleteEnabled(false);
+  }, [open]);
 
   const handleConfirmationTextChange = (e) => {
     const text = e.target.value;
@@ -24,11 +24,18 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
   };
 
   return (
-    <Transition visible={showModal} animation='scale' duration={500}>
-      <Modal closeIcon open={showModal} onClose={() => setShowModal(false)}>
-        <Header icon='trash' content={title || ""} />
+    <Transition visible={open} animation='scale' duration={500}>
+      <Modal closeIcon open={open} onClose={onClose}>
+        <Header icon={icon} content={title} ></Header>
+        <ModalContent>
+          <Table
+            headers={headers}
+            elements={elements}
+            mainKey="code"
+          />
+        </ModalContent>
         <Modal.Actions>
-          <Form onSubmit={handleSubmit(onDelete)}>
+          <Form onSubmit={handleSubmit(onConfirm)}>
             <Input
               height="40px"
               placeholder="Escriba 'borrar' para eliminar"
@@ -42,7 +49,9 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
               <Button
                 height="40px"
                 color='red'
-                onClick={() => setShowModal(false)} disabled={isLoading}>
+                onClick={onClose}
+                disabled={isLoading}
+              >
                 <SIcon name='times' />Cancelar
               </Button>
               <Button
@@ -59,7 +68,7 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
         </Modal.Actions>
       </Modal>
     </Transition>
-  )
+  );
 };
 
-export default ModalDelete;
+export default ModalMultiDelete;

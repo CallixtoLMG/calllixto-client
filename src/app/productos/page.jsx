@@ -13,7 +13,7 @@ import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { downloadExcel } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 const mockData = [
   ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
@@ -37,10 +37,6 @@ const Products = () => {
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
-
-  const products = useMemo(() => {
-    return data?.products
-  }, [data?.products]);
 
   useEffect(() => {
     setLabels(['Productos']);
@@ -79,7 +75,7 @@ const Products = () => {
       },
     ] : [];
     setActions(actions);
-  }, [products, push, role, setActions]);
+  }, [push, role, setActions]);
 
   useKeyboardShortcuts(() => push(PAGES.PRODUCTS.CREATE), SHORTKEYS.ENTER);
 

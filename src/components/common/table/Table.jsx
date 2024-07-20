@@ -1,9 +1,10 @@
 import { Loader } from "@/components/layout";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Header } from "semantic-ui-react";
+import { useEffect, useMemo, useState } from "react";
+import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
+import { PopupActions } from "../buttons";
 import Actions from "./Actions";
-import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkRow, Table, TableHeader, TableRow } from "./styles";
+import { ActionsContainer, Cell, CheckboxContainer, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
 
 const CustomTable = ({
   isLoading,
@@ -15,61 +16,115 @@ const CustomTable = ({
   tableHeight,
   deleteButtonInside,
   color,
+  selection = {},
+  onSelectionChange,
+  selectionActions = [],
   basic,
-  $wrap
+  $wrap,
+  clearSelection,
+  selectAll
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
+  const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
+  const allSelected = useMemo(() => Object.keys(selection)?.length === elements.length, [selection, elements]);
 
   useEffect(() => {
     setHydrated(true);
   }, []);
 
+  const handleToggleAll = () => {
+    if (allSelected) {
+      clearSelection();
+    } else {
+      selectAll();
+    }
+  };
+
   return (
     <Container tableHeight={tableHeight}>
-      <Table celled compact striped={!basic} color={color}>
+      <Table celled compact striped={!basic} color={color} definition={isSelectable}>
         <TableHeader fullWidth>
-          <Table.Row>
+          <TableRow>
+            {isSelectable && (
+              <HeaderCell width="65px" padding="0">
+                <CheckboxContainer>
+                  <Checkbox
+                    indeterminate={!!Object.keys(selection).length && !allSelected}
+                    checked={!isLoading && allSelected}
+                    onChange={handleToggleAll}
+                  />
+                </CheckboxContainer>
+              </HeaderCell>
+            )}
             {headers.map((header) => (
-              <HeaderCell key={`header_${header.id}`} basic={basic}>{header.title}</HeaderCell>
+              <HeaderCell key={`header_${header.id}`} $basic={basic}>{header.title}</HeaderCell>
             ))}
-          </Table.Row>
+            {!!Object.keys(selection).length && (
+              <ActionsContainer $header>
+                <InnerActionsContainer $header>
+                  <PopupActions
+                    position="right center"
+                    trigger={<Button icon circular color="yellow" size="mini"><Icon name="cog" /></Button>}
+                    buttons={selectionActions}
+                  />
+                </InnerActionsContainer>
+              </ActionsContainer>
+            )}
+          </TableRow>
         </TableHeader>
         {hydrated && (
-          <Loader active={isLoading}>
+          <Loader active={isLoading} $greyColor>
             <Table.Body>
               {!elements.length ? (
                 <Table.Row>
-                  <Table.Cell colSpan={headers.length} textAlign="center">
+                  <Cell colSpan={headers.length + (isSelectable ? 2 : 1)} textAlign="center">
                     <Header as="h4">
                       No se encontraron ítems
                     </Header>
-                  </Table.Cell>
+                  </Cell>
                 </Table.Row>
               ) : (
                 elements.map((element, index) => {
                   if (page) {
                     return (
-                      <LinkRow key={element[mainKey]} onClick={() => push(page.SHOW(element[mainKey]))}>
-                        {headers.map(header => (
-                          <Cell $wrap={$wrap} key={`cell_${header.id}`} align={header.align} width={header.width}>
-                            {header.value(element, index)}
+                      <TableRow key={element[mainKey]}>
+                        {isSelectable && (
+                          <Cell $basic={basic}>
+                            <Checkbox
+                              checked={!!selection[element[mainKey]]}
+                              onChange={() => onSelectionChange(element)}
+                            />
                           </Cell>
+                        )}
+                        {headers.map(header => (
+                          <LinkCell
+                            key={`cell_${header.id}`} align={header.align}
+                            width={header.width} onClick={() => push(page.SHOW(element[mainKey]))}
+                          >
+                            {header.value(element, index)}
+                          </LinkCell>
                         ))}
-                        {!!actions.length && (
+                        {!!selectionActions.length && (
                           <ActionsContainer deleteButtonInside={deleteButtonInside}>
                             <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
                               <Actions actions={actions} element={element} />
                             </InnerActionsContainer>
                           </ActionsContainer>
                         )}
-                      </LinkRow>
+                      </TableRow>
                     );
                   }
                   return (
                     <TableRow key={element[mainKey]}>
                       {headers.map(header => (
-                        <Cell $wrap={$wrap} key={`cell_${header.id}`} align={header.align} width={header.width}>
+                        <Cell
+                          key={`cell_${header.id}`}
+                          align={header.align}
+                          width={header.width}
+                          $wrap={$wrap}
+                          $basic={basic}
+                        >
                           {header.value(element, index)}
                         </Cell>
                       ))}
