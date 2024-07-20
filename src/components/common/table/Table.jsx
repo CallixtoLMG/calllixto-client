@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
 import { PopupActions } from "../buttons";
 import Actions from "./Actions";
-import { ActionsContainer, Cell, CheckboxContainer, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
+import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
+import { CenteredFlex } from "../custom";
 
 const CustomTable = ({
   isLoading,
@@ -47,14 +48,14 @@ const CustomTable = ({
         <TableHeader fullWidth>
           <TableRow>
             {isSelectable && (
-              <HeaderCell width="65px" padding="0">
-                <CheckboxContainer>
+              <HeaderCell width="50px" padding="0">
+                <CenteredFlex>
                   <Checkbox
                     indeterminate={!!Object.keys(selection).length && !allSelected}
                     checked={!isLoading && allSelected}
                     onChange={handleToggleAll}
                   />
-                </CheckboxContainer>
+                </CenteredFlex>
               </HeaderCell>
             )}
             {headers.map((header) => (
@@ -91,10 +92,12 @@ const CustomTable = ({
                       <TableRow key={element[mainKey]}>
                         {isSelectable && (
                           <Cell $basic={basic}>
-                            <Checkbox
-                              checked={!!selection[element[mainKey]]}
-                              onChange={() => onSelectionChange(element)}
-                            />
+                            <CenteredFlex>
+                              <Checkbox
+                                checked={!!selection[element[mainKey]]}
+                                onChange={() => onSelectionChange(element)}
+                              />
+                            </CenteredFlex>
                           </Cell>
                         )}
                         {headers.map(header => (

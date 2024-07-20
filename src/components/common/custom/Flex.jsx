@@ -34,3 +34,8 @@ export const FlexColumn = styled(Flex)`
 export const Box = styled(Common)`
   display: block;
 `;
+
+export const CenteredFlex = styled(Flex)`
+  justify-content: center;
+  align-items: center;
+`;

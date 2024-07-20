@@ -123,13 +123,5 @@ const LinkCell = styled(STable.Cell)`
   }
 `;
 
-const CheckboxContainer = styled(Flex)`
-  position: ${({ selection }) => selection ? "relative" : "static"} ;
-  align-items: center;
-  border-radius: 5px;
-  padding: 3px;
-  justify-content: center;
-`;
-
-export { ActionsContainer, Button, Cell, CheckboxContainer, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableHeader, TableRow };
+export { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableHeader, TableRow };
 
