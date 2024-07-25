@@ -1,6 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
+import { PopupActions } from "@/components/common/buttons";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
@@ -14,6 +15,7 @@ import { RULES } from "@/roles";
 import { downloadExcel } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Button, Icon } from "semantic-ui-react";
 
 const mockData = [
   ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
@@ -53,18 +55,30 @@ const Products = () => {
       },
       {
         id: 2,
-        button: <BatchImport isCreating />,
-      },
-      {
-        id: 3,
-        button: <BatchImport />,
-      },
-      {
-        id: 4,
-        icon: 'download',
-        color: 'blue',
-        onClick: () => downloadExcel(mockData, "Ejemplo de tabla"),
-        text: 'Plantilla'
+        button: (
+          <PopupActions
+            width="90px"
+            title="Excel"
+            icon="file excel"
+            color="blue"
+            buttons={
+              [
+                <BatchImport key="batch-create" isCreating />,
+                <BatchImport key="batch-update" />,
+                <Button
+                  size="small"
+                  icon
+                  labelPosition="left"
+                  key="batch-template"
+                  color="blue"
+                  onClick={() => downloadExcel(mockData, "Ejemplo de tabla")}
+                >
+                  <Icon name="download" />Plantilla
+                </Button>
+              ]
+            }
+          />
+        )
       },
       {
         id: 5,
