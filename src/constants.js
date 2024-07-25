@@ -218,3 +218,5 @@ export const PRODUCTS_HELP = {
   FRACTIONABLE_PRODUCT: "Al activar esta opción los precios pueden ser editables desde la creación de un presupuesto.",
   EDITABLE_PRICE: "Al activar esta opción se pueden fraccionar los productos desde la creación de un presupuesto.",
 };
+
+export const PICK_UP_IN_STORE = "Retira en tienda";

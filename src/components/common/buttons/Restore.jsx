@@ -4,6 +4,7 @@ import { Icon } from "semantic-ui-react";
 export const Restore = ({ isUpdating, isLoading, isDirty, onClick, disabled }) => {
   return (
     <Button
+      padding="0"
       disabled={isLoading || !isDirty || disabled}
       type="button"
       color="brown"

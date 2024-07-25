@@ -1,6 +1,7 @@
 import { FieldsContainer, Flex, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
+import { PICK_UP_IN_STORE } from "@/constants";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetCancelled } from "@/utils";
 import { useMemo } from "react";
 import { Popup } from "semantic-ui-react";
@@ -110,7 +111,7 @@ const BudgetView = ({ budget }) => {
         </FormField>
         <FormField flex="1">
           <Label>Dirección</Label>
-          <Segment>{budget?.customer?.addresses[0]?.address}</Segment>
+          <Segment>{budget?.pickUpInStore ? PICK_UP_IN_STORE : budget?.customer?.addresses[0]?.address}</Segment>
         </FormField>
         <FormField width="200px">
           <Label>Teléfono</Label>

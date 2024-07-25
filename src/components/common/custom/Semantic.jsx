@@ -123,6 +123,7 @@ export const Dropdown = styled(SDropdown)`
 `;
 
 export const Button = styled(SButton)`
+  padding: ${({ padding }) => padding && padding} !important;
   display:flex;
   width: ${({ width = "120px" }) => width && width} !important;
   margin: 0 !important;

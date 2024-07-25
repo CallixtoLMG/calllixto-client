@@ -17,7 +17,7 @@ import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext }
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { isBudgetCancelled, isBudgetConfirmed, isBudgetDraft, isBudgetPending, isBudgetExpired, now } from "@/utils";
+import { isBudgetCancelled, isBudgetConfirmed, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -88,6 +88,8 @@ const Input = styled(SInput)`
 `;
 
 const Budget = ({ params }) => {
+  const [pickUpInStore, setPickUpInStore] = useState(false);
+
   useValidateToken();
   const { push } = useRouter();
   const { userData } = useUserContext();
@@ -315,10 +317,11 @@ const Budget = ({ params }) => {
   };
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (pickUpInStore) => {
       const confirmationData = {
         confirmedBy: `${userData.firstName} ${userData.lastName}`,
         confirmedAt: now(),
+        pickUpInStore
       };
       const { data } = await confirmBudget(confirmationData, budget?.id);
       return data;
@@ -376,8 +379,6 @@ const Budget = ({ params }) => {
     },
   });
 
-  console.log({ budget: budget?.state  })
-
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
       <NoPrint>
@@ -399,6 +400,8 @@ const Budget = ({ params }) => {
                 isModalOpen={isModalCustomerOpen}
                 onClose={handleModalCustomerClose}
                 customer={customerData}
+                pickUpInStore={pickUpInStore}
+                setPickUpInStore={setPickUpInStore}
               />
               <ModalConfirmation
                 isModalOpen={isModalConfirmationOpen}
@@ -406,6 +409,8 @@ const Budget = ({ params }) => {
                 customer={customerData}
                 onConfirm={mutate}
                 isLoading={isPending}
+                pickUpInStore={pickUpInStore}
+                setPickUpInStore={setPickUpInStore}
               />
             </>
           ) : <Box />}
