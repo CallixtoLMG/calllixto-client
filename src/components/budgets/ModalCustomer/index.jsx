@@ -25,17 +25,22 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, pickUpInStore, setPickU
   const handleEdit = async (data) => {
     setIsLoading(true);
     try {
-      const response = await edit(data);
+      const filteredData = { ...data };
+      if (!filteredData.addresses || filteredData.addresses.length === 0 || !filteredData.addresses[0]?.address) {
+        filteredData.addresses = [{}];
+      };
+
+      const response = await edit(filteredData);
       if (response?.data?.statusOk) {
         toast.success('Cliente actualizado!');
-      }
-      onClose(true, data);
+      };
+      onClose(true, filteredData);
     } catch (error) {
       console.error('Error en la edición del cliente:', error?.message);
       onClose(false);
     } finally {
       setIsLoading(false);
-    }
+    };
   };
 
   return (
@@ -66,7 +71,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, pickUpInStore, setPickU
                 <Segment height="40px">{customer?.name}</Segment>
               </FormField>
               <FormField flex="1">
-                {!!customer?.addresses.length ? (
+                {!!customer?.addresses?.length ? (
                   <>
                     <Label>Dirección</Label>
                     <Segment>{customer.addresses[0]?.address}</Segment>
@@ -74,21 +79,27 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, pickUpInStore, setPickU
                 ) : (
                   <>
                     <RuledLabel title="Dirección" message={!pickUpInStore && errors?.addresses && errors.addresses[0]?.message} required={!pickUpInStore} />
-                    <Controller
-                      name={`addresses[0]`}
-                      control={control}
-                      rules={!pickUpInStore && RULES.REQUIRED}
-                      render={({ field: { value, onChange, ...rest } }) => (
-                        <Input
-                          {...rest}
-                          value={!pickUpInStore ? (value?.address || '') : PICK_UP_IN_STORE}
-                          onChange={(e) => {
-                            onChange({ address: e.target.value })
-                          }}
-                          placeholder="Dirección"
-                        />
-                      )}
-                    />
+                    {!pickUpInStore ? (
+                      <Controller
+                        name={`addresses[0]`}
+                        control={control}
+                        rules={RULES.REQUIRED}
+                        render={({ field: { value, onChange, ...rest } }) => (
+                          <Input
+                            {...rest}
+                            value={value?.address || ''}
+                            onChange={(e) => {
+                              onChange({ address: e.target.value })
+                            }}
+                            placeholder="Dirección"
+                          />
+                        )}
+                      />
+                    ) : (
+                      <Segment>
+                        {PICK_UP_IN_STORE}
+                      </Segment>
+                    )}
                   </>
                 )}
               </FormField>
