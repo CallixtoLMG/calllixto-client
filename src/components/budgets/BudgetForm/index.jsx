@@ -1,6 +1,6 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { ActionLabel, Box, Button, ButtonsContainer, Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
@@ -11,7 +11,7 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Message, Modal, Popup, Transition } from "semantic-ui-react";
+import { Button, ButtonGroup, Message, Modal, Popup, Transition } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
@@ -38,6 +38,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   const [temporaryProducts, setTemporaryProducts] = useState([]);
   const [expiration, setExpiration] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
+  const [retiro, setRetiro] = useState(false);
   const { control, handleSubmit, setValue, getValues, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
       ...budget,
@@ -396,8 +397,24 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </Modal.Content>
           <Modal.Actions>
             <ButtonsContainer>
-              <Button color="red" onClick={handleCancelUpdate}>Cancelar</Button>
-              <Button color="green" onClick={handleConfirmUpdate}>Confirmar</Button>
+              <Button
+                icon
+                labelPosition="left"
+                color="red"
+                onClick={handleCancelUpdate}
+              >
+                <Icon name="cancel" />
+                CANCELAR
+              </Button>
+              <Button
+                icon
+                labelPosition="left"
+                color="green"
+                onClick={handleConfirmUpdate}
+              >
+                <Icon name="check" />
+                CONFIRMAR
+              </Button>
             </ButtonsContainer>
           </Modal.Actions>
         </Modal>
@@ -405,23 +422,69 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       <Form onSubmit={handleSubmit(handleConfirm)}>
         <FieldsContainer>
           <FormField width="300px">
-            <Checkbox
-              toggle
-              checked={isConfirmed}
-              onChange={() => {
-                setIsConfirmed(!isConfirmed);
-                setValue('state', isConfirmed ? BUDGET_STATES.PENDING.id : BUDGET_STATES.CONFIRMED.id);
-              }}
-              label={isConfirmed ? "Confirmado" : "Confirmar presupuesto"}
-              customColors={{ false: 'orange', true: 'green' }}
-            />
+            <ButtonGroup size="small">
+              <Button
+                icon
+                labelPosition="left"
+                type="button"
+                basic={!isConfirmed}
+                color={isConfirmed ? "green" : "orange"}
+                width="fit-content"
+                onClick={() => {
+                  setIsConfirmed(true);
+                  setValue('state', BUDGET_STATES.CONFIRMED.id);
+                }}
+              >
+                <Icon name="check" />
+                CONFIRMADO
+              </Button>
+              <Button
+                icon
+                labelPosition="left"
+                type="button"
+                basic={isConfirmed}
+                color={isConfirmed ? "green" : "orange"}
+                width="fit-content"
+                onClick={() => {
+                  setIsConfirmed(false);
+                  setValue('state', BUDGET_STATES.PENDING.id);
+                }}
+              >
+                <Icon name="hourglass half" />
+                PENDIENTE
+              </Button>
+            </ButtonGroup>
+          </FormField>
+          <FormField width="350px">
+            <ButtonGroup size="small">
+              <Button
+                type="button"
+                basic={!retiro}
+                color="blue"
+                onClick={() => {
+                  setRetiro(true);
+                }}
+              >
+                Retira en Tienda
+              </Button>
+              <Button
+                type="button"
+                basic={retiro}
+                color="blue"
+                onClick={() => {
+                  setRetiro(false);
+                }}
+              >
+                Enviar a Dirección
+              </Button>
+            </ButtonGroup>
           </FormField>
         </FieldsContainer>
         <FieldsContainer>
           <FormField width="300px">
             <Label>Vendedor</Label>
             <Controller name="seller" control={control} rules={RULES.REQUIRED}
-              render={({ field: { value } }) => <Segment>{value}</Segment>}
+              render={({ field: { value } }) => <Segment placeholder>{value}</Segment>}
             />
           </FormField>
         </FieldsContainer>
@@ -518,26 +581,35 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               control={control}
               rules={RULES.REQUIRED}
               render={({ field: { onChange, value } }) => (
-                <Flex flexDirection="column" rowGap="5px" >
-                  <ActionLabel
-                    color={value.length === PAYMENT_METHODS.length && 'blue'}
-                    width="fit-content"
-                    onClick={() => {
-                      if (value.length === PAYMENT_METHODS.length) {
-                        onChange([]);
-                      } else {
-                        onChange(PAYMENT_METHODS);
-                      }
-                    }}
-                  >
-                    Todos
-                  </ActionLabel>
+                <Flex flexDirection="column" rowGap="5px">
+                  <Box>
+                    <Button
+                      icon
+                      labelPosition="left"
+                      size="small"
+                      type="button"
+                      basic={value.length !== PAYMENT_METHODS.length}
+                      color="blue"
+                      onClick={() => {
+                        if (value.length === PAYMENT_METHODS.length) {
+                          onChange([]);
+                        } else {
+                          onChange(PAYMENT_METHODS);
+                        }
+                      }}
+                    >
+                      <Icon name="check" />
+                      Todos
+                    </Button>
+                  </Box>
                   <Flex columnGap="5px" wrap="wrap" rowGap="5px">
                     {PAYMENT_METHODS.map(text => (
-                      <ActionLabel
+                      <Button
+                        size="small"
                         width="fit-content"
                         key={text}
-                        color={value.includes(text) && 'blue'}
+                        basic={!value.includes(text)}
+                        color="blue"
                         onClick={() => {
                           if (value.includes(text)) {
                             onChange(value.filter(payment => payment !== text));
@@ -546,7 +618,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                           }
                         }}
                       >{text}
-                      </ActionLabel>
+                      </Button>
                     ))}
                   </Flex>
                 </Flex>
@@ -572,7 +644,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </FormField>
           <FormField flex={1}>
             <Label>Fecha de vencimiento</Label>
-            <Segment>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
+            <Segment placeholder>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
           </FormField>
         </FieldsContainer>
         <SubmitAndRestore
@@ -584,16 +656,20 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           onReset={handleReset}
           color={currentState.color}
           onSubmit={handleSubmit(handleConfirm)}
-          icon={currentState.icon} text={currentState.title}
+          icon={currentState.icon}
+          text={currentState.title.toLocaleUpperCase()}
           extraButton={
             <Button
+              icon
+              labelPosition="left"
               disabled={isLoading || !isDirty || isBudgetConfirmed(watchState)}
               loading={isLoading && watchState === BUDGET_STATES.DRAFT.id}
               type="button"
               onClick={handleSubmit(handleDraft)}
               color={BUDGET_STATES.DRAFT.color}
+              width="fit-content"
             >
-              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
+              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title.toLocaleUpperCase()}
             </Button>
           }
         />

@@ -8,17 +8,17 @@ const SupplierView = ({ supplier }) => {
       <FieldsContainer>
         <FormField>
           <Label>Código</Label>
-          <Segment>{supplier?.id}</Segment>
+          <Segment placeholder>{supplier?.id}</Segment>
         </FormField>
         <FormField width="40%">
           <Label>Nombre</Label>
-          <Segment>{supplier?.name}</Segment>
+          <Segment placeholder>{supplier?.name}</Segment>
         </FormField>
       </FieldsContainer>
       <ContactView {...supplier} />
       <FieldsContainer>
         <Label >Comentarios</Label>
-        <Segment>{supplier?.comments}</Segment>
+        <Segment placeholder>{supplier?.comments}</Segment>
       </FieldsContainer>
     </ViewContainer>
   )

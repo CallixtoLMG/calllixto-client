@@ -141,10 +141,12 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const selectionActions = useMemo(() => {
     const actions = [
       <Button
+        icon
+        labelPosition="left"
         key={2}
         onClick={() => setShouldPrint(true)}
         color="blue"
-        size="tiny"
+        size="small"
       >
         <Icon name="barcode" /> Descargar Códigos
       </Button>
@@ -152,10 +154,12 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     if (RULES.canRemove[role]) {
       actions.unshift(
         <Button
+          icon
+          labelPosition="left"
           key={1}
           onClick={() => setShowConfirmDeleteModal(true)}
           color="red"
-          size="tiny"
+          size="small"
         >
           <Icon name="trash" /> Eliminar Productos
         </Button>

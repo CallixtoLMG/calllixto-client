@@ -1,7 +1,7 @@
-import { Button, ButtonsContainer, Input } from "@/components/common/custom";
+import { ButtonsContainer, Input } from "@/components/common/custom";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
-import { Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
+import { Header, Modal, Icon as SIcon, Transition, Button } from 'semantic-ui-react';
 import { Form } from "./styles";
 
 
@@ -40,19 +40,24 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
             />
             <ButtonsContainer>
               <Button
+                icon
+                labelPosition="left"
                 height="40px"
-                color='red'
-                onClick={() => setShowModal(false)} disabled={isLoading}>
-                <SIcon name='times' />Cancelar
+                color='grey'
+                onClick={() => setShowModal(false)} disabled={isLoading}
+                >
+                <SIcon name='times' />CANCELAR
               </Button>
               <Button
+                icon
+                labelPosition="left"
                 height="40px"
                 disabled={!isDeleteEnabled || isLoading}
                 loading={isLoading}
-                color='green'
+                color='red'
                 type="submit"
               >
-                <SIcon name='trash' />Aceptar
+                <SIcon name='trash' />ELIMINAR
               </Button>
             </ButtonsContainer>
           </Form>

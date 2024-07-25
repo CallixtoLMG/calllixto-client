@@ -1,5 +1,5 @@
 import { Flex } from '@/components/common/custom';
-import { Button as SButton, Segment as SSegment, Table as STable } from "semantic-ui-react";
+import { Segment as SSegment, Table as STable } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Cell = styled(STable.Cell)`
@@ -53,13 +53,6 @@ const Table = styled(STable)`
   overflow-y: auto!important;
   overflow-x: hidden!important;
   border: 1px solid black;
-`;
-
-const Button = styled(SButton)`
-  margin: ${({ marginLeft = "0" }) => `0 0 0 ${marginLeft}!important`};
-  visibility: ${({ hidden }) => hidden && "hidden"} !important;
-  height: 35px!important;
-  align-self: center;
 `;
 
 const TableHeader = styled(STable.Header)`
@@ -123,5 +116,5 @@ const LinkCell = styled(STable.Cell)`
   }
 `;
 
-export { ActionsContainer, Button, Cell, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableHeader, TableRow };
+export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableHeader, TableRow };
 

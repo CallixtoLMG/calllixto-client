@@ -1,5 +1,5 @@
 import { LIST_BANNED_PRODUCTS_QUERY_KEY, editBanProducts, useListBanProducts } from "@/api/products";
-import { Button, FieldsContainer, Flex, Form, FormField, Input, Label, Modal } from "@/components/common/custom";
+import { FieldsContainer, Flex, Form, FormField, Input, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { handleEnterKeyPress } from '@/utils';
@@ -8,7 +8,7 @@ import { isEqual, sortBy } from 'lodash';
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Transition } from "semantic-ui-react";
+import { Transition, Button, Icon } from "semantic-ui-react";
 import { BAN_FILTERS, BAN_PRODUCTS_COLUMNS } from "../products.common";
 import { ModalActions } from "./styles";
 
@@ -125,8 +125,25 @@ const BanProduct = ({ open, setOpen }) => {
             </FieldsContainer>
             <ModalActions>
               <Flex columnGap="5px">
-                <Button disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))} loading={isPending} type="submit" color="green" content="Aceptar" />
-                <Button disabled={isPending} onClick={() => setOpen(false)} color="red" content="Cancelar" />
+                <Button
+                  icon
+                  labelPosition="left"
+                  disabled={isPending}
+                  onClick={() => setOpen(false)}
+                  color="red"
+                >
+                  <Icon name="cancel" />
+                  CANCELAR
+                </Button>
+                <Button
+                  disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))}
+                  loading={isPending}
+                  type="submit"
+                  color="green"
+                >
+                  <Icon name="check" />
+                  ACEPTAR
+                </Button>
               </Flex>
             </ModalActions>
           </Form>

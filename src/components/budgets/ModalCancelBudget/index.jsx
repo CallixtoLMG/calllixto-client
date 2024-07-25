@@ -1,6 +1,6 @@
-import { Button, ButtonsContainer, FieldsContainer, Label, TextArea } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Label, TextArea } from "@/components/common/custom";
 import { useState } from "react";
-import { Modal, Transition } from "semantic-ui-react";
+import { Modal, Transition, Button, Icon } from "semantic-ui-react";
 import { ModalContent } from "./styles";
 
 const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
@@ -26,19 +26,27 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
         <Modal.Actions>
           <ButtonsContainer width="100%" marginTop="10px">
             <Button
+              icon
+              labelPosition="left"
               disabled={isLoading}
               type="button"
               color="grey"
-              onClick={() => onClose(false)}>
-              Cancelar
+              onClick={() => onClose(false)}
+            >
+              <Icon name="close" />
+              CANCELAR
             </Button>
             <Button
+              icon
+              labelPosition="left"
               color="red"
               onClick={() => onConfirm(cancelReason)}
               disabled={!cancelReason || isLoading}
               loading={isLoading}
+              basic
             >
-              Anular
+              <Icon name="ban" />
+              ANULAR
             </Button>
           </ButtonsContainer>
         </Modal.Actions>

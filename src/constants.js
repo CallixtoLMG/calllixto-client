@@ -184,14 +184,6 @@ export const BUDGET_STATES = {
   }
 };
 
-export const FILTER_TYPES = {
-  TEXT: 'text',
-  SELECT: 'select',
-  DATE: 'date',
-  NUMBER: 'number',
-  CHECKBOX: 'checkbox',
-};
-
 export const SHORTKEYS = {
   ENTER: "Control+Enter",
   ALT_ENTER: "Control+Alt+Enter",

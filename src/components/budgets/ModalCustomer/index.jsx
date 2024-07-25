@@ -1,11 +1,11 @@
 import { edit } from "@/api/customers";
-import { Button, ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
+import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
 import { RULES } from "@/constants";
 import { formatedSimplePhone } from "@/utils";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Modal, Transition } from "semantic-ui-react";
+import { Modal, Transition, Button, Icon } from "semantic-ui-react";
 
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -53,13 +53,13 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
             <FieldsContainer>
               <FormField flex="1">
                 <Label>Nombre</Label>
-                <Segment height="40px">{customer?.name}</Segment>
+                <Segment height="40px" placeholder>{customer?.name}</Segment>
               </FormField>
               <FormField flex="1">
                 {!!customer?.addresses.length ? (
                   <>
                     <Label>Dirección</Label>
-                    <Segment>{customer.addresses[0].address}</Segment>
+                    <Segment placeholder>{customer.addresses[0].address}</Segment>
                   </>
                 ) : (
                   <>
@@ -86,7 +86,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                 {!!customer?.phoneNumbers[0] ? (
                   <>
                     <Label>Teléfono</Label>
-                    <Segment>{formatedSimplePhone(customer.phoneNumbers[0])}</Segment>
+                    <Segment placeholder>{formatedSimplePhone(customer.phoneNumbers[0])}</Segment>
                   </>
                 ) : (
                   <>
@@ -151,19 +151,26 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
               </FormField>
               <ButtonsContainer width="100%" marginTop="10px">
                 <Button
+                  icon
+                  labelPosition="left"
+                  disabled={isLoading}
+                  type="button"
+                  color="red"
+                  onClick={() => onClose(false)}
+                >
+                  <Icon name="cancel" />
+                  CANCELAR
+                </Button>
+                <Button
+                  icon
+                  labelPosition="left"
                   disabled={isLoading}
                   loading={isLoading}
                   type="submit"
                   color="green"
                 >
-                  Confirmar
-                </Button>
-                <Button
-                  disabled={isLoading}
-                  type="button"
-                  color="red"
-                  onClick={() => onClose(false)}>
-                  Cancelar
+                  <Icon name="check" />
+                  CONFIRMAR
                 </Button>
               </ButtonsContainer>
             </FieldsContainer>

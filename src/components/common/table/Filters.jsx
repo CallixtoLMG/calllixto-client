@@ -36,8 +36,13 @@ const Filters = ({ children, onRestoreFilters, clearSelection }) => {
           {children}
         </FiltersContainer>
         <Flex alignSelf="center">
-          <Button circular icon type="submit">
-            <Icon name="search" />
+          <Button
+            size="small"
+            icon
+            type="submit"
+            labelPosition="left"
+          >
+            <Icon name="search" />Buscar
           </Button>
         </Flex>
       </HeaderSegment>

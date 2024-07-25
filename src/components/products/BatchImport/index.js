@@ -1,5 +1,5 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListAllProducts, useListBanProducts } from "@/api/products";
-import { Button, CurrencyFormatInput, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { CurrencyFormatInput, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { downloadExcel, now } from "@/utils";
@@ -7,7 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { ButtonContent, Icon, Transition } from "semantic-ui-react";
+import { Icon, Transition, Button } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { ContainerModal, Modal, ModalActions, ModalHeader, WaitMsg } from "./styles";
 
@@ -350,18 +350,14 @@ const BatchImport = ({ isCreating }) => {
         onChange={handleFileUpload}
       />
       <Button
-        width="90px"
-        animated="vertical"
+        size="small"
+        icon
+        labelPosition="left"
         color="blue"
         onClick={handleClick}
         type="button"
       >
-        <ButtonContent hidden>
-          {importSettings.button}
-        </ButtonContent>
-        <ButtonContent visible>
-          <Icon name="upload" />
-        </ButtonContent>
+        <Icon name="upload" />{importSettings.button}
       </Button>
       <Transition animation="fade" duration={500} visible={open}>
         <Modal

@@ -14,14 +14,16 @@ const Actions = ({ actions, element, index }) => {
           content={action.tooltip}
           key={`action_${action.id}`}
           position="top right"
-          trigger={<Button
-            type="button"
-            icon={action.icon}
-            onClick={(event) => handleClick(event, action, index)}
-            color={action.color}
-            className="circular"
-            size="mini"
-          />}
+          trigger={
+            <Button
+              type="button"
+              icon={action.icon}
+              onClick={(event) => handleClick(event, action, index)}
+              color={action.color}
+              className="circular"
+              size="mini"
+            />
+          }
         />
       ))}
     </>

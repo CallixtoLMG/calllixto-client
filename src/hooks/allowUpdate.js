@@ -1,7 +1,8 @@
 import { useUserContext } from "@/User";
-import { Box, Checkbox } from "@/components/common/custom";
+import { Box } from "@/components/common/custom";
 import { RULES } from "@/roles";
 import { useState } from "react";
+import { Button, ButtonGroup, Icon } from "semantic-ui-react";
 
 export const useAllowUpdate = () => {
   const { role } = useUserContext();
@@ -11,10 +12,36 @@ export const useAllowUpdate = () => {
     <>
       {RULES.canUpdate[role] && (
         <Box>
-          <Checkbox
-            toggle checked={allowUpdate}
-            onChange={(e, value) => setAllowUpdate(value.checked)} label="Actualizar"
-          />
+          <ButtonGroup size="small">
+            <Button
+              icon
+              labelPosition="left"
+              type="button"
+              basic={!allowUpdate}
+              color="blue"
+              width="fit-content"
+              onClick={() => {
+                setAllowUpdate(true);
+              }}
+            >
+              <Icon name="edit" />
+              Actualizar
+            </Button>
+            <Button
+              icon
+              labelPosition="right"
+              type="button"
+              basic={allowUpdate}
+              color="blue"
+              width="fit-content"
+              onClick={() => {
+                setAllowUpdate(false);
+              }}
+            >
+              <Icon name="eye" />
+              Ver
+            </Button>
+          </ButtonGroup>
         </Box>
       )}
     </>

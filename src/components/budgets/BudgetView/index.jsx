@@ -100,21 +100,21 @@ const BudgetView = ({ budget }) => {
       <FieldsContainer>
         <FormField width="300px">
           <Label>Vendedor</Label>
-          <Segment>{budget?.seller}</Segment>
+          <Segment placeholder>{budget?.seller}</Segment>
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
         <FormField width="300px">
           <Label>Cliente</Label>
-          <Segment>{budget?.customer?.name}</Segment>
+          <Segment placeholder>{budget?.customer?.name}</Segment>
         </FormField>
         <FormField flex="1">
           <Label>Dirección</Label>
-          <Segment>{budget?.customer?.addresses[0]?.address}</Segment>
+          <Segment placeholder>{budget?.customer?.addresses[0]?.address}</Segment>
         </FormField>
         <FormField width="200px">
           <Label>Teléfono</Label>
-          <Segment>{formatedSimplePhone(budget?.customer?.phoneNumbers[0])}</Segment>
+          <Segment placeholder>{formatedSimplePhone(budget?.customer?.phoneNumbers[0])}</Segment>
         </FormField>
       </FieldsContainer>
       <Table
@@ -125,16 +125,16 @@ const BudgetView = ({ budget }) => {
       <Total readOnly subtotal={subtotal} globalDiscount={budget?.globalDiscount} additionalCharge={budget?.additionalCharge} />
       <FieldsContainer rowGap="5px" >
         <Label>Comentarios</Label>
-        <Segment>{budget?.comments}</Segment>
+        <Segment placeholder>{budget?.comments}</Segment>
       </FieldsContainer>
       <FieldsContainer>
         <FormField flex={3}>
           <Label>Métodos de pago</Label>
-          <Segment>{formattedPaymentMethods}</Segment>
+          <Segment placeholder>{formattedPaymentMethods}</Segment>
         </FormField>
         <FormField flex={1}>
           <Label>Fecha de vencimiento</Label>
-          <Segment>{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
+          <Segment placeholder>{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
         </FormField>
       </FieldsContainer>
     </ViewContainer>

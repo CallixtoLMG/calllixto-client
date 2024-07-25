@@ -65,7 +65,13 @@ const KeyboardShortcuts = () => {
             </List>
           </StyledModalContent>
           <Modal.Actions>
-            <Button color='red' onClick={() => setOpen(false)}>
+            <Button
+              icon
+              labelPosition="left"
+              color="grey"
+              onClick={() => setOpen(false)}
+              basic
+            >
               <Icon name='remove' /> Cerrar
             </Button>
           </Modal.Actions>

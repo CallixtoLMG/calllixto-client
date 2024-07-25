@@ -1,8 +1,8 @@
-import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } from "@/components/common/custom";
 import { formatedSimplePhone } from "@/utils";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { Modal, Transition } from "semantic-ui-react";
+import { Icon, Modal, Transition, Button } from "semantic-ui-react";
 
 const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
   const { handleSubmit } = useForm({ defaultValues: customer });
@@ -41,19 +41,26 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
               </FormField >
               <ButtonsContainer width="100%" marginTop="10px">
                 <Button
+                  icon
+                  labelPosition="left"
+                  disabled={isLoading}
+                  type="button"
+                  color="red"
+                  onClick={() => onClose(false)}
+                >
+                  <Icon name='cancel' />
+                  CANCELAR
+                </Button>
+                <Button
+                  icon
+                  labelPosition="left"
                   disabled={isLoading}
                   loading={isLoading}
                   type="submit"
                   color="green"
                 >
-                  Confirmar
-                </Button>
-                <Button
-                  disabled={isLoading}
-                  type="button"
-                  color="red"
-                  onClick={() => onClose(false)}>
-                  Cancelar
+                  <Icon name='check' />
+                  CONFIRMAR
                 </Button>
               </ButtonsContainer>
             </FieldsContainer>

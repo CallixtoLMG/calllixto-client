@@ -1,7 +1,7 @@
-import { Button, ButtonsContainer, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Modal, Transition } from "semantic-ui-react";
+import { Icon, Modal, Transition, Button } from "semantic-ui-react";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const { control, handleSubmit, formState: { isDirty }, reset } = useForm();
@@ -23,15 +23,15 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
             <FieldsContainer>
               <FormField flex="1">
                 <Label>Código</Label>
-                <Segment>{product?.code}</Segment>
+                <Segment placeholder>{product?.code}</Segment>
               </FormField>
               <FormField flex="1">
                 <Label>Nombre</Label>
-                <Segment>{product?.name}</Segment>
+                <Segment placeholder>{product?.name}</Segment>
               </FormField>
               <FormField width="50px">
                 <Label>Cantidad</Label>
-                <Segment>{product?.quantity}</Segment>
+                <Segment placeholder>{product?.quantity}</Segment>
               </FormField>
             </FieldsContainer>
             <Form onSubmit={handleSubmit(onAddComment)}>
@@ -56,18 +56,24 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         <Modal.Actions>
           <ButtonsContainer>
             <Button
-              disabled={!isDirty}
-              onClick={handleSubmit(onAddComment)}
-              color="green"
-            >
-              Confirmar
-            </Button>
-            <Button
+              icon
+              labelPosition="left"
               type="button"
               color="red"
               onClick={() => onClose(false)}
             >
-              Cancelar
+              <Icon name="cancel" />
+              CANCELAR
+            </Button>
+            <Button
+              icon
+              labelPosition="left"
+              disabled={!isDirty}
+              onClick={handleSubmit(onAddComment)}
+              color="green"
+            >
+              <Icon name="check" />
+              CONFIRMAR
             </Button>
           </ButtonsContainer>
         </Modal.Actions>
