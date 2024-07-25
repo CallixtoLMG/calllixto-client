@@ -429,7 +429,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                 type="button"
                 basic={!isConfirmed}
                 color={isConfirmed ? "green" : "orange"}
-                width="fit-content"
                 onClick={() => {
                   setIsConfirmed(true);
                   setValue('state', BUDGET_STATES.CONFIRMED.id);
@@ -444,7 +443,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                 type="button"
                 basic={isConfirmed}
                 color={isConfirmed ? "green" : "orange"}
-                width="fit-content"
                 onClick={() => {
                   setIsConfirmed(false);
                   setValue('state', BUDGET_STATES.PENDING.id);
