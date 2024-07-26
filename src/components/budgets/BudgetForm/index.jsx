@@ -38,7 +38,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   const [temporaryProducts, setTemporaryProducts] = useState([]);
   const [expiration, setExpiration] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
-  const [retiro, setRetiro] = useState(false);
   const { control, handleSubmit, setValue, getValues, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
       ...budget,
@@ -453,42 +452,32 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             </ButtonGroup>
           </FormField>
           <FormField width="350px">
+            <Controller
+              name="pickUpInStore"
+              control={control}
+              render={({ field: { onChange, value } }) => (
             <ButtonGroup size="small">
               <Button
                 type="button"
-                basic={!retiro}
+                    basic={!value}
                 color="blue"
                 onClick={() => {
-                  setRetiro(true);
+                      onChange(true);
                 }}
               >
-                Retira en Tienda
+                    {PICK_UP_IN_STORE}
               </Button>
               <Button
                 type="button"
-                basic={retiro}
+                    basic={value}
                 color="blue"
                 onClick={() => {
-                  setRetiro(false);
+                      onChange(false);
                 }}
               >
                 Enviar a Dirección
               </Button>
             </ButtonGroup>
-          </FormField>
-          <FormField width="300px">
-            <Controller
-              name="pickUpInStore"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Checkbox
-                  toggle
-                  label={PICK_UP_IN_STORE}
-                  checked={value}
-                  onChange={(e, { checked }) => {
-                    onChange(checked);
-                  }}
-                />
               )}
             />
           </FormField>

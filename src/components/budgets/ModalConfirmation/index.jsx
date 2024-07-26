@@ -1,9 +1,9 @@
-import { ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Label, Segment } from "@/components/common/custom";
 import { PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone } from "@/utils";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button, Icon, Modal, Transition } from "semantic-ui-react";
+import { Button, ButtonGroup, Icon, Modal, Transition } from "semantic-ui-react";
 
 const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
   const { handleSubmit } = useForm({ defaultValues: customer });
@@ -26,14 +26,28 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
         <Modal.Header>
           <Flex justifyContent="space-between">
             Desea confirmar el presupuesto?
-            <Checkbox
-              toggle
-              label={PICK_UP_IN_STORE}
-              checked={pickUpInStore}
-              onChange={() => {
-                setPickUpInStore(!pickUpInStore);
-              }}
-            />
+            <ButtonGroup size="small">
+              <Button
+                type="button"
+                basic={!pickUpInStore}
+                color="blue"
+                onClick={() => {
+                  setPickUpInStore(true);
+                }}
+              >
+                {PICK_UP_IN_STORE}
+              </Button>
+              <Button
+                type="button"
+                basic={pickUpInStore}
+                color="blue"
+                onClick={() => {
+                  setPickUpInStore(false);
+                }}
+              >
+                Enviar a Dirección
+              </Button>
+            </ButtonGroup>
           </Flex>
         </Modal.Header>
         <Modal.Content>
