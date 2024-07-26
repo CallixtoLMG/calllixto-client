@@ -32,7 +32,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
-  const [pickUpInStore, setPickUpInStore] = useState(budget?.pickUpInStore || false);
   const hasShownModal = useRef(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [shouldShowModal, setShouldShowModal] = useState(false);
@@ -47,7 +46,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state']);
+  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore']);
   const [subtotal, setSubtotal] = useState(0);
   const productSearchRef = useRef(null);
   const customerOptions =
@@ -117,12 +116,12 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   const handleCreate = async (data, state) => {
     const isvalid = validateCustomer();
     if (isvalid) {
-      const { seller, products, customer, globalDiscount, expirationOffsetDays, paymentMethods, comments, additionalCharge, pickUpInStore } = data;
-      const formData = {
-        seller, products, customer: { id: customer.id, name: customer.name }, globalDiscount,
-        expirationOffsetDays, paymentMethods, comments, state, additionalCharge, pickUpInStore
-      };
-      await onSubmit(formData);
+      const { customer } = data;
+      await onSubmit({
+        ...data,
+        customer: { id: customer.id, name: customer.name },
+        state
+      });
     };
   };
 
@@ -135,7 +134,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
 
   const validateCustomer = () => {
     const customer = getValues("customer");
-    if (isBudgetConfirmed(watchState) && pickUpInStore && (!customer.addresses.length || !customer.phoneNumbers.length)) {
+    if (isBudgetConfirmed(watchState) && watchPickUp && (!customer.addresses.length || !customer.phoneNumbers.length)) {
       if (!customer.addresses.length) {
         setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
@@ -427,7 +426,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                   checked={value}
                   onChange={(e, { checked }) => {
                     onChange(checked);
-                    setPickUpInStore(!pickUpInStore)
                   }}
                 />
               )}
@@ -473,16 +471,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             />
           </FormField>
           <FormField flex={1}>
-            <RuledLabel title="Dirección" message={isBudgetConfirmed(watchState) && !draft && !pickUpInStore && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !pickUpInStore} />
+            <RuledLabel title="Dirección" message={isBudgetConfirmed(watchState) && !draft && !watchPickUp && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
             <Segment placeholder>
-              {
-                !pickUpInStore && !budget?.pickUpInStore ?
-                  watchCustomer?.addresses[0]?.address
-                  : budget?.pickUpInStore && !pickUpInStore ?
-                    watchCustomer?.addresses[0]?.address
-                    :
-                    PICK_UP_IN_STORE
-              }
+              {!watchPickUp ? watchCustomer?.addresses?.[0]?.address : PICK_UP_IN_STORE}
             </Segment>
           </FormField>
           <FormField width="200px">

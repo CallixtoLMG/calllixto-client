@@ -1,12 +1,13 @@
 import { Button, ButtonsContainer, Checkbox, FieldsContainer, Flex, Form, FormField, Label, Segment } from "@/components/common/custom";
 import { PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone } from "@/utils";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 
-const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading, pickUpInStore, setPickUpInStore }) => {
+const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
   const { handleSubmit } = useForm({ defaultValues: customer });
+  const [pickUpInStore, setPickUpInStore] = useState(false);
 
   const inputRef = useRef(null);
   useEffect(() => {

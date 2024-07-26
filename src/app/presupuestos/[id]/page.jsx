@@ -88,8 +88,6 @@ const Input = styled(SInput)`
 `;
 
 const Budget = ({ params }) => {
-  const [pickUpInStore, setPickUpInStore] = useState(false);
-
   useValidateToken();
   const { push } = useRouter();
   const { userData } = useUserContext();
@@ -400,8 +398,6 @@ const Budget = ({ params }) => {
                 isModalOpen={isModalCustomerOpen}
                 onClose={handleModalCustomerClose}
                 customer={customerData}
-                pickUpInStore={pickUpInStore}
-                setPickUpInStore={setPickUpInStore}
               />
               <ModalConfirmation
                 isModalOpen={isModalConfirmationOpen}
@@ -409,8 +405,6 @@ const Budget = ({ params }) => {
                 customer={customerData}
                 onConfirm={mutate}
                 isLoading={isPending}
-                pickUpInStore={pickUpInStore}
-                setPickUpInStore={setPickUpInStore}
               />
             </>
           ) : <Box />}
