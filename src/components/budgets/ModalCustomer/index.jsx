@@ -1,7 +1,6 @@
 import { edit } from "@/api/customers";
 import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
 import { RULES } from "@/constants";
-import { formatedSimplePhone } from "@/utils";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -28,14 +27,14 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
       const response = await edit(data);
       if (response?.data?.statusOk) {
         toast.success('Cliente actualizado!');
-      }
+      };
       onClose(true, data);
     } catch (error) {
       console.error('Error en la edición del cliente:', error?.message);
       onClose(false);
     } finally {
       setIsLoading(false);
-    }
+    };
   };
 
   return (
@@ -56,98 +55,85 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                 <Segment height="40px" placeholder>{customer?.name}</Segment>
               </FormField>
               <FormField flex="1">
-                {!!customer?.addresses.length ? (
-                  <>
-                    <Label>Dirección</Label>
-                    <Segment placeholder>{customer.addresses[0].address}</Segment>
-                  </>
-                ) : (
-                  <>
-                    <RuledLabel title="Dirección" message={errors?.addresses && errors.addresses[0]?.message} required />
-                    <Controller
-                      name={`addresses[0]`}
-                      control={control}
-                      rules={RULES.REQUIRED}
-                      render={({ field: { value, onChange, ...rest } }) => (
-                        <Input
-                          {...rest}
-                          value={value?.address || ''}
-                          onChange={(e) => {
-                            onChange({ address: e.target.value })
-                          }}
-                          placeholder="Dirección"
-                        />
-                      )}
+                <RuledLabel title="Dirección" message={errors?.addresses?.message} required />
+                <Controller
+                  name="addresses"
+                  control={control}
+                  rules={RULES.REQUIRED}
+                  render={({ field: { value, onChange, ...rest } }) => (
+                    <Input
+                      {...rest}
+                      value={value?.[0]?.address || ''}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (!value) {
+                          onChange(undefined);
+                          return;
+                        }
+                        onChange([{ address: e.target.value }])
+                      }}
+                      placeholder="Dirección"
                     />
-                  </>
-                )}
+                  )}
+                />
               </FormField>
               <FormField width="200px">
-                {!!customer?.phoneNumbers[0] ? (
-                  <>
-                    <Label>Teléfono</Label>
-                    <Segment placeholder>{formatedSimplePhone(customer.phoneNumbers[0])}</Segment>
-                  </>
-                ) : (
-                  <>
-                    <RuledLabel title="Teléfono" message={errors?.phoneNumbers && errors.phoneNumbers[0]?.message} required />
-                    <PhoneContainer>
-                      <Controller
-                        name={`phoneNumbers[0]`}
-                        control={control}
-                        rules={{
-                          validate: {
-                            correctLength: (value) => {
-                              if (!value?.areaCode || !value?.number) return 'Un teléfono es requerido';
-                              if (value?.areaCode || value?.number) {
-                                const areaCode = value.areaCode.replace(/[^0-9]/g, '');
-                                const number = value.number.replace(/[^0-9]/g, '');
-                                return (areaCode.length + number.length === 10) || "El número debe tener 10 caracteres";
-                              }
-                              return true;
-                            }
+                <RuledLabel title="Teléfono" message={errors?.phoneNumbers && errors.phoneNumbers[0]?.message} required />
+                <PhoneContainer>
+                  <Controller
+                    name={`phoneNumbers[0]`}
+                    control={control}
+                    rules={{
+                      validate: {
+                        correctLength: (value) => {
+                          if (!value?.areaCode || !value?.number) return 'Un teléfono es requerido';
+                          if (value?.areaCode || value?.number) {
+                            const areaCode = value.areaCode.replace(/[^0-9]/g, '');
+                            const number = value.number.replace(/[^0-9]/g, '');
+                            return (areaCode.length + number.length === 10) || "El número debe tener 10 caracteres";
                           }
-                        }}
-                        render={({ field: { value, onChange }, fieldState: { error } }) => (
-                          <>
-                            <CurrencyFormatInput
-                              $shadow
-                              $marginY
-                              height="50px"
-                              format="####"
-                              width="35%"
-                              placeholder="Área"
-                              value={value?.areaCode}
-                              onChange={(e) => {
-                                const formattedValue = e.target.value.replace(/[^0-9]/g, '');
-                                onChange({
-                                  ...value,
-                                  areaCode: formattedValue
-                                });
-                              }}
-                            />
-                            <CurrencyFormatInput
-                              $marginY
-                              $shadow
-                              height="50px"
-                              format="#######"
-                              width="60%"
-                              placeholder="Número"
-                              value={value?.number}
-                              onChange={(e) => {
-                                const formattedValue = e.target.value.replace(/[^0-9]/g, '');
-                                onChange({
-                                  ...value,
-                                  number: formattedValue
-                                });
-                              }}
-                            />
-                          </>
-                        )}
-                      />
-                    </PhoneContainer>
-                  </>
-                )}
+                          return true;
+                        }
+                      }
+                    }}
+                    render={({ field: { value, onChange }, fieldState: { error } }) => (
+                      <>
+                        <CurrencyFormatInput
+                          $shadow
+                          $marginY
+                          height="50px"
+                          format="####"
+                          width="35%"
+                          placeholder="Área"
+                          value={value?.areaCode}
+                          onChange={(e) => {
+                            const formattedValue = e.target.value.replace(/[^0-9]/g, '');
+                            onChange({
+                              ...value,
+                              areaCode: formattedValue
+                            });
+                          }}
+                        />
+                        <CurrencyFormatInput
+                          $marginY
+                          $shadow
+                          height="50px"
+                          format="#######"
+                          width="60%"
+                          placeholder="Número"
+                          value={value?.number}
+                          onChange={(e) => {
+                            const formattedValue = e.target.value.replace(/[^0-9]/g, '');
+                            onChange({
+                              ...value,
+                              number: formattedValue
+                            });
+                          }}
+                        />
+                      </>
+                    )}
+                  />
+                </PhoneContainer>
               </FormField>
               <ButtonsContainer width="100%" marginTop="10px">
                 <Button

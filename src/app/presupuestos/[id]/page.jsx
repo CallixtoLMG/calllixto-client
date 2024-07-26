@@ -298,10 +298,11 @@ const Budget = ({ params }) => {
   };
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (pickUpInStore) => {
       const confirmationData = {
         confirmedBy: `${userData.firstName} ${userData.lastName}`,
         confirmedAt: now(),
+        pickUpInStore
       };
       const { data } = await confirmBudget(confirmationData, budget?.id);
       return data;

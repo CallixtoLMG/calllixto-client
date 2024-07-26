@@ -6,7 +6,7 @@ import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
-import { BUDGET_STATES, PAGES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
+import { BUDGET_STATES, PAGES, PICK_UP_IN_STORE, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -47,7 +47,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state']);
+  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore']);
   const [subtotal, setSubtotal] = useState(0);
   const productSearchRef = useRef(null);
   const customerOptions =
@@ -55,7 +55,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       .map(customer => ({
         key: customer.id, value: customer.id, text: customer.name,
       }));
-
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
       setIsTableLoading(true);
@@ -118,12 +117,12 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   const handleCreate = async (data, state) => {
     const isvalid = validateCustomer();
     if (isvalid) {
-      const { seller, products, customer, globalDiscount, expirationOffsetDays, paymentMethods, comments, additionalCharge } = data;
-      const formData = {
-        seller, products, customer: { id: customer.id, name: customer.name }, globalDiscount,
-        expirationOffsetDays, paymentMethods, comments, state, additionalCharge
-      };
-      await onSubmit(formData);
+      const { customer } = data;
+      await onSubmit({
+        ...data,
+        customer: { id: customer.id, name: customer.name },
+        state
+      });
     };
   };
 
@@ -136,7 +135,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
 
   const validateCustomer = () => {
     const customer = getValues("customer");
-    if (isBudgetConfirmed(watchState) && (!customer.addresses.length || !customer.phoneNumbers.length)) {
+    if (isBudgetConfirmed(watchState) && watchPickUp && (!customer.addresses.length || !customer.phoneNumbers.length)) {
       if (!customer.addresses.length) {
         setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
@@ -477,6 +476,22 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               </Button>
             </ButtonGroup>
           </FormField>
+          <FormField width="300px">
+            <Controller
+              name="pickUpInStore"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Checkbox
+                  toggle
+                  label={PICK_UP_IN_STORE}
+                  checked={value}
+                  onChange={(e, { checked }) => {
+                    onChange(checked);
+                  }}
+                />
+              )}
+            />
+          </FormField>
         </FieldsContainer>
         <FieldsContainer>
           <FormField width="300px">
@@ -517,8 +532,10 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             />
           </FormField>
           <FormField flex={1}>
-            <RuledLabel title="Dirección" message={isBudgetConfirmed(watchState) && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState)} />
-            <Segment placeholder>{watchCustomer?.addresses[0]?.address}</Segment>
+            <RuledLabel title="Dirección" message={isBudgetConfirmed(watchState) && !draft && !watchPickUp && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
+            <Segment placeholder>
+              {!watchPickUp ? watchCustomer?.addresses?.[0]?.address : PICK_UP_IN_STORE}
+            </Segment>
           </FormField>
           <FormField width="200px">
             <RuledLabel title="Teléfono" message={isBudgetConfirmed(watchState) && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />

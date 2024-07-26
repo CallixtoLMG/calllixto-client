@@ -102,7 +102,7 @@ export const Modal = styled(SModal)`
 `;
 
 export const Button = styled(SButton)`
-  
+
   &&&&{
     width: ${({ width = '120px' }) => `${width}!important`} ;
     padding-left: 45px!important;

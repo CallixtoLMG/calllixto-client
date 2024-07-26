@@ -1,11 +1,13 @@
 import { ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } from "@/components/common/custom";
+import { PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone } from "@/utils";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Button, Icon, Modal, Transition } from "semantic-ui-react";
 
 const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
   const { handleSubmit } = useForm({ defaultValues: customer });
+  const [pickUpInStore, setPickUpInStore] = useState(false);
 
   const inputRef = useRef(null);
   useEffect(() => {
@@ -22,22 +24,32 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
         onClose={() => onClose(false)}
       >
         <Modal.Header>
-          Desea confirmar el presupuesto?
+          <Flex justifyContent="space-between">
+            Desea confirmar el presupuesto?
+            <Checkbox
+              toggle
+              label={PICK_UP_IN_STORE}
+              checked={pickUpInStore}
+              onChange={() => {
+                setPickUpInStore(!pickUpInStore);
+              }}
+            />
+          </Flex>
         </Modal.Header>
         <Modal.Content>
-          <Form onSubmit={handleSubmit(onConfirm)}>
+          <Form onSubmit={handleSubmit(() => onConfirm(pickUpInStore))}>
             <FieldsContainer>
               <FormField flex="1">
                 <Label>ID</Label>
-                <Segment alignContent="center" height="40px">{customer?.name}</Segment>
+                <Segment placeholder alignContent="center" height="40px">{customer?.name}</Segment>
               </FormField>
               <FormField flex="1">
                 <Label>Dirección</Label>
-                <Segment alignContent="center" height="40px">{customer?.addresses[0]?.address}</Segment>
+                <Segment placeholder alignContent="center" height="40px">{!pickUpInStore ? customer?.addresses[0]?.address : PICK_UP_IN_STORE}</Segment>
               </FormField>
               <FormField width="200px">
                 <Label>Teléfono</Label>
-                <Segment alignContent="center" height="40px">{formatedSimplePhone(customer?.phoneNumbers[0])}</Segment>
+                <Segment placeholder alignContent="center" height="40px">{formatedSimplePhone(customer?.phoneNumbers[0])}</Segment>
               </FormField >
               <ButtonsContainer width="100%" marginTop="10px">
                 <Button
