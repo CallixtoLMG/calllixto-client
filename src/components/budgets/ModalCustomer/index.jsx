@@ -1,13 +1,13 @@
 import { edit } from "@/api/customers";
-import { Button, ButtonsContainer, Checkbox, CurrencyFormatInput, FieldsContainer, Flex, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
-import { PICK_UP_IN_STORE, RULES } from "@/constants";
+import { Button, ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
+import { RULES } from "@/constants";
 import { formatedSimplePhone } from "@/utils";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Modal, Transition } from "semantic-ui-react";
 
-const ModalCustomer = ({ isModalOpen, onClose, customer, pickUpInStore, setPickUpInStore }) => {
+const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { control, handleSubmit, formState: { errors }, reset } = useForm({ defaultValues: customer });
 
@@ -51,17 +51,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, pickUpInStore, setPickU
         onClose={() => onClose(false)}
       >
         <Modal.Header>
-          <Flex justifyContent="space-between">
-            Es necesario completar los siguientes datos del cliente
-            <Checkbox
-              toggle
-              label={PICK_UP_IN_STORE}
-              checked={pickUpInStore}
-              onChange={() => {
-                setPickUpInStore(!pickUpInStore);
-              }}
-            />
-          </Flex>
+          Es necesario completar los siguientes datos del cliente
         </Modal.Header>
         <Modal.Content>
           <Form onSubmit={handleSubmit(handleEdit)}>
@@ -78,28 +68,22 @@ const ModalCustomer = ({ isModalOpen, onClose, customer, pickUpInStore, setPickU
                   </>
                 ) : (
                   <>
-                    <RuledLabel title="Dirección" message={!pickUpInStore && errors?.addresses && errors.addresses[0]?.message} required={!pickUpInStore} />
-                    {!pickUpInStore ? (
-                      <Controller
-                        name={`addresses[0]`}
-                        control={control}
-                        rules={RULES.REQUIRED}
-                        render={({ field: { value, onChange, ...rest } }) => (
-                          <Input
-                            {...rest}
-                            value={value?.address || ''}
-                            onChange={(e) => {
-                              onChange({ address: e.target.value })
-                            }}
-                            placeholder="Dirección"
-                          />
-                        )}
-                      />
-                    ) : (
-                      <Segment>
-                        {PICK_UP_IN_STORE}
-                      </Segment>
-                    )}
+                    <RuledLabel title="Dirección" message={errors?.addresses && errors.addresses[0]?.message} required />
+                    <Controller
+                      name={`addresses[0]`}
+                      control={control}
+                      rules={RULES.REQUIRED}
+                      render={({ field: { value, onChange, ...rest } }) => (
+                        <Input
+                          {...rest}
+                          value={value?.address || ''}
+                          onChange={(e) => {
+                            onChange({ address: e.target.value })
+                          }}
+                          placeholder="Dirección"
+                        />
+                      )}
+                    />
                   </>
                 )}
               </FormField>
