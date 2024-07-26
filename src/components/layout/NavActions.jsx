@@ -1,6 +1,6 @@
-import { Box, Flex } from '@/components/common/custom';
+import { Box, Button, Flex } from '@/components/common/custom';
 import { createContext, useContext, useState } from 'react';
-import { Icon, Button } from 'semantic-ui-react';
+import { Icon } from 'semantic-ui-react';
 import styled from 'styled-components';
 
 const ActionsContainer = styled(Flex)`
