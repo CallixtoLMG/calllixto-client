@@ -1,5 +1,6 @@
 import {
   Form,
+  Button as SButton,
   Dropdown as SDropdown,
   Icon as SIcon,
   Input as SInput,
@@ -98,4 +99,13 @@ export const Modal = styled(SModal)`
   max-width: 90%!important;
   max-height: 90vh!important;
   min-height: ${({ minHeight = '100px' }) => `${minHeight}!important`} ;
+`;
+
+export const Button = styled(SButton)`
+  
+  &&&&{
+    width: ${({ width = '120px' }) => `${width}!important`} ;
+    padding-left: 45px!important;
+    margin-right: 0;
+  }
 `;

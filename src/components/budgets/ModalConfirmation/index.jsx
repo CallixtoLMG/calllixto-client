@@ -2,7 +2,7 @@ import { ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } fr
 import { formatedSimplePhone } from "@/utils";
 import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { Icon, Modal, Transition, Button } from "semantic-ui-react";
+import { Button, Icon, Modal, Transition } from "semantic-ui-react";
 
 const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
   const { handleSubmit } = useForm({ defaultValues: customer });
@@ -49,7 +49,7 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                   onClick={() => onClose(false)}
                 >
                   <Icon name='cancel' />
-                  CANCELAR
+                  Cancelar
                 </Button>
                 <Button
                   icon
@@ -60,7 +60,7 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                   color="green"
                 >
                   <Icon name='check' />
-                  CONFIRMAR
+                  Confirmar
                 </Button>
               </ButtonsContainer>
             </FieldsContainer>

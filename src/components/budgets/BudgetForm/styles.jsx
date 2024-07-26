@@ -1,6 +1,6 @@
+import { Flex } from '@/components/common/custom';
 import { Icon as SIcon, MessageHeader as SMessageHeader, MessageItem as SMessageItem, MessageList as SMessageList } from "semantic-ui-react";
 import styled from 'styled-components';
-import { Flex } from '@/components/common/custom';
 
 const Container = styled(Flex)`
   flex-direction: row;
@@ -16,7 +16,6 @@ const MessageItem = styled(SMessageItem)`
 `;
 
 const Icon = styled(SIcon)`
-  scale: 1.2!important;
   border-radius: 2px!important;
 `;
 

@@ -10,7 +10,7 @@ export const Restore = ({ isUpdating, isLoading, isDirty, onClick, disabled }) =
       color="brown"
       onClick={onClick}
       >
-      <Icon name={isUpdating ? "undo" : "delete"} />{isUpdating ? "RESTAURAR" : "LIMPIAR"}
+      <Icon name={isUpdating ? "undo" : "delete"} />{isUpdating ? "Restaurar" : "Limpiar"}
     </Button>
   )
 }

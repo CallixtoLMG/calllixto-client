@@ -5,7 +5,7 @@ import { formatedSimplePhone } from "@/utils";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Modal, Transition, Button, Icon } from "semantic-ui-react";
+import { Button, Icon, Modal, Transition } from "semantic-ui-react";
 
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -159,7 +159,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   onClick={() => onClose(false)}
                 >
                   <Icon name="cancel" />
-                  CANCELAR
+                  Cancelar
                 </Button>
                 <Button
                   icon
@@ -170,7 +170,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   color="green"
                 >
                   <Icon name="check" />
-                  CONFIRMAR
+                  Confirmar
                 </Button>
               </ButtonsContainer>
             </FieldsContainer>

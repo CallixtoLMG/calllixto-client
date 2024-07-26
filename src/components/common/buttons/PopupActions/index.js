@@ -1,7 +1,7 @@
 import { NoPrint } from '@/components/layout';
 import { cloneElement, useState } from 'react';
-import { Icon, Popup, Button } from 'semantic-ui-react';
-import { Box, ButtonsContainer, Flex } from '../../custom';
+import { Icon, Popup } from 'semantic-ui-react';
+import { Button, ButtonsContainer, Flex } from '../../custom';
 
 const PopupActions = ({ width, title, color, buttons, icon, position = "bottom center", trigger }) => {
   const [open, setOpen] = useState(false);

@@ -1,6 +1,6 @@
 import { ButtonsContainer, FieldsContainer, Label, TextArea } from "@/components/common/custom";
 import { useState } from "react";
-import { Modal, Transition, Button, Icon } from "semantic-ui-react";
+import { Button, Icon, Modal, Transition } from "semantic-ui-react";
 import { ModalContent } from "./styles";
 
 const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
@@ -34,7 +34,7 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
               onClick={() => onClose(false)}
             >
               <Icon name="close" />
-              CANCELAR
+              Cancelar
             </Button>
             <Button
               icon

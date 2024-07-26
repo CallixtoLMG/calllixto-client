@@ -404,7 +404,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                 onClick={handleCancelUpdate}
               >
                 <Icon name="cancel" />
-                CANCELAR
+                Cancelar
               </Button>
               <Button
                 icon
@@ -413,7 +413,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                 onClick={handleConfirmUpdate}
               >
                 <Icon name="check" />
-                CONFIRMAR
+                Confirmar
               </Button>
             </ButtonsContainer>
           </Modal.Actions>
@@ -435,7 +435,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                 }}
               >
                 <Icon name="check" />
-                CONFIRMADO
+                Confirmado
               </Button>
               <Button
                 icon
@@ -449,7 +449,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                 }}
               >
                 <Icon name="hourglass half" />
-                PENDIENTE
+                Pendiente
               </Button>
             </ButtonGroup>
           </FormField>
@@ -574,54 +574,53 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
         <FieldsContainer>
           <FormField flex={3}>
             <Label>Métodos de pago</Label>
-            <Controller
-              name="paymentMethods"
-              control={control}
-              rules={RULES.REQUIRED}
-              render={({ field: { onChange, value } }) => (
-                <Flex flexDirection="column" rowGap="5px">
-                  <Box>
-                    <Button
-                      icon
-                      labelPosition="left"
-                      size="small"
-                      type="button"
-                      basic={value.length !== PAYMENT_METHODS.length}
-                      color="blue"
-                      onClick={() => {
-                        if (value.length === PAYMENT_METHODS.length) {
-                          onChange([]);
-                        } else {
-                          onChange(PAYMENT_METHODS);
-                        }
-                      }}
-                    >
-                      <Icon name="check" />
-                      Todos
-                    </Button>
-                  </Box>
-                  <Flex columnGap="5px" wrap="wrap" rowGap="5px">
-                    {PAYMENT_METHODS.map(text => (
+            <Segment>
+              <Controller
+                name="paymentMethods"
+                control={control}
+                rules={RULES.REQUIRED}
+                render={({ field: { onChange, value } }) => (
+                  <Flex flexDirection="column" rowGap="5px">
+                    <Box>
                       <Button
                         size="small"
-                        width="fit-content"
-                        key={text}
-                        basic={!value.includes(text)}
+                        type="button"
+                        basic={value.length !== PAYMENT_METHODS.length}
                         color="blue"
                         onClick={() => {
-                          if (value.includes(text)) {
-                            onChange(value.filter(payment => payment !== text));
+                          if (value.length === PAYMENT_METHODS.length) {
+                            onChange([]);
                           } else {
-                            onChange([...value, text]);
+                            onChange(PAYMENT_METHODS);
                           }
                         }}
-                      >{text}
+                      >
+                        Todos
                       </Button>
-                    ))}
+                    </Box>
+                    <Flex columnGap="5px" wrap="wrap" rowGap="5px">
+                      {PAYMENT_METHODS.map(text => (
+                        <Button
+                          size="small"
+                          width="fit-content"
+                          key={text}
+                          basic={!value.includes(text)}
+                          color="blue"
+                          onClick={() => {
+                            if (value.includes(text)) {
+                              onChange(value.filter(payment => payment !== text));
+                            } else {
+                              onChange([...value, text]);
+                            }
+                          }}
+                        >{text}
+                        </Button>
+                      ))}
+                    </Flex>
                   </Flex>
-                </Flex>
-              )}
-            />
+                )}
+              />
+            </Segment>
           </FormField>
           <FormField flex={1}>
             <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
@@ -655,7 +654,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           color={currentState.color}
           onSubmit={handleSubmit(handleConfirm)}
           icon={currentState.icon}
-          text={currentState.title.toLocaleUpperCase()}
+          text={currentState.title}
           extraButton={
             <Button
               icon
@@ -667,7 +666,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               color={BUDGET_STATES.DRAFT.color}
               width="fit-content"
             >
-              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title.toLocaleUpperCase()}
+              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
             </Button>
           }
         />

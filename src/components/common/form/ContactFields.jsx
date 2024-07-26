@@ -1,7 +1,7 @@
 import { validateEmail, validatePhone } from "@/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Icon, Popup, Button } from "semantic-ui-react";
+import { Button, Icon, Popup } from "semantic-ui-react";
 import { Box, FieldsContainer, FormField, Input, Label, RuledLabel } from '../custom';
 import { Table } from '../table';
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "./form.common";
@@ -102,6 +102,7 @@ export const ContactFields = () => {
                 icon
                 labelPosition="left"
                 color="green"
+                type="button"
               >
                 <Icon name="add" />Teléfono
               </Button>

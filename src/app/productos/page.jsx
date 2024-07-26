@@ -57,7 +57,6 @@ const Products = () => {
         id: 2,
         button: (
           <PopupActions
-            width="90px"
             title="Excel"
             icon="file excel"
             color="blue"

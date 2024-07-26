@@ -1,7 +1,8 @@
 import { SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from 'next/navigation';
-import { Button, Icon } from 'semantic-ui-react';
+import { Icon } from 'semantic-ui-react';
+import { Button } from "../custom";
 
 const GoBack = () => {
   const { back } = useRouter();
@@ -13,6 +14,7 @@ const GoBack = () => {
 
   return (
     <Button
+      width="fit-content"
       size="small"
       icon
       labelPosition="left"

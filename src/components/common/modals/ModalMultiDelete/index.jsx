@@ -53,7 +53,7 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
                 onClick={onClose}
                 disabled={isLoading}
               >
-                <SIcon name='times' />CANCELAR
+                <SIcon name='times' />Cancelar
               </Button>
               <Button
                 icon
@@ -63,7 +63,7 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
                 color="red"
                 type="submit"
               >
-                <SIcon name='trash' />ELIMINAR
+                <SIcon name='trash' />Eliminar
               </Button>
             </ButtonsContainer>
           </Form>

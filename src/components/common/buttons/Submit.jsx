@@ -11,7 +11,7 @@ export const Submit = ({ isUpdating, isLoading, isDirty, onClick, disabled, colo
       color={color}
       onClick={onClick}
       >
-      <Icon name={icon ? icon : isUpdating ? "edit" : "add"} />{text ? text : isUpdating ? "ACTUALIZAR" : "CREAR"}
+      <Icon name={icon ? icon : isUpdating ? "edit" : "add"} />{text ? text : isUpdating ? "Actualizar" : "Crear"}
     </Button>
   )
 }

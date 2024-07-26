@@ -8,7 +8,7 @@ import { isEqual, sortBy } from 'lodash';
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Transition, Button, Icon } from "semantic-ui-react";
+import { Button, Icon, Transition } from "semantic-ui-react";
 import { BAN_FILTERS, BAN_PRODUCTS_COLUMNS } from "../products.common";
 import { ModalActions } from "./styles";
 
@@ -133,7 +133,7 @@ const BanProduct = ({ open, setOpen }) => {
                   color="red"
                 >
                   <Icon name="cancel" />
-                  CANCELAR
+                  Cancelar
                 </Button>
                 <Button
                   disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))}
@@ -142,7 +142,7 @@ const BanProduct = ({ open, setOpen }) => {
                   color="green"
                 >
                   <Icon name="check" />
-                  ACEPTAR
+                  Aceptar
                 </Button>
               </Flex>
             </ModalActions>
