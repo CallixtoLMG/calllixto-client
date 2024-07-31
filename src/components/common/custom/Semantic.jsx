@@ -5,6 +5,7 @@ import {
   Icon as SIcon,
   Input as SInput,
   Label as SLabel,
+  Menu as SMenu,
   Modal as SModal,
   Segment as SSegment,
   TextArea as STextarea
@@ -20,6 +21,7 @@ export const Segment = styled(SSegment)`
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
   overflow: auto;
   align-content: center;
+  opacity: ${({ show }) => show ? "0" : "1"} !important;
 `;
 
 export const Input = styled(SInput)`
@@ -54,8 +56,9 @@ export const Label = styled(SLabel)`
   width: ${({ width }) => width ? width : '100%'} !important;
   height: ${({ height }) => height ? height : 'fit-content'} !important;
   margin: ${({ margin }) => margin ? margin : '0'} !important;
-  padding: ${({ padding }) => padding && padding} !important;
+  padding: ${({ padding }) => padding} !important;
   align-content: center;
+  opacity: ${({ show }) => show ? "0" : "1"} !important;
 `;
 
 export const TextArea = styled(STextarea)`
@@ -90,8 +93,60 @@ export const Dropdown = styled(SDropdown)`
   };
 `;
 
+export const DropdownOption = styled(SDropdown)`
+  justify-content: space-between!important;
+  margin:0!important;
+  font-size: 12px!important;
+  padding: 12px 10px!important;
+  padding: ${({ menu }) => menu ? "9px 10px" : "12px 10px"} !important ;
+  width: ${({ width = '100%' }) => `${width}!important`} ;
+  justify-content: space-between!important;
+  align-content: center;
+  margin:0!important;
+  &::before {
+    content:none!important;
+  }
+  i.dropdown.icon{
+    margin-left: 5px!important;
+  }
+`;
+
+export const DropdownItem = styled(SDropdown.Item)`
+  font-size: 12px!important;
+  color: rgba(0, 0, 0, 0.87);
+  font-weight: 400;
+  width: 100%;
+  &&&&&&{
+    padding: 12px 10px!important;
+  }
+  &:hover {
+    background-color: #f5f5f5!important;
+    color: rgba(0, 0, 0, 0.87);
+  };
+`;
+
+export const Menu = styled(SMenu)`
+  &&&{
+    width:110px;
+    height: 35px;
+    min-height:35px;
+    font-size: 12px!important;
+    border:none;
+  }
+`;
+
+export const DropdownMenu = styled(SDropdown.Menu)`
+  left: 110%!important;
+  &&&&{
+    top: 2px!important;
+  }
+`;
+
 export const Icon = styled(SIcon)`
   align-self: center!important;
+  margin-right: ${({ marginRight }) => marginRight && `11px!important`} ;
+  top: ${({ dollarIcon }) => dollarIcon && `-3px!important`} ;
+  position: ${({ dollarIcon }) => dollarIcon && `relative!important`} ;
 `;
 
 export const Modal = styled(SModal)`
@@ -101,11 +156,13 @@ export const Modal = styled(SModal)`
   min-height: ${({ minHeight = '100px' }) => `${minHeight}!important`} ;
 `;
 
-export const Button = styled(SButton)`
-
+export const IconedButton = styled(SButton)`
   &&&&{
-    width: ${({ width = '120px' }) => `${width}!important`} ;
-    padding-left: 45px!important;
+    text-align: center;
+    height: ${({ height = '35px' }) => `${height}!important`} ;
+    font-size: 12px;
+    width: ${({ width = '110px' }) => `${width}!important`} ;
+    padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
     margin-right: 0;
   }
 `;

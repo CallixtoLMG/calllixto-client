@@ -1,14 +1,15 @@
 import { edit } from "@/api/customers";
-import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
+import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, IconedButton, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
 import { RULES } from "@/constants";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Button, Icon, Modal, Transition } from "semantic-ui-react";
+import { Icon, Modal, Transition } from "semantic-ui-react";
 
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { control, handleSubmit, formState: { errors }, reset } = useForm({ defaultValues: customer });
+  const formRef = useRef(null);
 
   useEffect(() => {
     reset(customer);
@@ -37,6 +38,12 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
     };
   };
 
+  const handleConfirmClick = () => {
+    if (formRef.current) {
+      formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
+  };
+
   return (
     <Transition visible={isModalOpen} animation='scale' duration={500}>
       <Modal
@@ -48,7 +55,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
           Es necesario completar los siguientes datos del cliente
         </Modal.Header>
         <Modal.Content>
-          <Form onSubmit={handleSubmit(handleEdit)}>
+          <Form ref={formRef} onSubmit={handleSubmit(handleEdit)}>
             <FieldsContainer>
               <FormField flex="1">
                 <Label>Nombre</Label>
@@ -135,35 +142,39 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   />
                 </PhoneContainer>
               </FormField>
-              <ButtonsContainer width="100%" marginTop="10px">
-                <Button
-                  icon
-                  labelPosition="left"
-                  disabled={isLoading}
-                  type="button"
-                  color="red"
-                  onClick={() => onClose(false)}
-                >
-                  <Icon name="cancel" />
-                  Cancelar
-                </Button>
-                <Button
-                  icon
-                  labelPosition="left"
-                  disabled={isLoading}
-                  loading={isLoading}
-                  type="submit"
-                  color="green"
-                >
-                  <Icon name="check" />
-                  Confirmar
-                </Button>
-              </ButtonsContainer>
             </FieldsContainer>
           </Form>
         </Modal.Content>
+        <Modal.Actions>
+          <ButtonsContainer width="100%">
+            <IconedButton
+              icon
+              labelPosition="left"
+              disabled={isLoading}
+              type="button"
+              color="red"
+              onClick={() => onClose(false)}
+            >
+              <Icon name="cancel" />
+              Cancelar
+            </IconedButton>
+            <IconedButton
+              icon
+              labelPosition="left"
+              disabled={isLoading}
+              loading={isLoading}
+              type="button"
+              color="green"
+              onClick={handleConfirmClick}
+            >
+              <Icon name="check" />
+              Confirmar
+            </IconedButton>
+          </ButtonsContainer>
+        </Modal.Actions>
       </Modal>
-    </Transition >)
-}
+    </Transition>
+  );
+};
 
 export default ModalCustomer;

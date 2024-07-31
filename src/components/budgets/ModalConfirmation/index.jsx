@@ -1,13 +1,14 @@
-import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, IconedButton, Label, Segment } from "@/components/common/custom";
 import { PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone } from "@/utils";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button, ButtonGroup, Icon, Modal, Transition } from "semantic-ui-react";
+import { ButtonGroup, Icon, Modal, Transition } from "semantic-ui-react";
 
 const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
   const { handleSubmit } = useForm({ defaultValues: customer });
   const [pickUpInStore, setPickUpInStore] = useState(false);
+  const formRef = useRef(null);
 
   const inputRef = useRef(null);
   useEffect(() => {
@@ -15,6 +16,12 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
       inputRef.current?.focus();
     }
   }, [isModalOpen]);
+
+  const handleConfirmClick = () => {
+    if (formRef.current) {
+      formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
+  };
 
   return (
     <Transition visible={isModalOpen} animation='scale' duration={500}>
@@ -24,10 +31,14 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
         onClose={() => onClose(false)}
       >
         <Modal.Header>
-          <Flex justifyContent="space-between">
+          <Flex alignItems="center" justifyContent="space-between">
             Desea confirmar el presupuesto?
             <ButtonGroup size="small">
-              <Button
+              <IconedButton
+                height="32px"
+                width="fit-content"
+                icon
+                labelPosition="left"
                 type="button"
                 basic={!pickUpInStore}
                 color="blue"
@@ -35,9 +46,14 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                   setPickUpInStore(true);
                 }}
               >
+                <Icon name="warehouse" />
                 {PICK_UP_IN_STORE}
-              </Button>
-              <Button
+              </IconedButton>
+              <IconedButton
+                height="32px"
+                width="fit-content"
+                icon
+                labelPosition="left"
                 type="button"
                 basic={pickUpInStore}
                 color="blue"
@@ -45,13 +61,14 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                   setPickUpInStore(false);
                 }}
               >
+                <Icon name="truck" />
                 Enviar a Dirección
-              </Button>
+              </IconedButton>
             </ButtonGroup>
           </Flex>
         </Modal.Header>
         <Modal.Content>
-          <Form onSubmit={handleSubmit(() => onConfirm(pickUpInStore))}>
+          <Form ref={formRef} onSubmit={handleSubmit(() => onConfirm(pickUpInStore))}>
             <FieldsContainer>
               <FormField flex="1">
                 <Label>ID</Label>
@@ -65,33 +82,36 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                 <Label>Teléfono</Label>
                 <Segment placeholder alignContent="center" height="40px">{formatedSimplePhone(customer?.phoneNumbers[0])}</Segment>
               </FormField >
-              <ButtonsContainer width="100%" marginTop="10px">
-                <Button
-                  icon
-                  labelPosition="left"
-                  disabled={isLoading}
-                  type="button"
-                  color="red"
-                  onClick={() => onClose(false)}
-                >
-                  <Icon name='cancel' />
-                  Cancelar
-                </Button>
-                <Button
-                  icon
-                  labelPosition="left"
-                  disabled={isLoading}
-                  loading={isLoading}
-                  type="submit"
-                  color="green"
-                >
-                  <Icon name='check' />
-                  Confirmar
-                </Button>
-              </ButtonsContainer>
             </FieldsContainer>
           </Form>
         </Modal.Content>
+        <Modal.Actions>
+          <ButtonsContainer width="100%">
+            <IconedButton
+              icon
+              labelPosition="left"
+              disabled={isLoading}
+              type="button"
+              color="red"
+              onClick={() => onClose(false)}
+            >
+              <Icon name='cancel' />
+              Cancelar
+            </IconedButton>
+            <IconedButton
+              icon
+              labelPosition="left"
+              disabled={isLoading}
+              loading={isLoading}
+              type="submit"
+              color="green"
+              onClick={handleConfirmClick}
+            >
+              <Icon name='check' />
+              Confirmar
+            </IconedButton>
+          </ButtonsContainer>
+        </Modal.Actions>
       </Modal>
     </Transition>)
 };

@@ -1,8 +1,8 @@
 import { validateEmail, validatePhone } from "@/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Button, Icon, Popup } from "semantic-ui-react";
-import { Box, FieldsContainer, FormField, Input, Label, RuledLabel } from '../custom';
+import { Icon, Popup } from "semantic-ui-react";
+import { Box, FieldsContainer, FormField, IconedButton, Input, Label, RuledLabel } from '../custom';
 import { Table } from '../table';
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "./form.common";
 
@@ -97,7 +97,7 @@ export const ContactFields = () => {
         <Popup
           trigger={
             <Box width="fit-content">
-              <Button
+              <IconedButton
                 size="small"
                 icon
                 labelPosition="left"
@@ -105,7 +105,7 @@ export const ContactFields = () => {
                 type="button"
               >
                 <Icon name="add" />Teléfono
-              </Button>
+              </IconedButton>
             </Box>
           }
           on='click'
@@ -144,7 +144,7 @@ export const ContactFields = () => {
                 onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'number', e.target.value)}
               />
             </FormField>
-            <Button
+            <IconedButton
               size="small"
               icon
               labelPosition="left"
@@ -152,7 +152,7 @@ export const ContactFields = () => {
               onClick={handleAddPhone}
             >
               <Icon name="add" />Agregar
-            </Button>
+            </IconedButton>
           </FieldsContainer>
         </Popup>
         <Table
@@ -167,7 +167,7 @@ export const ContactFields = () => {
         <Popup
           trigger={
             <Box width="fit-content">
-              <Button
+              <IconedButton
                 size="small"
                 icon
                 labelPosition="left"
@@ -175,7 +175,7 @@ export const ContactFields = () => {
                 color="green"
               >
                 <Icon name="add" />Dirección
-              </Button>
+              </IconedButton>
             </Box>
           }
           on='click'
@@ -202,7 +202,7 @@ export const ContactFields = () => {
                 onChange={(e) => updateFieldToAdd(setAddressToAdd, 'address', e.target.value)}
               />
             </FormField>
-            <Button
+            <IconedButton
               size="small"
               icon
               labelPosition="left"
@@ -210,7 +210,7 @@ export const ContactFields = () => {
               onClick={handleAddAddress}
             >
               <Icon name="add" />Agregar
-            </Button>
+            </IconedButton>
           </FieldsContainer>
         </Popup>
         <Table
@@ -226,7 +226,7 @@ export const ContactFields = () => {
         <Popup
           trigger={
             <Box width="fit-content">
-              <Button
+              <IconedButton
                 size="small"
                 icon
                 labelPosition="left"
@@ -234,7 +234,7 @@ export const ContactFields = () => {
                 color="green"
               >
                 <Icon name="add" />Email
-              </Button>
+              </IconedButton>
             </Box>
           }
           on='click'
@@ -261,15 +261,14 @@ export const ContactFields = () => {
                 onChange={(e) => updateFieldToAdd(setEmailToAdd, 'email', e.target.value)}
               />
             </FormField>
-            <Button
-              size="small"
+            <IconedButton
               icon
               labelPosition="left"
               color="green"
               onClick={handleAddEmail}
             >
               <Icon name="add" />Agregar
-            </Button>
+            </IconedButton>
           </FieldsContainer>
         </Popup>
         <Table

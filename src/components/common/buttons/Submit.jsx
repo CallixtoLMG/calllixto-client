@@ -1,8 +1,9 @@
-import { Button, Icon } from "semantic-ui-react";
+import { Icon } from "semantic-ui-react";
+import { IconedButton } from "../custom";
 
 export const Submit = ({ isUpdating, isLoading, isDirty, onClick, disabled, color = 'green', icon, text }) => {
   return (
-    <Button
+    <IconedButton
       icon
       labelPosition="left"
       disabled={isLoading || !isDirty || disabled}
@@ -12,7 +13,7 @@ export const Submit = ({ isUpdating, isLoading, isDirty, onClick, disabled, colo
       onClick={onClick}
       >
       <Icon name={icon ? icon : isUpdating ? "edit" : "add"} />{text ? text : isUpdating ? "Actualizar" : "Crear"}
-    </Button>
+    </IconedButton>
   )
 }
 

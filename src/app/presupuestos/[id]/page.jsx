@@ -10,8 +10,7 @@ import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
-import { PopupActions } from "@/components/common/buttons";
-import { Box, Flex, Icon } from "@/components/common/custom";
+import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Menu } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
@@ -23,11 +22,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Button, Input as SInput } from "semantic-ui-react";
+import { Dropdown, Input as SInput } from "semantic-ui-react";
 import styled from "styled-components";
 
 const PrintButton = ({ onClick, color, iconName, text }) => (
-  <Button
+  <IconedButton
     icon
     labelPosition="left"
     onClick={onClick}
@@ -35,12 +34,12 @@ const PrintButton = ({ onClick, color, iconName, text }) => (
     size="small"
   >
     <Icon name={iconName} />{text}
-  </Button>
+  </IconedButton>
 );
 
 const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) => (
   <a href={href} target={target}>
-    <Button
+    <IconedButton
       icon
       labelPosition="left"
       width={width}
@@ -48,7 +47,7 @@ const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) =
       size="small"
     >
       <Icon name={iconName} />{text}
-    </Button>
+    </IconedButton>
   </a>
 );
 
@@ -165,13 +164,13 @@ const Budget = ({ params }) => {
           mode: BUDGET_PDF_FORMAT.DISPATCH,
           color: 'blue',
           iconName: 'truck',
-          text: 'Remito'
+          text: 'Remito',
         },
         {
           mode: BUDGET_PDF_FORMAT.CLIENT,
           color: 'blue',
           iconName: 'address card',
-          text: 'Cliente'
+          text: 'Cliente',
         },
         {
           mode: BUDGET_PDF_FORMAT.INTERNAL,
@@ -210,49 +209,90 @@ const Budget = ({ params }) => {
         }] : [])
       ];
 
+      const sendButtons1 = [
+        {
+          text: 'WhatsApp',
+          iconName: 'whatsapp',
+          color: 'green',
+          subOptions: budget?.customer?.phoneNumbers?.map(({ ref, areaCode, number }) => ({
+            key: `${APIS.WSP(`${areaCode}${number}`)}`,
+            href: `${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`,
+            text: `${ref ? `${ref} - ` : ''}${areaCode} ${number}`,
+            iconName: 'whatsapp',
+            color: 'green',
+          })) || []
+        },
+        {
+          text: 'Mail',
+          iconName: 'mail',
+          color: 'red',
+          subOptions: budget?.customer?.emails?.map(({ ref, email }) => ({
+            key: `${APIS.MAIL(email, budget?.customer?.name)}`,
+            href: `${APIS.MAIL(email, budget?.customer?.name)}`,
+            text: `${ref ? `${ref} - ` : ''}${email}`,
+            iconName: 'mail',
+            color: 'red',
+          })) || []
+        }
+      ];
+
       const actions = [
         {
           id: 1,
           button: (
-            <PopupActions
-              width="90px"
-              title="PDFs"
-              icon="download"
-              color="blue"
-              buttons={
-                printButtons.map(({ mode, color, iconName, text }) => (
-                  <PrintButton
+            <Dropdown
+              pointing
+              as={IconedButton}
+              text='PDFs'
+              icon='download'
+              floating
+              labeled
+              button
+              className='icon blue'
+            >
+              <Dropdown.Menu>
+                {printButtons.map(({ mode, iconName, text, color }) => (
+                  <DropdownItem
                     key={mode}
                     onClick={() => {
                       setPrintPdfMode(mode);
                       setTimeout(handlePrint);
                     }}
-                    color={color}
-                    iconName={iconName}
-                    text={text}
-                  />
-                ))
-              }
-            />
+                  >
+                    <Icon color={color} name={iconName} /> {text}
+                  </DropdownItem>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
           )
         },
         {
           id: 2,
-          button: <PopupActions width="90px" title="Enviar" icon="send" color="blue"
-            buttons={
-              [...sendButtons.map(({ href, color, iconName, text, buttons }) => (
-                <PopupActions
-                  key={iconName}
-                  href={href}
-                  color={color}
-                  icon={iconName}
-                  title={text}
-                  buttons={buttons}
-                  position="right center"
-                />
-              ))]
-            }
-          />
+          button: (
+            <Menu>
+              <DropdownOption menu pointing text='Enviar' icon='send' floating labeled button className='icon blue'>
+                <Dropdown.Menu>
+                  {sendButtons1.map(({ text, iconName, color, subOptions }) => (
+                    <Flex key={iconName}>
+                      {subOptions.length > 0 && (
+                        <DropdownOption text={text} pointing="left" className="link item">
+                          <DropdownMenu icon={iconName}>
+                            {subOptions.map(({ key, href, text, iconName, color }) => (
+                              <Flex >
+                                <DropdownItem key={key} as='a' href={href} target="_blank">
+                                  <Icon name={iconName} color={color} /> {text}
+                                </DropdownItem>
+                              </Flex>
+                            ))}
+                          </DropdownMenu>
+                        </DropdownOption>
+                      )}
+                    </Flex>
+                  ))}
+                </Dropdown.Menu>
+              </DropdownOption>
+            </Menu>
+          )
         },
         {
           id: 3,
@@ -366,9 +406,9 @@ const Budget = ({ params }) => {
         <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) ? "0" : "0 0 15px 0!important"} justifyContent="space-between">
           {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
             <>
-              <Button
+              <IconedButton
                 icon
-                labelPosition="right"
+                labelPosition="left"
                 type="button"
                 width="fit-content"
                 color="green"
@@ -376,7 +416,7 @@ const Budget = ({ params }) => {
               >
                 <Icon name='check' />
                 Confirmar
-              </Button>
+              </IconedButton>
               <ModalCustomer
                 isModalOpen={isModalCustomerOpen}
                 onClose={handleModalCustomerClose}
@@ -396,7 +436,7 @@ const Budget = ({ params }) => {
               height="35px"
               width="fit-content"
               action={
-                <Button
+                <IconedButton
                   icon
                   labelPosition='left'
                   type="button"
@@ -412,13 +452,38 @@ const Budget = ({ params }) => {
                 >
                   <Icon name='dollar' />
                   Cotizar en USD
-                </Button>
+                </IconedButton>
               }
               actionPosition='left'
               placeholder="$0"
               value={dolarRate}
               disabled={!showDolarExangeRate}
-            />
+            >
+              {/* <CurrencyFormatInput/> */}
+
+            </Input>
+            // <Flex width="fit-content">
+            //   <IconedButton
+            //     icon
+            //     labelPosition='left'
+            //     type="button"
+            //     basic={!showDolarExangeRate}
+            //     onClick={() => {
+            //       setShowDolarExangeRate(prev => !prev);
+            //       if (!showDolarExangeRate) {
+            //         setDolarRate(0);
+            //       }
+            //     }}
+            //     color="green"
+            //     width="fit-content"
+            //   >
+            //     <Icon name='dollar' />
+            //     Cotizar en USD
+            //   </IconedButton>
+            //   <Label padding="0 7px" width="110px" show={!showDolarExangeRate}>
+            //     <Price value={dolarRate} />
+            //   </Label>
+            // </Flex>
           )}
         </Flex>
         {isBudgetDraft(budget?.state) ? (

@@ -1,7 +1,7 @@
-"use client";
+"use client"
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
-import { PopupActions } from "@/components/common/buttons";
+import { DropdownItem, Icon, IconedButton } from "@/components/common/custom";
 import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
@@ -15,7 +15,7 @@ import { RULES } from "@/roles";
 import { downloadExcel } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Button, Icon } from "semantic-ui-react";
+import { Dropdown } from "semantic-ui-react";
 
 const mockData = [
   ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
@@ -56,27 +56,28 @@ const Products = () => {
       {
         id: 2,
         button: (
-          <PopupActions
-            title="Excel"
-            icon="file excel"
-            color="blue"
-            buttons={
-              [
-                <BatchImport key="batch-create" isCreating />,
-                <BatchImport key="batch-update" />,
-                <Button
-                  size="small"
-                  icon
-                  labelPosition="left"
-                  key="batch-template"
-                  color="blue"
-                  onClick={() => downloadExcel(mockData, "Ejemplo de tabla")}
-                >
-                  <Icon name="download" />Plantilla
-                </Button>
-              ]
-            }
-          />
+          <Dropdown
+            pointing
+            as={IconedButton}
+            text='Excel'
+            icon='file excel'
+            floating
+            labeled
+            button
+            className='icon'
+          >
+            <Dropdown.Menu>
+              <DropdownItem>
+                <BatchImport key="batch-create" isCreating />
+              </DropdownItem>
+              <DropdownItem>
+                <BatchImport key="batch-update" />
+              </DropdownItem>
+              <DropdownItem onClick={() => downloadExcel(mockData, "Ejemplo de tabla")}>
+                <Icon name="download" />Plantilla
+              </DropdownItem>
+            </Dropdown.Menu>
+          </Dropdown>
         )
       },
       {

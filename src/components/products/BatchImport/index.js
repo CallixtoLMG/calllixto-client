@@ -1,5 +1,5 @@
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListAllProducts, useListBanProducts } from "@/api/products";
-import { CurrencyFormatInput, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, Icon, IconedButton, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { downloadExcel, now } from "@/utils";
@@ -7,9 +7,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Icon, Transition, Button } from "semantic-ui-react";
+import { Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
-import { ContainerModal, Modal, ModalActions, ModalHeader, WaitMsg } from "./styles";
+import { Modal, ModalHeader, WaitMsg } from "./styles";
 
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts, refetch } = useListAllProducts({});
@@ -28,8 +28,15 @@ const BatchImport = ({ isCreating }) => {
   const watchProducts = watch("importProducts", []);
   const queryClient = useQueryClient();
   const inputRef = useRef();
+  const formRef = useRef(null);
   const [existingCodes, setExistingCodes] = useState({});
   const totalProducts = importedProductsCount + downloadProducts.length;
+
+  const handleConfirmClick = () => {
+    if (formRef.current) {
+      formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
+  };
 
   useEffect(() => {
     const codes = products?.reduce((acc, product) => {
@@ -42,6 +49,7 @@ const BatchImport = ({ isCreating }) => {
 
   const importSettings = useMemo(() => {
     return {
+      icon: isCreating ? "add" : "pencil",
       button: isCreating ? "Crear" : "Actualizar",
       fileName: isCreating ? "Productos ya existentes" : "Productos no existentes",
       label: isCreating ? "Nuevos productos" : "Productos para actualizar",
@@ -349,16 +357,16 @@ const BatchImport = ({ isCreating }) => {
         style={{ display: 'none' }}
         onChange={handleFileUpload}
       />
-      <Button
-        size="small"
-        icon
-        labelPosition="left"
-        color="blue"
+      <IconedButton
+        height="fit-content"
+        width="fit-content"
+        paddingLeft="0"
+        as="Icon"
         onClick={handleClick}
         type="button"
       >
-        <Icon name="upload" />{importSettings.button}
-      </Button>
+        <Icon marginRight name={importSettings.icon} />{importSettings.button}
+      </IconedButton>
       <Transition animation="fade" duration={500} visible={open}>
         <Modal
           closeIcon
@@ -376,48 +384,63 @@ const BatchImport = ({ isCreating }) => {
                     ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
                   </p>
                 </Modal.Content>
-                <ModalActions>
-                  <Flex columnGap="5px" >
-                    <Button
+                <Modal.Actions>
+                  <ButtonsContainer>
+                    <IconedButton
+                      icon
+                      labelPosition="left"
                       positive
                       onClick={handleDownloadConfirmation}
-                      content="Confirmar"
-                    />
-                    <Button
+                    >
+                      <Icon name='check' />
+                      Confirmar
+                    </IconedButton>
+                    <IconedButton
+                      icon
+                      labelPosition="left"
                       negative
                       onClick={() => setShowConfirmationModal(false)}
-                      content="Cancelar"
-                    />
-                  </Flex>
-                </ModalActions>
+                    >
+                      <Icon name='x' />
+                      Cancelar
+                    </IconedButton>
+                  </ButtonsContainer>
+                </Modal.Actions>
               </Loader>
             </>
           ) : (
             <Loader active={loadingProducts || isLoading}>
-              <ContainerModal>
-                <Form onSubmit={handleSubmit(mutate)}>
-                  {watchProducts.length <= 50 ? (
-                    <>
-                      <FieldsContainer>
-                        <FormField width={6}>
-                          <Label >Archivo seleccionado:</Label>
-                          <Segment>{selectedFile}</Segment>
-                        </FormField>
-                      </FieldsContainer>
-                      <FieldsContainer rowGap="5px">
-                        <Label>{`${importSettings.label}: ${importedProductsCount}`}</Label>
-                        <Table
-                          deleteButtonInside
-                          tableHeight="50vh"
-                          mainKey="code"
-                          headers={PRODUCTS_COLUMNS}
-                          elements={watchProducts}
-                          actions={actions}
-                        />
-                      </FieldsContainer>
-                    </>
-                  ) : (
-                    <>
+
+              {watchProducts.length <= 50 ? (
+                <>
+                  <Modal.Content>
+                    <Form ref={formRef} onSubmit={handleSubmit(mutate)}>
+                      <FlexColumn rowGap="5px">
+                        <FieldsContainer  >
+                          <FormField width={6}>
+                            <Label >Archivo seleccionado:</Label>
+                            <Segment>{selectedFile}</Segment>
+                          </FormField>
+                        </FieldsContainer>
+                        <FieldsContainer rowGap="5px">
+                          <Label>{`${importSettings.label}: ${importedProductsCount}`}</Label>
+                          <Table
+                            deleteButtonInside
+                            tableHeight="50vh"
+                            mainKey="code"
+                            headers={PRODUCTS_COLUMNS}
+                            elements={watchProducts}
+                            actions={actions}
+                          />
+                        </FieldsContainer>
+                      </FlexColumn>
+                    </Form>
+                  </Modal.Content>
+                </>
+              ) : (
+                <>
+                  <Modal.Content>
+                    <Form ref={formRef} onSubmit={handleSubmit(mutate)}>
                       <FieldsContainer>
                         <FormField width={8}>
                           <Label >Archivo seleccionado:</Label>
@@ -425,34 +448,43 @@ const BatchImport = ({ isCreating }) => {
                         </FormField>
                         <FormField width={7}>
                           <Label >Cantidad a importar:</Label>
-                          <Segment>{`${importSettings.label} hola: ${importedProductsCount}`}</Segment>
+                          <Segment>{`${importSettings.label} ${importedProductsCount}`}</Segment>
                         </FormField>
                       </FieldsContainer>
-                    </>
-                  )}
-                  <ModalActions>
-                    {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
-                    <Flex columnGap="5px">
-                      <Button
-                        disabled={importSettings.isButtonDisabled(isPending)}
-                        loading={isLoading || isPending}
-                        type="submit"
-                        color="green"
-                        content="Aceptar"
-                      />
-                      <Button
-                        disabled={isLoading || isPending}
-                        onClick={() => setOpen(false)}
-                        color="red"
-                        content="Cancelar"
-                      />
-                    </Flex>
-                  </ModalActions>
-                </Form>
-              </ContainerModal>
+                    </Form>
+                  </Modal.Content>
+                </>
+              )}
+              <Modal.Actions>
+                <ButtonsContainer>
+                  {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
+                  <IconedButton
+                    icon
+                    labelPosition="left"
+                    disabled={importSettings.isButtonDisabled(isPending)}
+                    loading={isLoading || isPending}
+                    type="submit"
+                    color="green"
+                    onClick={handleConfirmClick}
+                  >
+                    <Icon name='check' />
+                    Aceptar
+                  </IconedButton>
+                  <IconedButton
+                    icon
+                    labelPosition="left"
+                    disabled={isLoading || isPending}
+                    onClick={() => setOpen(false)}
+                    color="red"
+                  >
+                    <Icon name='x' />
+                    Cancelar
+                  </IconedButton>
+                </ButtonsContainer>
+              </Modal.Actions>
             </Loader>
           )}
-        </Modal>
+        </Modal >
       </Transition >
       <Transition animation="fade" duration={500} visible={showUnprocessedModal}>
         <Modal open={showUnprocessedModal} onClose={() => setShowUnprocessedModal(false)}>
@@ -461,18 +493,28 @@ const BatchImport = ({ isCreating }) => {
             <p> {`Se han encontrado ${unprocessedProductsCount} productos con errores que no pueden ser importados`}.</p>
             <p>¿Deseas descargar un archivo de Excel con estos productos?</p>
           </Modal.Content>
-          <ModalActions>
-            <Button color="green" onClick={() => {
-              handleUnprocessedDownload();
-            }}>
+          <Modal.Actions>
+            <IconedButton
+              icon
+              labelPosition="left"
+              color="green"
+              onClick={() => {
+                handleUnprocessedDownload();
+              }}>
+              <Icon name='check' />
               Confirmar
-            </Button>
-            <Button color="red" onClick={() => {
-              setShowUnprocessedModal(false);
-            }}>
+            </IconedButton>
+            <IconedButton
+              icon
+              labelPosition="left"
+              color="red"
+              onClick={() => {
+                setShowUnprocessedModal(false);
+              }}>
+              <Icon name='x' />
               Cancelar
-            </Button>
-          </ModalActions>
+            </IconedButton>
+          </Modal.Actions>
         </Modal>
       </Transition>
     </>

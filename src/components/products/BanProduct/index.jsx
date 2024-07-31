@@ -1,14 +1,14 @@
 import { LIST_BANNED_PRODUCTS_QUERY_KEY, editBanProducts, useListBanProducts } from "@/api/products";
-import { FieldsContainer, Flex, Form, FormField, Input, Label, Modal } from "@/components/common/custom";
+import { FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { handleEnterKeyPress } from '@/utils';
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { isEqual, sortBy } from 'lodash';
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Button, Icon, Transition } from "semantic-ui-react";
+import { Icon, Transition } from "semantic-ui-react";
 import { BAN_FILTERS, BAN_PRODUCTS_COLUMNS } from "../products.common";
 import { ModalActions } from "./styles";
 
@@ -18,6 +18,7 @@ const BanProduct = ({ open, setOpen }) => {
   const watchProducts = watch('products');
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState('');
+  const formRef = useRef(null);
 
   const deleteProduct = useCallback((element) => {
     const newProducts = watchProducts.filter(product => product !== element.code);
@@ -85,6 +86,12 @@ const BanProduct = ({ open, setOpen }) => {
     }
   }, [blacklist, isLoading, setValue]);
 
+  const handleConfirmClick = () => {
+    if (formRef.current) {
+      formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+    }
+  };
+
   return (
     <Transition animation="fade" duration={500} visible={open}>
       <Modal width="500px"
@@ -93,7 +100,7 @@ const BanProduct = ({ open, setOpen }) => {
         onClose={() => setOpen()}
       >
         <Modal.Content>
-          <Form onSubmit={handleSubmit(mutate)}>
+          <Form ref={formRef} onSubmit={handleSubmit(mutate)}>
             <FieldsContainer>
               <FormField width="100%">
                 <Label>Agregar código</Label>
@@ -123,31 +130,34 @@ const BanProduct = ({ open, setOpen }) => {
                 ></Table>
               </Loader >
             </FieldsContainer>
-            <ModalActions>
-              <Flex columnGap="5px">
-                <Button
-                  icon
-                  labelPosition="left"
-                  disabled={isPending}
-                  onClick={() => setOpen(false)}
-                  color="red"
-                >
-                  <Icon name="cancel" />
-                  Cancelar
-                </Button>
-                <Button
-                  disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))}
-                  loading={isPending}
-                  type="submit"
-                  color="green"
-                >
-                  <Icon name="check" />
-                  Aceptar
-                </Button>
-              </Flex>
-            </ModalActions>
           </Form>
         </Modal.Content>
+        <ModalActions>
+          <Flex columnGap="5px">
+            <IconedButton
+              icon
+              labelPosition="left"
+              disabled={isPending}
+              onClick={() => setOpen(false)}
+              color="red"
+            >
+              <Icon name="cancel" />
+              Cancelar
+            </IconedButton>
+            <IconedButton
+              icon
+              labelPosition="left"
+              disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))}
+              loading={isPending}
+              type="submit"
+              color="green"
+              onClick={handleConfirmClick}
+            >
+              <Icon name="check" />
+              Aceptar
+            </IconedButton>
+          </Flex>
+        </ModalActions>
       </Modal>
     </Transition>
   );

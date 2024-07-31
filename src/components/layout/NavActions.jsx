@@ -1,4 +1,4 @@
-import { Box, Button, Flex } from '@/components/common/custom';
+import { Box, Flex, IconedButton } from '@/components/common/custom';
 import { createContext, useContext, useState } from 'react';
 import { Icon } from 'semantic-ui-react';
 import styled from 'styled-components';
@@ -37,17 +37,16 @@ const NavActions = () => {
         return (
           <Box key={`action_${id}`} >
             {button ? button : (
-              <Button
+              <IconedButton
                 size="small"
                 icon
                 labelPosition="left"
-                width="fit-content"
                 color={color}
                 onClick={onClick}
                 type="button"
               >
                 <Icon name={icon} />{text}
-              </Button>
+              </IconedButton>
             )}
           </Box>
         );

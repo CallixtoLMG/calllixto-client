@@ -1,7 +1,7 @@
-import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Icon, Modal, Transition } from "semantic-ui-react";
+import { Icon, Modal, Transition } from "semantic-ui-react";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const { control, handleSubmit, formState: { isDirty }, reset } = useForm();
@@ -55,7 +55,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer>
-            <Button
+            <IconedButton
               icon
               labelPosition="left"
               type="button"
@@ -64,8 +64,8 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
             >
               <Icon name="cancel" />
               Cancelar
-            </Button>
-            <Button
+            </IconedButton>
+            <IconedButton
               icon
               labelPosition="left"
               disabled={!isDirty}
@@ -74,7 +74,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
             >
               <Icon name="check" />
               Confirmar
-            </Button>
+            </IconedButton>
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>

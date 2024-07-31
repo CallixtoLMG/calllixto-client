@@ -1,12 +1,11 @@
-import { FieldsContainer, Flex, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, Flex, FormField, Icon, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { PICK_UP_IN_STORE } from "@/constants";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetCancelled } from "@/utils";
 import { useMemo } from "react";
 import { Popup } from "semantic-ui-react";
-import { Container, Icon, Message, MessageHeader } from "./styles";
-
+import { Container, Message, MessageHeader } from "./styles";
 const BudgetView = ({ budget }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const subtotal = useMemo(() => getTotalSum(budget?.products), [budget]);

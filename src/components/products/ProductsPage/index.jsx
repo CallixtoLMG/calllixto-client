@@ -1,6 +1,6 @@
 import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
 import { BarCodeContainer, BarCodeSubContainer, Barcode, ProductCode, ProductName } from "@/commonStyles";
-import { Flex, Input } from "@/components/common/custom";
+import { Flex, IconedButton, Input } from "@/components/common/custom";
 import { ModalDelete, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { usePaginationContext } from "@/components/common/table/Pagination";
@@ -12,7 +12,7 @@ import JsBarcode from 'jsbarcode';
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Button, Form, Icon } from "semantic-ui-react";
+import { Form, Icon } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
 
 const EMPTY_FILTERS = { code: '', name: '' };
@@ -140,7 +140,8 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
 
   const selectionActions = useMemo(() => {
     const actions = [
-      <Button
+      <IconedButton
+        width="fit-content"
         icon
         labelPosition="left"
         key={2}
@@ -148,12 +149,14 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
         color="blue"
         size="small"
       >
-        <Icon name="barcode" /> Descargar Códigos
-      </Button>
+        <Icon name="barcode" />
+        Descargar Códigos
+      </IconedButton>
     ];
     if (RULES.canRemove[role]) {
       actions.unshift(
-        <Button
+        <IconedButton
+          width="fit-content"
           icon
           labelPosition="left"
           key={1}
@@ -161,10 +164,11 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           color="red"
           size="small"
         >
-          <Icon name="trash" /> Eliminar Productos
-        </Button>
-      )
-    }
+          <Icon name="trash" />
+          Eliminar Productos
+        </IconedButton>
+      );
+    };
     return actions;
   }, [role]);
 

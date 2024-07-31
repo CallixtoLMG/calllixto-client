@@ -1,12 +1,12 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
+import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, IconedButton, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import { MEASSURE_UNITS, PAGES, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Button, Icon } from "semantic-ui-react";
+import { Icon } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
@@ -52,8 +52,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   return (
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
-      <FieldsContainer alignItems="flex-end">
-        <FormField width="20%">
+      <FieldsContainer rowGap="5px" alignItems="flex-end">
+        <FormField flex="1">
           <RuledLabel title="Proveedor" message={!isUpdating && isDirty && isSubmitted && !supplier && 'Campo requerido.'} required />
           {!isUpdating ? (
             <Dropdown
@@ -99,15 +99,15 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           ) : (
             <Segment placeholder>{product?.brandName}</Segment>
           )}
-        </FormField>
-        <FormField />
+        </FormField >
         <FormField width="20%">
           <Controller
             name="editablePrice"
             control={control}
             render={({ field: { value, onChange, ...rest } }) => (
-              <Button
+              <IconedButton
                 {...rest}
+                width="fit-content"
                 icon
                 labelPosition="left"
                 color="blue"
@@ -117,7 +117,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               >
                 <Icon name="pencil" />
                 Precio Editable
-              </Button>
+              </IconedButton>
             )}
           />
         </FormField>
@@ -126,8 +126,9 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             name="fractionConfig.active"
             control={control}
             render={({ field: { value, onChange, ...rest } }) => (
-              <Button
+              <IconedButton
                 {...rest}
+                width="fit-content"
                 icon
                 labelPosition="left"
                 color="blue"
@@ -137,13 +138,13 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               >
                 <Icon name="cut" />
                 Producto Fraccionable
-              </Button>
+              </IconedButton>
             )}
           />
         </FormField>
 
       </FieldsContainer>
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px">
         <FormField width="20%">
           <RuledLabel title="Código" message={errors?.code?.message} required={!isUpdating} />
           {isUpdating ? (

@@ -1,14 +1,14 @@
 "use client";
-import { FieldsContainer, FormField, Label, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, FormField, IconedButton, Label, Segment, ViewContainer } from "@/components/common/custom";
 import { MEASSURE_UNITS } from "@/constants";
 import { formatedPrice } from "@/utils";
-import { Button, Icon } from "semantic-ui-react";
+import { Icon } from "semantic-ui-react";
 
 const ProductView = ({ product }) => {
   return (
     <ViewContainer>
       <FieldsContainer alignItems="flex-end">
-        <FormField width="20%">
+        <FormField flex="1">
           <Label>Proveedor</Label>
           <Segment placeholder>{product?.supplierName}</Segment>
         </FormField>
@@ -16,9 +16,9 @@ const ProductView = ({ product }) => {
           <Label>Marca</Label>
           <Segment placeholder>{product?.brandName}</Segment>
         </FormField>
-        <FormField />
         <FormField width="20%">
-          <Button
+          <IconedButton
+            width="fit-content"
             icon
             labelPosition="left"
             color="blue"
@@ -27,10 +27,11 @@ const ProductView = ({ product }) => {
           >
             <Icon name="pencil" />
             Precio Editable
-          </Button>
+          </IconedButton>
         </FormField>
         <FormField width="20%">
-          <Button
+          <IconedButton
+            width="fit-content"
             icon
             labelPosition="left"
             color="blue"
@@ -39,7 +40,7 @@ const ProductView = ({ product }) => {
           >
             <Icon name="cut" />
             Producto Fraccionable
-          </Button>
+          </IconedButton>
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
@@ -57,7 +58,7 @@ const ProductView = ({ product }) => {
         </FormField>
         <FormField width="20%">
           <Label>Unidad de Medida</Label>
-          <Segment placeholder>{MEASSURE_UNITS[product.fractionConfig.unit.toUpperCase()].text}</Segment>
+          <Segment placeholder>{MEASSURE_UNITS[product.fractionConfig?.unit?.toUpperCase()]?.text}</Segment>
         </FormField>
       </FieldsContainer>
       <FieldsContainer>

@@ -1,7 +1,7 @@
 import { NoPrint } from '@/components/layout';
 import { cloneElement, useState } from 'react';
 import { Icon, Popup } from 'semantic-ui-react';
-import { Button, ButtonsContainer, Flex } from '../../custom';
+import { ButtonsContainer, Flex, IconedButton } from '../../custom';
 
 const PopupActions = ({ width, title, color, buttons, icon, position = "bottom center", trigger }) => {
   const [open, setOpen] = useState(false);
@@ -18,7 +18,7 @@ const PopupActions = ({ width, title, color, buttons, icon, position = "bottom c
       position={position}
       trigger={trigger || (
         <ButtonsContainer>
-          <Button
+          <IconedButton
             size="small"
             icon
             labelPosition="left"
@@ -26,7 +26,7 @@ const PopupActions = ({ width, title, color, buttons, icon, position = "bottom c
             color={color}
           >
             <Icon name={icon} />{title}
-          </Button>
+          </IconedButton>
         </ButtonsContainer>
       )}
       content={

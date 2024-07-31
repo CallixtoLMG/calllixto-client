@@ -1,6 +1,6 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
@@ -11,7 +11,7 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Button, ButtonGroup, Message, Modal, Popup, Transition } from "semantic-ui-react";
+import { ButtonGroup, Message, Modal, Popup, Transition } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import ModalComment from "./ModalComment";
 import { Container, Icon, MessageHeader, MessageItem, MessageList } from "./styles";
@@ -395,7 +395,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </Modal.Content>
           <Modal.Actions>
             <ButtonsContainer>
-              <Button
+              <IconedButton
                 icon
                 labelPosition="left"
                 color="red"
@@ -403,8 +403,8 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               >
                 <Icon name="cancel" />
                 Cancelar
-              </Button>
-              <Button
+              </IconedButton>
+              <IconedButton
                 icon
                 labelPosition="left"
                 color="green"
@@ -412,7 +412,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               >
                 <Icon name="check" />
                 Confirmar
-              </Button>
+              </IconedButton>
             </ButtonsContainer>
           </Modal.Actions>
         </Modal>
@@ -421,7 +421,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
         <FieldsContainer>
           <FormField width="300px">
             <ButtonGroup size="small">
-              <Button
+              <IconedButton
                 icon
                 labelPosition="left"
                 type="button"
@@ -434,8 +434,8 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               >
                 <Icon name="check" />
                 Confirmado
-              </Button>
-              <Button
+              </IconedButton>
+              <IconedButton
                 icon
                 labelPosition="left"
                 type="button"
@@ -448,7 +448,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               >
                 <Icon name="hourglass half" />
                 Pendiente
-              </Button>
+              </IconedButton>
             </ButtonGroup>
           </FormField>
           <FormField width="350px">
@@ -456,28 +456,34 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               name="pickUpInStore"
               control={control}
               render={({ field: { onChange, value } }) => (
-            <ButtonGroup size="small">
-              <Button
-                type="button"
+                <ButtonGroup size="small">
+                  <IconedButton
+                    icon
+                    labelPosition="left"
+                    type="button"
                     basic={!value}
-                color="blue"
-                onClick={() => {
+                    color="blue"
+                    onClick={() => {
                       onChange(true);
-                }}
-              >
+                    }}
+                  >
+                    <Icon name="warehouse" />
                     {PICK_UP_IN_STORE}
-              </Button>
-              <Button
-                type="button"
+                  </IconedButton>
+                  <IconedButton
+                    icon
+                    labelPosition="left"
+                    type="button"
                     basic={value}
-                color="blue"
-                onClick={() => {
+                    color="blue"
+                    onClick={() => {
                       onChange(false);
-                }}
-              >
-                Enviar a Dirección
-              </Button>
-            </ButtonGroup>
+                    }}
+                  >
+                    <Icon name="truck" />
+                    Enviar a Dirección
+                  </IconedButton>
+                </ButtonGroup>
               )}
             />
           </FormField>
@@ -588,8 +594,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                 render={({ field: { onChange, value } }) => (
                   <Flex flexDirection="column" rowGap="5px">
                     <Box>
-                      <Button
-                        size="small"
+                      <IconedButton
+                        paddingLeft="fit-content"
+                        width="fit-content"
                         type="button"
                         basic={value.length !== PAYMENT_METHODS.length}
                         color="blue"
@@ -602,12 +609,12 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                         }}
                       >
                         Todos
-                      </Button>
+                      </IconedButton>
                     </Box>
                     <Flex columnGap="5px" wrap="wrap" rowGap="5px">
                       {PAYMENT_METHODS.map(text => (
-                        <Button
-                          size="small"
+                        <IconedButton
+                          paddingLeft="fit-content"
                           width="fit-content"
                           key={text}
                           basic={!value.includes(text)}
@@ -620,7 +627,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                             }
                           }}
                         >{text}
-                        </Button>
+                        </IconedButton>
                       ))}
                     </Flex>
                   </Flex>
@@ -662,7 +669,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           icon={currentState.icon}
           text={currentState.title}
           extraButton={
-            <Button
+            <IconedButton
               icon
               labelPosition="left"
               disabled={isLoading || !isDirty || isBudgetConfirmed(watchState)}
@@ -673,7 +680,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               width="fit-content"
             >
               <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
-            </Button>
+            </IconedButton>
           }
         />
       </Form>
