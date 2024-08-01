@@ -10,7 +10,7 @@ import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
-import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Menu } from "@/components/common/custom";
+import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Menu, Price2 } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
@@ -22,20 +22,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Dropdown, Input as SInput } from "semantic-ui-react";
-import styled from "styled-components";
-
-const PrintButton = ({ onClick, color, iconName, text }) => (
-  <IconedButton
-    icon
-    labelPosition="left"
-    onClick={onClick}
-    color={color}
-    size="small"
-  >
-    <Icon name={iconName} />{text}
-  </IconedButton>
-);
+import { ButtonGroup, Dropdown } from "semantic-ui-react";
 
 const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) => (
   <a href={href} target={target}>
@@ -50,24 +37,6 @@ const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) =
     </IconedButton>
   </a>
 );
-
-const Input = styled(SInput)`
-  margin: 0!important;
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
-  border-radius: 0.28571429rem;
-  max-width: ${({ $maxWidth }) => $maxWidth && `200px!important;`};
-  height: ${({ height = '50px' }) => height} !important;
-  width: ${({ width = '100%' }) => `${width}!important`};
-  display: flex!important;
-  input{
-    height: ${({ height }) => height || '50px'} !important;
-    padding: 0 14px!important;
-    text-align: ${({ center }) => (center ? 'center' : 'left')} !important;
-  };
-  div{
-    line-height: 190%!important;
-  }
-`;
 
 const Budget = ({ params }) => {
   useValidateToken();
@@ -432,58 +401,44 @@ const Budget = ({ params }) => {
             </>
           ) : <Box />}
           {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-            <Input
-              height="35px"
-              width="fit-content"
-              action={
+            <Flex alignItems="center">
+              <ButtonGroup>
                 <IconedButton
                   icon
                   labelPosition='left'
                   type="button"
                   basic={!showDolarExangeRate}
-                  onClick={() => {
-                    setShowDolarExangeRate(prev => !prev);
-                    if (!showDolarExangeRate) {
-                      setDolarRate(0);
-                    }
-                  }}
+                  onClick={() => setShowDolarExangeRate(prev => !prev)}
                   color="green"
                   width="fit-content"
                 >
-                  <Icon name='dollar' />
+                  <Icon fontSize="14px" name='dollar' />
                   Cotizar en USD
                 </IconedButton>
-              }
-              actionPosition='left'
-              placeholder="$0"
-              value={dolarRate}
-              disabled={!showDolarExangeRate}
-            >
-              {/* <CurrencyFormatInput/> */}
-
-            </Input>
-            // <Flex width="fit-content">
-            //   <IconedButton
-            //     icon
-            //     labelPosition='left'
-            //     type="button"
-            //     basic={!showDolarExangeRate}
-            //     onClick={() => {
-            //       setShowDolarExangeRate(prev => !prev);
-            //       if (!showDolarExangeRate) {
-            //         setDolarRate(0);
-            //       }
-            //     }}
-            //     color="green"
-            //     width="fit-content"
-            //   >
-            //     <Icon name='dollar' />
-            //     Cotizar en USD
-            //   </IconedButton>
-            //   <Label padding="0 7px" width="110px" show={!showDolarExangeRate}>
-            //     <Price value={dolarRate} />
-            //   </Label>
-            // </Flex>
+                <Flex
+                  padding
+                  color="green"
+                  width="fit-content"
+                  as={IconedButton}
+                  icon
+                  dollar
+                  dollarHover={showDolarExangeRate}
+                  basic={!showDolarExangeRate}
+                  labelPosition='left'
+                >
+                  <Icon fontSize="14px" name='dollar' />
+                  <Price2
+                    height="25px"
+                    width="90px"
+                    dollar={showDolarExangeRate}
+                    noBorder
+                    value={dolarRate}
+                    editable={showDolarExangeRate}
+                    onChange={setDolarRate}
+                  />
+                </Flex>
+              </ButtonGroup>
+            </Flex>
           )}
         </Flex>
         {isBudgetDraft(budget?.state) ? (

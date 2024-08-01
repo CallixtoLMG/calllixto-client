@@ -145,8 +145,9 @@ export const DropdownMenu = styled(SDropdown.Menu)`
 export const Icon = styled(SIcon)`
   align-self: center!important;
   margin-right: ${({ marginRight }) => marginRight && `11px!important`} ;
-  top: ${({ dollarIcon }) => dollarIcon && `-3px!important`} ;
-  position: ${({ dollarIcon }) => dollarIcon && `relative!important`} ;
+  top: ${({ dollar }) => dollar && `-3px!important`} ;
+  position: ${({ dollar }) => dollar && `relative!important`} ;
+  font-size: ${({ fontSize }) => `${fontSize}!important`} ;
 `;
 
 export const Modal = styled(SModal)`
@@ -163,6 +164,11 @@ export const IconedButton = styled(SButton)`
     font-size: 12px;
     width: ${({ width = '110px' }) => `${width}!important`} ;
     padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
+    padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
     margin-right: 0;
-  }
+    cursor: ${({ dollar }) => dollar && `default`} ;
+    &:hover {
+      background-color: ${({ dollarHover }) => dollarHover && `#21ba45!important`} ;
+    };
+  };
 `;

@@ -195,7 +195,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 }}
                 value={value || 0}
                 placeholder="Precio"
-                $marginY
               />
             )}
           />
