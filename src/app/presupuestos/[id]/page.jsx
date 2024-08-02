@@ -10,7 +10,7 @@ import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
-import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Menu, Price2 } from "@/components/common/custom";
+import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Input, Menu } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
@@ -22,8 +22,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { ButtonGroup, Dropdown } from "semantic-ui-react";
-
+import { Dropdown } from "semantic-ui-react";
 const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) => (
   <a href={href} target={target}>
     <IconedButton
@@ -77,12 +76,40 @@ const Budget = ({ params }) => {
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
   const [dolarRate, setDolarRate] = useState(dolar);
   const printRef = useRef();
+  const [formattedDolarRate, setFormattedDolarRate] = useState('');
+  const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
 
   useEffect(() => {
-    if (dolar && showDolarExangeRate) {
+    if (dolar && showDolarExangeRate && !initialDolarRateSet) {
       setDolarRate(dolar);
+      setFormattedDolarRate(formatValue(dolar));
+      setInitialDolarRateSet(true);
     }
-  }, [dolar, showDolarExangeRate]);
+    if (!showDolarExangeRate) {
+      setInitialDolarRateSet(false);
+    }
+  }, [dolar, showDolarExangeRate, initialDolarRateSet]);
+
+  const formatValue = (value) => {
+    let formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
+  };
+
+  const handleDollarChange = (e) => {
+    let value = e.target.value;
+    value = value.replace(/[^0-9.]/g, '');
+    const parts = value.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (parts.length > 1) {
+      value = parts[0] + '.' + parts[1].substring(0, 2);
+    } else {
+      value = parts[0];
+    }
+    const numericValue = parseFloat(value.replace(/,/g, ''));
+
+    setFormattedDolarRate(value);
+    setDolarRate(numericValue);
+  };
 
   const products = useMemo(() => productsData?.products?.map(product => ({
     ...product,
@@ -401,44 +428,40 @@ const Budget = ({ params }) => {
             </>
           ) : <Box />}
           {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-            <Flex alignItems="center">
-              <ButtonGroup>
+            <Input
+              textAlignLast="right"
+              innerWidth="90px"
+              type="text"
+              height="35px"
+              width="fit-content"
+              onChange={handleDollarChange}
+              actionPosition='left'
+              placeholder="Precio dolar"
+              value={formattedDolarRate}
+              disabled={!showDolarExangeRate}
+              action={
                 <IconedButton
                   icon
                   labelPosition='left'
                   type="button"
                   basic={!showDolarExangeRate}
-                  onClick={() => setShowDolarExangeRate(prev => !prev)}
+                  onClick={() => {
+                    setShowDolarExangeRate(prev => !prev);
+                    if (!showDolarExangeRate) {
+                      setFormattedDolarRate(formatValue(dolarRate));
+                    } else {
+                      setFormattedDolarRate('');
+                      setDolarRate(0);
+                    }
+                  }}
                   color="green"
                   width="fit-content"
                 >
-                  <Icon fontSize="14px" name='dollar' />
+                  <Icon name='dollar' />
                   Cotizar en USD
                 </IconedButton>
-                <Flex
-                  padding
-                  color="green"
-                  width="fit-content"
-                  as={IconedButton}
-                  icon
-                  dollar
-                  dollarHover={showDolarExangeRate}
-                  basic={!showDolarExangeRate}
-                  labelPosition='left'
-                >
-                  <Icon fontSize="14px" name='dollar' />
-                  <Price2
-                    height="25px"
-                    width="90px"
-                    dollar={showDolarExangeRate}
-                    noBorder
-                    value={dolarRate}
-                    editable={showDolarExangeRate}
-                    onChange={setDolarRate}
-                  />
-                </Flex>
-              </ButtonGroup>
-            </Flex>
+              }
+            />
           )}
         </Flex>
         {isBudgetDraft(budget?.state) ? (

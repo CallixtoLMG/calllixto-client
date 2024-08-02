@@ -14,7 +14,7 @@ import styled from "styled-components";
 
 export const Segment = styled(SSegment)`
   height: ${({ height = 'auto' }) => height} !important;
-  padding:${({ height }) => height && "10px"} !important;
+  padding: ${({ height, padding }) => padding || (height && "10px")} !important;
   margin: ${({ margin = "0" }) => margin} !important;
   width: ${({ width = '100%' }) => width} !important;
   min-height: 50px!important;
@@ -36,10 +36,12 @@ export const Input = styled(SInput)`
     height: ${({ height }) => height || '50px'} !important;
     padding: 0 14px!important;
     text-align: ${({ center }) => (center ? 'center' : 'left')} !important;
+    width: ${({ innerWidth = '100%' }) => `${innerWidth}!important`};
+    text-align-last: ${({ textAlignLast }) => `${textAlignLast}!important`};
   };
   div{
     line-height: 190%!important;
-  }
+  };
 `;
 
 export const FormField = styled(Form.Field)`
@@ -166,9 +168,5 @@ export const IconedButton = styled(SButton)`
     padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
     padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
     margin-right: 0;
-    cursor: ${({ dollar }) => dollar && `default`} ;
-    &:hover {
-      background-color: ${({ dollarHover }) => dollarHover && `#21ba45!important`} ;
-    };
   };
 `;

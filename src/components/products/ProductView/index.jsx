@@ -1,7 +1,6 @@
 "use client";
-import { FieldsContainer, FormField, IconedButton, Label, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, FormField, IconedButton, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { MEASSURE_UNITS } from "@/constants";
-import { formatedPrice } from "@/utils";
 import { Icon } from "semantic-ui-react";
 
 const ProductView = ({ product }) => {
@@ -54,14 +53,14 @@ const ProductView = ({ product }) => {
         </FormField>
         <FormField width="20%">
           <Label>Precio</Label>
-          <Segment placeholder>{formatedPrice(product?.price)}</Segment>
+          <Segment padding="10px 14px" height="40px" placeholder> <Price value={product?.price} /></Segment>
         </FormField>
         <FormField width="20%">
           <Label>Unidad de Medida</Label>
           <Segment placeholder>{MEASSURE_UNITS[product.fractionConfig?.unit?.toUpperCase()]?.text}</Segment>
         </FormField>
       </FieldsContainer>
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px">
         <Label>Comentarios</Label>
         <Segment placeholder>{product?.comments}</Segment>
       </FieldsContainer>

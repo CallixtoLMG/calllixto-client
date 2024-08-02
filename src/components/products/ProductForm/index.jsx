@@ -183,6 +183,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             control={control}
             render={({ field: { onChange, value } }) => (
               <CurrencyFormatInput
+                textAlignLast="right"
                 height="50px"
                 displayType="input"
                 thousandSeparator={true}
@@ -217,7 +218,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           />
         </FormField>
       </FieldsContainer>
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px">
         <Label>Comentarios</Label>
         <ControlledComments control={control} />
       </FieldsContainer>
