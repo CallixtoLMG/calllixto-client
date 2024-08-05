@@ -274,7 +274,7 @@ const Budget = ({ params }) => {
                         <DropdownOption text={text} pointing="left" className="link item">
                           <DropdownMenu icon={iconName}>
                             {subOptions.map(({ key, href, text, iconName, color }) => (
-                              <Flex >
+                              <Flex key={key}>
                                 <DropdownItem key={key} as='a' href={href} target="_blank">
                                   <Icon name={iconName} color={color} /> {text}
                                 </DropdownItem>
