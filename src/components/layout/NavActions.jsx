@@ -1,10 +1,10 @@
-import { Box, Button, Flex } from '@/components/common/custom';
+import { Box, Flex, IconedButton } from '@/components/common/custom';
 import { createContext, useContext, useState } from 'react';
-import { ButtonContent, Icon } from 'semantic-ui-react';
+import { Icon } from 'semantic-ui-react';
 import styled from 'styled-components';
 
 const ActionsContainer = styled(Flex)`
-  column-gap: 5px;
+  column-gap: 10px;
 `;
 
 const NavActionsContext = createContext();
@@ -37,19 +37,16 @@ const NavActions = () => {
         return (
           <Box key={`action_${id}`} >
             {button ? button : (
-              <Button
-                width="90px"
-                animated="vertical"
+              <IconedButton
+                size="small"
+                icon
+                labelPosition="left"
                 color={color}
                 onClick={onClick}
                 type="button"
-                fluid
               >
-                <ButtonContent hidden>{text}</ButtonContent>
-                <ButtonContent visible>
-                  <Icon name={icon} />
-                </ButtonContent>
-              </Button>
+                <Icon name={icon} />{text}
+              </IconedButton>
             )}
           </Box>
         );

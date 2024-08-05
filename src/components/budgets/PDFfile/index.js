@@ -1,7 +1,7 @@
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Box, Flex, FlexColumn, Price } from "@/components/common/custom";
 import { Table, Total } from '@/components/common/table';
-import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/constants";
+import { BUDGET_PDF_FORMAT, BUDGET_STATES, PICK_UP_IN_STORE } from "@/constants";
 import { expirationDate, formatedDateOnly, formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
@@ -80,7 +80,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <Field width="100%" label="Cliente" value={(get(budget, "customer.name", ""))} />
           </Flex>
           <Flex>
-            <Field flex="1" width="fit-content" label="Dirección" value={(get(budget, "customer.addresses[0].address", ""))} />
+            <Field flex="1" width="fit-content" label="Dirección" value={budget?.pickUpInStore ? PICK_UP_IN_STORE : (get(budget, "customer.addresses[0].address", ""))} />
             <Field width="fit-content" label="Teléfono" value={formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))} />
           </Flex>
         </SectionContainer>

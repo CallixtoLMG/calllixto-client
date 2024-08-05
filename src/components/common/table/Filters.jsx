@@ -1,4 +1,4 @@
-import { Flex } from '@/components/common/custom';
+import { Flex, IconedButton } from '@/components/common/custom';
 import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { Paginator } from './Pagination';
@@ -36,9 +36,13 @@ const Filters = ({ children, onRestoreFilters, clearSelection }) => {
           {children}
         </FiltersContainer>
         <Flex alignSelf="center">
-          <Button circular icon type="submit">
-            <Icon name="search" />
-          </Button>
+          <IconedButton
+            icon
+            type="submit"
+            labelPosition="left"
+          >
+            <Icon name="search" />Buscar
+          </IconedButton>
         </Flex>
       </HeaderSegment>
       <HeaderSegment >

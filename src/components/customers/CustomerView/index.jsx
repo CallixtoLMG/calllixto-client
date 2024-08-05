@@ -8,13 +8,13 @@ const CustomerView = ({ customer }) => {
       <FieldsContainer>
         <FormField width="33%">
           <Label>Nombre</Label>
-          <Segment>{customer?.name}</Segment>
+          <Segment placeholder>{customer?.name}</Segment>
         </FormField>
       </FieldsContainer>
       <ContactView {...customer} />
       <FieldsContainer>
         <Label>Comentarios</Label>
-        <Segment>{customer?.comments}</Segment>
+        <Segment placeholder>{customer?.comments}</Segment>
       </FieldsContainer>
     </ViewContainer>
   )

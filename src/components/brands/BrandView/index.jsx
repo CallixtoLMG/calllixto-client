@@ -7,16 +7,16 @@ const BrandView = ({ brand }) => {
       <FieldsContainer>
         <FormField>
           <Label>Código</Label>
-          <Segment>{brand?.id}</Segment>
+          <Segment placeholder>{brand?.id}</Segment>
         </FormField>
         <FormField width="50%">
           <Label>Nombre</Label>
-          <Segment>{brand?.name}</Segment>
+          <Segment placeholder>{brand?.name}</Segment>
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
         <Label>Comentarios</Label>
-        <Segment>{brand?.comments}</Segment>
+        <Segment placeholder>{brand?.comments}</Segment>
       </FieldsContainer>
     </ViewContainer>
   )

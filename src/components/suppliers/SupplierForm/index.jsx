@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, Label, RuledLabel } from "@/components/common/custom";
+import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ContactFields, ControlledComments } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -30,21 +30,25 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
       <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
         <FieldsContainer>
           <FormField>
-            <RuledLabel title="Código" message={errors?.id?.message} required />
-            <Controller
-              name="id"
-              control={control}
-              rules={RULES.REQUIRED_TWO_DIGIT}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  placeholder="Código (A1)"
-                  disabled={isUpdating}
-                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                  maxLength={2}
-                />
-              )}
-            />
+            <RuledLabel title="Código" message={errors?.id?.message} required={!isUpdating} />
+            {isUpdating ? (
+              <Segment placeholder>{supplier?.id}</Segment>
+            ) : (
+              <Controller
+                name="id"
+                control={control}
+                rules={RULES.REQUIRED_TWO_DIGIT}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    placeholder="Código (A1)"
+                    disabled={isUpdating}
+                    onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                    maxLength={2}
+                  />
+                )}
+              />
+            )}
           </FormField>
           <FormField width="40%">
             <RuledLabel title="Nombre" message={errors?.name?.message} required />

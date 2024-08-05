@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Button, Icon, List, Modal, Popup, Transition } from 'semantic-ui-react';
+import { Icon, List, Modal, Popup, Transition } from 'semantic-ui-react';
+import { IconedButton } from '../../custom';
 import { HelpIcon, StyledListContent, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader } from "./styles";
 
 const KeyboardShortcuts = () => {
@@ -65,9 +66,15 @@ const KeyboardShortcuts = () => {
             </List>
           </StyledModalContent>
           <Modal.Actions>
-            <Button color='red' onClick={() => setOpen(false)}>
+            <IconedButton
+              icon
+              labelPosition="left"
+              color="grey"
+              onClick={() => setOpen(false)}
+              basic
+            >
               <Icon name='remove' /> Cerrar
-            </Button>
+            </IconedButton>
           </Modal.Actions>
         </Modal>
       </Transition>

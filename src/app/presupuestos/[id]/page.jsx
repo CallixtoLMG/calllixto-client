@@ -10,82 +10,32 @@ import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
-import { PopupActions } from "@/components/common/buttons";
-import { Box, Button, Checkbox, CurrencyFormatInput, Flex, Icon, Label } from "@/components/common/custom";
+import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Input, Menu } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { isBudgetCancelled, isBudgetConfirmed, isBudgetDraft, isBudgetPending, isBudgetExpired, now } from "@/utils";
+import { isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Container as SContainer, Input as SInput } from "semantic-ui-react";
-import styled from "styled-components";
-
-const PrintButton = ({ onClick, color, iconName, text }) => (
-  <Button
-    onClick={onClick}
-    color={color}
-    size="tiny">
-    <Icon name={iconName} />{text}
-  </Button>
-);
-
+import { Dropdown } from "semantic-ui-react";
 const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) => (
   <a href={href} target={target}>
-    <Button
+    <IconedButton
+      icon
+      labelPosition="left"
       width={width}
       color={color}
-      size="tiny">
+      size="small"
+    >
       <Icon name={iconName} />{text}
-    </Button>
+    </IconedButton>
   </a>
 );
-
-const CheckboxContainer = styled(SContainer)`
-  &&&{
-    display:flex!important;
-    flex-direction:row!important;
-    align-items: center!important;
-    width: 100%!important;
-    max-width: 370px!important;
-    column-gap: 5px!important;
-    margin:0!important;
-  }
-`;
-
-const DolarContainer = styled(SContainer)`
-  &&&{
-    visibility: ${({ show }) => (show ? 'visible' : 'hidden')}!important;
-    display:flex!important;
-    width:fit-content;
-    color:red!important;
-    gap: 5px!important;
-    margin:0!important;
-  }
-`;
-
-const Input = styled(SInput)`
-  margin: 0!important;
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
-  border-radius: 0.28571429rem;
-  max-width: ${({ $maxWidth }) => $maxWidth && `200px!important;`};
-  height: ${({ height = '50px' }) => height} !important;
-  width: ${({ width = '100%' }) => `${width}!important`};
-  display: flex!important;
-  input{
-    height: ${({ height }) => height || '50px'} !important;
-    padding: 0 14px!important;
-    text-align: ${({ center }) => (center ? 'center' : 'left')} !important;
-  };
-  div{
-    line-height: 190%!important;
-  }
-`;
 
 const Budget = ({ params }) => {
   useValidateToken();
@@ -126,12 +76,40 @@ const Budget = ({ params }) => {
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
   const [dolarRate, setDolarRate] = useState(dolar);
   const printRef = useRef();
+  const [formattedDolarRate, setFormattedDolarRate] = useState('');
+  const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
 
   useEffect(() => {
-    if (dolar && showDolarExangeRate) {
+    if (dolar && showDolarExangeRate && !initialDolarRateSet) {
       setDolarRate(dolar);
+      setFormattedDolarRate(formatValue(dolar));
+      setInitialDolarRateSet(true);
     }
-  }, [dolar, showDolarExangeRate]);
+    if (!showDolarExangeRate) {
+      setInitialDolarRateSet(false);
+    }
+  }, [dolar, showDolarExangeRate, initialDolarRateSet]);
+
+  const formatValue = (value) => {
+    let formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
+  };
+
+  const handleDollarChange = (e) => {
+    let value = e.target.value;
+    value = value.replace(/[^0-9.]/g, '');
+    const parts = value.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    if (parts.length > 1) {
+      value = parts[0] + '.' + parts[1].substring(0, 2);
+    } else {
+      value = parts[0];
+    }
+    const numericValue = parseFloat(value.replace(/,/g, ''));
+
+    setFormattedDolarRate(value);
+    setDolarRate(numericValue);
+  };
 
   const products = useMemo(() => productsData?.products?.map(product => ({
     ...product,
@@ -180,19 +158,19 @@ const Budget = ({ params }) => {
       const printButtons = [
         {
           mode: BUDGET_PDF_FORMAT.DISPATCH,
-          color: 'green',
+          color: 'blue',
           iconName: 'truck',
-          text: 'Remito'
+          text: 'Remito',
         },
         {
           mode: BUDGET_PDF_FORMAT.CLIENT,
-          color: 'green',
+          color: 'blue',
           iconName: 'address card',
-          text: 'Cliente'
+          text: 'Cliente',
         },
         {
           mode: BUDGET_PDF_FORMAT.INTERNAL,
-          color: 'green',
+          color: 'blue',
           iconName: 'archive',
           text: 'Interno'
         }
@@ -205,6 +183,7 @@ const Budget = ({ params }) => {
               key={`${APIS.WSP(`${areaCode}${number}`)}`}
               href={`${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`}
               text={`${ref ? `${ref} - ` : ''}${areaCode} ${number}`}
+              iconName="whatsapp"
             />
           )),
           color: 'green',
@@ -217,6 +196,7 @@ const Budget = ({ params }) => {
               key={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
               href={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
               text={`${ref ? `${ref} - ` : ''}${email}`}
+              iconName="mail"
             />
           )),
           color: 'red',
@@ -225,51 +205,90 @@ const Budget = ({ params }) => {
         }] : [])
       ];
 
+      const sendButtons1 = [
+        {
+          text: 'WhatsApp',
+          iconName: 'whatsapp',
+          color: 'green',
+          subOptions: budget?.customer?.phoneNumbers?.map(({ ref, areaCode, number }) => ({
+            key: `${APIS.WSP(`${areaCode}${number}`)}`,
+            href: `${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`,
+            text: `${ref ? `${ref} - ` : ''}${areaCode} ${number}`,
+            iconName: 'whatsapp',
+            color: 'green',
+          })) || []
+        },
+        {
+          text: 'Mail',
+          iconName: 'mail',
+          color: 'red',
+          subOptions: budget?.customer?.emails?.map(({ ref, email }) => ({
+            key: `${APIS.MAIL(email, budget?.customer?.name)}`,
+            href: `${APIS.MAIL(email, budget?.customer?.name)}`,
+            text: `${ref ? `${ref} - ` : ''}${email}`,
+            iconName: 'mail',
+            color: 'red',
+          })) || []
+        }
+      ];
+
       const actions = [
         {
           id: 1,
           button: (
-            <PopupActions
-              width="90px"
-              title="PDFs"
-              icon="download"
-              color="blue"
-              buttons={
-                printButtons.map(({ mode, color, iconName, text }) => (
-                  <PrintButton
+            <Dropdown
+              pointing
+              as={IconedButton}
+              text='PDFs'
+              icon='download'
+              floating
+              labeled
+              button
+              className='icon blue'
+            >
+              <Dropdown.Menu>
+                {printButtons.map(({ mode, iconName, text, color }) => (
+                  <DropdownItem
                     key={mode}
                     onClick={() => {
                       setPrintPdfMode(mode);
                       setTimeout(handlePrint);
                     }}
-                    color={color}
-                    iconName={iconName}
-                    text={text}
-                  />
-                ))
-              }
-            />
+                  >
+                    <Icon color={color} name={iconName} /> {text}
+                  </DropdownItem>
+                ))}
+              </Dropdown.Menu>
+            </Dropdown>
           )
         },
         {
           id: 2,
-          button: <PopupActions width="90px" title="Enviar" icon="send" color="blue"
-            buttons={
-              [...sendButtons.map(({ href, color, iconName, text, buttons, width }) => (
-                <PopupActions
-                  width="120px"
-                  animated={false}
-                  key={iconName}
-                  href={href}
-                  color={color}
-                  iconName={iconName}
-                  title={text}
-                  buttons={buttons}
-                  position="right center"
-                />
-              ))]
-            }
-          />
+          button: (
+            <Menu>
+              <DropdownOption menu pointing text='Enviar' icon='send' floating labeled button className='icon blue'>
+                <Dropdown.Menu>
+                  {sendButtons1.map(({ text, iconName, color, subOptions }) => (
+                    <Flex key={iconName}>
+                      {subOptions.length > 0 && (
+                        <DropdownOption text={text} pointing="left" className="link item">
+                          <DropdownMenu icon={iconName}>
+                            {subOptions.map(({ key, href, text, iconName, color }) => (
+                              <Flex key={key}>
+                                <DropdownItem key={key} as='a' href={href} target="_blank">
+                                  <Icon name={iconName} color={color} /> {text}
+                                </DropdownItem>
+                              </Flex>
+                            ))}
+                          </DropdownMenu>
+                        </DropdownOption>
+                      )}
+                    </Flex>
+                  ))}
+                </Dropdown.Menu>
+              </DropdownOption>
+            </Menu>
+          )
         },
         {
           id: 3,
@@ -290,7 +309,7 @@ const Budget = ({ params }) => {
     }
   }, [budget, push, role, setActions]);
 
-  const handleCheckboxChange = () => {
+  const handleConfirm = () => {
     if (!customerHasInfo) {
       setIsModalCustomerOpen(true);
       return;
@@ -315,10 +334,11 @@ const Budget = ({ params }) => {
   };
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (pickUpInStore) => {
       const confirmationData = {
         confirmedBy: `${userData.firstName} ${userData.lastName}`,
         confirmedAt: now(),
+        pickUpInStore
       };
       const { data } = await confirmBudget(confirmationData, budget?.id);
       return data;
@@ -376,25 +396,23 @@ const Budget = ({ params }) => {
     },
   });
 
-  console.log({ budget: budget?.state  })
-
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
       <NoPrint>
         <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) ? "0" : "0 0 15px 0!important"} justifyContent="space-between">
           {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
             <>
-              <Checkbox
-                center
-                toggle
-                checked={isBudgetConfirmed(budget?.state)}
-                onChange={handleCheckboxChange}
-                label="Confirmar presupuesto"
-                customColors={{
-                  false: 'orange',
-                  true: 'green'
-                }}
-              />
+              <IconedButton
+                icon
+                labelPosition="left"
+                type="button"
+                width="fit-content"
+                color="green"
+                onClick={handleConfirm}
+              >
+                <Icon name='check' />
+                Confirmar
+              </IconedButton>
               <ModalCustomer
                 isModalOpen={isModalCustomerOpen}
                 onClose={handleModalCustomerClose}
@@ -410,34 +428,40 @@ const Budget = ({ params }) => {
             </>
           ) : <Box />}
           {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-            <Flex height="21px" >
-              <CheckboxContainer>
-                <Checkbox
-                  toggle
-                  checked={showDolarExangeRate}
-                  onChange={() => setShowDolarExangeRate(prev => !prev)}
-                  label="Cotizar en dólares"
-                />
-                <DolarContainer show={showDolarExangeRate}>
-                  <Label padding="0 9px" height="21px" width="fit-content">Cambio</Label>
-                  <CurrencyFormatInput
-                    height="21px"
-                    displayType="input"
-                    thousandSeparator={true}
-                    decimalScale={2}
-                    allowNegative={false}
-                    width="100px"
-                    prefix="$ "
-                    customInput={Input}
-                    onValueChange={value => {
-                      setDolarRate(value.floatValue);
-                    }}
-                    value={dolarRate}
-                    placeholder="Precio"
-                  />
-                </DolarContainer>
-              </CheckboxContainer>
-            </Flex>
+            <Input
+              textAlignLast="right"
+              innerWidth="90px"
+              type="text"
+              height="35px"
+              width="fit-content"
+              onChange={handleDollarChange}
+              actionPosition='left'
+              placeholder="Precio dolar"
+              value={formattedDolarRate}
+              disabled={!showDolarExangeRate}
+              action={
+                <IconedButton
+                  icon
+                  labelPosition='left'
+                  type="button"
+                  basic={!showDolarExangeRate}
+                  onClick={() => {
+                    setShowDolarExangeRate(prev => !prev);
+                    if (!showDolarExangeRate) {
+                      setFormattedDolarRate(formatValue(dolarRate));
+                    } else {
+                      setFormattedDolarRate('');
+                      setDolarRate(0);
+                    }
+                  }}
+                  color="green"
+                  width="fit-content"
+                >
+                  <Icon name='dollar' />
+                  Cotizar en USD
+                </IconedButton>
+              }
+            />
           )}
         </Flex>
         {isBudgetDraft(budget?.state) ? (

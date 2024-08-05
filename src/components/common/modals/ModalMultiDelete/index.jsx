@@ -1,8 +1,8 @@
-import { ButtonsContainer, Input } from "@/components/common/custom";
+import { ButtonsContainer, IconedButton, Input } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Button, Header, Icon as SIcon, Transition } from 'semantic-ui-react';
+import { Header, Icon as SIcon, Transition } from 'semantic-ui-react';
 import { Form, Modal, ModalContent } from "./styles";
 
 const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title, icon, headers }) => {
@@ -46,23 +46,25 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
               width="220px"
             />
             <ButtonsContainer>
-              <Button
-                height="40px"
-                color='red'
+              <IconedButton
+                icon
+                labelPosition="left"
+                color="grey"
                 onClick={onClose}
                 disabled={isLoading}
               >
                 <SIcon name='times' />Cancelar
-              </Button>
-              <Button
-                height="40px"
+              </IconedButton>
+              <IconedButton
+                icon
+                labelPosition="left"
                 disabled={!isDeleteEnabled || isLoading}
                 loading={isLoading}
-                color='green'
+                color="red"
                 type="submit"
               >
-                <SIcon name='trash' />Aceptar
-              </Button>
+                <SIcon name='trash' />Eliminar
+              </IconedButton>
             </ButtonsContainer>
           </Form>
         </Modal.Actions>

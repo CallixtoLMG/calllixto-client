@@ -1,9 +1,9 @@
 import { NoPrint } from '@/components/layout';
 import { cloneElement, useState } from 'react';
-import { ButtonContent, Icon, Popup } from 'semantic-ui-react';
-import { Button, ButtonsContainer, Flex } from '../../custom';
+import { Icon, Popup } from 'semantic-ui-react';
+import { ButtonsContainer, Flex, IconedButton } from '../../custom';
 
-const PopupActions = ({ width, title, color, buttons, icon, animated = true, position = "bottom center", trigger }) => {
+const PopupActions = ({ width, title, color, buttons, icon, position = "bottom center", trigger }) => {
   const [open, setOpen] = useState(false);
 
   const handleClose = () => {
@@ -18,18 +18,21 @@ const PopupActions = ({ width, title, color, buttons, icon, animated = true, pos
       position={position}
       trigger={trigger || (
         <ButtonsContainer>
-          <Button width={width} {...animated && { animated: 'vertical' }} color={color}>
-            <ButtonContent hidden>{title}</ButtonContent>
-            <ButtonContent visible>
-              <Icon name={icon} />
-            </ButtonContent>
-          </Button>
+          <IconedButton
+            size="small"
+            icon
+            labelPosition="left"
+            width={width}
+            color={color}
+          >
+            <Icon name={icon} />{title}
+          </IconedButton>
         </ButtonsContainer>
       )}
       content={
         <NoPrint>
           <Flex rowGap="5px" flexDirection="column">
-            {buttons?.map((child) => 
+            {buttons?.map((child) =>
               cloneElement(child, {
                 onClick: () => {
                   handleClose();

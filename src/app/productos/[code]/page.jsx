@@ -80,14 +80,12 @@ const Product = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      <NoPrint>
-        {Toggle}
-        {allowUpdate ? (
-          <ProductForm product={product} onSubmit={mutate} isUpdating isLoading={isPending} />
-        ) : (
-          <ProductView product={product} />
-        )}
-      </NoPrint>
+      {Toggle}
+      {allowUpdate ? (
+        <ProductForm product={product} onSubmit={mutate} isUpdating isLoading={isPending} />
+      ) : (
+        <ProductView product={product} />
+      )}
       {product && (
         <OnlyPrint>
           <SubContainer>

@@ -184,14 +184,6 @@ export const BUDGET_STATES = {
   }
 };
 
-export const FILTER_TYPES = {
-  TEXT: 'text',
-  SELECT: 'select',
-  DATE: 'date',
-  NUMBER: 'number',
-  CHECKBOX: 'checkbox',
-};
-
 export const SHORTKEYS = {
   ENTER: "Control+Enter",
   ALT_ENTER: "Control+Alt+Enter",
@@ -218,3 +210,5 @@ export const PRODUCTS_HELP = {
   FRACTIONABLE_PRODUCT: "Al activar esta opción los precios pueden ser editables desde la creación de un presupuesto.",
   EDITABLE_PRICE: "Al activar esta opción se pueden fraccionar los productos desde la creación de un presupuesto.",
 };
+
+export const PICK_UP_IN_STORE = "Retira en tienda";

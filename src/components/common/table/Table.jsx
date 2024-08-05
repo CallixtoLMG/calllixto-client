@@ -108,7 +108,7 @@ const CustomTable = ({
                             {header.value(element, index)}
                           </LinkCell>
                         ))}
-                        {!!selectionActions.length && (
+                        {!!actions.length && (
                           <ActionsContainer deleteButtonInside={deleteButtonInside}>
                             <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
                               <Actions actions={actions} element={element} />

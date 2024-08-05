@@ -1,12 +1,12 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Checkbox, CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment, Flex } from "@/components/common/custom";
+import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, IconedButton, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
-import { MEASSURE_UNITS, PAGES, PRODUCTS_HELP, RULES, SHORTKEYS } from "@/constants";
+import { MEASSURE_UNITS, PAGES, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Icon, Popup } from "semantic-ui-react";
+import { Icon } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
@@ -52,44 +52,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   return (
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
-      <FieldsContainer>
-        <FormField width="250px">
-          <Flex alignItems="center" columnGap="5px">
-            <Controller
-              name="fractionConfig.active"
-              control={control}
-              render={({ field: { value, onChange, ...rest } }) => (
-                <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Producto Fraccionable" />
-              )}
-            />
-            <Popup
-              content={PRODUCTS_HELP.FRACTIONABLE_PRODUCT}
-              position='right center'
-              size='tiny'
-              trigger={<Icon size="tiny" circular inverted color="orange" name="question"></Icon>}
-            />
-          </Flex>
-        </FormField>
-        <FormField>
-          <Flex alignItems="center" columnGap="5px">
-            <Controller
-              name="editablePrice"
-              control={control}
-              render={({ field: { value, onChange, ...rest } }) => (
-                <Checkbox {...rest} toggle checked={value} onChange={() => onChange(!value)} label="Precio editable" />
-              )}
-            />
-            <Popup
-              content={PRODUCTS_HELP.EDITABLE_PRICE}
-              position='right center'
-              size='tiny'
-              trigger={<Icon size="tiny" circular inverted color="orange" name="question"></Icon>}
-            />
-          </Flex>
-        </FormField>
-      </FieldsContainer>
-      <FieldsContainer>
-        <FormField width="30%">
+      <FieldsContainer rowGap="5px" alignItems="flex-end">
+        <FormField flex="1">
           <RuledLabel title="Proveedor" message={!isUpdating && isDirty && isSubmitted && !supplier && 'Campo requerido.'} required />
           {!isUpdating ? (
             <Dropdown
@@ -109,10 +73,10 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               }}
             />
           ) : (
-            <Segment disabled>{product?.supplierName}</Segment>
+            <Segment placeholder>{product?.supplierName}</Segment>
           )}
         </FormField>
-        <FormField width="30%">
+        <FormField flex="1">
           <RuledLabel title="Marca" message={!isUpdating && isDirty && isSubmitted && !brand && 'Campo requerido.'} required />
           {!isUpdating ? (
             <Dropdown
@@ -133,28 +97,75 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               disabled={isUpdating}
             />
           ) : (
-            <Segment disabled>{product?.brandName}</Segment>
+            <Segment placeholder>{product?.brandName}</Segment>
           )}
-        </FormField>
-      </FieldsContainer>
-      <FieldsContainer>
+        </FormField >
         <FormField width="20%">
-          <RuledLabel title="Código" message={errors?.code?.message} required />
           <Controller
-            name="code"
+            name="editablePrice"
             control={control}
-            rules={RULES.REQUIRED_MAX26_DIGIT_CODE}
-            render={({ field }) => (
-              <Input
-                {...field}
-                placeholder="Código"
-                onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                disabled={isUpdating}
-                {...((supplier?.id || brand?.id) && { label: { basic: true, content: `${supplier?.id ?? ''} ${brand?.id ?? ''}` } })}
-                labelPosition='left'
-              />
+            render={({ field: { value, onChange, ...rest } }) => (
+              <IconedButton
+                {...rest}
+                width="fit-content"
+                icon
+                labelPosition="left"
+                color="blue"
+                onClick={() => onChange(!value)}
+                type="button"
+                basic={!value}
+              >
+                <Icon name="pencil" />
+                Precio Editable
+              </IconedButton>
             )}
           />
+        </FormField>
+        <FormField width="20%">
+          <Controller
+            name="fractionConfig.active"
+            control={control}
+            render={({ field: { value, onChange, ...rest } }) => (
+              <IconedButton
+                {...rest}
+                width="fit-content"
+                icon
+                labelPosition="left"
+                color="blue"
+                onClick={() => onChange(!value)}
+                basic={!value}
+                type="button"
+              >
+                <Icon name="cut" />
+                Producto Fraccionable
+              </IconedButton>
+            )}
+          />
+        </FormField>
+
+      </FieldsContainer>
+      <FieldsContainer rowGap="5px">
+        <FormField width="20%">
+          <RuledLabel title="Código" message={errors?.code?.message} required={!isUpdating} />
+          {isUpdating ? (
+            <Segment placeholder>{product?.code}</Segment>
+          ) : (
+            <Controller
+              name="code"
+              control={control}
+              rules={RULES.REQUIRED_MAX26_DIGIT_CODE}
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  placeholder="Código"
+                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                  {...((supplier?.id || brand?.id) && { label: { basic: true, content: `${supplier?.id ?? ''} ${brand?.id ?? ''}` } })}
+                  labelPosition='left'
+                />
+              )}
+            />
+          )}
+
         </FormField>
         <FormField flex="1">
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
@@ -172,6 +183,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             control={control}
             render={({ field: { onChange, value } }) => (
               <CurrencyFormatInput
+                textAlignLast="right"
                 height="50px"
                 displayType="input"
                 thousandSeparator={true}
@@ -184,31 +196,29 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 }}
                 value={value || 0}
                 placeholder="Precio"
-                $marginY
               />
             )}
           />
         </FormField>
-        {watchFractionable && (
-          <FormField>
-            <Label>Unidad de Medida</Label>
-            <Controller
-              name="fractionConfig.unit"
-              control={control}
-              render={({ field: { onChange, ...rest } }) => (
-                <Dropdown
-                  {...rest}
-                  selection
-                  options={Object.values(MEASSURE_UNITS)}
-                  defaultValue={Object.values(MEASSURE_UNITS)[0].value}
-                  onChange={(e, { value }) => onChange(value)}
-                />
-              )}
-            />
-          </FormField>
-        )}
+        <FormField width="20%">
+          <Label>Unidad de Medida</Label>
+          <Controller
+            name="fractionConfig.unit"
+            control={control}
+            render={({ field: { onChange, ...rest } }) => (
+              <Dropdown
+                {...rest}
+                selection
+                options={Object.values(MEASSURE_UNITS)}
+                defaultValue={Object.values(MEASSURE_UNITS)[0].value}
+                onChange={(e, { value }) => onChange(value)}
+                disabled={!watchFractionable}
+              />
+            )}
+          />
+        </FormField>
       </FieldsContainer>
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px">
         <Label>Comentarios</Label>
         <ControlledComments control={control} />
       </FieldsContainer>

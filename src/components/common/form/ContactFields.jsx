@@ -2,7 +2,7 @@ import { validateEmail, validatePhone } from "@/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Icon, Popup } from "semantic-ui-react";
-import { Button, FieldsContainer, Flex, FormField, Input, Label, RuledLabel } from '../custom';
+import { Box, FieldsContainer, FormField, IconedButton, Input, Label, RuledLabel } from '../custom';
 import { Table } from '../table';
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "./form.common";
 
@@ -96,9 +96,17 @@ export const ContactFields = () => {
       <FormField width="33%">
         <Popup
           trigger={
-            <Flex>
-              <Button type="button" color="green"><Icon name="add" /> Teléfono</Button>
-            </Flex>
+            <Box width="fit-content">
+              <IconedButton
+                size="small"
+                icon
+                labelPosition="left"
+                color="green"
+                type="button"
+              >
+                <Icon name="add" />Teléfono
+              </IconedButton>
+            </Box>
           }
           on='click'
           onClose={() => {
@@ -136,9 +144,15 @@ export const ContactFields = () => {
                 onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'number', e.target.value)}
               />
             </FormField>
-            <Button color="green" onClick={handleAddPhone}>
+            <IconedButton
+              size="small"
+              icon
+              labelPosition="left"
+              color="green"
+              onClick={handleAddPhone}
+            >
               <Icon name="add" />Agregar
-            </Button>
+            </IconedButton>
           </FieldsContainer>
         </Popup>
         <Table
@@ -152,9 +166,17 @@ export const ContactFields = () => {
       <FormField flex="1">
         <Popup
           trigger={
-            <Flex >
-              <Button type="button" color="green"><Icon name="add" /> Dirección</Button>
-            </Flex>
+            <Box width="fit-content">
+              <IconedButton
+                size="small"
+                icon
+                labelPosition="left"
+                type="button"
+                color="green"
+              >
+                <Icon name="add" />Dirección
+              </IconedButton>
+            </Box>
           }
           on='click'
           onClose={() => {
@@ -180,9 +202,15 @@ export const ContactFields = () => {
                 onChange={(e) => updateFieldToAdd(setAddressToAdd, 'address', e.target.value)}
               />
             </FormField>
-            <Button color="green" onClick={handleAddAddress}>
+            <IconedButton
+              size="small"
+              icon
+              labelPosition="left"
+              color="green"
+              onClick={handleAddAddress}
+            >
               <Icon name="add" />Agregar
-            </Button>
+            </IconedButton>
           </FieldsContainer>
         </Popup>
         <Table
@@ -197,9 +225,17 @@ export const ContactFields = () => {
       <FormField flex="1">
         <Popup
           trigger={
-            <Flex >
-              <Button type="button" color="green"><Icon name="add" /> Email</Button>
-            </Flex>
+            <Box width="fit-content">
+              <IconedButton
+                size="small"
+                icon
+                labelPosition="left"
+                type="button"
+                color="green"
+              >
+                <Icon name="add" />Email
+              </IconedButton>
+            </Box>
           }
           on='click'
           onClose={() => {
@@ -225,9 +261,14 @@ export const ContactFields = () => {
                 onChange={(e) => updateFieldToAdd(setEmailToAdd, 'email', e.target.value)}
               />
             </FormField>
-            <Button color="green" onClick={handleAddEmail}>
+            <IconedButton
+              icon
+              labelPosition="left"
+              color="green"
+              onClick={handleAddEmail}
+            >
               <Icon name="add" />Agregar
-            </Button>
+            </IconedButton>
           </FieldsContainer>
         </Popup>
         <Table

@@ -111,7 +111,7 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
   ].filter(Boolean);
 };
 
-const PAYMENT_METHODS = ['Efectivo', 'Transferencia Bancaria', 'Tarjeta de débito', 'Tarjeta de crédito', 'Mercado Pago', 'Dólares'];
+const PAYMENT_METHODS = ['Efectivo', 'Transferencia Bancaria', 'Tarjeta de Débito', 'Tarjeta de Crédito', 'Mercado Pago', 'Dólares'];
 
 export { ATTRIBUTES, BUDGETS_COLUMNS, PAYMENT_METHODS, PRODUCTS_COLUMNS };
 

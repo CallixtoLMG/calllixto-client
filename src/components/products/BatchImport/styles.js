@@ -1,6 +1,6 @@
+import { Flex } from "@/components/common/custom";
 import { Header as SHeader, Modal as SModal } from "semantic-ui-react";
 import styled from "styled-components";
-import { Flex } from "@/components/common/custom";
 
 const Modal = styled(SModal)`
   width: 100%!important;
@@ -13,7 +13,7 @@ const ModalHeader = styled(SModal.Header)`
 `;
 
 const WaitMsg = styled.p`
-  font-size: 14px!important;
+  font-size: 12px!important;
   margin: 0!important;
   align-content: center;
 `;

@@ -27,11 +27,10 @@ export const FieldsContainer = styled(Flex)`
 export const ButtonsContainer = styled(Flex)`
   flex-direction: row;
   margin-top: ${({ marginTop }) => (marginTop ? marginTop : '0')};
-  justify-content: ${({ center }) => (center ? 'center' : 'flex-end')};
-  column-gap: 5px;
-  width: ${({ width }) => (width ? width : 'auto')}!important;
+  justify-content: flex-end;
+  column-gap: 10px;
   padding: 0!important;
-  height: ${({ height = 'auto' }) => height} !important;
+  width: ${({ width = 'auto' }) => width} !important;
 `;
 
 export const PhoneContainer = styled(Flex)`

@@ -1,52 +1,68 @@
 "use client";
-import { Checkbox, FieldsContainer, FormField, Label, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, FormField, IconedButton, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { MEASSURE_UNITS } from "@/constants";
-import { formatedPrice } from "@/utils";
+import { Icon } from "semantic-ui-react";
 
 const ProductView = ({ product }) => {
   return (
     <ViewContainer>
-      <FieldsContainer>
-      <FormField width="250px">
-          <Checkbox toggle checked={product?.fractionConfig?.active} label="Producto fraccionable" disabled />
-        </FormField>
-        <FormField >
-          <Checkbox toggle checked={product?.editablePrice} label="Precio editable" disabled />
-        </FormField>
-      </FieldsContainer>
-      <FieldsContainer>
-        <FormField width="30%">
+      <FieldsContainer alignItems="flex-end">
+        <FormField flex="1">
           <Label>Proveedor</Label>
-          <Segment>{product?.supplierName}</Segment>
+          <Segment placeholder>{product?.supplierName}</Segment>
         </FormField>
-        <FormField width="30%">
+        <FormField flex="1">
           <Label>Marca</Label>
-          <Segment>{product?.brandName}</Segment>
+          <Segment placeholder>{product?.brandName}</Segment>
+        </FormField>
+        <FormField width="20%">
+          <IconedButton
+            width="fit-content"
+            icon
+            labelPosition="left"
+            color="blue"
+            basic={!product?.editablePrice}
+            disabled
+          >
+            <Icon name="pencil" />
+            Precio Editable
+          </IconedButton>
+        </FormField>
+        <FormField width="20%">
+          <IconedButton
+            width="fit-content"
+            icon
+            labelPosition="left"
+            color="blue"
+            basic={!product?.fractionConfig?.active}
+            disabled
+          >
+            <Icon name="cut" />
+            Producto Fraccionable
+          </IconedButton>
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
         <FormField width="20%">
           <Label>Código</Label>
-          <Segment>{product?.code}</Segment>
+          <Segment placeholder>{product?.code}</Segment>
         </FormField>
         <FormField flex="1">
           <Label>Nombre</Label>
-          <Segment>{product?.name}</Segment>
+          <Segment placeholder>{product?.name}</Segment>
         </FormField>
         <FormField width="20%">
           <Label>Precio</Label>
-          <Segment>{formatedPrice(product?.price)}</Segment>
+          <Segment padding="10px 14px" height="40px" placeholder> <Price value={product?.price} /></Segment>
         </FormField>
-        {product?.fractionConfig?.active && (
-          <FormField>
-            <Label>Unidad de Medida</Label>
-            <Segment>{MEASSURE_UNITS[product.fractionConfig.unit.toUpperCase()].text}</Segment>
-          </FormField>
-        )}
+        <FormField width="20%">
+          <Label>Unidad de Medida</Label>
+          <Segment placeholder>{MEASSURE_UNITS[product.fractionConfig?.unit?.toUpperCase()]?.text}</Segment>
+        </FormField>
       </FieldsContainer>
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px">
         <Label>Comentarios</Label>
-        <Segment>{product?.comments}</Segment>
+        <Segment placeholder>{product?.comments}</Segment>
       </FieldsContainer>
     </ViewContainer>
   );
