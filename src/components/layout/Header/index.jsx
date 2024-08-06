@@ -1,13 +1,12 @@
 import { useUserContext } from "@/User";
+import { Flex } from '@/components/common/custom';
 import { KeyboardShortcuts } from "@/components/common/modals";
-import { NoPrint } from "@/components/layout";
 import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from 'next/navigation';
 import { Dropdown, Menu } from 'semantic-ui-react';
 import { Container, LogDiv, ModLink, Text } from "./styles";
-import { Flex } from '@/components/common/custom';
 
 const Header = () => {
   const pathname = usePathname();
@@ -38,7 +37,7 @@ const Header = () => {
   useKeyboardShortcuts(shortcutMapping);
 
   return (
-    <NoPrint>
+    <>
       {showHeader &&
         <Menu fixed='top'>
           <Container>
@@ -58,7 +57,7 @@ const Header = () => {
                   ))}
                 </Flex>
                 <Flex>
-                    <KeyboardShortcuts/>
+                  <KeyboardShortcuts />
                   {isCallixtoUser(role) &&
                     <LogDiv padding="8px">
                       <Dropdown
@@ -85,7 +84,7 @@ const Header = () => {
 
         </Menu>
       }
-    </NoPrint>
+    </>
   );
 };
 

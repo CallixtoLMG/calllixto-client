@@ -42,7 +42,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   const handleForm = async (data) => {
     if (!isUpdating) {
-      data.code = `${supplier.id}${brand.id}${data.code}`;
+      data.code = `${supplier?.id}${brand?.id}${data.code}`;
     }
     await onSubmit(data);
   };
@@ -153,9 +153,10 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             <Controller
               name="code"
               control={control}
-              rules={RULES.REQUIRED_MAX26_DIGIT_CODE}
+              rules={RULES.REQUIRED_MAX26_DIGIT_CODE && brand?.id && supplier?.id}
               render={({ field }) => (
                 <Input
+                  innerWidth="0"
                   {...field}
                   placeholder="Código"
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}

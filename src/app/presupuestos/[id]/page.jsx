@@ -12,7 +12,7 @@ import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
 import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Input, Menu } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
-import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
@@ -398,97 +398,95 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      <NoPrint>
-        <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) ? "0" : "0 0 15px 0!important"} justifyContent="space-between">
-          {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
-            <>
-              <IconedButton
-                icon
-                labelPosition="left"
-                type="button"
-                width="fit-content"
-                color="green"
-                onClick={handleConfirm}
-              >
-                <Icon name='check' />
-                Confirmar
-              </IconedButton>
-              <ModalCustomer
-                isModalOpen={isModalCustomerOpen}
-                onClose={handleModalCustomerClose}
-                customer={customerData}
-              />
-              <ModalConfirmation
-                isModalOpen={isModalConfirmationOpen}
-                onClose={handleModalConfirmationClose}
-                customer={customerData}
-                onConfirm={mutate}
-                isLoading={isPending}
-              />
-            </>
-          ) : <Box />}
-          {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-            <Input
-              textAlignLast="right"
-              innerWidth="90px"
-              type="text"
-              height="35px"
-              width="fit-content"
-              onChange={handleDollarChange}
-              actionPosition='left'
-              placeholder="Precio dolar"
-              value={formattedDolarRate}
-              disabled={!showDolarExangeRate}
-              action={
-                <IconedButton
-                  icon
-                  labelPosition='left'
-                  type="button"
-                  basic={!showDolarExangeRate}
-                  onClick={() => {
-                    setShowDolarExangeRate(prev => !prev);
-                    if (!showDolarExangeRate) {
-                      setFormattedDolarRate(formatValue(dolarRate));
-                    } else {
-                      setFormattedDolarRate('');
-                      setDolarRate(0);
-                    }
-                  }}
-                  color="green"
-                  width="fit-content"
-                >
-                  <Icon name='dollar' />
-                  Cotizar en USD
-                </IconedButton>
-              }
-            />
-          )}
-        </Flex>
-        {isBudgetDraft(budget?.state) ? (
-          <BudgetForm
-            onSubmit={mutateEdit}
-            products={products}
-            customers={customers}
-            user={userData}
-            budget={budget}
-            isLoading={isPendingEdit}
-            draft
-            printPdfMode={printPdfMode}
-          />
-        ) : (
+      <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0" } justifyContent="space-between">
+        {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
           <>
-            <BudgetView
-              budget={{ ...budget, customer: customerData }}
+            <IconedButton
+              icon
+              labelPosition="left"
+              type="button"
+              width="fit-content"
+              color="green"
+              onClick={handleConfirm}
+            >
+              <Icon name='check' />
+              Confirmar
+            </IconedButton>
+            <ModalCustomer
+              isModalOpen={isModalCustomerOpen}
+              onClose={handleModalCustomerClose}
+              customer={customerData}
             />
-            <ModalCancel
-              isModalOpen={isModalCancelOpen}
-              onClose={handleModalCancelClose}
-              onConfirm={mutateCancel}
-              isLoading={isPendingCancel}
+            <ModalConfirmation
+              isModalOpen={isModalConfirmationOpen}
+              onClose={handleModalConfirmationClose}
+              customer={customerData}
+              onConfirm={mutate}
+              isLoading={isPending}
             />
           </>
+        ) : <Box />}
+        {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
+          <Input
+            textAlignLast="right"
+            innerWidth="90px"
+            type="text"
+            height="35px"
+            width="fit-content"
+            onChange={handleDollarChange}
+            actionPosition='left'
+            placeholder="Precio dolar"
+            value={formattedDolarRate}
+            disabled={!showDolarExangeRate}
+            action={
+              <IconedButton
+                icon
+                labelPosition='left'
+                type="button"
+                basic={!showDolarExangeRate}
+                onClick={() => {
+                  setShowDolarExangeRate(prev => !prev);
+                  if (!showDolarExangeRate) {
+                    setFormattedDolarRate(formatValue(dolarRate));
+                  } else {
+                    setFormattedDolarRate('');
+                    setDolarRate(0);
+                  }
+                }}
+                color="green"
+                width="fit-content"
+              >
+                <Icon name='dollar' />
+                Cotizar en USD
+              </IconedButton>
+            }
+          />
         )}
-      </NoPrint>
+      </Flex>
+      {isBudgetDraft(budget?.state) ? (
+        <BudgetForm
+          onSubmit={mutateEdit}
+          products={products}
+          customers={customers}
+          user={userData}
+          budget={budget}
+          isLoading={isPendingEdit}
+          draft
+          printPdfMode={printPdfMode}
+        />
+      ) : (
+        <>
+          <BudgetView
+            budget={{ ...budget, customer: customerData }}
+          />
+          <ModalCancel
+            isModalOpen={isModalCancelOpen}
+            onClose={handleModalCancelClose}
+            onConfirm={mutateCancel}
+            isLoading={isPendingCancel}
+          />
+        </>
+      )}
       <OnlyPrint marginTop="20px">
         <PDFfile
           ref={printRef}

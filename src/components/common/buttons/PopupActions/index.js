@@ -1,4 +1,3 @@
-import { NoPrint } from '@/components/layout';
 import { cloneElement, useState } from 'react';
 import { Icon, Popup } from 'semantic-ui-react';
 import { ButtonsContainer, Flex, IconedButton } from '../../custom';
@@ -30,20 +29,18 @@ const PopupActions = ({ width, title, color, buttons, icon, position = "bottom c
         </ButtonsContainer>
       )}
       content={
-        <NoPrint>
-          <Flex rowGap="5px" flexDirection="column">
-            {buttons?.map((child) =>
-              cloneElement(child, {
-                onClick: () => {
-                  handleClose();
-                  if (child.props.onClick) {
-                    child.props.onClick();
-                  }
+        <Flex rowGap="5px" flexDirection="column">
+          {buttons?.map((child) =>
+            cloneElement(child, {
+              onClick: () => {
+                handleClose();
+                if (child.props.onClick) {
+                  child.props.onClick();
                 }
-              })
-            )}
-          </Flex>
-        </NoPrint>
+              }
+            })
+          )}
+        </Flex>
       }
       on="click"
     />
