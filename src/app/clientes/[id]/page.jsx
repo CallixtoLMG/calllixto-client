@@ -18,7 +18,7 @@ const Customer = ({ params }) => {
   const { data: customer, isLoading } = useGetCustomer(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const [allowUpdate, Toggle] = useAllowUpdate();
+  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
 
   useEffect(() => {
     resetActions();
@@ -53,7 +53,7 @@ const Customer = ({ params }) => {
   return (
     <Loader active={isLoading}>
       {Toggle}
-      {allowUpdate ? (
+      {isUpdating ? (
         <CustomerForm
           customer={customer}
           onSubmit={mutate}

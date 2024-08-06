@@ -12,12 +12,15 @@ import { toast } from "react-hot-toast";
 import ProductView from "../../../components/products/ProductView";
 import { SubContainer, Barcode, ProductCode, ProductName } from "@/components/products/ProductView/styles";
 import JsBarcode from "jsbarcode";
+import { useUserContext } from "@/User";
+import { RULES } from "@/roles";
 
 const Product = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
   const { data: product, isLoading } = useGetProduct(params.code);
-  const [allowUpdate, Toggle] = useAllowUpdate();
+  const { role } = useUserContext();
+  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const queryClient = useQueryClient();
@@ -81,7 +84,7 @@ const Product = ({ params }) => {
   return (
     <Loader active={isLoading}>
       {Toggle}
-      {allowUpdate ? (
+      {isUpdating ? (
         <ProductForm product={product} onSubmit={mutate} isUpdating isLoading={isPending} />
       ) : (
         <ProductView product={product} />

@@ -18,18 +18,17 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
-
 const Supplier = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
   const { data: supplier, isLoading, isRefetching } = useGetSupplier(params.id);
-  const [allowUpdate, Toggle] = useAllowUpdate();
+  const { role } = useUserContext();
+  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [open, setOpen] = useState(false);
   const [shouldPrint, setShouldPrint] = useState(false);
   const queryClient = useQueryClient();
-  const { role } = useUserContext();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar todos los productos de la marca "${name}"?`;
 
   const { data: productsData, isLoading: loadingProducts, refetch } = useListAllProducts({
@@ -75,14 +74,15 @@ const Supplier = ({ params }) => {
     setShouldPrint(false);
   }, [params.id]);
 
-  const handleBarcodeClick = async () => {
-    const { data } = await refetch();
-    if (data) {
-      setShouldPrint(true);
-    }
-  };
 
   useEffect(() => {
+    const handleBarcodeClick = async () => {
+      const { data } = await refetch();
+      if (data) {
+        setShouldPrint(true);
+      }
+    };
+
     const actions = RULES.canRemove[role]
       ? [
         {
@@ -102,7 +102,7 @@ const Supplier = ({ params }) => {
       ]
       : [];
     setActions(actions);
-  }, [role, setActions]);
+  }, [refetch, role, setActions]);
 
   const { mutate: mutateUpdate, isPending: isLoadingUpdate } = useMutation({
     mutationFn: async (supplier) => {
@@ -154,7 +154,7 @@ const Supplier = ({ params }) => {
           onDelete={mutateDelete}
           isLoading={isLoadingDelete}
         />}
-      {allowUpdate ? (
+      {isUpdating ? (
         <SupplierForm supplier={supplier} onSubmit={mutateUpdate} isLoading={isLoadingUpdate} isUpdating />
       ) : (
         <>
