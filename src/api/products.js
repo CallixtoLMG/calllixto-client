@@ -3,7 +3,6 @@ import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
 import {
   BATCH,
   BLACK_LIST,
-  CLIENT,
   EDIT_BATCH,
   PATHS,
   SUPPLIER,
@@ -14,7 +13,6 @@ import axios from "./axios";
 const { omit, chunk } = require("lodash");
 
 const PRODUCTS_URL = `${PATHS.PRODUCTS}`;
-const BAN_PRODUCTS_URL = `${CLIENT}`;
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_ALL_PRODUCTS_QUERY_KEY = "listAllProducts";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
@@ -26,7 +24,7 @@ export function create(product) {
     createdAt: now(),
   };
   return axios.post(PRODUCTS_URL, body);
-}
+};
 
 export function edit(product) {
   const body = {
@@ -34,11 +32,11 @@ export function edit(product) {
     updatedAt: now(),
   };
   return axios.put(`${PRODUCTS_URL}/${product.code}`, body);
-}
+};
 
 export function deleteProduct(id) {
   return axios.delete(`${PRODUCTS_URL}/${id}`);
-}
+};
 
 export function useListProducts({
   sort,
@@ -71,7 +69,7 @@ export function useListProducts({
       };
     } catch (error) {
       throw error;
-    }
+    };
   };
 
   const query = useQuery({
@@ -119,7 +117,7 @@ export function useListAllProducts({ attributes = [], enabled = false, code } = 
   });
 
   return query;
-}
+};
 
 export function useGetProduct(id) {
   const getProduct = async (id) => {
@@ -128,7 +126,7 @@ export function useGetProduct(id) {
       return data?.product;
     } catch (error) {
       throw error;
-    }
+    };
   };
 
   const query = useQuery({
@@ -139,7 +137,7 @@ export function useGetProduct(id) {
   });
 
   return query;
-}
+};
 
 export async function createBatch(products) {
   const parsedProducts = products.map((product) => ({
@@ -172,7 +170,7 @@ export async function createBatch(products) {
   };
 
   return Promise.resolve({ data });
-}
+};
 
 export async function editBatch(products) {
   const chuncks = chunk(products, 100);
@@ -201,32 +199,12 @@ export async function editBatch(products) {
   };
 
   return Promise.resolve({ data });
-}
-
-export function useListBanProducts() {
-  const listBannedProducts = async () => {
-    try {
-      const { data } = await axios.get(BAN_PRODUCTS_URL);
-      return data?.client?.blacklist || [];
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const query = useQuery({
-    queryKey: [LIST_BANNED_PRODUCTS_QUERY_KEY],
-    queryFn: () => listBannedProducts(),
-    retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
-  });
-
-  return query;
-}
+};
 
 export function editBanProducts(products) {
-  return axios.put(`${BLACK_LIST}`, products);
-}
+  return axios.put(BLACK_LIST, products);
+};
 
 export function deleteBatchProducts(id) {
   return axios.delete(`${PRODUCTS_URL}/${SUPPLIER}/${id}`);
-}
+};
