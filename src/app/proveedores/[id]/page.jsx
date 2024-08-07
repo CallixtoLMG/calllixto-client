@@ -57,7 +57,7 @@ const Supplier = ({ params }) => {
       handlePrint();
     } else {
       toast.success('No hay productos de este proveedor', {
-        icon: <Icon name="info circle" color="blue" />,
+        icon:<Icon margin="0" toast name="info circle" color="blue" />,
       });
     }
   };

@@ -83,7 +83,7 @@ const Product = ({ params }) => {
       )}
       {product && (
         <OnlyPrint>
-          <PrintBarCodes singelProduct ref={printRef} products={product} />
+          <PrintBarCodes singelProduct ref={printRef} products={[product]} />
         </OnlyPrint>
       )}
     </Loader>

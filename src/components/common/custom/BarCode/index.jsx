@@ -4,9 +4,7 @@ import { BarCodeContainer, BarCodeSubContainer, Barcode, ProductCode, ProductNam
 
 const PrintBarCodes = forwardRef(({ products }, ref) => {
   const generateBarcodes = useCallback(() => {
-    const productsArray = Array.isArray(products) ? products : [products];
-
-    productsArray?.forEach(product => {
+    products?.forEach(product => {
       const barcodeElement = document.getElementById(`barcode-${product?.code}`);
       if (barcodeElement) {
         JsBarcode(barcodeElement, product?.code, {
@@ -25,13 +23,10 @@ const PrintBarCodes = forwardRef(({ products }, ref) => {
     generateBarcodes();
   }, [generateBarcodes]);
 
-  const productsArray = Array.isArray(products) ? products : [products];
-  const singleProduct = productsArray.length === 1;
-
   return (
     <BarCodeContainer ref={ref}>
-      {productsArray?.map(product => (
-        <BarCodeSubContainer singleProduct={singleProduct} key={product?.code}>
+      {products?.map(product => (
+        <BarCodeSubContainer singleProduct={products?.length === 1} key={product?.code}>
           <ProductName>{product?.name}</ProductName>
           <Barcode id={`barcode-${product?.code}`}></Barcode>
           <ProductCode>{product?.code}</ProductCode>
