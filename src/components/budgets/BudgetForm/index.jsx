@@ -619,6 +619,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                           key={text}
                           basic={!value.includes(text)}
                           color="blue"
+                          type="button"
                           onClick={() => {
                             if (value.includes(text)) {
                               onChange(value.filter(payment => payment !== text));

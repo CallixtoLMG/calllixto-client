@@ -1,5 +1,4 @@
 "use client";
-import { useUserContext } from "@/User";
 import { Loader } from "@/components/layout";
 import { PAGES, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
@@ -14,7 +13,6 @@ import { ModButton, ModGrid, ModGridColumn, ModHeader, Text } from "./styled";
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
   const { handleSubmit, control } = useForm();
-  const { setUserData } = useUserContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const { mutate } = useMutation({
@@ -25,7 +23,6 @@ const LoginForm = ({ onSubmit }) => {
     },
     onSuccess: (userData) => {
       if (userData) {
-        setUserData(userData);
         push(PAGES.BUDGETS.BASE);
         toast.success("Ingreso exitoso!");
       } else {
