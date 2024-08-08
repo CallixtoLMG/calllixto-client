@@ -1,6 +1,7 @@
 "use client";
 import { GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, edit, useGetProduct } from "@/api/products";
-import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import PrintBarCodes from "@/components/common/custom/BarCode";
+import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
@@ -9,9 +10,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
+import { useReactToPrint } from "react-to-print";
 import ProductView from "../../../components/products/ProductView";
-import { SubContainer, Barcode, ProductCode, ProductName } from "@/components/products/ProductView/styles";
-import JsBarcode from "jsbarcode";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -20,6 +20,8 @@ const Product = ({ params }) => {
   const [allowUpdate, Toggle] = useAllowUpdate();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
+  const printRef = useRef(null);
+
   const queryClient = useQueryClient();
   useEffect(() => {
     resetActions();
@@ -51,6 +53,11 @@ const Product = ({ params }) => {
     push(PAGES.NOT_FOUND.BASE);
   };
 
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    removeAfterPrint: true,
+  });
+
   useEffect(() => {
     if (product) {
       const actions = [
@@ -58,25 +65,13 @@ const Product = ({ params }) => {
           id: 1,
           icon: 'barcode',
           color: 'blue',
-          onClick: () => setTimeout(window.print),
+          onClick: () => setTimeout(handlePrint),
           text: 'Código'
         },
       ];
       setActions(actions);
     }
   }, [product, setActions]);
-  const barcodeRef = useRef(null);
-
-  useEffect(() => {
-    if (product?.code && barcodeRef.current) {
-      JsBarcode(barcodeRef.current, product.code, {
-        format: "CODE128",
-        lineColor: "#000",
-        width: 2,
-        height: 100,
-      });
-    }
-  }, [product]);
 
   return (
     <Loader active={isLoading}>
@@ -88,11 +83,7 @@ const Product = ({ params }) => {
       )}
       {product && (
         <OnlyPrint>
-          <SubContainer>
-            <ProductName>{product.name}</ProductName>
-            <Barcode ref={barcodeRef}></Barcode>
-            <ProductCode>{product.code}</ProductCode>
-          </SubContainer>
+          <PrintBarCodes singelProduct ref={printRef} products={[product]} />
         </OnlyPrint>
       )}
     </Loader>

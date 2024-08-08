@@ -147,9 +147,10 @@ export const DropdownMenu = styled(SDropdown.Menu)`
 export const Icon = styled(SIcon)`
   align-self: center!important;
   margin-right: ${({ marginRight }) => marginRight && `11px!important`} ;
-  top: ${({ dollar }) => dollar && `-3px!important`} ;
-  position: ${({ dollar }) => dollar && `relative!important`} ;
+  top: ${({ dollar, toast }) => (dollar ? `-3px` : toast ? `-2px` : 'initial')} !important;
+  position: ${({ dollar, toast }) => dollar || toast && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
+  margin: ${({ margin }) => `${margin}!important;`};
 `;
 
 export const Modal = styled(SModal)`

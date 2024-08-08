@@ -11,7 +11,7 @@ import { Icon } from "semantic-ui-react";
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
-  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted } } = useForm({
+  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors } = useForm({
     defaultValues: {
       fractionConfig: {
         active: false,
@@ -42,7 +42,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   const handleForm = async (data) => {
     if (!isUpdating) {
-      data.code = `${supplier.id}${brand.id}${data.code}`;
+      data.code = `${supplier?.id}${brand?.id}${data.code}`;
     }
     await onSubmit(data);
   };
@@ -70,6 +70,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               onChange={(e, { value }) => {
                 const supplier = suppliers.find((supplier) => supplier.name === value);
                 setSupplier(supplier);
+                clearErrors("code");
               }}
             />
           ) : (
@@ -93,6 +94,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               onChange={(e, { value }) => {
                 const brand = brands.find((brand) => brand.name === value);
                 setBrand(brand);
+                clearErrors("code"); 
               }}
               disabled={isUpdating}
             />
@@ -153,9 +155,10 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             <Controller
               name="code"
               control={control}
-              rules={RULES.REQUIRED_MAX26_DIGIT_CODE}
+              rules={RULES.REQUIRED_BRAND_AND_SUPPLIER(brand, supplier)}
               render={({ field }) => (
                 <Input
+                  innerWidth="0"
                   {...field}
                   placeholder="Código"
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
