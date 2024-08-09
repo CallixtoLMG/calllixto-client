@@ -57,7 +57,6 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
-        <Label>Comentarios</Label>
         <ControlledComments control={control} />
       </FieldsContainer>
       <SubmitAndRestore

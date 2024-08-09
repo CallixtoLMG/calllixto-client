@@ -62,7 +62,6 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
         </FieldsContainer>
         <ContactFields />
         <FieldsContainer>
-          <Label >Comentarios</Label>
           <ControlledComments control={control} />
         </FieldsContainer>
         <SubmitAndRestore

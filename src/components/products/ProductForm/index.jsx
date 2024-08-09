@@ -209,8 +209,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           />
         </FormField>
       </FieldsContainer>
-      <FieldsContainer rowGap="5px">
-        <Label>Comentarios</Label>
+      <FieldsContainer>
         <ControlledComments control={control} />
       </FieldsContainer>
       <SubmitAndRestore

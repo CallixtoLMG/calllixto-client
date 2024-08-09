@@ -555,8 +555,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
           />
         </Loader>
-        <FieldsContainer rowGap="5px!important">
-          <Label>Comentarios</Label>
+        <FieldsContainer>
           <ControlledComments control={control} />
         </FieldsContainer>
         <FieldsContainer>

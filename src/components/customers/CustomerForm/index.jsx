@@ -44,7 +44,6 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
         </FieldsContainer>
         <ContactFields />
         <FieldsContainer>
-          <Label>Comentarios</Label>
           <ControlledComments control={control} />
         </FieldsContainer>
         <SubmitAndRestore
