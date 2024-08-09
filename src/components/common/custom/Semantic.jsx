@@ -98,9 +98,9 @@ export const Dropdown = styled(SDropdown)`
 export const DropdownOption = styled(SDropdown)`
   justify-content: space-between!important;
   margin:0!important;
-  font-size: 12px!important;
-  padding: 12px 10px!important;
-  padding: ${({ menu }) => menu ? "9px 10px" : "12px 10px"} !important ;
+  font-size: 13px!important;
+  padding: 13px 10px!important;
+  padding: ${({ menu }) => menu ? "9px 10px" : "13px 10px"} !important ;
   width: ${({ width = '100%' }) => `${width}!important`} ;
   justify-content: space-between!important;
   align-content: center;
@@ -114,12 +114,12 @@ export const DropdownOption = styled(SDropdown)`
 `;
 
 export const DropdownItem = styled(SDropdown.Item)`
-  font-size: 12px!important;
+  font-size: 13px!important;
   color: rgba(0, 0, 0, 0.87);
   font-weight: 400;
   width: 100%;
   &&&&&&{
-    padding: 12px 10px!important;
+    padding: 13px 10px!important;
   }
   &:hover {
     background-color: #f5f5f5!important;
@@ -132,7 +132,7 @@ export const Menu = styled(SMenu)`
     width:110px;
     height: 35px;
     min-height:35px;
-    font-size: 12px!important;
+    font-size: 13px!important;
     border:none;
   }
 `;

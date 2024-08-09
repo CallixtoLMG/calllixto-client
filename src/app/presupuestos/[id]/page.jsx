@@ -17,7 +17,7 @@ import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
+import { formatedSimplePhone, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -66,6 +66,7 @@ const Budget = ({ params }) => {
   const printRef = useRef();
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
   const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
+  const [selectedContact, setSelectedContact] = useState({ phone: '', address: '' });
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {
@@ -133,6 +134,10 @@ const Budget = ({ params }) => {
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
       ].filter(Boolean));
       setCustomerData(budget.customer);
+      setSelectedContact({
+        address: budget.customer?.addresses?.[0]?.address,
+        phone: formatedSimplePhone(budget.customer?.phoneNumbers?.[0])
+      });
     }
   }, [setLabels, budget, push, isLoading]);
 
@@ -266,7 +271,7 @@ const Budget = ({ params }) => {
       ].filter(Boolean);
       setActions(actions);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [budget, push, role, setActions]);
 
   const handleConfirm = () => {
@@ -418,11 +423,15 @@ const Budget = ({ params }) => {
           isLoading={isPendingEdit}
           draft
           printPdfMode={printPdfMode}
+          selectedContact={selectedContact}
+          setSelectedContact={setSelectedContact}
         />
       ) : (
         <>
           <BudgetView
             budget={{ ...budget, customer: customerData }}
+            selectedContact={selectedContact}
+            setSelectedContact={setSelectedContact}
           />
           <ModalCancel
             isModalOpen={isModalCancelOpen}
@@ -440,6 +449,7 @@ const Budget = ({ params }) => {
           id={userData.client?.id}
           printPdfMode={printPdfMode}
           dolarExchangeRate={showDolarExangeRate && dolarRate}
+          selectedContact={selectedContact}
         />
       </OnlyPrint>
     </Loader >

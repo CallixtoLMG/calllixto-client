@@ -22,7 +22,7 @@ const Field = ({ label, value, ...rest }) => (
   </Flex>
 );
 
-const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0 }, ref) => {
+const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0, selectedContact }, ref) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL, [printPdfMode]);
@@ -80,8 +80,8 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <Field width="100%" label="Cliente" value={(get(budget, "customer.name", ""))} />
           </Flex>
           <Flex>
-            <Field flex="1" width="fit-content" label="Dirección" value={budget?.pickUpInStore ? PICK_UP_IN_STORE : (get(budget, "customer.addresses[0].address", ""))} />
-            <Field width="fit-content" label="Teléfono" value={formatedSimplePhone(get(budget, "customer.phoneNumbers[0]"))} />
+            <Field flex="1" width="fit-content" label="Dirección" value={budget?.pickUpInStore ? PICK_UP_IN_STORE : selectedContact?.address} />
+            <Field width="fit-content" label="Teléfono" value={selectedContact?.phone} />
           </Flex>
         </SectionContainer>
         <Divider />

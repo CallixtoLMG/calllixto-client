@@ -27,7 +27,18 @@ const EMPTY_BUDGET = (user) => ({
   expirationOffsetDays: ''
 });
 
-const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoading, isCloning, draft }) => {
+const BudgetForm = ({
+  onSubmit,
+  products,
+  customers = [],
+  budget,
+  user,
+  isLoading,
+  isCloning,
+  draft,
+  selectedContact,
+  setSelectedContact
+}) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
@@ -506,13 +517,41 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </FormField>
           <FormField flex={1}>
             <RuledLabel title="Dirección" message={shouldError && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
-            <Segment placeholder>
-              {!watchPickUp ? watchCustomer?.addresses?.[0]?.address : PICK_UP_IN_STORE}
-            </Segment>
+            {watchPickUp ? (
+              <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
+            ) : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? (
+              <Segment placeholder>{watchCustomer?.addresses?.[0]?.address}</Segment>
+            ) : (
+              (
+                <Dropdown
+                  selection
+                  options={watchCustomer?.addresses.map((address) => ({
+                    key: address.address,
+                    text: address.address,
+                    value: address.address,
+                  }))}
+                  value={selectedContact.address}
+                  onChange={(e, { value }) => setSelectedContact({ ...selectedContact, address: value })}
+                />
+              )
+            )}
           </FormField>
           <FormField width="200px">
             <RuledLabel title="Teléfono" message={shouldError && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
-            <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
+            {!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? (
+              <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
+            ) : (
+              <Dropdown
+                selection
+                options={watchCustomer?.phoneNumbers.map((phone) => ({
+                  key: formatedSimplePhone(phone),
+                  text: formatedSimplePhone(phone),
+                  value: formatedSimplePhone(phone),
+                }))}
+                value={selectedContact.phone}
+                onChange={(e, { value }) => setSelectedContact({ ...selectedContact, phone: value })}
+              />
+            )}
           </FormField>
         </FieldsContainer>
         <FormField width="300px" error={errors?.products?.message}>
