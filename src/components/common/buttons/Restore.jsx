@@ -8,7 +8,7 @@ export const Restore = ({ isUpdating, isLoading, isDirty, onClick, disabled }) =
       disabled={isLoading || !isDirty || disabled}
       color="brown"
       onClick={onClick}
-      width="110px"
+      width="130px"
     />
   )
 }

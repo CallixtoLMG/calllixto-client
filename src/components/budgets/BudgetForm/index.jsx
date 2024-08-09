@@ -49,11 +49,14 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore']);
   const [subtotal, setSubtotal] = useState(0);
   const productSearchRef = useRef(null);
-  const customerOptions =
-    customers.filter(customer => customer.id && customer.name)
+  const customerOptions = useMemo(() => {
+    return customers.filter(customer => customer.id && customer.name)
       .map(customer => ({
         key: customer.id, value: customer.id, text: customer.name,
       }));
+  }, [customers]);
+  const shouldError = useMemo(() => isBudgetConfirmed(watchState) && !draft && !watchPickUp, [draft, watchPickUp, watchState]);
+
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
       setIsTableLoading(true);
@@ -133,12 +136,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   }, [watchState]);
 
   const validateCustomer = () => {
-    const customer = getValues("customer");
-    if (isBudgetConfirmed(watchState) && watchPickUp && (!customer.addresses.length || !customer.phoneNumbers.length)) {
-      if (!customer.addresses.length) {
+    if (isBudgetConfirmed(watchState) && !watchPickUp && (!watchCustomer.addresses.length || !watchCustomer.phoneNumbers.length)) {
+      if (!watchCustomer.addresses.length) {
         setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
-      if (!customer.phoneNumbers.length) {
+      if (!watchCustomer.phoneNumbers.length) {
         setError('customer.phoneNumbers', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
       return false;
@@ -473,7 +475,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </FormField>
         </FieldsContainer>
         <FieldsContainer>
-          <FormField width="300px">
+          <FormField width="300px" error={errors?.customer?.message}>
             <RuledLabel title="Cliente" message={errors?.customer?.message} required />
             <Controller
               name="customer"
@@ -503,17 +505,17 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             />
           </FormField>
           <FormField flex={1}>
-            <RuledLabel title="Dirección" message={isBudgetConfirmed(watchState) && !draft && !watchPickUp && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
+            <RuledLabel title="Dirección" message={shouldError && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
             <Segment placeholder>
               {!watchPickUp ? watchCustomer?.addresses?.[0]?.address : PICK_UP_IN_STORE}
             </Segment>
           </FormField>
           <FormField width="200px">
-            <RuledLabel title="Teléfono" message={isBudgetConfirmed(watchState) && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
+            <RuledLabel title="Teléfono" message={shouldError && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
             <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
           </FormField>
         </FieldsContainer>
-        <FormField width="300px">
+        <FormField width="300px" error={errors?.products?.message}>
           <RuledLabel title="Agregar producto" message={errors?.products?.message} required />
           <Controller name="products"
             control={control}
@@ -611,7 +613,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               />
             </Segment>
           </FormField>
-          <FormField flex={1}>
+          <FormField flex={1} error={errors?.expirationOffsetDays?.message}>
             <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
             <Controller name="expirationOffsetDays" control={control}
               rules={RULES.REQUIRED}
@@ -652,7 +654,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               loading={isLoading && watchState === BUDGET_STATES.DRAFT.id}
               onClick={handleSubmit(handleDraft)}
               color={BUDGET_STATES.DRAFT.color}
-              width="110px"
+              width="130px"
             />
           }
         />

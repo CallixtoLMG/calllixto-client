@@ -10,7 +10,7 @@ export const Submit = ({ isUpdating, isLoading, isDirty, onClick, disabled, colo
       submit
       color={color}
       onClick={onClick}
-      width="110px"
+      width="130px"
     />
   )
 }

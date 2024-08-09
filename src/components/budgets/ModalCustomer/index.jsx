@@ -62,7 +62,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                 <Label>Nombre</Label>
                 <Segment height="40px" placeholder>{customer?.name}</Segment>
               </FormField>
-              <FormField flex="1">
+              <FormField flex="1" error={errors?.addresses?.message}>
                 <RuledLabel title="Dirección" message={errors?.addresses?.message} required />
                 <Controller
                   name="addresses"
@@ -85,8 +85,8 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   )}
                 />
               </FormField>
-              <FormField width="200px">
-                <RuledLabel title="Teléfono" message={errors?.phoneNumbers && errors.phoneNumbers[0]?.message} required />
+              <FormField width="200px" error={errors?.phoneNumbers?.[0]?.message}>
+                <RuledLabel title="Teléfono" message={errors?.phoneNumbers?.[0]?.message} required />
                 <PhoneContainer>
                   <Controller
                     name={`phoneNumbers[0]`}

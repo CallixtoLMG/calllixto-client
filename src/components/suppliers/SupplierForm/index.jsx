@@ -29,7 +29,7 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
         <FieldsContainer>
-          <FormField>
+          <FormField error={errors?.id?.message}>
             <RuledLabel title="Código" message={errors?.id?.message} required={!isUpdating} />
             {isUpdating ? (
               <Segment placeholder>{supplier?.id}</Segment>
@@ -50,7 +50,7 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
               />
             )}
           </FormField>
-          <FormField width="40%">
+          <FormField width="40%" error={errors?.name?.message}>
             <RuledLabel title="Nombre" message={errors?.name?.message} required />
             <Controller
               name="name"

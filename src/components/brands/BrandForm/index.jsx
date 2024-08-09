@@ -26,7 +26,7 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
   return (
     <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
       <FieldsContainer>
-        <FormField>
+        <FormField error={errors?.id?.message}>
           <RuledLabel title="Código" message={errors?.id?.message} required={!isUpdating} />
           {isUpdating ? (
             <Segment placeholder>{brand?.id}</Segment>
@@ -46,7 +46,7 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
             />
           )}
         </FormField>
-        <FormField width="50%">
+        <FormField width="50%" error={errors?.name?.message}>
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
           <Controller
             name="name"

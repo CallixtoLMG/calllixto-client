@@ -1,12 +1,11 @@
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, IconedButton, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
+import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import { MEASSURE_UNITS, PAGES, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Icon } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
@@ -47,14 +46,16 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     await onSubmit(data);
   };
 
+  const shouldError = useMemo(() => !isUpdating && isDirty && isSubmitted, [isDirty, isSubmitted, isUpdating]);
+
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT), SHORTKEYS.DELETE);
 
   return (
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer rowGap="5px" alignItems="flex-end">
-        <FormField flex="1">
-          <RuledLabel title="Proveedor" message={!isUpdating && isDirty && isSubmitted && !supplier && 'Campo requerido.'} required />
+        <FormField flex="1" error={shouldError && !supplier && 'Campo requerido.'}>
+          <RuledLabel title="Proveedor" message={shouldError && !supplier && 'Campo requerido.'} required />
           {!isUpdating ? (
             <Dropdown
               required
@@ -77,8 +78,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             <Segment placeholder>{product?.supplierName}</Segment>
           )}
         </FormField>
-        <FormField flex="1">
-          <RuledLabel title="Marca" message={!isUpdating && isDirty && isSubmitted && !brand && 'Campo requerido.'} required />
+        <FormField flex="1" error={shouldError && !brand && 'Campo requerido.'}>
+          <RuledLabel title="Marca" message={shouldError && !brand && 'Campo requerido.'} required />
           {!isUpdating ? (
             <Dropdown
               required
@@ -135,7 +136,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
       </FieldsContainer>
       <FieldsContainer rowGap="5px">
-        <FormField width="20%">
+        <FormField width="20%" error={errors?.code?.message}>
           <RuledLabel title="Código" message={errors?.code?.message} required={!isUpdating} />
           {isUpdating ? (
             <Segment placeholder>{product?.code}</Segment>
@@ -158,7 +159,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           )}
 
         </FormField>
-        <FormField flex="1">
+        <FormField flex="1" error={errors?.name?.message}>
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
           <Controller
             name="name"
@@ -168,7 +169,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           />
         </FormField>
         <FormField width="20%">
-          <RuledLabel title="Precio" />
+          <Label>Precio</Label>
           <Controller
             name="price"
             control={control}
