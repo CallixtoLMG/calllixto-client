@@ -10,6 +10,7 @@ import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
+import { IconnedButton } from "@/components/common/buttons";
 import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Input, Menu } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -23,19 +24,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Dropdown } from "semantic-ui-react";
-const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) => (
-  <a href={href} target={target}>
-    <IconedButton
-      icon
-      labelPosition="left"
-      width={width}
-      color={color}
-      size="small"
-    >
-      <Icon name={iconName} />{text}
-    </IconedButton>
-  </a>
-);
 
 const Budget = ({ params }) => {
   useValidateToken();
@@ -177,35 +165,6 @@ const Budget = ({ params }) => {
       ];
 
       const sendButtons = [
-        ...(budget?.customer?.phoneNumbers?.length ? [{
-          buttons: budget?.customer?.phoneNumbers.map(({ ref, areaCode, number }) => (
-            <SendButton
-              key={`${APIS.WSP(`${areaCode}${number}`)}`}
-              href={`${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`}
-              text={`${ref ? `${ref} - ` : ''}${areaCode} ${number}`}
-              iconName="whatsapp"
-            />
-          )),
-          color: 'green',
-          iconName: 'whatsapp',
-          text: 'WhatsApp'
-        }] : []),
-        ...(budget?.customer?.emails?.length ? [{
-          buttons: budget?.customer?.emails?.map(({ ref, email }) => (
-            <SendButton
-              key={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
-              href={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
-              text={`${ref ? `${ref} - ` : ''}${email}`}
-              iconName="mail"
-            />
-          )),
-          color: 'red',
-          iconName: 'mail',
-          text: 'Mail'
-        }] : [])
-      ];
-
-      const sendButtons1 = [
         {
           text: 'WhatsApp',
           iconName: 'whatsapp',
@@ -268,7 +227,7 @@ const Budget = ({ params }) => {
             <Menu>
               <DropdownOption menu pointing text='Enviar' icon='send' floating labeled button className='icon blue'>
                 <Dropdown.Menu>
-                  {sendButtons1.map(({ text, iconName, color, subOptions }) => (
+                  {sendButtons.map(({ text, iconName, color, subOptions }) => (
                     <Flex key={iconName}>
                       {subOptions.length > 0 && (
                         <DropdownOption text={text} pointing="left" className="link item">
@@ -307,6 +266,7 @@ const Budget = ({ params }) => {
       ].filter(Boolean);
       setActions(actions);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [budget, push, role, setActions]);
 
   const handleConfirm = () => {
@@ -398,20 +358,10 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0" } justifyContent="space-between">
+      <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} justifyContent="space-between">
         {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
           <>
-            <IconedButton
-              icon
-              labelPosition="left"
-              type="button"
-              width="fit-content"
-              color="green"
-              onClick={handleConfirm}
-            >
-              <Icon name='check' />
-              Confirmar
-            </IconedButton>
+            <IconnedButton text="Confirmar" icon="check" color="green" onClick={handleConfirm} />
             <ModalCustomer
               isModalOpen={isModalCustomerOpen}
               onClose={handleModalCustomerClose}
@@ -439,10 +389,10 @@ const Budget = ({ params }) => {
             value={formattedDolarRate}
             disabled={!showDolarExangeRate}
             action={
-              <IconedButton
-                icon
-                labelPosition='left'
-                type="button"
+              <IconnedButton
+                text="Cotizar en USD"
+                icon="dollar"
+                color="green"
                 basic={!showDolarExangeRate}
                 onClick={() => {
                   setShowDolarExangeRate(prev => !prev);
@@ -453,12 +403,7 @@ const Budget = ({ params }) => {
                     setDolarRate(0);
                   }
                 }}
-                color="green"
-                width="fit-content"
-              >
-                <Icon name='dollar' />
-                Cotizar en USD
-              </IconedButton>
+              />
             }
           />
         )}

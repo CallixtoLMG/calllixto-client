@@ -1,4 +1,4 @@
-import { SubmitAndRestore } from "@/components/common/buttons";
+import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, IconedButton, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import { MEASSURE_UNITS, PAGES, RULES, SHORTKEYS } from "@/constants";
@@ -94,7 +94,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               onChange={(e, { value }) => {
                 const brand = brands.find((brand) => brand.name === value);
                 setBrand(brand);
-                clearErrors("code"); 
+                clearErrors("code");
               }}
               disabled={isUpdating}
             />
@@ -107,19 +107,13 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             name="editablePrice"
             control={control}
             render={({ field: { value, onChange, ...rest } }) => (
-              <IconedButton
+              <IconnedButton
                 {...rest}
-                width="fit-content"
-                icon
-                labelPosition="left"
-                color="blue"
+                text="Precio Editable"
+                icon="pencil"
                 onClick={() => onChange(!value)}
-                type="button"
                 basic={!value}
-              >
-                <Icon name="pencil" />
-                Precio Editable
-              </IconedButton>
+              />
             )}
           />
         </FormField>
@@ -128,19 +122,13 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             name="fractionConfig.active"
             control={control}
             render={({ field: { value, onChange, ...rest } }) => (
-              <IconedButton
+              <IconnedButton
                 {...rest}
-                width="fit-content"
-                icon
-                labelPosition="left"
-                color="blue"
+                text="Producto Fraccionable"
+                icon="cut"
                 onClick={() => onChange(!value)}
                 basic={!value}
-                type="button"
-              >
-                <Icon name="cut" />
-                Producto Fraccionable
-              </IconedButton>
+              />
             )}
           />
         </FormField>

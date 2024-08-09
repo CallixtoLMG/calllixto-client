@@ -1,10 +1,11 @@
 import { edit } from "@/api/customers";
-import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, IconedButton, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
+import { IconnedButton } from "@/components/common/buttons";
+import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
 import { RULES } from "@/constants";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Icon, Modal, Transition } from "semantic-ui-react";
+import { Modal, Transition } from "semantic-ui-react";
 
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -145,29 +146,21 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer width="100%">
-            <IconedButton
-              icon
-              labelPosition="left"
+            <IconnedButton
+              text="Cancelar"
+              icon="cancel"
               disabled={isLoading}
-              type="button"
               color="red"
               onClick={() => onClose(false)}
-            >
-              <Icon name="cancel" />
-              Cancelar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
+            />
+            <IconnedButton
+              text="Confirmar"
+              icon="check"
               disabled={isLoading}
               loading={isLoading}
-              type="button"
               color="green"
               onClick={handleConfirmClick}
-            >
-              <Icon name="check" />
-              Confirmar
-            </IconedButton>
+            />
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>

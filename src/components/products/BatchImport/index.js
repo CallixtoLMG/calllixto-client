@@ -1,6 +1,6 @@
 import { useUserContext } from "@/User";
 import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListAllProducts } from "@/api/products";
-import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, Icon, IconedButton, Input, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { downloadExcel, now } from "@/utils";
@@ -8,9 +8,10 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Transition } from "semantic-ui-react";
+import { Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { Modal, ModalHeader, WaitMsg } from "./styles";
+import { IconnedButton } from "@/components/common/buttons";
 
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts, refetch } = useListAllProducts({});
@@ -393,24 +394,18 @@ const BatchImport = ({ isCreating }) => {
                 </Modal.Content>
                 <Modal.Actions>
                   <ButtonsContainer>
-                    <IconedButton
-                      icon
-                      labelPosition="left"
-                      positive
+                    <IconnedButton
+                      text="Confirmar"
+                      icon="check"
+                      color="green"
                       onClick={handleDownloadConfirmation}
-                    >
-                      <Icon name='check' />
-                      Confirmar
-                    </IconedButton>
-                    <IconedButton
-                      icon
-                      labelPosition="left"
-                      negative
+                    />
+                    <IconnedButton
+                      text="Cancelar"
+                      icon="x"
+                      color="red"
                       onClick={() => setShowConfirmationModal(false)}
-                    >
-                      <Icon name='x' />
-                      Cancelar
-                    </IconedButton>
+                    />
                   </ButtonsContainer>
                 </Modal.Actions>
               </Loader>
@@ -465,28 +460,22 @@ const BatchImport = ({ isCreating }) => {
               <Modal.Actions>
                 <ButtonsContainer>
                   {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
-                  <IconedButton
-                    icon
-                    labelPosition="left"
+                  <IconnedButton
+                    text="Aceptar"
+                    icon="check"
                     disabled={importSettings.isButtonDisabled(isPending)}
                     loading={isLoading || isPending}
-                    type="submit"
+                    submit
                     color="green"
                     onClick={handleConfirmClick}
-                  >
-                    <Icon name='check' />
-                    Aceptar
-                  </IconedButton>
-                  <IconedButton
-                    icon
-                    labelPosition="left"
+                  />
+                  <IconnedButton
+                    text="Cancelar"
+                    icon="x"
                     disabled={isLoading || isPending}
                     onClick={() => setOpen(false)}
                     color="red"
-                  >
-                    <Icon name='x' />
-                    Cancelar
-                  </IconedButton>
+                  />
                 </ButtonsContainer>
               </Modal.Actions>
             </Loader>
@@ -501,26 +490,22 @@ const BatchImport = ({ isCreating }) => {
             <p>¿Deseas descargar un archivo de Excel con estos productos?</p>
           </Modal.Content>
           <Modal.Actions>
-            <IconedButton
-              icon
-              labelPosition="left"
+            <IconnedButton
+              text="Confirmar"
+              icon="check"
               color="green"
               onClick={() => {
                 handleUnprocessedDownload();
-              }}>
-              <Icon name='check' />
-              Confirmar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
+              }}
+            />
+            <IconnedButton
+              text="Cancelar"
+              icon="x"
               color="red"
               onClick={() => {
                 setShowUnprocessedModal(false);
-              }}>
-              <Icon name='x' />
-              Cancelar
-            </IconedButton>
+              }}
+            />
           </Modal.Actions>
         </Modal>
       </Transition>

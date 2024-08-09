@@ -1,5 +1,5 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
-import { SubmitAndRestore } from "@/components/common/buttons";
+import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import ProductSearch from "@/components/common/search/search";
@@ -395,24 +395,18 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </Modal.Content>
           <Modal.Actions>
             <ButtonsContainer>
-              <IconedButton
-                icon
-                labelPosition="left"
+              <IconnedButton
+                text="Cancelar"
+                icon="cancel"
                 color="red"
                 onClick={handleCancelUpdate}
-              >
-                <Icon name="cancel" />
-                Cancelar
-              </IconedButton>
-              <IconedButton
-                icon
-                labelPosition="left"
+              />
+              <IconnedButton
+                text="Confirmar"
+                icon="check"
                 color="green"
                 onClick={handleConfirmUpdate}
-              >
-                <Icon name="check" />
-                Confirmar
-              </IconedButton>
+              />
             </ButtonsContainer>
           </Modal.Actions>
         </Modal>
@@ -421,34 +415,26 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
         <FieldsContainer>
           <FormField width="300px">
             <ButtonGroup size="small">
-              <IconedButton
-                icon
-                labelPosition="left"
-                type="button"
+              <IconnedButton
+                text="Confirmado"
+                icon="check"
                 basic={!isConfirmed}
                 color={isConfirmed ? "green" : "orange"}
                 onClick={() => {
                   setIsConfirmed(true);
                   setValue('state', BUDGET_STATES.CONFIRMED.id);
                 }}
-              >
-                <Icon name="check" />
-                Confirmado
-              </IconedButton>
-              <IconedButton
-                icon
-                labelPosition="left"
-                type="button"
+              />
+              <IconnedButton
+                text="Pendiente"
+                icon="hourglass half"
                 basic={isConfirmed}
                 color={isConfirmed ? "green" : "orange"}
                 onClick={() => {
                   setIsConfirmed(false);
                   setValue('state', BUDGET_STATES.PENDING.id);
                 }}
-              >
-                <Icon name="hourglass half" />
-                Pendiente
-              </IconedButton>
+              />
             </ButtonGroup>
           </FormField>
           <FormField width="350px">
@@ -457,32 +443,22 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               control={control}
               render={({ field: { onChange, value } }) => (
                 <ButtonGroup size="small">
-                  <IconedButton
-                    icon
-                    labelPosition="left"
-                    type="button"
+                  <IconnedButton
+                    text={PICK_UP_IN_STORE}
+                    icon="warehouse"
                     basic={!value}
-                    color="blue"
                     onClick={() => {
                       onChange(true);
                     }}
-                  >
-                    <Icon name="warehouse" />
-                    {PICK_UP_IN_STORE}
-                  </IconedButton>
-                  <IconedButton
-                    icon
-                    labelPosition="left"
-                    type="button"
+                  />
+                  <IconnedButton
+                    text="Enviar a Dirección"
+                    icon="truck"
                     basic={value}
-                    color="blue"
                     onClick={() => {
                       onChange(false);
                     }}
-                  >
-                    <Icon name="truck" />
-                    Enviar a Dirección
-                  </IconedButton>
+                  />
                 </ButtonGroup>
               )}
             />
@@ -670,18 +646,15 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           icon={currentState.icon}
           text={currentState.title}
           extraButton={
-            <IconedButton
-              icon
-              labelPosition="left"
+            <IconnedButton
+              text={BUDGET_STATES.DRAFT.title}
+              icon={BUDGET_STATES.DRAFT.icon}
               disabled={isLoading || !isDirty || isBudgetConfirmed(watchState)}
               loading={isLoading && watchState === BUDGET_STATES.DRAFT.id}
-              type="button"
               onClick={handleSubmit(handleDraft)}
               color={BUDGET_STATES.DRAFT.color}
-              width="fit-content"
-            >
-              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
-            </IconedButton>
+              width="110px"
+            />
           }
         />
       </Form>

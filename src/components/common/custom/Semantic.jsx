@@ -161,10 +161,10 @@ export const Modal = styled(SModal)`
 `;
 
 export const IconedButton = styled(SButton)`
-  &&&&{
+  &&&& {
     text-align: center;
     height: ${({ height = '35px' }) => `${height}!important`} ;
-    font-size: 12px;
+    font-size: 13px;
     width: ${({ width = '110px' }) => `${width}!important`} ;
     padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
     padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;

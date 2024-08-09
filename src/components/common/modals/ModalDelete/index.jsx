@@ -1,8 +1,9 @@
-import { ButtonsContainer, IconedButton, Input } from "@/components/common/custom";
+import { ButtonsContainer, Input } from "@/components/common/custom";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
-import { Header, Modal, Icon as SIcon, Transition } from 'semantic-ui-react';
+import { Header, Modal, Transition } from 'semantic-ui-react';
 import { Form } from "./styles";
+import { IconnedButton } from "../../buttons";
 
 const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) => {
   const [confirmationText, setConfirmationText] = useState('');
@@ -38,26 +39,22 @@ const ModalDelete = ({ title, onDelete, showModal, setShowModal, isLoading }) =>
               width="220px"
             />
             <ButtonsContainer>
-              <IconedButton
-                icon
-                labelPosition="left"
+              <IconnedButton
+                text="Cancelar"
+                icon="times"
                 height="40px"
-                color='grey'
+                color="grey"
                 onClick={() => setShowModal(false)} disabled={isLoading}
-              >
-                <SIcon name='times' />Cancelar
-              </IconedButton>
-              <IconedButton
-                icon
-                labelPosition="left"
+              />
+              <IconnedButton
+                text="Eliminar"
+                icon="trash"
                 height="40px"
                 disabled={!isDeleteEnabled || isLoading}
                 loading={isLoading}
-                color='red'
-                type="submit"
-              >
-                <SIcon name='trash' />Eliminar
-              </IconedButton>
+                color="red"
+                submit
+              />
             </ButtonsContainer>
           </Form>
         </Modal.Actions>

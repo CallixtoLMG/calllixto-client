@@ -14,6 +14,7 @@ import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form, Icon } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
+import { IconnedButton } from "@/components/common/buttons";
 
 const EMPTY_FILTERS = { code: '', name: '' };
 
@@ -117,36 +118,26 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
 
   const selectionActions = useMemo(() => {
     const actions = [
-      <IconedButton
-        width="fit-content"
-        icon
-        labelPosition="left"
+      <IconnedButton
         key={2}
+        text="Descargar Códigos"
+        icon="barcode"
         onClick={handlePrint}
-        color="blue"
-        size="small"
-      >
-        <Icon name="barcode" />
-        Descargar Códigos
-      </IconedButton>
+      />
     ];
     if (RULES.canRemove[role]) {
       actions.unshift(
-        <IconedButton
-          width="fit-content"
-          icon
-          labelPosition="left"
+        <IconnedButton
           key={1}
-          onClick={() => setShowConfirmDeleteModal(true)}
+          text="Eliminar Productos"
+          icon="trash"
           color="red"
-          size="small"
-        >
-          <Icon name="trash" />
-          Eliminar Productos
-        </IconedButton>
+          onClick={() => setShowConfirmDeleteModal(true)}
+        />
       );
     };
     return actions;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role]);
 
   return (

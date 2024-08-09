@@ -1,8 +1,9 @@
 import { useUserContext } from "@/User";
-import { Box, IconedButton } from "@/components/common/custom";
+import { Box } from "@/components/common/custom";
 import { RULES } from "@/roles";
 import { useState } from "react";
-import { ButtonGroup, Icon } from "semantic-ui-react";
+import { ButtonGroup } from "semantic-ui-react";
+import { IconnedButton } from "@/components/common/buttons";
 
 export const useAllowUpdate = () => {
   const { role } = useUserContext();
@@ -13,34 +14,21 @@ export const useAllowUpdate = () => {
       {RULES.canUpdate[role] && (
         <Box>
           <ButtonGroup size="small">
-            <IconedButton
-              icon
-              labelPosition="left"
-              type="button"
-              basic={!allowUpdate}
-              color="blue"
-              width="fit-content"
-              onClick={() => {
-                setAllowUpdate(true);
-              }}
-            >
-              <Icon name="edit" />
-              Actualizar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="right"
-              type="button"
+            <IconnedButton
+              text="Actualizar"
+              icon="edit"
+              onClick={() => setAllowUpdate(true)} basic={!allowUpdate}
+              width="130px"
+            />
+            <IconnedButton
+              text="Ver"
+              icon="eye"
               basic={allowUpdate}
-              color="blue"
-              width="fit-content"
               onClick={() => {
                 setAllowUpdate(false);
               }}
-            >
-              <Icon name="eye" />
-              Ver
-            </IconedButton>
+              width="130px"
+            />
           </ButtonGroup>
         </Box>
       )}

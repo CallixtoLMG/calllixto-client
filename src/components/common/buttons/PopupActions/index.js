@@ -1,6 +1,7 @@
 import { cloneElement, useState } from 'react';
-import { Icon, Popup } from 'semantic-ui-react';
-import { ButtonsContainer, Flex, IconedButton } from '../../custom';
+import { Popup } from 'semantic-ui-react';
+import { ButtonsContainer, Flex } from '../../custom';
+import { IconnedButton } from '..';
 
 const PopupActions = ({ width, title, color, buttons, icon, position = "bottom center", trigger }) => {
   const [open, setOpen] = useState(false);
@@ -17,15 +18,12 @@ const PopupActions = ({ width, title, color, buttons, icon, position = "bottom c
       position={position}
       trigger={trigger || (
         <ButtonsContainer>
-          <IconedButton
-            size="small"
-            icon
-            labelPosition="left"
+          <IconnedButton
+            text={title}
+            icon={icon}
             width={width}
             color={color}
-          >
-            <Icon name={icon} />{title}
-          </IconedButton>
+          />
         </ButtonsContainer>
       )}
       content={

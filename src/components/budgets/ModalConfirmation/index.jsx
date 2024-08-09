@@ -1,9 +1,10 @@
-import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, IconedButton, Label, Segment } from "@/components/common/custom";
+import { IconnedButton } from "@/components/common/buttons";
+import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Label, Segment } from "@/components/common/custom";
 import { PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone } from "@/utils";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { ButtonGroup, Icon, Modal, Transition } from "semantic-ui-react";
+import { ButtonGroup, Modal, Transition } from "semantic-ui-react";
 
 const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading }) => {
   const { handleSubmit } = useForm({ defaultValues: customer });
@@ -34,36 +35,24 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
           <Flex alignItems="center" justifyContent="space-between">
             Desea confirmar el presupuesto?
             <ButtonGroup size="small">
-              <IconedButton
+              <IconnedButton
+                text={PICK_UP_IN_STORE}
+                icon="warehouse"
                 height="32px"
-                width="fit-content"
-                icon
-                labelPosition="left"
-                type="button"
                 basic={!pickUpInStore}
-                color="blue"
                 onClick={() => {
                   setPickUpInStore(true);
                 }}
-              >
-                <Icon name="warehouse" />
-                {PICK_UP_IN_STORE}
-              </IconedButton>
-              <IconedButton
+              />
+              <IconnedButton
+                text="Enviar a Dirección"
+                icon="truck"
                 height="32px"
-                width="fit-content"
-                icon
-                labelPosition="left"
-                type="button"
                 basic={pickUpInStore}
-                color="blue"
                 onClick={() => {
                   setPickUpInStore(false);
                 }}
-              >
-                <Icon name="truck" />
-                Enviar a Dirección
-              </IconedButton>
+              />
             </ButtonGroup>
           </Flex>
         </Modal.Header>
@@ -87,29 +76,22 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer width="100%">
-            <IconedButton
-              icon
-              labelPosition="left"
+            <IconnedButton
+              text="Cancelar"
+              icon="cancel"
               disabled={isLoading}
-              type="button"
               color="red"
               onClick={() => onClose(false)}
-            >
-              <Icon name='cancel' />
-              Cancelar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
+            />
+            <IconnedButton
+              text="Confirmar"
+              icon="check"
               disabled={isLoading}
               loading={isLoading}
-              type="submit"
+              submit
               color="green"
               onClick={handleConfirmClick}
-            >
-              <Icon name='check' />
-              Confirmar
-            </IconedButton>
+            />
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>

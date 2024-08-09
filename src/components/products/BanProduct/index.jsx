@@ -1,6 +1,6 @@
 import { useUserContext } from "@/User";
 import { editBanProducts } from "@/api/products";
-import { FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Modal } from "@/components/common/custom";
+import { FieldsContainer, Flex, Form, FormField, Input, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { handleEnterKeyPress } from '@/utils';
@@ -9,9 +9,10 @@ import { isEqual, sortBy } from 'lodash';
 import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Icon, Transition } from "semantic-ui-react";
+import { Transition } from "semantic-ui-react";
 import { BAN_FILTERS, BAN_PRODUCTS_COLUMNS } from "../products.common";
 import { ModalActions } from "./styles";
+import { IconnedButton } from "@/components/common/buttons";
 
 const BanProduct = ({ open, setOpen }) => {
   const { getBlacklist, updateSessionData, userData } = useUserContext();
@@ -129,28 +130,22 @@ const BanProduct = ({ open, setOpen }) => {
         </Modal.Content>
         <ModalActions>
           <Flex columnGap="5px">
-            <IconedButton
-              icon
-              labelPosition="left"
+            <IconnedButton
+              text="Cancelar"
+              icon="cancel"
               disabled={isPending}
               onClick={() => setOpen(false)}
               color="red"
-            >
-              <Icon name="cancel" />
-              Cancelar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
+            />
+            <IconnedButton
+              text="Aceptar"
+              icon="check"
               disabled={isPending || isEqual(sortBy(getBlacklist()), sortBy(watchProducts))}
               loading={isPending}
-              type="submit"
+              submit
               color="green"
               onClick={handleConfirmClick}
-            >
-              <Icon name="check" />
-              Aceptar
-            </IconedButton>
+            />
           </Flex>
         </ModalActions>
       </Modal>

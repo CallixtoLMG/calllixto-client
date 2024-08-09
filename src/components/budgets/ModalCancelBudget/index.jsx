@@ -2,6 +2,7 @@ import { ButtonsContainer, FieldsContainer, IconedButton, Label, TextArea } from
 import { useState } from "react";
 import { Icon, Modal, Transition } from "semantic-ui-react";
 import { ModalContent } from "./styles";
+import { IconnedButton } from "@/components/common/buttons";
 
 const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
   const [cancelReason, setCancelReason] = useState("");
@@ -25,29 +26,16 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
         </ModalContent>
         <Modal.Actions>
           <ButtonsContainer width="100%" marginTop="10px">
-            <IconedButton
-              icon
-              labelPosition="left"
-              disabled={isLoading}
-              type="button"
-              color="grey"
-              onClick={() => onClose(false)}
-            >
-              <Icon name="close" />
-              Cancelar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
+            <IconnedButton text="Cancelar" icon="cancel" color="red" onClick={() => onClose(false)} disabled={isLoading} />
+            <IconnedButton
+              text="Anular"
+              icon="ban"
               color="red"
               onClick={() => onConfirm(cancelReason)}
               disabled={!cancelReason || isLoading}
               loading={isLoading}
               basic
-            >
-              <Icon name="ban" />
-              Anular
-            </IconedButton>
+            />
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>
