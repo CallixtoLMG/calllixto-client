@@ -1,9 +1,10 @@
-import { usePaginationContext } from "@/components/common/table/Pagination";
-import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
+import { ENTITIES, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { encodeUri, now } from "@/utils";
+import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
+import { getAllEntity } from "./common";
+
 
 const SUPPLIER_URL = `${PATHS.SUPPLIERS}`;
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
@@ -30,72 +31,11 @@ export function deleteSupplier(id) {
   return axios.delete(`${SUPPLIER_URL}/${id}`);
 };
 
-export function useListSuppliers({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
-  const { addKey, currentPage, keys, filters } = usePaginationContext();
-
-  const params = {
-    attributes: encodeUri(attributes),
-    pageSize,
-    ...(keys[ENTITIES.SUPPLIERS][currentPage] && {
-      LastEvaluatedKey: encodeUri(keys[ENTITIES.SUPPLIERS][currentPage])
-    }),
-    ...(sort && { sort }),
-    order,
-    ...filters
-  };
-
-  const listSuppliers = async (params) => {
-    try {
-      const { data } = await axios.get(SUPPLIER_URL, { params });
-      if (data?.LastEvaluatedKey) {
-        addKey(data?.LastEvaluatedKey, ENTITIES.SUPPLIERS);
-      }
-      return { suppliers: data?.suppliers || [], LastEvaluatedKey: data.LastEvaluatedKey }
-    } catch (error) {
-      throw error;
-    }
-  };
-
+export function useListAllSuppliers() {
   const query = useQuery({
-    queryKey: [LIST_SUPPLIERS_QUERY_KEY, params, attributes],
-    queryFn: () => listSuppliers(params),
-  });
-
-  return query;
-};
-
-export function useListAllSuppliers({ attributes = [] }) {
-  const listSuppliers = async () => {
-    try {
-      let suppliers = [];
-      let LastEvaluatedKey;
-
-      do {
-        const params = {
-          attributes: encodeUri(attributes),
-          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(LastEvaluatedKey) }),
-        };
-
-        const { data } = await axios.get(SUPPLIER_URL, { params });
-
-        if (data.statusOk) {
-          suppliers = [...suppliers, ...data.suppliers];
-        }
-
-        LastEvaluatedKey = data?.LastEvaluatedKey;
-
-      } while (LastEvaluatedKey);
-
-      return { suppliers };
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const query = useQuery({
-    queryKey: [LIST_ALL_SUPPLIER_QUERY_KEY, attributes],
-    queryFn: () => listSuppliers(),
-    staleTime: TIME_IN_MS.FOUR_HOURS,
+    queryKey: [LIST_ALL_SUPPLIER_QUERY_KEY],
+    queryFn: () => getAllEntity({ entity: ENTITIES.SUPPLIERS, url: SUPPLIER_URL, params: { sort: 'id', order: true } }),
+    staleTime: TIME_IN_MS.ONE_DAY,
   });
 
   return query;

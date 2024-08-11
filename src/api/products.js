@@ -1,5 +1,4 @@
-import { usePaginationContext } from "@/components/common/table/Pagination";
-import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
+import { ENTITIES, TIME_IN_MS } from "@/constants";
 import {
   BATCH,
   BLACK_LIST,
@@ -8,9 +7,10 @@ import {
   PATHS,
   SUPPLIER,
 } from "@/fetchUrls";
-import { encodeUri, now } from "@/utils";
+import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from "./axios";
+import { getAllEntity } from "./common";
 const { omit, chunk } = require("lodash");
 
 const PRODUCTS_URL = `${PATHS.PRODUCTS}`;
@@ -40,82 +40,11 @@ export function deleteProduct(id) {
   return axios.delete(`${PRODUCTS_URL}/${id}`);
 }
 
-export function useListProducts({
-  sort,
-  order = true,
-  pageSize = DEFAULT_PAGE_SIZE,
-  attributes = [],
-}) {
-  const { addKey, currentPage, keys, filters } = usePaginationContext();
-
-  const params = {
-    attributes: encodeUri(attributes),
-    pageSize,
-    ...(keys[ENTITIES.PRODUCTS][currentPage] && {
-      LastEvaluatedKey: encodeUri(keys[ENTITIES.PRODUCTS][currentPage]),
-    }),
-    ...(sort && { sort }),
-    order,
-    ...filters,
-  };
-
-  const listProducts = async (params) => {
-    try {
-      const { data } = await axios.get(PRODUCTS_URL, { params });
-      if (data?.LastEvaluatedKey) {
-        addKey(data?.LastEvaluatedKey, ENTITIES.PRODUCTS);
-      }
-      return {
-        products: data?.products || [],
-        LastEvaluatedKey: data.LastEvaluatedKey,
-      };
-    } catch (error) {
-      throw error;
-    }
-  };
-
+export function useListAllProducts() {
   const query = useQuery({
-    queryKey: [LIST_PRODUCTS_QUERY_KEY, params],
-    queryFn: () => listProducts(params),
-  });
-  return query;
-}
-
-export function useListAllProducts({ attributes = [], enabled = false, code } = {}) {
-  const listProducts = async () => {
-    try {
-      let products = [];
-      let LastEvaluatedKey;
-
-      do {
-        const params = {
-          code,
-          attributes: encodeUri(attributes),
-          ...(LastEvaluatedKey && {
-            LastEvaluatedKey: encodeUri(LastEvaluatedKey),
-          }),
-        };
-
-        const { data } = await axios.get(PRODUCTS_URL, { params });
-
-        if (data.statusOk) {
-          products = [...products, ...data.products];
-        }
-
-        LastEvaluatedKey = data?.LastEvaluatedKey;
-      } while (LastEvaluatedKey);
-
-      return { products };
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const query = useQuery({
-    queryKey: [LIST_ALL_PRODUCTS_QUERY_KEY, attributes],
-    queryFn: () => listProducts(),
-    staleTime: TIME_IN_MS.FIVE_MINUTES,
-    enabled,
+    queryKey: [LIST_ALL_PRODUCTS_QUERY_KEY],
+    queryFn: () => getAllEntity({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, params: { sort: 'date' } }),
+    staleTime: TIME_IN_MS.ONE_DAY,
   });
 
   return query;

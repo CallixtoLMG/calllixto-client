@@ -1,9 +1,9 @@
-import { usePaginationContext } from "@/components/common/table/Pagination";
-import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
+import { ENTITIES, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { encodeUri, now } from "@/utils";
+import { now } from "@/utils";
 import { useQuery } from '@tanstack/react-query';
 import axios from './axios';
+import { getAllEntity } from './common';
 
 const BRANDS_URL = `${PATHS.BRANDS}`;
 
@@ -31,72 +31,11 @@ export function deleteBrand(id) {
   return axios.delete(`${BRANDS_URL}/${id}`);
 };
 
-export function useListBrands({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
-  const { addKey, currentPage, keys, filters } = usePaginationContext();
-
-  const params = {
-    attributes: encodeUri(attributes),
-    pageSize,
-    ...(keys[ENTITIES.BRANDS][currentPage] && {
-      LastEvaluatedKey: encodeUri(keys[ENTITIES.BRANDS][currentPage])
-    }),
-    ...(sort && { sort }),
-    order,
-    ...filters
-  };
-
-  const listBrands = async (params) => {
-    try {
-      const { data } = await axios.get(BRANDS_URL, { params });
-      if (data?.LastEvaluatedKey) {
-        addKey(data?.LastEvaluatedKey, ENTITIES.BRANDS);
-      }
-      return { brands: data?.brands || [], LastEvaluatedKey: data.LastEvaluatedKey }
-    } catch (error) {
-      throw error;
-    }
-  };
-
+export function useListAllBrands() {
   const query = useQuery({
-    queryKey: [LIST_BRANDS_QUERY_KEY, params, attributes],
-    queryFn: () => listBrands(params),
-  });
-
-  return query;
-};
-
-export function useListAllBrands({ attributes = [] }) {
-  const listBrands = async () => {
-    try {
-      let brands = [];
-      let LastEvaluatedKey;
-
-      do {
-        const params = {
-          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(LastEvaluatedKey) }),
-          attributes: encodeUri(attributes)
-        };
-
-        const { data } = await axios.get(BRANDS_URL, { params });
-
-        if (data.statusOk) {
-          brands = [...brands, ...data.brands];
-        }
-
-        LastEvaluatedKey = data?.LastEvaluatedKey;
-
-      } while (LastEvaluatedKey);
-
-      return { brands };
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const query = useQuery({
-    queryKey: [LIST_ALL_BRANDS_QUERY_KEY, attributes],
-    queryFn: () => listBrands(),
-    staleTime: TIME_IN_MS.FOUR_HOURS,
+    queryKey: [LIST_ALL_BRANDS_QUERY_KEY],
+    queryFn: () => getAllEntity({ entity: ENTITIES.BRANDS, url: BRANDS_URL, params: { sort: 'name', order: true } }),
+    staleTime: TIME_IN_MS.ONE_DAY,
   });
 
   return query;

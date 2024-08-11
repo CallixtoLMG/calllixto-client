@@ -1,11 +1,9 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useListBrands } from "@/api/brands";
+import { useListAllBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
-import { ATTRIBUTES } from "@/components/brands/brands.common";
-import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -14,17 +12,11 @@ import { useEffect, useMemo } from "react";
 
 const Brands = () => {
   useValidateToken();
-  const { data, isLoading } = useListBrands({ attributes: [ATTRIBUTES.NAME, ATTRIBUTES.ID, ATTRIBUTES.COMMENT] });
+  const { data, isLoading } = useListAllBrands();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
-  const { handleEntityChange } = usePaginationContext();
-
-  useEffect(() => {
-    handleEntityChange(ENTITIES.BRANDS);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     setLabels([PAGES.BRANDS.NAME]);
@@ -48,7 +40,7 @@ const Brands = () => {
   }, [push, role, setActions]);
 
   useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEYS.ENTER);
-  
+
   return (
     <BrandsPage
       isLoading={isLoading}

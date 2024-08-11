@@ -1,14 +1,12 @@
 "use client"
 import { useUserContext } from "@/User";
-import { useListProducts } from "@/api/products";
+import { useListAllProducts } from "@/api/products";
 import { DropdownItem, Icon, IconedButton } from "@/components/common/custom";
-import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
-import { ATTRIBUTES } from "@/components/products/products.common";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -27,14 +25,8 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { handleEntityChange } = usePaginationContext();
 
-  useEffect(() => {
-    handleEntityChange(ENTITIES.PRODUCTS);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const { data, isLoading } = useListProducts({ sort: 'date', order: false, attributes: [ATTRIBUTES.NAME, ATTRIBUTES.PRICE, ATTRIBUTES.CODE, ATTRIBUTES.COMMENTS, ATTRIBUTES.BRAND_NAME, ATTRIBUTES.SUPPLIER_NAME] });
+  const { data, isLoading } = useListAllProducts();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();

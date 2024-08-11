@@ -121,13 +121,14 @@ export const TIME_IN_MS = {
   FIVE_MINUTES: 300000,
   ONE_HOUR: 3600000,
   FOUR_HOURS: 14400000,
+  ONE_DAY: 86400000,
 };
 
 export const TIME_IN_DAYS = {
   YEAR: '365',
 };
 
-export const DEFAULT_PAGE_SIZE = 30;
+export const DEFAULT_PAGE_SIZE = 20;
 
 export const ENTITIES = {
   CUSTOMERS: 'customers',

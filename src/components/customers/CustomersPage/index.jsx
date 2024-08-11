@@ -1,33 +1,44 @@
-import { LIST_CUSTOMERS_QUERY_KEY, deleteCustomer } from '@/api/customers';
+import { deleteCustomer } from '@/api/customers';
 import { Input } from '@/components/common/custom';
 import { ModalDelete } from '@/components/common/modals';
 import { Filters, Table } from '@/components/common/table';
-import { usePaginationContext } from "@/components/common/table/Pagination";
-import { PAGES } from "@/constants";
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useState } from "react";
+import { DEFAULT_PAGE_SIZE, PAGES } from "@/constants";
+import { useMutation } from '@tanstack/react-query';
+import { useMemo, useState } from "react";
 import { Controller, Form, FormProvider, useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { HEADERS } from "../customers.common";
+import { Pagination } from 'semantic-ui-react';
 
-const EMPTY_FILTERS = { id: '' };
+const EMPTY_FILTERS = { name: '' };
 
 const CustomersPage = ({ customers = [], isLoading }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const queryClient = useQueryClient();
-  const { resetFilters } = usePaginationContext();
   const methods = useForm();
   const { handleSubmit, control, reset } = methods;
 
-  const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar el cliente "${name}"?`, []);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
+  const [activePage, setActivePage] = useState(1);
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
+
+  const filteredCustomers = useMemo(() => {
+    return customers.filter(customer => {
+      if (filters.name) {
+        return customer.name.toLowerCase().includes(filters.name.toLowerCase());
+      }
+      return customer;
+    })
+  }, [customers, filters]);
+  const pages = useMemo(() => Math.ceil(filteredCustomers.length / DEFAULT_PAGE_SIZE), [filteredCustomers]);
+  const currentPageCustomers = useMemo(() => {
+    const startIndex = (activePage - 1) * DEFAULT_PAGE_SIZE;
+    const endIndex = startIndex + DEFAULT_PAGE_SIZE;
+    return filteredCustomers.slice(startIndex, endIndex);
+  }, [activePage, filteredCustomers]);
 
   const onFilter = (data) => {
-    const filters = { ...data };
-    if (data.name) {
-      filters.sort = "name";
-    };
-    resetFilters(filters);
+    setActivePage(1);
+    setFilters(data);
   }
 
   const actions = [
@@ -50,7 +61,6 @@ const CustomersPage = ({ customers = [], isLoading }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_CUSTOMERS_QUERY_KEY] });
         toast.success('Cliente eliminado!');
         setShowModal(false);
       } else {
@@ -70,12 +80,12 @@ const CustomersPage = ({ customers = [], isLoading }) => {
         <Form onSubmit={handleSubmit(onFilter)}>
           <Filters onRestoreFilters={onRestoreFilters}>
             <Controller
-              name="id"
+              name="name"
               control={control}
               render={({ field }) => (
                 <Input
-                  $maxWidth
                   {...field}
+                  $maxWidth
                   $marginBottom
                   height="35px"
                   placeholder="Nombre"
@@ -85,17 +95,28 @@ const CustomersPage = ({ customers = [], isLoading }) => {
           </Filters>
         </Form>
       </FormProvider>
+      <Pagination
+        activePage={activePage}
+        onPageChange={(e, { activePage }) => setActivePage(activePage)}
+        siblingRange={2}
+        boundaryRange={2}
+        firstItem={null}
+        lastItem={null}
+        pointing
+        secondary
+        totalPages={pages}
+      />
       <Table
         isLoading={isLoading}
         headers={HEADERS}
-        elements={customers.map((customer, index) => ({ ...customer, key: index + 1 }))}
+        elements={currentPageCustomers}
         page={PAGES.CUSTOMERS}
         actions={actions}
       />
       <ModalDelete
         showModal={showModal}
         setShowModal={setShowModal}
-        title={deleteQuestion(selectedCustomer?.name)}
+        title={`¿Está seguro que desea eliminar el cliente "${selectedCustomer?.name}"?`}
         onDelete={mutate}
         isLoading={isPending}
       />
