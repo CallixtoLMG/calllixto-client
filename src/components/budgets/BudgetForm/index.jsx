@@ -9,7 +9,7 @@ import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
 import { BUDGET_STATES, PAGES, PICK_UP_IN_STORE, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { ButtonGroup, Message, Modal, Popup, Transition } from "semantic-ui-react";
@@ -58,13 +58,16 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore']);
   const [subtotal, setSubtotal] = useState(0);
   const productSearchRef = useRef(null);
-  
-  // COMENTARIO
-  // ese totals sirver para deshabilitar los botones si es necesario
-  // a futuro no va a servir... porque va a ser editable
-  // como hacemos con el total porque se usa tambien en el componente Total, y ahi se aplican funciones al valor.
-  // Hacemos los calculos afuera, y se los pasamos a Total, PaymentMethods y pfdFile para mostrarlo.
-  // paymentsMade: los objetos van a tener amount, method, DATES(now) y comments
+  const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
+  const [finalTotal, setFinalTotal] = useState(0);
+
+  useEffect(() => {
+    const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
+    setSubtotalAfterDiscount(updatedSubtotalAfterDiscount);
+
+    const updatedFinalTotal = getSubtotal(updatedSubtotalAfterDiscount, watchAdditionalCharge);
+    setFinalTotal(updatedFinalTotal);
+  }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   useEffect(() => {
     setValue('paymentMethods', PAYMENT_METHODS.map(method => method.value));
@@ -617,11 +620,13 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               actions={actions}
             />
             <Total
-              subtotal={subtotal}
+              subtotal={subtotal} 
+              subtotalAfterDiscount={subtotalAfterDiscount} 
               globalDiscount={watchGlobalDiscount}
               onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
               additionalCharge={watchAdditionalCharge}
               onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
+              finalTotal={finalTotal}
             />
           </Loader>
           <FieldsContainer rowGap="5px!important">
@@ -630,7 +635,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </FieldsContainer>
           <FieldsContainer rowGap="15px">
             {isBudgetConfirmed(watchState) ?
-              <PaymentMethods totalBudget={subtotal} />
+              <PaymentMethods totalBudget={finalTotal} />
               : <FormField flex={3}>
                 <Label>Métodos de pago</Label>
                 <Segment>

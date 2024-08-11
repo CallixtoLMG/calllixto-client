@@ -1,7 +1,7 @@
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, IconedButton, Label, Segment } from "@/components/common/custom";
 import PaymentMethods from "@/components/common/form/PaymentMethods";
 import { PICK_UP_IN_STORE } from "@/constants";
-import { formatedSimplePhone } from "@/utils";
+import { formatedSimplePhone, now } from "@/utils";
 import { useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ButtonGroup, Form, Icon, Modal, Transition } from "semantic-ui-react";
@@ -29,6 +29,7 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
         ammount: payment.ammount,
         method: payment.method,
         comments: payment.comments,
+        createdAt: now()
       })),
       total: totals.totalAssigned,
       pickUpInStore,

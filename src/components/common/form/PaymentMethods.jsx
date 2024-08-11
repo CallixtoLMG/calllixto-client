@@ -1,18 +1,18 @@
 import { Divider } from "@/components/budgets/PDFfile/styles";
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.common";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 import { Field } from "../components/Field";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, FormField, Icon, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
 import { Table } from "../table";
+
 const EMPTY_PAYMENT = { method: '', amount: 0, comments: '' };
 
 // COMENTARIOS
 // Como es el tema del pdf? de todos modos falta lo de gawain.
 // arriba de forma de pago... titulo: detalle de pagos(crear/ confirmado / vista de confirmado) - Metodo 
-// Sacar fiels de los otros lugares
-// Acomodar padding para que entre bien el boton de borrar en la tabla
+// Sacar fiels del pdf
 
 const parseFloatSafe = (value) => {
   return typeof value === 'string' ? parseFloat(value.replace(/[^0-9.-]+/g, '')) : value;
@@ -24,7 +24,7 @@ const calculateTotals = (payments, totalBudget) => {
   return { totalAssigned, totalPending };
 };
 
-const PaymentMethods = ({ totalBudget, onTotalsChange, excludeDollars }) => {
+const PaymentMethods = ({ totalBudget, excludeDollars }) => {
   const formContext = useFormContext();
   if (!formContext) throw new Error("PaymentMethods must be used within a FormProvider.");
 
@@ -36,6 +36,7 @@ const PaymentMethods = ({ totalBudget, onTotalsChange, excludeDollars }) => {
     reset,
     watch,
     trigger,
+    setValue,
     formState: { errors },
   } = formContext;
 
@@ -46,10 +47,12 @@ const PaymentMethods = ({ totalBudget, onTotalsChange, excludeDollars }) => {
     excludeDollars ? method.key !== "dolares" : true
   );
 
-  useEffect(() => {
-    const { totalAssigned, totalPending } = calculateTotals(payments, totalBudget);
-    // onTotalsChange({ totalAssigned, totalPending });
-  }, [payments, totalBudget, onTotalsChange]);
+  const { totalPending } = calculateTotals(payments, totalBudget);
+  const isTotalCovered = totalPending <= 0;
+
+  const handleCompleteAmount = () => {
+    setValue('paymentToAdd.amount', totalPending.toFixed(2));
+  };
 
   const handleAddPayment = async () => {
     setIsAddingPayment(true);
@@ -98,7 +101,8 @@ const PaymentMethods = ({ totalBudget, onTotalsChange, excludeDollars }) => {
   };
 
   return (
-    <Segment ><Header>Detalle de pagos</Header>
+    <Segment padding="20px 60px 20px 40px">
+      <Header>Detalle de pagos</Header>
       <FlexColumn rowGap="15px">
         <FieldsContainer width="100%" alignItems="center" rowGap="5px">
           <FormField flex="2">
@@ -114,6 +118,7 @@ const PaymentMethods = ({ totalBudget, onTotalsChange, excludeDollars }) => {
                   selection
                   options={paymentOptions}
                   onChange={(e, { value }) => field.onChange(value)}
+                  disabled={isTotalCovered}
                 />
               )}
             />
@@ -153,7 +158,7 @@ const PaymentMethods = ({ totalBudget, onTotalsChange, excludeDollars }) => {
                     const { floatValue } = values;
                     field.onChange(floatValue || 0);
                   }}
-                  disabled={!watch('paymentToAdd.method')}
+                  disabled={isTotalCovered || !watch('paymentToAdd.method')}
                 />
               )}
             />
@@ -168,22 +173,36 @@ const PaymentMethods = ({ totalBudget, onTotalsChange, excludeDollars }) => {
                   {...field}
                   type='text'
                   placeholder='Comentarios'
-                  disabled={!watch('paymentToAdd.method')}
+                  disabled={isTotalCovered || !watch('paymentToAdd.method')}
                 />
               )}
             />
           </FormField>
-          <IconedButton
-            size="small"
-            icon
-            labelPosition="left"
-            color="green"
-            type="button"
-            onClick={handleAddPayment}
-            disabled={!watch('paymentToAdd.method')}
-          >
-            <Icon name="add" />Agregar
-          </IconedButton>
+          <FormField minWidth="fit-content" width="fit-content">
+            <IconedButton
+              padding="3px 18px 3px 40px"
+              size="small"
+              icon
+              labelPosition="left"
+              color="blue"
+              type="button"
+              onClick={handleCompleteAmount}
+              disabled={isTotalCovered || !watch('paymentToAdd.method')}
+            >
+              <Icon name="check" />Completar Monto
+            </IconedButton>
+            <IconedButton
+              size="small"
+              icon
+              labelPosition="left"
+              color="green"
+              type="button"
+              onClick={handleAddPayment}
+              disabled={isTotalCovered || !watch('paymentToAdd.method')}
+            >
+              <Icon name="add" />Agregar
+            </IconedButton>
+          </FormField>
         </FieldsContainer>
         <Flex width="100%">
           <Table
@@ -209,7 +228,9 @@ const PaymentMethods = ({ totalBudget, onTotalsChange, excludeDollars }) => {
             <Price value={calculateTotals(payments, totalBudget).totalPending.toFixed(2)} />
           </Field>
           <Divider />
-          <Field label="Total"><Price value={totalBudget.toFixed(2)} /></Field>
+          <Field label="Total">
+            <Price value={totalBudget.toFixed(2)} />
+          </Field>
         </FlexColumn>
       </FlexColumn>
     </Segment>

@@ -1,26 +1,19 @@
 import { Divider, Title } from '@/components/budgets/PDFfile/styles';
-import { formatedPercentage, getSubtotal } from '@/utils';
-import { useMemo } from "react";
+import { formatedPercentage } from '@/utils';
 import { Flex, FlexColumn, Input, Price } from '../custom';
-
-const Field = ({ label, children }) => (
-  <Flex justifyContent="space-between" height="30px">
-    <Title as="h4" $slim width="100px" textAlign="right">{label}</Title>
-    <Title as="h4">{children}</Title>
-  </Flex>
-)
+import { Field } from '../form';
 
 export const Total = ({
   readOnly,
   subtotal = 0,
+  subtotalAfterDiscount = 0,
   globalDiscount = 0,
-  onGlobalDiscountChange = () => {},
+  onGlobalDiscountChange = () => { },
   additionalCharge = 0,
-  onAdditionalChargeChange = () => {},
+  onAdditionalChargeChange = () => { },
+  finalTotal = 0,
   showAllways = true
 }) => {
-  const subtotalAfterDiscount = useMemo(() => getSubtotal(subtotal, -globalDiscount), [subtotal, globalDiscount]);
-  const finalTotal = useMemo(() => getSubtotal(subtotalAfterDiscount, additionalCharge), [subtotalAfterDiscount, additionalCharge]);
 
   return (
     <FlexColumn marginLeft="auto" rowGap={readOnly ? "0" : '5px'} width="250px">
