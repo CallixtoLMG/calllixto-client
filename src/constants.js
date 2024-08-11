@@ -148,7 +148,7 @@ export const BUDGET_PDF_FORMAT = {
 export const BUDGET_STATES = {
   CONFIRMED: {
     id: 'CONFIRMED',
-    title: 'Confirmado',
+    title: 'Confirmar',
     color: 'green',
     icon: 'check',
   },

@@ -1,4 +1,4 @@
-import { Price, Flex, Box } from "@/components/common/custom";
+import { Box, Flex, Price } from "@/components/common/custom";
 import { BUDGET_STATES } from "@/constants";
 import { formatedDateAndHour, formatedPercentage, getPrice, getTotal, getTotalSum } from "@/utils";
 import { Label } from "semantic-ui-react";
@@ -111,7 +111,20 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
   ].filter(Boolean);
 };
 
-const PAYMENT_METHODS = ['Efectivo', 'Transferencia Bancaria', 'Tarjeta de Débito', 'Tarjeta de Crédito', 'Mercado Pago', 'Dólares'];
+const PAYMENT_METHODS = [
+  { key: 'efectivo', text: 'Efectivo', value: 'Efectivo' },
+  { key: 'transferencia', text: 'Transferencia Bancaria', value: 'Transferencia Bancaria' },
+  { key: 'debito', text: 'Tarjeta de Débito', value: 'Tarjeta de Débito' },
+  { key: 'credito', text: 'Tarjeta de Crédito', value: 'Tarjeta de Crédito' },
+  { key: 'mercado_pago', text: 'Mercado Pago', value: 'Mercado Pago' },
+  { key: 'dolares', text: 'Dólares', value: 'Dólares' }
+];
 
-export { ATTRIBUTES, BUDGETS_COLUMNS, PAYMENT_METHODS, PRODUCTS_COLUMNS };
+const PAYMENT_TABLE_HEADERS = [
+  { id: 'method', width: 4, title: 'Método de Pago', value: (element) => element.method },
+  { id: 'amount', width: 3, title: 'Monto', value: (element) => <Price value={element.amount} /> },
+  { id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) => element.comments }
+];
+
+export { ATTRIBUTES, BUDGETS_COLUMNS, PAYMENT_METHODS, PAYMENT_TABLE_HEADERS, PRODUCTS_COLUMNS };
 

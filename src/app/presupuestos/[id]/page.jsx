@@ -16,13 +16,14 @@ import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext }
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
+import { getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Dropdown } from "semantic-ui-react";
+
 const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) => (
   <a href={href} target={target}>
     <IconedButton
@@ -334,11 +335,14 @@ const Budget = ({ params }) => {
   };
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (pickUpInStore) => {
+    mutationFn: async (dataToSend) => {
+      const { pickUpInStore, paymentsMade, total } = dataToSend;
       const confirmationData = {
         confirmedBy: `${userData.firstName} ${userData.lastName}`,
         confirmedAt: now(),
-        pickUpInStore
+        pickUpInStore,
+        paymentsMade,
+        total
       };
       const { data } = await confirmBudget(confirmationData, budget?.id);
       return data;
@@ -355,7 +359,6 @@ const Budget = ({ params }) => {
       }
     },
   });
-
   const { mutate: mutateCancel, isPending: isPendingCancel } = useMutation({
     mutationFn: async (cancelReason) => {
       const cancelData = {
@@ -419,6 +422,7 @@ const Budget = ({ params }) => {
                 customer={customerData}
               />
               <ModalConfirmation
+                total={getTotalSum(budget.products)}
                 isModalOpen={isModalConfirmationOpen}
                 onClose={handleModalConfirmationClose}
                 customer={customerData}
@@ -436,7 +440,7 @@ const Budget = ({ params }) => {
               width="fit-content"
               onChange={handleDollarChange}
               actionPosition='left'
-              placeholder="Precio dolar"
+              placeholder="Precio $"
               value={formattedDolarRate}
               disabled={!showDolarExangeRate}
               action={
