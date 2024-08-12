@@ -1,13 +1,13 @@
-import { usePaginationContext } from "@/components/common/table/Pagination";
-import { DEFAULT_PAGE_SIZE, TIME_IN_MS } from "@/constants";
+import { TIME_IN_MS, ENTITIES } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { encodeUri, now } from "@/utils";
+import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
+import { getAllEntity } from "./common";
 
 const BUDGETS_URL = `${PATHS.BUDGETS}`;
 
-export const LIST_BUDGETS_QUERY_KEY = 'listBudgets';
+export const LIST_ALL_BUDGETS_QUERY_KEY = 'lisAllBudgets';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 
 export function create(budget) {
@@ -34,38 +34,15 @@ export function edit(budget) {
   return axios.put(`${BUDGETS_URL}/${budget.id}`, body);
 };
 
-export function useListBudgets({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
-  const { addKey, currentPage, keys, filters } = usePaginationContext();
-
-
-  const params = {
-    attributes: encodeUri(attributes),
-    pageSize,
-    ...(keys["budgets"][currentPage] && { LastEvaluatedKey: encodeUri(keys["budgets"][currentPage]) }),
-    ...(sort && { sort }),
-    order,
-    ...filters
-  };
-
-  const listBudgets = async (params) => {
-    try {
-      const { data } = await axios.get(BUDGETS_URL, { params });
-      if (data?.LastEvaluatedKey) {
-        addKey(data?.LastEvaluatedKey, "budgets");
-      }
-      return { budgets: data?.budgets || [], LastEvaluatedKey: data.LastEvaluatedKey }
-    } catch (error) {
-      throw error;
-    }
-  };
-
+export function useListAllBudgets() {
   const query = useQuery({
-    queryKey: [LIST_BUDGETS_QUERY_KEY, params, attributes],
-    queryFn: () => listBudgets(params),
+    queryKey: [LIST_ALL_BUDGETS_QUERY_KEY],
+    queryFn: () => getAllEntity({ entity: ENTITIES.BUDGETS, url: BUDGETS_URL, params: { sort: 'date' } }),
+    staleTime: TIME_IN_MS.ONE_DAY,
   });
 
   return query;
-};
+}
 
 export function useGetBudget(id) {
   const getBudget = async (id) => {

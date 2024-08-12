@@ -2,44 +2,29 @@ import { deleteCustomer } from '@/api/customers';
 import { Input } from '@/components/common/custom';
 import { ModalDelete } from '@/components/common/modals';
 import { Filters, Table } from '@/components/common/table';
-import { DEFAULT_PAGE_SIZE, PAGES } from "@/constants";
+import { PAGES } from "@/constants";
 import { useMutation } from '@tanstack/react-query';
-import { useMemo, useState } from "react";
-import { Controller, Form, FormProvider, useForm } from 'react-hook-form';
+import { useCallback, useState } from "react";
+import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { HEADERS } from "../customers.common";
-import { Pagination } from 'semantic-ui-react';
+import { Form } from 'semantic-ui-react';
 
 const EMPTY_FILTERS = { name: '' };
 
 const CustomersPage = ({ customers = [], isLoading }) => {
-  const methods = useForm();
-  const { handleSubmit, control, reset } = methods;
+  const { handleSubmit, control, reset } = useForm();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
-  const [activePage, setActivePage] = useState(1);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
 
-  const filteredCustomers = useMemo(() => {
-    return customers.filter(customer => {
-      if (filters.name) {
-        return customer.name.toLowerCase().includes(filters.name.toLowerCase());
-      }
-      return customer;
-    })
-  }, [customers, filters]);
-  const pages = useMemo(() => Math.ceil(filteredCustomers.length / DEFAULT_PAGE_SIZE), [filteredCustomers]);
-  const currentPageCustomers = useMemo(() => {
-    const startIndex = (activePage - 1) * DEFAULT_PAGE_SIZE;
-    const endIndex = startIndex + DEFAULT_PAGE_SIZE;
-    return filteredCustomers.slice(startIndex, endIndex);
-  }, [activePage, filteredCustomers]);
-
-  const onFilter = (data) => {
-    setActivePage(1);
-    setFilters(data);
-  }
+  const onFilter = useCallback(customer => {
+    if (filters.name) {
+      return customer.name.toLowerCase().includes(filters.name.toLowerCase());
+    }
+    return customer;
+  }, [filters]);
 
   const actions = [
     {
@@ -71,47 +56,36 @@ const CustomersPage = ({ customers = [], isLoading }) => {
 
   const onRestoreFilters = () => {
     reset(EMPTY_FILTERS);
-    onFilter(EMPTY_FILTERS);
+    setFilters(EMPTY_FILTERS);
   }
 
   return (
     <>
-      <FormProvider {...methods}>
-        <Form onSubmit={handleSubmit(onFilter)}>
-          <Filters onRestoreFilters={onRestoreFilters}>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  $maxWidth
-                  $marginBottom
-                  height="35px"
-                  placeholder="Nombre"
-                />
-              )}
-            />
-          </Filters>
-        </Form>
-      </FormProvider>
-      <Pagination
-        activePage={activePage}
-        onPageChange={(e, { activePage }) => setActivePage(activePage)}
-        siblingRange={2}
-        boundaryRange={2}
-        firstItem={null}
-        lastItem={null}
-        pointing
-        secondary
-        totalPages={pages}
-      />
+      <Form onSubmit={handleSubmit(setFilters)}>
+        <Filters onRestoreFilters={onRestoreFilters}>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                $maxWidth
+                $marginBottom
+                height="35px"
+                placeholder="Nombre"
+              />
+            )}
+          />
+        </Filters>
+      </Form>
       <Table
         isLoading={isLoading}
         headers={HEADERS}
-        elements={currentPageCustomers}
         page={PAGES.CUSTOMERS}
+        elements={customers}
         actions={actions}
+        onFilter={onFilter}
+        paginate
       />
       <ModalDelete
         showModal={showModal}

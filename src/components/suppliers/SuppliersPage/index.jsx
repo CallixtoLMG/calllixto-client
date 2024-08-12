@@ -1,13 +1,12 @@
-import { LIST_SUPPLIERS_QUERY_KEY, deleteSupplier } from "@/api/suppliers";
+import { deleteSupplier } from "@/api/suppliers";
 import { Input } from "@/components/common/custom";
 import { ModalDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
-import { usePaginationContext } from "@/components/common/table/Pagination";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
 import { SUPPLIERS_COLUMNS } from "../suppliers.common";
@@ -15,25 +14,25 @@ import { SUPPLIERS_COLUMNS } from "../suppliers.common";
 const EMPTY_FILTERS = { id: '', name: '' };
 
 const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
+  const { handleSubmit, control, reset } = useForm();
+
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const queryClient = useQueryClient();
-  const { resetFilters } = usePaginationContext();
-  const methods = useForm();
-  const { handleSubmit, control, reset, setValue } = methods;
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
 
   const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar la marca "${name}"?`, []);
 
-  const onFilter = (data) => {
-    const filters = { ...data };
-    if (data.id) {
-      filters.sort = "id";
+  const onFilter = useCallback((supplier) => {
+    if (filters.name && !supplier.name.toLowerCase().includes(filters.name.toLowerCase())) {
+      return false;
     }
-    if (data.name) {
-      filters.sort = "name";
+
+    if (filters.id && !supplier.id.toLowerCase().includes(filters.id.toLowerCase())) {
+      return false;
     }
-    resetFilters(filters);
-  };
+
+    return true;
+  }, [filters]);
 
   const actions = RULES.canRemove[role] ? [
     {
@@ -55,7 +54,6 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
         toast.success('Marca eliminada!');
         setShowModal(false);
       } else {
@@ -66,57 +64,49 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
 
   const onRestoreFilters = () => {
     reset(EMPTY_FILTERS);
-    onFilter(EMPTY_FILTERS);
+    setFilters(EMPTY_FILTERS);
   }
 
   return (
     <>
-      <FormProvider {...methods}>
-        <Form onSubmit={handleSubmit(onFilter)}>
-          <Filters onRestoreFilters={onRestoreFilters}>
-            <Controller
-              name="id"
-              control={control}
-              render={({ field: { onChange, ...rest} }) => (
-                <Input
-                  {...rest}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Id"
-                  onChange={(e) => {
-                    setValue('name', '');
-                    onChange(e.target.value);
-                  }}
-                />
-              )}
-            />
-            <Controller
-              name="name"
-              control={control}
-              render={({ field: { onChange, ...rest} }) => (
-                <Input
-                  {...rest}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Nombre"
-                  onChange={(e) => {
-                    setValue('id', '');
-                    onChange(e.target.value);
-                  }}
-                />
-              )}
-            />
-          </Filters>
-        </Form>
-      </FormProvider>
+      <Form onSubmit={handleSubmit(setFilters)}>
+        <Filters onRestoreFilters={onRestoreFilters}>
+          <Controller
+            name="id"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                $marginBottom
+                $maxWidth
+                height="35px"
+                placeholder="Id"
+              />
+            )}
+          />
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                $marginBottom
+                $maxWidth
+                height="35px"
+                placeholder="Nombre"
+              />
+            )}
+          />
+        </Filters>
+      </Form>
       <Table
         isLoading={isLoading}
         headers={SUPPLIERS_COLUMNS}
         elements={suppliers}
         page={PAGES.SUPPLIERS}
         actions={actions}
+        onFilter={onFilter}
+        paginate
       />
       <ModalDelete
         showModal={showModal}

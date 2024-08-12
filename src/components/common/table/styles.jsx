@@ -29,13 +29,6 @@ const PaginationContainer = styled(Flex)`
   justify-content: center;
 `;
 
-const PaginationSegment = styled(SSegment)`
-  line-height: 1!important;
-  height:35px!important;
-  margin: 0!important;
-  padding: 10px!important;
-`;
-
 const FiltersContainer = styled(Flex)`
   column-gap: 10px;
   align-items: center;
@@ -116,5 +109,5 @@ const LinkCell = styled(STable.Cell)`
   }
 `;
 
-export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableHeader, TableRow };
+export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, Segment, Table, TableHeader, TableRow };
 

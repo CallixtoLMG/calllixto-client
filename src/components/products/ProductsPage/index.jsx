@@ -9,41 +9,22 @@ import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import JsBarcode from 'jsbarcode';
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Form, Icon, Pagination } from "semantic-ui-react";
+import { Form, Icon } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
-import { DEFAULT_PAGE_SIZE } from "@/constants";
 
 const EMPTY_FILTERS = { code: '', name: '' };
 
 const ProductsPage = ({ products = [], role, isLoading }) => {
-  const methods = useForm();
-  const { handleSubmit, control, reset, setValue } = methods;
+  const { handleSubmit, control, reset }  = useForm();
+
   const [showModal, setShowModal] = useState(false);
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState({});
   const [shouldPrint, setShouldPrint] = useState(false);
-  const [activePage, setActivePage] = useState(1);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
-
-  const filteredProducts = useMemo(() => {
-    return products.filter(product => {
-      if (filters.name) {
-        return product.name.toLowerCase().includes(filters.name.toLowerCase());
-      }
-      return product;
-    })
-  }, [filters, products]);
-
-  const pages = useMemo(() => Math.ceil(filteredProducts.length / DEFAULT_PAGE_SIZE), [filteredProducts]);
-
-  const currentPageProducts = useMemo(() => {
-    const startIndex = (activePage - 1) * DEFAULT_PAGE_SIZE;
-    const endIndex = startIndex + DEFAULT_PAGE_SIZE;
-    return filteredProducts.slice(startIndex, endIndex);
-  }, [activePage, filteredProducts]);
 
   const generateBarcodes = useCallback(() => {
     Object.keys(selectedProducts).forEach(code => {
@@ -73,10 +54,17 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     }
   }, [shouldPrint, generateBarcodes]);
 
-  const onFilter = useCallback((data) => {
-    setActivePage(1);
-    setFilters(data);
-  }, []);
+  const onFilter = useCallback(product => {
+    if (filters.name && !product.name.toLowerCase().includes(filters.name.toLowerCase())) {
+      return false;
+    }
+
+    if (filters.code && !product.code.toLowerCase().includes(filters.code.toLowerCase())) {
+      return false;
+    }
+
+    return true;
+  }, [filters]);
 
   const actions = RULES.canRemove[role] ? [
     {
@@ -109,7 +97,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
 
   const onRestoreFilters = useCallback(() => {
     reset(EMPTY_FILTERS);
-    onFilter(EMPTY_FILTERS);
+    setFilters(EMPTY_FILTERS);
   }, [reset, onFilter]);
 
   const onSelectionChange = useCallback(selected => {
@@ -187,62 +175,41 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     <>
       <NoPrint>
         <Flex flexDirection="column" rowGap="15px">
-          <FormProvider {...methods}>
-            <Form onSubmit={handleSubmit(onFilter)}>
-              <Filters clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
-                <Controller
-                  name="code"
-                  control={control}
-                  render={({ field: { onChange, ...rest } }) => (
-                    <Input
-                      {...rest}
-                      $marginBottom
-                      $maxWidth
-                      height="35px"
-                      placeholder="Código"
-                      onChange={(e) => {
-                        setValue('name', '');
-                        onChange(e.target.value);
-                      }}
-                    />
-                  )}
-                />
-                <Controller
-                  name="name"
-                  control={control}
-                  render={({ field: { onChange, ...rest } }) => (
-                    <Input
-                      {...rest}
-                      $marginBottom
-                      $maxWidth
-                      height="35px"
-                      placeholder="Nombre"
-                      onChange={(e) => {
-                        setValue('code', '');
-                        onChange(e.target.value);
-                      }}
-                    />
-                  )}
-                />
-              </Filters>
-            </Form>
-          </FormProvider>
-          <Pagination
-            activePage={activePage}
-            onPageChange={(e, { activePage }) => setActivePage(activePage)}
-            siblingRange={2}
-            boundaryRange={2}
-            firstItem={null}
-            lastItem={null}
-            pointing
-            secondary
-            totalPages={pages}
-          />
+          <Form onSubmit={handleSubmit(setFilters)}>
+            <Filters onRestoreFilters={onRestoreFilters}>
+              <Controller
+                name="code"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    $marginBottom
+                    $maxWidth
+                    height="35px"
+                    placeholder="Código"
+                  />
+                )}
+              />
+              <Controller
+                name="name"
+                control={control}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    $marginBottom
+                    $maxWidth
+                    height="35px"
+                    placeholder="Nombre"
+                  />
+                )}
+              />
+            </Filters>
+          </Form>
           <Table
             isLoading={isLoading || deleteIsPending}
             mainKey="code"
             headers={PRODUCT_COLUMNS}
-            elements={currentPageProducts}
+            elements={products}
             page={PAGES.PRODUCTS}
             actions={actions}
             selection={selectedProducts}
@@ -250,6 +217,8 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
             selectionActions={selectionActions}
             clearSelection={clearSelection}
             selectAll={selectAll}
+            onFilter={onFilter}
+            paginate
           />
           <ModalDelete
             showModal={showModal}

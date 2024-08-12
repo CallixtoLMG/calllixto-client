@@ -1,7 +1,6 @@
 "use client";
 import { UserProvider } from "@/User";
 import { GoBackButton } from "@/components/common/buttons";
-import { PaginationProvider } from "@/components/common/table/Pagination";
 import { BreadcrumProvider, Breadcrumb, Header, NavActions, NavActionsProvider, NoPrint, Toaster } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -66,27 +65,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }} />
           <QueryClientProvider client={queryClient}>
             <UserProvider>
-              <PaginationProvider>
-                <Header />
-                <NavActionsProvider>
-                  <BreadcrumProvider>
-                    {show && (
-                      <NoPrint>
-                        <NavigationContainer>
-                          <BreadcrumbContainer>
-                            <GoBackButton />
-                            <Breadcrumb />
-                          </BreadcrumbContainer>
-                          <NavActions />
-                        </NavigationContainer>
-                      </NoPrint>
-                    )}
-                    <LayoutChildrenContainer>
-                      {children}
-                    </LayoutChildrenContainer>
-                  </BreadcrumProvider>
-                </NavActionsProvider>
-              </PaginationProvider>
+              <Header />
+              <NavActionsProvider>
+                <BreadcrumProvider>
+                  {show && (
+                    <NoPrint>
+                      <NavigationContainer>
+                        <BreadcrumbContainer>
+                          <GoBackButton />
+                          <Breadcrumb />
+                        </BreadcrumbContainer>
+                        <NavActions />
+                      </NavigationContainer>
+                    </NoPrint>
+                  )}
+                  <LayoutChildrenContainer>
+                    {children}
+                  </LayoutChildrenContainer>
+                </BreadcrumProvider>
+              </NavActionsProvider>
             </UserProvider>
           </QueryClientProvider>
         </body>
