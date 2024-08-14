@@ -20,7 +20,7 @@ export const useAllowUpdate = ({ canUpdate }) => {
             <IconnedButton
               text="Ver"
               icon="eye"
-              basic={allowUpdate}
+              basic={isUpdating}
               onClick={() => {
                 setIsUpdating(false);
               }}
