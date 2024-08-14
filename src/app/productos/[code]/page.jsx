@@ -74,6 +74,7 @@ const Product = ({ params }) => {
       ];
       setActions(actions);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, setActions]);
 
   return (
