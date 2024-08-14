@@ -1,5 +1,5 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
-import { SubmitAndRestore } from "@/components/common/buttons";
+import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import PaymentMethods from "@/components/common/form/PaymentMethods";
@@ -30,7 +30,20 @@ const EMPTY_BUDGET = (user) => ({
 
 const EMPTY_PAYMENT = { method: '', amount: 0, comments: '' };
 
-const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoading, isCloning, draft }) => {
+const BudgetForm = ({
+  onSubmit,
+  products,
+  customers = [],
+  budget,
+  user,
+  isLoading,
+  isCloning,
+  draft,
+  selectedContact,
+  setSelectedContact
+}) => {
+
+  const paymentMethodsResetRef = useRef(null);
   const methods = useForm({
     defaultValues: {
       paymentToAdd: EMPTY_PAYMENT,
@@ -73,11 +86,14 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     setValue('paymentMethods', PAYMENT_METHODS.map(method => method.value));
   }, [setValue]);
 
-  const customerOptions =
-    customers.filter(customer => customer.id && customer.name)
+  const customerOptions = useMemo(() => {
+    return customers.filter(customer => customer.id && customer.name)
       .map(customer => ({
         key: customer.id, value: customer.id, text: customer.name,
       }));
+  }, [customers]);
+  const shouldError = useMemo(() => isBudgetConfirmed(watchState) && !draft && !watchPickUp, [draft, watchPickUp, watchState]);
+
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
       setIsTableLoading(true);
@@ -157,12 +173,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   }, [watchState]);
 
   const validateCustomer = () => {
-    const customer = getValues("customer");
-    if (isBudgetConfirmed(watchState) && watchPickUp && (!customer.addresses.length || !customer.phoneNumbers.length)) {
-      if (!customer.addresses.length) {
+    if (isBudgetConfirmed(watchState) && !watchPickUp && (!watchCustomer.addresses.length || !watchCustomer.phoneNumbers.length)) {
+      if (!watchCustomer.addresses.length) {
         setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
-      if (!customer.phoneNumbers.length) {
+      if (!watchCustomer.phoneNumbers.length) {
         setError('customer.phoneNumbers', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
       return false;
@@ -187,6 +202,10 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
 
     if (productSearchRef.current) {
       productSearchRef.current.clear();
+    }
+
+    if (paymentMethodsResetRef.current) {
+      paymentMethodsResetRef.current();
     }
   }, [reset, user, draft, isCloning, budget]);
 
@@ -419,24 +438,18 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </Modal.Content>
           <Modal.Actions>
             <ButtonsContainer>
-              <IconedButton
-                icon
-                labelPosition="left"
+              <IconnedButton
+                text="Cancelar"
+                icon="cancel"
                 color="red"
                 onClick={handleCancelUpdate}
-              >
-                <Icon name="cancel" />
-                Cancelar
-              </IconedButton>
-              <IconedButton
-                icon
-                labelPosition="left"
+              />
+              <IconnedButton
+                text="Confirmar"
+                icon="check"
                 color="green"
                 onClick={handleConfirmUpdate}
-              >
-                <Icon name="check" />
-                Confirmar
-              </IconedButton>
+              />
             </ButtonsContainer>
           </Modal.Actions>
         </Modal>
@@ -446,34 +459,26 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           <FieldsContainer>
             <FormField width="300px">
               <ButtonGroup size="small">
-                <IconedButton
-                  icon
-                  labelPosition="left"
-                  type="button"
+                <IconnedButton
+                  text="Confirmado"
+                  icon="check"
                   basic={!isConfirmed}
                   color={isConfirmed ? "green" : "orange"}
                   onClick={() => {
                     setIsConfirmed(true);
                     setValue('state', BUDGET_STATES.CONFIRMED.id);
                   }}
-                >
-                  <Icon name="check" />
-                  Confirmado
-                </IconedButton>
-                <IconedButton
-                  icon
-                  labelPosition="left"
-                  type="button"
+                />
+                <IconnedButton
+                  text="Pendiente"
+                  icon="hourglass half"
                   basic={isConfirmed}
                   color={isConfirmed ? "green" : "orange"}
                   onClick={() => {
                     setIsConfirmed(false);
                     setValue('state', BUDGET_STATES.PENDING.id);
                   }}
-                >
-                  <Icon name="hourglass half" />
-                  Pendiente
-                </IconedButton>
+                />
               </ButtonGroup>
             </FormField>
             <FormField width="350px">
@@ -482,32 +487,22 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <ButtonGroup size="small">
-                    <IconedButton
-                      icon
-                      labelPosition="left"
-                      type="button"
+                    <IconnedButton
+                      text={PICK_UP_IN_STORE}
+                      icon="warehouse"
                       basic={!value}
-                      color="blue"
                       onClick={() => {
                         onChange(true);
                       }}
-                    >
-                      <Icon name="warehouse" />
-                      {PICK_UP_IN_STORE}
-                    </IconedButton>
-                    <IconedButton
-                      icon
-                      labelPosition="left"
-                      type="button"
+                    />
+                    <IconnedButton
+                      text="Enviar a Dirección"
+                      icon="truck"
                       basic={value}
-                      color="blue"
                       onClick={() => {
                         onChange(false);
                       }}
-                    >
-                      <Icon name="truck" />
-                      Enviar a Dirección
-                    </IconedButton>
+                    />
                   </ButtonGroup>
                 )}
               />
@@ -575,14 +570,42 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               />
             </FormField>
             <FormField flex={1}>
-              <RuledLabel title="Dirección" message={isBudgetConfirmed(watchState) && !draft && !watchPickUp && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
-              <Segment placeholder>
-                {!watchPickUp ? watchCustomer?.addresses?.[0]?.address : PICK_UP_IN_STORE}
-              </Segment>
+              <RuledLabel title="Dirección" message={shouldError && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
+              {watchPickUp ? (
+                <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
+              ) : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? (
+                <Segment placeholder>{watchCustomer?.addresses?.[0]?.address}</Segment>
+              ) : (
+                (
+                  <Dropdown
+                    selection
+                    options={watchCustomer?.addresses.map((address) => ({
+                      key: address.address,
+                      text: address.address,
+                      value: address.address,
+                    }))}
+                    value={selectedContact.address}
+                    onChange={(e, { value }) => setSelectedContact({ ...selectedContact, address: value })}
+                  />
+                )
+              )}
             </FormField>
             <FormField width="200px">
-              <RuledLabel title="Teléfono" message={isBudgetConfirmed(watchState) && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
-              <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
+              <RuledLabel title="Teléfono" message={shouldError && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
+              {!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? (
+                <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
+              ) : (
+                <Dropdown
+                  selection
+                  options={watchCustomer?.phoneNumbers.map((phone) => ({
+                    key: formatedSimplePhone(phone),
+                    text: formatedSimplePhone(phone),
+                    value: formatedSimplePhone(phone),
+                  }))}
+                  value={selectedContact.phone}
+                  onChange={(e, { value }) => setSelectedContact({ ...selectedContact, phone: value })}
+                />
+              )}
             </FormField>
           </FieldsContainer>
           <FormField width="300px">
@@ -620,9 +643,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               actions={actions}
             />
             <Total
-              subtotal={subtotal} 
-              subtotalAfterDiscount={subtotalAfterDiscount} 
+              subtotal={subtotal}
               globalDiscount={watchGlobalDiscount}
+              subtotalAfterDiscount={subtotalAfterDiscount}
               onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
               additionalCharge={watchAdditionalCharge}
               onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
@@ -630,12 +653,14 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             />
           </Loader>
           <FieldsContainer rowGap="5px!important">
-            <Label>Comentarios</Label>
             <ControlledComments control={control} />
           </FieldsContainer>
-          <FieldsContainer rowGap="15px">
+          <FieldsContainer width="100%" rowGap="15px">
             {isBudgetConfirmed(watchState) ?
-              <PaymentMethods totalBudget={finalTotal} />
+              <PaymentMethods
+                finalTotal={finalTotal}
+                onResetPayments={(resetFn) => { paymentMethodsResetRef.current = resetFn; }}
+              />
               : <FormField flex={3}>
                 <Label>Métodos de pago</Label>
                 <Segment>
@@ -717,8 +742,8 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               </IconedButton>
             }
           />
-        </Form >
-      </FormProvider>
+        </Form>
+      </FormProvider >
     </>
   );
 };

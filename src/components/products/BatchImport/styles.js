@@ -13,7 +13,7 @@ const ModalHeader = styled(SModal.Header)`
 `;
 
 const WaitMsg = styled.p`
-  font-size: 12px!important;
+  font-size: 13px!important;
   margin: 0!important;
   align-content: center;
 `;

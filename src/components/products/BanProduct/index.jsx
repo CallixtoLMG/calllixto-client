@@ -1,22 +1,23 @@
-import { LIST_BANNED_PRODUCTS_QUERY_KEY, editBanProducts, useListBanProducts } from "@/api/products";
-import { FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Modal } from "@/components/common/custom";
+import { useUserContext } from "@/User";
+import { editBanProducts } from "@/api/products";
+import { FieldsContainer, Flex, Form, FormField, Input, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { handleEnterKeyPress } from '@/utils';
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { isEqual, sortBy } from 'lodash';
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Icon, Transition } from "semantic-ui-react";
+import { Transition } from "semantic-ui-react";
 import { BAN_FILTERS, BAN_PRODUCTS_COLUMNS } from "../products.common";
 import { ModalActions } from "./styles";
+import { IconnedButton } from "@/components/common/buttons";
 
 const BanProduct = ({ open, setOpen }) => {
-  const { data: blacklist, isLoading } = useListBanProducts();
-  const { handleSubmit, setValue, watch } = useForm();
+  const { getBlacklist, updateSessionData, userData } = useUserContext();
+  const { handleSubmit, setValue, watch } = useForm({ defaultValues: { products: getBlacklist() }});
   const watchProducts = watch('products');
-  const queryClient = useQueryClient();
   const [filter, setFilter] = useState('');
   const formRef = useRef(null);
 
@@ -71,7 +72,8 @@ const BanProduct = ({ open, setOpen }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BANNED_PRODUCTS_QUERY_KEY] });
+        const updatedUser = { ...userData, client: { ...userData.client, blacklist: watchProducts } };
+        updateSessionData(updatedUser);
         toast.success('Lista de productos bloquedos actualizada!');
         setOpen(false);
       } else {
@@ -79,12 +81,6 @@ const BanProduct = ({ open, setOpen }) => {
       }
     },
   });
-
-  useEffect(() => {
-    if (!isLoading) {
-      setValue("products", blacklist);
-    }
-  }, [blacklist, isLoading, setValue]);
 
   const handleConfirmClick = () => {
     if (formRef.current) {
@@ -114,7 +110,7 @@ const BanProduct = ({ open, setOpen }) => {
             </FieldsContainer>
             <FieldsContainer rowGap="5px"  >
               <Label>Productos vedados</Label>
-              <Loader greyColor active={isLoading}>
+              <Loader greyColor>
                 <Table
                   deleteButtonInside
                   tableHeight="40vh"
@@ -134,28 +130,22 @@ const BanProduct = ({ open, setOpen }) => {
         </Modal.Content>
         <ModalActions>
           <Flex columnGap="5px">
-            <IconedButton
-              icon
-              labelPosition="left"
+            <IconnedButton
+              text="Cancelar"
+              icon="cancel"
               disabled={isPending}
               onClick={() => setOpen(false)}
               color="red"
-            >
-              <Icon name="cancel" />
-              Cancelar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
-              disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))}
+            />
+            <IconnedButton
+              text="Aceptar"
+              icon="check"
+              disabled={isPending || isEqual(sortBy(getBlacklist()), sortBy(watchProducts))}
               loading={isPending}
-              type="submit"
+              submit
               color="green"
               onClick={handleConfirmClick}
-            >
-              <Icon name="check" />
-              Aceptar
-            </IconedButton>
+            />
           </Flex>
         </ModalActions>
       </Modal>

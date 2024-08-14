@@ -1,3 +1,4 @@
+import { IconnedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -55,26 +56,8 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer>
-            <IconedButton
-              icon
-              labelPosition="left"
-              type="button"
-              color="red"
-              onClick={() => onClose(false)}
-            >
-              <Icon name="cancel" />
-              Cancelar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
-              disabled={!isDirty}
-              onClick={handleSubmit(onAddComment)}
-              color="green"
-            >
-              <Icon name="check" />
-              Confirmar
-            </IconedButton>
+            <IconnedButton text="Cancelar" icon="cancel" color="red" onClick={() => onClose(false)} />
+            <IconnedButton text="Confirmar" icon="check" color="green" onClick={handleSubmit(onAddComment)} disabled={!isDirty} />
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>

@@ -31,3 +31,4 @@ export const Price = ({ value }) => {
     </Flex>
   );
 };
+

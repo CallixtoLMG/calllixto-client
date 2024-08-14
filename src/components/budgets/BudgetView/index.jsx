@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Flex, FormField, Icon, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
+import { Dropdown, FieldsContainer, Flex, FormField, Icon, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import PaymentMethods from "@/components/common/form/PaymentMethods";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
@@ -11,7 +11,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { Container, Message, MessageHeader } from "./styles";
 
-const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, finalTotal }) => {
+const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, finalTotal, selectedContact, setSelectedContact }) => {
   const methods = useForm({
     defaultValues: {
       payments: budget?.payments || [], // Suponiendo que `payments` sea la lista de métodos de pago
@@ -124,11 +124,41 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, finalTotal }) => 
         </FormField>
         <FormField flex="1">
           <Label>Dirección</Label>
-          <Segment>{budget?.pickUpInStore ? PICK_UP_IN_STORE : budget?.customer?.addresses[0]?.address}</Segment>
+          {budget?.pickUpInStore ? (
+            <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
+          ) : !budget?.customer?.addresses?.length || budget.customer.addresses.length === 1 ? (
+            <Segment placeholder>{budget.customer?.addresses?.[0]?.address}</Segment>
+          ) : (
+            (
+              <Dropdown
+                selection
+                options={budget?.customer?.addresses.map((address) => ({
+                  key: address.address,
+                  text: address.address,
+                  value: address.address,
+                }))}
+                value={selectedContact.address}
+                onChange={(e, { value }) => setSelectedContact({ ...selectedContact, address: value })}
+              />
+            )
+          )}
         </FormField>
         <FormField width="200px">
           <Label>Teléfono</Label>
-          <Segment placeholder>{formatedSimplePhone(budget?.customer?.phoneNumbers[0])}</Segment>
+          {!budget?.customer?.phoneNumbers?.length || budget?.customer?.phoneNumbers.length === 1 ? (
+            <Segment placeholder>{formatedSimplePhone(budget.customer?.phoneNumbers[0])}</Segment>
+          ) : (
+            <Dropdown
+              selection
+              options={budget?.customer?.phoneNumbers.map((phone) => ({
+                key: formatedSimplePhone(phone),
+                text: formatedSimplePhone(phone),
+                value: formatedSimplePhone(phone),
+              }))}
+              value={selectedContact?.phone}
+              onChange={(e, { value }) => setSelectedContact({ ...selectedContact, phone: value })}
+            />
+          )}
         </FormField>
       </FieldsContainer>
       <Table

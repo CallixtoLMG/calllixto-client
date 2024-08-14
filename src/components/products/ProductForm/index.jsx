@@ -1,17 +1,16 @@
-import { SubmitAndRestore } from "@/components/common/buttons";
-import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, IconedButton, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
+import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
+import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import { MEASSURE_UNITS, PAGES, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Icon } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
-  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted } } = useForm({
+  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors } = useForm({
     defaultValues: {
       fractionConfig: {
         active: false,
@@ -42,10 +41,12 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   const handleForm = async (data) => {
     if (!isUpdating) {
-      data.code = `${supplier.id}${brand.id}${data.code}`;
+      data.code = `${supplier?.id}${brand?.id}${data.code}`;
     }
     await onSubmit(data);
   };
+
+  const shouldError = useMemo(() => !isUpdating && isDirty && isSubmitted, [isDirty, isSubmitted, isUpdating]);
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT), SHORTKEYS.DELETE);
@@ -53,8 +54,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   return (
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer rowGap="5px" alignItems="flex-end">
-        <FormField flex="1">
-          <RuledLabel title="Proveedor" message={!isUpdating && isDirty && isSubmitted && !supplier && 'Campo requerido.'} required />
+        <FormField flex="1" error={shouldError && !supplier && 'Campo requerido.'}>
+          <RuledLabel title="Proveedor" message={shouldError && !supplier && 'Campo requerido.'} required />
           {!isUpdating ? (
             <Dropdown
               required
@@ -70,14 +71,15 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               onChange={(e, { value }) => {
                 const supplier = suppliers.find((supplier) => supplier.name === value);
                 setSupplier(supplier);
+                clearErrors("code");
               }}
             />
           ) : (
             <Segment placeholder>{product?.supplierName}</Segment>
           )}
         </FormField>
-        <FormField flex="1">
-          <RuledLabel title="Marca" message={!isUpdating && isDirty && isSubmitted && !brand && 'Campo requerido.'} required />
+        <FormField flex="1" error={shouldError && !brand && 'Campo requerido.'}>
+          <RuledLabel title="Marca" message={shouldError && !brand && 'Campo requerido.'} required />
           {!isUpdating ? (
             <Dropdown
               required
@@ -93,6 +95,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               onChange={(e, { value }) => {
                 const brand = brands.find((brand) => brand.name === value);
                 setBrand(brand);
+                clearErrors("code");
               }}
               disabled={isUpdating}
             />
@@ -105,19 +108,13 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             name="editablePrice"
             control={control}
             render={({ field: { value, onChange, ...rest } }) => (
-              <IconedButton
+              <IconnedButton
                 {...rest}
-                width="fit-content"
-                icon
-                labelPosition="left"
-                color="blue"
+                text="Precio Editable"
+                icon="pencil"
                 onClick={() => onChange(!value)}
-                type="button"
                 basic={!value}
-              >
-                <Icon name="pencil" />
-                Precio Editable
-              </IconedButton>
+              />
             )}
           />
         </FormField>
@@ -126,26 +123,20 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             name="fractionConfig.active"
             control={control}
             render={({ field: { value, onChange, ...rest } }) => (
-              <IconedButton
+              <IconnedButton
                 {...rest}
-                width="fit-content"
-                icon
-                labelPosition="left"
-                color="blue"
+                text="Producto Fraccionable"
+                icon="cut"
                 onClick={() => onChange(!value)}
                 basic={!value}
-                type="button"
-              >
-                <Icon name="cut" />
-                Producto Fraccionable
-              </IconedButton>
+              />
             )}
           />
         </FormField>
 
       </FieldsContainer>
       <FieldsContainer rowGap="5px">
-        <FormField width="20%">
+        <FormField width="20%" error={errors?.code?.message}>
           <RuledLabel title="Código" message={errors?.code?.message} required={!isUpdating} />
           {isUpdating ? (
             <Segment placeholder>{product?.code}</Segment>
@@ -153,9 +144,10 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             <Controller
               name="code"
               control={control}
-              rules={RULES.REQUIRED_MAX26_DIGIT_CODE}
+              rules={RULES.REQUIRED_BRAND_AND_SUPPLIER(brand, supplier)}
               render={({ field }) => (
                 <Input
+                  innerWidth="0"
                   {...field}
                   placeholder="Código"
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
@@ -167,7 +159,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           )}
 
         </FormField>
-        <FormField flex="1">
+        <FormField flex="1" error={errors?.name?.message}>
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
           <Controller
             name="name"
@@ -177,7 +169,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           />
         </FormField>
         <FormField width="20%">
-          <RuledLabel title="Precio" />
+          <Label>Precio</Label>
           <Controller
             name="price"
             control={control}
@@ -218,8 +210,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           />
         </FormField>
       </FieldsContainer>
-      <FieldsContainer rowGap="5px">
-        <Label>Comentarios</Label>
+      <FieldsContainer>
         <ControlledComments control={control} />
       </FieldsContainer>
       <SubmitAndRestore

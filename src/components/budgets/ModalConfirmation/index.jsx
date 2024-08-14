@@ -1,10 +1,11 @@
-import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, IconedButton, Label, Segment } from "@/components/common/custom";
+import { IconnedButton } from "@/components/common/buttons";
+import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, Label, Segment } from "@/components/common/custom";
 import PaymentMethods from "@/components/common/form/PaymentMethods";
 import { PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone, now } from "@/utils";
 import { useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { ButtonGroup, Form, Icon, Modal, Transition } from "semantic-ui-react";
+import { ButtonGroup, Form, Modal, Transition } from "semantic-ui-react";
 
 const EMPTY_PAYMENT = { method: '', amount: 0, comments: '' };
 
@@ -12,7 +13,7 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
   const methods = useForm({
     defaultValues: { paymentToAdd: EMPTY_PAYMENT, payments: [], ...customer },
   });
-  
+
   const formRef = useRef(null);
   const roundedFinalTotal = parseFloat(finalTotal.toFixed(2));
   const handleConfirmClick = () => {
@@ -24,7 +25,7 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
   const handleFinalConfirm = (data) => {
     const { payments, pickUpInStore } = data;
     const dataToSend = {
-      paymentsMade: payments.map((payment) => ({
+      paymentsMade: payments?.map((payment) => ({
         amount: payment.amount,
         method: payment.method,
         comments: payment.comments,
@@ -50,32 +51,20 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
           <Flex alignItems="center" justifyContent="space-between">
             Desea confirmar el presupuesto?
             <ButtonGroup size="small">
-              <IconedButton
+              <IconnedButton
+                text={PICK_UP_IN_STORE}
+                icon="warehouse"
                 height="32px"
-                width="fit-content"
-                icon
-                labelPosition="left"
-                type="button"
                 basic={!methods.getValues("pickUpInStore")}
-                color="blue"
                 onClick={() => handlePickupInStoreChange(true)}
-              >
-                <Icon name="warehouse" />
-                {PICK_UP_IN_STORE}
-              </IconedButton>
-              <IconedButton
+              />
+              <IconnedButton
+                text="Enviar a Dirección"
+                icon="truck"
                 height="32px"
-                width="fit-content"
-                icon
-                labelPosition="left"
-                type="button"
                 basic={methods.getValues("pickUpInStore")}
-                color="blue"
                 onClick={() => handlePickupInStoreChange(false)}
-              >
-                <Icon name="truck" />
-                Enviar a Dirección
-              </IconedButton>
+              />
             </ButtonGroup>
           </Flex>
         </Modal.Header>
@@ -109,29 +98,22 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer width="100%">
-            <IconedButton
-              icon
-              labelPosition="left"
+            <IconnedButton
+              text="Cancelar"
+              icon="cancel"
               disabled={isLoading}
-              type="button"
               color="red"
               onClick={() => onClose(false)}
-            >
-              <Icon name='cancel' />
-              Cancelar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
+            />
+            <IconnedButton
+              text="Confirmar"
+              icon="check"
               disabled={isLoading}
               loading={isLoading}
-              type="submit"
+              submit
               color="green"
               onClick={handleConfirmClick}
-            >
-              <Icon name='check' />
-              Confirmar
-            </IconedButton>
+            />
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>

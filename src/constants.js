@@ -74,10 +74,20 @@ export const RULES = {
     required: 'Campo requerido.',
     pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
   },
-  REQUIRED_MAX26_DIGIT_CODE: {
-    required: 'Campo requerido.',
-    pattern: { value: REGEX.MAX26_DIGIT_CODE, message: 'El código debe tener entre 5 y 30 valores alfanuméricos(- y _ habilitados), sumando marca y proveedor' }
-  },
+  REQUIRED_BRAND_AND_SUPPLIER: (brand, supplier) => ({
+    validate: (value) => {
+      if (!brand?.id || !supplier?.id) {
+        return 'Debe seleccionar un proveedor y una marca antes de ingresar un código';
+      }
+      if (!value) {
+        return 'El código es requerido';
+      }
+      if (!REGEX.MAX26_DIGIT_CODE.test(value)) {
+        return 'El código no puede tener más de 26 caracteres alfanuméricos, incluyendo "-" y "_"';
+      }
+      return true;
+    }
+  }),
   REQUIRED_THREE_NUMBERS: {
     required: 'Campo requerido.',
     pattern: { value: REGEX.THREE_NUMBERS_CODE, message: 'El valor puede ser hasta un máximo de 3 números' }

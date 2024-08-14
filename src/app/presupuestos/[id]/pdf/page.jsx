@@ -6,7 +6,7 @@ import { BUDGET_PDF_FORMAT, PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useValidateToken } from "@/hooks/userData";
 import { useUserContext } from "@/User";
-import { getTotalSum } from "@/utils";
+import { formatedSimplePhone, getTotalSum } from "@/utils";
 
 const PDF = ({ params }) => {
   useValidateToken();
@@ -26,6 +26,10 @@ const PDF = ({ params }) => {
         client={userData?.client?.metadata}
         subtotal={getTotalSum(budget?.products)}
         printPdfMode={BUDGET_PDF_FORMAT.CLIENT}
+        selectedContact={{
+          address: budget?.customer?.addresses?.[0]?.address,
+          phone: formatedSimplePhone(budget?.customer?.phoneNumbers?.[0]),
+        }}
       />
     </Loader>
   )

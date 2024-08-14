@@ -1,8 +1,7 @@
 import { SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from 'next/navigation';
-import { Icon } from 'semantic-ui-react';
-import { IconedButton } from "../custom";
+import { IconnedButton } from ".";
 
 const GoBack = () => {
   const { back } = useRouter();
@@ -13,18 +12,12 @@ const GoBack = () => {
   useKeyboardShortcuts(handleClick, SHORTKEYS.BACKSPACE)
 
   return (
-    <IconedButton
-      size="small"
-      icon
-      labelPosition="left"
-      width="fit-content"
+    <IconnedButton
+      text="Atrás"
+      icon="arrow left"
       color="grey"
       onClick={handleClick}
-      type="button"
-    >
-      <Icon name="arrow left" />
-      Atrás
-    </IconedButton>
+    />
   );
 };
 

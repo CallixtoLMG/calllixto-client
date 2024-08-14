@@ -1,10 +1,9 @@
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.common";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, FormField, Icon, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
 import { Table, TotalList } from "../table";
-
 const EMPTY_PAYMENT = { method: '', amount: 0, comments: '' };
 
 const parseFloatSafe = (value) => {
@@ -17,7 +16,18 @@ const calculateTotals = (payments, finalTotal) => {
   return { totalAssigned: parseFloat(totalAssigned), totalPending: parseFloat(totalPending) };
 };
 
-const PaymentMethods = ({ finalTotal, excludeDollars, maxHeight }) => {
+const PaymentMethods = ({ finalTotal, excludeDollars, maxHeight, onResetPayments }) => {
+
+  const handleResetPayments = () => {
+    reset({ payments: [] });
+  };
+
+  useEffect(() => {
+    if (onResetPayments) {
+      onResetPayments(handleResetPayments);
+    }
+  }, [onResetPayments]);
+
   const formContext = useFormContext();
   if (!formContext) throw new Error("PaymentMethods must be used within a FormProvider.");
 
@@ -100,7 +110,7 @@ const PaymentMethods = ({ finalTotal, excludeDollars, maxHeight }) => {
   ];
 
   return (
-    <Flex maxHeight={maxHeight ? "55vh" : "auto"}>
+    <Flex width="100%" maxHeight={maxHeight ? "55vh" : ""}>
       <Segment padding="20px 60px 20px 20px">
         <Header>Detalle de Pagos</Header>
         <FlexColumn rowGap="15px">

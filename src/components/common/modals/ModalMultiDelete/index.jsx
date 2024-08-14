@@ -1,9 +1,10 @@
-import { ButtonsContainer, IconedButton, Input } from "@/components/common/custom";
+import { ButtonsContainer, Input } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Header, Icon as SIcon, Transition } from 'semantic-ui-react';
+import { Header, Transition } from 'semantic-ui-react';
 import { Form, Modal, ModalContent } from "./styles";
+import { IconnedButton } from "../../buttons";
 
 const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title, icon, headers }) => {
   const [confirmationText, setConfirmationText] = useState('');
@@ -46,25 +47,21 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
               width="220px"
             />
             <ButtonsContainer>
-              <IconedButton
-                icon
-                labelPosition="left"
+              <IconnedButton
+                text="Cancelar"
+                icon="times"
                 color="grey"
                 onClick={onClose}
                 disabled={isLoading}
-              >
-                <SIcon name='times' />Cancelar
-              </IconedButton>
-              <IconedButton
-                icon
-                labelPosition="left"
+              />
+              <IconnedButton
+                text="Eliminar"
+                icon="trash"
                 disabled={!isDeleteEnabled || isLoading}
                 loading={isLoading}
                 color="red"
-                type="submit"
-              >
-                <SIcon name='trash' />Eliminar
-              </IconedButton>
+                submit
+              />
             </ButtonsContainer>
           </Form>
         </Modal.Actions>

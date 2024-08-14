@@ -2,9 +2,10 @@
 import { useUserContext } from "@/User";
 import { LIST_PRODUCTS_QUERY_KEY, deleteBatchProducts, useListAllProducts } from "@/api/products";
 import { GET_SUPPLIER_QUERY_KEY, LIST_SUPPLIERS_QUERY_KEY, edit, useGetSupplier } from "@/api/suppliers";
-import { BarCodeContainer, BarCodeSubContainer, Barcode, ProductCode, ProductName } from "@/commonStyles";
+import { Icon } from "@/components/common/custom";
+import PrintBarCodes from "@/components/common/custom/BarCode";
 import { ModalDelete } from "@/components/common/modals";
-import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES } from "@/components/products/products.common";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import SupplierView from "@/components/suppliers/SupplierView";
@@ -13,10 +14,10 @@ import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import JsBarcode from 'jsbarcode';
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
+import { useReactToPrint } from "react-to-print";
 
 const Supplier = ({ params }) => {
   useValidateToken();
@@ -27,9 +28,9 @@ const Supplier = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [open, setOpen] = useState(false);
-  const [shouldPrint, setShouldPrint] = useState(false);
   const queryClient = useQueryClient();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar todos los productos de la marca "${name}"?`;
+  const printRef = useRef();
 
   const { data: productsData, isLoading: loadingProducts, refetch } = useListAllProducts({
     attributes: [ATTRIBUTES.CODE, ATTRIBUTES.NAME],
@@ -39,47 +40,29 @@ const Supplier = ({ params }) => {
 
   useEffect(() => {
     resetActions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     setLabels([PAGES.SUPPLIERS.NAME, supplier?.name]);
   }, [setLabels, supplier]);
 
-  useEffect(() => {
-    if (productsData && productsData.products) {
-      productsData.products.forEach((product) => {
-        const barcodeElement = document.getElementById(`barcode-${product?.code}`);
-        if (barcodeElement) {
-          JsBarcode(barcodeElement, product?.code, {
-            format: "CODE128",
-            lineColor: "#000",
-            width: 2,
-            height: 80,
-            displayValue: false,
-            fit: true
-          });
-        }
-      });
-    }
-  }, [productsData]);
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    removeAfterPrint: true,
+  });
 
-  useEffect(() => {
-    if (shouldPrint && productsData && productsData.products && !loadingProducts) {
-      window.print();
-      setShouldPrint(false);
-    }
-  }, [shouldPrint, productsData, loadingProducts]);
-
-  useEffect(() => {
-    setShouldPrint(false);
-  }, [params.id]);
 
 
   useEffect(() => {
-    const handleBarcodeClick = async () => {
+    const handleBarCodePrint = async () => {
       const { data } = await refetch();
-      if (data) {
-        setShouldPrint(true);
+      if (data?.products?.length) {
+        handlePrint();
+      } else {
+        toast.success('No hay productos de este proveedor', {
+          icon:<Icon margin="0" toast name="info circle" color="blue" />,
+        });
       }
     };
 
@@ -90,7 +73,7 @@ const Supplier = ({ params }) => {
           icon: 'barcode',
           color: 'blue',
           text: 'Códigos',
-          onClick: handleBarcodeClick,
+          onClick: handleBarCodePrint,
         },
         {
           id: 2,
@@ -102,6 +85,7 @@ const Supplier = ({ params }) => {
       ]
       : [];
     setActions(actions);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetch, role, setActions]);
 
   const { mutate: mutateUpdate, isPending: isLoadingUpdate } = useMutation({
@@ -139,13 +123,11 @@ const Supplier = ({ params }) => {
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);
-  }
+  };
 
   return (
     <Loader active={isLoading || isRefetching || loadingProducts}>
-      <NoPrint>
-        {Toggle}
-      </NoPrint>
+      {Toggle}
       {open &&
         <ModalDelete
           showModal={open}
@@ -158,19 +140,9 @@ const Supplier = ({ params }) => {
         <SupplierForm supplier={supplier} onSubmit={mutateUpdate} isLoading={isLoadingUpdate} isUpdating />
       ) : (
         <>
-          <NoPrint>
-            <SupplierView supplier={supplier} />
-          </NoPrint>
+          <SupplierView supplier={supplier} />
           <OnlyPrint>
-            <BarCodeContainer>
-              {productsData?.products?.map((product) => (
-                <BarCodeSubContainer key={product.code}>
-                  <ProductName>{product.name}</ProductName>
-                  <Barcode id={`barcode-${product.code}`}></Barcode>
-                  <ProductCode>{product.code}</ProductCode>
-                </BarCodeSubContainer>
-              ))}
-            </BarCodeContainer>
+            <PrintBarCodes ref={printRef} products={productsData?.products} />
           </OnlyPrint>
         </>
       )}

@@ -10,33 +10,20 @@ import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
+import { IconnedButton } from "@/components/common/buttons";
 import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Input, Menu } from "@/components/common/custom";
 import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
-import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
+import { formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Dropdown } from "semantic-ui-react";
-
-const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) => (
-  <a href={href} target={target}>
-    <IconedButton
-      icon
-      labelPosition="left"
-      width={width}
-      color={color}
-      size="small"
-    >
-      <Icon name={iconName} />{text}
-    </IconedButton>
-  </a>
-);
 
 const Budget = ({ params }) => {
   useValidateToken();
@@ -82,6 +69,7 @@ const Budget = ({ params }) => {
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [finalTotal, setFinalTotal] = useState(0);
+  const [selectedContact, setSelectedContact] = useState({ phone: '', address: '' });
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {
@@ -157,6 +145,10 @@ const Budget = ({ params }) => {
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
       ].filter(Boolean));
       setCustomerData(budget.customer);
+      setSelectedContact({
+        address: budget.customer?.addresses?.[0]?.address,
+        phone: formatedSimplePhone(budget.customer?.phoneNumbers?.[0])
+      });
     }
   }, [setLabels, budget, push, isLoading]);
 
@@ -189,35 +181,6 @@ const Budget = ({ params }) => {
       ];
 
       const sendButtons = [
-        ...(budget?.customer?.phoneNumbers?.length ? [{
-          buttons: budget?.customer?.phoneNumbers.map(({ ref, areaCode, number }) => (
-            <SendButton
-              key={`${APIS.WSP(`${areaCode}${number}`)}`}
-              href={`${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`}
-              text={`${ref ? `${ref} - ` : ''}${areaCode} ${number}`}
-              iconName="whatsapp"
-            />
-          )),
-          color: 'green',
-          iconName: 'whatsapp',
-          text: 'WhatsApp'
-        }] : []),
-        ...(budget?.customer?.emails?.length ? [{
-          buttons: budget?.customer?.emails?.map(({ ref, email }) => (
-            <SendButton
-              key={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
-              href={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
-              text={`${ref ? `${ref} - ` : ''}${email}`}
-              iconName="mail"
-            />
-          )),
-          color: 'red',
-          iconName: 'mail',
-          text: 'Mail'
-        }] : [])
-      ];
-
-      const sendButtons1 = [
         {
           text: 'WhatsApp',
           iconName: 'whatsapp',
@@ -280,7 +243,7 @@ const Budget = ({ params }) => {
             <Menu>
               <DropdownOption menu pointing text='Enviar' icon='send' floating labeled button className='icon blue'>
                 <Dropdown.Menu>
-                  {sendButtons1.map(({ text, iconName, color, subOptions }) => (
+                  {sendButtons.map(({ text, iconName, color, subOptions }) => (
                     <Flex key={iconName}>
                       {subOptions.length > 0 && (
                         <DropdownOption text={text} pointing="left" className="link item">
@@ -319,6 +282,7 @@ const Budget = ({ params }) => {
       ].filter(Boolean);
       setActions(actions);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [budget, push, role, setActions]);
 
   const handleConfirm = () => {
@@ -412,103 +376,88 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      <NoPrint>
-        <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) ? "0" : "0 0 15px 0!important"} justifyContent="space-between">
-          {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
-            <>
-              <IconedButton
-                icon
-                labelPosition="left"
-                type="button"
-                width="fit-content"
-                color="green"
-                onClick={handleConfirm}
-              >
-                <Icon name='check' />
-                Confirmar
-              </IconedButton>
-              <ModalCustomer
-                isModalOpen={isModalCustomerOpen}
-                onClose={handleModalCustomerClose}
-                customer={customerData}
-              />
-              <ModalConfirmation
-                subtotal={subtotal}
-                subtotalAfterDiscount={subtotalAfterDiscount}
-                finalTotal={finalTotal}
-                isModalOpen={isModalConfirmationOpen}
-                onClose={handleModalConfirmationClose}
-                customer={customerData}
-                onConfirm={mutate}
-                isLoading={isPending}
-              />
-            </>
-          ) : <Box />}
-          {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-            <Input
-              textAlignLast="right"
-              innerWidth="90px"
-              type="text"
-              height="35px"
-              width="fit-content"
-              onChange={handleDollarChange}
-              actionPosition='left'
-              placeholder="Precio $"
-              value={formattedDolarRate}
-              disabled={!showDolarExangeRate}
-              action={
-                <IconedButton
-                  icon
-                  labelPosition='left'
-                  type="button"
-                  basic={!showDolarExangeRate}
-                  onClick={() => {
-                    setShowDolarExangeRate(prev => !prev);
-                    if (!showDolarExangeRate) {
-                      setFormattedDolarRate(formatValue(dolarRate));
-                    } else {
-                      setFormattedDolarRate('');
-                      setDolarRate(0);
-                    }
-                  }}
-                  color="green"
-                  width="fit-content"
-                >
-                  <Icon name='dollar' />
-                  Cotizar en USD
-                </IconedButton>
-              }
-            />
-          )}
-        </Flex>
-        {isBudgetDraft(budget?.state) ? (
-          <BudgetForm
-            onSubmit={mutateEdit}
-            products={products}
-            customers={customers}
-            user={userData}
-            budget={budget}
-            isLoading={isPendingEdit}
-            draft
-            printPdfMode={printPdfMode}
-          />
-        ) : (
+      <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} justifyContent="space-between">
+        {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
           <>
-            <BudgetView
-              budget={{ ...budget, customer: customerData }}
+            <IconnedButton text="Confirmar" icon="check" color="green" onClick={handleConfirm} />
+            <ModalCustomer
+              isModalOpen={isModalCustomerOpen}
+              onClose={handleModalCustomerClose}
+              customer={customerData}
+            />
+            <ModalConfirmation
               subtotal={subtotal}
               subtotalAfterDiscount={subtotalAfterDiscount}
               finalTotal={finalTotal}
-            />
-            <ModalCancel
-              isModalOpen={isModalCancelOpen}
-              onClose={handleModalCancelClose}
-              onConfirm={mutateCancel}
-              isLoading={isPendingCancel}
+              isModalOpen={isModalConfirmationOpen}
+              onClose={handleModalConfirmationClose}
+              customer={customerData}
+              onConfirm={mutate}
+              isLoading={isPending}
             />
           </>
+        ) : <Box />}
+        {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
+          <Input
+            textAlignLast="right"
+            innerWidth="90px"
+            type="text"
+            height="35px"
+            width="fit-content"
+            onChange={handleDollarChange}
+            actionPosition='left'
+            placeholder="Precio dolar"
+            value={formattedDolarRate}
+            disabled={!showDolarExangeRate}
+            action={
+              <IconnedButton
+                text="Cotizar en USD"
+                icon="dollar"
+                color="green"
+                basic={!showDolarExangeRate}
+                onClick={() => {
+                  setShowDolarExangeRate(prev => !prev);
+                  if (!showDolarExangeRate) {
+                    setFormattedDolarRate(formatValue(dolarRate));
+                  } else {
+                    setFormattedDolarRate('');
+                    setDolarRate(0);
+                  }
+                }}
+              />
+            }
+          />
         )}
-      </NoPrint>
+      </Flex>
+      {isBudgetDraft(budget?.state) ? (
+        <BudgetForm
+          onSubmit={mutateEdit}
+          products={products}
+          customers={customers}
+          user={userData}
+          budget={budget}
+          isLoading={isPendingEdit}
+          draft
+          printPdfMode={printPdfMode}
+          selectedContact={selectedContact}
+          setSelectedContact={setSelectedContact}
+        />
+      ) : (
+        <>
+          <BudgetView
+            budget={{ ...budget, customer: customerData }}
+            subtotal={subtotal}
+            subtotalAfterDiscount={subtotalAfterDiscount}
+            finalTotal={finalTotal}
+          />
+          <ModalCancel
+            isModalOpen={isModalCancelOpen}
+            onClose={handleModalCancelClose}
+            onConfirm={mutateCancel}
+            isLoading={isPendingCancel}
+          />
+        </>
+      )}
       <OnlyPrint marginTop="20px">
         <PDFfile
           ref={printRef}
@@ -520,6 +469,7 @@ const Budget = ({ params }) => {
           subtotal={subtotal}
           subtotalAfterDiscount={subtotalAfterDiscount}
           finalTotal={finalTotal}
+          selectedContact={selectedContact}
         />
       </OnlyPrint>
     </Loader >
