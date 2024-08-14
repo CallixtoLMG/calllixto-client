@@ -10,12 +10,15 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 import BrandView from "../../../components/brands/BrandView";
+import { useUserContext } from "@/User";
+import { RULES } from "@/roles";
 
 const Brand = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
   const { data: brand, isLoading, isRefetching } = useGetBrand(params.id);
-  const [allowUpdate, Toggle] = useAllowUpdate();
+  const { role } = useUserContext();
+  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const queryClient = useQueryClient();
@@ -53,7 +56,7 @@ const Brand = ({ params }) => {
   return (
     <Loader active={isLoading || isRefetching}>
       {Toggle}
-      {allowUpdate ? (
+      {isUpdating ? (
         <BrandForm brand={brand} onSubmit={mutate} isLoading={isPending} isUpdating />
       ) : (
         <BrandView brand={brand} />

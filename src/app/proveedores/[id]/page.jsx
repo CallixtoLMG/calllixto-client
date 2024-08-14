@@ -23,12 +23,12 @@ const Supplier = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
   const { data: supplier, isLoading, isRefetching } = useGetSupplier(params.id);
-  const [allowUpdate, Toggle] = useAllowUpdate();
+  const { role } = useUserContext();
+  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [open, setOpen] = useState(false);
   const queryClient = useQueryClient();
-  const { role } = useUserContext();
   const deleteQuestion = (name) => `¿Está seguro que desea eliminar todos los productos de la marca "${name}"?`;
   const printRef = useRef();
 
@@ -51,18 +51,20 @@ const Supplier = ({ params }) => {
     removeAfterPrint: true,
   });
 
-  const handleBarCodePrint = async () => {
-    const { data } = await refetch();
-    if (data?.products?.length) {
-      handlePrint();
-    } else {
-      toast.success('No hay productos de este proveedor', {
-        icon:<Icon margin="0" toast name="info circle" color="blue" />,
-      });
-    }
-  };
+
 
   useEffect(() => {
+    const handleBarCodePrint = async () => {
+      const { data } = await refetch();
+      if (data?.products?.length) {
+        handlePrint();
+      } else {
+        toast.success('No hay productos de este proveedor', {
+          icon:<Icon margin="0" toast name="info circle" color="blue" />,
+        });
+      }
+    };
+
     const actions = RULES.canRemove[role]
       ? [
         {
@@ -82,7 +84,8 @@ const Supplier = ({ params }) => {
       ]
       : [];
     setActions(actions);
-  }, [role, setActions]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refetch, role, setActions]);
 
   const { mutate: mutateUpdate, isPending: isLoadingUpdate } = useMutation({
     mutationFn: async (supplier) => {
@@ -132,7 +135,7 @@ const Supplier = ({ params }) => {
           onDelete={mutateDelete}
           isLoading={isLoadingDelete}
         />}
-      {allowUpdate ? (
+      {isUpdating ? (
         <SupplierForm supplier={supplier} onSubmit={mutateUpdate} isLoading={isLoadingUpdate} isUpdating />
       ) : (
         <>
