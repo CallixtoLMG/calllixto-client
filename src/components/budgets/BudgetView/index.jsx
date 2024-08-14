@@ -1,14 +1,24 @@
+import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Flex, FormField, Icon, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
+import PaymentMethods from "@/components/common/form/PaymentMethods";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { PICK_UP_IN_STORE } from "@/constants";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetCancelled } from "@/utils";
+import { useAllowUpdate } from "@/hooks/allowUpdate";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled } from "@/utils";
 import { useMemo } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { Container, Message, MessageHeader } from "./styles";
-const BudgetView = ({ budget }) => {
+
+const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, finalTotal }) => {
+  const methods = useForm({
+    defaultValues: {
+      payments: budget?.payments || [], // Suponiendo que `payments` sea la lista de métodos de pago
+    },
+  });
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
-  const subtotal = useMemo(() => getTotalSum(budget?.products), [budget]);
+  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
@@ -97,10 +107,14 @@ const BudgetView = ({ budget }) => {
           <p>{budget?.cancelledMsg}</p>
         </Message>
       </FieldsContainer>}
-      <FieldsContainer>
+      <FieldsContainer justifyContent="space-between">
         <FormField width="300px">
           <Label>Vendedor</Label>
           <Segment placeholder>{budget?.seller}</Segment>
+        </FormField>
+        <FormField >
+          <Label>Fecha de vencimiento</Label>
+          <Segment placeholder>{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
@@ -122,21 +136,32 @@ const BudgetView = ({ budget }) => {
         headers={BUDGET_FORM_PRODUCT_COLUMNS}
         elements={budget?.products}
       />
-      <Total readOnly subtotal={subtotal} globalDiscount={budget?.globalDiscount} additionalCharge={budget?.additionalCharge} />
+      <Total
+        readOnly
+        subtotal={subtotal}
+        finalTotal={finalTotal}
+        subtotalAfterDiscount={subtotalAfterDiscount}
+        globalDiscount={budget?.globalDiscount}
+        additionalCharge={budget?.additionalCharge}
+      />
       <FieldsContainer rowGap="5px" >
         <Label>Comentarios</Label>
         <Segment placeholder>{budget?.comments}</Segment>
       </FieldsContainer>
-      <FieldsContainer>
-        <FormField flex={3}>
-          <Label>Métodos de pago</Label>
-          <Segment placeholder>{formattedPaymentMethods}</Segment>
-        </FormField>
-        <FormField flex={1}>
-          <Label>Fecha de vencimiento</Label>
-          <Segment placeholder>{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
-        </FormField>
-      </FieldsContainer>
+      {Toggle}
+      {isUpdating ? (
+        <FormProvider  {...methods}>
+          <PaymentMethods finalTotal={finalTotal} />
+          <SubmitAndRestore />
+        </FormProvider>
+      ) : (
+        <FieldsContainer>
+          <FormField flex={3}>
+            <Label>Métodos de pago</Label>
+            <Segment placeholder>{formattedPaymentMethods}</Segment>
+          </FormField>
+        </FieldsContainer>
+      )}
     </ViewContainer>
   );
 };

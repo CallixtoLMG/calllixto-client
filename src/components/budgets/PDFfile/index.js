@@ -1,8 +1,8 @@
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
 import { Box, Flex, FlexColumn, Price } from "@/components/common/custom";
-import { Table, Total } from '@/components/common/table';
+import { Table, Total, TotalList } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT, BUDGET_STATES, PICK_UP_IN_STORE } from "@/constants";
-import { expirationDate, formatedDateOnly, formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft } from "@/utils";
+import { expirationDate, formatedDateOnly, formatedSimplePhone, isBudgetCancelled, isBudgetDraft } from "@/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { forwardRef, useMemo } from "react";
@@ -22,16 +22,50 @@ const Field = ({ label, value, ...rest }) => (
   </Flex>
 );
 
-const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0 }, ref) => {
+const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, finalTotal }, ref) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL, [printPdfMode]);
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
-  const subtotal = useMemo(() => getTotalSum(budget?.products), [budget]);
-  const subtotalAfterDiscount = useMemo(() => getSubtotal(subtotal, -budget?.globalDiscount || 0), [subtotal, budget]);
-  const finalTotal = useMemo(() => getSubtotal(subtotalAfterDiscount, budget?.additionalCharge || 0), [subtotalAfterDiscount, budget]);
+  const roundedFinalTotal = parseFloat(finalTotal.toFixed(2));
+
+  const createTotalListItems = (paymentMethods, finalTotal) => {
+    const totalAssigned = paymentMethods?.reduce((acc, payment) => acc + payment.amount, 0) || 0;
+    const totalPending = finalTotal - totalAssigned;
+
+    const items = paymentMethods?.map((payment, index) => ({
+      id: index + 1,
+      title: payment.method,
+      amount: <Price value={payment.amount.toLocaleString()} />,
+      ...(payment.comments && { subtitle: payment.comments }),
+    })) || [];
+
+    items.push({
+      id: items.length + 1,
+      title: "Total Pagado",
+      amount: <Price value={totalAssigned.toLocaleString()} />,
+    });
+
+    if (totalPending > 0) {
+      items.push({
+        id: items.length + 2,
+        title: "Total Pendiente",
+        amount: <Price value={totalPending.toLocaleString()} />,
+      });
+    }
+
+    items.push({
+      id: items.length + (totalPending > 0 ? 3 : 2),
+      title: "Total a Pagar",
+      amount: <Price value={roundedFinalTotal.toLocaleString()} />,
+    });
+
+    return items;
+  };
+
+  const TOTAL_LIST_ITEMS = createTotalListItems(budget?.paymentsMade, roundedFinalTotal);
 
   return (
     <FlexColumn ref={ref} padding="30px" rowGap="15px">
@@ -100,17 +134,18 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             additionalCharge={budget?.additionalCharge}
             readOnly
             showAllways={false}
+            finalTotal={roundedFinalTotal}
+            subtotalAfterDiscount={subtotalAfterDiscount}
           />
         )
       }
-      <Box height="10px" />
-      <FlexColumn rowGap="25px">
+      <FlexColumn rowGap="15px">
         {!!dolarExchangeRate && !dispatchPdf && (
           <DataContainer width="100%">
             <Title as="h4" alignSelf="left" $slim>Cotización en USD</Title>
             <Divider />
             <Title as="h4" alignSelf="left" width="fit-content" minHeight="30px">
-              <Price value={finalTotal / parseInt(dolarExchangeRate)} />
+              <Price value={roundedFinalTotal / parseInt(dolarExchangeRate)} />
             </Title>
           </DataContainer>
         )}
@@ -134,13 +169,20 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
           </DataContainer>
         )}
         {!dispatchPdf &&
-          <DataContainer width="100%">
-            <Title as="h4" alignSelf="left" $slim>Formas de Pago</Title>
-            <Divider />
-            <Title as="h4" alignSelf="left" minHeight="30px">
-              {budget?.paymentMethods?.join(" | ")}
-            </Title>
-          </DataContainer>
+          <>
+            <DataContainer width="100%">
+              <Title as="h4" alignSelf="left" textAlignLast="left" $slim>Detalles de Pago</Title>
+              <Divider />
+              <TotalList labelWidth="200px" width="300px" readOnly items={TOTAL_LIST_ITEMS} />
+            </DataContainer>
+            <DataContainer width="100%">
+              <Title as="h4" alignSelf="left" textAlignLast="left" $slim>Formas de Pago</Title>
+              <Divider />
+              <Title as="h4" alignSelf="left" textAlignLast="left" minHeight="30px">
+                {budget?.paymentMethods?.join(" | ")}
+              </Title>
+            </DataContainer>
+          </>
         }
       </FlexColumn>
     </FlexColumn >

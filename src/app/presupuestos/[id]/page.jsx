@@ -16,7 +16,7 @@ import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext }
 import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
+import { getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -79,6 +79,9 @@ const Budget = ({ params }) => {
   const printRef = useRef();
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
   const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
+  const [subtotal, setSubtotal] = useState(0);
+  const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
+  const [finalTotal, setFinalTotal] = useState(0);
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {
@@ -139,6 +142,14 @@ const Budget = ({ params }) => {
       return;
     }
     if (budget) {
+      const calculatedSubtotal = getTotalSum(budget?.products);
+      const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount);
+      const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget?.additionalCharge);
+
+      setSubtotal(calculatedSubtotal);
+      setSubtotalAfterDiscount(calculatedSubtotalAfterDiscount);
+      setFinalTotal(calculatedFinalTotal);
+
       const stateTitle = BUDGET_STATES[budget.state]?.title || BUDGET_STATES.INACTIVE.title;
       const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([
@@ -422,7 +433,9 @@ const Budget = ({ params }) => {
                 customer={customerData}
               />
               <ModalConfirmation
-                total={getTotalSum(budget.products)}
+                subtotal={subtotal}
+                subtotalAfterDiscount={subtotalAfterDiscount}
+                finalTotal={finalTotal}
                 isModalOpen={isModalConfirmationOpen}
                 onClose={handleModalConfirmationClose}
                 customer={customerData}
@@ -483,6 +496,9 @@ const Budget = ({ params }) => {
           <>
             <BudgetView
               budget={{ ...budget, customer: customerData }}
+              subtotal={subtotal}
+              subtotalAfterDiscount={subtotalAfterDiscount}
+              finalTotal={finalTotal}
             />
             <ModalCancel
               isModalOpen={isModalCancelOpen}
@@ -501,6 +517,9 @@ const Budget = ({ params }) => {
           id={userData.client?.id}
           printPdfMode={printPdfMode}
           dolarExchangeRate={showDolarExangeRate && dolarRate}
+          subtotal={subtotal}
+          subtotalAfterDiscount={subtotalAfterDiscount}
+          finalTotal={finalTotal}
         />
       </OnlyPrint>
     </Loader >

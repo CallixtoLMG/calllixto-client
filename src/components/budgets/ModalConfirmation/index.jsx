@@ -2,20 +2,19 @@ import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, IconedB
 import PaymentMethods from "@/components/common/form/PaymentMethods";
 import { PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone, now } from "@/utils";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { ButtonGroup, Form, Icon, Modal, Transition } from "semantic-ui-react";
 
-const EMPTY_PAYMENT = { method: '', ammount: 0, comments: '' };
+const EMPTY_PAYMENT = { method: '', amount: 0, comments: '' };
 
-const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading, total }) => {
+const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading, subtotal, subtotalAfterDiscount, finalTotal }) => {
   const methods = useForm({
     defaultValues: { paymentToAdd: EMPTY_PAYMENT, payments: [], ...customer },
   });
-
+  
   const formRef = useRef(null);
-  const simpleTotal = Number(total.toFixed(2))
-  const [totals, setTotals] = useState({ totalAssigned: 0, totalPending: total });
+  const roundedFinalTotal = parseFloat(finalTotal.toFixed(2));
   const handleConfirmClick = () => {
     if (formRef.current) {
       formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
@@ -26,12 +25,12 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
     const { payments, pickUpInStore } = data;
     const dataToSend = {
       paymentsMade: payments.map((payment) => ({
-        ammount: payment.ammount,
+        amount: payment.amount,
         method: payment.method,
         comments: payment.comments,
         createdAt: now()
       })),
-      total: totals.totalAssigned,
+      total: roundedFinalTotal,
       pickUpInStore,
     };
     onConfirm(dataToSend);
@@ -98,7 +97,12 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                     <Segment placeholder alignContent="center" height="40px">{formatedSimplePhone(customer?.phoneNumbers[0])}</Segment>
                   </FormField>
                 </FieldsContainer>
-                <PaymentMethods totalBudget={simpleTotal} onTotalsChange={setTotals} excludeDollars />
+                <PaymentMethods
+                  subtotal={subtotal}
+                  finalTotal={roundedFinalTotal}
+                  subtotalAfterDiscount={subtotalAfterDiscount}
+                  excludeDollars
+                  maxHeight />
               </FlexColumn>
             </Form>
           </FormProvider>

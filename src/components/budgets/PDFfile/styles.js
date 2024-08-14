@@ -24,11 +24,13 @@ const Title = styled(SHeader)`
   color: ${({ color }) => color ? "rgba(235,124,21,255)" : "black"} !important;
   align-content: center;
   align-self: ${({ alignSelf = "center" }) => alignSelf} !important;
-  text-align: ${({ textAlign }) => textAlign || "left"} !important;
+  text-align: ${({ textAlign }) => textAlign || "right"} !important;
+  text-align-last: ${({ textAlignLast }) => textAlignLast || ""};
   text-decoration: ${({ $cancelled }) => $cancelled ? 'line-through' : 'none'};
   width: ${({ width }) => width || "auto"}!important;
   font-weight: ${({ $slim }) => $slim ? 'normal' : "bold"} !important;
   min-height: ${({ minHeight }) => minHeight || ""};
+  min-width: ${({ minWidth }) => minWidth || ""};
 `;
 
 const Divider = styled.div`

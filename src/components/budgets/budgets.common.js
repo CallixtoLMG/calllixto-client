@@ -121,7 +121,7 @@ const PAYMENT_METHODS = [
 ];
 
 const PAYMENT_TABLE_HEADERS = [
-  { id: 'method', width: 4, title: 'Método de Pago', value: (element) => element.method },
+  { id: 'method', width: 4, title: 'Método', value: (element) => element.method },
   { id: 'amount', width: 3, title: 'Monto', value: (element) => <Price value={element.amount} /> },
   { id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) => element.comments }
 ];
