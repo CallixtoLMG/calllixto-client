@@ -1,7 +1,7 @@
 "use client";
 import { UserProvider } from "@/User";
 import { GoBackButton } from "@/components/common/buttons";
-import { BreadcrumProvider, Breadcrumb, Header, NavActions, NavActionsProvider, NoPrint, Toaster } from "@/components/layout";
+import { BreadcrumProvider, Breadcrumb, Header, NavActions, NavActionsProvider, Toaster } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Inter } from 'next/font/google';
@@ -69,15 +69,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <NavActionsProvider>
                 <BreadcrumProvider>
                   {show && (
-                    <NoPrint>
-                      <NavigationContainer>
-                        <BreadcrumbContainer>
-                          <GoBackButton />
-                          <Breadcrumb />
-                        </BreadcrumbContainer>
-                        <NavActions />
-                      </NavigationContainer>
-                    </NoPrint>
+                    <NavigationContainer>
+                      <BreadcrumbContainer>
+                        <GoBackButton />
+                        <Breadcrumb />
+                      </BreadcrumbContainer>
+                      <NavActions />
+                    </NavigationContainer>
                   )}
                   <LayoutChildrenContainer>
                     {children}

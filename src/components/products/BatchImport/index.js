@@ -1,5 +1,6 @@
-import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListAllProducts, useListBanProducts } from "@/api/products";
-import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, Icon, IconedButton, Input, Label, Segment } from "@/components/common/custom";
+import { useUserContext } from "@/User";
+import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListAllProducts } from "@/api/products";
+import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { downloadExcel, now } from "@/utils";
@@ -7,14 +8,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Transition } from "semantic-ui-react";
+import { Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { Modal, ModalHeader, WaitMsg } from "./styles";
+import { IconnedButton } from "@/components/common/buttons";
 
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts, refetch } = useListAllProducts({});
   const products = useMemo(() => data?.products, [data?.products]);
-  const { data: blacklist, isLoading: loadingBlacklist } = useListBanProducts();
+  const { getBlacklist } = useUserContext();
   const { handleSubmit, control, reset, setValue, watch } = useForm();
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -53,7 +55,7 @@ const BatchImport = ({ isCreating }) => {
       button: isCreating ? "Crear" : "Actualizar",
       fileName: isCreating ? "Productos ya existentes" : "Productos no existentes",
       label: isCreating ? "Nuevos productos" : "Productos para actualizar",
-      confirmation: isCreating ? "con códigos duplicados o ya" : "no",
+      confirmation: isCreating ? "con errores o ya" : "no",
       onSubmit: isCreating ? createBatch : editBatch,
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
         const productCode = formattedProduct.code.toUpperCase();
@@ -90,7 +92,7 @@ const BatchImport = ({ isCreating }) => {
   const handleFileUpload = async (e) => {
     reset();
     const file = e?.target.files[0];
-    if (!file || loadingBlacklist || loadingProducts) return;
+    if (!file || loadingProducts) return;
     setOpen(true);
     setIsLoading(true);
     try {
@@ -139,19 +141,19 @@ const BatchImport = ({ isCreating }) => {
     const productCounts = {};
 
     const updatedExistingCodes = updatedProducts?.reduce((acc, product) => {
-      acc[product.code.toUpperCase()] = product;
+      acc[product.code?.toUpperCase()] = product;
       return acc;
     }, {});
 
     parsedData.forEach(product => {
-      const code = String(product.code).toUpperCase();
+      const code = product.code ? String(product.code).toUpperCase() : "Sin código";
       productCounts[code] = (productCounts[code] || 0) + 1;
     });
 
     parsedData.forEach(product => {
-      const code = String(product.code).toUpperCase();
+      const code = product.code ? String(product.code).toUpperCase() : "Sin código";
       const hasAtLeastOneValue = product.code || product.name || product.price;
-      if (hasAtLeastOneValue && !blacklist?.some(item => item === code)) {
+      if (hasAtLeastOneValue) {
         const formattedProduct = {
           code,
           name: product.name,
@@ -159,7 +161,11 @@ const BatchImport = ({ isCreating }) => {
           comments: product.comments
         };
 
-        if (productCounts[code] > 1) {
+        if (code === "Sin código") {
+          downloadProducts.push({ ...formattedProduct, msg: "Este producto no tiene código" });
+        } else if (getBlacklist().some(item => item === code)) {
+          downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra en la lista de productos bloqueados" });
+        } else if (productCounts[code] > 1) {
           downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra duplicado" });
         } else if (updatedExistingCodes && updatedExistingCodes[code] && !isCreating) {
           importProducts.push(formattedProduct);
@@ -180,9 +186,10 @@ const BatchImport = ({ isCreating }) => {
     }
   };
 
+
   const handleDownloadConfirmation = () => {
     const data = [
-      ['Codigo', 'Nombre', 'Precio', 'Comentarios', 'Error'],
+      ['Código', 'Nombre', 'Precio', 'Comentarios', 'Error'],
       ...downloadProducts.map((product) => [
         product.code,
         product.name,
@@ -204,7 +211,7 @@ const BatchImport = ({ isCreating }) => {
         msg: product?.msg || "Este producto tiene errores"
       }));
       const formattedData = [
-        ["Codigo", "Nombre", "Precio", "Comentarios", "Mensaje de error"],
+        ["Código", "Nombre", "Precio", "Comentarios", "Mensaje de error"],
         ...data.map(product => [
           product.code,
           product.name,
@@ -380,30 +387,25 @@ const BatchImport = ({ isCreating }) => {
                 <ModalHeader> Confirmar descarga</ModalHeader>
                 <Modal.Content>
                   <p>
-                    {`Se han encontrado ${downloadProducts.length} productos (de ${totalProducts}) ${importSettings.confirmation} existentes en la lista...`}<br /><br />
-                    ¿Deseas descargar un archivo de Excel con estos productos antes de continuar?
+                    {`Se ha${downloadProducts.length === 1 ? '' : 'n'} encontrado ${downloadProducts.length} producto${downloadProducts.length === 1 ? '' : 's'} (de ${totalProducts}) ${importSettings.confirmation} existente${downloadProducts.length === 1 ? '' : 's'} en la lista...`}
+                    <br />
+                    ¿Desea descargar un archivo de Excel con estos productos antes de continuar?
                   </p>
                 </Modal.Content>
                 <Modal.Actions>
                   <ButtonsContainer>
-                    <IconedButton
-                      icon
-                      labelPosition="left"
-                      positive
+                    <IconnedButton
+                      text="Confirmar"
+                      icon="check"
+                      color="green"
                       onClick={handleDownloadConfirmation}
-                    >
-                      <Icon name='check' />
-                      Confirmar
-                    </IconedButton>
-                    <IconedButton
-                      icon
-                      labelPosition="left"
-                      negative
+                    />
+                    <IconnedButton
+                      text="Cancelar"
+                      icon="x"
+                      color="red"
                       onClick={() => setShowConfirmationModal(false)}
-                    >
-                      <Icon name='x' />
-                      Cancelar
-                    </IconedButton>
+                    />
                   </ButtonsContainer>
                 </Modal.Actions>
               </Loader>
@@ -458,28 +460,22 @@ const BatchImport = ({ isCreating }) => {
               <Modal.Actions>
                 <ButtonsContainer>
                   {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
-                  <IconedButton
-                    icon
-                    labelPosition="left"
+                  <IconnedButton
+                    text="Aceptar"
+                    icon="check"
                     disabled={importSettings.isButtonDisabled(isPending)}
                     loading={isLoading || isPending}
-                    type="submit"
+                    submit
                     color="green"
                     onClick={handleConfirmClick}
-                  >
-                    <Icon name='check' />
-                    Aceptar
-                  </IconedButton>
-                  <IconedButton
-                    icon
-                    labelPosition="left"
+                  />
+                  <IconnedButton
+                    text="Cancelar"
+                    icon="x"
                     disabled={isLoading || isPending}
                     onClick={() => setOpen(false)}
                     color="red"
-                  >
-                    <Icon name='x' />
-                    Cancelar
-                  </IconedButton>
+                  />
                 </ButtonsContainer>
               </Modal.Actions>
             </Loader>
@@ -494,26 +490,22 @@ const BatchImport = ({ isCreating }) => {
             <p>¿Deseas descargar un archivo de Excel con estos productos?</p>
           </Modal.Content>
           <Modal.Actions>
-            <IconedButton
-              icon
-              labelPosition="left"
+            <IconnedButton
+              text="Confirmar"
+              icon="check"
               color="green"
               onClick={() => {
                 handleUnprocessedDownload();
-              }}>
-              <Icon name='check' />
-              Confirmar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
+              }}
+            />
+            <IconnedButton
+              text="Cancelar"
+              icon="x"
               color="red"
               onClick={() => {
                 setShowUnprocessedModal(false);
-              }}>
-              <Icon name='x' />
-              Cancelar
-            </IconedButton>
+              }}
+            />
           </Modal.Actions>
         </Modal>
       </Transition>

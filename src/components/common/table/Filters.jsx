@@ -1,7 +1,8 @@
-import { Flex, IconedButton } from '@/components/common/custom';
+import { Flex } from '@/components/common/custom';
 import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { FiltersContainer } from './styles';
+import { IconnedButton } from '../buttons';
 
 const MainContainer = styled(Flex)`
   column-gap: 10px;
@@ -35,13 +36,12 @@ const Filters = ({ children, onRestoreFilters }) => {
           {children}
         </FiltersContainer>
         <Flex alignSelf="center">
-          <IconedButton
-            icon
-            type="submit"
-            labelPosition="left"
-          >
-            <Icon name="search" />Buscar
-          </IconedButton>
+          <IconnedButton
+            text="Buscar"
+            icon="search"
+            submit
+            color="none"
+          />
         </Flex>
       </HeaderSegment>
     </MainContainer>

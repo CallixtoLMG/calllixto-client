@@ -1,58 +1,38 @@
-import { LIST_PRODUCTS_QUERY_KEY, deleteProduct } from "@/api/products";
-import { BarCodeContainer, BarCodeSubContainer, Barcode, ProductCode, ProductName } from "@/commonStyles";
-import { Flex, IconedButton, Input } from "@/components/common/custom";
+import { deleteProduct } from "@/api/products";
+import { Flex, Input } from "@/components/common/custom";
+import PrintBarCodes from "@/components/common/custom/BarCode";
 import { ModalDelete, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
-import { NoPrint, OnlyPrint } from "@/components/layout";
+import { OnlyPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
-import JsBarcode from 'jsbarcode';
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useCallback, useMemo, useState } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Form, Icon } from "semantic-ui-react";
+import { useReactToPrint } from "react-to-print";
+import { Form } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
+import { IconnedButton } from "@/components/common/buttons";
 
 const EMPTY_FILTERS = { code: '', name: '' };
 
 const ProductsPage = ({ products = [], role, isLoading }) => {
-  const { handleSubmit, control, reset }  = useForm();
+  const methods = useForm();
+  const { handleSubmit, control, reset } = methods;
 
   const [showModal, setShowModal] = useState(false);
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState({});
-  const [shouldPrint, setShouldPrint] = useState(false);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
 
-  const generateBarcodes = useCallback(() => {
-    Object.keys(selectedProducts).forEach(code => {
-      const barcodeElement = document.getElementById(`barcode-${code}`);
-      if (barcodeElement) {
-        JsBarcode(barcodeElement, code, {
-          format: "CODE128",
-          lineColor: "#000",
-          width: 2,
-          height: 80,
-          displayValue: false,
-          fit: true
-        });
-      }
-    });
-  }, [selectedProducts]);
+  const printRef = useRef();
 
-  useEffect(() => {
-    if (shouldPrint) {
-      generateBarcodes();
-      const printTimeout = setTimeout(() => {
-        window.print();
-        setShouldPrint(false);
-      }, 500);
-
-      return () => clearTimeout(printTimeout);
-    }
-  }, [shouldPrint, generateBarcodes]);
+  const handlePrint = useReactToPrint({
+    content: () => printRef.current,
+    removeAfterPrint: true,
+  });
 
   const onFilter = useCallback(product => {
     if (filters.name && !product.name.toLowerCase().includes(filters.name.toLowerCase())) {
@@ -86,7 +66,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
         toast.success('Producto eliminado!');
         setShowModal(false);
       } else {
@@ -98,7 +77,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const onRestoreFilters = useCallback(() => {
     reset(EMPTY_FILTERS);
     setFilters(EMPTY_FILTERS);
-  }, [reset, onFilter]);
+  }, [reset]);
 
   const onSelectionChange = useCallback(selected => {
     const isSelected = !!selectedProducts[selected.code];
@@ -127,7 +106,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
       return deletePromises.length;
     },
     onSuccess: (deletedCount) => {
-      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
       toast.success(`${deletedCount} productos eliminados!`);
       setSelectedProducts({});
       setShowConfirmDeleteModal(false);
@@ -139,106 +117,94 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
 
   const selectionActions = useMemo(() => {
     const actions = [
-      <IconedButton
-        width="fit-content"
-        icon
-        labelPosition="left"
+      <IconnedButton
         key={2}
-        onClick={() => setShouldPrint(true)}
-        color="blue"
-        size="small"
-      >
-        <Icon name="barcode" />
-        Descargar Códigos
-      </IconedButton>
+        text="Descargar Códigos"
+        icon="barcode"
+        onClick={handlePrint}
+      />
     ];
     if (RULES.canRemove[role]) {
       actions.unshift(
-        <IconedButton
-          width="fit-content"
-          icon
-          labelPosition="left"
+        <IconnedButton
           key={1}
-          onClick={() => setShowConfirmDeleteModal(true)}
+          text="Eliminar Productos"
+          icon="trash"
           color="red"
-          size="small"
-        >
-          <Icon name="trash" />
-          Eliminar Productos
-        </IconedButton>
+          onClick={() => setShowConfirmDeleteModal(true)}
+        />
       );
     };
     return actions;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role]);
 
   return (
     <>
-      <NoPrint>
-        <Flex flexDirection="column" rowGap="15px">
-          <Form onSubmit={handleSubmit(setFilters)}>
-            <Filters onRestoreFilters={onRestoreFilters}>
+      <Flex flexDirection="column" rowGap="15px">
+        <FormProvider {...methods}>
+          <Form onSubmit={handleSubmit(onFilter)}>
+            <Filters clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
               <Controller
                 name="code"
                 control={control}
-                render={({ field }) => (
+                render={({ field: { onChange, ...rest } }) => (
                   <Input
-                    {...field}
+                    {...rest}
                     $marginBottom
                     $maxWidth
                     height="35px"
                     placeholder="Código"
+                    onChange={(e) => {
+                      setValue('name', '');
+                      onChange(e.target.value);
+                    }}
                   />
                 )}
               />
               <Controller
                 name="name"
                 control={control}
-                render={({ field }) => (
+                render={({ field: { onChange, ...rest } }) => (
                   <Input
-                    {...field}
+                    {...rest}
                     $marginBottom
                     $maxWidth
                     height="35px"
                     placeholder="Nombre"
+                    onChange={(e) => {
+                      setValue('code', '');
+                      onChange(e.target.value);
+                    }}
                   />
                 )}
               />
             </Filters>
           </Form>
-          <Table
-            isLoading={isLoading || deleteIsPending}
-            mainKey="code"
-            headers={PRODUCT_COLUMNS}
-            elements={products}
-            page={PAGES.PRODUCTS}
-            actions={actions}
-            selection={selectedProducts}
-            onSelectionChange={onSelectionChange}
-            selectionActions={selectionActions}
-            clearSelection={clearSelection}
-            selectAll={selectAll}
-            onFilter={onFilter}
-            paginate
-          />
-          <ModalDelete
-            showModal={showModal}
-            setShowModal={setShowModal}
-            title={`¿Está seguro que desea eliminar el producto "${selectedProduct?.name}"?`}
-            onDelete={mutate}
-            isLoading={isPending}
-          />
-        </Flex>
-      </NoPrint>
-      <OnlyPrint firstPageMarginTop="-95px">
-        <BarCodeContainer>
-          {Object.keys(selectedProducts).map((code) => (
-            <BarCodeSubContainer key={code}>
-              <ProductName>{products.find(product => product.code === code)?.name}</ProductName>
-              <Barcode id={`barcode-${code}`}></Barcode>
-              <ProductCode>{code}</ProductCode>
-            </BarCodeSubContainer>
-          ))}
-        </BarCodeContainer>
+        </FormProvider>
+        <Table
+          isLoading={isLoading || deleteIsPending}
+          mainKey="code"
+          headers={PRODUCT_COLUMNS}
+          elements={products.map(p => ({ ...p, key: p.code }))}
+          page={PAGES.PRODUCTS}
+          actions={actions}
+          selection={selectedProducts}
+          onSelectionChange={onSelectionChange}
+          selectionActions={selectionActions}
+          clearSelection={clearSelection}
+          selectAll={selectAll}
+        />
+        <ModalDelete
+          showModal={showModal}
+          setShowModal={setShowModal}
+          title={`¿Está seguro que desea eliminar el producto "${selectedProduct?.name}"?`}
+          onDelete={mutate}
+          isLoading={isPending}
+        />
+      </Flex>
+      <OnlyPrint >
+        <PrintBarCodes ref={printRef} products={Object.values(selectedProducts)} />
       </OnlyPrint>
       <ModalMultiDelete
         open={showConfirmDeleteModal}

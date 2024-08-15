@@ -1,14 +1,25 @@
-import { FieldsContainer, Flex, FormField, Icon, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
+import { SubmitAndRestore } from "@/components/common/buttons";
+import { Dropdown, FieldsContainer, Flex, FormField, Icon, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
+import Payments from "@/components/common/form/Payments";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { PICK_UP_IN_STORE } from "@/constants";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetCancelled } from "@/utils";
+import { useAllowUpdate } from "@/hooks/allowUpdate";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
 import { useMemo } from "react";
+import { useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { Container, Message, MessageHeader } from "./styles";
-const BudgetView = ({ budget }) => {
+
+const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
+  const methods = useForm({
+    defaultValues: {
+      payments: budget?.paymentsMade || [],
+    },
+  });
+
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
-  const subtotal = useMemo(() => getTotalSum(budget?.products), [budget]);
+  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
@@ -97,10 +108,14 @@ const BudgetView = ({ budget }) => {
           <p>{budget?.cancelledMsg}</p>
         </Message>
       </FieldsContainer>}
-      <FieldsContainer>
+      <FieldsContainer justifyContent="space-between">
         <FormField width="300px">
           <Label>Vendedor</Label>
           <Segment placeholder>{budget?.seller}</Segment>
+        </FormField>
+        <FormField >
+          <Label>Fecha de vencimiento</Label>
+          <Segment placeholder>{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
@@ -110,11 +125,41 @@ const BudgetView = ({ budget }) => {
         </FormField>
         <FormField flex="1">
           <Label>Dirección</Label>
-          <Segment>{budget?.pickUpInStore ? PICK_UP_IN_STORE : budget?.customer?.addresses[0]?.address}</Segment>
+          {budget?.pickUpInStore ? (
+            <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
+          ) : !budget?.customer?.addresses?.length || budget.customer.addresses.length === 1 ? (
+            <Segment placeholder>{budget.customer?.addresses?.[0]?.address}</Segment>
+          ) : (
+            (
+              <Dropdown
+                selection
+                options={budget?.customer?.addresses.map((address) => ({
+                  key: address.address,
+                  text: address.address,
+                  value: address.address,
+                }))}
+                value={selectedContact.address}
+                onChange={(e, { value }) => setSelectedContact({ ...selectedContact, address: value })}
+              />
+            )
+          )}
         </FormField>
         <FormField width="200px">
           <Label>Teléfono</Label>
-          <Segment placeholder>{formatedSimplePhone(budget?.customer?.phoneNumbers[0])}</Segment>
+          {!budget?.customer?.phoneNumbers?.length || budget?.customer?.phoneNumbers.length === 1 ? (
+            <Segment placeholder>{formatedSimplePhone(budget.customer?.phoneNumbers[0])}</Segment>
+          ) : (
+            <Dropdown
+              selection
+              options={budget?.customer?.phoneNumbers.map((phone) => ({
+                key: formatedSimplePhone(phone),
+                text: formatedSimplePhone(phone),
+                value: formatedSimplePhone(phone),
+              }))}
+              value={selectedContact?.phone}
+              onChange={(e, { value }) => setSelectedContact({ ...selectedContact, phone: value })}
+            />
+          )}
         </FormField>
       </FieldsContainer>
       <Table
@@ -122,19 +167,30 @@ const BudgetView = ({ budget }) => {
         headers={BUDGET_FORM_PRODUCT_COLUMNS}
         elements={budget?.products}
       />
-      <Total readOnly subtotal={subtotal} globalDiscount={budget?.globalDiscount} additionalCharge={budget?.additionalCharge} />
+      <Total
+        readOnly
+        subtotal={subtotal}
+        total={total}
+        subtotalAfterDiscount={subtotalAfterDiscount}
+        globalDiscount={budget?.globalDiscount}
+        additionalCharge={budget?.additionalCharge}
+      />
       <FieldsContainer rowGap="5px" >
         <Label>Comentarios</Label>
         <Segment placeholder>{budget?.comments}</Segment>
       </FieldsContainer>
+      <Flex justifyContent="space-between">
+        {Toggle}
+      </Flex>
+      {isBudgetConfirmed(budget?.state) && (
+        <Payments total={total} methods={methods}>
+        <SubmitAndRestore disabled={!isUpdating} />
+        </Payments>
+      )}
       <FieldsContainer>
         <FormField flex={3}>
           <Label>Métodos de pago</Label>
           <Segment placeholder>{formattedPaymentMethods}</Segment>
-        </FormField>
-        <FormField flex={1}>
-          <Label>Fecha de vencimiento</Label>
-          <Segment placeholder>{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
         </FormField>
       </FieldsContainer>
     </ViewContainer>

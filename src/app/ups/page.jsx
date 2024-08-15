@@ -3,6 +3,7 @@ import { IconedButton } from '@/components/common/custom';
 import { useRouter } from 'next/navigation';
 import { Header, Icon } from 'semantic-ui-react';
 import { MainContainer } from "./styles";
+import { IconnedButton } from '@/components/common/buttons';
 
 const NotFound = () => {
   const { back } = useRouter();
@@ -16,16 +17,7 @@ const NotFound = () => {
         <Icon color="red" name="exclamation circle" />
         Página no encontrada o no está autorizado!
       </Header>
-      <IconedButton
-        width="fit-content"
-        icon
-        labelPosition="left"
-        onClick={handleClick}
-        color="red"
-      >
-        <Icon name="arrow left" />
-        Volver atrás
-      </IconedButton>
+      <IconnedButton text="Volver atrás" icon="arrow left" color="red" onClick={handleClick} />
     </MainContainer>
   );
 };

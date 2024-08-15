@@ -1,5 +1,5 @@
 "use client";
-import { ViewContainer, FieldsContainer, FormField, Label, Segment } from "@/components/common/custom";
+import { FieldsContainer, FormField, Label, Segment, ViewContainer } from "@/components/common/custom";
 import { ContactView } from "@/components/common/form";
 
 const SupplierView = ({ supplier }) => {
@@ -16,7 +16,7 @@ const SupplierView = ({ supplier }) => {
         </FormField>
       </FieldsContainer>
       <ContactView {...supplier} />
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px">
         <Label >Comentarios</Label>
         <Segment placeholder>{supplier?.comments}</Segment>
       </FieldsContainer>

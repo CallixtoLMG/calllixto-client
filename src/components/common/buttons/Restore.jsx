@@ -1,18 +1,15 @@
-import { Icon } from "semantic-ui-react";
-import { IconedButton } from "../custom";
+import { IconnedButton } from ".";
 
 export const Restore = ({ isUpdating, isLoading, isDirty, onClick, disabled }) => {
   return (
-    <IconedButton
-      icon
-      labelPosition="left"
+    <IconnedButton
+      text={isUpdating ? "Restaurar" : "Limpiar"}
+      icon={isUpdating ? "undo" : "delete"}
       disabled={isLoading || !isDirty || disabled}
-      type="button"
       color="brown"
       onClick={onClick}
-    >
-      <Icon name={isUpdating ? "undo" : "delete"} />{isUpdating ? "Restaurar" : "Limpiar"}
-    </IconedButton>
+      width="130px"
+    />
   )
 }
 

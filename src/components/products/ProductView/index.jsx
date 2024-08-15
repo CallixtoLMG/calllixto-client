@@ -1,4 +1,5 @@
 "use client";
+import { IconnedButton } from "@/components/common/buttons";
 import { FieldsContainer, FormField, IconedButton, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { MEASSURE_UNITS } from "@/constants";
 import { Icon } from "semantic-ui-react";
@@ -16,30 +17,10 @@ const ProductView = ({ product }) => {
           <Segment placeholder>{product?.brandName}</Segment>
         </FormField>
         <FormField width="20%">
-          <IconedButton
-            width="fit-content"
-            icon
-            labelPosition="left"
-            color="blue"
-            basic={!product?.editablePrice}
-            disabled
-          >
-            <Icon name="pencil" />
-            Precio Editable
-          </IconedButton>
+          <IconnedButton icon="pencil" basic={!product?.editablePrice} disabled text="Precio Editable" />
         </FormField>
         <FormField width="20%">
-          <IconedButton
-            width="fit-content"
-            icon
-            labelPosition="left"
-            color="blue"
-            basic={!product?.fractionConfig?.active}
-            disabled
-          >
-            <Icon name="cut" />
-            Producto Fraccionable
-          </IconedButton>
+          <IconnedButton icon="cut" basic={!product?.fractionConfig?.active} disabled text="Producto Fraccionable" />
         </FormField>
       </FieldsContainer>
       <FieldsContainer>

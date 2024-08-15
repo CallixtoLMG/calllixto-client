@@ -2,6 +2,7 @@ import styled from "styled-components";
 
 const Common = styled.div`
   height: ${({ height = 'auto' }) => height};
+  max-height: ${({ maxHeight }) => maxHeight};
   width: ${({ width = 'auto' }) => width};
   min-width: ${({ minWidth = 'auto' }) => minWidth};
   margin: ${({ margin = '0' }) => margin};
@@ -26,6 +27,7 @@ export const Flex = styled(Common)`
   align-self: ${({ alignSelf }) => alignSelf};
   flex-wrap: ${({ wrap }) => wrap};
   flex-direction: ${({ flexDirection = "row" }) => flexDirection};
+  overflow-y: ${({ overflowY }) => overflowY};
 `;
 
 export const FlexColumn = styled(Flex)`

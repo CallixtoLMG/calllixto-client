@@ -1,16 +1,17 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
-import { SubmitAndRestore } from "@/components/common/buttons";
+import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
+import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
 import { BUDGET_STATES, PAGES, PICK_UP_IN_STORE, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
+import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Message, Modal, Popup, Transition } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import ModalComment from "./ModalComment";
@@ -23,37 +24,73 @@ const EMPTY_BUDGET = (user) => ({
   comments: '',
   globalDiscount: 0,
   additionalCharge: 0,
-  paymentMethods: PAYMENT_METHODS,
-  expirationOffsetDays: ''
+  paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
+  expirationOffsetDays: '',
+  payments: [],
 });
 
-const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoading, isCloning, draft }) => {
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
-  const [outdatedProducts, setOutdatedProducts] = useState([]);
-  const [removedProducts, setRemovedProducts] = useState([]);
-  const hasShownModal = useRef(false);
-  const [isTableLoading, setIsTableLoading] = useState(false);
-  const [shouldShowModal, setShouldShowModal] = useState(false);
-  const [temporaryProducts, setTemporaryProducts] = useState([]);
-  const [expiration, setExpiration] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
-  const { control, handleSubmit, setValue, getValues, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = useForm({
+const BudgetForm = ({
+  onSubmit,
+  products,
+  customers = [],
+  budget,
+  user,
+  isLoading,
+  isCloning,
+  draft,
+  selectedContact,
+  setSelectedContact
+}) => {
+  const methods = useForm({
     defaultValues: budget ? {
       ...budget,
+      payments: budget.payments || [],
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore']);
-  const [subtotal, setSubtotal] = useState(0);
+  const { control, handleSubmit, setValue, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = methods;
+  const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
+    control,
+    name: "products"
+  });
+  const [watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp, watchProducts] = watch(['globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore', 'products']);
+
+  const hasShownModal = useRef(false);
   const productSearchRef = useRef(null);
-  const customerOptions =
-    customers.filter(customer => customer.id && customer.name)
-      .map(customer => ({
-        key: customer.id, value: customer.id, text: customer.name,
-      }));
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [outdatedProducts, setOutdatedProducts] = useState([]);
+  const [removedProducts, setRemovedProducts] = useState([]);
+  const [temporaryProducts, setTemporaryProducts] = useState([]);
+
+  const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
+  const [isTableLoading, setIsTableLoading] = useState(false);
+  const [shouldShowModal, setShouldShowModal] = useState(false);
+  const [expiration, setExpiration] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
+  const [subtotal, setSubtotal] = useState(0);
+  const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
+    setSubtotalAfterDiscount(updatedSubtotalAfterDiscount);
+
+    const updatedtotal = getSubtotal(updatedSubtotalAfterDiscount, watchAdditionalCharge);
+    setTotal(updatedtotal);
+  }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
+
+  const customerOptions = useMemo(() => {
+    return customers.map(({ id, name }) => ({
+      key: id, value: id, text: name
+    }));
+  }, [customers]);
+
+  const shouldError = useMemo(() => isBudgetConfirmed(watchState) && !draft && !watchPickUp, [draft, watchPickUp, watchState]);
+
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
       setIsTableLoading(true);
@@ -103,12 +140,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     setSubtotal(totalSum);
   }, [watchProducts]);
 
-  const deleteProduct = useCallback((index) => {
-    const newProducts = [...watchProducts];
-    newProducts.splice(index, 1);
-    setValue("products", newProducts);
-  }, [watchProducts, setValue]);
-
   useEffect(() => {
     calculateTotal();
   }, [watchProducts, calculateTotal]);
@@ -133,12 +164,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   }, [watchState]);
 
   const validateCustomer = () => {
-    const customer = getValues("customer");
-    if (isBudgetConfirmed(watchState) && watchPickUp && (!customer.addresses.length || !customer.phoneNumbers.length)) {
-      if (!customer.addresses.length) {
+    if (isBudgetConfirmed(watchState) && !watchPickUp && (!watchCustomer.addresses.length || !watchCustomer.phoneNumbers.length)) {
+      if (!watchCustomer.addresses.length) {
         setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
-      if (!customer.phoneNumbers.length) {
+      if (!watchCustomer.phoneNumbers.length) {
         setError('customer.phoneNumbers', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
       return false;
@@ -157,6 +187,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     } else {
       reset({
         ...EMPTY_BUDGET(user),
+        state: watchState,
         seller: `${user?.firstName} ${user?.lastName}`,
       });
     }
@@ -164,21 +195,19 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [reset, user, draft, isCloning, budget]);
+  }, [draft, isCloning, reset, user, budget, watchState]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));
     setIsModalCommentOpen(true);
   }, []);
 
-  const handleModalCommentClose = () => setIsModalCommentOpen(false);
-
   const actions = [
     {
       id: 1,
       icon: 'trash',
       color: 'red',
-      onClick: (element, index) => deleteProduct(index),
+      onClick: (element, index) => removeProduct(index),
       tooltip: 'Eliminar'
     },
     {
@@ -191,10 +220,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   ];
 
   const onAddComment = async ({ index, dispatchComment }) => {
-    const newProducts = [...watchProducts];
-    const product = newProducts[index];
+    const product = watchProducts[index];
     product.dispatchComment = dispatchComment;
-    setValue("products", newProducts);
+    updateProduct(index, product);
     setIsModalCommentOpen(false);
   };
 
@@ -359,7 +387,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
 
   return (
     <>
-      <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={handleModalCommentClose} product={selectedProduct} />
+      <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={setIsModalCommentOpen} product={selectedProduct} />
       <Transition visible={shouldShowModal} animation='scale' duration={500}>
         <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={handleCancelUpdate} size="large">
           <Modal.Header>Desea actualizar el presupuesto, ya que algunos productos sufrieron modificaciones?</Modal.Header>
@@ -395,60 +423,46 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </Modal.Content>
           <Modal.Actions>
             <ButtonsContainer>
-              <IconedButton
-                icon
-                labelPosition="left"
+              <IconnedButton
+                text="Cancelar"
+                icon="cancel"
                 color="red"
                 onClick={handleCancelUpdate}
-              >
-                <Icon name="cancel" />
-                Cancelar
-              </IconedButton>
-              <IconedButton
-                icon
-                labelPosition="left"
+              />
+              <IconnedButton
+                text="Confirmar"
+                icon="check"
                 color="green"
                 onClick={handleConfirmUpdate}
-              >
-                <Icon name="check" />
-                Confirmar
-              </IconedButton>
+              />
             </ButtonsContainer>
           </Modal.Actions>
         </Modal>
       </Transition>
       <Form onSubmit={handleSubmit(handleConfirm)}>
-        <FieldsContainer>
+        <FieldsContainer justifyContent="space-between">
           <FormField width="300px">
             <ButtonGroup size="small">
-              <IconedButton
-                icon
-                labelPosition="left"
-                type="button"
+              <IconnedButton
+                text="Confirmado"
+                icon="check"
                 basic={!isConfirmed}
                 color={isConfirmed ? "green" : "orange"}
                 onClick={() => {
                   setIsConfirmed(true);
                   setValue('state', BUDGET_STATES.CONFIRMED.id);
                 }}
-              >
-                <Icon name="check" />
-                Confirmado
-              </IconedButton>
-              <IconedButton
-                icon
-                labelPosition="left"
-                type="button"
+              />
+              <IconnedButton
+                text="Pendiente"
+                icon="hourglass half"
                 basic={isConfirmed}
                 color={isConfirmed ? "green" : "orange"}
                 onClick={() => {
                   setIsConfirmed(false);
                   setValue('state', BUDGET_STATES.PENDING.id);
                 }}
-              >
-                <Icon name="hourglass half" />
-                Pendiente
-              </IconedButton>
+              />
             </ButtonGroup>
           </FormField>
           <FormField width="350px">
@@ -457,44 +471,57 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               control={control}
               render={({ field: { onChange, value } }) => (
                 <ButtonGroup size="small">
-                  <IconedButton
-                    icon
-                    labelPosition="left"
-                    type="button"
+                  <IconnedButton
+                    text={PICK_UP_IN_STORE}
+                    icon="warehouse"
                     basic={!value}
-                    color="blue"
                     onClick={() => {
                       onChange(true);
                     }}
-                  >
-                    <Icon name="warehouse" />
-                    {PICK_UP_IN_STORE}
-                  </IconedButton>
-                  <IconedButton
-                    icon
-                    labelPosition="left"
-                    type="button"
+                  />
+                  <IconnedButton
+                    text="Enviar a Dirección"
+                    icon="truck"
                     basic={value}
-                    color="blue"
                     onClick={() => {
                       onChange(false);
                     }}
-                  >
-                    <Icon name="truck" />
-                    Enviar a Dirección
-                  </IconedButton>
+                  />
                 </ButtonGroup>
               )}
             />
           </FormField>
         </FieldsContainer>
-        <FieldsContainer>
+        <FieldsContainer justifyContent="space-between">
           <FormField width="300px">
             <Label>Vendedor</Label>
             <Controller name="seller" control={control} rules={RULES.REQUIRED}
               render={({ field: { value } }) => <Segment placeholder>{value}</Segment>}
             />
           </FormField>
+          <FieldsContainer >
+            <FormField flex={1}>
+              <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
+              <Controller name="expirationOffsetDays" control={control}
+                rules={RULES.REQUIRED}
+                render={({ field }) => (
+                  <Input {...field} maxLength={3} type="text" placeholder="Cant. en días (p. ej: 3, 10, etc)"
+                    onChange={(e) => {
+                      let value = e.target.value;
+                      value = value.replace(/\D/g, '');
+                      if (parseInt(value, 10) > 365) value = TIME_IN_DAYS.YEAR;
+                      field.onChange(value);
+                      setExpiration(value);
+                    }}
+                  />
+                )}
+              />
+            </FormField>
+            <FormField flex={1}>
+              <Label>Fecha de vencimiento</Label>
+              <Segment placeholder>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
+            </FormField>
+          </FieldsContainer>
         </FieldsContainer>
         <FieldsContainer>
           <FormField width="300px">
@@ -527,14 +554,42 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             />
           </FormField>
           <FormField flex={1}>
-            <RuledLabel title="Dirección" message={isBudgetConfirmed(watchState) && !draft && !watchPickUp && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
-            <Segment placeholder>
-              {!watchPickUp ? watchCustomer?.addresses?.[0]?.address : PICK_UP_IN_STORE}
-            </Segment>
+            <RuledLabel title="Dirección" message={shouldError && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
+            {watchPickUp ? (
+              <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
+            ) : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? (
+              <Segment placeholder>{watchCustomer?.addresses?.[0]?.address}</Segment>
+            ) : (
+              (
+                <Dropdown
+                  selection
+                  options={watchCustomer?.addresses.map((address) => ({
+                    key: address.address,
+                    text: address.address,
+                    value: address.address,
+                  }))}
+                  value={selectedContact.address}
+                  onChange={(e, { value }) => setSelectedContact({ ...selectedContact, address: value })}
+                />
+              )
+            )}
           </FormField>
           <FormField width="200px">
-            <RuledLabel title="Teléfono" message={isBudgetConfirmed(watchState) && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
-            <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
+            <RuledLabel title="Teléfono" message={shouldError && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
+            {!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? (
+              <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
+            ) : (
+              <Dropdown
+                selection
+                options={watchCustomer?.phoneNumbers.map((phone) => ({
+                  key: formatedSimplePhone(phone),
+                  text: formatedSimplePhone(phone),
+                  value: formatedSimplePhone(phone),
+                }))}
+                value={selectedContact.phone}
+                onChange={(e, { value }) => setSelectedContact({ ...selectedContact, phone: value })}
+              />
+            )}
           </FormField>
         </FieldsContainer>
         <FormField width="300px">
@@ -542,12 +597,12 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           <Controller name="products"
             control={control}
             rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
-            render={({ field: { onChange, value } }) => (
+            render={() => (
               <ProductSearch
                 ref={productSearchRef}
                 products={products}
                 onProductSelect={(selectedProduct) => {
-                  onChange([...watchProducts, {
+                  appendProduct({
                     ...selectedProduct,
                     quantity: 1,
                     discount: 0,
@@ -559,8 +614,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                         price: selectedProduct.price,
                       }
                     })
-                  }]);
-                }} />
+                  })
+                }}
+              />
             )}
           />
         </FormField>
@@ -574,89 +630,77 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           <Total
             subtotal={subtotal}
             globalDiscount={watchGlobalDiscount}
+            subtotalAfterDiscount={subtotalAfterDiscount}
             onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
             additionalCharge={watchAdditionalCharge}
             onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
+            total={total}
           />
         </Loader>
         <FieldsContainer rowGap="5px!important">
-          <Label>Comentarios</Label>
           <ControlledComments control={control} />
         </FieldsContainer>
-        <FieldsContainer>
-          <FormField flex={3}>
-            <Label>Métodos de pago</Label>
-            <Segment>
-              <Controller
-                name="paymentMethods"
-                control={control}
-                rules={RULES.REQUIRED}
-                render={({ field: { onChange, value } }) => (
-                  <Flex flexDirection="column" rowGap="5px">
-                    <Box>
-                      <IconedButton
-                        paddingLeft="fit-content"
-                        width="fit-content"
-                        type="button"
-                        basic={value.length !== PAYMENT_METHODS.length}
-                        color="blue"
-                        onClick={() => {
-                          if (value.length === PAYMENT_METHODS.length) {
-                            onChange([]);
-                          } else {
-                            onChange(PAYMENT_METHODS);
-                          }
-                        }}
-                      >
-                        Todos
-                      </IconedButton>
-                    </Box>
-                    <Flex columnGap="5px" wrap="wrap" rowGap="5px">
-                      {PAYMENT_METHODS.map(text => (
+        <FieldsContainer width="100%" rowGap="15px">
+          {isBudgetConfirmed(watchState) ? (
+            <Payments
+              methods={methods}
+              total={total}
+            />
+          ) : (
+            <FormField flex={3}>
+              <Label>Métodos de pago</Label>
+              <Segment>
+                <Controller
+                  name="paymentMethods"
+                  control={control}
+                  rules={RULES.REQUIRED}
+                  render={({ field: { onChange, value } }) => (
+                    <Flex flexDirection="column" rowGap="5px">
+                      <Box>
                         <IconedButton
                           paddingLeft="fit-content"
                           width="fit-content"
-                          key={text}
-                          basic={!value.includes(text)}
-                          color="blue"
                           type="button"
+                          basic={value.length !== PAYMENT_METHODS.length}
+                          color="blue"
                           onClick={() => {
-                            if (value.includes(text)) {
-                              onChange(value.filter(payment => payment !== text));
+                            if (value.length === PAYMENT_METHODS.length) {
+                              onChange([]);
                             } else {
-                              onChange([...value, text]);
+                              onChange(PAYMENT_METHODS.map(method => method.value));
                             }
                           }}
-                        >{text}
+                        >
+                          Todos
                         </IconedButton>
-                      ))}
+                      </Box>
+                      <Flex columnGap="5px" wrap="wrap" rowGap="5px">
+                        {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
+                          <IconedButton
+                            paddingLeft="fit-content"
+                            width="fit-content"
+                            key={key}
+                            basic={!value.includes(methodValue)}
+                            color="blue"
+                            type="button"
+                            onClick={() => {
+                              if (value.includes(methodValue)) {
+                                onChange(value.filter(payment => payment !== methodValue));
+                              } else {
+                                onChange([...value, methodValue]);
+                              }
+                            }}
+                          >
+                            {text}
+                          </IconedButton>
+                        ))}
+                      </Flex>
                     </Flex>
-                  </Flex>
-                )}
-              />
-            </Segment>
-          </FormField>
-          <FormField flex={1}>
-            <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
-            <Controller name="expirationOffsetDays" control={control}
-              rules={RULES.REQUIRED}
-              render={({ field }) => (
-                <Input {...field} maxLength={3} type="text" placeholder="Cant. en días (p. ej: 3, 10, etc)"
-                  onChange={(e) => {
-                    let value = e.target.value;
-                    value = value.replace(/\D/g, '');
-                    if (parseInt(value, 10) > 365) value = TIME_IN_DAYS.YEAR;
-                    field.onChange(value);
-                    setExpiration(value);
-                  }}
+                  )}
                 />
-              )}
-            />
-          </FormField>
-          <FormField flex={1}>
-            <Label>Fecha de vencimiento</Label>
-            <Segment placeholder>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
-          </FormField>
+              </Segment>
+            </FormField>
+          )}
         </FieldsContainer>
         <SubmitAndRestore
           draft={draft}

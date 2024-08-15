@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, Label, RuledLabel } from "@/components/common/custom";
+import { FieldsContainer, Form, FormField, Input, RuledLabel } from "@/components/common/custom";
 import { ContactFields, ControlledComments } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -32,7 +32,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleCreate)}>
         <FieldsContainer>
-          <FormField width="33%">
+          <FormField width="33%" error={errors?.name?.message}>
             <RuledLabel title="Nombre" message={errors?.name?.message} required />
             <Controller
               name="name"
@@ -44,7 +44,6 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
         </FieldsContainer>
         <ContactFields />
         <FieldsContainer>
-          <Label>Comentarios</Label>
           <ControlledComments control={control} />
         </FieldsContainer>
         <SubmitAndRestore
