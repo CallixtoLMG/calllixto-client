@@ -7,7 +7,6 @@ import { getAllEntity } from './common';
 
 const BRANDS_URL = `${PATHS.BRANDS}`;
 
-export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 export const GET_BRAND_QUERY_KEY = 'getBrand';
 export const LIST_ALL_BRANDS_QUERY_KEY = 'listAllBrands';
 

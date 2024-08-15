@@ -7,7 +7,6 @@ import { getAllEntity } from "./common";
 
 
 const SUPPLIER_URL = `${PATHS.SUPPLIERS}`;
-export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_ALL_SUPPLIER_QUERY_KEY = 'listAllSuppliers';
 

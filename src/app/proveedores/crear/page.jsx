@@ -1,10 +1,10 @@
 "use client";
-import { LIST_SUPPLIERS_QUERY_KEY, create } from "@/api/suppliers";
+import { create } from "@/api/suppliers";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
@@ -14,7 +14,6 @@ const CreateSupplier = () => {
   const { push } = useRouter();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     resetActions();
@@ -32,7 +31,6 @@ const CreateSupplier = () => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
         toast.success('Proveedor creado!');
         push(PAGES.SUPPLIERS.BASE);
       } else {

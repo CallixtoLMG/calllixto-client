@@ -13,10 +13,8 @@ import { getAllEntity } from "./common";
 const { omit, chunk } = require("lodash");
 
 const PRODUCTS_URL = `${PATHS.PRODUCTS}`;
-export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_ALL_PRODUCTS_QUERY_KEY = "listAllProducts";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
-export const LIST_BANNED_PRODUCTS_QUERY_KEY = "listBannedProducts";
 
 export function create(product) {
   const body = {

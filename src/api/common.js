@@ -1,6 +1,7 @@
 import { encodeUri } from "@/utils";
 import axios from './axios';
 import localforage from "./local-forage";
+import { config } from "@/config";
 
 export async function getAllEntity({ entity, url, params }) {
   const list = async () => {
@@ -30,11 +31,15 @@ export async function getAllEntity({ entity, url, params }) {
     }
   };
 
-  let values = await localforage.getItem(entity);
+  let values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
   if (values) {
     return { [entity]: values };
   }
   values = await list();
-  await localforage.setItem(entity, values);
+  await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
   return { [entity]: values };
 };
+
+export function removeEntity(entity) {
+  return localforage.removeItem(`${config.APP_ENV}-${entity}`);
+}

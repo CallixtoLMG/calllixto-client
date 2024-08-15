@@ -1,6 +1,6 @@
 "use client";
 import { useListAllBrands } from "@/api/brands";
-import { create, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
+import { create } from "@/api/products";
 import { useListAllSuppliers } from "@/api/suppliers";
 import { ATTRIBUTES as BRANDS_ATTRIBUTES } from "@/components/brands/brands.common";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -8,7 +8,7 @@ import ProductForm from "@/components/products/ProductForm";
 import { ATTRIBUTES as SUPPLIERS_ATTRIBUTES } from "@/components/suppliers/suppliers.common";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
@@ -20,7 +20,6 @@ const CreateProduct = () => {
   const { data: suppliers, isLoading: isLoadingSuppliers } = useListAllSuppliers({ attributes: [SUPPLIERS_ATTRIBUTES.NAME, SUPPLIERS_ATTRIBUTES.ID] });
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     resetActions();
@@ -52,7 +51,6 @@ const CreateProduct = () => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
         toast.success('Producto creado!');
         push(PAGES.PRODUCTS.BASE);
       } else {

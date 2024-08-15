@@ -1,5 +1,4 @@
 import { useUserContext } from "@/User";
-import { LIST_PRODUCTS_QUERY_KEY, createBatch, editBatch, useListAllProducts } from "@/api/products";
 import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
@@ -265,7 +264,6 @@ const BatchImport = ({ isCreating }) => {
       const unprocessedCount = response.unprocessed?.length;
       const createdCount = importedProductsCount - unprocessedCount;
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
         toast.success(isCreating ?
           `Productos importados: ${importedProductsCount}.\nProductos creados exitosamente: ${createdCount}.\nProductos sin procesar: ${unprocessedCount}.`
           : "Los productos se han actualizado con exito!");

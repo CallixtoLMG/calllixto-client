@@ -1,5 +1,5 @@
 "use client";
-import { GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, edit, useGetProduct } from "@/api/products";
+import { GET_PRODUCT_QUERY_KEY, edit, useGetProduct } from "@/api/products";
 import PrintBarCodes from "@/components/common/custom/BarCode";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
@@ -42,7 +42,6 @@ const Product = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_PRODUCT_QUERY_KEY, params.id] });
         toast.success('Producto actualizado!');
         push(PAGES.PRODUCTS.BASE);

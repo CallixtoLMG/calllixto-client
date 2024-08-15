@@ -60,7 +60,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
       color: 'green',
       onClick: (budget) => { push(PAGES.BUDGETS.CLONE(budget?.id)) },
       tooltip: 'Clonar'
-    },
+    }
   ];
 
   const onRestoreFilters = () => {

@@ -1,20 +1,21 @@
 "use client";
 import { useUserContext } from "@/User";
-import { deleteSupplier } from "@/api/suppliers";
+import { deleteSupplier, LIST_ALL_SUPPLIER_QUERY_KEY } from "@/api/suppliers";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
-import { PAGES, SHORTKEYS } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useListAllSuppliers } from "../../api/suppliers";
+import { useRestoreEntity } from "@/hooks/common";
 
 const Suppliers = () => {
   useValidateToken();
-
-  const { data, isLoading } = useListAllSuppliers();
+  const { data, isLoading, isRefetching } = useListAllSuppliers();
+  const restoreEntity = useRestoreEntity({ entity: ENTITIES.SUPPLIERS, key: LIST_ALL_SUPPLIER_QUERY_KEY });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -24,7 +25,14 @@ const Suppliers = () => {
     setLabels([PAGES.SUPPLIERS.NAME]);
   }, [setLabels]);
 
+  const suppliers = useMemo(() => data?.suppliers, [data]);
+  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
+
   useEffect(() => {
+    const handleRestore = async () => {
+      await restoreEntity();
+    };
+
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
@@ -34,15 +42,24 @@ const Suppliers = () => {
         text: 'Crear'
       }
     ] : [];
+    actions.push({
+      id: 2,
+      icon: 'undo',
+      color: 'grey',
+      onClick: handleRestore,
+      text: 'Actualizar',
+      disabled: loading
+    });
     setActions(actions);
-  }, [push, role, setActions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.SUPPLIERS.CREATE), SHORTKEYS.ENTER);
 
   return (
     <SuppliersPage
-      isLoading={isLoading}
-      suppliers={data?.suppliers}
+      isLoading={loading}
+      suppliers={loading ? [] : suppliers}
       role={role}
       onDelete={deleteSupplier}
     />

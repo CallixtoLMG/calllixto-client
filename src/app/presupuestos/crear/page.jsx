@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { LIST_BUDGETS_QUERY_KEY, useGetBudget } from "@/api/budgets";
+import { useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
@@ -9,7 +9,7 @@ import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/
 import { ATTRIBUTES as PRODUCTS_ATTRIBUTES } from "@/components/products/products.common";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
@@ -18,6 +18,9 @@ const CreateBudget = () => {
   useValidateToken();
   const { userData } = useUserContext();
   const searchParams = useSearchParams();
+  const { setLabels } = useBreadcrumContext();
+  const { resetActions } = useNavActionsContext();
+
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
 
@@ -27,10 +30,6 @@ const CreateBudget = () => {
 
   const products = useMemo(() => productsData?.products, [productsData]);
   const customers = useMemo(() => customersData?.customers, [customersData]);
-
-  const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     resetActions();
@@ -62,7 +61,6 @@ const CreateBudget = () => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
         toast.success('Presupuesto creado!');
         push(PAGES.BUDGETS.BASE);
       } else {

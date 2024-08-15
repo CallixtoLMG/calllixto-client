@@ -1,10 +1,10 @@
 "use client";
-import { LIST_CUSTOMERS_QUERY_KEY, create } from "@/api/customers";
+import { create } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
@@ -13,7 +13,6 @@ const CreateCustomer = () => {
   useValidateToken();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -32,7 +31,6 @@ const CreateCustomer = () => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_CUSTOMERS_QUERY_KEY] });
         toast.success('Cliente creado!');
         push(PAGES.CUSTOMERS.BASE);
       } else {

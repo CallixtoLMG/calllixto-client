@@ -1,16 +1,18 @@
 "use client";
-import { useListAllBudgets } from "@/api/budgets";
+import { LIST_ALL_BUDGETS_QUERY_KEY, useListAllBudgets } from "@/api/budgets";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { PAGES, SHORTKEYS } from "@/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { useRestoreEntity } from "@/hooks/common";
 
 const Budgets = () => {
   useValidateToken();
-  const { data, isLoading } = useListAllBudgets();
+  const { data, isLoading, isRefetching } = useListAllBudgets();
+  const restoreEntity = useRestoreEntity({ entity: ENTITIES.BUDGETS, key: LIST_ALL_BUDGETS_QUERY_KEY });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -19,11 +21,14 @@ const Budgets = () => {
     setLabels([PAGES.BUDGETS.NAME]);
   }, [setLabels]);
 
-  const { budgets } = useMemo(() => {
-    return { budgets: data?.budgets }
-  }, [data]);
+  const budgets = useMemo(() => data?.budgets, [data]);
+  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
   useEffect(() => {
+    const handleRestore = async () => {
+      await restoreEntity();
+    };
+
     const actions = [
       {
         id: 1,
@@ -31,15 +36,24 @@ const Budgets = () => {
         color: 'green',
         onClick: () => { push(PAGES.BUDGETS.CREATE) },
         text: 'Crear'
-      }
+      },
+      {
+        id: 2,
+        icon: 'undo',
+        color: 'grey',
+        onClick: handleRestore,
+        text: 'Actualizar',
+        disabled: loading
+      },
     ];
     setActions(actions);
-  }, [push, setActions]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [push, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <BudgetsPage isLoading={isLoading} budgets={budgets} />
+    <BudgetsPage isLoading={loading} budgets={loading ? [] : budgets} />
   )
 };
 

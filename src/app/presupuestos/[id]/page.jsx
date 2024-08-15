@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
+import { GET_BUDGET_QUERY_KEY, cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useDolarExangeRate } from "@/api/external";
 import { useListAllProducts } from "@/api/products";
@@ -324,7 +324,6 @@ const Budget = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto confirmado!');
         setIsModalConfirmationOpen(false);
@@ -346,7 +345,6 @@ const Budget = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto anulado!');
         setIsModalCancelOpen(false);
@@ -364,7 +362,6 @@ const Budget = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto actualizado!');
         push(PAGES.BUDGETS.BASE);

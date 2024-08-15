@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
-import { LIST_PRODUCTS_QUERY_KEY, deleteBatchProducts, useListAllProducts } from "@/api/products";
-import { GET_SUPPLIER_QUERY_KEY, LIST_SUPPLIERS_QUERY_KEY, edit, useGetSupplier } from "@/api/suppliers";
+import { deleteBatchProducts, useListAllProducts } from "@/api/products";
+import { GET_SUPPLIER_QUERY_KEY, edit, useGetSupplier } from "@/api/suppliers";
 import { Icon } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/BarCode";
 import { ModalDelete } from "@/components/common/modals";
@@ -95,7 +95,6 @@ const Supplier = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_SUPPLIER_QUERY_KEY, params.id] });
         toast.success('Proveedor actualizado!');
         push(PAGES.SUPPLIERS.BASE);
@@ -112,7 +111,6 @@ const Supplier = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
         toast.success('Lista de productos del proveedor eliminada!');
         setOpen(false);
       } else {

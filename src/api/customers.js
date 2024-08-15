@@ -7,8 +7,7 @@ import { getAllEntity } from "./common";
 
 const CUSTOMERS_URL = `${PATHS.CUSTOMERS}`;
 
-export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
-export const LIST__ALL_CUSTOMERS_QUERY_KEY = 'listCustomers';
+export const LIST_ALL_CUSTOMERS_QUERY_KEY = 'listAllCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 
 export function create(customer) {
@@ -33,7 +32,7 @@ export function deleteCustomer(id) {
 
 export function useListAllCustomers() {
   const query = useQuery({
-    queryKey: [LIST__ALL_CUSTOMERS_QUERY_KEY],
+    queryKey: [LIST_ALL_CUSTOMERS_QUERY_KEY],
     queryFn: () => getAllEntity({ entity: ENTITIES.CUSTOMERS, url: CUSTOMERS_URL, params: { sort: 'name', order: true } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });

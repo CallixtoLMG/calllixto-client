@@ -1,5 +1,5 @@
 "use client";
-import { GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY, edit, useGetCustomer } from "@/api/customers";
+import { GET_CUSTOMER_QUERY_KEY, edit, useGetCustomer } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
 import CustomerView from "@/components/customers/CustomerView";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -36,7 +36,6 @@ const Customer = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_CUSTOMERS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_CUSTOMER_QUERY_KEY, params.id] });
         toast.success('Cliente actualizado!');
         push(PAGES.CUSTOMERS.BASE);

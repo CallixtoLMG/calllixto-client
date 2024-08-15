@@ -1,5 +1,5 @@
 "use client";
-import { GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY, edit, useGetBrand } from "@/api/brands";
+import { GET_BRAND_QUERY_KEY, edit, useGetBrand } from "@/api/brands";
 import BrandForm from "@/components/brands/BrandForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
@@ -39,7 +39,6 @@ const Brand = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY] });
         queryClient.invalidateQueries({ queryKey: [GET_BRAND_QUERY_KEY, params.id] });
         toast.success('Marca actualizada!');
         push(PAGES.BRANDS.BASE);

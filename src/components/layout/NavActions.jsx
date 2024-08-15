@@ -1,11 +1,6 @@
 import { Box, Flex } from '@/components/common/custom';
 import { createContext, useContext, useState } from 'react';
-import styled from 'styled-components';
 import { IconnedButton } from '../common/buttons';
-
-const ActionsContainer = styled(Flex)`
-  column-gap: 10px;
-`;
 
 const NavActionsContext = createContext();
 
@@ -31,9 +26,8 @@ const useNavActionsContext = () => {
 const NavActions = () => {
   const { actions } = useNavActionsContext();
   return (
-    <ActionsContainer>
-      {actions.map(action => {
-        const { id, icon, color, onClick, text, button } = action;
+    <Flex columnGap="10px">
+      {actions.map(({ id, icon, color, onClick, text, button, disabled }) => {
         return (
           <Box key={`action_${id}`} >
             {button ? button : (
@@ -43,12 +37,13 @@ const NavActions = () => {
                 color={color}
                 onClick={onClick}
                 width="110px"
+                disabled={disabled}
               />
             )}
           </Box>
         );
       })}
-    </ActionsContainer>
+    </Flex>
   );
 };
 
