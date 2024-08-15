@@ -143,7 +143,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     <>
       <Flex flexDirection="column" rowGap="15px">
         <FormProvider {...methods}>
-          <Form onSubmit={handleSubmit(onFilter)}>
+          <Form onSubmit={handleSubmit(setFilters)}>
             <Filters clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
               <Controller
                 name="code"
