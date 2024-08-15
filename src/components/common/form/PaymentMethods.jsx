@@ -1,9 +1,12 @@
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.common";
-import { useEffect, useState } from "react";
-import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { useState } from "react";
+import { useFieldArray } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, FormField, Icon, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
 import { Table, TotalList } from "../table";
+// reconmbrar los totalaes
+// renombrear paymentsmethod, por payments
+
 const EMPTY_PAYMENT = { method: '', amount: 0, comments: '' };
 
 const parseFloatSafe = (value) => {
@@ -16,91 +19,39 @@ const calculateTotals = (payments, finalTotal) => {
   return { totalAssigned: parseFloat(totalAssigned), totalPending: parseFloat(totalPending) };
 };
 
-const PaymentMethods = ({ finalTotal, excludeDollars, maxHeight, onResetPayments }) => {
+const PaymentMethods = ({ finalTotal, maxHeight, methods }) => {
 
-  const handleResetPayments = () => {
-    reset({ payments: [] });
-  };
+  const [payment, setPayment] = useState(EMPTY_PAYMENT);
+  const [errors, setErrors] = useState({})
 
-  useEffect(() => {
-    if (onResetPayments) {
-      onResetPayments(handleResetPayments);
-    }
-  }, [onResetPayments]);
+  const { control, setValue } = methods;
 
-  const formContext = useFormContext();
-  if (!formContext) throw new Error("PaymentMethods must be used within a FormProvider.");
-
-  const {
+  const { fields: payments, append: appendPayment, remove: removePayment } = useFieldArray({
     control,
-    setError,
-    clearErrors,
-    getValues,
-    reset,
-    watch,
-    trigger,
-    setValue,
-    formState: { errors },
-  } = formContext;
-
-  const [isAddingPayment, setIsAddingPayment] = useState(false);
-  const payments = useWatch({ name: "payments", control });
-
-  const paymentOptions = PAYMENT_METHODS.filter((method) =>
-    excludeDollars ? method.key !== "dolares" : true
-  );
+    name: "payments"
+  });
 
   const { totalPending, totalAssigned } = calculateTotals(payments, finalTotal);
   const isTotalCovered = totalPending <= 0;
 
   const handleCompleteAmount = () => {
-    setValue('paymentToAdd.amount', totalPending.toFixed(2));
+    setPayment({ ...payment, amount: totalPending.toFixed(2) });
   };
 
   const handleAddPayment = async () => {
-    setIsAddingPayment(true);
-    const valid = await trigger("paymentToAdd.amount");
-    if (!valid) {
-      setIsAddingPayment(false);
-      return;
+    if (!payment.method || payment.amount <= 0) {
+      setErrors({ ...errors, amount: "El monto debe ser un número mayor que 0" })
+      return
     }
-
-    const { payments, paymentToAdd } = getValues();
-    let amountValue = parseFloatSafe(paymentToAdd.amount);
-
-    if (isNaN(amountValue) || amountValue <= 0) {
-      setError("paymentToAdd.amount", {
-        type: "manual",
-        message: "El monto debe ser un número mayor que 0.",
-      });
-      setIsAddingPayment(false);
-      return;
-    }
-
-    const newTotalAssigned = totalAssigned + amountValue;
-
-    if (newTotalAssigned > finalTotal) {
-      setError("paymentToAdd.amount", {
-        type: "manual",
-        message: `El pago no puede superar al monto total (${finalTotal.toFixed(2)}).`,
-      });
-      setIsAddingPayment(false);
-      return;
-    }
-
-    reset({
-      payments: [...payments, { ...paymentToAdd, amount: amountValue }],
-      paymentToAdd: EMPTY_PAYMENT,
-    });
-    clearErrors("paymentToAdd.amount");
-    setIsAddingPayment(false);
+    setValue("comments", "pindonganegra")
+    appendPayment(payment)
+    setPayment(EMPTY_PAYMENT);
+    console.log("payments", payments)
+    setErrors({});
   };
 
   const handleRemovePayment = (index) => {
-    const { payments } = getValues();
-    const newPayments = [...payments];
-    newPayments.splice(index, 1);
-    reset({ payments: newPayments });
+    removePayment(index);
   };
 
   const TOTAL_LIST_ITEMS = [
@@ -117,76 +68,42 @@ const PaymentMethods = ({ finalTotal, excludeDollars, maxHeight, onResetPayments
           <FieldsContainer width="100%" alignItems="center" rowGap="5px">
             <FormField flex="2">
               <Label>Método</Label>
-              <Controller
-                name="paymentToAdd.method"
-                control={control}
-                render={({ field }) => (
-                  <Dropdown
-                    {...field}
-                    placeholder='Seleccione método de pago'
-                    fluid
-                    selection
-                    options={paymentOptions}
-                    onChange={(e, { value }) => field.onChange(value)}
-                    disabled={isTotalCovered}
-                  />
-                )}
+              <Dropdown
+                placeholder='Seleccione método de pago'
+                fluid
+                selection
+                options={PAYMENT_METHODS.filter((method) => method.key !== "dolares")}
+                onChange={(e, { value }) => setPayment({ ...payment, method: value })}
+                disabled={isTotalCovered}
               />
             </FormField>
             <FormField flex="1">
               <RuledLabel title="Monto" message={errors.paymentToAdd?.amount?.message} required />
-              <Controller
-                name="paymentToAdd.amount"
-                control={control}
-                rules={{
-                  validate: (value) => {
-                    const numericValue = parseFloatSafe(value);
-                    const remainingAmount = finalTotal - payments.reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0);
-
-                    if (numericValue > remainingAmount) {
-                      return `El monto no puede exceder el presupuesto restante (${remainingAmount.toFixed(2)})`;
-                    }
-
-                    if (isAddingPayment && (numericValue === 0 || isNaN(numericValue))) {
-                      return "El monto debe ser mayor que 0";
-                    }
-                    return true;
-                  }
+              <CurrencyFormatInput
+                height="50px"
+                textAlignLast="right"
+                customInput={Input}
+                displayType="input"
+                thousandSeparator={true}
+                decimalScale={2}
+                allowNegative={false}
+                value={payment.amount || 0}
+                prefix="$ "
+                onValueChange={(values) => {
+                  const { floatValue } = values;
+                  setPayment({ ...payment, amount: floatValue || 0 });
                 }}
-                render={({ field }) => (
-                  <CurrencyFormatInput
-                    {...field}
-                    height="50px"
-                    textAlignLast="right"
-                    customInput={Input}
-                    displayType="input"
-                    thousandSeparator={true}
-                    decimalScale={2}
-                    allowNegative={false}
-                    value={field.value || 0}
-                    prefix="$ "
-                    onValueChange={(values) => {
-                      const { floatValue } = values;
-                      field.onChange(floatValue || 0);
-                    }}
-                    disabled={isTotalCovered || !watch('paymentToAdd.method')}
-                  />
-                )}
+                disabled={isTotalCovered}
               />
+
             </FormField>
             <FormField flex="3">
               <Label>Comentarios</Label>
-              <Controller
-                name="paymentToAdd.comments"
-                control={control}
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    type='text'
-                    placeholder='Comentarios'
-                    disabled={isTotalCovered || !watch('paymentToAdd.method')}
-                  />
-                )}
+              <Input
+                type='text'
+                placeholder='Comentarios'
+                disabled={isTotalCovered}
+                onChange={(e, { value }) => setPayment({ ...payment, comments: value })}
               />
             </FormField>
             <FormField minWidth="fit-content" width="fit-content">
@@ -198,7 +115,7 @@ const PaymentMethods = ({ finalTotal, excludeDollars, maxHeight, onResetPayments
                 color="blue"
                 type="button"
                 onClick={handleCompleteAmount}
-                disabled={isTotalCovered || !watch('paymentToAdd.method')}
+                disabled={isTotalCovered}
               >
                 <Icon name="check" />Completar Monto
               </IconedButton>
@@ -209,7 +126,7 @@ const PaymentMethods = ({ finalTotal, excludeDollars, maxHeight, onResetPayments
                 color="green"
                 type="button"
                 onClick={handleAddPayment}
-                disabled={isTotalCovered || !watch('paymentToAdd.method')}
+                disabled={isTotalCovered}
               >
                 <Icon name="add" />Agregar
               </IconedButton>
