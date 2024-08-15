@@ -2,7 +2,7 @@ import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
-import PaymentMethods from "@/components/common/form/PaymentMethods";
+import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
@@ -11,7 +11,7 @@ import { BUDGET_STATES, PAGES, PICK_UP_IN_STORE, RULES, SHORTKEYS, TIME_IN_DAYS 
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Message, Modal, Popup, Transition } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import ModalComment from "./ModalComment";
@@ -24,11 +24,10 @@ const EMPTY_BUDGET = (user) => ({
   comments: '',
   globalDiscount: 0,
   additionalCharge: 0,
-  paymentMethods: PAYMENT_METHODS,
-  expirationOffsetDays: ''
+  paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
+  expirationOffsetDays: '',
+  payments: [],
 });
-
-const EMPTY_PAYMENT = { method: '', amount: 0, comments: '' };
 
 const BudgetForm = ({
   onSubmit,
@@ -42,56 +41,54 @@ const BudgetForm = ({
   selectedContact,
   setSelectedContact
 }) => {
-
-  const paymentMethodsResetRef = useRef(null);
   const methods = useForm({
-    defaultValues: {
-      paymentToAdd: EMPTY_PAYMENT,
-      payments: [],
-    },
-  });
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
-  const [outdatedProducts, setOutdatedProducts] = useState([]);
-  const [removedProducts, setRemovedProducts] = useState([]);
-  const hasShownModal = useRef(false);
-  const [isTableLoading, setIsTableLoading] = useState(false);
-  const [shouldShowModal, setShouldShowModal] = useState(false);
-  const [temporaryProducts, setTemporaryProducts] = useState([]);
-  const [expiration, setExpiration] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
-  const { control, handleSubmit, setValue, getValues, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = useForm({
     defaultValues: budget ? {
       ...budget,
+      payments: budget.payments || [],
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore']);
-  const [subtotal, setSubtotal] = useState(0);
+  const { control, handleSubmit, setValue, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = methods;
+  const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
+    control,
+    name: "products"
+  });
+  const [watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp, watchProducts] = watch(['globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore', 'products']);
+
+  const hasShownModal = useRef(false);
   const productSearchRef = useRef(null);
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [outdatedProducts, setOutdatedProducts] = useState([]);
+  const [removedProducts, setRemovedProducts] = useState([]);
+  const [temporaryProducts, setTemporaryProducts] = useState([]);
+
+  const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
+  const [isTableLoading, setIsTableLoading] = useState(false);
+  const [shouldShowModal, setShouldShowModal] = useState(false);
+  const [expiration, setExpiration] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
+  const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
-  const [finalTotal, setFinalTotal] = useState(0);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
     setSubtotalAfterDiscount(updatedSubtotalAfterDiscount);
 
-    const updatedFinalTotal = getSubtotal(updatedSubtotalAfterDiscount, watchAdditionalCharge);
-    setFinalTotal(updatedFinalTotal);
+    const updatedtotal = getSubtotal(updatedSubtotalAfterDiscount, watchAdditionalCharge);
+    setTotal(updatedtotal);
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
-  // useEffect(() => {
-  //   setValue('paymentMethods', PAYMENT_METHODS.map(method => method.value));
-  // }, [setValue]);
-
   const customerOptions = useMemo(() => {
-    return customers.filter(customer => customer.id && customer.name)
-      .map(customer => ({
-        key: customer.id, value: customer.id, text: customer.name,
-      }));
+    return customers.map(({ id, name }) => ({
+      key: id, value: id, text: name
+    }));
   }, [customers]);
+
   const shouldError = useMemo(() => isBudgetConfirmed(watchState) && !draft && !watchPickUp, [draft, watchPickUp, watchState]);
 
   useEffect(() => {
@@ -143,18 +140,11 @@ const BudgetForm = ({
     setSubtotal(totalSum);
   }, [watchProducts]);
 
-  const deleteProduct = useCallback((index) => {
-    const newProducts = [...watchProducts];
-    newProducts.splice(index, 1);
-    setValue("products", newProducts);
-  }, [watchProducts, setValue]);
-
   useEffect(() => {
     calculateTotal();
   }, [watchProducts, calculateTotal]);
 
   const handleCreate = async (data, state) => {
-    console.log(data)
     const isvalid = validateCustomer();
     if (isvalid) {
       const { customer } = data;
@@ -197,6 +187,7 @@ const BudgetForm = ({
     } else {
       reset({
         ...EMPTY_BUDGET(user),
+        state: watchState,
         seller: `${user?.firstName} ${user?.lastName}`,
       });
     }
@@ -204,25 +195,19 @@ const BudgetForm = ({
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-
-    if (paymentMethodsResetRef.current) {
-      paymentMethodsResetRef.current();
-    }
-  }, [reset, user, draft, isCloning, budget]);
+  }, [draft, isCloning, reset, user, budget, watchState]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));
     setIsModalCommentOpen(true);
   }, []);
 
-  const handleModalCommentClose = () => setIsModalCommentOpen(false);
-
   const actions = [
     {
       id: 1,
       icon: 'trash',
       color: 'red',
-      onClick: (element, index) => deleteProduct(index),
+      onClick: (element, index) => removeProduct(index),
       tooltip: 'Eliminar'
     },
     {
@@ -235,10 +220,9 @@ const BudgetForm = ({
   ];
 
   const onAddComment = async ({ index, dispatchComment }) => {
-    const newProducts = [...watchProducts];
-    const product = newProducts[index];
+    const product = watchProducts[index];
     product.dispatchComment = dispatchComment;
-    setValue("products", newProducts);
+    updateProduct(index, product);
     setIsModalCommentOpen(false);
   };
 
@@ -403,7 +387,7 @@ const BudgetForm = ({
 
   return (
     <>
-      <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={handleModalCommentClose} product={selectedProduct} />
+      <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={setIsModalCommentOpen} product={selectedProduct} />
       <Transition visible={shouldShowModal} animation='scale' duration={500}>
         <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={handleCancelUpdate} size="large">
           <Modal.Header>Desea actualizar el presupuesto, ya que algunos productos sufrieron modificaciones?</Modal.Header>
@@ -613,12 +597,12 @@ const BudgetForm = ({
           <Controller name="products"
             control={control}
             rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
-            render={({ field: { onChange, value } }) => (
+            render={() => (
               <ProductSearch
                 ref={productSearchRef}
                 products={products}
                 onProductSelect={(selectedProduct) => {
-                  onChange([...watchProducts, {
+                  appendProduct({
                     ...selectedProduct,
                     quantity: 1,
                     discount: 0,
@@ -630,8 +614,9 @@ const BudgetForm = ({
                         price: selectedProduct.price,
                       }
                     })
-                  }]);
-                }} />
+                  })
+                }}
+              />
             )}
           />
         </FormField>
@@ -649,20 +634,20 @@ const BudgetForm = ({
             onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
             additionalCharge={watchAdditionalCharge}
             onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
-            finalTotal={finalTotal}
+            total={total}
           />
         </Loader>
         <FieldsContainer rowGap="5px!important">
           <ControlledComments control={control} />
         </FieldsContainer>
         <FieldsContainer width="100%" rowGap="15px">
-          <PaymentMethods
-            methods={methods}
-            finalTotal={finalTotal}
-          />
-          {isBudgetConfirmed(watchState) ?
-            <></>
-            : <FormField flex={3}>
+          {isBudgetConfirmed(watchState) ? (
+            <Payments
+              methods={methods}
+              total={total}
+            />
+          ) : (
+            <FormField flex={3}>
               <Label>Métodos de pago</Label>
               <Segment>
                 <Controller
@@ -715,7 +700,7 @@ const BudgetForm = ({
                 />
               </Segment>
             </FormField>
-          }
+          )}
         </FieldsContainer>
         <SubmitAndRestore
           draft={draft}

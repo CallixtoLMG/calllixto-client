@@ -1,24 +1,24 @@
 import { Divider } from '@/components/budgets/PDFfile/styles';
 import { Field } from '@/components/common/components/Field';
-import React from 'react';
+import { isValidElement } from 'react';
 import styled from 'styled-components';
 import { Flex, FlexColumn } from '../custom';
 
-const Subtitle = styled.p`
+const SubTitle = styled.p`
   font-style: italic;
 `;
 
-export const TotalList = ({ items = [], readOnly, width, labelWidth }) => {
-  const renderContent = (content) => {
-    return typeof content === 'string' ? content : (
-      React.isValidElement(content) ? content : null
-    );
-  };
+// mandar a utils
+const renderContent = (content) => {
+  return typeof content === 'string' ? content : (
+    isValidElement(content) ? content : null
+  );
+};
 
+export const TotalList = ({ items = [], readOnly, width, labelWidth }) => {
   return (
     <FlexColumn marginLeft="auto" rowGap={!readOnly ? "5px" : "0"} width={!width ? "250px" : width} >
       {items
-        .filter(item => item.amount) 
         .map(({ title, amount, subtitle }, index) => (
           <FlexColumn rowGap={!readOnly ? "5px" : "0"} key={index}>
             <Field labelWidth={labelWidth} width={width} label={renderContent(title)}>
@@ -26,9 +26,9 @@ export const TotalList = ({ items = [], readOnly, width, labelWidth }) => {
             </Field>
             {subtitle && (
               <Flex justifyContent="right">
-                <Subtitle >
-                  {`(${renderContent(subtitle)})`}
-                </Subtitle>
+                <SubTitle>
+                  {`(${subtitle})`}
+                </SubTitle>
               </Flex>
             )}
             {index < items.length - 1 && <Divider />}

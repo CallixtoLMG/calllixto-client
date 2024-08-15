@@ -22,18 +22,18 @@ const Field = ({ label, value, ...rest }) => (
   </Flex>
 );
 
-const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, finalTotal, selectedContact }, ref) => {
+const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, total, selectedContact }, ref) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL, [printPdfMode]);
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
-  const roundedFinalTotal = parseFloat(finalTotal.toFixed(2));
+  const roundedFinalTotal = parseFloat(total.toFixed(2));
 
-  const createTotalListItems = (paymentMethods, finalTotal) => {
+  const createTotalListItems = (paymentMethods, total) => {
     const totalAssigned = paymentMethods?.reduce((acc, payment) => acc + payment.amount, 0) || 0;
-    const totalPending = finalTotal - totalAssigned;
+    const totalPending = total - totalAssigned;
 
     const items = paymentMethods?.map((payment, index) => ({
       id: index + 1,
@@ -134,7 +134,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             additionalCharge={budget?.additionalCharge}
             readOnly
             showAllways={false}
-            finalTotal={roundedFinalTotal}
+            total={roundedFinalTotal}
             subtotalAfterDiscount={subtotalAfterDiscount}
           />
         )

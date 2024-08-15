@@ -1,22 +1,23 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Dropdown, FieldsContainer, Flex, FormField, Icon, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
-import PaymentMethods from "@/components/common/form/PaymentMethods";
+import Payments from "@/components/common/form/Payments";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { PICK_UP_IN_STORE } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled } from "@/utils";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
 import { useMemo } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { Container, Message, MessageHeader } from "./styles";
 
-const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, finalTotal, selectedContact, setSelectedContact }) => {
+const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
   const methods = useForm({
     defaultValues: {
-      payments: budget?.payments || [], // Suponiendo que `payments` sea la lista de métodos de pago
+      payments: budget?.paymentsMade || [],
     },
   });
+
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
 
@@ -169,7 +170,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, finalTotal, selec
       <Total
         readOnly
         subtotal={subtotal}
-        finalTotal={finalTotal}
+        total={total}
         subtotalAfterDiscount={subtotalAfterDiscount}
         globalDiscount={budget?.globalDiscount}
         additionalCharge={budget?.additionalCharge}
@@ -178,20 +179,20 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, finalTotal, selec
         <Label>Comentarios</Label>
         <Segment placeholder>{budget?.comments}</Segment>
       </FieldsContainer>
-      {Toggle}
-      {isUpdating ? (
-        <FormProvider  {...methods}>
-          <PaymentMethods finalTotal={finalTotal} />
-          <SubmitAndRestore />
-        </FormProvider>
-      ) : (
-        <FieldsContainer>
-          <FormField flex={3}>
-            <Label>Métodos de pago</Label>
-            <Segment placeholder>{formattedPaymentMethods}</Segment>
-          </FormField>
-        </FieldsContainer>
+      <Flex justifyContent="space-between">
+        {Toggle}
+      </Flex>
+      {isBudgetConfirmed(budget?.state) && (
+        <Payments total={total} methods={methods}>
+        <SubmitAndRestore disabled={!isUpdating} />
+        </Payments>
       )}
+      <FieldsContainer>
+        <FormField flex={3}>
+          <Label>Métodos de pago</Label>
+          <Segment placeholder>{formattedPaymentMethods}</Segment>
+        </FormField>
+      </FieldsContainer>
     </ViewContainer>
   );
 };

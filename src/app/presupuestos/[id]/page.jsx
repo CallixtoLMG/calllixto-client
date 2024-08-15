@@ -68,7 +68,7 @@ const Budget = ({ params }) => {
   const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
-  const [finalTotal, setFinalTotal] = useState(0);
+  const [total, setTotal] = useState(0);
   const [selectedContact, setSelectedContact] = useState({ phone: '', address: '' });
 
   useEffect(() => {
@@ -136,7 +136,7 @@ const Budget = ({ params }) => {
 
       setSubtotal(calculatedSubtotal);
       setSubtotalAfterDiscount(calculatedSubtotalAfterDiscount);
-      setFinalTotal(calculatedFinalTotal);
+      setTotal(calculatedFinalTotal);
 
       const stateTitle = BUDGET_STATES[budget.state]?.title || BUDGET_STATES.INACTIVE.title;
       const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
@@ -388,7 +388,7 @@ const Budget = ({ params }) => {
             <ModalConfirmation
               subtotal={subtotal}
               subtotalAfterDiscount={subtotalAfterDiscount}
-              finalTotal={finalTotal}
+              total={total}
               isModalOpen={isModalConfirmationOpen}
               onClose={handleModalConfirmationClose}
               customer={customerData}
@@ -448,7 +448,7 @@ const Budget = ({ params }) => {
             budget={{ ...budget, customer: customerData }}
             subtotal={subtotal}
             subtotalAfterDiscount={subtotalAfterDiscount}
-            finalTotal={finalTotal}
+            total={total}
           />
           <ModalCancel
             isModalOpen={isModalCancelOpen}
@@ -468,7 +468,7 @@ const Budget = ({ params }) => {
           dolarExchangeRate={showDolarExangeRate && dolarRate}
           subtotal={subtotal}
           subtotalAfterDiscount={subtotalAfterDiscount}
-          finalTotal={finalTotal}
+          total={total}
           selectedContact={selectedContact}
         />
       </OnlyPrint>

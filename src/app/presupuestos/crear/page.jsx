@@ -57,7 +57,6 @@ const CreateBudget = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (budget) => {
-      console.log(budget)
       // const { data } = await create(budget);
       // return data;
     },

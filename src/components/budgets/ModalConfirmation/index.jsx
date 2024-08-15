@@ -1,47 +1,37 @@
 import { IconnedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, Label, Segment } from "@/components/common/custom";
-import PaymentMethods from "@/components/common/form/PaymentMethods";
+import Payments from "@/components/common/form/Payments";
 import { PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone, now } from "@/utils";
-import { useRef } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useMemo, useRef } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { ButtonGroup, Form, Modal, Transition } from "semantic-ui-react";
 
-const EMPTY_PAYMENT = { method: '', amount: 0, comments: '' };
-
-const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading, subtotal, subtotalAfterDiscount, finalTotal }) => {
+const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading, total = 0 }) => {
   const methods = useForm({
-    defaultValues: { paymentToAdd: EMPTY_PAYMENT, payments: [], ...customer },
+    defaultValues: { payments: [], ...customer },
   });
-
+  const { control } = methods;
   const formRef = useRef(null);
-  const roundedFinalTotal = parseFloat(finalTotal.toFixed(2));
+  const parsedTotal = useMemo(() => parseFloat(total.toFixed(2)), [total]);
+
   const handleConfirmClick = () => {
     if (formRef.current) {
       formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }
   };
 
-  const handleFinalConfirm = (data) => {
+  const handleConfirm = (data) => {
     const { payments, pickUpInStore } = data;
-    const dataToSend = {
+    const payload = {
       paymentsMade: payments?.map((payment) => ({
-        amount: payment.amount,
-        method: payment.method,
-        comments: payment.comments,
+        ...payment,
         createdAt: now()
       })),
-      total: roundedFinalTotal,
-      pickUpInStore,
+      total: parsedTotal,
+      pickUpInStore
     };
-    onConfirm(dataToSend);
-  };
-
-  const handlePickupInStoreChange = (value) => {
-    methods.reset({
-      ...methods.getValues(),
-      pickUpInStore: value,
-    });
+    onConfirm(payload);
   };
 
   return (
@@ -50,27 +40,35 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
         <Modal.Header>
           <Flex alignItems="center" justifyContent="space-between">
             Desea confirmar el presupuesto?
-            <ButtonGroup size="small">
-              <IconnedButton
-                text={PICK_UP_IN_STORE}
-                icon="warehouse"
-                height="32px"
-                basic={!methods.getValues("pickUpInStore")}
-                onClick={() => handlePickupInStoreChange(true)}
-              />
-              <IconnedButton
-                text="Enviar a Dirección"
-                icon="truck"
-                height="32px"
-                basic={methods.getValues("pickUpInStore")}
-                onClick={() => handlePickupInStoreChange(false)}
-              />
-            </ButtonGroup>
+            <Controller
+              name="pickUpInStore"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <ButtonGroup size="small">
+                  <IconnedButton
+                    text={PICK_UP_IN_STORE}
+                    icon="warehouse"
+                    basic={!value}
+                    onClick={() => {
+                      onChange(true);
+                    }}
+                  />
+                  <IconnedButton
+                    text="Enviar a Dirección"
+                    icon="truck"
+                    basic={value}
+                    onClick={() => {
+                      onChange(false);
+                    }}
+                  />
+                </ButtonGroup>
+              )}
+            />
           </Flex>
         </Modal.Header>
         <Modal.Content>
           <FormProvider {...methods}>
-            <Form ref={formRef} onSubmit={methods.handleSubmit(handleFinalConfirm)}>
+            <Form ref={formRef} onSubmit={methods.handleSubmit(handleConfirm)}>
               <FlexColumn rowGap="15px">
                 <FieldsContainer>
                   <FormField flex="1">
@@ -86,12 +84,11 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                     <Segment placeholder alignContent="center" height="40px">{formatedSimplePhone(customer?.phoneNumbers[0])}</Segment>
                   </FormField>
                 </FieldsContainer>
-                <PaymentMethods
-                  subtotal={subtotal}
-                  finalTotal={roundedFinalTotal}
-                  subtotalAfterDiscount={subtotalAfterDiscount}
-                  excludeDollars
-                  maxHeight />
+                <Payments
+                  methods={methods}
+                  total={parsedTotal}
+                  maxHeight
+                />
               </FlexColumn>
             </Form>
           </FormProvider>

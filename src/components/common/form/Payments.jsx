@@ -1,84 +1,76 @@
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.common";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, FormField, Icon, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
 import { Table, TotalList } from "../table";
-// reconmbrar los totalaes
-// renombrear paymentsmethod, por payments
 
-const EMPTY_PAYMENT = { method: '', amount: 0, comments: '' };
+const EMPTY_PAYMENT = () => ({ method: '', amount: 0, comments: '' });
 
-const parseFloatSafe = (value) => {
-  return typeof value === 'string' ? parseFloat(value.replace(/[^0-9.-]+/g, '')) : value;
-};
-
-const calculateTotals = (payments, finalTotal) => {
+const calculateTotals = (payments, total) => {
   const totalAssigned = payments.reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0).toFixed(2);
-  const totalPending = (finalTotal - totalAssigned).toFixed(2);
-  return { totalAssigned: parseFloat(totalAssigned), totalPending: parseFloat(totalPending) };
+  const totalPending = (total - totalAssigned).toFixed(2);
+  return { totalAssigned, totalPending };
 };
 
-const PaymentMethods = ({ finalTotal, maxHeight, methods }) => {
-
-  const [payment, setPayment] = useState(EMPTY_PAYMENT);
-  const [errors, setErrors] = useState({})
-
-  const { control, setValue } = methods;
-
+const Payments = ({ total, maxHeight, methods, children }) => {
+  const { control } = methods;
   const { fields: payments, append: appendPayment, remove: removePayment } = useFieldArray({
     control,
     name: "payments"
   });
 
-  const { totalPending, totalAssigned } = calculateTotals(payments, finalTotal);
-  const isTotalCovered = totalPending <= 0;
+  const { totalPending, totalAssigned } = useMemo(() => calculateTotals(payments, total), [total, payments]);
+  const isTotalCovered = useMemo(() => totalPending <= 0, [totalPending]);
 
-  const handleCompleteAmount = () => {
-    setPayment({ ...payment, amount: totalPending.toFixed(2) });
-  };
+  const [payment, setPayment] = useState(EMPTY_PAYMENT);
+  const [errors, setErrors] = useState({})
 
   const handleAddPayment = async () => {
     if (!payment.method || payment.amount <= 0) {
-      setErrors({ ...errors, amount: "El monto debe ser un número mayor que 0" })
-      return
+      setErrors({ ...errors, amount: "El monto debe ser mayor que 0" });
+      return;
     }
-    setValue("comments", "pindonganegra")
-    appendPayment(payment)
+
+    if (payment.amount > totalPending) {
+      setErrors({ ...errors, amount: `El monto no puede superar al total pendiente ($ ${totalPending})` });
+      return;
+    }
+
+    appendPayment(payment);
     setPayment(EMPTY_PAYMENT);
-    console.log("payments", payments)
     setErrors({});
   };
 
-  const handleRemovePayment = (index) => {
-    removePayment(index);
-  };
-
   const TOTAL_LIST_ITEMS = [
-    { id: 1, title: "Pagado", amount: <Price value={totalAssigned?.toFixed(2)} /> },
-    { id: 2, title: "Pendiente", amount: <Price value={totalPending?.toFixed(2)} /> },
-    { id: 3, title: "Total", amount: <Price value={finalTotal?.toFixed(2)} /> },
+    { id: 1, title: "Pagado", amount: <Price value={totalAssigned} /> },
+    { id: 2, title: "Pendiente", amount: <Price value={totalPending} /> },
+    { id: 3, title: "Total", amount: <Price value={total} /> },
   ];
 
   return (
     <Flex width="100%" maxHeight={maxHeight ? "55vh" : ""}>
       <Segment padding="20px 60px 20px 20px">
-        <Header>Detalle de Pagos</Header>
+        <Header>
+          Detalle de Pagos
+          {children}
+        </Header>
         <FlexColumn rowGap="15px">
           <FieldsContainer width="100%" alignItems="center" rowGap="5px">
             <FormField flex="2">
               <Label>Método</Label>
               <Dropdown
-                placeholder='Seleccione método de pago'
+                placeholder="Seleccione método de pago"
                 fluid
                 selection
-                options={PAYMENT_METHODS.filter((method) => method.key !== "dolares")}
+                options={PAYMENT_METHODS.filter((method) => method.key !== 'dolares')}
+                value={payment.method}
                 onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                 disabled={isTotalCovered}
               />
             </FormField>
             <FormField flex="1">
-              <RuledLabel title="Monto" message={errors.paymentToAdd?.amount?.message} required />
+              <RuledLabel title="Monto" message={errors.amount} required />
               <CurrencyFormatInput
                 height="50px"
                 textAlignLast="right"
@@ -91,9 +83,9 @@ const PaymentMethods = ({ finalTotal, maxHeight, methods }) => {
                 prefix="$ "
                 onValueChange={(values) => {
                   const { floatValue } = values;
-                  setPayment({ ...payment, amount: floatValue || 0 });
+                  setPayment({ ...payment, amount: parseFloat(floatValue) || 0 });
                 }}
-                disabled={isTotalCovered}
+                disabled={isTotalCovered || !payment.method}
               />
 
             </FormField>
@@ -102,7 +94,8 @@ const PaymentMethods = ({ finalTotal, maxHeight, methods }) => {
               <Input
                 type='text'
                 placeholder='Comentarios'
-                disabled={isTotalCovered}
+                disabled={isTotalCovered || !payment.method}
+                value={payment.comments}
                 onChange={(e, { value }) => setPayment({ ...payment, comments: value })}
               />
             </FormField>
@@ -114,7 +107,7 @@ const PaymentMethods = ({ finalTotal, maxHeight, methods }) => {
                 labelPosition="left"
                 color="blue"
                 type="button"
-                onClick={handleCompleteAmount}
+                onClick={() => setPayment({ ...payment, amount: parseFloat(totalPending) })}
                 disabled={isTotalCovered}
               >
                 <Icon name="check" />Completar Monto
@@ -141,19 +134,17 @@ const PaymentMethods = ({ finalTotal, maxHeight, methods }) => {
                   id: 1,
                   icon: 'trash',
                   color: 'red',
-                  onClick: (_, index) => handleRemovePayment(index),
+                  onClick: (_, index) => removePayment(index),
                   tooltip: 'Eliminar',
                 },
               ]}
             />
           </Flex>
-          <FlexColumn marginLeft="auto" width="250px">
-            <TotalList readOnly items={TOTAL_LIST_ITEMS} />
-          </FlexColumn>
+          <TotalList readOnly items={TOTAL_LIST_ITEMS} />
         </FlexColumn>
       </Segment>
     </Flex>
   );
 };
 
-export default PaymentMethods;
+export default Payments;

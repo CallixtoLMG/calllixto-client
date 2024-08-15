@@ -11,7 +11,7 @@ export const Total = ({
   onGlobalDiscountChange = () => { },
   additionalCharge = 0,
   onAdditionalChargeChange = () => { },
-  finalTotal = 0,
+  total = 0,
 }) => {
 
   const items = [];
@@ -135,7 +135,7 @@ export const Total = ({
   items.push({
     id: items.length + 1,
     title: <Title as="h4" width="100px" textAlign="right">TOTAL</Title>,
-    amount: <Title as="h3"><Price value={finalTotal} /></Title>
+    amount: <Title as="h3"><Price value={total} /></Title>
   });
 
   return (
