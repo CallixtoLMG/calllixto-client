@@ -148,34 +148,26 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
               <Controller
                 name="code"
                 control={control}
-                render={({ field: { onChange, ...rest } }) => (
+                render={({ field }) => (
                   <Input
-                    {...rest}
+                    {...field}
                     $marginBottom
                     $maxWidth
                     height="35px"
                     placeholder="Código"
-                    onChange={(e) => {
-                      setValue('name', '');
-                      onChange(e.target.value);
-                    }}
                   />
                 )}
               />
               <Controller
                 name="name"
                 control={control}
-                render={({ field: { onChange, ...rest } }) => (
+                render={({ field }) => (
                   <Input
-                    {...rest}
+                    {...field}
                     $marginBottom
                     $maxWidth
                     height="35px"
                     placeholder="Nombre"
-                    onChange={(e) => {
-                      setValue('code', '');
-                      onChange(e.target.value);
-                    }}
                   />
                 )}
               />

@@ -75,9 +75,9 @@ const BudgetsPage = ({ budgets, isLoading }) => {
           <Controller
             name="state"
             control={control}
-            render={({ field: { onChange, ...rest } }) => (
+            render={({ field }) => (
               <Dropdown
-                {...rest}
+                {...field}
                 $maxWidth
                 top="10px"
                 height="35px"
@@ -85,10 +85,6 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                 selection
                 options={STATE_OPTIONS}
                 defaultValue={STATE_OPTIONS[0].key}
-                onChange={(e, { value }) => {
-                  onChange(value);
-                  handleSubmit(onFilter)();
-                }}
               />
             )}
           />
