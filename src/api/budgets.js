@@ -37,7 +37,7 @@ export function edit(budget) {
 export function useListAllBudgets() {
   const query = useQuery({
     queryKey: [LIST_ALL_BUDGETS_QUERY_KEY],
-    queryFn: () => getAllEntity({ entity: ENTITIES.BUDGETS, url: BUDGETS_URL, params: { sort: 'date' } }),
+    queryFn: () => getAllEntity({ entity: ENTITIES.BUDGETS, url: BUDGETS_URL }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 

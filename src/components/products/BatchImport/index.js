@@ -3,7 +3,7 @@ import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, For
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { downloadExcel, now } from "@/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -11,9 +11,10 @@ import { Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { Modal, ModalHeader, WaitMsg } from "./styles";
 import { IconnedButton } from "@/components/common/buttons";
+import { useListAllProducts, createBatch, editBatch } from "@/api/products";
 
 const BatchImport = ({ isCreating }) => {
-  const { data, isLoading: loadingProducts, refetch } = useListAllProducts({});
+  const { data, isLoading: loadingProducts } = useListAllProducts();
   const products = useMemo(() => data?.products, [data?.products]);
   const { getBlacklist } = useUserContext();
   const { handleSubmit, control, reset, setValue, watch } = useForm();
@@ -27,7 +28,6 @@ const BatchImport = ({ isCreating }) => {
   const [unprocessedProductsCount, setUnprocessedProductsCount] = useState(0);
   const [importedProductsCount, setImportedProductsCount] = useState(0);
   const watchProducts = watch("importProducts", []);
-  const queryClient = useQueryClient();
   const inputRef = useRef();
   const formRef = useRef(null);
   const [existingCodes, setExistingCodes] = useState({});
@@ -95,14 +95,12 @@ const BatchImport = ({ isCreating }) => {
     setOpen(true);
     setIsLoading(true);
     try {
-      const response = await refetch();
-      const updatedProducts = response.data.products;
       setSelectedFile(file.name);
       const reader = new FileReader();
       reader.onload = async (event) => {
         try {
           const data = event.target.result;
-          await processFile(data, updatedProducts);
+          await processFile(data, products);
         } catch (error) {
           console.error("Error processing file:", error);
         }
