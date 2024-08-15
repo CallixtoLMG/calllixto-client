@@ -7,7 +7,7 @@ import { OnlyPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
@@ -194,6 +194,8 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           selectionActions={selectionActions}
           clearSelection={clearSelection}
           selectAll={selectAll}
+          onFilter={onFilter}
+          paginate
         />
         <ModalDelete
           showModal={showModal}
