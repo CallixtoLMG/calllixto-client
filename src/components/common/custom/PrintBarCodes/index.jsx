@@ -1,27 +1,27 @@
 import JsBarcode from "jsbarcode";
-import { forwardRef, useCallback, useEffect } from "react";
+import { forwardRef, useEffect } from "react";
 import { BarCodeContainer, BarCodeSubContainer, Barcode, ProductCode, ProductName } from "./styles";
 
 const PrintBarCodes = forwardRef(({ products }, ref) => {
-  const generateBarcodes = useCallback(() => {
-    products?.forEach(product => {
-      const barcodeElement = document.getElementById(`barcode-${product?.code}`);
-      if (barcodeElement) {
-        JsBarcode(barcodeElement, product?.code, {
-          format: "CODE128",
-          lineColor: "#000",
-          width: 2,
-          height: 80,
-          displayValue: false,
-          fit: true
-        });
-      }
-    });
-  }, [products]);
-
   useEffect(() => {
+    const generateBarcodes = () => {
+      products?.forEach(product => {
+        const barcodeElement = document.getElementById(`barcode-${product?.code}`);
+        if (barcodeElement) {
+          JsBarcode(barcodeElement, product?.code, {
+            format: "CODE128",
+            lineColor: "#000",
+            width: 2,
+            height: 80,
+            displayValue: false,
+            fit: true
+          });
+        }
+      });
+    };
+
     generateBarcodes();
-  }, [generateBarcodes]);
+  }, [products]);
 
   return (
     <BarCodeContainer ref={ref}>

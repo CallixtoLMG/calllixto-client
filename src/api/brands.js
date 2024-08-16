@@ -3,12 +3,12 @@ import { PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from '@tanstack/react-query';
 import axios from './axios';
-import { getAllEntity } from './common';
+import { getAllEntity, getEntityById } from './common';
 
 const BRANDS_URL = `${PATHS.BRANDS}`;
 
 export const GET_BRAND_QUERY_KEY = 'getBrand';
-export const LIST_ALL_BRANDS_QUERY_KEY = 'listAllBrands';
+export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 
 export function create(brand) {
   const body = {
@@ -32,7 +32,7 @@ export function deleteBrand(id) {
 
 export function useListAllBrands() {
   const query = useQuery({
-    queryKey: [LIST_ALL_BRANDS_QUERY_KEY],
+    queryKey: [LIST_BRANDS_QUERY_KEY],
     queryFn: () => getAllEntity({ entity: ENTITIES.BRANDS, url: BRANDS_URL, params: { sort: 'name', order: true } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
@@ -41,18 +41,9 @@ export function useListAllBrands() {
 };
 
 export function useGetBrand(id) {
-  const getBrand = async (id) => {
-    try {
-      const { data } = await axios.get(`${BRANDS_URL}/${id}`);
-      return data?.brand;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   const query = useQuery({
     queryKey: [GET_BRAND_QUERY_KEY, id],
-    queryFn: () => getBrand(id),
+    queryFn: () => getEntityById({ id, url: BRANDS_URL, entity: ENTITIES.BRANDS }),
     retry: false,
     staleTime: TIME_IN_MS.ONE_HOUR,
   });

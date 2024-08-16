@@ -9,11 +9,13 @@ import {
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from "./axios";
-import { getAllEntity } from "./common";
-const { omit, chunk } = require("lodash");
+import { getAllEntity, getEntityById } from "./common";
+import { omit, chunk } from "lodash";
 
 const PRODUCTS_URL = `${PATHS.PRODUCTS}`;
-export const LIST_ALL_PRODUCTS_QUERY_KEY = "listAllProducts";
+
+export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
+export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
 
 export function create(product) {
@@ -38,7 +40,7 @@ export function deleteProduct(id) {
 
 export function useListAllProducts() {
   const query = useQuery({
-    queryKey: [LIST_ALL_PRODUCTS_QUERY_KEY],
+    queryKey: [LIST_PRODUCTS_QUERY_KEY],
     queryFn: () => getAllEntity({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, params: { sort: 'date' } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
@@ -46,21 +48,27 @@ export function useListAllProducts() {
   return query;
 };
 
-export function useGetProduct(id) {
-  const getProduct = async (id) => {
-    try {
-      const { data } = await axios.get(`${PRODUCTS_URL}/${id}`);
-      return data?.product;
-    } catch (error) {
-      throw error;
-    };
-  };
+export function useProductsBySupplierId(supplierId) {
+  const listBySupplierId = async () => {
+    const { products } = await getAllEntity({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, params: { sort: 'date' } });
+    return products.filter((product) => product.code.startsWith(supplierId));
+  }
 
   const query = useQuery({
+    queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId],
+    queryFn: () => listBySupplierId(),
+    staleTime: TIME_IN_MS.ONE_DAY,
+  });
+
+  return query;
+}
+
+export function useGetProduct(id) {
+  const query = useQuery({
     queryKey: [GET_PRODUCT_QUERY_KEY, id],
-    queryFn: () => getProduct(id),
+    queryFn: () => getEntityById({ id, url: PRODUCTS_URL, entity: ENTITIES.PRODUCTS, key: 'code' }),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_MINUTE,
+    staleTime: TIME_IN_MS.ONE_HOUR,
   });
 
   return query;

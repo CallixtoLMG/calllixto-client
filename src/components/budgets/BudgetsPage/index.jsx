@@ -87,6 +87,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
                 defaultValue={STATE_OPTIONS[0].key}
                 onChange={(e, { value }) => {
                   onChange(value);
+                  setFilters({ ...filters, state: value });
                 }}
               />
             )}

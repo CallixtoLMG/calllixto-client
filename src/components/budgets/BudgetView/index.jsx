@@ -147,7 +147,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         <FormField width="200px">
           <Label>Teléfono</Label>
           {!budget?.customer?.phoneNumbers?.length || budget?.customer?.phoneNumbers.length === 1 ? (
-            <Segment placeholder>{formatedSimplePhone(budget.customer?.phoneNumbers[0])}</Segment>
+            <Segment placeholder>{formatedSimplePhone(budget.customer?.phoneNumbers?.[0])}</Segment>
           ) : (
             <Dropdown
               selection

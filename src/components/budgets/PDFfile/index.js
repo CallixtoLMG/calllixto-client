@@ -31,16 +31,16 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
   const roundedFinalTotal = parseFloat(total.toFixed(2));
 
-  const createTotalListItems = (paymentMethods, total) => {
-    const totalAssigned = paymentMethods?.reduce((acc, payment) => acc + payment.amount, 0) || 0;
+  const createTotalListItems = (paymentMethods = [], total) => {
+    const totalAssigned = paymentMethods.reduce((acc, payment) => acc + payment.amount, 0) || 0;
     const totalPending = total - totalAssigned;
 
-    const items = paymentMethods?.map((payment, index) => ({
+    const items = paymentMethods.map((payment, index) => ({
       id: index + 1,
       title: payment.method,
-      amount: <Price value={payment.amount.toLocaleString()} />,
+      amount: <Price value={payment.amount?.toLocaleString()} />,
       ...(payment.comments && { subtitle: payment.comments }),
-    })) || [];
+    }));
 
     items.push({
       id: items.length + 1,

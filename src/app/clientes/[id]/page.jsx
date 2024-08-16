@@ -1,12 +1,12 @@
 "use client";
-import { GET_CUSTOMER_QUERY_KEY, edit, useGetCustomer } from "@/api/customers";
+import { edit, useGetCustomer } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
 import CustomerView from "@/components/customers/CustomerView";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
@@ -14,7 +14,6 @@ import { toast } from "react-hot-toast";
 const Customer = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
-  const queryClient = useQueryClient();
   const { data: customer, isLoading } = useGetCustomer(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
@@ -36,7 +35,6 @@ const Customer = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [GET_CUSTOMER_QUERY_KEY, params.id] });
         toast.success('Cliente actualizado!');
         push(PAGES.CUSTOMERS.BASE);
       } else {

@@ -1,19 +1,18 @@
 "use client";
 import { useUserContext } from "@/User";
-import { deleteBatchProducts, useListAllProducts } from "@/api/products";
-import { GET_SUPPLIER_QUERY_KEY, edit, useGetSupplier } from "@/api/suppliers";
+import { deleteBatchProducts, useProductsBySupplierId } from "@/api/products";
+import { edit, useGetSupplier } from "@/api/suppliers";
 import { Icon } from "@/components/common/custom";
-import PrintBarCodes from "@/components/common/custom/BarCode";
+import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalDelete } from "@/components/common/modals";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ATTRIBUTES } from "@/components/products/products.common";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import SupplierView from "@/components/suppliers/SupplierView";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -21,26 +20,20 @@ import { useReactToPrint } from "react-to-print";
 
 const Supplier = ({ params }) => {
   useValidateToken();
-  const { push } = useRouter();
-  const { data: supplier, isLoading, isRefetching } = useGetSupplier(params.id);
   const { role } = useUserContext();
-  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { push } = useRouter();
+  const { data: supplier, isLoading } = useGetSupplier(params.id);
+  const { data: products, isLoading: loadingProducts } = useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const [open, setOpen] = useState(false);
-  const queryClient = useQueryClient();
-  const deleteQuestion = (name) => `¿Está seguro que desea eliminar todos los productos de la marca "${name}"?`;
-  const printRef = useRef();
+  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
 
-  const { data: productsData, isLoading: loadingProducts, refetch } = useListAllProducts({
-    attributes: [ATTRIBUTES.CODE, ATTRIBUTES.NAME],
-    enabled: false,
-    code: supplier?.id,
-  });
+  const [open, setOpen] = useState(false);
+  const printRef = useRef();
 
   useEffect(() => {
     resetActions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -52,16 +45,13 @@ const Supplier = ({ params }) => {
     removeAfterPrint: true,
   });
 
-
-
   useEffect(() => {
     const handleBarCodePrint = async () => {
-      const { data } = await refetch();
-      if (data?.products?.length) {
+      if (products.length) {
         handlePrint();
       } else {
         toast.success('No hay productos de este proveedor', {
-          icon:<Icon margin="0" toast name="info circle" color="blue" />,
+          icon: <Icon margin="0" toast name="info circle" color="blue" />,
         });
       }
     };
@@ -85,8 +75,8 @@ const Supplier = ({ params }) => {
       ]
       : [];
     setActions(actions);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetch, role, setActions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, setActions]);
 
   const { mutate: mutateUpdate, isPending: isLoadingUpdate } = useMutation({
     mutationFn: async (supplier) => {
@@ -95,7 +85,6 @@ const Supplier = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [GET_SUPPLIER_QUERY_KEY, params.id] });
         toast.success('Proveedor actualizado!');
         push(PAGES.SUPPLIERS.BASE);
       } else {
@@ -124,13 +113,13 @@ const Supplier = ({ params }) => {
   };
 
   return (
-    <Loader active={isLoading || isRefetching || loadingProducts}>
+    <Loader active={isLoading || loadingProducts}>
       {Toggle}
       {open &&
         <ModalDelete
           showModal={open}
           setShowModal={setOpen}
-          title={deleteQuestion(supplier?.name)}
+          title={`¿Está seguro que desea eliminar todos los productos del proveedor "${supplier?.name}"?`}
           onDelete={mutateDelete}
           isLoading={isLoadingDelete}
         />}
@@ -139,9 +128,9 @@ const Supplier = ({ params }) => {
       ) : (
         <>
           <SupplierView supplier={supplier} />
-          <OnlyPrint>
-            <PrintBarCodes ref={printRef} products={productsData?.products} />
-          </OnlyPrint>
+          {/* <OnlyPrint>
+            <PrintBarCodes ref={printRef} products={products} />
+          </OnlyPrint> */}
         </>
       )}
     </Loader>

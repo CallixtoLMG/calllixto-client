@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { deleteSupplier, LIST_ALL_SUPPLIER_QUERY_KEY } from "@/api/suppliers";
+import { deleteSupplier, LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
@@ -15,7 +15,7 @@ import { useRestoreEntity } from "@/hooks/common";
 const Suppliers = () => {
   useValidateToken();
   const { data, isLoading, isRefetching } = useListAllSuppliers();
-  const restoreEntity = useRestoreEntity({ entity: ENTITIES.SUPPLIERS, key: LIST_ALL_SUPPLIER_QUERY_KEY });
+  const restoreEntity = useRestoreEntity({ entity: ENTITIES.SUPPLIERS, key: LIST_SUPPLIERS_QUERY_KEY });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();

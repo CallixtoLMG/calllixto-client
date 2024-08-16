@@ -40,6 +40,24 @@ export async function getAllEntity({ entity, url, params }) {
   return { [entity]: values };
 };
 
+export async function getEntityById({ id, url, entity, key = 'id' }) {
+  console.log({ id });
+  const getEntity = async (id) => {
+    try {
+      const { data } = await axios.get(`${url}/${id}`);
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  let value = (await localforage.getItem(`${config.APP_ENV}-${entity}`)).find((item) => item[key] === id);
+  if (value) {
+    return value;
+  }
+  return getEntity();
+};
+
 export function removeEntity(entity) {
   return localforage.removeItem(`${config.APP_ENV}-${entity}`);
 }

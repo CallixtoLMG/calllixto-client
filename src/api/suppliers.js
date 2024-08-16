@@ -3,12 +3,12 @@ import { PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-import { getAllEntity } from "./common";
+import { getAllEntity, getEntityById } from "./common";
 
 
 const SUPPLIER_URL = `${PATHS.SUPPLIERS}`;
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
-export const LIST_ALL_SUPPLIER_QUERY_KEY = 'listAllSuppliers';
+export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 
 export function create(supplier) {
   const body = {
@@ -32,7 +32,7 @@ export function deleteSupplier(id) {
 
 export function useListAllSuppliers() {
   const query = useQuery({
-    queryKey: [LIST_ALL_SUPPLIER_QUERY_KEY],
+    queryKey: [LIST_SUPPLIERS_QUERY_KEY],
     queryFn: () => getAllEntity({ entity: ENTITIES.SUPPLIERS, url: SUPPLIER_URL, params: { sort: 'id', order: true } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
@@ -41,18 +41,9 @@ export function useListAllSuppliers() {
 };
 
 export function useGetSupplier(id) {
-  const getSupplier = async (id) => {
-    try {
-      const { data } = await axios.get(`${SUPPLIER_URL}/${id}`);
-      return data?.supplier;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   const query = useQuery({
     queryKey: [GET_SUPPLIER_QUERY_KEY, id],
-    queryFn: () => getSupplier(id),
+    queryFn: () => getEntityById({ id, url: SUPPLIER_URL, entity: ENTITIES.SUPPLIERS }),
     retry: false,
     staleTime: TIME_IN_MS.ONE_HOUR,
   });

@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { GET_BUDGET_QUERY_KEY, cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
+import { cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useDolarExangeRate } from "@/api/external";
 import { useListAllProducts } from "@/api/products";
@@ -12,13 +12,11 @@ import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
 import { IconnedButton } from "@/components/common/buttons";
 import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Input, Menu } from "@/components/common/custom";
-import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
@@ -27,49 +25,33 @@ import { Dropdown } from "semantic-ui-react";
 
 const Budget = ({ params }) => {
   useValidateToken();
-  const { push } = useRouter();
+  const { role } = useUserContext();
   const { userData } = useUserContext();
-  const { data: budget, isLoading } = useGetBudget(params.id);
-  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({
-    attributes: [
-      PRODUCT_ATTRIBUTES.CODE,
-      PRODUCT_ATTRIBUTES.PRICE,
-      PRODUCT_ATTRIBUTES.NAME,
-      PRODUCT_ATTRIBUTES.COMMENTS,
-      PRODUCT_ATTRIBUTES.BRAND_NAME,
-      PRODUCT_ATTRIBUTES.SUPPLIER_NAME
-    ],
-    enabled: isBudgetDraft(budget?.state)
-  });
-  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({
-    attributes: [
-      CUSTOMERS_ATTRIBUTES.ADDRESSES,
-      CUSTOMERS_ATTRIBUTES.PHONES,
-      CUSTOMERS_ATTRIBUTES.ID,
-      CUSTOMERS_ATTRIBUTES.NAME
-    ],
-    enabled: budget?.state === BUDGET_STATES.DRAFT.id
-  });
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { role } = useUserContext();
-  const queryClient = useQueryClient();
+
+  const { push } = useRouter();
+  const { data: budget, isLoading } = useGetBudget(params.id);
+  const { data: productsData, isLoading: loadingProducts } = useListAllProducts();
+  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers();
+
   const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
   const [printPdfMode, setPrintPdfMode] = useState(BUDGET_PDF_FORMAT.CLIENT);
   const [customerData, setCustomerData] = useState();
-  const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
   const [dolarRate, setDolarRate] = useState(dolar);
-  const printRef = useRef();
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
   const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
   const [selectedContact, setSelectedContact] = useState({ phone: '', address: '' });
+
+  const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
+  const printRef = useRef();
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {
@@ -83,7 +65,7 @@ const Budget = ({ params }) => {
   }, [dolar, showDolarExangeRate, initialDolarRateSet]);
 
   const formatValue = (value) => {
-    let formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
   };
 
@@ -129,6 +111,7 @@ const Budget = ({ params }) => {
       push(PAGES.NOT_FOUND.BASE);
       return;
     }
+
     if (budget) {
       const calculatedSubtotal = getTotalSum(budget?.products);
       const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount);
@@ -324,7 +307,6 @@ const Budget = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto confirmado!');
         setIsModalConfirmationOpen(false);
         push(PAGES.BUDGETS.BASE);
@@ -333,6 +315,7 @@ const Budget = ({ params }) => {
       }
     },
   });
+
   const { mutate: mutateCancel, isPending: isPendingCancel } = useMutation({
     mutationFn: async (cancelReason) => {
       const cancelData = {
@@ -345,7 +328,6 @@ const Budget = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto anulado!');
         setIsModalCancelOpen(false);
         push(PAGES.BUDGETS.BASE);
@@ -362,7 +344,6 @@ const Budget = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto actualizado!');
         push(PAGES.BUDGETS.BASE);
       } else {

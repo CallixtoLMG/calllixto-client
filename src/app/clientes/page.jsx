@@ -1,5 +1,5 @@
 "use client";
-import { useListAllCustomers, LIST_ALL_CUSTOMERS_QUERY_KEY } from "@/api/customers";
+import { useListAllCustomers, LIST_CUSTOMERS_QUERY_KEY } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES, SHORTKEYS } from "@/constants";
@@ -13,7 +13,7 @@ import { ENTITIES } from "@/constants";
 const Customers = () => {
   useValidateToken();
   const { data, isLoading, isRefetching } = useListAllCustomers();
-  const restoreEntity = useRestoreEntity({ entity: ENTITIES.CUSTOMERS, key: LIST_ALL_CUSTOMERS_QUERY_KEY });
+  const restoreEntity = useRestoreEntity({ entity: ENTITIES.CUSTOMERS, key: LIST_CUSTOMERS_QUERY_KEY });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();

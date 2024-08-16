@@ -89,7 +89,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                 <RuledLabel title="Teléfono" message={errors?.phoneNumbers?.[0]?.message} required />
                 <PhoneContainer>
                   <Controller
-                    name={`phoneNumbers[0]`}
+                    name="phoneNumbers?.[0]"
                     control={control}
                     rules={{
                       validate: {

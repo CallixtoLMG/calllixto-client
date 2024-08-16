@@ -77,11 +77,11 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                   </FormField>
                   <FormField flex="1">
                     <Label>Dirección</Label>
-                    <Segment placeholder alignContent="center" height="40px">{!methods.getValues("pickUpInStore") ? customer?.addresses[0]?.address : PICK_UP_IN_STORE}</Segment>
+                    <Segment placeholder alignContent="center" height="40px">{!methods.getValues("pickUpInStore") ? customer?.addresses?.[0]?.address : PICK_UP_IN_STORE}</Segment>
                   </FormField>
                   <FormField width="200px">
                     <Label>Teléfono</Label>
-                    <Segment placeholder alignContent="center" height="40px">{formatedSimplePhone(customer?.phoneNumbers[0])}</Segment>
+                    <Segment placeholder alignContent="center" height="40px">{formatedSimplePhone(customer?.phoneNumbers?.[0])}</Segment>
                   </FormField>
                 </FieldsContainer>
                 <Payments

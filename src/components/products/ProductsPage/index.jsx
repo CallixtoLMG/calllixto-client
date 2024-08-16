@@ -1,6 +1,6 @@
 import { deleteProduct } from "@/api/products";
 import { Flex, Input } from "@/components/common/custom";
-import PrintBarCodes from "@/components/common/custom/BarCode";
+import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalDelete, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { OnlyPrint } from "@/components/layout";

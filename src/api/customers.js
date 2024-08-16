@@ -3,11 +3,11 @@ import { PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-import { getAllEntity } from "./common";
+import { getAllEntity, getEntityById } from "./common";
 
 const CUSTOMERS_URL = `${PATHS.CUSTOMERS}`;
 
-export const LIST_ALL_CUSTOMERS_QUERY_KEY = 'listAllCustomers';
+export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 
 export function create(customer) {
@@ -32,7 +32,7 @@ export function deleteCustomer(id) {
 
 export function useListAllCustomers() {
   const query = useQuery({
-    queryKey: [LIST_ALL_CUSTOMERS_QUERY_KEY],
+    queryKey: [LIST_CUSTOMERS_QUERY_KEY],
     queryFn: () => getAllEntity({ entity: ENTITIES.CUSTOMERS, url: CUSTOMERS_URL, params: { sort: 'name', order: true } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
@@ -41,18 +41,9 @@ export function useListAllCustomers() {
 };
 
 export function useGetCustomer(id) {
-  const getCustomer = async (id) => {
-    try {
-      const { data } = await axios.get(`${CUSTOMERS_URL}/${id}`);
-      return data?.customer;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   const query = useQuery({
     queryKey: [GET_CUSTOMER_QUERY_KEY, id],
-    queryFn: () => getCustomer(id),
+    queryFn: () => getEntityById({ id, url: CUSTOMERS_URL, entity: ENTITIES.CUSTOMERS }),
     retry: false,
     staleTime: TIME_IN_MS.ONE_HOUR,
   });

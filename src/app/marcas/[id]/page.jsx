@@ -1,11 +1,11 @@
 "use client";
-import { GET_BRAND_QUERY_KEY, edit, useGetBrand } from "@/api/brands";
+import { edit, useGetBrand } from "@/api/brands";
 import BrandForm from "@/components/brands/BrandForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
@@ -15,13 +15,12 @@ import { RULES } from "@/roles";
 
 const Brand = ({ params }) => {
   useValidateToken();
-  const { push } = useRouter();
-  const { data: brand, isLoading, isRefetching } = useGetBrand(params.id);
   const { role } = useUserContext();
-  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { push } = useRouter();
+  const { data: brand, isLoading } = useGetBrand(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
+  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
 
   useEffect(() => {
     resetActions();
@@ -39,7 +38,6 @@ const Brand = ({ params }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [GET_BRAND_QUERY_KEY, params.id] });
         toast.success('Marca actualizada!');
         push(PAGES.BRANDS.BASE);
       } else {
@@ -53,7 +51,7 @@ const Brand = ({ params }) => {
   };
 
   return (
-    <Loader active={isLoading || isRefetching}>
+    <Loader active={isLoading}>
       {Toggle}
       {isUpdating ? (
         <BrandForm brand={brand} onSubmit={mutate} isLoading={isPending} isUpdating />
