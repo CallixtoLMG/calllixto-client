@@ -12,12 +12,12 @@ export const now = () => {
   return date;
 };
 
-export const expirationDate = (createdAt, expirationOffsetDays) => {
-  const fechaCreacionParsed = dayjs(createdAt);
-  const fechaVencimiento = fechaCreacionParsed.add(expirationOffsetDays, 'day');
-  return fechaVencimiento.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+export const expirationDate = (expirationOffsetDays, createdAt = dayjs().format()) => {
+  const dateCreated = dayjs(createdAt);
+  const dueDate = dateCreated.add(expirationOffsetDays, 'day');
+  return dueDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
 };
-export const actualDate = dayjs();
+
 export const formatedDateAndHour = (date) => dayjs(date).format('DD-MM-YYYY - hh:mm A');
 export const formatedDateOnly = (date) => dayjs(date).format('DD-MM-YYYY');
 
@@ -34,16 +34,6 @@ export function encodeUri(value) {
   }
   return undefined;
 };
-
-export const formatedPricePdf = (number) => {
-  let modNumber = Number(number);
-  modNumber = Math.ceil(modNumber);
-  return modNumber.toLocaleString('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    minimumFractionDigits: 0,
-  });
-}
 
 export const formatProductCodePopup = (code, brand, supplier) => {
   const firstPart = code ? code?.substring(0, 2) : "";
@@ -79,10 +69,6 @@ export const getPrice = (product) => {
   return editablePrice || !fractionConfig?.active ? price : fractionConfig?.value * price;
 }
 
-export const cleanValue = (value) => {
-  return value.replace(/,/g, '');
-};
-
 export const removeDecimal = (value) => {
   return value.replace(/\./g, '');
 };
@@ -98,15 +84,15 @@ export const getSubtotal = (total, discountOrCharge) => {
   return subtotal;
 };
 
-export const formatedSimplePhone = (phoneNumbers) => {
-  if (!phoneNumbers) return '';
-  return `+54 ${phoneNumbers.areaCode} ${phoneNumbers.number}`;
+export const formatedSimplePhone = (phone) => {
+  if (!phone) return '';
+  return `+54 ${phone.areaCode} ${phone.number}`;
 };
 
 export const getPhonesForDisplay = (phoneNumbers) => {
   if (!phoneNumbers || phoneNumbers.length === 0) return { primaryPhone: '', additionalPhones: null };
 
-  const primaryPhone = `+54 ${phoneNumbers?.[0]?.areaCode} ${phoneNumbers?.[0]?.number}`;
+  const primaryPhone = formatedSimplePhone(phoneNumbers[0]);
   if (phoneNumbers.length === 1) return { primaryPhone, additionalPhones: null };
 
   const additionalPhones = phoneNumbers.slice(1);

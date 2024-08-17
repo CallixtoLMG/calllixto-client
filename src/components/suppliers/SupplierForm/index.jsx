@@ -19,6 +19,15 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
   }, [reset]);
 
   const handleCreate = (data) => {
+    if (!data.addresses.length) {
+      delete data.addresses;
+    }
+    if (!data.phoneNumbers.length) {
+      delete data.phoneNumbers;
+    }
+    if (!data.emails.length) {
+      delete data.emails;
+    }
     onSubmit(data);
   };
 
@@ -27,7 +36,7 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
+      <Form onSubmit={handleSubmit(handleCreate)} onKeyDown={preventSend}>
         <FieldsContainer>
           <FormField error={errors?.id?.message}>
             <RuledLabel title="Código" message={errors?.id?.message} required={!isUpdating} />

@@ -22,6 +22,15 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
   }, [reset]);
 
   const handleCreate = (data) => {
+    if (!data.addresses.length) {
+      delete data.addresses;
+    }
+    if (!data.phoneNumbers.length) {
+      delete data.phoneNumbers;
+    }
+    if (!data.emails.length) {
+      delete data.emails;
+    }
     onSubmit(data);
   };
 

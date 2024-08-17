@@ -115,7 +115,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         </FormField>
         <FormField >
           <Label>Fecha de vencimiento</Label>
-          <Segment placeholder>{formatedDateOnly(expirationDate(budget?.createdAt, budget?.expirationOffsetDays))}</Segment>
+          <Segment placeholder>{formatedDateOnly(expirationDate(budget?.expirationOffsetDays, budget?.createdAt))}</Segment>
         </FormField>
       </FieldsContainer>
       <FieldsContainer>

@@ -1,4 +1,4 @@
-import { validateEmail, validatePhone } from "@/utils";
+import { formatedSimplePhone, validateEmail, validatePhone } from "@/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
@@ -46,9 +46,7 @@ export const ContactFields = () => {
       setError({ phone: 'El área y el número deben sumar 10 dígitos.' });
       return;
     }
-    const phoneExists = phoneFields.some(
-      (phone) => phone.areaCode === phoneToAdd.areaCode && phone.number === phoneToAdd.number
-    );
+    const phoneExists = phoneFields.some(phone => formatedSimplePhone(phone) === formatedSimplePhone(phoneToAdd));
     if (phoneExists) {
       setError({ phone: 'El teléfono ya existe.' });
       return;
