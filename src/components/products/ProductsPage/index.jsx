@@ -1,4 +1,4 @@
-import { deleteProduct } from "@/api/products";
+import { deleteProduct, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
 import { Flex, Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalDelete, ModalMultiDelete } from "@/components/common/modals";
@@ -6,7 +6,7 @@ import { Filters, Table } from "@/components/common/table";
 import { OnlyPrint } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -19,6 +19,7 @@ const EMPTY_FILTERS = { code: '', name: '' };
 
 const ProductsPage = ({ products = [], role, isLoading }) => {
   const methods = useForm();
+  const queryClient = useQueryClient();
   const { handleSubmit, control, reset } = methods;
 
   const [showModal, setShowModal] = useState(false);
@@ -61,12 +62,13 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      const { data } = await deleteProduct(selectedProduct?.code);
-      return data;
+      const response = await deleteProduct(selectedProduct?.code);
+      return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Producto eliminado!');
+        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: 'all' });
         setShowModal(false);
       } else {
         toast.error(response.message);

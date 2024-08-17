@@ -1,10 +1,10 @@
-import { deleteBrand } from "@/api/brands";
+import { deleteBrand, LIST_BRANDS_QUERY_KEY } from "@/api/brands";
 import { Input } from "@/components/common/custom";
 import { ModalDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -15,6 +15,7 @@ const EMPTY_FILTERS = { id: '', name: '' };
 
 const BrandsPage = ({ brands = [], role, isLoading }) => {
   const { handleSubmit, control, reset } = useForm();
+  const queryClient = useQueryClient();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
@@ -54,12 +55,14 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      const { data } = await deleteBrand(selectedBrand?.id);
-      return data
+      const response = await deleteBrand(selectedBrand?.id);
+      return response;
     },
     onSuccess: (response) => {
+      console.log({ response });
       if (response.statusOk) {
         toast.success('Marca eliminada!');
+        queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY], refetchType: 'all' });
         setShowModal(false);
       } else {
         toast.error(response.message);

@@ -9,21 +9,41 @@ import {
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from "./axios";
-import { getAllEntity, getEntityById } from "./common";
+import { listItems, getItemById, createItem, deleteItem } from "./common";
 import { omit, chunk } from "lodash";
 
 const PRODUCTS_URL = `${PATHS.PRODUCTS}`;
-
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
 
-export function create(product) {
-  const body = {
-    ...product,
-    createdAt: now(),
-  };
-  return axios.post(PRODUCTS_URL, body);
+export function useListAllProducts() {
+  const query = useQuery({
+    queryKey: [LIST_PRODUCTS_QUERY_KEY],
+    queryFn: () => listItems({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, params: { sort: 'date' } }),
+    staleTime: TIME_IN_MS.ONE_DAY,
+  });
+
+  return query;
+};
+
+export function useGetProduct(id) {
+  const query = useQuery({
+    queryKey: [GET_PRODUCT_QUERY_KEY, id],
+    queryFn: () => getItemById({ id, url: PRODUCTS_URL, entity: ENTITIES.PRODUCTS, key: 'code' }),
+    retry: false,
+    staleTime: TIME_IN_MS.ONE_HOUR,
+  });
+
+  return query;
+};
+
+export function createProduct(product) {
+  return createItem({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, value: product });
+};
+
+export function deleteProduct(code) {
+  return deleteItem({ entity: ENTITIES.PRODUCTS, id: code, url: PRODUCTS_URL });
 };
 
 export function edit(product) {
@@ -34,23 +54,9 @@ export function edit(product) {
   return axios.put(`${PRODUCTS_URL}/${product.code}`, body);
 };
 
-export function deleteProduct(id) {
-  return axios.delete(`${PRODUCTS_URL}/${id}`);
-};
-
-export function useListAllProducts() {
-  const query = useQuery({
-    queryKey: [LIST_PRODUCTS_QUERY_KEY],
-    queryFn: () => getAllEntity({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, params: { sort: 'date' } }),
-    staleTime: TIME_IN_MS.ONE_DAY,
-  });
-
-  return query;
-};
-
 export function useProductsBySupplierId(supplierId) {
   const listBySupplierId = async () => {
-    const { products } = await getAllEntity({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, params: { sort: 'date' } });
+    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, params: { sort: 'date' } });
     return products.filter((product) => product.code.startsWith(supplierId));
   }
 
@@ -62,17 +68,6 @@ export function useProductsBySupplierId(supplierId) {
 
   return query;
 }
-
-export function useGetProduct(id) {
-  const query = useQuery({
-    queryKey: [GET_PRODUCT_QUERY_KEY, id],
-    queryFn: () => getEntityById({ id, url: PRODUCTS_URL, entity: ENTITIES.PRODUCTS, key: 'code' }),
-    retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
-  });
-
-  return query;
-};
 
 export async function createBatch(products) {
   const parsedProducts = products.map((product) => ({

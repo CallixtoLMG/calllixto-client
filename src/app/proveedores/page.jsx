@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { deleteSupplier, LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
+import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
@@ -61,7 +61,6 @@ const Suppliers = () => {
       isLoading={loading}
       suppliers={loading ? [] : suppliers}
       role={role}
-      onDelete={deleteSupplier}
     />
   );
 };

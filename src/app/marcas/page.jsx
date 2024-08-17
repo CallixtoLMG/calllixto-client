@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { LIST_BRANDS_QUERY_KEY, useListAllBrands } from "@/api/brands";
+import { LIST_BRANDS_QUERY_KEY, useListBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
@@ -13,7 +13,7 @@ import { useEffect, useMemo } from "react";
 
 const Brands = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListAllBrands();
+  const { data, isLoading, isRefetching } = useListBrands();
   const restoreEntity = useRestoreEntity({ entity: ENTITIES.BRANDS, key: LIST_BRANDS_QUERY_KEY });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();

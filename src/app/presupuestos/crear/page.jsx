@@ -1,15 +1,13 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useGetBudget } from "@/api/budgets";
+import { useGetBudget, LIST_BUDGETS_QUERY_KEY, createBudget } from "@/api/budgets";
 import { useListAllCustomers } from "@/api/customers";
 import { useListAllProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ATTRIBUTES as PRODUCTS_ATTRIBUTES } from "@/components/products/products.common";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
@@ -20,12 +18,13 @@ const CreateBudget = () => {
   const searchParams = useSearchParams();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
+  const queryClient = useQueryClient();
 
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
 
-  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({ attributes: PRODUCTS_ATTRIBUTES, enabled: true });
-  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({ attributes: [CUSTOMERS_ATTRIBUTES.ADDRESSES, CUSTOMERS_ATTRIBUTES.PHONES, CUSTOMERS_ATTRIBUTES.ID, CUSTOMERS_ATTRIBUTES.NAME], enabled: true });
+  const { data: productsData, isLoading: loadingProducts } = useListAllProducts();
+  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
 
   const products = useMemo(() => productsData?.products, [productsData]);
@@ -56,12 +55,13 @@ const CreateBudget = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (budget) => {
-      // const { data } = await create(budget);
-      // return data;
+      const response = await createBudget(budget);
+      return response;
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       if (response.statusOk) {
         toast.success('Presupuesto creado!');
+        await queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY], refetchType: 'all' });
         push(PAGES.BUDGETS.BASE);
       } else {
         toast.error(response.message);

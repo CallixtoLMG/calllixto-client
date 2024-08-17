@@ -1,10 +1,10 @@
-import { deleteSupplier } from "@/api/suppliers";
+import { deleteSupplier, LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { Input } from "@/components/common/custom";
 import { ModalDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -13,8 +13,9 @@ import { SUPPLIERS_COLUMNS } from "../suppliers.common";
 
 const EMPTY_FILTERS = { id: '', name: '' };
 
-const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
+const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
   const { handleSubmit, control, reset } = useForm();
+  const queryClient = useQueryClient();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
@@ -49,12 +50,13 @@ const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      const { data } = await deleteSupplier(selectedSupplier?.id);
-      return data;
+      const response = await deleteSupplier(selectedSupplier.id);
+      return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        toast.success('Marca eliminada!');
+        toast.success('Proveedor eliminado!');
+        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY], refetchType: 'all' });
         setShowModal(false);
       } else {
         toast.error(response.message);

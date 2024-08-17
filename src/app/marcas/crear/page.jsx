@@ -1,10 +1,10 @@
 "use client";
-import { create } from "@/api/brands";
+import { createBrand, LIST_BRANDS_QUERY_KEY } from "@/api/brands";
 import BrandForm from "@/components/brands/BrandForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
@@ -14,6 +14,7 @@ const CreateBrand = () => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const { push } = useRouter();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     resetActions();
@@ -26,12 +27,13 @@ const CreateBrand = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (brand) => {
-      const { data } = await create(brand);
-      return data;
+      const response = await createBrand(brand);
+      return response;
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       if (response.statusOk) {
         toast.success('Marca creada!');
+        await queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY], refetchType: 'all' });
         push(PAGES.BRANDS.BASE);
       } else {
         toast.error(response.message);

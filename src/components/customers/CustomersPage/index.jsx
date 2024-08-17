@@ -1,9 +1,9 @@
-import { deleteCustomer } from '@/api/customers';
+import { deleteCustomer, LIST_CUSTOMERS_QUERY_KEY } from '@/api/customers';
 import { Input } from '@/components/common/custom';
 import { ModalDelete } from '@/components/common/modals';
 import { Filters, Table } from '@/components/common/table';
 import { PAGES } from "@/constants";
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from "react";
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
@@ -14,6 +14,7 @@ const EMPTY_FILTERS = { name: '' };
 
 const CustomersPage = ({ customers = [], isLoading }) => {
   const { handleSubmit, control, reset } = useForm();
+  const queryClient = useQueryClient();
 
   const [showModal, setShowModal] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState(null);
@@ -41,12 +42,13 @@ const CustomersPage = ({ customers = [], isLoading }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      const { data } = await deleteCustomer(selectedCustomer?.id);
-      return data
+      const response = await deleteCustomer(selectedCustomer?.id);
+      return response
     },
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Cliente eliminado!');
+        queryClient.invalidateQueries({ queryKey: [LIST_CUSTOMERS_QUERY_KEY], refetchType: 'all' });
         setShowModal(false);
       } else {
         toast.error(response.message);
