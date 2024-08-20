@@ -43,7 +43,7 @@ export function createProduct(product) {
 };
 
 export function deleteProduct(code) {
-  return deleteItem({ entity: ENTITIES.PRODUCTS, id: code, url: PRODUCTS_URL });
+  return deleteItem({ entity: ENTITIES.PRODUCTS, id: code, url: PRODUCTS_URL, key: 'code' });
 };
 
 export function edit(product) {

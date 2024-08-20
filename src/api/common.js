@@ -77,11 +77,11 @@ export async function createItem({ entity, value, url }) {
   return data;
 }
 
-export async function deleteItem({ entity, id, url }) {
+export async function deleteItem({ entity, id, url, key }) {
   const { data } = await axios.delete(`${url}/${id}`);
 
   if (data.statusOk) {
-    await removeStorageItem({ entity, id });
+    await removeStorageItem({ entity, id, key });
   }
 
   return data;
