@@ -1,5 +1,5 @@
 "use client";
-import { LIST_BUDGETS_QUERY_KEY, useListAllBudgets } from "@/api/budgets";
+import { LIST_BUDGETS_QUERY_KEY, useListBudgets } from "@/api/budgets";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
@@ -11,7 +11,7 @@ import { useRestoreEntity } from "@/hooks/common";
 
 const Budgets = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListAllBudgets();
+  const { data, isLoading, isRefetching } = useListBudgets();
   const restoreEntity = useRestoreEntity({ entity: ENTITIES.BUDGETS, key: LIST_BUDGETS_QUERY_KEY });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();

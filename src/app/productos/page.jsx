@@ -1,6 +1,6 @@
 "use client"
 import { useUserContext } from "@/User";
-import { LIST_PRODUCTS_QUERY_KEY, useListAllProducts } from "@/api/products";
+import { LIST_PRODUCTS_QUERY_KEY, useListProducts } from "@/api/products";
 import { DropdownItem, Icon, IconedButton } from "@/components/common/custom";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
@@ -26,7 +26,7 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { data, isLoading, isRefetching } = useListAllProducts();
+  const { data, isLoading, isRefetching } = useListProducts();
   const restoreEntity = useRestoreEntity({ entity: ENTITIES.PRODUCTS, key: LIST_PRODUCTS_QUERY_KEY });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();

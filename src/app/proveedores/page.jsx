@@ -9,12 +9,12 @@ import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
-import { useListAllSuppliers } from "../../api/suppliers";
+import { useListSuppliers } from "../../api/suppliers";
 import { useRestoreEntity } from "@/hooks/common";
 
 const Suppliers = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListAllSuppliers();
+  const { data, isLoading, isRefetching } = useListSuppliers();
   const restoreEntity = useRestoreEntity({ entity: ENTITIES.SUPPLIERS, key: LIST_SUPPLIERS_QUERY_KEY });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();

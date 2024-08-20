@@ -11,10 +11,10 @@ import { Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { Modal, ModalHeader, WaitMsg } from "./styles";
 import { IconnedButton } from "@/components/common/buttons";
-import { useListAllProducts, createBatch, editBatch } from "@/api/products";
+import { useListProducts, createBatch, editBatch } from "@/api/products";
 
 const BatchImport = ({ isCreating }) => {
-  const { data, isLoading: loadingProducts } = useListAllProducts();
+  const { data, isLoading: loadingProducts } = useListProducts();
   const products = useMemo(() => data?.products, [data?.products]);
   const { getBlacklist } = useUserContext();
   const { handleSubmit, control, reset, setValue, watch } = useForm();

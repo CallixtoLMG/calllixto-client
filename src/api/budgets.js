@@ -9,7 +9,7 @@ const BUDGETS_URL = `${PATHS.BUDGETS}`;
 export const LIST_BUDGETS_QUERY_KEY = 'lisAllBudgets';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 
-export function useListAllBudgets() {
+export function useListBudgets() {
   const query = useQuery({
     queryKey: [LIST_BUDGETS_QUERY_KEY],
     queryFn: () => listItems({ entity: ENTITIES.BUDGETS, url: BUDGETS_URL }),

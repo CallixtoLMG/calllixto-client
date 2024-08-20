@@ -9,7 +9,7 @@ const CUSTOMERS_URL = `${PATHS.CUSTOMERS}`;
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 
-export function useListAllCustomers() {
+export function useListCustomers() {
   const query = useQuery({
     queryKey: [LIST_CUSTOMERS_QUERY_KEY],
     queryFn: () => listItems({ entity: ENTITIES.CUSTOMERS, url: CUSTOMERS_URL, params: { sort: 'name', order: true } }),

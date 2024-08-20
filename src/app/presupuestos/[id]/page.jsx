@@ -1,9 +1,9 @@
 "use client";
 import { useUserContext } from "@/User";
 import { cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
-import { useListAllCustomers } from "@/api/customers";
+import { useListCustomers } from "@/api/customers";
 import { useDolarExangeRate } from "@/api/external";
-import { useListAllProducts } from "@/api/products";
+import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import BudgetView from "@/components/budgets/BudgetView";
 import ModalCancel from "@/components/budgets/ModalCancelBudget";
@@ -32,8 +32,8 @@ const Budget = ({ params }) => {
 
   const { push } = useRouter();
   const { data: budget, isLoading } = useGetBudget(params.id);
-  const { data: productsData, isLoading: loadingProducts } = useListAllProducts();
-  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers();
+  const { data: productsData, isLoading: loadingProducts } = useListProducts();
+  const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
 
   const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });

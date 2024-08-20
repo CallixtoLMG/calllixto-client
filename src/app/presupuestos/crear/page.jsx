@@ -1,8 +1,8 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useGetBudget, LIST_BUDGETS_QUERY_KEY, createBudget } from "@/api/budgets";
-import { useListAllCustomers } from "@/api/customers";
-import { useListAllProducts } from "@/api/products";
+import { useListCustomers } from "@/api/customers";
+import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
@@ -23,8 +23,8 @@ const CreateBudget = () => {
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
 
-  const { data: productsData, isLoading: loadingProducts } = useListAllProducts();
-  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers();
+  const { data: productsData, isLoading: loadingProducts } = useListProducts();
+  const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
 
   const products = useMemo(() => productsData?.products, [productsData]);

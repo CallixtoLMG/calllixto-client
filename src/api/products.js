@@ -17,7 +17,7 @@ export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
 
-export function useListAllProducts() {
+export function useListProducts() {
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_QUERY_KEY],
     queryFn: () => listItems({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, params: { sort: 'date' } }),

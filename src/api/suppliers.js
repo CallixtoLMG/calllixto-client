@@ -10,7 +10,7 @@ const SUPPLIER_URL = `${PATHS.SUPPLIERS}`;
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 
-export function useListAllSuppliers() {
+export function useListSuppliers() {
   const query = useQuery({
     queryKey: [LIST_SUPPLIERS_QUERY_KEY],
     queryFn: () => listItems({ entity: ENTITIES.SUPPLIERS, url: SUPPLIER_URL, params: { sort: 'id', order: true } }),
