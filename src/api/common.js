@@ -92,7 +92,7 @@ export async function addStorageItem({ entity, value }) {
   await localforage.setItem(`${config.APP_ENV}-${entity}`, [value, ...values]);
 }
 
-export async function removeStorageItem({ entity, id }) {
+export async function removeStorageItem({ entity, id, key = 'id' }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, values.filter((item) => item.id !== id));
+  await localforage.setItem(`${config.APP_ENV}-${entity}`, values.filter((item) => item[key] !== id));
 }
