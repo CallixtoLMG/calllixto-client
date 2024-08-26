@@ -31,7 +31,7 @@ export function useGetBudget(id) {
 };
 
 export function createBudget(budget) {
-  return createItem({ entity: ENTITIES.BUDGETS, url: BUDGETS_URL, value: budget });
+  return createItem({ entity: ENTITIES.BUDGETS, url: BUDGETS_URL, value: budget, responseEntity: 'budget' });
 };
 
 export function edit(budget) {

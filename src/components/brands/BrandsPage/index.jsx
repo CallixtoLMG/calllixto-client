@@ -59,7 +59,6 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
       return response;
     },
     onSuccess: (response) => {
-      console.log({ response });
       if (response.statusOk) {
         toast.success('Marca eliminada!');
         queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY], refetchType: 'all' });

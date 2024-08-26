@@ -9,7 +9,7 @@ const SUPPLIERS_COLUMNS = [
     id: 1,
     title: "Id",
     width: 1,
-    value: (supplier) => supplier.id
+    value: (supplier) => supplier?.id
   },
   {
     id: 2,

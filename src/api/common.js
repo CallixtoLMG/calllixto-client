@@ -63,7 +63,7 @@ export async function getItemById({ id, url, entity, key = 'id' }) {
   return getEntity();
 }
 
-export async function createItem({ entity, value, url }) {
+export async function createItem({ entity, value, url, responseEntity }) {
   const body = {
     ...value,
     createdAt: now()
@@ -71,7 +71,7 @@ export async function createItem({ entity, value, url }) {
   const { data } = await axios.post(url, body);
 
   if (data.statusOk) {
-    await addStorageItem({ entity, value });
+    await addStorageItem({ entity, value: data[responseEntity] });
   }
 
   return data;

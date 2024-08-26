@@ -31,7 +31,7 @@ export function useGetCustomer(id) {
 };
 
 export function createCustomer(customer) {
-  return createItem({ entity: ENTITIES.CUSTOMERS, url: CUSTOMERS_URL, value: customer });
+  return createItem({ entity: ENTITIES.CUSTOMERS, url: CUSTOMERS_URL, value: customer, responseEntity: 'customer' });
 };
 
 export function deleteCustomer(id) {

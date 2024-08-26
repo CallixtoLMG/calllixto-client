@@ -39,7 +39,7 @@ export function useGetProduct(id) {
 };
 
 export function createProduct(product) {
-  return createItem({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, value: product });
+  return createItem({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, value: product, responseEntity: 'product' });
 };
 
 export function deleteProduct(code) {

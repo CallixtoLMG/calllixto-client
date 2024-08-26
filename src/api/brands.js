@@ -31,7 +31,7 @@ export function useGetBrand(id) {
 };
 
 export function createBrand(brand) {
-  return createItem({ entity: ENTITIES.BRANDS, url: BRANDS_URL, value: brand });
+  return createItem({ entity: ENTITIES.BRANDS, url: BRANDS_URL, value: brand, responseEntity: 'brand' });
 };
 
 export function deleteBrand(id) {
