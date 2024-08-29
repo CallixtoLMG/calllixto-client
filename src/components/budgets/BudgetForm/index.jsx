@@ -577,7 +577,7 @@ const BudgetForm = ({
           <FormField width="200px">
             <RuledLabel title="Teléfono" message={shouldError && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
             {!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? (
-              <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumber?.[0])}</Segment>
+              <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers?.[0])}</Segment>
             ) : (
               <Dropdown
                 selection

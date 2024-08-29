@@ -3,7 +3,7 @@ import { PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from '@tanstack/react-query';
 import axios from './axios';
-import { createItem, deleteItem, listItems, getItemById } from './common';
+import { createItem, deleteItem, getItemById, listItems } from './common';
 
 const BRANDS_URL = `${PATHS.BRANDS}`;
 export const GET_BRAND_QUERY_KEY = 'getBrand';
@@ -31,7 +31,7 @@ export function useGetBrand(id) {
 };
 
 export function createBrand(brand) {
-  return createItem({ entity: ENTITIES.BRANDS, url: BRANDS_URL, value: brand, responseEntity: 'brand' });
+  return createItem({ entity: ENTITIES.BRANDS, url: BRANDS_URL, value: brand, responseEntity: ENTITIES.BRAND });
 };
 
 export function deleteBrand(id) {

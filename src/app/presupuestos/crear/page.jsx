@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useGetBudget, LIST_BUDGETS_QUERY_KEY, createBudget } from "@/api/budgets";
+import { LIST_BUDGETS_QUERY_KEY, createBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
@@ -46,12 +46,12 @@ const CreateBudget = () => {
     text: product.name,
   })), [products]);
 
-  const mappedCustomers = useMemo(() => customers?.map(customer => ({
-    ...customer,
-    key: customer.name,
-    value: customer.name,
-    text: customer.name,
-  })), [customers]);
+  // const mappedCustomers = useMemo(() => customers?.map(customer => ({
+  //   ...customer,
+  //   key: customer.name,
+  //   value: customer.name,
+  //   text: customer.name,
+  // })), [customers]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (budget) => {
@@ -84,7 +84,7 @@ const CreateBudget = () => {
       <BudgetForm
         onSubmit={mutate}
         products={mappedProducts}
-        customers={mappedCustomers}
+        customers={customers}
         user={userData}
         budget={clonedBudget}
         isCloning={!!clonedBudget}
