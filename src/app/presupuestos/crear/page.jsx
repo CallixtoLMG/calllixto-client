@@ -46,13 +46,6 @@ const CreateBudget = () => {
     text: product.name,
   })), [products]);
 
-  // const mappedCustomers = useMemo(() => customers?.map(customer => ({
-  //   ...customer,
-  //   key: customer.name,
-  //   value: customer.name,
-  //   text: customer.name,
-  // })), [customers]);
-
   const { mutate, isPending } = useMutation({
     mutationFn: async (budget) => {
       const response = await createBudget(budget);
