@@ -21,13 +21,11 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const methods = useForm();
   const queryClient = useQueryClient();
   const { handleSubmit, control, reset } = methods;
-
   const [showModal, setShowModal] = useState(false);
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState({});
   const [filters, setFilters] = useState(EMPTY_FILTERS);
-
   const printRef = useRef();
 
   const handlePrint = useReactToPrint({
@@ -94,21 +92,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
 
   const clearSelection = () => {
     setSelectedProducts({});
-  };
-
-  // const selectAll = () => {
-  //   const newProducts = products.reduce((acc, product) => acc[product.code] ? acc : { ...acc, [product.code]: product }, {});
-  //   setSelectedProducts(newProducts);
-  // };
-
-  const selectAll = () => {
-    const newProducts = currentPageElements.reduce((acc, product) => {
-      if (!acc[product.code]) {
-        acc[product.code] = product;
-      }
-      return acc;
-    }, {});
-    setSelectedProducts(newProducts);
   };
 
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
@@ -197,7 +180,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           onSelectionChange={onSelectionChange}
           selectionActions={selectionActions}
           clearSelection={clearSelection}
-          selectAll={selectAll}
           onFilter={onFilter}
           paginate
         />

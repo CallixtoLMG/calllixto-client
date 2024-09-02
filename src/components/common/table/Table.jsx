@@ -24,14 +24,12 @@ const CustomTable = ({
   basic,
   $wrap,
   clearSelection,
-  selectAll,
   paginate,
   onFilter = () => true,
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
-  // const allSelected = useMemo(() => Object.keys(selection)?.length === elements.length, [selection, elements]);
   const [activePage, setActivePage] = useState(1);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
   const pages = useMemo(() => Math.ceil(filteredElements.length / DEFAULT_PAGE_SIZE), [filteredElements]);
@@ -49,27 +47,20 @@ const CustomTable = ({
     setHydrated(true);
   }, []);
 
-  // useEffect(() => {
-  //   setActivePage(1);
-  // }, [filteredElements]);
-
   useEffect(() => {
     if (activePage > pages) {
-      setActivePage(1); // Solo restablecer si la página actual está fuera del rango
+      setActivePage(1);
     }
-  }, [filteredElements, pages, activePage]);
+  }, [pages, activePage]);
 
-  // const handleToggleAll = () => {
-  //   if (allSelected) {
-  //     clearSelection();
-  //   } else {
-  //     selectAll();
-  //   }
-  // };
+  const handlePageChange = (e, { activePage }) => {
+    clearSelection();
+    setActivePage(activePage);
+  };
 
   const handleToggleAll = () => {
     if (allSelected) {
-      clearSelection(); // Esto debería limpiar la selección
+      clearSelection();
     } else {
       currentPageElements.forEach(product => {
         if (!selection[product[mainKey]]) {
@@ -85,7 +76,7 @@ const CustomTable = ({
         <PaginationContainer>
           <Pagination
             activePage={activePage}
-            onPageChange={(e, { activePage }) => setActivePage(activePage)}
+            onPageChange={handlePageChange}
             siblingRange={2}
             boundaryRange={2}
             firstItem={null}
