@@ -208,7 +208,8 @@ const BudgetForm = ({
       icon: 'trash',
       color: 'red',
       onClick: (element, index) => removeProduct(index),
-      tooltip: 'Eliminar'
+      tooltip: 'Eliminar',
+      width:"100%"
     },
     {
       id: 2,
