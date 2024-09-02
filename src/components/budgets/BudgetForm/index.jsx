@@ -216,7 +216,7 @@ const BudgetForm = ({
       icon: 'add',
       color: 'green',
       onClick: (element, index) => handleOpenCommentModal(element, index),
-      tooltip: 'Comentario para remito'
+      tooltip: 'Comentarios'
     },
   ];
 
