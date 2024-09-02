@@ -142,10 +142,15 @@ export const DEFAULT_PAGE_SIZE = 20;
 
 export const ENTITIES = {
   CUSTOMERS: 'customers',
+  CUSTOMER: 'customer',
   SUPPLIERS: 'suppliers',
+  SUPPLIER: 'supplier',
   BRANDS: 'brands',
+  BRAND: 'brand',
   PRODUCTS: 'products',
+  PRODUCT: 'product',
   BUDGETS: 'budgets',
+  BUDGET: 'budget',
 };
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";

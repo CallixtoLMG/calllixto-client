@@ -8,9 +8,9 @@ import {
 } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
+import { chunk, omit } from "lodash";
 import axios from "./axios";
-import { listItems, getItemById, createItem, deleteItem } from "./common";
-import { omit, chunk } from "lodash";
+import { createItem, deleteItem, getItemById, listItems } from "./common";
 
 const PRODUCTS_URL = `${PATHS.PRODUCTS}`;
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
@@ -39,7 +39,7 @@ export function useGetProduct(id) {
 };
 
 export function createProduct(product) {
-  return createItem({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, value: product, responseEntity: 'product' });
+  return createItem({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, value: product, responseEntity: ENTITIES.PRODUCT });
 };
 
 export function deleteProduct(code) {

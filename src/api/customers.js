@@ -3,7 +3,7 @@ import { PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-import { createItem, listItems, getItemById, deleteItem } from "./common";
+import { createItem, deleteItem, getItemById, listItems } from "./common";
 
 const CUSTOMERS_URL = `${PATHS.CUSTOMERS}`;
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
@@ -31,7 +31,7 @@ export function useGetCustomer(id) {
 };
 
 export function createCustomer(customer) {
-  return createItem({ entity: ENTITIES.CUSTOMERS, url: CUSTOMERS_URL, value: customer, responseEntity: 'customer' });
+  return createItem({ entity: ENTITIES.CUSTOMERS, url: CUSTOMERS_URL, value: customer, responseEntity: ENTITIES.CUSTOMER });
 };
 
 export function deleteCustomer(id) {
