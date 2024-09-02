@@ -1,4 +1,5 @@
 import { deleteProduct, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
+import { IconnedButton } from "@/components/common/buttons";
 import { Flex, Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalDelete, ModalMultiDelete } from "@/components/common/modals";
@@ -13,7 +14,6 @@ import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
-import { IconnedButton } from "@/components/common/buttons";
 
 const EMPTY_FILTERS = { code: '', name: '' };
 
@@ -96,8 +96,18 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     setSelectedProducts({});
   };
 
+  // const selectAll = () => {
+  //   const newProducts = products.reduce((acc, product) => acc[product.code] ? acc : { ...acc, [product.code]: product }, {});
+  //   setSelectedProducts(newProducts);
+  // };
+
   const selectAll = () => {
-    const newProducts = products.reduce((acc, product) => acc[product.code] ? acc : { ...acc, [product.code]: product }, {});
+    const newProducts = currentPageElements.reduce((acc, product) => {
+      if (!acc[product.code]) {
+        acc[product.code] = product;
+      }
+      return acc;
+    }, {});
     setSelectedProducts(newProducts);
   };
 

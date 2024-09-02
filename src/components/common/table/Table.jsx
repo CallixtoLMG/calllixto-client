@@ -1,12 +1,12 @@
 import { Loader } from "@/components/layout";
+import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Checkbox, Header, Icon, Pagination } from "semantic-ui-react";
 import { PopupActions } from "../buttons";
+import { CenteredFlex } from "../custom";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, Table, TableHeader, TableRow } from "./styles";
-import { CenteredFlex } from "../custom";
-import { DEFAULT_PAGE_SIZE } from "@/constants";
 
 const CustomTable = ({
   isLoading,
@@ -31,8 +31,7 @@ const CustomTable = ({
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
-  const allSelected = useMemo(() => Object.keys(selection)?.length === elements.length, [selection, elements]);
-
+  // const allSelected = useMemo(() => Object.keys(selection)?.length === elements.length, [selection, elements]);
   const [activePage, setActivePage] = useState(1);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
   const pages = useMemo(() => Math.ceil(filteredElements.length / DEFAULT_PAGE_SIZE), [filteredElements]);
@@ -42,19 +41,41 @@ const CustomTable = ({
     return filteredElements.slice(startIndex, endIndex);
   }, [activePage, filteredElements]);
 
+  const allSelected = useMemo(() => {
+    return currentPageElements.length > 0 && currentPageElements.every(product => selection[product[mainKey]]);
+  }, [currentPageElements, selection]);
+
   useEffect(() => {
     setHydrated(true);
   }, []);
 
+  // useEffect(() => {
+  //   setActivePage(1);
+  // }, [filteredElements]);
+
   useEffect(() => {
-    setActivePage(1);
-  }, [filteredElements]);
+    if (activePage > pages) {
+      setActivePage(1); // Solo restablecer si la página actual está fuera del rango
+    }
+  }, [filteredElements, pages, activePage]);
+
+  // const handleToggleAll = () => {
+  //   if (allSelected) {
+  //     clearSelection();
+  //   } else {
+  //     selectAll();
+  //   }
+  // };
 
   const handleToggleAll = () => {
     if (allSelected) {
-      clearSelection();
+      clearSelection(); // Esto debería limpiar la selección
     } else {
-      selectAll();
+      currentPageElements.forEach(product => {
+        if (!selection[product[mainKey]]) {
+          onSelectionChange(product);
+        }
+      });
     }
   };
 
