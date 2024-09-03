@@ -10,7 +10,7 @@ const Iconned = ({
   disabled,
   loading,
   width = 'fit-content',
-  height = "inherit",
+  height,
   submit
 }) => {
 

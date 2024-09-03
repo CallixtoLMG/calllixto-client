@@ -4,13 +4,14 @@ import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { useRestoreEntity } from "@/hooks/common";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
+import { downloadExcel, formatedSimplePhone } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { useListSuppliers } from "../../api/suppliers";
-import { useRestoreEntity } from "@/hooks/common";
 
 const Suppliers = () => {
   useValidateToken();
@@ -33,6 +34,19 @@ const Suppliers = () => {
       await restoreEntity();
     };
 
+    const prepareSupplierDataForExcel = (suppliers) => {
+      const headers = ["ID", 'Nombre', 'Dirección', 'Teléfono'];
+
+      const supplierData = suppliers.map(supplier => [
+        supplier.id,
+        supplier.name,
+        supplier.addresses?.[0]?.address || 'Sin Dirección',
+        formatedSimplePhone(supplier.phoneNumbers?.[0] || ''),
+      ]);
+
+      return [headers, ...supplierData];
+    };
+
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
@@ -48,8 +62,22 @@ const Suppliers = () => {
       color: 'grey',
       onClick: handleRestore,
       text: 'Actualizar',
+      disabled: loading,
+      width: "fit-content",
+    });
+    actions.push({
+      id: 3,
+      icon: 'file excel',
+      color: 'gray',
+      width: "fit-content",
+      onClick: () => {
+        const formattedData = prepareSupplierDataForExcel(suppliers);
+        downloadExcel(formattedData, "Lista de Proveedores");
+      },
+      text: 'Proveedores',
       disabled: loading
     });
+
     setActions(actions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);

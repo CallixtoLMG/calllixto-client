@@ -8,6 +8,7 @@ import { useRestoreEntity } from "@/hooks/common";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
+import { downloadExcel } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
@@ -32,6 +33,18 @@ const Brands = () => {
       await restoreEntity();
     };
 
+    const prepareBrandDataForExcel = (brands) => {
+      const headers = ['ID', 'Nombre', 'Comentarios'];
+
+      const brandData = brands.map(brand => [
+        brand.id,
+        brand.name,
+        brand.comments || 'Sin Comentarios',
+      ]);
+
+      return [headers, ...brandData];
+    };
+
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
@@ -47,10 +60,23 @@ const Brands = () => {
       color: 'grey',
       onClick: handleRestore,
       text: 'Actualizar',
+      disabled: loading,
+      width: "fit-content",
+    });
+
+    actions.push({
+      id: 3,
+      icon: 'file excel',
+      color: 'gray',
+      onClick: () => {
+        const formattedData = prepareBrandDataForExcel(brands);
+        downloadExcel(formattedData, "Lista de Marcas");
+      },
+      text: 'Marcas',
       disabled: loading
     });
     setActions(actions);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEYS.ENTER);
