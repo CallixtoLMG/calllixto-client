@@ -1,8 +1,8 @@
 import { IconnedButton } from "@/components/common/buttons";
-import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Icon, Modal, Transition } from "semantic-ui-react";
+import { Modal, Transition } from "semantic-ui-react";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const { control, handleSubmit, formState: { isDirty }, reset } = useForm();
@@ -18,7 +18,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         open={isModalOpen}
         onClose={() => onClose(false)}
       >
-        <Modal.Header>Comentario para remito</Modal.Header>
+        <Modal.Header>Comentarios del producto</Modal.Header>
         <Modal.Content>
           <Flex flexDirection="column" rowGap="15px">
             <FieldsContainer>

@@ -70,8 +70,8 @@ const ActionsContainer = styled.td`
     return $header ? 'translateX(calc(100%))' : "translateY(-50%) translateX(calc(100%))";
   }} !important;
   transition: all 0.1s ease-in-out!important;
-  opacity: ${({ $header }) => $header ? "1" : "0"};
-  visibility: ${({ $header }) => $header ? "visible" : "hidden"};
+  opacity: ${({ $header, $open }) => $header || $open ? "1" : "0"};
+  visibility: ${({ $header, $open }) => $header || $open ? "visible" : "hidden"};
   border: none!important;
   padding: ${({ $header }) => $header && "0!important"};
   padding-left: 5px !important;

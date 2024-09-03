@@ -1,7 +1,7 @@
+import { config } from "@/config";
 import { encodeUri, now } from "@/utils";
 import axios from './axios';
 import localforage from "./local-forage";
-import { config } from "@/config";
 
 export function removeStorageEntity(entity) {
   return localforage.removeItem(`${config.APP_ENV}-${entity}`);
@@ -75,7 +75,7 @@ export async function createItem({ entity, value, url, responseEntity }) {
   }
 
   return data;
-}
+};
 
 export async function deleteItem({ entity, id, url, key }) {
   const { data } = await axios.delete(`${url}/${id}`);
@@ -85,7 +85,7 @@ export async function deleteItem({ entity, id, url, key }) {
   }
 
   return data;
-}
+};
 
 export async function addStorageItem({ entity, value }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);

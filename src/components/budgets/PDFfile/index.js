@@ -149,13 +149,13 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             </Title>
           </DataContainer>
         )}
-        {(!!comments?.length || budget?.comments) && (
+        {(budget?.comments?.trim() || (!dispatchPdf && comments?.length > 0)) && (
           <DataContainer width="100%">
-            <Title as="h4" alignSelf="left" $slim>Comentarios</Title>
+            <Title as="h4" alignSelf="left" textAlignLast="left" $slim>Comentarios</Title>
             <Divider />
-            <Title as="h4" alignSelf="left" minHeight="30px">
+            <Title as="h4" alignSelf="left" textAlignLast="left" minHeight="30px">
               {budget?.comments}
-              {!!comments.length && !dispatchPdf && (
+              {comments?.length > 0 && !dispatchPdf && (
                 <Box marginTop="2px">
                   <strong>Envío:</strong>
                   <List style={{ margin: '0' }}>

@@ -3,7 +3,7 @@ import { PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-import { listItems, getItemById, createItem, deleteItem } from "./common";
+import { createItem, deleteItem, getItemById, listItems } from "./common";
 
 
 const SUPPLIER_URL = `${PATHS.SUPPLIERS}`;
@@ -32,7 +32,7 @@ export function useGetSupplier(id) {
 };
 
 export function createSupplier(supplier) {
-  return createItem({ entity: ENTITIES.SUPPLIERS, url: SUPPLIER_URL, value: supplier, responseEntity: 'supplier' });
+  return createItem({ entity: ENTITIES.SUPPLIERS, url: SUPPLIER_URL, value: supplier, responseEntity: ENTITIES.SUPPLIERS });
 };
 
 export function deleteSupplier(id) {
