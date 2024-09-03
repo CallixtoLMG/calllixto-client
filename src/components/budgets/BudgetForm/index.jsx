@@ -208,14 +208,15 @@ const BudgetForm = ({
       icon: 'trash',
       color: 'red',
       onClick: (element, index) => removeProduct(index),
-      tooltip: 'Eliminar'
+      tooltip: 'Eliminar',
+      width:"100%"
     },
     {
       id: 2,
       icon: 'add',
       color: 'green',
       onClick: (element, index) => handleOpenCommentModal(element, index),
-      tooltip: 'Comentario para remito'
+      tooltip: 'Comentarios'
     },
   ];
 

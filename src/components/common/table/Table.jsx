@@ -1,12 +1,12 @@
 import { Loader } from "@/components/layout";
+import { DEFAULT_PAGE_SIZE } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Checkbox, Header, Icon, Pagination } from "semantic-ui-react";
-import { PopupActions } from "../buttons";
+import { IconnedButton, PopupActions } from "../buttons";
+import { CenteredFlex } from "../custom";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, Table, TableHeader, TableRow } from "./styles";
-import { CenteredFlex } from "../custom";
-import { DEFAULT_PAGE_SIZE } from "@/constants";
 
 const CustomTable = ({
   isLoading,
@@ -34,6 +34,7 @@ const CustomTable = ({
   const allSelected = useMemo(() => Object.keys(selection)?.length === elements.length, [selection, elements]);
 
   const [activePage, setActivePage] = useState(1);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
   const pages = useMemo(() => Math.ceil(filteredElements.length / DEFAULT_PAGE_SIZE), [filteredElements]);
   const currentPageElements = useMemo(() => {
@@ -93,12 +94,13 @@ const CustomTable = ({
               <HeaderCell key={`header_${header.id}`} $basic={basic}>{header.title}</HeaderCell>
             ))}
             {!!Object.keys(selection).length && (
-              <ActionsContainer $header>
+              <ActionsContainer $header $open={isPopupOpen}>
                 <InnerActionsContainer $header>
                   <PopupActions
                     position="right center"
                     trigger={<Button icon circular color="yellow" size="mini"><Icon name="cog" /></Button>}
                     buttons={selectionActions}
+                    onToggleOpen={setIsPopupOpen}
                   />
                 </InnerActionsContainer>
               </ActionsContainer>
@@ -140,9 +142,27 @@ const CustomTable = ({
                           </LinkCell>
                         ))}
                         {!!actions.length && (
-                          <ActionsContainer deleteButtonInside={deleteButtonInside}>
+                          <ActionsContainer deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
                             <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
-                              <Actions actions={actions} element={element} />
+                              {actions.length > 1 ? (
+                                <PopupActions
+                                  position="left center"
+                                  trigger={<Button icon circular color="blue" size="mini"><Icon name="cog" /></Button>}
+                                  buttons={actions.map((action, idx) => (
+                                    <IconnedButton
+                                      key={idx}
+                                      icon={action.icon}
+                                      color={action.color}
+                                      onClick={() => action.onClick(element, index)}
+                                      text={action.tooltip}
+                                      width={action.width}
+                                    />
+                                  ))}
+                                  onToggleOpen={setIsPopupOpen}
+                                />
+                              ) : (
+                                <Actions actions={actions} element={element} />
+                              )}
                             </InnerActionsContainer>
                           </ActionsContainer>
                         )}
@@ -163,9 +183,27 @@ const CustomTable = ({
                         </Cell>
                       ))}
                       {!!actions.length && (
-                        <ActionsContainer deleteButtonInside={deleteButtonInside}>
+                        <ActionsContainer deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
                           <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
-                            <Actions actions={actions} element={element} index={index} />
+                            {actions.length > 1 ? (
+                              <PopupActions
+                                position="left center"
+                                trigger={<Button type="button" icon circular color="orange" size="mini"><Icon name="cog" /></Button>}
+                                buttons={actions.map((action, idx) => (
+                                  <IconnedButton
+                                    key={idx}
+                                    icon={action.icon}
+                                    color={action.color}
+                                    onClick={() => action.onClick(element, index)}
+                                    text={action.tooltip}
+                                    width={action.width}
+                                  />
+                                ))}
+                                onToggleOpen={setIsPopupOpen}
+                              />
+                            ) : (
+                              <Actions actions={actions} element={element} index={index} />
+                            )}
                           </InnerActionsContainer>
                         </ActionsContainer>
                       )}
