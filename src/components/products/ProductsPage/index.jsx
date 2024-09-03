@@ -1,4 +1,5 @@
 import { deleteProduct, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
+import { IconnedButton } from "@/components/common/buttons";
 import { Flex, Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalDelete, ModalMultiDelete } from "@/components/common/modals";
@@ -13,7 +14,6 @@ import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
-import { IconnedButton } from "@/components/common/buttons";
 
 const EMPTY_FILTERS = { code: '', name: '' };
 
@@ -21,13 +21,11 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const methods = useForm();
   const queryClient = useQueryClient();
   const { handleSubmit, control, reset } = methods;
-
   const [showModal, setShowModal] = useState(false);
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState({});
   const [filters, setFilters] = useState(EMPTY_FILTERS);
-
   const printRef = useRef();
 
   const handlePrint = useReactToPrint({
@@ -95,10 +93,13 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const clearSelection = () => {
     setSelectedProducts({});
   };
-
-  const selectAll = () => {
-    const newProducts = products.reduce((acc, product) => acc[product.code] ? acc : { ...acc, [product.code]: product }, {});
-    setSelectedProducts(newProducts);
+  
+  const selectAllCurrentPageElements = (currentPageElements) => {
+    const newSelectedProducts = {};
+    currentPageElements.forEach(product => {
+      newSelectedProducts[product.code] = product; 
+    });
+    setSelectedProducts(newSelectedProducts);
   };
 
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
@@ -187,7 +188,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           onSelectionChange={onSelectionChange}
           selectionActions={selectionActions}
           clearSelection={clearSelection}
-          selectAll={selectAll}
+          selectAllCurrentPageElements={selectAllCurrentPageElements} 
           onFilter={onFilter}
           paginate
         />

@@ -24,15 +24,13 @@ const CustomTable = ({
   basic,
   $wrap,
   clearSelection,
-  selectAll,
+  selectAllCurrentPageElements, 
   paginate,
   onFilter = () => true,
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
-  const allSelected = useMemo(() => Object.keys(selection)?.length === elements.length, [selection, elements]);
-
   const [activePage, setActivePage] = useState(1);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
@@ -43,19 +41,30 @@ const CustomTable = ({
     return filteredElements.slice(startIndex, endIndex);
   }, [activePage, filteredElements]);
 
+  const allSelected = useMemo(() => {
+    return currentPageElements.length > 0 && currentPageElements.every(product => selection[product[mainKey]]);
+  }, [currentPageElements, selection]);
+
   useEffect(() => {
     setHydrated(true);
   }, []);
 
   useEffect(() => {
-    setActivePage(1);
-  }, [filteredElements]);
+    if (activePage > pages) {
+      setActivePage(1);
+    }
+  }, [pages, activePage]);
+
+  const handlePageChange = (e, { activePage }) => {
+    clearSelection();
+    setActivePage(activePage);
+  };
 
   const handleToggleAll = () => {
     if (allSelected) {
       clearSelection();
     } else {
-      selectAll();
+      selectAllCurrentPageElements(currentPageElements);
     }
   };
 
@@ -65,7 +74,7 @@ const CustomTable = ({
         <PaginationContainer>
           <Pagination
             activePage={activePage}
-            onPageChange={(e, { activePage }) => setActivePage(activePage)}
+            onPageChange={handlePageChange}
             siblingRange={2}
             boundaryRange={2}
             firstItem={null}
