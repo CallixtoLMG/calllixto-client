@@ -24,6 +24,7 @@ const CustomTable = ({
   basic,
   $wrap,
   clearSelection,
+  selectAllCurrentPageElements, 
   paginate,
   onFilter = () => true,
 }) => {
@@ -62,11 +63,7 @@ const CustomTable = ({
     if (allSelected) {
       clearSelection();
     } else {
-      currentPageElements.forEach(product => {
-        if (!selection[product[mainKey]]) {
-          onSelectionChange(product);
-        }
-      });
+      selectAllCurrentPageElements(currentPageElements);
     }
   };
 

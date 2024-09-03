@@ -93,6 +93,14 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const clearSelection = () => {
     setSelectedProducts({});
   };
+  
+  const selectAllCurrentPageElements = (currentPageElements) => {
+    const newSelectedProducts = {};
+    currentPageElements.forEach(product => {
+      newSelectedProducts[product.code] = product; 
+    });
+    setSelectedProducts(newSelectedProducts);
+  };
 
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
     mutationFn: async () => {
@@ -180,6 +188,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           onSelectionChange={onSelectionChange}
           selectionActions={selectionActions}
           clearSelection={clearSelection}
+          selectAllCurrentPageElements={selectAllCurrentPageElements} 
           onFilter={onFilter}
           paginate
         />
