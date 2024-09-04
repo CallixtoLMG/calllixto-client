@@ -164,37 +164,37 @@ export const BUDGET_PDF_FORMAT = {
 export const BUDGET_STATES = {
   CONFIRMED: {
     id: 'CONFIRMED',
-    title: 'Confirmar',
+    title: 'Confirmados',
     color: 'green',
     icon: 'check',
   },
   PENDING: {
     id: 'PENDING',
-    title: 'Pendiente',
+    title: 'Pendientes',
     color: 'orange',
     icon: 'hourglass half',
   },
   DRAFT: {
     id: 'DRAFT',
-    title: 'Borrador',
+    title: 'Borradores',
     color: 'teal',
     icon: 'erase',
   },
   CANCELLED: {
     id: 'CANCELLED',
-    title: 'Anulado',
+    title: 'Anulados',
     color: 'red',
     icon: 'ban',
   },
   EXPIRED: {
     id: 'EXPIRED',
-    title: 'Expirado',
+    title: 'Expirados',
     color: 'brown',
     icon: 'expired',
   },
   INACTIVE: {
     id: 'INACTIVE',
-    title: 'Indefinido',
+    title: 'Indefinidos',
     color: 'grey',
     icon: 'ban',
   }

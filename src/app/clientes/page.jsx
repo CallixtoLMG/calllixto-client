@@ -24,21 +24,23 @@ const Customers = () => {
 
   const customers = useMemo(() => data?.customers, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
+
+  const prepareCustomerDataForExcel = useMemo(() => {
+    if (!customers) return [];  
+    const headers = ['Nombre', 'Dirección', 'Teléfono'];
+
+    const customerData = customers.map(customer => [
+      customer.name,
+      customer.addresses?.map(address => address.address).join(' , '),
+      customer.phoneNumbers?.map(phone => formatedSimplePhone(phone)).join(' , ')
+    ]);
+
+    return [headers, ...customerData];
+  }, [customers]);
+
   useEffect(() => {
     const handleRestore = async () => {
       await restoreEntity();
-    };
-
-    const prepareCustomerDataForExcel = (customers) => {
-      const headers = ['Nombre', 'Dirección', 'Teléfono'];
-
-      const customerData = customers.map(customer => [
-        customer.name,
-        customer.addresses?.[0]?.address || 'Sin Dirección',
-        formatedSimplePhone(customer.phoneNumbers?.[0] || ''),
-      ]);
-
-      return [headers, ...customerData];
     };
 
     const actions = [
@@ -63,8 +65,7 @@ const Customers = () => {
         icon: 'file excel',
         color: 'gray',
         onClick: () => {
-          const formattedData = prepareCustomerDataForExcel(customers);
-          downloadExcel(formattedData, "Lista de Clientes");
+          downloadExcel(prepareCustomerDataForExcel, "Lista de Clientes");
         },
         text: 'Clientes',
         disabled: loading

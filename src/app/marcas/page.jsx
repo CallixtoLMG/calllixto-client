@@ -28,21 +28,23 @@ const Brands = () => {
   const brands = useMemo(() => data?.brands, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
+  const prepareBrandDataForExcel = useMemo(() => {
+    if (!brands) return [];  
+
+    const headers = ['ID', 'Nombre', 'Comentarios'];
+
+    const brandData = brands.map(brand => [
+      brand.id,
+      brand.name,
+      brand.comments,
+    ]);
+
+    return [headers, ...brandData];
+  }, [brands]);
+
   useEffect(() => {
     const handleRestore = async () => {
       await restoreEntity();
-    };
-
-    const prepareBrandDataForExcel = (brands) => {
-      const headers = ['ID', 'Nombre', 'Comentarios'];
-
-      const brandData = brands.map(brand => [
-        brand.id,
-        brand.name,
-        brand.comments || 'Sin Comentarios',
-      ]);
-
-      return [headers, ...brandData];
     };
 
     const actions = RULES.canCreate[role] ? [
@@ -69,8 +71,7 @@ const Brands = () => {
       icon: 'file excel',
       color: 'gray',
       onClick: () => {
-        const formattedData = prepareBrandDataForExcel(brands);
-        downloadExcel(formattedData, "Lista de Marcas");
+        downloadExcel(prepareBrandDataForExcel, "Lista de Marcas");
       },
       text: 'Marcas',
       disabled: loading

@@ -25,23 +25,66 @@ const Budgets = () => {
   const budgets = useMemo(() => data?.budgets, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
+  const stateTranslations = {
+    INACTIVE: 'Inactivo',
+    CONFIRMED: 'Confirmado',
+    PENDING: "Pendiente",
+    EXPIRED: "Expirado",
+    CANCELLED: "Cancelado",
+    UNDEFINED: "Indefinido",
+    DRAFT: "Borrador"
+  };
+
+  const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
+
+  const handleNaN = (value, defaultValue = 'Valor incorrecto') => isNaN(value) ? defaultValue : formatedPrice(value);
+
+  const prepareBudgetDataForExcel = useMemo(() => {
+    if (!budgets) return [];
+
+    let maxProductCount = 1;
+    const budgetData = budgets.map(budget => {
+
+      const translatedState = stateTranslations[budget.state] || budget.state;
+
+      maxProductCount = Math.max(maxProductCount, budget.products.length);
+
+      const budgetRow = [
+        handleUndefined(budget.id),
+        handleUndefined(translatedState),
+        handleUndefined(budget.customer.name),
+        handleUndefined(formatedDateAndHour(budget.createdAt)),
+        handleNaN(getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)),
+        `% ${budget.globalDiscount ?? 0}`,
+        `% ${budget.additionalCharge ?? 0}`,
+        handleUndefined(budget.seller)
+      ];
+
+
+      const productData = budget.products.map(product => {
+        let productName = handleUndefined(product.name);
+
+        if (product.fractionConfig?.active) {
+          productName = `${product.name} x ${product.fractionConfig.value} ${product.fractionConfig.unit}`;
+        }
+        return `Código: ${handleUndefined(product.code)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${handleNaN(product.price)}, Descuento: % ${product.discount ?? 0}, Total: ${handleNaN(product.price - (product.price * product.discount / 100))}`;
+      });
+
+      while (productData.length < maxProductCount) {
+        productData.push('');
+      }
+
+      return [...budgetRow, ...productData];
+    });
+
+    const productsHeaders = Array.from(Array(maxProductCount).keys()).map((index) => `Producto ${index + 1}`);
+    const headers = ['ID', 'Estado', 'Cliente', 'Fecha', "Total", "Descuento", "Cargo adicional", "Vendedor", ...productsHeaders];
+    return [headers, ...budgetData];
+  }, [budgets]);
+
   useEffect(() => {
     const handleRestore = async () => {
       await restoreEntity();
-    };
-
-    const prepareBudgetDataForExcel = (budgets) => {
-      const headers = ['ID', 'Cliente', 'Fecha', "Total", "Vendedor"];
-
-      const budgetData = budgets.map(budget => [
-        budget.id,
-        budget.customer.name,
-        formatedDateAndHour(budget.createdAt),
-        formatedPrice(getTotalSum(budget.products, budget.globalDiscount)),
-        budget.seller
-      ]);
-
-      return [headers, ...budgetData];
     };
 
     const actions = [
@@ -67,8 +110,7 @@ const Budgets = () => {
         color: 'gray',
         width: "fit-content",
         onClick: () => {
-          const formattedData = prepareBudgetDataForExcel(budgets);
-          downloadExcel(formattedData, "Lista de Presupuestos");
+          downloadExcel(prepareBudgetDataForExcel, "Lista de Presupuestos");
         },
         text: 'Presupuetos',
         disabled: loading
@@ -79,7 +121,7 @@ const Budgets = () => {
   }, [push, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
-
+  
   return (
     <BudgetsPage isLoading={loading} budgets={loading ? [] : budgets} />
   )

@@ -34,7 +34,6 @@ const Budget = ({ params }) => {
   const { data: budget, isLoading } = useGetBudget(params.id);
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
-
   const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
   const [printPdfMode, setPrintPdfMode] = useState(BUDGET_PDF_FORMAT.CLIENT);
@@ -49,7 +48,6 @@ const Budget = ({ params }) => {
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
   const [selectedContact, setSelectedContact] = useState({ phone: '', address: '' });
-
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const printRef = useRef();
 

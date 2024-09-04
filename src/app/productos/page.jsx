@@ -40,24 +40,26 @@ const Products = () => {
   const products = useMemo(() => data?.products, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
+  const prepareProductDataForExcel = useMemo(() => {
+    if (!products) return [];
+    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Comentarios'];
+
+    const productData = products.map(product => [
+      product.code,
+      product.name,
+      product.brandName,
+      product.supplierName,
+      formatedPrice(product.price),
+      product.comments
+    ]);
+
+    return [headers, ...productData];
+  },[products]);
+
+
   useEffect(() => {
     const handleRestore = async () => {
       await restoreEntity();
-    };
-
-    const prepareProductDataForExcel = (products) => {
-      const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Comentarios'];
-
-      const productData = products.map(product => [
-        product.code,
-        product.name,
-        product.brandName,
-        product.supplierName,
-        formatedPrice(product.price),
-        product.comments
-      ]);
-
-      return [headers, ...productData];
     };
 
     const actions = RULES.canCreate[role] ? [
@@ -89,8 +91,7 @@ const Products = () => {
                 <BatchImport key="batch-update" />
               </DropdownItem>
               <DropdownItem onClick={() => {
-                const formattedData = prepareProductDataForExcel(products);
-                downloadExcel(formattedData, "Lista de Productos");
+                downloadExcel(prepareProductDataForExcel, "Lista de Productos");
               }}>
                 <Icon name="download" />Productos
               </DropdownItem>

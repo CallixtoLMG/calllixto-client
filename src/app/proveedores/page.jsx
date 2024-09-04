@@ -29,23 +29,26 @@ const Suppliers = () => {
   const suppliers = useMemo(() => data?.suppliers, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
+  const prepareCustomerDataForExcel = useMemo(() => {
+    if (!suppliers) return [];
+    const headers = ["ID", 'Nombre', 'Dirección', 'Teléfono'];
+
+    const supplierData = suppliers.map(supplier => [
+      supplier.id,
+      supplier.name,
+      supplier.addresses?.map(address => address.address).join(' , '),
+      supplier.phoneNumbers?.map(phone => formatedSimplePhone(phone)).join(' , ')
+    ]);
+
+    return [headers, ...supplierData];
+  }, [suppliers]);
+
+
   useEffect(() => {
     const handleRestore = async () => {
       await restoreEntity();
     };
 
-    const prepareSupplierDataForExcel = (suppliers) => {
-      const headers = ["ID", 'Nombre', 'Dirección', 'Teléfono'];
-
-      const supplierData = suppliers.map(supplier => [
-        supplier.id,
-        supplier.name,
-        supplier.addresses?.[0]?.address || 'Sin Dirección',
-        formatedSimplePhone(supplier.phoneNumbers?.[0] || ''),
-      ]);
-
-      return [headers, ...supplierData];
-    };
 
     const actions = RULES.canCreate[role] ? [
       {
@@ -71,8 +74,7 @@ const Suppliers = () => {
       color: 'gray',
       width: "fit-content",
       onClick: () => {
-        const formattedData = prepareSupplierDataForExcel(suppliers);
-        downloadExcel(formattedData, "Lista de Proveedores");
+        downloadExcel(prepareCustomerDataForExcel, "Lista de Proveedores");
       },
       text: 'Proveedores',
       disabled: loading

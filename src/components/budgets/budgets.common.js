@@ -49,7 +49,7 @@ const BUDGETS_COLUMNS = [
     id: 4,
     title: "Total",
     width: 2,
-    value: (budget) => <Price value={(getTotalSum(budget.products, budget.globalDiscount))} />
+    value: (budget) => <Price value={(getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge))} />
   },
   {
     id: 5,
