@@ -27,7 +27,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const [selectedProducts, setSelectedProducts] = useState({});
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const printRef = useRef();
-
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     removeAfterPrint: true,

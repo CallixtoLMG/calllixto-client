@@ -11,7 +11,7 @@ import { useRestoreEntity } from "@/hooks/common";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { downloadExcel } from "@/utils";
+import { downloadExcel, formatedPrice } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Dropdown } from "semantic-ui-react";
@@ -39,6 +39,23 @@ const Products = () => {
 
   const products = useMemo(() => data?.products, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
+
+  const prepareProductDataForExcel = useMemo(() => {
+    if (!products) return [];
+    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Comentarios'];
+
+    const productData = products.map(product => [
+      product.code,
+      product.name,
+      product.brandName,
+      product.supplierName,
+      formatedPrice(product.price),
+      product.comments
+    ]);
+
+    return [headers, ...productData];
+  },[products]);
+
 
   useEffect(() => {
     const handleRestore = async () => {
@@ -73,15 +90,20 @@ const Products = () => {
               <DropdownItem>
                 <BatchImport key="batch-update" />
               </DropdownItem>
+              <DropdownItem onClick={() => {
+                downloadExcel(prepareProductDataForExcel, "Lista de Productos");
+              }}>
+                <Icon name="download" />Productos
+              </DropdownItem>
               <DropdownItem onClick={() => downloadExcel(mockData, "Ejemplo de tabla")}>
-                <Icon name="download" />Plantilla
+                <Icon name="file excel outline" />Plantilla
               </DropdownItem>
             </Dropdown.Menu>
           </Dropdown>
         )
       },
       {
-        id: 5,
+        id: 3,
         icon: 'ban',
         color: 'red',
         onClick: () => setOpen(true),
@@ -89,15 +111,16 @@ const Products = () => {
       },
     ] : [];
     actions.push({
-      id: 6,
+      id: 4,
       icon: 'undo',
       color: 'grey',
       onClick: handleRestore,
       text: 'Actualizar',
-      disabled: loading
+      disabled: loading,
+      width: "fit-content",
     });
     setActions(actions);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.PRODUCTS.CREATE), SHORTKEYS.ENTER);

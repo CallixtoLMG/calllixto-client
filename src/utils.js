@@ -73,10 +73,15 @@ export const removeDecimal = (value) => {
   return value.replace(/\./g, '');
 };
 
-export const getTotalSum = (products, discount = 0) => {
-  const totalSum = products?.reduce((a, b) => a + getTotal(b), 0);
-  const discountedTotal = totalSum - (totalSum * (discount / 100));
-  return discountedTotal;
+export const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
+
+export const handleNaN = (value, defaultValue = 'Valor incorrecto') => isNaN(value) ? defaultValue : formatedPrice(value);
+
+export const getTotalSum = (products, discount = 0, additionalCharge = 0) => {
+  const subtotal = products?.reduce((a, b) => a + getTotal(b), 0);
+  const discountedsubtotal = subtotal - (subtotal * (discount / 100));
+  const total = discountedsubtotal + (discountedsubtotal * (additionalCharge / 100));
+  return total;
 };
 
 export const getSubtotal = (total, discountOrCharge) => {

@@ -4,13 +4,14 @@ import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { useRestoreEntity } from "@/hooks/common";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
+import { downloadExcel, formatedSimplePhone } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { useListSuppliers } from "../../api/suppliers";
-import { useRestoreEntity } from "@/hooks/common";
 
 const Suppliers = () => {
   useValidateToken();
@@ -28,10 +29,26 @@ const Suppliers = () => {
   const suppliers = useMemo(() => data?.suppliers, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
+  const prepareSupplierDataForExcel = useMemo(() => {
+    if (!suppliers) return [];
+    const headers = ["ID", 'Nombre', 'Dirección', 'Teléfono'];
+
+    const supplierData = suppliers.map(supplier => [
+      supplier.id,
+      supplier.name,
+      supplier.addresses?.map(address => address.address).join(' , '),
+      supplier.phoneNumbers?.map(phone => formatedSimplePhone(phone)).join(' , ')
+    ]);
+
+    return [headers, ...supplierData];
+  }, [suppliers]);
+
+
   useEffect(() => {
     const handleRestore = async () => {
       await restoreEntity();
     };
+
 
     const actions = RULES.canCreate[role] ? [
       {
@@ -48,8 +65,21 @@ const Suppliers = () => {
       color: 'grey',
       onClick: handleRestore,
       text: 'Actualizar',
+      disabled: loading,
+      width: "fit-content",
+    });
+    actions.push({
+      id: 3,
+      icon: 'file excel',
+      color: 'gray',
+      width: "fit-content",
+      onClick: () => {
+        downloadExcel(prepareSupplierDataForExcel, "Lista de Proveedores");
+      },
+      text: 'Proveedores',
       disabled: loading
     });
+
     setActions(actions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
