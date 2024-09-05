@@ -1,19 +1,19 @@
 "use client";
+import { useUserContext } from "@/User";
 import { edit, useGetProduct } from "@/api/products";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { PAGES } from "@/constants";
+import { PAGES, PRODUCTS_STATES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
+import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import ProductView from "../../../components/products/ProductView";
-import { useUserContext } from "@/User";
-import { RULES } from "@/roles";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -31,8 +31,13 @@ const Product = ({ params }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const stateTitle = product?.state ? PRODUCTS_STATES[product.state]?.singularTitle || PRODUCTS_STATES.INACTIVE.singularTitle : PRODUCTS_STATES.INACTIVE.singularTitle;
+  const stateColor = product?.state ? PRODUCTS_STATES[product.state]?.color || PRODUCTS_STATES.INACTIVE.color : PRODUCTS_STATES.INACTIVE.color;
   useEffect(() => {
-    setLabels(['Productos', product?.name]);
+    setLabels([
+      PAGES.PRODUCTS.NAME,
+      product?.id ? { id: product.id, title: stateTitle, color: stateColor } : null
+    ].filter(Boolean));
   }, [setLabels, product]);
 
   const { mutate, isPending } = useMutation({
@@ -72,7 +77,7 @@ const Product = ({ params }) => {
       ];
       setActions(actions);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, setActions]);
 
   return (

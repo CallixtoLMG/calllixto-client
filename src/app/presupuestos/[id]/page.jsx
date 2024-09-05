@@ -119,7 +119,7 @@ const Budget = ({ params }) => {
       setSubtotalAfterDiscount(calculatedSubtotalAfterDiscount);
       setTotal(calculatedFinalTotal);
 
-      const stateTitle = BUDGET_STATES[budget.state]?.title || BUDGET_STATES.INACTIVE.title;
+      const stateTitle = BUDGET_STATES[budget.state]?.singularTitle || BUDGET_STATES.INACTIVE.singularTitle;
       const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([
         PAGES.BUDGETS.NAME,

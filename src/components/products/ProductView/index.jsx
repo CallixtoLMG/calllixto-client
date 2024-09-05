@@ -1,8 +1,7 @@
 "use client";
 import { IconnedButton } from "@/components/common/buttons";
-import { FieldsContainer, FormField, IconedButton, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { MEASSURE_UNITS } from "@/constants";
-import { Icon } from "semantic-ui-react";
 
 const ProductView = ({ product }) => {
   return (

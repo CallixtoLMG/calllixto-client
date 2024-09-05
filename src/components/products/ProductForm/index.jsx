@@ -133,7 +133,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             )}
           />
         </FormField>
-
       </FieldsContainer>
       <FieldsContainer rowGap="5px">
         <FormField width="20%" error={errors?.code?.message}>

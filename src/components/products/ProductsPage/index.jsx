@@ -1,31 +1,46 @@
 import { deleteProduct, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
-import { Flex, Input } from "@/components/common/custom";
+import { Dropdown, Flex, Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalDelete, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { OnlyPrint } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { PAGES, PRODUCTS_STATES } from "@/constants";
 import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Form } from "semantic-ui-react";
+import { Form, Label } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
 
-const EMPTY_FILTERS = { code: '', name: '' };
+const DEFAULT_STATE = { key: 'ALL', value: 'ALL', text: 'Todos' };
+const EMPTY_FILTERS = { code: '', name: '', state: DEFAULT_STATE.value };
+const STATE_OPTIONS = [
+  DEFAULT_STATE,
+  ...Object.entries(PRODUCTS_STATES).map(([key, value]) => (
+    {
+      key,
+      text: (
+        <Flex alignItems="center" justifyContent="space-between">
+          {value.title}&nbsp;<Label color={value.color} circular empty />
+        </Flex>
+      ),
+      value: key
+    }))
+];
 
 const ProductsPage = ({ products = [], role, isLoading }) => {
   const methods = useForm();
   const queryClient = useQueryClient();
-  const { handleSubmit, control, reset } = methods;
+  const { handleSubmit, control, reset, watch } = methods;
   const [showModal, setShowModal] = useState(false);
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState({});
   const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const [watchState] = watch(['state']);
   const printRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -38,6 +53,10 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     }
 
     if (filters.code && !product.code.toLowerCase().includes(filters.code.toLowerCase())) {
+      return false;
+    }
+
+    if (filters.state && !product.state.toLowerCase().includes(filters.state.toLowerCase()) && filters.state !== 'ALL') {
       return false;
     }
 
@@ -92,11 +111,11 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const clearSelection = () => {
     setSelectedProducts({});
   };
-  
+
   const selectAllCurrentPageElements = (currentPageElements) => {
     const newSelectedProducts = {};
     currentPageElements.forEach(product => {
-      newSelectedProducts[product.code] = product; 
+      newSelectedProducts[product.code] = product;
     });
     setSelectedProducts(newSelectedProducts);
   };
@@ -148,6 +167,26 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           <Form onSubmit={handleSubmit(setFilters)}>
             <Filters clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
               <Controller
+                name="state"
+                control={control}
+                render={({ field: { onChange, ...rest } }) => (
+                  <Dropdown
+                    {...rest}
+                    $maxWidth
+                    top="10px"
+                    height="35px"
+                    minHeight="35px"
+                    selection
+                    options={STATE_OPTIONS}
+                    defaultValue={STATE_OPTIONS[0].key}
+                    onChange={(e, { value }) => {
+                      onChange(value);
+                      setFilters({ ...filters, state: value });
+                    }}
+                  />
+                )}
+              />
+              <Controller
                 name="code"
                 control={control}
                 render={({ field }) => (
@@ -187,8 +226,9 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           onSelectionChange={onSelectionChange}
           selectionActions={selectionActions}
           clearSelection={clearSelection}
-          selectAllCurrentPageElements={selectAllCurrentPageElements} 
+          selectAllCurrentPageElements={selectAllCurrentPageElements}
           onFilter={onFilter}
+          color={PRODUCTS_STATES[watchState]?.color}
           paginate
         />
         <ModalDelete

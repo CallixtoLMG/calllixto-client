@@ -165,39 +165,76 @@ export const BUDGET_STATES = {
   CONFIRMED: {
     id: 'CONFIRMED',
     title: 'Confirmados',
+    singularTitle: 'Confirmado',
     color: 'green',
     icon: 'check',
   },
   PENDING: {
     id: 'PENDING',
     title: 'Pendientes',
+    singularTitle: 'Pendiente',
     color: 'orange',
     icon: 'hourglass half',
   },
   DRAFT: {
     id: 'DRAFT',
     title: 'Borradores',
+    singularTitle: 'Borrador',
     color: 'teal',
     icon: 'erase',
   },
   CANCELLED: {
     id: 'CANCELLED',
     title: 'Anulados',
+    singularTitle: 'Anulado',
     color: 'red',
     icon: 'ban',
   },
   EXPIRED: {
     id: 'EXPIRED',
     title: 'Expirados',
+    singularTitle: 'Expirado',
     color: 'brown',
     icon: 'expired',
   },
   INACTIVE: {
     id: 'INACTIVE',
     title: 'Indefinidos',
+    singularTitle: 'Indefinido',
     color: 'grey',
     icon: 'ban',
   }
+};
+
+export const PRODUCTS_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  DELETED: {
+    id: 'DELETED',
+    title: 'Borrados',
+    singularTitle: 'Borrado',
+    color: 'red',
+    icon: 'ban',
+  },
+  OUT_OF_STOCK: {
+    id: 'OUT_OF_STOCK',
+    title: 'Sin stock',
+    singularTitle: 'Sin stock',
+    color: 'orange',
+    icon: 'expired',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
 };
 
 export const SHORTKEYS = {
