@@ -6,7 +6,7 @@ import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
 import { useRestoreEntity } from "@/hooks/common";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
-import { downloadExcel, formatedDateAndHour, formatedPrice, getTotalSum } from "@/utils";
+import { downloadExcel, formatedDateAndHour, getTotal, getTotalSum, handleNaN, handleUndefined } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
@@ -34,10 +34,6 @@ const Budgets = () => {
     UNDEFINED: "Indefinido",
     DRAFT: "Borrador"
   };
-
-  const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
-
-  const handleNaN = (value, defaultValue = 'Valor incorrecto') => isNaN(value) ? defaultValue : formatedPrice(value);
 
   const prepareBudgetDataForExcel = useMemo(() => {
     if (!budgets) return [];
@@ -67,7 +63,7 @@ const Budgets = () => {
         if (product.fractionConfig?.active) {
           productName = `${product.name} x ${product.fractionConfig.value} ${product.fractionConfig.unit}`;
         }
-        return `Código: ${handleUndefined(product.code)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${handleNaN(product.price)}, Descuento: % ${product.discount ?? 0}, Total: ${handleNaN(product.price - (product.price * product.discount / 100))}`;
+        return `Código: ${handleUndefined(product.code)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${handleNaN(product.price)}, Descuento: % ${product.discount ?? 0}, Total: ${handleNaN(getTotal(product))};`;
       });
 
       while (productData.length < maxProductCount) {

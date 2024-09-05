@@ -29,7 +29,7 @@ const Suppliers = () => {
   const suppliers = useMemo(() => data?.suppliers, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const prepareCustomerDataForExcel = useMemo(() => {
+  const prepareSupplierDataForExcel = useMemo(() => {
     if (!suppliers) return [];
     const headers = ["ID", 'Nombre', 'Dirección', 'Teléfono'];
 
@@ -74,7 +74,7 @@ const Suppliers = () => {
       color: 'gray',
       width: "fit-content",
       onClick: () => {
-        downloadExcel(prepareCustomerDataForExcel, "Lista de Proveedores");
+        downloadExcel(prepareSupplierDataForExcel, "Lista de Proveedores");
       },
       text: 'Proveedores',
       disabled: loading
