@@ -1,7 +1,7 @@
 import { FormField, Label, TextArea } from "@/components/common/custom";
 import { Controller } from "react-hook-form";
 
-export const ControlledComments = ({ control }) => {
+export const ControlledComments = ({ control, disabled }) => {
   return (
     <FormField width="100%">
       <Label>Comentarios</Label>
@@ -13,6 +13,7 @@ export const ControlledComments = ({ control }) => {
             {...field}
             maxLength="2000"
             placeholder="Comentarios"
+            disabled={disabled}  
           />
         )}
       />

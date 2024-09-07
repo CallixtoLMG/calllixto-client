@@ -4,7 +4,7 @@ import { edit, useGetProduct } from "@/api/products";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { PAGES, PRODUCTS_STATES } from "@/constants";
+import { ENTITIES, PAGES, PRODUCTS_STATES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -30,20 +30,28 @@ const Product = ({ params }) => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   const stateTitle = product?.state ? PRODUCTS_STATES[product.state]?.singularTitle || PRODUCTS_STATES.INACTIVE.singularTitle : PRODUCTS_STATES.INACTIVE.singularTitle;
   const stateColor = product?.state ? PRODUCTS_STATES[product.state]?.color || PRODUCTS_STATES.INACTIVE.color : PRODUCTS_STATES.INACTIVE.color;
   useEffect(() => {
     setLabels([
       PAGES.PRODUCTS.NAME,
-      product?.id ? { id: product.id, title: stateTitle, color: stateColor } : null
+      product?.code ? { id: product.code, title: stateTitle, color: stateColor } : null
     ].filter(Boolean));
   }, [setLabels, product]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (product) => {
-      const { data } = await edit(product);
-      return data;
+      try {
+        const response = await edit({
+          product: product,
+          entity: ENTITIES.PRODUCTS,
+          responseEntity: ENTITIES.PRODUCT
+        });
+        return response;
+      } catch (error) {
+        console.error("Error en `mutate`:", error);
+        throw error;
+      }
     },
     onSuccess: (response) => {
       if (response.statusOk) {

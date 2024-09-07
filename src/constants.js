@@ -221,8 +221,8 @@ export const PRODUCTS_STATES = {
     color: 'red',
     icon: 'ban',
   },
-  OUT_OF_STOCK: {
-    id: 'OUT_OF_STOCK',
+  OOS: {
+    id: 'OOS',
     title: 'Sin stock',
     singularTitle: 'Sin stock',
     color: 'orange',
@@ -265,3 +265,5 @@ export const PRODUCTS_HELP = {
 };
 
 export const PICK_UP_IN_STORE = "Retira en tienda";
+
+export const OOS = "Sin stock";

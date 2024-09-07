@@ -1,11 +1,33 @@
 "use client";
 import { IconnedButton } from "@/components/common/buttons";
 import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
-import { MEASSURE_UNITS } from "@/constants";
+import { MEASSURE_UNITS, PRODUCTS_STATES } from "@/constants";
 
 const ProductView = ({ product }) => {
+  console.log("productView", product)
   return (
     <ViewContainer>
+      <FieldsContainer>
+        <IconnedButton
+          text={product.state === PRODUCTS_STATES.OOS.id ? "Sin stock" : "En stock"}
+          icon={product.state === PRODUCTS_STATES.OOS.id ? "x" : "box"}
+          basic={product.state === !PRODUCTS_STATES.OOS.id}
+          color="orange"
+          disabled
+        />
+        {/* <IconnedButton
+          text={PRODUCTS_STATES.INACTIVE.id ? "Inactivo" : "Activo"}
+          icon={PRODUCTS_STATES.INACTIVE.id ? "thumbs down outline" : "thumbs up outline"}
+          basic={!PRODUCTS_STATES.INACTIVE.id}
+          color="grey"
+        />
+        <IconnedButton
+          text={PRODUCTS_STATES.DELETED.id ? "Borrado" : "Recuperar"}
+          icon={PRODUCTS_STATES.DELETED.id ? "ban" : "undo"}
+          basic={!PRODUCTS_STATES.DELETED.id}
+          color="red"
+        /> */}
+      </FieldsContainer>
       <FieldsContainer alignItems="flex-end">
         <FormField flex="1">
           <Label>Proveedor</Label>

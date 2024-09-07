@@ -8,9 +8,9 @@ import {
 } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import { chunk, omit } from "lodash";
+import { chunk } from "lodash";
 import axios from "./axios";
-import { createItem, deleteItem, getItemById, listItems } from "./common";
+import { addStorageItem, createItem, deleteItem, getItemById, listItems } from "./common";
 
 const PRODUCTS_URL = `${PATHS.PRODUCTS}`;
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
@@ -20,7 +20,7 @@ export const GET_PRODUCT_QUERY_KEY = "getProduct";
 export function useListProducts() {
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, params: { sort: 'date' } }),
+    queryFn: () => listItems({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -46,12 +46,25 @@ export function deleteProduct(code) {
   return deleteItem({ entity: ENTITIES.PRODUCTS, id: code, url: PRODUCTS_URL, key: 'code' });
 };
 
-export function edit(product) {
-  const body = {
-    ...omit(product, "id"),
-    updatedAt: now(),
-  };
-  return axios.put(`${PRODUCTS_URL}/${product.code}`, body);
+export async function edit({ product, entity, responseEntity }) {
+  try {
+    const body = {
+      // ...omit(product, "id"),
+      ...product,
+      updatedAt: now(),
+    };
+    const { data } = await axios.put(`${PRODUCTS_URL}/${product.code}`, body);
+
+    if (data.statusOk) {
+      await addStorageItem({ entity, value: data[responseEntity] });
+    } else {
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in edit function:', error);
+    throw error; 
+  }
 };
 
 export function useProductsBySupplierId(supplierId) {

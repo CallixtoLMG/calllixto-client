@@ -1,7 +1,7 @@
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
-import { MEASSURE_UNITS, PAGES, RULES, SHORTKEYS } from "@/constants";
+import { MEASSURE_UNITS, PAGES, PRODUCTS_STATES, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback, useMemo, useState } from "react";
@@ -48,11 +48,57 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   const shouldError = useMemo(() => !isUpdating && isDirty && isSubmitted, [isDirty, isSubmitted, isUpdating]);
 
+  const isDeleted = product?.state === "DELETED";
+
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT), SHORTKEYS.DELETE);
-
+  console.log("productForm",product)
   return (
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
+      <FieldsContainer>
+        <Controller
+          name="state"
+          control={control}
+          render={({ field: { onChange, value } }) => {
+            const isOOS = value === PRODUCTS_STATES.OOS.id; // Verificamos si el estado es "sin stock"
+            const isInactive = value === PRODUCTS_STATES.INACTIVE.id; // Verificamos si el estado es "inactivo"
+            // const isDeleted = value === "DELETED"; // Verificamos si el estado es "eliminado"
+            return (
+              <>
+                {/* Botón de stock (sin stock / en stock) */}
+                <IconnedButton
+                  text={isOOS ? "Sin stock" : "En stock"}
+                  icon={isOOS ? "x" : "box"}
+                  basic={!isOOS}
+                  color="orange"
+                  onClick={() => onChange(isOOS ? "ACTIVE" : "OOS")}
+                  disabled={isInactive || isDeleted} // Deshabilitar si está inactivo o eliminado
+                />
+
+                {/* Botón para activar si el estado es INACTIVE */}
+                <IconnedButton
+                  text={isInactive ? "Activo" : "Inactivo"}
+                  basic={!isInactive}
+                  color="grey"
+                  icon={isInactive ? "thumbs up outline" : "thumbs down outline"}
+                  onClick={() => onChange(isInactive ? "ACTIVE" : "INACTIVE")}
+                  disabled={!isInactive || isDeleted} // Solo habilitar si está inactivo, pero no eliminado
+                />
+
+                {/* Botón para restaurar si el estado es DELETED */}
+                <IconnedButton
+                  text={isDeleted ? "Recuperar" : "Borrado"}
+                  icon={isDeleted ? "undo" : "ban"}
+                  basic={!isDeleted}
+                  color="red"
+                  onClick={() => onChange(isDeleted ? "DELETED" : "ACTIVE")}
+                  disabled={!isDeleted} // Solo habilitar si el estado es "eliminado"
+                />
+              </>
+            );
+          }}
+        />
+      </FieldsContainer>
       <FieldsContainer rowGap="5px" alignItems="flex-end">
         <FormField flex="1" error={shouldError && !supplier && 'Campo requerido.'}>
           <RuledLabel title="Proveedor" message={shouldError && !supplier && 'Campo requerido.'} required />
@@ -73,6 +119,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 setSupplier(supplier);
                 clearErrors("code");
               }}
+              disabled={isDeleted} // Deshabilitar si está eliminado
             />
           ) : (
             <Segment placeholder>{product?.supplierName}</Segment>
@@ -97,7 +144,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 setBrand(brand);
                 clearErrors("code");
               }}
-              disabled={isUpdating}
+              disabled={isDeleted} // Deshabilitar si está eliminado
             />
           ) : (
             <Segment placeholder>{product?.brandName}</Segment>
@@ -114,6 +161,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 icon="pencil"
                 onClick={() => onChange(!value)}
                 basic={!value}
+                disabled={isDeleted} // Deshabilitar si está eliminado
               />
             )}
           />
@@ -129,6 +177,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 icon="cut"
                 onClick={() => onChange(!value)}
                 basic={!value}
+                disabled={isDeleted} // Deshabilitar si está eliminado
               />
             )}
           />
@@ -152,11 +201,11 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                   {...((supplier?.id || brand?.id) && { label: { basic: true, content: `${supplier?.id ?? ''} ${brand?.id ?? ''}` } })}
                   labelPosition='left'
+                  disabled={isDeleted} // Deshabilitar si está eliminado
                 />
               )}
             />
           )}
-
         </FormField>
         <FormField flex="1" error={errors?.name?.message}>
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
@@ -164,7 +213,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             name="name"
             control={control}
             rules={RULES.REQUIRED}
-            render={({ field }) => <Input height="50px" {...field} placeholder="Nombre" />}
+            render={({ field }) => <Input height="50px" {...field} placeholder="Nombre" disabled={isDeleted} />} // Deshabilitar si está eliminado
           />
         </FormField>
         <FormField width="20%">
@@ -187,6 +236,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 }}
                 value={value || 0}
                 placeholder="Precio"
+                disabled={isDeleted} // Deshabilitar si está eliminado
               />
             )}
           />
@@ -203,20 +253,21 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 options={Object.values(MEASSURE_UNITS)}
                 defaultValue={Object.values(MEASSURE_UNITS)[0].value}
                 onChange={(e, { value }) => onChange(value)}
-                disabled={!watchFractionable}
+                disabled={!watchFractionable || isDeleted} // Deshabilitar si está eliminado
               />
             )}
           />
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
-        <ControlledComments control={control} />
+        <ControlledComments control={control} disabled={isDeleted} /> {/* Deshabilitar si está eliminado */}
       </FieldsContainer>
       <SubmitAndRestore
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}
         onReset={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT)}
+        disabled={isDeleted} // Deshabilitar si está eliminado
       />
     </Form>
   );
