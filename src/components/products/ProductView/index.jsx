@@ -11,22 +11,28 @@ const ProductView = ({ product }) => {
         <IconnedButton
           text={product.state === PRODUCTS_STATES.OOS.id ? "Sin stock" : "En stock"}
           icon={product.state === PRODUCTS_STATES.OOS.id ? "x" : "box"}
-          basic={product.state === !PRODUCTS_STATES.OOS.id}
+          basic={product.state === PRODUCTS_STATES.OOS.id}
           color="orange"
           disabled
         />
-        {/* <IconnedButton
-          text={PRODUCTS_STATES.INACTIVE.id ? "Inactivo" : "Activo"}
-          icon={PRODUCTS_STATES.INACTIVE.id ? "thumbs down outline" : "thumbs up outline"}
-          basic={!PRODUCTS_STATES.INACTIVE.id}
-          color="grey"
-        />
-        <IconnedButton
-          text={PRODUCTS_STATES.DELETED.id ? "Borrado" : "Recuperar"}
-          icon={PRODUCTS_STATES.DELETED.id ? "ban" : "undo"}
-          basic={!PRODUCTS_STATES.DELETED.id}
-          color="red"
-        /> */}
+
+        {product.state === PRODUCTS_STATES.INACTIVE.id &&
+          <IconnedButton
+            text={PRODUCTS_STATES.INACTIVE.id ? "Inactivo" : "Activo"}
+            icon={PRODUCTS_STATES.INACTIVE.id ? "stop circle" : "play circle"}
+            basic={!PRODUCTS_STATES.INACTIVE.id}
+            color="grey"
+            disabled
+          />}
+
+        {product.state === PRODUCTS_STATES.DELETED.id &&
+          <IconnedButton
+            text={PRODUCTS_STATES.DELETED.id ? "Borrado" : "Recuperar"}
+            icon={PRODUCTS_STATES.DELETED.id ? "ban" : "undo"}
+            basic={!PRODUCTS_STATES.DELETED.id}
+            color="red"
+            disabled
+          />}
       </FieldsContainer>
       <FieldsContainer alignItems="flex-end">
         <FormField flex="1">

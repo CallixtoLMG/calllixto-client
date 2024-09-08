@@ -192,7 +192,7 @@ const CustomTable = ({
                         </Cell>
                       ))}
                       {!!actions.length && (
-                        <ActionsContainer deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
+                        <ActionsContainer stillShow deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
                           <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
                             {actions.length > 1 ? (
                               <PopupActions

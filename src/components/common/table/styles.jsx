@@ -71,7 +71,7 @@ const ActionsContainer = styled.td`
   }} !important;
   transition: all 0.1s ease-in-out!important;
   opacity: ${({ $header, $open }) => $header || $open ? "1" : "0"};
-  visibility: ${({ $header, $open }) => $header || $open ? "visible" : "hidden"};
+  visibility: ${({ $header, $open, stillShow }) => $header || $open && stillShow ? "visible" : "hidden"};
   border: none!important;
   padding: ${({ $header }) => $header && "0!important"};
   padding-left: 5px !important;
