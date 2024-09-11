@@ -1,6 +1,6 @@
 import { deleteSupplier, LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { Input } from "@/components/common/custom";
-import { ModalDelete } from "@/components/common/modals";
+import { ModalAction } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
@@ -110,11 +110,11 @@ const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
         onFilter={onFilter}
         paginate
       />
-      <ModalDelete
+      <ModalAction
         showModal={showModal}
         setShowModal={setShowModal}
         title={deleteQuestion(selectedSupplier?.name)}
-        onDelete={mutate}
+        onConfirm={mutate}
         isLoading={isPending}
       />
     </>

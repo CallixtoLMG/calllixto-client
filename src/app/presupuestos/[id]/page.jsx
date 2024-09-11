@@ -258,7 +258,8 @@ const Budget = ({ params }) => {
           icon: 'ban',
           color: 'red',
           onClick: () => setIsModalCancelOpen(true),
-          text: 'Anular'
+          text: 'Anular',
+          basic: true
         },
       ].filter(Boolean);
       setActions(actions);

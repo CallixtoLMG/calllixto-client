@@ -1,11 +1,11 @@
-import { deleteProduct, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
+import { deleteProduct, editProduct, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
 import { Dropdown, Flex, Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
-import { ModalDelete, ModalMultiDelete } from "@/components/common/modals";
+import { ModalAction, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { OnlyPrint } from "@/components/layout";
-import { PAGES, PRODUCTS_STATES } from "@/constants";
+import { PAGES, PRODUCT_STATES } from "@/constants";
 import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -15,11 +15,9 @@ import { useReactToPrint } from "react-to-print";
 import { Form, Label } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
 
-const DEFAULT_STATE = { key: 'ALL', value: 'ALL', text: 'Todos' };
-const EMPTY_FILTERS = { code: '', name: '', state: DEFAULT_STATE.value };
+const EMPTY_FILTERS = { code: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
 const STATE_OPTIONS = [
-  DEFAULT_STATE,
-  ...Object.entries(PRODUCTS_STATES).map(([key, value]) => (
+  ...Object.entries(PRODUCT_STATES).map(([key, value]) => (
     {
       key,
       text: (
@@ -40,7 +38,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [selectedProducts, setSelectedProducts] = useState({});
   const [filters, setFilters] = useState(EMPTY_FILTERS);
-  const [watchState] = watch(['state']);
+  const watchState = watch('state', PRODUCT_STATES.ACTIVE.id);
   const printRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -56,7 +54,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
       return false;
     }
 
-    if (filters.state && !product.state.toLowerCase().includes(filters.state.toLowerCase()) && filters.state !== 'ALL') {
+    if (filters.state && filters.state !== product.state) {
       return false;
     }
 
@@ -78,7 +76,12 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      const response = await deleteProduct(selectedProduct?.code);
+      let response;
+      if (selectedProduct.state === PRODUCT_STATES.DELETED.id) {
+        response = await deleteProduct(selectedProduct?.code);
+      } else {
+        response = await editProduct({ ...selectedProduct, state: PRODUCT_STATES.DELETED.id });
+      }
       return response;
     },
     onSuccess: (response) => {
@@ -228,14 +231,14 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           clearSelection={clearSelection}
           selectAllCurrentPageElements={selectAllCurrentPageElements}
           onFilter={onFilter}
-          color={PRODUCTS_STATES[watchState]?.color}
+          color={PRODUCT_STATES[watchState]?.color}
           paginate
         />
-        <ModalDelete
+        <ModalAction
           showModal={showModal}
           setShowModal={setShowModal}
-          title={`¿Está seguro que desea eliminar el producto "${selectedProduct?.name}"?`}
-          onDelete={mutate}
+          title={`¿Está seguro que desea eliminar ${selectedProduct?.state === PRODUCT_STATES.DELETED.id ? "PERMANENTEMENTE" : ""} el producto "${selectedProduct?.name}"?`}
+          onConfirm={mutate}
           isLoading={isPending}
         />
       </Flex>

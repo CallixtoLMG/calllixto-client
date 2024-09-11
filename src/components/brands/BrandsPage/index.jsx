@@ -1,6 +1,6 @@
 import { deleteBrand, LIST_BRANDS_QUERY_KEY } from "@/api/brands";
 import { Input } from "@/components/common/custom";
-import { ModalDelete } from "@/components/common/modals";
+import { ModalAction } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { PAGES } from "@/constants";
 import { RULES } from "@/roles";
@@ -110,11 +110,11 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
         onFilter={onFilter}
         paginate
       />
-      <ModalDelete
+      <ModalAction
         showModal={showModal}
         setShowModal={setShowModal}
         title={deleteQuestion(selectedBrand?.name)}
-        onDelete={mutate}
+        onConfirm={mutate}
         isLoading={isPending}
       />
     </>

@@ -27,7 +27,7 @@ const NavActions = () => {
   const { actions } = useNavActionsContext();
   return (
     <Flex columnGap="10px">
-      {actions.map(({ id, icon, color, onClick, text, button, disabled, width }) => {
+      {actions.map(({ id, icon, color, onClick, text, button, disabled, width, basic, loading }) => {
         return (
           <Box key={`action_${id}`} >
             {button ? button : (
@@ -35,9 +35,11 @@ const NavActions = () => {
                 text={text}
                 icon={icon}
                 color={color}
+                basic={basic}
                 onClick={onClick}
                 width={width || "110px"}
                 disabled={disabled}
+                loading={loading}
               />
             )}
           </Box>

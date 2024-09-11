@@ -5,7 +5,7 @@ import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { PAGES, PRODUCT_STATES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -27,7 +27,7 @@ const CreateBudget = () => {
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
 
-  const products = useMemo(() => productsData?.products, [productsData]);
+  const products = useMemo(() => productsData?.products.filter((product)=> ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state)), [productsData]);
   const customers = useMemo(() => customersData?.customers, [customersData]);
 
   useEffect(() => {

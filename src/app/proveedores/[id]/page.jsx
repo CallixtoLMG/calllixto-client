@@ -3,9 +3,8 @@ import { useUserContext } from "@/User";
 import { deleteBatchProducts, useProductsBySupplierId } from "@/api/products";
 import { edit, useGetSupplier } from "@/api/suppliers";
 import { Icon } from "@/components/common/custom";
-import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
-import { ModalDelete } from "@/components/common/modals";
-import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { ModalAction } from "@/components/common/modals";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import SupplierView from "@/components/suppliers/SupplierView";
 import { PAGES } from "@/constants";
@@ -116,11 +115,11 @@ const Supplier = ({ params }) => {
     <Loader active={isLoading || loadingProducts}>
       {Toggle}
       {open &&
-        <ModalDelete
+        <ModalAction
           showModal={open}
           setShowModal={setOpen}
           title={`¿Está seguro que desea eliminar todos los productos del proveedor "${supplier?.name}"?`}
-          onDelete={mutateDelete}
+          onConfirm={mutateDelete}
           isLoading={isLoadingDelete}
         />}
       {isUpdating ? (

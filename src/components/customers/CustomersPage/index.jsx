@@ -1,14 +1,14 @@
 import { deleteCustomer, LIST_CUSTOMERS_QUERY_KEY } from '@/api/customers';
 import { Input } from '@/components/common/custom';
-import { ModalDelete } from '@/components/common/modals';
+import { ModalAction } from '@/components/common/modals';
 import { Filters, Table } from '@/components/common/table';
 import { PAGES } from "@/constants";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from "react";
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
-import { HEADERS } from "../customers.common";
 import { Form } from 'semantic-ui-react';
+import { HEADERS } from "../customers.common";
 
 const EMPTY_FILTERS = { name: '' };
 
@@ -89,11 +89,11 @@ const CustomersPage = ({ customers = [], isLoading }) => {
         onFilter={onFilter}
         paginate
       />
-      <ModalDelete
+      <ModalAction
         showModal={showModal}
         setShowModal={setShowModal}
         title={`¿Está seguro que desea eliminar el cliente "${selectedCustomer?.name}"?`}
-        onDelete={mutate}
+        onConfirm={mutate}
         isLoading={isPending}
       />
     </>

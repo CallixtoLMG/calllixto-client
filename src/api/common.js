@@ -77,9 +77,22 @@ export async function createItem({ entity, value, url, responseEntity }) {
   return data;
 };
 
+export async function editItem({ entity, value, url, responseEntity, key }) {
+  const body = {
+    ...value,
+    updatedAt: now()
+  }
+  const { data } = await axios.put(url, body);
+
+  if (data.statusOk) {
+    await updateStorageItem({ entity, key, value: data[responseEntity] });
+  }
+
+  return data;
+};
+
 export async function deleteItem({ entity, id, url, key }) {
   const { data } = await axios.delete(`${url}/${id}`);
-
   if (data.statusOk) {
     await removeStorageItem({ entity, id, key });
   }
@@ -90,9 +103,15 @@ export async function deleteItem({ entity, id, url, key }) {
 export async function addStorageItem({ entity, value }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
   await localforage.setItem(`${config.APP_ENV}-${entity}`, [value, ...values]);
-}
+};
+
+export async function updateStorageItem({ entity, value, key = "id" }) {
+  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
+  const updatedArray = values.map(item => item[key] === value[key] ? value : item)
+  await localforage.setItem(`${config.APP_ENV}-${entity}`, updatedArray);
+};
 
 export async function removeStorageItem({ entity, id, key = 'id' }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
   await localforage.setItem(`${config.APP_ENV}-${entity}`, values.filter((item) => item[key] !== id));
-}
+};

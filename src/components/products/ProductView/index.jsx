@@ -1,39 +1,20 @@
 "use client";
+import { Message, MessageHeader } from "@/components/budgets/BudgetView/styles";
 import { IconnedButton } from "@/components/common/buttons";
 import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
-import { MEASSURE_UNITS, PRODUCTS_STATES } from "@/constants";
+import { MEASSURE_UNITS } from "@/constants";
 
 const ProductView = ({ product }) => {
-  console.log("productView", product)
   return (
     <ViewContainer>
-      <FieldsContainer>
-        <IconnedButton
-          text={product.state === PRODUCTS_STATES.OOS.id ? "Sin stock" : "En stock"}
-          icon={product.state === PRODUCTS_STATES.OOS.id ? "x" : "box"}
-          basic={product.state === PRODUCTS_STATES.OOS.id}
-          color="orange"
-          disabled
-        />
 
-        {product.state === PRODUCTS_STATES.INACTIVE.id &&
-          <IconnedButton
-            text={PRODUCTS_STATES.INACTIVE.id ? "Inactivo" : "Activo"}
-            icon={PRODUCTS_STATES.INACTIVE.id ? "stop circle" : "play circle"}
-            basic={!PRODUCTS_STATES.INACTIVE.id}
-            color="grey"
-            disabled
-          />}
-
-        {product.state === PRODUCTS_STATES.DELETED.id &&
-          <IconnedButton
-            text={PRODUCTS_STATES.DELETED.id ? "Borrado" : "Recuperar"}
-            icon={PRODUCTS_STATES.DELETED.id ? "ban" : "undo"}
-            basic={!PRODUCTS_STATES.DELETED.id}
-            color="red"
-            disabled
-          />}
-      </FieldsContainer>
+      {product?.state === "DELETED" &&
+        <FieldsContainer>
+          <Message negative >
+            <MessageHeader>¡ATENCIÓN!</MessageHeader>
+            <p>Este producto se eliminara de manera automatica en X cantidad de dias</p>
+          </Message>
+        </FieldsContainer>}
       <FieldsContainer alignItems="flex-end">
         <FormField flex="1">
           <Label>Proveedor</Label>

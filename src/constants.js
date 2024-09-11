@@ -206,7 +206,7 @@ export const BUDGET_STATES = {
   }
 };
 
-export const PRODUCTS_STATES = {
+export const PRODUCT_STATES = {
   ACTIVE: {
     id: 'ACTIVE',
     title: 'Activos',
