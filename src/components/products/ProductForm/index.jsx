@@ -1,7 +1,7 @@
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
-import { MEASSURE_UNITS, PAGES, PRODUCT_STATES, RULES, SHORTKEYS } from "@/constants";
+import { ICONS, MEASSURE_UNITS, PAGES, PRODUCT_STATES, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback, useMemo, useState } from "react";
@@ -116,7 +116,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               <IconnedButton
                 {...rest}
                 text="Precio Editable"
-                icon="pencil"
+                icon={ICONS.PENCIL}
                 onClick={() => onChange(!value)}
                 basic={!value}
                 disabled={isDeleted}
@@ -132,7 +132,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               <IconnedButton
                 {...rest}
                 text="Producto Fraccionable"
-                icon="cut"
+                icon={ICONS.CUT}
                 onClick={() => onChange(!value)}
                 basic={!value}
                 disabled={isDeleted}

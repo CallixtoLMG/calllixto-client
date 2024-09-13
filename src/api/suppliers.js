@@ -32,7 +32,7 @@ export function useGetSupplier(id) {
 };
 
 export function createSupplier(supplier) {
-  return createItem({ entity: ENTITIES.SUPPLIERS, url: SUPPLIER_URL, value: supplier, responseEntity: ENTITIES.SUPPLIERS });
+  return createItem({ entity: ENTITIES.SUPPLIERS, url: SUPPLIER_URL, value: supplier, responseEntity: ENTITIES.SUPPLIER });
 };
 
 export function deleteSupplier(id) {

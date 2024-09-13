@@ -2,7 +2,7 @@
 import { LIST_CUSTOMERS_QUERY_KEY, useListCustomers } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useRestoreEntity } from "@/hooks/common";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
@@ -46,15 +46,15 @@ const Customers = () => {
     const actions = [
       {
         id: 1,
-        icon: 'add',
-        color: 'green',
+        icon: ICONS.ADD,
+        color: COLORS.GREEN,
         onClick: () => { push(PAGES.CUSTOMERS.CREATE) },
         text: 'Crear',
       },
       {
         id: 2,
-        icon: 'undo',
-        color: 'grey',
+        icon: ICONS.UNDO,
+        color: COLORS.GREY,
         onClick: handleRestore,
         text: 'Actualizar',
         disabled: loading,
@@ -62,8 +62,8 @@ const Customers = () => {
       },
       {
         id: 3,
-        icon: 'file excel',
-        color: 'gray',
+        icon: ICONS.FILE_EXCEL,
+        color: COLORS.SOFT_GREY,
         onClick: () => {
           downloadExcel(prepareCustomerDataForExcel, "Lista de Clientes");
         },

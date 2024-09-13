@@ -12,6 +12,10 @@ export const now = () => {
   return date;
 };
 
+export const threeMonthsDate = (date) => {
+  return dayjs(date).add(3, 'month').format('YYYY-MM-DD');
+};
+
 export const expirationDate = (expirationOffsetDays, createdAt = dayjs().format()) => {
   const dateCreated = dayjs(createdAt);
   const dueDate = dateCreated.add(expirationOffsetDays, 'day');

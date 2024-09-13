@@ -1,21 +1,23 @@
 import { ButtonsContainer, Input } from "@/components/common/custom";
+import { COLORS, ICONS } from "@/constants";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { Header, Modal, Transition } from 'semantic-ui-react';
 import { IconnedButton } from "../../buttons";
-import { Form } from "./styles";
+import { Form, Message, ModalContent } from "./styles";
 
 const ModalAction = ({
   title,
   onConfirm,
-  confirmationWord = 'borrar',
+  confirmationWord = 'eliminar',
   placeholder = `Escriba '${confirmationWord}' para confirmar`,
   confirmButtonText = 'Confirmar',
   confirmButtonIcon = 'check',
   showModal,
   setShowModal,
   isLoading,
-  noConfirmation = false
+  noConfirmation = false,
+  bodyContent = false,
 }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isActionEnabled, setIsActionEnabled] = useState(false);
@@ -40,6 +42,11 @@ const ModalAction = ({
     <Transition visible={showModal} animation='scale' duration={500}>
       <Modal closeIcon open={showModal} onClose={() => setShowModal(false)}>
         <Header icon={confirmButtonIcon} content={title || ""} />
+        {bodyContent && (
+          <ModalContent>
+            <Message negative>{bodyContent}.</Message>
+          </ModalContent>
+        )}
         <Modal.Actions>
           <Form onSubmit={handleSubmit(onConfirm)}>
             {!noConfirmation && (
@@ -56,19 +63,19 @@ const ModalAction = ({
             <ButtonsContainer>
               <IconnedButton
                 text="Cancelar"
-                icon="times"
+                icon={ICONS.TIMES}
                 height="40px"
-                color="red"
+                color={COLORS.RED}
                 onClick={() => setShowModal(false)}
                 disabled={isLoading}
               />
               <IconnedButton
                 text={confirmButtonText}
-                icon="check"
+                icon={ICONS.CHECK}
                 height="40px"
                 disabled={!isActionEnabled || isLoading}
                 loading={isLoading}
-                color="green"
+                color={COLORS.GREEN}
                 submit
               />
             </ButtonsContainer>

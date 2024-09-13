@@ -1,5 +1,5 @@
 import { Flex } from '@/components/common/custom';
-import { Search as SSearch } from "semantic-ui-react";
+import { Label as SLabel, Search as SSearch } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Container = styled(Flex)`
@@ -31,13 +31,21 @@ const Search = styled(SSearch)`
       border-radius: 0.28571429rem!important;
     };
   };
+div.content{
+    width: 100%!important;
+  }
 `;
 
 const Text = styled.p`
    margin: 0;
 `;
 
+const Label = styled(SLabel)`
+  width: fit-content!important;
+  margin-top:2px!important;
+`;
+
 export {
-  Container, Search, Text
+  Container, Label, Search, Text
 };
 

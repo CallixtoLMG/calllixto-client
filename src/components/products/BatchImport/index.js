@@ -1,7 +1,10 @@
 import { useUserContext } from "@/User";
+import { createBatch, editBatch, useListProducts } from "@/api/products";
+import { IconnedButton } from "@/components/common/buttons";
 import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
+import { COLORS, ICONS } from "@/constants";
 import { downloadExcel, now } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -10,8 +13,6 @@ import { toast } from "react-hot-toast";
 import { Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { Modal, ModalHeader, WaitMsg } from "./styles";
-import { IconnedButton } from "@/components/common/buttons";
-import { useListProducts, createBatch, editBatch } from "@/api/products";
 
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts } = useListProducts();
@@ -50,7 +51,7 @@ const BatchImport = ({ isCreating }) => {
 
   const importSettings = useMemo(() => {
     return {
-      icon: isCreating ? "add" : "pencil",
+      icon: isCreating ? ICONS.ADD : ICONS.PENCIL,
       button: isCreating ? "Crear" : "Actualizar",
       fileName: isCreating ? "Productos ya existentes" : "Productos no existentes",
       label: isCreating ? "Nuevos productos" : "Productos para actualizar",
@@ -286,8 +287,8 @@ const BatchImport = ({ isCreating }) => {
   const actions = [
     {
       id: 1,
-      icon: 'trash',
-      color: 'red',
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
       onClick: (element, index) => {
         deleteProduct(index);
       },
@@ -392,14 +393,14 @@ const BatchImport = ({ isCreating }) => {
                   <ButtonsContainer>
                     <IconnedButton
                       text="Confirmar"
-                      icon="check"
-                      color="green"
+                      icon={ICONS.CHECK}
+                      color={COLORS.GREEN}
                       onClick={handleDownloadConfirmation}
                     />
                     <IconnedButton
                       text="Cancelar"
-                      icon="x"
-                      color="red"
+                      icon={ICONS.X}
+                      color={COLORS.RED}
                       onClick={() => setShowConfirmationModal(false)}
                     />
                   </ButtonsContainer>
@@ -458,19 +459,19 @@ const BatchImport = ({ isCreating }) => {
                   {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
                   <IconnedButton
                     text="Aceptar"
-                    icon="check"
+                    icon={ICONS.CHECK}
                     disabled={importSettings.isButtonDisabled(isPending)}
                     loading={isLoading || isPending}
                     submit
-                    color="green"
+                    color={COLORS.GREEN}
                     onClick={handleConfirmClick}
                   />
                   <IconnedButton
                     text="Cancelar"
-                    icon="x"
+                    icon={ICONS.X}
                     disabled={isLoading || isPending}
                     onClick={() => setOpen(false)}
-                    color="red"
+                    color={COLORS.RED}
                   />
                 </ButtonsContainer>
               </Modal.Actions>
@@ -488,16 +489,16 @@ const BatchImport = ({ isCreating }) => {
           <Modal.Actions>
             <IconnedButton
               text="Confirmar"
-              icon="check"
-              color="green"
+              icon={ICONS.CHECK}
+              color={COLORS.GREEN}
               onClick={() => {
                 handleUnprocessedDownload();
               }}
             />
             <IconnedButton
               text="Cancelar"
-              icon="x"
-              color="red"
+              icon={ICONS.X}
+              color={COLORS.RED}
               onClick={() => {
                 setShowUnprocessedModal(false);
               }}

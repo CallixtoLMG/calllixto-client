@@ -3,7 +3,7 @@ import { useUserContext } from "@/User";
 import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useRestoreEntity } from "@/hooks/common";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
@@ -53,16 +53,16 @@ const Suppliers = () => {
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
-        icon: 'add',
-        color: 'green',
+        icon: ICONS.ADD,
+        color: COLORS.GREEN,
         onClick: () => { push(PAGES.SUPPLIERS.CREATE) },
         text: 'Crear'
       }
     ] : [];
     actions.push({
       id: 2,
-      icon: 'undo',
-      color: 'grey',
+      icon: ICONS.UNDO,
+      color: COLORS.GREY,
       onClick: handleRestore,
       text: 'Actualizar',
       disabled: loading,
@@ -70,8 +70,8 @@ const Suppliers = () => {
     });
     actions.push({
       id: 3,
-      icon: 'file excel',
-      color: 'gray',
+      icon: ICONS.FILE_EXCEL,
+      color: COLORS.SOFT_GREY,
       width: "fit-content",
       onClick: () => {
         downloadExcel(prepareSupplierDataForExcel, "Lista de Proveedores");

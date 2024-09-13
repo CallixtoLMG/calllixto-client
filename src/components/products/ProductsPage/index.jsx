@@ -5,7 +5,7 @@ import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { OnlyPrint } from "@/components/layout";
-import { PAGES, PRODUCT_STATES } from "@/constants";
+import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
 import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -64,8 +64,8 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const actions = RULES.canRemove[role] ? [
     {
       id: 1,
-      icon: 'trash',
-      color: 'red',
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
       onClick: (product) => {
         setSelectedProduct(product);
         setShowModal(true);
@@ -144,7 +144,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
       <IconnedButton
         key={2}
         text="Descargar Códigos"
-        icon="barcode"
+        icon={ICONS.BARCODE}
         onClick={handlePrint}
       />
     ];
@@ -153,8 +153,8 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
         <IconnedButton
           key={1}
           text="Eliminar Productos"
-          icon="trash"
-          color="red"
+          icon={ICONS.TRASH}
+          color={COLORS.RED}
           onClick={() => setShowConfirmDeleteModal(true)}
         />
       );
@@ -250,7 +250,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
         onClose={() => setShowConfirmDeleteModal(false)}
         onConfirm={deleteSelectedProducts}
         elements={Object.values(selectedProducts)}
-        icon="trash"
+        icon={ICONS.TRASH}
         title="Estás seguro de que desea eliminar estos productos PERMANENTEMENTE?"
         isLoading={deleteIsPending}
         headers={PRODUCT_COLUMNS}

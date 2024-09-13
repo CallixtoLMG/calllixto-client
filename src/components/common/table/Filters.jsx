@@ -1,8 +1,9 @@
 import { Flex } from '@/components/common/custom';
+import { COLORS, ICONS } from "@/constants";
 import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';
-import { FiltersContainer } from './styles';
 import { IconnedButton } from '../buttons';
+import { FiltersContainer } from './styles';
 
 const MainContainer = styled(Flex)`
   column-gap: 10px;
@@ -29,7 +30,7 @@ const Filters = ({ children, onRestoreFilters }) => {
             size="tiny"
             trigger={(
               <Button circular icon type="button" onClick={onRestoreFilters}>
-                <Icon name="undo" />
+                <Icon name={ICONS.UNDO} />
               </Button>
             )}
           />
@@ -38,9 +39,9 @@ const Filters = ({ children, onRestoreFilters }) => {
         <Flex alignSelf="center">
           <IconnedButton
             text="Buscar"
-            icon="search"
+            icon={ICONS.SEARCH}
             submit
-            color="none"
+            color={COLORS.SOFT_GREY}
           />
         </Flex>
       </HeaderSegment>

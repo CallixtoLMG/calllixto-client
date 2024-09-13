@@ -67,7 +67,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                   size="mini"
                   content={product.dispatchComment}
                   position="top center"
-                  trigger={<Icon name="truck" color="orange" />
+                  trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />
                   }
                 />
               )}

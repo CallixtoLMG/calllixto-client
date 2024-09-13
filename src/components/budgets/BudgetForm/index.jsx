@@ -7,7 +7,7 @@ import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
-import { BUDGET_STATES, PAGES, PICK_UP_IN_STORE, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
+import { BUDGET_STATES, COLORS, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -59,18 +59,15 @@ const BudgetForm = ({
 
   const hasShownModal = useRef(false);
   const productSearchRef = useRef(null);
-
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [temporaryProducts, setTemporaryProducts] = useState([]);
-
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [expiration, setExpiration] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
-
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
@@ -205,16 +202,16 @@ const BudgetForm = ({
   const actions = [
     {
       id: 1,
-      icon: 'trash',
-      color: 'red',
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
       onClick: (element, index) => removeProduct(index),
       tooltip: 'Eliminar',
-      width:"100%"
+      width: "100%"
     },
     {
       id: 2,
-      icon: 'add',
-      color: 'green',
+      icon: ICONS.ADD,
+      color: COLORS.GREEN,
       onClick: (element, index) => handleOpenCommentModal(element, index),
       tooltip: 'Comentarios'
     },
@@ -274,8 +271,9 @@ const BudgetForm = ({
           <Flex marginLeft="3px" marginRight="3px" columnGap="3px">
             {product.comments && <CommentTooltip comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
-              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name="truck" color="orange" />} />
+              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />} />
             )}
+            {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
           </Flex>
         </Container>
       ),
@@ -402,9 +400,9 @@ const BudgetForm = ({
                     return (
                       <MessageItem key={p.code}>
                         {`${p.code} | ${p.name} | `}
-                        <span style={{ color: 'red' }}>{formatedPrice(oldPrice.price)}</span>
+                        <span style={{ color: COLORS.RED }}>{formatedPrice(oldPrice.price)}</span>
                         {' -> '}
-                        <span style={{ color: 'green' }}>{`${formatedPrice(p.price)}.`}</span>
+                        <span style={{ color: COLORS.GREEN }}>{`${formatedPrice(p.price)}.`}</span>
                       </MessageItem>
                     );
                   })}
@@ -426,14 +424,14 @@ const BudgetForm = ({
             <ButtonsContainer>
               <IconnedButton
                 text="Cancelar"
-                icon="cancel"
-                color="red"
+                icon={ICONS.CANCEL}
+                color={COLORS.RED}
                 onClick={handleCancelUpdate}
               />
               <IconnedButton
                 text="Confirmar"
-                icon="check"
-                color="green"
+                icon={ICONS.CHECK}
+                color={COLORS.GREEN}
                 onClick={handleConfirmUpdate}
               />
             </ButtonsContainer>
@@ -446,9 +444,9 @@ const BudgetForm = ({
             <ButtonGroup size="small">
               <IconnedButton
                 text="Confirmado"
-                icon="check"
+                icon={ICONS.CHECK}
                 basic={!isConfirmed}
-                color={isConfirmed ? "green" : "orange"}
+                color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
                 onClick={() => {
                   setIsConfirmed(true);
                   setValue('state', BUDGET_STATES.CONFIRMED.id);
@@ -456,9 +454,9 @@ const BudgetForm = ({
               />
               <IconnedButton
                 text="Pendiente"
-                icon="hourglass half"
+                icon={ICONS.HOURGLASS_HALF}
                 basic={isConfirmed}
-                color={isConfirmed ? "green" : "orange"}
+                color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
                 onClick={() => {
                   setIsConfirmed(false);
                   setValue('state', BUDGET_STATES.PENDING.id);
@@ -474,7 +472,7 @@ const BudgetForm = ({
                 <ButtonGroup size="small">
                   <IconnedButton
                     text={PICK_UP_IN_STORE}
-                    icon="warehouse"
+                    icon={ICONS.WAREHOUSE}
                     basic={!value}
                     onClick={() => {
                       onChange(true);
@@ -482,7 +480,7 @@ const BudgetForm = ({
                   />
                   <IconnedButton
                     text="Enviar a Dirección"
-                    icon="truck"
+                    icon={ICONS.TRUCK}
                     basic={value}
                     onClick={() => {
                       onChange(false);
@@ -663,7 +661,7 @@ const BudgetForm = ({
                           width="fit-content"
                           type="button"
                           basic={value.length !== PAYMENT_METHODS.length}
-                          color="blue"
+                          color={COLORS.BLUE}
                           onClick={() => {
                             if (value.length === PAYMENT_METHODS.length) {
                               onChange([]);
@@ -682,7 +680,7 @@ const BudgetForm = ({
                             width="fit-content"
                             key={key}
                             basic={!value.includes(methodValue)}
-                            color="blue"
+                            color={COLORS.BLUE}
                             type="button"
                             onClick={() => {
                               if (value.includes(methodValue)) {

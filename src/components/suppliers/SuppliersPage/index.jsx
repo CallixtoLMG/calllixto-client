@@ -2,7 +2,7 @@ import { deleteSupplier, LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { Input } from "@/components/common/custom";
 import { ModalAction } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
-import { PAGES } from "@/constants";
+import { COLORS, ICONS, PAGES } from "@/constants";
 import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
@@ -38,8 +38,8 @@ const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
   const actions = RULES.canRemove[role] ? [
     {
       id: 1,
-      icon: 'trash',
-      color: 'red',
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
       onClick: (supplier) => {
         setSelectedSupplier(supplier);
         setShowModal(true);

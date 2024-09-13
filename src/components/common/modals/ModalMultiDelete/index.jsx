@@ -1,10 +1,11 @@
 import { ButtonsContainer, Input } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
+import { COLORS, ICONS } from "@/constants";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Header, Transition } from 'semantic-ui-react';
-import { Form, Modal, ModalContent } from "./styles";
 import { IconnedButton } from "../../buttons";
+import { Form, Modal, ModalContent } from "./styles";
 
 const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title, icon, headers }) => {
   const [confirmationText, setConfirmationText] = useState('');
@@ -21,7 +22,7 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
   const handleConfirmationTextChange = (e) => {
     const text = e.target.value;
     setConfirmationText(text);
-    setIsDeleteEnabled(text.toLowerCase() === 'borrar');
+    setIsDeleteEnabled(text.toLowerCase() === 'eliminar');
   };
 
   return (
@@ -39,7 +40,7 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
           <Form onSubmit={handleSubmit(onConfirm)}>
             <Input
               height="40px"
-              placeholder="Escriba 'borrar' para eliminar"
+              placeholder="Escriba 'eliminar' para confirmar"
               type="text"
               value={confirmationText}
               onChange={handleConfirmationTextChange}
@@ -49,17 +50,17 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
             <ButtonsContainer>
               <IconnedButton
                 text="Cancelar"
-                icon="times"
-                color="grey"
+                icon={ICONS.TIMES}
+                color={COLORS.GREY}
                 onClick={onClose}
                 disabled={isLoading}
               />
               <IconnedButton
                 text="Eliminar"
-                icon="trash"
+                icon={ICONS.TRASH}
                 disabled={!isDeleteEnabled || isLoading}
                 loading={isLoading}
-                color="red"
+                color={COLORS.RED}
                 submit
               />
             </ButtonsContainer>

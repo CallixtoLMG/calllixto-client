@@ -197,13 +197,6 @@ export const BUDGET_STATES = {
     color: 'brown',
     icon: 'expired',
   },
-  INACTIVE: {
-    id: 'INACTIVE',
-    title: 'Indefinidos',
-    singularTitle: 'Indefinido',
-    color: 'grey',
-    icon: 'ban',
-  }
 };
 
 export const PRODUCT_STATES = {
@@ -264,6 +257,64 @@ export const PRODUCTS_HELP = {
   EDITABLE_PRICE: "Al activar esta opción se pueden fraccionar los productos desde la creación de un presupuesto.",
 };
 
+export const COLORS = {
+  RED: 'red',
+  GREEN: 'green',
+  BLUE: 'blue',
+  ORANGE: 'orange',
+  GREY: 'grey',
+  SOFT_GREY: 'softgrey',
+  BROWN: 'brown',
+  TEAL: 'teal',
+  YELLOW: "yellow"
+};
+
+export const ICONS = {
+  X: 'x',
+  TRASH: 'trash',
+  CHECK: 'check',
+  TRUCK: 'truck',
+  HOURGLASS_HALF: "hourglass half",
+  ADD: "add",
+  UNDO: "undo",
+  BAN: "ban",
+  FILE_EXCEL: "file excel",
+  FILE_EXCEL_OUTLINE: "file excel outline",
+  SEND: "send",
+  DOWNLOAD: "download",
+  COPY: "copy",
+  DOLLAR: "dollar",
+  PLAY_CIRCLE: "play circle",
+  PAUSE_CIRCLE: "pause circle",
+  BOX: "box",
+  QUESTION: "question",
+  BARCODE: "barcode",
+  LIST_UL: "list ul",
+  INFO_CIRCLE: "info circle",
+  WAREHOUSE: "warehouse",
+  ARROW_LEFT: "arrow left",
+  CANCEL: "cancel",
+  DELETE: "delete",
+  EDIT: "edit",
+  TIMES: "times",
+  KEYBOARD: "keyboard",
+  REMOVE: "remove",
+  SEARCH: "search",
+  CHEVRON_RIGHT: "chevron right",
+  USER: "user",
+  LOCK: "lock",
+  PENCIL: "pencil",
+  CUT: "cut",
+  EDIT: "edit",
+  EYE: "eye",
+  COG: "cog",
+  EXCLAMATION_CIRCLE: "exclamation circle",
+  ADDRESS_CARD: "address card",
+  ARCHIVE: "archive"
+};
+
 export const PICK_UP_IN_STORE = "Retira en tienda";
 
 export const OOS = "Sin stock";
+
+export const ALL = "ALL";

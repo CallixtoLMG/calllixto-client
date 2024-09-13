@@ -1,19 +1,20 @@
 "use client";
 import { useUserContext } from "@/User";
 import { deleteBatchProducts, useProductsBySupplierId } from "@/api/products";
-import { edit, useGetSupplier } from "@/api/suppliers";
+import { deleteSupplier, edit, LIST_SUPPLIERS_QUERY_KEY, useGetSupplier } from "@/api/suppliers";
 import { Icon } from "@/components/common/custom";
+import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction } from "@/components/common/modals";
-import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import SupplierView from "@/components/suppliers/SupplierView";
-import { PAGES } from "@/constants";
+import { COLORS, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 
@@ -27,8 +28,10 @@ const Supplier = ({ params }) => {
   const { resetActions, setActions } = useNavActionsContext();
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
 
-  const [open, setOpen] = useState(false);
-  const printRef = useRef();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState(null);
+  const printRef = useRef(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     resetActions();
@@ -44,38 +47,23 @@ const Supplier = ({ params }) => {
     removeAfterPrint: true,
   });
 
-  useEffect(() => {
-    const handleBarCodePrint = async () => {
-      if (products.length) {
-        handlePrint();
-      } else {
-        toast.success('No hay productos de este proveedor', {
-          icon: <Icon margin="0" toast name="info circle" color="blue" />,
-        });
-      }
-    };
+  const modalConfig = useMemo(() => ({
+    deleteBatch: {
+      header: `¿Está seguro que desea eliminar todos los productos del proveedor "${supplier?.name}"?`,
+      confirmText: "eliminar",
+      icon: ICONS.TRASH
+    },
+    deleteSupplier: {
+      header: `¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor "${supplier?.name}"?`,
+      confirmText: "eliminar",
+      icon: ICONS.TRASH
+    },
+  }), [supplier]);
 
-    const actions = RULES.canRemove[role]
-      ? [
-        {
-          id: 1,
-          icon: 'barcode',
-          color: 'blue',
-          text: 'Códigos',
-          onClick: handleBarCodePrint,
-        },
-        {
-          id: 2,
-          icon: 'trash',
-          color: 'red',
-          onClick: () => setOpen(true),
-          text: 'Limpiar lista',
-        },
-      ]
-      : [];
-    setActions(actions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, setActions]);
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setModalAction(null);
+  };
 
   const { mutate: mutateUpdate, isPending: isLoadingUpdate } = useMutation({
     mutationFn: async (supplier) => {
@@ -92,7 +80,7 @@ const Supplier = ({ params }) => {
     },
   });
 
-  const { mutate: mutateDelete, isPending: isLoadingDelete } = useMutation({
+  const { mutate: mutateDeleteBatch, isPending: isLoadingDelete } = useMutation({
     mutationFn: async () => {
       const { data } = await deleteBatchProducts(params.id);
       return data;
@@ -100,38 +88,117 @@ const Supplier = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Lista de productos del proveedor eliminada!');
-        setOpen(false);
+        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY], refetchType: "all" });
+        handleModalClose();
       } else {
         toast.error(response.message);
       }
     },
+    onError: (error) => {
+      toast.error(`Error: ${error.message}`);
+    },
   });
+
+  const { mutate: mutateDelete, isPending: isLoadingDeleteSupplier } = useMutation({
+    mutationFn: async () => {
+      const { data } = await deleteSupplier(params.id);
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success('Proveedor eliminado permanentemente!');
+        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY], refetchType: "all" });
+        push(PAGES.SUPPLIERS.BASE);
+      } else {
+        toast.error(response.message);
+      }
+    },
+    onError: (error) => {
+      toast.error(`Error: ${error.message}`);
+    },
+  });
+
+  const handleActionConfirm = async () => {
+    if (modalAction === "deleteBatch") {
+      mutateDeleteBatch();
+    } else if (modalAction === "deleteSupplier") {
+      mutateDelete();
+    }
+    handleModalClose();
+  };
+
+  useEffect(() => {
+    const handleBarCodePrint = async () => {
+      if (products.length) {
+        handlePrint();
+      } else {
+        toast.success('No hay productos de este proveedor', {
+          icon: <Icon margin="0" toast name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />,
+        });
+      }
+    };
+
+    const actions = RULES.canRemove[role] ? [
+      {
+        id: 1,
+        icon: ICONS.BARCODE,
+        color: COLORS.BLUE,
+        text: 'Códigos',
+        onClick: handleBarCodePrint,
+      },
+      {
+        id: 2,
+        icon: ICONS.LIST_UL,
+        color: COLORS.RED,
+        text: 'Limpiar lista',
+        onClick: () => {
+          setModalAction("deleteBatch");
+          setIsModalOpen(true);
+        },
+        width: "fit-content",
+      },
+      {
+        id: 3,
+        icon: ICONS.TRASH,
+        color: COLORS.RED,
+        text: 'Eliminar Proveedor',
+        onClick: () => {
+          setModalAction("deleteSupplier");
+          setIsModalOpen(true);
+        },
+        width: "fit-content",
+      },
+    ] : [];
+
+    setActions(actions);
+  }, [role, products, setActions]);
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);
-  };
+  }
 
   return (
     <Loader active={isLoading || loadingProducts}>
       {Toggle}
-      {open &&
-        <ModalAction
-          showModal={open}
-          setShowModal={setOpen}
-          title={`¿Está seguro que desea eliminar todos los productos del proveedor "${supplier?.name}"?`}
-          onConfirm={mutateDelete}
-          isLoading={isLoadingDelete}
-        />}
       {isUpdating ? (
         <SupplierForm supplier={supplier} onSubmit={mutateUpdate} isLoading={isLoadingUpdate} isUpdating />
       ) : (
         <>
           <SupplierView supplier={supplier} />
-          {/* <OnlyPrint>
+          <OnlyPrint>
             <PrintBarCodes ref={printRef} products={products} />
-          </OnlyPrint> */}
+          </OnlyPrint>
         </>
       )}
+      <ModalAction
+        title={modalConfig[modalAction]?.header}
+        onConfirm={handleActionConfirm}
+        confirmationWord={modalConfig[modalAction]?.confirmText}
+        confirmButtonIcon={modalConfig[modalAction]?.icon}
+        showModal={isModalOpen}
+        setShowModal={setIsModalOpen}
+        isLoading={isLoadingDelete || isLoadingDeleteSupplier}
+      />
     </Loader>
   );
 };

@@ -1,5 +1,5 @@
 import { Loader } from "@/components/layout";
-import { DEFAULT_PAGE_SIZE } from "@/constants";
+import { COLORS, DEFAULT_PAGE_SIZE, ICONS } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Checkbox, Header, Icon, Pagination } from "semantic-ui-react";
@@ -107,7 +107,7 @@ const CustomTable = ({
                 <InnerActionsContainer $header>
                   <PopupActions
                     position="right center"
-                    trigger={<Button icon circular color="yellow" size="mini"><Icon name="cog" /></Button>}
+                    trigger={<Button icon circular color={COLORS.YELLOW} size="mini"><Icon name={ICONS.COG} /></Button>}
                     buttons={selectionActions}
                     onToggleOpen={setIsPopupOpen}
                   />
@@ -156,7 +156,7 @@ const CustomTable = ({
                               {actions.length > 1 ? (
                                 <PopupActions
                                   position="left center"
-                                  trigger={<Button icon circular color="blue" size="mini"><Icon name="cog" /></Button>}
+                                  trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                   buttons={actions.map((action, idx) => (
                                     <IconnedButton
                                       key={idx}
@@ -197,7 +197,7 @@ const CustomTable = ({
                             {actions.length > 1 ? (
                               <PopupActions
                                 position="left center"
-                                trigger={<Button type="button" icon circular color="orange" size="mini"><Icon name="cog" /></Button>}
+                                trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                 buttons={actions.map((action, idx) => (
                                   <IconnedButton
                                     key={idx}

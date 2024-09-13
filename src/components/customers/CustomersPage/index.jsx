@@ -2,7 +2,7 @@ import { deleteCustomer, LIST_CUSTOMERS_QUERY_KEY } from '@/api/customers';
 import { Input } from '@/components/common/custom';
 import { ModalAction } from '@/components/common/modals';
 import { Filters, Table } from '@/components/common/table';
-import { PAGES } from "@/constants";
+import { COLORS, ICONS, PAGES } from "@/constants";
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useState } from "react";
 import { Controller, useForm } from 'react-hook-form';
@@ -30,8 +30,8 @@ const CustomersPage = ({ customers = [], isLoading }) => {
   const actions = [
     {
       id: 1,
-      icon: 'trash',
-      color: 'red',
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
       onClick: (customer) => {
         setSelectedCustomer(customer);
         setShowModal(true);
@@ -95,6 +95,7 @@ const CustomersPage = ({ customers = [], isLoading }) => {
         title={`¿Está seguro que desea eliminar el cliente "${selectedCustomer?.name}"?`}
         onConfirm={mutate}
         isLoading={isPending}
+        confirmButtonIcon={ICONS.TRASH}
       />
     </>
   );

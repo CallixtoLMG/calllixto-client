@@ -1,7 +1,7 @@
 import { edit } from "@/api/customers";
 import { IconnedButton } from "@/components/common/buttons";
 import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
-import { RULES } from "@/constants";
+import { COLORS, RULES } from "@/constants";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -148,17 +148,17 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
           <ButtonsContainer width="100%">
             <IconnedButton
               text="Cancelar"
-              icon="cancel"
+              icon={ICONS.CANCEL}
               disabled={isLoading}
-              color="red"
+              color={COLORS.RED}
               onClick={() => onClose(false)}
             />
             <IconnedButton
               text="Confirmar"
-              icon="check"
+              icon={ICONS.CHECK}
               disabled={isLoading}
               loading={isLoading}
-              color="green"
+              color={COLORS.GREEN}
               onClick={handleConfirmClick}
             />
           </ButtonsContainer>

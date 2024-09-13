@@ -1,7 +1,7 @@
 import { IconnedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, Label, Segment } from "@/components/common/custom";
 import Payments from "@/components/common/form/Payments";
-import { PICK_UP_IN_STORE } from "@/constants";
+import { COLORS, PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone, now } from "@/utils";
 import { useMemo, useRef } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -47,7 +47,7 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                 <ButtonGroup size="small">
                   <IconnedButton
                     text={PICK_UP_IN_STORE}
-                    icon="warehouse"
+                    icon={ICONS.WAREHOUSE}
                     basic={!value}
                     onClick={() => {
                       onChange(true);
@@ -55,7 +55,7 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                   />
                   <IconnedButton
                     text="Enviar a Dirección"
-                    icon="truck"
+                    icon={ICONS.TRUCK}
                     basic={value}
                     onClick={() => {
                       onChange(false);
@@ -97,18 +97,18 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
           <ButtonsContainer width="100%">
             <IconnedButton
               text="Cancelar"
-              icon="cancel"
+              icon={ICONS.CANCEL}
               disabled={isLoading}
-              color="red"
+              color={COLORS.RED}
               onClick={() => onClose(false)}
             />
             <IconnedButton
               text="Confirmar"
-              icon="check"
+              icon={ICONS.CHECK}
               disabled={isLoading}
               loading={isLoading}
               submit
-              color="green"
+              color={COLORS.GREEN}
               onClick={handleConfirmClick}
             />
           </ButtonsContainer>

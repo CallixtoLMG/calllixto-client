@@ -1,4 +1,5 @@
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.common";
+import { COLORS, ICONS } from "@/constants";
 import { useMemo, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Header } from "semantic-ui-react";
@@ -105,23 +106,23 @@ const Payments = ({ total, maxHeight, methods, children }) => {
                 size="small"
                 icon
                 labelPosition="left"
-                color="blue"
+                color={COLORS.BLUE}
                 type="button"
                 onClick={() => setPayment({ ...payment, amount: parseFloat(totalPending) })}
                 disabled={isTotalCovered}
               >
-                <Icon name="check" />Completar Monto
+                <Icon name={ICONS.CHECK} />Completar Monto
               </IconedButton>
               <IconedButton
                 size="small"
                 icon
                 labelPosition="left"
-                color="green"
+                color={COLORS.GREEN}
                 type="button"
                 onClick={handleAddPayment}
                 disabled={isTotalCovered}
               >
-                <Icon name="add" />Agregar
+                <Icon name={ICONS.ADD} />Agregar
               </IconedButton>
             </FormField>
           </FieldsContainer>
@@ -132,8 +133,8 @@ const Payments = ({ total, maxHeight, methods, children }) => {
               actions={[
                 {
                   id: 1,
-                  icon: 'trash',
-                  color: 'red',
+                  icon: ICONS.TRASH,
+                  color: COLORS.RED,
                   onClick: (_, index) => removePayment(index),
                   tooltip: 'Eliminar',
                 },

@@ -6,7 +6,7 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useRestoreEntity } from "@/hooks/common";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
@@ -65,8 +65,8 @@ const Products = () => {
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
-        icon: 'add',
-        color: 'green',
+        icon: ICONS.ADD,
+        color: COLORS.GREEN,
         onClick: () => { push(PAGES.PRODUCTS.CREATE) },
         text: 'Crear'
       },
@@ -77,7 +77,7 @@ const Products = () => {
             pointing
             as={IconedButton}
             text='Excel'
-            icon='file excel'
+            icon={ICONS.FILE_EXCEL}
             floating
             labeled
             button
@@ -93,10 +93,10 @@ const Products = () => {
               <DropdownItem onClick={() => {
                 downloadExcel(prepareProductDataForExcel, "Lista de Productos");
               }}>
-                <Icon name="download" />Productos
+                <Icon name={ICONS.DOWNLOAD} />Productos
               </DropdownItem>
               <DropdownItem onClick={() => downloadExcel(mockData, "Ejemplo de tabla")}>
-                <Icon name="file excel outline" />Plantilla
+                <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla
               </DropdownItem>
             </Dropdown.Menu>
           </Dropdown>
@@ -104,16 +104,16 @@ const Products = () => {
       },
       {
         id: 3,
-        icon: 'ban',
-        color: 'red',
+        icon: ICONS.BAN,
+        color: COLORS.RED,
         onClick: () => setOpen(true),
         text: 'Bloquear'
       },
     ] : [];
     actions.push({
       id: 4,
-      icon: 'undo',
-      color: 'grey',
+      icon: ICONS.UNDO,
+      color: COLORS.GREY,
       onClick: handleRestore,
       text: 'Actualizar',
       disabled: loading,

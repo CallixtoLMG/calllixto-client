@@ -1,18 +1,17 @@
 "use client";
-import { Message, MessageHeader } from "@/components/budgets/BudgetView/styles";
+import { Message } from "@/components/budgets/BudgetView/styles";
 import { IconnedButton } from "@/components/common/buttons";
 import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
-import { MEASSURE_UNITS } from "@/constants";
+import { ICONS, MEASSURE_UNITS, PRODUCT_STATES } from "@/constants";
+import { threeMonthsDate } from "@/utils";
 
 const ProductView = ({ product }) => {
   return (
     <ViewContainer>
-
-      {product?.state === "DELETED" &&
+      {product?.state === PRODUCT_STATES.DELETED.id &&
         <FieldsContainer>
           <Message negative >
-            <MessageHeader>¡ATENCIÓN!</MessageHeader>
-            <p>Este producto se eliminara de manera automatica en X cantidad de dias</p>
+            <p>{`Este producto se eliminara PERMANENTEMENTE de forma automatica el día ${threeMonthsDate(product.updateAt)}. (90 días desde su eliminación).`}</p>
           </Message>
         </FieldsContainer>}
       <FieldsContainer alignItems="flex-end">
@@ -25,10 +24,10 @@ const ProductView = ({ product }) => {
           <Segment placeholder>{product?.brandName}</Segment>
         </FormField>
         <FormField width="20%">
-          <IconnedButton icon="pencil" basic={!product?.editablePrice} disabled text="Precio Editable" />
+          <IconnedButton icon={ICONS.PENCIL} basic={!product?.editablePrice} disabled text="Precio Editable" />
         </FormField>
         <FormField width="20%">
-          <IconnedButton icon="cut" basic={!product?.fractionConfig?.active} disabled text="Producto Fraccionable" />
+          <IconnedButton icon={ICONS.CUT} basic={!product?.fractionConfig?.active} disabled text="Producto Fraccionable" />
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
@@ -46,7 +45,7 @@ const ProductView = ({ product }) => {
         </FormField>
         <FormField width="20%">
           <Label>Unidad de Medida</Label>
-          <Segment placeholder>{MEASSURE_UNITS[product.fractionConfig?.unit?.toUpperCase()]?.text}</Segment>
+          <Segment placeholder>{MEASSURE_UNITS[product?.fractionConfig?.unit?.toUpperCase()]?.text}</Segment>
         </FormField>
       </FieldsContainer>
       <FieldsContainer rowGap="5px">

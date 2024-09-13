@@ -3,7 +3,7 @@ import { useUserContext } from "@/User";
 import { LIST_BRANDS_QUERY_KEY, useListBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useRestoreEntity } from "@/hooks/common";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
@@ -29,7 +29,7 @@ const Brands = () => {
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
   const prepareBrandDataForExcel = useMemo(() => {
-    if (!brands) return [];  
+    if (!brands) return [];
 
     const headers = ['ID', 'Nombre', 'Comentarios'];
 
@@ -50,16 +50,16 @@ const Brands = () => {
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
-        icon: 'add',
-        color: 'green',
+        icon: ICONS.ADD,
+        color: COLORS.GREEN,
         onClick: () => { push(PAGES.BRANDS.CREATE) },
         text: 'Crear'
       }
     ] : [];
     actions.push({
       id: 2,
-      icon: 'undo',
-      color: 'grey',
+      icon: ICONS.UNDO,
+      color: COLORS.GREY,
       onClick: handleRestore,
       text: 'Actualizar',
       disabled: loading,
@@ -68,8 +68,8 @@ const Brands = () => {
 
     actions.push({
       id: 3,
-      icon: 'file excel',
-      color: 'gray',
+      icon: ICONS.FILE_EXCEL,
+      color: COLORS.SOFT_GREY,
       onClick: () => {
         downloadExcel(prepareBrandDataForExcel, "Lista de Marcas");
       },
