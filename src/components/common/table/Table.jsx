@@ -2,9 +2,9 @@ import { Loader } from "@/components/layout";
 import { COLORS, DEFAULT_PAGE_SIZE, ICONS } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Checkbox, Header, Icon, Pagination } from "semantic-ui-react";
+import { Button, Checkbox, Header, Icon, Pagination, Popup } from "semantic-ui-react";
 import { IconnedButton, PopupActions } from "../buttons";
-import { CenteredFlex } from "../custom";
+import { CenteredFlex, Dropdown } from "../custom";
 import Actions from "./Actions";
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, Table, TableHeader, TableRow } from "./styles";
 
@@ -24,7 +24,7 @@ const CustomTable = ({
   basic,
   $wrap,
   clearSelection,
-  selectAllCurrentPageElements, 
+  selectAllCurrentPageElements,
   paginate,
   onFilter = () => true,
 }) => {
@@ -33,13 +33,20 @@ const CustomTable = ({
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
   const [activePage, setActivePage] = useState(1);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const pageSizeOptions = [
+    { key: 10, text: '10', value: 10 },
+    { key: 20, text: '20', value: 20 },
+    { key: 50, text: '50', value: 50 },
+    { key: 100, text: '100', value: 100 }
+  ];
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
-  const pages = useMemo(() => Math.ceil(filteredElements.length / DEFAULT_PAGE_SIZE), [filteredElements]);
+  const pages = useMemo(() => Math.ceil(filteredElements.length / pageSize), [filteredElements, pageSize]);
   const currentPageElements = useMemo(() => {
-    const startIndex = (activePage - 1) * DEFAULT_PAGE_SIZE;
-    const endIndex = startIndex + DEFAULT_PAGE_SIZE;
+    const startIndex = (activePage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
     return filteredElements.slice(startIndex, endIndex);
-  }, [activePage, filteredElements]);
+  }, [activePage, filteredElements, pageSize]);
 
   const allSelected = useMemo(() => {
     return currentPageElements.length > 0 && currentPageElements.every(product => selection[product[mainKey]]);
@@ -68,10 +75,34 @@ const CustomTable = ({
     }
   };
 
+  const handlePageSizeChange = (e, { value }) => {
+    setPageSize(value);
+    setActivePage(1);
+    clearSelection && clearSelection()
+  };
+
   return (
     <Container tableHeight={tableHeight}>
       {paginate && (
         <PaginationContainer>
+          <Popup
+            size="mini"
+            content="Elementos mostrados"
+            trigger={(
+              <Dropdown
+                options={pageSizeOptions}
+                value={pageSize}
+                onChange={handlePageSizeChange}
+                selection
+                compact
+                height="40px"
+                top="10px"
+                margin="0 20px 0 0"
+              />
+            )}
+            position="left center"
+            mouseEnterDelay={500}
+          />
           <Pagination
             activePage={activePage}
             onPageChange={handlePageChange}

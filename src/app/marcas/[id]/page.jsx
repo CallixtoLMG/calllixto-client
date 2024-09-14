@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { deleteBrand, edit, LIST_BRANDS_QUERY_KEY, useGetBrand } from "@/api/brands";
+import { LIST_BRANDS_QUERY_KEY, deleteBrand, edit, useGetBrand } from "@/api/brands";
 import BrandForm from "@/components/brands/BrandForm";
 import BrandView from "@/components/brands/BrandView";
 import ModalAction from "@/components/common/modals/ModalAction";
@@ -22,7 +22,6 @@ const Brand = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const queryClient = useQueryClient();

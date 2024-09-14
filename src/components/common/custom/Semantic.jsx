@@ -96,10 +96,12 @@ export const Dropdown = styled(SDropdown)`
 `;
 
 export const DropdownOption = styled(SDropdown)`
+&&&&{
+  padding-left: ${({ paddingLeft }) => paddingLeft}!important;
+}
   justify-content: space-between!important;
   margin:0!important;
-  font-size: 13px!important;
-  padding: 13px 10px!important;
+  font-size: 13.5px!important;
   padding: ${({ menu }) => menu ? "9px 10px" : "13px 10px"} !important ;
   width: ${({ width = '100%' }) => `${width}!important`} ;
   justify-content: space-between!important;
@@ -114,7 +116,7 @@ export const DropdownOption = styled(SDropdown)`
 `;
 
 export const DropdownItem = styled(SDropdown.Item)`
-  font-size: 13px!important;
+  font-size: 13.5px!important;
   color: rgba(0, 0, 0, 0.87);
   font-weight: 400;
   width: 100%;
@@ -125,6 +127,9 @@ export const DropdownItem = styled(SDropdown.Item)`
     background-color: #f5f5f5!important;
     color: rgba(0, 0, 0, 0.87);
   };
+  i{
+    margin-right: 5px!important
+  }
 `;
 
 export const Menu = styled(SMenu)`
@@ -148,7 +153,7 @@ export const Icon = styled(SIcon)`
   align-self: center!important;
   margin-right: ${({ marginRight }) => marginRight && `11px!important`} ;
   top: ${({ dollar, toast }) => (dollar ? `-3px` : toast ? `-2px` : 'initial')} !important;
-  position: ${({ dollar, toast }) =>( dollar || toast) && `relative!important`} ;
+  position: ${({ dollar, toast }) => (dollar || toast) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
 `;
@@ -164,7 +169,7 @@ export const IconedButton = styled(SButton)`
   &&&& {
     text-align: center;
     height: ${({ height = '35px' }) => `${height}!important`} ;
-    font-size: 13px;
+    font-size: 13.5px;
     width: ${({ width = '110px' }) => `${width}!important`} ;
     padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
     padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;

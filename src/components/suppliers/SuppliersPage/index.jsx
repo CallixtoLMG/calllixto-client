@@ -15,13 +15,11 @@ const EMPTY_FILTERS = { id: '', name: '' };
 
 const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
   const { handleSubmit, control, reset } = useForm();
-  const queryClient = useQueryClient();
-
   const [showModal, setShowModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
-
   const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar la marca "${name}"?`, []);
+  const queryClient = useQueryClient();
 
   const onFilter = useCallback((supplier) => {
     if (filters.name && !supplier.name.toLowerCase().includes(filters.name.toLowerCase())) {
@@ -61,6 +59,9 @@ const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
       } else {
         toast.error(response.message);
       }
+    },
+    onError: (error) => {
+      toast.error(`Error: ${error.message}`);
     },
   });
 

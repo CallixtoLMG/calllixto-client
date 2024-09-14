@@ -221,7 +221,16 @@ const Budget = ({ params }) => {
           id: 2,
           button: (
             <Menu>
-              <DropdownOption menu pointing text='Enviar' icon={ICONS.SEND} floating labeled button className='icon blue'>
+              <DropdownOption
+                menu
+                pointing
+                text='Enviar'
+                icon={ICONS.SEND}
+                floating
+                labeled
+                button
+                className='icon blue'
+                paddingLeft="45px">
                 <Dropdown.Menu>
                   {sendButtons.map(({ text, iconName, color, subOptions }) => (
                     <Flex key={iconName}>
@@ -382,7 +391,7 @@ const Budget = ({ params }) => {
             width="fit-content"
             onChange={handleDollarChange}
             actionPosition='left'
-            placeholder="Precio dolar"
+            placeholder="Precio"
             value={formattedDolarRate}
             disabled={!showDolarExangeRate}
             action={

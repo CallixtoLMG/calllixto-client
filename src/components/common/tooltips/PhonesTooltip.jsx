@@ -1,5 +1,5 @@
 import { Box } from "@/components/common/custom";
-import { ICONS } from "@/constants";
+import { COLORS, ICONS } from "@/constants";
 import { formatedSimplePhone } from "@/utils";
 import { Icon, List, ListItem, Popup } from "semantic-ui-react";
 

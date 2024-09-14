@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { deleteBatchProducts, useProductsBySupplierId } from "@/api/products";
-import { deleteSupplier, edit, LIST_SUPPLIERS_QUERY_KEY, useGetSupplier } from "@/api/suppliers";
+import { LIST_SUPPLIERS_QUERY_KEY, deleteSupplier, edit, useGetSupplier } from "@/api/suppliers";
 import { Icon } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction } from "@/components/common/modals";
@@ -27,12 +27,11 @@ const Supplier = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const printRef = useRef(null);
   const queryClient = useQueryClient();
-
+console.log(products)
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,7 +87,7 @@ const Supplier = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Lista de productos del proveedor eliminada!');
-        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY], refetchType: "all" });
+        // queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY], refetchType: "all" });
         handleModalClose();
       } else {
         toast.error(response.message);
@@ -101,8 +100,8 @@ const Supplier = ({ params }) => {
 
   const { mutate: mutateDelete, isPending: isLoadingDeleteSupplier } = useMutation({
     mutationFn: async () => {
-      const { data } = await deleteSupplier(params.id);
-      return data;
+      const response = await deleteSupplier(params.id);
+      return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -167,6 +166,7 @@ const Supplier = ({ params }) => {
           setIsModalOpen(true);
         },
         width: "fit-content",
+        basic: true,
       },
     ] : [];
 

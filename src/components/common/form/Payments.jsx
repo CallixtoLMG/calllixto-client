@@ -3,7 +3,7 @@ import { COLORS, ICONS } from "@/constants";
 import { useMemo, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Header } from "semantic-ui-react";
-import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, FormField, Icon, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
+import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
 import { Table, TotalList } from "../table";
 
 const EMPTY_PAYMENT = () => ({ method: '', amount: 0, comments: '' });
@@ -104,26 +104,26 @@ const Payments = ({ total, maxHeight, methods, children }) => {
               <IconedButton
                 padding="3px 18px 3px 40px"
                 size="small"
-                icon
+                content="Completar"
+                icon={ICONS.CHECK}
                 labelPosition="left"
                 color={COLORS.BLUE}
                 type="button"
                 onClick={() => setPayment({ ...payment, amount: parseFloat(totalPending) })}
                 disabled={isTotalCovered}
-              >
-                <Icon name={ICONS.CHECK} />Completar Monto
-              </IconedButton>
+                width="fit-content"
+              />
               <IconedButton
                 size="small"
-                icon
+                icon={ICONS.ADD}
+                content="Agregar"
                 labelPosition="left"
                 color={COLORS.GREEN}
                 type="button"
                 onClick={handleAddPayment}
                 disabled={isTotalCovered}
-              >
-                <Icon name={ICONS.ADD} />Agregar
-              </IconedButton>
+                width="100%"
+              />
             </FormField>
           </FieldsContainer>
           <Flex width="100%">
