@@ -9,8 +9,14 @@ import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
+
+const modalConfig = {
+  header: "¿Está seguro que desea eliminar PERMANENTEMENTE este cliente?",
+  confirmText: "eliminar",
+  icon: ICONS.TRASH
+}
 
 const Customer = ({ params }) => {
   useValidateToken();
@@ -20,7 +26,6 @@ const Customer = ({ params }) => {
   const { resetActions, setActions } = useNavActionsContext();
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalAction, setModalAction] = useState(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -30,7 +35,6 @@ const Customer = ({ params }) => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setModalAction(null);
   };
 
   useEffect(() => {
@@ -54,9 +58,8 @@ const Customer = ({ params }) => {
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: async () => {
-      const response = await deleteCustomer(params.id);
-      return response;
+    mutationFn: () => {
+      return deleteCustomer(params.id);
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -72,22 +75,10 @@ const Customer = ({ params }) => {
     },
   });
 
-  const modalConfig = useMemo(() => ({
-    hardDelete: {
-      header: "¿Está seguro que desea eliminar PERMANENTEMENTE este cliente?",
-      confirmText: "eliminar",
-      icon: ICONS.TRASH
-    },
-  }), []);
-
-  const handleActionConfirm = async () => {
-    if (modalAction === "hardDelete") {
-      mutateDelete();
-    } else {
-      mutate(customer);
-    }
+  const handleActionConfirm = useCallback(async () => {
+    mutateDelete();
     handleModalClose();
-  };
+  }, [mutateDelete]);
 
   useEffect(() => {
     if (customer) {
@@ -97,11 +88,11 @@ const Customer = ({ params }) => {
           icon: ICONS.TRASH,
           color: COLORS.RED,
           onClick: () => {
-            setModalAction("hardDelete");
             setIsModalOpen(true);
           },
           text: "Eliminar",
           loading: isDeletePending,
+          disabled: isDeletePending,
         },
       ];
 
@@ -127,10 +118,10 @@ const Customer = ({ params }) => {
         <CustomerView customer={customer} />
       )}
       <ModalAction
-        title={modalConfig[modalAction]?.header}
+        title={modalConfig.header}
         onConfirm={handleActionConfirm}
-        confirmationWord={modalConfig[modalAction]?.confirmText}
-        confirmButtonIcon={modalConfig[modalAction]?.icon}
+        confirmationWord={modalConfig.confirmText}
+        confirmButtonIcon={modalConfig.icon}
         showModal={isModalOpen}
         setShowModal={setIsModalOpen}
         isLoading={isPending || isDeletePending}

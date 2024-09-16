@@ -1,5 +1,5 @@
 import { Loader } from "@/components/layout";
-import { COLORS, DEFAULT_PAGE_SIZE, ICONS } from "@/constants";
+import { COLORS, DEFAULT_PAGE_SIZE, ICONS, PAGE_SIZE_OPTIONS } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Checkbox, Header, Icon, Pagination, Popup } from "semantic-ui-react";
@@ -34,14 +34,9 @@ const CustomTable = ({
   const [activePage, setActivePage] = useState(1);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const pageSizeOptions = [
-    { key: 10, text: '10', value: 10 },
-    { key: 20, text: '20', value: 20 },
-    { key: 50, text: '50', value: 50 },
-    { key: 100, text: '100', value: 100 }
-  ];
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
   const pages = useMemo(() => Math.ceil(filteredElements.length / pageSize), [filteredElements, pageSize]);
+
   const currentPageElements = useMemo(() => {
     const startIndex = (activePage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
@@ -49,8 +44,8 @@ const CustomTable = ({
   }, [activePage, filteredElements, pageSize]);
 
   const allSelected = useMemo(() => {
-    return currentPageElements.length > 0 && currentPageElements.every(product => selection[product[mainKey]]);
-  }, [currentPageElements, selection]);
+    return !!currentPageElements.length && currentPageElements.every(product => selection[product[mainKey]]);
+  }, [currentPageElements, mainKey, selection]);
 
   useEffect(() => {
     setHydrated(true);
@@ -78,7 +73,7 @@ const CustomTable = ({
   const handlePageSizeChange = (e, { value }) => {
     setPageSize(value);
     setActivePage(1);
-    clearSelection && clearSelection()
+    clearSelection?.();
   };
 
   return (
@@ -90,7 +85,7 @@ const CustomTable = ({
             content="Elementos mostrados"
             trigger={(
               <Dropdown
-                options={pageSizeOptions}
+                options={PAGE_SIZE_OPTIONS}
                 value={pageSize}
                 onChange={handlePageSizeChange}
                 selection

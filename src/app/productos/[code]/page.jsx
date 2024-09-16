@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import ProductView from "../../../components/products/ProductView";
+import ProductView from "@/components/products/ProductView";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -146,7 +146,7 @@ const Product = ({ params }) => {
       PAGES.PRODUCTS.NAME,
       product?.code ? { id: product.code, title: stateTitle, color: stateColor } : null
     ].filter(Boolean));
-  }, [setLabels, product]);
+  }, [setLabels, product, stateTitle, stateColor]);
 
   useEffect(() => {
     if (product) {
@@ -220,7 +220,8 @@ const Product = ({ params }) => {
 
       setActions(actions);
     }
-  }, [product, isOOS, isInactive, isDeleted, handleRecoverClick, handleActivateClick, handleInactivateClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, isPending, isDeletePending]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product, isOOS, isInactive, isDeleted, handleRecoverClick, handleActivateClick, handleInactivateClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, isPending, isDeletePending, setActions]);
 
   return (
     <Loader active={isLoading}>

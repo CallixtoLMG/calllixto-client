@@ -10,7 +10,7 @@ const ModalAction = ({
   title,
   onConfirm,
   confirmationWord = 'eliminar',
-  placeholder = `Escriba '${confirmationWord}' para confirmar`,
+  placeholder = `Escriba "${confirmationWord}" para confirmar`,
   confirmButtonText = 'Confirmar',
   confirmButtonIcon = 'check',
   showModal,
@@ -57,7 +57,7 @@ const ModalAction = ({
                 value={confirmationText}
                 onChange={handleConfirmationTextChange}
                 ref={inputElement}
-                width="220px"
+                width="230px"
               />
             )}
             <ButtonsContainer>

@@ -11,7 +11,7 @@ const ProductView = ({ product }) => {
       {product?.state === PRODUCT_STATES.DELETED.id &&
         <FieldsContainer>
           <Message negative >
-            <p>{`Este producto se eliminara PERMANENTEMENTE de forma automatica el día ${threeMonthsDate(product.updateAt)}. (90 días desde su eliminación).`}</p>
+            <p>Este producto se eliminará <b>PERMANENTEMENTE</b> de forma automática el día {threeMonthsDate(product.updateAt)} (90 días desde su eliminación).</p>
           </Message>
         </FieldsContainer>}
       <FieldsContainer alignItems="flex-end">

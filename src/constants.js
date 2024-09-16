@@ -313,6 +313,13 @@ export const ICONS = {
   ARCHIVE: "archive"
 };
 
+export const PAGE_SIZE_OPTIONS = [
+  { key: 10, text: '10', value: 10 },
+  { key: 20, text: '20', value: 20 },
+  { key: 50, text: '50', value: 50 },
+  { key: 100, text: '100', value: 100 }
+];
+
 export const PICK_UP_IN_STORE = "Retira en tienda";
 
 export const OOS = "Sin stock";

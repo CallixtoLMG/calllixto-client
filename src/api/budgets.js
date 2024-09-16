@@ -5,14 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
 import { createItem, listItems } from "./common";
 
-const BUDGETS_URL = `${PATHS.BUDGETS}`;
 export const LIST_BUDGETS_QUERY_KEY = 'lisAllBudgets';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 
 export function useListBudgets() {
   const query = useQuery({
     queryKey: [LIST_BUDGETS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.BUDGETS, url: BUDGETS_URL }),
+    queryFn: () => listItems({ entity: ENTITIES.BUDGETS, url: PATHS.BUDGETS }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -22,7 +21,7 @@ export function useListBudgets() {
 export function useGetBudget(id) {
   const getBudget = async (id) => {
     try {
-      const { data } = await axios.get(`${BUDGETS_URL}/${id}`);
+      const { data } = await axios.get(`${PATHS.BUDGETS}/${id}`);
       return data?.budget;
     } catch (error) {
       throw error;
@@ -41,7 +40,7 @@ export function useGetBudget(id) {
 };
 
 export function createBudget(budget) {
-  return createItem({ entity: ENTITIES.BUDGETS, url: BUDGETS_URL, value: budget, responseEntity: ENTITIES.BUDGET });
+  return createItem({ entity: ENTITIES.BUDGETS, url: PATHS.BUDGETS, value: budget, responseEntity: ENTITIES.BUDGET });
 };
 
 export function edit(budget) {
@@ -49,13 +48,13 @@ export function edit(budget) {
     ...budget,
     updatedAt: now(),
   };
-  return axios.put(`${BUDGETS_URL}/${budget.id}`, body);
+  return axios.put(`${PATHS.BUDGETS}/${budget.id}`, body);
 };
 
 export function confirmBudget(budget, id) {
-  return axios.put(`${BUDGETS_URL}/${id}/confirm`, budget);
+  return axios.put(`${PATHS.BUDGETS}/${id}/confirm`, budget);
 };
 
 export function cancelBudget(budget, id) {
-  return axios.put(`${BUDGETS_URL}/${id}/cancel`, budget);
+  return axios.put(`${PATHS.BUDGETS}/${id}/cancel`, budget);
 };

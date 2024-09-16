@@ -14,6 +14,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 
+const modalConfig = {
+  header: "¿Está seguro que desea eliminar PERMANENTEMENTE esta marca?",
+  confirmText: "eliminar",
+  icon: ICONS.TRASH
+};
+
 const Brand = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
@@ -23,7 +29,6 @@ const Brand = ({ params }) => {
   const { resetActions, setActions } = useNavActionsContext();
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalAction, setModalAction] = useState(null);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -33,7 +38,6 @@ const Brand = ({ params }) => {
 
   const handleModalClose = () => {
     setIsModalOpen(false);
-    setModalAction(null);
   };
 
   useEffect(() => {
@@ -56,9 +60,8 @@ const Brand = ({ params }) => {
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: async () => {
-      const response = await deleteBrand(params.id); 
-      return response;
+    mutationFn: () => {
+      return deleteBrand(params.id);
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -74,20 +77,8 @@ const Brand = ({ params }) => {
     },
   });
 
-  const modalConfig = useMemo(() => ({
-    hardDelete: {
-      header: "¿Está seguro que desea eliminar PERMANENTEMENTE esta marca?",
-      confirmText: "eliminar",
-      icon: ICONS.TRASH
-    },
-  }), []);
-
   const handleActionConfirm = async () => {
-    if (modalAction === "hardDelete") {
-      mutateDelete();
-    } else {
-      mutate(brand);
-    }
+    mutateDelete();
     handleModalClose();
   };
 
@@ -99,15 +90,15 @@ const Brand = ({ params }) => {
           icon: ICONS.TRASH,
           color: COLORS.RED,
           onClick: () => {
-            setModalAction("hardDelete");  
             setIsModalOpen(true);
           },
           text: "Eliminar",
           loading: isDeletePending,
+          disabled: isDeletePending,
         },
       ];
 
-      setActions(actions); 
+      setActions(actions);
     }
   }, [brand, setActions, isPending, isDeletePending]);
 
@@ -129,10 +120,10 @@ const Brand = ({ params }) => {
         <BrandView brand={brand} />
       )}
       <ModalAction
-        title={modalConfig[modalAction]?.header}
+        title={modalConfig.header}
         onConfirm={handleActionConfirm}
-        confirmationWord={modalConfig[modalAction]?.confirmText}
-        confirmButtonIcon={modalConfig[modalAction]?.icon}
+        confirmationWord={modalConfig.confirmText}
+        confirmButtonIcon={modalConfig.icon}
         showModal={isModalOpen}
         setShowModal={setIsModalOpen}
         isLoading={isPending || isDeletePending}
