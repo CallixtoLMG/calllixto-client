@@ -12,7 +12,6 @@ import { chunk } from "lodash";
 import axios from "./axios";
 import { createItem, deleteItem, editItem, getItemById, listItems } from "./common";
 
-const PRODUCTS_URL = `${PATHS.PRODUCTS}`;
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
@@ -20,7 +19,7 @@ export const GET_PRODUCT_QUERY_KEY = "getProduct";
 export function useListProducts() {
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL }),
+    queryFn: () => listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -30,7 +29,7 @@ export function useListProducts() {
 export function useGetProduct(id) {
   const query = useQuery({
     queryKey: [GET_PRODUCT_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PRODUCTS_URL, entity: ENTITIES.PRODUCTS, key: 'code' }),
+    queryFn: () => getItemById({ id, url: PATHS.PRODUCTS, entity: ENTITIES.PRODUCTS, key: 'code' }),
     retry: false,
     staleTime: TIME_IN_MS.ONE_HOUR,
   });
@@ -39,20 +38,20 @@ export function useGetProduct(id) {
 };
 
 export function createProduct(product) {
-  return createItem({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, value: product, responseEntity: ENTITIES.PRODUCT });
+  return createItem({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, value: product, responseEntity: ENTITIES.PRODUCT });
 };
 
 export function deleteProduct(code) {
-  return deleteItem({ entity: ENTITIES.PRODUCTS, id: code, url: PRODUCTS_URL, key: 'code' });
+  return deleteItem({ entity: ENTITIES.PRODUCTS, id: code, url: PATHS.PRODUCTS, key: 'code' });
 };
 
 export function editProduct(product) {
-  return editItem({ entity: ENTITIES.PRODUCTS, url: `${PRODUCTS_URL}/${product.code}`, value: product, key: "code", responseEntity: ENTITIES.PRODUCT });
+  return editItem({ entity: ENTITIES.PRODUCTS, url: `${PATHS.PRODUCTS}/${product.code}`, value: product, key: "code", responseEntity: ENTITIES.PRODUCT });
 };
 
 export function useProductsBySupplierId(supplierId) {
   const listBySupplierId = async () => {
-    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PRODUCTS_URL, params: { sort: 'date' } });
+    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: 'date' } });
     return products.filter((product) => product.code.startsWith(supplierId));
   }
 
@@ -76,7 +75,7 @@ export async function createBatch(products) {
     const delay = Math.min(25000, 2 ** Math.log(i) * 100 + Math.random() * 100);
     i += i / 2
     return new Promise((resolve) => setTimeout(resolve, delay)).then(() => {
-      return axios.post(`${PRODUCTS_URL}/${BATCH}`, { products: chunk });
+      return axios.post(`${PATHS.PRODUCTS}/${BATCH}`, { products: chunk });
     });
   });
 
@@ -105,7 +104,7 @@ export async function editBatch(products) {
   const promises = chuncks.map((chunk) => {
     delay += delayIncrement;
     return new Promise((resolve) => setTimeout(resolve, delay)).then(() =>
-      axios.post(`${PRODUCTS_URL}/${EDIT_BATCH}`, { update: chunk }),
+      axios.post(`${PATHS.PRODUCTS}/${EDIT_BATCH}`, { update: chunk }),
     );
   });
 
@@ -132,5 +131,5 @@ export function editBanProducts(products) {
 };
 
 export function deleteBatchProducts(id) {
-  return axios.delete(`${PRODUCTS_URL}/${SUPPLIER}/${id}`);
+  return axios.delete(`${PATHS.PRODUCTS}/${SUPPLIER}/${id}`);
 };

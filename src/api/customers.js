@@ -5,14 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
 import { createItem, deleteItem, getItemById, listItems } from "./common";
 
-const CUSTOMERS_URL = `${PATHS.CUSTOMERS}`;
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 
 export function useListCustomers() {
   const query = useQuery({
     queryKey: [LIST_CUSTOMERS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.CUSTOMERS, url: CUSTOMERS_URL, params: { sort: 'name', order: true } }),
+    queryFn: () => listItems({ entity: ENTITIES.CUSTOMERS, url: PATHS.CUSTOMERS, params: { sort: 'name', order: true } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -22,7 +21,7 @@ export function useListCustomers() {
 export function useGetCustomer(id) {
   const query = useQuery({
     queryKey: [GET_CUSTOMER_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: CUSTOMERS_URL, entity: ENTITIES.CUSTOMERS }),
+    queryFn: () => getItemById({ id, url: PATHS.CUSTOMERS, entity: ENTITIES.CUSTOMERS }),
     retry: false,
     staleTime: TIME_IN_MS.ONE_HOUR,
   });
@@ -31,11 +30,11 @@ export function useGetCustomer(id) {
 };
 
 export function createCustomer(customer) {
-  return createItem({ entity: ENTITIES.CUSTOMERS, url: CUSTOMERS_URL, value: customer, responseEntity: ENTITIES.CUSTOMER });
+  return createItem({ entity: ENTITIES.CUSTOMERS, url: PATHS.CUSTOMERS, value: customer, responseEntity: ENTITIES.CUSTOMER });
 };
 
 export function deleteCustomer(id) {
-  return deleteItem({ entity: ENTITIES.CUSTOMERS, id, url: CUSTOMERS_URL });
+  return deleteItem({ entity: ENTITIES.CUSTOMERS, id, url: PATHS.CUSTOMERS });
 };
 
 export function edit(customer) {
@@ -43,5 +42,5 @@ export function edit(customer) {
     ...customer,
     updatedAt: now()
   }
-  return axios.put(`${CUSTOMERS_URL}/${customer.id}`, body);
+  return axios.put(`${PATHS.CUSTOMERS}/${customer.id}`, body);
 };

@@ -6,14 +6,13 @@ import axios from './axios';
 import { createItem, deleteItem, getItemById, listItems } from "./common";
 
 
-const SUPPLIER_URL = `${PATHS.SUPPLIERS}`;
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 
 export function useListSuppliers() {
   const query = useQuery({
     queryKey: [LIST_SUPPLIERS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.SUPPLIERS, url: SUPPLIER_URL, params: { sort: 'id', order: true } }),
+    queryFn: () => listItems({ entity: ENTITIES.SUPPLIERS, url: PATHS.SUPPLIERS, params: { sort: 'id', order: true } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -23,7 +22,7 @@ export function useListSuppliers() {
 export function useGetSupplier(id) {
   const query = useQuery({
     queryKey: [GET_SUPPLIER_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: SUPPLIER_URL, entity: ENTITIES.SUPPLIERS }),
+    queryFn: () => getItemById({ id, url: PATHS.SUPPLIERS, entity: ENTITIES.SUPPLIERS }),
     retry: false,
     staleTime: TIME_IN_MS.ONE_HOUR,
   });
@@ -32,11 +31,11 @@ export function useGetSupplier(id) {
 };
 
 export function createSupplier(supplier) {
-  return createItem({ entity: ENTITIES.SUPPLIERS, url: SUPPLIER_URL, value: supplier, responseEntity: ENTITIES.SUPPLIER });
+  return createItem({ entity: ENTITIES.SUPPLIERS, url: PATHS.SUPPLIERS, value: supplier, responseEntity: ENTITIES.SUPPLIER });
 };
 
 export function deleteSupplier(id) {
-  return deleteItem({ entity: ENTITIES.SUPPLIERS, id, url: SUPPLIER_URL });
+  return deleteItem({ entity: ENTITIES.SUPPLIERS, id, url: PATHS.SUPPLIERS });
 };
 
 export function edit(supplier) {
@@ -44,5 +43,5 @@ export function edit(supplier) {
     ...supplier,
     updatedAt: now()
   }
-  return axios.put(`${SUPPLIER_URL}/${supplier.id}`, body);
+  return axios.put(`${PATHS.SUPPLIERS}/${supplier.id}`, body);
 };
