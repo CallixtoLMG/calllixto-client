@@ -31,7 +31,7 @@ export function useGetProduct(id) {
     queryKey: [GET_PRODUCT_QUERY_KEY, id],
     queryFn: () => getItemById({ id, url: PATHS.PRODUCTS, entity: ENTITIES.PRODUCTS, key: 'code' }),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
+    staleTime: TIME_IN_MS.ONE_DAY,
   });
 
   return query;

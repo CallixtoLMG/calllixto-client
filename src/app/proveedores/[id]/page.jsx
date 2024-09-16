@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { deleteBatchProducts, useProductsBySupplierId } from "@/api/products";
+import { LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, deleteBatchProducts, useProductsBySupplierId } from "@/api/products";
 import { LIST_SUPPLIERS_QUERY_KEY, deleteSupplier, edit, useGetSupplier } from "@/api/suppliers";
 import { Icon } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
@@ -31,7 +31,8 @@ const Supplier = ({ params }) => {
   const [modalAction, setModalAction] = useState(null);
   const printRef = useRef(null);
   const queryClient = useQueryClient();
-console.log(products)
+  const [activeAction, setActiveAction] = useState(null);
+
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -86,8 +87,9 @@ console.log(products)
     },
     onSuccess: (response) => {
       if (response.statusOk) {
+        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplier.id], refetchType: "all" });
+        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: "all" });
         toast.success('Lista de productos del proveedor eliminada!');
-        // queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY], refetchType: "all" });
         handleModalClose();
       } else {
         toast.error(response.message);
@@ -117,19 +119,27 @@ console.log(products)
     },
   });
 
-  const handleActionConfirm = async () => {
-    if (modalAction === "deleteBatch") {
-      mutateDeleteBatch();
-    } else if (modalAction === "deleteSupplier") {
-      mutateDelete();
-    }
+  const handleActionConfirm = async (actionType) => {
+    setActiveAction(actionType);
     handleModalClose();
+
+    if (actionType === "deleteBatch") {
+      mutateDeleteBatch({}, {
+        onSettled: () => setActiveAction(null),
+      });
+    } else if (actionType === "deleteSupplier") {
+      mutateDelete({}, {
+        onSettled: () => setActiveAction(null),
+      });
+    }
   };
 
   useEffect(() => {
     const handleBarCodePrint = async () => {
       if (products.length) {
+        setActiveAction('print');
         handlePrint();
+        setActiveAction(null);
       } else {
         toast.success('No hay productos de este proveedor', {
           icon: <Icon margin="0" toast name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />,
@@ -144,6 +154,8 @@ console.log(products)
         color: COLORS.BLUE,
         text: 'Códigos',
         onClick: handleBarCodePrint,
+        loading: activeAction === 'print',
+        disabled: !!activeAction,
       },
       {
         id: 2,
@@ -154,6 +166,8 @@ console.log(products)
           setModalAction("deleteBatch");
           setIsModalOpen(true);
         },
+        loading: activeAction === 'deleteBatch',
+        disabled: !!activeAction,
         width: "fit-content",
       },
       {
@@ -165,13 +179,15 @@ console.log(products)
           setModalAction("deleteSupplier");
           setIsModalOpen(true);
         },
+        loading: activeAction === 'deleteSupplier',
+        disabled: !!activeAction,
         width: "fit-content",
         basic: true,
       },
     ] : [];
 
     setActions(actions);
-  }, [role, products, setActions]);
+  }, [role, products, activeAction, setActions]);
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);
@@ -192,7 +208,7 @@ console.log(products)
       )}
       <ModalAction
         title={modalConfig[modalAction]?.header}
-        onConfirm={handleActionConfirm}
+        onConfirm={() => handleActionConfirm(modalAction)}
         confirmationWord={modalConfig[modalAction]?.confirmText}
         confirmButtonIcon={modalConfig[modalAction]?.icon}
         showModal={isModalOpen}

@@ -1,5 +1,5 @@
 import { Flex } from '@/components/common/custom';
-import { Segment as SSegment, Table as STable } from "semantic-ui-react";
+import { Pagination as SPagination, Segment as SSegment, Table as STable } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Cell = styled(STable.Cell)`
@@ -20,7 +20,14 @@ const Container = styled(Flex)`
   overflow-x: ${({ tableHeight }) => tableHeight && "auto"} !important;
 `;
 
+const Pagination = styled(SPagination)`
+  margin: auto!important;
+`;
+
 const PaginationContainer = styled(Flex)`
+  width:100%;
+  align-items: center;
+  position: relative; 
   align-self: center;
   max-height: ${({ height = 'none' }) => `${height}!important`};
   flex-direction: row;
@@ -109,5 +116,5 @@ const LinkCell = styled(STable.Cell)`
   }
 `;
 
-export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, Segment, Table, TableHeader, TableRow };
+export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, Pagination, PaginationContainer, Segment, Table, TableHeader, TableRow };
 

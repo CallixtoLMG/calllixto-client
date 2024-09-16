@@ -27,6 +27,7 @@ const Customer = ({ params }) => {
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const queryClient = useQueryClient();
+  const [activeAction, setActiveAction] = useState(null);
 
   useEffect(() => {
     resetActions();
@@ -75,10 +76,17 @@ const Customer = ({ params }) => {
     },
   });
 
-  const handleActionConfirm = useCallback(async () => {
-    mutateDelete();
-    handleModalClose();
-  }, [mutateDelete]);
+  const handleActionConfirm = useCallback(async (actionType) => {
+    setActiveAction(actionType);
+
+    if (actionType === 'delete') {
+      mutateDelete({}, {
+        onSettled: () => {
+          setActiveAction(null);
+        }
+      });
+    }
+  }, [mutateDelete, mutate, customer]);
 
   useEffect(() => {
     if (customer) {
@@ -87,18 +95,17 @@ const Customer = ({ params }) => {
           id: 1,
           icon: ICONS.TRASH,
           color: COLORS.RED,
-          onClick: () => {
-            setIsModalOpen(true);
-          },
+          onClick: () => setIsModalOpen(true),
           text: "Eliminar",
-          loading: isDeletePending,
-          disabled: isDeletePending,
+          actionType: 'delete', 
+          loading: activeAction === 'delete',
+          disabled: !!activeAction, 
         },
       ];
 
       setActions(actions);
     }
-  }, [customer, setActions, isPending, isDeletePending]);
+  }, [customer, setActions, activeAction, handleActionConfirm]);
 
   if (!isLoading && !customer) {
     push(PAGES.NOT_FOUND.BASE);

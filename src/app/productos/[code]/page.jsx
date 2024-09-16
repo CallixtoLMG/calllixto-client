@@ -1,10 +1,11 @@
 "use client";
 import { useUserContext } from "@/User";
-import { LIST_PRODUCTS_QUERY_KEY, deleteProduct, editProduct, useGetProduct } from "@/api/products";
+import { GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, deleteProduct, editProduct, useGetProduct } from "@/api/products";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction } from "@/components/common/modals";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
+import ProductView from "@/components/products/ProductView";
 import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
@@ -14,7 +15,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import ProductView from "@/components/products/ProductView";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -31,6 +31,7 @@ const Product = ({ params }) => {
   const isInactive = product?.state === PRODUCT_STATES.INACTIVE.id;
   const queryClient = useQueryClient();
   const printRef = useRef(null);
+  const [activeAction, setActiveAction] = useState(null);
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -47,12 +48,17 @@ const Product = ({ params }) => {
   };
 
   const handleActionConfirm = async () => {
+    setActiveAction(modalAction);
     if (modalAction === "hardDelete") {
-      mutateDelete(product);
+      mutateDelete(product, {
+        onSettled: () => setActiveAction(null), 
+      });
     } else {
       const newState = actionMap[modalAction];
       if (newState) {
-        mutate({ ...product, state: newState });
+        mutate({ ...product, state: newState }, {
+          onSettled: () => setActiveAction(null), 
+        });
       }
     }
     handleModalClose();
@@ -69,7 +75,6 @@ const Product = ({ params }) => {
   const handleStockChangeClick = useCallback(() => openModalWithAction(isOOS ? "inStock" : "outOfStock"), [isOOS, openModalWithAction]);
   const handleSoftDeleteClick = useCallback(() => openModalWithAction("softDelete"), [openModalWithAction]);
   const handleHardDeleteClick = useCallback(() => openModalWithAction("hardDelete"), [openModalWithAction]);
-
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     removeAfterPrint: true,
@@ -84,6 +89,7 @@ const Product = ({ params }) => {
       if (response.statusOk) {
         toast.success("Producto actualizado!");
         queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: "all" });
+        queryClient.invalidateQueries({ queryKey: [GET_PRODUCT_QUERY_KEY, product.code], refetchType: "all" });
         push(PAGES.PRODUCTS.BASE);
       } else {
         toast.error(response.message);
@@ -157,23 +163,22 @@ const Product = ({ params }) => {
           color: COLORS.BLUE,
           onClick: () => setTimeout(handlePrint),
           text: "Código",
-          loading: isPending || isDeletePending,
+          loading: activeAction === "print", 
+          disabled: !!activeAction, 
         },
       ];
-
       if (!isDeleted && !isInactive) {
         actions.push({
           id: 2,
           icon: isOOS ? ICONS.BOX : ICONS.BAN,
           color: COLORS.ORANGE,
           onClick: handleStockChangeClick,
-          text: isOOS ? "En stock" : PRODUCT_STATES.OOS.id,
-          disabled: isInactive || isDeleted,
-          loading: isPending || isDeletePending,
-          width: "fit-content"
+          text: isOOS ? "En stock" : PRODUCT_STATES.OOS.singularTitle,
+          width: "fit-content",
+          loading: activeAction === "outOfStock", 
+          disabled: !!activeAction, 
         });
       }
-
       if (!isDeleted) {
         actions.push({
           id: 3,
@@ -181,21 +186,20 @@ const Product = ({ params }) => {
           color: COLORS.GREY,
           onClick: isInactive ? handleActivateClick : handleInactivateClick,
           text: isInactive ? "Activar" : "Desactivar",
-          disabled: isDeleted,
-          loading: isPending || isDeletePending,
-          width: "fit-content"
+          width: "fit-content",
+          loading: activeAction === "activate" || activeAction === "inactivate", 
+          disabled: !!activeAction, 
         });
-
         actions.push({
           id: 4,
           icon: ICONS.TRASH,
           color: COLORS.RED,
           onClick: handleSoftDeleteClick,
           text: "Eliminar",
-          loading: isPending || isDeletePending,
+          loading: activeAction === "softDelete",
+          disabled: !!activeAction,
         });
       }
-
       if (isDeleted) {
         actions.push({
           id: 5,
@@ -203,25 +207,24 @@ const Product = ({ params }) => {
           color: COLORS.GREEN,
           onClick: handleRecoverClick,
           text: "Recuperar",
-          disabled: !isDeleted,
-          loading: isPending || isDeletePending,
-          width: "fit-content"
+          width: "fit-content",
+          loading: activeAction === "recover", 
+          disabled: !!activeAction,
         });
-
         actions.push({
           id: 6,
           icon: ICONS.TRASH,
           color: COLORS.RED,
           onClick: handleHardDeleteClick,
           text: "Eliminar",
-          loading: isPending || isDeletePending,
+          loading: activeAction === "hardDelete", 
+          disabled: !!activeAction, 
         });
       }
-
+  
       setActions(actions);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product, isOOS, isInactive, isDeleted, handleRecoverClick, handleActivateClick, handleInactivateClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, isPending, isDeletePending, setActions]);
+  }, [product, isOOS, isInactive, isDeleted, activeAction, handleRecoverClick, handleActivateClick, handleInactivateClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, setActions]);
 
   return (
     <Loader active={isLoading}>

@@ -11,7 +11,7 @@ import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
 
 const modalConfig = {
@@ -30,6 +30,7 @@ const Brand = ({ params }) => {
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const queryClient = useQueryClient();
+  const [activeAction, setActiveAction] = useState(null); // Estado para la acción activa
 
   useEffect(() => {
     resetActions();
@@ -78,8 +79,12 @@ const Brand = ({ params }) => {
   });
 
   const handleActionConfirm = async () => {
-    mutateDelete();
-    handleModalClose();
+    setActiveAction("delete"); 
+    handleModalClose();       
+  
+    mutateDelete({}, {
+      onSettled: () => setActiveAction(null), 
+    });
   };
 
   useEffect(() => {

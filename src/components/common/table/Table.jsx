@@ -2,11 +2,11 @@ import { Loader } from "@/components/layout";
 import { COLORS, DEFAULT_PAGE_SIZE, ICONS, PAGE_SIZE_OPTIONS } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Checkbox, Header, Icon, Pagination, Popup } from "semantic-ui-react";
+import { Button, Checkbox, Header, Icon, Popup } from "semantic-ui-react";
 import { IconnedButton, PopupActions } from "../buttons";
 import { CenteredFlex, Dropdown } from "../custom";
 import Actions from "./Actions";
-import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, Table, TableHeader, TableRow } from "./styles";
+import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Pagination, PaginationContainer, Table, TableHeader, TableRow } from "./styles";
 
 const CustomTable = ({
   isLoading,
@@ -58,7 +58,7 @@ const CustomTable = ({
   }, [pages, activePage]);
 
   const handlePageChange = (e, { activePage }) => {
-    clearSelection();
+    clearSelection?.();
     setActivePage(activePage);
   };
 
@@ -79,7 +79,18 @@ const CustomTable = ({
   return (
     <Container tableHeight={tableHeight}>
       {paginate && (
-        <PaginationContainer>
+        <PaginationContainer center>
+          <Pagination
+            activePage={activePage}
+            onPageChange={handlePageChange}
+            siblingRange={2}
+            boundaryRange={2}
+            firstItem={null}
+            lastItem={null}
+            pointing
+            secondary
+            totalPages={pages}
+          />
           <Popup
             size="mini"
             content="Elementos mostrados"
@@ -92,22 +103,11 @@ const CustomTable = ({
                 compact
                 height="40px"
                 top="10px"
-                margin="0 20px 0 0"
+                width="fit-content"
               />
             )}
             position="left center"
             mouseEnterDelay={500}
-          />
-          <Pagination
-            activePage={activePage}
-            onPageChange={handlePageChange}
-            siblingRange={2}
-            boundaryRange={2}
-            firstItem={null}
-            lastItem={null}
-            pointing
-            secondary
-            totalPages={pages}
           />
         </PaginationContainer>
       )}
