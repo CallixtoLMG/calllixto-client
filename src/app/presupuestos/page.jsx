@@ -106,7 +106,7 @@ const Budgets = () => {
         onClick: () => {
           downloadExcel(prepareBudgetDataForExcel, "Lista de Presupuestos");
         },
-        text: 'Presupuetos',
+        text: 'Presupuestos',
         disabled: loading
       },
     ];

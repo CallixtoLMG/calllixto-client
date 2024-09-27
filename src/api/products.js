@@ -10,7 +10,7 @@ import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { chunk } from "lodash";
 import axios from "./axios";
-import { createItem, deleteItem, editItem, getItemById, listItems } from "./common";
+import { createItem, deleteItem, getItemById, listItems, useEditItem } from "./common";
 
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
@@ -45,8 +45,27 @@ export function deleteProduct(code) {
   return deleteItem({ entity: ENTITIES.PRODUCTS, id: code, url: PATHS.PRODUCTS, key: 'code' });
 };
 
-export function editProduct(product) {
-  return editItem({ entity: ENTITIES.PRODUCTS, url: `${PATHS.PRODUCTS}/${product.code}`, value: product, key: "code", responseEntity: ENTITIES.PRODUCT });
+// export function editProduct(product) {
+//   return editItem({ entity: ENTITIES.PRODUCTS, url: `${PATHS.PRODUCTS}/${product.code}`, value: product, key: "code", responseEntity: ENTITIES.PRODUCT });
+// };
+
+export const useEditProduct = () => {
+  const editItem = useEditItem();
+
+  const editProduct = async (product) => {
+    const response = await editItem({
+      entity: ENTITIES.PRODUCTS,
+      url: `${PATHS.PRODUCTS}/${product.code}`,
+      value: product,
+      key: "code",
+      responseEntity: ENTITIES.PRODUCT,
+      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, product.code]]
+    });
+
+    return response;
+  };
+
+  return editProduct;
 };
 
 export function useProductsBySupplierId(supplierId) {

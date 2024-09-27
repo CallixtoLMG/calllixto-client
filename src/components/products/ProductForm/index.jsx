@@ -1,9 +1,9 @@
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
-import { ICONS, MEASSURE_UNITS, PAGES, PRODUCT_STATES, RULES, SHORTKEYS } from "@/constants";
+import { ICONS, MEASSURE_UNITS, PAGES, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { preventSend } from "@/utils";
+import { isProductDeleted, preventSend } from "@/utils";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 
@@ -48,8 +48,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   const shouldError = useMemo(() => !isUpdating && isDirty && isSubmitted, [isDirty, isSubmitted, isUpdating]);
 
-  const isDeleted = product?.state === PRODUCT_STATES.DELETED.id;
-
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT), SHORTKEYS.DELETE);
 
@@ -75,7 +73,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 setSupplier(supplier);
                 clearErrors("code");
               }}
-              disabled={isDeleted}
+              disabled={isProductDeleted(product?.state)}
             />
           ) : (
             <Segment placeholder>{product?.supplierName}</Segment>
@@ -100,7 +98,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 setBrand(brand);
                 clearErrors("code");
               }}
-              disabled={isDeleted}
+              disabled={isProductDeleted(product?.state)}
             />
           ) : (
             <Segment placeholder>{product?.brandName}</Segment>
@@ -117,7 +115,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 icon={ICONS.PENCIL}
                 onClick={() => onChange(!value)}
                 basic={!value}
-                disabled={isDeleted}
+                disabled={isProductDeleted(product?.state)}
               />
             )}
           />
@@ -133,7 +131,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 icon={ICONS.CUT}
                 onClick={() => onChange(!value)}
                 basic={!value}
-                disabled={isDeleted}
+                disabled={isProductDeleted(product?.state)}
               />
             )}
           />
@@ -157,7 +155,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                   {...((supplier?.id || brand?.id) && { label: { basic: true, content: `${supplier?.id ?? ''} ${brand?.id ?? ''}` } })}
                   labelPosition='left'
-                  disabled={isDeleted}
+                  disabled={isProductDeleted(product?.state)}
                 />
               )}
             />
@@ -169,7 +167,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             name="name"
             control={control}
             rules={RULES.REQUIRED}
-            render={({ field }) => <Input height="50px" {...field} placeholder="Nombre" disabled={isDeleted} />}
+            render={({ field }) => <Input height="50px" {...field} placeholder="Nombre" disabled={isProductDeleted(product?.state)} />}
           />
         </FormField>
         <FormField width="20%">
@@ -192,7 +190,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 }}
                 value={value || 0}
                 placeholder="Precio"
-                disabled={isDeleted}
+                disabled={isProductDeleted(product?.state)}
               />
             )}
           />
@@ -209,21 +207,21 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 options={Object.values(MEASSURE_UNITS)}
                 defaultValue={Object.values(MEASSURE_UNITS)[0].value}
                 onChange={(e, { value }) => onChange(value)}
-                disabled={!watchFractionable || isDeleted}
+                disabled={!watchFractionable || isProductDeleted(product?.state)}
               />
             )}
           />
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
-        <ControlledComments control={control} disabled={isDeleted} />
+        <ControlledComments control={control} disabled={isProductDeleted(product?.state)} />
       </FieldsContainer>
       <SubmitAndRestore
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}
         onReset={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT)}
-        disabled={isDeleted}
+        disabled={isProductDeleted(product?.state)}
       />
     </Form>
   );

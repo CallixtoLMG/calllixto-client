@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, deleteProduct, editProduct, useGetProduct } from "@/api/products";
+import { LIST_PRODUCTS_QUERY_KEY, deleteProduct, useEditProduct, useGetProduct } from "@/api/products";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction } from "@/components/common/modals";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -10,6 +10,7 @@ import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
+import { isProductDeleted, isProductInactive, isProductOOS } from "@/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -26,12 +27,11 @@ const Product = ({ params }) => {
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
-  const isDeleted = product?.state === PRODUCT_STATES.DELETED.id;
-  const isOOS = product?.state === PRODUCT_STATES.OOS.id;
-  const isInactive = product?.state === PRODUCT_STATES.INACTIVE.id;
   const queryClient = useQueryClient();
   const printRef = useRef(null);
   const [activeAction, setActiveAction] = useState(null);
+
+  const editProduct = useEditProduct();
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -51,13 +51,13 @@ const Product = ({ params }) => {
     setActiveAction(modalAction);
     if (modalAction === "hardDelete") {
       mutateDelete(product, {
-        onSettled: () => setActiveAction(null), 
+        onSettled: () => setActiveAction(null),
       });
     } else {
       const newState = actionMap[modalAction];
       if (newState) {
         mutate({ ...product, state: newState }, {
-          onSettled: () => setActiveAction(null), 
+          onSettled: () => setActiveAction(null),
         });
       }
     }
@@ -72,9 +72,10 @@ const Product = ({ params }) => {
   const handleRecoverClick = useCallback(() => openModalWithAction("recover"), [openModalWithAction]);
   const handleActivateClick = useCallback(() => openModalWithAction("activate"), [openModalWithAction]);
   const handleInactivateClick = useCallback(() => openModalWithAction("inactivate"), [openModalWithAction]);
-  const handleStockChangeClick = useCallback(() => openModalWithAction(isOOS ? "inStock" : "outOfStock"), [isOOS, openModalWithAction]);
+  const handleStockChangeClick = useCallback(() => openModalWithAction(isProductOOS(product?.state) ? "inStock" : "outOfStock"), [isProductOOS(product?.state), openModalWithAction]);
   const handleSoftDeleteClick = useCallback(() => openModalWithAction("softDelete"), [openModalWithAction]);
   const handleHardDeleteClick = useCallback(() => openModalWithAction("hardDelete"), [openModalWithAction]);
+
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     removeAfterPrint: true,
@@ -88,8 +89,6 @@ const Product = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto actualizado!");
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: "all" });
-        queryClient.invalidateQueries({ queryKey: [GET_PRODUCT_QUERY_KEY, product.code], refetchType: "all" });
         push(PAGES.PRODUCTS.BASE);
       } else {
         toast.error(response.message);
@@ -163,32 +162,32 @@ const Product = ({ params }) => {
           color: COLORS.BLUE,
           onClick: () => setTimeout(handlePrint),
           text: "Código",
-          loading: activeAction === "print", 
-          disabled: !!activeAction, 
+          loading: activeAction === "print",
+          disabled: !!activeAction,
         },
       ];
-      if (!isDeleted && !isInactive) {
+      if (!isProductDeleted(product?.state) && !isProductInactive(product?.state)) {
         actions.push({
           id: 2,
-          icon: isOOS ? ICONS.BOX : ICONS.BAN,
+          icon: isProductOOS(product?.state) ? ICONS.BOX : ICONS.BAN,
           color: COLORS.ORANGE,
           onClick: handleStockChangeClick,
-          text: isOOS ? "En stock" : PRODUCT_STATES.OOS.singularTitle,
+          text: isProductOOS(product?.state) ? "En stock" : PRODUCT_STATES.OOS.singularTitle,
           width: "fit-content",
-          loading: activeAction === "outOfStock", 
-          disabled: !!activeAction, 
+          loading: activeAction === "outOfStock",
+          disabled: !!activeAction,
         });
       }
-      if (!isDeleted) {
+      if (!isProductDeleted(product?.state)) {
         actions.push({
           id: 3,
-          icon: isInactive ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
+          icon: isProductInactive(product?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
           color: COLORS.GREY,
-          onClick: isInactive ? handleActivateClick : handleInactivateClick,
-          text: isInactive ? "Activar" : "Desactivar",
+          onClick: isProductInactive(product?.state) ? handleActivateClick : handleInactivateClick,
+          text: isProductInactive(product?.state) ? "Activar" : "Desactivar",
           width: "fit-content",
-          loading: activeAction === "activate" || activeAction === "inactivate", 
-          disabled: !!activeAction, 
+          loading: activeAction === "activate" || activeAction === "inactivate",
+          disabled: !!activeAction,
         });
         actions.push({
           id: 4,
@@ -200,7 +199,7 @@ const Product = ({ params }) => {
           disabled: !!activeAction,
         });
       }
-      if (isDeleted) {
+      if (isProductDeleted(product?.state)) {
         actions.push({
           id: 5,
           icon: ICONS.UNDO,
@@ -208,7 +207,7 @@ const Product = ({ params }) => {
           onClick: handleRecoverClick,
           text: "Recuperar",
           width: "fit-content",
-          loading: activeAction === "recover", 
+          loading: activeAction === "recover",
           disabled: !!activeAction,
         });
         actions.push({
@@ -217,14 +216,14 @@ const Product = ({ params }) => {
           color: COLORS.RED,
           onClick: handleHardDeleteClick,
           text: "Eliminar",
-          loading: activeAction === "hardDelete", 
-          disabled: !!activeAction, 
+          loading: activeAction === "hardDelete",
+          disabled: !!activeAction,
         });
       }
-  
+
       setActions(actions);
     }
-  }, [product, isOOS, isInactive, isDeleted, activeAction, handleRecoverClick, handleActivateClick, handleInactivateClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, setActions]);
+  }, [product, activeAction, handleRecoverClick, handleActivateClick, handleInactivateClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, setActions]);
 
   return (
     <Loader active={isLoading}>
@@ -242,7 +241,7 @@ const Product = ({ params }) => {
         bodyContent={bodyContent}
       />
 
-      {!isDeleted && Toggle}
+      {!isProductDeleted(product?.state) && Toggle}
       {isUpdating ? (
         <ProductForm product={product} onSubmit={mutate} isUpdating isLoading={isPending} />
       ) : (

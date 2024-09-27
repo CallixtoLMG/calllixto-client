@@ -1,5 +1,6 @@
 import { config } from "@/config";
 import { encodeUri, now } from "@/utils";
+import { useQueryClient } from "@tanstack/react-query";
 import axios from './axios';
 import localforage from "./local-forage";
 
@@ -77,18 +78,23 @@ export async function createItem({ entity, value, url, responseEntity }) {
   return data;
 };
 
-export async function editItem({ entity, value, url, responseEntity, key }) {
-  const body = {
-    ...value,
-    updatedAt: now()
-  }
-  const { data } = await axios.put(url, body);
+export function useEditItem() {
+  const queryClient = useQueryClient();
+  const editItem = async ({ entity, value, url, responseEntity, key, invalidateQueries = [] }) => {
+    const body = {
+      ...value,
+      updatedAt: now()
+    }
+    const { data } = await axios.put(url, body);
 
-  if (data.statusOk) {
-    await updateStorageItem({ entity, key, value: data[responseEntity] });
-  }
+    if (data.statusOk) {
+      await updateStorageItem({ entity, key, value: data[responseEntity] });
+    }
+    invalidateQueries.forEach((query) => { queryClient.invalidateQueries({ queryKey: query, refetchType: 'all' }); })
 
-  return data;
+    return data;
+  }
+  return editItem;
 };
 
 export async function deleteItem({ entity, id, url, key }) {

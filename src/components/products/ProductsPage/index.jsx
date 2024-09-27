@@ -1,4 +1,4 @@
-import { deleteProduct, editProduct, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
+import { deleteProduct, LIST_PRODUCTS_QUERY_KEY, useEditProduct } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
 import { Dropdown, Flex, Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
@@ -17,21 +17,19 @@ import { PRODUCT_COLUMNS } from "../products.common";
 
 const EMPTY_FILTERS = { code: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
 const STATE_OPTIONS = [
-  ...Object.entries(PRODUCT_STATES).map(([key, value]) => (
-    {
-      key,
-      text: (
-        <Flex alignItems="center" justifyContent="space-between">
-          {value.title}&nbsp;<Label color={value.color} circular empty />
-        </Flex>
-      ),
-      value: key
-    }))
+  ...Object.entries(PRODUCT_STATES).map(([key, value]) => ({
+    key,
+    text: (
+      <Flex alignItems="center" justifyContent="space-between">
+        {value.title}&nbsp;<Label color={value.color} circular empty />
+      </Flex>
+    ),
+    value: key
+  }))
 ];
 
 const ProductsPage = ({ products = [], role, isLoading }) => {
   const methods = useForm();
-  const queryClient = useQueryClient();
   const { handleSubmit, control, reset, watch } = methods;
   const [showModal, setShowModal] = useState(false);
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
@@ -40,10 +38,13 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const watchState = watch('state', PRODUCT_STATES.ACTIVE.id);
   const printRef = useRef();
+  const queryClient = useQueryClient();
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     removeAfterPrint: true,
   });
+
+  const editProduct = useEditProduct();
 
   const onFilter = useCallback(product => {
     if (filters.name && !product.name.toLowerCase().includes(filters.name.toLowerCase())) {
@@ -87,7 +88,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Producto eliminado!');
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: 'all' });
         setShowModal(false);
       } else {
         toast.error(response.message);
@@ -132,6 +132,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     onSuccess: (deletedCount) => {
       toast.success(`${deletedCount} productos eliminados!`);
       setSelectedProducts({});
+      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] }); // Invalidamos la query
       setShowConfirmDeleteModal(false);
     },
     onError: (error) => {
@@ -158,7 +159,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
           onClick={() => setShowConfirmDeleteModal(true)}
         />
       );
-    };
+    }
     return actions;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role]);

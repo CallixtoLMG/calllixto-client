@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import * as XLSX from "xlsx";
-import { BUDGET_STATES, REGEX } from "./constants";
+import { BUDGET_STATES, PRODUCT_STATES, REGEX } from "./constants";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -174,6 +174,18 @@ export const isBudgetExpired = (status) => {
   return status === BUDGET_STATES.EXPIRED.id;
 };
 
-export const isBudgetPending = (status) => {
-  return status === BUDGET_STATES.PENDING.id;
+export const isProductActive = (status) => {
+  return status === PRODUCT_STATES.ACTIVE.id;
+};
+
+export const isProductOOS = (status) => {
+  return status === PRODUCT_STATES.OOS.id;
+};
+
+export const isProductInactive = (status) => {
+  return status === PRODUCT_STATES.INACTIVE.id;
+};
+
+export const isProductDeleted = (status) => {
+  return status === PRODUCT_STATES.DELETED.id;
 };
