@@ -1,9 +1,9 @@
+import { ATTRIBUTES } from "@/components/customers/customers.common";
 import { ENTITIES, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { now } from "@/utils";
+import { encodeUri } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import axios from './axios';
-import { createItem, deleteItem, getItemById, listItems } from "./common";
+import { getItemById, listItems, useCreateItem, useDeleteItem, useEditItem } from "./common";
 
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
@@ -11,7 +11,7 @@ export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 export function useListCustomers() {
   const query = useQuery({
     queryKey: [LIST_CUSTOMERS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.CUSTOMERS, url: PATHS.CUSTOMERS, params: { sort: 'name', order: true } }),
+    queryFn: () => listItems({ entity: ENTITIES.CUSTOMERS, url: PATHS.CUSTOMERS, params: { sort: 'name', order: true, attributes: encodeUri(Object.values(ATTRIBUTES)) } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -29,18 +29,58 @@ export function useGetCustomer(id) {
   return query;
 };
 
-export function createCustomer(customer) {
-  return createItem({ entity: ENTITIES.CUSTOMERS, url: PATHS.CUSTOMERS, value: customer, responseEntity: ENTITIES.CUSTOMER });
+export const useCreateCustomer = () => {
+  const createItem = useCreateItem();
+
+  const createCustomer = async (customer) => {
+    const response = await createItem({
+      entity: ENTITIES.CUSTOMERS,
+      url: PATHS.CUSTOMERS,
+      value: customer,
+      responseEntity: ENTITIES.CUSTOMER,
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY]],
+    });
+
+    return response;
+  };
+
+  return createCustomer;
 };
 
-export function deleteCustomer(id) {
-  return deleteItem({ entity: ENTITIES.CUSTOMERS, id, url: PATHS.CUSTOMERS });
+export const useDeleteCustomer = () => {
+  const deleteItem = useDeleteItem();
+
+  const deleteCustomer = async (id) => {
+    const response = await deleteItem({
+      entity: ENTITIES.CUSTOMERS,
+      id,
+      url: PATHS.CUSTOMERS,
+      key: "id",
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY]]
+    });
+
+    return response;
+  };
+
+  return deleteCustomer;
 };
 
-export function edit(customer) {
-  const body = {
-    ...customer,
-    updatedAt: now()
-  }
-  return axios.put(`${PATHS.CUSTOMERS}/${customer.id}`, body);
+export const useEditCustomer = () => {
+  const editItem = useEditItem();
+
+  const editCustomer = async (customer) => {
+
+    const response = await editItem({
+      entity: ENTITIES.CUSTOMERS,
+      url: `${PATHS.CUSTOMERS}/${customer.id}`,
+      value: customer,
+      key: "id",
+      responseEntity: ENTITIES.CUSTOMER,
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
+    });
+
+    return response;
+  };
+
+  return editCustomer;
 };

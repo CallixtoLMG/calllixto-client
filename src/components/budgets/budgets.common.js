@@ -13,7 +13,9 @@ const ATTRIBUTES = {
   PRODUCTS: "products",
   DISCOUNT: "globalDiscount",
   STATE: "state",
-  FRACTION_CONFIG: "fractionConfig",
+  ADDITIONAL_CHARGE: "additionalCharge",
+  PAYMENT_METHODS: "paymentMethods",
+  EXPIRATION_OFF_SET_DAYS: "expirationOffsetDays"
 };
 
 const BUDGETS_COLUMNS = [

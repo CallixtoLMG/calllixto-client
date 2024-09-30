@@ -59,7 +59,7 @@ const LoginForm = ({ onSubmit }) => {
                   placeholder='Correo electrónico'
                   fluid
                   icon={ICONS.USER}
-                  iconPosition={ICONS.LOCK}
+                  iconPosition='left'
                 />
               )}
             />

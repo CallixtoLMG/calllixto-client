@@ -14,7 +14,7 @@ const BrandView = ({ brand }) => {
           <Segment placeholder>{brand?.name}</Segment>
         </FormField>
       </FieldsContainer>
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px">
         <Label>Comentarios</Label>
         <Segment placeholder>{brand?.comments}</Segment>
       </FieldsContainer>

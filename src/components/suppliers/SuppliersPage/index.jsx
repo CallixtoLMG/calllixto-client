@@ -1,10 +1,10 @@
-import { deleteSupplier, LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
+import { useDeleteSupplier } from "@/api/suppliers";
 import { Input } from "@/components/common/custom";
 import { ModalAction } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { COLORS, ICONS, PAGES } from "@/constants";
 import { RULES } from "@/roles";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -19,8 +19,8 @@ const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
   const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar la marca "${name}"?`, []);
-  const queryClient = useQueryClient();
-
+  const deleteSupplier = useDeleteSupplier();
+  
   const onFilter = useCallback((supplier) => {
     if (filters.name && !supplier.name.toLowerCase().includes(filters.name.toLowerCase())) {
       return false;
@@ -54,7 +54,6 @@ const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Proveedor eliminado!');
-        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY], refetchType: 'all' });
         setShowModal(false);
       } else {
         toast.error(response.message);

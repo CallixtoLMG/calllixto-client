@@ -89,9 +89,15 @@ export const Dropdown = styled(SDropdown)`
     min-width: ${({ minWidth }) => `${minWidth}!important;`};
     height: ${({ height = "50px" }) => `${height}!important`};
   };
+  i{
+    margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
+  }
   i.dropdown.icon {
     height: 50px!important;
     top: ${({ top = "15px" }) => `${top}!important`};
+  };
+  &:hover {
+    background-color: ${({ noBgColor }) => `${noBgColor}!important`};
   };
 `;
 

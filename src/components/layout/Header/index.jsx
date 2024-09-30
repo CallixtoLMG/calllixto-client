@@ -1,7 +1,13 @@
 import { useUserContext } from "@/User";
+import { LIST_BRANDS_QUERY_KEY } from "@/api/brands";
+import { LIST_BUDGETS_QUERY_KEY } from "@/api/budgets";
+import { LIST_CUSTOMERS_QUERY_KEY } from "@/api/customers";
+import { LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
+import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { Flex } from '@/components/common/custom';
 import { KeyboardShortcuts } from "@/components/common/modals";
-import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";
+import OptionsDropdown from "@/components/layout/OptionsHeader";
+import { DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from 'next/navigation';
@@ -12,6 +18,20 @@ const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
+
+
+  const entityMapping = {
+    [PAGES.CUSTOMERS.BASE]: { entity: ENTITIES.CUSTOMERS, queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
+    [PAGES.PRODUCTS.BASE]: { entity: ENTITIES.PRODUCTS, queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
+    [PAGES.BUDGETS.BASE]: { entity: ENTITIES.BUDGETS, queryKey: LIST_BUDGETS_QUERY_KEY, text: PAGES.BUDGETS.NAME },
+    [PAGES.BRANDS.BASE]: { entity: ENTITIES.BRANDS, queryKey: LIST_BRANDS_QUERY_KEY, text: PAGES.BRANDS.NAME },
+    [PAGES.SUPPLIERS.BASE]: { entity: ENTITIES.SUPPLIERS, queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
+
+  };
+
+  const currentEntity = Object.keys(entityMapping).find(key => pathname.includes(key))
+    ? entityMapping[pathname]
+    : null;
 
   const handleClientChange = (event, data) => {
     const userData = JSON.parse(sessionStorage.getItem("userData"));
@@ -27,6 +47,7 @@ const Header = () => {
 
   const routesWithoutHeader = [PAGES.LOGIN.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
+
   const shortcutMapping = {
     [PAGES.CUSTOMERS.SHORTKEYS]: () => push(PAGES.CUSTOMERS.BASE),
     [PAGES.SUPPLIERS.SHORTKEYS]: () => push(PAGES.SUPPLIERS.BASE),
@@ -58,14 +79,16 @@ const Header = () => {
                 </Flex>
                 <Flex>
                   <KeyboardShortcuts />
-                  {isCallixtoUser(role) &&
+                  {currentEntity?.entity && currentEntity?.queryKey && (
+                    <OptionsDropdown entity={currentEntity.entity} queryKey={currentEntity.queryKey} text={currentEntity.text} />
+                  )}
+                  {isCallixtoUser(role) && (
                     <LogDiv padding="8px">
                       <Dropdown
                         search
                         selection
                         defaultValue={userData.selectedClientId || DEFAULT_SELECTED_CLIENT}
-                        options={userData.callixtoClients.map((client) =>
-                        ({
+                        options={userData.callixtoClients.map((client) => ({
                           key: client,
                           text: client,
                           value: client,
@@ -73,7 +96,7 @@ const Header = () => {
                         onChange={handleClientChange}
                       />
                     </LogDiv>
-                  }
+                  )}
                   <LogDiv>
                     <Menu.Item onClick={handleLogout}><Text>Cerrar sesión</Text></Menu.Item>
                   </LogDiv>
@@ -81,7 +104,6 @@ const Header = () => {
               </>
             )}
           </Container>
-
         </Menu>
       }
     </>

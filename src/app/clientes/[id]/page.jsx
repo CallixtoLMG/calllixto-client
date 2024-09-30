@@ -1,5 +1,5 @@
 "use client";
-import { deleteCustomer, edit, LIST_CUSTOMERS_QUERY_KEY, useGetCustomer } from "@/api/customers";
+import { useDeleteCustomer, useEditCustomer, useGetCustomer } from "@/api/customers";
 import ModalAction from "@/components/common/modals/ModalAction";
 import CustomerForm from "@/components/customers/CustomerForm";
 import CustomerView from "@/components/customers/CustomerView";
@@ -7,7 +7,7 @@ import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/
 import { COLORS, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -26,17 +26,14 @@ const Customer = ({ params }) => {
   const { resetActions, setActions } = useNavActionsContext();
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const queryClient = useQueryClient();
   const [activeAction, setActiveAction] = useState(null);
+  const editCustomer = useEditCustomer();
+  const deleteCustomer = useDeleteCustomer();
 
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
 
   useEffect(() => {
     setLabels([PAGES.CUSTOMERS.NAME, customer?.name]);
@@ -45,7 +42,7 @@ const Customer = ({ params }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (customer) => {
-      const { data } = await edit(customer);
+      const data = await editCustomer(customer);
       return data;
     },
     onSuccess: (response) => {
@@ -65,7 +62,6 @@ const Customer = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Cliente eliminado permanentemente!');
-        queryClient.invalidateQueries({ queryKey: [LIST_CUSTOMERS_QUERY_KEY], refetchType: "all" });
         push(PAGES.CUSTOMERS.BASE);
       } else {
         toast.error(response.message);
@@ -86,7 +82,7 @@ const Customer = ({ params }) => {
         }
       });
     }
-  }, [mutateDelete, mutate, customer]);
+  }, [mutateDelete]);
 
   useEffect(() => {
     if (customer) {
@@ -97,9 +93,9 @@ const Customer = ({ params }) => {
           color: COLORS.RED,
           onClick: () => setIsModalOpen(true),
           text: "Eliminar",
-          actionType: 'delete', 
+          actionType: 'delete',
           loading: activeAction === 'delete',
-          disabled: !!activeAction, 
+          disabled: !!activeAction,
         },
       ];
 

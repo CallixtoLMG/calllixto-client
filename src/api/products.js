@@ -1,3 +1,4 @@
+import { ATTRIBUTES } from "@/components/products/products.common";
 import { ENTITIES, TIME_IN_MS } from "@/constants";
 import {
   BATCH,
@@ -6,11 +7,11 @@ import {
   PATHS,
   SUPPLIER,
 } from "@/fetchUrls";
-import { now } from "@/utils";
+import { encodeUri, now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import { chunk } from "lodash";
 import axios from "./axios";
-import { createItem, deleteItem, getItemById, listItems, useEditItem } from "./common";
+import { getItemById, listItems, useCreateItem, useDeleteItem, useEditItem } from "./common";
 
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
@@ -19,7 +20,7 @@ export const GET_PRODUCT_QUERY_KEY = "getProduct";
 export function useListProducts() {
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS }),
+    queryFn: () => listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { attributes: encodeUri(Object.values(ATTRIBUTES)) } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -37,17 +38,41 @@ export function useGetProduct(id) {
   return query;
 };
 
-export function createProduct(product) {
-  return createItem({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, value: product, responseEntity: ENTITIES.PRODUCT });
+export const useCreateProduct = () => {
+  const createItem = useCreateItem();
+
+  const createProduct = async (product) => {
+    const response = await createItem({
+      entity: ENTITIES.PRODUCTS,
+      url: PATHS.PRODUCTS,
+      value: product,
+      responseEntity: ENTITIES.PRODUCT,
+      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]],
+    });
+
+    return response;
+  };
+
+  return createProduct;
 };
 
-export function deleteProduct(code) {
-  return deleteItem({ entity: ENTITIES.PRODUCTS, id: code, url: PATHS.PRODUCTS, key: 'code' });
-};
+export const useDeleteProduct = () => {
+  const deleteItem = useDeleteItem();
 
-// export function editProduct(product) {
-//   return editItem({ entity: ENTITIES.PRODUCTS, url: `${PATHS.PRODUCTS}/${product.code}`, value: product, key: "code", responseEntity: ENTITIES.PRODUCT });
-// };
+  const deleteProduct = async (code) => {
+    const response = await deleteItem({
+      entity: ENTITIES.PRODUCTS,
+      id: code,
+      url: PATHS.PRODUCTS,
+      key: "code",
+      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]]
+    });
+
+    return response;
+  };
+
+  return deleteProduct;
+};
 
 export const useEditProduct = () => {
   const editItem = useEditItem();

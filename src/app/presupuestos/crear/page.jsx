@@ -1,13 +1,13 @@
 "use client";
 import { useUserContext } from "@/User";
-import { LIST_BUDGETS_QUERY_KEY, createBudget, useGetBudget } from "@/api/budgets";
+import { useCreateBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES, PRODUCT_STATES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
@@ -18,16 +18,13 @@ const CreateBudget = () => {
   const searchParams = useSearchParams();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
-
+  const createBudget = useCreateBudget();
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
-
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
-
-  const products = useMemo(() => productsData?.products.filter((product)=> ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state)), [productsData]);
+  const products = useMemo(() => productsData?.products.filter((product) => ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state)), [productsData]);
   const customers = useMemo(() => customersData?.customers, [customersData]);
 
   useEffect(() => {
@@ -54,7 +51,6 @@ const CreateBudget = () => {
     onSuccess: async (response) => {
       if (response.statusOk) {
         toast.success('Presupuesto creado!');
-        await queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY], refetchType: 'all' });
         push(PAGES.BUDGETS.BASE);
       } else {
         toast.error(response.message);

@@ -138,7 +138,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                   text: address.address,
                   value: address.address,
                 }))}
-                value={selectedContact.address}
+                value={selectedContact?.address}
                 onChange={(e, { value }) => setSelectedContact({ ...selectedContact, address: value })}
               />
             )

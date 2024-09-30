@@ -1,10 +1,8 @@
 "use client";
 import { useUserContext } from "@/User";
-import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
-import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/constants";
-import { useRestoreEntity } from "@/hooks/common";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -16,7 +14,6 @@ import { useListSuppliers } from "../../api/suppliers";
 const Suppliers = () => {
   useValidateToken();
   const { data, isLoading, isRefetching } = useListSuppliers();
-  const restoreEntity = useRestoreEntity({ entity: ENTITIES.SUPPLIERS, key: LIST_SUPPLIERS_QUERY_KEY });
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -45,10 +42,6 @@ const Suppliers = () => {
 
 
   useEffect(() => {
-    const handleRestore = async () => {
-      await restoreEntity();
-    };
-
 
     const actions = RULES.canCreate[role] ? [
       {
@@ -59,15 +52,6 @@ const Suppliers = () => {
         text: 'Crear'
       }
     ] : [];
-    actions.push({
-      id: 2,
-      icon: ICONS.UNDO,
-      color: COLORS.GREY,
-      onClick: handleRestore,
-      text: 'Actualizar',
-      disabled: loading,
-      width: "fit-content",
-    });
     actions.push({
       id: 3,
       icon: ICONS.FILE_EXCEL,

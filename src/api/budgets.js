@@ -1,9 +1,10 @@
+import { ATTRIBUTES } from "@/components/budgets/budgets.common";
 import { ENTITIES, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { now } from "@/utils";
+import { encodeUri } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-import { createItem, listItems } from "./common";
+import { listItems, useCreateItem, useEditItem } from "./common";
 
 export const LIST_BUDGETS_QUERY_KEY = 'lisAllBudgets';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
@@ -11,7 +12,7 @@ export const GET_BUDGET_QUERY_KEY = 'getBudget';
 export function useListBudgets() {
   const query = useQuery({
     queryKey: [LIST_BUDGETS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.BUDGETS, url: PATHS.BUDGETS }),
+    queryFn: () => listItems({ entity: ENTITIES.BUDGETS, url: PATHS.BUDGETS, params: { attributes: encodeUri(Object.values(ATTRIBUTES)) } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -39,16 +40,42 @@ export function useGetBudget(id) {
   return query;
 };
 
-export function createBudget(budget) {
-  return createItem({ entity: ENTITIES.BUDGETS, url: PATHS.BUDGETS, value: budget, responseEntity: ENTITIES.BUDGET });
+export const useCreateBudget = () => {
+  const createItem = useCreateItem();
+
+  const createBudget = async (budget) => {
+    const response = await createItem({
+      entity: ENTITIES.BUDGETS,
+      url: PATHS.BUDGETS,
+      value: budget,
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY]],
+    });
+
+    return response;
+  };
+
+  return createBudget;
 };
 
-export function edit(budget) {
-  const body = {
-    ...budget,
-    updatedAt: now(),
+export const useEditBudget = () => {
+  const editItem = useEditItem();
+
+  const editBudget = async (budget) => {
+
+    const response = await editItem({
+      entity: ENTITIES.BUDGETS,
+      url: `${PATHS.BUDGETS}/${budget.id}`,
+      value: budget,
+      key: "id",
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, budget.id]]
+    });
+
+    return response;
   };
-  return axios.put(`${PATHS.BUDGETS}/${budget.id}`, body);
+
+  return editBudget;
 };
 
 export function confirmBudget(budget, id) {

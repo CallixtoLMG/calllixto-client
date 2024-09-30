@@ -12,7 +12,7 @@ const CustomerView = ({ customer }) => {
         </FormField>
       </FieldsContainer>
       <ContactView {...customer} />
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px">
         <Label>Comentarios</Label>
         <Segment placeholder>{customer?.comments}</Segment>
       </FieldsContainer>

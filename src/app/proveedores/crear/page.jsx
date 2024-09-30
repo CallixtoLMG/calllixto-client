@@ -1,10 +1,10 @@
 "use client";
-import { createSupplier, LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
+import { useCreateSupplier } from "@/api/suppliers";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
@@ -14,8 +14,7 @@ const CreateSupplier = () => {
   const { push } = useRouter();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
-
+  const createSupplier = useCreateSupplier();
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -33,7 +32,6 @@ const CreateSupplier = () => {
     onSuccess: async (response) => {
       if (response.statusOk) {
         toast.success('Proveedor creado!');
-        await queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY], refetchType: 'all' });
         push(PAGES.SUPPLIERS.BASE);
       } else {
         toast.error(response.message);

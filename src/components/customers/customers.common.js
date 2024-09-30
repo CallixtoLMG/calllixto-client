@@ -1,8 +1,8 @@
-import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
-import { CommentTooltip, AddressesTooltip, PhonesTooltip } from "../common/tooltips";
 import { Flex } from "@/components/common/custom";
+import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
+import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "../common/tooltips";
 
-export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value' };
+export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value', STATE: "state" };
 
 export const HEADERS = [
   {

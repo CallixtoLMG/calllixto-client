@@ -64,46 +64,68 @@ export async function getItemById({ id, url, entity, key = 'id' }) {
   return getEntity();
 }
 
-export async function createItem({ entity, value, url, responseEntity }) {
-  const body = {
-    ...value,
-    createdAt: now()
-  }
-  const { data } = await axios.post(url, body);
+export function useCreateItem() {
+  const queryClient = useQueryClient();
 
-  if (data.statusOk) {
-    await addStorageItem({ entity, value: data[responseEntity] });
-  }
+  const createItem = async ({ entity, value, url, responseEntity, invalidateQueries = [] }) => {
+    const body = {
+      ...value,
+      createdAt: now(),
+    };
 
-  return data;
+    const { data } = await axios.post(url, body);
+
+    if (data.statusOk) {
+      await addStorageItem({ entity, value: data[responseEntity] });
+
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: 'all' });
+      });
+    }
+
+    return data;
+  };
+
+  return createItem;
 };
 
 export function useEditItem() {
   const queryClient = useQueryClient();
+
   const editItem = async ({ entity, value, url, responseEntity, key, invalidateQueries = [] }) => {
-    const body = {
+    const updatedItem = {
       ...value,
-      updatedAt: now()
-    }
-    const { data } = await axios.put(url, body);
+      updatedAt: now(),
+    };
+    const { data } = await axios.put(url, updatedItem);
 
     if (data.statusOk) {
       await updateStorageItem({ entity, key, value: data[responseEntity] });
+
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: 'all' });
+      });
     }
-    invalidateQueries.forEach((query) => { queryClient.invalidateQueries({ queryKey: query, refetchType: 'all' }); })
 
     return data;
-  }
+  };
+
   return editItem;
-};
+}
 
-export async function deleteItem({ entity, id, url, key }) {
-  const { data } = await axios.delete(`${url}/${id}`);
-  if (data.statusOk) {
-    await removeStorageItem({ entity, id, key });
+export function useDeleteItem() {
+  const queryClient = useQueryClient();
+  
+  const deleteItem = async ({ entity, id, url, key, invalidateQueries = [] }) => {
+    const { data } = await axios.delete(`${url}/${id}`);
+
+    if (data.statusOk) {
+      await removeStorageItem({ entity, id, key });
+    }
+    invalidateQueries.forEach((query) => { queryClient.invalidateQueries({ queryKey: query, refetchType: 'all' }); })
+    return data;
   }
-
-  return data;
+  return deleteItem;
 };
 
 export async function addStorageItem({ entity, value }) {
@@ -113,7 +135,7 @@ export async function addStorageItem({ entity, value }) {
 
 export async function updateStorageItem({ entity, value, key = "id" }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  const updatedArray = values.map(item => item[key] === value[key] ? value : item)
+  const updatedArray = values.map(item => item[key] === value[key] ? { ...item, ...value } : item)
   await localforage.setItem(`${config.APP_ENV}-${entity}`, updatedArray);
 };
 

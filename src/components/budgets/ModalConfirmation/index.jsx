@@ -1,7 +1,7 @@
 import { IconnedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, Label, Segment } from "@/components/common/custom";
 import Payments from "@/components/common/form/Payments";
-import { COLORS, PICK_UP_IN_STORE } from "@/constants";
+import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone, now } from "@/utils";
 import { useMemo, useRef } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";

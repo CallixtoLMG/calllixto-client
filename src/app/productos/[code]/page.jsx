@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { LIST_PRODUCTS_QUERY_KEY, deleteProduct, useEditProduct, useGetProduct } from "@/api/products";
+import { useDeleteProduct, useEditProduct, useGetProduct } from "@/api/products";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction } from "@/components/common/modals";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -11,7 +11,7 @@ import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -27,12 +27,11 @@ const Product = ({ params }) => {
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
-  const queryClient = useQueryClient();
   const printRef = useRef(null);
   const [activeAction, setActiveAction] = useState(null);
-
   const editProduct = useEditProduct();
-
+  const deleteProduct = useDeleteProduct();
+  const isProductOOSState = useMemo(() => isProductOOS(product?.state), [product?.state]);
   const handleModalClose = () => {
     setIsModalOpen(false);
     setModalAction(null);
@@ -72,7 +71,7 @@ const Product = ({ params }) => {
   const handleRecoverClick = useCallback(() => openModalWithAction("recover"), [openModalWithAction]);
   const handleActivateClick = useCallback(() => openModalWithAction("activate"), [openModalWithAction]);
   const handleInactivateClick = useCallback(() => openModalWithAction("inactivate"), [openModalWithAction]);
-  const handleStockChangeClick = useCallback(() => openModalWithAction(isProductOOS(product?.state) ? "inStock" : "outOfStock"), [isProductOOS(product?.state), openModalWithAction]);
+  const handleStockChangeClick = useCallback(() => openModalWithAction(isProductOOSState ? "inStock" : "outOfStock"), [openModalWithAction, isProductOOSState]);
   const handleSoftDeleteClick = useCallback(() => openModalWithAction("softDelete"), [openModalWithAction]);
   const handleHardDeleteClick = useCallback(() => openModalWithAction("hardDelete"), [openModalWithAction]);
 
@@ -83,8 +82,8 @@ const Product = ({ params }) => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (product) => {
-      const response = await editProduct(product);
-      return response;
+      const data = await editProduct(product);
+      return data;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -109,7 +108,6 @@ const Product = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto eliminado permanentemente!");
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: "all" });
         push(PAGES.PRODUCTS.BASE);
       } else {
         toast.error(response.message);

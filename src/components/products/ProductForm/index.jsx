@@ -40,10 +40,21 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   }, [reset, isUpdating]);
 
   const handleForm = async (data) => {
-    if (!isUpdating) {
-      data.code = `${supplier?.id}${brand?.id}${data.code}`;
+    const filteredData = { ...data };
+  
+    if (data.fractionConfig && !data.fractionConfig.active && product?.fractionConfig?.active === false) {
+      delete filteredData.fractionConfig;
     }
-    await onSubmit(data);
+  
+    if (data.editablePrice === product?.editablePrice) {
+      delete filteredData.editablePrice;
+    }
+  
+    if (!isUpdating) {
+      filteredData.code = `${supplier?.id}${brand?.id}${data.code}`;
+    }
+  
+    await onSubmit(filteredData);
   };
 
   const shouldError = useMemo(() => !isUpdating && isDirty && isSubmitted, [isDirty, isSubmitted, isUpdating]);

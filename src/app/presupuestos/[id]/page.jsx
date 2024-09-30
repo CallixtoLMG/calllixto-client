@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
+import { cancelBudget, confirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useDolarExangeRate } from "@/api/external";
 import { useListProducts } from "@/api/products";
@@ -49,6 +49,7 @@ const Budget = ({ params }) => {
   const [selectedContact, setSelectedContact] = useState({ phone: '', address: '' });
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const printRef = useRef();
+  const editBudget = useEditBudget();
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {
@@ -346,7 +347,7 @@ const Budget = ({ params }) => {
 
   const { mutate: mutateEdit, isPending: isPendingEdit } = useMutation({
     mutationFn: async (budget) => {
-      const { data } = await edit({ ...budget, id: params.id });
+      const data = await editBudget({ ...budget, id: params.id });
       return data;
     },
     onSuccess: (response) => {
@@ -434,6 +435,8 @@ const Budget = ({ params }) => {
             subtotal={subtotal}
             subtotalAfterDiscount={subtotalAfterDiscount}
             total={total}
+            selectedContact={selectedContact}
+            setSelectedContact={setSelectedContact}
           />
           <ModalCancel
             isModalOpen={isModalCancelOpen}

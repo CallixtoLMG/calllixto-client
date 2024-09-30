@@ -1,9 +1,9 @@
+import { ATTRIBUTES } from "@/components/brands/brands.common";
 import { ENTITIES, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { now } from "@/utils";
+import { encodeUri } from "@/utils";
 import { useQuery } from '@tanstack/react-query';
-import axios from './axios';
-import { createItem, deleteItem, getItemById, listItems } from './common';
+import { getItemById, listItems, useCreateItem, useDeleteItem, useEditItem } from './common';
 
 export const GET_BRAND_QUERY_KEY = 'getBrand';
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
@@ -11,7 +11,7 @@ export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 export function useListBrands() {
   const query = useQuery({
     queryKey: [LIST_BRANDS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.BRANDS, url: PATHS.BRANDS, params: { sort: 'name', order: true } }),
+    queryFn: () => listItems({ entity: ENTITIES.BRANDS, url: PATHS.BRANDS, params: { sort: 'name', order: true, attributes: encodeUri(Object.values(ATTRIBUTES)) } }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -29,18 +29,58 @@ export function useGetBrand(id) {
   return query;
 };
 
-export function createBrand(brand) {
-  return createItem({ entity: ENTITIES.BRANDS, url: PATHS.BRANDS, value: brand, responseEntity: ENTITIES.BRAND });
+export const useCreateBrand = () => {
+  const createItem = useCreateItem();
+
+  const createBrand = async (brand) => {
+    const response = await createItem({
+      entity: ENTITIES.BRANDS,
+      url: PATHS.BRANDS,
+      value: brand,
+      responseEntity: ENTITIES.BRAND,
+      invalidateQueries: [[LIST_BRANDS_QUERY_KEY]],
+    });
+
+    return response;
+  };
+
+  return createBrand;
 };
 
-export function deleteBrand(id) {
-  return deleteItem({ entity: ENTITIES.BRANDS, id, url: PATHS.BRANDS });
+export const useDeleteBrand = () => {
+  const deleteItem = useDeleteItem();
+
+  const deleteBrand = async (id) => {
+    const response = await deleteItem({
+      entity: ENTITIES.BRANDS,
+      id,
+      url: PATHS.BRANDS,
+      key: "id",
+      invalidateQueries: [[LIST_BRANDS_QUERY_KEY]]
+    });
+
+    return response;
+  };
+
+  return deleteBrand;
 };
 
-export function edit(brand) {
-  const body = {
-    ...brand,
-    updatedAt: now()
-  }
-  return axios.put(`${PATHS.BRANDS}/${brand.id}`, body);
+export const useEditBrand = () => {
+  const editItem = useEditItem();
+
+  const editBrand = async (brand) => {
+
+    const response = await editItem({
+      entity: ENTITIES.BRANDS,
+      url: `${PATHS.BRANDS}/${brand.id}`,
+      value: brand,
+      key: "id",
+      responseEntity: ENTITIES.BRAND,
+      invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, brand.id]]
+    });
+
+    return response;
+  };
+
+  return editBrand;
 };

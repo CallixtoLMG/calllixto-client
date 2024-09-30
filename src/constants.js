@@ -310,7 +310,8 @@ export const ICONS = {
   COG: "cog",
   EXCLAMATION_CIRCLE: "exclamation circle",
   ADDRESS_CARD: "address card",
-  ARCHIVE: "archive"
+  ARCHIVE: "archive",
+  OPTIONS: "options"
 };
 
 export const PAGE_SIZE_OPTIONS = [

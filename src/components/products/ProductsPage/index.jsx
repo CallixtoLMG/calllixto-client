@@ -1,4 +1,4 @@
-import { deleteProduct, LIST_PRODUCTS_QUERY_KEY, useEditProduct } from "@/api/products";
+import { useDeleteProduct, useEditProduct } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
 import { Dropdown, Flex, Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
@@ -7,7 +7,7 @@ import { Filters, Table } from "@/components/common/table";
 import { OnlyPrint } from "@/components/layout";
 import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
 import { RULES } from "@/roles";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -38,16 +38,16 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const watchState = watch('state', PRODUCT_STATES.ACTIVE.id);
   const printRef = useRef();
-  const queryClient = useQueryClient();
+  const deleteProduct = useDeleteProduct();
+  const editProduct = useEditProduct();
+
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     removeAfterPrint: true,
   });
 
-  const editProduct = useEditProduct();
-
   const onFilter = useCallback(product => {
-    if (filters.name && !product.name.toLowerCase().includes(filters.name.toLowerCase())) {
+    if (filters.name && !product.name?.toLowerCase().includes(filters.name.toLowerCase())) {
       return false;
     }
 
@@ -132,7 +132,6 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     onSuccess: (deletedCount) => {
       toast.success(`${deletedCount} productos eliminados!`);
       setSelectedProducts({});
-      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] }); // Invalidamos la query
       setShowConfirmDeleteModal(false);
     },
     onError: (error) => {

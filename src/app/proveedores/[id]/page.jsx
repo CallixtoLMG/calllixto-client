@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, deleteBatchProducts, useProductsBySupplierId } from "@/api/products";
-import { LIST_SUPPLIERS_QUERY_KEY, deleteSupplier, edit, useGetSupplier } from "@/api/suppliers";
+import { useDeleteSupplier, useGetSupplier } from "@/api/suppliers";
 import { Icon } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction } from "@/components/common/modals";
@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
+import { useEditSupplier } from "../../../api/suppliers";
 
 const Supplier = ({ params }) => {
   useValidateToken();
@@ -32,6 +33,8 @@ const Supplier = ({ params }) => {
   const printRef = useRef(null);
   const queryClient = useQueryClient();
   const [activeAction, setActiveAction] = useState(null);
+  const editSupplier = useEditSupplier();
+  const deleteSupplier = useDeleteSupplier();
 
   useEffect(() => {
     resetActions();
@@ -67,7 +70,7 @@ const Supplier = ({ params }) => {
 
   const { mutate: mutateUpdate, isPending: isLoadingUpdate } = useMutation({
     mutationFn: async (supplier) => {
-      const { data } = await edit(supplier);
+      const data = await editSupplier(supplier);
       return data;
     },
     onSuccess: (response) => {
@@ -108,7 +111,6 @@ const Supplier = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Proveedor eliminado permanentemente!');
-        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY], refetchType: "all" });
         push(PAGES.SUPPLIERS.BASE);
       } else {
         toast.error(response.message);

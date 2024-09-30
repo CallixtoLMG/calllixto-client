@@ -1,7 +1,7 @@
 import { Flex } from '@/components/common/custom';
 import { CommentTooltip } from "@/components/common/tooltips";
 
-const ATTRIBUTES = { ID: "id", NAME: "name", COMMENT: "comments" };
+const ATTRIBUTES = { ID: "id", NAME: "name", COMMENT: "comments", STATE: "state" };
 
 const BRAND_COLUMNS = [
   {
@@ -23,6 +23,6 @@ const BRAND_COLUMNS = [
 ];
 
 export {
-  ATTRIBUTES, BRAND_COLUMNS,
+  ATTRIBUTES, BRAND_COLUMNS
 };
 
