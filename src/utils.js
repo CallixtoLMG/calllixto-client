@@ -69,7 +69,7 @@ export const getTotal = (product) => {
 };
 
 export const getPrice = (product) => {
-  const { editablePrice, fractionConfig, price} = product;
+  const { editablePrice, fractionConfig, price } = product;
   return editablePrice || !fractionConfig?.active ? price : fractionConfig?.value * price;
 }
 
@@ -192,4 +192,13 @@ export const isProductInactive = (status) => {
 
 export const isProductDeleted = (status) => {
   return status === PRODUCT_STATES.DELETED.id;
+};
+
+export const filterProductsBySupplierId = (products, supplierId) => {
+  if (!products) return [];
+
+  return products.filter(product => {
+    const productSupplierId = product.code.substring(0, supplierId.length);
+    return productSupplierId !== supplierId;
+  });
 };

@@ -78,8 +78,22 @@ export const useEditBudget = () => {
   return editBudget;
 };
 
-export function confirmBudget(budget, id) {
-  return axios.put(`${PATHS.BUDGETS}/${id}/confirm`, budget);
+export const useConfirmBudget = () => {
+  const editItem = useEditItem();
+
+  const confirmBudget = async (budget, id) => {
+    const response = await editItem({
+      entity: ENTITIES.BUDGETS,
+      url: `${PATHS.BUDGETS}/${id}/confirm`,
+      value: budget,
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY]],
+    });
+    console.log(response)
+    return response;
+  };
+
+  return confirmBudget
 };
 
 export function cancelBudget(budget, id) {

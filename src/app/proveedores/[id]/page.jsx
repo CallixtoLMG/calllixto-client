@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, deleteBatchProducts, useProductsBySupplierId } from "@/api/products";
+import { useDeleteBatchProducts, useProductsBySupplierId } from "@/api/products";
 import { useDeleteSupplier, useGetSupplier } from "@/api/suppliers";
 import { Icon } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
@@ -12,7 +12,7 @@ import { COLORS, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -31,10 +31,10 @@ const Supplier = ({ params }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const printRef = useRef(null);
-  const queryClient = useQueryClient();
   const [activeAction, setActiveAction] = useState(null);
   const editSupplier = useEditSupplier();
   const deleteSupplier = useDeleteSupplier();
+  const deleteBatchProducts = useDeleteBatchProducts();
 
   useEffect(() => {
     resetActions();
@@ -85,13 +85,11 @@ const Supplier = ({ params }) => {
 
   const { mutate: mutateDeleteBatch, isPending: isLoadingDelete } = useMutation({
     mutationFn: async () => {
-      const { data } = await deleteBatchProducts(params.id);
-      return data;
+      const response = await deleteBatchProducts(params.id);
+      return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplier.id], refetchType: "all" });
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: "all" });
         toast.success('Lista de productos del proveedor eliminada!');
         handleModalClose();
       } else {

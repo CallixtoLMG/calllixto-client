@@ -56,7 +56,6 @@ const BudgetForm = ({
     name: "products"
   });
   const [watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp, watchProducts] = watch(['globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore', 'products']);
-
   const hasShownModal = useRef(false);
   const productSearchRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -592,7 +591,7 @@ const BudgetForm = ({
           </FormField>
         </FieldsContainer>
         <FormField width="300px">
-          <RuledLabel title="Agregar producto" message={errors?.products?.message} required />
+          <RuledLabel title="Agregar producto" message={errors?.products?.root?.message} required />
           <Controller name="products"
             control={control}
             rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
@@ -717,7 +716,7 @@ const BudgetForm = ({
               icon
               labelPosition="left"
               disabled={isLoading || !isDirty || isBudgetConfirmed(watchState)}
-              loading={isLoading && watchState === BUDGET_STATES.DRAFT.id}
+              loading={isLoading && isBudgetDraft(watchState)}
               type="button"
               onClick={handleSubmit(handleDraft)}
               color={BUDGET_STATES.DRAFT.color}

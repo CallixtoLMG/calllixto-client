@@ -3,7 +3,7 @@ import { Dropdown, FieldsContainer, Flex, FormField, Icon, Label, Price, Segment
 import Payments from "@/components/common/form/Payments";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
-import { PICK_UP_IN_STORE } from "@/constants";
+import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
 import { useMemo } from "react";

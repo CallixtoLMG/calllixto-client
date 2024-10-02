@@ -7,7 +7,8 @@ import { CommentTooltip } from "../common/tooltips";
 const ATTRIBUTES = {
   ID: "id",
   CUSTOMER: "customer",
-  CREATEDAT: "createdAt",
+  CREATED_AT: "createdAt",
+  UPDATED_AT: "updatedAt",
   CONFIRMED: "confirmed",
   SELLER: "seller",
   PRODUCTS: "products",
@@ -15,7 +16,12 @@ const ATTRIBUTES = {
   STATE: "state",
   ADDITIONAL_CHARGE: "additionalCharge",
   PAYMENT_METHODS: "paymentMethods",
-  EXPIRATION_OFF_SET_DAYS: "expirationOffsetDays"
+  PAYMENTS_MADE: "paymentsMade",
+  EXPIRATION_OFF_SET_DAYS: "expirationOffsetDays",
+  PICKUP_IN_STORE: "pickUpInStore",
+  TOTAL: "total",
+  CONFIRMED_AT: "confirmedAt",
+  CONFIRMED_BY: "confirmedBy"
 };
 
 const BUDGETS_COLUMNS = [

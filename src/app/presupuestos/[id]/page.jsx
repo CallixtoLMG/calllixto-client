@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { cancelBudget, confirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
+import { cancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useDolarExangeRate } from "@/api/external";
 import { useListProducts } from "@/api/products";
@@ -50,6 +50,7 @@ const Budget = ({ params }) => {
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const printRef = useRef();
   const editBudget = useEditBudget();
+  const confirmBudget = useConfirmBudget();
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {
@@ -310,8 +311,9 @@ const Budget = ({ params }) => {
         paymentsMade,
         total
       };
-      const { data } = await confirmBudget(confirmationData, budget?.id);
-      return data;
+      const response = await confirmBudget(confirmationData, budget?.id);
+      
+      return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {

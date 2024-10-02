@@ -5,13 +5,13 @@ import {
   BLACK_LIST,
   EDIT_BATCH,
   PATHS,
-  SUPPLIER,
+  SUPPLIER
 } from "@/fetchUrls";
 import { encodeUri, now } from "@/utils";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { chunk } from "lodash";
 import axios from "./axios";
-import { getItemById, listItems, useCreateItem, useDeleteItem, useEditItem } from "./common";
+import { getItemById, listItems, removeStorageItemsByCustomFilter, useCreateItem, useDeleteItem, useEditItem } from "./common";
 
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
@@ -93,16 +93,33 @@ export const useEditProduct = () => {
   return editProduct;
 };
 
+// export function useProductsBySupplierId(supplierId) {
+//   const listBySupplierId = async () => {
+//     const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: 'date' } });
+//     return products.filter((product) => product.code.startsWith(supplierId));
+//   }
+
+//   const query = useQuery({
+//     queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId],
+//     queryFn: () => listBySupplierId(),
+//     staleTime: TIME_IN_MS.ONE_DAY,
+//   });
+
+//   return query;
+// }
+
 export function useProductsBySupplierId(supplierId) {
   const listBySupplierId = async () => {
-    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: 'date' } });
+    // const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: 'date' } });
+    const { data } = await axios.get(`events/products`);
+    console.log(data)
     return products.filter((product) => product.code.startsWith(supplierId));
   }
 
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId],
     queryFn: () => listBySupplierId(),
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: 0,
   });
 
   return query;
@@ -176,4 +193,26 @@ export function editBanProducts(products) {
 
 export function deleteBatchProducts(id) {
   return axios.delete(`${PATHS.PRODUCTS}/${SUPPLIER}/${id}`);
+};
+
+export const useDeleteBatchProducts = () => {
+  const queryClient = useQueryClient();
+
+  const deleteBatchProducts = async (supplierId) => {
+
+    const { data } = await axios.delete(`${PATHS.PRODUCTS}/${SUPPLIER}/${supplierId}`)
+    if (data.statusOk) {
+      await removeStorageItemsByCustomFilter({
+        entity: ENTITIES.PRODUCTS, filter: ((product) => !product.code.startsWith(supplierId))
+      })
+
+      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId], refetchType: "all" });
+      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: "all" });
+      queryClient.invalidateQueries({ queryKey: [GET_PRODUCT_QUERY_KEY], refetchType: "all" });
+    }
+
+    return data;
+  };
+
+  return deleteBatchProducts;
 };

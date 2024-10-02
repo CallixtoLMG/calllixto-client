@@ -8,7 +8,7 @@ import { Dropdown } from '../common/custom';
 const OptionsDropdown = ({ entity, queryKey, text }) => {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const restoreEntity = entity && queryKey ? useRestoreEntity({ entity, key: queryKey }) : null;
+  const restoreEntity = useRestoreEntity({ entity, key: queryKey });
 
   const handleRestoreClick = () => {
     setShowModal(true);
@@ -16,7 +16,7 @@ const OptionsDropdown = ({ entity, queryKey, text }) => {
 
   const handleConfirm = async () => {
     setIsLoading(true);
-    if (restoreEntity) {
+    if (entity && queryKey && restoreEntity) {
       await restoreEntity();
     }
     setIsLoading(false);
@@ -41,7 +41,6 @@ const OptionsDropdown = ({ entity, queryKey, text }) => {
         height="100%"
         iconMargin="0"
         item
-        simple
         icon={<Icon size='large' name={ICONS.OPTIONS} color={COLORS.ORANGE} />}
         direction="bottom"
       >
