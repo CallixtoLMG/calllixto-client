@@ -114,7 +114,7 @@ export function useListAllProducts({ attributes = [], enabled = false, code } = 
   const query = useQuery({
     queryKey: [LIST_ALL_PRODUCTS_QUERY_KEY, attributes],
     queryFn: () => listProducts(),
-    staleTime: TIME_IN_MS.FIVE_MINUTES,
+    staleTime: TIME_IN_MS.ONE_HOUR,
     enabled,
   });
 
