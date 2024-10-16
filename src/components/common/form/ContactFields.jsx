@@ -2,11 +2,11 @@ import { formatedSimplePhone, validateEmail, validatePhone } from "@/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
+import { COLORS, ICONS } from "../../../constants";
+import { IconnedButton } from "../buttons";
 import { Box, FieldsContainer, FormField, Input, Label, RuledLabel } from '../custom';
 import { Table } from '../table';
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "./form.common";
-import { IconnedButton } from "../buttons";
-
 
 const EMPTY_PHONE = { ref: '', areaCode: '', number: '' };
 const EMPTY_ADDRESS = { ref: '', address: '' };
@@ -98,8 +98,8 @@ export const ContactFields = () => {
             <Box width="fit-content">
               <IconnedButton
                 text="Teléfono"
-                icon="add"
-                color="green"
+                icon={ICONS.ADD}
+                color={COLORS.GREEN}
               />
             </Box>
           }
@@ -141,8 +141,8 @@ export const ContactFields = () => {
             </FormField>
             <IconnedButton
               text="Agregar"
-              icon="add"
-              color="green"
+              icon={ICONS.ADD}
+              color={COLORS.GREEN}
               onClick={handleAddPhone}
             />
           </FieldsContainer>
@@ -150,7 +150,7 @@ export const ContactFields = () => {
         <Table
           headers={PHONE_TABLE_HEADERS}
           actions={[
-            { id: 1, icon: 'trash', color: 'red', onClick: (phone, index) => removePhone(index), tooltip: 'Eliminar' }
+            { id: 1, icon: ICONS.TRASH, color: COLORS.RED, onClick: (phone, index) => removePhone(index), tooltip: 'Eliminar' }
           ]}
           elements={phoneFields}
         />
@@ -161,9 +161,9 @@ export const ContactFields = () => {
             <Box width="fit-content">
               <IconnedButton
                 text="Dirección"
-                icon="add"
+                icon={ICONS.ADD}
                 type="button"
-                color="green"
+                color={COLORS.GREEN}
               />
             </Box>
           }
@@ -193,8 +193,8 @@ export const ContactFields = () => {
             </FormField>
             <IconnedButton
               text="Agregar"
-              icon="add"
-              color="green"
+              icon={ICONS.ADD}
+              color={COLORS.GREEN}
               onClick={handleAddAddress}
             />
           </FieldsContainer>
@@ -203,7 +203,7 @@ export const ContactFields = () => {
           $wrap
           headers={ADDRESS_TABLE_HEADERS}
           actions={[
-            { id: 1, icon: 'trash', color: 'red', onClick: (address, index) => removeAddress(index), tooltip: 'Eliminar' }
+            { id: 1, icon: ICONS.TRASH, color: COLORS.RED, onClick: (address, index) => removeAddress(index), tooltip: 'Eliminar' }
           ]}
           elements={addressFields}
         />
@@ -214,8 +214,8 @@ export const ContactFields = () => {
             <Box width="fit-content">
               <IconnedButton
                 text="Email"
-                icon="add"
-                color="green"
+                icon={ICONS.ADD}
+                color={COLORS.GREEN}
               />
             </Box>
           }
@@ -245,8 +245,8 @@ export const ContactFields = () => {
             </FormField>
             <IconnedButton
               text="Agregar"
-              icon="add"
-              color="green"
+              icon={ICONS.ADD}
+              color={COLORS.GREEN}
               onClick={handleAddEmail}
             />
           </FieldsContainer>
@@ -255,7 +255,7 @@ export const ContactFields = () => {
           $wrap={true}
           headers={EMAIL_TABLE_HEADERS}
           actions={[
-            { id: 1, icon: 'trash', color: 'red', onClick: (email, index) => removeEmail(index), tooltip: 'Eliminar' }
+            { id: 1, icon: ICONS.TRASH, color: COLORS.RED, onClick: (email, index) => removeEmail(index), tooltip: 'Eliminar' }
           ]}
           elements={emailsFields}
         />

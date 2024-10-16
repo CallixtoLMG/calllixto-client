@@ -1,10 +1,18 @@
+import { ICONS } from '@/constants';
 import { createContext, useContext, useState } from 'react';
 import { BreadcrumbDivider, BreadcrumbSection, Breadcrumb as SBreadcrumb, Label as SLabel } from 'semantic-ui-react';
 import styled from "styled-components";
 
 const Label = styled(SLabel)`
   position: relative;
-  top: -2px;
+  top: -3px;
+`;
+
+const SSBreadcrumb = styled(SBreadcrumb)`
+  height: 35px!important;
+  align-content: center;
+   position: relative;
+  top: 2px;
 `;
 
 const BreadcrumContext = createContext();
@@ -29,10 +37,10 @@ const useBreadcrumContext = () => {
 const Breadcrumb = () => {
   const { labels } = useBreadcrumContext();
   return (
-    <SBreadcrumb size='huge'>
+    <SSBreadcrumb size='huge'>
       {labels.map((label, index) => (
         <BreadcrumbSection key={`label_${index}`}>
-          {index !== 0 && label && <BreadcrumbDivider icon="chevron right" />}
+          {index !== 0 && label && <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />}
           {typeof label === 'string' ? (
             label
           ) : (
@@ -47,9 +55,9 @@ const Breadcrumb = () => {
           )}
         </BreadcrumbSection>
       ))}
-    </SBreadcrumb>
+    </SSBreadcrumb>
   );
 };
 
-export { BreadcrumProvider, Breadcrumb, useBreadcrumContext };
+export { Breadcrumb, BreadcrumProvider, useBreadcrumContext };
 

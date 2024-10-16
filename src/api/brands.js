@@ -1,18 +1,20 @@
-import { ENTITIES, TIME_IN_MS } from "@/constants";
+import { ATTRIBUTES } from "@/components/brands/brands.common";
+import { ACTIVE, ENTITIES, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { now } from "@/utils";
 import { useQuery } from '@tanstack/react-query';
-import axios from './axios';
-import { createItem, deleteItem, getItemById, listItems } from './common';
+import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from './common';
 
-const BRANDS_URL = `${PATHS.BRANDS}`;
 export const GET_BRAND_QUERY_KEY = 'getBrand';
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 
-export function useListBrands() {
+export function useListBrands({ sort = 'name', order = true } = {}) {
   const query = useQuery({
     queryKey: [LIST_BRANDS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.BRANDS, url: BRANDS_URL, params: { sort: 'name', order: true } }),
+    queryFn: () => listItems({
+      entity: ENTITIES.BRANDS,
+      url: PATHS.BRANDS,
+      params: getDefaultListParams(ATTRIBUTES, sort, order)
+    }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -22,7 +24,7 @@ export function useListBrands() {
 export function useGetBrand(id) {
   const query = useQuery({
     queryKey: [GET_BRAND_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: BRANDS_URL, entity: ENTITIES.BRANDS }),
+    queryFn: () => getItemById({ id, url: PATHS.BRANDS, entity: ENTITIES.BRANDS }),
     retry: false,
     staleTime: TIME_IN_MS.ONE_HOUR,
   });
@@ -30,18 +32,106 @@ export function useGetBrand(id) {
   return query;
 };
 
-export function createBrand(brand) {
-  return createItem({ entity: ENTITIES.BRANDS, url: BRANDS_URL, value: brand, responseEntity: ENTITIES.BRAND });
+export const useCreateBrand = () => {
+  const createItem = useCreateItem();
+
+  const createBrand = async (brand) => {
+    const response = await createItem({
+      entity: ENTITIES.BRANDS,
+      url: PATHS.BRANDS,
+      value: brand,
+      responseEntity: ENTITIES.BRAND,
+      invalidateQueries: [[LIST_BRANDS_QUERY_KEY]],
+    });
+
+    return response;
+  };
+
+  return createBrand;
 };
 
-export function deleteBrand(id) {
-  return deleteItem({ entity: ENTITIES.BRANDS, id, url: BRANDS_URL });
+export const useDeleteBrand = () => {
+  const deleteItem = useDeleteItem();
+
+  const deleteBrand = async (id) => {
+    const response = await deleteItem({
+      entity: ENTITIES.BRANDS,
+      id,
+      url: PATHS.BRANDS,
+      key: "id",
+      invalidateQueries: [[LIST_BRANDS_QUERY_KEY]]
+    });
+
+    return response;
+  };
+
+  return deleteBrand;
 };
 
-export function edit(brand) {
-  const body = {
-    ...brand,
-    updatedAt: now()
-  }
-  return axios.put(`${BRANDS_URL}/${brand.id}`, body);
+export const useEditBrand = () => {
+  const editItem = useEditItem();
+
+  const editBrand = async (brand) => {
+
+    const response = await editItem({
+      entity: ENTITIES.BRANDS,
+      url: `${PATHS.BRANDS}/${brand.id}`,
+      value: brand,
+      key: "id",
+      responseEntity: ENTITIES.BRAND,
+      invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, brand.id]]
+    });
+
+    return response;
+  };
+
+  return editBrand;
 };
+
+
+export const useInactiveBrand = () => {
+  const inactiveItem = useInactiveItem();
+
+  const inactiveBrand = async (brand, reason) => {
+    const updatedBrand = {
+      ...brand,
+      inactiveReason: reason
+    }
+
+    const response = await inactiveItem({
+      entity: ENTITIES.BRANDS,
+      url: `${PATHS.BRANDS}/${brand.id}/${INACTIVE}`,
+      value: updatedBrand,
+      key: "id",
+      responseEntity: ENTITIES.BRAND,
+      invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, brand.id]]
+    });
+
+    return response;
+  };
+
+  return inactiveBrand;
+};
+export const useActiveBrand = () => {
+  const activeItem = useActiveItem();
+
+  const activeBrand = async (brand) => {
+    const updatedBrand = {
+      ...brand,
+    }
+
+    const response = await activeItem({
+      entity: ENTITIES.BRANDS,
+      url: `${PATHS.BRANDS}/${brand.id}/${ACTIVE}`,
+      value: updatedBrand,
+      key: "id",
+      responseEntity: ENTITIES.BRAND,
+      invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, brand.id]]
+    });
+
+    return response;
+  };
+
+  return activeBrand;
+};
+

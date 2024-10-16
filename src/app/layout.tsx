@@ -10,9 +10,7 @@ import { useState } from "react";
 import 'semantic-ui-css/semantic.min.css';
 import styled from "styled-components";
 import StyledComponentsRegistry from './registry';
-import {
-  LayoutChildrenContainer
-} from "./stylesLayout";
+import { GlobalStyle, LayoutChildrenContainer } from "./stylesLayout";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -56,36 +54,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en">
-      <StyledComponentsRegistry>
-        <body className={inter.className}>
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              duration: 4000
-            }} />
-          <QueryClientProvider client={queryClient}>
-            <UserProvider>
-              <Header />
-              <NavActionsProvider>
-                <BreadcrumProvider>
-                  {show && (
-                    <NavigationContainer>
-                      <BreadcrumbContainer>
-                        <GoBackButton />
-                        <Breadcrumb />
-                      </BreadcrumbContainer>
-                      <NavActions />
-                    </NavigationContainer>
-                  )}
-                  <LayoutChildrenContainer>
-                    {children}
-                  </LayoutChildrenContainer>
-                </BreadcrumProvider>
-              </NavActionsProvider>
-            </UserProvider>
-          </QueryClientProvider>
-        </body>
-      </StyledComponentsRegistry>
+      <GlobalStyle/>
+        <StyledComponentsRegistry>
+          <body className={inter.className}>
+            <Toaster
+              position="top-center"
+              toastOptions={{
+                duration: 4000
+              }} />
+            <QueryClientProvider client={queryClient}>
+              <UserProvider>
+                <Header />
+                <NavActionsProvider>
+                  <BreadcrumProvider>
+                    {show && (
+                      <NavigationContainer>
+                        <BreadcrumbContainer>
+                          <GoBackButton />
+                          <Breadcrumb />
+                        </BreadcrumbContainer>
+                        <NavActions />
+                      </NavigationContainer>
+                    )}
+                    <LayoutChildrenContainer>
+                      {children}
+                    </LayoutChildrenContainer>
+                  </BreadcrumProvider>
+                </NavActionsProvider>
+              </UserProvider>
+            </QueryClientProvider>
+          </body>
+        </StyledComponentsRegistry>
     </html>
   );
 };

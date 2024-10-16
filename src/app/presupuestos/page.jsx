@@ -1,9 +1,8 @@
 "use client";
-import { LIST_BUDGETS_QUERY_KEY, useListBudgets } from "@/api/budgets";
+import { useListBudgets } from "@/api/budgets";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
-import { useRestoreEntity } from "@/hooks/common";
+import { BUDGET_STATES, COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel, formatedDateAndHour, getTotal, getTotalSum, handleNaN, handleUndefined } from "@/utils";
@@ -13,7 +12,6 @@ import { useEffect, useMemo } from "react";
 const Budgets = () => {
   useValidateToken();
   const { data, isLoading, isRefetching } = useListBudgets();
-  const restoreEntity = useRestoreEntity({ entity: ENTITIES.BUDGETS, key: LIST_BUDGETS_QUERY_KEY });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -25,26 +23,21 @@ const Budgets = () => {
   const budgets = useMemo(() => data?.budgets, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const stateTranslations = {
-    INACTIVE: 'Inactivo',
-    CONFIRMED: 'Confirmado',
-    PENDING: "Pendiente",
-    EXPIRED: "Expirado",
-    CANCELLED: "Cancelado",
-    UNDEFINED: "Indefinido",
-    DRAFT: "Borrador"
-  };
+  const stateTranslations = useMemo(() => ({
+    CONFIRMED: BUDGET_STATES.CONFIRMED,
+    PENDING: BUDGET_STATES.PENDING,
+    EXPIRED: BUDGET_STATES.EXPIRED,
+    CANCELLED: BUDGET_STATES.CANCELLED,
+    DRAFT: BUDGET_STATES.DRAFT
+  }), []);
 
   const prepareBudgetDataForExcel = useMemo(() => {
     if (!budgets) return [];
 
     let maxProductCount = 1;
     const budgetData = budgets.map(budget => {
-
       const translatedState = stateTranslations[budget.state] || budget.state;
-
-      maxProductCount = Math.max(maxProductCount, budget.products.length);
-
+      maxProductCount = Math.max(maxProductCount, budget.products?.length);
       const budgetRow = [
         handleUndefined(budget.id),
         handleUndefined(translatedState),
@@ -56,10 +49,8 @@ const Budgets = () => {
         handleUndefined(budget.seller)
       ];
 
-
       const productData = budget.products.map(product => {
         let productName = handleUndefined(product.name);
-
         if (product.fractionConfig?.active) {
           productName = `${product.name} x ${product.fractionConfig.value} ${product.fractionConfig.unit}`;
         }
@@ -76,39 +67,27 @@ const Budgets = () => {
     const productsHeaders = Array.from(Array(maxProductCount).keys()).map((index) => `Producto ${index + 1}`);
     const headers = ['ID', 'Estado', 'Cliente', 'Fecha', "Total", "Descuento", "Cargo adicional", "Vendedor", ...productsHeaders];
     return [headers, ...budgetData];
-  }, [budgets]);
+  }, [budgets, stateTranslations]);
 
   useEffect(() => {
-    const handleRestore = async () => {
-      await restoreEntity();
-    };
 
     const actions = [
       {
         id: 1,
-        icon: 'add',
-        color: 'green',
+        icon: ICONS.ADD,
+        color: COLORS.GREEN,
         onClick: () => { push(PAGES.BUDGETS.CREATE) },
         text: 'Crear'
       },
       {
-        id: 2,
-        icon: 'undo',
-        color: 'grey',
-        onClick: handleRestore,
-        text: 'Actualizar',
-        disabled: loading,
-        width: "fit-content",
-      },
-      {
         id: 3,
-        icon: 'excel file',
-        color: 'gray',
+        icon: ICONS.FILE_EXCEL,
+        color: COLORS.SOFT_GREY,
         width: "fit-content",
         onClick: () => {
           downloadExcel(prepareBudgetDataForExcel, "Lista de Presupuestos");
         },
-        text: 'Presupuetos',
+        text: 'Presupuestos',
         disabled: loading
       },
     ];
@@ -117,7 +96,7 @@ const Budgets = () => {
   }, [push, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
-  
+
   return (
     <BudgetsPage isLoading={loading} budgets={loading ? [] : budgets} />
   )

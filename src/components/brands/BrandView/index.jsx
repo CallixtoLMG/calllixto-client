@@ -1,9 +1,17 @@
 "use client";
-import { FieldsContainer, FormField, Label, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, FormField, Label, Message, MessageHeader, Segment, ViewContainer } from "@/components/common/custom";
+import { isItemInactive } from "@/utils";
 
 const BrandView = ({ brand }) => {
   return (
     <ViewContainer>
+      {isItemInactive(brand?.state) &&
+        <FieldsContainer>
+          <Message negative >
+            <MessageHeader>Motivo de inactivación</MessageHeader>
+            <p>{brand.inactiveReason}</p>
+          </Message>
+        </FieldsContainer>}
       <FieldsContainer>
         <FormField>
           <Label>Código</Label>
@@ -14,7 +22,7 @@ const BrandView = ({ brand }) => {
           <Segment placeholder>{brand?.name}</Segment>
         </FormField>
       </FieldsContainer>
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px">
         <Label>Comentarios</Label>
         <Segment placeholder>{brand?.comments}</Segment>
       </FieldsContainer>

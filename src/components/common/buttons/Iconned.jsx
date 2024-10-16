@@ -1,10 +1,11 @@
+import { COLORS } from '@/constants';
 import { Icon } from 'semantic-ui-react';
 import { IconedButton } from "../custom";
 
 const Iconned = ({
   text,
   icon,
-  color = 'blue',
+  color = COLORS.BLUE,
   onClick,
   basic,
   disabled,

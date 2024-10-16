@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
+import { FieldsContainer, Form, FormField, Input, RuledLabel, Segment } from "@/components/common/custom";
 import { ContactFields, ControlledComments } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -20,13 +20,13 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
 
   const handleCreate = (data) => {
     if (!data.addresses.length) {
-      delete data.addresses;
+      data.addresses = [];
     }
     if (!data.phoneNumbers.length) {
-      delete data.phoneNumbers;
+      data.phoneNumbers = [];
     }
     if (!data.emails.length) {
-      delete data.emails;
+      data.emails = [];
     }
     onSubmit(data);
   };

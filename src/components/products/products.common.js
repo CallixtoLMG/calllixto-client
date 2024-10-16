@@ -1,7 +1,7 @@
+import { Flex, Price } from "@/components/common/custom";
+import { CommentTooltip } from "@/components/common/tooltips";
 import { getBrandCode, getProductCode, getSupplierCode } from "@/utils";
 import { Popup } from "semantic-ui-react";
-import { Price, Flex } from "@/components/common/custom";
-import { CommentTooltip } from "@/components/common/tooltips";
 
 const ATTRIBUTES = {
   CODE: "code",
@@ -11,6 +11,9 @@ const ATTRIBUTES = {
   BRAND_NAME: "brandName",
   SUPPLIER_NAME: "supplierName",
   EDITABLE_PRICE: "editablePrice",
+  FRACTION_CONFIG: "fractionConfig",
+  STATE: "state",
+  PREVIOS_VERSIONS: "previousVersions"
 };
 
 const PRODUCT_COLUMNS = [

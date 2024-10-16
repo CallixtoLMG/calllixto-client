@@ -1,12 +1,12 @@
 "use client";
 import { useListBrands } from "@/api/brands";
-import { createProduct, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
+import { useCreateProduct } from "@/api/products";
 import { useListSuppliers } from "@/api/suppliers";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
@@ -18,7 +18,7 @@ const CreateProduct = () => {
   const { data: suppliers, isLoading: isLoadingSuppliers } = useListSuppliers();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
+  const createProduct = useCreateProduct();
 
   useEffect(() => {
     resetActions();
@@ -51,10 +51,9 @@ const CreateProduct = () => {
     onSuccess: async (response) => {
       if (response.statusOk) {
         toast.success('Producto creado!');
-        await queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: 'all' });
         push(PAGES.PRODUCTS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
     onError: (error) => {

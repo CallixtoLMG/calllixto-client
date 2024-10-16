@@ -1,5 +1,6 @@
 import { IconnedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { COLORS, ICONS } from "@/constants";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
@@ -56,8 +57,8 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer>
-            <IconnedButton text="Cancelar" icon="cancel" color="red" onClick={() => onClose(false)} />
-            <IconnedButton text="Confirmar" icon="check" color="green" onClick={handleSubmit(onAddComment)} disabled={!isDirty} />
+            <IconnedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} />
+            <IconnedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleSubmit(onAddComment)} disabled={!isDirty} />
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>

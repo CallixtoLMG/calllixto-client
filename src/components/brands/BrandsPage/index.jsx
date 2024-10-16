@@ -1,27 +1,27 @@
-import { deleteBrand, LIST_BRANDS_QUERY_KEY } from "@/api/brands";
-import { Input } from "@/components/common/custom";
-import { ModalDelete } from "@/components/common/modals";
+import { Dropdown, Flex, Input } from "@/components/common/custom";
 import { Filters, Table } from "@/components/common/table";
-import { PAGES } from "@/constants";
-import { RULES } from "@/roles";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { BRANDS_STATES, PAGES } from "@/constants";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import { Form } from "semantic-ui-react";
+import { Form, Label } from "semantic-ui-react";
 import { BRAND_COLUMNS } from "../brands.common";
 
-const EMPTY_FILTERS = { id: '', name: '' };
+const EMPTY_FILTERS = { id: '', name: '', state: BRANDS_STATES.ACTIVE.id };
+const STATE_OPTIONS = [
+  ...Object.entries(BRANDS_STATES).map(([key, value]) => ({
+    key,
+    text: (
+      <Flex alignItems="center" justifyContent="space-between">
+        {value.title}&nbsp;<Label color={value.color} circular empty />
+      </Flex>
+    ),
+    value: key
+  }))
+];
 
-const BrandsPage = ({ brands = [], role, isLoading }) => {
+const BrandsPage = ({ brands = [], isLoading }) => {
   const { handleSubmit, control, reset } = useForm();
-  const queryClient = useQueryClient();
-
-  const [showModal, setShowModal] = useState(false);
-  const [selectedBrand, setSelectedBrand] = useState(null);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
-
-  const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar la marca "${name}"?`, []);
 
   const onFilter = useCallback((brand) => {
     if (filters.name && !brand.name.toLowerCase().includes(filters.name.toLowerCase())) {
@@ -29,6 +29,10 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
     }
 
     if (filters.id && !brand.id.toLowerCase().includes(filters.id.toLowerCase())) {
+      return false;
+    }
+
+    if (filters.state && filters.state !== brand.state) {
       return false;
     }
 
@@ -40,39 +44,30 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
     setFilters(EMPTY_FILTERS);
   }
 
-  const actions = RULES.canRemove[role] ? [
-    {
-      id: 1,
-      icon: 'trash',
-      color: 'red',
-      onClick: (brand) => {
-        setSelectedBrand(brand);
-        setShowModal(true);
-      },
-      tooltip: 'Eliminar'
-    }
-  ] : [];
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
-      const response = await deleteBrand(selectedBrand?.id);
-      return response;
-    },
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success('Marca eliminada!');
-        queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY], refetchType: 'all' });
-        setShowModal(false);
-      } else {
-        toast.error(response.message);
-      }
-    },
-  });
-
   return (
     <>
       <Form onSubmit={handleSubmit(setFilters)}>
         <Filters onRestoreFilters={onRestoreFilters}>
+          <Controller
+            name="state"
+            control={control}
+            render={({ field: { onChange, ...rest } }) => (
+              <Dropdown
+                {...rest}
+                $maxWidth
+                top="10px"
+                height="35px"
+                minHeight="35px"
+                selection
+                options={STATE_OPTIONS}
+                defaultValue={STATE_OPTIONS[0].key}
+                onChange={(e, { value }) => {
+                  onChange(value);
+                  setFilters({ ...filters, state: value });
+                }}
+              />
+            )}
+          />
           <Controller
             name="id"
             control={control}
@@ -106,16 +101,8 @@ const BrandsPage = ({ brands = [], role, isLoading }) => {
         headers={BRAND_COLUMNS}
         elements={brands}
         page={PAGES.BRANDS}
-        actions={actions}
         onFilter={onFilter}
         paginate
-      />
-      <ModalDelete
-        showModal={showModal}
-        setShowModal={setShowModal}
-        title={deleteQuestion(selectedBrand?.name)}
-        onDelete={mutate}
-        isLoading={isPending}
       />
     </>
   )

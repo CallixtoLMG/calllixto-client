@@ -1,6 +1,7 @@
+import { Box } from "@/components/common/custom";
+import { COLORS, ICONS } from "@/constants";
 import { formatedSimplePhone } from "@/utils";
 import { Icon, List, ListItem, Popup } from "semantic-ui-react";
-import { Box } from "@/components/common/custom";
 
 export const PhonesTooltip = ({ phones }) => {
   return (
@@ -18,7 +19,7 @@ export const PhonesTooltip = ({ phones }) => {
       position="top center"
       trigger={
         <Box marginLeft="5px" marginRight="5px">
-          <Icon name="list ul" color="yellow" />
+          <Icon name={ICONS.LIST_UL} color={COLORS.YELLOW} />
         </Box>
       }
     />

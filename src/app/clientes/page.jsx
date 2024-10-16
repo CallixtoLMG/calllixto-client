@@ -1,9 +1,8 @@
 "use client";
-import { LIST_CUSTOMERS_QUERY_KEY, useListCustomers } from "@/api/customers";
+import { useListCustomers } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
-import { useRestoreEntity } from "@/hooks/common";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel, formatedSimplePhone } from "@/utils";
@@ -13,7 +12,6 @@ import { useEffect, useMemo } from "react";
 const Customers = () => {
   useValidateToken();
   const { data, isLoading, isRefetching } = useListCustomers();
-  const restoreEntity = useRestoreEntity({ entity: ENTITIES.CUSTOMERS, key: LIST_CUSTOMERS_QUERY_KEY });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -39,31 +37,19 @@ const Customers = () => {
   }, [customers]);
 
   useEffect(() => {
-    const handleRestore = async () => {
-      await restoreEntity();
-    };
 
     const actions = [
       {
         id: 1,
-        icon: 'add',
-        color: 'green',
+        icon: ICONS.ADD,
+        color: COLORS.GREEN,
         onClick: () => { push(PAGES.CUSTOMERS.CREATE) },
         text: 'Crear',
       },
       {
-        id: 2,
-        icon: 'undo',
-        color: 'grey',
-        onClick: handleRestore,
-        text: 'Actualizar',
-        disabled: loading,
-        width: "fit-content",
-      },
-      {
         id: 3,
-        icon: 'file excel',
-        color: 'gray',
+        icon: ICONS.FILE_EXCEL,
+        color: COLORS.SOFT_GREY,
         onClick: () => {
           downloadExcel(prepareCustomerDataForExcel, "Lista de Clientes");
         },

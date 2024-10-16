@@ -1,13 +1,13 @@
 "use client"
 import { useUserContext } from "@/User";
-import { LIST_PRODUCTS_QUERY_KEY, useListProducts } from "@/api/products";
+import { useListProducts } from "@/api/products";
 import { DropdownItem, Icon, IconedButton } from "@/components/common/custom";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
-import { useRestoreEntity } from "@/hooks/common";
+import { ATTRIBUTES } from "@/components/products/products.common";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -26,8 +26,7 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { data, isLoading, isRefetching } = useListProducts();
-  const restoreEntity = useRestoreEntity({ entity: ENTITIES.PRODUCTS, key: LIST_PRODUCTS_QUERY_KEY });
+  const { data, isLoading, isRefetching } = useListProducts({ attributes: [ATTRIBUTES.NAME, ATTRIBUTES.PRICE, ATTRIBUTES.CODE, ATTRIBUTES.COMMENTS, ATTRIBUTES.BRAND_NAME, ATTRIBUTES.SUPPLIER_NAME, ATTRIBUTES.FRACTION_CONFIG, ATTRIBUTES.EDITABLE_PRICE] });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -54,19 +53,16 @@ const Products = () => {
     ]);
 
     return [headers, ...productData];
-  },[products]);
+  }, [products]);
 
 
   useEffect(() => {
-    const handleRestore = async () => {
-      await restoreEntity();
-    };
 
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
-        icon: 'add',
-        color: 'green',
+        icon: ICONS.ADD,
+        color: COLORS.GREEN,
         onClick: () => { push(PAGES.PRODUCTS.CREATE) },
         text: 'Crear'
       },
@@ -77,7 +73,7 @@ const Products = () => {
             pointing
             as={IconedButton}
             text='Excel'
-            icon='file excel'
+            icon={ICONS.FILE_EXCEL}
             floating
             labeled
             button
@@ -93,10 +89,10 @@ const Products = () => {
               <DropdownItem onClick={() => {
                 downloadExcel(prepareProductDataForExcel, "Lista de Productos");
               }}>
-                <Icon name="download" />Productos
+                <Icon name={ICONS.DOWNLOAD} />Productos
               </DropdownItem>
               <DropdownItem onClick={() => downloadExcel(mockData, "Ejemplo de tabla")}>
-                <Icon name="file excel outline" />Plantilla
+                <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla
               </DropdownItem>
             </Dropdown.Menu>
           </Dropdown>
@@ -104,21 +100,12 @@ const Products = () => {
       },
       {
         id: 3,
-        icon: 'ban',
-        color: 'red',
+        icon: ICONS.BAN,
+        color: COLORS.RED,
         onClick: () => setOpen(true),
         text: 'Bloquear'
       },
     ] : [];
-    actions.push({
-      id: 4,
-      icon: 'undo',
-      color: 'grey',
-      onClick: handleRestore,
-      text: 'Actualizar',
-      disabled: loading,
-      width: "fit-content",
-    });
     setActions(actions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);

@@ -1,60 +1,39 @@
-import { deleteCustomer, LIST_CUSTOMERS_QUERY_KEY } from '@/api/customers';
-import { Input } from '@/components/common/custom';
-import { ModalDelete } from '@/components/common/modals';
+import { Dropdown, Flex, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
-import { PAGES } from "@/constants";
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { CUSTOMER_STATES, PAGES } from "@/constants";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from 'react-hook-form';
-import { toast } from 'react-hot-toast';
+import { Form, Label } from 'semantic-ui-react';
 import { HEADERS } from "../customers.common";
-import { Form } from 'semantic-ui-react';
 
-const EMPTY_FILTERS = { name: '' };
+const EMPTY_FILTERS = { name: '', state: CUSTOMER_STATES.ACTIVE.id };
+const STATE_OPTIONS = [
+  ...Object.entries(CUSTOMER_STATES).map(([key, value]) => ({
+    key,
+    text: (
+      <Flex alignItems="center" justifyContent="space-between">
+        {value.title}&nbsp;<Label color={value.color} circular empty />
+      </Flex>
+    ),
+    value: key
+  }))
+];
 
 const CustomersPage = ({ customers = [], isLoading }) => {
   const { handleSubmit, control, reset } = useForm();
-  const queryClient = useQueryClient();
-
-  const [showModal, setShowModal] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
 
   const onFilter = useCallback(customer => {
-    if (filters.name) {
-      return customer.name.toLowerCase().includes(filters.name.toLowerCase());
+
+    if (filters.name && !customer.name?.toLowerCase().includes(filters.name.toLowerCase())) {
+      return false;
     }
-    return customer;
+
+    if (filters.state && filters.state !== customer.state) {
+      return false;
+    }
+    return true;
   }, [filters]);
-
-  const actions = [
-    {
-      id: 1,
-      icon: 'trash',
-      color: 'red',
-      onClick: (customer) => {
-        setSelectedCustomer(customer);
-        setShowModal(true);
-      },
-      tooltip: 'Eliminar'
-    }
-  ];
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
-      const response = await deleteCustomer(selectedCustomer?.id);
-      return response
-    },
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success('Cliente eliminado!');
-        queryClient.invalidateQueries({ queryKey: [LIST_CUSTOMERS_QUERY_KEY], refetchType: 'all' });
-        setShowModal(false);
-      } else {
-        toast.error(response.message);
-      }
-    },
-  });
 
   const onRestoreFilters = () => {
     reset(EMPTY_FILTERS);
@@ -65,6 +44,26 @@ const CustomersPage = ({ customers = [], isLoading }) => {
     <>
       <Form onSubmit={handleSubmit(setFilters)}>
         <Filters onRestoreFilters={onRestoreFilters}>
+          <Controller
+            name="state"
+            control={control}
+            render={({ field: { onChange, ...rest } }) => (
+              <Dropdown
+                {...rest}
+                $maxWidth
+                top="10px"
+                height="35px"
+                minHeight="35px"
+                selection
+                options={STATE_OPTIONS}
+                defaultValue={STATE_OPTIONS[0].key}
+                onChange={(e, { value }) => {
+                  onChange(value);
+                  setFilters({ ...filters, state: value });
+                }}
+              />
+            )}
+          />
           <Controller
             name="name"
             control={control}
@@ -85,16 +84,8 @@ const CustomersPage = ({ customers = [], isLoading }) => {
         headers={HEADERS}
         page={PAGES.CUSTOMERS}
         elements={customers}
-        actions={actions}
         onFilter={onFilter}
         paginate
-      />
-      <ModalDelete
-        showModal={showModal}
-        setShowModal={setShowModal}
-        title={`¿Está seguro que desea eliminar el cliente "${selectedCustomer?.name}"?`}
-        onDelete={mutate}
-        isLoading={isPending}
       />
     </>
   );

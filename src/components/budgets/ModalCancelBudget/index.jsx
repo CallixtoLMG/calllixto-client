@@ -1,8 +1,9 @@
-import { ButtonsContainer, FieldsContainer, IconedButton, Label, TextArea } from "@/components/common/custom";
-import { useState } from "react";
-import { Icon, Modal, Transition } from "semantic-ui-react";
-import { ModalContent } from "./styles";
 import { IconnedButton } from "@/components/common/buttons";
+import { ButtonsContainer, FieldsContainer, Label, TextArea } from "@/components/common/custom";
+import { COLORS, ICONS } from "@/constants";
+import { useState } from "react";
+import { Modal, Transition } from "semantic-ui-react";
+import { ModalContent } from "./styles";
 
 const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
   const [cancelReason, setCancelReason] = useState("");
@@ -26,11 +27,11 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
         </ModalContent>
         <Modal.Actions>
           <ButtonsContainer width="100%" marginTop="10px">
-            <IconnedButton text="Cancelar" icon="cancel" color="red" onClick={() => onClose(false)} disabled={isLoading} />
+            <IconnedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} />
             <IconnedButton
               text="Anular"
-              icon="ban"
-              color="red"
+              icon={ICONS.BAN}
+              color={COLORS.RED}
               onClick={() => onConfirm(cancelReason)}
               disabled={!cancelReason || isLoading}
               loading={isLoading}

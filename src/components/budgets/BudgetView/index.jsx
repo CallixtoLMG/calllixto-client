@@ -1,25 +1,55 @@
+import { useUpdatePayments } from "@/api/budgets";
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Dropdown, FieldsContainer, Flex, FormField, Icon, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
 import Payments from "@/components/common/form/Payments";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
-import { PICK_UP_IN_STORE } from "@/constants";
+import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed, now } from "@/utils";
+import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "react-hot-toast";
 import { Popup } from "semantic-ui-react";
 import { Container, Message, MessageHeader } from "./styles";
+
 
 const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
   const methods = useForm({
     defaultValues: {
-      payments: budget?.paymentsMade || [],
+      paymentsMade: budget?.paymentsMade || [],
     },
+    mode: "onChange",
   });
+
+  const { formState: { isDirty } } = methods;
 
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
+  const updatePayment = useUpdatePayments();
+
+  const { mutate: mutateUpdatePayment, isPending: isLoadingUpdatePayment } = useMutation({
+    mutationFn: async () => {
+      const formData = methods.getValues();
+      const updatedBudget = {
+        ...budget,
+        paymentsMade: formData.paymentsMade,
+        updatedAt: now(),
+      };
+
+      const data = await updatePayment({ budget: updatedBudget, id: budget.id });
+
+      return data;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Pagos actualizados!");
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+  });
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
@@ -67,7 +97,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                   size="mini"
                   content={product.dispatchComment}
                   position="top center"
-                  trigger={<Icon name="truck" color="orange" />
+                  trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />
                   }
                 />
               )}
@@ -102,12 +132,13 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
 
   return (
     <ViewContainer>
-      {isBudgetCancelled(budget?.state) && <FieldsContainer>
-        <Message negative >
-          <MessageHeader>Motivo de anulación</MessageHeader>
-          <p>{budget?.cancelledMsg}</p>
-        </Message>
-      </FieldsContainer>}
+      {isBudgetCancelled(budget?.state) &&
+        <FieldsContainer>
+          <Message negative >
+            <MessageHeader>Motivo de anulación</MessageHeader>
+            <p>{budget?.cancelledMsg}</p>
+          </Message>
+        </FieldsContainer>}
       <FieldsContainer justifyContent="space-between">
         <FormField width="300px">
           <Label>Vendedor</Label>
@@ -138,7 +169,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                   text: address.address,
                   value: address.address,
                 }))}
-                value={selectedContact.address}
+                value={selectedContact?.address}
                 onChange={(e, { value }) => setSelectedContact({ ...selectedContact, address: value })}
               />
             )
@@ -179,13 +210,24 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         <Label>Comentarios</Label>
         <Segment placeholder>{budget?.comments}</Segment>
       </FieldsContainer>
-      <Flex justifyContent="space-between">
-        {Toggle}
-      </Flex>
-      {isBudgetConfirmed(budget?.state) && (
-        <Payments total={total} methods={methods}>
-        <SubmitAndRestore disabled={!isUpdating} />
-        </Payments>
+      {(isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state)) && (
+        <>
+          {isBudgetConfirmed(budget?.state) &&
+            <Flex justifyContent="space-between">
+              {Toggle}
+            </Flex>}
+          <Payments update={isUpdating} total={total} methods={methods}>
+            <SubmitAndRestore
+              isUpdating={isUpdating}
+              isLoading={isLoadingUpdatePayment}
+              isDirty={isDirty}
+              onSubmit={() => mutateUpdatePayment()}
+              onReset={() => methods.reset({ paymentsMade: budget.paymentsMade })}
+              disabled={!isDirty}
+              text="Guardar"
+            />
+          </Payments>
+        </>
       )}
       <FieldsContainer>
         <FormField flex={3}>

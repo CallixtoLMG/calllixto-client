@@ -1,16 +1,17 @@
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { CurrencyFormatInput, Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
+import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
-import { MEASSURE_UNITS, PAGES, RULES, SHORTKEYS } from "@/constants";
+import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, PAGES, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { preventSend } from "@/utils";
+import { isProductDeleted, preventSend } from "@/utils";
 import { useCallback, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { Popup } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
-  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors } = useForm({
+  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors, setError } = useForm({
     defaultValues: {
       fractionConfig: {
         active: false,
@@ -40,10 +41,31 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   }, [reset, isUpdating]);
 
   const handleForm = async (data) => {
-    if (!isUpdating) {
-      data.code = `${supplier?.id}${brand?.id}${data.code}`;
+    if (supplier?.state === SUPPLIER_STATES.INACTIVE.id) {
+      setError("supplier", { type: "manual", message: "Este proveedor está inactivo." });
+      return;
     }
-    await onSubmit(data);
+
+    if (brand?.state === BRANDS_STATES.INACTIVE.id) {
+      setError("brand", { type: "manual", message: "Esta marca está inactiva." });
+      return;
+    }
+
+    const filteredData = { ...data };
+
+    if (data.fractionConfig && !data.fractionConfig.active && product?.fractionConfig?.active === false) {
+      delete filteredData.fractionConfig;
+    }
+
+    if (data.editablePrice === product?.editablePrice) {
+      delete filteredData.editablePrice;
+    }
+
+    if (!isUpdating) {
+      filteredData.code = `${supplier?.id}${brand?.id}${data.code}`;
+    }
+
+    await onSubmit(filteredData);
   };
 
   const shouldError = useMemo(() => !isUpdating && isDirty && isSubmitted, [isDirty, isSubmitted, isUpdating]);
@@ -51,11 +73,83 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT), SHORTKEYS.DELETE);
 
+  const supplierOptions = useMemo(() => {
+    return suppliers?.map(({ id, name, state, deactivationReason }) => ({
+      key: id,
+      value: name,
+      text: name,
+      content: (
+        <Flex justifyContent="space-between" alignItems="center">
+          <span>{name}</span>
+          <Flex>
+            {state === SUPPLIER_STATES.INACTIVE.id && (
+              <Popup
+                trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
+                content={deactivationReason || 'Motivo no especificado'}
+                position="top center"
+                size="mini"
+              />
+            )}
+          </Flex>
+        </Flex>
+      ),
+    }));
+  }, [suppliers]);
+
+  const brandOptions = useMemo(() => {
+    return brands?.map(({ id, name, state, deactivationReason }) => ({
+      key: id,
+      value: name,
+      text: name,
+      content: (
+        <Flex justifyContent="space-between" alignItems="center">
+          <span>{name}</span>
+          <Flex>
+            {state === BRANDS_STATES.INACTIVE.id && (
+              <Popup
+                trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
+                content={deactivationReason || 'Motivo no especificado'}
+                position="top center"
+                size="mini"
+              />
+            )}
+          </Flex>
+        </Flex>
+      ),
+    }));
+  }, [brands]);
+
+  const handleSupplierChange = (value) => {
+    const selectedSupplier = suppliers.find((supplier) => supplier.name === value);
+    setSupplier(selectedSupplier);
+
+    if (selectedSupplier?.state === SUPPLIER_STATES.INACTIVE.id) {
+      setError("supplier", { type: "manual", message: "No es posible crear un producto con un proveedor inactivo." });
+    } else {
+      clearErrors("supplier");
+    }
+
+    clearErrors("code");
+  };
+
+  const handleBrandChange = (value) => {
+    const selectedBrand = brands.find((brand) => brand.name === value);
+    setBrand(selectedBrand);
+
+    if (selectedBrand?.state === BRANDS_STATES.INACTIVE.id) {
+      setError("brand", { type: "manual", message: "No es posible crear un producto con una marca inactiva." });
+    } else {
+      clearErrors("brand");
+    }
+
+    clearErrors("code");
+  };
+
   return (
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
       <FieldsContainer rowGap="5px" alignItems="flex-end">
-        <FormField flex="1" error={shouldError && !supplier && 'Campo requerido.'}>
-          <RuledLabel title="Proveedor" message={shouldError && !supplier && 'Campo requerido.'} required />
+        <FormField flex="1" error={errors.supplier?.message}>
+          <RuledLabel title="Proveedor" message={errors.supplier?.message} required />
           {!isUpdating ? (
             <Dropdown
               required
@@ -65,21 +159,19 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               selection
               minCharacters={2}
               noResultsMessage="Sin resultados!"
-              options={suppliers}
+              options={supplierOptions}
               clearable
               value={supplier?.name}
-              onChange={(e, { value }) => {
-                const supplier = suppliers.find((supplier) => supplier.name === value);
-                setSupplier(supplier);
-                clearErrors("code");
-              }}
+              onChange={(e, { value }) => handleSupplierChange(value)}
+              disabled={isProductDeleted(product?.state)}
             />
           ) : (
-            <Segment placeholder>{product?.supplierName}</Segment>
+            <Segment placeholder={product?.supplierName} />
           )}
         </FormField>
-        <FormField flex="1" error={shouldError && !brand && 'Campo requerido.'}>
-          <RuledLabel title="Marca" message={shouldError && !brand && 'Campo requerido.'} required />
+
+        <FormField flex="1" error={errors.brand?.message}>
+          <RuledLabel title="Marca" message={errors.brand?.message} required />
           {!isUpdating ? (
             <Dropdown
               required
@@ -89,20 +181,16 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               selection
               minCharacters={2}
               noResultsMessage="Sin resultados!"
-              options={brands}
+              options={brandOptions}
               clearable
               value={brand?.name}
-              onChange={(e, { value }) => {
-                const brand = brands.find((brand) => brand.name === value);
-                setBrand(brand);
-                clearErrors("code");
-              }}
-              disabled={isUpdating}
+              onChange={(e, { value }) => handleBrandChange(value)}
+              disabled={isProductDeleted(product?.state)}
             />
           ) : (
-            <Segment placeholder>{product?.brandName}</Segment>
+            <Segment placeholder={product?.brandName} />
           )}
-        </FormField >
+        </FormField>
         <FormField width="20%">
           <Controller
             name="editablePrice"
@@ -111,9 +199,10 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               <IconnedButton
                 {...rest}
                 text="Precio Editable"
-                icon="pencil"
+                icon={ICONS.PENCIL}
                 onClick={() => onChange(!value)}
                 basic={!value}
+                disabled={isProductDeleted(product?.state)}
               />
             )}
           />
@@ -126,14 +215,14 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               <IconnedButton
                 {...rest}
                 text="Producto Fraccionable"
-                icon="cut"
+                icon={ICONS.CUT}
                 onClick={() => onChange(!value)}
                 basic={!value}
+                disabled={isProductDeleted(product?.state)}
               />
             )}
           />
         </FormField>
-
       </FieldsContainer>
       <FieldsContainer rowGap="5px">
         <FormField width="20%" error={errors?.code?.message}>
@@ -153,11 +242,11 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                   onChange={(e) => field.onChange(e.target.value.toUpperCase())}
                   {...((supplier?.id || brand?.id) && { label: { basic: true, content: `${supplier?.id ?? ''} ${brand?.id ?? ''}` } })}
                   labelPosition='left'
+                  disabled={isProductDeleted(product?.state)}
                 />
               )}
             />
           )}
-
         </FormField>
         <FormField flex="1" error={errors?.name?.message}>
           <RuledLabel title="Nombre" message={errors?.name?.message} required />
@@ -165,7 +254,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             name="name"
             control={control}
             rules={RULES.REQUIRED}
-            render={({ field }) => <Input height="50px" {...field} placeholder="Nombre" />}
+            render={({ field }) => <Input height="50px" {...field} placeholder="Nombre" disabled={isProductDeleted(product?.state)} />}
           />
         </FormField>
         <FormField width="20%">
@@ -188,6 +277,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 }}
                 value={value || 0}
                 placeholder="Precio"
+                disabled={isProductDeleted(product?.state)}
               />
             )}
           />
@@ -204,20 +294,21 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 options={Object.values(MEASSURE_UNITS)}
                 defaultValue={Object.values(MEASSURE_UNITS)[0].value}
                 onChange={(e, { value }) => onChange(value)}
-                disabled={!watchFractionable}
+                disabled={!watchFractionable || isProductDeleted(product?.state)}
               />
             )}
           />
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
-        <ControlledComments control={control} />
+        <ControlledComments control={control} disabled={isProductDeleted(product?.state)} />
       </FieldsContainer>
       <SubmitAndRestore
         isUpdating={isUpdating}
         isLoading={isLoading}
         isDirty={isDirty}
         onReset={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT)}
+        disabled={isProductDeleted(product?.state)}
       />
     </Form>
   );

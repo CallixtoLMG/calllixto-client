@@ -7,7 +7,7 @@ import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
-import { BUDGET_STATES, PAGES, PICK_UP_IN_STORE, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
+import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -26,7 +26,7 @@ const EMPTY_BUDGET = (user) => ({
   additionalCharge: 0,
   paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
   expirationOffsetDays: '',
-  payments: [],
+  paymentsMade: [],
 });
 
 const BudgetForm = ({
@@ -44,7 +44,7 @@ const BudgetForm = ({
   const methods = useForm({
     defaultValues: budget ? {
       ...budget,
-      payments: budget.payments || [],
+      paymentsMade: budget.paymentsMade || [],
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
     mode: 'onSubmit',
@@ -56,24 +56,21 @@ const BudgetForm = ({
     name: "products"
   });
   const [watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp, watchProducts] = watch(['globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore', 'products']);
-
   const hasShownModal = useRef(false);
   const productSearchRef = useRef(null);
-
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [temporaryProducts, setTemporaryProducts] = useState([]);
-
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [shouldShowModal, setShouldShowModal] = useState(false);
   const [expiration, setExpiration] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
-
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
+  const isCustomerInactive = watchCustomer?.state === CUSTOMER_STATES.INACTIVE.id;
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -84,8 +81,28 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers.map(({ id, name }) => ({
-      key: id, value: id, text: name
+    return customers.map(({ id, name, state, deactivationReason }) => ({
+      key: id,
+      value: id,
+      text: name,
+      content: (
+        <Flex justifyContent="space-between" alignItems="center">
+          <span>{name}</span>
+          {state === CUSTOMER_STATES.INACTIVE.id && (
+            <Flex >
+              <Popup
+                trigger={
+                  <Label color={COLORS.GREY} size="mini">
+                    Desactivado
+                  </Label>}
+                content={deactivationReason || 'Motivo no especificado'}
+                position="top center"
+                size="mini"
+              />
+            </Flex>
+          )}
+        </Flex>
+      ),
     }));
   }, [customers]);
 
@@ -151,9 +168,10 @@ const BudgetForm = ({
       await onSubmit({
         ...data,
         customer: { id: customer.id, name: customer.name },
+        total: Number(total.toFixed(2)),
         state
       });
-    };
+    }
   };
 
   const currentState = useMemo(() => {
@@ -205,16 +223,16 @@ const BudgetForm = ({
   const actions = [
     {
       id: 1,
-      icon: 'trash',
-      color: 'red',
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
       onClick: (element, index) => removeProduct(index),
       tooltip: 'Eliminar',
-      width:"100%"
+      width: "100%"
     },
     {
       id: 2,
-      icon: 'add',
-      color: 'green',
+      icon: ICONS.ADD,
+      color: COLORS.GREEN,
       onClick: (element, index) => handleOpenCommentModal(element, index),
       tooltip: 'Comentarios'
     },
@@ -245,8 +263,12 @@ const BudgetForm = ({
     },
     {
       id: 2,
-      title: "Cantidad", value: (product, index) => (
-        <Controller name={`products[${index}].quantity`} control={control} rules={RULES.REQUIRED}
+      title: "Cantidad",
+      value: (product, index) => (
+        <Controller
+          name={`products[${index}].quantity`}
+          control={control}
+          rules={RULES.REQUIRED}
           render={({ field: { onChange, ...rest } }) => (
             <CurrencyFormatInput
               {...rest}
@@ -254,11 +276,13 @@ const BudgetForm = ({
               $shadow
               decimalScale={2}
               displayType="input"
-              onFocus={(e) => e.target.select()} onChange={(e) => {
+              onFocus={(e) => e.target.select()}
+              onChange={(e) => {
                 const value = Math.abs(e.target.value);
                 onChange(value);
                 calculateTotal();
               }}
+              disabled={product.state === PRODUCT_STATES.OOS.id}
             />
           )}
         />
@@ -274,8 +298,9 @@ const BudgetForm = ({
           <Flex marginLeft="3px" marginRight="3px" columnGap="3px">
             {product.comments && <CommentTooltip comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
-              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name="truck" color="orange" />} />
+              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />} />
             )}
+            {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
           </Flex>
         </Container>
       ),
@@ -375,11 +400,18 @@ const BudgetForm = ({
   ], [control, calculateTotal, setValue]);
 
   const handleDraft = async (data) => {
-    await handleCreate(data, BUDGET_STATES.DRAFT.id);
+    setValue("state", BUDGET_STATES.DRAFT.id);
+    await handleCreate({ ...data, total: Number(total.toFixed(2)) }, BUDGET_STATES.DRAFT.id);
   };
 
   const handleConfirm = async (data) => {
-    await handleCreate(data, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
+    if (isCustomerInactive) {
+      setError('customer', { type: 'manual', message: `No es posible confirmar ni dejar pendientes presupuestos con clientes inactivos, solo borradores.` });
+      return;
+    }
+
+    setValue('state', isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
+    await handleCreate({ ...data, total: Number(total.toFixed(2)) }, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleDraft)(), SHORTKEYS.ENTER);
@@ -402,9 +434,9 @@ const BudgetForm = ({
                     return (
                       <MessageItem key={p.code}>
                         {`${p.code} | ${p.name} | `}
-                        <span style={{ color: 'red' }}>{formatedPrice(oldPrice.price)}</span>
+                        <span style={{ color: COLORS.RED }}>{formatedPrice(oldPrice.price)}</span>
                         {' -> '}
-                        <span style={{ color: 'green' }}>{`${formatedPrice(p.price)}.`}</span>
+                        <span style={{ color: COLORS.GREEN }}>{`${formatedPrice(p.price)}.`}</span>
                       </MessageItem>
                     );
                   })}
@@ -426,14 +458,14 @@ const BudgetForm = ({
             <ButtonsContainer>
               <IconnedButton
                 text="Cancelar"
-                icon="cancel"
-                color="red"
+                icon={ICONS.CANCEL}
+                color={COLORS.RED}
                 onClick={handleCancelUpdate}
               />
               <IconnedButton
                 text="Confirmar"
-                icon="check"
-                color="green"
+                icon={ICONS.CHECK}
+                color={COLORS.GREEN}
                 onClick={handleConfirmUpdate}
               />
             </ButtonsContainer>
@@ -446,9 +478,9 @@ const BudgetForm = ({
             <ButtonGroup size="small">
               <IconnedButton
                 text="Confirmado"
-                icon="check"
+                icon={ICONS.CHECK}
                 basic={!isConfirmed}
-                color={isConfirmed ? "green" : "orange"}
+                color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
                 onClick={() => {
                   setIsConfirmed(true);
                   setValue('state', BUDGET_STATES.CONFIRMED.id);
@@ -456,9 +488,9 @@ const BudgetForm = ({
               />
               <IconnedButton
                 text="Pendiente"
-                icon="hourglass half"
+                icon={ICONS.HOURGLASS_HALF}
                 basic={isConfirmed}
-                color={isConfirmed ? "green" : "orange"}
+                color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
                 onClick={() => {
                   setIsConfirmed(false);
                   setValue('state', BUDGET_STATES.PENDING.id);
@@ -474,7 +506,7 @@ const BudgetForm = ({
                 <ButtonGroup size="small">
                   <IconnedButton
                     text={PICK_UP_IN_STORE}
-                    icon="warehouse"
+                    icon={ICONS.WAREHOUSE}
                     basic={!value}
                     onClick={() => {
                       onChange(true);
@@ -482,7 +514,7 @@ const BudgetForm = ({
                   />
                   <IconnedButton
                     text="Enviar a Dirección"
-                    icon="truck"
+                    icon={ICONS.TRUCK}
                     basic={value}
                     onClick={() => {
                       onChange(false);
@@ -526,7 +558,11 @@ const BudgetForm = ({
         </FieldsContainer>
         <FieldsContainer>
           <FormField width="300px">
-            <RuledLabel title="Cliente" message={errors?.customer?.message} required />
+            <RuledLabel
+              title="Cliente"
+              message={errors?.customer?.message || (isCustomerInactive ? `El cliente está inactivo, solo ${isBudgetDraft(budget?.state) ? "actualizar" : "crear"} borradores esta permitido.` : '')}
+              required
+            />
             <Controller
               name="customer"
               control={control}
@@ -594,7 +630,7 @@ const BudgetForm = ({
           </FormField>
         </FieldsContainer>
         <FormField width="300px">
-          <RuledLabel title="Agregar producto" message={errors?.products?.message} required />
+          <RuledLabel title="Agregar producto" message={errors?.products?.root?.message} required />
           <Controller name="products"
             control={control}
             rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
@@ -605,7 +641,7 @@ const BudgetForm = ({
                 onProductSelect={(selectedProduct) => {
                   appendProduct({
                     ...selectedProduct,
-                    quantity: 1,
+                    quantity: selectedProduct.state === PRODUCT_STATES.OOS.id ? 0 : 1,
                     discount: 0,
                     key: uuid(),
                     ...(selectedProduct.fractionConfig?.active && {
@@ -615,7 +651,7 @@ const BudgetForm = ({
                         price: selectedProduct.price,
                       }
                     })
-                  })
+                  });
                 }}
               />
             )}
@@ -646,6 +682,7 @@ const BudgetForm = ({
             <Payments
               methods={methods}
               total={total}
+              update
             />
           ) : (
             <FormField flex={3}>
@@ -663,7 +700,7 @@ const BudgetForm = ({
                           width="fit-content"
                           type="button"
                           basic={value.length !== PAYMENT_METHODS.length}
-                          color="blue"
+                          color={COLORS.BLUE}
                           onClick={() => {
                             if (value.length === PAYMENT_METHODS.length) {
                               onChange([]);
@@ -682,7 +719,7 @@ const BudgetForm = ({
                             width="fit-content"
                             key={key}
                             basic={!value.includes(methodValue)}
-                            color="blue"
+                            color={COLORS.BLUE}
                             type="button"
                             onClick={() => {
                               if (value.includes(methodValue)) {
@@ -713,19 +750,19 @@ const BudgetForm = ({
           color={currentState.color}
           onSubmit={handleSubmit(handleConfirm)}
           icon={currentState.icon}
-          text={currentState.title}
+          text={currentState.singularTitle}
           extraButton={
             <IconedButton
               icon
               labelPosition="left"
-              disabled={isLoading || !isDirty || isBudgetConfirmed(watchState)}
-              loading={isLoading && watchState === BUDGET_STATES.DRAFT.id}
+              disabled={isLoading || !isDirty }
+              loading={isLoading && isBudgetDraft(watchState)}
               type="button"
               onClick={handleSubmit(handleDraft)}
               color={BUDGET_STATES.DRAFT.color}
               width="fit-content"
             >
-              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
+              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.singularTitle}
             </IconedButton>
           }
         />

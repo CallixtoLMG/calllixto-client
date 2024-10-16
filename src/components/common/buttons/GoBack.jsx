@@ -1,4 +1,4 @@
-import { SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from 'next/navigation';
 import { IconnedButton } from ".";
@@ -14,8 +14,8 @@ const GoBack = () => {
   return (
     <IconnedButton
       text="Atrás"
-      icon="arrow left"
-      color="grey"
+      icon={ICONS.ARROW_LEFT}
+      color={COLORS.GREY}
       onClick={handleClick}
     />
   );

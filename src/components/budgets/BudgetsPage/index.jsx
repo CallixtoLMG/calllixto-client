@@ -1,13 +1,13 @@
 import { Dropdown, Flex, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
-import { BUDGET_STATES, PAGES } from "@/constants";
+import { ALL, BUDGET_STATES, COLORS, ICONS, PAGES } from "@/constants";
 import { useRouter } from "next/navigation";
+import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Form, Label } from 'semantic-ui-react';
 import { BUDGETS_COLUMNS } from "../budgets.common";
-import { useCallback, useState } from 'react';
 
-const DEFAULT_STATE = { key: 'ALL', value: 'ALL', text: 'Todos' };
+const DEFAULT_STATE = { key: ALL, value: ALL, text: 'Todos' };
 const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: DEFAULT_STATE.value };
 const STATE_OPTIONS = [
   DEFAULT_STATE,
@@ -46,7 +46,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
       return false;
     }
 
-    if (filters.state && !budget.state.toLowerCase().includes(filters.state.toLowerCase()) && filters.state !== 'ALL') {
+    if (filters.state && budget.state !== filters.state && filters.state !== ALL) {
       return false;
     }
 
@@ -56,8 +56,8 @@ const BudgetsPage = ({ budgets, isLoading }) => {
   const actions = [
     {
       id: 1,
-      icon: 'copy',
-      color: 'green',
+      icon: ICONS.COPY,
+      color: COLORS.GREEN,
       onClick: (budget) => { push(PAGES.BUDGETS.CLONE(budget?.id)) },
       tooltip: 'Clonar'
     }

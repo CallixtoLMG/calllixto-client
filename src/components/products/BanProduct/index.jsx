@@ -1,8 +1,10 @@
 import { useUserContext } from "@/User";
 import { editBanProducts } from "@/api/products";
+import { IconnedButton } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, FormField, Input, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
+import { COLORS, ICONS } from "@/constants";
 import { handleEnterKeyPress } from '@/utils';
 import { useMutation } from "@tanstack/react-query";
 import { isEqual, sortBy } from 'lodash';
@@ -12,7 +14,6 @@ import { toast } from "react-hot-toast";
 import { Transition } from "semantic-ui-react";
 import { BAN_FILTERS, BAN_PRODUCTS_COLUMNS } from "../products.common";
 import { ModalActions } from "./styles";
-import { IconnedButton } from "@/components/common/buttons";
 
 const BanProduct = ({ open, setOpen }) => {
   const { getBlacklist, updateSessionData, userData } = useUserContext();
@@ -29,8 +30,8 @@ const BanProduct = ({ open, setOpen }) => {
   const actions = [
     {
       id: 1,
-      icon: 'trash',
-      color: 'red',
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
       onClick: deleteProduct,
       tooltip: 'Eliminar'
     }
@@ -77,7 +78,7 @@ const BanProduct = ({ open, setOpen }) => {
         toast.success('Lista de productos bloquedos actualizada!');
         setOpen(false);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
   });
@@ -132,18 +133,18 @@ const BanProduct = ({ open, setOpen }) => {
           <Flex columnGap="5px">
             <IconnedButton
               text="Cancelar"
-              icon="cancel"
+              icon={ICONS.CANCEL}
               disabled={isPending}
               onClick={() => setOpen(false)}
-              color="red"
+              color={COLORS.RED}
             />
             <IconnedButton
               text="Aceptar"
-              icon="check"
+              icon={ICONS.CHECK}
               disabled={isPending || isEqual(sortBy(getBlacklist()), sortBy(watchProducts))}
               loading={isPending}
               submit
-              color="green"
+              color={COLORS.GREEN}
               onClick={handleConfirmClick}
             />
           </Flex>

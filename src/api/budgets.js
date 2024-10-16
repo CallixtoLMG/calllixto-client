@@ -1,18 +1,21 @@
-import { ENTITIES, TIME_IN_MS } from "@/constants";
+import { ATTRIBUTES } from "@/components/budgets/budgets.common";
+import { ENTITIES, getDefaultListParams, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
-import { createItem, listItems } from "./common";
+import { listItems, useCreateItem, useEditItem } from "./common";
 
-const BUDGETS_URL = `${PATHS.BUDGETS}`;
 export const LIST_BUDGETS_QUERY_KEY = 'lisAllBudgets';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 
 export function useListBudgets() {
   const query = useQuery({
     queryKey: [LIST_BUDGETS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.BUDGETS, url: BUDGETS_URL }),
+    queryFn: () => listItems({
+      entity: ENTITIES.BUDGETS,
+      url: PATHS.BUDGETS,
+      params: getDefaultListParams(ATTRIBUTES)
+    }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -22,7 +25,7 @@ export function useListBudgets() {
 export function useGetBudget(id) {
   const getBudget = async (id) => {
     try {
-      const { data } = await axios.get(`${BUDGETS_URL}/${id}`);
+      const { data } = await axios.get(`${PATHS.BUDGETS}/${id}`);
       return data?.budget;
     } catch (error) {
       throw error;
@@ -40,22 +43,98 @@ export function useGetBudget(id) {
   return query;
 };
 
-export function createBudget(budget) {
-  return createItem({ entity: ENTITIES.BUDGETS, url: BUDGETS_URL, value: budget, responseEntity: ENTITIES.BUDGET });
-};
+export const useCreateBudget = () => {
+  const createItem = useCreateItem();
 
-export function edit(budget) {
-  const body = {
-    ...budget,
-    updatedAt: now(),
+  const createBudget = async (budget) => {
+    const response = await createItem({
+      entity: ENTITIES.BUDGETS,
+      url: PATHS.BUDGETS,
+      value: budget,
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY]],
+    });
+
+    return response;
   };
-  return axios.put(`${BUDGETS_URL}/${budget.id}`, body);
+
+  return createBudget;
 };
 
-export function confirmBudget(budget, id) {
-  return axios.put(`${BUDGETS_URL}/${id}/confirm`, budget);
+export const useEditBudget = () => {
+  const editItem = useEditItem();
+
+  const editBudget = async (budget) => {
+
+    const response = await editItem({
+      entity: ENTITIES.BUDGETS,
+      url: `${PATHS.BUDGETS}/${budget.id}`,
+      value: budget,
+      key: "id",
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, budget.id]]
+    });
+
+    return response;
+  };
+
+  return editBudget;
 };
 
-export function cancelBudget(budget, id) {
-  return axios.put(`${BUDGETS_URL}/${id}/cancel`, budget);
+export const useConfirmBudget = () => {
+  const editItem = useEditItem();
+
+  const confirmBudget = async (budget, id) => {
+    const response = await editItem({
+      entity: ENTITIES.BUDGETS,
+      url: `${PATHS.BUDGETS}/${id}/confirm`,
+      value: budget,
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY]],
+    });
+    return response;
+  };
+
+  return confirmBudget
+};
+
+export const useCancelBudget = () => {
+  const editItem = useEditItem();
+
+  const cancelBudget = async ({ budget, id }) => {
+
+    const response = await editItem({
+      entity: ENTITIES.BUDGETS,
+      url: `${PATHS.BUDGETS}/${id}/cancel`,
+      value: budget,
+      key: "id",
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]]
+    });
+
+    return response;
+  };
+
+  return cancelBudget;
+};
+
+export const useUpdatePayments = () => {
+  const editItem = useEditItem();
+
+  const updatePayments = async ({ budget, id }) => {
+    const { paymentsMade, updatedAt } = budget;
+
+    const response = await editItem({
+      entity: ENTITIES.BUDGETS,
+      url: `${PATHS.BUDGETS}/${id}/payments`,
+      value: { paymentsMade, updatedAt },
+      key: "id",
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]]
+    });
+
+    return response;
+  };
+
+  return updatePayments;
 };

@@ -1,19 +1,11 @@
 import { Divider } from '@/components/budgets/PDFfile/styles';
 import { Field } from '@/components/common/components/Field';
-import { isValidElement } from 'react';
+import { renderContent } from '@/utils';
 import styled from 'styled-components';
 import { Flex, FlexColumn } from '../custom';
-
 const SubTitle = styled.p`
   font-style: italic;
 `;
-
-// mandar a utils
-const renderContent = (content) => {
-  return typeof content === 'string' ? content : (
-    isValidElement(content) ? content : null
-  );
-};
 
 export const TotalList = ({ items = [], readOnly, width, labelWidth }) => {
   return (

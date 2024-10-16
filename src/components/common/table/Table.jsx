@@ -1,12 +1,12 @@
 import { Loader } from "@/components/layout";
-import { DEFAULT_PAGE_SIZE } from "@/constants";
+import { COLORS, DEFAULT_PAGE_SIZE, ICONS, PAGE_SIZE_OPTIONS } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Checkbox, Header, Icon, Pagination } from "semantic-ui-react";
+import { Button, Checkbox, Header, Icon, Popup } from "semantic-ui-react";
 import { IconnedButton, PopupActions } from "../buttons";
-import { CenteredFlex } from "../custom";
+import { CenteredFlex, Dropdown } from "../custom";
 import Actions from "./Actions";
-import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, Table, TableHeader, TableRow } from "./styles";
+import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Pagination, PaginationContainer, Table, TableHeader, TableRow } from "./styles";
 
 const CustomTable = ({
   isLoading,
@@ -24,7 +24,7 @@ const CustomTable = ({
   basic,
   $wrap,
   clearSelection,
-  selectAllCurrentPageElements, 
+  selectAllCurrentPageElements,
   paginate,
   onFilter = () => true,
 }) => {
@@ -33,17 +33,19 @@ const CustomTable = ({
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
   const [activePage, setActivePage] = useState(1);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
-  const pages = useMemo(() => Math.ceil(filteredElements.length / DEFAULT_PAGE_SIZE), [filteredElements]);
+  const pages = useMemo(() => Math.ceil(filteredElements.length / pageSize), [filteredElements, pageSize]);
+
   const currentPageElements = useMemo(() => {
-    const startIndex = (activePage - 1) * DEFAULT_PAGE_SIZE;
-    const endIndex = startIndex + DEFAULT_PAGE_SIZE;
+    const startIndex = (activePage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
     return filteredElements.slice(startIndex, endIndex);
-  }, [activePage, filteredElements]);
+  }, [activePage, filteredElements, pageSize]);
 
   const allSelected = useMemo(() => {
-    return currentPageElements.length > 0 && currentPageElements.every(product => selection[product[mainKey]]);
-  }, [currentPageElements, selection]);
+    return !!currentPageElements.length && currentPageElements.every(product => selection[product[mainKey]]);
+  }, [currentPageElements, mainKey, selection]);
 
   useEffect(() => {
     setHydrated(true);
@@ -56,7 +58,7 @@ const CustomTable = ({
   }, [pages, activePage]);
 
   const handlePageChange = (e, { activePage }) => {
-    clearSelection();
+    clearSelection?.();
     setActivePage(activePage);
   };
 
@@ -68,10 +70,16 @@ const CustomTable = ({
     }
   };
 
+  const handlePageSizeChange = (e, { value }) => {
+    setPageSize(value);
+    setActivePage(1);
+    clearSelection?.();
+  };
+
   return (
     <Container tableHeight={tableHeight}>
       {paginate && (
-        <PaginationContainer>
+        <PaginationContainer center>
           <Pagination
             activePage={activePage}
             onPageChange={handlePageChange}
@@ -82,6 +90,24 @@ const CustomTable = ({
             pointing
             secondary
             totalPages={pages}
+          />
+          <Popup
+            size="mini"
+            content="Elementos mostrados"
+            trigger={(
+              <Dropdown
+                options={PAGE_SIZE_OPTIONS}
+                value={pageSize}
+                onChange={handlePageSizeChange}
+                selection
+                compact
+                height="40px"
+                top="10px"
+                width="fit-content"
+              />
+            )}
+            position="left center"
+            mouseEnterDelay={500}
           />
         </PaginationContainer>
       )}
@@ -107,7 +133,7 @@ const CustomTable = ({
                 <InnerActionsContainer $header>
                   <PopupActions
                     position="right center"
-                    trigger={<Button icon circular color="yellow" size="mini"><Icon name="cog" /></Button>}
+                    trigger={<Button icon circular color={COLORS.YELLOW} size="mini"><Icon name={ICONS.COG} /></Button>}
                     buttons={selectionActions}
                     onToggleOpen={setIsPopupOpen}
                   />
@@ -156,7 +182,7 @@ const CustomTable = ({
                               {actions.length > 1 ? (
                                 <PopupActions
                                   position="left center"
-                                  trigger={<Button icon circular color="blue" size="mini"><Icon name="cog" /></Button>}
+                                  trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                   buttons={actions.map((action, idx) => (
                                     <IconnedButton
                                       key={idx}
@@ -192,12 +218,12 @@ const CustomTable = ({
                         </Cell>
                       ))}
                       {!!actions.length && (
-                        <ActionsContainer deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
+                        <ActionsContainer stillShow deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
                           <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
                             {actions.length > 1 ? (
                               <PopupActions
                                 position="left center"
-                                trigger={<Button type="button" icon circular color="orange" size="mini"><Icon name="cog" /></Button>}
+                                trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                 buttons={actions.map((action, idx) => (
                                   <IconnedButton
                                     key={idx}

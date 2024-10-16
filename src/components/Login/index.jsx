@@ -1,6 +1,6 @@
 "use client";
 import { Loader } from "@/components/layout";
-import { PAGES, RULES } from "@/constants";
+import { ICONS, PAGES, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -58,7 +58,7 @@ const LoginForm = ({ onSubmit }) => {
                   {...field}
                   placeholder='Correo electrónico'
                   fluid
-                  icon='user'
+                  icon={ICONS.USER}
                   iconPosition='left'
                 />
               )}
@@ -73,7 +73,7 @@ const LoginForm = ({ onSubmit }) => {
                   type='password'
                   placeholder='Contraseña'
                   fluid
-                  icon='lock'
+                  icon={ICONS.LOCK}
                   iconPosition='left'
                 />
               )}
