@@ -2,6 +2,7 @@ import { RestoreButton, SubmitButton } from "@/components/common/buttons";
 import { ButtonsContainer } from '@/components/common/custom';
 
 export const SubmitAndRestore = ({ draft, isUpdating, isLoading, isDirty, onReset, extraButton, disabled, onSubmit = () => { }, color, icon, text }) => {
+
   return (
     <ButtonsContainer>
       <RestoreButton

@@ -1,4 +1,5 @@
 import { config } from "@/config";
+import { PATHS } from "@/fetchUrls";
 import { encodeUri, now } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from './axios';
@@ -8,135 +9,106 @@ export function removeStorageEntity(entity) {
   return localforage.removeItem(`${config.APP_ENV}-${entity}`);
 }
 
-// export async function listItems({ entity, url, params }) {
-//   const list = async () => {
-//     try {
-//       let values = [];
-//       let LastEvaluatedKey;
+async function entityList({ entity, url, params }) {
+  try {
+    let values = [];
+    let LastEvaluatedKey;
 
-//       do {
-//         const { data } = await axios.get(url, {
-//           params: {
-//             ...params,
-//             ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(LastEvaluatedKey) }),
-//           }
-//         });
-
-//         if (data.statusOk) {
-//           values = [...values, ...data[entity]];
-//         }
-
-//         LastEvaluatedKey = data?.LastEvaluatedKey;
-
-//       } while (LastEvaluatedKey);
-
-//       return values;
-//     } catch (error) {
-//       throw error;
-//     }
-//   };
-
-//   let values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-//   if (values) {
-//     return { [entity]: values };
-//   }
-//   values = await list();
-//   await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
-//   return { [entity]: values };
-// }
-
-export async function listItems({ entity, url, eventsUrl, params }) {
-  const list = async () => {
-    try {
-      let values = [];
-      let LastEvaluatedKey;
-
-      // Realizar peticiones paginadas para obtener todos los elementos
-      do {
-        const { data } = await axios.get(url, {
-          params: {
-            ...params,
-            ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(LastEvaluatedKey) }),
-          }
-        });
-
-        if (data.statusOk) {
-          values = [...values, ...data[entity]];
-        }
-
-        LastEvaluatedKey = data?.LastEvaluatedKey;
-
-      } while (LastEvaluatedKey);
-
-      return values;
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  // Obtener el último `lastEventId` desde el almacenamiento local
-  let lastEventId = await localforage.getItem(`${config.APP_ENV}-${entity}-lastEventId`);
-
-  // Obtener los elementos actuales desde `localforage`
-  let values = await localforage.getItem(`${config.APP_ENV}-${entity}`) || [];
-
-  // Si hay un `lastEventId`, obtener eventos desde ese punto
-  if (lastEventId) {
-    try {
-      const { data } = await axios.get(eventsUrl, { 
-        params: { lastEventId } 
+    do {
+      const { data } = await axios.get(url, {
+        params: {
+          ...params,
+          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(LastEvaluatedKey) }),
+        },
       });
 
-      if (data.statusOk && data.events.length > 0) {
-        const newEvents = data.events;
-
-        // Aplicar los eventos a la lista de elementos almacenados
-        newEvents.forEach(event => {
-          event.value.forEach(item => {
-            switch (event.action) {
-              case 'C': // Crear nuevo elemento
-                values = [...values, item];
-                break;
-              case 'U': // Actualizar elemento existente
-                values = values.map(existingItem =>
-                  existingItem.code === item.code ? { ...existingItem, ...item } : existingItem
-                );
-                break;
-              case 'D': // Eliminar elemento
-                values = values.filter(existingItem => existingItem.code !== item.code);
-                break;
-              default:
-                console.warn(`Acción desconocida: ${event.action}`);
-            }
-          });
-        });
-
-        // Actualizar el `lastEventId` con el último evento procesado
-        lastEventId = newEvents[newEvents.length - 1].id;
-        await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
+      if (data.statusOk) {
+        values = [...values, ...data[entity]];
       }
 
-    } catch (error) {
-      console.error(`Error al obtener eventos para ${entity}:`, error);
-    }
+      LastEvaluatedKey = data?.LastEvaluatedKey;
+    } while (LastEvaluatedKey);
+
+    return values;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function handleEvents({ entity, values, key = "id" }) {
+  let lastEventId = await localforage.getItem(`${config.APP_ENV}-${entity}-lastEventId`);
+
+  if (!lastEventId) {
+    return values;
   }
 
-  // Si no hay valores almacenados en `localforage`, realizar una petición completa
-  if (values.length === 0) {
-    values = await list();
-    await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
-  } else {
-    // Si hay eventos y ya aplicamos los cambios, actualizar los elementos almacenados
-    await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
+  const { data: eventsData } = await axios.get(`events/${entity}`, {
+    params: { lastEventId },
+  });
+
+  if (eventsData.statusOk) {
+    const newEvents = eventsData.events;
+
+    lastEventId = newEvents[newEvents.length - 1]?.id;
+
+    if (lastEventId) {
+      await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
+    }
+
+    newEvents.forEach((event) => {
+      if (event.action === "C") {
+        event.value.forEach((item) => {
+          const exists = values.find((existingItem) => existingItem[key] === item[key]);
+          if (!exists) {
+            values = [item, ...values];
+          }
+        });
+      }
+
+      if (event.action === "U") {
+        event.value.forEach((item) => {
+
+          values = values.map((existingItem) =>
+            existingItem[key] === item[key] ? { ...existingItem, ...item } : existingItem
+          );
+        });
+      }
+
+      if (event.action === "D") {
+        values = values.filter(existingItem => !event.value.map((item) => item[key]).includes(existingItem[key]));
+      }
+    });
   }
+
+  return values;
+}
+
+export async function listItems({ entity, url, params, key = "id" }) {
+  let values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
+  if (!values?.length) {
+
+    values = await entityList({ entity, url, params });
+
+    await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
+
+    const { data } = await axios.get(`${PATHS.EVENTS}/${entity}`, { params: { order: false, pageSize: 1 } });
+
+    const lastEventId = data?.events?.[0]?.id;
+    if (lastEventId) {
+      await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
+    }
+  } else {
+    values = await handleEvents({ entity, values, key });
+  }
+
+  await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
 
   return { [entity]: values };
 }
 
 
-
-
-export async function getItemById({ id, url, entity, key = 'id' }) {
+export async function getItemById({ id, url, entity, key = 'id', params }) {
+  await listItems({ entity, url, params, key })
   const getEntity = async (id) => {
     try {
       const { data } = await axios.get(`${url}/${id}`);
@@ -178,6 +150,56 @@ export function useCreateItem() {
   };
 
   return createItem;
+};
+
+export function useInactiveItem() {
+  const queryClient = useQueryClient();
+
+  const inactiveItem = async ({ entity, value, url, responseEntity, invalidateQueries = [], key }) => {
+    const body = {
+      ...value,
+      updatedAt: now(),
+    };
+
+    const { data } = await axios.post(url, body);
+    
+    if (data.statusOk) {
+      await updateStorageItem({ entity, value: data[responseEntity], key });
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: 'all' });
+      });
+    }
+
+    return data;
+  };
+
+  return inactiveItem;
+};
+
+export function useActiveItem() {
+  const queryClient = useQueryClient();
+
+  const activeItem = async ({ entity, value, url, responseEntity, invalidateQueries = [], key }) => {
+    const body = {
+      ...value,
+      updatedAt: now(),
+    };
+
+    const { data } = await axios.post(url, body);
+
+    if (data.statusOk) {
+
+      await updateStorageItem({ entity, value: data[responseEntity], key });
+
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: 'all' });
+      });
+    }
+
+    return data;
+  };
+
+  return activeItem;
 };
 
 export function useEditItem() {

@@ -34,7 +34,7 @@ const CreateSupplier = () => {
         toast.success('Proveedor creado!');
         push(PAGES.SUPPLIERS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
     onError: (error) => {

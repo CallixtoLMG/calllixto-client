@@ -1,17 +1,24 @@
 "use client";
 import { Message } from "@/components/budgets/BudgetView/styles";
 import { IconnedButton } from "@/components/common/buttons";
-import { FieldsContainer, FormField, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, FormField, Label, MessageHeader, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { ICONS, MEASSURE_UNITS, PRODUCT_STATES } from "@/constants";
-import { threeMonthsDate } from "@/utils";
+import { isItemInactive, threeMonthsDate } from "@/utils";
 
 const ProductView = ({ product }) => {
   return (
     <ViewContainer>
+      {isItemInactive(product?.state) &&
+        <FieldsContainer>
+          <Message negative >
+            <MessageHeader>Motivo de inactivación</MessageHeader>
+            <p>{product.inactiveReason}</p>
+          </Message>
+        </FieldsContainer>}
       {product?.state === PRODUCT_STATES.DELETED.id &&
         <FieldsContainer>
           <Message negative >
-            <p>Este producto se eliminará <b>PERMANENTEMENTE</b> de forma automática el día {threeMonthsDate(product.updateAt)} (90 días desde su eliminación).</p>
+            <p>Este producto se eliminará <b>PERMANENTEMENTE</b> de forma automática el día {threeMonthsDate(product.updateAt)} (90 días desde que se marco como eliminado).</p>
           </Message>
         </FieldsContainer>}
       <FieldsContainer alignItems="flex-end">

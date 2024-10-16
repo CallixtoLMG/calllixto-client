@@ -1,26 +1,28 @@
-import { useDeleteSupplier } from "@/api/suppliers";
-import { Input } from "@/components/common/custom";
-import { ModalAction } from "@/components/common/modals";
+import { Dropdown, Flex, Input } from "@/components/common/custom";
 import { Filters, Table } from "@/components/common/table";
-import { COLORS, ICONS, PAGES } from "@/constants";
-import { RULES } from "@/roles";
-import { useMutation } from "@tanstack/react-query";
+import { PAGES, SUPPLIER_STATES } from "@/constants";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import { Form } from "semantic-ui-react";
+import { Form, Label } from "semantic-ui-react";
 import { SUPPLIERS_COLUMNS } from "../suppliers.common";
 
-const EMPTY_FILTERS = { id: '', name: '' };
+const EMPTY_FILTERS = { id: '', name: '', state: SUPPLIER_STATES.ACTIVE.id };
+const STATE_OPTIONS = [
+  ...Object.entries(SUPPLIER_STATES).map(([key, value]) => ({
+    key,
+    text: (
+      <Flex alignItems="center" justifyContent="space-between">
+        {value.title}&nbsp;<Label color={value.color} circular empty />
+      </Flex>
+    ),
+    value: key
+  }))
+];
 
-const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
+const SuppliersPage = ({ isLoading, suppliers = [] }) => {
   const { handleSubmit, control, reset } = useForm();
-  const [showModal, setShowModal] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
-  const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar la marca "${name}"?`, []);
-  const deleteSupplier = useDeleteSupplier();
-  
+
   const onFilter = useCallback((supplier) => {
     if (filters.name && !supplier.name.toLowerCase().includes(filters.name.toLowerCase())) {
       return false;
@@ -30,39 +32,12 @@ const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
       return false;
     }
 
+    if (filters.state && filters.state !== supplier.state) {
+      return false;
+    }
+
     return true;
   }, [filters]);
-
-  const actions = RULES.canRemove[role] ? [
-    {
-      id: 1,
-      icon: ICONS.TRASH,
-      color: COLORS.RED,
-      onClick: (supplier) => {
-        setSelectedSupplier(supplier);
-        setShowModal(true);
-      },
-      tooltip: 'Eliminar'
-    }
-  ] : [];
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
-      const response = await deleteSupplier(selectedSupplier.id);
-      return response;
-    },
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success('Proveedor eliminado!');
-        setShowModal(false);
-      } else {
-        toast.error(response.message);
-      }
-    },
-    onError: (error) => {
-      toast.error(`Error: ${error.message}`);
-    },
-  });
 
   const onRestoreFilters = () => {
     reset(EMPTY_FILTERS);
@@ -73,6 +48,26 @@ const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
     <>
       <Form onSubmit={handleSubmit(setFilters)}>
         <Filters onRestoreFilters={onRestoreFilters}>
+          <Controller
+            name="state"
+            control={control}
+            render={({ field: { onChange, ...rest } }) => (
+              <Dropdown
+                {...rest}
+                $maxWidth
+                top="10px"
+                height="35px"
+                minHeight="35px"
+                selection
+                options={STATE_OPTIONS}
+                defaultValue={STATE_OPTIONS[0].key}
+                onChange={(e, { value }) => {
+                  onChange(value);
+                  setFilters({ ...filters, state: value });
+                }}
+              />
+            )}
+          />
           <Controller
             name="id"
             control={control}
@@ -106,16 +101,8 @@ const SuppliersPage = ({ isLoading, suppliers = [], role }) => {
         headers={SUPPLIERS_COLUMNS}
         elements={suppliers}
         page={PAGES.SUPPLIERS}
-        actions={actions}
         onFilter={onFilter}
         paginate
-      />
-      <ModalAction
-        showModal={showModal}
-        setShowModal={setShowModal}
-        title={deleteQuestion(selectedSupplier?.name)}
-        onConfirm={mutate}
-        isLoading={isPending}
       />
     </>
   )

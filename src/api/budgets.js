@@ -1,7 +1,6 @@
 import { ATTRIBUTES } from "@/components/budgets/budgets.common";
-import { ENTITIES, TIME_IN_MS } from "@/constants";
+import { ENTITIES, getDefaultListParams, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { encodeUri } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
 import { listItems, useCreateItem, useEditItem } from "./common";
@@ -12,7 +11,11 @@ export const GET_BUDGET_QUERY_KEY = 'getBudget';
 export function useListBudgets() {
   const query = useQuery({
     queryKey: [LIST_BUDGETS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.BUDGETS, url: PATHS.BUDGETS, params: { attributes: encodeUri(Object.values(ATTRIBUTES)) } }),
+    queryFn: () => listItems({
+      entity: ENTITIES.BUDGETS,
+      url: PATHS.BUDGETS,
+      params: getDefaultListParams(ATTRIBUTES)
+    }),
     staleTime: TIME_IN_MS.ONE_DAY,
   });
 
@@ -89,13 +92,49 @@ export const useConfirmBudget = () => {
       responseEntity: ENTITIES.BUDGET,
       invalidateQueries: [[LIST_BUDGETS_QUERY_KEY]],
     });
-    console.log(response)
     return response;
   };
 
   return confirmBudget
 };
 
-export function cancelBudget(budget, id) {
-  return axios.put(`${PATHS.BUDGETS}/${id}/cancel`, budget);
+export const useCancelBudget = () => {
+  const editItem = useEditItem();
+
+  const cancelBudget = async ({ budget, id }) => {
+
+    const response = await editItem({
+      entity: ENTITIES.BUDGETS,
+      url: `${PATHS.BUDGETS}/${id}/cancel`,
+      value: budget,
+      key: "id",
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]]
+    });
+
+    return response;
+  };
+
+  return cancelBudget;
+};
+
+export const useUpdatePayments = () => {
+  const editItem = useEditItem();
+
+  const updatePayments = async ({ budget, id }) => {
+    const { paymentsMade, updatedAt } = budget;
+
+    const response = await editItem({
+      entity: ENTITIES.BUDGETS,
+      url: `${PATHS.BUDGETS}/${id}/payments`,
+      value: { paymentsMade, updatedAt },
+      key: "id",
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]]
+    });
+
+    return response;
+  };
+
+  return updatePayments;
 };

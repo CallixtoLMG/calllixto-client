@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { cancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
+import { useCancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useDolarExangeRate } from "@/api/external";
 import { useListProducts } from "@/api/products";
@@ -51,6 +51,7 @@ const Budget = ({ params }) => {
   const printRef = useRef();
   const editBudget = useEditBudget();
   const confirmBudget = useConfirmBudget();
+  const cancelBudget = useCancelBudget();
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {
@@ -312,7 +313,7 @@ const Budget = ({ params }) => {
         total
       };
       const response = await confirmBudget(confirmationData, budget?.id);
-      
+
       return response;
     },
     onSuccess: (response) => {
@@ -321,7 +322,7 @@ const Budget = ({ params }) => {
         setIsModalConfirmationOpen(false);
         push(PAGES.BUDGETS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
   });
@@ -342,7 +343,7 @@ const Budget = ({ params }) => {
         setIsModalCancelOpen(false);
         push(PAGES.BUDGETS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
   });
@@ -357,7 +358,7 @@ const Budget = ({ params }) => {
         toast.success('Presupuesto actualizado!');
         push(PAGES.BUDGETS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
   });

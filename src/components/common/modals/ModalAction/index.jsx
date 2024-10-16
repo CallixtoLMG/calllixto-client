@@ -18,6 +18,7 @@ const ModalAction = ({
   isLoading,
   noConfirmation = false,
   bodyContent = false,
+  disableButtons = false, 
 }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isActionEnabled, setIsActionEnabled] = useState(false);
@@ -29,13 +30,13 @@ const ModalAction = ({
       inputElement?.current?.focus();
     }
     setConfirmationText('');
-    setIsActionEnabled(noConfirmation);
-  }, [showModal, noConfirmation]);
+    setIsActionEnabled(noConfirmation || disableButtons); 
+  }, [showModal, noConfirmation, disableButtons]);
 
   const handleConfirmationTextChange = (e) => {
     const text = e.target.value;
     setConfirmationText(text);
-    setIsActionEnabled(text.toLowerCase() === confirmationWord);
+    setIsActionEnabled(text.toLowerCase() === confirmationWord && !disableButtons);
   };
 
   return (
@@ -44,12 +45,12 @@ const ModalAction = ({
         <Header icon={confirmButtonIcon} content={title || ""} />
         {bodyContent && (
           <ModalContent>
-            <Message negative>{bodyContent}.</Message>
+            <Message>{bodyContent}</Message>
           </ModalContent>
         )}
         <Modal.Actions>
           <Form onSubmit={handleSubmit(onConfirm)}>
-            {!noConfirmation && (
+            {!noConfirmation && !disableButtons && ( 
               <Input
                 height="40px"
                 placeholder={placeholder}
@@ -73,7 +74,7 @@ const ModalAction = ({
                 text={confirmButtonText}
                 icon={ICONS.CHECK}
                 height="40px"
-                disabled={!isActionEnabled || isLoading}
+                disabled={!isActionEnabled || isLoading || disableButtons} 
                 loading={isLoading}
                 color={COLORS.GREEN}
                 submit

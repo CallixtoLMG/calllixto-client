@@ -78,7 +78,7 @@ const BanProduct = ({ open, setOpen }) => {
         toast.success('Lista de productos bloquedos actualizada!');
         setOpen(false);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
   });

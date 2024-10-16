@@ -35,7 +35,7 @@ const CreateCustomer = () => {
         toast.success('Cliente creado!');
         push(PAGES.CUSTOMERS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
     onError: (error) => {

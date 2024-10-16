@@ -90,7 +90,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
         toast.success('Producto eliminado!');
         setShowModal(false);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
   });

@@ -1,18 +1,21 @@
 import { ATTRIBUTES } from "@/components/suppliers/suppliers.common";
-import { ENTITIES, TIME_IN_MS } from "@/constants";
+import { ACTIVE, ENTITIES, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { encodeUri } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import { getItemById, listItems, useCreateItem, useDeleteItem, useEditItem } from "./common";
+import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 
-export function useListSuppliers() {
+export function useListSuppliers({ sort = 'id', order = true } = {}) {
   const query = useQuery({
     queryKey: [LIST_SUPPLIERS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.SUPPLIERS, url: PATHS.SUPPLIERS, params: { sort: 'id', order: true, attributes: encodeUri(Object.values(ATTRIBUTES)) } }),
-    staleTime: TIME_IN_MS.ONE_DAY,
+    queryFn: () => listItems({
+      entity: ENTITIES.SUPPLIERS,
+      url: PATHS.SUPPLIERS,
+      params: getDefaultListParams(ATTRIBUTES, sort, order)
+    }),
+    staleTime: 0,
   });
 
   return query;
@@ -85,3 +88,52 @@ export const useEditSupplier = () => {
 
   return editSupplier;
 };
+
+export const useInactiveSupplier = () => {
+  const inactiveItem = useInactiveItem();
+
+  const inactiveSupplier = async (supplier, reason) => {
+    const updatedSupplier = {
+      ...supplier,
+      inactiveReason: reason
+    }
+
+    const response = await inactiveItem({
+      entity: ENTITIES.SUPPLIERS,
+      url: `${PATHS.SUPPLIERS}/${supplier.id}/${INACTIVE}`,
+      value: updatedSupplier,
+      key: "id",
+      responseEntity: ENTITIES.SUPPLIER,
+      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, supplier.id]]
+    });
+
+    return response;
+  };
+
+  return inactiveSupplier;
+};
+
+export const useActiveSupplier = () => {
+  const activeItem = useActiveItem();
+
+  const activeSupplier = async (supplier) => {
+    const updatedSupplier = {
+      ...supplier,
+    }
+
+    const response = await activeItem({
+      entity: ENTITIES.SUPPLIERS,
+      url: `${PATHS.SUPPLIERS}/${supplier.id}/${ACTIVE}`,
+      value: updatedSupplier,
+      key: "id",
+      responseEntity: ENTITIES.SUPPLIER,
+      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, supplier.id]]
+    });
+
+    return response;
+  };
+
+  return activeSupplier;
+};
+
+

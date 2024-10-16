@@ -53,7 +53,7 @@ const CreateProduct = () => {
         toast.success('Producto creado!');
         push(PAGES.PRODUCTS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
     onError: (error) => {

@@ -7,7 +7,7 @@ import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
-import { BUDGET_STATES, COLORS, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
+import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -26,7 +26,7 @@ const EMPTY_BUDGET = (user) => ({
   additionalCharge: 0,
   paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
   expirationOffsetDays: '',
-  payments: [],
+  paymentsMade: [],
 });
 
 const BudgetForm = ({
@@ -44,7 +44,7 @@ const BudgetForm = ({
   const methods = useForm({
     defaultValues: budget ? {
       ...budget,
-      payments: budget.payments || [],
+      paymentsMade: budget.paymentsMade || [],
       seller: `${user?.firstName} ${user?.lastName}`,
     } : EMPTY_BUDGET(user),
     mode: 'onSubmit',
@@ -70,6 +70,7 @@ const BudgetForm = ({
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
+  const isCustomerInactive = watchCustomer?.state === CUSTOMER_STATES.INACTIVE.id;
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -80,8 +81,28 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers.map(({ id, name }) => ({
-      key: id, value: id, text: name
+    return customers.map(({ id, name, state, deactivationReason }) => ({
+      key: id,
+      value: id,
+      text: name,
+      content: (
+        <Flex justifyContent="space-between" alignItems="center">
+          <span>{name}</span>
+          {state === CUSTOMER_STATES.INACTIVE.id && (
+            <Flex >
+              <Popup
+                trigger={
+                  <Label color={COLORS.GREY} size="mini">
+                    Desactivado
+                  </Label>}
+                content={deactivationReason || 'Motivo no especificado'}
+                position="top center"
+                size="mini"
+              />
+            </Flex>
+          )}
+        </Flex>
+      ),
     }));
   }, [customers]);
 
@@ -147,9 +168,10 @@ const BudgetForm = ({
       await onSubmit({
         ...data,
         customer: { id: customer.id, name: customer.name },
+        total: Number(total.toFixed(2)),
         state
       });
-    };
+    }
   };
 
   const currentState = useMemo(() => {
@@ -241,8 +263,12 @@ const BudgetForm = ({
     },
     {
       id: 2,
-      title: "Cantidad", value: (product, index) => (
-        <Controller name={`products[${index}].quantity`} control={control} rules={RULES.REQUIRED}
+      title: "Cantidad",
+      value: (product, index) => (
+        <Controller
+          name={`products[${index}].quantity`}
+          control={control}
+          rules={RULES.REQUIRED}
           render={({ field: { onChange, ...rest } }) => (
             <CurrencyFormatInput
               {...rest}
@@ -250,11 +276,13 @@ const BudgetForm = ({
               $shadow
               decimalScale={2}
               displayType="input"
-              onFocus={(e) => e.target.select()} onChange={(e) => {
+              onFocus={(e) => e.target.select()}
+              onChange={(e) => {
                 const value = Math.abs(e.target.value);
                 onChange(value);
                 calculateTotal();
               }}
+              disabled={product.state === PRODUCT_STATES.OOS.id}
             />
           )}
         />
@@ -372,11 +400,18 @@ const BudgetForm = ({
   ], [control, calculateTotal, setValue]);
 
   const handleDraft = async (data) => {
-    await handleCreate(data, BUDGET_STATES.DRAFT.id);
+    setValue("state", BUDGET_STATES.DRAFT.id);
+    await handleCreate({ ...data, total: Number(total.toFixed(2)) }, BUDGET_STATES.DRAFT.id);
   };
 
   const handleConfirm = async (data) => {
-    await handleCreate(data, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
+    if (isCustomerInactive) {
+      setError('customer', { type: 'manual', message: `No es posible confirmar ni dejar pendientes presupuestos con clientes inactivos, solo borradores.` });
+      return;
+    }
+
+    setValue('state', isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
+    await handleCreate({ ...data, total: Number(total.toFixed(2)) }, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleDraft)(), SHORTKEYS.ENTER);
@@ -523,7 +558,11 @@ const BudgetForm = ({
         </FieldsContainer>
         <FieldsContainer>
           <FormField width="300px">
-            <RuledLabel title="Cliente" message={errors?.customer?.message} required />
+            <RuledLabel
+              title="Cliente"
+              message={errors?.customer?.message || (isCustomerInactive ? `El cliente está inactivo, solo ${isBudgetDraft(budget?.state) ? "actualizar" : "crear"} borradores esta permitido.` : '')}
+              required
+            />
             <Controller
               name="customer"
               control={control}
@@ -602,7 +641,7 @@ const BudgetForm = ({
                 onProductSelect={(selectedProduct) => {
                   appendProduct({
                     ...selectedProduct,
-                    quantity: 1,
+                    quantity: selectedProduct.state === PRODUCT_STATES.OOS.id ? 0 : 1,
                     discount: 0,
                     key: uuid(),
                     ...(selectedProduct.fractionConfig?.active && {
@@ -612,7 +651,7 @@ const BudgetForm = ({
                         price: selectedProduct.price,
                       }
                     })
-                  })
+                  });
                 }}
               />
             )}
@@ -643,6 +682,7 @@ const BudgetForm = ({
             <Payments
               methods={methods}
               total={total}
+              update
             />
           ) : (
             <FormField flex={3}>
@@ -710,19 +750,19 @@ const BudgetForm = ({
           color={currentState.color}
           onSubmit={handleSubmit(handleConfirm)}
           icon={currentState.icon}
-          text={currentState.title}
+          text={currentState.singularTitle}
           extraButton={
             <IconedButton
               icon
               labelPosition="left"
-              disabled={isLoading || !isDirty || isBudgetConfirmed(watchState)}
+              disabled={isLoading || !isDirty }
               loading={isLoading && isBudgetDraft(watchState)}
               type="button"
               onClick={handleSubmit(handleDraft)}
               color={BUDGET_STATES.DRAFT.color}
               width="fit-content"
             >
-              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
+              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.singularTitle}
             </IconedButton>
           }
         />

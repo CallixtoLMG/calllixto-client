@@ -13,15 +13,14 @@ const calculateTotals = (payments, total) => {
   const totalPending = (total - totalAssigned).toFixed(2);
   return { totalAssigned, totalPending };
 };
-
-const Payments = ({ total, maxHeight, methods, children }) => {
+const Payments = ({ total, maxHeight, methods, children, update }) => {
   const { control } = methods;
-  const { fields: payments, append: appendPayment, remove: removePayment } = useFieldArray({
+  const { fields: paymentsMade, append: appendPayment, remove: removePayment } = useFieldArray({
     control,
-    name: "payments"
+    name: "paymentsMade"
   });
 
-  const { totalPending, totalAssigned } = useMemo(() => calculateTotals(payments, total), [total, payments]);
+  const { totalPending, totalAssigned } = useMemo(() => calculateTotals(paymentsMade, total), [total, paymentsMade]);
   const isTotalCovered = useMemo(() => totalPending <= 0, [totalPending]);
 
   const [payment, setPayment] = useState(EMPTY_PAYMENT);
@@ -54,10 +53,9 @@ const Payments = ({ total, maxHeight, methods, children }) => {
       <Segment padding="20px 60px 20px 20px">
         <Header>
           Detalle de Pagos
-          {children}
         </Header>
         <FlexColumn rowGap="15px">
-          <FieldsContainer width="100%" alignItems="center" rowGap="5px">
+          {update && <FieldsContainer width="100%" alignItems="center" rowGap="5px">
             <FormField flex="2">
               <Label>Método</Label>
               <Dropdown
@@ -125,11 +123,11 @@ const Payments = ({ total, maxHeight, methods, children }) => {
                 width="100%"
               />
             </FormField>
-          </FieldsContainer>
+          </FieldsContainer>}
           <Flex width="100%">
             <Table
               headers={PAYMENT_TABLE_HEADERS}
-              elements={payments}
+              elements={paymentsMade}
               actions={[
                 {
                   id: 1,
@@ -142,6 +140,7 @@ const Payments = ({ total, maxHeight, methods, children }) => {
             />
           </Flex>
           <TotalList readOnly items={TOTAL_LIST_ITEMS} />
+          {update && children}
         </FlexColumn>
       </Segment>
     </Flex>

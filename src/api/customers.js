@@ -1,22 +1,26 @@
 import { ATTRIBUTES } from "@/components/customers/customers.common";
-import { ENTITIES, TIME_IN_MS } from "@/constants";
+import { ACTIVE, ENTITIES, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { encodeUri } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import { getItemById, listItems, useCreateItem, useDeleteItem, useEditItem } from "./common";
+import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 
-export function useListCustomers() {
+export function useListCustomers({ sort = 'name', order = true } = {}) {
   const query = useQuery({
-    queryKey: [LIST_CUSTOMERS_QUERY_KEY],
-    queryFn: () => listItems({ entity: ENTITIES.CUSTOMERS, url: PATHS.CUSTOMERS, params: { sort: 'name', order: true, attributes: encodeUri(Object.values(ATTRIBUTES)) } }),
-    staleTime: TIME_IN_MS.ONE_DAY,
+    queryKey: [LIST_CUSTOMERS_QUERY_KEY, sort, order],
+    queryFn: () => listItems({
+      entity: ENTITIES.CUSTOMERS,
+      url: PATHS.CUSTOMERS,
+      params: getDefaultListParams(ATTRIBUTES, sort, order)
+    }),
+    retry: false,
+    staleTime: 0,
   });
 
   return query;
-};
+}
 
 export function useGetCustomer(id) {
   const query = useQuery({
@@ -83,4 +87,51 @@ export const useEditCustomer = () => {
   };
 
   return editCustomer;
+};
+
+export const useInactiveCustomer = () => {
+  const inactiveItem = useInactiveItem();
+
+  const inactiveCustomer = async (customer, reason) => {
+    const updatedCustomer = {
+      ...customer,
+      inactiveReason: reason
+    }
+
+    const response = await inactiveItem({
+      entity: ENTITIES.CUSTOMERS,
+      url: `${PATHS.CUSTOMERS}/${customer.id}/${INACTIVE}`,
+      value: updatedCustomer,
+      key: "id",
+      responseEntity: ENTITIES.CUSTOMER,
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
+    });
+
+    return response;
+  };
+
+  return inactiveCustomer;
+};
+
+export const useActiveCustomer = () => {
+  const activeItem = useActiveItem();
+
+  const activeCustomer = async (customer) => {
+    const updatedCustomer = {
+      ...customer,
+    }
+
+    const response = await activeItem({
+      entity: ENTITIES.CUSTOMERS,
+      url: `${PATHS.CUSTOMERS}/${customer.id}/${ACTIVE}`,
+      value: updatedCustomer,
+      key: "id",
+      responseEntity: ENTITIES.CUSTOMER,
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
+    });
+
+    return response;
+  };
+
+  return activeCustomer;
 };

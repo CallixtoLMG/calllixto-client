@@ -140,6 +140,17 @@ export const TIME_IN_DAYS = {
 
 export const DEFAULT_PAGE_SIZE = 20;
 
+export const getDefaultListParams = (attributes, sort, order) => {
+  const params = {
+    attributes: encodeUri(Object.values(attributes)),
+  };
+
+  if (sort) params.sort = sort;
+  if (typeof order !== 'undefined') params.order = order;
+
+  return params;
+};
+
 export const ENTITIES = {
   CUSTOMERS: 'customers',
   CUSTOMER: 'customer',
@@ -151,6 +162,7 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
+  EVENTS: "events"
 };
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
@@ -209,8 +221,8 @@ export const PRODUCT_STATES = {
   },
   DELETED: {
     id: 'DELETED',
-    title: 'Borrados',
-    singularTitle: 'Borrado',
+    title: 'Eliminados',
+    singularTitle: 'Eliminado',
     color: 'red',
     icon: 'ban',
   },
@@ -220,6 +232,57 @@ export const PRODUCT_STATES = {
     singularTitle: 'Sin stock',
     color: 'orange',
     icon: 'expired',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
+};
+
+export const CUSTOMER_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
+};
+
+export const SUPPLIER_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
+};
+
+export const BRANDS_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
   },
   INACTIVE: {
     id: 'INACTIVE',
@@ -326,3 +389,7 @@ export const PICK_UP_IN_STORE = "Retira en tienda";
 export const OOS = "Sin stock";
 
 export const ALL = "ALL";
+
+export const ACTIVE = "active";
+
+export const INACTIVE = "inactive";

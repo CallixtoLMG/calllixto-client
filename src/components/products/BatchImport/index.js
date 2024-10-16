@@ -268,7 +268,7 @@ const BatchImport = ({ isCreating }) => {
           : "Los productos se han actualizado con exito!");
         handleModalClose();
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
       if (response.unprocessed?.length) {
         setShowUnprocessedModal(true);

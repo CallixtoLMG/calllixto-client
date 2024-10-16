@@ -11,6 +11,7 @@ export const CurrencyFormatInput = styled(CurrencyFormat)`
   align-items: center;
   align-content: center;
   text-align-last: ${({ textAlignLast }) => textAlignLast} !important;
+  opacity: ${({ disabled }) => disabled ? '0.3' : '1'};
 
   &:focus {
     outline: none;

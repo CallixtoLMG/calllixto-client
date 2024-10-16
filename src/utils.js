@@ -1,6 +1,7 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import { isValidElement } from "react";
 import * as XLSX from "xlsx";
 import { BUDGET_STATES, PRODUCT_STATES, REGEX } from "./constants";
 
@@ -190,6 +191,14 @@ export const isProductInactive = (status) => {
   return status === PRODUCT_STATES.INACTIVE.id;
 };
 
+export const isItemInactive = (state) => {
+  return state === "INACTIVE";
+};
+
+export const isItemDeleted = (state) => {
+  return state === "DELETED";
+};
+
 export const isProductDeleted = (status) => {
   return status === PRODUCT_STATES.DELETED.id;
 };
@@ -201,4 +210,10 @@ export const filterProductsBySupplierId = (products, supplierId) => {
     const productSupplierId = product.code.substring(0, supplierId.length);
     return productSupplierId !== supplierId;
   });
+};
+
+export const renderContent = (content) => {
+  return typeof content === 'string' ? content : (
+    isValidElement(content) ? content : null
+  );
 };

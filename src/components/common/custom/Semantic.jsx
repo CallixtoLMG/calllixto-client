@@ -6,9 +6,11 @@ import {
   Input as SInput,
   Label as SLabel,
   Menu as SMenu,
+  Message as SMessage,
+  MessageHeader as SMessageHeader,
   Modal as SModal,
   Segment as SSegment,
-  TextArea as STextarea
+  TextArea as STextarea,
 } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -181,4 +183,12 @@ export const IconedButton = styled(SButton)`
     padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
     margin-right: 0;
   };
+`;
+
+export const MessageHeader = styled(SMessageHeader)`
+  font-size: 15px!important;
+`;
+
+export const Message = styled(SMessage)`
+  width: 100%;
 `;

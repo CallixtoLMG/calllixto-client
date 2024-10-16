@@ -53,7 +53,7 @@ const CreateBudget = () => {
         toast.success('Presupuesto creado!');
         push(PAGES.BUDGETS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
     onError: (error) => {
