@@ -1,4 +1,5 @@
 import { config } from "@/config";
+import { CREATE_KEY, DELETE_KEY, UPDATE_KEY } from "@/constants";
 import { PATHS } from "@/fetchUrls";
 import { encodeUri, now } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -56,7 +57,7 @@ export async function handleEvents({ entity, values, key = "id" }) {
     }
 
     newEvents.forEach((event) => {
-      if (event.action === "C") {
+      if (event.action === CREATE_KEY) {
         event.value.forEach((item) => {
           const exists = values.find((existingItem) => existingItem[key] === item[key]);
           if (!exists) {
@@ -65,7 +66,7 @@ export async function handleEvents({ entity, values, key = "id" }) {
         });
       }
 
-      if (event.action === "U") {
+      if (event.action === UPDATE_KEY) {
         event.value.forEach((item) => {
 
           values = values.map((existingItem) =>
@@ -74,7 +75,7 @@ export async function handleEvents({ entity, values, key = "id" }) {
         });
       }
 
-      if (event.action === "D") {
+      if (event.action === DELETE_KEY) {
         values = values.filter(existingItem => !event.value.map((item) => item[key]).includes(existingItem[key]));
       }
     });

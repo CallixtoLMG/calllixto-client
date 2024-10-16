@@ -393,3 +393,9 @@ export const ALL = "ALL";
 export const ACTIVE = "active";
 
 export const INACTIVE = "inactive";
+
+export const UPDATE_KEY = "U";
+
+export const CREATE_KEY = "C";
+
+export const DELETE_KEY = "D";
