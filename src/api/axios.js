@@ -28,7 +28,7 @@ const getClientId = () => {
 
 export const instance = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_URL}${getClientId()}`,
-  timeout: 15000,
+  timeout: 60000,
   headers: {
     authorization: `Bearer ${getToken()}`
   },
