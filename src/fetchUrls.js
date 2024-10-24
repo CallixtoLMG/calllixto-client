@@ -17,4 +17,7 @@ export const CLIENT = "clients";
 export const VALIDATE = "validate";
 export const EDIT_BATCH = "transact";
 export const URL = process.env.NEXT_PUBLIC_URL;
-
+export const EVENTS = "events"
+export const PAYMENTS = "payments"
+export const CONFIRM = "confirm"
+export const CANCEL = "cancel"

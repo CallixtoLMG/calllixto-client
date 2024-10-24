@@ -313,7 +313,6 @@ const Budget = ({ params }) => {
         total
       };
       const response = await confirmBudget(confirmationData, budget?.id);
-
       return response;
     },
     onSuccess: (response) => {
@@ -332,10 +331,10 @@ const Budget = ({ params }) => {
       const cancelData = {
         cancelledBy: `${userData.firstName} ${userData.lastName}`,
         cancelledAt: now(),
-        cancelledMsg: cancelReason,
+        cancelledMsg: cancelReason
       };
-      const { data } = await cancelBudget(cancelData, budget?.id);
-      return data;
+      const response = await cancelBudget({ cancelData, id: budget?.id });
+      return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -346,6 +345,10 @@ const Budget = ({ params }) => {
         toast.error(response.error.message);
       }
     },
+    onError: (error) => {
+      console.log("Error al anular el presupuesto:", error);
+      toast.error(`Error al anular: ${error.message}`);
+    }
   });
 
   const { mutate: mutateEdit, isPending: isPendingEdit } = useMutation({
@@ -446,6 +449,7 @@ const Budget = ({ params }) => {
             onClose={handleModalCancelClose}
             onConfirm={mutateCancel}
             isLoading={isPendingCancel}
+            id={budget?.id}
           />
         </>
       )}

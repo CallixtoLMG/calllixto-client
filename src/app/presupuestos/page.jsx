@@ -11,7 +11,7 @@ import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListBudgets();
+  const { data, isLoading, isRefetching, refetch } = useListBudgets();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -98,7 +98,7 @@ const Budgets = () => {
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <BudgetsPage isLoading={loading} budgets={loading ? [] : budgets} />
+    <BudgetsPage onRefetch={refetch} isLoading={loading} budgets={loading ? [] : budgets} />
   )
 };
 

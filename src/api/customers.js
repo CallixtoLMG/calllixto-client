@@ -59,7 +59,6 @@ export const useDeleteCustomer = () => {
       entity: ENTITIES.CUSTOMERS,
       id,
       url: PATHS.CUSTOMERS,
-      key: "id",
       invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY]]
     });
 
@@ -78,7 +77,6 @@ export const useEditCustomer = () => {
       entity: ENTITIES.CUSTOMERS,
       url: `${PATHS.CUSTOMERS}/${customer.id}`,
       value: customer,
-      key: "id",
       responseEntity: ENTITIES.CUSTOMER,
       invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
     });
@@ -102,7 +100,6 @@ export const useInactiveCustomer = () => {
       entity: ENTITIES.CUSTOMERS,
       url: `${PATHS.CUSTOMERS}/${customer.id}/${INACTIVE}`,
       value: updatedCustomer,
-      key: "id",
       responseEntity: ENTITIES.CUSTOMER,
       invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
     });
@@ -125,7 +122,6 @@ export const useActiveCustomer = () => {
       entity: ENTITIES.CUSTOMERS,
       url: `${PATHS.CUSTOMERS}/${customer.id}/${ACTIVE}`,
       value: updatedCustomer,
-      key: "id",
       responseEntity: ENTITIES.CUSTOMER,
       invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
     });

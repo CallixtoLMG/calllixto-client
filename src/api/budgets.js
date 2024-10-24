@@ -1,6 +1,6 @@
 import { ATTRIBUTES } from "@/components/budgets/budgets.common";
 import { ENTITIES, getDefaultListParams, TIME_IN_MS } from "@/constants";
-import { PATHS } from "@/fetchUrls";
+import { CANCEL, CONFIRM, PATHS, PAYMENTS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import axios from './axios';
 import { listItems, useCreateItem, useEditItem } from "./common";
@@ -70,7 +70,6 @@ export const useEditBudget = () => {
       entity: ENTITIES.BUDGETS,
       url: `${PATHS.BUDGETS}/${budget.id}`,
       value: budget,
-      key: "id",
       responseEntity: ENTITIES.BUDGET,
       invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, budget.id]]
     });
@@ -87,10 +86,10 @@ export const useConfirmBudget = () => {
   const confirmBudget = async (budget, id) => {
     const response = await editItem({
       entity: ENTITIES.BUDGETS,
-      url: `${PATHS.BUDGETS}/${id}/confirm`,
+      url: `${PATHS.BUDGETS}/${id}/${CONFIRM}`,
       value: budget,
       responseEntity: ENTITIES.BUDGET,
-      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY]],
+      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]]
     });
     return response;
   };
@@ -101,13 +100,12 @@ export const useConfirmBudget = () => {
 export const useCancelBudget = () => {
   const editItem = useEditItem();
 
-  const cancelBudget = async ({ budget, id }) => {
+  const cancelBudget = async ({ cancelData, id }) => {
 
     const response = await editItem({
       entity: ENTITIES.BUDGETS,
-      url: `${PATHS.BUDGETS}/${id}/cancel`,
-      value: budget,
-      key: "id",
+      url: `${PATHS.BUDGETS}/${id}/${CANCEL}`,
+      value: cancelData,
       responseEntity: ENTITIES.BUDGET,
       invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]]
     });
@@ -126,9 +124,8 @@ export const useUpdatePayments = () => {
 
     const response = await editItem({
       entity: ENTITIES.BUDGETS,
-      url: `${PATHS.BUDGETS}/${id}/payments`,
+      url: `${PATHS.BUDGETS}/${id}/${PAYMENTS}`,
       value: { paymentsMade, updatedAt },
-      key: "id",
       responseEntity: ENTITIES.BUDGET,
       invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]]
     });

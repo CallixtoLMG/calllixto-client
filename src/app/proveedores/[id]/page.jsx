@@ -12,7 +12,7 @@ import { COLORS, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { isItemInactive } from "@/utils";
+import { downloadExcel, formatedPrice, isItemInactive } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -27,11 +27,12 @@ const Supplier = ({ params }) => {
   const { data: products, isLoading: loadingProducts } = useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { isUpdating, toggleButton }  = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
-  const [reason, setReason] = useState(""); 
+  const [isExcelLoading, setIsExcelLoading] = useState(false);
+  const [reason, setReason] = useState("");
   const printRef = useRef(null);
   const editSupplier = useEditSupplier();
   const deleteSupplier = useDeleteSupplier();
@@ -48,6 +49,26 @@ const Supplier = ({ params }) => {
     setLabels([PAGES.SUPPLIERS.NAME, supplier?.name]);
   }, [setLabels, supplier]);
 
+  const hasAssociatedProducts = useMemo(() => {
+    return products?.length > 0;
+  }, [products]);
+
+  const prepareProductDataForExcel = useMemo(() => {
+    if (!products) return [];
+    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Comentarios'];
+
+    const productData = products.map(product => [
+      product.code,
+      product.name,
+      product.brandName,
+      product.supplierName,
+      formatedPrice(product.price),
+      product.comments
+    ]);
+
+    return [headers, ...productData];
+  }, [products]);
+
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     removeAfterPrint: true,
@@ -57,14 +78,15 @@ const Supplier = ({ params }) => {
     deleteSupplier: {
       header: `¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
-      icon: ICONS.TRASH
+      icon: ICONS.TRASH,
+      tooltip: hasAssociatedProducts ? "No se puede eliminar este proveedor, existen productos asociados." : false,
     },
     deleteBatch: {
       header: `¿Está seguro que desea eliminar todos los productos del proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH
     },
-    
+
     active: {
       header: `¿Está seguro que desea activar el proveedor "${supplier?.name}"?`,
       icon: ICONS.PLAY_CIRCLE,
@@ -78,15 +100,13 @@ const Supplier = ({ params }) => {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setModalAction(null);
-    setReason(""); 
+    setReason("");
   };
 
   const handleOpenModalWithAction = useCallback((action) => {
     setModalAction(action);
     setIsModalOpen(true);
   }, []);
-
-
 
   const handleActivateClick = useCallback(() => handleOpenModalWithAction("active"), [handleOpenModalWithAction]);
   const handleInactivateClick = useCallback(() => handleOpenModalWithAction("inactive"), [handleOpenModalWithAction]);
@@ -180,16 +200,15 @@ const Supplier = ({ params }) => {
       mutateDelete();
     } else if (modalAction === "inactive") {
       if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar al cliente.");
+        toast.error("Debe proporcionar una razón para desactivar al proveedor.");
         return;
       }
       mutateInactive({ supplier, reason });
-    } else if (modalAction === "active") { 
+    } else if (modalAction === "active") {
       mutateActive({ supplier });
     }
 
     handleModalClose();
-
   };
 
   const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
@@ -230,6 +249,26 @@ const Supplier = ({ params }) => {
       },
       {
         id: 3,
+        icon: ICONS.FILE_EXCEL,
+        color: COLORS.SOFT_GREY,
+        text: "Descargar lista",
+        onClick: () => {
+          if (products?.length) {
+            setIsExcelLoading(true);  
+            downloadExcel(prepareProductDataForExcel, `Lista de productos de ${supplier.name}`);
+            setIsExcelLoading(false); 
+          } else {
+            toast("No hay productos de este proveedor para descargar.", {
+              icon: <Icon margin="0" toast name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />,
+            });
+          }
+        },
+        loading: isExcelLoading, 
+        disabled: isExcelLoading || !!activeAction || loadingProducts,  
+        width: "fit-content",
+      },
+      {
+        id: 4,
         icon: ICONS.LIST_UL,
         color: COLORS.RED,
         text: "Limpiar lista",
@@ -239,13 +278,14 @@ const Supplier = ({ params }) => {
         width: "fit-content",
       },
       {
-        id: 4,
+        id: 5,
         icon: ICONS.TRASH,
         color: COLORS.RED,
         text: "Eliminar",
         onClick: handleDeleteClick,
         loading: activeAction === "deleteSupplier",
-        disabled: !!activeAction,
+        disabled: hasAssociatedProducts || !!activeAction,
+        tooltip: hasAssociatedProducts ? "No se puede eliminar este proveedor, existen productos asociados." : false,
         width: "fit-content",
         basic: true,
       },
@@ -260,7 +300,7 @@ const Supplier = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts}>
-      {Toggle}
+      {toggleButton}
       {isUpdating ? (
         <SupplierForm supplier={supplier} onSubmit={mutateEdit} isLoading={isEditPending} isUpdating />
       ) : (

@@ -7,7 +7,7 @@ import { ButtonGroup } from "semantic-ui-react";
 export const useAllowUpdate = ({ canUpdate }) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const button = (
+  const toggleButton = (
     <>
       {canUpdate && (
         <Box>
@@ -33,5 +33,5 @@ export const useAllowUpdate = ({ canUpdate }) => {
     </>
   );
 
-  return [isUpdating, button];
+  return { isUpdating, toggleButton, setIsUpdating };
 }

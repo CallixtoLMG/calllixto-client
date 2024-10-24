@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
 import { ModalContent } from "./styles";
 
-const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
+const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
   const [cancelReason, setCancelReason] = useState("");
   return (
     <Transition visible={isModalOpen} animation='scale' duration={500}>
@@ -32,7 +32,7 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
               text="Anular"
               icon={ICONS.BAN}
               color={COLORS.RED}
-              onClick={() => onConfirm(cancelReason)}
+              onClick={() => onConfirm(cancelReason, id)}
               disabled={!cancelReason || isLoading}
               loading={isLoading}
               basic

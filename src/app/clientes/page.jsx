@@ -11,7 +11,7 @@ import { useEffect, useMemo } from "react";
 
 const Customers = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListCustomers();
+  const { data, isLoading, isRefetching, refetch } = useListCustomers();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -24,13 +24,13 @@ const Customers = () => {
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
   const prepareCustomerDataForExcel = useMemo(() => {
-    if (!customers) return [];  
+    if (!customers) return [];
     const headers = ['Nombre', 'Dirección', 'Teléfono'];
 
     const customerData = customers.map(customer => [
       customer.name,
-      customer.addresses?.map(address => address.address).join(' , '),
-      customer.phoneNumbers?.map(phone => formatedSimplePhone(phone)).join(' , ')
+      customer.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
+      customer.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
     ]);
 
     return [headers, ...customerData];
@@ -64,7 +64,7 @@ const Customers = () => {
   useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <CustomersPage isLoading={loading} customers={loading ? [] : customers} />
+    <CustomersPage onRefetch={refetch} isLoading={loading} customers={loading ? [] : customers} />
   );
 };
 

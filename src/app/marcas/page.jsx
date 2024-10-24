@@ -13,7 +13,7 @@ import { useEffect, useMemo } from "react";
 
 const Brands = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListBrands();
+  const { data, isLoading, isRefetching, refetch } = useListBrands();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -70,6 +70,7 @@ const Brands = () => {
 
   return (
     <BrandsPage
+      onRefetch={refetch}
       isLoading={loading}
       brands={loading ? [] : brands}
       role={role}

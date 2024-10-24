@@ -13,7 +13,7 @@ import { useListSuppliers } from "../../api/suppliers";
 
 const Suppliers = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListSuppliers();
+  const { data, isLoading, isRefetching, refetch } = useListSuppliers();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -33,8 +33,8 @@ const Suppliers = () => {
     const supplierData = suppliers.map(supplier => [
       supplier.id,
       supplier.name,
-      supplier.addresses?.map(address => address.address).join(' , '),
-      supplier.phoneNumbers?.map(phone => formatedSimplePhone(phone)).join(' , ')
+      supplier.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
+      supplier.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
     ]);
 
     return [headers, ...supplierData];
@@ -72,6 +72,7 @@ const Suppliers = () => {
 
   return (
     <SuppliersPage
+      onRefetch={refetch}
       isLoading={loading}
       suppliers={loading ? [] : suppliers}
       role={role}

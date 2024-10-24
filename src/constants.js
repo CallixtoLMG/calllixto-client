@@ -162,7 +162,6 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
-  EVENTS: "events"
 };
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
@@ -374,7 +373,8 @@ export const ICONS = {
   EXCLAMATION_CIRCLE: "exclamation circle",
   ADDRESS_CARD: "address card",
   ARCHIVE: "archive",
-  OPTIONS: "options"
+  OPTIONS: "options",
+  REFRESH: "refresh"
 };
 
 export const PAGE_SIZE_OPTIONS = [
@@ -399,3 +399,13 @@ export const UPDATE_KEY = "U";
 export const CREATE_KEY = "C";
 
 export const DELETE_KEY = "D";
+
+export const ID = "id";
+
+export const CODE = "code";
+
+export const FILTERS_OPTIONS = {
+  DATE: "date",
+  NAME: "name"
+}
+

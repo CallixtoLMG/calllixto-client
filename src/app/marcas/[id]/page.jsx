@@ -1,6 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useActiveBrand, useDeleteBrand, useEditBrand, useGetBrand, useInactiveBrand } from "@/api/brands";
+import { useListProducts } from "@/api/products";
 import BrandForm from "@/components/brands/BrandForm";
 import BrandView from "@/components/brands/BrandView";
 import { Input } from "@/components/common/custom";
@@ -23,7 +24,7 @@ const Brand = ({ params }) => {
   const { data: brand, isLoading } = useGetBrand(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { isUpdating, toggleButton }  = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -32,6 +33,7 @@ const Brand = ({ params }) => {
   const deleteBrand = useDeleteBrand();
   const activeBrand = useActiveBrand();
   const inactiveBrand = useInactiveBrand();
+  const { data: productsData, isLoading: isLoadingproductsData } = useListProducts();
 
   useEffect(() => {
     resetActions();
@@ -41,6 +43,13 @@ const Brand = ({ params }) => {
   useEffect(() => {
     setLabels([PAGES.BRANDS.NAME, brand?.name]);
   }, [setLabels, brand]);
+
+  const hasAssociatedProducts = useMemo(() => {
+    return productsData?.products?.some(product => {
+      const brandCodeInProduct = product.code?.substring(2, 4);
+      return brandCodeInProduct === String(brand?.id);
+    });
+  }, [productsData, brand?.id]);
 
   const modalConfig = useMemo(() => ({
     delete: {
@@ -139,12 +148,12 @@ const Brand = ({ params }) => {
       mutateDelete();
     } else if (modalAction === "inactive") {
       if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar al cliente.");
+        toast.error("Debe proporcionar una razón para desactivar la marca.");
         return;
       }
-      mutateInactive({ brand, reason }); 
+      mutateInactive({ brand, reason });
     } else if (modalAction === "active") {
-      mutateActive({ brand }); 
+      mutateActive({ brand });
     }
 
     handleModalClose();
@@ -170,17 +179,18 @@ const Brand = ({ params }) => {
           id: 2,
           icon: ICONS.TRASH,
           color: COLORS.RED,
-          text: "eliminar",
+          text: "Eliminar",
           basic: true,
           onClick: handleDeleteClick,
           loading: activeAction === "delete",
-          disabled: !!activeAction,
+          disabled: hasAssociatedProducts || !!activeAction, 
+          tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
         },
       ] : [];
 
       setActions(actions);
     }
-  }, [role, brand, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions]);
+  }, [role, brand, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions, hasAssociatedProducts]);
 
   if (!isLoading && !brand) {
     push(PAGES.NOT_FOUND.BASE);
@@ -188,7 +198,7 @@ const Brand = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      {Toggle}
+      {toggleButton}
       {isUpdating ? (
         <BrandForm brand={brand} onSubmit={mutateEdit} isLoading={isEditPending} isUpdating />
       ) : (

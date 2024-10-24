@@ -590,41 +590,45 @@ const BudgetForm = ({
               )}
             />
           </FormField>
-          <FormField flex={1}>
+          <FormField flex={2}>
             <RuledLabel title="Dirección" message={shouldError && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
             {watchPickUp ? (
               <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
             ) : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? (
-              <Segment placeholder>{watchCustomer?.addresses?.[0]?.address}</Segment>
+              <Segment placeholder>{`${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer?.addresses?.[0]?.ref}: ` : ''}${watchCustomer?.addresses?.[0]?.address ? watchCustomer?.addresses?.[0]?.address : ""}`} </Segment>
             ) : (
-              (
-                <Dropdown
-                  selection
-                  options={watchCustomer?.addresses.map((address) => ({
-                    key: address.address,
-                    text: address.address,
-                    value: address.address,
-                  }))}
-                  value={selectedContact.address}
-                  onChange={(e, { value }) => setSelectedContact({ ...selectedContact, address: value })}
-                />
-              )
+              <Dropdown
+                selection
+                options={watchCustomer?.addresses.map((address) => ({
+                  key: address.address,
+                  text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
+                  value: address.address,
+                }))}
+                value={selectedContact.address}
+                onChange={(e, { value }) => setSelectedContact({
+                  ...selectedContact,
+                  address: value,
+                })}
+              />
             )}
           </FormField>
-          <FormField width="200px">
+          <FormField flex={1}>
             <RuledLabel title="Teléfono" message={shouldError && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
             {!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? (
-              <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers?.[0])}</Segment>
+              <Segment placeholder>{`${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer?.phoneNumbers?.[0]?.ref}: ` : ''}${formatedSimplePhone(watchCustomer?.phoneNumbers?.[0])}`} </Segment>
             ) : (
               <Dropdown
                 selection
                 options={watchCustomer?.phoneNumbers.map((phone) => ({
                   key: formatedSimplePhone(phone),
-                  text: formatedSimplePhone(phone),
+                  text: `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`,
                   value: formatedSimplePhone(phone),
                 }))}
                 value={selectedContact.phone}
-                onChange={(e, { value }) => setSelectedContact({ ...selectedContact, phone: value })}
+                onChange={(e, { value }) => setSelectedContact({
+                  ...selectedContact,
+                  phone: value,
+                })}
               />
             )}
           </FormField>
@@ -755,7 +759,7 @@ const BudgetForm = ({
             <IconedButton
               icon
               labelPosition="left"
-              disabled={isLoading || !isDirty }
+              disabled={isLoading || !isDirty}
               loading={isLoading && isBudgetDraft(watchState)}
               type="button"
               onClick={handleSubmit(handleDraft)}

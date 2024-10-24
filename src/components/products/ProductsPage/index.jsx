@@ -7,8 +7,9 @@ import { Filters, Table } from "@/components/common/table";
 import { OnlyPrint } from "@/components/layout";
 import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
 import { RULES } from "@/roles";
+import { createFilter } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
@@ -28,7 +29,7 @@ const STATE_OPTIONS = [
   }))
 ];
 
-const ProductsPage = ({ products = [], role, isLoading }) => {
+const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
   const methods = useForm();
   const { handleSubmit, control, reset, watch } = methods;
   const [showModal, setShowModal] = useState(false);
@@ -46,21 +47,10 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     removeAfterPrint: true,
   });
 
-  const onFilter = useCallback(product => {
-    if (filters.name && !product.name?.toLowerCase().includes(filters.name.toLowerCase())) {
-      return false;
-    }
-
-    if (filters.code && !product.code.toLowerCase().includes(filters.code.toLowerCase())) {
-      return false;
-    }
-
-    if (filters.state && filters.state !== product.state) {
-      return false;
-    }
-
-    return true;
-  }, [filters]);
+  const onFilter = useCallback(
+    createFilter(filters, ['name', 'code']),
+    [filters]
+  );
 
   const actions = RULES.canRemove[role] ? [
     {
@@ -123,6 +113,10 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
     setSelectedProducts(newSelectedProducts);
   };
 
+  useEffect(() => {
+    clearSelection();
+  }, [filters.state]);
+
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
     mutationFn: async () => {
       const deletePromises = Object.keys(selectedProducts).map(code => deleteProduct(code));
@@ -168,7 +162,7 @@ const ProductsPage = ({ products = [], role, isLoading }) => {
       <Flex flexDirection="column" rowGap="15px">
         <FormProvider {...methods}>
           <Form onSubmit={handleSubmit(setFilters)}>
-            <Filters clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
+            <Filters onRefetch={onRefetch} clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
               <Controller
                 name="state"
                 control={control}

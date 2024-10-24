@@ -36,7 +36,6 @@ const CustomTable = ({
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
   const pages = useMemo(() => Math.ceil(filteredElements.length / pageSize), [filteredElements, pageSize]);
-
   const currentPageElements = useMemo(() => {
     const startIndex = (activePage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
@@ -80,6 +79,7 @@ const CustomTable = ({
     <Container tableHeight={tableHeight}>
       {paginate && (
         <PaginationContainer center>
+
           <Pagination
             activePage={activePage}
             onPageChange={handlePageChange}
@@ -109,6 +109,7 @@ const CustomTable = ({
             position="left center"
             mouseEnterDelay={500}
           />
+
         </PaginationContainer>
       )}
       <Table celled compact striped={!basic} color={color} definition={isSelectable}>

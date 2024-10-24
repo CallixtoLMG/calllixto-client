@@ -19,7 +19,7 @@ const HeaderSegment = styled(SSegment)`
   justify-content: space-between;
 `;
 
-const Filters = ({ children, onRestoreFilters }) => {
+const Filters = ({ children, onRestoreFilters, onRefetch }) => {
   return (
     <MainContainer>
       <HeaderSegment flex="1">
@@ -36,14 +36,26 @@ const Filters = ({ children, onRestoreFilters }) => {
           />
           {children}
         </FiltersContainer>
-        <Flex alignSelf="center">
+        <Flex columnGap="10px" alignSelf="center">
           <IconnedButton
             text="Buscar"
             icon={ICONS.SEARCH}
             submit
             color={COLORS.SOFT_GREY}
+            width='130px'
+          />
+          <Popup
+            content="Actualizar tabla"
+            position="right center"
+            size="tiny"
+            trigger={(
+              <Button circular icon type="button" onClick={onRefetch}>
+                <Icon color={COLORS.WHITE} name={ICONS.REFRESH} />
+              </Button>
+            )}
           />
         </Flex>
+
       </HeaderSegment>
     </MainContainer>
   )

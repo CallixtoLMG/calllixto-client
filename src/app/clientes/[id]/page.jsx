@@ -23,7 +23,7 @@ const Customer = ({ params }) => {
   const { data: budgetData, isLoading: isLoadingBudgets } = useListBudgets();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
+  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: true });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -65,7 +65,7 @@ const Customer = ({ params }) => {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setModalAction(null);
-    setReason(""); 
+    setReason("");
   };
 
   const handleOpenModalWithAction = useCallback(async (action) => {
@@ -80,6 +80,7 @@ const Customer = ({ params }) => {
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: async (customer) => {
       const data = await editCustomer(customer);
+
       return data;
     },
     onSuccess: (response) => {
@@ -120,6 +121,10 @@ const Customer = ({ params }) => {
         toast.error(response.error.message);
       }
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
@@ -134,21 +139,28 @@ const Customer = ({ params }) => {
         toast.error(response.error.message);
       }
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const handleActionConfirm = async () => {
-    setActiveAction(modalAction);
-
-    if (modalAction === "delete") {
-      mutateDelete(); 
-    } else if (modalAction === "inactive") {
+    if (modalAction === "inactive") {
       if (!reason) {
         toast.error("Debe proporcionar una razón para desactivar al cliente.");
         return;
       }
-      mutateInactive({ customer, reason }); 
-    } else if (modalAction === "active") {  
-      mutateActive({ customer }); 
+    }
+
+    setActiveAction(modalAction);
+
+    if (modalAction === "delete") {
+      mutateDelete();
+    } else if (modalAction === "inactive") {
+      mutateInactive({ customer, reason });
+    } else if (modalAction === "active") {
+      mutateActive({ customer });
     }
 
     handleModalClose();
@@ -167,7 +179,7 @@ const Customer = ({ params }) => {
           onClick: isItemInactive(customer.state) ? handleActivateClick : handleInactiveClick,
           text: isItemInactive(customer.state) ? "Activar" : "Desactivar",
           loading: (activeAction === "active" || activeAction === "inactive"),
-          disabled: !!modalAction,
+          disabled: !!activeAction,
           width: "fit-content",
         },
         {
@@ -179,7 +191,7 @@ const Customer = ({ params }) => {
           tooltip: hasAssociatedBudgets ? "No se puede eliminar este cliente, existen presupuestos asociados." : false,
           basic: true,
           loading: activeAction === "delete",
-          disabled: hasAssociatedBudgets,
+          disabled: hasAssociatedBudgets || !!activeAction,
         },
       ];
 
@@ -193,7 +205,7 @@ const Customer = ({ params }) => {
 
   return (
     <Loader active={isLoading || isLoadingBudgets}>
-      {Toggle}
+      {toggleButton}
       {isUpdating ? (
         <CustomerForm
           customer={customer}

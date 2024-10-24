@@ -1,6 +1,7 @@
 import { Dropdown, Flex, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
 import { ALL, BUDGET_STATES, COLORS, ICONS, PAGES } from "@/constants";
+import { createFilter } from '@/utils';
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
@@ -23,35 +24,17 @@ const STATE_OPTIONS = [
     }))
 ];
 
-const BudgetsPage = ({ budgets, isLoading }) => {
+const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const { push } = useRouter();
   const { handleSubmit, control, reset, watch } = useForm();
   const [watchState] = watch(['state']);
   const [filters, setFilters] = useState(EMPTY_FILTERS);
 
-  const onFilter = useCallback(budget => {
-    if (filters.name && !budget.name.toLowerCase().includes(filters.name.toLowerCase())) {
-      return false;
-    }
-
-    if (filters.id && !budget.id.toLowerCase().includes(filters.id.toLowerCase())) {
-      return false;
-    }
-
-    if (filters.customer && !budget.customer?.name?.toLowerCase().includes(filters.customer.toLowerCase())) {
-      return false;
-    }
-
-    if (filters.seller && !budget.seller.toLowerCase().includes(filters.seller.toLowerCase())) {
-      return false;
-    }
-
-    if (filters.state && budget.state !== filters.state && filters.state !== ALL) {
-      return false;
-    }
-
-    return true;
-  }, [filters]);
+  const keysToFilter = ['id', 'customer', 'seller'];
+  const onFilter = useCallback(createFilter(filters, keysToFilter, {
+    customer: budget => budget.customer?.name || '',
+    allState: ALL,
+  }), [filters]);
 
   const actions = [
     {
@@ -71,7 +54,7 @@ const BudgetsPage = ({ budgets, isLoading }) => {
   return (
     <>
       <Form onSubmit={handleSubmit(setFilters)}>
-        <Filters onRestoreFilters={onRestoreFilters}>
+        <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
           <Controller
             name="state"
             control={control}

@@ -25,7 +25,7 @@ const Product = ({ params }) => {
   const { data: product, isLoading } = useGetProduct(params.code);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { isUpdating, toggleButton }  = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -129,6 +129,10 @@ const Product = ({ params }) => {
     onError: (error) => {
       toast.error(`Error al actualizar el producto: ${error.message || error}`);
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
@@ -147,6 +151,10 @@ const Product = ({ params }) => {
     onError: (error) => {
       toast.error(`Error al activar el producto: ${error.message || error}`);
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
@@ -164,6 +172,10 @@ const Product = ({ params }) => {
     },
     onError: (error) => {
       toast.error(`Error al desactivar el producto: ${error.message || error}`);
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
     },
   });
 
@@ -187,6 +199,10 @@ const Product = ({ params }) => {
     onError: (error) => {
       toast.error(`Error al eliminar el producto: ${error.message || error}`);
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const handleActionConfirm = async () => {
@@ -195,10 +211,10 @@ const Product = ({ params }) => {
       mutateDelete();
     } else if (modalAction === "softDelete") {
       if (product.state === PRODUCT_STATES.DELETED.id) {
-        mutateDelete(); 
+        mutateDelete();
       } else {
         const updatedProduct = { ...product, state: PRODUCT_STATES.DELETED.id };
-        mutateEdit(updatedProduct);  
+        mutateEdit(updatedProduct);
       }
     } else if (modalAction === "inactive") {
       if (!reason) {
@@ -251,7 +267,7 @@ const Product = ({ params }) => {
           onClick: handleStockChangeClick,
           text: isProductOOS(product?.state) ? "En stock" : PRODUCT_STATES.OOS.singularTitle,
           width: "fit-content",
-          loading: activeAction === "outOfStock" || isEditPending ,
+          loading: activeAction === "outOfStock" || isEditPending,
           disabled: !!activeAction,
         });
       }
@@ -310,7 +326,7 @@ const Product = ({ params }) => {
 
   return (
     <Loader active={isLoading}>
-      {!isProductDeleted(product?.state) && Toggle}
+      {!isProductDeleted(product?.state) && toggleButton}
       {isUpdating ? (
         <ProductForm
           product={product}
@@ -334,19 +350,19 @@ const Product = ({ params }) => {
         showModal={isModalOpen}
         setShowModal={setIsModalOpen}
         isLoading={isInactivePending || isActivePending || isDeletePending || isEditPending}
-        noConfirmation={!requiresConfirmation}
+        noConfirmation={!requiresConfirmation && modalAction !== "inactive"}
         bodyContent={
-          modalAction === "hardDelete" ? (
-            "UNA VEZ ELIMINADO DE ESTA FORMA, EL PRODUCTO NO SE PUEDE RECUPERAR."
-          ) : modalAction === "inactive" ? (
+          modalAction === "inactive" ? (
             <Input
               type="text"
               placeholder="Indique la razón de desactivación"
               value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              onChange={(e) => setReason(e.target.value)} 
             />
           ) : null
         }
+        requireReason={modalAction === "inactive"} 
+        reason={reason} 
       />
     </Loader>
   );

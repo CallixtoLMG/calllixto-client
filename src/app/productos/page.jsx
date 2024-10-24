@@ -26,7 +26,7 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { data, isLoading, isRefetching } = useListProducts({ attributes: [ATTRIBUTES.NAME, ATTRIBUTES.PRICE, ATTRIBUTES.CODE, ATTRIBUTES.COMMENTS, ATTRIBUTES.BRAND_NAME, ATTRIBUTES.SUPPLIER_NAME, ATTRIBUTES.FRACTION_CONFIG, ATTRIBUTES.EDITABLE_PRICE] });
+  const { data, isLoading, isRefetching, refetch } = useListProducts({ attributes: [ATTRIBUTES.NAME, ATTRIBUTES.PRICE, ATTRIBUTES.CODE, ATTRIBUTES.COMMENTS, ATTRIBUTES.BRAND_NAME, ATTRIBUTES.SUPPLIER_NAME, ATTRIBUTES.FRACTION_CONFIG, ATTRIBUTES.EDITABLE_PRICE] });
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -103,7 +103,8 @@ const Products = () => {
         icon: ICONS.BAN,
         color: COLORS.RED,
         onClick: () => setOpen(true),
-        text: 'Bloquear'
+        text: 'Bloquear',
+        basic: true
       },
     ] : [];
     setActions(actions);
@@ -116,6 +117,7 @@ const Products = () => {
     <>
       {open && <BanProduct open={open} setOpen={setOpen} />}
       <ProductsPage
+        onRefetch={refetch}
         isLoading={loading}
         products={loading ? [] : products}
         role={role}

@@ -166,7 +166,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               disabled={isProductDeleted(product?.state)}
             />
           ) : (
-            <Segment placeholder={product?.supplierName} />
+            <Segment placeholder>{product?.supplierName}</Segment>
           )}
         </FormField>
 
@@ -188,7 +188,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               disabled={isProductDeleted(product?.state)}
             />
           ) : (
-            <Segment placeholder={product?.brandName} />
+            <Segment placeholder>{product?.brandName}</Segment>
           )}
         </FormField>
         <FormField width="20%">

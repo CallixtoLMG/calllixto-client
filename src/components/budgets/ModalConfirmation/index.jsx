@@ -9,7 +9,7 @@ import { ButtonGroup, Form, Modal, Transition } from "semantic-ui-react";
 
 const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading, total = 0 }) => {
   const methods = useForm({
-    defaultValues: { payments: [], ...customer },
+    defaultValues: { paymentsMade: [], ...customer },
   });
   const { control } = methods;
   const formRef = useRef(null);
@@ -22,15 +22,17 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
   };
 
   const handleConfirm = (data) => {
-    const { payments, pickUpInStore } = data;
+    const { paymentsMade, pickUpInStore } = data;
+
     const payload = {
-      paymentsMade: payments?.map((payment) => ({
+      paymentsMade: paymentsMade?.map((payment) => ({
         ...payment,
         createdAt: now()
       })),
       total: parsedTotal,
       pickUpInStore
     };
+    
     onConfirm(payload);
   };
 
@@ -77,17 +79,22 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                   </FormField>
                   <FormField flex="1">
                     <Label>Dirección</Label>
-                    <Segment placeholder alignContent="center" height="40px">{!methods.getValues("pickUpInStore") ? customer?.addresses?.[0]?.address : PICK_UP_IN_STORE}</Segment>
+                    <Segment placeholder alignContent="center" height="40px">
+                      {!methods.getValues("pickUpInStore") ? `${customer?.addresses?.[0]?.ref ? `${customer?.addresses?.[0]?.ref}:` : "(Sin referencia)"} ${customer?.addresses?.[0]?.address}` : PICK_UP_IN_STORE}
+                    </Segment>
                   </FormField>
                   <FormField width="200px">
                     <Label>Teléfono</Label>
-                    <Segment placeholder alignContent="center" height="40px">{formatedSimplePhone(customer?.phoneNumbers?.[0])}</Segment>
+                    <Segment placeholder alignContent="center" height="40px">
+                      {`${customer?.phoneNumbers?.[0]?.ref ? `${customer?.phoneNumbers?.[0]?.ref}:` : "(Sin referencia)"} ${formatedSimplePhone(customer?.phoneNumbers?.[0])}`}
+                    </Segment>
                   </FormField>
                 </FieldsContainer>
                 <Payments
                   methods={methods}
                   total={parsedTotal}
                   maxHeight
+                  update
                 />
               </FlexColumn>
             </Form>

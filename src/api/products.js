@@ -1,5 +1,5 @@
 import { ATTRIBUTES } from "@/components/products/products.common";
-import { ACTIVE, ENTITIES, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
+import { ACTIVE, ALL, CODE, ENTITIES, FILTERS_OPTIONS, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
 import {
   BATCH,
   BLACK_LIST,
@@ -35,7 +35,7 @@ export function useListProducts() {
 export function useGetProduct(id) {
   const query = useQuery({
     queryKey: [GET_PRODUCT_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PATHS.PRODUCTS, entity: ENTITIES.PRODUCTS, key: 'code' }),
+    queryFn: () => getItemById({ id, url: PATHS.PRODUCTS, entity: ENTITIES.PRODUCTS, key: CODE }),
     retry: false,
     staleTime: TIME_IN_MS.ONE_DAY,
   });
@@ -69,7 +69,7 @@ export const useDeleteProduct = () => {
       entity: ENTITIES.PRODUCTS,
       id: code,
       url: PATHS.PRODUCTS,
-      key: "code",
+      key: CODE,
       invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]]
     });
 
@@ -87,7 +87,7 @@ export const useEditProduct = () => {
       entity: ENTITIES.PRODUCTS,
       url: `${PATHS.PRODUCTS}/${product.code}`,
       value: product,
-      key: "code",
+      key: CODE,
       responseEntity: ENTITIES.PRODUCT,
       invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, product.code]]
     });
@@ -100,7 +100,7 @@ export const useEditProduct = () => {
 
 export function useProductsBySupplierId(supplierId) {
   const listBySupplierId = async () => {
-    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: 'date' } });
+    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: FILTERS_OPTIONS.DATE } });
     return products.filter((product) => product.code.startsWith(supplierId));
   }
 
@@ -190,9 +190,9 @@ export const useDeleteBatchProducts = () => {
         entity: ENTITIES.PRODUCTS, filter: ((product) => !product.code.startsWith(supplierId))
       })
 
-      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId], refetchType: "all" });
-      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: "all" });
-      queryClient.invalidateQueries({ queryKey: [GET_PRODUCT_QUERY_KEY], refetchType: "all" });
+      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId], refetchType: ALL });
+      queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: ALL });
+      queryClient.invalidateQueries({ queryKey: [GET_PRODUCT_QUERY_KEY], refetchType: ALL });
     }
 
     return data;
@@ -214,7 +214,7 @@ export const useInactiveProduct = () => {
       entity: ENTITIES.PRODUCTS,
       url: `${PATHS.PRODUCTS}/${product.code}/${INACTIVE}`,
       value: updatedProduct,
-      key: "code",
+      key: CODE,
       responseEntity: ENTITIES.PRODUCT,
       invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, product.code]]
     });
@@ -237,7 +237,7 @@ export const useActiveProduct = () => {
       entity: ENTITIES.PRODUCTS,
       url: `${PATHS.PRODUCTS}/${product.code}/${ACTIVE}`,
       value: updatedProduct,
-      key: "code",
+      key: CODE,
       responseEntity: ENTITIES.PRODUCT,
       invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, product.code]]
     });

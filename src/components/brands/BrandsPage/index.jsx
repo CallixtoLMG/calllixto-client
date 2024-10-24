@@ -1,6 +1,7 @@
 import { Dropdown, Flex, Input } from "@/components/common/custom";
 import { Filters, Table } from "@/components/common/table";
 import { BRANDS_STATES, PAGES } from "@/constants";
+import { createFilter } from "@/utils";
 import { useCallback, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Form, Label } from "semantic-ui-react";
@@ -19,25 +20,14 @@ const STATE_OPTIONS = [
   }))
 ];
 
-const BrandsPage = ({ brands = [], isLoading }) => {
+const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
   const { handleSubmit, control, reset } = useForm();
   const [filters, setFilters] = useState(EMPTY_FILTERS);
 
-  const onFilter = useCallback((brand) => {
-    if (filters.name && !brand.name.toLowerCase().includes(filters.name.toLowerCase())) {
-      return false;
-    }
-
-    if (filters.id && !brand.id.toLowerCase().includes(filters.id.toLowerCase())) {
-      return false;
-    }
-
-    if (filters.state && filters.state !== brand.state) {
-      return false;
-    }
-
-    return true;
-  }, [filters]);
+  const onFilter = useCallback(
+    createFilter(filters, ['name', 'id']),
+    [filters]
+  );
 
   const onRestoreFilters = () => {
     reset(EMPTY_FILTERS);
@@ -47,7 +37,7 @@ const BrandsPage = ({ brands = [], isLoading }) => {
   return (
     <>
       <Form onSubmit={handleSubmit(setFilters)}>
-        <Filters onRestoreFilters={onRestoreFilters}>
+        <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
           <Controller
             name="state"
             control={control}

@@ -26,7 +26,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
   const { formState: { isDirty } } = methods;
 
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
-  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({ canUpdate: true });
   const updatePayment = useUpdatePayments();
 
   const { mutate: mutateUpdatePayment, isPending: isLoadingUpdatePayment } = useMutation({
@@ -45,6 +45,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pagos actualizados!");
+        setIsUpdating(false);
       } else {
         toast.error(response.error.message);
       }
@@ -152,43 +153,53 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
       <FieldsContainer>
         <FormField width="300px">
           <Label>Cliente</Label>
-          <Segment placeholder>{budget?.customer?.name}</Segment>
+          <Segment placeholder>{budget?.customer?.name ? budget?.customer?.name: "No se ha seleccionado cliente" }</Segment>
         </FormField>
-        <FormField flex="1">
+        <FormField flex="2">
           <Label>Dirección</Label>
           {budget?.pickUpInStore ? (
             <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
-          ) : !budget?.customer?.addresses?.length || budget.customer.addresses.length === 1 ? (
-            <Segment placeholder>{budget.customer?.addresses?.[0]?.address}</Segment>
+          ) : !budget?.customer?.addresses?.length ? (
+            <Segment placeholder>No existe una dirección registrada</Segment>
+          ) : budget.customer.addresses.length === 1 ? (
+            <Segment placeholder>{`${budget.customer?.addresses?.[0]?.ref}: ${budget.customer?.addresses?.[0]?.address}`}</Segment>
           ) : (
             (
               <Dropdown
                 selection
                 options={budget?.customer?.addresses.map((address) => ({
                   key: address.address,
-                  text: address.address,
+                  text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
                   value: address.address,
                 }))}
                 value={selectedContact?.address}
-                onChange={(e, { value }) => setSelectedContact({ ...selectedContact, address: value })}
+                onChange={(e, { value }) => setSelectedContact({
+                  ...selectedContact,
+                  address: value
+                })}
               />
             )
           )}
         </FormField>
-        <FormField width="200px">
+        <FormField flex="1">
           <Label>Teléfono</Label>
-          {!budget?.customer?.phoneNumbers?.length || budget?.customer?.phoneNumbers.length === 1 ? (
-            <Segment placeholder>{formatedSimplePhone(budget.customer?.phoneNumbers?.[0])}</Segment>
+          {!budget?.customer?.phoneNumbers?.length ? (
+            <Segment placeholder>No existe un teléfono registrado</Segment>
+          ) : budget?.customer?.phoneNumbers.length === 1 ? (
+            <Segment placeholder>{`${budget.customer?.phoneNumbers?.[0]?.ref}: ${formatedSimplePhone(budget.customer?.phoneNumbers?.[0])}`}</Segment>
           ) : (
             <Dropdown
               selection
               options={budget?.customer?.phoneNumbers.map((phone) => ({
                 key: formatedSimplePhone(phone),
-                text: formatedSimplePhone(phone),
+                text: `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`,
                 value: formatedSimplePhone(phone),
               }))}
               value={selectedContact?.phone}
-              onChange={(e, { value }) => setSelectedContact({ ...selectedContact, phone: value })}
+              onChange={(e, { value }) => setSelectedContact({
+                ...selectedContact,
+                phone: value
+              })}
             />
           )}
         </FormField>
@@ -214,7 +225,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         <>
           {isBudgetConfirmed(budget?.state) &&
             <Flex justifyContent="space-between">
-              {Toggle}
+              {toggleButton}
             </Flex>}
           <Payments update={isUpdating} total={total} methods={methods}>
             <SubmitAndRestore
