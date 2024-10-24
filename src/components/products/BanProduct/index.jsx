@@ -53,16 +53,17 @@ const BanProduct = ({ open, setOpen }) => {
         toast.error(`El código [${code}] ya existe en la lista!`);
         return true;
       }
+      return false;
     });
 
     if (error) {
-      event.target.value = ''; 
+      event.target.value = '';
       return;
     }
 
     const updatedProducts = [...watchProducts, ...newCodes];
     setValue("products", updatedProducts, { shouldDirty: true });
-    event.target.value = '';
+    event.target.value = ''; 
   };
 
   const { mutate, isPending } = useMutation({
@@ -105,7 +106,7 @@ const BanProduct = ({ open, setOpen }) => {
                     size="tiny"
                     content={
                       <div>
-                        <p>* Para añadir un código nuevo a la lista, anotelo y luego pulse "enter". Cuando haya concluido de agregar códigos, clickeé  "Confirmar".</p>
+                        <p>* Para añadir un código nuevo a la lista, anótelo y luego pulse &quot;enter&quot;. Cuando haya concluido de agregar códigos, clickeé &quot;Confirmar&quot;.</p>
                         <p>* Existe la posibilidad de agregar múltiples códigos a la vez, para ello, debe escribirlos separados por una coma y un espacio, por ejemplo:</p>
                         <p>  PCMU123, PCMU124, PCMU125</p>
                       </div>}

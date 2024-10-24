@@ -66,7 +66,7 @@ const OptionsDropdown = ({ entity, queryKey, text }) => {
         isLoading={isLoading}
         noConfirmation={true}
         bodyContent={<>Esta acción puede tomar varios minutos en completarse, no se recomienda ejecutarla de manera frecuente!
-          Si no encontrás un elemento en las tablas, podrías probar primero usando el ícono de <strong>"actualizar"</strong> encima de ellas.</>}
+          Si no encontrás un elemento en las tablas, podrías probar primero usando el ícono de <strong>&quot;actualizar&quot;</strong> encima de ellas.</>}
         warning
       />
     </>
