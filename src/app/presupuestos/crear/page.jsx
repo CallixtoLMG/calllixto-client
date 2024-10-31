@@ -21,7 +21,7 @@ const CreateBudget = () => {
   const createBudget = useCreateBudget();
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
-  const { data: productsData, isLoading: loadingProducts } = useListProducts();
+  const { data: productsData, isLoading: loadingProducts, refetch } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
   const products = useMemo(() => productsData?.products.filter((product) => ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state)), [productsData]);
@@ -34,6 +34,7 @@ const CreateBudget = () => {
 
   useEffect(() => {
     setLabels([PAGES.BUDGETS.NAME, 'Crear']);
+    refetch();
   }, [setLabels]);
 
   const mappedProducts = useMemo(() => products?.map(product => ({

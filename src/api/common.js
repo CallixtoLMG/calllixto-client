@@ -1,7 +1,7 @@
 import { config } from "@/config";
-import { ALL, CREATE_KEY, DELETE_KEY, ID, UPDATE_KEY } from "@/constants";
+import { ALL, CREATE_KEY, DEFAULT_LAST_EVENT_ID, DELETE_KEY, DELETE_SUPPLIER_PRODUCTS_KEY, ID, UPDATE_ALL_KEY, UPDATE_KEY } from "@/constants";
 import { EVENTS, PATHS } from "@/fetchUrls";
-import { encodeUri, now } from "@/utils";
+import { now } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import axios from './axios';
 import localforage from "./local-forage";
@@ -16,11 +16,14 @@ async function entityList({ entity, url, params }) {
     let LastEvaluatedKey;
 
     do {
+
+      const queryParams = {
+        ...params,
+        ...(LastEvaluatedKey && { LastEvaluatedKey: JSON.stringify(LastEvaluatedKey) }),
+      };
+
       const { data } = await axios.get(url, {
-        params: {
-          ...params,
-          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(LastEvaluatedKey) }),
-        },
+        params: queryParams,
       });
 
       if (data.statusOk) {
@@ -32,6 +35,7 @@ async function entityList({ entity, url, params }) {
 
     return values;
   } catch (error) {
+    console.error("entityList - Error fetching data:", error);
     throw error;
   }
 }
@@ -39,12 +43,10 @@ async function entityList({ entity, url, params }) {
 async function handleEvents({ entity, values, key = ID }) {
   let lastEventId = await localforage.getItem(`${config.APP_ENV}-${entity}-lastEventId`);
 
-  if (!lastEventId) {
 
-    const lastEventId = "A0001"; // CORREGIR
-    if (lastEventId) {
-      await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
-    }
+  if (!lastEventId) {
+    lastEventId = DEFAULT_LAST_EVENT_ID;
+    await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
   }
 
   const { data: eventsData } = await axios.get(`${EVENTS}/${entity}`, {
@@ -55,12 +57,15 @@ async function handleEvents({ entity, values, key = ID }) {
     const newEvents = eventsData.events;
 
     lastEventId = newEvents[newEvents.length - 1]?.id;
-
     if (lastEventId) {
       await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
     }
 
-    newEvents.forEach((event) => {
+    if (newEvents.some((event) => event.action === UPDATE_ALL_KEY)) {
+      return [];
+    }
+
+    for (const event of newEvents) {
       if (event.action === CREATE_KEY) {
         event.value.forEach((item) => {
           const exists = values.find((existingItem) => existingItem[key] === item[key]);
@@ -72,7 +77,6 @@ async function handleEvents({ entity, values, key = ID }) {
 
       if (event.action === UPDATE_KEY) {
         event.value.forEach((item) => {
-
           values = values.map((existingItem) =>
             existingItem[key] === item[key] ? { ...existingItem, ...item } : existingItem
           );
@@ -80,9 +84,23 @@ async function handleEvents({ entity, values, key = ID }) {
       }
 
       if (event.action === DELETE_KEY) {
-        values = values.filter(existingItem => !event.value.map((item) => item[key]).includes(existingItem[key]));
+        const idsToDelete = event.value.map((item) => item[key]);
+        values = values.filter(existingItem => !idsToDelete.includes(existingItem[key]));
       }
-    });
+
+
+      if (event.action === DELETE_SUPPLIER_PRODUCTS_KEY) {
+        console.log("hola")
+        const supplierIdToDelete = event.value.supplierId;
+
+        await removeStorageItemsByCustomFilter({
+          entity: 'products',
+          filter: (product) => product.code.slice(0, 2) !== supplierIdToDelete
+        });
+
+        values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
+      }
+    }
   }
 
   return values;
@@ -90,27 +108,28 @@ async function handleEvents({ entity, values, key = ID }) {
 
 export async function listItems({ entity, url, params, key = ID }) {
   let values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  if (!values?.length) {
 
+  if (values?.length) {
+    values = await handleEvents({ entity, values, key });
+  }
+
+  if (!values || values.length === 0) {
     values = await entityList({ entity, url, params });
 
     await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
 
     const { data } = await axios.get(`${PATHS.EVENTS}/${entity}`, { params: { order: false, pageSize: 1 } });
-
     const lastEventId = data?.events?.[0]?.id;
+
     if (lastEventId) {
       await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
     }
-  } else {
-    values = await handleEvents({ entity, values, key });
   }
 
   await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
 
   return { [entity]: values };
-}
-
+};
 
 export async function getItemById({ id, url, entity, key = ID, params }) {
   await listItems({ entity, url, params, key })
@@ -268,5 +287,6 @@ export async function removeStorageItem({ entity, id, key = ID }) {
 
 export async function removeStorageItemsByCustomFilter({ entity, filter }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, values.filter(filter));
+  const filteredValues = values.filter(filter);
+  await localforage.setItem(`${config.APP_ENV}-${entity}`, filteredValues);
 };

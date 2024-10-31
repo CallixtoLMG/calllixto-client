@@ -1,5 +1,5 @@
 import { useUserContext } from "@/User";
-import { createBatch, editBatch, useListProducts } from "@/api/products";
+import { useCreateBatch, useEditBatch, useListProducts } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
 import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
@@ -34,6 +34,8 @@ const BatchImport = ({ isCreating }) => {
   const [existingCodes, setExistingCodes] = useState({});
   const totalProducts = importedProductsCount + downloadProducts.length;
 
+  const handleBatchAction = isCreating ? useCreateBatch() : useEditBatch();
+
   const handleConfirmClick = () => {
     if (formRef.current) {
       formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
@@ -56,7 +58,7 @@ const BatchImport = ({ isCreating }) => {
       fileName: isCreating ? "Productos ya existentes" : "Productos no existentes",
       label: isCreating ? "Nuevos productos" : "Productos para actualizar",
       confirmation: isCreating ? "con errores o ya" : "no",
-      onSubmit: isCreating ? createBatch : editBatch,
+      onSubmit: handleBatchAction,  // Usa el hook basado en la acción
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
         const productCode = formattedProduct.code.toUpperCase();
         if (productCounts[productCode] > 1) {
@@ -184,7 +186,6 @@ const BatchImport = ({ isCreating }) => {
     }
   };
 
-
   const handleDownloadConfirmation = () => {
     const data = [
       ['Código', 'Nombre', 'Precio', 'Comentarios', 'Error'],
@@ -265,7 +266,7 @@ const BatchImport = ({ isCreating }) => {
       if (response.statusOk) {
         toast.success(isCreating ?
           `Productos importados: ${importedProductsCount}.\nProductos creados exitosamente: ${createdCount}.\nProductos sin procesar: ${unprocessedCount}.`
-          : "Los productos se han actualizado con exito!");
+          : "Los productos se han actualizado con éxito!");
         handleModalClose();
       } else {
         toast.error(response.error.message);

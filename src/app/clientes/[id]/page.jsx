@@ -91,6 +91,10 @@ const Customer = ({ params }) => {
         toast.error(response.error.message);
       }
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
@@ -105,6 +109,10 @@ const Customer = ({ params }) => {
       } else {
         toast.error(response.error.message);
       }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
     },
   });
 

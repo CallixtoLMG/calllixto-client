@@ -21,6 +21,7 @@ const Brands = () => {
 
   useEffect(() => {
     setLabels([PAGES.BRANDS.NAME]);
+    refetch();
   }, [setLabels]);
 
   const brands = useMemo(() => data?.brands, [data]);

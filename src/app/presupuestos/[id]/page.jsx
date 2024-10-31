@@ -114,13 +114,13 @@ const Budget = ({ params }) => {
 
     if (budget) {
       const calculatedSubtotal = getTotalSum(budget?.products);
-      const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount);
-      const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget?.additionalCharge);
+      const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount ? -budget.globalDiscount : 0);
+      const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget?.additionalCharge ? budget?.additionalCharge : 0);
 
       setSubtotal(calculatedSubtotal);
       setSubtotalAfterDiscount(calculatedSubtotalAfterDiscount);
       setTotal(calculatedFinalTotal);
-
+    
       const stateTitle = BUDGET_STATES[budget.state]?.singularTitle || BUDGET_STATES.INACTIVE.singularTitle;
       const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([
@@ -346,7 +346,6 @@ const Budget = ({ params }) => {
       }
     },
     onError: (error) => {
-      console.log("Error al anular el presupuesto:", error);
       toast.error(`Error al anular: ${error.message}`);
     }
   });

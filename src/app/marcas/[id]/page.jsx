@@ -95,6 +95,10 @@ const Brand = ({ params }) => {
         toast.error(response.error.message);
       }
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
@@ -109,6 +113,10 @@ const Brand = ({ params }) => {
       } else {
         toast.error(response.error.message);
       }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
     },
   });
 
@@ -125,6 +133,10 @@ const Brand = ({ params }) => {
         toast.error(response.error.message);
       }
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
@@ -138,6 +150,10 @@ const Brand = ({ params }) => {
       } else {
         toast.error(response.error.message);
       }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
     },
   });
 

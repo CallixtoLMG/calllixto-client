@@ -1,7 +1,7 @@
 import { Box, Flex, Price } from "@/components/common/custom";
-import { BUDGET_STATES } from "@/constants";
-import { formatedDateAndHour, formatedPercentage, getPrice, getTotal, getTotalSum } from "@/utils";
-import { Label } from "semantic-ui-react";
+import { BUDGET_STATES, COLORS } from "@/constants";
+import { formatedDateAndHour, formatedPercentage, getPrice, getTotal, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
+import { Label, Popup } from "semantic-ui-react";
 import { CommentTooltip } from "../common/tooltips";
 
 const ATTRIBUTES = {
@@ -21,7 +21,53 @@ const ATTRIBUTES = {
   PICKUP_IN_STORE: "pickUpInStore",
   TOTAL: "total",
   CONFIRMED_AT: "confirmedAt",
-  CONFIRMED_BY: "confirmedBy"
+  CONFIRMED_BY: "confirmedBy",
+  CANCELLED_AT: "cancelledAt",
+  CANCELLED_BY: "cancelledBy"
+};
+
+const getLabelColor = (budget) => BUDGET_STATES[budget?.state]?.color;
+
+const getPopupContent = (budget) => {
+  if (isBudgetConfirmed(budget?.state)) {
+    return (
+      <>
+        <div>{`Confirmado por ${budget?.confirmedBy || "Sin vendedor"}`}</div>
+        <div>{`Fecha: ${formatedDateAndHour(budget?.confirmedAt)}`}</div>
+      </>
+    );
+  }
+  if (isBudgetCancelled(budget?.state)) {
+    return (
+      <>
+        <div>{`Anulado por ${budget?.cancelledBy || "Sin vendedor"}`}</div>
+        <div>{`Fecha: ${formatedDateAndHour(budget?.cancelledAt)}`}</div>
+      </>
+    );
+  }
+  return null;
+};
+
+export const getBudgetState = (budget) => {
+  if (isBudgetConfirmed(budget?.state)) {
+    return {
+      label: "Confirmado por",
+      color: COLORS.GREEN,
+      person: budget?.confirmedBy || budget?.seller,
+      date: formatedDateAndHour(budget?.confirmedAt),
+      dateLabel: "Fecha de confirmación"
+    };
+  }
+  if (isBudgetCancelled(budget?.state)) {
+    return {
+      label: "Anulado por",
+      color: COLORS.RED,
+      person: budget?.cancelledBy || budget?.seller,
+      date: formatedDateAndHour(budget?.cancelledAt),
+      dateLabel: "Fecha de anulación"
+    };
+  }
+  return null;
 };
 
 const BUDGETS_COLUMNS = [
@@ -30,22 +76,37 @@ const BUDGETS_COLUMNS = [
     title: "Id",
     width: 1,
     align: "left",
-    value: (budget) =>
+    value: (budget) => (
       <Box width="60px">
-        <Label ribbon color={BUDGET_STATES[budget?.state]?.color}>
-          {budget.id}
-        </Label>
+        {isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state) ? (
+          <Popup
+            trigger={
+              <Label ribbon color={getLabelColor(budget)}>
+                {budget.id}
+              </Label>
+            }
+            content={getPopupContent(budget)}
+            position="right center"
+            size="mini"
+          />
+        ) : (
+          <Label ribbon color={getLabelColor(budget)}>
+            {budget.id}
+          </Label>
+        )}
       </Box>
+    )
   },
   {
     id: 2,
     title: "Cliente",
     align: "left",
-    value: (budget) =>
+    value: (budget) => (
       <Flex justifyContent="space-between">
         {budget.customer.name}
         {budget.comments && <CommentTooltip comment={budget.comments} />}
       </Flex>
+    )
   },
   {
     id: 3,
@@ -57,7 +118,9 @@ const BUDGETS_COLUMNS = [
     id: 4,
     title: "Total",
     width: 2,
-    value: (budget) => <Price value={(getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge))} />
+    value: (budget) => (
+      <Price value={getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)} />
+    )
   },
   {
     id: 5,

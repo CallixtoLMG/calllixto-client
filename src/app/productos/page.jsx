@@ -6,7 +6,6 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
-import { ATTRIBUTES } from "@/components/products/products.common";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
@@ -26,7 +25,7 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { data, isLoading, isRefetching, refetch } = useListProducts({ attributes: [ATTRIBUTES.NAME, ATTRIBUTES.PRICE, ATTRIBUTES.CODE, ATTRIBUTES.COMMENTS, ATTRIBUTES.BRAND_NAME, ATTRIBUTES.SUPPLIER_NAME, ATTRIBUTES.FRACTION_CONFIG, ATTRIBUTES.EDITABLE_PRICE] });
+  const { data, isLoading, isRefetching, refetch } = useListProducts();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -34,6 +33,7 @@ const Products = () => {
 
   useEffect(() => {
     setLabels(['Productos']);
+    refetch();
   }, [setLabels]);
 
   const products = useMemo(() => data?.products, [data]);

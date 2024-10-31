@@ -162,6 +162,7 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
+  EVENTS: 'events'
 };
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
@@ -388,7 +389,7 @@ export const PICK_UP_IN_STORE = "Retira en tienda";
 
 export const OOS = "Sin stock";
 
-export const ALL = "ALL";
+export const ALL = "all";
 
 export const ACTIVE = "active";
 
@@ -400,6 +401,12 @@ export const CREATE_KEY = "C";
 
 export const DELETE_KEY = "D";
 
+export const UPDATE_ALL_KEY = "A";
+
+export const DELETE_SUPPLIER_PRODUCTS_KEY = "S";
+
+export const DEFAULT_LAST_EVENT_ID = "A0001";
+
 export const ID = "id";
 
 export const CODE = "code";
@@ -407,5 +414,5 @@ export const CODE = "code";
 export const FILTERS_OPTIONS = {
   DATE: "date",
   NAME: "name"
-}
+};
 

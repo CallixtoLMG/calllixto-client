@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useDeleteBatchProducts, useProductsBySupplierId } from "@/api/products";
+import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
 import { useActiveSupplier, useDeleteSupplier, useEditSupplier, useGetSupplier, useInactiveSupplier } from "@/api/suppliers";
 import { Icon, Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
@@ -27,7 +27,7 @@ const Supplier = ({ params }) => {
   const { data: products, isLoading: loadingProducts } = useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton }  = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -36,7 +36,7 @@ const Supplier = ({ params }) => {
   const printRef = useRef(null);
   const editSupplier = useEditSupplier();
   const deleteSupplier = useDeleteSupplier();
-  const deleteBatchProducts = useDeleteBatchProducts();
+  const deleteBySupplierId = useDeleteBySupplierId();
   const inactiveSupplier = useInactiveSupplier();
   const activeSupplier = useActiveSupplier();
 
@@ -126,6 +126,10 @@ const Supplier = ({ params }) => {
         toast.error(response.error.message);
       }
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
@@ -140,6 +144,10 @@ const Supplier = ({ params }) => {
       } else {
         toast.error(response.error.message);
       }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
     },
   });
 
@@ -159,11 +167,15 @@ const Supplier = ({ params }) => {
     onError: (error) => {
       toast.error(`Error: ${error.message}`);
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const { mutate: mutateDeleteBatch, isPending: isDeleteBatchPending } = useMutation({
     mutationFn: async () => {
-      const response = await deleteBatchProducts(params.id);
+      const response = await deleteBySupplierId(params.id);
       return response;
     },
     onSuccess: (response) => {
@@ -173,6 +185,10 @@ const Supplier = ({ params }) => {
       } else {
         toast.error(response.error.message);
       }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
     },
   });
 
@@ -188,6 +204,10 @@ const Supplier = ({ params }) => {
       } else {
         toast.error(response.error.message);
       }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
     },
   });
 
@@ -254,17 +274,17 @@ const Supplier = ({ params }) => {
         text: "Descargar lista",
         onClick: () => {
           if (products?.length) {
-            setIsExcelLoading(true);  
+            setIsExcelLoading(true);
             downloadExcel(prepareProductDataForExcel, `Lista de productos de ${supplier.name}`);
-            setIsExcelLoading(false); 
+            setIsExcelLoading(false);
           } else {
             toast("No hay productos de este proveedor para descargar.", {
               icon: <Icon margin="0" toast name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />,
             });
           }
         },
-        loading: isExcelLoading, 
-        disabled: isExcelLoading || !!activeAction || loadingProducts,  
+        loading: isExcelLoading,
+        disabled: isExcelLoading || !!activeAction || loadingProducts,
         width: "fit-content",
       },
       {
@@ -274,7 +294,8 @@ const Supplier = ({ params }) => {
         text: "Limpiar lista",
         onClick: handleDeleteBatchClick,
         loading: activeAction === "deleteBatch",
-        disabled: !!activeAction,
+        disabled: !hasAssociatedProducts || !!activeAction,
+        tooltip: !hasAssociatedProducts ? "No existen productos asociados." : false,
         width: "fit-content",
       },
       {

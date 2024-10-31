@@ -35,12 +35,16 @@ const CustomTable = ({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
-  const pages = useMemo(() => Math.ceil(filteredElements.length / pageSize), [filteredElements, pageSize]);
+  const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
+
   const currentPageElements = useMemo(() => {
+    if (!paginate) {
+      return filteredElements;
+    }
     const startIndex = (activePage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     return filteredElements.slice(startIndex, endIndex);
-  }, [activePage, filteredElements, pageSize]);
+  }, [activePage, filteredElements, pageSize, paginate]);
 
   const allSelected = useMemo(() => {
     return !!currentPageElements.length && currentPageElements.every(product => selection[product[mainKey]]);
@@ -79,7 +83,6 @@ const CustomTable = ({
     <Container tableHeight={tableHeight}>
       {paginate && (
         <PaginationContainer center>
-
           <Pagination
             activePage={activePage}
             onPageChange={handlePageChange}
@@ -109,7 +112,6 @@ const CustomTable = ({
             position="left center"
             mouseEnterDelay={500}
           />
-
         </PaginationContainer>
       )}
       <Table celled compact striped={!basic} color={color} definition={isSelectable}>

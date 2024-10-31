@@ -113,73 +113,90 @@ export function useProductsBySupplierId(supplierId) {
   return query;
 }
 
-export async function createBatch(products) {
-  const parsedProducts = products.map((product) => ({
-    ...product,
-    createdAt: now(),
-  }));
-  const chuncks = chunk(parsedProducts, 500);
-  let i = 25;
-  const promises = chuncks.map((chunk) => {
-    const delay = Math.min(25000, 2 ** Math.log(i) * 100 + Math.random() * 100);
-    i += i / 2
-    return new Promise((resolve) => setTimeout(resolve, delay)).then(() => {
-      return axios.post(`${PATHS.PRODUCTS}/${BATCH}`, { products: chunk });
+export const useCreateBatch = () => {
+  const queryClient = useQueryClient();
+
+  const createBatch = async (products) => {
+    const parsedProducts = products.map((product) => ({
+      ...product,
+      createdAt: now(),
+    }));
+    const chunks = chunk(parsedProducts, 500);
+    let i = 25;
+    const promises = chunks.map((chunk) => {
+      const delay = Math.min(25000, 2 ** Math.log(i) * 100 + Math.random() * 100);
+      i += i / 2;
+      return new Promise((resolve) => setTimeout(resolve, delay)).then(() => {
+        return axios.post(`${PATHS.PRODUCTS}/${BATCH}`, { products: chunk });
+      });
     });
-  });
 
-  const responses = await Promise.all(promises);
+    const responses = await Promise.all(promises);
 
-  const data = {
-    statusOk: true,
-    unprocessed: responses
-      .map((response) => {
-        if (response?.data?.statusOk) {
-          return response.data.unprocessed;
-        }
-        return [];
-      })
-      .flat()
-      .filter((item) => item),
+    const data = {
+      statusOk: true,
+      unprocessed: responses
+        .map((response) => (response?.data?.statusOk ? response.data.unprocessed : []))
+        .flat()
+        .filter((item) => item),
+    };
+
+    console.log("Invalidando queries después de createBatch");
+    const invalidateQueries = [
+      [LIST_PRODUCTS_QUERY_KEY],
+    ];
+    invalidateQueries.forEach((query) => {
+      queryClient.invalidateQueries({ queryKey: query, refetchType: ALL }); 
+    });
+
+    return { data };
   };
 
-  return Promise.resolve({ data });
+  return createBatch;
 };
 
-export async function editBatch(products) {
-  const chuncks = chunk(products, 100);
-  let delay = 0;
-  const delayIncrement = 1000;
-  const promises = chuncks.map((chunk) => {
-    delay += delayIncrement;
-    return new Promise((resolve) => setTimeout(resolve, delay)).then(() =>
-      axios.post(`${PATHS.PRODUCTS}/${EDIT_BATCH}`, { update: chunk }),
-    );
-  });
+export const useEditBatch = () => {
+  const queryClient = useQueryClient();
 
-  const responses = await Promise.all(promises);
+  const editBatch = async (products) => {
+    const chunks = chunk(products, 100);
+    let delay = 0;
+    const delayIncrement = 1000;
+    const promises = chunks.map((chunk) => {
+      delay += delayIncrement;
+      return new Promise((resolve) => setTimeout(resolve, delay)).then(() =>
+        axios.post(`${PATHS.PRODUCTS}/${EDIT_BATCH}`, { update: chunk })
+      );
+    });
 
-  const data = {
-    statusOk: true,
-    unprocessed: responses
-      .map((response) => {
-        if (response?.data?.statusOk) {
-          return response.data.unprocessed;
-        }
-        return [];
-      })
-      .flat()
-      .filter((item) => item),
+    const responses = await Promise.all(promises);
+
+    const data = {
+      statusOk: true,
+      unprocessed: responses
+        .map((response) => (response?.data?.statusOk ? response.data.unprocessed : []))
+        .flat()
+        .filter((item) => item),
+    };
+
+    const invalidateQueries = [
+      [LIST_PRODUCTS_QUERY_KEY],
+    ];
+    invalidateQueries.forEach((query) => {
+      queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+    });
+
+    return Promise.resolve({ data });
   };
 
-  return Promise.resolve({ data });
+  return editBatch;
 };
 
 export function editBanProducts(products) {
   return axios.put(BLACK_LIST, products);
 };
 
-export const useDeleteBatchProducts = () => {
+export const useDeleteBySupplierId = () => { 
   const queryClient = useQueryClient();
 
   const deleteBatchProducts = async (supplierId) => {

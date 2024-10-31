@@ -19,15 +19,10 @@ const UserProvider = ({ children }) => {
     getData();
   }, []);
 
-  // const updateSessionData = useCallback((data) => {
-  //   sessionStorage.setItem("userData", JSON.stringify(data));
-  // }, []);
-
-const updateSessionData = useCallback((data) => {
-  // ESTO ES PARA SOLUCIONAR LO DE BAN PRODUCTOS.
-  sessionStorage.setItem("userData", JSON.stringify(data));
-  setUserData(data);
-}, []);
+  const updateSessionData = useCallback((data) => {
+    sessionStorage.setItem("userData", JSON.stringify(data));
+    setUserData(data);
+  }, []);
 
   useEffect(() => {
     if (userData?.roles?.length) {
