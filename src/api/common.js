@@ -90,7 +90,6 @@ async function handleEvents({ entity, values, key = ID }) {
 
 
       if (event.action === DELETE_SUPPLIER_PRODUCTS_KEY) {
-        console.log("hola")
         const supplierIdToDelete = event.value.supplierId;
 
         await removeStorageItemsByCustomFilter({

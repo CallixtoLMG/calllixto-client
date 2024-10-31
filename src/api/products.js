@@ -5,11 +5,14 @@ import {
   BLACK_LIST,
   EDIT_BATCH,
   PATHS,
-  SUPPLIER
+  SUPPLIER,
+  URL,
+  VALIDATE
 } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { chunk } from "lodash";
+import { useMemo } from "react";
 import axios from "./axios";
 import { getItemById, listItems, removeStorageItemsByCustomFilter, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
@@ -31,6 +34,22 @@ export function useListProducts() {
 
   return query;
 };
+
+export function useHasAssociatedProducts(brandId) {
+  const { data: productsData, isLoading: isLoadingProducts } = useListProducts();
+
+  const hasAssociatedProducts = useMemo(() => {
+    if (!productsData?.products || !brandId) return false;
+
+    return productsData.products.some(product => {
+      const brandCodeInProduct = product.code?.substring(2, 4);
+      return brandCodeInProduct === String(brandId);
+    });
+  }, [productsData, brandId]);
+
+  return { hasAssociatedProducts, isLoadingProducts };
+}
+
 
 export function useGetProduct(id) {
   const query = useQuery({
@@ -120,6 +139,7 @@ export const useCreateBatch = () => {
     const parsedProducts = products.map((product) => ({
       ...product,
       createdAt: now(),
+      state: "ACTIVE"
     }));
     const chunks = chunk(parsedProducts, 500);
     let i = 25;
@@ -141,13 +161,13 @@ export const useCreateBatch = () => {
         .filter((item) => item),
     };
 
-    console.log("Invalidando queries después de createBatch");
-    const invalidateQueries = [
-      [LIST_PRODUCTS_QUERY_KEY],
-    ];
-    invalidateQueries.forEach((query) => {
-      queryClient.invalidateQueries({ queryKey: query, refetchType: ALL }); 
-    });
+    const invalidateQueries = [[LIST_PRODUCTS_QUERY_KEY]];
+
+    await Promise.all(
+      invalidateQueries.map(async (query) => {
+        await queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      })
+    );
 
     return { data };
   };
@@ -190,6 +210,42 @@ export const useEditBatch = () => {
   };
 
   return editBatch;
+};
+
+export async function getBlackList() {
+  let dataString = sessionStorage.getItem("userData");
+  let data = null;
+
+  if (dataString) {
+    try {
+      data = JSON.parse(dataString);
+      if (data?.client?.blacklist) {
+        return data.client.blacklist;
+      }
+    } catch (e) {
+      console.error("Error parsing userData from sessionStorage:", e);
+      sessionStorage.removeItem("userData"); 
+    }
+  }
+
+  try {
+    const response = await axios({
+      url: `${URL}${VALIDATE}`,  
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: `Bearer ${localStorage.getItem("token")}`
+      }
+    });
+
+    if (response.data) {
+      sessionStorage.setItem("userData", JSON.stringify(response.data)); 
+      return response.data.client.blacklist || []; 
+    }
+  } catch (e) {
+    console.error("Error fetching blackList from server:", e);
+    return [];
+  }
 };
 
 export function editBanProducts(products) {

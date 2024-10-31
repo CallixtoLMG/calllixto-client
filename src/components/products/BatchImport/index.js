@@ -58,7 +58,7 @@ const BatchImport = ({ isCreating }) => {
       fileName: isCreating ? "Productos ya existentes" : "Productos no existentes",
       label: isCreating ? "Nuevos productos" : "Productos para actualizar",
       confirmation: isCreating ? "con errores o ya" : "no",
-      onSubmit: handleBatchAction,  // Usa el hook basado en la acción
+      onSubmit: handleBatchAction, 
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
         const productCode = formattedProduct.code.toUpperCase();
         if (productCounts[productCode] > 1) {

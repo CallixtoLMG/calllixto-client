@@ -1,14 +1,14 @@
-import { useUserContext } from "@/User";
-import { editBanProducts } from "@/api/products";
+import { editBanProducts, getBlackList } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, FormField, Icon, Input, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { COLORS, ICONS } from "@/constants";
+import { useUserContext } from "@/User";
 import { handleEnterKeyPress } from '@/utils';
 import { useMutation } from "@tanstack/react-query";
 import { isEqual, sortBy } from 'lodash';
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Popup, Transition } from "semantic-ui-react";
@@ -16,10 +16,26 @@ import { BAN_PRODUCTS_COLUMNS } from "../products.common";
 import { ModalActions } from "./styles";
 
 const BanProduct = ({ open, setOpen }) => {
-  const { getBlacklist, updateSessionData, userData } = useUserContext();
-  const { handleSubmit, setValue, watch } = useForm({ defaultValues: { products: getBlacklist() } });
+  const { handleSubmit, setValue, watch } = useForm({ defaultValues: { products: [] } });
+  const { updateSessionData, userData } = useUserContext();
+  const [blacklist, setBlacklist] = useState([]);
+  const [isLoadingBlacklist, setIsLoadingBlacklist] = useState(true);
   const watchProducts = watch('products');
   const formRef = useRef(null);
+
+  useEffect(() => {
+    if (open) {
+      const loadBlacklist = async () => {
+        setIsLoadingBlacklist(true);
+        const fetchedBlacklist = await getBlackList();
+        const blacklistItems = fetchedBlacklist || [];
+        setBlacklist(blacklistItems);
+        setValue("products", blacklistItems);
+        setIsLoadingBlacklist(false);
+      };
+      loadBlacklist();
+    }
+  }, [open, setValue]);
 
   const deleteProduct = useCallback((element) => {
     const newProducts = watchProducts.filter(product => product !== element.code);
@@ -63,7 +79,7 @@ const BanProduct = ({ open, setOpen }) => {
 
     const updatedProducts = [...watchProducts, ...newCodes];
     setValue("products", updatedProducts, { shouldDirty: true });
-    event.target.value = ''; 
+    event.target.value = '';
   };
 
   const { mutate, isPending } = useMutation({
@@ -123,7 +139,7 @@ const BanProduct = ({ open, setOpen }) => {
             </FieldsContainer>
             <FieldsContainer rowGap="5px">
               <Label>Productos vedados</Label>
-              <Loader greyColor>
+              <Loader active={isLoadingBlacklist} greyColor>
                 <Table
                   deleteButtonInside
                   tableHeight="40vh"
@@ -148,7 +164,7 @@ const BanProduct = ({ open, setOpen }) => {
             <IconnedButton
               text="Aceptar"
               icon={ICONS.CHECK}
-              disabled={isPending || isEqual(sortBy(getBlacklist()), sortBy(watchProducts))}
+              disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))}
               loading={isPending}
               submit
               color={COLORS.GREEN}
