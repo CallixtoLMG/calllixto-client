@@ -1,4 +1,4 @@
-import { editBanProducts, getBlackList } from "@/api/products";
+import { editBanProducts, useGetBlackList } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, FormField, Icon, Input, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
@@ -8,7 +8,7 @@ import { useUserContext } from "@/User";
 import { handleEnterKeyPress } from '@/utils';
 import { useMutation } from "@tanstack/react-query";
 import { isEqual, sortBy } from 'lodash';
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Popup, Transition } from "semantic-ui-react";
@@ -18,24 +18,19 @@ import { ModalActions } from "./styles";
 const BanProduct = ({ open, setOpen }) => {
   const { handleSubmit, setValue, watch } = useForm({ defaultValues: { products: [] } });
   const { updateSessionData, userData } = useUserContext();
-  const [blacklist, setBlacklist] = useState([]);
-  const [isLoadingBlacklist, setIsLoadingBlacklist] = useState(true);
   const watchProducts = watch('products');
   const formRef = useRef(null);
+  const { data: blacklist, isLoading, isFetching, refetch } = useGetBlackList();
+
+  useEffect(() => {
+    setValue("products", blacklist);
+  }, [blacklist]);
 
   useEffect(() => {
     if (open) {
-      const loadBlacklist = async () => {
-        setIsLoadingBlacklist(true);
-        const fetchedBlacklist = await getBlackList();
-        const blacklistItems = fetchedBlacklist || [];
-        setBlacklist(blacklistItems);
-        setValue("products", blacklistItems);
-        setIsLoadingBlacklist(false);
-      };
-      loadBlacklist();
+      refetch();
     }
-  }, [open, setValue]);
+  }, [open, refetch]);
 
   const deleteProduct = useCallback((element) => {
     const newProducts = watchProducts.filter(product => product !== element.code);
@@ -139,7 +134,7 @@ const BanProduct = ({ open, setOpen }) => {
             </FieldsContainer>
             <FieldsContainer rowGap="5px">
               <Label>Productos vedados</Label>
-              <Loader active={isLoadingBlacklist} greyColor>
+              <Loader $marginTop active={isLoading || isFetching} greyColor>
                 <Table
                   deleteButtonInside
                   tableHeight="40vh"

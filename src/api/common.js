@@ -1,5 +1,5 @@
 import { config } from "@/config";
-import { ALL, CREATE_KEY, DEFAULT_LAST_EVENT_ID, DELETE_KEY, DELETE_SUPPLIER_PRODUCTS_KEY, ID, UPDATE_ALL_KEY, UPDATE_KEY } from "@/constants";
+import { ALL, DEFAULT_LAST_EVENT_ID, ENTITIES, EVENT_KEYS, ID } from "@/constants";
 import { EVENTS, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
@@ -61,12 +61,12 @@ async function handleEvents({ entity, values, key = ID }) {
       await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
     }
 
-    if (newEvents.some((event) => event.action === UPDATE_ALL_KEY)) {
+    if (newEvents.some((event) => event.action === EVENT_KEYS.UPDATE_ALL)) {
       return [];
     }
 
     for (const event of newEvents) {
-      if (event.action === CREATE_KEY) {
+      if (event.action === EVENT_KEYS.CREATE) {
         event.value.forEach((item) => {
           const exists = values.find((existingItem) => existingItem[key] === item[key]);
           if (!exists) {
@@ -75,7 +75,7 @@ async function handleEvents({ entity, values, key = ID }) {
         });
       }
 
-      if (event.action === UPDATE_KEY) {
+      if (event.action === EVENT_KEYS.UPDATE) {
         event.value.forEach((item) => {
           values = values.map((existingItem) =>
             existingItem[key] === item[key] ? { ...existingItem, ...item } : existingItem
@@ -83,17 +83,16 @@ async function handleEvents({ entity, values, key = ID }) {
         });
       }
 
-      if (event.action === DELETE_KEY) {
+      if (event.action === EVENT_KEYS.DELETE) {
         const idsToDelete = event.value.map((item) => item[key]);
         values = values.filter(existingItem => !idsToDelete.includes(existingItem[key]));
       }
 
-
-      if (event.action === DELETE_SUPPLIER_PRODUCTS_KEY) {
+      if (event.action === EVENT_KEYS.DELETE_SUPPLIER_PRODUCTS) {
         const supplierIdToDelete = event.value.supplierId;
 
         await removeStorageItemsByCustomFilter({
-          entity: 'products',
+          entity: ENTITIES.PRODUCTS,
           filter: (product) => product.code.slice(0, 2) !== supplierIdToDelete
         });
 
@@ -268,6 +267,53 @@ export function useDeleteItem() {
   return deleteItem;
 };
 
+export function useBatchDeleteItems() {
+  const queryClient = useQueryClient();
+
+  const batchDeleteItems = async ({ entity, id = [], url, key = ID, invalidateQueries = [] }) => {
+    if (!Array.isArray(id) || id.length === 0) {
+      console.warn("No hay IDs válidos para eliminar.");
+      return { statusOk: true, deletedCount: 0 };
+    }
+
+    const successfulDeletes = [];
+    let deletedCount = 0;
+
+    for (const code of id) {
+      try {
+        const { data } = await axios.delete(`${url}/${code}`);
+        if (data.statusOk) {
+          deletedCount += 1;
+
+          if (data.product?.estado === "delete") {
+            successfulDeletes.push(code);
+          }
+        } else {
+          console.warn(`No se pudo eliminar el ID ${code}:`, data.error);
+        }
+      } catch (error) {
+        console.error(`Error al eliminar el elemento con ID ${code}:`, error);
+      }
+    }
+
+    if (successfulDeletes.length > 0) {
+      await removeStorageItemsByCustomFilter({
+        entity,
+        filter: (item) => !successfulDeletes.includes(item[key]),
+      });
+    }
+
+    invalidateQueries.forEach((query) => {
+      queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+    });
+
+    return { statusOk: true, deletedCount };
+  };
+
+  return batchDeleteItems;
+}
+
+
 export async function addStorageItem({ entity, value }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
   await localforage.setItem(`${config.APP_ENV}-${entity}`, [value, ...values]);
@@ -286,6 +332,10 @@ export async function removeStorageItem({ entity, id, key = ID }) {
 
 export async function removeStorageItemsByCustomFilter({ entity, filter }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
+  if (!values) {
+    console.warn("No se encontraron valores en el storage para la entidad:", entity);
+    return;
+  }
   const filteredValues = values.filter(filter);
   await localforage.setItem(`${config.APP_ENV}-${entity}`, filteredValues);
 };

@@ -2,7 +2,7 @@
 import { useListCustomers } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, CUSTOMER_STATES, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel, formatedSimplePhone } from "@/utils";
@@ -25,14 +25,20 @@ const Customers = () => {
 
   const prepareCustomerDataForExcel = useMemo(() => {
     if (!customers) return [];
-    const headers = ['Nombre', 'Dirección', 'Teléfono'];
-
-    const customerData = customers.map(customer => [
-      customer.name,
-      customer.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
-      customer.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
-    ]);
-
+  
+    const headers = ['Nombre', 'Estado', 'Dirección', 'Teléfono'];
+  
+    const customerData = customers.map(customer => {
+      const customerState = CUSTOMER_STATES[customer.state]?.singularTitle || customer.state;
+  
+      return [
+        customer.name,
+        customerState,
+        customer.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
+        customer.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
+      ];
+    });
+  
     return [headers, ...customerData];
   }, [customers]);
 

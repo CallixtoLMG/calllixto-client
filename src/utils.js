@@ -66,7 +66,7 @@ export const formatedPercentage = (number = 0) => {
 
 export const getPrice = (product) => {
   const { editablePrice, fractionConfig, price } = product;
-  return editablePrice || !fractionConfig?.active ? price : fractionConfig?.value * price;
+  return fractionConfig?.active ? fractionConfig?.value * price : price;
 };
 
 export const getTotal = (product) => {

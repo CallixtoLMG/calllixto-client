@@ -18,7 +18,8 @@ const Budgets = () => {
 
   useEffect(() => {
     setLabels([PAGES.BUDGETS.NAME]);
-  }, [setLabels]);
+    refetch()
+  }, [setLabels, refetch]);
 
   const budgets = useMemo(() => data?.budgets, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);

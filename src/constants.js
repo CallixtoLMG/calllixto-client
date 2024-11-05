@@ -51,7 +51,7 @@ export const PAGES = {
 };
 
 export const APIS = {
-  MAIL: (email, name) => `mailto:${email}?Subject=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
+  MAIL: (email, name) => `mailto:${email}?Subject=${encodeUri(`Hola estimado/a ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
   WSP: (phone, name) => `https://api.whatsapp.com/send?phone=${phone}&text=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
 };
 
@@ -395,15 +395,13 @@ export const ACTIVE = "active";
 
 export const INACTIVE = "inactive";
 
-export const UPDATE_KEY = "U";
-
-export const CREATE_KEY = "C";
-
-export const DELETE_KEY = "D";
-
-export const UPDATE_ALL_KEY = "A";
-
-export const DELETE_SUPPLIER_PRODUCTS_KEY = "S";
+export const EVENT_KEYS = {
+  UPDATE: 'U',
+  CREATE: "C",
+  DELETE: "D",
+  UPDATE_ALL: "A",
+  DELETE_SUPPLIER_PRODUCTS: "S"
+}
 
 export const DEFAULT_LAST_EVENT_ID = "A0001";
 

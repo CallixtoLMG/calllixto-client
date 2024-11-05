@@ -14,7 +14,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { chunk } from "lodash";
 import { useMemo } from "react";
 import axios from "./axios";
-import { getItemById, listItems, removeStorageItemsByCustomFilter, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
+import { getItemById, listItems, removeStorageItemsByCustomFilter, useActiveItem, useBatchDeleteItems, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
@@ -24,7 +24,7 @@ export function useListProducts() {
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_QUERY_KEY],
     queryFn: () => listItems({
-      key: "code",
+      key: CODE,
       entity: ENTITIES.PRODUCTS,
       url: PATHS.PRODUCTS,
       params: getDefaultListParams(ATTRIBUTES)
@@ -35,7 +35,7 @@ export function useListProducts() {
   return query;
 };
 
-export function useHasAssociatedProducts(brandId) {
+export function useHasProductsByBrandId(brandId) {
   const { data: productsData, isLoading: isLoadingProducts } = useListProducts();
 
   const hasAssociatedProducts = useMemo(() => {
@@ -98,6 +98,24 @@ export const useDeleteProduct = () => {
   return deleteProduct;
 };
 
+export const useBatchDeleteProducts = () => {
+  const batchDeleteItems = useBatchDeleteItems();
+
+  const batchDeleteProducts = async (codes) => {
+    const responses = await batchDeleteItems({
+      entity: ENTITIES.PRODUCTS,
+      id: codes,
+      url: PATHS.PRODUCTS,
+      key: CODE,
+      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]]
+    });
+
+    return responses;
+  };
+
+  return batchDeleteProducts;
+};
+
 export const useEditProduct = () => {
   const editItem = useEditItem();
 
@@ -135,14 +153,16 @@ export function useProductsBySupplierId(supplierId) {
 export const useCreateBatch = () => {
   const queryClient = useQueryClient();
 
-  const createBatch = async (products) => {
+  const createBatch = async (products, invalidateQueries = [[LIST_PRODUCTS_QUERY_KEY]]) => {
     const parsedProducts = products.map((product) => ({
       ...product,
       createdAt: now(),
-      state: "ACTIVE"
+      state: ACTIVE,
     }));
+
     const chunks = chunk(parsedProducts, 500);
     let i = 25;
+
     const promises = chunks.map((chunk) => {
       const delay = Math.min(25000, 2 ** Math.log(i) * 100 + Math.random() * 100);
       i += i / 2;
@@ -161,13 +181,11 @@ export const useCreateBatch = () => {
         .filter((item) => item),
     };
 
-    const invalidateQueries = [[LIST_PRODUCTS_QUERY_KEY]];
-
-    await Promise.all(
-      invalidateQueries.map(async (query) => {
-        await queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
-      })
-    );
+    if (data.statusOk) {
+      invalidateQueries.forEach((query) =>
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL })
+      );
+    }
 
     return { data };
   };
@@ -178,10 +196,11 @@ export const useCreateBatch = () => {
 export const useEditBatch = () => {
   const queryClient = useQueryClient();
 
-  const editBatch = async (products) => {
+  const editBatch = async (products, invalidateQueries = [[LIST_PRODUCTS_QUERY_KEY]]) => {
     const chunks = chunk(products, 100);
     let delay = 0;
     const delayIncrement = 1000;
+
     const promises = chunks.map((chunk) => {
       delay += delayIncrement;
       return new Promise((resolve) => setTimeout(resolve, delay)).then(() =>
@@ -199,60 +218,53 @@ export const useEditBatch = () => {
         .filter((item) => item),
     };
 
-    const invalidateQueries = [
-      [LIST_PRODUCTS_QUERY_KEY],
-    ];
-    invalidateQueries.forEach((query) => {
-      queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
-    });
+    if (data.statusOk) {
+      invalidateQueries.forEach((query) =>
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL })
+      );
+    }
 
-    return Promise.resolve({ data });
+    return { data };
   };
 
   return editBatch;
 };
 
-export async function getBlackList() {
-  let dataString = sessionStorage.getItem("userData");
-  let data = null;
-
-  if (dataString) {
+export function useGetBlackList() {
+  async function getBlackList() {
     try {
-      data = JSON.parse(dataString);
-      if (data?.client?.blacklist) {
-        return data.client.blacklist;
+      const response = await axios({
+        url: `${URL}${VALIDATE}`,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: `Bearer ${localStorage.getItem("token")}`
+        }
+      });
+
+      if (response.data) {
+        sessionStorage.setItem("userData", JSON.stringify(response.data));
+        return response.data.client?.blacklist || [];
       }
     } catch (e) {
-      console.error("Error parsing userData from sessionStorage:", e);
-      sessionStorage.removeItem("userData"); 
+      console.error("Error fetching blackList from server:", e);
+      return [];
     }
-  }
+  };
 
-  try {
-    const response = await axios({
-      url: `${URL}${VALIDATE}`,  
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        authorization: `Bearer ${localStorage.getItem("token")}`
-      }
-    });
+  const query = useQuery({
+    queryKey: ["PEPITO"],
+    queryFn: getBlackList,
+  });
 
-    if (response.data) {
-      sessionStorage.setItem("userData", JSON.stringify(response.data)); 
-      return response.data.client.blacklist || []; 
-    }
-  } catch (e) {
-    console.error("Error fetching blackList from server:", e);
-    return [];
-  }
+  return query;
 };
 
 export function editBanProducts(products) {
   return axios.put(BLACK_LIST, products);
 };
 
-export const useDeleteBySupplierId = () => { 
+export const useDeleteBySupplierId = () => {
   const queryClient = useQueryClient();
 
   const deleteBatchProducts = async (supplierId) => {

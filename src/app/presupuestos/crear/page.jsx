@@ -35,7 +35,7 @@ const CreateBudget = () => {
   useEffect(() => {
     setLabels([PAGES.BUDGETS.NAME, 'Crear']);
     refetch();
-  }, [setLabels]);
+  }, [setLabels, refetch]);
 
   const mappedProducts = useMemo(() => products?.map(product => ({
     ...product,

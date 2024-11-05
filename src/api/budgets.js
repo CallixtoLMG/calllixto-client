@@ -26,7 +26,16 @@ export function useGetBudget(id) {
   const getBudget = async (id) => {
     try {
       const { data } = await axios.get(`${PATHS.BUDGETS}/${id}`);
-      return data?.budget;
+
+      const budget = data?.budget
+        ? {
+          ...data.budget,
+          globalDiscount: data.budget.globalDiscount || 0,
+          additionalCharge: data.budget.additionalCharge || 0
+        }
+        : null;
+
+      return budget;
     } catch (error) {
       throw error;
     }

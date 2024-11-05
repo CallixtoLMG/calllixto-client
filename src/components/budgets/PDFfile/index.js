@@ -29,7 +29,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
-  const roundedFinalTotal = parseFloat(total.toFixed(2));
+  const roundedFinalTotal = parseFloat(total?.toFixed(2));
 
   const createTotalListItems = (paymentMethods = [], total) => {
     const totalAssigned = paymentMethods.reduce((acc, payment) => acc + payment.amount, 0) || 0;
@@ -38,28 +38,28 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
     const items = paymentMethods.map((payment, index) => ({
       id: index + 1,
       title: payment.method,
-      amount: <Price value={payment.amount?.toLocaleString()} />,
+      amount: <Price value={payment.amount} />,
       ...(payment.comments && { subtitle: payment.comments }),
     }));
 
     items.push({
       id: items.length + 1,
       title: "Total Pagado",
-      amount: <Price value={totalAssigned.toLocaleString()} />,
+      amount: <Price value={totalAssigned} />,
     });
 
     if (totalPending > 0) {
       items.push({
         id: items.length + 2,
         title: "Total Pendiente",
-        amount: <Price value={totalPending.toLocaleString()} />,
+        amount: <Price value={totalPending} />,
       });
     }
 
     items.push({
       id: items.length + (totalPending > 0 ? 3 : 2),
       title: "Total a Pagar",
-      amount: <Price value={roundedFinalTotal.toLocaleString()} />,
+      amount: <Price value={roundedFinalTotal} />,
     });
 
     return items;

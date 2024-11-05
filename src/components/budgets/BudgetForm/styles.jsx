@@ -17,6 +17,8 @@ const MessageItem = styled(SMessageItem)`
 
 const Icon = styled(SIcon)`
   border-radius: 2px!important;
+  position: ${({ positionRelative }) => positionRelative && "relative"} !important;
+  top:${({ positionRelative }) => positionRelative && "-0.15em"} !important;
 `;
 
 const MessageList = styled(SMessageList)`

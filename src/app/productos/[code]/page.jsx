@@ -7,7 +7,7 @@ import { ModalAction } from "@/components/common/modals";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import ProductView from "@/components/products/ProductView";
-import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PRODUCT_STATES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -22,10 +22,10 @@ const Product = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { data: product, isLoading } = useGetProduct(params.code);
+  const { data: product, isLoading, refetch } = useGetProduct(params.code);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton }  = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -55,7 +55,8 @@ const Product = ({ params }) => {
       PAGES.PRODUCTS.NAME,
       product?.code ? { id: product.code, title: stateTitle, color: stateColor } : null
     ].filter(Boolean));
-  }, [setLabels, product, stateTitle, stateColor]);
+    refetch()
+  }, [setLabels, product, stateTitle, stateColor, refetch]);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -107,8 +108,8 @@ const Product = ({ params }) => {
   }, []);
 
   const handleRecoverClick = useCallback(() => handleOpenModalWithAction("recover"), [handleOpenModalWithAction]);
-  const handleActiveClick = useCallback(() => handleOpenModalWithAction("active"), [handleOpenModalWithAction]);
-  const handleInactiveClick = useCallback(() => handleOpenModalWithAction("inactive"), [handleOpenModalWithAction]);
+  const handleActiveClick = useCallback(() => handleOpenModalWithAction(ACTIVE), [handleOpenModalWithAction]);
+  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE), [handleOpenModalWithAction]);
   const handleStockChangeClick = useCallback(() => handleOpenModalWithAction(isProductOOSState ? "inStock" : "outOfStock"), [handleOpenModalWithAction, isProductOOSState]);
   const handleSoftDeleteClick = useCallback(() => handleOpenModalWithAction("softDelete"), [handleOpenModalWithAction]);
   const handleHardDeleteClick = useCallback(() => handleOpenModalWithAction("hardDelete"), [handleOpenModalWithAction]);
@@ -216,14 +217,14 @@ const Product = ({ params }) => {
         const updatedProduct = { ...product, state: PRODUCT_STATES.DELETED.id };
         mutateEdit(updatedProduct);
       }
-    } else if (modalAction === "inactive") {
+    } else if (modalAction === INACTIVE) {
       if (!reason) {
         toast.error("Debe proporcionar una razón para desactivar el producto.");
         return;
       }
       mutateInactive({ product, reason });
 
-    } else if (modalAction === "active") {
+    } else if (modalAction === ACTIVE) {
       mutateActive({ product });
 
     } else if (modalAction === "outOfStock") {
@@ -256,7 +257,7 @@ const Product = ({ params }) => {
           onClick: () => setTimeout(handlePrint),
           text: "Código",
           loading: activeAction === "print",
-          disabled: !!activeAction,
+          disabled: !!activeAction || isEditPending,
         },
       ];
       if (!isProductDeleted(product?.state) && !isProductInactive(product?.state)) {
@@ -267,8 +268,8 @@ const Product = ({ params }) => {
           onClick: handleStockChangeClick,
           text: isProductOOS(product?.state) ? "En stock" : PRODUCT_STATES.OOS.singularTitle,
           width: "fit-content",
-          loading: activeAction === "outOfStock" || isEditPending,
-          disabled: !!activeAction,
+          loading: activeAction === "outOfStock",
+          disabled: !!activeAction || isEditPending,
         });
       }
       if (!isProductDeleted(product?.state)) {
@@ -279,8 +280,8 @@ const Product = ({ params }) => {
           onClick: isItemInactive(product?.state) ? handleActiveClick : handleInactiveClick,
           text: isItemInactive(product?.state) ? "Activar" : "Desactivar",
           width: "fit-content",
-          loading: (activeAction === "active" || activeAction === "inactive"),
-          disabled: !!activeAction,
+          loading: (activeAction === ACTIVE || activeAction === INACTIVE),
+          disabled: !!activeAction || isEditPending,
         });
         actions.push({
           id: 4,
@@ -290,7 +291,7 @@ const Product = ({ params }) => {
           text: "Eliminar",
           basic: true,
           loading: activeAction === "softDelete",
-          disabled: !!activeAction,
+          disabled: !!activeAction || isEditPending,
         });
       }
       if (isProductDeleted(product?.state)) {
@@ -302,7 +303,7 @@ const Product = ({ params }) => {
           text: "Recuperar",
           width: "fit-content",
           loading: activeAction === "recover",
-          disabled: !!activeAction,
+          disabled: !!activeAction || isEditPending,
         });
         actions.push({
           id: 6,
@@ -312,13 +313,13 @@ const Product = ({ params }) => {
           text: "Eliminar",
           basic: true,
           loading: activeAction === "hardDelete",
-          disabled: !!activeAction,
+          disabled: !!activeAction || isEditPending,
         });
       }
 
       setActions(actions);
     }
-  }, [product, activeAction, handleRecoverClick, handleActiveClick, handleInactiveClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, setActions]);
+  }, [product, activeAction, isEditPending, handleRecoverClick, handleActiveClick, handleInactiveClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, setActions]);
 
   if (!isLoading && !product) {
     push(PAGES.NOT_FOUND.BASE);
@@ -350,19 +351,19 @@ const Product = ({ params }) => {
         showModal={isModalOpen}
         setShowModal={setIsModalOpen}
         isLoading={isInactivePending || isActivePending || isDeletePending || isEditPending}
-        noConfirmation={!requiresConfirmation && modalAction !== "inactive"}
+        noConfirmation={!requiresConfirmation && modalAction !== INACTIVE}
         bodyContent={
-          modalAction === "inactive" ? (
+          modalAction === INACTIVE ? (
             <Input
               type="text"
               placeholder="Indique la razón de desactivación"
               value={reason}
-              onChange={(e) => setReason(e.target.value)} 
+              onChange={(e) => setReason(e.target.value)}
             />
           ) : null
         }
-        requireReason={modalAction === "inactive"} 
-        reason={reason} 
+        requireReason={modalAction === INACTIVE}
+        reason={reason}
       />
     </Loader>
   );

@@ -7,9 +7,11 @@ import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
+import { ATTRIBUTES } from "@/components/products/products.common";
 import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
+import { pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Message, Modal, Popup, Transition } from "semantic-ui-react";
@@ -114,22 +116,38 @@ const BudgetForm = ({
       let budgetProducts = [...budget.products];
       const outdatedProducts = products.filter(product => {
         const budgetProduct = budgetProducts.find(budgetProduct => budgetProduct.code === product.code);
+  
         if (budgetProduct) {
           budgetProducts = budgetProducts.filter(budgetProduct => budgetProduct.code !== product.code);
-          return budgetProduct.price !== product.price;
+  
+          const priceChanged = budgetProduct.price !== product.price;
+          const stateChanged = budgetProduct.state !== product.state;
+  
+          return priceChanged || stateChanged;
         }
         return false;
       });
+  
       if (outdatedProducts.length || budgetProducts.length) {
-        let newProducts = [...watchProducts];
-        newProducts = newProducts.filter(product => !budgetProducts.some(budgetProduct => budgetProduct.code === product.code));
-        newProducts = newProducts.map(product => {
-          const outdatedProduct = outdatedProducts.find(outdatedProduct => outdatedProduct.code === product.code);
-          if (outdatedProduct) {
-            return { ...product, price: outdatedProduct.price };
-          }
-          return product;
-        });
+        let newProducts = watchProducts
+          .filter(product => 
+            !budgetProducts.some(budgetProduct => budgetProduct.code === product.code) &&
+            product.state !== PRODUCT_STATES.DELETED.id &&
+            product.state !== PRODUCT_STATES.INACTIVE.id
+          )
+          .map(product => {
+            const outdatedProduct = outdatedProducts.find(outdatedProduct => outdatedProduct.code === product.code);
+            if (outdatedProduct) {
+              return {
+                ...product,
+                price: outdatedProduct.price,
+                state: outdatedProduct.state,
+                quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity
+              };
+            }
+            return product;
+          });
+  
         setTemporaryProducts(newProducts);
         setOutdatedProducts(outdatedProducts);
         setRemovedProducts(budgetProducts);
@@ -148,6 +166,10 @@ const BudgetForm = ({
   };
 
   const handleCancelUpdate = () => {
+    setValue(
+      "products",
+      temporaryProducts.filter(product => product.state !== PRODUCT_STATES.DELETED.id && product.state !== PRODUCT_STATES.INACTIVE.id)
+    );
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
@@ -168,6 +190,7 @@ const BudgetForm = ({
       await onSubmit({
         ...data,
         customer: { id: customer.id, name: customer.name },
+        products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount"])),
         total: Number(total.toFixed(2)),
         state
       });
@@ -349,7 +372,8 @@ const BudgetForm = ({
             name={`products[${index}].price`}
             control={control}
             render={({ field: { onChange, value } }) => (
-              <Flex alignItems="center" columnGap="5px">$
+              <Flex alignItems="center" columnGap="5px">
+                <Icon positionRelative name={ICONS.DOLLAR} />
                 <CurrencyFormatInput
                   height="35px"
                   displayType="input"
@@ -427,17 +451,32 @@ const BudgetForm = ({
           <Modal.Content>
             {!!outdatedProducts.length && (
               <Message>
-                <MessageHeader>Productos con precio actualizado</MessageHeader>
+                <MessageHeader>Productos con cambios</MessageHeader>
                 <MessageList>
                   {outdatedProducts.map(p => {
-                    const oldPrice = budget.products.find(op => op.code === p.code);
+                    const oldProduct = budget.products.find(op => op.code === p.code);
+                    const priceChanged = oldProduct.price !== p.price;
+                    const stateChanged = oldProduct.state !== p.state;
+
                     return (
                       <MessageItem key={p.code}>
-                        {`${p.code} | ${p.name} | `}
-                        <span style={{ color: COLORS.RED }}>{formatedPrice(oldPrice.price)}</span>
-                        {' -> '}
-                        <span style={{ color: COLORS.GREEN }}>{`${formatedPrice(p.price)}.`}</span>
-                      </MessageItem>
+                      {`${p.code} | ${p.name} | `}
+                      {priceChanged && (
+                        <>
+                          <span style={{ color: COLORS.RED }}>{formatedPrice(oldProduct.price)}</span>
+                          {' -> '}
+                          <span style={{ color: COLORS.GREEN }}>{formatedPrice(p.price)}</span>
+                        </>
+                      )}
+                      {stateChanged && (
+                        <>
+                          {' | Estado: '}
+                          <span style={{ color: PRODUCT_STATES[oldProduct.state].color }}>{PRODUCT_STATES[oldProduct.state].singularTitle}</span>
+                          {' -> '}
+                          <span style={{ color: PRODUCT_STATES[p.state].color }}>{PRODUCT_STATES[p.state].singularTitle}</span>
+                        </>
+                      )}
+                    </MessageItem>
                     );
                   })}
                 </MessageList>

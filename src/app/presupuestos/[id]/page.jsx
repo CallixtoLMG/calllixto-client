@@ -22,6 +22,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Dropdown } from "semantic-ui-react";
+import { v4 as uuid } from 'uuid';
 
 const Budget = ({ params }) => {
   useValidateToken();
@@ -113,14 +114,18 @@ const Budget = ({ params }) => {
     }
 
     if (budget) {
-      const calculatedSubtotal = getTotalSum(budget?.products);
-      const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount ? -budget.globalDiscount : 0);
-      const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget?.additionalCharge ? budget?.additionalCharge : 0);
+      budget.products = budget.products.map((product) => ({
+        ...product, key: uuid(),
+      }))
+      budget.globalDiscount = budget.globalDiscount ?? 0;
+      budget.additionalCharge = budget.additionalCharge ?? 0;
+      const calculatedSubtotal = getTotalSum(budget.products);
+      const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount);
+      const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget.additionalCharge);
 
       setSubtotal(calculatedSubtotal);
       setSubtotalAfterDiscount(calculatedSubtotalAfterDiscount);
       setTotal(calculatedFinalTotal);
-    
       const stateTitle = BUDGET_STATES[budget.state]?.singularTitle || BUDGET_STATES.INACTIVE.singularTitle;
       const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([

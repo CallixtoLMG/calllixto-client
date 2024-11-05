@@ -19,7 +19,7 @@ import { toast } from "react-hot-toast";
 const Customer = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
-  const { data: customer, isLoading } = useGetCustomer(params.id);
+  const { data: customer, isLoading, refetch } = useGetCustomer(params.id);
   const { data: budgetData, isLoading: isLoadingBudgets } = useListBudgets();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
@@ -40,7 +40,8 @@ const Customer = ({ params }) => {
 
   useEffect(() => {
     setLabels([PAGES.CUSTOMERS.NAME, customer?.name]);
-  }, [customer, setLabels]);
+    refetch();
+  }, [customer, setLabels, refetch]);
 
   const hasAssociatedBudgets = useMemo(() => {
     return budgetData?.budgets?.some(budget => budget.customer?.id === customer?.id);
@@ -187,7 +188,7 @@ const Customer = ({ params }) => {
           onClick: isItemInactive(customer.state) ? handleActivateClick : handleInactiveClick,
           text: isItemInactive(customer.state) ? "Activar" : "Desactivar",
           loading: (activeAction === "active" || activeAction === "inactive"),
-          disabled: !!activeAction,
+          disabled: !!activeAction || isEditPending,
           width: "fit-content",
         },
         {
@@ -199,13 +200,13 @@ const Customer = ({ params }) => {
           tooltip: hasAssociatedBudgets ? "No se puede eliminar este cliente, existen presupuestos asociados." : false,
           basic: true,
           loading: activeAction === "delete",
-          disabled: hasAssociatedBudgets || !!activeAction,
+          disabled: hasAssociatedBudgets || !!activeAction || isEditPending,
         },
       ];
 
       setActions(actions);
     }
-  }, [customer, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions]);
+  }, [customer, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions, hasAssociatedBudgets]);
 
   if (!isLoading && !customer) {
     push(PAGES.NOT_FOUND.BASE);

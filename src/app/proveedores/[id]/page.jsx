@@ -8,7 +8,7 @@ import { ModalAction } from "@/components/common/modals";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import SupplierView from "@/components/suppliers/SupplierView";
-import { COLORS, ICONS, PAGES } from "@/constants";
+import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -23,7 +23,7 @@ const Supplier = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { data: supplier, isLoading } = useGetSupplier(params.id);
+  const { data: supplier, isLoading, refetch } = useGetSupplier(params.id);
   const { data: products, isLoading: loadingProducts } = useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
@@ -47,7 +47,8 @@ const Supplier = ({ params }) => {
 
   useEffect(() => {
     setLabels([PAGES.SUPPLIERS.NAME, supplier?.name]);
-  }, [setLabels, supplier]);
+    refetch();
+  }, [setLabels, supplier, refetch]);
 
   const hasAssociatedProducts = useMemo(() => {
     return products?.length > 0;
@@ -55,16 +56,20 @@ const Supplier = ({ params }) => {
 
   const prepareProductDataForExcel = useMemo(() => {
     if (!products) return [];
-    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Comentarios'];
+    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Estado', 'Comentarios'];
 
-    const productData = products.map(product => [
-      product.code,
-      product.name,
-      product.brandName,
-      product.supplierName,
-      formatedPrice(product.price),
-      product.comments
-    ]);
+    const productData = products.map(product => {
+      const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
+      return [
+        product.code,
+        product.name,
+        product.brandName,
+        product.supplierName,
+        formatedPrice(product.price),
+        productState,
+        product.comments
+      ];
+    });
 
     return [headers, ...productData];
   }, [products]);
@@ -74,7 +79,7 @@ const Supplier = ({ params }) => {
     removeAfterPrint: true,
   });
 
-  const modalConfig = useMemo(() => ({
+  const modalConfig = {
     deleteSupplier: {
       header: `¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
@@ -82,11 +87,10 @@ const Supplier = ({ params }) => {
       tooltip: hasAssociatedProducts ? "No se puede eliminar este proveedor, existen productos asociados." : false,
     },
     deleteBatch: {
-      header: `¿Está seguro que desea eliminar todos los productos del proveedor "${supplier?.name}"?`,
+      header: `¿Está seguro que desea eliminar los ${products?.length || ""} productos del proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH
     },
-
     active: {
       header: `¿Está seguro que desea activar el proveedor "${supplier?.name}"?`,
       icon: ICONS.PLAY_CIRCLE,
@@ -95,7 +99,7 @@ const Supplier = ({ params }) => {
       header: `¿Está seguro que desea desactivar el proveedor "${supplier?.name}"?`,
       icon: ICONS.PAUSE_CIRCLE,
     }
-  }), [supplier]);
+  };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -255,7 +259,7 @@ const Supplier = ({ params }) => {
         text: "Códigos",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
-        disabled: !!activeAction,
+        disabled: !!activeAction || isEditPending,
       },
       {
         id: 2,
@@ -264,7 +268,7 @@ const Supplier = ({ params }) => {
         text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
         onClick: isItemInactive(supplier?.state) ? handleActivateClick : handleInactivateClick,
         loading: (activeAction === "active" || activeAction === "inactive"),
-        disabled: !!activeAction,
+        disabled: !!activeAction || isEditPending,
         width: "fit-content",
       },
       {
@@ -284,7 +288,7 @@ const Supplier = ({ params }) => {
           }
         },
         loading: isExcelLoading,
-        disabled: isExcelLoading || !!activeAction || loadingProducts,
+        disabled: isExcelLoading || !!activeAction || loadingProducts || isEditPending,
         width: "fit-content",
       },
       {
@@ -294,7 +298,7 @@ const Supplier = ({ params }) => {
         text: "Limpiar lista",
         onClick: handleDeleteBatchClick,
         loading: activeAction === "deleteBatch",
-        disabled: !hasAssociatedProducts || !!activeAction,
+        disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
         tooltip: !hasAssociatedProducts ? "No existen productos asociados." : false,
         width: "fit-content",
       },
@@ -305,7 +309,7 @@ const Supplier = ({ params }) => {
         text: "Eliminar",
         onClick: handleDeleteClick,
         loading: activeAction === "deleteSupplier",
-        disabled: hasAssociatedProducts || !!activeAction,
+        disabled: hasAssociatedProducts || !!activeAction || isEditPending,
         tooltip: hasAssociatedProducts ? "No se puede eliminar este proveedor, existen productos asociados." : false,
         width: "fit-content",
         basic: true,
@@ -313,7 +317,7 @@ const Supplier = ({ params }) => {
     ] : [];
 
     setActions(actions);
-  }, [role, activeAction, isActivePending, handleDeleteBatchClick, handleDeleteClick, handleActivateClick, handleInactivateClick, products, supplier?.state, setActions]);
+  }, [role, activeAction, hasAssociatedProducts, isActivePending, isExcelLoading, handleDeleteBatchClick, loadingProducts, prepareProductDataForExcel, supplier?.name, handleDeleteClick, handleActivateClick, handleInactivateClick, products, supplier?.state, setActions]);
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);

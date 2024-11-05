@@ -1,4 +1,4 @@
-import { useDeleteProduct, useEditProduct } from "@/api/products";
+import { useBatchDeleteProducts, useDeleteProduct, useEditProduct } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
 import { Dropdown, Flex, Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
@@ -40,6 +40,7 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
   const watchState = watch('state', PRODUCT_STATES.ACTIVE.id);
   const printRef = useRef();
   const deleteProduct = useDeleteProduct();
+  const batchDeleteProducts = useBatchDeleteProducts();
   const editProduct = useEditProduct();
 
   const handlePrint = useReactToPrint({
@@ -119,9 +120,9 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
 
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
     mutationFn: async () => {
-      const deletePromises = Object.keys(selectedProducts).map(code => deleteProduct(code));
-      await Promise.all(deletePromises);
-      return deletePromises.length;
+      const codes = Object.keys(selectedProducts);
+      const response = await batchDeleteProducts(codes);
+      return response.deletedCount;
     },
     onSuccess: (deletedCount) => {
       toast.success(`${deletedCount} productos eliminados!`);

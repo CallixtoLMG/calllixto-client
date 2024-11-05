@@ -3,7 +3,7 @@ import { useUserContext } from "@/User";
 import { useListBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { BRANDS_STATES, COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -22,7 +22,7 @@ const Brands = () => {
   useEffect(() => {
     setLabels([PAGES.BRANDS.NAME]);
     refetch();
-  }, [setLabels]);
+  }, [setLabels, refetch]);
 
   const brands = useMemo(() => data?.brands, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
@@ -30,13 +30,16 @@ const Brands = () => {
   const prepareBrandDataForExcel = useMemo(() => {
     if (!brands) return [];
 
-    const headers = ['ID', 'Nombre', 'Comentarios'];
-
-    const brandData = brands.map(brand => [
-      brand.id,
-      brand.name,
-      brand.comments,
-    ]);
+    const headers = ['ID', 'Nombre', 'Estado', 'Comentarios'];
+    const brandData = brands.map(brand => {
+      const brandState = BRANDS_STATES[brand.state]?.singularTitle || brand.state;
+      return [
+        brand.id,
+        brand.name,
+        brandState,
+        brand.comments,
+      ];
+    });
 
     return [headers, ...brandData];
   }, [brands]);

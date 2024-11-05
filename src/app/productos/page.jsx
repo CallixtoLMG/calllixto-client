@@ -6,7 +6,7 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, PAGES, PRODUCT_STATES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -34,23 +34,27 @@ const Products = () => {
   useEffect(() => {
     setLabels(['Productos']);
     refetch();
-  }, [setLabels]);
+  }, [setLabels, refetch]);
 
   const products = useMemo(() => data?.products, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
   const prepareProductDataForExcel = useMemo(() => {
     if (!products) return [];
-    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Comentarios'];
+    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Estado', 'Comentarios'];
 
-    const productData = products.map(product => [
-      product.code,
-      product.name,
-      product.brandName,
-      product.supplierName,
-      formatedPrice(product.price),
-      product.comments
-    ]);
+    const productData = products.map(product => {
+      const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
+      return [
+        product.code,
+        product.name,
+        product.brandName,
+        product.supplierName,
+        formatedPrice(product.price),
+        productState,
+        product.comments
+      ];
+    });
 
     return [headers, ...productData];
   }, [products]);
