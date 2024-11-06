@@ -9,7 +9,7 @@ import { PAGES, PRODUCT_STATES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateBudget = () => {
@@ -24,17 +24,17 @@ const CreateBudget = () => {
   const { data: productsData, isLoading: loadingProducts, refetch } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
+  const [isRefetching, setIsRefetching] = useState(true);
   const products = useMemo(() => productsData?.products.filter((product) => ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state)), [productsData]);
   const customers = useMemo(() => customersData?.customers, [customersData]);
 
   useEffect(() => {
     resetActions();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     setLabels([PAGES.BUDGETS.NAME, 'Crear']);
-    refetch();
+    refetch().then(() => setIsRefetching(false));
   }, [setLabels, refetch]);
 
   const mappedProducts = useMemo(() => products?.map(product => ({
@@ -70,16 +70,19 @@ const CreateBudget = () => {
   }, [budget]);
 
   return (
-    <Loader active={loadingProducts || loadingCustomers || loadingBudget}>
-      <BudgetForm
-        onSubmit={mutate}
-        products={mappedProducts}
-        customers={customers}
-        user={userData}
-        budget={clonedBudget}
-        isCloning={!!clonedBudget}
-        isLoading={isPending}
-      />
+    <Loader active={loadingProducts || loadingCustomers || loadingBudget || isRefetching}>
+      {!isRefetching && (
+        <BudgetForm
+          onSubmit={mutate}
+          products={mappedProducts}
+          customers={customers}
+          user={userData}
+          budget={clonedBudget}
+          isCloning={!!clonedBudget}
+          isLoading={isPending}
+          refetchProducts={refetch}
+        />
+      )}
     </Loader>
   )
 };

@@ -234,6 +234,9 @@ const CustomTable = ({
                           <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
                             {actions.length > 1 ? (
                               <PopupActions
+                                open={popupOpenId === element[mainKey]}
+                                onOpen={() => handleTogglePopup(element[mainKey])}
+                                onClose={() => handleTogglePopup(null)}
                                 position="left center"
                                 trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                 buttons={actions.map((action, idx) => (
@@ -246,7 +249,7 @@ const CustomTable = ({
                                     width={action.width}
                                   />
                                 ))}
-                                onToggleOpen={setIsPopupOpen}
+
                               />
                             ) : (
                               <Actions actions={actions} element={element} index={index} />
