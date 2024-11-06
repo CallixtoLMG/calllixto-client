@@ -27,7 +27,7 @@ const OptionsDropdown = ({ entity, queryKey, text }) => {
     {
       key: 'restore',
       text: `Actualizar ${text}`,
-      icon: <Icon name={ICONS.UNDO} color={COLORS.GREY} />,
+      icon: <Icon name={ICONS.REFRESH} color={COLORS.GREY} />,
       onClick: handleRestoreClick,
     }
   ];
@@ -55,16 +55,22 @@ const OptionsDropdown = ({ entity, queryKey, text }) => {
           ))}
         </Dropdown.Menu>
       </Dropdown>
-
       <ModalAction
-        title={`¿Confirmar actualización de ${text}?`}
+        title={`¿Actualizar ${text}?`}
         onConfirm={handleConfirm}
         confirmButtonText="Actualizar"
-        confirmButtonIcon={ICONS.CHECK}
+        confirmButtonIcon={ICONS.REFRESH}
         showModal={showModal}
         setShowModal={setShowModal}
         isLoading={isLoading}
-        noConfirmation={true} 
+        noConfirmation={true}
+        bodyContent={
+          <>
+            Esta acción puede tomar varios minutos en completarse, no se recomienda ejecutarla de manera frecuente!
+            Si no encuentras un elemento en las tablas, podrías probar primero usando el ícono de <strong>&quot;Actualizar&quot;</strong> al lado del botón <strong>&quot;Buscar&quot;</strong>.
+          </>
+        }
+        warning
       />
     </>
   );

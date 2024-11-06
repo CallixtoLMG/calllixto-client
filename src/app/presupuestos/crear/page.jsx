@@ -21,7 +21,7 @@ const CreateBudget = () => {
   const createBudget = useCreateBudget();
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
-  const { data: productsData, isLoading: loadingProducts } = useListProducts();
+  const { data: productsData, isLoading: loadingProducts, refetch, isRefetching } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
   const products = useMemo(() => productsData?.products.filter((product) => ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state)), [productsData]);
@@ -34,7 +34,8 @@ const CreateBudget = () => {
 
   useEffect(() => {
     setLabels([PAGES.BUDGETS.NAME, 'Crear']);
-  }, [setLabels]);
+    refetch();
+  }, [setLabels, refetch]);
 
   const mappedProducts = useMemo(() => products?.map(product => ({
     ...product,
@@ -69,7 +70,7 @@ const CreateBudget = () => {
   }, [budget]);
 
   return (
-    <Loader active={loadingProducts || loadingCustomers || loadingBudget}>
+    <Loader active={loadingProducts || loadingCustomers || loadingBudget || isRefetching}>
       <BudgetForm
         onSubmit={mutate}
         products={mappedProducts}
@@ -78,6 +79,7 @@ const CreateBudget = () => {
         budget={clonedBudget}
         isCloning={!!clonedBudget}
         isLoading={isPending}
+        refetchProducts={refetch}
       />
     </Loader>
   )

@@ -59,5 +59,5 @@ const Breadcrumb = () => {
   );
 };
 
-export { Breadcrumb, BreadcrumProvider, useBreadcrumContext };
+export { BreadcrumProvider, Breadcrumb, useBreadcrumContext };
 

@@ -10,9 +10,16 @@ const EMPTY_PAYMENT = () => ({ method: '', amount: 0, comments: '' });
 
 const calculateTotals = (payments, total) => {
   const totalAssigned = payments.reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0).toFixed(2);
-  const totalPending = (total - totalAssigned).toFixed(2);
+  
+  let totalPending = (total - totalAssigned).toFixed(2);
+
+  if (Math.abs(totalPending) < 0.01) {
+    totalPending = (0).toFixed(2);
+  }
+
   return { totalAssigned, totalPending };
 };
+
 const Payments = ({ total, maxHeight, methods, children, update }) => {
   const { control } = methods;
   const { fields: paymentsMade, append: appendPayment, remove: removePayment } = useFieldArray({
@@ -22,7 +29,6 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
 
   const { totalPending, totalAssigned } = useMemo(() => calculateTotals(paymentsMade, total), [total, paymentsMade]);
   const isTotalCovered = useMemo(() => totalPending <= 0, [totalPending]);
-
   const [payment, setPayment] = useState(EMPTY_PAYMENT);
   const [errors, setErrors] = useState({})
 

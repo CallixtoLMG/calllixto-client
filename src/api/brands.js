@@ -1,5 +1,5 @@
 import { ATTRIBUTES } from "@/components/brands/brands.common";
-import { ACTIVE, ENTITIES, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
+import { ACTIVE, ENTITIES, FILTERS_OPTIONS, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from './common';
@@ -7,7 +7,7 @@ import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, us
 export const GET_BRAND_QUERY_KEY = 'getBrand';
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 
-export function useListBrands({ sort = 'name', order = true } = {}) {
+export function useListBrands({ sort = FILTERS_OPTIONS.NAME, order = true } = {}) {
   const query = useQuery({
     queryKey: [LIST_BRANDS_QUERY_KEY],
     queryFn: () => listItems({
@@ -102,7 +102,6 @@ export const useInactiveBrand = () => {
       entity: ENTITIES.BRANDS,
       url: `${PATHS.BRANDS}/${brand.id}/${INACTIVE}`,
       value: updatedBrand,
-      key: "id",
       responseEntity: ENTITIES.BRAND,
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, brand.id]]
     });
@@ -124,7 +123,6 @@ export const useActiveBrand = () => {
       entity: ENTITIES.BRANDS,
       url: `${PATHS.BRANDS}/${brand.id}/${ACTIVE}`,
       value: updatedBrand,
-      key: "id",
       responseEntity: ENTITIES.BRAND,
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, brand.id]]
     });

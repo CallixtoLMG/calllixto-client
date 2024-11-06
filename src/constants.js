@@ -51,7 +51,7 @@ export const PAGES = {
 };
 
 export const APIS = {
-  MAIL: (email, name) => `mailto:${email}?Subject=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
+  MAIL: (email, name) => `mailto:${email}?Subject=${encodeUri(`Hola estimado/a ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
   WSP: (phone, name) => `https://api.whatsapp.com/send?phone=${phone}&text=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
 };
 
@@ -162,7 +162,7 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
-  EVENTS: "events"
+  EVENTS: 'events'
 };
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
@@ -374,7 +374,8 @@ export const ICONS = {
   EXCLAMATION_CIRCLE: "exclamation circle",
   ADDRESS_CARD: "address card",
   ARCHIVE: "archive",
-  OPTIONS: "options"
+  OPTIONS: "options",
+  REFRESH: "refresh"
 };
 
 export const PAGE_SIZE_OPTIONS = [
@@ -388,14 +389,28 @@ export const PICK_UP_IN_STORE = "Retira en tienda";
 
 export const OOS = "Sin stock";
 
-export const ALL = "ALL";
+export const ALL = "all";
 
 export const ACTIVE = "active";
 
 export const INACTIVE = "inactive";
 
-export const UPDATE_KEY = "U";
+export const EVENT_KEYS = {
+  UPDATE: 'U',
+  CREATE: "C",
+  DELETE: "D",
+  UPDATE_ALL: "A",
+  DELETE_SUPPLIER_PRODUCTS: "S"
+}
 
-export const CREATE_KEY = "C";
+export const DEFAULT_LAST_EVENT_ID = "A0001";
 
-export const DELETE_KEY = "D";
+export const ID = "id";
+
+export const CODE = "code";
+
+export const FILTERS_OPTIONS = {
+  DATE: "date",
+  NAME: "name"
+};
+

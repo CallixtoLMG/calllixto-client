@@ -33,15 +33,19 @@ const CustomTable = ({
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
   const [activePage, setActivePage] = useState(1);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupOpenId, setPopupOpenId] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
-  const pages = useMemo(() => Math.ceil(filteredElements.length / pageSize), [filteredElements, pageSize]);
+  const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
 
   const currentPageElements = useMemo(() => {
+    if (!paginate) {
+      return filteredElements;
+    }
     const startIndex = (activePage - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     return filteredElements.slice(startIndex, endIndex);
-  }, [activePage, filteredElements, pageSize]);
+  }, [activePage, filteredElements, pageSize, paginate]);
 
   const allSelected = useMemo(() => {
     return !!currentPageElements.length && currentPageElements.every(product => selection[product[mainKey]]);
@@ -60,6 +64,10 @@ const CustomTable = ({
   const handlePageChange = (e, { activePage }) => {
     clearSelection?.();
     setActivePage(activePage);
+  };
+
+  const handleTogglePopup = (id) => {
+    setPopupOpenId(popupOpenId === id ? null : id);
   };
 
   const handleToggleAll = () => {
@@ -135,7 +143,9 @@ const CustomTable = ({
                     position="right center"
                     trigger={<Button icon circular color={COLORS.YELLOW} size="mini"><Icon name={ICONS.COG} /></Button>}
                     buttons={selectionActions}
-                    onToggleOpen={setIsPopupOpen}
+                    open={isPopupOpen}
+                    onOpen={() => setIsPopupOpen(true)}
+                    onClose={() => setIsPopupOpen(false)}
                   />
                 </InnerActionsContainer>
               </ActionsContainer>
@@ -181,6 +191,9 @@ const CustomTable = ({
                             <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
                               {actions.length > 1 ? (
                                 <PopupActions
+                                  open={popupOpenId === element[mainKey]}
+                                  onOpen={() => handleTogglePopup(element[mainKey])}
+                                  onClose={() => handleTogglePopup(null)}
                                   position="left center"
                                   trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                   buttons={actions.map((action, idx) => (
@@ -193,7 +206,6 @@ const CustomTable = ({
                                       width={action.width}
                                     />
                                   ))}
-                                  onToggleOpen={setIsPopupOpen}
                                 />
                               ) : (
                                 <Actions actions={actions} element={element} />
@@ -222,6 +234,9 @@ const CustomTable = ({
                           <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
                             {actions.length > 1 ? (
                               <PopupActions
+                                open={popupOpenId === element[mainKey]}
+                                onOpen={() => handleTogglePopup(element[mainKey])}
+                                onClose={() => handleTogglePopup(null)}
                                 position="left center"
                                 trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                 buttons={actions.map((action, idx) => (
@@ -234,7 +249,7 @@ const CustomTable = ({
                                     width={action.width}
                                   />
                                 ))}
-                                onToggleOpen={setIsPopupOpen}
+
                               />
                             ) : (
                               <Actions actions={actions} element={element} index={index} />

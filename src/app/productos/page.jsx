@@ -6,8 +6,7 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
-import { ATTRIBUTES } from "@/components/products/products.common";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, PAGES, PRODUCT_STATES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -26,7 +25,7 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { data, isLoading, isRefetching } = useListProducts({ attributes: [ATTRIBUTES.NAME, ATTRIBUTES.PRICE, ATTRIBUTES.CODE, ATTRIBUTES.COMMENTS, ATTRIBUTES.BRAND_NAME, ATTRIBUTES.SUPPLIER_NAME, ATTRIBUTES.FRACTION_CONFIG, ATTRIBUTES.EDITABLE_PRICE] });
+  const { data, isLoading, isRefetching, refetch } = useListProducts();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -34,23 +33,28 @@ const Products = () => {
 
   useEffect(() => {
     setLabels(['Productos']);
-  }, [setLabels]);
+    refetch();
+  }, [setLabels, refetch]);
 
   const products = useMemo(() => data?.products, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
   const prepareProductDataForExcel = useMemo(() => {
     if (!products) return [];
-    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Comentarios'];
+    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Estado', 'Comentarios'];
 
-    const productData = products.map(product => [
-      product.code,
-      product.name,
-      product.brandName,
-      product.supplierName,
-      formatedPrice(product.price),
-      product.comments
-    ]);
+    const productData = products.map(product => {
+      const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
+      return [
+        product.code,
+        product.name,
+        product.brandName,
+        product.supplierName,
+        formatedPrice(product.price),
+        productState,
+        product.comments
+      ];
+    });
 
     return [headers, ...productData];
   }, [products]);
@@ -103,7 +107,8 @@ const Products = () => {
         icon: ICONS.BAN,
         color: COLORS.RED,
         onClick: () => setOpen(true),
-        text: 'Bloquear'
+        text: 'Bloquear',
+        basic: true
       },
     ] : [];
     setActions(actions);
@@ -116,6 +121,7 @@ const Products = () => {
     <>
       {open && <BanProduct open={open} setOpen={setOpen} />}
       <ProductsPage
+        onRefetch={refetch}
         isLoading={loading}
         products={loading ? [] : products}
         role={role}

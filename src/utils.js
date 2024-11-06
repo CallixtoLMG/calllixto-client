@@ -62,25 +62,17 @@ export const formatProductCode = (code) => {
 
 export const formatedPercentage = (number = 0) => {
   return number + " %"
-}
+};
+
+export const getPrice = (product) => {
+  const { editablePrice, fractionConfig, price } = product;
+  return fractionConfig?.active ? fractionConfig?.value * price : price;
+};
 
 export const getTotal = (product) => {
   const price = getPrice(product);
   return price * product.quantity * (1 - (product.discount / 100)) || 0;
 };
-
-export const getPrice = (product) => {
-  const { editablePrice, fractionConfig, price } = product;
-  return editablePrice || !fractionConfig?.active ? price : fractionConfig?.value * price;
-}
-
-export const removeDecimal = (value) => {
-  return value.replace(/\./g, '');
-};
-
-export const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
-
-export const handleNaN = (value, defaultValue = 'Valor incorrecto') => isNaN(value) ? defaultValue : formatedPrice(value);
 
 export const getTotalSum = (products, discount = 0, additionalCharge = 0) => {
   const subtotal = products?.reduce((a, b) => a + getTotal(b), 0);
@@ -93,6 +85,16 @@ export const getSubtotal = (total, discountOrCharge) => {
   const subtotal = total + (total * (discountOrCharge / 100));
   return subtotal;
 };
+
+export const removeDecimal = (value) => {
+  return value.replace(/\./g, '');
+};
+
+export const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
+
+export const handleNaN = (value, defaultValue = 'Valor incorrecto') => isNaN(value) ? defaultValue : formatedPrice(value);
+
+
 
 export const formatedSimplePhone = (phone) => {
   if (!phone) return '';
@@ -131,12 +133,6 @@ export const getProductCode = (code) => {
   return code?.slice(4);
 };
 
-export const preventSend = (event) => {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-  };
-};
-
 export const downloadExcel = (data, fileName) => {
   const ws = XLSX.utils.aoa_to_sheet(data);
   const wb = XLSX.utils.book_new();
@@ -144,10 +140,29 @@ export const downloadExcel = (data, fileName) => {
   XLSX.writeFile(wb, `${fileName}.xlsx`);
 };
 
+export const preventSend = (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+  };
+};
+
 export const handleEnterKeyPress = (e, action) => {
   if (e.key === 'Enter') {
     e.preventDefault();
     action(e);
+  }
+};
+
+export const handleConfirmKeyPress = (e, isActionEnabled, handleSubmit, onConfirm) => {
+  if (e.key === 'Enter' && isActionEnabled) {
+    handleSubmit(onConfirm)();
+  }
+};
+
+export const handleKeyPressWithSubmit = (e, isActionEnabled, isLoading, handleSubmit, onConfirm) => {
+  if (e.key === 'Enter' && isActionEnabled && !isLoading) {
+    e.preventDefault();
+    handleSubmit(onConfirm)();
   }
 };
 
@@ -216,4 +231,31 @@ export const renderContent = (content) => {
   return typeof content === 'string' ? content : (
     isValidElement(content) ? content : null
   );
+};
+
+export const createFilter = (filters, keysToFilter, exceptions = {}) => {
+  return item => {
+    for (const key of keysToFilter) {
+      if (filters[key]) {
+        const filterWords = filters[key].toLowerCase().split(/\s+/);
+
+        const itemValue = typeof item[key] === 'string'
+          ? item[key].toLowerCase()
+          : typeof exceptions[key] === 'function'
+            ? exceptions[key](item).toLowerCase()
+            : '';
+
+        const allWordsMatch = filterWords.every(word => itemValue.includes(word));
+        if (!allWordsMatch) {
+          return false;
+        }
+      }
+    }
+
+    if (filters.state && filters.state !== item.state && filters.state !== exceptions.allState) {
+      return false;
+    }
+
+    return true;
+  };
 };

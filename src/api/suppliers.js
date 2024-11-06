@@ -1,5 +1,5 @@
 import { ATTRIBUTES } from "@/components/suppliers/suppliers.common";
-import { ACTIVE, ENTITIES, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
+import { ACTIVE, ENTITIES, getDefaultListParams, ID, INACTIVE, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
@@ -7,7 +7,7 @@ import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, us
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 
-export function useListSuppliers({ sort = 'id', order = true } = {}) {
+export function useListSuppliers({ sort = ID, order = true } = {}) {
   const query = useQuery({
     queryKey: [LIST_SUPPLIERS_QUERY_KEY],
     queryFn: () => listItems({

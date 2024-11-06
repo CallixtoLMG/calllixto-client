@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, PAGES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -13,7 +13,7 @@ import { useListSuppliers } from "../../api/suppliers";
 
 const Suppliers = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListSuppliers();
+  const { data, isLoading, isRefetching, refetch } = useListSuppliers();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -28,14 +28,18 @@ const Suppliers = () => {
 
   const prepareSupplierDataForExcel = useMemo(() => {
     if (!suppliers) return [];
-    const headers = ["ID", 'Nombre', 'Dirección', 'Teléfono'];
+    const headers = ["ID", 'Nombre', 'Estado', 'Dirección', 'Teléfono'];
 
-    const supplierData = suppliers.map(supplier => [
-      supplier.id,
-      supplier.name,
-      supplier.addresses?.map(address => address.address).join(' , '),
-      supplier.phoneNumbers?.map(phone => formatedSimplePhone(phone)).join(' , ')
-    ]);
+    const supplierData = suppliers.map(supplier => {
+      const supplierState = SUPPLIER_STATES[supplier.state]?.singularTitle || supplier.state;
+      return [
+        supplier.id,
+        supplier.name,
+        supplierState,
+        supplier.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
+        supplier.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
+      ];
+    });
 
     return [headers, ...supplierData];
   }, [suppliers]);
@@ -72,6 +76,7 @@ const Suppliers = () => {
 
   return (
     <SuppliersPage
+      onRefetch={refetch}
       isLoading={loading}
       suppliers={loading ? [] : suppliers}
       role={role}

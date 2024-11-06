@@ -21,6 +21,7 @@ const UserProvider = ({ children }) => {
 
   const updateSessionData = useCallback((data) => {
     sessionStorage.setItem("userData", JSON.stringify(data));
+    setUserData(data);
   }, []);
 
   useEffect(() => {

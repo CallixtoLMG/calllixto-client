@@ -12,8 +12,8 @@ import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Popup } from "semantic-ui-react";
+import { getBudgetState } from "../budgets.common";
 import { Container, Message, MessageHeader } from "./styles";
-
 
 const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
   const methods = useForm({
@@ -22,12 +22,12 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
     },
     mode: "onChange",
   });
-
   const { formState: { isDirty } } = methods;
 
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
-  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: true });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({ canUpdate: true });
   const updatePayment = useUpdatePayments();
+  const budgetState = getBudgetState(budget);
 
   const { mutate: mutateUpdatePayment, isPending: isLoadingUpdatePayment } = useMutation({
     mutationFn: async () => {
@@ -45,6 +45,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pagos actualizados!");
+        setIsUpdating(false);
       } else {
         toast.error(response.error.message);
       }
@@ -139,56 +140,83 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             <p>{budget?.cancelledMsg}</p>
           </Message>
         </FieldsContainer>}
-      <FieldsContainer justifyContent="space-between">
-        <FormField width="300px">
-          <Label>Vendedor</Label>
-          <Segment placeholder>{budget?.seller}</Segment>
-        </FormField>
-        <FormField >
-          <Label>Fecha de vencimiento</Label>
-          <Segment placeholder>{formatedDateOnly(expirationDate(budget?.expirationOffsetDays, budget?.createdAt))}</Segment>
-        </FormField>
-      </FieldsContainer>
+      <Flex justifyContent="space-between" >
+        <FieldsContainer >
+          <FormField width="300px">
+            <Label>Vendedor</Label>
+            <Segment placeholder>{budget?.seller}</Segment>
+          </FormField>
+          {budgetState && (
+            <FormField width="300px">
+              <Label color={budgetState.color}>{budgetState.label}</Label>
+              <Segment placeholder>{budgetState.person}</Segment>
+            </FormField>)}
+        </FieldsContainer>
+        <FieldsContainer >
+          {budgetState && (
+            <FormField>
+              <Label color={budgetState.color}>{budgetState.dateLabel}</Label>
+              <Segment placeholder>{budgetState.date}</Segment>
+            </FormField>
+          )}
+          {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) &&
+            <FormField>
+              <Label>Fecha de vencimiento</Label>
+              <Segment placeholder>{formatedDateOnly(expirationDate(budget?.expirationOffsetDays, budget?.createdAt))}</Segment>
+            </FormField>
+          }
+        </FieldsContainer>
+      </Flex>
       <FieldsContainer>
         <FormField width="300px">
           <Label>Cliente</Label>
-          <Segment placeholder>{budget?.customer?.name}</Segment>
+          <Segment placeholder>{budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}</Segment>
         </FormField>
-        <FormField flex="1">
+        <FormField flex="2">
           <Label>Dirección</Label>
           {budget?.pickUpInStore ? (
             <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
-          ) : !budget?.customer?.addresses?.length || budget.customer.addresses.length === 1 ? (
-            <Segment placeholder>{budget.customer?.addresses?.[0]?.address}</Segment>
+          ) : !budget?.customer?.addresses?.length ? (
+            <Segment placeholder>No existe una dirección registrada</Segment>
+          ) : budget.customer.addresses.length === 1 ? (
+            <Segment placeholder>{`${budget.customer?.addresses?.[0]?.ref ? `${budget.customer?.addresses?.[0]?.ref} :` : ""} ${budget.customer?.addresses?.[0]?.address}`}</Segment>
           ) : (
             (
               <Dropdown
                 selection
                 options={budget?.customer?.addresses.map((address) => ({
                   key: address.address,
-                  text: address.address,
+                  text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
                   value: address.address,
                 }))}
                 value={selectedContact?.address}
-                onChange={(e, { value }) => setSelectedContact({ ...selectedContact, address: value })}
+                onChange={(e, { value }) => setSelectedContact({
+                  ...selectedContact,
+                  address: value
+                })}
               />
             )
           )}
         </FormField>
-        <FormField width="200px">
+        <FormField flex="1">
           <Label>Teléfono</Label>
-          {!budget?.customer?.phoneNumbers?.length || budget?.customer?.phoneNumbers.length === 1 ? (
-            <Segment placeholder>{formatedSimplePhone(budget.customer?.phoneNumbers?.[0])}</Segment>
+          {!budget?.customer?.phoneNumbers?.length ? (
+            <Segment placeholder>No existe un teléfono registrado</Segment>
+          ) : budget?.customer?.phoneNumbers.length === 1 ? (
+            <Segment placeholder>{`${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${formatedSimplePhone(budget.customer?.phoneNumbers?.[0])}`}</Segment>
           ) : (
             <Dropdown
               selection
               options={budget?.customer?.phoneNumbers.map((phone) => ({
                 key: formatedSimplePhone(phone),
-                text: formatedSimplePhone(phone),
+                text: `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`,
                 value: formatedSimplePhone(phone),
               }))}
               value={selectedContact?.phone}
-              onChange={(e, { value }) => setSelectedContact({ ...selectedContact, phone: value })}
+              onChange={(e, { value }) => setSelectedContact({
+                ...selectedContact,
+                phone: value
+              })}
             />
           )}
         </FormField>
@@ -210,32 +238,34 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         <Label>Comentarios</Label>
         <Segment placeholder>{budget?.comments}</Segment>
       </FieldsContainer>
-      {(isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state)) && (
-        <>
-          {isBudgetConfirmed(budget?.state) &&
-            <Flex justifyContent="space-between">
-              {Toggle}
-            </Flex>}
-          <Payments update={isUpdating} total={total} methods={methods}>
-            <SubmitAndRestore
-              isUpdating={isUpdating}
-              isLoading={isLoadingUpdatePayment}
-              isDirty={isDirty}
-              onSubmit={() => mutateUpdatePayment()}
-              onReset={() => methods.reset({ paymentsMade: budget.paymentsMade })}
-              disabled={!isDirty}
-              text="Guardar"
-            />
-          </Payments>
-        </>
-      )}
+      {
+        (isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state)) && (
+          <>
+            {isBudgetConfirmed(budget?.state) &&
+              <Flex justifyContent="space-between">
+                {toggleButton}
+              </Flex>}
+            <Payments update={isUpdating} total={total} methods={methods}>
+              <SubmitAndRestore
+                isUpdating={isUpdating}
+                isLoading={isLoadingUpdatePayment}
+                isDirty={isDirty}
+                onSubmit={() => mutateUpdatePayment()}
+                onReset={() => methods.reset({ paymentsMade: budget.paymentsMade })}
+                disabled={!isDirty}
+                text="Guardar"
+              />
+            </Payments>
+          </>
+        )
+      }
       <FieldsContainer>
         <FormField flex={3}>
           <Label>Métodos de pago</Label>
           <Segment placeholder>{formattedPaymentMethods}</Segment>
         </FormField>
       </FieldsContainer>
-    </ViewContainer>
+    </ViewContainer >
   );
 };
 

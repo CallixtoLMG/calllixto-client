@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useDeleteBatchProducts, useProductsBySupplierId } from "@/api/products";
+import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
 import { useActiveSupplier, useDeleteSupplier, useEditSupplier, useGetSupplier, useInactiveSupplier } from "@/api/suppliers";
 import { Icon, Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
@@ -8,11 +8,11 @@ import { ModalAction } from "@/components/common/modals";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import SupplierView from "@/components/suppliers/SupplierView";
-import { COLORS, ICONS, PAGES } from "@/constants";
+import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { isItemInactive } from "@/utils";
+import { downloadExcel, formatedPrice, isItemInactive } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -23,19 +23,20 @@ const Supplier = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { data: supplier, isLoading } = useGetSupplier(params.id);
+  const { data: supplier, isLoading, refetch } = useGetSupplier(params.id);
   const { data: products, isLoading: loadingProducts } = useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
-  const [reason, setReason] = useState(""); 
+  const [isExcelLoading, setIsExcelLoading] = useState(false);
+  const [reason, setReason] = useState("");
   const printRef = useRef(null);
   const editSupplier = useEditSupplier();
   const deleteSupplier = useDeleteSupplier();
-  const deleteBatchProducts = useDeleteBatchProducts();
+  const deleteBySupplierId = useDeleteBySupplierId();
   const inactiveSupplier = useInactiveSupplier();
   const activeSupplier = useActiveSupplier();
 
@@ -46,25 +47,50 @@ const Supplier = ({ params }) => {
 
   useEffect(() => {
     setLabels([PAGES.SUPPLIERS.NAME, supplier?.name]);
-  }, [setLabels, supplier]);
+    refetch();
+  }, [setLabels, supplier, refetch]);
+
+  const hasAssociatedProducts = useMemo(() => {
+    return products?.length > 0;
+  }, [products]);
+
+  const prepareProductDataForExcel = useMemo(() => {
+    if (!products) return [];
+    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Estado', 'Comentarios'];
+
+    const productData = products.map(product => {
+      const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
+      return [
+        product.code,
+        product.name,
+        product.brandName,
+        product.supplierName,
+        formatedPrice(product.price),
+        productState,
+        product.comments
+      ];
+    });
+
+    return [headers, ...productData];
+  }, [products]);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     removeAfterPrint: true,
   });
 
-  const modalConfig = useMemo(() => ({
+  const modalConfig = {
     deleteSupplier: {
       header: `¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
-      icon: ICONS.TRASH
+      icon: ICONS.TRASH,
+      tooltip: hasAssociatedProducts ? "No se puede eliminar este proveedor, existen productos asociados." : false,
     },
     deleteBatch: {
-      header: `¿Está seguro que desea eliminar todos los productos del proveedor "${supplier?.name}"?`,
+      header: `¿Está seguro que desea eliminar los ${products?.length || ""} productos del proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH
     },
-    
     active: {
       header: `¿Está seguro que desea activar el proveedor "${supplier?.name}"?`,
       icon: ICONS.PLAY_CIRCLE,
@@ -73,20 +99,18 @@ const Supplier = ({ params }) => {
       header: `¿Está seguro que desea desactivar el proveedor "${supplier?.name}"?`,
       icon: ICONS.PAUSE_CIRCLE,
     }
-  }), [supplier]);
+  };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
     setModalAction(null);
-    setReason(""); 
+    setReason("");
   };
 
   const handleOpenModalWithAction = useCallback((action) => {
     setModalAction(action);
     setIsModalOpen(true);
   }, []);
-
-
 
   const handleActivateClick = useCallback(() => handleOpenModalWithAction("active"), [handleOpenModalWithAction]);
   const handleInactivateClick = useCallback(() => handleOpenModalWithAction("inactive"), [handleOpenModalWithAction]);
@@ -106,6 +130,10 @@ const Supplier = ({ params }) => {
         toast.error(response.error.message);
       }
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
@@ -120,6 +148,10 @@ const Supplier = ({ params }) => {
       } else {
         toast.error(response.error.message);
       }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
     },
   });
 
@@ -139,11 +171,15 @@ const Supplier = ({ params }) => {
     onError: (error) => {
       toast.error(`Error: ${error.message}`);
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const { mutate: mutateDeleteBatch, isPending: isDeleteBatchPending } = useMutation({
     mutationFn: async () => {
-      const response = await deleteBatchProducts(params.id);
+      const response = await deleteBySupplierId(params.id);
       return response;
     },
     onSuccess: (response) => {
@@ -153,6 +189,10 @@ const Supplier = ({ params }) => {
       } else {
         toast.error(response.error.message);
       }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
     },
   });
 
@@ -169,6 +209,10 @@ const Supplier = ({ params }) => {
         toast.error(response.error.message);
       }
     },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
   });
 
   const handleActionConfirm = async () => {
@@ -180,16 +224,15 @@ const Supplier = ({ params }) => {
       mutateDelete();
     } else if (modalAction === "inactive") {
       if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar al cliente.");
+        toast.error("Debe proporcionar una razón para desactivar al proveedor.");
         return;
       }
       mutateInactive({ supplier, reason });
-    } else if (modalAction === "active") { 
+    } else if (modalAction === "active") {
       mutateActive({ supplier });
     }
 
     handleModalClose();
-
   };
 
   const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
@@ -216,7 +259,7 @@ const Supplier = ({ params }) => {
         text: "Códigos",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
-        disabled: !!activeAction,
+        disabled: !!activeAction || isEditPending,
       },
       {
         id: 2,
@@ -225,34 +268,57 @@ const Supplier = ({ params }) => {
         text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
         onClick: isItemInactive(supplier?.state) ? handleActivateClick : handleInactivateClick,
         loading: (activeAction === "active" || activeAction === "inactive"),
-        disabled: !!activeAction,
+        disabled: !!activeAction || isEditPending,
         width: "fit-content",
       },
       {
         id: 3,
+        icon: ICONS.FILE_EXCEL,
+        color: COLORS.SOFT_GREY,
+        text: "Descargar lista",
+        onClick: () => {
+          if (products?.length) {
+            setIsExcelLoading(true);
+            downloadExcel(prepareProductDataForExcel, `Lista de productos de ${supplier.name}`);
+            setIsExcelLoading(false);
+          } else {
+            toast("No hay productos de este proveedor para descargar.", {
+              icon: <Icon margin="0" toast name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />,
+            });
+          }
+        },
+        loading: isExcelLoading,
+        disabled: isExcelLoading || !!activeAction || loadingProducts || isEditPending,
+        width: "fit-content",
+      },
+      {
+        id: 4,
         icon: ICONS.LIST_UL,
         color: COLORS.RED,
         text: "Limpiar lista",
         onClick: handleDeleteBatchClick,
         loading: activeAction === "deleteBatch",
-        disabled: !!activeAction,
+        disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
+        tooltip: !hasAssociatedProducts ? "No existen productos asociados." : false,
         width: "fit-content",
       },
       {
-        id: 4,
+        id: 5,
         icon: ICONS.TRASH,
         color: COLORS.RED,
         text: "Eliminar",
         onClick: handleDeleteClick,
         loading: activeAction === "deleteSupplier",
-        disabled: !!activeAction,
+        disabled: hasAssociatedProducts || !!activeAction || isEditPending,
+        tooltip: hasAssociatedProducts ? "No se puede eliminar este proveedor, existen productos asociados." : false,
         width: "fit-content",
         basic: true,
       },
     ] : [];
 
     setActions(actions);
-  }, [role, activeAction, isActivePending, handleDeleteBatchClick, handleDeleteClick, handleActivateClick, handleInactivateClick, products, supplier?.state, setActions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, activeAction, hasAssociatedProducts, isActivePending, isExcelLoading, isEditPending, handleDeleteBatchClick, loadingProducts, prepareProductDataForExcel, supplier?.name, handleDeleteClick, handleActivateClick, handleInactivateClick, products, supplier?.state, setActions]);
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);
@@ -260,7 +326,7 @@ const Supplier = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts}>
-      {Toggle}
+      {toggleButton}
       {isUpdating ? (
         <SupplierForm supplier={supplier} onSubmit={mutateEdit} isLoading={isEditPending} isUpdating />
       ) : (

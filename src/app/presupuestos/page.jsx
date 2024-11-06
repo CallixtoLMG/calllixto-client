@@ -11,14 +11,15 @@ import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListBudgets();
+  const { data, isLoading, isRefetching, refetch } = useListBudgets();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
     setLabels([PAGES.BUDGETS.NAME]);
-  }, [setLabels]);
+    refetch()
+  }, [setLabels, refetch]);
 
   const budgets = useMemo(() => data?.budgets, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
@@ -98,7 +99,7 @@ const Budgets = () => {
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <BudgetsPage isLoading={loading} budgets={loading ? [] : budgets} />
+    <BudgetsPage onRefetch={refetch} isLoading={loading} budgets={loading ? [] : budgets} />
   )
 };
 

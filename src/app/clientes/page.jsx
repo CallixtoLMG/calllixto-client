@@ -2,7 +2,7 @@
 import { useListCustomers } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, CUSTOMER_STATES, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel, formatedSimplePhone } from "@/utils";
@@ -11,7 +11,7 @@ import { useEffect, useMemo } from "react";
 
 const Customers = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching } = useListCustomers();
+  const { data, isLoading, isRefetching, refetch } = useListCustomers();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -24,15 +24,21 @@ const Customers = () => {
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
   const prepareCustomerDataForExcel = useMemo(() => {
-    if (!customers) return [];  
-    const headers = ['Nombre', 'Dirección', 'Teléfono'];
-
-    const customerData = customers.map(customer => [
-      customer.name,
-      customer.addresses?.map(address => address.address).join(' , '),
-      customer.phoneNumbers?.map(phone => formatedSimplePhone(phone)).join(' , ')
-    ]);
-
+    if (!customers) return [];
+  
+    const headers = ['Nombre', 'Estado', 'Dirección', 'Teléfono'];
+  
+    const customerData = customers.map(customer => {
+      const customerState = CUSTOMER_STATES[customer.state]?.singularTitle || customer.state;
+  
+      return [
+        customer.name,
+        customerState,
+        customer.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
+        customer.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
+      ];
+    });
+  
     return [headers, ...customerData];
   }, [customers]);
 
@@ -64,7 +70,7 @@ const Customers = () => {
   useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <CustomersPage isLoading={loading} customers={loading ? [] : customers} />
+    <CustomersPage onRefetch={refetch} isLoading={loading} customers={loading ? [] : customers} />
   );
 };
 

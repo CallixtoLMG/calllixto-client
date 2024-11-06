@@ -22,6 +22,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Dropdown } from "semantic-ui-react";
+import { v4 as uuid } from 'uuid';
 
 const Budget = ({ params }) => {
   useValidateToken();
@@ -113,14 +114,16 @@ const Budget = ({ params }) => {
     }
 
     if (budget) {
-      const calculatedSubtotal = getTotalSum(budget?.products);
+      budget.products = budget.products.map((product) => ({
+        ...product, key: uuid(),
+      }))
+      const calculatedSubtotal = getTotalSum(budget.products);
       const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount);
-      const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget?.additionalCharge);
+      const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget.additionalCharge);
 
       setSubtotal(calculatedSubtotal);
       setSubtotalAfterDiscount(calculatedSubtotalAfterDiscount);
       setTotal(calculatedFinalTotal);
-
       const stateTitle = BUDGET_STATES[budget.state]?.singularTitle || BUDGET_STATES.INACTIVE.singularTitle;
       const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([
@@ -313,7 +316,6 @@ const Budget = ({ params }) => {
         total
       };
       const response = await confirmBudget(confirmationData, budget?.id);
-
       return response;
     },
     onSuccess: (response) => {
@@ -332,10 +334,10 @@ const Budget = ({ params }) => {
       const cancelData = {
         cancelledBy: `${userData.firstName} ${userData.lastName}`,
         cancelledAt: now(),
-        cancelledMsg: cancelReason,
+        cancelledMsg: cancelReason
       };
-      const { data } = await cancelBudget(cancelData, budget?.id);
-      return data;
+      const response = await cancelBudget({ cancelData, id: budget?.id });
+      return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -346,6 +348,9 @@ const Budget = ({ params }) => {
         toast.error(response.error.message);
       }
     },
+    onError: (error) => {
+      toast.error(`Error al anular: ${error.message}`);
+    }
   });
 
   const { mutate: mutateEdit, isPending: isPendingEdit } = useMutation({
@@ -446,6 +451,7 @@ const Budget = ({ params }) => {
             onClose={handleModalCancelClose}
             onConfirm={mutateCancel}
             isLoading={isPendingCancel}
+            id={budget?.id}
           />
         </>
       )}

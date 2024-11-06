@@ -1,26 +1,15 @@
-import { cloneElement, useState } from 'react';
+import { cloneElement } from 'react';
 import { Popup } from 'semantic-ui-react';
 import { IconnedButton } from '..';
 import { ButtonsContainer, Flex } from '../../custom';
 
-const PopupActions = ({ width, title, color, buttons, icon, position = "bottom center", trigger, onToggleOpen }) => {
-  const [open, setOpen] = useState(false);
-
-  const handleClose = () => {
-    setOpen(false);
-    if (onToggleOpen) onToggleOpen(false);
-  };
-
-  const handleOpen = () => {
-    setOpen(true);
-    if (onToggleOpen) onToggleOpen(true);
-  };
+const PopupActions = ({ width, title, color, buttons, icon, position = "bottom center", trigger, open, onOpen, onClose }) => {
 
   return (
     <Popup
       open={open}
-      onClose={handleClose}
-      onOpen={handleOpen}
+      onClose={onClose}
+      onOpen={onOpen}
       position={position}
       trigger={trigger || (
         <ButtonsContainer>
@@ -37,10 +26,10 @@ const PopupActions = ({ width, title, color, buttons, icon, position = "bottom c
           {buttons?.map((child) =>
             cloneElement(child, {
               onClick: () => {
-                handleClose();
                 if (child.props.onClick) {
-                  child.props.onClick();
+                  child.props.onClick(); 
                 }
+                if (onClose) onClose(); 
               }
             })
           )}

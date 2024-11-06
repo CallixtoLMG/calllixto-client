@@ -1,6 +1,7 @@
 import { Dropdown, Flex, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
 import { CUSTOMER_STATES, PAGES } from "@/constants";
+import { createFilter } from '@/utils';
 import { useCallback, useState } from "react";
 import { Controller, useForm } from 'react-hook-form';
 import { Form, Label } from 'semantic-ui-react';
@@ -19,21 +20,15 @@ const STATE_OPTIONS = [
   }))
 ];
 
-const CustomersPage = ({ customers = [], isLoading }) => {
+const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
   const { handleSubmit, control, reset } = useForm();
   const [filters, setFilters] = useState(EMPTY_FILTERS);
 
-  const onFilter = useCallback(customer => {
-
-    if (filters.name && !customer.name?.toLowerCase().includes(filters.name.toLowerCase())) {
-      return false;
-    }
-
-    if (filters.state && filters.state !== customer.state) {
-      return false;
-    }
-    return true;
-  }, [filters]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const onFilter = useCallback(
+    createFilter(filters, ['name']),
+    [filters]
+  );
 
   const onRestoreFilters = () => {
     reset(EMPTY_FILTERS);
@@ -43,7 +38,7 @@ const CustomersPage = ({ customers = [], isLoading }) => {
   return (
     <>
       <Form onSubmit={handleSubmit(setFilters)}>
-        <Filters onRestoreFilters={onRestoreFilters}>
+        <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
           <Controller
             name="state"
             control={control}

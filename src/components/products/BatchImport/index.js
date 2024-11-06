@@ -1,5 +1,4 @@
-import { useUserContext } from "@/User";
-import { createBatch, editBatch, useListProducts } from "@/api/products";
+import { useCreateBatch, useEditBatch, useGetBlackList, useListProducts } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
 import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
@@ -17,7 +16,7 @@ import { Modal, ModalHeader, WaitMsg } from "./styles";
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts } = useListProducts();
   const products = useMemo(() => data?.products, [data?.products]);
-  const { getBlacklist } = useUserContext();
+  const { refetch: refetchBlacklist } = useGetBlackList();
   const { handleSubmit, control, reset, setValue, watch } = useForm();
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -33,6 +32,9 @@ const BatchImport = ({ isCreating }) => {
   const formRef = useRef(null);
   const [existingCodes, setExistingCodes] = useState({});
   const totalProducts = importedProductsCount + downloadProducts.length;
+  const createBatch = useCreateBatch();
+  const editBatch = useEditBatch();
+  const handleBatchAction = isCreating ? createBatch : editBatch;
 
   const handleConfirmClick = () => {
     if (formRef.current) {
@@ -56,7 +58,7 @@ const BatchImport = ({ isCreating }) => {
       fileName: isCreating ? "Productos ya existentes" : "Productos no existentes",
       label: isCreating ? "Nuevos productos" : "Productos para actualizar",
       confirmation: isCreating ? "con errores o ya" : "no",
-      onSubmit: isCreating ? createBatch : editBatch,
+      onSubmit: handleBatchAction,
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
         const productCode = formattedProduct.code.toUpperCase();
         if (productCounts[productCode] > 1) {
@@ -74,7 +76,7 @@ const BatchImport = ({ isCreating }) => {
         return !watchProducts.length || isLoading || isPending;
       }
     };
-  }, [isCreating, watchProducts, isLoading]);
+  }, [isCreating, watchProducts, isLoading, handleBatchAction]);
 
   const handleClick = useCallback(() => {
     inputRef.current.value = null;
@@ -97,11 +99,12 @@ const BatchImport = ({ isCreating }) => {
     setIsLoading(true);
     try {
       setSelectedFile(file.name);
+      const updatedBlacklist = await refetchBlacklist().then(result => result.data || []);
       const reader = new FileReader();
       reader.onload = async (event) => {
         try {
           const data = event.target.result;
-          await processFile(data, products);
+          await processFile(data, products, updatedBlacklist);
         } catch (error) {
           console.error("Error processing file:", error);
         }
@@ -115,7 +118,7 @@ const BatchImport = ({ isCreating }) => {
     }
   };
 
-  const processFile = async (data, updatedProducts) => {
+  const processFile = async (data, updatedProducts, blacklist) => {
     const workbook = XLSX.read(data, { type: "binary" });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
@@ -161,7 +164,7 @@ const BatchImport = ({ isCreating }) => {
 
         if (code === "Sin código") {
           downloadProducts.push({ ...formattedProduct, msg: "Este producto no tiene código" });
-        } else if (getBlacklist().some(item => item === code)) {
+        } else if (blacklist.some(item => item === code)) {
           downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra en la lista de productos bloqueados" });
         } else if (productCounts[code] > 1) {
           downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra duplicado" });
@@ -183,7 +186,6 @@ const BatchImport = ({ isCreating }) => {
       setDownloadProducts(downloadProducts);
     }
   };
-
 
   const handleDownloadConfirmation = () => {
     const data = [
@@ -265,7 +267,7 @@ const BatchImport = ({ isCreating }) => {
       if (response.statusOk) {
         toast.success(isCreating ?
           `Productos importados: ${importedProductsCount}.\nProductos creados exitosamente: ${createdCount}.\nProductos sin procesar: ${unprocessedCount}.`
-          : "Los productos se han actualizado con exito!");
+          : "Los productos se han actualizado con éxito!");
         handleModalClose();
       } else {
         toast.error(response.error.message);
