@@ -270,8 +270,8 @@ export function useDeleteItem() {
 export function useBatchDeleteItems() {
   const queryClient = useQueryClient();
 
-  const batchDeleteItems = async ({ entity, id = [], url, key = ID, invalidateQueries = [] }) => {
-    if (!Array.isArray(id) || id.length === 0) {
+  const batchDeleteItems = async ({ entity, ids = [], url, key = ID, invalidateQueries = [] }) => {
+    if (!Array.isArray(ids) || ids.length === 0) {
       console.warn("No hay IDs válidos para eliminar.");
       return { statusOk: true, deletedCount: 0 };
     }
@@ -279,13 +279,13 @@ export function useBatchDeleteItems() {
     const successfulDeletes = [];
     let deletedCount = 0;
 
-    for (const code of id) {
+    for (const code of ids) {
       try {
         const { data } = await axios.delete(`${url}/${code}`);
         if (data.statusOk) {
           deletedCount += 1;
 
-          if (data.product?.estado === "delete") {
+          if (data.product?.state === "delete") {
             successfulDeletes.push(code);
           }
         } else {

@@ -104,7 +104,7 @@ export const useBatchDeleteProducts = () => {
   const batchDeleteProducts = async (codes) => {
     const responses = await batchDeleteItems({
       entity: ENTITIES.PRODUCTS,
-      id: codes,
+      ids: codes,
       url: PATHS.PRODUCTS,
       key: CODE,
       invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]]
@@ -153,7 +153,7 @@ export function useProductsBySupplierId(supplierId) {
 export const useCreateBatch = () => {
   const queryClient = useQueryClient();
 
-  const createBatch = async (products, invalidateQueries = [[LIST_PRODUCTS_QUERY_KEY]]) => {
+  const createBatch = async (products) => {
     const parsedProducts = products.map((product) => ({
       ...product,
       createdAt: now(),
@@ -182,9 +182,7 @@ export const useCreateBatch = () => {
     };
 
     if (data.statusOk) {
-      invalidateQueries.forEach((query) =>
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL })
-      );
+      queryClient.invalidateQueries({ queryKey: [[LIST_PRODUCTS_QUERY_KEY]], refetchType: ALL })
     }
 
     return { data };

@@ -117,8 +117,6 @@ const Budget = ({ params }) => {
       budget.products = budget.products.map((product) => ({
         ...product, key: uuid(),
       }))
-      budget.globalDiscount = budget.globalDiscount ?? 0;
-      budget.additionalCharge = budget.additionalCharge ?? 0;
       const calculatedSubtotal = getTotalSum(budget.products);
       const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount);
       const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget.additionalCharge);

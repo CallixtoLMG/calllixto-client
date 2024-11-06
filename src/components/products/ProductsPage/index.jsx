@@ -48,6 +48,7 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
     removeAfterPrint: true,
   });
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onFilter = useCallback(
     createFilter(filters, ['name', 'code']),
     [filters]

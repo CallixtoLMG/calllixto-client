@@ -159,7 +159,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
               <Segment placeholder>{budgetState.date}</Segment>
             </FormField>
           )}
-          {!isBudgetConfirmed(budget?.state) &&
+          {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) &&
             <FormField>
               <Label>Fecha de vencimiento</Label>
               <Segment placeholder>{formatedDateOnly(expirationDate(budget?.expirationOffsetDays, budget?.createdAt))}</Segment>
@@ -225,7 +225,6 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         mainKey="key"
         headers={BUDGET_FORM_PRODUCT_COLUMNS}
         elements={budget?.products}
-        
       />
       <Total
         readOnly

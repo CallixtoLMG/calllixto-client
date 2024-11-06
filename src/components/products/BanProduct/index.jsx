@@ -1,10 +1,10 @@
+import { useUserContext } from "@/User";
 import { editBanProducts, useGetBlackList } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, FormField, Icon, Input, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { COLORS, ICONS } from "@/constants";
-import { useUserContext } from "@/User";
 import { handleEnterKeyPress } from '@/utils';
 import { useMutation } from "@tanstack/react-query";
 import { isEqual, sortBy } from 'lodash';
@@ -24,7 +24,7 @@ const BanProduct = ({ open, setOpen }) => {
 
   useEffect(() => {
     setValue("products", blacklist);
-  }, [blacklist]);
+  }, [blacklist, setValue]);
 
   useEffect(() => {
     if (open) {

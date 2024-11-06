@@ -206,7 +206,7 @@ const Customer = ({ params }) => {
 
       setActions(actions);
     }
-  }, [customer, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions, hasAssociatedBudgets]);
+  }, [customer, activeAction, isActivePending, isInactivePending, isDeletePending, isEditPending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions, hasAssociatedBudgets]);
 
   if (!isLoading && !customer) {
     push(PAGES.NOT_FOUND.BASE);

@@ -317,7 +317,8 @@ const Supplier = ({ params }) => {
     ] : [];
 
     setActions(actions);
-  }, [role, activeAction, hasAssociatedProducts, isActivePending, isExcelLoading, handleDeleteBatchClick, loadingProducts, prepareProductDataForExcel, supplier?.name, handleDeleteClick, handleActivateClick, handleInactivateClick, products, supplier?.state, setActions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, activeAction, hasAssociatedProducts, isActivePending, isExcelLoading, isEditPending, handleDeleteBatchClick, loadingProducts, prepareProductDataForExcel, supplier?.name, handleDeleteClick, handleActivateClick, handleInactivateClick, products, supplier?.state, setActions]);
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);

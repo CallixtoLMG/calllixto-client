@@ -24,6 +24,7 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
   const { handleSubmit, control, reset } = useForm();
   const [filters, setFilters] = useState(EMPTY_FILTERS);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const onFilter = useCallback(
     createFilter(filters, ['id', 'name']),
     [filters]

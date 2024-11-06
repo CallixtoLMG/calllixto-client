@@ -31,6 +31,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const [filters, setFilters] = useState(EMPTY_FILTERS);
 
   const keysToFilter = ['id', 'customer', 'seller'];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   const onFilter = useCallback(createFilter(filters, keysToFilter, {
     customer: budget => budget.customer?.name || '',
     allState: ALL,

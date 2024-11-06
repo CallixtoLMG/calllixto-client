@@ -319,6 +319,7 @@ const Product = ({ params }) => {
 
       setActions(actions);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, activeAction, isEditPending, handleRecoverClick, handleActiveClick, handleInactiveClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, setActions]);
 
   if (!isLoading && !product) {
