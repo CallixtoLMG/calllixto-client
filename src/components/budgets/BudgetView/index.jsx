@@ -4,9 +4,9 @@ import { Dropdown, FieldsContainer, Flex, FormField, Icon, Label, Price, Segment
 import Payments from "@/components/common/form/Payments";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
-import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/constants";
+import { COLORS, ICONS, PICK_UP_IN_STORE, PRODUCT_STATES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed, now } from "@/utils";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed, isProductOOS, now } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -63,7 +63,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
               trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
               position="top center"
               on="hover"
-              content={product.brandName}
+              content={product.supplierName}
             />
             -
             <Popup
@@ -71,7 +71,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
               trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>}
               position="top center"
               on="hover"
-              content={product.supplierName}
+              content={product.brandName}
             />
             -
             <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
@@ -93,6 +93,9 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             {product.name} {product.fractionConfig?.active && `x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}`}
             <Flex marginLeft="7px">
               {product.comments && <CommentTooltip comment={product.comments} />}
+              {isProductOOS(product.state) && (
+                <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
+              )}
               {product.dispatchComment && (
                 <Popup
                   size="mini"
@@ -234,10 +237,6 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         globalDiscount={budget?.globalDiscount}
         additionalCharge={budget?.additionalCharge}
       />
-      <FieldsContainer rowGap="5px" >
-        <Label>Comentarios</Label>
-        <Segment placeholder>{budget?.comments}</Segment>
-      </FieldsContainer>
       {
         (isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state)) && (
           <>
@@ -259,6 +258,10 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           </>
         )
       }
+      <FieldsContainer rowGap="5px" >
+        <Label>Comentarios</Label>
+        <Segment placeholder>{budget?.comments}</Segment>
+      </FieldsContainer>
       <FieldsContainer>
         <FormField flex={3}>
           <Label>Métodos de pago</Label>

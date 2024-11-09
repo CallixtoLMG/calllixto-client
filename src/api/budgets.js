@@ -45,7 +45,7 @@ export function useGetBudget(id) {
     queryKey: [GET_BUDGET_QUERY_KEY, id],
     queryFn: () => getBudget(id),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
+    staleTime: TIME_IN_MS.FIVE_MINUTES,
     enabled: !!id,
   });
 

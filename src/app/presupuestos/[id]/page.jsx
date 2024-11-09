@@ -40,6 +40,7 @@ const Budget = ({ params }) => {
   const [customerData, setCustomerData] = useState();
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
+  const [pickUpInStore, setPickUpInStore] = useState(false);
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
   const [dolarRate, setDolarRate] = useState(dolar);
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
@@ -68,6 +69,16 @@ const Budget = ({ params }) => {
   const formatValue = (value) => {
     const formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
+  };
+
+  useEffect(() => {
+    if (budget) {
+      setPickUpInStore(budget.pickUpInStore || false);
+    }
+  }, [budget]);
+
+  const handlePickUpChange = (value) => {
+    setPickUpInStore(value);
   };
 
   const handleDollarChange = (e) => {
@@ -388,6 +399,8 @@ const Budget = ({ params }) => {
               customer={customerData}
               onConfirm={mutate}
               isLoading={isPending}
+              pickUpInStore={pickUpInStore}
+              onPickUpChange={handlePickUpChange}
             />
           </>
         ) : <Box />}
@@ -435,6 +448,8 @@ const Budget = ({ params }) => {
           printPdfMode={printPdfMode}
           selectedContact={selectedContact}
           setSelectedContact={setSelectedContact}
+          pickUpInStore={pickUpInStore}
+          onPickUpChange={handlePickUpChange}
         />
       ) : (
         <>

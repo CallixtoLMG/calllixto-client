@@ -3,17 +3,40 @@ import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, Label, 
 import Payments from "@/components/common/form/Payments";
 import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone, now } from "@/utils";
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { ButtonGroup, Form, Modal, Transition } from "semantic-ui-react";
 
-const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoading, total = 0 }) => {
+const ModalConfirmation = ({
+  isModalOpen,
+  onClose,
+  customer,
+  onConfirm,
+  isLoading,
+  total = 0,
+  pickUpInStore,
+  onPickUpChange
+}) => {
   const methods = useForm({
-    defaultValues: { paymentsMade: [], ...customer },
+    defaultValues: {
+      paymentsMade: [],
+      pickUpInStore,
+      ...customer
+    },
   });
-  const { control } = methods;
+  const { control, setValue, watch } = methods;
   const formRef = useRef(null);
   const parsedTotal = useMemo(() => parseFloat(total.toFixed(2)), [total]);
+  const modalPickUpInStore = watch("pickUpInStore");
+
+  useEffect(() => {
+    setValue("pickUpInStore", pickUpInStore);
+  }, [pickUpInStore, setValue]);
+
+  const handleTogglePickUpInStore = (value) => {
+    setValue("pickUpInStore", value);
+    onPickUpChange(value);
+  };
 
   const handleConfirmClick = () => {
     if (formRef.current) {
@@ -32,7 +55,6 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
       total: parsedTotal,
       pickUpInStore
     };
-    
     onConfirm(payload);
   };
 
@@ -50,18 +72,14 @@ const ModalConfirmation = ({ isModalOpen, onClose, customer, onConfirm, isLoadin
                   <IconnedButton
                     text={PICK_UP_IN_STORE}
                     icon={ICONS.WAREHOUSE}
-                    basic={!value}
-                    onClick={() => {
-                      onChange(true);
-                    }}
+                    basic={!modalPickUpInStore}   // Muestra el botón como activo según `modalPickUpInStore`
+                    onClick={() => handleTogglePickUpInStore(true)} // Cambia el estado a true
                   />
                   <IconnedButton
                     text="Enviar a Dirección"
                     icon={ICONS.TRUCK}
-                    basic={value}
-                    onClick={() => {
-                      onChange(false);
-                    }}
+                    basic={modalPickUpInStore}    // Muestra el botón como activo si `pickUpInStore` es false
+                    onClick={() => handleTogglePickUpInStore(false)} // Cambia el estado a false
                   />
                 </ButtonGroup>
               )}

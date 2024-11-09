@@ -1,5 +1,5 @@
 import { Box, Flex, Price } from "@/components/common/custom";
-import { BUDGET_STATES, COLORS } from "@/constants";
+import { BUDGET_STATES, COLORS, PRODUCT_STATES } from "@/constants";
 import { formatedDateAndHour, formatedPercentage, getPrice, getTotal, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
 import { Label, Popup } from "semantic-ui-react";
 import { CommentTooltip } from "../common/tooltips";
@@ -23,7 +23,8 @@ const ATTRIBUTES = {
   CONFIRMED_AT: "confirmedAt",
   CONFIRMED_BY: "confirmedBy",
   CANCELLED_AT: "cancelledAt",
-  CANCELLED_BY: "cancelledBy"
+  CANCELLED_BY: "cancelledBy",
+  COMMENTS: "comments"
 };
 
 const getLabelColor = (budget) => BUDGET_STATES[budget?.state]?.color;
@@ -146,7 +147,14 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       title: "Nombre",
       align: "left",
       wrap: true,
-      value: (product) => `${product.name} ${product.fractionConfig?.active ? ` x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}` : ''}`
+      value: (product) => (
+        <Flex justifyContent="space-between">
+          <span>{`${product.name} ${product.fractionConfig?.active ? ` x ${product.fractionConfig.value} ${product.fractionConfig.unit}` : ''}`}</span>
+          {product.state === PRODUCT_STATES.OOS.id && (
+            <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
+          )}
+        </Flex>
+      )
     },
     !dispatchPdf && {
       id: 3,
