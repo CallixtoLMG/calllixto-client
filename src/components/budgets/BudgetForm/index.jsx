@@ -11,7 +11,7 @@ import { ATTRIBUTES } from "@/components/products/products.common";
 import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
-import { pick } from "lodash";
+import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Message, Modal, Popup, Transition } from "semantic-ui-react";
@@ -41,14 +41,35 @@ const BudgetForm = ({
   isCloning,
   draft,
   selectedContact,
-  setSelectedContact
+  setSelectedContact,
 }) => {
   const methods = useForm({
-    defaultValues: budget ? {
-      ...budget,
-      paymentsMade: budget.paymentsMade || [],
-      seller: `${user?.firstName} ${user?.lastName}`,
-    } : EMPTY_BUDGET(user),
+    defaultValues: isCloning && budget
+      ? {
+        ...omit(budget, ['id', 'comments', 'paymentsMade', 'customer', 'expirationOffsetDays', 'paymentMethods']),
+        products: budget.products.map((product) => ({
+          ...product,
+          quantity: product.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
+          ...(product.fractionConfig?.active && {
+            fractionConfig: {
+              ...product.fractionConfig,
+              value: product.fractionConfig.value || 1,
+              price: product.price,
+            }
+          })
+        })),
+        seller: `${user?.firstName} ${user?.lastName}`, 
+        paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
+      }
+      : budget && draft
+        ? {
+          ...budget,
+          seller: `${user?.firstName} ${user?.lastName}`,
+          paymentsMade: budget.paymentsMade || [],
+        }
+        : {
+          ...EMPTY_BUDGET(user),
+        },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
@@ -61,6 +82,7 @@ const BudgetForm = ({
   const hasShownModal = useRef(false);
   const productSearchRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [originalPrices, setOriginalPrices] = useState({});
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [temporaryProducts, setTemporaryProducts] = useState([]);
@@ -116,38 +138,51 @@ const BudgetForm = ({
       let budgetProducts = [...budget.products];
       const outdatedProducts = products.filter(product => {
         const budgetProduct = budgetProducts.find(budgetProduct => budgetProduct.code === product.code);
-  
+
         if (budgetProduct) {
           budgetProducts = budgetProducts.filter(budgetProduct => budgetProduct.code !== product.code);
-  
+
           const priceChanged = budgetProduct.price !== product.price;
           const stateChanged = budgetProduct.state !== product.state;
-  
-          return priceChanged || stateChanged;
+          const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
+
+          const fractionConfigChanged =
+            (budgetProduct.fractionConfig?.active !== product.fractionConfig?.active) ||
+            (
+              budgetProduct.fractionConfig?.active &&
+              product.fractionConfig?.active &&
+              (budgetProduct.fractionConfig.value !== product.fractionConfig.value && product.fractionConfig.value !== undefined)
+            );
+
+          return priceChanged || stateChanged || editableChanged || fractionConfigChanged;
         }
         return false;
       });
-  
+
       if (outdatedProducts.length || budgetProducts.length) {
-        let newProducts = watchProducts
-          .filter(product => 
-            !budgetProducts.some(budgetProduct => budgetProduct.code === product.code) &&
-            product.state !== PRODUCT_STATES.DELETED.id &&
-            product.state !== PRODUCT_STATES.INACTIVE.id
-          )
-          .map(product => {
-            const outdatedProduct = outdatedProducts.find(outdatedProduct => outdatedProduct.code === product.code);
-            if (outdatedProduct) {
-              return {
-                ...product,
-                price: outdatedProduct.price,
-                state: outdatedProduct.state,
-                quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity
-              };
-            }
-            return product;
-          });
-  
+        let newProducts = watchProducts.map(product => {
+          const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
+          if (outdatedProduct) {
+            setOriginalPrices(prev => ({
+              ...prev,
+              [product.code]: product.price
+            }));
+
+            return {
+              ...product,
+              price: outdatedProduct.price,
+              editablePrice: outdatedProduct.editablePrice,
+              fractionConfig: {
+                ...outdatedProduct.fractionConfig,
+                value: outdatedProduct.fractionConfig?.value || 1
+              },
+              state: outdatedProduct.state,
+              quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity
+            };
+          }
+          return product;
+        });
+
         setTemporaryProducts(newProducts);
         setOutdatedProducts(outdatedProducts);
         setRemovedProducts(budgetProducts);
@@ -161,14 +196,27 @@ const BudgetForm = ({
 
   const handleConfirmUpdate = () => {
     setValue('products', temporaryProducts);
+    setOriginalPrices({});
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
 
   const handleCancelUpdate = () => {
+    const restoredProducts = temporaryProducts.map(product => {
+      if (originalPrices[product.code] !== undefined) {
+        return {
+          ...product,
+          price: originalPrices[product.code],
+        };
+      }
+      return product;
+    });
+
     setValue(
       "products",
-      temporaryProducts.filter(product => product.state !== PRODUCT_STATES.DELETED.id && product.state !== PRODUCT_STATES.INACTIVE.id)
+      restoredProducts.filter(product =>
+        product.state !== PRODUCT_STATES.DELETED.id && product.state !== PRODUCT_STATES.INACTIVE.id
+      )
     );
     setShouldShowModal(false);
     setIsTableLoading(false);
@@ -190,7 +238,7 @@ const BudgetForm = ({
       await onSubmit({
         ...data,
         customer: { id: customer.id, name: customer.name },
-        products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount"])),
+        products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment"])),
         total: Number(total.toFixed(2)),
         state
       });
@@ -457,26 +505,56 @@ const BudgetForm = ({
                     const oldProduct = budget.products.find(op => op.code === p.code);
                     const priceChanged = oldProduct.price !== p.price;
                     const stateChanged = oldProduct.state !== p.state;
+                    const editablePriceBecameTrue = !oldProduct.editablePrice && p.editablePrice;
+                    const editablePriceBecameFalse = oldProduct.editablePrice && !p.editablePrice;
+                    const fractionConfigBecameActive = !oldProduct.fractionConfig?.active && p.fractionConfig?.active;
+                    const fractionConfigBecameInactive = oldProduct.fractionConfig?.active && !p.fractionConfig?.active;
 
                     return (
                       <MessageItem key={p.code}>
-                      {`${p.code} | ${p.name} | `}
-                      {priceChanged && (
-                        <>
-                          <span style={{ color: COLORS.RED }}>{formatedPrice(oldProduct.price)}</span>
-                          {' -> '}
-                          <span style={{ color: COLORS.GREEN }}>{formatedPrice(p.price)}</span>
-                        </>
-                      )}
-                      {stateChanged && (
-                        <>
-                          {' | Estado: '}
-                          <span style={{ color: PRODUCT_STATES[oldProduct.state].color }}>{PRODUCT_STATES[oldProduct.state].singularTitle}</span>
-                          {' -> '}
-                          <span style={{ color: PRODUCT_STATES[p.state].color }}>{PRODUCT_STATES[p.state].singularTitle}</span>
-                        </>
-                      )}
-                    </MessageItem>
+                        {`${p.code} | ${p.name} | `}
+                        {priceChanged && (
+                          <>
+                            <span style={{ color: COLORS.RED }}>{formatedPrice(oldProduct.price)}</span>
+                            {' -> '}
+                            <span style={{ color: COLORS.GREEN }}>{formatedPrice(p.price)}</span>
+                          </>
+                        )}
+                        {stateChanged && (
+                          <>
+                            {' | Estado: '}
+                            <span style={{ color: PRODUCT_STATES[oldProduct.state].color }}>{PRODUCT_STATES[oldProduct.state].singularTitle}</span>
+                            {' -> '}
+                            <span style={{ color: PRODUCT_STATES[p.state].color }}>{PRODUCT_STATES[p.state].singularTitle}</span>
+                          </>
+                        )}
+                        {editablePriceBecameTrue && (
+                          <>
+                            {' | '}
+                            <span style={{ color: COLORS.GREY }}>Ahora el precio es editable</span>
+                          </>
+                        )}
+                        {editablePriceBecameFalse && (
+                          <>
+                            {' | '}
+                            <span style={{ color: COLORS.GREY }}>El precio ya no es editable</span>
+                          </>
+                        )}
+                        {fractionConfigBecameActive && p.fractionConfig?.active && (
+                          <>
+                            {' | '}
+                            <span style={{ color: COLORS.GREY }}>
+                              El producto ahora tiene la medida: {p.fractionConfig.value} {p.fractionConfig.unit}.
+                            </span>
+                          </>
+                        )}
+                        {fractionConfigBecameInactive && (
+                          <>
+                            {' | '}
+                            <span style={{ color: COLORS.GREY }}>Este producto ya no usa medidas.</span>
+                          </>
+                        )}
+                      </MessageItem>
                     );
                   })}
                 </MessageList>
@@ -717,11 +795,8 @@ const BudgetForm = ({
             total={total}
           />
         </Loader>
-        <FieldsContainer rowGap="5px!important">
-          <ControlledComments control={control} />
-        </FieldsContainer>
         <FieldsContainer width="100%" rowGap="15px">
-          {isBudgetConfirmed(watchState) ? (
+          {isBudgetConfirmed(watchState) && !isCloning ? (
             <Payments
               methods={methods}
               total={total}
@@ -782,6 +857,9 @@ const BudgetForm = ({
               </Segment>
             </FormField>
           )}
+        </FieldsContainer>
+        <FieldsContainer rowGap="5px!important">
+          <ControlledComments control={control} />
         </FieldsContainer>
         <SubmitAndRestore
           draft={draft}
