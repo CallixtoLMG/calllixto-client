@@ -14,14 +14,16 @@ import { toast } from "react-hot-toast";
 const CreateProduct = () => {
   useValidateToken();
   const { push } = useRouter();
-  const { data: brands, isLoading: isLoadingBrands } = useListBrands();
-  const { data: suppliers, isLoading: isLoadingSuppliers } = useListSuppliers();
+  const { data: brands, isLoading: isLoadingBrands, refetch: refetchBrands, isRefetching: isBrandsRefetching } = useListBrands();
+  const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers, isRefetching: isSupplierRefetching } = useListSuppliers();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createProduct = useCreateProduct();
 
   useEffect(() => {
     resetActions();
+    refetchBrands();
+    refetchSuppliers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -62,7 +64,7 @@ const CreateProduct = () => {
   });
 
   return (
-    <Loader active={isLoadingBrands || isLoadingSuppliers}>
+    <Loader active={isLoadingBrands || isLoadingSuppliers || isBrandsRefetching || isSupplierRefetching}>
       <ProductForm
         brands={mappedBrands}
         suppliers={mappedSuppliers}
