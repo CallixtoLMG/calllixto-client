@@ -259,7 +259,8 @@ const Supplier = ({ params }) => {
         text: "Códigos",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
-        disabled: !!activeAction || isEditPending,
+        disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
+        tooltip: !hasAssociatedProducts ? "No existen productos de este proveedor." : false,
       },
       {
         id: 2,
@@ -275,7 +276,7 @@ const Supplier = ({ params }) => {
         id: 3,
         icon: ICONS.FILE_EXCEL,
         color: COLORS.SOFT_GREY,
-        text: "Descargar lista",
+        text: "Descargar productos",
         onClick: () => {
           if (products?.length) {
             setIsExcelLoading(true);
@@ -288,18 +289,19 @@ const Supplier = ({ params }) => {
           }
         },
         loading: isExcelLoading,
-        disabled: isExcelLoading || !!activeAction || loadingProducts || isEditPending,
+        disabled: isExcelLoading || !!activeAction || loadingProducts || isEditPending || !hasAssociatedProducts,
+        tooltip: !hasAssociatedProducts ? "No existen productos de este proveedor." : false,
         width: "fit-content",
       },
       {
         id: 4,
         icon: ICONS.LIST_UL,
         color: COLORS.RED,
-        text: "Limpiar lista",
+        text: "Eliminar productos",
         onClick: handleDeleteBatchClick,
         loading: activeAction === "deleteBatch",
         disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
-        tooltip: !hasAssociatedProducts ? "No existen productos asociados." : false,
+        tooltip: !hasAssociatedProducts ? "No existen productos de este proveedor." : false,
         width: "fit-content",
       },
       {
