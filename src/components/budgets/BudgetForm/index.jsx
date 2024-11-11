@@ -42,8 +42,6 @@ const BudgetForm = ({
   draft,
   selectedContact,
   setSelectedContact,
-  pickUpInStore,
-  onPickUpChange
 }) => {
   const methods = useForm({
     defaultValues: isCloning && budget
@@ -52,8 +50,6 @@ const BudgetForm = ({
         products: budget.products.map((product) => ({
           ...product,
           quantity: product.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
-          discount: product.discount || 0,
-          key: uuid(),
           ...(product.fractionConfig?.active && {
             fractionConfig: {
               ...product.fractionConfig,
@@ -62,22 +58,17 @@ const BudgetForm = ({
             }
           })
         })),
-        globalDiscount: budget.globalDiscount || 0,
-        additionalCharge: budget.additionalCharge || 0,
-        seller: `${user?.firstName} ${user?.lastName}`,
+        seller: `${user?.firstName} ${user?.lastName}`, 
         paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
-        pickUpInStore: pickUpInStore
       }
       : budget && draft
         ? {
           ...budget,
           seller: `${user?.firstName} ${user?.lastName}`,
           paymentsMade: budget.paymentsMade || [],
-          pickUpInStore: pickUpInStore
         }
         : {
           ...EMPTY_BUDGET(user),
-          pickUpInStore: pickUpInStore
         },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -636,7 +627,6 @@ const BudgetForm = ({
                     basic={!value}
                     onClick={() => {
                       onChange(true);
-                      onPickUpChange(true);
                     }}
                   />
                   <IconnedButton
@@ -645,7 +635,6 @@ const BudgetForm = ({
                     basic={value}
                     onClick={() => {
                       onChange(false);
-                      onPickUpChange(false);
                     }}
                   />
                 </ButtonGroup>
