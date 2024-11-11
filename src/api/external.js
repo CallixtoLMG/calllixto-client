@@ -5,9 +5,8 @@ import axios from "axios";
 export function useDolarExangeRate({ enabled = false } = {}) {
   const getDolarExangeRate = async () => {
     try {
-      const { data } = await axios.get('https://dolarapi.com/v1/dolares/blue');
-      const { compra, venta } = data;
-      return (compra + venta) / 2;
+      const { data } = await axios.get('https://api.bluelytics.com.ar/v2/latest');
+      return data.blue.value_avg;
     } catch (error) {
       throw error;
     }
