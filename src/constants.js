@@ -403,7 +403,7 @@ export const EVENT_KEYS = {
   DELETE_SUPPLIER_PRODUCTS: "S"
 }
 
-export const DEFAULT_LAST_EVENT_ID = "A0001";
+export const DEFAULT_LAST_EVENT_ID = "A0000";
 
 export const ID = "id";
 
