@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
+import { FieldsContainer, Form, FormField, Input, RuledLabel, Segment } from "@/components/common/custom";
 import { ContactFields, ControlledComments } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -19,6 +19,15 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
   }, [reset]);
 
   const handleCreate = (data) => {
+    if (!data.addresses.length) {
+      data.addresses = [];
+    }
+    if (!data.phoneNumbers.length) {
+      data.phoneNumbers = [];
+    }
+    if (!data.emails.length) {
+      data.emails = [];
+    }
     onSubmit(data);
   };
 
@@ -27,9 +36,9 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
+      <Form onSubmit={handleSubmit(handleCreate)} onKeyDown={preventSend}>
         <FieldsContainer>
-          <FormField>
+          <FormField error={errors?.id?.message}>
             <RuledLabel title="Código" message={errors?.id?.message} required={!isUpdating} />
             {isUpdating ? (
               <Segment placeholder>{supplier?.id}</Segment>
@@ -50,7 +59,7 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
               />
             )}
           </FormField>
-          <FormField width="40%">
+          <FormField width="40%" error={errors?.name?.message}>
             <RuledLabel title="Nombre" message={errors?.name?.message} required />
             <Controller
               name="name"
@@ -62,7 +71,6 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
         </FieldsContainer>
         <ContactFields />
         <FieldsContainer>
-          <Label >Comentarios</Label>
           <ControlledComments control={control} />
         </FieldsContainer>
         <SubmitAndRestore

@@ -51,7 +51,7 @@ export const PAGES = {
 };
 
 export const APIS = {
-  MAIL: (email, name) => `mailto:${email}?Subject=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
+  MAIL: (email, name) => `mailto:${email}?Subject=${encodeUri(`Hola estimado/a ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
   WSP: (phone, name) => `https://api.whatsapp.com/send?phone=${phone}&text=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
 };
 
@@ -74,10 +74,20 @@ export const RULES = {
     required: 'Campo requerido.',
     pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
   },
-  REQUIRED_MAX26_DIGIT_CODE: {
-    required: 'Campo requerido.',
-    pattern: { value: REGEX.MAX26_DIGIT_CODE, message: 'El código debe tener entre 5 y 30 valores alfanuméricos(- y _ habilitados), sumando marca y proveedor' }
-  },
+  REQUIRED_BRAND_AND_SUPPLIER: (brand, supplier) => ({
+    validate: (value) => {
+      if (!brand?.id || !supplier?.id) {
+        return 'Debe seleccionar un proveedor y una marca antes de ingresar un código';
+      }
+      if (!value) {
+        return 'El código es requerido';
+      }
+      if (!REGEX.MAX26_DIGIT_CODE.test(value)) {
+        return 'El código no puede tener más de 26 caracteres alfanuméricos, incluyendo "-" y "_"';
+      }
+      return true;
+    }
+  }),
   REQUIRED_THREE_NUMBERS: {
     required: 'Campo requerido.',
     pattern: { value: REGEX.THREE_NUMBERS_CODE, message: 'El valor puede ser hasta un máximo de 3 números' }
@@ -121,20 +131,38 @@ export const TIME_IN_MS = {
   FIVE_MINUTES: 300000,
   ONE_HOUR: 3600000,
   FOUR_HOURS: 14400000,
+  ONE_DAY: 86400000,
 };
 
 export const TIME_IN_DAYS = {
   YEAR: '365',
 };
 
-export const DEFAULT_PAGE_SIZE = 30;
+export const DEFAULT_PAGE_SIZE = 20;
+
+export const getDefaultListParams = (attributes, sort, order) => {
+  const params = {
+    attributes: encodeUri(Object.values(attributes)),
+  };
+
+  if (sort) params.sort = sort;
+  if (typeof order !== 'undefined') params.order = order;
+
+  return params;
+};
 
 export const ENTITIES = {
   CUSTOMERS: 'customers',
+  CUSTOMER: 'customer',
   SUPPLIERS: 'suppliers',
+  SUPPLIER: 'supplier',
   BRANDS: 'brands',
+  BRAND: 'brand',
   PRODUCTS: 'products',
+  PRODUCT: 'product',
   BUDGETS: 'budgets',
+  BUDGET: 'budget',
+  EVENTS: 'events'
 };
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
@@ -148,40 +176,121 @@ export const BUDGET_PDF_FORMAT = {
 export const BUDGET_STATES = {
   CONFIRMED: {
     id: 'CONFIRMED',
-    title: 'Confirmado',
+    title: 'Confirmados',
+    singularTitle: 'Confirmado',
     color: 'green',
     icon: 'check',
   },
   PENDING: {
     id: 'PENDING',
-    title: 'Pendiente',
+    title: 'Pendientes',
+    singularTitle: 'Pendiente',
     color: 'orange',
     icon: 'hourglass half',
   },
   DRAFT: {
     id: 'DRAFT',
-    title: 'Borrador',
+    title: 'Borradores',
+    singularTitle: 'Borrador',
     color: 'teal',
     icon: 'erase',
   },
   CANCELLED: {
     id: 'CANCELLED',
-    title: 'Anulado',
+    title: 'Anulados',
+    singularTitle: 'Anulado',
     color: 'red',
     icon: 'ban',
   },
   EXPIRED: {
     id: 'EXPIRED',
-    title: 'Expirado',
+    title: 'Expirados',
+    singularTitle: 'Expirado',
     color: 'brown',
+    icon: 'expired',
+  },
+};
+
+export const PRODUCT_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  DELETED: {
+    id: 'DELETED',
+    title: 'Eliminados',
+    singularTitle: 'Eliminado',
+    color: 'red',
+    icon: 'ban',
+  },
+  OOS: {
+    id: 'OOS',
+    title: 'Sin stock',
+    singularTitle: 'Sin stock',
+    color: 'orange',
     icon: 'expired',
   },
   INACTIVE: {
     id: 'INACTIVE',
-    title: 'Indefinido',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
     color: 'grey',
-    icon: 'ban',
-  }
+    icon: 'hourglass half',
+  },
+};
+
+export const CUSTOMER_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
+};
+
+export const SUPPLIER_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
+};
+
+export const BRANDS_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
 };
 
 export const SHORTKEYS = {
@@ -211,4 +320,97 @@ export const PRODUCTS_HELP = {
   EDITABLE_PRICE: "Al activar esta opción se pueden fraccionar los productos desde la creación de un presupuesto.",
 };
 
+export const COLORS = {
+  RED: 'red',
+  GREEN: 'green',
+  BLUE: 'blue',
+  ORANGE: 'orange',
+  GREY: 'grey',
+  SOFT_GREY: 'softgrey',
+  BROWN: 'brown',
+  TEAL: 'teal',
+  YELLOW: "yellow"
+};
+
+export const ICONS = {
+  X: 'x',
+  TRASH: 'trash',
+  CHECK: 'check',
+  TRUCK: 'truck',
+  HOURGLASS_HALF: "hourglass half",
+  ADD: "add",
+  UNDO: "undo",
+  BAN: "ban",
+  FILE_EXCEL: "file excel",
+  FILE_EXCEL_OUTLINE: "file excel outline",
+  SEND: "send",
+  DOWNLOAD: "download",
+  COPY: "copy",
+  DOLLAR: "dollar",
+  PLAY_CIRCLE: "play circle",
+  PAUSE_CIRCLE: "pause circle",
+  BOX: "box",
+  QUESTION: "question",
+  BARCODE: "barcode",
+  LIST_UL: "list ul",
+  INFO_CIRCLE: "info circle",
+  WAREHOUSE: "warehouse",
+  ARROW_LEFT: "arrow left",
+  CANCEL: "cancel",
+  DELETE: "delete",
+  EDIT: "edit",
+  TIMES: "times",
+  KEYBOARD: "keyboard",
+  REMOVE: "remove",
+  SEARCH: "search",
+  CHEVRON_RIGHT: "chevron right",
+  USER: "user",
+  LOCK: "lock",
+  PENCIL: "pencil",
+  CUT: "cut",
+  EDIT: "edit",
+  EYE: "eye",
+  COG: "cog",
+  EXCLAMATION_CIRCLE: "exclamation circle",
+  ADDRESS_CARD: "address card",
+  ARCHIVE: "archive",
+  OPTIONS: "options",
+  REFRESH: "refresh"
+};
+
+export const PAGE_SIZE_OPTIONS = [
+  { key: 10, text: '10', value: 10 },
+  { key: 20, text: '20', value: 20 },
+  { key: 50, text: '50', value: 50 },
+  { key: 100, text: '100', value: 100 }
+];
+
 export const PICK_UP_IN_STORE = "Retira en tienda";
+
+export const OOS = "Sin stock";
+
+export const ALL = "all";
+
+export const ACTIVE = "active";
+
+export const INACTIVE = "inactive";
+
+export const EVENT_KEYS = {
+  UPDATE: 'U',
+  CREATE: "C",
+  DELETE: "D",
+  UPDATE_ALL: "A",
+  DELETE_SUPPLIER_PRODUCTS: "S"
+}
+
+export const DEFAULT_LAST_EVENT_ID = "A0001";
+
+export const ID = "id";
+
+export const CODE = "code";
+
+export const FILTERS_OPTIONS = {
+  DATE: "date",
+  NAME: "name"
+};
+

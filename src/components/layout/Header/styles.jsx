@@ -1,7 +1,7 @@
+import { Flex } from "@/components/common/custom";
 import Link from "next/link";
 import { Container as SContainer } from "semantic-ui-react";
 import styled from "styled-components";
-import { Flex } from "@/components/common/custom";
 
 const ModLink = styled(Link)`
   display:flex;
@@ -25,7 +25,6 @@ const LogDiv = styled(Flex)`
     background-color: #f5f5f5!important;
   };
   a {
-    border-left: 1px solid rgba(34,36,38,.1)!important;
     &:hover {
       background-color: #f5f5f5!important;
     };
@@ -36,10 +35,6 @@ const Container = styled(SContainer)`
   display: flex;
   height: 60px!important;
   width: 95%!important;
-
-  div:first-of-type {
-    border-left: 1px solid rgba(34,36,38,.1);
-  };
 
   div:last-child {
     margin-left: auto!important;

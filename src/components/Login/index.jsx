@@ -1,7 +1,6 @@
 "use client";
-import { useUserContext } from "@/User";
 import { Loader } from "@/components/layout";
-import { PAGES, RULES } from "@/constants";
+import { ICONS, PAGES, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -14,7 +13,6 @@ import { ModButton, ModGrid, ModGridColumn, ModHeader, Text } from "./styled";
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
   const { handleSubmit, control } = useForm();
-  const { setUserData } = useUserContext();
   const [isLoading, setIsLoading] = useState(false);
 
   const { mutate } = useMutation({
@@ -25,7 +23,6 @@ const LoginForm = ({ onSubmit }) => {
     },
     onSuccess: (userData) => {
       if (userData) {
-        setUserData(userData);
         push(PAGES.BUDGETS.BASE);
         toast.success("Ingreso exitoso!");
       } else {
@@ -61,7 +58,7 @@ const LoginForm = ({ onSubmit }) => {
                   {...field}
                   placeholder='Correo electrónico'
                   fluid
-                  icon='user'
+                  icon={ICONS.USER}
                   iconPosition='left'
                 />
               )}
@@ -76,7 +73,7 @@ const LoginForm = ({ onSubmit }) => {
                   type='password'
                   placeholder='Contraseña'
                   fluid
-                  icon='lock'
+                  icon={ICONS.LOCK}
                   iconPosition='left'
                 />
               )}

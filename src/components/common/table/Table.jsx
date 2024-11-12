@@ -1,11 +1,12 @@
 import { Loader } from "@/components/layout";
+import { COLORS, DEFAULT_PAGE_SIZE, ICONS, PAGE_SIZE_OPTIONS } from "@/constants";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
-import { PopupActions } from "../buttons";
+import { Button, Checkbox, Header, Icon, Popup } from "semantic-ui-react";
+import { IconnedButton, PopupActions } from "../buttons";
+import { CenteredFlex, Dropdown } from "../custom";
 import Actions from "./Actions";
-import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
-import { CenteredFlex } from "../custom";
+import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Pagination, PaginationContainer, Table, TableHeader, TableRow } from "./styles";
 
 const CustomTable = ({
   isLoading,
@@ -23,27 +24,101 @@ const CustomTable = ({
   basic,
   $wrap,
   clearSelection,
-  selectAll
+  selectAllCurrentPageElements,
+  paginate,
+  onFilter = () => true,
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
-  const allSelected = useMemo(() => Object.keys(selection)?.length === elements.length, [selection, elements]);
+  const [activePage, setActivePage] = useState(1);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [popupOpenId, setPopupOpenId] = useState(null);
+  const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
+  const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
+  const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
+
+  const currentPageElements = useMemo(() => {
+    if (!paginate) {
+      return filteredElements;
+    }
+    const startIndex = (activePage - 1) * pageSize;
+    const endIndex = startIndex + pageSize;
+    return filteredElements.slice(startIndex, endIndex);
+  }, [activePage, filteredElements, pageSize, paginate]);
+
+  const allSelected = useMemo(() => {
+    return !!currentPageElements.length && currentPageElements.every(product => selection[product[mainKey]]);
+  }, [currentPageElements, mainKey, selection]);
 
   useEffect(() => {
     setHydrated(true);
   }, []);
 
+  useEffect(() => {
+    if (activePage > pages) {
+      setActivePage(1);
+    }
+  }, [pages, activePage]);
+
+  const handlePageChange = (e, { activePage }) => {
+    clearSelection?.();
+    setActivePage(activePage);
+  };
+
+  const handleTogglePopup = (id) => {
+    setPopupOpenId(popupOpenId === id ? null : id);
+  };
+
   const handleToggleAll = () => {
     if (allSelected) {
       clearSelection();
     } else {
-      selectAll();
+      selectAllCurrentPageElements(currentPageElements);
     }
+  };
+
+  const handlePageSizeChange = (e, { value }) => {
+    setPageSize(value);
+    setActivePage(1);
+    clearSelection?.();
   };
 
   return (
     <Container tableHeight={tableHeight}>
+      {paginate && (
+        <PaginationContainer center>
+          <Pagination
+            activePage={activePage}
+            onPageChange={handlePageChange}
+            siblingRange={2}
+            boundaryRange={2}
+            firstItem={null}
+            lastItem={null}
+            pointing
+            secondary
+            totalPages={pages}
+          />
+          <Popup
+            size="mini"
+            content="Elementos mostrados"
+            trigger={(
+              <Dropdown
+                options={PAGE_SIZE_OPTIONS}
+                value={pageSize}
+                onChange={handlePageSizeChange}
+                selection
+                compact
+                height="40px"
+                top="10px"
+                width="fit-content"
+              />
+            )}
+            position="left center"
+            mouseEnterDelay={500}
+          />
+        </PaginationContainer>
+      )}
       <Table celled compact striped={!basic} color={color} definition={isSelectable}>
         <TableHeader fullWidth>
           <TableRow>
@@ -62,12 +137,15 @@ const CustomTable = ({
               <HeaderCell key={`header_${header.id}`} $basic={basic}>{header.title}</HeaderCell>
             ))}
             {!!Object.keys(selection).length && (
-              <ActionsContainer $header>
+              <ActionsContainer $header $open={isPopupOpen}>
                 <InnerActionsContainer $header>
                   <PopupActions
                     position="right center"
-                    trigger={<Button icon circular color="yellow" size="mini"><Icon name="cog" /></Button>}
+                    trigger={<Button icon circular color={COLORS.YELLOW} size="mini"><Icon name={ICONS.COG} /></Button>}
                     buttons={selectionActions}
+                    open={isPopupOpen}
+                    onOpen={() => setIsPopupOpen(true)}
+                    onClose={() => setIsPopupOpen(false)}
                   />
                 </InnerActionsContainer>
               </ActionsContainer>
@@ -77,7 +155,7 @@ const CustomTable = ({
         {hydrated && (
           <Loader active={isLoading} $greyColor>
             <Table.Body>
-              {!elements.length ? (
+              {!currentPageElements.length ? (
                 <Table.Row>
                   <Cell colSpan={headers.length + (isSelectable ? 2 : 1)} textAlign="center">
                     <Header as="h4">
@@ -86,7 +164,7 @@ const CustomTable = ({
                   </Cell>
                 </Table.Row>
               ) : (
-                elements.map((element, index) => {
+                currentPageElements.map((element, index) => {
                   if (page) {
                     return (
                       <TableRow key={element[mainKey]}>
@@ -109,9 +187,29 @@ const CustomTable = ({
                           </LinkCell>
                         ))}
                         {!!actions.length && (
-                          <ActionsContainer deleteButtonInside={deleteButtonInside}>
+                          <ActionsContainer deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
                             <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
-                              <Actions actions={actions} element={element} />
+                              {actions.length > 1 ? (
+                                <PopupActions
+                                  open={popupOpenId === element[mainKey]}
+                                  onOpen={() => handleTogglePopup(element[mainKey])}
+                                  onClose={() => handleTogglePopup(null)}
+                                  position="left center"
+                                  trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
+                                  buttons={actions.map((action, idx) => (
+                                    <IconnedButton
+                                      key={idx}
+                                      icon={action.icon}
+                                      color={action.color}
+                                      onClick={() => action.onClick(element, index)}
+                                      text={action.tooltip}
+                                      width={action.width}
+                                    />
+                                  ))}
+                                />
+                              ) : (
+                                <Actions actions={actions} element={element} />
+                              )}
                             </InnerActionsContainer>
                           </ActionsContainer>
                         )}
@@ -132,9 +230,30 @@ const CustomTable = ({
                         </Cell>
                       ))}
                       {!!actions.length && (
-                        <ActionsContainer deleteButtonInside={deleteButtonInside}>
+                        <ActionsContainer stillShow deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
                           <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
-                            <Actions actions={actions} element={element} index={index} />
+                            {actions.length > 1 ? (
+                              <PopupActions
+                                open={popupOpenId === element[mainKey]}
+                                onOpen={() => handleTogglePopup(element[mainKey])}
+                                onClose={() => handleTogglePopup(null)}
+                                position="left center"
+                                trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
+                                buttons={actions.map((action, idx) => (
+                                  <IconnedButton
+                                    key={idx}
+                                    icon={action.icon}
+                                    color={action.color}
+                                    onClick={() => action.onClick(element, index)}
+                                    text={action.tooltip}
+                                    width={action.width}
+                                  />
+                                ))}
+
+                              />
+                            ) : (
+                              <Actions actions={actions} element={element} index={index} />
+                            )}
                           </InnerActionsContainer>
                         </ActionsContainer>
                       )}

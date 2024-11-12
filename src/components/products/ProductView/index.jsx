@@ -1,11 +1,26 @@
 "use client";
-import { FieldsContainer, FormField, IconedButton, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
-import { MEASSURE_UNITS } from "@/constants";
-import { Icon } from "semantic-ui-react";
+import { Message } from "@/components/budgets/BudgetView/styles";
+import { IconnedButton } from "@/components/common/buttons";
+import { FieldsContainer, FormField, Label, MessageHeader, Price, Segment, ViewContainer } from "@/components/common/custom";
+import { ICONS, MEASSURE_UNITS, PRODUCT_STATES } from "@/constants";
+import { isItemInactive, threeMonthsDate } from "@/utils";
 
 const ProductView = ({ product }) => {
   return (
     <ViewContainer>
+      {isItemInactive(product?.state) &&
+        <FieldsContainer>
+          <Message negative >
+            <MessageHeader>Motivo de inactivación</MessageHeader>
+            <p>{product.inactiveReason}</p>
+          </Message>
+        </FieldsContainer>}
+      {product?.state === PRODUCT_STATES.DELETED.id &&
+        <FieldsContainer>
+          <Message negative >
+            <p>Este producto se eliminará <b>PERMANENTEMENTE</b> de forma automática el día {threeMonthsDate(product.updateAt)} (90 días desde que se marco como eliminado).</p>
+          </Message>
+        </FieldsContainer>}
       <FieldsContainer alignItems="flex-end">
         <FormField flex="1">
           <Label>Proveedor</Label>
@@ -16,30 +31,10 @@ const ProductView = ({ product }) => {
           <Segment placeholder>{product?.brandName}</Segment>
         </FormField>
         <FormField width="20%">
-          <IconedButton
-            width="fit-content"
-            icon
-            labelPosition="left"
-            color="blue"
-            basic={!product?.editablePrice}
-            disabled
-          >
-            <Icon name="pencil" />
-            Precio Editable
-          </IconedButton>
+          <IconnedButton icon={ICONS.PENCIL} basic={!product?.editablePrice} disabled text="Precio Editable" />
         </FormField>
         <FormField width="20%">
-          <IconedButton
-            width="fit-content"
-            icon
-            labelPosition="left"
-            color="blue"
-            basic={!product?.fractionConfig?.active}
-            disabled
-          >
-            <Icon name="cut" />
-            Producto Fraccionable
-          </IconedButton>
+          <IconnedButton icon={ICONS.CUT} basic={!product?.fractionConfig?.active} disabled text="Producto Fraccionable" />
         </FormField>
       </FieldsContainer>
       <FieldsContainer>
@@ -57,7 +52,7 @@ const ProductView = ({ product }) => {
         </FormField>
         <FormField width="20%">
           <Label>Unidad de Medida</Label>
-          <Segment placeholder>{MEASSURE_UNITS[product.fractionConfig?.unit?.toUpperCase()]?.text}</Segment>
+          <Segment placeholder>{MEASSURE_UNITS[product?.fractionConfig?.unit?.toUpperCase()]?.text}</Segment>
         </FormField>
       </FieldsContainer>
       <FieldsContainer rowGap="5px">

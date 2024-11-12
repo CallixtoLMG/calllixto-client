@@ -1,27 +1,39 @@
 "use client";
-import { GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY, edit, useGetBrand } from "@/api/brands";
+import { useUserContext } from "@/User";
+import { useActiveBrand, useDeleteBrand, useEditBrand, useGetBrand, useInactiveBrand } from "@/api/brands";
+import { useHasProductsByBrandId } from "@/api/products";
 import BrandForm from "@/components/brands/BrandForm";
+import BrandView from "@/components/brands/BrandView";
+import { Input } from "@/components/common/custom";
+import ModalAction from "@/components/common/modals/ModalAction";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { COLORS, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { toast } from "react-hot-toast";
-import BrandView from "../../../components/brands/BrandView";
-import { useUserContext } from "@/User";
 import { RULES } from "@/roles";
+import { isItemInactive } from "@/utils";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
 
 const Brand = ({ params }) => {
   useValidateToken();
-  const { push } = useRouter();
-  const { data: brand, isLoading, isRefetching } = useGetBrand(params.id);
   const { role } = useUserContext();
-  const [isUpdating, Toggle] = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { push } = useRouter();
+  const { data: brand, isLoading, refetch } = useGetBrand(params.id);
   const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
+  const { resetActions, setActions } = useNavActionsContext();
+  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState(null);
+  const [activeAction, setActiveAction] = useState(null);
+  const [reason, setReason] = useState("");
+  const editBrand = useEditBrand();
+  const deleteBrand = useDeleteBrand();
+  const activeBrand = useActiveBrand();
+  const inactiveBrand = useInactiveBrand();
+  const { hasAssociatedProducts, isLoadingProducts } = useHasProductsByBrandId(brand?.id);
 
   useEffect(() => {
     resetActions();
@@ -30,39 +42,201 @@ const Brand = ({ params }) => {
 
   useEffect(() => {
     setLabels([PAGES.BRANDS.NAME, brand?.name]);
-  }, [setLabels, brand]);
+    refetch();
+  }, [setLabels, brand, refetch]);
 
-  const { mutate, isPending } = useMutation({
+  const modalConfig = useMemo(() => ({
+    delete: {
+      header: `¿Está seguro que desea eliminar la marca "${brand?.name}"?`,
+      confirmText: "eliminar",
+      icon: ICONS.TRASH,
+    },
+    active: {
+      header: `¿Está seguro que desea activar el cliente ${brand?.id}?`,
+      icon: ICONS.PLAY_CIRCLE
+    },
+    inactive: {
+      header: `¿Está seguro que desea desactivar el cliente ${brand?.id}?`,
+      icon: ICONS.PAUSE_CIRCLE
+    },
+  }), [brand]);
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setModalAction(null);
+    setReason("");
+  };
+
+  const handleOpenModalWithAction = useCallback((action) => {
+    setModalAction(action);
+    setIsModalOpen(true);
+  }, []);
+
+  const handleActivateClick = useCallback(() => handleOpenModalWithAction("active"), [handleOpenModalWithAction]);
+  const handleInactiveClick = useCallback(() => handleOpenModalWithAction("inactive"), [handleOpenModalWithAction]);
+  const handleDeleteClick = useCallback(() => handleOpenModalWithAction("delete"), [handleOpenModalWithAction]);
+
+  const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: async (brand) => {
-      const { data } = await edit(brand);
+      const data = await editBrand(brand);
       return data;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BRANDS_QUERY_KEY] });
-        queryClient.invalidateQueries({ queryKey: [GET_BRAND_QUERY_KEY, params.id] });
-        toast.success('Marca actualizada!');
+        toast.success("Marca actualizada!");
         push(PAGES.BRANDS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
     },
   });
 
-  if (!isLoading && !brand) {
-    push(PAGES.NOT_FOUND.BASE);
+  const { mutate: mutateActive, isPending: isActivePending } = useMutation({
+    mutationFn: async ({ brand }) => {
+      const response = await activeBrand(brand);
+      return response;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Marca activada!");
+        push(PAGES.BRANDS.BASE);
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
+  });
+
+  const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
+    mutationFn: async ({ brand, reason }) => {
+      const response = await inactiveBrand(brand, reason);
+      return response;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Marca desactivada!");
+        push(PAGES.BRANDS.BASE);
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
+  });
+
+  const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
+    mutationFn: () => {
+      return deleteBrand(params.id);
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Marca eliminada permanentemente!");
+        push(PAGES.BRANDS.BASE);
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
+  });
+
+  const handleActionConfirm = async () => {
+    setActiveAction(modalAction);
+
+    if (modalAction === "delete") {
+      mutateDelete();
+    } else if (modalAction === "inactive") {
+      if (!reason) {
+        toast.error("Debe proporcionar una razón para desactivar la marca.");
+        return;
+      }
+      mutateInactive({ brand, reason });
+    } else if (modalAction === "active") {
+      mutateActive({ brand });
+    }
+
+    handleModalClose();
   };
 
+  const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
+  const requiresConfirmation = modalAction === "delete";
+
+  useEffect(() => {
+    if (brand) {
+      const actions = RULES.canRemove[role] ? [
+        {
+          id: 1,
+          icon: isItemInactive(brand?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
+          color: COLORS.GREY,
+          text: isItemInactive(brand?.state) ? "Activar" : "Desactivar",
+          onClick: isItemInactive(brand?.state) ? handleActivateClick : handleInactiveClick,
+          loading: (activeAction === "active" || activeAction === "inactive"),
+          disabled: !!activeAction,
+          width: "fit-content",
+        },
+        {
+          id: 2,
+          icon: ICONS.TRASH,
+          color: COLORS.RED,
+          text: "Eliminar",
+          basic: true,
+          onClick: handleDeleteClick,
+          loading: activeAction === "delete",
+          disabled: hasAssociatedProducts || !!activeAction,
+          tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
+        },
+      ] : [];
+
+      setActions(actions);
+    }
+  }, [role, brand, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions, hasAssociatedProducts]);
+
+  if (!isLoading && !brand) {
+    push(PAGES.NOT_FOUND.BASE);
+  }
+
   return (
-    <Loader active={isLoading || isRefetching}>
-      {Toggle}
+    <Loader active={isLoading || isLoadingProducts}>
+      {toggleButton}
       {isUpdating ? (
-        <BrandForm brand={brand} onSubmit={mutate} isLoading={isPending} isUpdating />
+        <BrandForm brand={brand} onSubmit={mutateEdit} isLoading={isEditPending} isUpdating />
       ) : (
         <BrandView brand={brand} />
       )}
+      <ModalAction
+        title={header}
+        onConfirm={handleActionConfirm}
+        confirmationWord={requiresConfirmation ? confirmText : ""}
+        confirmButtonIcon={icon}
+        showModal={isModalOpen}
+        setShowModal={handleModalClose}
+        isLoading={isDeletePending || isInactivePending || isActivePending}
+        noConfirmation={!requiresConfirmation}
+        disableButtons={!reason && modalAction === "inactive"}
+        bodyContent={
+          modalAction === "inactive" && (
+            <Input
+              type="text"
+              placeholder="Indique la razón de desactivación"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            />
+          )
+        }
+      />
     </Loader>
-  )
+  );
 };
 
 export default Brand;

@@ -1,10 +1,10 @@
 "use client";
-import { LIST_CUSTOMERS_QUERY_KEY, create } from "@/api/customers";
+import { useCreateCustomer } from "@/api/customers";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
@@ -13,8 +13,8 @@ const CreateCustomer = () => {
   useValidateToken();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
   const { push } = useRouter();
+  const createCustomer = useCreateCustomer();
 
   useEffect(() => {
     resetActions();
@@ -27,16 +27,15 @@ const CreateCustomer = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (customer) => {
-      const { data } = await create(customer);
-      return data;
+      const response = await createCustomer(customer);
+      return response;
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_CUSTOMERS_QUERY_KEY] });
         toast.success('Cliente creado!');
         push(PAGES.CUSTOMERS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
     onError: (error) => {

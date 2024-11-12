@@ -1,122 +1,139 @@
-import { usePaginationContext } from "@/components/common/table/Pagination";
-import { DEFAULT_PAGE_SIZE, ENTITIES, TIME_IN_MS } from "@/constants";
+import { ATTRIBUTES } from "@/components/suppliers/suppliers.common";
+import { ACTIVE, ENTITIES, getDefaultListParams, ID, INACTIVE, TIME_IN_MS } from "@/constants";
 import { PATHS } from "@/fetchUrls";
-import { encodeUri, now } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import axios from './axios';
+import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
-const SUPPLIER_URL = `${PATHS.SUPPLIERS}`;
-export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
-export const LIST_ALL_SUPPLIER_QUERY_KEY = 'listAllSuppliers';
+export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 
-export function create(supplier) {
-  const body = {
-    ...supplier,
-    createdAt: now()
-  }
-  return axios.post(SUPPLIER_URL, body);
-};
-
-export function edit(supplier) {
-  const body = {
-    ...supplier,
-    updatedAt: now()
-  }
-  return axios.put(`${SUPPLIER_URL}/${supplier.id}`, body);
-};
-
-export function deleteSupplier(id) {
-  return axios.delete(`${SUPPLIER_URL}/${id}`);
-};
-
-export function useListSuppliers({ sort, order = true, pageSize = DEFAULT_PAGE_SIZE, attributes = [] }) {
-  const { addKey, currentPage, keys, filters } = usePaginationContext();
-
-  const params = {
-    attributes: encodeUri(attributes),
-    pageSize,
-    ...(keys[ENTITIES.SUPPLIERS][currentPage] && {
-      LastEvaluatedKey: encodeUri(keys[ENTITIES.SUPPLIERS][currentPage])
+export function useListSuppliers({ sort = ID, order = true } = {}) {
+  const query = useQuery({
+    queryKey: [LIST_SUPPLIERS_QUERY_KEY],
+    queryFn: () => listItems({
+      entity: ENTITIES.SUPPLIERS,
+      url: PATHS.SUPPLIERS,
+      params: getDefaultListParams(ATTRIBUTES, sort, order)
     }),
-    ...(sort && { sort }),
-    order,
-    ...filters
-  };
-
-  const listSuppliers = async (params) => {
-    try {
-      const { data } = await axios.get(SUPPLIER_URL, { params });
-      if (data?.LastEvaluatedKey) {
-        addKey(data?.LastEvaluatedKey, ENTITIES.SUPPLIERS);
-      }
-      return { suppliers: data?.suppliers || [], LastEvaluatedKey: data.LastEvaluatedKey }
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const query = useQuery({
-    queryKey: [LIST_SUPPLIERS_QUERY_KEY, params, attributes],
-    queryFn: () => listSuppliers(params),
-  });
-
-  return query;
-};
-
-export function useListAllSuppliers({ attributes = [] }) {
-  const listSuppliers = async () => {
-    try {
-      let suppliers = [];
-      let LastEvaluatedKey;
-
-      do {
-        const params = {
-          attributes: encodeUri(attributes),
-          ...(LastEvaluatedKey && { LastEvaluatedKey: encodeUri(LastEvaluatedKey) }),
-        };
-
-        const { data } = await axios.get(SUPPLIER_URL, { params });
-
-        if (data.statusOk) {
-          suppliers = [...suppliers, ...data.suppliers];
-        }
-
-        LastEvaluatedKey = data?.LastEvaluatedKey;
-
-      } while (LastEvaluatedKey);
-
-      return { suppliers };
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const query = useQuery({
-    queryKey: [LIST_ALL_SUPPLIER_QUERY_KEY, attributes],
-    queryFn: () => listSuppliers(),
-    staleTime: TIME_IN_MS.FOUR_HOURS,
+    staleTime: 0,
   });
 
   return query;
 };
 
 export function useGetSupplier(id) {
-  const getSupplier = async (id) => {
-    try {
-      const { data } = await axios.get(`${SUPPLIER_URL}/${id}`);
-      return data?.supplier;
-    } catch (error) {
-      throw error;
-    }
-  };
-
   const query = useQuery({
     queryKey: [GET_SUPPLIER_QUERY_KEY, id],
-    queryFn: () => getSupplier(id),
+    queryFn: () => getItemById({ id, url: PATHS.SUPPLIERS, entity: ENTITIES.SUPPLIERS }),
     retry: false,
     staleTime: TIME_IN_MS.ONE_HOUR,
   });
 
   return query;
 };
+
+export const useCreateSupplier = () => {
+  const createItem = useCreateItem();
+
+  const createSupplier = async (supplier) => {
+    const response = await createItem({
+      entity: ENTITIES.SUPPLIERS,
+      url: PATHS.SUPPLIERS,
+      value: supplier,
+      responseEntity: ENTITIES.SUPPLIER,
+      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY]],
+    });
+
+    return response;
+  };
+
+  return createSupplier;
+};
+
+export const useDeleteSupplier = () => {
+  const deleteItem = useDeleteItem();
+
+  const deleteSupplier = async (id) => {
+    const response = await deleteItem({
+      entity: ENTITIES.SUPPLIERS,
+      id,
+      url: PATHS.SUPPLIERS,
+      key: "id",
+      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY]]
+    });
+
+    return response;
+  };
+
+  return deleteSupplier;
+};
+
+export const useEditSupplier = () => {
+  const editItem = useEditItem();
+
+
+  const editSupplier = async (supplier) => {
+
+    const response = await editItem({
+      entity: ENTITIES.SUPPLIERS,
+      url: `${PATHS.SUPPLIERS}/${supplier.id}`,
+      value: supplier,
+      key: "id",
+      responseEntity: ENTITIES.SUPPLIER,
+      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, supplier.id]]
+    });
+
+    return response;
+  };
+
+  return editSupplier;
+};
+
+export const useInactiveSupplier = () => {
+  const inactiveItem = useInactiveItem();
+
+  const inactiveSupplier = async (supplier, reason) => {
+    const updatedSupplier = {
+      ...supplier,
+      inactiveReason: reason
+    }
+
+    const response = await inactiveItem({
+      entity: ENTITIES.SUPPLIERS,
+      url: `${PATHS.SUPPLIERS}/${supplier.id}/${INACTIVE}`,
+      value: updatedSupplier,
+      key: "id",
+      responseEntity: ENTITIES.SUPPLIER,
+      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, supplier.id]]
+    });
+
+    return response;
+  };
+
+  return inactiveSupplier;
+};
+
+export const useActiveSupplier = () => {
+  const activeItem = useActiveItem();
+
+  const activeSupplier = async (supplier) => {
+    const updatedSupplier = {
+      ...supplier,
+    }
+
+    const response = await activeItem({
+      entity: ENTITIES.SUPPLIERS,
+      url: `${PATHS.SUPPLIERS}/${supplier.id}/${ACTIVE}`,
+      value: updatedSupplier,
+      key: "id",
+      responseEntity: ENTITIES.SUPPLIER,
+      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, supplier.id]]
+    });
+
+    return response;
+  };
+
+  return activeSupplier;
+};
+
+

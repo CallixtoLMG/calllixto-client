@@ -2,19 +2,17 @@
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
 import { DropdownItem, Icon, IconedButton } from "@/components/common/custom";
-import { usePaginationContext } from "@/components/common/table/Pagination";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
-import { ATTRIBUTES } from "@/components/products/products.common";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, PAGES, PRODUCT_STATES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { downloadExcel } from "@/utils";
+import { downloadExcel, formatedPrice } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Dropdown } from "semantic-ui-react";
 
 const mockData = [
@@ -27,14 +25,7 @@ const mockData = [
 const Products = () => {
   useValidateToken();
   const { role } = useUserContext();
-  const { handleEntityChange } = usePaginationContext();
-
-  useEffect(() => {
-    handleEntityChange(ENTITIES.PRODUCTS);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const { data, isLoading } = useListProducts({ sort: 'date', order: false, attributes: [ATTRIBUTES.NAME, ATTRIBUTES.PRICE, ATTRIBUTES.CODE, ATTRIBUTES.COMMENTS, ATTRIBUTES.BRAND_NAME, ATTRIBUTES.SUPPLIER_NAME] });
+  const { data, isLoading, isRefetching, refetch } = useListProducts();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
@@ -42,14 +33,40 @@ const Products = () => {
 
   useEffect(() => {
     setLabels(['Productos']);
-  }, [setLabels]);
+    refetch();
+  }, [setLabels, refetch]);
+
+  const products = useMemo(() => data?.products, [data]);
+  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
+
+  const prepareProductDataForExcel = useMemo(() => {
+    if (!products) return [];
+    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Estado', 'Comentarios'];
+
+    const productData = products.map(product => {
+      const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
+      return [
+        product.code,
+        product.name,
+        product.brandName,
+        product.supplierName,
+        formatedPrice(product.price),
+        productState,
+        product.comments
+      ];
+    });
+
+    return [headers, ...productData];
+  }, [products]);
+
 
   useEffect(() => {
+
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
-        icon: 'add',
-        color: 'green',
+        icon: ICONS.ADD,
+        color: COLORS.GREEN,
         onClick: () => { push(PAGES.PRODUCTS.CREATE) },
         text: 'Crear'
       },
@@ -60,7 +77,7 @@ const Products = () => {
             pointing
             as={IconedButton}
             text='Excel'
-            icon='file excel'
+            icon={ICONS.FILE_EXCEL}
             floating
             labeled
             button
@@ -73,23 +90,30 @@ const Products = () => {
               <DropdownItem>
                 <BatchImport key="batch-update" />
               </DropdownItem>
+              <DropdownItem onClick={() => {
+                downloadExcel(prepareProductDataForExcel, "Lista de Productos");
+              }}>
+                <Icon name={ICONS.DOWNLOAD} />Productos
+              </DropdownItem>
               <DropdownItem onClick={() => downloadExcel(mockData, "Ejemplo de tabla")}>
-                <Icon name="download" />Plantilla
+                <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla
               </DropdownItem>
             </Dropdown.Menu>
           </Dropdown>
         )
       },
       {
-        id: 5,
-        icon: 'ban',
-        color: 'red',
+        id: 3,
+        icon: ICONS.BAN,
+        color: COLORS.RED,
         onClick: () => setOpen(true),
-        text: 'Bloquear'
+        text: 'Bloquear',
+        basic: true
       },
     ] : [];
     setActions(actions);
-  }, [push, role, setActions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.PRODUCTS.CREATE), SHORTKEYS.ENTER);
 
@@ -97,8 +121,9 @@ const Products = () => {
     <>
       {open && <BanProduct open={open} setOpen={setOpen} />}
       <ProductsPage
-        isLoading={isLoading}
-        products={data?.products}
+        onRefetch={refetch}
+        isLoading={loading}
+        products={loading ? [] : products}
         role={role}
       />
     </>

@@ -1,7 +1,8 @@
-import { Flex, IconedButton } from '@/components/common/custom';
+import { Flex } from '@/components/common/custom';
+import { COLORS, ICONS } from "@/constants";
 import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';
-import { Paginator } from './Pagination';
+import { IconnedButton } from '../buttons';
 import { FiltersContainer } from './styles';
 
 const MainContainer = styled(Flex)`
@@ -18,7 +19,7 @@ const HeaderSegment = styled(SSegment)`
   justify-content: space-between;
 `;
 
-const Filters = ({ children, onRestoreFilters, clearSelection }) => {
+const Filters = ({ children, onRestoreFilters, onRefetch }) => {
   return (
     <MainContainer>
       <HeaderSegment flex="1">
@@ -29,24 +30,32 @@ const Filters = ({ children, onRestoreFilters, clearSelection }) => {
             size="tiny"
             trigger={(
               <Button circular icon type="button" onClick={onRestoreFilters}>
-                <Icon name="undo" />
+                <Icon name={ICONS.UNDO} />
               </Button>
             )}
           />
           {children}
         </FiltersContainer>
-        <Flex alignSelf="center">
-          <IconedButton
-            icon
-            type="submit"
-            labelPosition="left"
-          >
-            <Icon name="search" />Buscar
-          </IconedButton>
+        <Flex columnGap="10px" alignSelf="center">
+          <IconnedButton
+            text="Buscar"
+            icon={ICONS.SEARCH}
+            submit
+            color={COLORS.SOFT_GREY}
+            width='130px'
+          />
+          <Popup
+            content="Actualizar tabla"
+            position="right center"
+            size="tiny"
+            trigger={(
+              <Button circular icon type="button" onClick={onRefetch}>
+                <Icon color={COLORS.WHITE} name={ICONS.REFRESH} />
+              </Button>
+            )}
+          />
         </Flex>
-      </HeaderSegment>
-      <HeaderSegment >
-        <Paginator onGoPreviousPage={clearSelection} onGoNextPage={clearSelection} />
+
       </HeaderSegment>
     </MainContainer>
   )

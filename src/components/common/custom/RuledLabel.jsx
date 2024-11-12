@@ -1,6 +1,7 @@
+import { Flex } from '@/components/common/custom';
+import { COLORS, ICONS } from "@/constants";
 import { Popup, Icon as SIcon, Label as SLabel } from "semantic-ui-react";
 import styled from "styled-components";
-import { Flex } from '@/components/common/custom';
 
 const Label = styled(SLabel)`
   width: 100%!important;
@@ -18,13 +19,13 @@ export const RuledLabel = ({ title, message, required, onDelete, readonly, popup
       <Flex justifyContent="space-between">
         <span>
           {title}
-          {required && <span style={{ color: message ? 'red' : 'teal' }}> *</span>}
+          {required && <span style={{ color: message ? COLORS.RED : COLORS.TEAL }}> *</span>}
         </span>
         {message && (
           <Popup
             position="top center"
             content={message}
-            trigger={<Icon name="exclamation circle" color="red" />}
+            trigger={<Icon name={ICONS.EXCLAMATION_CIRCLE} color={COLORS.RED} />}
           />
         )}
         {!readonly && onDelete && (
@@ -32,7 +33,7 @@ export const RuledLabel = ({ title, message, required, onDelete, readonly, popup
             size="mini"
             position="top center"
             content={popupMsg}
-            trigger={<Icon pointer name="trash" color="red" size="small" onClick={onDelete} />}
+            trigger={<Icon pointer name={ICONS.TRASH} color={COLORS.ORANGE} size="small" onClick={onDelete} />}
           />
         )}
       </Flex>

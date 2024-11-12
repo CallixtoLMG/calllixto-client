@@ -1,16 +1,19 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
-import { SubmitAndRestore } from "@/components/common/buttons";
+import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
+import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
-import { BUDGET_STATES, PAGES, PICK_UP_IN_STORE, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
+import { ATTRIBUTES } from "@/components/products/products.common";
+import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { actualDate, expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
+import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Message, Modal, Popup, Transition } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import ModalComment from "./ModalComment";
@@ -23,59 +26,163 @@ const EMPTY_BUDGET = (user) => ({
   comments: '',
   globalDiscount: 0,
   additionalCharge: 0,
-  paymentMethods: PAYMENT_METHODS,
-  expirationOffsetDays: ''
+  paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
+  expirationOffsetDays: '',
+  paymentsMade: [],
 });
 
-const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoading, isCloning, draft }) => {
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
-  const [outdatedProducts, setOutdatedProducts] = useState([]);
-  const [removedProducts, setRemovedProducts] = useState([]);
-  const hasShownModal = useRef(false);
-  const [isTableLoading, setIsTableLoading] = useState(false);
-  const [shouldShowModal, setShouldShowModal] = useState(false);
-  const [temporaryProducts, setTemporaryProducts] = useState([]);
-  const [expiration, setExpiration] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
-  const { control, handleSubmit, setValue, getValues, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = useForm({
-    defaultValues: budget ? {
-      ...budget,
-      seller: `${user?.firstName} ${user?.lastName}`,
-    } : EMPTY_BUDGET(user),
+const BudgetForm = ({
+  onSubmit,
+  products,
+  customers = [],
+  budget,
+  user,
+  isLoading,
+  isCloning,
+  draft,
+  selectedContact,
+  setSelectedContact,
+}) => {
+  const methods = useForm({
+    defaultValues: isCloning && budget
+      ? {
+        ...omit(budget, ['id', 'comments', 'paymentsMade', 'customer', 'expirationOffsetDays', 'paymentMethods']),
+        products: budget.products.map((product) => ({
+          ...product,
+          quantity: product.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
+          ...(product.fractionConfig?.active && {
+            fractionConfig: {
+              ...product.fractionConfig,
+              value: product.fractionConfig.value || 1,
+              price: product.price,
+            }
+          })
+        })),
+        seller: `${user?.firstName} ${user?.lastName}`, 
+        paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
+      }
+      : budget && draft
+        ? {
+          ...budget,
+          seller: `${user?.firstName} ${user?.lastName}`,
+          paymentsMade: budget.paymentsMade || [],
+        }
+        : {
+          ...EMPTY_BUDGET(user),
+        },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  const [watchProducts, watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp] = watch(['products', 'globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore']);
-  const [subtotal, setSubtotal] = useState(0);
+  const { control, handleSubmit, setValue, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = methods;
+  const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
+    control,
+    name: "products"
+  });
+  const [watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp, watchProducts] = watch(['globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore', 'products']);
+  const hasShownModal = useRef(false);
   const productSearchRef = useRef(null);
-  const customerOptions =
-    customers.filter(customer => customer.id && customer.name)
-      .map(customer => ({
-        key: customer.id, value: customer.id, text: customer.name,
-      }));
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [originalPrices, setOriginalPrices] = useState({});
+  const [outdatedProducts, setOutdatedProducts] = useState([]);
+  const [removedProducts, setRemovedProducts] = useState([]);
+  const [temporaryProducts, setTemporaryProducts] = useState([]);
+  const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
+  const [isTableLoading, setIsTableLoading] = useState(false);
+  const [shouldShowModal, setShouldShowModal] = useState(false);
+  const [expiration, setExpiration] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [subtotal, setSubtotal] = useState(0);
+  const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
+  const [total, setTotal] = useState(0);
+  const isCustomerInactive = watchCustomer?.state === CUSTOMER_STATES.INACTIVE.id;
+
+  useEffect(() => {
+    const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
+    setSubtotalAfterDiscount(updatedSubtotalAfterDiscount);
+
+    const updatedtotal = getSubtotal(updatedSubtotalAfterDiscount, watchAdditionalCharge);
+    setTotal(updatedtotal);
+  }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
+
+  const customerOptions = useMemo(() => {
+    return customers.map(({ id, name, state, deactivationReason }) => ({
+      key: id,
+      value: id,
+      text: name,
+      content: (
+        <Flex justifyContent="space-between" alignItems="center">
+          <span>{name}</span>
+          {state === CUSTOMER_STATES.INACTIVE.id && (
+            <Flex >
+              <Popup
+                trigger={
+                  <Label color={COLORS.GREY} size="mini">
+                    Desactivado
+                  </Label>}
+                content={deactivationReason || 'Motivo no especificado'}
+                position="top center"
+                size="mini"
+              />
+            </Flex>
+          )}
+        </Flex>
+      ),
+    }));
+  }, [customers]);
+
+  const shouldError = useMemo(() => isBudgetConfirmed(watchState) && !draft && !watchPickUp, [draft, watchPickUp, watchState]);
+
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
       setIsTableLoading(true);
       let budgetProducts = [...budget.products];
       const outdatedProducts = products.filter(product => {
         const budgetProduct = budgetProducts.find(budgetProduct => budgetProduct.code === product.code);
+
         if (budgetProduct) {
           budgetProducts = budgetProducts.filter(budgetProduct => budgetProduct.code !== product.code);
-          return budgetProduct.price !== product.price;
+
+          const priceChanged = budgetProduct.price !== product.price;
+          const stateChanged = budgetProduct.state !== product.state;
+          const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
+
+          const fractionConfigChanged =
+            (budgetProduct.fractionConfig?.active !== product.fractionConfig?.active) ||
+            (
+              budgetProduct.fractionConfig?.active &&
+              product.fractionConfig?.active &&
+              (budgetProduct.fractionConfig.value !== product.fractionConfig.value && product.fractionConfig.value !== undefined)
+            );
+
+          return priceChanged || stateChanged || editableChanged || fractionConfigChanged;
         }
         return false;
       });
+
       if (outdatedProducts.length || budgetProducts.length) {
-        let newProducts = [...watchProducts];
-        newProducts = newProducts.filter(product => !budgetProducts.some(budgetProduct => budgetProduct.code === product.code));
-        newProducts = newProducts.map(product => {
-          const outdatedProduct = outdatedProducts.find(outdatedProduct => outdatedProduct.code === product.code);
+        let newProducts = watchProducts.map(product => {
+          const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
           if (outdatedProduct) {
-            return { ...product, price: outdatedProduct.price };
+            setOriginalPrices(prev => ({
+              ...prev,
+              [product.code]: product.price
+            }));
+
+            return {
+              ...product,
+              price: outdatedProduct.price,
+              editablePrice: outdatedProduct.editablePrice,
+              fractionConfig: {
+                ...outdatedProduct.fractionConfig,
+                value: outdatedProduct.fractionConfig?.value || 1
+              },
+              state: outdatedProduct.state,
+              quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity
+            };
           }
           return product;
         });
+
         setTemporaryProducts(newProducts);
         setOutdatedProducts(outdatedProducts);
         setRemovedProducts(budgetProducts);
@@ -89,11 +196,28 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
 
   const handleConfirmUpdate = () => {
     setValue('products', temporaryProducts);
+    setOriginalPrices({});
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
 
   const handleCancelUpdate = () => {
+    const restoredProducts = temporaryProducts.map(product => {
+      if (originalPrices[product.code] !== undefined) {
+        return {
+          ...product,
+          price: originalPrices[product.code],
+        };
+      }
+      return product;
+    });
+
+    setValue(
+      "products",
+      restoredProducts.filter(product =>
+        product.state !== PRODUCT_STATES.DELETED.id && product.state !== PRODUCT_STATES.INACTIVE.id
+      )
+    );
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
@@ -102,12 +226,6 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     const totalSum = getTotalSum(watchProducts);
     setSubtotal(totalSum);
   }, [watchProducts]);
-
-  const deleteProduct = useCallback((index) => {
-    const newProducts = [...watchProducts];
-    newProducts.splice(index, 1);
-    setValue("products", newProducts);
-  }, [watchProducts, setValue]);
 
   useEffect(() => {
     calculateTotal();
@@ -120,9 +238,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
       await onSubmit({
         ...data,
         customer: { id: customer.id, name: customer.name },
+        products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment"])),
+        total: Number(total.toFixed(2)),
         state
       });
-    };
+    }
   };
 
   const currentState = useMemo(() => {
@@ -133,12 +253,11 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   }, [watchState]);
 
   const validateCustomer = () => {
-    const customer = getValues("customer");
-    if (isBudgetConfirmed(watchState) && watchPickUp && (!customer.addresses.length || !customer.phoneNumbers.length)) {
-      if (!customer.addresses.length) {
+    if (isBudgetConfirmed(watchState) && !watchPickUp && (!watchCustomer.addresses.length || !watchCustomer.phoneNumbers.length)) {
+      if (!watchCustomer.addresses.length) {
         setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
-      if (!customer.phoneNumbers.length) {
+      if (!watchCustomer.phoneNumbers.length) {
         setError('customer.phoneNumbers', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
       };
       return false;
@@ -157,6 +276,7 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     } else {
       reset({
         ...EMPTY_BUDGET(user),
+        state: watchState,
         seller: `${user?.firstName} ${user?.lastName}`,
       });
     }
@@ -164,37 +284,35 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [reset, user, draft, isCloning, budget]);
+  }, [draft, isCloning, reset, user, budget, watchState]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));
     setIsModalCommentOpen(true);
   }, []);
 
-  const handleModalCommentClose = () => setIsModalCommentOpen(false);
-
   const actions = [
     {
       id: 1,
-      icon: 'trash',
-      color: 'red',
-      onClick: (element, index) => deleteProduct(index),
-      tooltip: 'Eliminar'
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
+      onClick: (element, index) => removeProduct(index),
+      tooltip: 'Eliminar',
+      width: "100%"
     },
     {
       id: 2,
-      icon: 'add',
-      color: 'green',
+      icon: ICONS.ADD,
+      color: COLORS.GREEN,
       onClick: (element, index) => handleOpenCommentModal(element, index),
-      tooltip: 'Comentario para remito'
+      tooltip: 'Comentarios'
     },
   ];
 
   const onAddComment = async ({ index, dispatchComment }) => {
-    const newProducts = [...watchProducts];
-    const product = newProducts[index];
+    const product = watchProducts[index];
     product.dispatchComment = dispatchComment;
-    setValue("products", newProducts);
+    updateProduct(index, product);
     setIsModalCommentOpen(false);
   };
 
@@ -216,8 +334,12 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
     },
     {
       id: 2,
-      title: "Cantidad", value: (product, index) => (
-        <Controller name={`products[${index}].quantity`} control={control} rules={RULES.REQUIRED}
+      title: "Cantidad",
+      value: (product, index) => (
+        <Controller
+          name={`products[${index}].quantity`}
+          control={control}
+          rules={RULES.REQUIRED}
           render={({ field: { onChange, ...rest } }) => (
             <CurrencyFormatInput
               {...rest}
@@ -225,11 +347,13 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               $shadow
               decimalScale={2}
               displayType="input"
-              onFocus={(e) => e.target.select()} onChange={(e) => {
+              onFocus={(e) => e.target.select()}
+              onChange={(e) => {
                 const value = Math.abs(e.target.value);
                 onChange(value);
                 calculateTotal();
               }}
+              disabled={product.state === PRODUCT_STATES.OOS.id}
             />
           )}
         />
@@ -245,8 +369,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           <Flex marginLeft="3px" marginRight="3px" columnGap="3px">
             {product.comments && <CommentTooltip comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
-              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name="truck" color="orange" />} />
+              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />} />
             )}
+            {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
           </Flex>
         </Container>
       ),
@@ -295,7 +420,8 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
             name={`products[${index}].price`}
             control={control}
             render={({ field: { onChange, value } }) => (
-              <Flex alignItems="center" columnGap="5px">$
+              <Flex alignItems="center" columnGap="5px">
+                <Icon positionRelative name={ICONS.DOLLAR} />
                 <CurrencyFormatInput
                   height="35px"
                   displayType="input"
@@ -346,11 +472,18 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
   ], [control, calculateTotal, setValue]);
 
   const handleDraft = async (data) => {
-    await handleCreate(data, BUDGET_STATES.DRAFT.id);
+    setValue("state", BUDGET_STATES.DRAFT.id);
+    await handleCreate({ ...data, total: Number(total.toFixed(2)) }, BUDGET_STATES.DRAFT.id);
   };
 
   const handleConfirm = async (data) => {
-    await handleCreate(data, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
+    if (isCustomerInactive) {
+      setError('customer', { type: 'manual', message: `No es posible confirmar ni dejar pendientes presupuestos con clientes inactivos, solo borradores.` });
+      return;
+    }
+
+    setValue('state', isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
+    await handleCreate({ ...data, total: Number(total.toFixed(2)) }, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleDraft)(), SHORTKEYS.ENTER);
@@ -359,23 +492,68 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
 
   return (
     <>
-      <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={handleModalCommentClose} product={selectedProduct} />
+      <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={setIsModalCommentOpen} product={selectedProduct} />
       <Transition visible={shouldShowModal} animation='scale' duration={500}>
         <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={handleCancelUpdate} size="large">
           <Modal.Header>Desea actualizar el presupuesto, ya que algunos productos sufrieron modificaciones?</Modal.Header>
           <Modal.Content>
             {!!outdatedProducts.length && (
               <Message>
-                <MessageHeader>Productos con precio actualizado</MessageHeader>
+                <MessageHeader>Productos con cambios</MessageHeader>
                 <MessageList>
                   {outdatedProducts.map(p => {
-                    const oldPrice = budget.products.find(op => op.code === p.code);
+                    const oldProduct = budget.products.find(op => op.code === p.code);
+                    const priceChanged = oldProduct.price !== p.price;
+                    const stateChanged = oldProduct.state !== p.state;
+                    const editablePriceBecameTrue = !oldProduct.editablePrice && p.editablePrice;
+                    const editablePriceBecameFalse = oldProduct.editablePrice && !p.editablePrice;
+                    const fractionConfigBecameActive = !oldProduct.fractionConfig?.active && p.fractionConfig?.active;
+                    const fractionConfigBecameInactive = oldProduct.fractionConfig?.active && !p.fractionConfig?.active;
+
                     return (
                       <MessageItem key={p.code}>
                         {`${p.code} | ${p.name} | `}
-                        <span style={{ color: 'red' }}>{formatedPrice(oldPrice.price)}</span>
-                        {' -> '}
-                        <span style={{ color: 'green' }}>{`${formatedPrice(p.price)}.`}</span>
+                        {priceChanged && (
+                          <>
+                            <span style={{ color: COLORS.RED }}>{formatedPrice(oldProduct.price)}</span>
+                            {' -> '}
+                            <span style={{ color: COLORS.GREEN }}>{formatedPrice(p.price)}</span>
+                          </>
+                        )}
+                        {stateChanged && (
+                          <>
+                            {' | Estado: '}
+                            <span style={{ color: PRODUCT_STATES[oldProduct.state].color }}>{PRODUCT_STATES[oldProduct.state].singularTitle}</span>
+                            {' -> '}
+                            <span style={{ color: PRODUCT_STATES[p.state].color }}>{PRODUCT_STATES[p.state].singularTitle}</span>
+                          </>
+                        )}
+                        {editablePriceBecameTrue && (
+                          <>
+                            {' | '}
+                            <span style={{ color: COLORS.GREY }}>Ahora el precio es editable</span>
+                          </>
+                        )}
+                        {editablePriceBecameFalse && (
+                          <>
+                            {' | '}
+                            <span style={{ color: COLORS.GREY }}>El precio ya no es editable</span>
+                          </>
+                        )}
+                        {fractionConfigBecameActive && p.fractionConfig?.active && (
+                          <>
+                            {' | '}
+                            <span style={{ color: COLORS.GREY }}>
+                              El producto ahora tiene la medida: {p.fractionConfig.value} {p.fractionConfig.unit}.
+                            </span>
+                          </>
+                        )}
+                        {fractionConfigBecameInactive && (
+                          <>
+                            {' | '}
+                            <span style={{ color: COLORS.GREY }}>Este producto ya no usa medidas.</span>
+                          </>
+                        )}
                       </MessageItem>
                     );
                   })}
@@ -395,60 +573,46 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           </Modal.Content>
           <Modal.Actions>
             <ButtonsContainer>
-              <IconedButton
-                icon
-                labelPosition="left"
-                color="red"
+              <IconnedButton
+                text="Cancelar"
+                icon={ICONS.CANCEL}
+                color={COLORS.RED}
                 onClick={handleCancelUpdate}
-              >
-                <Icon name="cancel" />
-                Cancelar
-              </IconedButton>
-              <IconedButton
-                icon
-                labelPosition="left"
-                color="green"
+              />
+              <IconnedButton
+                text="Confirmar"
+                icon={ICONS.CHECK}
+                color={COLORS.GREEN}
                 onClick={handleConfirmUpdate}
-              >
-                <Icon name="check" />
-                Confirmar
-              </IconedButton>
+              />
             </ButtonsContainer>
           </Modal.Actions>
         </Modal>
       </Transition>
       <Form onSubmit={handleSubmit(handleConfirm)}>
-        <FieldsContainer>
+        <FieldsContainer justifyContent="space-between">
           <FormField width="300px">
             <ButtonGroup size="small">
-              <IconedButton
-                icon
-                labelPosition="left"
-                type="button"
+              <IconnedButton
+                text="Confirmado"
+                icon={ICONS.CHECK}
                 basic={!isConfirmed}
-                color={isConfirmed ? "green" : "orange"}
+                color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
                 onClick={() => {
                   setIsConfirmed(true);
                   setValue('state', BUDGET_STATES.CONFIRMED.id);
                 }}
-              >
-                <Icon name="check" />
-                Confirmado
-              </IconedButton>
-              <IconedButton
-                icon
-                labelPosition="left"
-                type="button"
+              />
+              <IconnedButton
+                text="Pendiente"
+                icon={ICONS.HOURGLASS_HALF}
                 basic={isConfirmed}
-                color={isConfirmed ? "green" : "orange"}
+                color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
                 onClick={() => {
                   setIsConfirmed(false);
                   setValue('state', BUDGET_STATES.PENDING.id);
                 }}
-              >
-                <Icon name="hourglass half" />
-                Pendiente
-              </IconedButton>
+              />
             </ButtonGroup>
           </FormField>
           <FormField width="350px">
@@ -457,48 +621,65 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               control={control}
               render={({ field: { onChange, value } }) => (
                 <ButtonGroup size="small">
-                  <IconedButton
-                    icon
-                    labelPosition="left"
-                    type="button"
+                  <IconnedButton
+                    text={PICK_UP_IN_STORE}
+                    icon={ICONS.WAREHOUSE}
                     basic={!value}
-                    color="blue"
                     onClick={() => {
                       onChange(true);
                     }}
-                  >
-                    <Icon name="warehouse" />
-                    {PICK_UP_IN_STORE}
-                  </IconedButton>
-                  <IconedButton
-                    icon
-                    labelPosition="left"
-                    type="button"
+                  />
+                  <IconnedButton
+                    text="Enviar a Dirección"
+                    icon={ICONS.TRUCK}
                     basic={value}
-                    color="blue"
                     onClick={() => {
                       onChange(false);
                     }}
-                  >
-                    <Icon name="truck" />
-                    Enviar a Dirección
-                  </IconedButton>
+                  />
                 </ButtonGroup>
               )}
             />
           </FormField>
         </FieldsContainer>
-        <FieldsContainer>
+        <FieldsContainer justifyContent="space-between">
           <FormField width="300px">
             <Label>Vendedor</Label>
             <Controller name="seller" control={control} rules={RULES.REQUIRED}
               render={({ field: { value } }) => <Segment placeholder>{value}</Segment>}
             />
           </FormField>
+          <FieldsContainer >
+            <FormField flex={1}>
+              <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
+              <Controller name="expirationOffsetDays" control={control}
+                rules={RULES.REQUIRED}
+                render={({ field }) => (
+                  <Input {...field} maxLength={3} type="text" placeholder="Cant. en días (p. ej: 3, 10, etc)"
+                    onChange={(e) => {
+                      let value = e.target.value;
+                      value = value.replace(/\D/g, '');
+                      if (parseInt(value, 10) > 365) value = TIME_IN_DAYS.YEAR;
+                      field.onChange(value);
+                      setExpiration(value);
+                    }}
+                  />
+                )}
+              />
+            </FormField>
+            <FormField flex={1}>
+              <Label>Fecha de vencimiento</Label>
+              <Segment placeholder>{formatedDateOnly(expirationDate(expiration || 0))}</Segment>
+            </FormField>
+          </FieldsContainer>
         </FieldsContainer>
         <FieldsContainer>
           <FormField width="300px">
-            <RuledLabel title="Cliente" message={errors?.customer?.message} required />
+            <RuledLabel
+              title="Cliente"
+              message={errors?.customer?.message || (isCustomerInactive ? `El cliente está inactivo, solo ${isBudgetDraft(budget?.state) ? "actualizar" : "crear"} borradores esta permitido.` : '')}
+              required
+            />
             <Controller
               name="customer"
               control={control}
@@ -526,30 +707,62 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
               )}
             />
           </FormField>
-          <FormField flex={1}>
-            <RuledLabel title="Dirección" message={isBudgetConfirmed(watchState) && !draft && !watchPickUp && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
-            <Segment placeholder>
-              {!watchPickUp ? watchCustomer?.addresses?.[0]?.address : PICK_UP_IN_STORE}
-            </Segment>
+          <FormField flex={2}>
+            <RuledLabel title="Dirección" message={shouldError && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
+            {watchPickUp ? (
+              <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
+            ) : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? (
+              <Segment placeholder>{`${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer?.addresses?.[0]?.ref}: ` : ''}${watchCustomer?.addresses?.[0]?.address ? watchCustomer?.addresses?.[0]?.address : ""}`} </Segment>
+            ) : (
+              <Dropdown
+                selection
+                options={watchCustomer?.addresses.map((address) => ({
+                  key: address.address,
+                  text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
+                  value: address.address,
+                }))}
+                value={selectedContact.address}
+                onChange={(e, { value }) => setSelectedContact({
+                  ...selectedContact,
+                  address: value,
+                })}
+              />
+            )}
           </FormField>
-          <FormField width="200px">
-            <RuledLabel title="Teléfono" message={isBudgetConfirmed(watchState) && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
-            <Segment placeholder>{formatedSimplePhone(watchCustomer?.phoneNumbers[0])}</Segment>
+          <FormField flex={1}>
+            <RuledLabel title="Teléfono" message={shouldError && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
+            {!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? (
+              <Segment placeholder>{`${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer?.phoneNumbers?.[0]?.ref}: ` : ''}${formatedSimplePhone(watchCustomer?.phoneNumbers?.[0])}`} </Segment>
+            ) : (
+              <Dropdown
+                selection
+                options={watchCustomer?.phoneNumbers.map((phone) => ({
+                  key: formatedSimplePhone(phone),
+                  text: `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`,
+                  value: formatedSimplePhone(phone),
+                }))}
+                value={selectedContact.phone}
+                onChange={(e, { value }) => setSelectedContact({
+                  ...selectedContact,
+                  phone: value,
+                })}
+              />
+            )}
           </FormField>
         </FieldsContainer>
         <FormField width="300px">
-          <RuledLabel title="Agregar producto" message={errors?.products?.message} required />
+          <RuledLabel title="Agregar producto" message={errors?.products?.root?.message} required />
           <Controller name="products"
             control={control}
             rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
-            render={({ field: { onChange, value } }) => (
+            render={() => (
               <ProductSearch
                 ref={productSearchRef}
                 products={products}
                 onProductSelect={(selectedProduct) => {
-                  onChange([...watchProducts, {
+                  appendProduct({
                     ...selectedProduct,
-                    quantity: 1,
+                    quantity: selectedProduct.state === PRODUCT_STATES.OOS.id ? 0 : 1,
                     discount: 0,
                     key: uuid(),
                     ...(selectedProduct.fractionConfig?.active && {
@@ -559,8 +772,9 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
                         price: selectedProduct.price,
                       }
                     })
-                  }]);
-                }} />
+                  });
+                }}
+              />
             )}
           />
         </FormField>
@@ -574,89 +788,78 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           <Total
             subtotal={subtotal}
             globalDiscount={watchGlobalDiscount}
+            subtotalAfterDiscount={subtotalAfterDiscount}
             onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
             additionalCharge={watchAdditionalCharge}
             onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
+            total={total}
           />
         </Loader>
-        <FieldsContainer rowGap="5px!important">
-          <Label>Comentarios</Label>
-          <ControlledComments control={control} />
-        </FieldsContainer>
-        <FieldsContainer>
-          <FormField flex={3}>
-            <Label>Métodos de pago</Label>
-            <Segment>
-              <Controller
-                name="paymentMethods"
-                control={control}
-                rules={RULES.REQUIRED}
-                render={({ field: { onChange, value } }) => (
-                  <Flex flexDirection="column" rowGap="5px">
-                    <Box>
-                      <IconedButton
-                        paddingLeft="fit-content"
-                        width="fit-content"
-                        type="button"
-                        basic={value.length !== PAYMENT_METHODS.length}
-                        color="blue"
-                        onClick={() => {
-                          if (value.length === PAYMENT_METHODS.length) {
-                            onChange([]);
-                          } else {
-                            onChange(PAYMENT_METHODS);
-                          }
-                        }}
-                      >
-                        Todos
-                      </IconedButton>
-                    </Box>
-                    <Flex columnGap="5px" wrap="wrap" rowGap="5px">
-                      {PAYMENT_METHODS.map(text => (
+        <FieldsContainer width="100%" rowGap="15px">
+          {isBudgetConfirmed(watchState) && !isCloning ? (
+            <Payments
+              methods={methods}
+              total={total}
+              update
+            />
+          ) : (
+            <FormField flex={3}>
+              <Label>Métodos de pago</Label>
+              <Segment>
+                <Controller
+                  name="paymentMethods"
+                  control={control}
+                  rules={RULES.REQUIRED}
+                  render={({ field: { onChange, value } }) => (
+                    <Flex flexDirection="column" rowGap="5px">
+                      <Box>
                         <IconedButton
                           paddingLeft="fit-content"
                           width="fit-content"
-                          key={text}
-                          basic={!value.includes(text)}
-                          color="blue"
                           type="button"
+                          basic={value.length !== PAYMENT_METHODS.length}
+                          color={COLORS.BLUE}
                           onClick={() => {
-                            if (value.includes(text)) {
-                              onChange(value.filter(payment => payment !== text));
+                            if (value.length === PAYMENT_METHODS.length) {
+                              onChange([]);
                             } else {
-                              onChange([...value, text]);
+                              onChange(PAYMENT_METHODS.map(method => method.value));
                             }
                           }}
-                        >{text}
+                        >
+                          Todos
                         </IconedButton>
-                      ))}
+                      </Box>
+                      <Flex columnGap="5px" wrap="wrap" rowGap="5px">
+                        {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
+                          <IconedButton
+                            paddingLeft="fit-content"
+                            width="fit-content"
+                            key={key}
+                            basic={!value.includes(methodValue)}
+                            color={COLORS.BLUE}
+                            type="button"
+                            onClick={() => {
+                              if (value.includes(methodValue)) {
+                                onChange(value.filter(payment => payment !== methodValue));
+                              } else {
+                                onChange([...value, methodValue]);
+                              }
+                            }}
+                          >
+                            {text}
+                          </IconedButton>
+                        ))}
+                      </Flex>
                     </Flex>
-                  </Flex>
-                )}
-              />
-            </Segment>
-          </FormField>
-          <FormField flex={1}>
-            <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
-            <Controller name="expirationOffsetDays" control={control}
-              rules={RULES.REQUIRED}
-              render={({ field }) => (
-                <Input {...field} maxLength={3} type="text" placeholder="Cant. en días (p. ej: 3, 10, etc)"
-                  onChange={(e) => {
-                    let value = e.target.value;
-                    value = value.replace(/\D/g, '');
-                    if (parseInt(value, 10) > 365) value = TIME_IN_DAYS.YEAR;
-                    field.onChange(value);
-                    setExpiration(value);
-                  }}
+                  )}
                 />
-              )}
-            />
-          </FormField>
-          <FormField flex={1}>
-            <Label>Fecha de vencimiento</Label>
-            <Segment placeholder>{formatedDateOnly(expirationDate(actualDate.format(), expiration || 0))}</Segment>
-          </FormField>
+              </Segment>
+            </FormField>
+          )}
+        </FieldsContainer>
+        <FieldsContainer rowGap="5px!important">
+          <ControlledComments control={control} />
         </FieldsContainer>
         <SubmitAndRestore
           draft={draft}
@@ -668,19 +871,19 @@ const BudgetForm = ({ onSubmit, products, customers = [], budget, user, isLoadin
           color={currentState.color}
           onSubmit={handleSubmit(handleConfirm)}
           icon={currentState.icon}
-          text={currentState.title}
+          text={currentState.singularTitle}
           extraButton={
             <IconedButton
               icon
               labelPosition="left"
-              disabled={isLoading || !isDirty || isBudgetConfirmed(watchState)}
-              loading={isLoading && watchState === BUDGET_STATES.DRAFT.id}
+              disabled={isLoading || !isDirty}
+              loading={isLoading && isBudgetDraft(watchState)}
               type="button"
               onClick={handleSubmit(handleDraft)}
               color={BUDGET_STATES.DRAFT.color}
               width="fit-content"
             >
-              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.title}
+              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.singularTitle}
             </IconedButton>
           }
         />

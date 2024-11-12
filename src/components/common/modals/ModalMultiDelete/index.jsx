@@ -1,8 +1,10 @@
-import { ButtonsContainer, IconedButton, Input } from "@/components/common/custom";
+import { ButtonsContainer, Input } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
+import { COLORS, ICONS } from "@/constants";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Header, Icon as SIcon, Transition } from 'semantic-ui-react';
+import { Header, Transition } from 'semantic-ui-react';
+import { IconnedButton } from "../../buttons";
 import { Form, Modal, ModalContent } from "./styles";
 
 const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title, icon, headers }) => {
@@ -20,7 +22,7 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
   const handleConfirmationTextChange = (e) => {
     const text = e.target.value;
     setConfirmationText(text);
-    setIsDeleteEnabled(text.toLowerCase() === 'borrar');
+    setIsDeleteEnabled(text.toLowerCase() === 'eliminar');
   };
 
   return (
@@ -38,7 +40,7 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
           <Form onSubmit={handleSubmit(onConfirm)}>
             <Input
               height="40px"
-              placeholder="Escriba 'borrar' para eliminar"
+              placeholder="Escriba 'eliminar' para confirmar"
               type="text"
               value={confirmationText}
               onChange={handleConfirmationTextChange}
@@ -46,25 +48,21 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
               width="220px"
             />
             <ButtonsContainer>
-              <IconedButton
-                icon
-                labelPosition="left"
-                color="grey"
+              <IconnedButton
+                text="Cancelar"
+                icon={ICONS.TIMES}
+                color={COLORS.GREY}
                 onClick={onClose}
                 disabled={isLoading}
-              >
-                <SIcon name='times' />Cancelar
-              </IconedButton>
-              <IconedButton
-                icon
-                labelPosition="left"
+              />
+              <IconnedButton
+                text="Eliminar"
+                icon={ICONS.TRASH}
                 disabled={!isDeleteEnabled || isLoading}
                 loading={isLoading}
-                color="red"
-                type="submit"
-              >
-                <SIcon name='trash' />Eliminar
-              </IconedButton>
+                color={COLORS.RED}
+                submit
+              />
             </ButtonsContainer>
           </Form>
         </Modal.Actions>

@@ -1,14 +1,12 @@
 "use client";
-import { useListAllBrands } from "@/api/brands";
-import { create, LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
-import { useListAllSuppliers } from "@/api/suppliers";
-import { ATTRIBUTES as BRANDS_ATTRIBUTES } from "@/components/brands/brands.common";
+import { useListBrands } from "@/api/brands";
+import { useCreateProduct } from "@/api/products";
+import { useListSuppliers } from "@/api/suppliers";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { ATTRIBUTES as SUPPLIERS_ATTRIBUTES } from "@/components/suppliers/suppliers.common";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
@@ -16,14 +14,16 @@ import { toast } from "react-hot-toast";
 const CreateProduct = () => {
   useValidateToken();
   const { push } = useRouter();
-  const { data: brands, isLoading: isLoadingBrands } = useListAllBrands({ attributes: [BRANDS_ATTRIBUTES.NAME, BRANDS_ATTRIBUTES.ID] });
-  const { data: suppliers, isLoading: isLoadingSuppliers } = useListAllSuppliers({ attributes: [SUPPLIERS_ATTRIBUTES.NAME, SUPPLIERS_ATTRIBUTES.ID] });
+  const { data: brands, isLoading: isLoadingBrands, refetch: refetchBrands, isRefetching: isBrandsRefetching } = useListBrands();
+  const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers, isRefetching: isSupplierRefetching } = useListSuppliers();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
+  const createProduct = useCreateProduct();
 
   useEffect(() => {
     resetActions();
+    refetchBrands();
+    refetchSuppliers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -47,16 +47,15 @@ const CreateProduct = () => {
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (product) => {
-      const { data } = await create(product);
-      return data;
+      const response = await createProduct(product);
+      return response;
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY] });
         toast.success('Producto creado!');
         push(PAGES.PRODUCTS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
     onError: (error) => {
@@ -65,7 +64,7 @@ const CreateProduct = () => {
   });
 
   return (
-    <Loader active={isLoadingBrands || isLoadingSuppliers}>
+    <Loader active={isLoadingBrands || isLoadingSuppliers || isBrandsRefetching || isSupplierRefetching}>
       <ProductForm
         brands={mappedBrands}
         suppliers={mappedSuppliers}

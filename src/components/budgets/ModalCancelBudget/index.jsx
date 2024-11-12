@@ -1,9 +1,11 @@
-import { ButtonsContainer, FieldsContainer, IconedButton, Label, TextArea } from "@/components/common/custom";
+import { IconnedButton } from "@/components/common/buttons";
+import { ButtonsContainer, Input } from "@/components/common/custom";
+import { COLORS, ICONS } from "@/constants";
 import { useState } from "react";
-import { Icon, Modal, Transition } from "semantic-ui-react";
-import { ModalContent } from "./styles";
+import { Modal, Transition } from "semantic-ui-react";
+import { Message, ModalContent } from "./styles";
 
-const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
+const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
   const [cancelReason, setCancelReason] = useState("");
   return (
     <Transition visible={isModalOpen} animation='scale' duration={500}>
@@ -12,42 +14,29 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading }) => {
           Desea anular la venta?
         </Modal.Header>
         <ModalContent>
-          <FieldsContainer rowGap="5px" width="100%">
-            <Label>Motivo</Label>
-            <TextArea
-              padding="10px"
-              width="100%"
+          <Message>
+            <Input
+              height="40px"
               placeholder="Motivo de anulación..."
+              type="text"
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
+              tabIndex="0"
             />
-          </FieldsContainer>
+          </Message>
         </ModalContent>
         <Modal.Actions>
           <ButtonsContainer width="100%" marginTop="10px">
-            <IconedButton
-              icon
-              labelPosition="left"
-              disabled={isLoading}
-              type="button"
-              color="grey"
-              onClick={() => onClose(false)}
-            >
-              <Icon name="close" />
-              Cancelar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
-              color="red"
-              onClick={() => onConfirm(cancelReason)}
+            <IconnedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} />
+            <IconnedButton
+              text="Anular"
+              icon={ICONS.BAN}
+              color={COLORS.RED}
+              onClick={() => onConfirm(cancelReason, id)}
               disabled={!cancelReason || isLoading}
               loading={isLoading}
               basic
-            >
-              <Icon name="ban" />
-              Anular
-            </IconedButton>
+            />
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>

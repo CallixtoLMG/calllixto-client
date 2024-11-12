@@ -1,11 +1,12 @@
-import { validateEmail, validatePhone } from "@/utils";
+import { formatedSimplePhone, validateEmail, validatePhone } from "@/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Icon, Popup } from "semantic-ui-react";
-import { Box, FieldsContainer, FormField, IconedButton, Input, Label, RuledLabel } from '../custom';
+import { Popup } from "semantic-ui-react";
+import { COLORS, ICONS } from "../../../constants";
+import { IconnedButton } from "../buttons";
+import { Box, FieldsContainer, FormField, Input, Label, RuledLabel } from '../custom';
 import { Table } from '../table';
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "./form.common";
-
 
 const EMPTY_PHONE = { ref: '', areaCode: '', number: '' };
 const EMPTY_ADDRESS = { ref: '', address: '' };
@@ -45,9 +46,7 @@ export const ContactFields = () => {
       setError({ phone: 'El área y el número deben sumar 10 dígitos.' });
       return;
     }
-    const phoneExists = phoneFields.some(
-      (phone) => phone.areaCode === phoneToAdd.areaCode && phone.number === phoneToAdd.number
-    );
+    const phoneExists = phoneFields.some(phone => formatedSimplePhone(phone) === formatedSimplePhone(phoneToAdd));
     if (phoneExists) {
       setError({ phone: 'El teléfono ya existe.' });
       return;
@@ -97,15 +96,11 @@ export const ContactFields = () => {
         <Popup
           trigger={
             <Box width="fit-content">
-              <IconedButton
-                size="small"
-                icon
-                labelPosition="left"
-                color="green"
-                type="button"
-              >
-                <Icon name="add" />Teléfono
-              </IconedButton>
+              <IconnedButton
+                text="Teléfono"
+                icon={ICONS.ADD}
+                color={COLORS.GREEN}
+              />
             </Box>
           }
           on='click'
@@ -144,21 +139,18 @@ export const ContactFields = () => {
                 onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'number', e.target.value)}
               />
             </FormField>
-            <IconedButton
-              size="small"
-              icon
-              labelPosition="left"
-              color="green"
+            <IconnedButton
+              text="Agregar"
+              icon={ICONS.ADD}
+              color={COLORS.GREEN}
               onClick={handleAddPhone}
-            >
-              <Icon name="add" />Agregar
-            </IconedButton>
+            />
           </FieldsContainer>
         </Popup>
         <Table
           headers={PHONE_TABLE_HEADERS}
           actions={[
-            { id: 1, icon: 'trash', color: 'red', onClick: (phone, index) => removePhone(index), tooltip: 'Eliminar' }
+            { id: 1, icon: ICONS.TRASH, color: COLORS.RED, onClick: (phone, index) => removePhone(index), tooltip: 'Eliminar' }
           ]}
           elements={phoneFields}
         />
@@ -167,15 +159,12 @@ export const ContactFields = () => {
         <Popup
           trigger={
             <Box width="fit-content">
-              <IconedButton
-                size="small"
-                icon
-                labelPosition="left"
+              <IconnedButton
+                text="Dirección"
+                icon={ICONS.ADD}
                 type="button"
-                color="green"
-              >
-                <Icon name="add" />Dirección
-              </IconedButton>
+                color={COLORS.GREEN}
+              />
             </Box>
           }
           on='click'
@@ -202,22 +191,19 @@ export const ContactFields = () => {
                 onChange={(e) => updateFieldToAdd(setAddressToAdd, 'address', e.target.value)}
               />
             </FormField>
-            <IconedButton
-              size="small"
-              icon
-              labelPosition="left"
-              color="green"
+            <IconnedButton
+              text="Agregar"
+              icon={ICONS.ADD}
+              color={COLORS.GREEN}
               onClick={handleAddAddress}
-            >
-              <Icon name="add" />Agregar
-            </IconedButton>
+            />
           </FieldsContainer>
         </Popup>
         <Table
           $wrap
           headers={ADDRESS_TABLE_HEADERS}
           actions={[
-            { id: 1, icon: 'trash', color: 'red', onClick: (address, index) => removeAddress(index), tooltip: 'Eliminar' }
+            { id: 1, icon: ICONS.TRASH, color: COLORS.RED, onClick: (address, index) => removeAddress(index), tooltip: 'Eliminar' }
           ]}
           elements={addressFields}
         />
@@ -226,15 +212,11 @@ export const ContactFields = () => {
         <Popup
           trigger={
             <Box width="fit-content">
-              <IconedButton
-                size="small"
-                icon
-                labelPosition="left"
-                type="button"
-                color="green"
-              >
-                <Icon name="add" />Email
-              </IconedButton>
+              <IconnedButton
+                text="Email"
+                icon={ICONS.ADD}
+                color={COLORS.GREEN}
+              />
             </Box>
           }
           on='click'
@@ -261,21 +243,19 @@ export const ContactFields = () => {
                 onChange={(e) => updateFieldToAdd(setEmailToAdd, 'email', e.target.value)}
               />
             </FormField>
-            <IconedButton
-              icon
-              labelPosition="left"
-              color="green"
+            <IconnedButton
+              text="Agregar"
+              icon={ICONS.ADD}
+              color={COLORS.GREEN}
               onClick={handleAddEmail}
-            >
-              <Icon name="add" />Agregar
-            </IconedButton>
+            />
           </FieldsContainer>
         </Popup>
         <Table
           $wrap={true}
           headers={EMAIL_TABLE_HEADERS}
           actions={[
-            { id: 1, icon: 'trash', color: 'red', onClick: (email, index) => removeEmail(index), tooltip: 'Eliminar' }
+            { id: 1, icon: ICONS.TRASH, color: COLORS.RED, onClick: (email, index) => removeEmail(index), tooltip: 'Eliminar' }
           ]}
           elements={emailsFields}
         />

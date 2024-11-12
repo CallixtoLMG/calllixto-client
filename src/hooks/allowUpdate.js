@@ -1,48 +1,37 @@
-import { Box, IconedButton } from "@/components/common/custom";
+import { IconnedButton } from "@/components/common/buttons";
+import { Box } from "@/components/common/custom";
+import { ICONS } from "@/constants";
 import { useState } from "react";
-import { ButtonGroup, Icon } from "semantic-ui-react";
+import { ButtonGroup } from "semantic-ui-react";
 
 export const useAllowUpdate = ({ canUpdate }) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const button = (
+  const toggleButton = (
     <>
       {canUpdate && (
         <Box>
           <ButtonGroup size="small">
-            <IconedButton
-              icon
-              labelPosition="left"
-              type="button"
-              basic={!isUpdating}
-              color="blue"
-              width="fit-content"
-              onClick={() => {
-                setIsUpdating(true);
-              }}
-            >
-              <Icon name="edit" />
-              Actualizar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="right"
-              type="button"
+            <IconnedButton
+              text="Actualizar"
+              icon={ICONS.EDIT}
+              onClick={() => setIsUpdating(true)} basic={!isUpdating}
+              width="130px"
+            />
+            <IconnedButton
+              text="Ver"
+              icon={ICONS.EYE}
               basic={isUpdating}
-              color="blue"
-              width="fit-content"
               onClick={() => {
                 setIsUpdating(false);
               }}
-            >
-              <Icon name="eye" />
-              Ver
-            </IconedButton>
+              width="130px"
+            />
           </ButtonGroup>
         </Box>
       )}
     </>
   );
 
-  return [isUpdating, button];
+  return { isUpdating, toggleButton, setIsUpdating };
 }

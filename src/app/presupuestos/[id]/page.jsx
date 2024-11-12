@@ -1,83 +1,58 @@
 "use client";
 import { useUserContext } from "@/User";
-import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY, cancelBudget, confirmBudget, edit, useGetBudget } from "@/api/budgets";
-import { useListAllCustomers } from "@/api/customers";
+import { useCancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
+import { useListCustomers } from "@/api/customers";
 import { useDolarExangeRate } from "@/api/external";
-import { useListAllProducts } from "@/api/products";
+import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import BudgetView from "@/components/budgets/BudgetView";
 import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
+import { IconnedButton } from "@/components/common/buttons";
 import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Input, Menu } from "@/components/common/custom";
-import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
-import { Loader, NoPrint, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ATTRIBUTES as PRODUCT_ATTRIBUTES } from "@/components/products/products.common";
-import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, PAGES } from "@/constants";
+import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, COLORS, ICONS, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Dropdown } from "semantic-ui-react";
-const SendButton = ({ width, href, color, iconName, text, target = "_blank" }) => (
-  <a href={href} target={target}>
-    <IconedButton
-      icon
-      labelPosition="left"
-      width={width}
-      color={color}
-      size="small"
-    >
-      <Icon name={iconName} />{text}
-    </IconedButton>
-  </a>
-);
+import { v4 as uuid } from 'uuid';
 
 const Budget = ({ params }) => {
   useValidateToken();
-  const { push } = useRouter();
+  const { role } = useUserContext();
   const { userData } = useUserContext();
-  const { data: budget, isLoading } = useGetBudget(params.id);
-  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({
-    attributes: [
-      PRODUCT_ATTRIBUTES.CODE,
-      PRODUCT_ATTRIBUTES.PRICE,
-      PRODUCT_ATTRIBUTES.NAME,
-      PRODUCT_ATTRIBUTES.COMMENTS,
-      PRODUCT_ATTRIBUTES.BRAND_NAME,
-      PRODUCT_ATTRIBUTES.SUPPLIER_NAME
-    ],
-    enabled: isBudgetDraft(budget?.state)
-  });
-  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({
-    attributes: [
-      CUSTOMERS_ATTRIBUTES.ADDRESSES,
-      CUSTOMERS_ATTRIBUTES.PHONES,
-      CUSTOMERS_ATTRIBUTES.ID,
-      CUSTOMERS_ATTRIBUTES.NAME
-    ],
-    enabled: budget?.state === BUDGET_STATES.DRAFT.id
-  });
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { role } = useUserContext();
-  const queryClient = useQueryClient();
+  const { push } = useRouter();
+  const { data: budget, isLoading } = useGetBudget(params.id);
+  const { data: productsData, isLoading: loadingProducts } = useListProducts();
+  const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
   const [printPdfMode, setPrintPdfMode] = useState(BUDGET_PDF_FORMAT.CLIENT);
   const [customerData, setCustomerData] = useState();
-  const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
   const [dolarRate, setDolarRate] = useState(dolar);
-  const printRef = useRef();
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
   const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
+  const [subtotal, setSubtotal] = useState(0);
+  const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [selectedContact, setSelectedContact] = useState({ phone: '', address: '' });
+  const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
+  const printRef = useRef();
+  const editBudget = useEditBudget();
+  const confirmBudget = useConfirmBudget();
+  const cancelBudget = useCancelBudget();
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {
@@ -91,11 +66,11 @@ const Budget = ({ params }) => {
   }, [dolar, showDolarExangeRate, initialDolarRateSet]);
 
   const formatValue = (value) => {
-    let formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    const formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
   };
 
-  const handleDollarChange = (e) => {
+   const handleDollarChange = (e) => {
     let value = e.target.value;
     value = value.replace(/[^0-9.]/g, '');
     const parts = value.split('.');
@@ -137,14 +112,29 @@ const Budget = ({ params }) => {
       push(PAGES.NOT_FOUND.BASE);
       return;
     }
+
     if (budget) {
-      const stateTitle = BUDGET_STATES[budget.state]?.title || BUDGET_STATES.INACTIVE.title;
+      budget.products = budget.products.map((product) => ({
+        ...product, key: uuid(),
+      }))
+      const calculatedSubtotal = getTotalSum(budget.products);
+      const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount);
+      const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget.additionalCharge);
+
+      setSubtotal(calculatedSubtotal);
+      setSubtotalAfterDiscount(calculatedSubtotalAfterDiscount);
+      setTotal(calculatedFinalTotal);
+      const stateTitle = BUDGET_STATES[budget.state]?.singularTitle || BUDGET_STATES.INACTIVE.singularTitle;
       const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([
         PAGES.BUDGETS.NAME,
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
       ].filter(Boolean));
       setCustomerData(budget.customer);
+      setSelectedContact({
+        address: budget.customer?.addresses?.[0]?.address,
+        phone: formatedSimplePhone(budget.customer?.phoneNumbers?.[0])
+      });
     }
   }, [setLabels, budget, push, isLoading]);
 
@@ -158,76 +148,47 @@ const Budget = ({ params }) => {
       const printButtons = [
         {
           mode: BUDGET_PDF_FORMAT.DISPATCH,
-          color: 'blue',
-          iconName: 'truck',
+          color: COLORS.BLUE,
+          iconName: ICONS.TRUCK,
           text: 'Remito',
         },
         {
           mode: BUDGET_PDF_FORMAT.CLIENT,
-          color: 'blue',
-          iconName: 'address card',
+          color: COLORS.BLUE,
+          iconName: ICONS.ADDRESS_CARD,
           text: 'Cliente',
         },
         {
           mode: BUDGET_PDF_FORMAT.INTERNAL,
-          color: 'blue',
-          iconName: 'archive',
+          color: COLORS.BLUE,
+          iconName: ICONS.ARCHIVE,
           text: 'Interno'
         }
       ];
 
       const sendButtons = [
-        ...(budget?.customer?.phoneNumbers?.length ? [{
-          buttons: budget?.customer?.phoneNumbers.map(({ ref, areaCode, number }) => (
-            <SendButton
-              key={`${APIS.WSP(`${areaCode}${number}`)}`}
-              href={`${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`}
-              text={`${ref ? `${ref} - ` : ''}${areaCode} ${number}`}
-              iconName="whatsapp"
-            />
-          )),
-          color: 'green',
-          iconName: 'whatsapp',
-          text: 'WhatsApp'
-        }] : []),
-        ...(budget?.customer?.emails?.length ? [{
-          buttons: budget?.customer?.emails?.map(({ ref, email }) => (
-            <SendButton
-              key={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
-              href={`${APIS.MAIL(budget?.customer?.email, budget?.customer?.name)}`}
-              text={`${ref ? `${ref} - ` : ''}${email}`}
-              iconName="mail"
-            />
-          )),
-          color: 'red',
-          iconName: 'mail',
-          text: 'Mail'
-        }] : [])
-      ];
-
-      const sendButtons1 = [
         {
           text: 'WhatsApp',
           iconName: 'whatsapp',
-          color: 'green',
+          color: COLORS.GREEN,
           subOptions: budget?.customer?.phoneNumbers?.map(({ ref, areaCode, number }) => ({
             key: `${APIS.WSP(`${areaCode}${number}`)}`,
             href: `${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`,
             text: `${ref ? `${ref} - ` : ''}${areaCode} ${number}`,
             iconName: 'whatsapp',
-            color: 'green',
+            color: COLORS.GREEN,
           })) || []
         },
         {
           text: 'Mail',
           iconName: 'mail',
-          color: 'red',
+          color: COLORS.RED,
           subOptions: budget?.customer?.emails?.map(({ ref, email }) => ({
             key: `${APIS.MAIL(email, budget?.customer?.name)}`,
             href: `${APIS.MAIL(email, budget?.customer?.name)}`,
             text: `${ref ? `${ref} - ` : ''}${email}`,
             iconName: 'mail',
-            color: 'red',
+            color: COLORS.RED,
           })) || []
         }
       ];
@@ -240,7 +201,7 @@ const Budget = ({ params }) => {
               pointing
               as={IconedButton}
               text='PDFs'
-              icon='download'
+              icon={ICONS.DOWNLOAD}
               floating
               labeled
               button
@@ -266,9 +227,18 @@ const Budget = ({ params }) => {
           id: 2,
           button: (
             <Menu>
-              <DropdownOption menu pointing text='Enviar' icon='send' floating labeled button className='icon blue'>
+              <DropdownOption
+                menu
+                pointing
+                text='Enviar'
+                icon={ICONS.SEND}
+                floating
+                labeled
+                button
+                className='icon blue'
+                paddingLeft="45px">
                 <Dropdown.Menu>
-                  {sendButtons1.map(({ text, iconName, color, subOptions }) => (
+                  {sendButtons.map(({ text, iconName, color, subOptions }) => (
                     <Flex key={iconName}>
                       {subOptions.length > 0 && (
                         <DropdownOption text={text} pointing="left" className="link item">
@@ -292,21 +262,23 @@ const Budget = ({ params }) => {
         },
         {
           id: 3,
-          icon: 'copy',
-          color: 'green',
+          icon: ICONS.COPY,
+          color: COLORS.GREEN,
           onClick: () => { push(PAGES.BUDGETS.CLONE(budget.id)) },
           text: 'Clonar'
         },
         budget.state === BUDGET_STATES.CONFIRMED.id && {
           id: 4,
-          icon: 'ban',
-          color: 'red',
+          icon: ICONS.BAN,
+          color: COLORS.RED,
           onClick: () => setIsModalCancelOpen(true),
-          text: 'Anular'
+          text: 'Anular',
+          basic: true
         },
       ].filter(Boolean);
       setActions(actions);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [budget, push, role, setActions]);
 
   const handleConfirm = () => {
@@ -334,24 +306,25 @@ const Budget = ({ params }) => {
   };
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (pickUpInStore) => {
+    mutationFn: async (dataToSend) => {
+      const { pickUpInStore, paymentsMade, total } = dataToSend;
       const confirmationData = {
         confirmedBy: `${userData.firstName} ${userData.lastName}`,
         confirmedAt: now(),
-        pickUpInStore
+        pickUpInStore,
+        paymentsMade,
+        total
       };
-      const { data } = await confirmBudget(confirmationData, budget?.id);
-      return data;
+      const response = await confirmBudget(confirmationData, budget?.id);
+      return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
-        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto confirmado!');
         setIsModalConfirmationOpen(false);
         push(PAGES.BUDGETS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
   });
@@ -361,134 +334,128 @@ const Budget = ({ params }) => {
       const cancelData = {
         cancelledBy: `${userData.firstName} ${userData.lastName}`,
         cancelledAt: now(),
-        cancelledMsg: cancelReason,
+        cancelledMsg: cancelReason
       };
-      const { data } = await cancelBudget(cancelData, budget?.id);
-      return data;
+      const response = await cancelBudget({ cancelData, id: budget?.id });
+      return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
-        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto anulado!');
         setIsModalCancelOpen(false);
         push(PAGES.BUDGETS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
+    onError: (error) => {
+      toast.error(`Error al anular: ${error.message}`);
+    }
   });
 
   const { mutate: mutateEdit, isPending: isPendingEdit } = useMutation({
     mutationFn: async (budget) => {
-      const { data } = await edit({ ...budget, id: params.id });
+      const data = await editBudget({ ...budget, id: params.id });
       return data;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
-        queryClient.invalidateQueries({ queryKey: [GET_BUDGET_QUERY_KEY, budget?.id] });
         toast.success('Presupuesto actualizado!');
         push(PAGES.BUDGETS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
   });
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      <NoPrint>
-        <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) ? "0" : "0 0 15px 0!important"} justifyContent="space-between">
-          {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
-            <>
-              <IconedButton
-                icon
-                labelPosition="left"
-                type="button"
-                width="fit-content"
-                color="green"
-                onClick={handleConfirm}
-              >
-                <Icon name='check' />
-                Confirmar
-              </IconedButton>
-              <ModalCustomer
-                isModalOpen={isModalCustomerOpen}
-                onClose={handleModalCustomerClose}
-                customer={customerData}
-              />
-              <ModalConfirmation
-                isModalOpen={isModalConfirmationOpen}
-                onClose={handleModalConfirmationClose}
-                customer={customerData}
-                onConfirm={mutate}
-                isLoading={isPending}
-              />
-            </>
-          ) : <Box />}
-          {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-            <Input
-              textAlignLast="right"
-              innerWidth="90px"
-              type="text"
-              height="35px"
-              width="fit-content"
-              onChange={handleDollarChange}
-              actionPosition='left'
-              placeholder="Precio dolar"
-              value={formattedDolarRate}
-              disabled={!showDolarExangeRate}
-              action={
-                <IconedButton
-                  icon
-                  labelPosition='left'
-                  type="button"
-                  basic={!showDolarExangeRate}
-                  onClick={() => {
-                    setShowDolarExangeRate(prev => !prev);
-                    if (!showDolarExangeRate) {
-                      setFormattedDolarRate(formatValue(dolarRate));
-                    } else {
-                      setFormattedDolarRate('');
-                      setDolarRate(0);
-                    }
-                  }}
-                  color="green"
-                  width="fit-content"
-                >
-                  <Icon name='dollar' />
-                  Cotizar en USD
-                </IconedButton>
-              }
-            />
-          )}
-        </Flex>
-        {isBudgetDraft(budget?.state) ? (
-          <BudgetForm
-            onSubmit={mutateEdit}
-            products={products}
-            customers={customers}
-            user={userData}
-            budget={budget}
-            isLoading={isPendingEdit}
-            draft
-            printPdfMode={printPdfMode}
-          />
-        ) : (
+      <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} justifyContent="space-between">
+        {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
           <>
-            <BudgetView
-              budget={{ ...budget, customer: customerData }}
+            <IconnedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
+            <ModalCustomer
+              isModalOpen={isModalCustomerOpen}
+              onClose={handleModalCustomerClose}
+              customer={customerData}
             />
-            <ModalCancel
-              isModalOpen={isModalCancelOpen}
-              onClose={handleModalCancelClose}
-              onConfirm={mutateCancel}
-              isLoading={isPendingCancel}
+            <ModalConfirmation
+              subtotal={subtotal}
+              subtotalAfterDiscount={subtotalAfterDiscount}
+              total={total}
+              isModalOpen={isModalConfirmationOpen}
+              onClose={handleModalConfirmationClose}
+              customer={customerData}
+              onConfirm={mutate}
+              isLoading={isPending}
+              pickUpInStore={budget?.pickUpInStore}
             />
           </>
+        ) : <Box />}
+        {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
+          <Input
+            textAlignLast="right"
+            innerWidth="90px"
+            type="text"
+            height="35px"
+            width="fit-content"
+            onChange={handleDollarChange}
+            actionPosition='left'
+            placeholder="Precio"
+            value={formattedDolarRate}
+            disabled={!showDolarExangeRate}
+            action={
+              <IconnedButton
+                text="Cotizar en USD"
+                icon={ICONS.DOLLAR}
+                color={COLORS.GREEN}
+                basic={!showDolarExangeRate}
+                onClick={() => {
+                  setShowDolarExangeRate(prev => !prev);
+                  if (!showDolarExangeRate) {
+                    setFormattedDolarRate(formatValue(dolarRate));
+                  } else {
+                    setFormattedDolarRate('');
+                    setDolarRate(0);
+                  }
+                }}
+              />
+            }
+          />
         )}
-      </NoPrint>
+      </Flex>
+      {isBudgetDraft(budget?.state) ? (
+        <BudgetForm
+          onSubmit={mutateEdit}
+          products={products}
+          customers={customers}
+          user={userData}
+          budget={budget}
+          isLoading={isPendingEdit}
+          draft
+          printPdfMode={printPdfMode}
+          selectedContact={selectedContact}
+          setSelectedContact={setSelectedContact}
+        />
+      ) : (
+        <>
+          <BudgetView
+            budget={{ ...budget, customer: customerData }}
+            subtotal={subtotal}
+            subtotalAfterDiscount={subtotalAfterDiscount}
+            total={total}
+            selectedContact={selectedContact}
+            setSelectedContact={setSelectedContact}
+          />
+          <ModalCancel
+            isModalOpen={isModalCancelOpen}
+            onClose={handleModalCancelClose}
+            onConfirm={mutateCancel}
+            isLoading={isPendingCancel}
+            id={budget?.id}
+          />
+        </>
+      )}
       <OnlyPrint marginTop="20px">
         <PDFfile
           ref={printRef}
@@ -497,6 +464,10 @@ const Budget = ({ params }) => {
           id={userData.client?.id}
           printPdfMode={printPdfMode}
           dolarExchangeRate={showDolarExangeRate && dolarRate}
+          subtotal={subtotal}
+          subtotalAfterDiscount={subtotalAfterDiscount}
+          total={total}
+          selectedContact={selectedContact}
         />
       </OnlyPrint>
     </Loader >

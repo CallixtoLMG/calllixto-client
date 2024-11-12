@@ -6,14 +6,15 @@ const SLoader = styled(LoaderComp)`
   &::before {
     border-color: ${({ $greyColor }) => $greyColor && "#b2b0b2f5"} !important;
   };
+    top: ${({ $marginTop }) => $marginTop && "70%"} !important;
 `;
 
-export const Loader = ({ children, active, message, $greyColor }) => {
+export const Loader = ({ children, active, message, $greyColor, $marginTop }) => {
   return (
     <>
       {active ? (
         <Box height="150px">
-          <SLoader $greyColor active size="large">{message && message}</SLoader>
+          <SLoader $marginTop={$marginTop} $greyColor active size="large">{message && message}</SLoader>
         </Box>
       ) : children}
     </>

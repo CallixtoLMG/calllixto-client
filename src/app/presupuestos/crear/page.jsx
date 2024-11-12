@@ -1,15 +1,13 @@
 "use client";
 import { useUserContext } from "@/User";
-import { LIST_BUDGETS_QUERY_KEY, create, useGetBudget } from "@/api/budgets";
-import { useListAllCustomers } from "@/api/customers";
-import { useListAllProducts } from "@/api/products";
+import { useCreateBudget, useGetBudget } from "@/api/budgets";
+import { useListCustomers } from "@/api/customers";
+import { useListProducts } from "@/api/products";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { ATTRIBUTES as CUSTOMERS_ATTRIBUTES } from "@/components/customers/customers.common";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ATTRIBUTES as PRODUCTS_ATTRIBUTES } from "@/components/products/products.common";
-import { PAGES } from "@/constants";
+import { PAGES, PRODUCT_STATES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
@@ -18,19 +16,16 @@ const CreateBudget = () => {
   useValidateToken();
   const { userData } = useUserContext();
   const searchParams = useSearchParams();
-  const cloneId = searchParams.get('clonar');
-  const { push } = useRouter();
-
-  const { data: productsData, isLoading: loadingProducts } = useListAllProducts({ attributes: PRODUCTS_ATTRIBUTES, enabled: true });
-  const { data: customersData, isLoading: loadingCustomers } = useListAllCustomers({ attributes: [CUSTOMERS_ATTRIBUTES.ADDRESSES, CUSTOMERS_ATTRIBUTES.PHONES, CUSTOMERS_ATTRIBUTES.ID, CUSTOMERS_ATTRIBUTES.NAME], enabled: true });
-  const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
-
-  const products = useMemo(() => productsData?.products, [productsData]);
-  const customers = useMemo(() => customersData?.customers, [customersData]);
-
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const queryClient = useQueryClient();
+  const createBudget = useCreateBudget();
+  const cloneId = searchParams.get('clonar');
+  const { push } = useRouter();
+  const { data: productsData, isLoading: loadingProducts, refetch, isRefetching } = useListProducts();
+  const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
+  const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
+  const products = useMemo(() => productsData?.products.filter((product) => ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state)), [productsData]);
+  const customers = useMemo(() => customersData?.customers, [customersData]);
 
   useEffect(() => {
     resetActions();
@@ -39,7 +34,8 @@ const CreateBudget = () => {
 
   useEffect(() => {
     setLabels([PAGES.BUDGETS.NAME, 'Crear']);
-  }, [setLabels]);
+    refetch();
+  }, [setLabels, refetch]);
 
   const mappedProducts = useMemo(() => products?.map(product => ({
     ...product,
@@ -48,25 +44,17 @@ const CreateBudget = () => {
     text: product.name,
   })), [products]);
 
-  const mappedCustomers = useMemo(() => customers?.map(customer => ({
-    ...customer,
-    key: customer.name,
-    value: customer.name,
-    text: customer.name,
-  })), [customers]);
-
   const { mutate, isPending } = useMutation({
     mutationFn: async (budget) => {
-      const { data } = await create(budget);
-      return data;
+      const response = await createBudget(budget);
+      return response;
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_BUDGETS_QUERY_KEY] });
         toast.success('Presupuesto creado!');
         push(PAGES.BUDGETS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(response.error.message);
       }
     },
     onError: (error) => {
@@ -82,15 +70,16 @@ const CreateBudget = () => {
   }, [budget]);
 
   return (
-    <Loader active={loadingProducts || loadingCustomers || loadingBudget}>
+    <Loader active={loadingProducts || loadingCustomers || loadingBudget || isRefetching}>
       <BudgetForm
         onSubmit={mutate}
         products={mappedProducts}
-        customers={mappedCustomers}
+        customers={customers}
         user={userData}
         budget={clonedBudget}
         isCloning={!!clonedBudget}
         isLoading={isPending}
+        refetchProducts={refetch}
       />
     </Loader>
   )

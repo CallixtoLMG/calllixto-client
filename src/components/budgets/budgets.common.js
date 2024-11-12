@@ -1,19 +1,74 @@
-import { Price, Flex, Box } from "@/components/common/custom";
-import { BUDGET_STATES } from "@/constants";
-import { formatedDateAndHour, formatedPercentage, getPrice, getTotal, getTotalSum } from "@/utils";
-import { Label } from "semantic-ui-react";
+import { Box, Flex, Price } from "@/components/common/custom";
+import { BUDGET_STATES, COLORS, PRODUCT_STATES } from "@/constants";
+import { formatedDateAndHour, formatedPercentage, getPrice, getTotal, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
+import { Label, Popup } from "semantic-ui-react";
 import { CommentTooltip } from "../common/tooltips";
 
 const ATTRIBUTES = {
   ID: "id",
   CUSTOMER: "customer",
-  CREATEDAT: "createdAt",
+  CREATED_AT: "createdAt",
+  UPDATED_AT: "updatedAt",
   CONFIRMED: "confirmed",
   SELLER: "seller",
   PRODUCTS: "products",
   DISCOUNT: "globalDiscount",
   STATE: "state",
-  FRACTION_CONFIG: "fractionConfig",
+  ADDITIONAL_CHARGE: "additionalCharge",
+  PAYMENT_METHODS: "paymentMethods",
+  PAYMENTS_MADE: "paymentsMade",
+  EXPIRATION_OFF_SET_DAYS: "expirationOffsetDays",
+  PICKUP_IN_STORE: "pickUpInStore",
+  TOTAL: "total",
+  CONFIRMED_AT: "confirmedAt",
+  CONFIRMED_BY: "confirmedBy",
+  CANCELLED_AT: "cancelledAt",
+  CANCELLED_BY: "cancelledBy",
+  COMMENTS: "comments"
+};
+
+const getLabelColor = (budget) => BUDGET_STATES[budget?.state]?.color;
+
+const getPopupContent = (budget) => {
+  if (isBudgetConfirmed(budget?.state)) {
+    return (
+      <>
+        <div>{`Confirmado por ${budget?.confirmedBy || "Sin vendedor"}`}</div>
+        <div>{`Fecha: ${formatedDateAndHour(budget?.confirmedAt)}`}</div>
+      </>
+    );
+  }
+  if (isBudgetCancelled(budget?.state)) {
+    return (
+      <>
+        <div>{`Anulado por ${budget?.cancelledBy || "Sin vendedor"}`}</div>
+        <div>{`Fecha: ${formatedDateAndHour(budget?.cancelledAt)}`}</div>
+      </>
+    );
+  }
+  return null;
+};
+
+export const getBudgetState = (budget) => {
+  if (isBudgetConfirmed(budget?.state)) {
+    return {
+      label: "Confirmado por",
+      color: COLORS.GREEN,
+      person: budget?.confirmedBy || budget?.seller,
+      date: formatedDateAndHour(budget?.confirmedAt),
+      dateLabel: "Fecha de confirmación"
+    };
+  }
+  if (isBudgetCancelled(budget?.state)) {
+    return {
+      label: "Anulado por",
+      color: COLORS.RED,
+      person: budget?.cancelledBy || budget?.seller,
+      date: formatedDateAndHour(budget?.cancelledAt),
+      dateLabel: "Fecha de anulación"
+    };
+  }
+  return null;
 };
 
 const BUDGETS_COLUMNS = [
@@ -22,22 +77,37 @@ const BUDGETS_COLUMNS = [
     title: "Id",
     width: 1,
     align: "left",
-    value: (budget) =>
+    value: (budget) => (
       <Box width="60px">
-        <Label ribbon color={BUDGET_STATES[budget?.state]?.color}>
-          {budget.id}
-        </Label>
+        {isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state) ? (
+          <Popup
+            trigger={
+              <Label ribbon color={getLabelColor(budget)}>
+                {budget.id}
+              </Label>
+            }
+            content={getPopupContent(budget)}
+            position="right center"
+            size="mini"
+          />
+        ) : (
+          <Label ribbon color={getLabelColor(budget)}>
+            {budget.id}
+          </Label>
+        )}
       </Box>
+    )
   },
   {
     id: 2,
     title: "Cliente",
     align: "left",
-    value: (budget) =>
+    value: (budget) => (
       <Flex justifyContent="space-between">
         {budget.customer.name}
         {budget.comments && <CommentTooltip comment={budget.comments} />}
       </Flex>
+    )
   },
   {
     id: 3,
@@ -49,7 +119,9 @@ const BUDGETS_COLUMNS = [
     id: 4,
     title: "Total",
     width: 2,
-    value: (budget) => <Price value={(getTotalSum(budget.products, budget.globalDiscount))} />
+    value: (budget) => (
+      <Price value={getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)} />
+    )
   },
   {
     id: 5,
@@ -75,7 +147,14 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       title: "Nombre",
       align: "left",
       wrap: true,
-      value: (product) => `${product.name} ${product.fractionConfig?.active ? ` x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}` : ''}`
+      value: (product) => (
+        <Flex justifyContent="space-between">
+          <span>{`${product.name} ${product.fractionConfig?.active ? ` x ${product.fractionConfig.value} ${product.fractionConfig.unit}` : ''}`}</span>
+          {product.state === PRODUCT_STATES.OOS.id && (
+            <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
+          )}
+        </Flex>
+      )
     },
     !dispatchPdf && {
       id: 3,
@@ -111,7 +190,20 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
   ].filter(Boolean);
 };
 
-const PAYMENT_METHODS = ['Efectivo', 'Transferencia Bancaria', 'Tarjeta de Débito', 'Tarjeta de Crédito', 'Mercado Pago', 'Dólares'];
+const PAYMENT_METHODS = [
+  { key: 'efectivo', text: 'Efectivo', value: 'Efectivo' },
+  { key: 'transferencia', text: 'Transferencia Bancaria', value: 'Transferencia Bancaria' },
+  { key: 'debito', text: 'Tarjeta de Débito', value: 'Tarjeta de Débito' },
+  { key: 'credito', text: 'Tarjeta de Crédito', value: 'Tarjeta de Crédito' },
+  { key: 'mercado_pago', text: 'Mercado Pago', value: 'Mercado Pago' },
+  { key: 'dolares', text: 'Dólares', value: 'Dólares' }
+];
 
-export { ATTRIBUTES, BUDGETS_COLUMNS, PAYMENT_METHODS, PRODUCTS_COLUMNS };
+const PAYMENT_TABLE_HEADERS = [
+  { id: 'method', width: 4, title: 'Método', value: (element) => element.method },
+  { id: 'amount', width: 3, title: 'Monto', value: (element) => <Price value={element.amount} /> },
+  { id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) => element.comments }
+];
+
+export { ATTRIBUTES, BUDGETS_COLUMNS, PAYMENT_METHODS, PAYMENT_TABLE_HEADERS, PRODUCTS_COLUMNS };
 

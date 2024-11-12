@@ -1,19 +1,18 @@
-import { Icon } from "semantic-ui-react";
-import { IconedButton } from "../custom";
+import { COLORS, ICONS } from "@/constants";
+import { IconnedButton } from ".";
 
-export const Submit = ({ isUpdating, isLoading, isDirty, onClick, disabled, color = 'green', icon, text }) => {
+export const Submit = ({ isUpdating, isLoading, isDirty, onClick, disabled, color = COLORS.GREEN, icon, text }) => {
   return (
-    <IconedButton
-      icon
-      labelPosition="left"
+    <IconnedButton
+      text={text ? text : isUpdating ? "Actualizar" : "Crear"}
+      icon={icon ? icon : isUpdating ? ICONS.EDIT : ICONS.ADD}
       disabled={isLoading || !isDirty || disabled}
       loading={isLoading}
-      type="submit"
+      submit
       color={color}
       onClick={onClick}
-      >
-      <Icon name={icon ? icon : isUpdating ? "edit" : "add"} />{text ? text : isUpdating ? "Actualizar" : "Crear"}
-    </IconedButton>
+      width="130px"
+    />
   )
 }
 

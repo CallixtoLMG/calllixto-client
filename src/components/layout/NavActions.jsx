@@ -1,11 +1,7 @@
-import { Box, Flex, IconedButton } from '@/components/common/custom';
+import { Box, Flex } from '@/components/common/custom';
 import { createContext, useContext, useState } from 'react';
-import { Icon } from 'semantic-ui-react';
-import styled from 'styled-components';
-
-const ActionsContainer = styled(Flex)`
-  column-gap: 10px;
-`;
+import { Popup } from 'semantic-ui-react';
+import { IconnedButton } from '../common/buttons';
 
 const NavActionsContext = createContext();
 
@@ -31,29 +27,52 @@ const useNavActionsContext = () => {
 const NavActions = () => {
   const { actions } = useNavActionsContext();
   return (
-    <ActionsContainer>
-      {actions.map(action => {
-        const { id, icon, color, onClick, text, button } = action;
+    <Flex columnGap="10px">
+      {actions.map(({ id, icon, color, onClick, text, button, disabled, width, basic, loading, tooltip }) => {
         return (
           <Box key={`action_${id}`} >
             {button ? button : (
-              <IconedButton
-                size="small"
-                icon
-                labelPosition="left"
-                color={color}
-                onClick={onClick}
-                type="button"
-              >
-                <Icon name={icon} />{text}
-              </IconedButton>
+              tooltip ? (
+                <Popup
+                  content={tooltip}
+                  position="bottom center"
+                  on="hover"
+                  size='tiny'
+                  trigger={
+                    <Box>
+                      <IconnedButton
+                        text={text}
+                        icon={icon}
+                        color={color}
+                        basic={basic}
+                        onClick={onClick}
+                        width={width || "110px"}
+                        disabled={disabled}
+                        loading={loading}
+                      />
+                    </Box>
+                  }
+                />
+              ) : (
+                <IconnedButton
+                  text={text}
+                  icon={icon}
+                  color={color}
+                  basic={basic}
+                  onClick={onClick}
+                  width={width || "110px"}
+                  disabled={disabled}
+                  loading={loading}
+                />
+              )
             )}
           </Box>
         );
       })}
-    </ActionsContainer>
+    </Flex>
   );
 };
+
 
 export { NavActions, NavActionsProvider, useNavActionsContext };
 

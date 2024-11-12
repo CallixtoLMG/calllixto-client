@@ -1,7 +1,9 @@
-import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
+import { IconnedButton } from "@/components/common/buttons";
+import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { COLORS, ICONS } from "@/constants";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { Icon, Modal, Transition } from "semantic-ui-react";
+import { Modal, Transition } from "semantic-ui-react";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const { control, handleSubmit, formState: { isDirty }, reset } = useForm();
@@ -17,7 +19,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         open={isModalOpen}
         onClose={() => onClose(false)}
       >
-        <Modal.Header>Comentario para remito</Modal.Header>
+        <Modal.Header>Comentarios del producto</Modal.Header>
         <Modal.Content>
           <Flex flexDirection="column" rowGap="15px">
             <FieldsContainer>
@@ -55,26 +57,8 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer>
-            <IconedButton
-              icon
-              labelPosition="left"
-              type="button"
-              color="red"
-              onClick={() => onClose(false)}
-            >
-              <Icon name="cancel" />
-              Cancelar
-            </IconedButton>
-            <IconedButton
-              icon
-              labelPosition="left"
-              disabled={!isDirty}
-              onClick={handleSubmit(onAddComment)}
-              color="green"
-            >
-              <Icon name="check" />
-              Confirmar
-            </IconedButton>
+            <IconnedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} />
+            <IconnedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleSubmit(onAddComment)} disabled={!isDirty} />
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>

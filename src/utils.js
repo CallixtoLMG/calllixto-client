@@ -1,8 +1,9 @@
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
+import { isValidElement } from "react";
 import * as XLSX from "xlsx";
-import { BUDGET_STATES, REGEX } from "./constants";
+import { BUDGET_STATES, PRODUCT_STATES, REGEX } from "./constants";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)
@@ -12,12 +13,16 @@ export const now = () => {
   return date;
 };
 
-export const expirationDate = (createdAt, expirationOffsetDays) => {
-  const fechaCreacionParsed = dayjs(createdAt);
-  const fechaVencimiento = fechaCreacionParsed.add(expirationOffsetDays, 'day');
-  return fechaVencimiento.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+export const threeMonthsDate = (date) => {
+  return dayjs(date).add(3, 'month').format('YYYY-MM-DD');
 };
-export const actualDate = dayjs();
+
+export const expirationDate = (expirationOffsetDays, createdAt = dayjs().format()) => {
+  const dateCreated = dayjs(createdAt);
+  const dueDate = dateCreated.add(expirationOffsetDays, 'day');
+  return dueDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
+};
+
 export const formatedDateAndHour = (date) => dayjs(date).format('DD-MM-YYYY - hh:mm A');
 export const formatedDateOnly = (date) => dayjs(date).format('DD-MM-YYYY');
 
@@ -34,16 +39,6 @@ export function encodeUri(value) {
   }
   return undefined;
 };
-
-export const formatedPricePdf = (number) => {
-  let modNumber = Number(number);
-  modNumber = Math.ceil(modNumber);
-  return modNumber.toLocaleString('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    minimumFractionDigits: 0,
-  });
-}
 
 export const formatProductCodePopup = (code, brand, supplier) => {
   const firstPart = code ? code?.substring(0, 2) : "";
@@ -67,30 +62,23 @@ export const formatProductCode = (code) => {
 
 export const formatedPercentage = (number = 0) => {
   return number + " %"
-}
+};
+
+export const getPrice = (product) => {
+  const { editablePrice, fractionConfig, price } = product;
+  return fractionConfig?.active ? fractionConfig?.value * price : price;
+};
 
 export const getTotal = (product) => {
   const price = getPrice(product);
   return price * product.quantity * (1 - (product.discount / 100)) || 0;
 };
 
-export const getPrice = (product) => {
-  const { editablePrice, fractionConfig, price} = product;
-  return editablePrice || !fractionConfig?.active ? price : fractionConfig?.value * price;
-}
-
-export const cleanValue = (value) => {
-  return value.replace(/,/g, '');
-};
-
-export const removeDecimal = (value) => {
-  return value.replace(/\./g, '');
-};
-
-export const getTotalSum = (products, discount = 0) => {
-  const totalSum = products?.reduce((a, b) => a + getTotal(b), 0);
-  const discountedTotal = totalSum - (totalSum * (discount / 100));
-  return discountedTotal;
+export const getTotalSum = (products, discount = 0, additionalCharge = 0) => {
+  const subtotal = products?.reduce((a, b) => a + getTotal(b), 0);
+  const discountedsubtotal = subtotal - (subtotal * (discount / 100));
+  const total = discountedsubtotal + (discountedsubtotal * (additionalCharge / 100));
+  return total;
 };
 
 export const getSubtotal = (total, discountOrCharge) => {
@@ -98,15 +86,25 @@ export const getSubtotal = (total, discountOrCharge) => {
   return subtotal;
 };
 
-export const formatedSimplePhone = (phoneNumbers) => {
-  if (!phoneNumbers) return '';
-  return `+54 ${phoneNumbers.areaCode} ${phoneNumbers.number}`;
+export const removeDecimal = (value) => {
+  return value.replace(/\./g, '');
+};
+
+export const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
+
+export const handleNaN = (value, defaultValue = 'Valor incorrecto') => isNaN(value) ? defaultValue : formatedPrice(value);
+
+
+
+export const formatedSimplePhone = (phone) => {
+  if (!phone) return '';
+  return `+54 ${phone.areaCode} ${phone.number}`;
 };
 
 export const getPhonesForDisplay = (phoneNumbers) => {
   if (!phoneNumbers || phoneNumbers.length === 0) return { primaryPhone: '', additionalPhones: null };
 
-  const primaryPhone = `+54 ${phoneNumbers[0]?.areaCode} ${phoneNumbers[0]?.number}`;
+  const primaryPhone = formatedSimplePhone(phoneNumbers[0]);
   if (phoneNumbers.length === 1) return { primaryPhone, additionalPhones: null };
 
   const additionalPhones = phoneNumbers.slice(1);
@@ -116,7 +114,7 @@ export const getPhonesForDisplay = (phoneNumbers) => {
 export const getAddressesForDisplay = (addresses) => {
   if (!addresses || addresses.length === 0) return { primaryAddress: '', additionalAddress: null };
 
-  const primaryAddress = addresses[0]?.address;
+  const primaryAddress = addresses?.[0]?.address;
   if (addresses.length === 1) return { primaryAddress, additionalAddress: null };
 
   const additionalAddresses = addresses.slice(1);
@@ -135,12 +133,6 @@ export const getProductCode = (code) => {
   return code?.slice(4);
 };
 
-export const preventSend = (event) => {
-  if (event.key === 'Enter') {
-    event.preventDefault();
-  };
-};
-
 export const downloadExcel = (data, fileName) => {
   const ws = XLSX.utils.aoa_to_sheet(data);
   const wb = XLSX.utils.book_new();
@@ -148,10 +140,29 @@ export const downloadExcel = (data, fileName) => {
   XLSX.writeFile(wb, `${fileName}.xlsx`);
 };
 
+export const preventSend = (event) => {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+  };
+};
+
 export const handleEnterKeyPress = (e, action) => {
   if (e.key === 'Enter') {
     e.preventDefault();
     action(e);
+  }
+};
+
+export const handleConfirmKeyPress = (e, isActionEnabled, handleSubmit, onConfirm) => {
+  if (e.key === 'Enter' && isActionEnabled) {
+    handleSubmit(onConfirm)();
+  }
+};
+
+export const handleKeyPressWithSubmit = (e, isActionEnabled, isLoading, handleSubmit, onConfirm) => {
+  if (e.key === 'Enter' && isActionEnabled && !isLoading) {
+    e.preventDefault();
+    handleSubmit(onConfirm)();
   }
 };
 
@@ -175,10 +186,76 @@ export const isBudgetCancelled = (status) => {
   return status === BUDGET_STATES.CANCELLED.id;
 };
 
+export const isBudgetPending = (status) => {
+  return status === BUDGET_STATES.PENDING.id;
+};
+
 export const isBudgetExpired = (status) => {
   return status === BUDGET_STATES.EXPIRED.id;
 };
 
-export const isBudgetPending = (status) => {
-  return status === BUDGET_STATES.PENDING.id;
+export const isProductActive = (status) => {
+  return status === PRODUCT_STATES.ACTIVE.id;
+};
+
+export const isProductOOS = (status) => {
+  return status === PRODUCT_STATES.OOS.id;
+};
+
+export const isProductInactive = (status) => {
+  return status === PRODUCT_STATES.INACTIVE.id;
+};
+
+export const isItemInactive = (state) => {
+  return state === "INACTIVE";
+};
+
+export const isItemDeleted = (state) => {
+  return state === "DELETED";
+};
+
+export const isProductDeleted = (status) => {
+  return status === PRODUCT_STATES.DELETED.id;
+};
+
+export const filterProductsBySupplierId = (products, supplierId) => {
+  if (!products) return [];
+
+  return products.filter(product => {
+    const productSupplierId = product.code.substring(0, supplierId.length);
+    return productSupplierId !== supplierId;
+  });
+};
+
+export const renderContent = (content) => {
+  return typeof content === 'string' ? content : (
+    isValidElement(content) ? content : null
+  );
+};
+
+export const createFilter = (filters, keysToFilter, exceptions = {}) => {
+  return item => {
+    for (const key of keysToFilter) {
+      if (filters[key]) {
+        const filterWords = filters[key].toLowerCase().split(/\s+/);
+
+        const itemValue = typeof item[key] === 'string'
+          ? item[key].toLowerCase()
+          : typeof exceptions[key] === 'function'
+            ? exceptions[key](item).toLowerCase()
+            : '';
+
+        const allWordsMatch = filterWords.every(word => itemValue.includes(word));
+        if (!allWordsMatch) {
+          return false;
+        }
+      }
+    }
+
+    if (filters.state && filters.state !== item.state && filters.state !== exceptions.allState) {
+      return false;
+    }
+
+    return true;
+  };
 };

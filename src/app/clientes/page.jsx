@@ -1,53 +1,76 @@
 "use client";
 import { useListCustomers } from "@/api/customers";
-import { usePaginationContext } from "@/components/common/table/Pagination";
 import CustomersPage from "@/components/customers/CustomersPage";
-import { ATTRIBUTES } from "@/components/customers/customers.common";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, CUSTOMER_STATES, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
+import { downloadExcel, formatedSimplePhone } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 const Customers = () => {
   useValidateToken();
-  const { data, isLoading } = useListCustomers({ attributes: [ATTRIBUTES.ID, ATTRIBUTES.NAME, ATTRIBUTES.ADDRESSES, ATTRIBUTES.PHONES, ATTRIBUTES.EMAILS,  ATTRIBUTES.COMMENT] });
+  const { data, isLoading, isRefetching, refetch } = useListCustomers();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
-  const { handleEntityChange } = usePaginationContext();
   const { push } = useRouter();
-
-  useEffect(() => {
-    handleEntityChange(ENTITIES.CUSTOMERS)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   useEffect(() => {
     setLabels([PAGES.CUSTOMERS.NAME]);
   }, [setLabels]);
 
-  const { customers } = useMemo(() => {
-    return { customers: data?.customers }
-  }, [data]);
+  const customers = useMemo(() => data?.customers, [data]);
+  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
+
+  const prepareCustomerDataForExcel = useMemo(() => {
+    if (!customers) return [];
+  
+    const headers = ['Nombre', 'Estado', 'Dirección', 'Teléfono'];
+  
+    const customerData = customers.map(customer => {
+      const customerState = CUSTOMER_STATES[customer.state]?.singularTitle || customer.state;
+  
+      return [
+        customer.name,
+        customerState,
+        customer.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
+        customer.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
+      ];
+    });
+  
+    return [headers, ...customerData];
+  }, [customers]);
 
   useEffect(() => {
+
     const actions = [
       {
         id: 1,
-        icon: 'add',
-        color: 'green',
+        icon: ICONS.ADD,
+        color: COLORS.GREEN,
         onClick: () => { push(PAGES.CUSTOMERS.CREATE) },
-        text: 'Crear'
-      }
+        text: 'Crear',
+      },
+      {
+        id: 3,
+        icon: ICONS.FILE_EXCEL,
+        color: COLORS.SOFT_GREY,
+        onClick: () => {
+          downloadExcel(prepareCustomerDataForExcel, "Lista de Clientes");
+        },
+        text: 'Clientes',
+        disabled: loading
+      },
     ];
     setActions(actions);
-  }, [push, setActions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [push, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <CustomersPage isLoading={isLoading} customers={customers} />
+    <CustomersPage onRefetch={refetch} isLoading={loading} customers={loading ? [] : customers} />
   );
 };
 

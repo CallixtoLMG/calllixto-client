@@ -1,129 +1,99 @@
-import { LIST_SUPPLIERS_QUERY_KEY, deleteSupplier } from "@/api/suppliers";
-import { Input } from "@/components/common/custom";
-import { ModalDelete } from "@/components/common/modals";
+import { Dropdown, Flex, Input } from "@/components/common/custom";
 import { Filters, Table } from "@/components/common/table";
-import { usePaginationContext } from "@/components/common/table/Pagination";
-import { PAGES } from "@/constants";
-import { RULES } from "@/roles";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { PAGES, SUPPLIER_STATES } from "@/constants";
+import { createFilter } from "@/utils";
 import { useCallback, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
-import { toast } from "react-hot-toast";
-import { Form } from "semantic-ui-react";
+import { Controller, useForm } from "react-hook-form";
+import { Form, Label } from "semantic-ui-react";
 import { SUPPLIERS_COLUMNS } from "../suppliers.common";
 
-const EMPTY_FILTERS = { id: '', name: '' };
+const EMPTY_FILTERS = { id: '', name: '', state: SUPPLIER_STATES.ACTIVE.id };
+const STATE_OPTIONS = [
+  ...Object.entries(SUPPLIER_STATES).map(([key, value]) => ({
+    key,
+    text: (
+      <Flex alignItems="center" justifyContent="space-between">
+        {value.title}&nbsp;<Label color={value.color} circular empty />
+      </Flex>
+    ),
+    value: key
+  }))
+];
 
-const SuppliersPage = ({ suppliers = [], role, isLoading }) => {
-  const [showModal, setShowModal] = useState(false);
-  const [selectedSupplier, setSelectedSupplier] = useState(null);
-  const queryClient = useQueryClient();
-  const { resetFilters } = usePaginationContext();
-  const methods = useForm();
-  const { handleSubmit, control, reset, setValue } = methods;
+const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
+  const { handleSubmit, control, reset } = useForm();
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
 
-  const deleteQuestion = useCallback((name) => `¿Está seguro que desea eliminar la marca "${name}"?`, []);
-
-  const onFilter = (data) => {
-    const filters = { ...data };
-    if (data.id) {
-      filters.sort = "id";
-    }
-    if (data.name) {
-      filters.sort = "name";
-    }
-    resetFilters(filters);
-  };
-
-  const actions = RULES.canRemove[role] ? [
-    {
-      id: 1,
-      icon: 'trash',
-      color: 'red',
-      onClick: (supplier) => {
-        setSelectedSupplier(supplier);
-        setShowModal(true);
-      },
-      tooltip: 'Eliminar'
-    }
-  ] : [];
-
-  const { mutate, isPending } = useMutation({
-    mutationFn: async () => {
-      const { data } = await deleteSupplier(selectedSupplier?.id);
-      return data;
-    },
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        queryClient.invalidateQueries({ queryKey: [LIST_SUPPLIERS_QUERY_KEY] });
-        toast.success('Marca eliminada!');
-        setShowModal(false);
-      } else {
-        toast.error(response.message);
-      }
-    },
-  });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const onFilter = useCallback(
+    createFilter(filters, ['id', 'name']),
+    [filters]
+  );
 
   const onRestoreFilters = () => {
     reset(EMPTY_FILTERS);
-    onFilter(EMPTY_FILTERS);
+    setFilters(EMPTY_FILTERS);
   }
 
   return (
     <>
-      <FormProvider {...methods}>
-        <Form onSubmit={handleSubmit(onFilter)}>
-          <Filters onRestoreFilters={onRestoreFilters}>
-            <Controller
-              name="id"
-              control={control}
-              render={({ field: { onChange, ...rest} }) => (
-                <Input
-                  {...rest}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Id"
-                  onChange={(e) => {
-                    setValue('name', '');
-                    onChange(e.target.value);
-                  }}
-                />
-              )}
-            />
-            <Controller
-              name="name"
-              control={control}
-              render={({ field: { onChange, ...rest} }) => (
-                <Input
-                  {...rest}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Nombre"
-                  onChange={(e) => {
-                    setValue('id', '');
-                    onChange(e.target.value);
-                  }}
-                />
-              )}
-            />
-          </Filters>
-        </Form>
-      </FormProvider>
+      <Form onSubmit={handleSubmit(setFilters)}>
+        <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
+          <Controller
+            name="state"
+            control={control}
+            render={({ field: { onChange, ...rest } }) => (
+              <Dropdown
+                {...rest}
+                $maxWidth
+                top="10px"
+                height="35px"
+                minHeight="35px"
+                selection
+                options={STATE_OPTIONS}
+                defaultValue={STATE_OPTIONS[0].key}
+                onChange={(e, { value }) => {
+                  onChange(value);
+                  setFilters({ ...filters, state: value });
+                }}
+              />
+            )}
+          />
+          <Controller
+            name="id"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                $marginBottom
+                $maxWidth
+                height="35px"
+                placeholder="Id"
+              />
+            )}
+          />
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                $marginBottom
+                $maxWidth
+                height="35px"
+                placeholder="Nombre"
+              />
+            )}
+          />
+        </Filters>
+      </Form>
       <Table
         isLoading={isLoading}
         headers={SUPPLIERS_COLUMNS}
         elements={suppliers}
         page={PAGES.SUPPLIERS}
-        actions={actions}
-      />
-      <ModalDelete
-        showModal={showModal}
-        setShowModal={setShowModal}
-        title={deleteQuestion(selectedSupplier?.name)}
-        onDelete={mutate}
-        isLoading={isPending}
+        onFilter={onFilter}
+        paginate
       />
     </>
   )

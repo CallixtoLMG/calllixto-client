@@ -1,49 +1,39 @@
-import { NoPrint } from '@/components/layout';
-import { cloneElement, useState } from 'react';
-import { Icon, Popup } from 'semantic-ui-react';
-import { ButtonsContainer, Flex, IconedButton } from '../../custom';
+import { cloneElement } from 'react';
+import { Popup } from 'semantic-ui-react';
+import { IconnedButton } from '..';
+import { ButtonsContainer, Flex } from '../../custom';
 
-const PopupActions = ({ width, title, color, buttons, icon, position = "bottom center", trigger }) => {
-  const [open, setOpen] = useState(false);
-
-  const handleClose = () => {
-    setOpen(false);
-  };
+const PopupActions = ({ width, title, color, buttons, icon, position = "bottom center", trigger, open, onOpen, onClose }) => {
 
   return (
     <Popup
       open={open}
-      onClose={() => setOpen(false)}
-      onOpen={() => setOpen(true)}
+      onClose={onClose}
+      onOpen={onOpen}
       position={position}
       trigger={trigger || (
         <ButtonsContainer>
-          <IconedButton
-            size="small"
-            icon
-            labelPosition="left"
+          <IconnedButton
+            text={title}
+            icon={icon}
             width={width}
             color={color}
-          >
-            <Icon name={icon} />{title}
-          </IconedButton>
+          />
         </ButtonsContainer>
       )}
       content={
-        <NoPrint>
-          <Flex rowGap="5px" flexDirection="column">
-            {buttons?.map((child) =>
-              cloneElement(child, {
-                onClick: () => {
-                  handleClose();
-                  if (child.props.onClick) {
-                    child.props.onClick();
-                  }
+        <Flex rowGap="5px" flexDirection="column">
+          {buttons?.map((child) =>
+            cloneElement(child, {
+              onClick: () => {
+                if (child.props.onClick) {
+                  child.props.onClick(); 
                 }
-              })
-            )}
-          </Flex>
-        </NoPrint>
+                if (onClose) onClose(); 
+              }
+            })
+          )}
+        </Flex>
       }
       on="click"
     />

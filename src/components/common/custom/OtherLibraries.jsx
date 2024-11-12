@@ -1,4 +1,5 @@
 import { Icon } from "@/components/common/custom";
+import { ICONS } from "@/constants";
 import CurrencyFormat from 'react-currency-format';
 import styled from "styled-components";
 import { Flex } from './Flex';
@@ -10,6 +11,7 @@ export const CurrencyFormatInput = styled(CurrencyFormat)`
   align-items: center;
   align-content: center;
   text-align-last: ${({ textAlignLast }) => textAlignLast} !important;
+  opacity: ${({ disabled }) => disabled ? '0.3' : '1'};
 
   &:focus {
     outline: none;
@@ -20,7 +22,7 @@ export const CurrencyFormatInput = styled(CurrencyFormat)`
 export const Price = ({ value }) => {
   return (
     <Flex alignItems="center" justifyContent="space-between">
-      <Icon dollar name="dollar" />
+      <Icon dollar name={ICONS.DOLLAR} />
       <CurrencyFormatInput
         displayType="text"
         thousandSeparator={true}
@@ -31,3 +33,4 @@ export const Price = ({ value }) => {
     </Flex>
   );
 };
+

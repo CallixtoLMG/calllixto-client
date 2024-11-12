@@ -1,13 +1,14 @@
 import { Dropdown, Flex, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
-import { usePaginationContext } from "@/components/common/table/Pagination";
-import { BUDGET_STATES, PAGES } from "@/constants";
+import { ALL, BUDGET_STATES, COLORS, ICONS, PAGES } from "@/constants";
+import { createFilter } from '@/utils';
 import { useRouter } from "next/navigation";
-import { Controller, FormProvider, useForm } from 'react-hook-form';
+import { useCallback, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { Form, Label } from 'semantic-ui-react';
 import { BUDGETS_COLUMNS } from "../budgets.common";
 
-const DEFAULT_STATE = { key: 'ALL', value: 'ALL', text: 'Todos' };
+const DEFAULT_STATE = { key: ALL, value: ALL, text: 'Todos' };
 const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: DEFAULT_STATE.value };
 const STATE_OPTIONS = [
   DEFAULT_STATE,
@@ -23,137 +24,99 @@ const STATE_OPTIONS = [
     }))
 ];
 
-const BudgetsPage = ({ budgets, isLoading }) => {
+const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const { push } = useRouter();
-  const { resetFilters } = usePaginationContext();
-  const methods = useForm();
-  const { handleSubmit, control, reset, setValue, watch } = methods;
+  const { handleSubmit, control, reset, watch } = useForm();
   const [watchState] = watch(['state']);
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
 
-  const onFilter = (data) => {
-    const filters = { ...data };
-    if (data.id) {
-      filters.sort = "id";
-      setValue('state', DEFAULT_STATE.value);
-      delete filters.state;
-    }
-    if (data.customer) {
-      filters.sort = "customer";
-      if (data.state === DEFAULT_STATE.value) {
-        setValue('state', BUDGET_STATES.PENDING.id);
-      }
-    }
-    if (data.seller) {
-      filters.sort = "seller";
-      if (data.state === DEFAULT_STATE.value) {
-        setValue('state', BUDGET_STATES.PENDING.id);
-      }
-    }
-    resetFilters(filters);
-  };
+  const keysToFilter = ['id', 'customer', 'seller'];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  const onFilter = useCallback(createFilter(filters, keysToFilter, {
+    customer: budget => budget.customer?.name || '',
+    allState: ALL,
+  }), [filters]);
 
   const actions = [
     {
       id: 1,
-      icon: 'copy',
-      color: 'green',
+      icon: ICONS.COPY,
+      color: COLORS.GREEN,
       onClick: (budget) => { push(PAGES.BUDGETS.CLONE(budget?.id)) },
       tooltip: 'Clonar'
-    },
+    }
   ];
 
   const onRestoreFilters = () => {
     reset(EMPTY_FILTERS);
-    onFilter(EMPTY_FILTERS);
+    setFilters(EMPTY_FILTERS);
   }
 
   return (
     <>
-      <FormProvider {...methods}>
-        <Form onSubmit={handleSubmit(onFilter)}>
-          <Filters onRestoreFilters={onRestoreFilters}>
-            <Controller
-              name="state"
-              control={control}
-              render={({ field: { onChange, ...rest } }) => (
-                <Dropdown
-                  {...rest}
-                  $maxWidth
-                  top="10px"
-                  height="35px"
-                  minHeight="35px"
-                  selection
-                  options={STATE_OPTIONS}
-                  defaultValue={STATE_OPTIONS[0].key}
-                  onChange={(e, { value }) => {
-                    setValue('id', '');
-                    if (value === DEFAULT_STATE.value) {
-                      setValue('customer', '');
-                      setValue('seller', '');
-                    }
-                    onChange(value);
-                    handleSubmit(onFilter)();
-                  }}
-                />
-              )}
-            />
-            <Controller
-              name="id"
-              control={control}
-              render={({ field: { onChange, ...rest } }) => (
-                <Input
-                  {...rest}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Id"
-                  onChange={(e) => {
-                    setValue('customer', '');
-                    setValue('seller', '');
-                    onChange(e.target.value);
-                  }}
-                />
-              )}
-            />
-            <Controller
-              name="customer"
-              control={control}
-              render={({ field: { onChange, ...rest } }) => (
-                <Input
-                  {...rest}
-                  $maxWidth
-                  $marginBottom
-                  height="35px"
-                  placeholder="Cliente"
-                  onChange={(e) => {
-                    setValue('id', '');
-                    setValue('seller', '');
-                    onChange(e.target.value);
-                  }}
-                />
-              )}
-            />
-            <Controller
-              name="seller"
-              control={control}
-              render={({ field: { onChange, ...rest } }) => (
-                <Input
-                  {...rest}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Vendedor"
-                  onChange={(e) => {
-                    setValue('id', '');
-                    setValue('customer', '');
-                    onChange(e.target.value);
-                  }}
-                />
-              )}
-            />
-          </Filters>
-        </Form>
-      </FormProvider>
+      <Form onSubmit={handleSubmit(setFilters)}>
+        <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
+          <Controller
+            name="state"
+            control={control}
+            render={({ field: { onChange, ...rest } }) => (
+              <Dropdown
+                {...rest}
+                $maxWidth
+                top="10px"
+                height="35px"
+                minHeight="35px"
+                selection
+                options={STATE_OPTIONS}
+                defaultValue={STATE_OPTIONS[0].key}
+                onChange={(e, { value }) => {
+                  onChange(value);
+                  setFilters({ ...filters, state: value });
+                }}
+              />
+            )}
+          />
+          <Controller
+            name="id"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                $marginBottom
+                $maxWidth
+                height="35px"
+                placeholder="Id"
+              />
+            )}
+          />
+          <Controller
+            name="customer"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                $maxWidth
+                $marginBottom
+                height="35px"
+                placeholder="Cliente"
+              />
+            )}
+          />
+          <Controller
+            name="seller"
+            control={control}
+            render={({ field }) => (
+              <Input
+                {...field}
+                $marginBottom
+                $maxWidth
+                height="35px"
+                placeholder="Vendedor"
+              />
+            )}
+          />
+        </Filters>
+      </Form>
       <Table
         isLoading={isLoading}
         headers={BUDGETS_COLUMNS}
@@ -161,6 +124,8 @@ const BudgetsPage = ({ budgets, isLoading }) => {
         page={PAGES.BUDGETS}
         actions={actions}
         color={BUDGET_STATES[watchState]?.color}
+        onFilter={onFilter}
+        paginate
       />
     </>
 

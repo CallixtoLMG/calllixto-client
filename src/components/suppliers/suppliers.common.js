@@ -1,15 +1,15 @@
-import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
-import { PhonesTooltip, AddressesTooltip, CommentTooltip } from "@/components/common/tooltips";
 import { Flex } from "@/components/common/custom";
+import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "@/components/common/tooltips";
+import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
 
-const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments" };
+const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments", STATE: "state" };
 
 const SUPPLIERS_COLUMNS = [
   {
     id: 1,
     title: "Id",
     width: 1,
-    value: (supplier) => supplier.id
+    value: (supplier) => supplier?.id
   },
   {
     id: 2,

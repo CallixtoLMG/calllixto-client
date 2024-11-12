@@ -1,5 +1,5 @@
 import { Flex } from '@/components/common/custom';
-import { Segment as SSegment, Table as STable } from "semantic-ui-react";
+import { Pagination as SPagination, Segment as SSegment, Table as STable } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Cell = styled(STable.Cell)`
@@ -20,20 +20,20 @@ const Container = styled(Flex)`
   overflow-x: ${({ tableHeight }) => tableHeight && "auto"} !important;
 `;
 
+const Pagination = styled(SPagination)`
+  margin: auto!important;
+`;
+
 const PaginationContainer = styled(Flex)`
+  width:100%;
+  align-items: center;
+  position: relative; 
   align-self: center;
   max-height: ${({ height = 'none' }) => `${height}!important`};
   flex-direction: row;
   justify-content: ${({ center }) => center ? "center" : "flex-end"};
   column-gap: 10px;
   justify-content: center;
-`;
-
-const PaginationSegment = styled(SSegment)`
-  line-height: 1!important;
-  height:35px!important;
-  margin: 0!important;
-  padding: 10px!important;
 `;
 
 const FiltersContainer = styled(Flex)`
@@ -77,8 +77,8 @@ const ActionsContainer = styled.td`
     return $header ? 'translateX(calc(100%))' : "translateY(-50%) translateX(calc(100%))";
   }} !important;
   transition: all 0.1s ease-in-out!important;
-  opacity: ${({ $header }) => $header ? "1" : "0"};
-  visibility: ${({ $header }) => $header ? "visible" : "hidden"};
+  opacity: ${({ $header, $open }) => $header || $open ? "1" : "0"};
+  visibility: ${({ $header, $open, stillShow }) => $header || $open && stillShow ? "visible" : "hidden"};
   border: none!important;
   padding: ${({ $header }) => $header && "0!important"};
   padding-left: 5px !important;
@@ -116,5 +116,5 @@ const LinkCell = styled(STable.Cell)`
   }
 `;
 
-export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, PaginationContainer, PaginationSegment, Segment, Table, TableHeader, TableRow };
+export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, Pagination, PaginationContainer, Segment, Table, TableHeader, TableRow };
 

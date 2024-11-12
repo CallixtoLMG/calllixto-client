@@ -1,10 +1,18 @@
 "use client";
-import { ViewContainer, FieldsContainer, FormField, Label, Segment } from "@/components/common/custom";
+import { FieldsContainer, FormField, Label, Message, MessageHeader, Segment, ViewContainer } from "@/components/common/custom";
 import { ContactView } from "@/components/common/form";
+import { isItemInactive } from "@/utils";
 
 const SupplierView = ({ supplier }) => {
   return (
     <ViewContainer>
+      {isItemInactive(supplier?.state) &&
+        <FieldsContainer>
+          <Message negative >
+            <MessageHeader>Motivo de inactivación</MessageHeader>
+            <p>{supplier.inactiveReason}</p>
+          </Message>
+        </FieldsContainer>}
       <FieldsContainer>
         <FormField>
           <Label>Código</Label>
@@ -16,7 +24,7 @@ const SupplierView = ({ supplier }) => {
         </FormField>
       </FieldsContainer>
       <ContactView {...supplier} />
-      <FieldsContainer>
+      <FieldsContainer rowGap="5px">
         <Label >Comentarios</Label>
         <Segment placeholder>{supplier?.comments}</Segment>
       </FieldsContainer>
