@@ -58,7 +58,7 @@ const BudgetForm = ({
             }
           })
         })),
-        seller: `${user?.firstName} ${user?.lastName}`, 
+        seller: `${user?.firstName} ${user?.lastName}`,
         paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
       }
       : budget && draft
@@ -143,7 +143,7 @@ const BudgetForm = ({
           budgetProducts = budgetProducts.filter(budgetProduct => budgetProduct.code !== product.code);
 
           const priceChanged = budgetProduct.price !== product.price;
-          const stateChanged = budgetProduct.state !== product.state;
+          // const stateChanged = budgetProduct.state !== product.state;
           const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
 
           const fractionConfigChanged =
@@ -154,7 +154,7 @@ const BudgetForm = ({
               (budgetProduct.fractionConfig.value !== product.fractionConfig.value && product.fractionConfig.value !== undefined)
             );
 
-          return priceChanged || stateChanged || editableChanged || fractionConfigChanged;
+          return priceChanged || editableChanged || fractionConfigChanged; // || stateChanged;
         }
         return false;
       });
@@ -504,7 +504,7 @@ const BudgetForm = ({
                   {outdatedProducts.map(p => {
                     const oldProduct = budget.products.find(op => op.code === p.code);
                     const priceChanged = oldProduct.price !== p.price;
-                    const stateChanged = oldProduct.state !== p.state;
+                    // const stateChanged = oldProduct.state !== p.state;
                     const editablePriceBecameTrue = !oldProduct.editablePrice && p.editablePrice;
                     const editablePriceBecameFalse = oldProduct.editablePrice && !p.editablePrice;
                     const fractionConfigBecameActive = !oldProduct.fractionConfig?.active && p.fractionConfig?.active;
@@ -520,14 +520,14 @@ const BudgetForm = ({
                             <span style={{ color: COLORS.GREEN }}>{formatedPrice(p.price)}</span>
                           </>
                         )}
-                        {stateChanged && (
+                        {/* {stateChanged && (
                           <>
                             {' | Estado: '}
                             <span style={{ color: PRODUCT_STATES[oldProduct.state].color }}>{PRODUCT_STATES[oldProduct.state].singularTitle}</span>
                             {' -> '}
                             <span style={{ color: PRODUCT_STATES[p.state].color }}>{PRODUCT_STATES[p.state].singularTitle}</span>
                           </>
-                        )}
+                        )} */}
                         {editablePriceBecameTrue && (
                           <>
                             {' | '}
