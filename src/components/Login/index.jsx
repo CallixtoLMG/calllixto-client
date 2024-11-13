@@ -23,13 +23,19 @@ const LoginForm = ({ onSubmit }) => {
     },
     onSuccess: (userData) => {
       if (userData) {
-        push(PAGES.BUDGETS.BASE);
-        toast.success("Ingreso exitoso!");
+        setTimeout(() => {
+          setIsLoading(false);
+          push(PAGES.BUDGETS.BASE);
+        }, 500);
       } else {
         toast.error("Los datos ingresados no son correctos!");
         setIsLoading(false);
       }
-    }
+    },
+    onError: () => {
+      toast.error("Hubo un error al intentar ingresar, por favor intenta de nuevo.");
+      setIsLoading(false);
+    },
   });
 
   return (

@@ -35,10 +35,10 @@ export const PAGES = {
     SHORTKEYS: 'Control+4'
   },
   BUDGETS: {
-    BASE: "/presupuestos",
-    CREATE: "/presupuestos/crear",
-    CLONE: (id) => `/presupuestos/crear?clonar=${id}`,
-    SHOW: (id) => `/presupuestos/${id}`,
+    BASE: "/ventas",
+    CREATE: "/ventas/crear",
+    CLONE: (id) => `/ventas/crear?clonar=${id}`,
+    SHOW: (id) => `/ventas/${id}`,
     NAME: 'Ventas',
     SHORTKEYS: 'Control+5'
   },
