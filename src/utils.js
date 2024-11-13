@@ -94,8 +94,6 @@ export const handleUndefined = (value, defaultValue = 'Sin definir') => value ??
 
 export const handleNaN = (value, defaultValue = 'Valor incorrecto') => isNaN(value) ? defaultValue : formatedPrice(value);
 
-
-
 export const formatedSimplePhone = (phone) => {
   if (!phone) return '';
   return `+54 ${phone.areaCode} ${phone.number}`;

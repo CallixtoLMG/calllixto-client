@@ -54,11 +54,11 @@ const Supplier = ({ params }) => {
     return products?.length > 0;
   }, [products]);
 
-  const prepareProductDataForExcel = useMemo(() => {
-    if (!products) return [];
+  const handleDownloadExcel = useCallback(() => {
+    if (!products) return;
     const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Estado', 'Comentarios'];
 
-    const productData = products.map(product => {
+    const mappedProducts = products.map(product => {
       const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
       return [
         product.code,
@@ -70,9 +70,8 @@ const Supplier = ({ params }) => {
         product.comments
       ];
     });
-
-    return [headers, ...productData];
-  }, [products]);
+    downloadExcel([headers, ...mappedProducts], `Lista de productos de ${supplier.name}`);
+  }, [products, supplier]);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -277,7 +276,7 @@ const Supplier = ({ params }) => {
         onClick: () => {
           if (products?.length) {
             setIsExcelLoading(true);
-            downloadExcel(prepareProductDataForExcel, `Lista de productos de ${supplier.name}`);
+            handleDownloadExcel();
             setIsExcelLoading(false);
           } else {
             toast("No hay productos de este proveedor para descargar.", {
@@ -317,7 +316,7 @@ const Supplier = ({ params }) => {
 
     setActions(actions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, activeAction, hasAssociatedProducts, isActivePending, isExcelLoading, isEditPending, handleDeleteBatchClick, loadingProducts, prepareProductDataForExcel, supplier?.name, handleDeleteClick, handleActivateClick, handleInactivateClick, products, supplier?.state, setActions]);
+  }, [role, activeAction, hasAssociatedProducts, isActivePending, isExcelLoading, isEditPending, handleDeleteBatchClick, loadingProducts, supplier?.name, handleDeleteClick, handleActivateClick, handleInactivateClick, products, supplier?.state, setActions]);
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);

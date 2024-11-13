@@ -7,7 +7,7 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel, formatedDateAndHour, getTotal, getTotalSum, handleNaN, handleUndefined } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 const Budgets = () => {
   useValidateToken();
@@ -32,11 +32,10 @@ const Budgets = () => {
     DRAFT: BUDGET_STATES.DRAFT
   }), []);
 
-  const prepareBudgetDataForExcel = useMemo(() => {
-    if (!budgets) return [];
-
+  const handleDownloadExcel = useCallback(() => {
+    if (!budgets) return;
     let maxProductCount = 1;
-    const budgetData = budgets.map(budget => {
+    const mappedBudgets = budgets.map(budget => {
       const translatedState = stateTranslations[budget.state] || budget.state;
       maxProductCount = Math.max(maxProductCount, budget.products?.length);
       const budgetRow = [
@@ -67,11 +66,10 @@ const Budgets = () => {
 
     const productsHeaders = Array.from(Array(maxProductCount).keys()).map((index) => `Producto ${index + 1}`);
     const headers = ['ID', 'Estado', 'Cliente', 'Fecha', "Total", "Descuento", "Cargo adicional", "Vendedor", ...productsHeaders];
-    return [headers, ...budgetData];
+    downloadExcel([headers, ...mappedBudgets], "Lista de Ventas");
   }, [budgets, stateTranslations]);
 
   useEffect(() => {
-
     const actions = [
       {
         id: 1,
@@ -85,9 +83,7 @@ const Budgets = () => {
         icon: ICONS.FILE_EXCEL,
         color: COLORS.SOFT_GREY,
         width: "fit-content",
-        onClick: () => {
-          downloadExcel(prepareBudgetDataForExcel, "Lista de Presupuestos");
-        },
+        onClick: handleDownloadExcel,
         text: 'Presupuestos',
         disabled: loading
       },

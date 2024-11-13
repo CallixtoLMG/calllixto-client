@@ -12,7 +12,7 @@ import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { downloadExcel, formatedPrice } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Dropdown } from "semantic-ui-react";
 
 const mockData = [
@@ -39,11 +39,10 @@ const Products = () => {
   const products = useMemo(() => data?.products, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const prepareProductDataForExcel = useMemo(() => {
-    if (!products) return [];
+  const handleDownloadExcel = useCallback(() => {
+    if (!products) return;
     const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Estado', 'Comentarios'];
-
-    const productData = products.map(product => {
+    const mappedPRoducts = products.map(product => {
       const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
       return [
         product.code,
@@ -55,13 +54,10 @@ const Products = () => {
         product.comments
       ];
     });
-
-    return [headers, ...productData];
+    downloadExcel([headers, ...mappedPRoducts], "Lista de Productos");
   }, [products]);
 
-
   useEffect(() => {
-
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
@@ -90,9 +86,7 @@ const Products = () => {
               <DropdownItem>
                 <BatchImport key="batch-update" />
               </DropdownItem>
-              <DropdownItem onClick={() => {
-                downloadExcel(prepareProductDataForExcel, "Lista de Productos");
-              }}>
+              <DropdownItem onClick={handleDownloadExcel}>
                 <Icon name={ICONS.DOWNLOAD} />Productos
               </DropdownItem>
               <DropdownItem onClick={() => downloadExcel(mockData, "Ejemplo de tabla")}>
