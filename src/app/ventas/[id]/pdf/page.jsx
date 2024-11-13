@@ -23,7 +23,7 @@ const PDF = ({ params }) => {
     <Loader active={isLoading}>
       <PDFfile
         budget={budget}
-        client={userData?.client?.metadata}
+        client={userData?.client}
         subtotal={getTotalSum(budget?.products)}
         printPdfMode={BUDGET_PDF_FORMAT.CLIENT}
         selectedContact={{

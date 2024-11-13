@@ -457,7 +457,7 @@ const Budget = ({ params }) => {
         <PDFfile
           ref={printRef}
           budget={budget}
-          client={userData?.client?.metadata}
+          client={userData?.client}
           id={userData.client?.id}
           printPdfMode={printPdfMode}
           dolarExchangeRate={showDolarExangeRate && dolarRate}
