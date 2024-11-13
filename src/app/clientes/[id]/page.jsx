@@ -87,7 +87,6 @@ const Customer = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente actualizado!");
-        push(PAGES.CUSTOMERS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -106,7 +105,6 @@ const Customer = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente activado!");
-        push(PAGES.CUSTOMERS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -125,7 +123,6 @@ const Customer = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente desactivado!");
-        push(PAGES.CUSTOMERS.BASE);
       } else {
         toast.error(response.error.message);
       }

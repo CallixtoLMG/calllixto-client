@@ -32,7 +32,6 @@ const CreateBrand = () => {
     onSuccess: async (response) => {
       if (response.statusOk) {
         toast.success('Marca creada!');
-        push(PAGES.BRANDS.BASE);
       } else {
         toast.error(response.error.message);
       }

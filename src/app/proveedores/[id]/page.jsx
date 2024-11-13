@@ -125,7 +125,6 @@ const Supplier = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Proveedor actualizado!');
-        push(PAGES.SUPPLIERS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -144,7 +143,6 @@ const Supplier = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Proveedor activado!");
-        push(PAGES.SUPPLIERS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -163,7 +161,6 @@ const Supplier = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Proveedor desactivado!");
-        push(PAGES.SUPPLIERS.BASE);
       } else {
         toast.error(response.error.message);
       }
