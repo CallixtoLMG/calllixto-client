@@ -51,6 +51,7 @@ const CreateBudget = () => {
     },
     onSuccess: async (response) => {
       if (response.statusOk) {
+        push(PAGES.BUDGETS.SHOW(response.budget.id))
         toast.success('Presupuesto creado!');
       } else {
         toast.error(response.error.message);
