@@ -36,7 +36,7 @@ const Budgets = () => {
     if (!budgets) return;
     let maxProductCount = 1;
     const mappedBudgets = budgets.map(budget => {
-      const translatedState = stateTranslations[budget.state] || budget.state;
+      const translatedState = stateTranslations[budget.state].singularTitle || budget.state;
       maxProductCount = Math.max(maxProductCount, budget.products?.length);
       const budgetRow = [
         handleUndefined(budget.id),
