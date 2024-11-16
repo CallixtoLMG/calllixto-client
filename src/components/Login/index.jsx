@@ -9,11 +9,13 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, Text } from "./styled";
+import { useUserContext } from "@/User";
 
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
   const { handleSubmit, control } = useForm();
   const [isLoading, setIsLoading] = useState(false);
+  const { setUserData } = useUserContext();
 
   const { mutate } = useMutation({
     mutationFn: async (dataLogin) => {
@@ -23,10 +25,8 @@ const LoginForm = ({ onSubmit }) => {
     },
     onSuccess: (userData) => {
       if (userData) {
-        setTimeout(() => {
-          setIsLoading(false);
-          push(PAGES.BUDGETS.BASE);
-        }, 500);
+        setUserData(userData);
+        push(PAGES.BUDGETS.BASE);
       } else {
         toast.error("Los datos ingresados no son correctos!");
         setIsLoading(false);

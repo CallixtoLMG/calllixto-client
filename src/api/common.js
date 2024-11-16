@@ -3,7 +3,7 @@ import { ALL, DEFAULT_LAST_EVENT_ID, ENTITIES, EVENT_KEYS, ID } from "@/constant
 import { EVENTS, PATHS } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
-import axios from './axios';
+import { getInstance } from './axios';
 import localforage from "./local-forage";
 
 export function removeStorageEntity(entity) {
@@ -22,7 +22,7 @@ async function entityList({ entity, url, params }) {
         ...(LastEvaluatedKey && { LastEvaluatedKey: JSON.stringify(LastEvaluatedKey) }),
       };
 
-      const { data } = await axios.get(url, {
+      const { data } = await getInstance().get(url, {
         params: queryParams,
       });
 
@@ -49,7 +49,7 @@ async function handleEvents({ entity, values, key = ID }) {
     await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
   }
 
-  const { data: eventsData } = await axios.get(`${EVENTS}/${entity}`, {
+  const { data: eventsData } = await getInstance().get(`${EVENTS}/${entity}`, {
     params: { lastEventId },
   });
 
@@ -116,7 +116,7 @@ export async function listItems({ entity, url, params, key = ID }) {
 
     await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
 
-    const { data } = await axios.get(`${PATHS.EVENTS}/${entity}`, { params: { order: false, pageSize: 1 } });
+    const { data } = await getInstance().get(`${PATHS.EVENTS}/${entity}`, { params: { order: false, pageSize: 1 } });
     const lastEventId = data?.events?.[0]?.id;
 
     if (lastEventId) {
@@ -133,7 +133,7 @@ export async function getItemById({ id, url, entity, key = ID, params }) {
   await listItems({ entity, url, params, key })
   const getEntity = async (id) => {
     try {
-      const { data } = await axios.get(`${url}/${id}`);
+      const { data } = await getInstance().get(`${url}/${id}`);
       if (data.statusOk) {
         return data;
       }
@@ -158,7 +158,7 @@ export function useCreateItem() {
       createdAt: now(),
     };
 
-    const { data } = await axios.post(url, body);
+    const { data } = await getInstance().post(url, body);
 
     if (data.statusOk) {
       await addStorageItem({ entity, value: data[responseEntity] });
@@ -183,7 +183,7 @@ export function useInactiveItem() {
       updatedAt: now(),
     };
 
-    const { data } = await axios.post(url, body);
+    const { data } = await getInstance().post(url, body);
 
     if (data.statusOk) {
       await updateStorageItem({ entity, value: data[responseEntity], key });
@@ -207,7 +207,7 @@ export function useActiveItem() {
       updatedAt: now(),
     };
 
-    const { data } = await axios.post(url, body);
+    const { data } = await getInstance().post(url, body);
 
     if (data.statusOk) {
 
@@ -232,7 +232,7 @@ export function useEditItem() {
       ...value,
       updatedAt: now(),
     };
-    const { data } = await axios.put(url, updatedItem);
+    const { data } = await getInstance().put(url, updatedItem);
 
     if (data.statusOk) {
       if (data[responseEntity]) {
@@ -256,7 +256,7 @@ export function useDeleteItem() {
   const queryClient = useQueryClient();
 
   const deleteItem = async ({ entity, id, url, key = ID, invalidateQueries = [] }) => {
-    const { data } = await axios.delete(`${url}/${id}`);
+    const { data } = await getInstance().delete(`${url}/${id}`);
 
     if (data.statusOk) {
       await removeStorageItem({ entity, id, key });
@@ -281,7 +281,7 @@ export function useBatchDeleteItems() {
 
     for (const code of ids) {
       try {
-        const { data } = await axios.delete(`${url}/${code}`);
+        const { data } = await getInstance().delete(`${url}/${code}`);
         if (data.statusOk) {
           deletedCount += 1;
 

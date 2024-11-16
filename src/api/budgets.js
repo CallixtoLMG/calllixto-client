@@ -2,7 +2,7 @@ import { ATTRIBUTES } from "@/components/budgets/budgets.common";
 import { ENTITIES, getDefaultListParams, TIME_IN_MS } from "@/constants";
 import { CANCEL, CONFIRM, PATHS, PAYMENTS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
-import axios from './axios';
+import { getInstance } from './axios';
 import { listItems, useCreateItem, useEditItem } from "./common";
 
 export const LIST_BUDGETS_QUERY_KEY = 'lisAllBudgets';
@@ -25,7 +25,7 @@ export function useListBudgets() {
 export function useGetBudget(id) {
   const getBudget = async (id) => {
     try {
-      const { data } = await axios.get(`${PATHS.BUDGETS}/${id}`);
+      const { data } = await getInstance().get(`${PATHS.BUDGETS}/${id}`);
 
       const budget = data?.budget
         ? {
