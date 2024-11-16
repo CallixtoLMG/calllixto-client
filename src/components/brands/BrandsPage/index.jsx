@@ -1,9 +1,9 @@
 import { Dropdown, Flex, Input } from "@/components/common/custom";
 import { Filters, Table } from "@/components/common/table";
 import { BRANDS_STATES, PAGES } from "@/constants";
+import { useFilters } from "@/hooks/useFilters"; // Importamos el hook
 import { createFilter } from "@/utils";
-import { useCallback, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { Form, Label } from "semantic-ui-react";
 import { BRAND_COLUMNS } from "../brands.common";
 
@@ -21,24 +21,25 @@ const STATE_OPTIONS = [
 ];
 
 const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
-  const { handleSubmit, control, reset } = useForm();
-  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const {
+    control,
+    hasUnsavedFilters,
+    onRestoreFilters,
+    onSubmit,
+    onStateChange,
+    appliedFilters,
+  } = useFilters(EMPTY_FILTERS, ['id', 'name']); 
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  const onFilter = useCallback(
-    createFilter(filters, ['name', 'id']),
-    [filters]
-  );
-
-  const onRestoreFilters = () => {
-    reset(EMPTY_FILTERS);
-    setFilters(EMPTY_FILTERS);
-  }
+  const onFilter = createFilter(appliedFilters, ['name', 'id']);
 
   return (
     <>
-      <Form onSubmit={handleSubmit(setFilters)}>
-        <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
+      <Form onSubmit={onSubmit(() => {})}>
+        <Filters
+          onRefetch={onRefetch}
+          onRestoreFilters={onRestoreFilters}
+          hasUnsavedFilters={hasUnsavedFilters()}
+        >
           <Controller
             name="state"
             control={control}
@@ -51,10 +52,10 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
                 minHeight="35px"
                 selection
                 options={STATE_OPTIONS}
-                defaultValue={STATE_OPTIONS[0].key}
+                defaultValue={EMPTY_FILTERS.state}
                 onChange={(e, { value }) => {
                   onChange(value);
-                  setFilters({ ...filters, state: value });
+                  onStateChange(value);
                 }}
               />
             )}
@@ -96,7 +97,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
         paginate
       />
     </>
-  )
+  );
 };
 
 export default BrandsPage;

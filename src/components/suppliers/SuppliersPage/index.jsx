@@ -1,9 +1,9 @@
 import { Dropdown, Flex, Input } from "@/components/common/custom";
 import { Filters, Table } from "@/components/common/table";
 import { PAGES, SUPPLIER_STATES } from "@/constants";
+import { useFilters } from "@/hooks/useFilters";
 import { createFilter } from "@/utils";
-import { useCallback, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller } from "react-hook-form";
 import { Form, Label } from "semantic-ui-react";
 import { SUPPLIERS_COLUMNS } from "../suppliers.common";
 
@@ -21,24 +21,25 @@ const STATE_OPTIONS = [
 ];
 
 const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
-  const { handleSubmit, control, reset } = useForm();
-  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const {
+    control,
+    hasUnsavedFilters,
+    onRestoreFilters,
+    onSubmit,
+    onStateChange,
+    appliedFilters,
+  } = useFilters(EMPTY_FILTERS, ['id', 'name']);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const onFilter = useCallback(
-    createFilter(filters, ['id', 'name']),
-    [filters]
-  );
-
-  const onRestoreFilters = () => {
-    reset(EMPTY_FILTERS);
-    setFilters(EMPTY_FILTERS);
-  }
+  const onFilter = createFilter(appliedFilters, ['id', 'name']);
 
   return (
     <>
-      <Form onSubmit={handleSubmit(setFilters)}>
-        <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
+      <Form onSubmit={onSubmit(() => { })}>
+        <Filters
+          onRefetch={onRefetch}
+          onRestoreFilters={onRestoreFilters}
+          hasUnsavedFilters={hasUnsavedFilters()}
+        >
           <Controller
             name="state"
             control={control}
@@ -51,10 +52,10 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
                 minHeight="35px"
                 selection
                 options={STATE_OPTIONS}
-                defaultValue={STATE_OPTIONS[0].key}
+                defaultValue={EMPTY_FILTERS.state}
                 onChange={(e, { value }) => {
                   onChange(value);
-                  setFilters({ ...filters, state: value });
+                  onStateChange(value);
                 }}
               />
             )}
@@ -96,7 +97,7 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
         paginate
       />
     </>
-  )
+  );
 };
 
 export default SuppliersPage;

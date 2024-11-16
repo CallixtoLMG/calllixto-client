@@ -1,10 +1,10 @@
 import { Dropdown, Flex, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
 import { ALL, BUDGET_STATES, COLORS, ICONS, PAGES } from "@/constants";
+import { useFilters } from "@/hooks/useFilters";
 import { createFilter } from '@/utils';
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import { Form, Label } from 'semantic-ui-react';
 import { BUDGETS_COLUMNS } from "../budgets.common";
 
@@ -26,16 +26,20 @@ const STATE_OPTIONS = [
 
 const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const { push } = useRouter();
-  const { handleSubmit, control, reset, watch } = useForm();
-  const [watchState] = watch(['state']);
-  const [filters, setFilters] = useState(EMPTY_FILTERS);
 
-  const keysToFilter = ['id', 'customer', 'seller'];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  const onFilter = useCallback(createFilter(filters, keysToFilter, {
+  const {
+    control,
+    hasUnsavedFilters,
+    onRestoreFilters,
+    onSubmit,
+    onStateChange,
+    appliedFilters,
+  } = useFilters(EMPTY_FILTERS, ['id', 'customer', 'seller']);
+
+  const onFilter = createFilter(appliedFilters, ['id', 'customer', 'seller'], {
     customer: budget => budget.customer?.name || '',
     allState: ALL,
-  }), [filters]);
+  });
 
   const actions = [
     {
@@ -47,15 +51,10 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
     }
   ];
 
-  const onRestoreFilters = () => {
-    reset(EMPTY_FILTERS);
-    setFilters(EMPTY_FILTERS);
-  }
-
   return (
     <>
-      <Form onSubmit={handleSubmit(setFilters)}>
-        <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
+      <Form onSubmit={onSubmit(() => { })}>
+        <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters} hasUnsavedFilters={hasUnsavedFilters()}>
           <Controller
             name="state"
             control={control}
@@ -68,10 +67,10 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
                 minHeight="35px"
                 selection
                 options={STATE_OPTIONS}
-                defaultValue={STATE_OPTIONS[0].key}
+                defaultValue={DEFAULT_STATE.value}
                 onChange={(e, { value }) => {
                   onChange(value);
-                  setFilters({ ...filters, state: value });
+                  onStateChange(value);
                 }}
               />
             )}
@@ -123,13 +122,12 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
         elements={budgets}
         page={PAGES.BUDGETS}
         actions={actions}
-        color={BUDGET_STATES[watchState]?.color}
+        color={BUDGET_STATES[appliedFilters.state]?.color}
         onFilter={onFilter}
         paginate
       />
     </>
-
-  )
+  );
 };
 
 export default BudgetsPage;

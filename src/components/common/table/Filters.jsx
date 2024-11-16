@@ -19,7 +19,7 @@ const HeaderSegment = styled(SSegment)`
   justify-content: space-between;
 `;
 
-const Filters = ({ children, onRestoreFilters, onRefetch }) => {
+const Filters = ({ children, onRestoreFilters, onRefetch, hasUnsavedFilters }) => {
   return (
     <MainContainer>
       <HeaderSegment flex="1">
@@ -41,8 +41,8 @@ const Filters = ({ children, onRestoreFilters, onRefetch }) => {
             text="Buscar"
             icon={ICONS.SEARCH}
             submit
-            color={COLORS.SOFT_GREY}
-            width='130px'
+            color={hasUnsavedFilters ? COLORS.PRIMARY : COLORS.SOFT_GREY} // Azul si hay cambios
+            width="130px"
           />
           <Popup
             content="Actualizar tabla"
