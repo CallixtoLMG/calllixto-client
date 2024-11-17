@@ -1,7 +1,7 @@
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
-import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, PAGES, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
+import { BRAND_STATES, COLORS, ICONS, MEASSURE_UNITS, PAGES, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { isProductDeleted, preventSend } from "@/utils";
 import { useCallback, useMemo, useState } from "react";
@@ -46,7 +46,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
       return;
     }
 
-    if (brand?.state === BRANDS_STATES.INACTIVE.id) {
+    if (brand?.state === BRAND_STATES.INACTIVE.id) {
       setError("brand", { type: "manual", message: "Esta marca está inactiva." });
       return;
     }
@@ -105,7 +105,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
         <Flex justifyContent="space-between" alignItems="center">
           <span>{name}</span>
           <Flex>
-            {state === BRANDS_STATES.INACTIVE.id && (
+            {state === BRAND_STATES.INACTIVE.id && (
               <Popup
                 trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
                 content={deactivationReason || 'Motivo no especificado'}
@@ -136,7 +136,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     const selectedBrand = brands.find((brand) => brand.name === value);
     setBrand(selectedBrand);
 
-    if (selectedBrand?.state === BRANDS_STATES.INACTIVE.id) {
+    if (selectedBrand?.state === BRAND_STATES.INACTIVE.id) {
       setError("brand", { type: "manual", message: "No es posible crear un producto con una marca inactiva." });
     } else {
       clearErrors("brand");

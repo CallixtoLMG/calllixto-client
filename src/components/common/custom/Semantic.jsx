@@ -54,6 +54,7 @@ export const FormField = styled(Form.Field)`
   margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
   row-gap: 5px!important;
+  max-height: ${({ maxHeight }) => `${maxHeight}!important`};
 `;
 
 export const Label = styled(SLabel)`

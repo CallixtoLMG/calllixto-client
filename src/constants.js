@@ -42,6 +42,13 @@ export const PAGES = {
     NAME: 'Ventas',
     SHORTKEYS: 'Control+5'
   },
+  USERS: {
+    BASE: "/usuarios",
+    CREATE: "/usuarios/crear",
+    SHOW: (id) => `/usuarios/${id}`,
+    NAME: 'Usuarios',
+    SHORTKEYS: 'Control+6'
+  },
   LOGIN: {
     BASE: "/login"
   },
@@ -162,6 +169,8 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
+  USERS: 'users',
+  USER: 'user',
   EVENTS: 'events'
 };
 
@@ -259,6 +268,23 @@ export const CUSTOMER_STATES = {
   },
 };
 
+export const USER_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
+};
+
 export const SUPPLIER_STATES = {
   ACTIVE: {
     id: 'ACTIVE',
@@ -276,7 +302,7 @@ export const SUPPLIER_STATES = {
   },
 };
 
-export const BRANDS_STATES = {
+export const BRAND_STATES = {
   ACTIVE: {
     id: 'ACTIVE',
     title: 'Activos',
