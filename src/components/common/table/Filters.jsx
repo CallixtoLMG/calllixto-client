@@ -41,7 +41,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, hasUnsavedFilters }) =
             text="Buscar"
             icon={ICONS.SEARCH}
             submit
-            color={hasUnsavedFilters ? COLORS.PRIMARY : COLORS.SOFT_GREY} // Azul si hay cambios
+            color={hasUnsavedFilters ? COLORS.PRIMARY : COLORS.SOFT_GREY}
             width="130px"
           />
           <Popup

@@ -1,7 +1,7 @@
 import { Dropdown, Flex, Input } from "@/components/common/custom";
 import { Filters, Table } from "@/components/common/table";
 import { BRANDS_STATES, PAGES } from "@/constants";
-import { useFilters } from "@/hooks/useFilters"; // Importamos el hook
+import { useFilters } from "@/hooks/useFilters";
 import { createFilter } from "@/utils";
 import { Controller } from "react-hook-form";
 import { Form, Label } from "semantic-ui-react";
@@ -28,7 +28,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
     onSubmit,
     onStateChange,
     appliedFilters,
-  } = useFilters(EMPTY_FILTERS, ['id', 'name']); 
+  } = useFilters(EMPTY_FILTERS, ['id', 'name']);
 
   const onFilter = createFilter(appliedFilters, ['name', 'id']);
 
