@@ -42,13 +42,11 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
   const [selectedProducts, setSelectedProducts] = useState({});
 
   const {
-    control,
-    hasUnsavedFilters,
     onRestoreFilters,
     onSubmit,
-    onStateChange,
     appliedFilters,
-  } = useFilters(EMPTY_FILTERS, ['code', 'name']);
+    methods
+  } = useFilters(EMPTY_FILTERS);
 
   const onFilter = createFilter(appliedFilters, ['code', 'name']);
 
@@ -160,12 +158,11 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
   return (
     <>
       <Flex flexDirection="column" rowGap="15px">
-        <FormProvider control={control}>
+        <FormProvider {...methods}>
           <Form onSubmit={onSubmit(() => { })}>
-            <Filters onRefetch={onRefetch} clearSelection={clearSelection} onRestoreFilters={onRestoreFilters} hasUnsavedFilters={hasUnsavedFilters()}>
+            <Filters onRefetch={onRefetch} clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
               <Controller
                 name="state"
-                control={control}
                 render={({ field: { onChange, ...rest } }) => (
                   <Dropdown
                     {...rest}
@@ -178,14 +175,13 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
                     defaultValue={EMPTY_FILTERS.state}
                     onChange={(e, { value }) => {
                       onChange(value);
-                      onStateChange(value);
+                      onSubmit(() => {})();
                     }}
                   />
                 )}
               />
               <Controller
                 name="code"
-                control={control}
                 render={({ field }) => (
                   <Input
                     {...field}
@@ -198,7 +194,6 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
               />
               <Controller
                 name="name"
-                control={control}
                 render={({ field }) => (
                   <Input
                     {...field}

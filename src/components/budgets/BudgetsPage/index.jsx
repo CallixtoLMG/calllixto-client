@@ -4,7 +4,7 @@ import { ALL, BUDGET_STATES, COLORS, ICONS, PAGES } from "@/constants";
 import { useFilters } from "@/hooks/useFilters";
 import { createFilter } from '@/utils';
 import { useRouter } from "next/navigation";
-import { Controller } from 'react-hook-form';
+import { Controller, FormProvider } from 'react-hook-form';
 import { Form, Label } from 'semantic-ui-react';
 import { BUDGETS_COLUMNS } from "../budgets.common";
 
@@ -28,13 +28,11 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const { push } = useRouter();
 
   const {
-    control,
-    hasUnsavedFilters,
     onRestoreFilters,
     onSubmit,
-    onStateChange,
     appliedFilters,
-  } = useFilters(EMPTY_FILTERS, ['id', 'customer', 'seller']);
+    methods
+  } = useFilters(EMPTY_FILTERS);
 
   const onFilter = createFilter(appliedFilters, ['id', 'customer', 'seller'], {
     customer: budget => budget.customer?.name || '',
@@ -53,69 +51,67 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
 
   return (
     <>
-      <Form onSubmit={onSubmit(() => { })}>
-        <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters} hasUnsavedFilters={hasUnsavedFilters()}>
-          <Controller
-            name="state"
-            control={control}
-            render={({ field: { onChange, ...rest } }) => (
-              <Dropdown
-                {...rest}
-                $maxWidth
-                top="10px"
-                height="35px"
-                minHeight="35px"
-                selection
-                options={STATE_OPTIONS}
-                defaultValue={DEFAULT_STATE.value}
-                onChange={(e, { value }) => {
-                  onChange(value);
-                  onStateChange(value);
-                }}
-              />
-            )}
-          />
-          <Controller
-            name="id"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                $marginBottom
-                $maxWidth
-                height="35px"
-                placeholder="Id"
-              />
-            )}
-          />
-          <Controller
-            name="customer"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                $maxWidth
-                $marginBottom
-                height="35px"
-                placeholder="Cliente"
-              />
-            )}
-          />
-          <Controller
-            name="seller"
-            control={control}
-            render={({ field }) => (
-              <Input
-                {...field}
-                $marginBottom
-                $maxWidth
-                height="35px"
-                placeholder="Vendedor"
-              />
-            )}
-          />
-        </Filters>
-      </Form>
+      <FormProvider {...methods}>
+        <Form onSubmit={onSubmit(() => {})}>
+          <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
+            <Controller
+              name="state"
+              render={({ field: { onChange, ...rest } }) => (
+                <Dropdown
+                  {...rest}
+                  $maxWidth
+                  top="10px"
+                  height="35px"
+                  minHeight="35px"
+                  selection
+                  options={STATE_OPTIONS}
+                  defaultValue={DEFAULT_STATE.value}
+                  onChange={(e, { value }) => {
+                    onChange(value);
+                    onSubmit(() => {})();
+                  }}
+                />
+              )}
+            />
+            <Controller
+              name="id"
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  $marginBottom
+                  $maxWidth
+                  height="35px"
+                  placeholder="Id"
+                />
+              )}
+            />
+            <Controller
+              name="customer"
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  $maxWidth
+                  $marginBottom
+                  height="35px"
+                  placeholder="Cliente"
+                />
+              )}
+            />
+            <Controller
+              name="seller"
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  $marginBottom
+                  $maxWidth
+                  height="35px"
+                  placeholder="Vendedor"
+                />
+              )}
+            />
+          </Filters>
+        </Form>
+      </FormProvider>
       <Table
         isLoading={isLoading}
         headers={BUDGETS_COLUMNS}

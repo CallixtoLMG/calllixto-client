@@ -4,6 +4,7 @@ import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { IconnedButton } from '../buttons';
 import { FiltersContainer } from './styles';
+import { useFormContext } from 'react-hook-form';
 
 const MainContainer = styled(Flex)`
   column-gap: 10px;
@@ -19,7 +20,8 @@ const HeaderSegment = styled(SSegment)`
   justify-content: space-between;
 `;
 
-const Filters = ({ children, onRestoreFilters, onRefetch, hasUnsavedFilters }) => {
+const Filters = ({ children, onRestoreFilters, onRefetch }) => {
+  const { formState: { isDirty } } = useFormContext();
   return (
     <MainContainer>
       <HeaderSegment flex="1">
@@ -41,7 +43,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, hasUnsavedFilters }) =
             text="Buscar"
             icon={ICONS.SEARCH}
             submit
-            color={hasUnsavedFilters ? COLORS.PRIMARY : COLORS.SOFT_GREY}
+            color={isDirty ? COLORS.PRIMARY : COLORS.SOFT_GREY}
             width="130px"
           />
           <Popup
@@ -55,7 +57,6 @@ const Filters = ({ children, onRestoreFilters, onRefetch, hasUnsavedFilters }) =
             )}
           />
         </Flex>
-
       </HeaderSegment>
     </MainContainer>
   )
