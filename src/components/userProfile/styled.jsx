@@ -11,7 +11,6 @@ const Text = styled.p`
 
 const ModGrid = styled(Grid)`
   &&& {
-    background-color: #C8E3DF!important;
     height: 100vh;
     display: flex;
     align-items: center;
@@ -29,12 +28,13 @@ const ModButton = styled.button`
   min-height: 1em;
   border: none;
   color: white;
-  margin: 0 0.25em 0 0;
+  margin: ${({ margin = "0 0.25em 0 0" }) => margin  && margin} !important;
   padding: 0.8em 1.5em 0.8em;
   font-weight: 700;
   line-height: 1em;
   border-radius: 0.3rem;
   transition: opacity .1s ease,background-color .1s ease,color .1s ease,box-shadow .1s ease,background .1s ease;
+  
 
   &:hover {
     background-color: #369294;

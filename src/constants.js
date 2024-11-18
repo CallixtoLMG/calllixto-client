@@ -45,6 +45,9 @@ export const PAGES = {
   LOGIN: {
     BASE: "/login"
   },
+  USER_PROFILE: {
+    BASE: "/perfilUsuario"
+  },
   NOT_FOUND: {
     BASE: "/ups"
   },
@@ -370,6 +373,7 @@ export const ICONS = {
   CUT: "cut",
   EDIT: "edit",
   EYE: "eye",
+  EYE_SLASH: "eye slash",
   COG: "cog",
   EXCLAMATION_CIRCLE: "exclamation circle",
   ADDRESS_CARD: "address card",

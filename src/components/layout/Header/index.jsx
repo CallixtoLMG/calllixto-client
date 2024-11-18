@@ -7,26 +7,23 @@ import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { Flex } from '@/components/common/custom';
 import { KeyboardShortcuts } from "@/components/common/modals";
 import OptionsDropdown from "@/components/layout/OptionsHeader";
-import { DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES } from "@/constants";
+import { COLORS, DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { isCallixtoUser } from "@/roles";
+import { isCallixtoUser, RULES } from "@/roles";
 import { usePathname, useRouter } from 'next/navigation';
-import { Dropdown, Menu } from 'semantic-ui-react';
+import { Dropdown, Icon, Menu } from 'semantic-ui-react';
 import { Container, LogDiv, ModLink, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-
-
   const entityMapping = {
     [PAGES.CUSTOMERS.BASE]: { entity: ENTITIES.CUSTOMERS, queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
     [PAGES.PRODUCTS.BASE]: { entity: ENTITIES.PRODUCTS, queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
     [PAGES.BUDGETS.BASE]: { entity: ENTITIES.BUDGETS, queryKey: LIST_BUDGETS_QUERY_KEY, text: PAGES.BUDGETS.NAME },
     [PAGES.BRANDS.BASE]: { entity: ENTITIES.BRANDS, queryKey: LIST_BRANDS_QUERY_KEY, text: PAGES.BRANDS.NAME },
     [PAGES.SUPPLIERS.BASE]: { entity: ENTITIES.SUPPLIERS, queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
-
   };
 
   const currentEntity = Object.keys(entityMapping).find(key => pathname.includes(key))
@@ -45,6 +42,10 @@ const Header = () => {
     push(PAGES.LOGIN.BASE);
   };
 
+  const handleUserManagement = () => {
+    push(PAGES.USER_PROFILE.BASE);
+  };
+
   const routesWithoutHeader = [PAGES.LOGIN.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
 
@@ -56,7 +57,6 @@ const Header = () => {
     [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
   };
   useKeyboardShortcuts(shortcutMapping);
-
   return (
     <>
       {showHeader &&
@@ -98,7 +98,28 @@ const Header = () => {
                     </LogDiv>
                   )}
                   <LogDiv>
-                    <Menu.Item onClick={handleLogout}><Text>Cerrar sesión</Text></Menu.Item>
+                    <Dropdown
+                      text={(
+                        <>
+                          <Icon color={COLORS.GREY} name="user" />
+                          {`${userData.firstName} ${userData.lastName}` || 'Usuario'}
+                        </>
+                      )}
+                      pointing="top right"
+                      className="link item"
+                    >
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={handleLogout}>
+                          <Icon color={COLORS.RED} name="log out" />
+                          Cerrar sesión
+                        </Dropdown.Item>
+                        {RULES.canUpdate[role] &&
+                          <Dropdown.Item onClick={handleUserManagement}>
+                            <Icon color={COLORS.ORANGE} name="settings" />
+                            Cambiar contraseña
+                          </Dropdown.Item>}
+                      </Dropdown.Menu>
+                    </Dropdown>
                   </LogDiv>
                 </Flex>
               </>

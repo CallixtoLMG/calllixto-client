@@ -7,7 +7,8 @@ export const PATHS = {
   LOGIN: "login",
   BRANDS: ENTITIES.BRANDS,
   SUPPLIERS: ENTITIES.SUPPLIERS,
-  EVENTS: ENTITIES.EVENTS
+  EVENTS: ENTITIES.EVENTS,
+  USER_PROFILE: "userProfile",
 };
 
 export const BATCH = "batch";
