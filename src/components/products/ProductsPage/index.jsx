@@ -6,11 +6,12 @@ import { ModalAction, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { OnlyPrint } from "@/components/layout";
 import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
+import { useFilters } from "@/hooks/useFilters";
 import { RULES } from "@/roles";
 import { createFilter } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { Controller, FormProvider } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form, Label } from "semantic-ui-react";
@@ -30,29 +31,29 @@ const STATE_OPTIONS = [
 ];
 
 const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
-  const methods = useForm();
-  const { handleSubmit, control, reset, watch } = methods;
-  const [showModal, setShowModal] = useState(false);
-  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [selectedProducts, setSelectedProducts] = useState({});
-  const [filters, setFilters] = useState(EMPTY_FILTERS);
-  const watchState = watch('state', PRODUCT_STATES.ACTIVE.id);
   const printRef = useRef();
   const deleteProduct = useDeleteProduct();
   const batchDeleteProducts = useBatchDeleteProducts();
   const editProduct = useEditProduct();
 
+  const [showModal, setShowModal] = useState(false);
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState({});
+
+  const {
+    onRestoreFilters,
+    onSubmit,
+    appliedFilters,
+    methods
+  } = useFilters(EMPTY_FILTERS);
+
+  const onFilter = createFilter(appliedFilters, ['code', 'name']);
+
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     removeAfterPrint: true,
   });
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const onFilter = useCallback(
-    createFilter(filters, ['name', 'code']),
-    [filters]
-  );
 
   const actions = RULES.canRemove[role] ? [
     {
@@ -87,11 +88,6 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
     },
   });
 
-  const onRestoreFilters = useCallback(() => {
-    reset(EMPTY_FILTERS);
-    setFilters(EMPTY_FILTERS);
-  }, [reset]);
-
   const onSelectionChange = useCallback(selected => {
     const isSelected = !!selectedProducts[selected.code];
     if (isSelected) {
@@ -117,7 +113,7 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
 
   useEffect(() => {
     clearSelection();
-  }, [filters.state]);
+  }, [appliedFilters.state]);
 
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
     mutationFn: async () => {
@@ -163,11 +159,10 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
     <>
       <Flex flexDirection="column" rowGap="15px">
         <FormProvider {...methods}>
-          <Form onSubmit={handleSubmit(setFilters)}>
+          <Form onSubmit={onSubmit(() => { })}>
             <Filters onRefetch={onRefetch} clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
               <Controller
                 name="state"
-                control={control}
                 render={({ field: { onChange, ...rest } }) => (
                   <Dropdown
                     {...rest}
@@ -177,17 +172,16 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
                     minHeight="35px"
                     selection
                     options={STATE_OPTIONS}
-                    defaultValue={STATE_OPTIONS[0].key}
+                    defaultValue={EMPTY_FILTERS.state}
                     onChange={(e, { value }) => {
                       onChange(value);
-                      setFilters({ ...filters, state: value });
+                      onSubmit(() => {})();
                     }}
                   />
                 )}
               />
               <Controller
                 name="code"
-                control={control}
                 render={({ field }) => (
                   <Input
                     {...field}
@@ -200,7 +194,6 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
               />
               <Controller
                 name="name"
-                control={control}
                 render={({ field }) => (
                   <Input
                     {...field}
@@ -227,7 +220,7 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
           clearSelection={clearSelection}
           selectAllCurrentPageElements={selectAllCurrentPageElements}
           onFilter={onFilter}
-          color={PRODUCT_STATES[watchState]?.color}
+          color={PRODUCT_STATES[appliedFilters.state]?.color}
           paginate
         />
         <ModalAction
@@ -238,7 +231,7 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
           isLoading={isPending}
         />
       </Flex>
-      <OnlyPrint >
+      <OnlyPrint>
         <PrintBarCodes ref={printRef} products={Object.values(selectedProducts)} />
       </OnlyPrint>
       <ModalMultiDelete

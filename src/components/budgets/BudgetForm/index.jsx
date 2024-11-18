@@ -144,7 +144,7 @@ const BudgetForm = ({
           budgetProducts = budgetProducts.filter(budgetProduct => budgetProduct.code !== product.code);
 
           const priceChanged = budgetProduct.price !== product.price;
-          const stateChanged = budgetProduct.state !== product.state;
+          // const stateChanged = budgetProduct.state !== product.state;
           const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
 
           const fractionConfigChanged =
@@ -155,7 +155,7 @@ const BudgetForm = ({
               (budgetProduct.fractionConfig.value !== product.fractionConfig.value && product.fractionConfig.value !== undefined)
             );
 
-          return priceChanged || stateChanged || editableChanged || fractionConfigChanged;
+          return priceChanged || editableChanged || fractionConfigChanged; // || stateChanged;
         }
         return false;
       });

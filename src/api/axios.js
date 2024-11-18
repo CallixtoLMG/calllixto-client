@@ -26,12 +26,17 @@ const getClientId = () => {
   };
 };
 
-export const instance = axios.create({
-  baseURL: `${process.env.NEXT_PUBLIC_URL}${getClientId()}`,
-  timeout: 15000,
-  headers: {
-    authorization: `Bearer ${getToken()}`
-  },
-});
+let axiosInstance = null;
 
-export default instance;
+export const getInstance = () => {
+  if (!axiosInstance) {
+    axiosInstance = axios.create({
+      baseURL: `${process.env.NEXT_PUBLIC_URL}${getClientId()}`,
+      timeout: 60000,
+      headers: {
+        authorization: `Bearer ${getToken()}`
+      },
+    });
+  }
+  return axiosInstance;
+};

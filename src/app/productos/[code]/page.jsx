@@ -122,7 +122,6 @@ const Product = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto actualizado!");
-        push(PAGES.PRODUCTS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -144,7 +143,6 @@ const Product = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto activado!");
-        push(PAGES.PRODUCTS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -166,7 +164,6 @@ const Product = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto desactivado!");
-        push(PAGES.PRODUCTS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -189,10 +186,10 @@ const Product = ({ params }) => {
       if (response.statusOk) {
         if (product.state === PRODUCT_STATES.DELETED.id) {
           toast.success("Producto eliminado permanentemente!");
+          push(PAGES.PRODUCTS.BASE);
         } else {
           toast.success("Producto marcado como eliminado.");
         }
-        push(PAGES.PRODUCTS.BASE);
       } else {
         toast.error(response.error.message);
       }

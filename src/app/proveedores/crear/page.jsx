@@ -31,8 +31,8 @@ const CreateSupplier = () => {
     },
     onSuccess: async (response) => {
       if (response.statusOk) {
+        push(PAGES.SUPPLIERS.SHOW(response.supplier.id))
         toast.success('Proveedor creado!');
-        push(PAGES.SUPPLIERS.BASE);
       } else {
         toast.error(response.error.message);
       }

@@ -8,7 +8,7 @@ import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { downloadExcel, formatedSimplePhone } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useListSuppliers } from "../../api/suppliers";
 
 const Suppliers = () => {
@@ -26,11 +26,10 @@ const Suppliers = () => {
   const suppliers = useMemo(() => data?.suppliers, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const prepareSupplierDataForExcel = useMemo(() => {
-    if (!suppliers) return [];
+  const handleDownloadExcel = useCallback(() => {
+    if (!suppliers) return;
     const headers = ["ID", 'Nombre', 'Estado', 'Dirección', 'Teléfono'];
-
-    const supplierData = suppliers.map(supplier => {
+    const mappedSuppliers = suppliers.map(supplier => {
       const supplierState = SUPPLIER_STATES[supplier.state]?.singularTitle || supplier.state;
       return [
         supplier.id,
@@ -40,13 +39,10 @@ const Suppliers = () => {
         supplier.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
       ];
     });
-
-    return [headers, ...supplierData];
+    downloadExcel([headers, ...mappedSuppliers], "Lista de Proveedores");
   }, [suppliers]);
 
-
   useEffect(() => {
-
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
@@ -61,9 +57,7 @@ const Suppliers = () => {
       icon: ICONS.FILE_EXCEL,
       color: COLORS.SOFT_GREY,
       width: "fit-content",
-      onClick: () => {
-        downloadExcel(prepareSupplierDataForExcel, "Lista de Proveedores");
-      },
+      onClick: handleDownloadExcel,
       text: 'Proveedores',
       disabled: loading
     });

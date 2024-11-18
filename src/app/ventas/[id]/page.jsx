@@ -322,7 +322,6 @@ const Budget = ({ params }) => {
       if (response.statusOk) {
         toast.success('Presupuesto confirmado!');
         setIsModalConfirmationOpen(false);
-        push(PAGES.BUDGETS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -343,7 +342,6 @@ const Budget = ({ params }) => {
       if (response.statusOk) {
         toast.success('Presupuesto anulado!');
         setIsModalCancelOpen(false);
-        push(PAGES.BUDGETS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -361,7 +359,6 @@ const Budget = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Presupuesto actualizado!');
-        push(PAGES.BUDGETS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -460,7 +457,7 @@ const Budget = ({ params }) => {
         <PDFfile
           ref={printRef}
           budget={budget}
-          client={userData?.client?.metadata}
+          client={userData?.client}
           id={userData.client?.id}
           printPdfMode={printPdfMode}
           dolarExchangeRate={showDolarExangeRate && dolarRate}

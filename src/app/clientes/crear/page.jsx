@@ -32,8 +32,8 @@ const CreateCustomer = () => {
     },
     onSuccess: async (response) => {
       if (response.statusOk) {
+        push(PAGES.CUSTOMERS.SHOW(response.customer.id))
         toast.success('Cliente creado!');
-        push(PAGES.CUSTOMERS.BASE);
       } else {
         toast.error(response.error.message);
       }

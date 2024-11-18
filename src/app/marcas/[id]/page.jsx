@@ -84,7 +84,6 @@ const Brand = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca actualizada!");
-        push(PAGES.BRANDS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -103,7 +102,6 @@ const Brand = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca activada!");
-        push(PAGES.BRANDS.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -122,7 +120,6 @@ const Brand = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca desactivada!");
-        push(PAGES.BRANDS.BASE);
       } else {
         toast.error(response.error.message);
       }

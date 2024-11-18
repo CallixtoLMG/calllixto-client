@@ -13,7 +13,7 @@ import { now } from "@/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { chunk } from "lodash";
 import { useMemo } from "react";
-import axios from "./axios";
+import { getInstance } from "./axios";
 import { getItemById, listItems, removeStorageItemsByCustomFilter, useActiveItem, useBatchDeleteItems, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
@@ -167,7 +167,7 @@ export const useCreateBatch = () => {
       const delay = Math.min(25000, 2 ** Math.log(i) * 100 + Math.random() * 100);
       i += i / 2;
       return new Promise((resolve) => setTimeout(resolve, delay)).then(() => {
-        return axios.post(`${PATHS.PRODUCTS}/${BATCH}`, { products: chunk });
+        return getInstance().post(`${PATHS.PRODUCTS}/${BATCH}`, { products: chunk });
       });
     });
 
@@ -202,7 +202,7 @@ export const useEditBatch = () => {
     const promises = chunks.map((chunk) => {
       delay += delayIncrement;
       return new Promise((resolve) => setTimeout(resolve, delay)).then(() =>
-        axios.post(`${PATHS.PRODUCTS}/${EDIT_BATCH}`, { update: chunk })
+        getInstance().post(`${PATHS.PRODUCTS}/${EDIT_BATCH}`, { update: chunk })
       );
     });
 
@@ -259,7 +259,7 @@ export function useGetBlackList() {
 };
 
 export function editBanProducts(products) {
-  return axios.put(BLACK_LIST, products);
+  return getInstance().put(BLACK_LIST, products);
 };
 
 export const useDeleteBySupplierId = () => {
@@ -267,7 +267,7 @@ export const useDeleteBySupplierId = () => {
 
   const deleteBatchProducts = async (supplierId) => {
 
-    const { data } = await axios.delete(`${PATHS.PRODUCTS}/${SUPPLIER}/${supplierId}`)
+    const { data } = await getInstance().delete(`${PATHS.PRODUCTS}/${SUPPLIER}/${supplierId}`)
     if (data.statusOk) {
       await removeStorageItemsByCustomFilter({
         entity: ENTITIES.PRODUCTS, filter: ((product) => !product.code.startsWith(supplierId))

@@ -52,8 +52,8 @@ const CreateProduct = () => {
     },
     onSuccess: async (response) => {
       if (response.statusOk) {
+        push(PAGES.PRODUCTS.SHOW(response.product.code))
         toast.success('Producto creado!');
-        push(PAGES.PRODUCTS.BASE);
       } else {
         toast.error(response.error.message);
       }

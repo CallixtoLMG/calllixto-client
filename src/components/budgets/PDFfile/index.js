@@ -76,8 +76,8 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             {clientPdf && (
               <>
                 <Title as="h4">{client?.name?.toUpperCase() || "Maderera Las Tapias"}</Title>
-                <Title as="h4">CUIT: {client?.cuil?.toUpperCase() || "CUIT"}</Title>
-                <Title as="h4">{client?.iva || "Condición IVA"}</Title>
+                <Title as="h4">CUIT: {client?.metadata?.cuil?.toUpperCase() || "CUIT"}</Title>
+                <Title as="h4">{client?.metadata?.iva || "Condición IVA"}</Title>
               </>
             )}
           </FlexColumn>
