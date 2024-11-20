@@ -9,7 +9,7 @@ import { KeyboardShortcuts } from "@/components/common/modals";
 import OptionsDropdown from "@/components/layout/OptionsHeader";
 import { COLORS, DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { isCallixtoUser, RULES } from "@/roles";
+import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from 'next/navigation';
 import { Dropdown, Icon, Menu } from 'semantic-ui-react';
 import { Container, LogDiv, ModLink, Text } from "./styles";
@@ -43,10 +43,10 @@ const Header = () => {
   };
 
   const handleUserManagement = () => {
-    push(PAGES.USER_PROFILE.BASE);
+    push(PAGES.CHANGE_PASSWORD.BASE);
   };
 
-  const routesWithoutHeader = [PAGES.LOGIN.BASE];
+  const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RECOVER_PASSWORD.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
 
   const shortcutMapping = {

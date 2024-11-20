@@ -8,7 +8,8 @@ export const PATHS = {
   BRANDS: ENTITIES.BRANDS,
   SUPPLIERS: ENTITIES.SUPPLIERS,
   EVENTS: ENTITIES.EVENTS,
-  USER_PROFILE: "userProfile",
+  RECOVER_PASSWORD: "recoverPassword",
+  CHANGE_PASSWORD: "changePassword",
 };
 
 export const BATCH = "batch";
