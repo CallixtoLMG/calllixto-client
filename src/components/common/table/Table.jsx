@@ -88,6 +88,7 @@ const CustomTable = ({
     <Container tableHeight={tableHeight}>
       {paginate && (
         <PaginationContainer center>
+          <span>{(activePage - 1) * pageSize + 1} - {Math.min(filteredElements.length, (activePage * pageSize))} de {filteredElements.length}</span>
           <Pagination
             activePage={activePage}
             onPageChange={handlePageChange}
