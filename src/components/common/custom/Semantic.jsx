@@ -23,6 +23,7 @@ export const Segment = styled(SSegment)`
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
   overflow: auto;
   align-content: center;
+  text-align: : ${({ textAlign }) => textAlign} !important;
   opacity: ${({ show }) => show ? "0" : "1"} !important;
 `;
 
@@ -37,7 +38,7 @@ export const Input = styled(SInput)`
   input{
     height: ${({ height }) => height || '50px'} !important;
     padding: 0 14px!important;
-    text-align: ${({ center }) => (center ? 'center' : 'left')} !important;
+    text-align: ${({ textAlign }) => (textAlign ? textAlign : 'left')} !important;
     width: ${({ innerWidth = '100%' }) => `${innerWidth}!important`};
     text-align-last: ${({ textAlignLast }) => `${textAlignLast}!important`};
   };

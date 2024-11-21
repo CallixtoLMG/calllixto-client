@@ -3,15 +3,17 @@ import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, 
 import { ControlledComments } from "@/components/common/form";
 import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, PAGES, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { RULES as ACCESS } from "@/roles";
+import { useUserContext } from "@/User";
 import { isProductDeleted, preventSend } from "@/utils";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
-  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors, setError } = useForm({
+  const { handleSubmit, control, reset, watch, setValue, formState: { isDirty, errors, isSubmitted }, clearErrors, setError } = useForm({
     defaultValues: {
       fractionConfig: {
         active: false,
@@ -19,11 +21,52 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
       },
       editablePrice: false,
       ...product,
+      cost: product?.cost || 0,
     }
   });
+  const [margin, setMargin] = useState("");
+  const [isTypingMargin, setIsTypingMargin] = useState(false);
+  const [price, cost] = watch(["price", "cost"]);
   const [supplier, setSupplier] = useState();
   const [brand, setBrand] = useState();
   const [watchFractionable] = watch(["fractionConfig.active"]);
+  const { role } = useUserContext();
+
+  const handleMarginChange = (e) => {
+    const rawValue = e.target.value;
+    setMargin(rawValue);
+    setIsTypingMargin(true);
+
+    const marginValue = parseFloat(rawValue);
+    if (!isNaN(marginValue)) {
+      const validCost = Number(cost) || 0;
+      const updatedPrice = validCost > 0 ? validCost + (validCost * marginValue / 100) : 0;
+
+      setValue("price", parseFloat(updatedPrice.toFixed(2)));
+    }
+  };
+
+  const handleMarginBlur = () => {
+    setIsTypingMargin(false);
+    const marginValue = parseFloat(margin);
+    if (!isNaN(marginValue)) {
+      setMargin(marginValue.toString());
+    }
+  };
+
+  useEffect(() => {
+    if (!isTypingMargin) {
+      const validCost = Number(cost) || 0;
+      const validPrice = Number(price) || 0;
+
+      if (validCost > 0) {
+        const calculatedMargin = ((validPrice - validCost) / validCost) * 100;
+        setMargin(calculatedMargin.toFixed(2));
+      } else {
+        setMargin("");
+      }
+    }
+  }, [price, cost, isTypingMargin]);
 
   const handleReset = useCallback((product) => {
     setSupplier({ name: "", id: "" });
@@ -169,7 +212,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             <Segment placeholder>{product?.supplierName}</Segment>
           )}
         </FormField>
-
         <FormField flex="1" error={errors.brand?.message}>
           <RuledLabel title="Marca" message={errors.brand?.message} required />
           {!isUpdating ? (
@@ -258,6 +300,58 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           />
         </FormField>
         <FormField width="20%">
+          <Label>Unidad de Medida</Label>
+          <Controller
+            name="fractionConfig.unit"
+            control={control}
+            render={({ field: { onChange, ...rest } }) => (
+              <Dropdown
+                {...rest}
+                selection
+                options={Object.values(MEASSURE_UNITS)}
+                defaultValue={Object.values(MEASSURE_UNITS)[0].value}
+                onChange={(e, { value }) => onChange(value)}
+                disabled={!watchFractionable || isProductDeleted(product?.state)}
+              />
+            )}
+          />
+        </FormField>
+      </FieldsContainer>
+      <FieldsContainer rowGap="5px">
+        {ACCESS.canUpdate[role] &&
+          <>
+            <FormField width="20%">
+              <RuledLabel title="Costo" />
+              <Controller
+                name="cost"
+                control={control}
+                rules={{ required: "El costo es requerido." }}
+                render={({ field }) => (
+                  <Input
+                    {...field}
+                    textAlign="right"
+                    type="number"
+                    min="0"
+                    placeholder="Costo"
+                    disabled={isProductDeleted(product?.state)}
+                  />
+                )}
+              />
+            </FormField>
+            <FormField width="20%">
+              <RuledLabel title="Margen (%)" />
+              <Input
+                textAlign="right"
+                type="text"
+                value={margin}
+                placeholder="Margen"
+                onChange={handleMarginChange}
+                onBlur={handleMarginBlur}
+              />
+            </FormField>
+          </>
+        }
+        <FormField width="20%">
           <Label>Precio</Label>
           <Controller
             name="price"
@@ -272,29 +366,10 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 allowNegative={false}
                 prefix="$ "
                 customInput={Input}
-                onValueChange={value => {
-                  onChange(value.floatValue);
-                }}
+                onValueChange={val => onChange(val.floatValue)}
                 value={value || 0}
                 placeholder="Precio"
                 disabled={isProductDeleted(product?.state)}
-              />
-            )}
-          />
-        </FormField>
-        <FormField width="20%">
-          <Label>Unidad de Medida</Label>
-          <Controller
-            name="fractionConfig.unit"
-            control={control}
-            render={({ field: { onChange, ...rest } }) => (
-              <Dropdown
-                {...rest}
-                selection
-                options={Object.values(MEASSURE_UNITS)}
-                defaultValue={Object.values(MEASSURE_UNITS)[0].value}
-                onChange={(e, { value }) => onChange(value)}
-                disabled={!watchFractionable || isProductDeleted(product?.state)}
               />
             )}
           />
