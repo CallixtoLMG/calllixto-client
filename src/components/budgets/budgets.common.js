@@ -200,9 +200,14 @@ const PAYMENT_METHODS = [
 ];
 
 const PAYMENT_TABLE_HEADERS = [
+  {
+    id: 'date',
+    title: 'Fecha de Pago',
+    value: (element) => formatedDateAndHour(element.date)
+  },
   { id: 'method', width: 4, title: 'Método', value: (element) => element.method },
   { id: 'amount', width: 3, title: 'Monto', value: (element) => <Price value={element.amount} /> },
-  { id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) => element.comments }
+  { id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) => element.comments },
 ];
 
 export { ATTRIBUTES, BUDGETS_COLUMNS, PAYMENT_METHODS, PAYMENT_TABLE_HEADERS, PRODUCTS_COLUMNS };

@@ -63,6 +63,8 @@ export const Label = styled(SLabel)`
   padding: ${({ padding }) => padding} !important;
   align-content: center;
   opacity: ${({ show }) => show ? "0" : "1"} !important;
+  font-weight: ${({ fontWeight }) => fontWeight} !important;
+  box-shadow: ${({ fontWeight }) => fontWeight && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
 `;
 
 export const TextArea = styled(STextarea)`

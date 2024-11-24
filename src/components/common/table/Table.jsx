@@ -1,12 +1,14 @@
 import { Loader } from "@/components/layout";
-import { COLORS, DEFAULT_PAGE_SIZE, ICONS, PAGE_SIZE_OPTIONS } from "@/constants";
+import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { Button, Checkbox, Header, Icon, Popup } from "semantic-ui-react";
+import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
 import { IconnedButton, PopupActions } from "../buttons";
-import { CenteredFlex, Dropdown } from "../custom";
+import { CenteredFlex } from "../custom";
 import Actions from "./Actions";
-import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Pagination, PaginationContainer, Table, TableHeader, TableRow } from "./styles";
+import Pagination from "./Pagination";
+import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
 
 const CustomTable = ({
   isLoading,
@@ -84,41 +86,28 @@ const CustomTable = ({
     clearSelection?.();
   };
 
+  const handleShortcutPageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= pages) {
+      setActivePage(newPage);
+    }
+  };
+
+  useKeyboardShortcuts({
+    [SHORTKEYS.RIGHT_ARROW]: () => handleShortcutPageChange(activePage + 1),
+    [SHORTKEYS.LEFT_ARROW]: () => handleShortcutPageChange(activePage - 1),
+  });
+
   return (
     <Container tableHeight={tableHeight}>
       {paginate && (
-        <PaginationContainer center>
-          <span>{(activePage - 1) * pageSize + 1} - {Math.min(filteredElements.length, (activePage * pageSize))} de {filteredElements.length}</span>
-          <Pagination
-            activePage={activePage}
-            onPageChange={handlePageChange}
-            siblingRange={2}
-            boundaryRange={2}
-            firstItem={null}
-            lastItem={null}
-            pointing
-            secondary
-            totalPages={pages}
-          />
-          <Popup
-            size="mini"
-            content="Elementos mostrados"
-            trigger={(
-              <Dropdown
-                options={PAGE_SIZE_OPTIONS}
-                value={pageSize}
-                onChange={handlePageSizeChange}
-                selection
-                compact
-                height="40px"
-                top="10px"
-                width="fit-content"
-              />
-            )}
-            position="left center"
-            mouseEnterDelay={500}
-          />
-        </PaginationContainer>
+        <Pagination
+          activePage={activePage}
+          pageSize={pageSize}
+          totalItems={filteredElements.length}
+          totalPages={pages}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
+        />
       )}
       <Table celled compact striped={!basic} color={color} definition={isSelectable}>
         <TableHeader fullWidth>

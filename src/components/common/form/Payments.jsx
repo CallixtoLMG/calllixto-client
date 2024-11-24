@@ -1,16 +1,17 @@
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.common";
 import { COLORS, ICONS } from "@/constants";
+import { now } from "@/utils";
 import { useMemo, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
 import { Table, TotalList } from "../table";
 
-const EMPTY_PAYMENT = () => ({ method: '', amount: 0, comments: '' });
+const EMPTY_PAYMENT = () => ({ method: '', amount: 0, comments: '', date: '' });
 
 const calculateTotals = (payments, total) => {
   const totalAssigned = payments.reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0).toFixed(2);
-  
+
   let totalPending = (total - totalAssigned).toFixed(2);
 
   if (Math.abs(totalPending) < 0.01) {
@@ -43,8 +44,9 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
       return;
     }
 
-    appendPayment(payment);
-    setPayment(EMPTY_PAYMENT);
+    const currentDate = now();
+    appendPayment({ ...payment, date: currentDate });
+    setPayment(EMPTY_PAYMENT());
     setErrors({});
   };
 
