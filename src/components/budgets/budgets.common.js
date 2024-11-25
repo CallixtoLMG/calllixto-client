@@ -203,7 +203,8 @@ const PAYMENT_TABLE_HEADERS = [
   {
     id: 'date',
     title: 'Fecha de Pago',
-    value: (element) => formatedDateAndHour(element.date)
+    value: (element) => element.date ? formatedDateAndHour(element.date) : "-",
+    width: 2
   },
   { id: 'method', width: 4, title: 'Método', value: (element) => element.method },
   { id: 'amount', width: 3, title: 'Monto', value: (element) => <Price value={element.amount} /> },

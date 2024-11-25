@@ -44,8 +44,7 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
       return;
     }
 
-    const currentDate = now();
-    appendPayment({ ...payment, date: currentDate });
+    appendPayment({ ...payment, date: now() });
     setPayment(EMPTY_PAYMENT());
     setErrors({});
   };

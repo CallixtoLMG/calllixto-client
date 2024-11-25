@@ -69,7 +69,7 @@ const CustomTable = ({
   };
 
   const handleTogglePopup = (id) => {
-    setPopupOpenId(popupOpenId === id ? null : id);
+    setPopupOpenId(id);
   };
 
   const handleToggleAll = () => {

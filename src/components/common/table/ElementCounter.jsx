@@ -2,7 +2,7 @@ import { Icon } from "semantic-ui-react";
 import { Label } from "../custom";
 
 const ElementCounter = ({ currentPage, pageSize, totalItems }) => {
-  const startIndex = (currentPage - 1) * pageSize + 1;
+  const startIndex = Math.min((currentPage - 1) * pageSize + 1, totalItems);
   const endIndex = Math.min(currentPage * pageSize, totalItems);
 
   return (
