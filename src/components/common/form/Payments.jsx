@@ -81,7 +81,7 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
                   placeholder="Selecciona una fecha"
                   dateFormat="dd-MM-yyyy"
                   disabled={isTotalCovered}
-                  excludedDays={[0]}
+                  excludedDays={[]}
                 />
               </FormField>
               <FormField flex="2">
