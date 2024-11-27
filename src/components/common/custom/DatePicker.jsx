@@ -1,4 +1,3 @@
-import { getDay } from "date-fns";
 import es from "date-fns/locale/es";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -32,21 +31,14 @@ const DatePicker = ({
   minDate,
   maxDate,
   disabled = false,
-  excludedDays = []
 }) => {
 
-  const isAllowedDate = (date) => {
-    const day = getDay(date);
-    return !excludedDays.includes(day);
-  };
   return (
-
     <ReactDatePicker
       selected={selected}
       onChange={onChange}
       dateFormat={dateFormat}
       locale={locale}
-      filterDate={isAllowedDate}
       showTimeSelect={showTimeSelect}
       placeholderText={placeholder}
       minDate={minDate}
