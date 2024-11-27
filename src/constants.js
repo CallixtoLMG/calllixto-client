@@ -45,6 +45,9 @@ export const PAGES = {
   LOGIN: {
     BASE: "/login"
   },
+  CONFIG: {
+    BASE: "/configuracion"
+  },
   NOT_FOUND: {
     BASE: "/ups"
   },

@@ -4,21 +4,23 @@ import { LIST_BUDGETS_QUERY_KEY } from "@/api/budgets";
 import { LIST_CUSTOMERS_QUERY_KEY } from "@/api/customers";
 import { LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
 import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
-import { Flex } from '@/components/common/custom';
+import { Flex } from "@/components/common/custom";
 import { KeyboardShortcuts } from "@/components/common/modals";
 import OptionsDropdown from "@/components/layout/OptionsHeader";
 import { DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { isCallixtoUser } from "@/roles";
-import { usePathname, useRouter } from 'next/navigation';
-import { Dropdown, Menu } from 'semantic-ui-react';
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
+import { Button, Dropdown, Icon, Menu } from "semantic-ui-react";
+import SideBar from "../SideBar";
 import { Container, LogDiv, ModLink, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-
+  const [isSidebarVisible, setSidebarVisible] = useState(false); // Controla la visibilidad del Sidebar
 
   const entityMapping = {
     [PAGES.CUSTOMERS.BASE]: { entity: ENTITIES.CUSTOMERS, queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
@@ -26,10 +28,9 @@ const Header = () => {
     [PAGES.BUDGETS.BASE]: { entity: ENTITIES.BUDGETS, queryKey: LIST_BUDGETS_QUERY_KEY, text: PAGES.BUDGETS.NAME },
     [PAGES.BRANDS.BASE]: { entity: ENTITIES.BRANDS, queryKey: LIST_BRANDS_QUERY_KEY, text: PAGES.BRANDS.NAME },
     [PAGES.SUPPLIERS.BASE]: { entity: ENTITIES.SUPPLIERS, queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
-
   };
 
-  const currentEntity = Object.keys(entityMapping).find(key => pathname.includes(key))
+  const currentEntity = Object.keys(entityMapping).find((key) => pathname.includes(key))
     ? entityMapping[pathname]
     : null;
 
@@ -40,10 +41,14 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem("token");
     sessionStorage.removeItem("userData");
     push(PAGES.LOGIN.BASE);
+    setSidebarVisible(false); // Cierra el Sidebar al cerrar sesión
   };
+
+  const handleOpenSidebar = () => setSidebarVisible(true);
+  const handleCloseSidebar = () => setSidebarVisible(false);
 
   const routesWithoutHeader = [PAGES.LOGIN.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
@@ -59,23 +64,29 @@ const Header = () => {
 
   return (
     <>
-      {showHeader &&
-        <Menu fixed='top'>
+      {showHeader && (
+        <Menu fixed="top">
           <Container>
             {!userData?.isAuthorized ? (
               <Flex>
                 <LogDiv>
-                  <Menu.Item onClick={handleLogout}><Text>Ingresar</Text></Menu.Item>
+                  <Menu.Item onClick={handleLogout}>
+                    <Text>Ingresar</Text>
+                  </Menu.Item>
                 </LogDiv>
               </Flex>
             ) : (
               <>
                 <Flex>
-                  {Object.values(PAGES).filter(page => !!page.NAME).map(page => (
-                    <ModLink key={page.BASE} $active={pathname.includes(page.BASE)} href={page.BASE}>
-                      <Menu.Item><Text $active={pathname.includes(page.BASE)}>{page.NAME}</Text></Menu.Item>
-                    </ModLink>
-                  ))}
+                  {Object.values(PAGES)
+                    .filter((page) => !!page.NAME)
+                    .map((page) => (
+                      <ModLink key={page.BASE} $active={pathname.includes(page.BASE)} href={page.BASE}>
+                        <Menu.Item>
+                          <Text $active={pathname.includes(page.BASE)}>{page.NAME}</Text>
+                        </Menu.Item>
+                      </ModLink>
+                    ))}
                 </Flex>
                 <Flex>
                   <KeyboardShortcuts />
@@ -98,14 +109,23 @@ const Header = () => {
                     </LogDiv>
                   )}
                   <LogDiv>
-                    <Menu.Item onClick={handleLogout}><Text>Cerrar sesión</Text></Menu.Item>
+                    <Menu.Item>
+                      <Button icon onClick={handleOpenSidebar}>
+                        <Icon name="bars" /> Menu
+                      </Button>
+                    </Menu.Item>
                   </LogDiv>
                 </Flex>
               </>
             )}
           </Container>
         </Menu>
-      }
+      )}
+      <SideBar
+        isVisible={isSidebarVisible}
+        onClose={handleCloseSidebar}
+        onLogout={handleLogout}
+      />
     </>
   );
 };
