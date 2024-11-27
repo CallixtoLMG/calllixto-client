@@ -1,6 +1,6 @@
 import { Box, Flex, Price } from "@/components/common/custom";
 import { BUDGET_STATES, COLORS, PRODUCT_STATES } from "@/constants";
-import { formatedDateAndHour, formatedPercentage, getPrice, getTotal, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
+import { formatedDateAndHour, formatedDateOnly, formatedPercentage, getPrice, getTotal, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
 import { Label, Popup } from "semantic-ui-react";
 import { CommentTooltip } from "../common/tooltips";
 
@@ -203,7 +203,10 @@ const PAYMENT_TABLE_HEADERS = [
   {
     id: 'date',
     title: 'Fecha de Pago',
-    value: (element) => element.date ? formatedDateAndHour(element.date) : "-",
+    value: (element) =>
+      element.date
+        ? formatedDateOnly(element.date)
+        : "-",
     width: 2
   },
   { id: 'method', width: 4, title: 'Método', value: (element) => element.method },
