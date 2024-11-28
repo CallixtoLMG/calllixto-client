@@ -4,5 +4,6 @@ export * from "./Loader";
 export * from "./NavActions";
 export * from "./NoPrint";
 export * from "./OnlyPrint";
-export * from "./SideBar";
 export * from "./Toaster";
+export * from "./UserMenu";
+

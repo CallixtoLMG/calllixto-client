@@ -1,10 +1,37 @@
-"use client"
-import { useState } from "react";
+"use client";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { PAGES } from "@/constants";
+import { useEffect, useState } from "react";
 import { Button, Form, Icon, Label, Segment, Tab, Table } from "semantic-ui-react";
 
 const SettingsPage = () => {
+  const { setLabels } = useBreadcrumContext();
+  const { setActions } = useNavActionsContext();
   const [tags, setTags] = useState([]);
   const [newTag, setNewTag] = useState({ name: "", color: "blue", comment: "" });
+  const [activeTabIndex, setActiveTabIndex] = useState(0); // Controla el Tab activo
+
+  // Lista de panes con nombres de entidades
+  const panes = [
+    { menuItem: "Clientes", entityName: "Clientes", render: renderTagsContent },
+    { menuItem: "Productos", entityName: "Productos", render: renderTagsContent },
+  ];
+
+  // Actualiza las etiquetas iniciales al cargar la página
+  useEffect(() => {
+    const entityName = panes[activeTabIndex]?.entityName || "General";
+    setLabels([PAGES.CONFIG.NAME, entityName]);
+    setActions([]);
+  }, [activeTabIndex, setLabels, setActions]);
+
+  function renderTagsContent() {
+    return (
+      <Tab.Pane>
+        {renderTagsForm()}
+        {renderTagsTable()}
+      </Tab.Pane>
+    );
+  }
 
   const handleAddTag = () => {
     if (newTag.name.trim()) {
@@ -97,52 +124,21 @@ const SettingsPage = () => {
     </Segment>
   );
 
-  const renderCommonSettings = () => (
-    <Segment>
-      <Form>
-        <Form.Checkbox
-          label="Habilitar notificaciones por correo"
-          toggle
-        />
-        <Form.Checkbox
-          label="Activar integración con terceros"
-          toggle
-        />
-        <Form.Input
-          label="URL del servicio externo"
-          placeholder="https://api.mi-servicio.com"
-        />
-        <Button color="blue">Guardar Cambios</Button>
-      </Form>
-    </Segment>
-  );
-
-  const panes = [
-    {
-      menuItem: "General",
-      render: () => (
-        <Tab.Pane>
-          <h3>Configuración General</h3>
-          {renderCommonSettings()}
-        </Tab.Pane>
-      ),
-    },
-    ...["Clientes", "Proveedores", "Marcas", "Productos", "Ventas"].map((entity) => ({
-      menuItem: entity,
-      render: () => (
-        <Tab.Pane>
-          <h3>Configuración de {entity}</h3>
-          {renderTagsForm()}
-          {renderTagsTable()}
-        </Tab.Pane>
-      ),
-    })),
-  ];
+  const handleTabChange = (_, { activeIndex }) => {
+    // Actualiza el Tab activo y las etiquetas
+    setActiveTabIndex(activeIndex);
+    const entityName = panes[activeIndex]?.entityName || "General";
+    setLabels([PAGES.CONFIG.NAME, entityName]);
+  };
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>Configuración</h2>
-      <Tab size="large" panes={panes} />
+      <Tab
+        size="large"
+        panes={panes.map(({ menuItem, render }) => ({ menuItem, render }))}
+        activeIndex={activeTabIndex}
+        onTabChange={handleTabChange}
+      />
     </div>
   );
 };
