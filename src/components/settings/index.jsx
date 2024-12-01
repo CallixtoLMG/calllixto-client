@@ -88,43 +88,41 @@ const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, s
   ] : [];
 
   const renderTagsForm = () => (
-    <Segment>
-      <Form>
-        <Form.Group widths="equal">
-          <FormInput
-            width={3}
-            label="Nombre"
-            placeholder="Nombre de la etiqueta"
-            value={newTag.name}
-            onChange={(e) => setNewTag({ ...newTag, name: e.target.value })}
+    <Form>
+      <Form.Group widths="equal">
+        <FormInput
+          width={3}
+          label="Nombre"
+          placeholder="Nombre de la etiqueta"
+          value={newTag.name}
+          onChange={(e) => setNewTag({ ...newTag, name: e.target.value })}
+        />
+        <FormSelect
+          width={2}
+          label="Color"
+          options={SEMANTIC_COLORS}
+          value={newTag.color}
+          onChange={(e, { value }) => setNewTag({ ...newTag, color: value })}
+        />
+        <FormInput
+          width={7}
+          label="Comentario"
+          placeholder="Comentario"
+          value={newTag.comment}
+          onChange={(e) => setNewTag({ ...newTag, comment: e.target.value })}
+        />
+        <Flex alignSelf="end">
+          <IconnedButton
+            text="Agregar"
+            icon={ICONS.ADD}
+            color={COLORS.GREEN}
+            onClick={addTag}
+            disabled={!newTag.name}
+            height="38px"
           />
-          <FormSelect
-            width={2}
-            label="Color"
-            options={SEMANTIC_COLORS}
-            value={newTag.color}
-            onChange={(e, { value }) => setNewTag({ ...newTag, color: value })}
-          />
-          <FormInput
-            width={7}
-            label="Comentario"
-            placeholder="Comentario"
-            value={newTag.comment}
-            onChange={(e) => setNewTag({ ...newTag, comment: e.target.value })}
-          />
-          <Flex alignSelf="end">
-            <IconnedButton
-              text="Agregar"
-              icon={ICONS.ADD}
-              color={COLORS.GREEN}
-              onClick={addTag}
-              disabled={!newTag.name}
-              height="38px"
-            />
-          </Flex>
-        </Form.Group>
-      </Form>
-    </Segment>
+        </Flex>
+      </Form.Group>
+    </Form>
   );
 
   // Renderizar contenido de tabs
@@ -142,28 +140,29 @@ const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, s
             Etiquetas
           </Accordion.Title>
           <Accordion.Content active={openAccordions[`${entity}-tags`]}>
-            {renderTagsForm()}
-            <FlexColumn rowGap="15px">
-              <Table
-                isLoading={isLoading}
-                headers={headers}
-                elements={localTags} // Pasamos los tags locales como datos
-                mainKey="name" // Usar un identificador único para las filas
-                actions={actions} // Acciones para cada fila
-                paginate={false} // No paginar
-                tableHeight="40vh"
-                deleteButtonInside
-              />
-              <SubmitAndRestore
-                isLoading={isLoading}
-                isDirty={JSON.stringify(localTags) !== JSON.stringify(initialTags)} // Verifica si hubo cambios
-                onReset={handleReset} // Restaurar al estado inicial
-                onSubmit={handleSaveChanges} // Guardar cambios
-                text="Actualizar"
-              />
-            </FlexColumn>
+            <Segment>
+              {renderTagsForm()}
+              <FlexColumn rowGap="15px">
+                <Table
+                  isLoading={isLoading}
+                  headers={headers}
+                  elements={localTags} // Pasamos los tags locales como datos
+                  mainKey="name" // Usar un identificador único para las filas
+                  actions={actions} // Acciones para cada fila
+                  paginate={false} // No paginar
+                  tableHeight="40vh"
+                  deleteButtonInside
+                />
+                <SubmitAndRestore
+                  isLoading={isLoading}
+                  isDirty={JSON.stringify(localTags) !== JSON.stringify(initialTags)} // Verifica si hubo cambios
+                  onReset={handleReset} // Restaurar al estado inicial
+                  onSubmit={handleSaveChanges} // Guardar cambios
+                  text="Actualizar"
+                />
+              </FlexColumn>
+            </Segment>
           </Accordion.Content>
-
         </Accordion>
       </Tab.Pane>
     );
