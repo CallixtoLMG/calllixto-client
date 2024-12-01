@@ -1,12 +1,12 @@
 import { useUserContext } from "@/User";
-import { Flex } from "@/components/common/custom";
+import { Flex, Icon } from "@/components/common/custom";
 import { KeyboardShortcuts } from "@/components/common/modals";
-import { DEFAULT_SELECTED_CLIENT, PAGES } from "@/constants";
+import { COLORS, DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/constants";
 import { isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
-import { Button, Icon, Label, Menu } from "semantic-ui-react";
+import { Button, Label, Menu, Popup } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
-import { Container, LogDiv, ModLink, Text } from "./styles";
+import { Container, LeftHeaderDiv, ModLink, RigthHeaderDiv, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -35,11 +35,11 @@ const Header = () => {
           <Container>
             {!userData?.isAuthorized ? (
               <Flex>
-                <LogDiv>
+                <LeftHeaderDiv>
                   <Menu.Item onClick={handleLogout}>
                     <Text>Ingresar</Text>
                   </Menu.Item>
-                </LogDiv>
+                </LeftHeaderDiv>
               </Flex>
             ) : (
               <>
@@ -55,24 +55,38 @@ const Header = () => {
                     ))}
                 </Flex>
                 <Flex>
-                  <KeyboardShortcuts />
+                  <RigthHeaderDiv >
+                    <KeyboardShortcuts />
+                  </RigthHeaderDiv>
                   {isCallixtoUser(role) && (
-                    <LogDiv>
-                      <Label>{userData.selectedClientId || DEFAULT_SELECTED_CLIENT}</Label>
-                    </LogDiv>
+                    <>
+                      <RigthHeaderDiv >
+                        <Popup
+                          content='Configuración'
+                          trigger={
+                            <Icon margin="0" pointer size='large' name={ICONS.SETTINGS} color={COLORS.ORANGE} onClick={() => push(PAGES.SETTINGS.BASE)} />
+                          }
+                          position='bottom right'
+                          size='tiny'
+                        />
+                      </RigthHeaderDiv>
+                      <RigthHeaderDiv >
+                        <Label>{userData.selectedClientId || DEFAULT_SELECTED_CLIENT}</Label>
+                      </RigthHeaderDiv>
+                    </>
                   )}
-                  <LogDiv>
+                  <RigthHeaderDiv >
                     <UserMenu
                       trigger={
                         <Button icon>
-                          <Icon name="bars" /> Menu
+                          <Icon name={ICONS.USER} /> Usuario
                         </Button>
                       }
                       onLogout={handleLogout}
                       onClientChange={handleClientChange}
                       userData={userData}
                     />
-                  </LogDiv>
+                  </RigthHeaderDiv>
                 </Flex>
               </>
             )}

@@ -1,0 +1,58 @@
+import { ENTITIES, TIME_IN_MS } from "@/constants";
+import { PATHS } from "@/fetchUrls";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { getItemById, listItems, useEditItem } from "./common";
+
+export const LIST_SETTINGS_QUERY_KEY = "listSettings";
+export const GET_SETTING_QUERY_KEY = "getSetting";
+
+export function useListSettings() {
+  const query = useQuery({
+    queryKey: [LIST_SETTINGS_QUERY_KEY],
+    queryFn: () =>
+      listItems({
+        entity: ENTITIES.SETTINGS,
+        url: PATHS.SETTINGS,
+      }),
+    staleTime: TIME_IN_MS.ONE_DAY,
+  });
+  return query;
+};
+
+export function useGetSetting(entity) {
+  const query = useQuery({
+    queryKey: [GET_SETTING_QUERY_KEY, entity],
+    queryFn: () =>
+      getItemById({
+        url: `${PATHS.SETTINGS}/${entity}`,
+        entity: ENTITIES.SETTINGS,
+      }),
+    staleTime: TIME_IN_MS.ONE_HOUR,
+    enabled: !!entity, // Solo se ejecuta si hay una entidad definida
+  });
+
+  return query;
+};
+
+export const useEditSetting = () => {
+  const editItem = useEditItem();
+  const queryClient = useQueryClient();
+
+  const editSetting = async ({ entity, value }) => {
+    const response = await editItem({
+      entity: ENTITIES.SETTINGS,
+      url: `${PATHS.SETTINGS}/${entity}`,
+      value,
+      key: "id",
+      responseEntity: ENTITIES.SETTINGS,
+      invalidateQueries: [
+        [LIST_SETTINGS_QUERY_KEY],
+        [GET_SETTING_QUERY_KEY, entity],
+      ],
+    });
+
+    return response;
+  };
+
+  return editSetting;
+};

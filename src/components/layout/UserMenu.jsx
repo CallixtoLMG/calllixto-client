@@ -1,9 +1,28 @@
-import { COLORS, PAGES } from "@/constants";
+import { COLORS } from "@/constants";
 import { isCallixtoUser } from "@/roles";
 import { useUserContext } from "@/User";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Accordion, Dropdown, Icon, Menu, Popup } from "semantic-ui-react";
+import styled from "styled-components";
+
+const AccordionMenu = styled(Menu)`
+  border-radius: 0!important;
+  border: 0!important;
+  border-top: 0.8px solid rgba(34, 36, 38, .15) !important;
+`;
+
+const AccordionItem = styled(Menu.Item)`
+  width: 100%;
+  align-content: center;
+  padding-top: 0.8rem!important; 
+  padding-bottom: 0.7rem!important; 
+  border-radius: 0!important;
+`;
+
+const AccordionTitle = styled(Accordion.Title)`
+  font-size:14px!important;
+`;
 
 const UserMenu = ({ trigger, onLogout, onClientChange }) => {
   const { push } = useRouter();
@@ -51,15 +70,15 @@ const UserMenu = ({ trigger, onLogout, onClientChange }) => {
           <Icon color={COLORS.YELLOW} name="lock" /> Cambiar contraseña
         </Menu.Item>
         {isCallixtoUser(role) && (
-          <Accordion as={Menu}>
-            <Menu.Item>
-              <Accordion.Title
+          <Accordion as={AccordionMenu}>
+            <AccordionItem>
+              <AccordionTitle
                 active={activeIndex === 0}
                 index={0}
                 onClick={() => handleAccordionClick(0)}
               >
                 <Icon name="dropdown" /> Clientes
-              </Accordion.Title>
+              </AccordionTitle>
               <Accordion.Content active={activeIndex === 0}>
                 <Dropdown
                   placeholder="Selecciona un cliente"
@@ -78,16 +97,10 @@ const UserMenu = ({ trigger, onLogout, onClientChange }) => {
                   style={{ marginTop: "10px" }}
                 />
               </Accordion.Content>
-            </Menu.Item>
+            </AccordionItem>
           </Accordion>
         )}
-        <Menu.Item
-          onClick={() => {
-            push(PAGES.CONFIG.BASE);
-          }}
-        >
-          <Icon color={COLORS.ORANGE} name="settings" /> Configuración
-        </Menu.Item>
+
       </Menu>
     </Popup>
   );

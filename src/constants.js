@@ -45,7 +45,7 @@ export const PAGES = {
   LOGIN: {
     BASE: "/login"
   },
-  CONFIG: {
+  SETTINGS: {
     BASE: "/configuracion",
     NAME: 'Configuración',
   },
@@ -166,7 +166,8 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
-  EVENTS: 'events'
+  EVENTS: 'events',
+  SETTINGS: "settings"
 };
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
@@ -379,8 +380,25 @@ export const ICONS = {
   ADDRESS_CARD: "address card",
   ARCHIVE: "archive",
   OPTIONS: "options",
-  REFRESH: "refresh"
+  REFRESH: "refresh",
+  SETTINGS: "settings"
 };
+
+export const SEMANTIC_COLORS = [
+  { key: "red", text: "Rojo", value: "red" },
+  { key: "orange", text: "Naranja", value: "orange" },
+  { key: "yellow", text: "Amarillo", value: "yellow" },
+  { key: "olive", text: "Oliva", value: "olive" },
+  { key: "green", text: "Verde", value: "green" },
+  { key: "teal", text: "Turquesa", value: "teal" },
+  { key: "blue", text: "Azul", value: "blue" },
+  { key: "violet", text: "Violeta", value: "violet" },
+  { key: "purple", text: "Púrpura", value: "purple" },
+  { key: "pink", text: "Rosa", value: "pink" },
+  { key: "brown", text: "Marrón", value: "brown" },
+  { key: "grey", text: "Gris", value: "grey" },
+  { key: "black", text: "Negro", value: "black" },
+];
 
 export const PAGE_SIZE_OPTIONS = [
   { key: 10, text: '10', value: 10 },

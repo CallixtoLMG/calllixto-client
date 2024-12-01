@@ -164,6 +164,7 @@ export const Icon = styled(SIcon)`
   position: ${({ dollar, toast }) => (dollar || toast) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
+  cursor: ${({ pointer }) => pointer && "pointer"} !important;;
 `;
 
 export const Modal = styled(SModal)`

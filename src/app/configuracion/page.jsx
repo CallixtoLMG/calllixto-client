@@ -1,146 +1,131 @@
 "use client";
+import { useEditSetting, useListSettings } from "@/api/settings";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import SettingsPage from "@/components/settings";
 import { PAGES } from "@/constants";
-import { useEffect, useState } from "react";
-import { Button, Form, Icon, Label, Segment, Tab, Table } from "semantic-ui-react";
+import { useValidateToken } from "@/hooks/userData";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "react-hot-toast";
 
-const SettingsPage = () => {
+// Mapeo para traducir nombres de entidades al español
+const entityLabels = {
+  BRANDS: "Marcas",
+  BUDGETS: "Presupuestos",
+  CUSTOMERS: "Clientes",
+  EXPENSES: "Gastos",
+  GENERAL: "General",
+  PRODUCTS: "Productos",
+  SUPPLIERS: "Proveedores",
+};
+
+const pluralEntities = {
+  PRODUCT: "PRODUCTS",
+  CUSTOMER: "CUSTOMERS",
+  BRAND: "BRANDS",
+  BUDGET: "BUDGETS",
+  SUPPLIER: "SUPPLIERS",
+  EXPENSE: "EXPENSES",
+  GENERAL: "GENERAL",
+};
+
+// Lista de entidades a ocultar
+const hiddenEntities = ["EXPENSE"]; // Ocultar "Gastos", por ejemplo.
+
+// Campos por los cuales filtrar entidades visibles
+const filterByFields = ["tags", "blacklist"]; // Mostrar entidades que tienen estos campos
+
+const Settings = () => {
+  useValidateToken();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
-  const [tags, setTags] = useState([]);
-  const [newTag, setNewTag] = useState({ name: "", color: "blue", comment: "" });
-  const [activeTabIndex, setActiveTabIndex] = useState(0); // Controla el Tab activo
+  const { data, isLoading } = useListSettings();
+  const [activeEntity, setActiveEntity] = useState(""); // Sin entidad activa por defecto
+  const [settingsData, setSettingsData] = useState({}); // Aquí se almacenan los datos de configuración.
+  const editSetting = useEditSetting();
+console.log(data)
+  // Función para capitalizar la primera letra
+  const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
-  // Lista de panes con nombres de entidades
-  const panes = [
-    { menuItem: "Clientes", entityName: "Clientes", render: renderTagsContent },
-    { menuItem: "Productos", entityName: "Productos", render: renderTagsContent },
-  ];
+  // Mutación para guardar cambios
+  const { mutate: mutateEdit, isLoading: isEditPending } = useMutation({
+    mutationFn: async ({ entity, tags }) => {
+      const response = await editSetting({
+        clientId: "client-id", // Cambiar por ID válido
+        entity,
+        value: { tags },
+      });
+      return response;
+    },
+    onSuccess: () => {
+      toast.success("Cambios guardados correctamente.");
+    },
+    onError: (error) => {
+      toast.error(`Error al guardar cambios: ${error.message || error}`);
+    },
+  });
 
-  // Actualiza las etiquetas iniciales al cargar la página
+  // Filtrar y preparar las entidades visibles
+  const visibleSettings = useMemo(() => {
+    if (!data?.settings) return [];
+  
+    return data.settings
+      .filter(({ entity }) => !hiddenEntities.includes(entity)) // Ocultar entidades especificadas
+      .filter((entity) => filterByFields.some((field) => entity[field] !== undefined)) // Filtrar por campos internos
+      .map(({ entity, ...rest }) => {
+        const pluralEntity = pluralEntities[entity] || entity; // Normalizar a plural si está en el mapeo
+        return {
+          entity: pluralEntity, // Usar el nombre plural
+          label: capitalize(entityLabels[pluralEntity] || pluralEntity.toLowerCase()), // Traducir y capitalizar
+          ...rest,
+        };
+      });
+  }, [data]);
+
+  // Actualizar settingsData cuando los datos del backend cambian
   useEffect(() => {
-    const entityName = panes[activeTabIndex]?.entityName || "General";
-    setLabels([PAGES.CONFIG.NAME, entityName]);
-    setActions([]);
-  }, [activeTabIndex, setLabels, setActions]);
-
-  function renderTagsContent() {
-    return (
-      <Tab.Pane>
-        {renderTagsForm()}
-        {renderTagsTable()}
-      </Tab.Pane>
-    );
-  }
-
-  const handleAddTag = () => {
-    if (newTag.name.trim()) {
-      setTags([...tags, newTag]);
-      setNewTag({ name: "", color: "blue", comment: "" });
+    if (visibleSettings.length > 0) {
+      const parsedData = visibleSettings.reduce((acc, setting) => {
+        acc[setting.entity] = setting; // Organizar por entidad
+        return acc;
+      }, {});
+      setSettingsData(parsedData);
     }
+  }, [visibleSettings]);
+
+  // Establecer labels iniciales y la entidad activa
+  useEffect(() => {
+    if (visibleSettings.length > 0) {
+      const initialEntity = visibleSettings[0]; // Primera entidad visible
+      setActiveEntity(initialEntity.entity); // Establece la entidad activa como su clave interna
+      setLabels([PAGES.SETTINGS.NAME, initialEntity.label]); // Actualizamos los labels
+      setActions([]); // Reseteamos acciones
+    }
+  }, [visibleSettings, setLabels, setActions]);
+
+  // Manejar cambios en la entidad activa
+  const handleEntityChange = (entityName) => {
+    setActiveEntity(entityName);
+    const label = entityLabels[entityName] || capitalize(entityName.toLowerCase());
+    setLabels([PAGES.SETTINGS.NAME, label]);
+    setActions([]); // Puedes personalizar las acciones aquí si es necesario
   };
 
-  const handleRemoveTag = (index) => {
-    setTags(tags.filter((_, i) => i !== index));
-  };
-
-  const renderTagsTable = () => (
-    <Table celled>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Nombre</Table.HeaderCell>
-          <Table.HeaderCell>Color</Table.HeaderCell>
-          <Table.HeaderCell>Comentario</Table.HeaderCell>
-          <Table.HeaderCell>Acciones</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {tags.map((tag, index) => (
-          <Table.Row key={index}>
-            <Table.Cell>{tag.name}</Table.Cell>
-            <Table.Cell>
-              <Label color={tag.color}>{tag.color}</Label>
-            </Table.Cell>
-            <Table.Cell>{tag.comment}</Table.Cell>
-            <Table.Cell>
-              <Button
-                icon
-                color="red"
-                onClick={() => handleRemoveTag(index)}
-                size="mini"
-              >
-                <Icon name="trash" />
-              </Button>
-            </Table.Cell>
-          </Table.Row>
-        ))}
-        {!tags.length && (
-          <Table.Row>
-            <Table.Cell colSpan="4" textAlign="center">
-              No hay etiquetas agregadas.
-            </Table.Cell>
-          </Table.Row>
-        )}
-      </Table.Body>
-    </Table>
-  );
-
-  const renderTagsForm = () => (
-    <Segment>
-      <Form>
-        <Form.Group widths="equal">
-          <Form.Input
-            label="Nombre"
-            placeholder="Nombre de la etiqueta"
-            value={newTag.name}
-            onChange={(e) => setNewTag({ ...newTag, name: e.target.value })}
-          />
-          <Form.Select
-            label="Color"
-            options={[
-              { key: "blue", text: "Azul", value: "blue" },
-              { key: "red", text: "Rojo", value: "red" },
-              { key: "green", text: "Verde", value: "green" },
-              { key: "yellow", text: "Amarillo", value: "yellow" },
-            ]}
-            value={newTag.color}
-            onChange={(e, { value }) =>
-              setNewTag({ ...newTag, color: value })
-            }
-          />
-        </Form.Group>
-        <Form.TextArea
-          label="Comentario"
-          placeholder="Comentario opcional..."
-          value={newTag.comment}
-          onChange={(e) =>
-            setNewTag({ ...newTag, comment: e.target.value })
-          }
-        />
-        <Button color="green" onClick={handleAddTag} disabled={!newTag.name}>
-          <Icon name="add" /> Agregar Etiqueta
-        </Button>
-      </Form>
-    </Segment>
-  );
-
-  const handleTabChange = (_, { activeIndex }) => {
-    // Actualiza el Tab activo y las etiquetas
-    setActiveTabIndex(activeIndex);
-    const entityName = panes[activeIndex]?.entityName || "General";
-    setLabels([PAGES.CONFIG.NAME, entityName]);
+  // Función para guardar cambios desde SettingsPage
+  const handleSaveChanges = ({ entity, tags }) => {
+    mutateEdit({ entity, tags });
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <Tab
-        size="large"
-        panes={panes.map(({ menuItem, render }) => ({ menuItem, render }))}
-        activeIndex={activeTabIndex}
-        onTabChange={handleTabChange}
-      />
-    </div>
+    <SettingsPage
+      activeEntity={activeEntity}
+      settingsData={settingsData}
+      isLoading={isLoading || isEditPending} // Mostrar loading si está editando
+      onEntityChange={handleEntityChange}
+      onSubmit={handleSaveChanges}
+      settings={visibleSettings}
+    />
   );
 };
 
-export default SettingsPage;
+export default Settings;
