@@ -18,6 +18,7 @@ const Container = styled(Flex)`
   max-height: ${({ tableHeight = 'none' }) => `${tableHeight}!important`};
   overflow-y: ${({ tableHeight }) => tableHeight && "auto"} !important;
   overflow-x: ${({ tableHeight }) => tableHeight && "auto"} !important;
+  padding: 2px 0;
 `;
 
 const Pagination = styled(SPagination)`

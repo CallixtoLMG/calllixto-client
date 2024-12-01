@@ -22,6 +22,9 @@ const AccordionItem = styled(Menu.Item)`
 
 const AccordionTitle = styled(Accordion.Title)`
   font-size:14px!important;
+  i.dropdown.icon{
+    margin: 0!important;
+  }
 `;
 
 const UserMenu = ({ trigger, onLogout, onClientChange }) => {

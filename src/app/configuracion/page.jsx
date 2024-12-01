@@ -4,6 +4,7 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsPage from "@/components/settings";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
+import { useUserContext } from "@/User";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
@@ -33,7 +34,7 @@ const pluralEntities = {
 const hiddenEntities = ["EXPENSE"]; // Ocultar "Gastos", por ejemplo.
 
 // Campos por los cuales filtrar entidades visibles
-const filterByFields = ["tags", "blacklist"]; // Mostrar entidades que tienen estos campos
+const filterByFields = ["tags"]; // Mostrar entidades que tienen estos campos
 
 const Settings = () => {
   useValidateToken();
@@ -43,7 +44,8 @@ const Settings = () => {
   const [activeEntity, setActiveEntity] = useState(""); // Sin entidad activa por defecto
   const [settingsData, setSettingsData] = useState({}); // Aquí se almacenan los datos de configuración.
   const editSetting = useEditSetting();
-console.log(data)
+  const { role } = useUserContext();
+
   // Función para capitalizar la primera letra
   const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
@@ -68,7 +70,7 @@ console.log(data)
   // Filtrar y preparar las entidades visibles
   const visibleSettings = useMemo(() => {
     if (!data?.settings) return [];
-  
+
     return data.settings
       .filter(({ entity }) => !hiddenEntities.includes(entity)) // Ocultar entidades especificadas
       .filter((entity) => filterByFields.some((field) => entity[field] !== undefined)) // Filtrar por campos internos
@@ -124,6 +126,7 @@ console.log(data)
       onEntityChange={handleEntityChange}
       onSubmit={handleSaveChanges}
       settings={visibleSettings}
+      role={role}
     />
   );
 };

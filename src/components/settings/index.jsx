@@ -1,13 +1,17 @@
-"use client";
+import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
-import { SEMANTIC_COLORS } from "@/constants";
+import { COLORS, ICONS, SEMANTIC_COLORS } from "@/constants";
+import { RULES } from "@/roles";
 import { useEffect, useState } from "react";
 import { toast } from "react-hot-toast";
-import { Accordion, Button, Form, Icon, Label, Segment, Tab, Table } from "semantic-ui-react";
-import { FormSelect } from "./styles";
+import { Accordion, Form, Icon, Label, Segment, Tab } from "semantic-ui-react";
+import { IconnedButton, SubmitAndRestore } from "../common/buttons";
+import { Flex, FlexColumn } from "../common/custom";
+import { FormInput, FormSelect } from "./styles";
 
-const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, settings = [], onSubmit }) => {
+const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, settings = [], onSubmit, role }) => {
   const [localTags, setLocalTags] = useState([]); // Maneja los tags localmente
+  const [initialTags, setInitialTags] = useState([]); // Estado inicial para restaurar
   const [newTag, setNewTag] = useState({ name: "", color: "blue", comment: "" });
   const [openAccordions, setOpenAccordions] = useState({}); // Maneja estados de acordeones
 
@@ -15,7 +19,10 @@ const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, s
   useEffect(() => {
     if (settingsData[activeEntity]?.tags) {
       setLocalTags(settingsData[activeEntity].tags);
+      setInitialTags(settingsData[activeEntity].tags); // Guarda el estado inicial
     }
+    // Limpiar los inputs cuando cambia la entidad activa
+    setNewTag({ name: "", color: "blue", comment: "" });
   }, [settingsData, activeEntity]);
 
   // Alternar acordeones
@@ -35,8 +42,8 @@ const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, s
   };
 
   // Eliminar una etiqueta localmente
-  const removeTag = (index) => {
-    setLocalTags((prev) => prev.filter((_, i) => i !== index));
+  const removeTag = (tagToRemove) => {
+    setLocalTags((prev) => prev.filter((tag) => tag !== tagToRemove));
   };
 
   // Guardar cambios al backend
@@ -47,6 +54,78 @@ const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, s
     }
     onSubmit({ entity: activeEntity, tags: localTags });
   };
+
+  const handleReset = () => {
+    setLocalTags(initialTags); // Restaurar las etiquetas locales al estado inicial
+  };
+
+  // Configurar encabezados de la tabla
+  const headers = [
+    {
+      id: "name",
+      title: "Etiqueta",
+      align: "left",
+      width: 5,
+      value: (tag) => <Label color={tag.color}>{tag.name}</Label>, // Mostrar el nombre de la etiqueta
+    },
+    {
+      id: "comment",
+      title: "Comentario",
+      align: "left",
+      value: (tag) => <span>{tag.comment}</span>, // Mostrar el comentario
+    },
+  ];
+
+  // Acciones para cada elemento
+  const actions = RULES.canRemove[role] ? [
+    {
+      id: "delete",
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
+      onClick: (tag) => removeTag(tag), // Eliminar directamente el tag correspondiente
+      tooltip: "Eliminar",
+    },
+  ] : [];
+
+  const renderTagsForm = () => (
+    <Segment>
+      <Form>
+        <Form.Group widths="equal">
+          <FormInput
+            width={3}
+            label="Nombre"
+            placeholder="Nombre de la etiqueta"
+            value={newTag.name}
+            onChange={(e) => setNewTag({ ...newTag, name: e.target.value })}
+          />
+          <FormSelect
+            width={2}
+            label="Color"
+            options={SEMANTIC_COLORS}
+            value={newTag.color}
+            onChange={(e, { value }) => setNewTag({ ...newTag, color: value })}
+          />
+          <FormInput
+            width={7}
+            label="Comentario"
+            placeholder="Comentario"
+            value={newTag.comment}
+            onChange={(e) => setNewTag({ ...newTag, comment: e.target.value })}
+          />
+          <Flex alignSelf="end">
+            <IconnedButton
+              text="Agregar"
+              icon={ICONS.ADD}
+              color={COLORS.GREEN}
+              onClick={addTag}
+              disabled={!newTag.name}
+              height="38px"
+            />
+          </Flex>
+        </Form.Group>
+      </Form>
+    </Segment>
+  );
 
   // Renderizar contenido de tabs
   const renderTabContent = (entity) => {
@@ -64,84 +143,31 @@ const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, s
           </Accordion.Title>
           <Accordion.Content active={openAccordions[`${entity}-tags`]}>
             {renderTagsForm()}
-            {renderTagsTable()}
-            <Button
-              color="blue"
-              onClick={handleSaveChanges}
-              disabled={isLoading}
-              style={{ marginTop: "1rem" }}
-            >
-              Guardar cambios
-            </Button>
+            <FlexColumn rowGap="15px">
+              <Table
+                isLoading={isLoading}
+                headers={headers}
+                elements={localTags} // Pasamos los tags locales como datos
+                mainKey="name" // Usar un identificador único para las filas
+                actions={actions} // Acciones para cada fila
+                paginate={false} // No paginar
+                tableHeight="40vh"
+                deleteButtonInside
+              />
+              <SubmitAndRestore
+                isLoading={isLoading}
+                isDirty={JSON.stringify(localTags) !== JSON.stringify(initialTags)} // Verifica si hubo cambios
+                onReset={handleReset} // Restaurar al estado inicial
+                onSubmit={handleSaveChanges} // Guardar cambios
+                text="Actualizar"
+              />
+            </FlexColumn>
           </Accordion.Content>
+
         </Accordion>
       </Tab.Pane>
     );
   };
-
-  const renderTagsForm = () => (
-    <Segment>
-      <Form>
-        <Form.Group widths="equal">
-          <Form.Input
-            label="Nombre"
-            placeholder="Nombre de la etiqueta"
-            value={newTag.name}
-            onChange={(e) => setNewTag({ ...newTag, name: e.target.value })}
-          />
-          <FormSelect
-            label="Color"
-            options={SEMANTIC_COLORS}
-            value={newTag.color}
-            onChange={(e, { value }) => setNewTag({ ...newTag, color: value })}
-          />
-          <Form.Input
-            label="Comentario"
-            placeholder="Comentario opcional..."
-            value={newTag.comment}
-            onChange={(e) => setNewTag({ ...newTag, comment: e.target.value })}
-          />
-        </Form.Group>
-        <Button color="green" onClick={addTag} disabled={!newTag.name}>
-          Agregar etiqueta
-        </Button>
-      </Form>
-    </Segment>
-  );
-
-  const renderTagsTable = () => (
-    <Table celled>
-      <Table.Header>
-        <Table.Row>
-          <Table.HeaderCell>Nombre</Table.HeaderCell>
-          <Table.HeaderCell>Color</Table.HeaderCell>
-          <Table.HeaderCell>Comentario</Table.HeaderCell>
-          <Table.HeaderCell>Acciones</Table.HeaderCell>
-        </Table.Row>
-      </Table.Header>
-      <Table.Body>
-        {localTags.map((tag, index) => (
-          <Table.Row key={index}>
-            <Table.Cell>{tag.name}</Table.Cell>
-            <Table.Cell>
-              <Label color={tag.color}>{tag.color}</Label>
-            </Table.Cell>
-            <Table.Cell>{tag.comment}</Table.Cell>
-            <Table.Cell>
-              <Button icon="trash" color="red" size="mini" onClick={() => removeTag(index)} />
-            </Table.Cell>
-          </Table.Row>
-        ))}
-        {!localTags.length && (
-          <Table.Row>
-            <Table.Cell colSpan="4" textAlign="center">
-              No hay etiquetas agregadas.
-            </Table.Cell>
-          </Table.Row>
-        )}
-      </Table.Body>
-    </Table>
-  );
 
   const panes = settings.map(({ entity, label }) => ({
     menuItem: label,
