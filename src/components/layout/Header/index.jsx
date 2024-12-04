@@ -1,10 +1,10 @@
 import { useUserContext } from "@/User";
 import { Flex, Icon } from "@/components/common/custom";
 import { KeyboardShortcuts } from "@/components/common/modals";
-import { COLORS, DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/constants";
-import { isCallixtoUser } from "@/roles";
+import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/constants";
+import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
-import { Button, Label, Menu, Popup } from "semantic-ui-react";
+import { Button, Label, Menu } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
 import { Container, LeftHeaderDiv, ModLink, RigthHeaderDiv, Text } from "./styles";
 
@@ -45,7 +45,13 @@ const Header = () => {
               <>
                 <Flex>
                   {Object.values(PAGES)
-                    .filter((page) => !!page.NAME)
+                    .filter((page) => {
+                      if (!page.NAME) return false;
+                      if (page.NAME === PAGES.SETTINGS.NAME) {
+                        return RULES.canUpdate[role];
+                      }
+                      return true;
+                    })
                     .map((page) => (
                       <ModLink key={page.BASE} $active={pathname.includes(page.BASE)} href={page.BASE}>
                         <Menu.Item>
@@ -55,27 +61,15 @@ const Header = () => {
                     ))}
                 </Flex>
                 <Flex>
-                  <RigthHeaderDiv >
+                  <RigthHeaderDiv>
                     <KeyboardShortcuts />
                   </RigthHeaderDiv>
                   {isCallixtoUser(role) && (
-                    <>
-                      <RigthHeaderDiv >
-                        <Popup
-                          content='Configuración'
-                          trigger={
-                            <Icon margin="0" pointer size='large' name={ICONS.SETTINGS} color={COLORS.ORANGE} onClick={() => push(PAGES.SETTINGS.BASE)} />
-                          }
-                          position='bottom right'
-                          size='tiny'
-                        />
-                      </RigthHeaderDiv>
-                      <RigthHeaderDiv >
-                        <Label>{userData.selectedClientId || DEFAULT_SELECTED_CLIENT}</Label>
-                      </RigthHeaderDiv>
-                    </>
+                    <RigthHeaderDiv>
+                      <Label>{userData.selectedClientId || DEFAULT_SELECTED_CLIENT}</Label>
+                    </RigthHeaderDiv>
                   )}
-                  <RigthHeaderDiv >
+                  <RigthHeaderDiv>
                     <UserMenu
                       trigger={
                         <Button icon>

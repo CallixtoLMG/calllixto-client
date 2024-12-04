@@ -30,23 +30,21 @@ const AccordionTitle = styled(Accordion.Title)`
 const UserMenu = ({ trigger, onLogout, onClientChange }) => {
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const [activeIndex, setActiveIndex] = useState(-1); // Controla el estado del acordeón
-  const [searchTerm, setSearchTerm] = useState(""); // Estado para la búsqueda
+  const [activeIndex, setActiveIndex] = useState(-1); 
+  const [searchTerm, setSearchTerm] = useState(""); 
 
   const handleAccordionClick = (index) => {
     setActiveIndex(activeIndex === index ? -1 : index);
   };
 
-  // Filtrar clientes según el término de búsqueda
   const filteredClients = useMemo(() => {
     return userData.callixtoClients?.filter((client) =>
       client.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [searchTerm, userData.callixtoClients]);
 
-  // Opciones para el Dropdown
   const clientOptions = useMemo(() => {
-    return filteredClients.map((client) => ({
+    return filteredClients?.map((client) => ({
       key: client,
       value: client,
       text: client,
