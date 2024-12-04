@@ -5,10 +5,10 @@ import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 import TagsModule from "./TagsModule";
 
-const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, settings = [], onSubmit, }) => {
+const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, settings = [], onSubmit, isPending }) => {
   const [localTags, setLocalTags] = useState([]);
   const [initialTags, setInitialTags] = useState([]);
-  const [openAccordions, setOpenAccordions] = useState({}); 
+  const [openAccordions, setOpenAccordions] = useState({});
   const [isTableModified, setIsTableModified] = useState(false);
 
   const { control, handleSubmit, reset, getValues, formState: { isDirty, errors } } = useForm({
@@ -26,23 +26,31 @@ const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, s
       setInitialTags(settingsData[activeEntity].tags);
       setIsTableModified(false);
     }
-
-    const initialAccordions = settings.reduce((acc, setting) => {
-      acc[setting.entity] = false; 
-      return acc;
-    }, {});
-    setOpenAccordions(initialAccordions);
+  
+    setOpenAccordions((prev) => {
+      const initialAccordions = settings.reduce((acc, setting) => {
+        acc[setting.entity] = prev[setting.entity] ?? false; 
+        return acc;
+      }, {});
+      return initialAccordions;
+    });
   }, [settingsData, activeEntity, settings]);
 
   const toggleAccordion = (key) => {
     setOpenAccordions((prev) => ({
       ...prev,
-      [key]: !prev[key], 
+      [key]: !prev[key],
     }));
   };
 
   const addTag = () => {
     const tagToAdd = getValues();
+
+    if (localTags.some((tag) => tag.name.toLowerCase() === tagToAdd.name.trim().toLowerCase())) {
+      toast.error("Ya existe una etiqueta con ese nombre.");
+      return;
+    }
+
     if (tagToAdd.name.trim()) {
       setLocalTags((prev) => [...prev, tagToAdd]);
       reset();
@@ -84,8 +92,9 @@ const SettingsPage = ({ activeEntity, settingsData, isLoading, onEntityChange, s
           onRemoveTag={removeTag}
           onReset={handleReset}
           onSaveChanges={handleSaveChanges}
+          isPending={isPending}
           isLoading={isLoading}
-          isAccordionOpen={openAccordions[entity]} 
+          isAccordionOpen={openAccordions[entity]}
           onToggleAccordion={() => toggleAccordion(entity)}
         />
       </Tab.Pane>

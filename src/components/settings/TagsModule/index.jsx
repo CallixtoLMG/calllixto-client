@@ -5,8 +5,8 @@ import { Table } from "@/components/common/table";
 import { COLORS, ICONS, SEMANTIC_COLORS } from "@/constants";
 import { RULES } from "@/roles";
 import { Controller } from "react-hook-form";
-import { Accordion, Form, Icon, Label, Segment } from "semantic-ui-react";
-import { FormInput, FormSelect } from "./styles";
+import { Accordion, Icon, Label, Segment } from "semantic-ui-react";
+import { Form, FormInput, FormSelect } from "./styles";
 
 const TagsModule = ({
   control,
@@ -18,13 +18,14 @@ const TagsModule = ({
   onRemoveTag,
   onReset,
   onSaveChanges,
+  isPending,
   isLoading,
   isAccordionOpen,
-  onToggleAccordion, 
+  onToggleAccordion,
 }) => {
 
   const { role } = useUserContext();
-  
+
   const headers = [
     {
       id: "name",
@@ -60,14 +61,14 @@ const TagsModule = ({
       <Accordion.Content active={isAccordionOpen}>
         <Segment>
           <Form onSubmit={onAddTag}>
-            <Form.Group widths="equal">
+            <Flex width="100%" paddingTop="20px" alignItems="flex-start" columnGap="15px">
               <Controller
                 name="name"
                 control={control}
                 rules={{ required: "El nombre es obligatorio" }}
                 render={({ field }) => (
-                  <Form.Input
-                    width={3}
+                  <FormInput
+                    width={4}
                     label="Nombre"
                     placeholder="Nombre de la etiqueta"
                     value={field.value}
@@ -81,7 +82,7 @@ const TagsModule = ({
                 control={control}
                 render={({ field }) => (
                   <FormSelect
-                    width={2}
+                    width={3}
                     label="Color"
                     options={SEMANTIC_COLORS}
                     value={field.value}
@@ -94,7 +95,7 @@ const TagsModule = ({
                 control={control}
                 render={({ field }) => (
                   <FormInput
-                    width={7}
+                    width={8}
                     label="Descripción"
                     placeholder="Descripción"
                     value={field.value}
@@ -102,19 +103,16 @@ const TagsModule = ({
                   />
                 )}
               />
-              <Flex marginBottom={errors.name && "2.8rem"} alignSelf="end">
-                <IconnedButton
-                  text="Agregar"
-                  icon={ICONS.ADD}
-                  color={COLORS.GREEN}
-                  onClick={onAddTag}
-                  disabled={!isDirty}
-                  height="38px"
-                />
-              </Flex>
-            </Form.Group>
+              <IconnedButton
+                text="Agregar"
+                icon={ICONS.ADD}
+                color={COLORS.GREEN}
+                onClick={onAddTag}
+                disabled={!isDirty}
+                height="38px"
+              />
+            </Flex>
           </Form>
-
           <FlexColumn rowGap="15px">
             <Table
               isLoading={isLoading}
@@ -128,7 +126,7 @@ const TagsModule = ({
             />
             <SubmitAndRestore
               isUpdating={true}
-              isLoading={isLoading}
+              isLoading={isPending}
               isDirty={isTableModified}
               onReset={onReset}
               onSubmit={onSaveChanges}

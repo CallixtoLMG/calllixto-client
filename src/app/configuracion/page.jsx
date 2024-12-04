@@ -29,26 +29,26 @@ const pluralEntities = {
   GENERAL: "GENERAL",
 };
 
-const hiddenEntities = ["EXPENSE"]; 
+const hiddenEntities = ["EXPENSE"];
 
-const filterByFields = ["tags"]; 
+const filterByFields = ["tags"];
 
 const Settings = () => {
   useValidateToken();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { data, isLoading } = useListSettings();
-  const [activeEntity, setActiveEntity] = useState(""); 
-  const [settingsData, setSettingsData] = useState({}); 
+  const [activeEntity, setActiveEntity] = useState("");
+  const [settingsData, setSettingsData] = useState({});
   const editSetting = useEditSetting();
   const { role } = useUserContext();
 
   const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
 
-  const { mutate: mutateEdit, isLoading: isEditPending } = useMutation({
+  const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: async ({ entity, tags }) => {
       const response = await editSetting({
-        clientId: "client-id", 
+        clientId: "client-id",
         entity,
         value: { tags },
       });
@@ -66,12 +66,12 @@ const Settings = () => {
     if (!data?.settings) return [];
 
     return data.settings
-      .filter(({ entity }) => !hiddenEntities.includes(entity)) 
-      .filter((entity) => filterByFields.some((field) => entity[field] !== undefined)) 
+      .filter(({ entity }) => !hiddenEntities.includes(entity))
+      .filter((entity) => filterByFields.some((field) => entity[field] !== undefined))
       .map(({ entity, ...rest }) => {
-        const pluralEntity = pluralEntities[entity] || entity; 
+        const pluralEntity = pluralEntities[entity] || entity;
         return {
-          entity: pluralEntity, 
+          entity: pluralEntity,
           label: capitalize(entityLabels[pluralEntity] || pluralEntity.toLowerCase()),
           ...rest,
         };
@@ -81,7 +81,7 @@ const Settings = () => {
   useEffect(() => {
     if (visibleSettings.length > 0) {
       const parsedData = visibleSettings.reduce((acc, setting) => {
-        acc[setting.entity] = setting; 
+        acc[setting.entity] = setting;
         return acc;
       }, {});
       setSettingsData(parsedData);
@@ -90,10 +90,10 @@ const Settings = () => {
 
   useEffect(() => {
     if (visibleSettings.length > 0) {
-      const initialEntity = visibleSettings[0]; 
+      const initialEntity = visibleSettings[0];
       setActiveEntity(initialEntity.entity);
-      setLabels([PAGES.SETTINGS.NAME, initialEntity.label]); 
-      setActions([]); 
+      setLabels([PAGES.SETTINGS.NAME, initialEntity.label]);
+      setActions([]);
     }
   }, [visibleSettings, setLabels, setActions]);
 
@@ -101,7 +101,7 @@ const Settings = () => {
     setActiveEntity(entityName);
     const label = entityLabels[entityName] || capitalize(entityName.toLowerCase());
     setLabels([PAGES.SETTINGS.NAME, label]);
-    setActions([]); 
+    setActions([]);
   };
 
   const handleSaveChanges = ({ entity, tags }) => {
@@ -112,7 +112,8 @@ const Settings = () => {
     <SettingsPage
       activeEntity={activeEntity}
       settingsData={settingsData}
-      isLoading={isLoading || isEditPending}
+      isLoading={isLoading}
+      isPending={isEditPending}
       onEntityChange={handleEntityChange}
       onSubmit={handleSaveChanges}
       settings={visibleSettings}
