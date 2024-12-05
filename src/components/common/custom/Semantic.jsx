@@ -101,6 +101,18 @@ export const Dropdown = styled(SDropdown)`
   &:hover {
     background-color: ${({ noBgColor }) => `${noBgColor}!important`};
   };
+  ${({ select }) => select && `
+    &&&&&& div.item {
+      height: 35px!important;
+      padding: 5px 10px!important;
+      width: fit-content!important;
+    }
+    div.divider.default.text {
+      height: 100%;
+      align-content: center;
+      margin: 0 10px!important;
+    }
+  `}
 `;
 
 export const DropdownOption = styled(SDropdown)`

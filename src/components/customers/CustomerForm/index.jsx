@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, RuledLabel } from "@/components/common/custom";
+import { Dropdown, FieldsContainer, Form, FormField, Input, Label, RuledLabel } from "@/components/common/custom";
 import { ContactFields, ControlledComments } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -8,9 +8,10 @@ import { useCallback } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 const EMPTY_CUSTOMER = { name: '', phoneNumbers: [], addresses: [], emails: [], comments: '' };
 
-const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdating }) => {
+const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdating, tags }) => {
   const methods = useForm({
     defaultValues: {
+      tags: [],
       ...EMPTY_CUSTOMER,
       ...customer,
     }
@@ -52,6 +53,47 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
           </FormField>
         </FieldsContainer>
         <ContactFields />
+        <FieldsContainer>
+          <FormField flex="1" error={errors?.tags?.message}>
+            <RuledLabel title="Etiquetas" message={errors?.tags?.message} />
+            <Controller
+              name="tags"
+              control={control}
+              rules={{ required: "Debe seleccionar al menos una etiqueta." }}
+              render={({ field: { value, onChange } }) => (
+                <Dropdown
+                  select
+                  minHeight="50px"
+                  height
+                  placeholder="Selecciona etiquetas"
+                  fluid
+                  multiple
+                  search
+                  selection
+                  options={tags?.map((tag) => ({
+                    key: tag.name,
+                    value: JSON.stringify(tag),
+                    text: tag.name,
+                    content: (
+                      <Label color={tag.color} >
+                        {tag.name}
+                      </Label>
+                    ),
+                  }))}
+                  value={value.map((tag) => JSON.stringify(tag))}
+                  onChange={(_, data) => {
+                    const selectedTags = data.value.map((item) => JSON.parse(item));
+                    onChange(selectedTags);
+                  }}
+                  renderLabel={(label) => ({
+                    color: tags.find((tag) => tag.name === label.text)?.color || 'grey',
+                    content: label.text,
+                  })}
+                />
+              )}
+            />
+          </FormField>
+        </FieldsContainer>
         <FieldsContainer>
           <ControlledComments control={control} />
         </FieldsContainer>

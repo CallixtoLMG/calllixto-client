@@ -24,11 +24,13 @@ export function useGetSetting(entity) {
     queryKey: [GET_SETTING_QUERY_KEY, entity],
     queryFn: () =>
       getItemById({
-        url: `${PATHS.SETTINGS}/${entity}`,
+        key: "entity",
+        id: entity,
+        url: `${PATHS.SETTINGS}`,
         entity: ENTITIES.SETTINGS,
       }),
     staleTime: TIME_IN_MS.ONE_HOUR,
-    enabled: !!entity, 
+    enabled: !!entity,
   });
 
   return query;

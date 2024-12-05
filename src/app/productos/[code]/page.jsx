@@ -1,6 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useActiveProduct, useDeleteProduct, useEditProduct, useGetProduct, useInactiveProduct } from "@/api/products";
+import { useGetSetting } from "@/api/settings";
 import { Input } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction } from "@/components/common/modals";
@@ -35,6 +36,7 @@ const Product = ({ params }) => {
   const deleteProduct = useDeleteProduct();
   const activeProduct = useActiveProduct();
   const inactiveProduct = useInactiveProduct();
+  const { data: productsSettings, isLoading: isLoadingproductsSettings } = useGetSetting("products");
   const isProductOOSState = useMemo(() => isProductOOS(product?.state), [product?.state]);
 
   const stateTitle = useMemo(() => {
@@ -44,6 +46,13 @@ const Product = ({ params }) => {
   const stateColor = useMemo(() => {
     return product?.state ? PRODUCT_STATES[product.state]?.color || PRODUCT_STATES.INACTIVE.color : PRODUCT_STATES.INACTIVE.color;
   }, [product?.state]);
+
+  const mappedTags = useMemo(() => productsSettings?.settings?.tags?.map(tag => ({
+    ...tag,
+    key: tag.id,
+    value: tag.name,
+    text: tag.name,
+  })), [productsSettings]);
 
   useEffect(() => {
     resetActions();
@@ -324,7 +333,7 @@ const Product = ({ params }) => {
   }
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || isLoadingproductsSettings}>
       {!isProductDeleted(product?.state) && toggleButton}
       {isUpdating ? (
         <ProductForm
@@ -332,6 +341,8 @@ const Product = ({ params }) => {
           onSubmit={mutateEdit}
           isUpdating
           isLoading={isEditPending}
+          tags={mappedTags}
+          select={true}
         />
       ) : (
         <ProductView product={product} />

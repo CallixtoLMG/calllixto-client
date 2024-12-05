@@ -131,7 +131,7 @@ export async function listItems({ entity, url, params, key = ID }) {
 
 export async function getItemById({ id, url, entity, key = ID, params }) {
   await listItems({ entity, url, params, key })
-  const getEntity = async (id) => {
+  const getEntity = async () => {
     try {
       const { data } = await getInstance().get(`${url}/${id}`);
       if (data.statusOk) {

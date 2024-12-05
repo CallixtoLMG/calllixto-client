@@ -13,6 +13,7 @@ const ATTRIBUTES = {
   EDITABLE_PRICE: "editablePrice",
   FRACTION_CONFIG: "fractionConfig",
   STATE: "state",
+  TAGS: "tags"
 };
 
 const PRODUCT_COLUMNS = [

@@ -1,6 +1,7 @@
 "use client";
 import { useListBrands } from "@/api/brands";
 import { useCreateProduct } from "@/api/products";
+import { useGetSetting } from "@/api/settings";
 import { useListSuppliers } from "@/api/suppliers";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
@@ -19,6 +20,7 @@ const CreateProduct = () => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createProduct = useCreateProduct();
+  const { data: productsSettings, isLoading: isLoadingproductsSettings } = useGetSetting("products");
 
   useEffect(() => {
     resetActions();
@@ -30,6 +32,13 @@ const CreateProduct = () => {
   useEffect(() => {
     setLabels(['Productos', 'Crear']);
   }, [setLabels]);
+
+  const mappedTags = useMemo(() => productsSettings?.settings?.tags?.map(tag => ({
+    ...tag,
+    key: tag.id,
+    value: tag.name,
+    text: tag.name,
+  })), [productsSettings]);
 
   const mappedBrands = useMemo(() => brands?.brands?.map(brand => ({
     ...brand,
@@ -64,12 +73,13 @@ const CreateProduct = () => {
   });
 
   return (
-    <Loader active={isLoadingBrands || isLoadingSuppliers || isBrandsRefetching || isSupplierRefetching}>
+    <Loader active={isLoadingBrands || isLoadingSuppliers || isBrandsRefetching || isSupplierRefetching || isLoadingproductsSettings}>
       <ProductForm
         brands={mappedBrands}
         suppliers={mappedSuppliers}
         onSubmit={mutate}
         isLoading={isPending}
+        tags={mappedTags}
       />
     </Loader>
   )

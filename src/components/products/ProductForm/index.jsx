@@ -10,9 +10,10 @@ import { Popup } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
-const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
+const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, tags }) => {
   const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors, setError } = useForm({
     defaultValues: {
+      tags: product?.tags || [],
       fractionConfig: {
         active: false,
         unit: MEASSURE_UNITS.MT.value,
@@ -295,6 +296,46 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                 defaultValue={Object.values(MEASSURE_UNITS)[0].value}
                 onChange={(e, { value }) => onChange(value)}
                 disabled={!watchFractionable || isProductDeleted(product?.state)}
+              />
+            )}
+          />
+        </FormField>
+      </FieldsContainer>
+     <FieldsContainer>
+        <FormField flex="1" error={errors?.tags?.message}>
+          <RuledLabel title="Etiquetas" message={errors?.tags?.message} />
+          <Controller
+            name="tags"
+            control={control}
+            rules={{ required: "Debe seleccionar al menos una etiqueta." }}
+            render={({ field: { value, onChange } }) => (
+              <Dropdown
+                select
+                minHeight="50px"
+                placeholder="Selecciona etiquetas"
+                fluid
+                multiple
+                search
+                selection
+                options={tags?.map((tag) => ({
+                  key: tag.name,
+                  value: JSON.stringify(tag), 
+                  text: tag.name,
+                  content: (
+                    <Label color={tag.color}>
+                      {tag.name}
+                    </Label>
+                  ),
+                }))}
+                value={value.map((tag) => JSON.stringify(tag))} 
+                onChange={(_, data) => {
+                  const selectedTags = data.value.map((item) => JSON.parse(item));
+                  onChange(selectedTags); 
+                }}
+                renderLabel={(label) => ({
+                  color: tags.find((tag) => tag.name === label.text)?.color || 'grey',
+                  content: label.text,
+                })} 
               />
             )}
           />

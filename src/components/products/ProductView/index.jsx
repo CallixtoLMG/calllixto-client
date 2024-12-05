@@ -1,26 +1,31 @@
 "use client";
 import { Message } from "@/components/budgets/BudgetView/styles";
 import { IconnedButton } from "@/components/common/buttons";
-import { FieldsContainer, FormField, Label, MessageHeader, Price, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, Flex, FormField, Label, MessageHeader, Price, Segment, ViewContainer } from "@/components/common/custom";
 import { ICONS, MEASSURE_UNITS, PRODUCT_STATES } from "@/constants";
 import { isItemInactive, threeMonthsDate } from "@/utils";
 
 const ProductView = ({ product }) => {
   return (
     <ViewContainer>
-      {isItemInactive(product?.state) &&
+      {isItemInactive(product?.state) && (
         <FieldsContainer>
-          <Message negative >
+          <Message negative>
             <MessageHeader>Motivo de inactivación</MessageHeader>
             <p>{product.inactiveReason}</p>
           </Message>
-        </FieldsContainer>}
-      {product?.state === PRODUCT_STATES.DELETED.id &&
+        </FieldsContainer>
+      )}
+      {product?.state === PRODUCT_STATES.DELETED.id && (
         <FieldsContainer>
-          <Message negative >
-            <p>Este producto se eliminará <b>PERMANENTEMENTE</b> de forma automática el día {threeMonthsDate(product.updateAt)} (90 días desde que se marco como eliminado).</p>
+          <Message negative>
+            <p>
+              Este producto se eliminará <b>PERMANENTEMENTE</b> de forma automática el día{" "}
+              {threeMonthsDate(product.updateAt)} (90 días desde que se marcó como eliminado).
+            </p>
           </Message>
-        </FieldsContainer>}
+        </FieldsContainer>
+      )}
       <FieldsContainer alignItems="flex-end">
         <FormField flex="1">
           <Label>Proveedor</Label>
@@ -48,12 +53,26 @@ const ProductView = ({ product }) => {
         </FormField>
         <FormField width="20%">
           <Label>Precio</Label>
-          <Segment padding="10px 14px" height="40px" placeholder> <Price value={product?.price} /></Segment>
+          <Segment padding="10px 14px" height="40px" placeholder>
+            <Price value={product?.price} />
+          </Segment>
         </FormField>
         <FormField width="20%">
           <Label>Unidad de Medida</Label>
           <Segment placeholder>{MEASSURE_UNITS[product?.fractionConfig?.unit?.toUpperCase()]?.text}</Segment>
         </FormField>
+      </FieldsContainer>
+      <FieldsContainer rowGap="5px">
+        <Label>Etiquetas</Label>
+        <Segment>
+          <Flex columnGap="5px">
+            {product?.tags?.map((tag) => (
+              <Label width="fit-content" key={tag.name} color={tag.color} size="medium" style={{ marginBottom: "5px" }}>
+                {tag.name}
+              </Label>
+            ))}
+          </Flex>
+        </Segment>
       </FieldsContainer>
       <FieldsContainer rowGap="5px">
         <Label>Comentarios</Label>
