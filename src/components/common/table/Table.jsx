@@ -68,10 +68,6 @@ const CustomTable = ({
     setActivePage(activePage);
   };
 
-  const handleTogglePopup = (id) => {
-    setPopupOpenId(id);
-  };
-
   const handleToggleAll = () => {
     if (allSelected) {
       clearSelection();
@@ -182,8 +178,8 @@ const CustomTable = ({
                               {actions.length > 1 ? (
                                 <PopupActions
                                   open={popupOpenId === element[mainKey]}
-                                  onOpen={() => handleTogglePopup(element[mainKey])}
-                                  onClose={() => handleTogglePopup(null)}
+                                  onOpen={() => setPopupOpenId(element[mainKey])}
+                                  onClose={() => setPopupOpenId(null)}
                                   position="left center"
                                   trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                   buttons={actions.map((action, idx) => (
@@ -225,8 +221,8 @@ const CustomTable = ({
                             {actions.length > 1 ? (
                               <PopupActions
                                 open={popupOpenId === element[mainKey]}
-                                onOpen={() => handleTogglePopup(element[mainKey])}
-                                onClose={() => handleTogglePopup(null)}
+                                onOpen={() => setPopupOpenId(element[mainKey])}
+                                onClose={() => setPopupOpenId(null)}
                                 position="left center"
                                 trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                 buttons={actions.map((action, idx) => (
