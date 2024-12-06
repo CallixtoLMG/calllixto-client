@@ -1,6 +1,6 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { Box, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
@@ -10,14 +10,15 @@ import { Loader } from "@/components/layout";
 import { ATTRIBUTES } from "@/components/products/products.common";
 import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPrice, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { ButtonGroup, Message, Modal, Popup, Transition } from "semantic-ui-react";
+import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
+import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
-import { Container, Icon, MessageHeader, MessageItem, MessageList, VerticalDivider } from "./styles";
+import { Container, Icon, VerticalDivider } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -493,102 +494,14 @@ const BudgetForm = ({
   return (
     <>
       <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={setIsModalCommentOpen} product={selectedProduct} />
-      <Transition visible={shouldShowModal} animation='scale' duration={500}>
-        <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={handleCancelUpdate} size="large">
-          <Modal.Header>Desea actualizar el presupuesto, ya que algunos productos sufrieron modificaciones?</Modal.Header>
-          <Modal.Content>
-            {!!outdatedProducts.length && (
-              <Message>
-                <MessageHeader>Productos con cambios</MessageHeader>
-                <MessageList>
-                  {outdatedProducts.map(p => {
-                    const oldProduct = budget.products.find(op => op.code === p.code);
-                    const priceChanged = oldProduct.price !== p.price;
-                    const stateChanged = oldProduct.state !== p.state;
-                    const editablePriceBecameTrue = !oldProduct.editablePrice && p.editablePrice;
-                    const editablePriceBecameFalse = oldProduct.editablePrice && !p.editablePrice;
-                    const fractionConfigBecameActive = !oldProduct.fractionConfig?.active && p.fractionConfig?.active;
-                    const fractionConfigBecameInactive = oldProduct.fractionConfig?.active && !p.fractionConfig?.active;
-
-                    return (
-                      <MessageItem key={p.code}>
-                        {`${p.code} | ${p.name} | `}
-                        {priceChanged && (
-                          <>
-                            <span style={{ color: COLORS.RED }}>{formatedPrice(oldProduct.price)}</span>
-                            {' -> '}
-                            <span style={{ color: COLORS.GREEN }}>{formatedPrice(p.price)}</span>
-                          </>
-                        )}
-                        {stateChanged && (
-                          <>
-                            {' | Estado: '}
-                            <span style={{ color: PRODUCT_STATES[oldProduct.state].color }}>{PRODUCT_STATES[oldProduct.state].singularTitle}</span>
-                            {' -> '}
-                            <span style={{ color: PRODUCT_STATES[p.state].color }}>{PRODUCT_STATES[p.state].singularTitle}</span>
-                          </>
-                        )}
-                        {editablePriceBecameTrue && (
-                          <>
-                            {' | '}
-                            <span style={{ color: COLORS.GREY }}>Ahora el precio es editable</span>
-                          </>
-                        )}
-                        {editablePriceBecameFalse && (
-                          <>
-                            {' | '}
-                            <span style={{ color: COLORS.GREY }}>El precio ya no es editable</span>
-                          </>
-                        )}
-                        {fractionConfigBecameActive && p.fractionConfig?.active && (
-                          <>
-                            {' | '}
-                            <span style={{ color: COLORS.GREY }}>
-                              El producto ahora tiene la medida: {p.fractionConfig.value} {p.fractionConfig.unit}.
-                            </span>
-                          </>
-                        )}
-                        {fractionConfigBecameInactive && (
-                          <>
-                            {' | '}
-                            <span style={{ color: COLORS.GREY }}>Este producto ya no usa medidas.</span>
-                          </>
-                        )}
-                      </MessageItem>
-                    );
-                  })}
-                </MessageList>
-              </Message>
-            )}
-            {!!removedProducts.length && (
-              <Message>
-                <MessageHeader>Productos no disponibles</MessageHeader>
-                <MessageList>
-                  {removedProducts.map(p => (
-                    <MessageItem key={p.code}>{`${p.code} | ${p.name} | ${formatedPrice(p.price)}.`}</MessageItem>
-                  ))}
-                </MessageList>
-              </Message>
-            )}
-          </Modal.Content>
-          <Modal.Actions>
-            <ButtonsContainer>
-              <IconnedButton
-                text="Cancelar"
-                icon={ICONS.CANCEL}
-                color={COLORS.RED}
-                onClick={handleCancelUpdate}
-              />
-              <IconnedButton
-                text="Confirmar"
-                icon={ICONS.CHECK}
-                color={COLORS.GREEN}
-                onClick={handleConfirmUpdate}
-              />
-            </ButtonsContainer>
-          </Modal.Actions>
-        </Modal>
-      </Transition>
+      <ModalUpdates
+        shouldShowModal={shouldShowModal}
+        outdatedProducts={outdatedProducts}
+        removedProducts={removedProducts}
+        budget={budget}
+        onCancel={handleCancelUpdate}
+        onConfirm={handleConfirmUpdate}
+      />
       <Form onSubmit={handleSubmit(handleConfirm)}>
         <FieldsContainer justifyContent="space-between">
           <FormField width="300px">
