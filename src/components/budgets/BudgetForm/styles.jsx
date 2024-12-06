@@ -26,5 +26,12 @@ const MessageList = styled(SMessageList)`
   overflow-y: auto;
 `;
 
-export { Container, Icon, MessageHeader, MessageItem, MessageList };
+const VerticalDivider = styled.div`
+  height: 30px;
+  width: 1px;
+  background-color: #ccc;
+  margin: 0 10px;
+`;
+
+export { Container, Icon, MessageHeader, MessageItem, MessageList, VerticalDivider };
 

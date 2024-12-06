@@ -70,7 +70,7 @@ const Budget = ({ params }) => {
     return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
   };
 
-   const handleDollarChange = (e) => {
+  const handleDollarChange = (e) => {
     let value = e.target.value;
     value = value.replace(/[^0-9.]/g, '');
     const parts = value.split('.');
