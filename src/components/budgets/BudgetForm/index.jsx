@@ -18,7 +18,7 @@ import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
-import { Container, Icon } from "./styles";
+import { Container, Icon, VerticalDivider } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,
@@ -724,46 +724,43 @@ const BudgetForm = ({
                   control={control}
                   rules={RULES.REQUIRED}
                   render={({ field: { onChange, value } }) => (
-                    <Flex flexDirection="column" rowGap="5px">
-                      <Box>
+                    <Flex columnGap="5px" wrap="wrap" rowGap="5px">
+                      <IconedButton
+                        paddingLeft="fit-content"
+                        width="fit-content"
+                        type="button"
+                        basic={value.length !== PAYMENT_METHODS.length}
+                        color={COLORS.BLUE}
+                        onClick={() => {
+                          if (value.length === PAYMENT_METHODS.length) {
+                            onChange([]);
+                          } else {
+                            onChange(PAYMENT_METHODS.map(method => method.value));
+                          }
+                        }}
+                      >
+                        Todos
+                      </IconedButton>
+                      <VerticalDivider />
+                      {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
                         <IconedButton
                           paddingLeft="fit-content"
                           width="fit-content"
-                          type="button"
-                          basic={value.length !== PAYMENT_METHODS.length}
+                          key={key}
+                          basic={!value.includes(methodValue)}
                           color={COLORS.BLUE}
+                          type="button"
                           onClick={() => {
-                            if (value.length === PAYMENT_METHODS.length) {
-                              onChange([]);
+                            if (value.includes(methodValue)) {
+                              onChange(value.filter(payment => payment !== methodValue));
                             } else {
-                              onChange(PAYMENT_METHODS.map(method => method.value));
+                              onChange([...value, methodValue]);
                             }
                           }}
                         >
-                          Todos
+                          {text}
                         </IconedButton>
-                      </Box>
-                      <Flex columnGap="5px" wrap="wrap" rowGap="5px">
-                        {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
-                          <IconedButton
-                            paddingLeft="fit-content"
-                            width="fit-content"
-                            key={key}
-                            basic={!value.includes(methodValue)}
-                            color={COLORS.BLUE}
-                            type="button"
-                            onClick={() => {
-                              if (value.includes(methodValue)) {
-                                onChange(value.filter(payment => payment !== methodValue));
-                              } else {
-                                onChange([...value, methodValue]);
-                              }
-                            }}
-                          >
-                            {text}
-                          </IconedButton>
-                        ))}
-                      </Flex>
+                      ))}
                     </Flex>
                   )}
                 />
@@ -800,7 +797,7 @@ const BudgetForm = ({
             </IconedButton>
           }
         />
-      </Form>
+      </Form >
     </>
   );
 };
