@@ -2,8 +2,10 @@ import { COLORS, PRODUCT_STATES } from "@/constants";
 import { formatProductCode } from "@/utils";
 import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
-import { CommentTooltip } from "../tooltips";
-import { Container, Label, Search, Text } from "./styles";
+import { Label } from "semantic-ui-react";
+import { Flex, FlexColumn } from "../custom";
+import { CommentTooltip, TagsTooltip } from "../tooltips";
+import { Search, Text } from "./styles";
 
 const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,16 +69,17 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
         key: product.code,
         title: product.name,
         description: (
-          <Container marginTop="5px" flexDir="column">
-            <Text>Código: {formatProductCode(product.code)}</Text>
-            <Container flexDir="row">
+          <FlexColumn marginTop="5px" rowGap="5px">
+            <FlexColumn >
+              <Text>Código: {formatProductCode(product.code)}</Text>
               <Text>Precio: {`$ ${product?.price?.toFixed(2)}`}</Text>
-            </Container>
-            <Container flexDir="row">
-              {product.state === PRODUCT_STATES.OOS.id && <Label size="tiny" color={COLORS.ORANGE}>Sin Stock</Label>}
-              {product.comments && <CommentTooltip comment={product.comments} />}
-            </Container>
-          </Container>
+            </FlexColumn>
+            <Flex width="100%" justifyContent="space-between" height="20px" marginTop="auto" columnGap="5px" alignItems="center">
+              {product.state === PRODUCT_STATES.OOS.id ? <Label size="tiny" color={COLORS.ORANGE}>Sin Stock</Label> : <div></div>}
+              {product.tags && <TagsTooltip tags={product.tags} />}
+              {product.comments ? <CommentTooltip comment={product.comments} /> : <Flex height="1rem" />} 
+            </Flex>
+          </FlexColumn>
         ),
         value: product,
       }))}

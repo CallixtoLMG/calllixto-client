@@ -85,21 +85,19 @@ const Settings = () => {
         return acc;
       }, {});
       setSettingsData(parsedData);
-    }
-  }, [visibleSettings]);
 
-  useEffect(() => {
-    if (visibleSettings.length > 0) {
-      const initialEntity = visibleSettings[0];
-      setActiveEntity(initialEntity.entity);
-      setLabels([PAGES.SETTINGS.NAME, initialEntity.label]);
-      setActions([]);
+      if (!activeEntity) {
+        const initialEntity = visibleSettings[0];
+        setActiveEntity(initialEntity.entity);
+        setLabels([PAGES.SETTINGS.NAME, initialEntity.label]);
+        setActions([]);
+      }
     }
-  }, [visibleSettings, setLabels, setActions]);
+  }, [visibleSettings, activeEntity, setLabels, setActions]);
 
-  const handleEntityChange = (entityName) => {
+  const handleEntityChange = (entityName, labelOverride) => {
     setActiveEntity(entityName);
-    const label = entityLabels[entityName] || capitalize(entityName.toLowerCase());
+    const label = labelOverride || entityLabels[entityName] || capitalize(entityName.toLowerCase());
     setLabels([PAGES.SETTINGS.NAME, label]);
     setActions([]);
   };

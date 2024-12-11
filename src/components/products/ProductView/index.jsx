@@ -64,10 +64,10 @@ const ProductView = ({ product }) => {
       </FieldsContainer>
       <FieldsContainer rowGap="5px">
         <Label>Etiquetas</Label>
-        <Segment>
+        <Segment height="50px">
           <Flex columnGap="5px">
             {product?.tags?.map((tag) => (
-              <Label width="fit-content" key={tag.name} color={tag.color} size="medium" style={{ marginBottom: "5px" }}>
+              <Label width="fit-content" key={tag.name} color={tag.color} >
                 {tag.name}
               </Label>
             ))}

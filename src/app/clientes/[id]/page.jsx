@@ -2,12 +2,13 @@
 
 import { useListBudgets } from "@/api/budgets";
 import { useActiveCustomer, useDeleteCustomer, useEditCustomer, useGetCustomer, useInactiveCustomer } from "@/api/customers";
+import { useGetSetting } from "@/api/settings";
 import { Input } from "@/components/common/custom";
 import ModalAction from "@/components/common/modals/ModalAction";
 import CustomerForm from "@/components/customers/CustomerForm";
 import CustomerView from "@/components/customers/CustomerView";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { COLORS, ICONS, PAGES } from "@/constants";
+import { COLORS, ENTITIES, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { isItemInactive } from "@/utils";
@@ -32,6 +33,7 @@ const Customer = ({ params }) => {
   const deleteCustomer = useDeleteCustomer();
   const inactiveCustomer = useInactiveCustomer();
   const activeCustomer = useActiveCustomer();
+  const { data: customersSettings, refetch: refetchCustomerSettings } = useGetSetting(ENTITIES.CUSTOMERS);
 
   useEffect(() => {
     resetActions();
@@ -41,7 +43,15 @@ const Customer = ({ params }) => {
   useEffect(() => {
     setLabels([PAGES.CUSTOMERS.NAME, customer?.name]);
     refetch();
+    refetchCustomerSettings();
   }, [customer, setLabels, refetch]);
+
+  const mappedTags = useMemo(() => customersSettings?.settings?.tags?.map(tag => ({
+    ...tag,
+    key: tag.id,
+    value: tag.name,
+    text: tag.name,
+  })), [customersSettings]);
 
   const hasAssociatedBudgets = useMemo(() => {
     return budgetData?.budgets?.some(budget => budget.customer?.id === customer?.id);
@@ -214,6 +224,7 @@ const Customer = ({ params }) => {
       {toggleButton}
       {isUpdating ? (
         <CustomerForm
+          tags={mappedTags}
           customer={customer}
           onSubmit={mutateEdit}
           isLoading={isEditPending}

@@ -6,7 +6,7 @@ import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
 import { Button, Label, Menu } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
-import { Container, LeftHeaderDiv, ModLink, RigthHeaderDiv, Text } from "./styles";
+import { Container, ModLink, RigthHeaderDiv, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -35,11 +35,11 @@ const Header = () => {
           <Container>
             {!userData?.isAuthorized ? (
               <Flex>
-                <LeftHeaderDiv>
+                <RigthHeaderDiv>
                   <Menu.Item onClick={handleLogout}>
                     <Text>Ingresar</Text>
                   </Menu.Item>
-                </LeftHeaderDiv>
+                </RigthHeaderDiv>
               </Flex>
             ) : (
               <>
@@ -73,7 +73,7 @@ const Header = () => {
                     <UserMenu
                       trigger={
                         <Button icon>
-                          <Icon name={ICONS.USER} /> Usuario
+                          <Icon name={ICONS.USER} /> {userData.firstName}
                         </Button>
                       }
                       onLogout={handleLogout}

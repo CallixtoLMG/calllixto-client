@@ -4,7 +4,7 @@ import { ContactFields, ControlledComments } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
-import { useCallback } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 const EMPTY_CUSTOMER = { name: '', phoneNumbers: [], addresses: [], emails: [], comments: '' };
 
@@ -18,22 +18,35 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
   });
   const { handleSubmit, control, reset, formState: { isDirty, errors } } = methods;
 
+  const [localCustomer, setLocalCustomer] = useState(customer);
+
   const handleReset = useCallback((customer) => {
     reset(customer);
   }, [reset]);
 
   const handleCreate = (data) => {
-    if (!data.addresses.length) {
-      data.addresses = [];
+    const { previousVersions, ...filteredData } = data;
+
+    if (!filteredData.addresses.length) {
+      filteredData.addresses = [];
     }
-    if (!data.phoneNumbers.length) {
-      data.phoneNumbers = [];
+    if (!filteredData.phoneNumbers.length) {
+      filteredData.phoneNumbers = [];
     }
-    if (!data.emails.length) {
-      data.emails = [];
+    if (!filteredData.emails.length) {
+      filteredData.emails = [];
     }
-    onSubmit(data);
+
+    onSubmit(filteredData);
+    const updatedCustomer = { ...localCustomer, tags: filteredData.tags };
+    setLocalCustomer(updatedCustomer);
   };
+
+  const filteredTags = useMemo(() => {
+    const customerTagNames = localCustomer?.tags?.map((tag) => tag.name) || [];
+    const uniqueTags = tags?.filter((tag) => !customerTagNames.includes(tag.name)) || [];
+    return [...(localCustomer?.tags || []), ...uniqueTags];
+  }, [tags, localCustomer]);
 
   useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_CUSTOMER, ...customer } : EMPTY_CUSTOMER), SHORTKEYS.DELETE);
@@ -54,23 +67,21 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
         </FieldsContainer>
         <ContactFields />
         <FieldsContainer>
-          <FormField flex="1" error={errors?.tags?.message}>
-            <RuledLabel title="Etiquetas" message={errors?.tags?.message} />
+          <FormField flex="1" >
+            <RuledLabel title="Etiquetas" />
             <Controller
               name="tags"
               control={control}
-              rules={{ required: "Debe seleccionar al menos una etiqueta." }}
               render={({ field: { value, onChange } }) => (
                 <Dropdown
+                  padding="10px"
                   select
-                  minHeight="50px"
-                  height
+                  inputHeight="50px"
                   placeholder="Selecciona etiquetas"
-                  fluid
                   multiple
                   search
                   selection
-                  options={tags?.map((tag) => ({
+                  options={filteredTags?.map((tag) => ({
                     key: tag.name,
                     value: JSON.stringify(tag),
                     text: tag.name,
@@ -86,7 +97,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
                     onChange(selectedTags);
                   }}
                   renderLabel={(label) => ({
-                    color: tags.find((tag) => tag.name === label.text)?.color || 'grey',
+                    color: filteredTags.find((tag) => tag.name === label.text)?.color || 'grey',
                     content: label.text,
                   })}
                 />

@@ -11,7 +11,8 @@ import { Popup } from "semantic-ui-react";
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, tags }) => {
-  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors, setError } = useForm({
+
+  const { handleSubmit, control, reset, watch, formState: { isDirty, errors }, clearErrors, setError } = useForm({
     defaultValues: {
       tags: product?.tags || [],
       fractionConfig: {
@@ -25,6 +26,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   const [supplier, setSupplier] = useState();
   const [brand, setBrand] = useState();
   const [watchFractionable] = watch(["fractionConfig.active"]);
+  const [localProduct, setLocalProduct] = useState(product);
 
   const handleReset = useCallback((product) => {
     setSupplier({ name: "", id: "" });
@@ -67,9 +69,11 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     }
 
     await onSubmit(filteredData);
-  };
+    const updatedProduct = { ...localProduct, tags: filteredData.tags };
+    setLocalProduct(updatedProduct);
 
-  const shouldError = useMemo(() => !isUpdating && isDirty && isSubmitted, [isDirty, isSubmitted, isUpdating]);
+    reset(updatedProduct);
+  };
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT), SHORTKEYS.DELETE);
@@ -145,6 +149,12 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
     clearErrors("code");
   };
+
+  const filteredTags = useMemo(() => {
+    const productTagNames = localProduct?.tags?.map((tag) => tag.name) || [];
+    const uniqueTags = tags?.filter((tag) => !productTagNames.includes(tag.name)) || [];
+    return [...(localProduct?.tags || []), ...uniqueTags];
+  }, [tags, localProduct]);
 
   return (
     <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
@@ -301,25 +311,24 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           />
         </FormField>
       </FieldsContainer>
-     <FieldsContainer>
-        <FormField flex="1" error={errors?.tags?.message}>
-          <RuledLabel title="Etiquetas" message={errors?.tags?.message} />
+      <FieldsContainer>
+        <FormField flex="1">
+          <RuledLabel title="Etiquetas" />
           <Controller
             name="tags"
             control={control}
-            rules={{ required: "Debe seleccionar al menos una etiqueta." }}
             render={({ field: { value, onChange } }) => (
               <Dropdown
+                padding="10px"
                 select
-                minHeight="50px"
+                inputHeight="50px"
                 placeholder="Selecciona etiquetas"
-                fluid
                 multiple
                 search
                 selection
-                options={tags?.map((tag) => ({
+                options={filteredTags?.map((tag) => ({
                   key: tag.name,
-                  value: JSON.stringify(tag), 
+                  value: JSON.stringify(tag),
                   text: tag.name,
                   content: (
                     <Label color={tag.color}>
@@ -327,15 +336,15 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                     </Label>
                   ),
                 }))}
-                value={value.map((tag) => JSON.stringify(tag))} 
+                value={value.map((tag) => JSON.stringify(tag))}
                 onChange={(_, data) => {
                   const selectedTags = data.value.map((item) => JSON.parse(item));
-                  onChange(selectedTags); 
+                  onChange(selectedTags);
                 }}
                 renderLabel={(label) => ({
-                  color: tags.find((tag) => tag.name === label.text)?.color || 'grey',
+                  color: filteredTags.find((tag) => tag.name === label.text)?.color || 'grey',
                   content: label.text,
-                })} 
+                })}
               />
             )}
           />

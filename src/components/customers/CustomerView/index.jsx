@@ -1,5 +1,5 @@
 "use client";
-import { FieldsContainer, FormField, Label, Message, MessageHeader, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, Flex, FormField, Label, Message, MessageHeader, Segment, ViewContainer } from "@/components/common/custom";
 import { ContactView } from "@/components/common/form";
 import { isItemInactive } from "@/utils";
 
@@ -20,6 +20,18 @@ const CustomerView = ({ customer }) => {
         </FormField>
       </FieldsContainer>
       <ContactView {...customer} />
+      <FieldsContainer rowGap="5px">
+        <Label>Etiquetas</Label>
+        <Segment>
+          <Flex columnGap="5px">
+            {customer?.tags?.map((tag) => (
+              <Label width="fit-content" key={tag.name} color={tag.color}>
+                {tag.name}
+              </Label>
+            ))}
+          </Flex>
+        </Segment>
+      </FieldsContainer>
       <FieldsContainer rowGap="5px">
         <Label>Comentarios</Label>
         <Segment placeholder>{customer?.comments}</Segment>

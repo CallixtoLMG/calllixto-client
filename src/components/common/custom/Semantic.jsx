@@ -89,7 +89,7 @@ export const Dropdown = styled(SDropdown)`
   width: ${({ width = "100%" }) => `${width}!important`};
   input {
     min-width: ${({ minWidth }) => `${minWidth}!important;`};
-    height: ${({ height = "50px" }) => `${height}!important`};
+    height: ${({ inputHeight = "50px" }) => `${inputHeight}!important`};
   };
   i{
     margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
@@ -103,14 +103,30 @@ export const Dropdown = styled(SDropdown)`
   };
   ${({ select }) => select && `
     &&&&&& div.item {
-      height: 35px!important;
       padding: 5px 10px!important;
       width: fit-content!important;
+      background-color: white;
+      font-size: 12px!important;
+      font-family: Lato;
+      &:hover {
+        background-color: white;
+      }
     }
-    div.divider.default.text {
+    a.ui.label {
+      height:fit-content;
+      align-self: center;
+      font-size: 12px!important;
+      font-family: Lato;
+      padding: 7px 10px!important;
+  
+    }
+    div.divider.text {
       height: 100%;
       align-content: center;
       margin: 0 10px!important;
+    }
+    div.visible.menu.transition {
+      padding-bottom: 5px;
     }
   `}
 `;

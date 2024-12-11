@@ -5,7 +5,7 @@ import { useGetSetting } from "@/api/settings";
 import { useListSuppliers } from "@/api/suppliers";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { PAGES } from "@/constants";
+import { ENTITIES, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -17,11 +17,11 @@ const CreateProduct = () => {
   const { push } = useRouter();
   const { data: brands, isLoading: isLoadingBrands, refetch: refetchBrands, isRefetching: isBrandsRefetching } = useListBrands();
   const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers, isRefetching: isSupplierRefetching } = useListSuppliers();
+  const { data: productsSettings, isLoading: isLoadingProductsSettings } = useGetSetting(ENTITIES.PRODUCTS);
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createProduct = useCreateProduct();
-  const { data: productsSettings, isLoading: isLoadingproductsSettings } = useGetSetting("products");
-
+  
   useEffect(() => {
     resetActions();
     refetchBrands();
@@ -73,7 +73,7 @@ const CreateProduct = () => {
   });
 
   return (
-    <Loader active={isLoadingBrands || isLoadingSuppliers || isBrandsRefetching || isSupplierRefetching || isLoadingproductsSettings}>
+    <Loader active={isLoadingBrands || isLoadingSuppliers || isBrandsRefetching || isSupplierRefetching || isLoadingProductsSettings}>
       <ProductForm
         brands={mappedBrands}
         suppliers={mappedSuppliers}

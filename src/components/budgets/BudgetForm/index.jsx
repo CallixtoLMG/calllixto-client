@@ -1,11 +1,11 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { Box, ButtonsContainer, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, OverflowCell, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
-import { CommentTooltip } from "@/components/common/tooltips";
+import { CommentTooltip, TagsTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
 import { ATTRIBUTES } from "@/components/products/products.common";
 import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
@@ -358,24 +358,25 @@ const BudgetForm = ({
           )}
         />
       ),
-      width: 2
+      width: 1
     },
     {
       id: 3,
       title: "Nombre",
       value: (product) => (
         <Container>
-          {product.name}
-          <Flex marginLeft="3px" marginRight="3px" columnGap="3px">
+          <OverflowCell text={product.name} />
+          <Flex alignItems="center" marginLeft="5px" columnGap="5px">
+            {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
+            {product.tags && <TagsTooltip tags={product.tags} />}
             {product.comments && <CommentTooltip comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
               <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />} />
             )}
-            {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
           </Flex>
         </Container>
       ),
-      width: 6,
+      width: 5,
       wrap: true,
       align: 'left'
     },
@@ -384,7 +385,7 @@ const BudgetForm = ({
       title: "Medida", value: (product, index) => (
         <>
           {product.fractionConfig?.active ? (
-            <Flex alignItems="center">
+            <Flex minWidth="7rem" alignItems="center">
               <Controller name={`products[${index}].fractionConfig.value`} control={control}
                 render={({ field: { onChange, ...rest } }) => (
                   <CurrencyFormatInput
@@ -409,7 +410,7 @@ const BudgetForm = ({
           )}
         </>
       ),
-      width: 2
+      width: 1
     },
     {
       id: 5,
@@ -420,7 +421,7 @@ const BudgetForm = ({
             name={`products[${index}].price`}
             control={control}
             render={({ field: { onChange, value } }) => (
-              <Flex alignItems="center" columnGap="5px">
+              <Flex  minWidth="9rem" alignItems="center" columnGap="5px">
                 <Icon positionRelative name={ICONS.DOLLAR} />
                 <CurrencyFormatInput
                   height="35px"
@@ -448,7 +449,7 @@ const BudgetForm = ({
       id: 6,
       title: "Descuento",
       value: (product, index) => (
-        <Flex alignItems="center" columnGap="5px">
+        <Flex minWidth="7rem" alignItems="center" columnGap="5px">
           <Controller name={`products[${index}].discount`} control={control} defaultValue={product.discount || 0}
             render={({ field: { onChange, ...rest } }) => (
               <Input
@@ -466,9 +467,9 @@ const BudgetForm = ({
           /> %
         </Flex>
       ),
-      width: 2
+      width: 1
     },
-    { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 7, width: 3 },
+    { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 7, width: 2 },
   ], [control, calculateTotal, setValue]);
 
   const handleDraft = async (data) => {

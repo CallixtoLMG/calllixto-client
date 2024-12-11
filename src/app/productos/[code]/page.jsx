@@ -8,7 +8,7 @@ import { ModalAction } from "@/components/common/modals";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import ProductView from "@/components/products/ProductView";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PRODUCT_STATES } from "@/constants";
+import { ACTIVE, COLORS, ENTITIES, ICONS, INACTIVE, PAGES, PRODUCT_STATES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -36,7 +36,7 @@ const Product = ({ params }) => {
   const deleteProduct = useDeleteProduct();
   const activeProduct = useActiveProduct();
   const inactiveProduct = useInactiveProduct();
-  const { data: productsSettings, isLoading: isLoadingproductsSettings } = useGetSetting("products");
+  const { data: productsSettings, isLoading: isLoadingproductsSettings, refetch: refetchProductsSettings } = useGetSetting(ENTITIES.PRODUCTS_SETTINGS);
   const isProductOOSState = useMemo(() => isProductOOS(product?.state), [product?.state]);
 
   const stateTitle = useMemo(() => {
@@ -64,8 +64,9 @@ const Product = ({ params }) => {
       PAGES.PRODUCTS.NAME,
       product?.code ? { id: product.code, title: stateTitle, color: stateColor } : null
     ].filter(Boolean));
-    refetch()
-  }, [setLabels, product, stateTitle, stateColor, refetch]);
+    refetch();
+    refetchProductsSettings();
+  }, [setLabels, product, stateTitle, stateColor, refetch, refetchProductsSettings]);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,

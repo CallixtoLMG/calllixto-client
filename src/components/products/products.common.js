@@ -1,5 +1,5 @@
-import { Flex, Price } from "@/components/common/custom";
-import { CommentTooltip } from "@/components/common/tooltips";
+import { Flex, OverflowCell, Price } from "@/components/common/custom";
+import { CommentTooltip, TagsTooltip } from "@/components/common/tooltips";
 import { getBrandCode, getProductCode, getSupplierCode } from "@/utils";
 import { Popup } from "semantic-ui-react";
 
@@ -43,11 +43,18 @@ const PRODUCT_COLUMNS = [
     id: 2,
     title: "Nombre",
     align: "left",
-    value: (product) =>
-      <Flex justifyContent="space-between">
-        {product.name}
-        {product.comments && <CommentTooltip comment={product.comments} />}
-      </Flex>
+    value: (product) => {
+      const { tags, name, comments } = product;
+      return (
+        <Flex justifyContent="space-between" alignItems="center">
+          <OverflowCell maxWidth="50vw" text={name} />
+          <Flex columnGap="7px" alignItems="center" justifyContent="flex-end">
+            {tags && <TagsTooltip tags={tags} />}
+            {comments && <CommentTooltip comment={comments} />}
+          </Flex>
+        </Flex>
+      );
+    }
   },
   {
     id: 3,

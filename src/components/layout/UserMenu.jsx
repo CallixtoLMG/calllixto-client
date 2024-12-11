@@ -30,8 +30,8 @@ const AccordionTitle = styled(Accordion.Title)`
 const UserMenu = ({ trigger, onLogout, onClientChange }) => {
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const [activeIndex, setActiveIndex] = useState(-1); 
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleAccordionClick = (index) => {
     setActiveIndex(activeIndex === index ? -1 : index);
@@ -63,13 +63,15 @@ const UserMenu = ({ trigger, onLogout, onClientChange }) => {
         <Menu.Item onClick={onLogout}>
           <Icon color={COLORS.RED} name="sign-out" /> Cerrar sesión
         </Menu.Item>
-        <Menu.Item
-          onClick={() => {
-            push("/change-password");
-          }}
-        >
-          <Icon color={COLORS.YELLOW} name="lock" /> Cambiar contraseña
-        </Menu.Item>
+        {isCallixtoUser(role) && (
+          <Menu.Item
+            onClick={() => {
+              push("/change-password");
+            }}
+          >
+            <Icon color={COLORS.YELLOW} name="lock" /> Cambiar contraseña
+          </Menu.Item>
+        )}
         {isCallixtoUser(role) && (
           <Accordion as={AccordionMenu}>
             <AccordionItem>

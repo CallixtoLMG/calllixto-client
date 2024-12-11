@@ -1,19 +1,26 @@
-import { Flex } from "@/components/common/custom";
+import { Flex, OverflowCell } from "@/components/common/custom";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
-import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "../common/tooltips";
+import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "../common/tooltips";
 
 export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value', STATE: "state", INACTIVE_REASON: "inactiveReason" };
 
 export const HEADERS = [
   {
-    id: 1,
-    title: 'Nombre',
-    align: 'left',
-    value: (customer) =>
-      <Flex justifyContent="space-between">
-        {customer.name}
-        {customer.comments && <CommentTooltip comment={customer.comments} />}
-      </Flex>
+    id: 2,
+    title: "Nombre",
+    align: "left",
+    value: (customer) => {
+      const { tags, name, comments } = customer;
+      return (
+        <Flex justifyContent="space-between" alignItems="center">
+          <OverflowCell maxWidth="40vw" text={name} />
+          <Flex columnGap="7px" alignItems="center" justifyContent="flex-end">
+            {tags && <TagsTooltip tags={tags} />}
+            {comments && <CommentTooltip comment={comments} />}
+          </Flex>
+        </Flex>
+      );
+    }
   },
   {
     id: 2,
