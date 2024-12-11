@@ -235,13 +235,16 @@ const BudgetForm = ({
   const handleCreate = async (data, state) => {
     const isvalid = validateCustomer();
     if (isvalid) {
-      const { customer } = data;
+      const { previousVersions, ...filteredData } = data;
+  
       await onSubmit({
-        ...data,
-        customer: { id: customer.id, name: customer.name },
-        products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment"])),
+        ...filteredData,
+        customer: { id: filteredData.customer.id, name: filteredData.customer.name },
+        products: filteredData.products.map((product) =>
+          pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment"])
+        ),
         total: Number(total.toFixed(2)),
-        state
+        state,
       });
     }
   };

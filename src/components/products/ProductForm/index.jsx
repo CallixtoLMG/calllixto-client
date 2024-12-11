@@ -11,7 +11,7 @@ import { Popup } from "semantic-ui-react";
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
-  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors, setError } = useForm({
+  const { handleSubmit, control, reset, watch, formState: { isDirty, errors }, clearErrors, setError } = useForm({
     defaultValues: {
       fractionConfig: {
         active: false,
@@ -51,24 +51,22 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
       return;
     }
 
-    const filteredData = { ...data };
+    const { previousVersions, ...filteredData } = data;
 
-    if (data.fractionConfig && !data.fractionConfig.active && product?.fractionConfig?.active === false) {
+    if (filteredData.fractionConfig && !filteredData.fractionConfig.active && product?.fractionConfig?.active === false) {
       delete filteredData.fractionConfig;
     }
 
-    if (data.editablePrice === product?.editablePrice) {
+    if (filteredData.editablePrice === product?.editablePrice) {
       delete filteredData.editablePrice;
     }
 
     if (!isUpdating) {
-      filteredData.code = `${supplier?.id}${brand?.id}${data.code}`;
+      filteredData.code = `${supplier?.id}${brand?.id}${filteredData.code}`;
     }
 
     await onSubmit(filteredData);
   };
-
-  const shouldError = useMemo(() => !isUpdating && isDirty && isSubmitted, [isDirty, isSubmitted, isUpdating]);
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT), SHORTKEYS.DELETE);

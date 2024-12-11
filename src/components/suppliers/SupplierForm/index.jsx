@@ -19,16 +19,17 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
   }, [reset]);
 
   const handleCreate = (data) => {
-    if (!data.addresses.length) {
-      data.addresses = [];
+    const { previousVersions, ...filteredData } = data;
+    if (!filteredData.addresses.length) {
+      filteredData.addresses = [];
     }
-    if (!data.phoneNumbers.length) {
-      data.phoneNumbers = [];
+    if (!filteredData.phoneNumbers.length) {
+      filteredData.phoneNumbers = [];
     }
-    if (!data.emails.length) {
-      data.emails = [];
+    if (!filteredData.emails.length) {
+      filteredData.emails = [];
     }
-    onSubmit(data);
+    onSubmit(filteredData);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);

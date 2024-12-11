@@ -17,7 +17,8 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
   }, [reset]);
 
   const handleCreate = (data) => {
-    onSubmit(data);
+    const { previousVersions, ...filteredData } = data;
+    onSubmit(filteredData);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
