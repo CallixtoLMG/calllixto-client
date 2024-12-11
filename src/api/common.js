@@ -321,7 +321,7 @@ export async function addStorageItem({ entity, value }) {
 
 export async function updateStorageItem({ entity, value, key = ID }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  const updatedArray = values.map(item => item[key] === value[key] ? { ...item, ...value } : item)
+  const updatedArray = values.map(item => item[key] === value[key] ? { ...item, ...value } : item);
   await localforage.setItem(`${config.APP_ENV}-${entity}`, updatedArray);
 };
 
