@@ -127,8 +127,8 @@ const BudgetForm = ({
             ) : (
               <div />
             )}
-            <TagsTooltip tags={tags} />
-            <CommentTooltip comment={comments} />
+            {tags ? <TagsTooltip tags={tags} /> : <Flex />}
+            {comments ? <CommentTooltip comment={comments} /> : <Flex />}
           </Flex>
         </FlexColumn>
       ),
