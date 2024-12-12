@@ -7,7 +7,7 @@ export const CommentTooltip = ({ comment }) => {
       size="mini"
       content={comment}
       position="top center"
-      trigger={<Icon name={ICONS.INFO_CIRCLE} color={COLORS.YELLOW} />}
+      trigger={<Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />}
     />
   );
 };

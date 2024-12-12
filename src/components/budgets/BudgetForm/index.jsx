@@ -1,9 +1,10 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Box, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, OverflowCell, Price, RuledLabel, Segment } from "@/components/common/custom";
+import { Box, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, Form, FormField, IconedButton, Input, Label, OverflowCell, Price, RuledLabel, Segment } from "@/components/common/custom";
 import { ControlledComments } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
+import { Text } from "@/components/common/search/styles";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip, TagsTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
@@ -106,27 +107,30 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers.map(({ id, name, state, deactivationReason }) => ({
+    return customers.map(({ id, name, state, inactiveReason, tags, comments }) => ({
       key: id,
       value: id,
       text: name,
       content: (
-        <Flex justifyContent="space-between" alignItems="center">
-          <span>{name}</span>
-          {state === CUSTOMER_STATES.INACTIVE.id && (
-            <Flex >
+        <FlexColumn marginTop="5px" rowGap="5px">
+          <FlexColumn>
+            <Text>{name}</Text>
+          </FlexColumn>
+          <Flex justifyContent="space-between" alignItems="center" columnGap="5px">
+            {state === CUSTOMER_STATES.INACTIVE.id ? (
               <Popup
-                trigger={
-                  <Label color={COLORS.GREY} size="mini">
-                    Desactivado
-                  </Label>}
-                content={deactivationReason || 'Motivo no especificado'}
+                trigger={<Label width="fit-content" color={COLORS.GREY} size="tiny">Desactivado</Label>}
+                content={inactiveReason || 'Motivo no especificado'}
                 position="top center"
                 size="mini"
               />
-            </Flex>
-          )}
-        </Flex>
+            ) : (
+              <div />
+            )}
+            <TagsTooltip tags={tags} />
+            <CommentTooltip comment={comments} />
+          </Flex>
+        </FlexColumn>
       ),
     }));
   }, [customers]);
@@ -422,7 +426,7 @@ const BudgetForm = ({
             name={`products[${index}].price`}
             control={control}
             render={({ field: { onChange, value } }) => (
-              <Flex  minWidth="9rem" alignItems="center" columnGap="5px">
+              <Flex minWidth="9rem" alignItems="center" columnGap="5px">
                 <Icon positionRelative name={ICONS.DOLLAR} />
                 <CurrencyFormatInput
                   height="35px"
@@ -569,7 +573,7 @@ const BudgetForm = ({
               <Controller name="expirationOffsetDays" control={control}
                 rules={RULES.REQUIRED}
                 render={({ field }) => (
-                  <Input {...field} maxLength={3} type="text" placeholder="Cant. en días (p. ej: 3, 10, etc)"
+                  <Input {...field} maxLength={3} type="text" placeholder="Cant. en días (p. ej: 3, 10)"
                     onChange={(e) => {
                       let value = e.target.value;
                       value = value.replace(/\D/g, '');
@@ -613,7 +617,7 @@ const BudgetForm = ({
                     if (!value) {
                       onChange(null);
                       return;
-                    };
+                    }
                     const customer = customers.find(opt => opt.id === value);
                     onChange(customer);
                   }}

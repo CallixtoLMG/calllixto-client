@@ -22,7 +22,7 @@ export const TagsTooltip = ({ tags }) => {
         <Popup
           size="mini"
           hoverable 
-          trigger={<Icon margin="0" name={ICONS.TAGS} color={COLORS.YELLOW} />}
+          trigger={<Icon margin="0" name={ICONS.TAGS} color={COLORS.BLUE} />}
           content={
             <Flex columnGap="5px" >
               {tags.slice(1).map((tag, index) => (
