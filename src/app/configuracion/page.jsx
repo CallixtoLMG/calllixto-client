@@ -1,6 +1,6 @@
 "use client";
 import { useEditSetting, useListSettings } from "@/api/settings";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsPage from "@/components/settings";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
@@ -107,16 +107,18 @@ const Settings = () => {
   };
 
   return (
-    <SettingsPage
-      activeEntity={activeEntity}
-      settingsData={settingsData}
-      isLoading={isLoading}
-      isPending={isEditPending}
-      onEntityChange={handleEntityChange}
-      onSubmit={handleSaveChanges}
-      settings={visibleSettings}
-      role={role}
-    />
+    <Loader active={isLoading}>
+      <SettingsPage
+        activeEntity={activeEntity}
+        settingsData={settingsData}
+        isLoading={isLoading}
+        isPending={isEditPending}
+        onEntityChange={handleEntityChange}
+        onSubmit={handleSaveChanges}
+        settings={visibleSettings}
+        role={role}
+      />
+    </Loader>
   );
 };
 

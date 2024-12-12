@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Icon } from 'semantic-ui-react';
 import { Dropdown } from '../common/custom';
 
-const OptionsDropdown = ({ entity, queryKey, text }) => {
+const HeaderDropdownOptions = ({ entity, queryKey, text }) => {
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const restoreEntity = useRestoreEntity({ entity, key: queryKey });
@@ -76,4 +76,4 @@ const OptionsDropdown = ({ entity, queryKey, text }) => {
   );
 };
 
-export default OptionsDropdown;
+export default HeaderDropdownOptions;
