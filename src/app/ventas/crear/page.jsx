@@ -11,6 +11,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
+import { v4 as uuid } from 'uuid';
 
 const CreateBudget = () => {
   useValidateToken();
@@ -51,6 +52,7 @@ const CreateBudget = () => {
     },
     onSuccess: async (response) => {
       if (response.statusOk) {
+        push(PAGES.BUDGETS.SHOW(response.budget.id))
         toast.success('Presupuesto creado!');
       } else {
         toast.error(response.error.message);
@@ -64,6 +66,9 @@ const CreateBudget = () => {
   const clonedBudget = useMemo(() => {
     if (budget) {
       const { customer, id, ...clonedBudget } = budget;
+      clonedBudget.products = clonedBudget.products.map((product) => ({
+        ...product, key: uuid(),
+      }))
       return clonedBudget;
     }
   }, [budget]);

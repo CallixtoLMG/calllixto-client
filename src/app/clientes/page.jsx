@@ -7,7 +7,7 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel, formatedSimplePhone } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 const Customers = () => {
   useValidateToken();
@@ -23,14 +23,11 @@ const Customers = () => {
   const customers = useMemo(() => data?.customers, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const prepareCustomerDataForExcel = useMemo(() => {
-    if (!customers) return [];
-  
+  const handleDownloadExcel = useCallback(() => {
+    if (!customers) return;
     const headers = ['Nombre', 'Estado', 'Dirección', 'Teléfono'];
-  
-    const customerData = customers.map(customer => {
+    const mappedCustomers = customers.map(customer => {
       const customerState = CUSTOMER_STATES[customer.state]?.singularTitle || customer.state;
-  
       return [
         customer.name,
         customerState,
@@ -38,12 +35,10 @@ const Customers = () => {
         customer.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
       ];
     });
-  
-    return [headers, ...customerData];
+    downloadExcel([headers, ...mappedCustomers], "Lista de Clientes");
   }, [customers]);
 
   useEffect(() => {
-
     const actions = [
       {
         id: 1,
@@ -56,9 +51,7 @@ const Customers = () => {
         id: 3,
         icon: ICONS.FILE_EXCEL,
         color: COLORS.SOFT_GREY,
-        onClick: () => {
-          downloadExcel(prepareCustomerDataForExcel, "Lista de Clientes");
-        },
+        onClick: handleDownloadExcel,
         text: 'Clientes',
         disabled: loading
       },

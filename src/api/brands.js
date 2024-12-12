@@ -72,7 +72,6 @@ export const useEditBrand = () => {
   const editItem = useEditItem();
 
   const editBrand = async (brand) => {
-
     const response = await editItem({
       entity: ENTITIES.BRANDS,
       url: `${PATHS.BRANDS}/${brand.id}`,

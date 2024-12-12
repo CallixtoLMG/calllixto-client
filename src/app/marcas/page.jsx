@@ -9,7 +9,7 @@ import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { downloadExcel } from "@/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 const Brands = () => {
   useValidateToken();
@@ -27,11 +27,10 @@ const Brands = () => {
   const brands = useMemo(() => data?.brands, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const prepareBrandDataForExcel = useMemo(() => {
-    if (!brands) return [];
-
+  const handleDownloadExcel = useCallback(() => {
+    if (!brands) return;
     const headers = ['ID', 'Nombre', 'Estado', 'Comentarios'];
-    const brandData = brands.map(brand => {
+    const mappedBrands = brands.map(brand => {
       const brandState = BRANDS_STATES[brand.state]?.singularTitle || brand.state;
       return [
         brand.id,
@@ -40,12 +39,10 @@ const Brands = () => {
         brand.comments,
       ];
     });
-
-    return [headers, ...brandData];
+    downloadExcel([headers, ...mappedBrands], "Lista de Marcas");
   }, [brands]);
 
   useEffect(() => {
-
     const actions = RULES.canCreate[role] ? [
       {
         id: 1,
@@ -55,14 +52,11 @@ const Brands = () => {
         text: 'Crear'
       }
     ] : [];
-
     actions.push({
       id: 3,
       icon: ICONS.FILE_EXCEL,
       color: COLORS.SOFT_GREY,
-      onClick: () => {
-        downloadExcel(prepareBrandDataForExcel, "Lista de Marcas");
-      },
+      onClick: handleDownloadExcel,
       text: 'Marcas',
       disabled: loading
     });
