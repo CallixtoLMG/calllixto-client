@@ -3,6 +3,7 @@ import { LIST_BRANDS_QUERY_KEY } from "@/api/brands";
 import { LIST_BUDGETS_QUERY_KEY } from "@/api/budgets";
 import { LIST_CUSTOMERS_QUERY_KEY } from "@/api/customers";
 import { LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
+import { LIST_SETTINGS_QUERY_KEY } from "@/api/settings";
 import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { Flex, Icon } from "@/components/common/custom";
 import { KeyboardShortcuts } from "@/components/common/modals";
@@ -26,6 +27,7 @@ const Header = () => {
     [PAGES.BUDGETS.BASE]: { entity: ENTITIES.BUDGETS, queryKey: LIST_BUDGETS_QUERY_KEY, text: PAGES.BUDGETS.NAME },
     [PAGES.BRANDS.BASE]: { entity: ENTITIES.BRANDS, queryKey: LIST_BRANDS_QUERY_KEY, text: PAGES.BRANDS.NAME },
     [PAGES.SUPPLIERS.BASE]: { entity: ENTITIES.SUPPLIERS, queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
+    [PAGES.SETTINGS.BASE]: { entity: ENTITIES.SETTINGS, queryKey: LIST_SETTINGS_QUERY_KEY, text: PAGES.SETTINGS.NAME },
   };
 
   const currentEntity = Object.keys(entityMapping).find(key => pathname.includes(key))
@@ -53,6 +55,7 @@ const Header = () => {
     [PAGES.BRANDS.SHORTKEYS]: () => push(PAGES.BRANDS.BASE),
     [PAGES.PRODUCTS.SHORTKEYS]: () => push(PAGES.PRODUCTS.BASE),
     [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
+    [PAGES.SETTINGS.SHORTKEYS]: () => push(PAGES.SETTINGS.BASE),
   };
   useKeyboardShortcuts(shortcutMapping);
 
