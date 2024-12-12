@@ -21,12 +21,12 @@ export const TagsTooltip = ({ tags }) => {
       {tags.length > 1 && (
         <Popup
           size="mini"
-          hoverable 
+          hoverable
           trigger={<Icon margin="0" name={ICONS.TAGS} color={COLORS.BLUE} />}
           content={
             <Flex columnGap="5px" >
               {tags.slice(1).map((tag, index) => (
-                <Popup
+                tag.description ? <Popup
                   key={index}
                   size="mini"
                   trigger={
@@ -36,7 +36,10 @@ export const TagsTooltip = ({ tags }) => {
                   }
                   content={tag.description}
                   position="top center"
-                />
+                /> :
+                  <Label size="mini" color={tag.color}>
+                    {tag.name}
+                  </Label>
               ))}
             </Flex>
           }

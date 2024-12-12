@@ -75,9 +75,9 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
               <Text>Precio: {`$ ${product?.price?.toFixed(2)}`}</Text>
             </FlexColumn>
             <Flex width="100%" justifyContent="space-between" height="20px" marginTop="auto" columnGap="5px" alignItems="center">
-              {product.state === PRODUCT_STATES.OOS.id ? <Label size="tiny" color={COLORS.ORANGE}>Sin Stock</Label> : <div></div>}
-              {product.tags && <TagsTooltip tags={product.tags} />}
-              {product.comments ? <CommentTooltip comment={product.comments} /> : <Flex height="1rem" />} 
+              {product.state === PRODUCT_STATES.OOS.id ? <Label size="tiny" color={COLORS.ORANGE}>Sin Stock</Label> : <Flex marginLeft="20px" />}
+              {product.tags ? <TagsTooltip tags={product.tags} /> : <Flex  />}
+              {product.comments ? <CommentTooltip comment={product.comments} /> : <Flex height="1rem" />}
             </Flex>
           </FlexColumn>
         ),
