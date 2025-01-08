@@ -174,8 +174,8 @@ const BudgetForm = ({
               price: outdatedProduct.price,
               editablePrice: outdatedProduct.editablePrice,
               fractionConfig: {
+                ...product.fractionConfig, 
                 ...outdatedProduct.fractionConfig,
-                value: outdatedProduct.fractionConfig?.value || 1
               },
               state: outdatedProduct.state,
               quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity
