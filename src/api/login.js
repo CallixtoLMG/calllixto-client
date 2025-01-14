@@ -1,13 +1,30 @@
-import { getUserData } from "@/api/userData";
-import { PATHS, URL } from "@/fetchUrls";
-import axios from "axios";
+import awsConfig from '@/aws-config';
+import { confirmSignIn, fetchAuthSession, signIn } from '@aws-amplify/auth';
+import { Amplify } from 'aws-amplify';
 
-export async function login(data) {
-  const { data: response } = await axios.post(`${URL}${PATHS.LOGIN}`, data);
-  if (response.$metadata?.httpStatusCode) {
-    const accessToken = response.AuthenticationResult.AccessToken;
-    localStorage.setItem("token", accessToken);
-    return getUserData();
+Amplify.configure(awsConfig);
+
+export async function login({ username, password, newPassword }) {
+  try {
+    const user = await signIn({
+      username,
+      password,
+    });
+
+    if (user.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+      await confirmSignIn({
+        challengeResponse: newPassword,
+      });
+    }
+
+    if (user.nextStep?.signInStep === 'DONE') {
+      const session = await fetchAuthSession();
+      const accessToken = session.tokens.accessToken.toString();
+      localStorage.setItem('token', accessToken);
+    }
+    
+  } catch (error) {
+    console.error('Error during ingreso:', error);
+    throw error;
   }
-  return false;
-};
+}

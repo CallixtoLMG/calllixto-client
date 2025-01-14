@@ -1,4 +1,6 @@
 "use client";
+import { useUserContext } from "@/User";
+import { getUserData } from "@/api/userData";
 import { Loader } from "@/components/layout";
 import { ICONS, PAGES, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
@@ -9,7 +11,6 @@ import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, Text } from "./styled";
-import { useUserContext } from "@/User";
 
 const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
@@ -20,7 +21,8 @@ const LoginForm = ({ onSubmit }) => {
   const { mutate } = useMutation({
     mutationFn: async (dataLogin) => {
       setIsLoading(true);
-      const data = await onSubmit(dataLogin);
+      await onSubmit(dataLogin);
+      const data = await getUserData();
       return data;
     },
     onSuccess: (userData) => {
@@ -32,17 +34,18 @@ const LoginForm = ({ onSubmit }) => {
         setIsLoading(false);
       }
     },
-    onError: () => {
-      toast.error("Hubo un error al intentar ingresar, por favor intenta de nuevo.");
+    onError: (error) => {
+      toast.error("Hubo un error al intentar ingresar. Por favor, intenta de nuevo.");
+      console.error(error);
       setIsLoading(false);
     },
   });
 
   return (
     <Loader active={isLoading}>
-      <ModGrid >
-        <ModGridColumn >
-          <ModHeader as='h3'>
+      <ModGrid>
+        <ModGridColumn>
+          <ModHeader as="h3">
             <div>
               <Image
                 src="/Callixto.png"
@@ -54,18 +57,18 @@ const LoginForm = ({ onSubmit }) => {
               <Text>Ingresa a tu cuenta</Text>
             </div>
           </ModHeader>
-          <Form onSubmit={handleSubmit(mutate)} size='large'>
+          <Form onSubmit={handleSubmit(mutate)} size="large">
             <Controller
-              name="email"
+              name="username"
               control={control}
               rules={RULES.REQUIRED}
               render={({ field }) => (
                 <Form.Input
                   {...field}
-                  placeholder='Correo electrónico'
+                  placeholder="Correo electrónico"
                   fluid
                   icon={ICONS.USER}
-                  iconPosition='left'
+                  iconPosition="left"
                 />
               )}
             />
@@ -76,15 +79,15 @@ const LoginForm = ({ onSubmit }) => {
               render={({ field }) => (
                 <Form.Input
                   {...field}
-                  type='password'
-                  placeholder='Contraseña'
+                  type="password"
+                  placeholder="Contraseña"
                   fluid
                   icon={ICONS.LOCK}
-                  iconPosition='left'
+                  iconPosition="left"
                 />
               )}
             />
-            <ModButton fluid="true" size='large'>
+            <ModButton fluid="true" size="large">
               Ingresar
             </ModButton>
           </Form>
