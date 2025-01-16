@@ -31,7 +31,7 @@ const PaginationContainer = styled(Flex)`
   align-self: center;
   max-height: ${({ height = 'none' }) => `${height}!important`};
   flex-direction: row;
-  justify-content: ${({ center }) => center ? "center" : "flex-end"};
+  justify-content: ${({ justifyContent = "flex-end" }) => justifyContent && justifyContent}!important;
   column-gap: 10px;
   justify-content: center;
 `;

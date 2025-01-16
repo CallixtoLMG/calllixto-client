@@ -37,8 +37,6 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem("userData");
     push(PAGES.LOGIN.BASE);
   };
 

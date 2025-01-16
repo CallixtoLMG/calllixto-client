@@ -1,4 +1,5 @@
 "use client";
+import { getUserData } from "@/api/userData";
 import { Loader } from "@/components/layout";
 import { ICONS, PAGES, RULES } from "@/constants";
 import { useUserContext } from "@/User";
@@ -27,7 +28,8 @@ const LoginForm = ({ onSubmit, onPasswordReset }) => {
   const { mutate: login } = useMutation({
     mutationFn: async (dataLogin) => {
       setIsLoading(true);
-      const data = await onSubmit(dataLogin);
+      await onSubmit(dataLogin);
+      const data = await getUserData();
       return data;
     },
     onSuccess: (userData) => {
@@ -41,8 +43,26 @@ const LoginForm = ({ onSubmit, onPasswordReset }) => {
         setIsLoading(false);
       }
     },
+    onError: (error) => {
+      toast.error("Hubo un error al intentar ingresar. Por favor, intenta de nuevo.");
+      console.error(error);
+      setIsLoading(false);
+    },
+  });
+
+  const { mutate: recoverPassword } = useMutation({
+    mutationFn: async (emailData) => {
+      setIsLoading(true);
+      const data = await onPasswordReset(emailData);
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Se ha enviado un enlace de recuperación a tu correo electrónico.");
+      setIsLoading(false);
+      handleScreenChange(false);
+    },
     onError: () => {
-      toast.error("Hubo un error al intentar ingresar, por favor intenta de nuevo.");
+      toast.error("Hubo un error al enviar el enlace de recuperación.");
       setIsLoading(false);
     },
   });

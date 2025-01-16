@@ -1,5 +1,6 @@
 import { Flex } from '@/components/common/custom';
 import { COLORS, ICONS } from "@/constants";
+import { useFormContext } from 'react-hook-form';
 import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { IconnedButton } from '../buttons';
@@ -20,6 +21,7 @@ const HeaderSegment = styled(SSegment)`
 `;
 
 const Filters = ({ children, onRestoreFilters, onRefetch }) => {
+  const { formState: { isDirty } } = useFormContext();
   return (
     <MainContainer>
       <HeaderSegment flex="1">
@@ -41,21 +43,17 @@ const Filters = ({ children, onRestoreFilters, onRefetch }) => {
             text="Buscar"
             icon={ICONS.SEARCH}
             submit
-            color={COLORS.SOFT_GREY}
-            width='130px'
+            color={isDirty ? COLORS.PRIMARY : COLORS.SOFT_GREY}
+            width="130px"
           />
-          <Popup
-            content="Actualizar tabla"
-            position="right center"
-            size="tiny"
-            trigger={(
-              <Button circular icon type="button" onClick={onRefetch}>
-                <Icon color={COLORS.WHITE} name={ICONS.REFRESH} />
-              </Button>
-            )}
+          <IconnedButton
+            text="Actualizar"
+            icon={ICONS.REFRESH}
+            color={COLORS.SOFT_GREY}
+            width="fit-content"
+            onClick={onRefetch}
           />
         </Flex>
-
       </HeaderSegment>
     </MainContainer>
   )
