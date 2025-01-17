@@ -63,6 +63,7 @@ const ChangePasswordForm = ({ onSubmit }) => {
                       e.preventDefault();
                       setShowCurrentPassword(!showCurrentPassword);
                     },
+                    type: "button",
                     title: showCurrentPassword ? "Ocultar contraseña" : "Mostrar contraseña",
                   }}
                 />
@@ -83,9 +84,10 @@ const ChangePasswordForm = ({ onSubmit }) => {
                   action={{
                     icon: showNewPassword ? ICONS.EYE_SLASH : ICONS.EYE,
                     onClick: (e) => {
-                      e.preventDefault(); 
+                      e.preventDefault();
                       setShowNewPassword(!showNewPassword);
                     },
+                    type: "button",
                     title: showNewPassword ? "Ocultar contraseña" : "Mostrar contraseña",
                   }}
                 />
@@ -113,6 +115,7 @@ const ChangePasswordForm = ({ onSubmit }) => {
                       e.preventDefault();
                       setShowConfirmPassword(!showConfirmPassword);
                     },
+                    type: "button",
                     title: showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña",
                   }}
                 />

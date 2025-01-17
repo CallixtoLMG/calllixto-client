@@ -18,6 +18,7 @@ const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
+  console.log(userData)
   const entityMapping = {
     [PAGES.CUSTOMERS.BASE]: { entity: ENTITIES.CUSTOMERS, queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
     [PAGES.PRODUCTS.BASE]: { entity: ENTITIES.PRODUCTS, queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
@@ -100,7 +101,7 @@ const Header = () => {
                       text={(
                         <>
                           <Icon color={COLORS.GREY} name="user" />
-                          {`${userData.firstName} ${userData.lastName}` || 'Usuario'}
+                          {`${userData.name}` || 'Usuario'}
                         </>
                       )}
                       pointing="top right"

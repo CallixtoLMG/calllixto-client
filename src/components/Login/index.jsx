@@ -17,7 +17,7 @@ const LoginForm = ({ onSubmit, onPasswordReset }) => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false);
   const { handleSubmit, control, reset } = useForm();
 
   const handleScreenChange = (isResetScreen) => {
@@ -67,23 +67,6 @@ const LoginForm = ({ onSubmit, onPasswordReset }) => {
     },
   });
 
-  const { mutate: recoverPassword } = useMutation({
-    mutationFn: async (emailData) => {
-      setIsLoading(true);
-      const data = await onPasswordReset(emailData);
-      return data;
-    },
-    onSuccess: () => {
-      toast.success("Se ha enviado un enlace de recuperación a tu correo electrónico.");
-      setIsLoading(false);
-      handleScreenChange(false);
-    },
-    onError: () => {
-      toast.error("Hubo un error al enviar el enlace de recuperación.");
-      setIsLoading(false);
-    },
-  });
-
   return (
     <Loader active={isLoading}>
       <ModGrid>
@@ -107,7 +90,7 @@ const LoginForm = ({ onSubmit, onPasswordReset }) => {
           {showPasswordReset ? (
             <Form onSubmit={handleSubmit(recoverPassword)} size="large">
               <Controller
-                name="email"
+                name="username"
                 control={control}
                 rules={{
                   required: "El correo electrónico es obligatorio",
@@ -144,7 +127,7 @@ const LoginForm = ({ onSubmit, onPasswordReset }) => {
           ) : (
             <Form onSubmit={handleSubmit(login)} size="large">
               <Controller
-                name="email"
+                name="username"
                 control={control}
                 rules={RULES.REQUIRED}
                 render={({ field }) => (
@@ -164,14 +147,18 @@ const LoginForm = ({ onSubmit, onPasswordReset }) => {
                 render={({ field }) => (
                   <Form.Input
                     {...field}
-                    type={showPassword ? "text" : "password"} 
+                    type={showPassword ? "text" : "password"}
                     placeholder="Contraseña"
                     fluid
-                    icon={ICONS.LOCK} 
+                    icon={ICONS.LOCK}
                     iconPosition="left"
                     action={{
                       icon: showPassword ? ICONS.EYE_SLASH : ICONS.EYE,
-                      onClick: () => setShowPassword(!showPassword), 
+                      onClick: (e) => {
+                        e.preventDefault();
+                        setShowPassword(!showPassword);
+                      },
+                      type: "button",
                       title: showPassword ? "Ocultar contraseña" : "Mostrar contraseña",
                     }}
                   />

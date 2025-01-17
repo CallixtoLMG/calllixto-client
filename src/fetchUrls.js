@@ -9,6 +9,8 @@ export const PATHS = {
   SUPPLIERS: ENTITIES.SUPPLIERS,
   EVENTS: ENTITIES.EVENTS,
   USER_PROFILE: "userProfile",
+  RECOVER_PASSWORD: `${ENTITIES.USERS}/reset`,
+  CHANGE_PASSWORD: "changePassword",
 };
 
 export const BATCH = "batch";

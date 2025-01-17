@@ -48,6 +48,12 @@ export const PAGES = {
   USER_PROFILE: {
     BASE: "/perfilUsuario"
   },
+  CHANGE_PASSWORD: {
+    BASE: "/cambiar-contrasena"
+  },
+  RECOVER_PASSWORD: {
+    BASE: "/recuperar-contrasena"
+  },
   NOT_FOUND: {
     BASE: "/ups"
   },
@@ -165,7 +171,8 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
-  EVENTS: 'events'
+  EVENTS: 'events',
+  USERS: 'users'
 };
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";

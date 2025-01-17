@@ -1,4 +1,5 @@
 import awsConfig from '@/aws-config';
+import { PATHS, URL } from '@/fetchUrls';
 import { confirmSignIn, fetchAuthSession, signIn } from '@aws-amplify/auth';
 import { Amplify } from 'aws-amplify';
 
@@ -22,9 +23,15 @@ export async function login({ username, password, newPassword }) {
       const accessToken = session.tokens.accessToken.toString();
       localStorage.setItem('token', accessToken);
     }
-    
+
   } catch (error) {
     console.error('Error during ingreso:', error);
     throw error;
   }
 }
+
+export async function recoverPassword(data) {
+  const { data: response } = await axios.post(`${URL}${PATHS.RECOVER_PASSWORD}`, data);
+  console.log("response", response)
+  return response
+};
