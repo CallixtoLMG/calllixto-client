@@ -45,8 +45,11 @@ export const PAGES = {
   LOGIN: {
     BASE: "/login"
   },
-  USER_PROFILE: {
-    BASE: "/perfilUsuario"
+  CHANGE_PASSWORD: {
+    BASE: "/cambiar-contrasena"
+  },
+  RECOVER_PASSWORD: {
+    BASE: "/recuperar-contrasena"
   },
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"

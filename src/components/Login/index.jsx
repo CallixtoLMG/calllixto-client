@@ -1,7 +1,7 @@
 "use client";
 import { getUserData } from "@/api/userData";
 import { Loader } from "@/components/layout";
-import { ICONS, PAGES, RULES } from "@/constants";
+import { ICONS, PAGES } from "@/constants";
 import { useUserContext } from "@/User";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
@@ -10,9 +10,9 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
-import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styled";
+import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styles";
 
-const LoginForm = ({ onSubmit, onPasswordReset }) => {
+const LoginForm = ({ onSubmit }) => {
   const { setUserData } = useUserContext();
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -36,16 +36,14 @@ const LoginForm = ({ onSubmit, onPasswordReset }) => {
       if (userData) {
         setUserData(userData);
         toast.success("Ingreso exitoso!");
-
         push(PAGES.BUDGETS.BASE);
       } else {
         toast.error("Los datos ingresados no son correctos!");
         setIsLoading(false);
       }
     },
-    onError: (error) => {
-      toast.error("Hubo un error al intentar ingresar. Por favor, intenta de nuevo.");
-      console.error(error);
+    onError: () => {
+      toast.error("Hubo un error al intentar ingresar, por favor intenta de nuevo.");
       setIsLoading(false);
     },
   });
@@ -80,11 +78,7 @@ const LoginForm = ({ onSubmit, onPasswordReset }) => {
                 height={100}
                 priority
               />
-              <Text>
-                {showPasswordReset
-                  ? "Para recuperar su contraseña ingrese su email"
-                  : "Ingresa a tu cuenta"}
-              </Text>
+              <Text>Ingresa a tu cuenta</Text>
             </div>
           </ModHeader>
           {showPasswordReset ? (
