@@ -18,17 +18,16 @@ const PasswordInput = ({ field, placeholder, error }) => {
       fluid
       icon={ICONS.LOCK}
       iconPosition="left"
-      error={error}
+      error={
+        error
+          ? { content: error.message, pointing: "below" }
+          : false
+      }
       action={{
         icon: isVisible ? ICONS.EYE_SLASH : ICONS.EYE,
         onClick: toggleVisibility,
-        onKeyDown: (e) => {
-          if (e.key === "Enter") {
-            e.preventDefault();
-            e.stopPropagation();
-          }
-        },
         title: isVisible ? "Ocultar contraseña" : "Mostrar contraseña",
+        type: "button",
       }}
     />
   );

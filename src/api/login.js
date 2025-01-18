@@ -1,7 +1,8 @@
 import awsConfig from '@/aws-config';
 import { PATHS, URL } from '@/fetchUrls';
-import { confirmSignIn, fetchAuthSession, signIn } from '@aws-amplify/auth';
+import { confirmResetPassword, confirmSignIn, fetchAuthSession, signIn } from '@aws-amplify/auth';
 import { Amplify } from 'aws-amplify';
+import axios from "axios";
 
 Amplify.configure(awsConfig);
 
@@ -25,13 +26,25 @@ export async function login({ username, password, newPassword }) {
     }
 
   } catch (error) {
-    console.error('Error during ingreso:', error);
+    console.error('Error durante el ingreso:', error);
     throw error;
   }
 }
 
 export async function recoverPassword(data) {
   const { data: response } = await axios.post(`${URL}${PATHS.RECOVER_PASSWORD}`, data);
-  console.log("response", response)
   return response
+};
+
+export async function confirmReset({ username, confirmationCode, newPassword }) {
+  try {
+    await confirmResetPassword({
+      username,
+      confirmationCode,
+      newPassword,
+    });
+  } catch (error) {
+    console.error('Error al cambiar confirmar contraseña:', error);
+    throw error;
+  };
 };

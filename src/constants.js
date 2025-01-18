@@ -51,12 +51,6 @@ export const PAGES = {
   RECOVER_PASSWORD: {
     BASE: "/recuperar-contrasena"
   },
-  CHANGE_PASSWORD: {
-    BASE: "/cambiar-contrasena"
-  },
-  RECOVER_PASSWORD: {
-    BASE: "/recuperar-contrasena"
-  },
   NOT_FOUND: {
     BASE: "/ups"
   },
@@ -389,7 +383,8 @@ export const ICONS = {
   ADDRESS_CARD: "address card",
   ARCHIVE: "archive",
   OPTIONS: "options",
-  REFRESH: "refresh"
+  REFRESH: "refresh",
+  MAIL_SQUARE: "mail square"
 };
 
 export const PAGE_SIZE_OPTIONS = [

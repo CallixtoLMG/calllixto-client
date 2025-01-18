@@ -1,7 +1,8 @@
 "use client";
+import { confirmReset, recoverPassword } from "@/api/login";
 import { GoBackButton } from "@/components/common/buttons";
 import { Loader } from "@/components/layout";
-import { COLORS, PAGES, RULES } from "@/constants";
+import { COLORS, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -12,26 +13,46 @@ import { Flex, FlexColumn, Label } from "../common/custom";
 import PasswordInput from "../common/custom/PasswordInput";
 import { ModGrid, ModGridColumn, ModHeader } from "./styled";
 
-const ChangePasswordForm = ({ onSubmit }) => {
+console.log(localStorage)
+
+const ChangePasswordForm = () => {
   const { push } = useRouter();
   const { handleSubmit, control, watch } = useForm();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { mutate } = useMutation({
+  const { mutate: onRecoverPassword } = useMutation({
+    mutationFn: async () => {
+      setIsLoading(true);
+      const data = await recoverPassword({username: "miltonbarraza90@gmail.com"});
+      return data;
+    },
+    onSuccess: (_, emailData) => {
+      toast.success("Se ha enviado un enlace de recuperación a tu correo electrónico.");
+      setIsLoading(false);
+      setIsCodeSent(true);
+      setEmail(emailData.username);
+      reset();
+    },
+    onError: () => {
+      toast.error("Hubo un error al enviar el enlace de recuperación.");
+      setIsLoading(false);
+    },
+  });
+
+  const { mutate: onConfirmReset } = useMutation({
     mutationFn: async (passwordData) => {
       setIsLoading(true);
-      const data = await onSubmit(passwordData);
+      // const { confirmPassword, ...dataToSend } = passwordData;
+      const data = await confirmReset({username:"miltonbarraza90@gmail.com", confirmationCode: "566719", newPassword: "321654987"});
       return data;
     },
     onSuccess: () => {
-      toast.success("Contraseña cambiada exitosamente!");
+      toast.success("Contraseña cambiada con éxito.");
+      setIsLoading(false);
       push(PAGES.LOGIN.BASE);
     },
     onError: () => {
-      toast.error("Hubo un error al intentar cambiar la contraseña.");
-      setIsLoading(false);
-    },
-    onSettled: () => {
+      toast.error("Hubo un error al cambiar la contraseña.");
       setIsLoading(false);
     },
   });
@@ -43,7 +64,7 @@ const ChangePasswordForm = ({ onSubmit }) => {
       <ModGrid>
         <ModGridColumn>
           <ModHeader as="h3">
-            <Label content="Cambiar Contraseña" />
+            <Label content="Cambiar contraseña" />
           </ModHeader>
           <Form
             onKeyDown={(e) => {
@@ -52,7 +73,7 @@ const ChangePasswordForm = ({ onSubmit }) => {
                 handleSubmit(mutate)();
               }
             }}
-            onSubmit={handleSubmit(mutate)}
+            onSubmit={handleSubmit(onConfirmReset)}
           >
             <Controller
               name="currentPassword"

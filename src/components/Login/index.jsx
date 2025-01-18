@@ -1,8 +1,8 @@
 "use client";
+import { useUserContext } from "@/User";
 import { getUserData } from "@/api/userData";
 import { Loader } from "@/components/layout";
-import { ICONS, PAGES } from "@/constants";
-import { useUserContext } from "@/User";
+import { ICONS, PAGES, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
+import PasswordInput from "../common/custom/PasswordInput";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styles";
 
 const LoginForm = ({ onSubmit }) => {
@@ -138,30 +139,18 @@ const LoginForm = ({ onSubmit }) => {
                 name="password"
                 control={control}
                 rules={RULES.REQUIRED}
-                render={({ field }) => (
-                  <Form.Input
-                    {...field}
-                    type={showPassword ? "text" : "password"}
+                render={({ field, fieldState: { error } }) => (
+                  <PasswordInput
+                    field={field}
                     placeholder="Contraseña"
-                    fluid
-                    icon={ICONS.LOCK}
-                    iconPosition="left"
-                    action={{
-                      icon: showPassword ? ICONS.EYE_SLASH : ICONS.EYE,
-                      onClick: (e) => {
-                        e.preventDefault();
-                        setShowPassword(!showPassword);
-                      },
-                      type: "button",
-                      title: showPassword ? "Ocultar contraseña" : "Mostrar contraseña",
-                    }}
+                    error={error?.message}
                   />
                 )}
               />
               <ModButton fluid="true" size="large">
                 Ingresar
               </ModButton>
-              <PasswordLink onClick={() => handleScreenChange(true)}>
+              <PasswordLink onClick={() => push(PAGES.RECOVER_PASSWORD.BASE)}>
                 ¿Olvidaste tu contraseña?
               </PasswordLink>
             </Form>
