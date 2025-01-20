@@ -44,7 +44,7 @@ const Header = () => {
     push(PAGES.CHANGE_PASSWORD.BASE);
   };
 
-  const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RECOVER_PASSWORD.BASE];
+  const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
 
   const shortcutMapping = {

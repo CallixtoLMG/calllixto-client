@@ -48,7 +48,7 @@ export const PAGES = {
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"
   },
-  RECOVER_PASSWORD: {
+  RESTORE_PASSWORD: {
     BASE: "/recuperar-contrasena"
   },
   NOT_FOUND: {

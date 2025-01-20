@@ -1,63 +1,87 @@
-"use client";
 import { confirmReset, recoverPassword } from "@/api/login";
+import { getUserData } from "@/api/userData";
 import { GoBackButton } from "@/components/common/buttons";
 import { Loader } from "@/components/layout";
-import { COLORS, RULES } from "@/constants";
+import { COLORS, ICONS, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Button, Form } from "semantic-ui-react";
-import { Flex, FlexColumn, Label } from "../common/custom";
+import { Flex, FlexColumn, Label, Message } from "../common/custom";
 import PasswordInput from "../common/custom/PasswordInput";
 import { ModGrid, ModGridColumn, ModHeader } from "./styled";
 
-console.log(localStorage)
-
 const ChangePasswordForm = () => {
   const { push } = useRouter();
-  const { handleSubmit, control, watch } = useForm();
-  const [isLoading, setIsLoading] = useState(false);
+  const { handleSubmit, control, watch, reset } = useForm();
+  const [email, setEmail] = useState("");
+  const [isCodeRequested, setIsCodeRequested] = useState(false);
 
-  const { mutate: onRecoverPassword } = useMutation({
+  useEffect(() => {
+    const getData = async () => {
+      const sessionData = await getUserData();
+      if (sessionData) {
+        setEmail(sessionData.username);
+      }
+    };
+
+    getData();
+  }, []);
+
+  const { mutate: requestCode, isPending: isRequestCodePending } = useMutation({
     mutationFn: async () => {
-      setIsLoading(true);
-      const data = await recoverPassword({username: "miltonbarraza90@gmail.com"});
-      return data;
-    },
-    onSuccess: (_, emailData) => {
-      toast.success("Se ha enviado un enlace de recuperación a tu correo electrónico.");
-      setIsLoading(false);
-      setIsCodeSent(true);
-      setEmail(emailData.username);
-      reset();
-    },
-    onError: () => {
-      toast.error("Hubo un error al enviar el enlace de recuperación.");
-      setIsLoading(false);
-    },
-  });
-
-  const { mutate: onConfirmReset } = useMutation({
-    mutationFn: async (passwordData) => {
-      setIsLoading(true);
-      // const { confirmPassword, ...dataToSend } = passwordData;
-      const data = await confirmReset({username:"miltonbarraza90@gmail.com", confirmationCode: "566719", newPassword: "321654987"});
+      const data = await recoverPassword({ username: email });
       return data;
     },
     onSuccess: () => {
-      toast.success("Contraseña cambiada con éxito.");
-      setIsLoading(false);
-      push(PAGES.LOGIN.BASE);
+      toast.success("Código de validación enviado a tu correo.");
+      setIsCodeRequested(true);
     },
     onError: () => {
-      toast.error("Hubo un error al cambiar la contraseña.");
-      setIsLoading(false);
+      toast.error("Hubo un error al solicitar el código de validación.");
     },
   });
 
+  const { mutate: onConfirmReset, isPending: isOnConfirmResetPending } = useMutation({
+    mutationFn: async (passwordData) => {
+      const { confirmPassword, ...dataToSend } = passwordData;
+      const response = await confirmReset(dataToSend);
+
+      if (!response.ok && response.error) {
+        throw new Error(response.error);
+      }
+
+      return response;
+    },
+    onSuccess: () => {
+      toast.success("Contraseña cambiada con éxito.");
+      resetInputs();
+    },
+    onError: (error) => {
+      console.error("Error:", error);
+      toast.error("Hubo un error al cambiar la contraseña.");
+    },
+  });
+
+  const resetInputs = () => {
+    reset({
+      confirmationCode: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+  };
+
   const newPassword = watch("newPassword");
+
+  const handleConfirmReset = (data) => {
+    const payload = {
+      ...data,
+      username: email,
+    };
+    onConfirmReset(payload);
+  };
 
   return (
     <Loader active={false}>
@@ -66,36 +90,61 @@ const ChangePasswordForm = () => {
           <ModHeader as="h3">
             <Label content="Cambiar contraseña" />
           </ModHeader>
-          <Form
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSubmit(mutate)();
-              }
-            }}
-            onSubmit={handleSubmit(onConfirmReset)}
-          >
+          <Flex justifyContent="center" marginBottom="14px">
+            <Button
+              fluid
+              type="button"
+              color="blue"
+              loading={isRequestCodePending}
+              disabled={isRequestCodePending}
+              onClick={() => requestCode()}
+            >
+              Solicitar código de validación
+            </Button>
+          </Flex>
+          <Flex justifyContent="center" marginBottom="14px">
+            <Message style={{ color: "gray", textAlign: "center" }}>
+              Al solicitar el código, recibirás un enlace en tu correo para validar el cambio de contraseña.
+            </Message>
+          </Flex>
+
+          <Form onSubmit={handleSubmit(handleConfirmReset)}>
             <Controller
-              name="currentPassword"
+              name="confirmationCode"
               control={control}
-              rules={RULES.REQUIRED}
-              render={({ field }) => (
-                <PasswordInput
-                  field={field}
-                  placeholder="Contraseña actual"
-                  error={false}
+              rules={{ required: "El código es obligatorio" }}
+              render={({ field, fieldState: { error } }) => (
+                <Form.Input
+                  {...field}
+                  placeholder="Código de recuperación"
+                  fluid
+                  icon={ICONS.MAIL_SQUARE}
+                  iconPosition="left"
+                  disabled={!isCodeRequested}
+                  error={
+                    error
+                      ? { content: error.message, pointing: "below" }
+                      : false
+                  }
                 />
               )}
             />
             <Controller
               name="newPassword"
               control={control}
-              rules={RULES.REQUIRED}
-              render={({ field }) => (
+              rules={{
+                required: "La nueva contraseña es obligatoria",
+                minLength: {
+                  value: 6,
+                  message: "La contraseña debe tener al menos 6 caracteres",
+                },
+              }}
+              render={({ field, fieldState: { error } }) => (
                 <PasswordInput
                   field={field}
                   placeholder="Nueva contraseña"
-                  error={false}
+                  error={error}
+                  disabled={!isCodeRequested}
                 />
               )}
             />
@@ -111,12 +160,20 @@ const ChangePasswordForm = () => {
                 <PasswordInput
                   field={field}
                   placeholder="Confirmar nueva contraseña"
-                  error={error?.message}
+                  error={error}
+                  disabled={!isCodeRequested}
                 />
               )}
             />
-            <FlexColumn rowGap="14px" >
-              <Button loading={isLoading} disabled={isLoading} fluid color={COLORS.GREEN}>Confirmar</Button>
+            <FlexColumn rowGap="14px">
+              <Button
+                loading={isOnConfirmResetPending}
+                disabled={isOnConfirmResetPending || isRequestCodePending || !isCodeRequested}
+                fluid
+                color={COLORS.GREEN}
+              >
+                Confirmar
+              </Button>
               <Flex justifyContent="center">
                 <GoBackButton />
               </Flex>

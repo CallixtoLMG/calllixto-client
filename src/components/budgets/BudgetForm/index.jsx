@@ -145,7 +145,6 @@ const BudgetForm = ({
 
           const priceChanged = budgetProduct.price !== product.price;
           const stateChanged = budgetProduct.state !== product.state;
-          const stateChanged = budgetProduct.state !== product.state;
           const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
 
           const fractionConfigChanged =

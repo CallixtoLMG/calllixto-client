@@ -150,7 +150,7 @@ const LoginForm = ({ onSubmit }) => {
               <ModButton fluid="true" size="large">
                 Ingresar
               </ModButton>
-              <PasswordLink onClick={() => push(PAGES.RECOVER_PASSWORD.BASE)}>
+              <PasswordLink onClick={() => push(PAGES.RESTORE_PASSWORD.BASE)}>
                 ¿Olvidaste tu contraseña?
               </PasswordLink>
             </Form>

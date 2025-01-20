@@ -1,4 +1,4 @@
-import { Grid, Header } from "semantic-ui-react";
+import { Button, Grid, Header } from "semantic-ui-react";
 import { styled } from "styled-components";
 
 const Text = styled.p`
@@ -19,7 +19,8 @@ const ModGrid = styled(Grid)`
   };
 `;
 
-const ModButton = styled.button`
+const ModButton = styled(Button)`
+&&& {
   background-color: #579294;
   color: white;
   width: 100%;
@@ -43,7 +44,7 @@ const ModButton = styled.button`
   &:active {
     background-color: #347C7D;
   }
-`;
+}`;
 
 const ModGridColumn = styled(Grid.Column)({
   maxWidth: '450px!important',

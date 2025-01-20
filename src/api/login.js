@@ -32,7 +32,7 @@ export async function login({ username, password, newPassword }) {
 }
 
 export async function recoverPassword(data) {
-  const { data: response } = await axios.post(`${URL}${PATHS.RECOVER_PASSWORD}`, data);
+  const { data: response } = await axios.post(`${URL}${PATHS.RESTORE_PASSWORD}`, data);
   return response
 };
 

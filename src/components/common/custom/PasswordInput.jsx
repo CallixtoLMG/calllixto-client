@@ -2,7 +2,7 @@ import { ICONS } from "@/constants";
 import { useState } from "react";
 import { Form } from "semantic-ui-react";
 
-const PasswordInput = ({ field, placeholder, error }) => {
+const PasswordInput = ({ field, placeholder, error, disabled }) => {
   const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = (e) => {
@@ -16,6 +16,7 @@ const PasswordInput = ({ field, placeholder, error }) => {
       type={isVisible ? "text" : "password"}
       placeholder={placeholder}
       fluid
+      disabled={disabled}
       icon={ICONS.LOCK}
       iconPosition="left"
       error={
