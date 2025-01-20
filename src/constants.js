@@ -128,6 +128,16 @@ export const RULES = {
   REQUIRED_POSITIVE: {
     required: 'Campo requerido.',
     min: { value: 1, message: 'El campo debe ser mayor a 0' }
+  },
+  REQUIRED_FOR_PASSWORD: {
+    required: "La nueva contraseña es obligatoria",
+    validate: (value) => {
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      return (
+        regex.test(value) ||
+        "La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula, un número y un carácter especial."
+      );
+    }
   }
 };
 
@@ -422,4 +432,12 @@ export const FILTERS_OPTIONS = {
   DATE: "date",
   NAME: "name"
 };
+
+export const PASSWORD_REQUIREMENTS = [
+  { label: "Al menos 8 caracteres.", test: /.{8,}/ },
+  { label: "Una letra mayúscula.", test: /[A-Z]/ },
+  { label: "Una letra minúscula.", test: /[a-z]/ },
+  { label: "Un número.", test: /\d/ },
+  { label: "Un carácter especial.", test: /[@$!%*?&]/ },
+];
 

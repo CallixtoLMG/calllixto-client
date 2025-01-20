@@ -9,6 +9,13 @@ const Text = styled.p`
   color: #579294;
 `;
 
+const MessageText = styled.p`
+  display: flex;
+  font-size: 12px;
+  margin: 0!important;
+  color: #579294;
+`;
+
 const ModGrid = styled(Grid)`
   &&& {
     background-color: #C8E3DF!important;
@@ -54,7 +61,7 @@ const ModHeader = styled(Header)({
   textAlign: 'center!important'
 });
 
-const PasswordLink = styled.a`
+const RedirectLink = styled.a`
   display: block;
   margin-top: 15px;
   text-align: center;
@@ -67,5 +74,5 @@ const PasswordLink = styled.a`
   }
 `;
 
-export { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text };
+export { MessageText, ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text };
 

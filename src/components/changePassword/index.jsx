@@ -2,13 +2,14 @@ import { confirmReset, recoverPassword } from "@/api/login";
 import { getUserData } from "@/api/userData";
 import { GoBackButton } from "@/components/common/buttons";
 import { Loader } from "@/components/layout";
-import { COLORS, ICONS, RULES } from "@/constants";
+import { COLORS, ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Button, Form } from "semantic-ui-react";
+import PasswordRequirements from "../common/components/PasswordRequirements";
 import { Flex, FlexColumn, Label, Message } from "../common/custom";
 import PasswordInput from "../common/custom/PasswordInput";
 import { ModGrid, ModGridColumn, ModHeader } from "./styled";
@@ -30,6 +31,20 @@ const ChangePasswordForm = () => {
     getData();
   }, []);
 
+  const resetInputs = () => {
+    reset({
+      confirmationCode: "",
+      newPassword: "",
+      confirmPassword: "",
+    });
+  };
+
+  useEffect(() => {
+    if (!isCodeRequested) {
+      resetInputs();
+    }
+  }, [isCodeRequested]);
+
   const { mutate: requestCode, isPending: isRequestCodePending } = useMutation({
     mutationFn: async () => {
       const data = await recoverPassword({ username: email });
@@ -47,31 +62,19 @@ const ChangePasswordForm = () => {
   const { mutate: onConfirmReset, isPending: isOnConfirmResetPending } = useMutation({
     mutationFn: async (passwordData) => {
       const { confirmPassword, ...dataToSend } = passwordData;
-      const response = await confirmReset(dataToSend);
-
-      if (!response.ok && response.error) {
-        throw new Error(response.error);
-      }
-
-      return response;
+      const data = await confirmReset(dataToSend);
+      return data;
     },
     onSuccess: () => {
       toast.success("Contraseña cambiada con éxito.");
       resetInputs();
+      push(PAGES.LOGIN.BASE);
     },
     onError: (error) => {
       console.error("Error:", error);
       toast.error("Hubo un error al cambiar la contraseña.");
     },
   });
-
-  const resetInputs = () => {
-    reset({
-      confirmationCode: "",
-      newPassword: "",
-      confirmPassword: "",
-    });
-  };
 
   const newPassword = watch("newPassword");
 
@@ -107,7 +110,6 @@ const ChangePasswordForm = () => {
               Al solicitar el código, recibirás un enlace en tu correo para validar el cambio de contraseña.
             </Message>
           </Flex>
-
           <Form onSubmit={handleSubmit(handleConfirmReset)}>
             <Controller
               name="confirmationCode"
@@ -134,18 +136,31 @@ const ChangePasswordForm = () => {
               control={control}
               rules={{
                 required: "La nueva contraseña es obligatoria",
-                minLength: {
-                  value: 6,
-                  message: "La contraseña debe tener al menos 6 caracteres",
+                validate: (value) => {
+                  const failedRequirements = PASSWORD_REQUIREMENTS.filter(
+                    (req) => !req.test.test(value)
+                  );
+                  return (
+                    failedRequirements.length === 0 ||
+                    "La contraseña no cumple con los requisitos."
+                  );
                 },
               }}
               render={({ field, fieldState: { error } }) => (
-                <PasswordInput
-                  field={field}
-                  placeholder="Nueva contraseña"
-                  error={error}
-                  disabled={!isCodeRequested}
-                />
+                <>
+                  <PasswordInput
+                    field={field}
+                    placeholder="Nueva contraseña"
+                    error={error}
+                    disabled={!isCodeRequested}
+                  />
+                  {isCodeRequested && (
+                    <PasswordRequirements
+                      requirements={PASSWORD_REQUIREMENTS}
+                      password={newPassword}
+                    />
+                  )}
+                </>
               )}
             />
             <Controller

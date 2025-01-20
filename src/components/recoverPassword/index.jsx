@@ -1,20 +1,32 @@
 "use client";
 import { confirmReset, recoverPassword } from "@/api/login";
-import { ICONS, PAGES, RULES } from "@/constants";
+import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
+import PasswordRequirements from "../common/components/PasswordRequirements";
 import PasswordInput from "../common/custom/PasswordInput";
-import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styles";
+import { ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text } from "./styles";
 
 const RecoverPasswordForm = () => {
   const { push } = useRouter();
   const { handleSubmit, control, reset, watch } = useForm();
   const [isCodeSent, setIsCodeSent] = useState(false);
   const [email, setEmail] = useState("");
+
+  const newPassword = watch("newPassword", "");
+
+  useEffect(() => {
+    if (!isCodeSent) {
+      reset({
+        newPassword: "",
+        confirmPassword: "",
+      });
+    }
+  }, [isCodeSent, reset]);
 
   const { mutate: onRecoverPassword, isPending: isRecoverPasswordPending } = useMutation({
     mutationFn: async (emailData) => {
@@ -46,8 +58,6 @@ const RecoverPasswordForm = () => {
       toast.error("Hubo un error al cambiar la contraseña.");
     },
   });
-
-  const newPassword = watch("newPassword");
 
   const handleConfirmReset = (data) => {
     const payload = {
@@ -116,17 +126,28 @@ const RecoverPasswordForm = () => {
                 control={control}
                 rules={{
                   required: "La nueva contraseña es obligatoria",
-                  minLength: {
-                    value: 6,
-                    message: "La contraseña debe tener al menos 6 caracteres",
+                  validate: (value) => {
+                    const failedRequirements = PASSWORD_REQUIREMENTS.filter(
+                      (req) => !req.test.test(value)
+                    );
+                    return (
+                      failedRequirements.length === 0 ||
+                      "La contraseña no cumple con los requisitos."
+                    );
                   },
                 }}
                 render={({ field, fieldState: { error } }) => (
-                  <PasswordInput
-                    field={field}
-                    placeholder="Nueva contraseña"
-                    error={error}
-                  />
+                  <>
+                    <PasswordInput
+                      field={field}
+                      placeholder="Nueva contraseña"
+                      error={error}
+                    />
+                    <PasswordRequirements
+                      requirements={PASSWORD_REQUIREMENTS}
+                      password={newPassword}
+                    />
+                  </>
                 )}
               />
               <Controller
@@ -154,9 +175,9 @@ const RecoverPasswordForm = () => {
           >
             {isCodeSent ? "Cambiar Contraseña" : "Enviar"}
           </ModButton>
-          <PasswordLink onClick={() => push(PAGES.LOGIN.BASE)}>
+          <RedirectLink onClick={() => push(PAGES.LOGIN.BASE)}>
             Volver al inicio de sesión
-          </PasswordLink>
+          </RedirectLink>
         </Form>
       </ModGridColumn>
     </ModGrid>
