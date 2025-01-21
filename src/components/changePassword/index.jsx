@@ -5,7 +5,7 @@ import { Loader } from "@/components/layout";
 import { COLORS, ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Button, Form } from "semantic-ui-react";
@@ -31,19 +31,19 @@ const ChangePasswordForm = () => {
     getData();
   }, []);
 
-  const resetInputs = () => {
+  const resetInputs = useCallback(() => {
     reset({
       confirmationCode: "",
       newPassword: "",
       confirmPassword: "",
     });
-  };
-
+  }, [reset]);
+  
   useEffect(() => {
     if (!isCodeRequested) {
       resetInputs();
     }
-  }, [isCodeRequested]);
+  }, [isCodeRequested, resetInputs]);
 
   const { mutate: requestCode, isPending: isRequestCodePending } = useMutation({
     mutationFn: async () => {
