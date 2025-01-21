@@ -7,7 +7,10 @@ export const PATHS = {
   LOGIN: "login",
   BRANDS: ENTITIES.BRANDS,
   SUPPLIERS: ENTITIES.SUPPLIERS,
-  EVENTS: ENTITIES.EVENTS
+  EVENTS: ENTITIES.EVENTS,
+  USER_PROFILE: "userProfile",
+  RESTORE_PASSWORD: `${ENTITIES.USERS}/restore`,
+  CHANGE_PASSWORD: "changePassword",
 };
 
 export const BATCH = "batch";
