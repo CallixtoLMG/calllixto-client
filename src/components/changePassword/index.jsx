@@ -71,8 +71,14 @@ const ChangePasswordForm = () => {
       push(PAGES.LOGIN.BASE);
     },
     onError: (error) => {
-      console.error("Error:", error);
-      toast.error("Hubo un error al cambiar la contraseña.");
+      if (error.name.includes("LimitExceededException")) {
+        toast.error("Se ha excedido el límite de intentos permitidos, por favor pruebe más tarde.");
+      } else if (error.name.includes("CodeMismatchException")) {
+        toast.error("Hubo un error en el código de validación.");
+      } else {
+        toast.error("Hubo un error al cambiar la contraseña.");
+        console.error("Error:", error);
+      }
     },
   });
 

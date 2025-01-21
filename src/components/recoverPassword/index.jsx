@@ -13,9 +13,8 @@ import { ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text } from
 
 const RecoverPasswordForm = () => {
   const { push } = useRouter();
-  const { handleSubmit, control, reset, watch } = useForm();
+  const { handleSubmit, control, reset, watch, getValues, setValue } = useForm();
   const [isCodeSent, setIsCodeSent] = useState(false);
-  const [email, setEmail] = useState("");
 
   const newPassword = watch("newPassword", "");
 
@@ -36,8 +35,9 @@ const RecoverPasswordForm = () => {
     onSuccess: (_, emailData) => {
       toast.success("Se ha enviado un enlace de recuperación a tu correo electrónico.");
       setIsCodeSent(true);
-      setEmail(emailData.username);
-      reset();
+      reset({
+        username: emailData.username,
+      });
     },
     onError: () => {
       toast.error("Hubo un error al enviar el enlace de recuperación.");
@@ -59,21 +59,18 @@ const RecoverPasswordForm = () => {
     },
   });
 
-  const handleConfirmReset = (data) => {
-    const payload = {
-      ...data,
-      username: email,
-    };
-    onConfirmReset(payload);
-  };
-
   return (
     <ModGrid>
       <ModGridColumn>
         <ModHeader as="h3">
           <Text>{isCodeSent ? "Cambiar Contraseña" : "Recuperar Contraseña"}</Text>
         </ModHeader>
-        <Form onSubmit={handleSubmit(isCodeSent ? handleConfirmReset : onRecoverPassword)} size="large">
+        <Form
+          onSubmit={handleSubmit((data) => {
+            isCodeSent ? onConfirmReset(data) : onRecoverPassword(data);
+          })}
+          size="large"
+        >
           {!isCodeSent ? (
             <Controller
               name="username"
