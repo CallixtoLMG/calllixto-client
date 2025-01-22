@@ -2,6 +2,7 @@ import { useUserContext } from "@/User";
 import { LIST_BRANDS_QUERY_KEY } from "@/api/brands";
 import { LIST_BUDGETS_QUERY_KEY } from "@/api/budgets";
 import { LIST_CUSTOMERS_QUERY_KEY } from "@/api/customers";
+import { LIST_EXPENSES_QUERY_KEY } from "@/api/expenses";
 import { LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
 import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { Flex } from '@/components/common/custom';
@@ -24,6 +25,7 @@ const Header = () => {
     [PAGES.BUDGETS.BASE]: { entity: ENTITIES.BUDGETS, queryKey: LIST_BUDGETS_QUERY_KEY, text: PAGES.BUDGETS.NAME },
     [PAGES.BRANDS.BASE]: { entity: ENTITIES.BRANDS, queryKey: LIST_BRANDS_QUERY_KEY, text: PAGES.BRANDS.NAME },
     [PAGES.SUPPLIERS.BASE]: { entity: ENTITIES.SUPPLIERS, queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
+    [PAGES.EXPENSES.BASE]: { entity: ENTITIES.EXPENSES, queryKey: LIST_EXPENSES_QUERY_KEY, text: PAGES.EXPENSES.NAME },
   };
 
   const currentEntity = Object.keys(entityMapping).find(key => pathname.includes(key))

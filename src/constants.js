@@ -42,6 +42,13 @@ export const PAGES = {
     NAME: 'Ventas',
     SHORTKEYS: 'Control+5'
   },
+  EXPENSES: {
+    BASE: "/gastos",
+    CREATE: "/gastos/crear",
+    SHOW: (id) => `/gastos/${id}`,
+    NAME: 'Gastos',
+    SHORTKEYS: 'Control+7'
+  },
   LOGIN: {
     BASE: "/login"
   },
@@ -179,7 +186,9 @@ export const ENTITIES = {
   BUDGETS: 'budgets',
   BUDGET: 'budget',
   EVENTS: 'events',
-  USERS: 'users'
+  USERS: 'users',
+  EXPENSES: 'expenses',
+  EXPENSE: 'expense',
 };
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
@@ -293,7 +302,24 @@ export const SUPPLIER_STATES = {
   },
 };
 
-export const BRANDS_STATES = {
+export const BRAND_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
+};
+
+export const EXPENSE_STATES = {
   ACTIVE: {
     id: 'ACTIVE',
     title: 'Activos',

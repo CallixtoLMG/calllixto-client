@@ -1,46 +1,45 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useListBrands } from "@/api/brands";
-import BrandsPage from "@/components/brands/BrandsPage";
+import { useListExpenses } from "@/api/expenses";
+import ExpensesPage from "@/components/expenses/ExpensesPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { BRAND_STATES, COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, EXPENSE_STATES, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { downloadExcel } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
-const Brands = () => {
+const Expenses = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching, refetch } = useListBrands();
+  const { data, isLoading, isRefetching, refetch } = useListExpenses();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
-    setLabels([PAGES.BRANDS.NAME]);
+    setLabels([PAGES.EXPENSES.NAME]);
     refetch();
   }, [setLabels, refetch]);
 
-  const brands = useMemo(() => data?.brands, [data]);
+  const expenses = useMemo(() => data?.expenses, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
   const handleDownloadExcel = useCallback(() => {
-    if (!brands) return;
+    if (!expenses) return;
     const headers = ['ID', 'Nombre', 'Estado', 'Comentarios'];
-    const mappedBrands = brands.map(brand => {
-      const brandState = BRAND_STATES[brand.state]?.singularTitle || brand.state;
+    const mappedExpenses = expenses.map(expense => {
+      const expenseState = EXPENSE_STATES[expense.state]?.singularTitle || expense.state;
       return [
-        brand.id,
-        brand.name,
-        brandState,
-        brand.comments,
+        expense.id,
+        expense.name,
+        expenseState,
+        expense.comments,
       ];
     });
-    downloadExcel([headers, ...mappedBrands], "Lista de Marcas");
-  }, [brands]);
+    downloadExcel([headers, ...mappedExpenses], "Lista de Gastos");
+  }, [expenses]);
 
   useEffect(() => {
     const actions = RULES.canCreate[role] ? [
@@ -48,7 +47,7 @@ const Brands = () => {
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
-        onClick: () => { push(PAGES.BRANDS.CREATE) },
+        onClick: () => { push(PAGES.EXPENSES.CREATE) },
         text: 'Crear'
       }
     ] : [];
@@ -57,23 +56,23 @@ const Brands = () => {
       icon: ICONS.FILE_EXCEL,
       color: COLORS.SOFT_GREY,
       onClick: handleDownloadExcel,
-      text: 'Marcas',
+      text: 'Gastos',
       disabled: loading
     });
     setActions(actions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
 
-  useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => push(PAGES.EXPENSES.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <BrandsPage
+    <ExpensesPage
       onRefetch={refetch}
       isLoading={loading}
-      brands={loading ? [] : brands}
+      expenses={loading ? [] : expenses}
       role={role}
     />
   );
 };
 
-export default Brands;
+export default Expenses;

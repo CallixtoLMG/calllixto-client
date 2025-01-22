@@ -11,6 +11,7 @@ export const PATHS = {
   USER_PROFILE: "userProfile",
   RESTORE_PASSWORD: `${ENTITIES.USERS}/restore`,
   CHANGE_PASSWORD: "changePassword",
+  EXPENSES: ENTITIES.EXPENSES
 };
 
 export const BATCH = "batch";

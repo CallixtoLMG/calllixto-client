@@ -1,11 +1,10 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useActiveBrand, useDeleteBrand, useEditBrand, useGetBrand, useInactiveBrand } from "@/api/brands";
-import { useHasProductsByBrandId } from "@/api/products";
-import BrandForm from "@/components/brands/BrandForm";
-import BrandView from "@/components/brands/BrandView";
+import { useActiveExpense, useDeleteExpense, useEditExpense, useGetExpense, useInactiveExpense } from "@/api/expenses";
 import { Input } from "@/components/common/custom";
 import ModalAction from "@/components/common/modals/ModalAction";
+import ExpenseForm from "@/components/expenses/ExpenseForm";
+import ExpenseView from "@/components/expenses/ExpenseView";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { COLORS, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
@@ -17,11 +16,11 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "react-hot-toast";
 
-const Brand = ({ params }) => {
+const Expense = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { data: brand, isLoading, refetch } = useGetBrand(params.id);
+  const { data: expense, isLoading, refetch } = useGetExpense(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
@@ -29,11 +28,10 @@ const Brand = ({ params }) => {
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
-  const editBrand = useEditBrand();
-  const deleteBrand = useDeleteBrand();
-  const activeBrand = useActiveBrand();
-  const inactiveBrand = useInactiveBrand();
-  const { hasAssociatedProducts, isLoadingProducts } = useHasProductsByBrandId(brand?.id);
+  const editExpense = useEditExpense();
+  const deleteExpense = useDeleteExpense();
+  const activeExpense = useActiveExpense();
+  const inactiveExpense = useInactiveExpense();
 
   useEffect(() => {
     resetActions();
@@ -41,25 +39,25 @@ const Brand = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.BRANDS.NAME, brand?.name]);
+    setLabels([PAGES.EXPENSES.NAME, expense?.name]);
     refetch();
-  }, [setLabels, brand, refetch]);
+  }, [setLabels, expense, refetch]);
 
   const modalConfig = useMemo(() => ({
     delete: {
-      header: `¿Está seguro que desea eliminar la marca "${brand?.name}"?`,
+      header: `¿Está seguro que desea eliminar el gasto "${expense?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
     },
     active: {
-      header: `¿Está seguro que desea activar la marca ${brand?.id}?`,
+      header: `¿Está seguro que desea activar el gasto ${expense?.id}?`,
       icon: ICONS.PLAY_CIRCLE
     },
     inactive: {
-      header: `¿Está seguro que desea desactivar la marca ${brand?.id}?`,
+      header: `¿Está seguro que desea desactivar el gasto ${expense?.id}?`,
       icon: ICONS.PAUSE_CIRCLE
     },
-  }), [brand]);
+  }), [expense]);
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -77,13 +75,13 @@ const Brand = ({ params }) => {
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction("delete"), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: async (brand) => {
-      const data = await editBrand(brand);
+    mutationFn: async (expense) => {
+      const data = await editExpense(expense);
       return data;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        toast.success("Marca actualizada!");
+        toast.success("Gasto actualizado!");
       } else {
         toast.error(response.error.message);
       }
@@ -95,13 +93,13 @@ const Brand = ({ params }) => {
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: async ({ brand }) => {
-      const response = await activeBrand(brand);
+    mutationFn: async ({ expense }) => {
+      const response = await activeExpense(expense);
       return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        toast.success("Marca activada!");
+        toast.success("Gasto activado!");
       } else {
         toast.error(response.error.message);
       }
@@ -113,13 +111,13 @@ const Brand = ({ params }) => {
   });
 
   const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: async ({ brand, reason }) => {
-      const response = await inactiveBrand(brand, reason);
+    mutationFn: async ({ expense, reason }) => {
+      const response = await inactiveExpense(expense, reason);
       return response;
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        toast.success("Marca desactivada!");
+        toast.success("Gasto desactivado!");
       } else {
         toast.error(response.error.message);
       }
@@ -132,12 +130,12 @@ const Brand = ({ params }) => {
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
     mutationFn: () => {
-      return deleteBrand(params.id);
+      return deleteExpense(params.id);
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        toast.success("Marca eliminada permanentemente!");
-        push(PAGES.BRANDS.BASE);
+        toast.success("Gasto eliminado permanentemente!");
+        push(PAGES.EXPENSES.BASE);
       } else {
         toast.error(response.error.message);
       }
@@ -155,12 +153,12 @@ const Brand = ({ params }) => {
       mutateDelete();
     } else if (modalAction === "inactive") {
       if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar la marca.");
+        toast.error("Debe proporcionar una razón para desactivar el gasto.");
         return;
       }
-      mutateInactive({ brand, reason });
+      mutateInactive({ expense, reason });
     } else if (modalAction === "active") {
-      mutateActive({ brand });
+      mutateActive({ expense });
     }
 
     handleModalClose();
@@ -170,14 +168,14 @@ const Brand = ({ params }) => {
   const requiresConfirmation = modalAction === "delete";
 
   useEffect(() => {
-    if (brand) {
+    if (expense) {
       const actions = RULES.canRemove[role] ? [
         {
           id: 1,
-          icon: isItemInactive(brand?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
+          icon: isItemInactive(expense?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
           color: COLORS.GREY,
-          text: isItemInactive(brand?.state) ? "Activar" : "Desactivar",
-          onClick: isItemInactive(brand?.state) ? handleActivateClick : handleInactiveClick,
+          text: isItemInactive(expense?.state) ? "Activar" : "Desactivar",
+          onClick: isItemInactive(expense?.state) ? handleActivateClick : handleInactiveClick,
           loading: (activeAction === "active" || activeAction === "inactive"),
           disabled: !!activeAction,
           width: "fit-content",
@@ -190,26 +188,25 @@ const Brand = ({ params }) => {
           basic: true,
           onClick: handleDeleteClick,
           loading: activeAction === "delete",
-          disabled: hasAssociatedProducts || !!activeAction,
-          tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
+          disabled: !!activeAction,
         },
       ] : [];
 
       setActions(actions);
     }
-  }, [role, brand, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions, hasAssociatedProducts]);
+  }, [role, expense, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions]);
 
-  if (!isLoading && !brand) {
+  if (!isLoading && !expense) {
     push(PAGES.NOT_FOUND.BASE);
   }
 
   return (
-    <Loader active={isLoading || isLoadingProducts}>
+    <Loader active={isLoading}>
       {toggleButton}
       {isUpdating ? (
-        <BrandForm brand={brand} onSubmit={mutateEdit} isLoading={isEditPending} isUpdating />
+        <ExpenseForm expense={expense} onSubmit={mutateEdit} isLoading={isEditPending} isUpdating />
       ) : (
-        <BrandView brand={brand} />
+        <ExpenseView expense={expense} />
       )}
       <ModalAction
         title={header}
@@ -236,4 +233,4 @@ const Brand = ({ params }) => {
   );
 };
 
-export default Brand;
+export default Expense;

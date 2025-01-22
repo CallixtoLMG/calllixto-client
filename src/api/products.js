@@ -11,6 +11,7 @@ import {
 } from "@/fetchUrls";
 import { now } from "@/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { chunk } from "lodash";
 import { useMemo } from "react";
 import { getInstance } from "./axios";

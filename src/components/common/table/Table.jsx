@@ -39,7 +39,8 @@ const CustomTable = ({
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
   const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
-
+  console.log("talbe", elements)
+  console.log("talbe2", filteredElements)
   const currentPageElements = useMemo(() => {
     if (!paginate) {
       return filteredElements;

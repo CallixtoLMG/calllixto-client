@@ -1,15 +1,15 @@
 import { Dropdown, Flex, Input } from "@/components/common/custom";
 import { Filters, Table } from "@/components/common/table";
-import { BRAND_STATES, PAGES } from "@/constants";
+import { EXPENSE_STATES, PAGES } from "@/constants";
 import { useFilters } from "@/hooks/useFilters";
 import { createFilter } from "@/utils";
 import { Controller, FormProvider } from "react-hook-form";
 import { Form, Label } from "semantic-ui-react";
-import { BRAND_COLUMNS } from "../brands.common";
+import { EXPENSE_COLUMNS } from "../expenses.common";
 
-const EMPTY_FILTERS = { id: '', name: '', state: BRAND_STATES.ACTIVE.id };
+const EMPTY_FILTERS = { id: '', name: '', category: ""};
 const STATE_OPTIONS = [
-  ...Object.entries(BRAND_STATES).map(([key, value]) => ({
+  ...Object.entries(EXPENSE_STATES).map(([key, value]) => ({
     key,
     text: (
       <Flex alignItems="center" justifyContent="space-between">
@@ -20,7 +20,8 @@ const STATE_OPTIONS = [
   }))
 ];
 
-const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
+const ExpensesPage = ({ expenses = [], isLoading, onRefetch }) => {
+  console.log("expenses", expenses)
   const {
     onRestoreFilters,
     onSubmit,
@@ -28,12 +29,13 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
     methods
   } = useFilters(EMPTY_FILTERS);
 
-  const onFilter = createFilter(appliedFilters, ['name', 'id']);
+  const onFilter = createFilter(appliedFilters, []);
+  console.log("onFilter", onFilter)
 
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit(() => {})}>
+        <Form onSubmit={onSubmit(() => { })}>
           <Filters
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
@@ -52,7 +54,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
                   defaultValue={EMPTY_FILTERS.state}
                   onChange={(e, { value }) => {
                     onChange(value);
-                    onSubmit(() => {})();
+                    onSubmit(() => { })();
                   }}
                 />
               )}
@@ -81,14 +83,26 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
                 />
               )}
             />
+            <Controller
+              name="category"
+              render={({ field }) => (
+                <Input
+                  {...field}
+                  $marginBottom
+                  $maxWidth
+                  height="35px"
+                  placeholder="Categoria"
+                />
+              )}
+            />
           </Filters>
         </Form>
       </FormProvider>
       <Table
         isLoading={isLoading}
-        headers={BRAND_COLUMNS}
-        elements={brands}
-        page={PAGES.BRANDS}
+        headers={EXPENSE_COLUMNS}
+        elements={expenses}
+        page={PAGES.EXPENSES}
         onFilter={onFilter}
         paginate
       />
@@ -96,4 +110,4 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
   );
 };
 
-export default BrandsPage;
+export default ExpensesPage;
