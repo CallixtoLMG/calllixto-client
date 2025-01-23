@@ -1,58 +1,69 @@
 "use client";
 import { useEditSetting, useListSettings } from "@/api/settings";
+import { SubmitAndRestore } from "@/components/common/buttons";
+import { Form } from "@/components/common/custom";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import SettingsPage from "@/components/settings";
+import SettingsTabs from "@/components/settings";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { useUserContext } from "@/User";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import { pick } from "lodash";
 
-const entityLabels = {
-  BRANDS: "Marcas",
-  BUDGETS: "Presupuestos",
-  CUSTOMERS: "Clientes",
-  EXPENSES: "Gastos",
-  GENERAL: "General",
-  PRODUCTS: "Productos",
-  SUPPLIERS: "Proveedores",
+const ENTITY_MAPPER = {
+  PRODUCT: {
+    name: "Productos",
+  },
+  CUSTOMER: {
+    name: "Clientes",
+  },
+  BRAND: {
+    name: "Marcas",
+  },
+  BUDGET: {
+    name: "Ventas",
+  },
+  SUPPLIER: {
+    name: "Proveedores",
+  },
+  EXPENSE: {
+    name: "Gastos",
+  },
+  GENERAL: {
+    name: "General",
+  },
 };
 
-const pluralEntities = {
-  PRODUCT: "PRODUCTS",
-  CUSTOMER: "CUSTOMERS",
-  BRAND: "BRANDS",
-  BUDGET: "BUDGETS",
-  SUPPLIER: "SUPPLIERS",
-  EXPENSE: "EXPENSES",
-  GENERAL: "GENERAL",
-};
-
-const hiddenEntities = ["EXPENSE"];
-
-const filterByFields = ["tags"];
+export const SUPPORTED_SETTINGS = {
+  PRODUCT: ['tags', 'blacklist'],
+  CUSTOMER: ['tags'],
+  EXPENSE: ['tags', 'categories'],
+}
 
 const Settings = () => {
   useValidateToken();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
-  const { data, isLoading } = useListSettings();
-  const [activeEntity, setActiveEntity] = useState("");
-  const [settingsData, setSettingsData] = useState({});
+  const { data } = useListSettings();
   const editSetting = useEditSetting();
-  const { role } = useUserContext();
+  const [activeEntity, setActiveEntity] = useState();
+  const methods = useForm();
+  const { handleSubmit, reset } = methods;
 
-  const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+  useEffect(() => {
+    setActions([]);
+    setLabels([PAGES.SETTINGS.NAME]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: async ({ entity, tags }) => {
-      const response = await editSetting({
-        clientId: "client-id",
-        entity,
-        value: { tags },
+  const { mutate: mutateEdit, isPending } = useMutation({
+    mutationFn: (data) => {
+      return editSetting({
+        entity: `${activeEntity.entity}S`,
+        value: pick(data, SUPPORTED_SETTINGS[activeEntity.entity])
       });
-      return response;
     },
     onSuccess: () => {
       toast.success("Cambios guardados correctamente.");
@@ -62,63 +73,40 @@ const Settings = () => {
     },
   });
 
-  const visibleSettings = useMemo(() => {
+  const handleEntityChange = useCallback((entity) => {
+    setActiveEntity(entity);
+    setLabels([PAGES.SETTINGS.NAME, entity.label]);
+    reset(entity);
+  }, [reset, setLabels]);
+
+  const settings = useMemo(() => {
     if (!data?.settings) return [];
-
-    return data.settings
-      .filter(({ entity }) => !hiddenEntities.includes(entity))
-      .filter((entity) => filterByFields.some((field) => entity[field] !== undefined))
-      .map(({ entity, ...rest }) => {
-        const pluralEntity = pluralEntities[entity] || entity;
-        return {
-          entity: pluralEntity,
-          label: capitalize(entityLabels[pluralEntity] || pluralEntity.toLowerCase()),
-          ...rest,
-        };
-      });
-  }, [data]);
-
-  useEffect(() => {
-    if (visibleSettings.length > 0) {
-      const parsedData = visibleSettings.reduce((acc, setting) => {
-        acc[setting.entity] = setting;
-        return acc;
-      }, {});
-      setSettingsData(parsedData);
-    }
-  }, [visibleSettings]);
-
-  useEffect(() => {
-    if (visibleSettings.length > 0) {
-      const initialEntity = visibleSettings[0];
-      setActiveEntity(initialEntity.entity);
-      setLabels([PAGES.SETTINGS.NAME, initialEntity.label]);
-      setActions([]);
-    }
-  }, [visibleSettings, setLabels, setActions]);
-
-  const handleEntityChange = (entityName) => {
-    setActiveEntity(entityName);
-    const label = entityLabels[entityName] || capitalize(entityName.toLowerCase());
-    setLabels([PAGES.SETTINGS.NAME, label]);
-    setActions([]);
-  };
-
-  const handleSaveChanges = ({ entity, tags }) => {
-    mutateEdit({ entity, tags });
-  };
+    const mappedEntities = data?.settings
+      .filter(entity => SUPPORTED_SETTINGS[entity.entity]?.some(setting => !!entity[setting]))
+      .map(entity => ({
+        ...entity,
+        label: ENTITY_MAPPER[entity.entity].name
+      }));
+    handleEntityChange(mappedEntities[0]);
+    return mappedEntities;
+  }, [data, handleEntityChange]);
 
   return (
-    <SettingsPage
-      activeEntity={activeEntity}
-      settingsData={settingsData}
-      isLoading={isLoading}
-      isPending={isEditPending}
-      onEntityChange={handleEntityChange}
-      onSubmit={handleSaveChanges}
-      settings={visibleSettings}
-      role={role}
-    />
+    <FormProvider {...methods}>
+      <Form onSubmit={handleSubmit(mutateEdit)}>
+        <SettingsTabs
+          activeEntity={activeEntity}
+          onEntityChange={handleEntityChange}
+          settings={settings}
+        />
+        <SubmitAndRestore
+          isUpdating={true}
+          isLoading={false}
+          onReset={() => {}}
+          isDirty={true}
+        />
+      </Form>
+    </FormProvider>
   );
 };
 

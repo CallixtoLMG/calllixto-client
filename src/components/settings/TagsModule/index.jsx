@@ -1,30 +1,17 @@
-import { useUserContext } from "@/User";
-import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
+import { IconnedButton } from "@/components/common/buttons";
 import { Flex, FlexColumn } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { COLORS, ICONS, SEMANTIC_COLORS } from "@/constants";
-import { RULES } from "@/roles";
-import { Controller } from "react-hook-form";
+import {  useFieldArray } from "react-hook-form";
 import { Accordion, Icon, Label, Segment } from "semantic-ui-react";
-import { Form, FormInput, FormSelect } from "./styles";
+import { FormInput, FormSelect } from "./styles";
+import { useState } from "react";
 
-const TagsModule = ({
-  control,
-  errors,
-  localTags,
-  isDirty,
-  isTableModified,
-  onAddTag,
-  onRemoveTag,
-  onReset,
-  onSaveChanges,
-  isPending,
-  isLoading,
-  isAccordionOpen,
-  onToggleAccordion,
-}) => {
-
-  const { role } = useUserContext();
+const TagsModule = () => {
+  const [tagToAdd, setTagToAdd] = useState({ name: "", color: "", description: "" });
+  const { fields: tags, append, remove } = useFieldArray({
+    name: "tags"
+  });
 
   const headers = [
     {
@@ -42,94 +29,64 @@ const TagsModule = ({
     },
   ];
 
-  const actions = RULES.canRemove[role] ? [
+  const actions = [
     {
       id: "delete",
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      onClick: onRemoveTag,
+      onClick: (tag, index) => remove(index),
       tooltip: "Eliminar",
     },
-  ] : [];
+  ];
 
   return (
     <Accordion fluid>
-      <Accordion.Title active={isAccordionOpen} onClick={onToggleAccordion}>
+      <Accordion.Title active={true} onClick={() => {}}>
         <Icon name="dropdown" />
         Etiquetas
       </Accordion.Title>
-      <Accordion.Content active={isAccordionOpen}>
+      <Accordion.Content active={true}>
         <Segment>
-          <Form onSubmit={onAddTag}>
-            <Flex width="100%" paddingTop="20px" alignItems="flex-start" columnGap="15px">
-              <Controller
-                name="name"
-                control={control}
-                rules={{ required: "El nombre es obligatorio" }}
-                render={({ field }) => (
-                  <FormInput
-                    width={4}
-                    label="Nombre"
-                    placeholder="Nombre de la etiqueta"
-                    value={field.value}
-                    onChange={(e) => field.onChange(e.target.value)}
-                    error={errors.name && { content: errors.name.message }}
-                  />
-                )}
-              />
-              <Controller
-                name="color"
-                control={control}
-                render={({ field }) => (
-                  <FormSelect
-                    width={3}
-                    label="Color"
-                    options={SEMANTIC_COLORS}
-                    value={field.value}
-                    onChange={(e, { value }) => field.onChange(value)}
-                  />
-                )}
-              />
-              <Controller
-                name="description"
-                control={control}
-                render={({ field }) => (
-                  <FormInput
-                    width={8}
-                    label="Descripción"
-                    placeholder="Descripción"
-                    value={field.value}
-                    onChange={(e) => field.onChange(e.target.value)}
-                  />
-                )}
-              />
-              <IconnedButton
-                text="Agregar"
-                icon={ICONS.ADD}
-                color={COLORS.GREEN}
-                onClick={onAddTag}
-                disabled={!isDirty}
-                height="38px"
-              />
-            </Flex>
-          </Form>
+          <Flex width="100%" paddingTop="20px" alignItems="flex-start" columnGap="15px">
+            <FormInput
+              width={4}
+              label="Nombre"
+              placeholder="Nombre de la etiqueta"
+              value={tagToAdd.name}
+              onChange={(e) => setTagToAdd({ ...tagToAdd, name: e.target.value })}
+            />
+            <FormSelect
+              width={3}
+              label="Color"
+              options={SEMANTIC_COLORS}
+              value={tagToAdd.color}
+              onChange={(e, { value }) => setTagToAdd({ ...tagToAdd, color: value })}
+            />
+            <FormInput
+              width={8}
+              label="Descripción"
+              placeholder="Descripción"
+              value={tagToAdd.description}
+              onChange={(e) => setTagToAdd({ ...tagToAdd, description: e.target.value })}
+            />
+            <IconnedButton
+              text="Agregar"
+              icon={ICONS.ADD}
+              color={COLORS.GREEN}
+              onClick={() => append(tagToAdd)}
+              height="38px"
+            />
+          </Flex>
           <FlexColumn rowGap="15px">
             <Table
-              isLoading={isLoading}
+              isLoading={false}
               headers={headers}
-              elements={localTags}
+              elements={tags}
               mainKey="name"
-              actions={actions}
               paginate={false}
+              actions={actions}
               tableHeight="40vh"
               deleteButtonInside
-            />
-            <SubmitAndRestore
-              isUpdating={true}
-              isLoading={isPending}
-              isDirty={isTableModified}
-              onReset={onReset}
-              onSubmit={onSaveChanges}
             />
           </FlexColumn>
         </Segment>

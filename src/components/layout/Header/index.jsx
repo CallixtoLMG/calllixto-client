@@ -1,7 +1,7 @@
 import { useUserContext } from "@/User";
 import { Dropdown, Flex, Icon } from "@/components/common/custom";
 import { KeyboardShortcuts } from "@/components/common/modals";
-import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/constants";
+import { COLORS, DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/constants";
 import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
 import { Button, Label, Menu } from "semantic-ui-react";
