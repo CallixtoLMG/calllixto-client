@@ -7,6 +7,11 @@ import { usePathname, useRouter } from "next/navigation";
 import { Button, Label, Menu } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
 import { Container, LeftHeaderDiv, ModLink, RigthHeaderDiv, Text } from "./styles";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { RULES, isCallixtoUser } from "@/roles";
+import { usePathname, useRouter } from 'next/navigation';
+import { Dropdown, Icon, Menu } from 'semantic-ui-react';
+import { Container, LogDiv, ModLink, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -20,14 +25,24 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("userData");
     push(PAGES.LOGIN.BASE);
   };
 
-  const routesWithoutHeader = [PAGES.LOGIN.BASE];
+  const handleUserManagement = () => {
+    push(PAGES.CHANGE_PASSWORD.BASE);
+  };
+
+  const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
 
+  const shortcutMapping = {
+    [PAGES.CUSTOMERS.SHORTKEYS]: () => push(PAGES.CUSTOMERS.BASE),
+    [PAGES.SUPPLIERS.SHORTKEYS]: () => push(PAGES.SUPPLIERS.BASE),
+    [PAGES.BRANDS.SHORTKEYS]: () => push(PAGES.BRANDS.BASE),
+    [PAGES.PRODUCTS.SHORTKEYS]: () => push(PAGES.PRODUCTS.BASE),
+    [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
+  };
+  useKeyboardShortcuts(shortcutMapping);
   return (
     <>
       {showHeader && (
@@ -81,6 +96,30 @@ const Header = () => {
                       userData={userData}
                     />
                   </RigthHeaderDiv>
+                  <LogDiv>
+                    <Dropdown
+                      text={(
+                        <>
+                          <Icon color={COLORS.GREY} name="user" />
+                          {`${userData.name}` || 'Usuario'}
+                        </>
+                      )}
+                      pointing="top right"
+                      className="link item"
+                    >
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={handleLogout}>
+                          <Icon color={COLORS.RED} name="log out" />
+                          Cerrar sesión
+                        </Dropdown.Item>
+                        {RULES.canUpdate[role] &&
+                          <Dropdown.Item onClick={handleUserManagement}>
+                            <Icon color={COLORS.ORANGE} name="settings" />
+                            Cambiar contraseña
+                          </Dropdown.Item>}
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </LogDiv>
                 </Flex>
               </>
             )}

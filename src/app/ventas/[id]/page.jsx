@@ -70,7 +70,7 @@ const Budget = ({ params }) => {
     return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
   };
 
-   const handleDollarChange = (e) => {
+  const handleDollarChange = (e) => {
     let value = e.target.value;
     value = value.replace(/[^0-9.]/g, '');
     const parts = value.split('.');
@@ -309,7 +309,7 @@ const Budget = ({ params }) => {
     mutationFn: async (dataToSend) => {
       const { pickUpInStore, paymentsMade, total } = dataToSend;
       const confirmationData = {
-        confirmedBy: `${userData.firstName} ${userData.lastName}`,
+        confirmedBy: `${userData.name}`,
         confirmedAt: now(),
         pickUpInStore,
         paymentsMade,
@@ -331,7 +331,7 @@ const Budget = ({ params }) => {
   const { mutate: mutateCancel, isPending: isPendingCancel } = useMutation({
     mutationFn: async (cancelReason) => {
       const cancelData = {
-        cancelledBy: `${userData.firstName} ${userData.lastName}`,
+        cancelledBy: `${userData.name}`,
         cancelledAt: now(),
         cancelledMsg: cancelReason
       };

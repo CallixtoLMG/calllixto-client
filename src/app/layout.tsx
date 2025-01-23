@@ -36,8 +36,8 @@ const BreadcrumbContainer = styled.div`
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const notShow = [PAGES.LOGIN.BASE, PAGES.BASE, PAGES.NOT_FOUND.BASE];
-  const show = !notShow.includes(pathname);
+  const hide = [PAGES.LOGIN.BASE, PAGES.BASE, PAGES.NOT_FOUND.BASE, PAGES.CHANGE_PASSWORD.BASE, PAGES.RESTORE_PASSWORD.BASE];
+  const show = !hide.includes(pathname);
 
   const [queryClient] = useState(
     () =>
@@ -54,37 +54,37 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
   return (
     <html lang="en">
-      <GlobalStyle/>
-        <StyledComponentsRegistry>
-          <body className={inter.className}>
-            <Toaster
-              position="top-center"
-              toastOptions={{
-                duration: 4000
-              }} />
-            <QueryClientProvider client={queryClient}>
-              <UserProvider>
-                <Header />
-                <NavActionsProvider>
-                  <BreadcrumProvider>
-                    {show && (
-                      <NavigationContainer>
-                        <BreadcrumbContainer>
-                          <GoBackButton />
-                          <Breadcrumb />
-                        </BreadcrumbContainer>
-                        <NavActions />
-                      </NavigationContainer>
-                    )}
-                    <LayoutChildrenContainer>
-                      {children}
-                    </LayoutChildrenContainer>
-                  </BreadcrumProvider>
-                </NavActionsProvider>
-              </UserProvider>
-            </QueryClientProvider>
-          </body>
-        </StyledComponentsRegistry>
+      <GlobalStyle />
+      <StyledComponentsRegistry>
+        <body className={inter.className}>
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 4000
+            }} />
+          <QueryClientProvider client={queryClient}>
+            <UserProvider>
+              <Header />
+              <NavActionsProvider>
+                <BreadcrumProvider>
+                  {show && (
+                    <NavigationContainer>
+                      <BreadcrumbContainer>
+                        <GoBackButton />
+                        <Breadcrumb />
+                      </BreadcrumbContainer>
+                      <NavActions />
+                    </NavigationContainer>
+                  )}
+                  <LayoutChildrenContainer>
+                    {children}
+                  </LayoutChildrenContainer>
+                </BreadcrumProvider>
+              </NavActionsProvider>
+            </UserProvider>
+          </QueryClientProvider>
+        </body>
+      </StyledComponentsRegistry>
     </html>
   );
 };
