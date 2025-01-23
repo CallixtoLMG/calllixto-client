@@ -1,5 +1,5 @@
 import { useUserContext } from "@/User";
-import { Flex, Icon } from "@/components/common/custom";
+import { Dropdown, Flex, Icon } from "@/components/common/custom";
 import { KeyboardShortcuts } from "@/components/common/modals";
 import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/constants";
 import { RULES, isCallixtoUser } from "@/roles";
@@ -8,10 +8,6 @@ import { Button, Label, Menu } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
 import { Container, LeftHeaderDiv, ModLink, RigthHeaderDiv, Text } from "./styles";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { RULES, isCallixtoUser } from "@/roles";
-import { usePathname, useRouter } from 'next/navigation';
-import { Dropdown, Icon, Menu } from 'semantic-ui-react';
-import { Container, LogDiv, ModLink, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -96,30 +92,28 @@ const Header = () => {
                       userData={userData}
                     />
                   </RigthHeaderDiv>
-                  <LogDiv>
-                    <Dropdown
-                      text={(
-                        <>
-                          <Icon color={COLORS.GREY} name="user" />
-                          {`${userData.name}` || 'Usuario'}
-                        </>
-                      )}
-                      pointing="top right"
-                      className="link item"
-                    >
-                      <Dropdown.Menu>
-                        <Dropdown.Item onClick={handleLogout}>
-                          <Icon color={COLORS.RED} name="log out" />
-                          Cerrar sesión
-                        </Dropdown.Item>
-                        {RULES.canUpdate[role] &&
-                          <Dropdown.Item onClick={handleUserManagement}>
-                            <Icon color={COLORS.ORANGE} name="settings" />
-                            Cambiar contraseña
-                          </Dropdown.Item>}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </LogDiv>
+                  <Dropdown
+                    text={(
+                      <>
+                        <Icon color={COLORS.GREY} name="user" />
+                        {`${userData.name}` || 'Usuario'}
+                      </>
+                    )}
+                    pointing="top right"
+                    className="link item"
+                  >
+                    <Dropdown.Menu>
+                      <Dropdown.Item onClick={handleLogout}>
+                        <Icon color={COLORS.RED} name="log out" />
+                        Cerrar sesión
+                      </Dropdown.Item>
+                      {RULES.canUpdate[role] &&
+                        <Dropdown.Item onClick={handleUserManagement}>
+                          <Icon color={COLORS.ORANGE} name="settings" />
+                          Cambiar contraseña
+                        </Dropdown.Item>}
+                    </Dropdown.Menu>
+                  </Dropdown>
                 </Flex>
               </>
             )}
