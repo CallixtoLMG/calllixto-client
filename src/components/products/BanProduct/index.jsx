@@ -142,7 +142,7 @@ const BanProduct = ({ open, setOpen }) => {
                   headers={BAN_PRODUCTS_COLUMNS}
                   elements={watchProducts?.map(p => ({ code: p }))}
                   actions={actions}
-                ></Table>
+                />
               </Loader>
             </FieldsContainer>
           </Form>

@@ -27,23 +27,8 @@ export const Segment = styled(SSegment)`
 `;
 
 export const Input = styled(SInput)`
-  margin: ${({ $marginBottom }) => $marginBottom && "5px 0"} !important;
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
-  border-radius: 0.28571429rem;
-  max-width: ${({ $maxWidth }) => $maxWidth && `200px!important;`};
-  height: ${({ height = '50px' }) => height} !important;
   width: ${({ width = '100%' }) => `${width}!important`};
-  display: flex!important;
-  input{
-    height: ${({ height }) => height || '50px'} !important;
-    padding: 0 14px!important;
-    text-align: ${({ center }) => (center ? 'center' : 'left')} !important;
-    width: ${({ innerWidth = '100%' }) => `${innerWidth}!important`};
-    text-align-last: ${({ textAlignLast }) => `${textAlignLast}!important`};
-  };
-  div{
-    line-height: 190%!important;
-  };
+  height: ${({ height }) => height} !important;
 `;
 
 export const FormField = styled(Form.Field)`
@@ -53,7 +38,6 @@ export const FormField = styled(Form.Field)`
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
-  row-gap: 5px!important;
   height: ${({ height }) => height} !important;
 `;
 
@@ -69,42 +53,11 @@ export const Label = styled(SLabel)`
 `;
 
 export const TextArea = styled(STextarea)`
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
-  border-radius: 0.28571429rem;
   resize: ${({ resize = "none" }) => `${resize}!important`};
-  width: ${({ width }) => `${width}!important`};
   padding: ${({ padding }) => `${padding}!important`};
 `;
 
-export const Dropdown = styled(SDropdown)`
-  padding: ${({ padding }) => `${padding}!important`};
-  min-width: ${({ minWidth }) => `${minWidth}!important;`};
-  max-width: ${({ $maxWidth }) => $maxWidth && `200px!important;`};
-  margin: ${({ margin }) => `${margin}!important;`};
-  box-shadow: ${({ hideBorder }) => hideBorder ? "none" : "0 1px 2px 0 rgba(34,36,38,.15) !important"};
-  border-radius: ${({ hideBorder }) => hideBorder ? "0" : "0.28571429rem !important"};
-  background-color: ${({ bgColor }) => `${bgColor}!important`};
-  height: ${({ height = "50px" }) => `${height}!important`};
-  min-height: ${({ minHeight }) => `${minHeight}!important`};
-  display: flex!important;
-  flex-wrap: wrap;
-  align-content: center;
-  width: ${({ width = "100%" }) => `${width}!important`};
-  input {
-    min-width: ${({ minWidth }) => `${minWidth}!important;`};
-    height: ${({ height = "50px" }) => `${height}!important`};
-  };
-  i{
-    margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
-  }
-  i.dropdown.icon {
-    height: 50px!important;
-    top: ${({ top = "15px" }) => `${top}!important`};
-  };
-  &:hover {
-    background-color: ${({ noBgColor }) => `${noBgColor}!important`};
-  };
-`;
+export const Dropdown = styled(SDropdown)``;
 
 export const DropdownOption = styled(SDropdown)`
 &&&&{

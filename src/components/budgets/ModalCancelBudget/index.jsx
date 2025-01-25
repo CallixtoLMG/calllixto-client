@@ -40,7 +40,7 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>
-    </Transition >
+    </Transition>
   );
 };
 

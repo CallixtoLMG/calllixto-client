@@ -467,7 +467,7 @@ const Budget = ({ params }) => {
           selectedContact={selectedContact}
         />
       </OnlyPrint>
-    </Loader >
+    </Loader>
   );
 };
 

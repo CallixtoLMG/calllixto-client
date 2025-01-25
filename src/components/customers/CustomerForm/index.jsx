@@ -1,11 +1,10 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, RuledLabel } from "@/components/common/custom";
-import { ContactFields, ControlledComments } from "@/components/common/form";
+import { FieldsContainer, Form } from "@/components/common/custom";
+import { ContactFields, ControlledComments, ControlledInput } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { preventSend } from "@/utils";
 import { useCallback } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 const EMPTY_CUSTOMER = { name: '', phoneNumbers: [], addresses: [], emails: [], comments: '' };
 
 const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdating }) => {
@@ -22,15 +21,6 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
   }, [reset]);
 
   const handleCreate = (data) => {
-    if (!data.addresses.length) {
-      data.addresses = [];
-    }
-    if (!data.phoneNumbers.length) {
-      data.phoneNumbers = [];
-    }
-    if (!data.emails.length) {
-      data.emails = [];
-    }
     onSubmit(data);
   };
 
@@ -41,20 +31,10 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleCreate)}>
         <FieldsContainer>
-          <FormField width="33%" error={errors?.name?.message}>
-            <RuledLabel title="Nombre" message={errors?.name?.message} required />
-            <Controller
-              name="name"
-              control={control}
-              rules={RULES.REQUIRED}
-              render={({ field }) => <Input {...field} placeholder="Nombre" onKeyPress={preventSend} />}
-            />
-          </FormField>
+          <ControlledInput width="40%"name="name" label="Nombre" placeholder="Nombre" rules={RULES.REQUIRED} />
         </FieldsContainer>
         <ContactFields />
-        <FieldsContainer>
-          <ControlledComments control={control} />
-        </FieldsContainer>
+        <ControlledComments />
         <SubmitAndRestore
           isUpdating={isUpdating}
           isLoading={isLoading}

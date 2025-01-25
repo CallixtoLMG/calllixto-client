@@ -1,10 +1,10 @@
 import { Icon } from "@/components/common/custom";
 import { ICONS } from "@/constants";
-import CurrencyFormat from 'react-currency-format';
 import styled from "styled-components";
 import { Flex } from './Flex';
+import { Input } from "semantic-ui-react";
 
-export const CurrencyFormatInput = styled(CurrencyFormat)`
+export const CurrencyFormatInput = styled(Input)`
   box-shadow: ${({ $shadow }) => $shadow && " 0 1px 2px 0 rgba(34,36,38,.15)!important"};
   width: ${({ width }) => width && `${width}!important`};
   height: ${({ height = '30px' }) => height} !important;

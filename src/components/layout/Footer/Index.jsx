@@ -11,7 +11,7 @@ const Footer = () => {
     <>
       {pathname !== PAGES.LOGIN.BASE &&
         <Segment>
-          <ModContainer >
+          <ModContainer>
             <div>
               <Image
                 src="/callixto.png"

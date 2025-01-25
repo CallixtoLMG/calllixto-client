@@ -1,32 +1,36 @@
 "use client";
-import { FieldsContainer, FormField, Label, Message, MessageHeader, Segment, ViewContainer } from "@/components/common/custom";
-import { isItemInactive } from "@/utils";
+import { FieldsContainer, Form, FormField, Input, TextArea, ViewContainer } from "@/components/common/custom";
 
 const BrandView = ({ brand }) => {
   return (
-    <ViewContainer>
-      {isItemInactive(brand?.state) &&
+    <Form>
+      <ViewContainer>
         <FieldsContainer>
-          <Message negative >
-            <MessageHeader>Motivo de inactivación</MessageHeader>
-            <p>{brand.inactiveReason}</p>
-          </Message>
-        </FieldsContainer>}
-      <FieldsContainer>
-        <FormField>
-          <Label>Código</Label>
-          <Segment placeholder>{brand?.id}</Segment>
-        </FormField>
-        <FormField width="50%">
-          <Label>Nombre</Label>
-          <Segment placeholder>{brand?.name}</Segment>
-        </FormField>
-      </FieldsContainer>
-      <FieldsContainer rowGap="5px">
-        <Label>Comentarios</Label>
-        <Segment placeholder>{brand?.comments}</Segment>
-      </FieldsContainer>
-    </ViewContainer>
+          <FormField
+            width="150px"
+            label="Código"
+            control={Input}
+            value={brand?.id}
+            readOnly
+          />
+          <FormField
+            width="40%"
+            label="Nombre"
+            control={Input}
+            value={brand?.name}
+            readOnly
+          />
+        </FieldsContainer>
+        <FormField
+          control={TextArea}
+          label="Comentarios"
+          width="100%"
+          placeholder="Comentarios"
+          value={brand?.comments}
+          readOnly
+        />
+      </ViewContainer>
+    </Form>
   )
 };
 

@@ -1,10 +1,10 @@
 import { formatedSimplePhone, validateEmail, validatePhone } from "@/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Popup } from "semantic-ui-react";
+import { Form, Popup } from "semantic-ui-react";
 import { COLORS, ICONS } from "../../../constants";
 import { IconnedButton } from "../buttons";
-import { Box, FieldsContainer, FormField, Input, Label, RuledLabel } from '../custom';
+import { Box, FieldsContainer, Flex, FormField, Input } from '../custom';
 import { Table } from '../table';
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "./form.common";
 
@@ -58,7 +58,7 @@ export const ContactFields = () => {
 
   const handleAddAddress = () => {
     if (!addressToAdd.address) {
-      setError({ address: 'La dirección es requerida.' });
+      setError({ address: 'Campo requerido.' });
       return;
     }
     const addressExists = addressFields.some(
@@ -92,7 +92,7 @@ export const ContactFields = () => {
 
   return (
     <FieldsContainer columnGap="50px">
-      <FormField width="33%">
+      <Flex flex="1" flexDirection="column">
         <Popup
           trigger={
             <Box width="fit-content">
@@ -109,44 +109,54 @@ export const ContactFields = () => {
             setError();
           }}
           position='top left'>
-          <FieldsContainer width="60vw" alignItems="center" rowGap="5px">
-            <FormField flex="1">
-              <Label>Referencia</Label>
-              <Input
+          <Form>
+            <FieldsContainer width="60vw" alignItems="center" rowGap="5px">
+              <FormField
+                flex="1"
+                label="Referencia"
+                control={Input}
                 placeholder="Referencia"
-                height="35px"
                 value={phoneToAdd.ref}
                 onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'ref', e.target.value)}
               />
-            </FormField>
-            <FormField flex="1">
-              <RuledLabel title="Área" message={error?.phone} required />
-              <Input
+              <FormField
+                flex="1"
+                label="Área"
+                control={Input}
+                error={error?.phone ? {
+                  content: error.phone,
+                  pointing: 'above',
+                } : null}
+                required
                 maxLength="4"
                 placeholder="Área"
-                height="35px"
                 value={phoneToAdd.areaCode}
                 onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'areaCode', e.target.value)}
               />
-            </FormField>
-            <FormField flex="1">
-              <RuledLabel title="Número" message={error?.phone} required />
-              <Input
+              <FormField
+                flex="1"
+                label="Número"
+                control={Input}
+                error={error?.phone ? {
+                  content: error.phone,
+                  pointing: 'above',
+                } : null}
+                required
                 maxLength="7"
                 placeholder="Número"
-                height="35px"
                 value={phoneToAdd.number}
                 onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'number', e.target.value)}
               />
-            </FormField>
-            <IconnedButton
-              text="Agregar"
-              icon={ICONS.ADD}
-              color={COLORS.GREEN}
-              onClick={handleAddPhone}
-            />
-          </FieldsContainer>
+              <IconnedButton
+                text="Agregar"
+                icon={ICONS.ADD}
+                color={COLORS.GREEN}
+                onClick={handleAddPhone}
+              />
+            </FieldsContainer>
+          </Form>
         </Popup>
+        <Box marginTop="8px" />
         <Table
           headers={PHONE_TABLE_HEADERS}
           actions={[
@@ -154,8 +164,8 @@ export const ContactFields = () => {
           ]}
           elements={phoneFields}
         />
-      </FormField>
-      <FormField flex="1">
+      </Flex>
+      <Flex flex="1" flexDirection="column">
         <Popup
           trigger={
             <Box width="fit-content">
@@ -172,33 +182,39 @@ export const ContactFields = () => {
             setAddressToAdd(EMPTY_ADDRESS);
           }}
           position='top left'>
-          <FieldsContainer width="45vw" alignItems="center" rowGap="5px">
-            <FormField flex="1">
-              <Label>Referencia</Label>
-              <Input
+          <Form>
+            <FieldsContainer width="45vw" alignItems="center" rowGap="5px">
+              <FormField
+                flex="1"
+                label="Referencia"
+                control={Input}
                 placeholder="Referencia"
-                height="35px"
                 value={addressToAdd.ref}
                 onChange={(e) => updateFieldToAdd(setAddressToAdd, 'ref', e.target.value)}
               />
-            </FormField>
-            <FormField flex="2">
-              <RuledLabel title="Dirección" message={error?.address} required />
-              <Input
+              <FormField
+                flex="2"
+                label="Dirección"
+                control={Input}
+                error={error?.address ? {
+                  content: error.address,
+                  pointing: 'above',
+                } : null}
+                required
                 placeholder="Dirección"
-                height="35px"
                 value={addressToAdd.address}
                 onChange={(e) => updateFieldToAdd(setAddressToAdd, 'address', e.target.value)}
               />
-            </FormField>
-            <IconnedButton
-              text="Agregar"
-              icon={ICONS.ADD}
-              color={COLORS.GREEN}
-              onClick={handleAddAddress}
-            />
-          </FieldsContainer>
+              <IconnedButton
+                text="Agregar"
+                icon={ICONS.ADD}
+                color={COLORS.GREEN}
+                onClick={handleAddAddress}
+              />
+            </FieldsContainer>
+          </Form>
         </Popup>
+        <Box marginTop="8px" />
         <Table
           $wrap
           headers={ADDRESS_TABLE_HEADERS}
@@ -207,8 +223,8 @@ export const ContactFields = () => {
           ]}
           elements={addressFields}
         />
-      </FormField>
-      <FormField flex="1">
+      </Flex>
+      <Flex flex="1" flexDirection="column">
         <Popup
           trigger={
             <Box width="fit-content">
@@ -224,33 +240,39 @@ export const ContactFields = () => {
             setEmailToAdd(EMPTY_EMAIL);
           }}
           position='top left'>
-          <FieldsContainer width="50vw" alignItems="center" rowGap="5px">
-            <FormField flex="1">
-              <Label>Referencia</Label>
-              <Input
+          <Form>
+            <FieldsContainer width="50vw" alignItems="center" rowGap="5px">
+              <FormField
+                flex="1"
+                label="Referencia"
+                control={Input}
                 placeholder="Referencia"
-                height="35px"
                 value={emailToAdd.ref}
                 onChange={(e) => updateFieldToAdd(setEmailToAdd, 'ref', e.target.value)}
               />
-            </FormField>
-            <FormField flex="2">
-              <RuledLabel title="Email" message={error?.email} required />
-              <Input
+              <FormField
+                flex="2"
+                label="Email"
+                control={Input}
+                error={error?.email ? {
+                  content: error.email,
+                  pointing: 'above',
+                } : null}
+                required
                 placeholder="Email"
-                height="35px"
                 value={emailToAdd.email}
                 onChange={(e) => updateFieldToAdd(setEmailToAdd, 'email', e.target.value)}
               />
-            </FormField>
-            <IconnedButton
-              text="Agregar"
-              icon={ICONS.ADD}
-              color={COLORS.GREEN}
-              onClick={handleAddEmail}
-            />
-          </FieldsContainer>
+              <IconnedButton
+                text="Agregar"
+                icon={ICONS.ADD}
+                color={COLORS.GREEN}
+                onClick={handleAddEmail}
+              />
+            </FieldsContainer>
+          </Form>
         </Popup>
+        <Box marginTop="8px" />
         <Table
           $wrap={true}
           headers={EMAIL_TABLE_HEADERS}
@@ -259,7 +281,7 @@ export const ContactFields = () => {
           ]}
           elements={emailsFields}
         />
-      </FormField>
+      </Flex>
     </FieldsContainer>
   )
 }

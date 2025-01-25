@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
 import { useActiveSupplier, useDeleteSupplier, useEditSupplier, useGetSupplier, useInactiveSupplier } from "@/api/suppliers";
-import { Icon, Input } from "@/components/common/custom";
+import { Flex, Icon, Input, Message, MessageHeader } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction } from "@/components/common/modals";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -325,6 +325,14 @@ const Supplier = ({ params }) => {
   return (
     <Loader active={isLoading || loadingProducts}>
       {toggleButton}
+      {isItemInactive(supplier?.state) && (
+        <Flex>
+          <Message negative>
+            <MessageHeader>Motivo de inactivación</MessageHeader>
+            <p>{supplier.inactiveReason}</p>
+          </Message>
+        </Flex>
+      )}
       {isUpdating ? (
         <SupplierForm supplier={supplier} onSubmit={mutateEdit} isLoading={isEditPending} isUpdating />
       ) : (

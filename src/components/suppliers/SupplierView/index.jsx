@@ -1,34 +1,38 @@
 "use client";
-import { FieldsContainer, FormField, Label, Message, MessageHeader, Segment, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, Form, FormField, Input, TextArea, ViewContainer } from "@/components/common/custom";
 import { ContactView } from "@/components/common/form";
-import { isItemInactive } from "@/utils";
 
 const SupplierView = ({ supplier }) => {
   return (
-    <ViewContainer>
-      {isItemInactive(supplier?.state) &&
+    <Form>
+      <ViewContainer>
         <FieldsContainer>
-          <Message negative >
-            <MessageHeader>Motivo de inactivación</MessageHeader>
-            <p>{supplier.inactiveReason}</p>
-          </Message>
-        </FieldsContainer>}
-      <FieldsContainer>
-        <FormField>
-          <Label>Código</Label>
-          <Segment placeholder>{supplier?.id}</Segment>
-        </FormField>
-        <FormField width="40%">
-          <Label>Nombre</Label>
-          <Segment placeholder>{supplier?.name}</Segment>
-        </FormField>
-      </FieldsContainer>
-      <ContactView {...supplier} />
-      <FieldsContainer rowGap="5px">
-        <Label >Comentarios</Label>
-        <Segment placeholder>{supplier?.comments}</Segment>
-      </FieldsContainer>
-    </ViewContainer>
+          <FormField
+            width="150px"
+            label="Código"
+            control={Input}
+            value={supplier?.id}
+            readOnly
+          />
+          <FormField
+            width="40%"
+            label="Nombre"
+            control={Input}
+            value={supplier?.name}
+            readOnly
+          />
+        </FieldsContainer>
+        <ContactView {...supplier} />
+        <FormField
+          control={TextArea}
+          label="Comentarios"
+          width="100%"
+          placeholder="Comentarios"
+          value={supplier?.comments}
+          readOnly
+        />
+      </ViewContainer>
+    </Form>
   )
 };
 

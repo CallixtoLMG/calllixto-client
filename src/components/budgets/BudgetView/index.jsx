@@ -1,6 +1,6 @@
 import { useUpdatePayments } from "@/api/budgets";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Dropdown, FieldsContainer, Flex, FormField, Icon, Label, Price, Segment, ViewContainer } from "@/components/common/custom";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, Price, Segment, TextArea, ViewContainer } from "@/components/common/custom";
 import Payments from "@/components/common/form/Payments";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
@@ -135,140 +135,148 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
   }, []);
 
   return (
-    <ViewContainer>
-      {isBudgetCancelled(budget?.state) &&
-        <FieldsContainer>
-          <Message negative >
-            <MessageHeader>Motivo de anulación</MessageHeader>
-            <p>{budget?.cancelledMsg}</p>
-          </Message>
-        </FieldsContainer>}
-      <Flex justifyContent="space-between" >
-        <FieldsContainer >
-          <FormField width="300px">
-            <Label>Vendedor</Label>
-            <Segment placeholder>{budget?.seller}</Segment>
-          </FormField>
-          {budgetState && (
-            <FormField width="300px">
-              <Label color={budgetState.color}>{budgetState.label}</Label>
-              <Segment placeholder>{budgetState.person}</Segment>
-            </FormField>)}
-        </FieldsContainer>
-        <FieldsContainer >
-          {budgetState && (
-            <FormField>
-              <Label color={budgetState.color}>{budgetState.dateLabel}</Label>
-              <Segment placeholder>{budgetState.date}</Segment>
-            </FormField>
-          )}
-          {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) &&
-            <FormField>
-              <Label>Fecha de vencimiento</Label>
-              <Segment placeholder>{formatedDateOnly(expirationDate(budget?.expirationOffsetDays, budget?.createdAt))}</Segment>
-            </FormField>
-          }
-        </FieldsContainer>
-      </Flex>
-      <FieldsContainer>
-        <FormField width="300px">
-          <Label>Cliente</Label>
-          <Segment placeholder>{budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}</Segment>
-        </FormField>
-        <FormField flex="2">
-          <Label>Dirección</Label>
-          {budget?.pickUpInStore ? (
-            <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
-          ) : !budget?.customer?.addresses?.length ? (
-            <Segment placeholder>No existe una dirección registrada</Segment>
-          ) : budget.customer.addresses.length === 1 ? (
-            <Segment placeholder>{`${budget.customer?.addresses?.[0]?.ref ? `${budget.customer?.addresses?.[0]?.ref} :` : ""} ${budget.customer?.addresses?.[0]?.address}`}</Segment>
-          ) : (
-            (
-              <Dropdown
-                selection
-                options={budget?.customer?.addresses.map((address) => ({
-                  key: address.address,
-                  text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
-                  value: address.address,
-                }))}
-                value={selectedContact?.address}
-                onChange={(e, { value }) => setSelectedContact({
-                  ...selectedContact,
-                  address: value
-                })}
-              />
-            )
-          )}
-        </FormField>
-        <FormField flex="1">
-          <Label>Teléfono</Label>
-          {!budget?.customer?.phoneNumbers?.length ? (
-            <Segment placeholder>No existe un teléfono registrado</Segment>
-          ) : budget?.customer?.phoneNumbers.length === 1 ? (
-            <Segment placeholder>{`${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${formatedSimplePhone(budget.customer?.phoneNumbers?.[0])}`}</Segment>
-          ) : (
-            <Dropdown
-              selection
-              options={budget?.customer?.phoneNumbers.map((phone) => ({
-                key: formatedSimplePhone(phone),
-                text: `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`,
-                value: formatedSimplePhone(phone),
-              }))}
-              value={selectedContact?.phone}
-              onChange={(e, { value }) => setSelectedContact({
-                ...selectedContact,
-                phone: value
-              })}
+    <Form>
+      <ViewContainer>
+        {isBudgetCancelled(budget?.state) && (
+          <Flex>
+            <Message negative>
+              <MessageHeader>Motivo de anulación</MessageHeader>
+              <p>{budget?.cancelledMsg}</p>
+            </Message>
+          </Flex>
+        )}
+        <Flex justifyContent="space-between">
+          <FieldsContainer>
+            <FormField
+              width="300px"
+              label="Vendedor"
+              control={Input}
+              value={budget?.seller}
+              readOnly
             />
-          )}
-        </FormField>
-      </FieldsContainer>
-      <Table
-        mainKey="key"
-        headers={BUDGET_FORM_PRODUCT_COLUMNS}
-        elements={budget?.products}
-      />
-      <Total
-        readOnly
-        subtotal={subtotal}
-        total={total}
-        subtotalAfterDiscount={subtotalAfterDiscount}
-        globalDiscount={budget?.globalDiscount}
-        additionalCharge={budget?.additionalCharge}
-      />
-      {
-        (isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state)) && (
-          <>
-            {isBudgetConfirmed(budget?.state) &&
-              <Flex justifyContent="space-between">
-                {toggleButton}
-              </Flex>}
-            <Payments update={isUpdating} total={total} methods={methods}>
-              <SubmitAndRestore
-                isUpdating={isUpdating}
-                isLoading={isLoadingUpdatePayment}
-                isDirty={isDirty}
-                onSubmit={() => mutateUpdatePayment()}
-                onReset={() => methods.reset({ paymentsMade: budget.paymentsMade })}
-                disabled={!isDirty}
-                text="Guardar"
+            {budgetState && (
+              <FormField
+                width="300px"
+                label={budgetState.label}
+                control={Input}
+                value={budgetState.person}
+                readOnly
               />
-            </Payments>
-          </>
-        )
-      }
-      <FieldsContainer rowGap="5px" >
-        <Label>Comentarios</Label>
-        <Segment placeholder>{budget?.comments}</Segment>
-      </FieldsContainer>
-      <FieldsContainer>
-        <FormField flex={3}>
-          <Label>Métodos de pago</Label>
-          <Segment placeholder>{formattedPaymentMethods}</Segment>
-        </FormField>
-      </FieldsContainer>
-    </ViewContainer >
+            )}
+          </FieldsContainer>
+          <FieldsContainer>
+            {budgetState && (
+              <FormField
+                label={budgetState.dateLabel}
+                control={Input}
+                value={budgetState.date}
+                readOnly
+              />
+            )}
+            {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) && (
+              <FormField
+                label="Fecha de vencimiento"
+                control={Input}
+                value={formatedDateOnly(expirationDate(budget?.expirationOffsetDays, budget?.createdAt))}
+                readOnly
+              />
+            )}
+          </FieldsContainer>
+        </Flex>
+        <FieldsContainer>
+          <FormField
+            width="300px"
+            label="Cliente"
+            control={Input}
+            value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
+            readOnly
+          />
+          <FormField
+            flex="2"
+            label="Dirección"
+            control={Dropdown}
+            value={budget?.pickUpInStore ? PICK_UP_IN_STORE : !budget?.customer?.addresses?.length ? 'No existe una dirección registrada' : `${budget.customer?.addresses?.[0]?.ref ? `${budget.customer?.addresses?.[0]?.ref} :` : ""} ${budget.customer?.addresses?.[0]?.address}`}
+            readOnly
+            selection
+            options={budget?.customer?.addresses.map((address) => ({
+              key: address.address,
+              text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
+              value: address.address,
+            }))}
+            onChange={(e, { value }) => setSelectedContact({
+              ...selectedContact,
+              address: value
+            })}
+          />
+          <FormField
+            flex="1"
+            label="Teléfono"
+            control={Dropdown}
+            value={!budget?.customer?.phoneNumbers?.length ? 'No existe un teléfono registrado' : budget?.customer?.phoneNumbers.length === 1 ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${formatedSimplePhone(budget.customer?.phoneNumbers?.[0])}` : selectedContact?.phone}
+            readOnly
+            selection
+            options={budget?.customer?.phoneNumbers.map((phone) => ({
+              key: formatedSimplePhone(phone),
+              text: `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`,
+              value: formatedSimplePhone(phone),
+            }))}
+            onChange={(e, { value }) => setSelectedContact({
+              ...selectedContact,
+              phone: value
+            })}
+          />
+        </FieldsContainer>
+        <Table
+          mainKey="key"
+          headers={BUDGET_FORM_PRODUCT_COLUMNS}
+          elements={budget?.products}
+        />
+        <Total
+          readOnly
+          subtotal={subtotal}
+          total={total}
+          subtotalAfterDiscount={subtotalAfterDiscount}
+          globalDiscount={budget?.globalDiscount}
+          additionalCharge={budget?.additionalCharge}
+        />
+        {
+          (isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state)) && (
+            <>
+              {isBudgetConfirmed(budget?.state) &&
+                <Flex justifyContent="space-between">
+                  {toggleButton}
+                </Flex>}
+              <Payments update={isUpdating} total={total} methods={methods}>
+                <SubmitAndRestore
+                  isUpdating={isUpdating}
+                  isLoading={isLoadingUpdatePayment}
+                  isDirty={isDirty}
+                  onSubmit={() => mutateUpdatePayment()}
+                  onReset={() => methods.reset({ paymentsMade: budget.paymentsMade })}
+                  disabled={!isDirty}
+                  text="Guardar"
+                />
+              </Payments>
+            </>
+          )
+        }
+        <FormField
+          control={TextArea}
+          label="Comentarios"
+          width="100%"
+          placeholder="Comentarios"
+          value={budget?.comments}
+          readOnly
+        />
+        <FormField
+          control={Input}
+          label="Métodos de pago"
+          width="100%"
+          value={formattedPaymentMethods}
+          readOnly
+        />
+      </ViewContainer>
+    </Form>
   );
 };
 

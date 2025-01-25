@@ -9,7 +9,7 @@ const SubTitle = styled.p`
 
 export const TotalList = ({ items = [], readOnly, width, labelWidth }) => {
   return (
-    <FlexColumn marginLeft="auto" rowGap={!readOnly ? "5px" : "0"} width={!width ? "250px" : width} >
+    <FlexColumn marginLeft="auto" rowGap={!readOnly ? "5px" : "0"} width={!width ? "250px" : width}>
       {items
         .map(({ title, amount, subtitle }, index) => (
           <FlexColumn rowGap={!readOnly ? "5px" : "0"} key={index}>

@@ -30,7 +30,7 @@ const NavActions = () => {
     <Flex columnGap="10px">
       {actions.map(({ id, icon, color, onClick, text, button, disabled, width, basic, loading, tooltip }) => {
         return (
-          <Box key={`action_${id}`} >
+          <Box key={`action_${id}`}>
             {button ? button : (
               tooltip ? (
                 <Popup

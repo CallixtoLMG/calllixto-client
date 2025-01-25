@@ -128,7 +128,7 @@ const ModalConfirmation = ({
           </Modal.Actions>
         </Modal>
       </Form>
-    </Transition >
+    </Transition>
   );
 };
 

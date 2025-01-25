@@ -28,7 +28,7 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
   return (
     <Transition visible={open} animation='scale' duration={500}>
       <Modal closeIcon open={open} onClose={onClose}>
-        <Header icon={icon} content={title} ></Header>
+        <Header icon={icon} content={title} />
         <ModalContent>
           <Table
             headers={headers}

@@ -9,12 +9,6 @@ const Container = styled(Flex)`
 `;
 
 const Search = styled(SSearch)`
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
-  border-radius: 0.28571429rem;
-  height: ${({ height = '50px' }) => `${height}!important`} ;
-  input {
-    height: ${({ height = '50px' }) => `${height}!important`} ;
-  };
   div.results.transition.visible {
     width: 80vw !important;
     display: grid!important;

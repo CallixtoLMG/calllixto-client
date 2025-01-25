@@ -2,7 +2,7 @@
 
 import { useListBudgets } from "@/api/budgets";
 import { useActiveCustomer, useDeleteCustomer, useEditCustomer, useGetCustomer, useInactiveCustomer } from "@/api/customers";
-import { Input } from "@/components/common/custom";
+import { Flex, Input, Message, MessageHeader } from "@/components/common/custom";
 import ModalAction from "@/components/common/modals/ModalAction";
 import CustomerForm from "@/components/customers/CustomerForm";
 import CustomerView from "@/components/customers/CustomerView";
@@ -212,6 +212,14 @@ const Customer = ({ params }) => {
   return (
     <Loader active={isLoading || isLoadingBudgets}>
       {toggleButton}
+      {isItemInactive(customer?.state) && (
+        <Flex>
+          <Message negative>
+            <MessageHeader>Motivo de inactivación</MessageHeader>
+            <p>{customer.inactiveReason}</p>
+          </Message>
+        </Flex>
+      )}
       {isUpdating ? (
         <CustomerForm
           customer={customer}
@@ -236,7 +244,7 @@ const Customer = ({ params }) => {
           modalAction === "inactive" && (
             <Input
               type="text"
-              placeholder="Indique la razón de desactivación"
+              placeholder="Motivo de inactivación"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

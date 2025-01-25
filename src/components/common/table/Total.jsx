@@ -1,16 +1,17 @@
 import { Title } from '@/components/budgets/PDFfile/styles';
 import { formatedPercentage } from '@/utils';
 import { TotalList } from '.';
-import { Flex, Input, Price } from '../custom';
+import { Flex, FormField, Input, Price } from '../custom';
+import { Icon } from 'semantic-ui-react';
 
 export const Total = ({
   readOnly,
   subtotal = 0,
   subtotalAfterDiscount = 0,
   globalDiscount = 0,
-  onGlobalDiscountChange = () => { },
+  onGlobalDiscountChange = () => {},
   additionalCharge = 0,
-  onAdditionalChargeChange = () => { },
+  onAdditionalChargeChange = () => {},
   total = 0,
 }) => {
 
@@ -65,17 +66,20 @@ export const Total = ({
         id: 2,
         title: "Descuento",
         amount: (
-          <Flex rowGap="5px" alignItems="center" justifyContent="flex-end" columnGap="10px">
-            <Input
-              $marginBottom
-              width="80px"
-              center
-              height="30px"
-              type="number"
-              value={globalDiscount}
-              onFocus={(e) => e.target.select()}
-              onChange={(e) => {
-                const value = e.target.value;
+          <Input
+            width="90px"
+            height="35px"
+            value={globalDiscount}
+            iconPosition='right'
+            onChange={(e) => {
+              let value = e.target.value;
+              value = value.replace(/,/g, '.');
+              const regex = /^[0-9]+([.,][0-9]*)?$/;
+              if (regex.test(value) || value === '') {
+                const parts = value.split(".");
+                if (parts[1] && parts[1].length > 2) {
+                  value = parts[0] + "." + parts[1].substring(0, 2);
+                }
                 if (value > 100) {
                   onGlobalDiscountChange(100);
                   return;
@@ -85,10 +89,13 @@ export const Total = ({
                   return;
                 }
                 onGlobalDiscountChange(value);
-              }}
-            />
-            %
-          </Flex>
+              }
+            }}
+            onFocus={(e) => e.target.select()}
+          >
+            <Icon name='percent' size='small' />
+            <input />
+          </Input>
         )
       },
       {
@@ -103,17 +110,20 @@ export const Total = ({
         id: 4,
         title: "Recargo",
         amount: (
-          <Flex alignItems="center" justifyContent="flex-end" columnGap="10px">
-            <Input
-              $marginBottom
-              width="80px"
-              center
-              height="30px"
-              type="number"
-              value={additionalCharge}
-              onFocus={(e) => e.target.select()}
-              onChange={(e) => {
-                const value = e.target.value;
+          <Input
+            width="90px"
+            height="35px"
+            value={additionalCharge}
+            iconPosition='right'
+            onChange={(e) => {
+              let value = e.target.value;
+              value = value.replace(/,/g, '.');
+              const regex = /^[0-9]+([.,][0-9]*)?$/;
+              if (regex.test(value) || value === '') {
+                const parts = value.split(".");
+                if (parts[1] && parts[1].length > 2) {
+                  value = parts[0] + "." + parts[1].substring(0, 2);
+                }
                 if (value > 100) {
                   onAdditionalChargeChange(100);
                   return;
@@ -123,10 +133,13 @@ export const Total = ({
                   return;
                 }
                 onAdditionalChargeChange(value);
-              }}
-            />
-            %
-          </Flex>
+              }
+            }}
+            onFocus={(e) => e.target.select()}
+          >
+            <Icon name='percent' size='small' />
+            <input />
+          </Input>
         )
       }
     );

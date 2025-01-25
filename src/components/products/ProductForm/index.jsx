@@ -1,17 +1,17 @@
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label, RuledLabel, Segment } from "@/components/common/custom";
-import { ControlledComments } from "@/components/common/form";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Label } from "@/components/common/custom";
+import { ControlledComments, ControlledInput, ControlledPrice } from "@/components/common/form";
 import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, PAGES, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { isProductDeleted, preventSend } from "@/utils";
 import { useCallback, useMemo, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
-  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors, setError } = useForm({
+  const methods = useForm({
     defaultValues: {
       fractionConfig: {
         active: false,
@@ -21,6 +21,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
       ...product,
     }
   });
+  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors, setError } = methods;
   const [supplier, setSupplier] = useState();
   const [brand, setBrand] = useState();
   const [watchFractionable] = watch(["fractionConfig.active"]);
@@ -67,8 +68,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
     await onSubmit(filteredData);
   };
-
-  const shouldError = useMemo(() => !isUpdating && isDirty && isSubmitted, [isDirty, isSubmitted, isUpdating]);
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT), SHORTKEYS.DELETE);
@@ -146,171 +145,135 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   };
 
   return (
-    <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
-      <FieldsContainer rowGap="5px" alignItems="flex-end">
-        <FormField flex="1" error={errors.supplier?.message}>
-          <RuledLabel title="Proveedor" message={errors.supplier?.message} required />
-          {!isUpdating ? (
-            <Dropdown
-              required
-              name="supplier"
-              placeholder={PAGES.SUPPLIERS.NAME}
-              search
-              selection
-              minCharacters={2}
-              noResultsMessage="Sin resultados!"
-              options={supplierOptions}
-              clearable
-              value={supplier?.name}
-              onChange={(e, { value }) => handleSupplierChange(value)}
-              disabled={isProductDeleted(product?.state)}
-            />
-          ) : (
-            <Segment placeholder>{product?.supplierName}</Segment>
-          )}
-        </FormField>
-
-        <FormField flex="1" error={errors.brand?.message}>
-          <RuledLabel title="Marca" message={errors.brand?.message} required />
-          {!isUpdating ? (
-            <Dropdown
-              required
-              name="brand"
-              placeholder={PAGES.BRANDS.NAME}
-              search
-              selection
-              minCharacters={2}
-              noResultsMessage="Sin resultados!"
-              options={brandOptions}
-              clearable
-              value={brand?.name}
-              onChange={(e, { value }) => handleBrandChange(value)}
-              disabled={isProductDeleted(product?.state)}
-            />
-          ) : (
-            <Segment placeholder>{product?.brandName}</Segment>
-          )}
-        </FormField>
-        <FormField width="20%">
-          <Controller
-            name="editablePrice"
-            control={control}
-            render={({ field: { value, onChange, ...rest } }) => (
-              <IconnedButton
-                {...rest}
-                text="Precio Editable"
-                icon={ICONS.PENCIL}
-                onClick={() => onChange(!value)}
-                basic={!value}
-                disabled={isProductDeleted(product?.state)}
-              />
-            )}
+    <FormProvider {...methods}>
+      <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
+        <FieldsContainer rowGap="5px" alignItems="flex-end">
+          <FormField
+            flex="1"
+            required
+            name="supplier"
+            placeholder={PAGES.SUPPLIERS.NAME}
+            search
+            selection
+            minCharacters={2}
+            noResultsMessage="Sin resultados!"
+            options={supplierOptions}
+            clearable
+            value={supplier?.name}
+            onChange={(e, { value }) => handleSupplierChange(value)}
+            disabled={isProductDeleted(product?.state)}
+            label="Proveedor"
+            error={errors?.supplier ? {
+              content: errors.supplier.message,
+              pointing: 'above',
+            } : null}
+            control={Dropdown}
           />
-        </FormField>
-        <FormField width="20%">
-          <Controller
-            name="fractionConfig.active"
-            control={control}
-            render={({ field: { value, onChange, ...rest } }) => (
-              <IconnedButton
-                {...rest}
-                text="Producto Fraccionable"
-                icon={ICONS.CUT}
-                onClick={() => onChange(!value)}
-                basic={!value}
-                disabled={isProductDeleted(product?.state)}
-              />
-            )}
+          <FormField
+            flex="1"
+            required
+            name="brand"
+            placeholder={PAGES.BRANDS.NAME}
+            search
+            selection
+            minCharacters={2}
+            noResultsMessage="Sin resultados!"
+            options={brandOptions}
+            clearable
+            value={brand?.name}
+            onChange={(e, { value }) => handleBrandChange(value)}
+            disabled={isProductDeleted(product?.state)}
+            label="Marca"
+            error={errors?.brand ? {
+              content: errors.brand.message,
+              pointing: 'above',
+            } : null}
+            control={Dropdown}
           />
-        </FormField>
-      </FieldsContainer>
-      <FieldsContainer rowGap="5px">
-        <FormField width="20%" error={errors?.code?.message}>
-          <RuledLabel title="Código" message={errors?.code?.message} required={!isUpdating} />
-          {isUpdating ? (
-            <Segment placeholder>{product?.code}</Segment>
-          ) : (
+          <FormField width="20%">
             <Controller
-              name="code"
+              name="editablePrice"
               control={control}
-              rules={RULES.REQUIRED_BRAND_AND_SUPPLIER(brand, supplier)}
-              render={({ field }) => (
-                <Input
-                  innerWidth="0"
-                  {...field}
-                  placeholder="Código"
-                  onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                  {...((supplier?.id || brand?.id) && { label: { basic: true, content: `${supplier?.id ?? ''} ${brand?.id ?? ''}` } })}
-                  labelPosition='left'
+              render={({ field: { value, onChange, ...rest } }) => (
+                <IconnedButton
+                  {...rest}
+                  text="Precio Editable"
+                  icon={ICONS.PENCIL}
+                  onClick={() => onChange(!value)}
+                  basic={!value}
                   disabled={isProductDeleted(product?.state)}
                 />
               )}
             />
-          )}
-        </FormField>
-        <FormField flex="1" error={errors?.name?.message}>
-          <RuledLabel title="Nombre" message={errors?.name?.message} required />
-          <Controller
+          </FormField>
+          <FormField width="20%">
+            <Controller
+              name="fractionConfig.active"
+              control={control}
+              render={({ field: { value, onChange, ...rest } }) => (
+                <IconnedButton
+                  {...rest}
+                  text="Producto Fraccionable"
+                  icon={ICONS.CUT}
+                  onClick={() => onChange(!value)}
+                  basic={!value}
+                  disabled={isProductDeleted(product?.state)}
+                />
+              )}
+            />
+          </FormField>
+        </FieldsContainer>
+        <FieldsContainer rowGap="5px">
+          <ControlledInput
+            width="20%"
+            name="code"
+            label="Código"
+            placeholder="Código"
+            rules={RULES.REQUIRED_BRAND_AND_SUPPLIER(brand, supplier)}
+            innerWidth="0"
+            onChange={(e) => e.target.value.toUpperCase()}
+            labelPosition='left'
+            disabled={isProductDeleted(product?.state)}
+          />
+          <ControlledInput
+            flex="1"
             name="name"
-            control={control}
+            label="Nombre"
+            placeholder="Nombre"
             rules={RULES.REQUIRED}
-            render={({ field }) => <Input height="50px" {...field} placeholder="Nombre" disabled={isProductDeleted(product?.state)} />}
+            innerWidth="0"
+            onChange={(e) => e.target.value.toUpperCase()}
+            labelPosition='left'
+            disabled={isProductDeleted(product?.state)}
           />
-        </FormField>
-        <FormField width="20%">
-          <Label>Precio</Label>
-          <Controller
-            name="price"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <CurrencyFormatInput
-                textAlignLast="right"
-                height="50px"
-                displayType="input"
-                thousandSeparator={true}
-                decimalScale={2}
-                allowNegative={false}
-                prefix="$ "
-                customInput={Input}
-                onValueChange={value => {
-                  onChange(value.floatValue);
-                }}
-                value={value || 0}
-                placeholder="Precio"
-                disabled={isProductDeleted(product?.state)}
-              />
-            )}
-          />
-        </FormField>
-        <FormField width="20%">
-          <Label>Unidad de Medida</Label>
+          <ControlledPrice name="price" label="Precio" />
           <Controller
             name="fractionConfig.unit"
             control={control}
             render={({ field: { onChange, ...rest } }) => (
-              <Dropdown
+              <FormField
                 {...rest}
+                width="20%"
+                label="Unidad de Medida"
+                control={Dropdown}
                 selection
                 options={Object.values(MEASSURE_UNITS)}
                 defaultValue={Object.values(MEASSURE_UNITS)[0].value}
                 onChange={(e, { value }) => onChange(value)}
-                disabled={!watchFractionable || isProductDeleted(product?.state)}
-              />
+                disabled={!watchFractionable || isProductDeleted(product?.state)} />
             )}
           />
-        </FormField>
-      </FieldsContainer>
-      <FieldsContainer>
-        <ControlledComments control={control} disabled={isProductDeleted(product?.state)} />
-      </FieldsContainer>
-      <SubmitAndRestore
-        isUpdating={isUpdating}
-        isLoading={isLoading}
-        isDirty={isDirty}
-        onReset={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT)}
-        disabled={isProductDeleted(product?.state)}
-      />
-    </Form>
+        </FieldsContainer>
+        <ControlledComments disabled={isProductDeleted(product?.state)} />
+        <SubmitAndRestore
+          isUpdating={isUpdating}
+          isLoading={isLoading}
+          isDirty={isDirty}
+          onReset={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT)}
+          disabled={isProductDeleted(product?.state)}
+        />
+      </Form>
+    </FormProvider>
   );
 };
 

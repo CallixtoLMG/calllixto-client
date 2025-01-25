@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useActiveProduct, useDeleteProduct, useEditProduct, useGetProduct, useInactiveProduct } from "@/api/products";
-import { Input } from "@/components/common/custom";
+import { Flex, Input, Message, MessageHeader } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction } from "@/components/common/modals";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -326,6 +326,14 @@ const Product = ({ params }) => {
   return (
     <Loader active={isLoading}>
       {!isProductDeleted(product?.state) && toggleButton}
+      {isItemInactive(product?.state) && (
+        <Flex>
+          <Message negative>
+            <MessageHeader>Motivo de inactivación</MessageHeader>
+            <p>{product.inactiveReason}</p>
+          </Message>
+        </Flex>
+      )}
       {isUpdating ? (
         <ProductForm
           product={product}

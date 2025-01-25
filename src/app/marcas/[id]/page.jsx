@@ -4,7 +4,7 @@ import { useActiveBrand, useDeleteBrand, useEditBrand, useGetBrand, useInactiveB
 import { useHasProductsByBrandId } from "@/api/products";
 import BrandForm from "@/components/brands/BrandForm";
 import BrandView from "@/components/brands/BrandView";
-import { Input } from "@/components/common/custom";
+import { Flex, Input, Message, MessageHeader } from "@/components/common/custom";
 import ModalAction from "@/components/common/modals/ModalAction";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { COLORS, ICONS, PAGES } from "@/constants";
@@ -206,6 +206,14 @@ const Brand = ({ params }) => {
   return (
     <Loader active={isLoading || isLoadingProducts}>
       {toggleButton}
+      {isItemInactive(brand?.state) && (
+        <Flex>
+          <Message negative>
+            <MessageHeader>Motivo de inactivación</MessageHeader>
+            <p>{brand.inactiveReason}</p>
+          </Message>
+        </Flex>
+      )}
       {isUpdating ? (
         <BrandForm brand={brand} onSubmit={mutateEdit} isLoading={isEditPending} isUpdating />
       ) : (
