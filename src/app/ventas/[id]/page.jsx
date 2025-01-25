@@ -309,7 +309,7 @@ const Budget = ({ params }) => {
     mutationFn: async (dataToSend) => {
       const { pickUpInStore, paymentsMade, total } = dataToSend;
       const confirmationData = {
-        confirmedBy: `${userData.firstName} ${userData.lastName}`,
+        confirmedBy: `${userData.name}`,
         confirmedAt: now(),
         pickUpInStore,
         paymentsMade,
@@ -331,7 +331,7 @@ const Budget = ({ params }) => {
   const { mutate: mutateCancel, isPending: isPendingCancel } = useMutation({
     mutationFn: async (cancelReason) => {
       const cancelData = {
-        cancelledBy: `${userData.firstName} ${userData.lastName}`,
+        cancelledBy: `${userData.name}`,
         cancelledAt: now(),
         cancelledMsg: cancelReason
       };

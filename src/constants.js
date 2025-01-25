@@ -45,6 +45,12 @@ export const PAGES = {
   LOGIN: {
     BASE: "/login"
   },
+  CHANGE_PASSWORD: {
+    BASE: "/cambiar-contrasena"
+  },
+  RESTORE_PASSWORD: {
+    BASE: "/recuperar-contrasena"
+  },
   NOT_FOUND: {
     BASE: "/ups"
   },
@@ -122,6 +128,16 @@ export const RULES = {
   REQUIRED_POSITIVE: {
     required: 'Campo requerido.',
     min: { value: 1, message: 'El campo debe ser mayor a 0' }
+  },
+  REQUIRED_FOR_PASSWORD: {
+    required: "La nueva contraseña es obligatoria",
+    validate: (value) => {
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      return (
+        regex.test(value) ||
+        "La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula, un número y un carácter especial."
+      );
+    }
   }
 };
 
@@ -162,7 +178,8 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
-  EVENTS: 'events'
+  EVENTS: 'events',
+  USERS: 'users'
 };
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
@@ -370,12 +387,14 @@ export const ICONS = {
   CUT: "cut",
   EDIT: "edit",
   EYE: "eye",
+  EYE_SLASH: "eye slash",
   COG: "cog",
   EXCLAMATION_CIRCLE: "exclamation circle",
   ADDRESS_CARD: "address card",
   ARCHIVE: "archive",
   OPTIONS: "options",
-  REFRESH: "refresh"
+  REFRESH: "refresh",
+  MAIL_SQUARE: "mail square"
 };
 
 export const PAGE_SIZE_OPTIONS = [
@@ -413,4 +432,12 @@ export const FILTERS_OPTIONS = {
   DATE: "date",
   NAME: "name"
 };
+
+export const PASSWORD_REQUIREMENTS = [
+  { label: "Al menos 8 caracteres.", test: /.{8,}/ },
+  { label: "Una letra mayúscula.", test: /[A-Z]/ },
+  { label: "Una letra minúscula.", test: /[a-z]/ },
+  { label: "Un número.", test: /\d/ },
+  { label: "Un carácter especial.", test: /[@$!%*?&]/ },
+];
 
