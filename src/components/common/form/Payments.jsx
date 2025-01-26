@@ -1,12 +1,11 @@
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.common";
-
 import { COLORS, ICONS } from "@/constants";
 import es from "date-fns/locale/es";
 import { useMemo, useState } from "react";
 import { registerLocale } from "react-datepicker";
 import { useFieldArray } from "react-hook-form";
 import { Header } from "semantic-ui-react";
-import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
+import { Dropdown, FieldsContainer, Flex, FlexColumn, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
 import DatePicker from "../custom/DatePicker";
 import { Table, TotalList } from "../table";
 
@@ -98,7 +97,8 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
               </FormField>
               <FormField flex="1">
                 <RuledLabel title="Monto" message={errors.amount} required />
-                <CurrencyFormatInput
+                {/* Usar controlled input */}
+                {/* <CurrencyFormatInput
                   height="50px"
                   textAlignLast="right"
                   customInput={Input}
@@ -113,7 +113,7 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
                     setPayment({ ...payment, amount: parseFloat(floatValue) || 0 });
                   }}
                   disabled={isTotalCovered || !payment.method}
-                />
+                /> */}
               </FormField>
               <FormField flex="3">
                 <Label>Comentarios</Label>

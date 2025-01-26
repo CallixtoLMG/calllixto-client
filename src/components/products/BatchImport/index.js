@@ -1,6 +1,6 @@
 import { useCreateBatch, useEditBatch, useGetBlackList, useListProducts } from "@/api/products";
 import { IconnedButton } from "@/components/common/buttons";
-import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, FlexColumn, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { COLORS, ICONS } from "@/constants";
@@ -318,26 +318,28 @@ const BatchImport = ({ isCreating }) => {
     },
     {
       title: "Precio", value: (product, index) => (
-        <Controller
-          name={`importProducts[${index}].price`}
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <CurrencyFormatInput
-              height="30px"
-              displayType="input"
-              thousandSeparator={true}
-              decimalScale={2}
-              allowNegative={false}
-              prefix="$ "
-              customInput={Input}
-              onValueChange={value => {
-                onChange(value.floatValue);
-              }}
-              value={value || 0}
-              placeholder="Precio"
-            />
-          )}
-        />
+        null
+        // usar controlled input
+        // <Controller
+        //   name={`importProducts[${index}].price`}
+        //   control={control}
+        //   render={({ field: { onChange, value } }) => (
+            // <CurrencyFormatInput
+            //   height="30px"
+            //   displayType="input"
+            //   thousandSeparator={true}
+            //   decimalScale={2}
+            //   allowNegative={false}
+            //   prefix="$ "
+            //   customInput={Input}
+            //   onValueChange={value => {
+            //     onChange(value.floatValue);
+            //   }}
+            //   value={value || 0}
+            //   placeholder="Precio"
+            // />
+        //   )}
+        // />
       ), id: 3, width: 3
     },
     {
