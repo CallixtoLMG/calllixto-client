@@ -3,6 +3,7 @@ import { Controller, useFormContext } from "react-hook-form";
 import { Header, Icon } from "semantic-ui-react";
 
 export const ControlledNumber = ({
+  width,
   name,
   rules,
   label,
@@ -21,6 +22,7 @@ export const ControlledNumber = ({
       rules={rules}
       render={({ field: { onChange: onChangeController, value, ...rest } }) => (
         <FormField
+          width={width}
           label={label}
           control={Input}
           error={errors?.[name] ? {

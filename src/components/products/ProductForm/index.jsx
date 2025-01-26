@@ -1,11 +1,11 @@
-import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
+import { SubmitAndRestore } from "@/components/common/buttons";
 import { Dropdown, FieldsContainer, Flex, Form, FormField, Label } from "@/components/common/custom";
-import { ControlledComments, ControlledInput, ControlledNumber } from "@/components/common/form";
+import { ControlledComments, ControlledDropdown, ControlledIconedButton, ControlledInput, ControlledNumber } from "@/components/common/form";
 import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, PAGES, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { isProductDeleted, preventSend } from "@/utils";
 import { useCallback, useMemo, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
@@ -22,7 +22,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     }
   });
 
-  const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors, setError } = methods;
+  const { handleSubmit, reset, watch, formState: { isDirty, errors }, clearErrors, setError } = methods;
   const [supplier, setSupplier] = useState();
   const [brand, setBrand] = useState();
   const [watchFractionable] = watch(["fractionConfig.active"]);
@@ -214,55 +214,29 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             disabled={isProductDeleted(product?.state)}
           />
         </FieldsContainer>
-        <FieldsContainer rowGap="5px">
-          <ControlledNumber name="price" label="Precio" price />
-          <FormField width="20%">
-            <Controller
-              name="editablePrice"
-              control={control}
-              render={({ field: { value, onChange, ...rest } }) => (
-                <IconnedButton
-                  {...rest}
-                  text="Precio Editable"
-                  icon={ICONS.PENCIL}
-                  onClick={() => onChange(!value)}
-                  basic={!value}
-                  disabled={isProductDeleted(product?.state)}
-                />
-              )}
-            />
-          </FormField>
-          <FormField width="20%">
-            <Controller
-              name="fractionConfig.active"
-              control={control}
-              render={({ field: { value, onChange, ...rest } }) => (
-                <IconnedButton
-                  {...rest}
-                  text="Producto Fraccionable"
-                  icon={ICONS.CUT}
-                  onClick={() => onChange(!value)}
-                  basic={!value}
-                  disabled={isProductDeleted(product?.state)}
-                />
-              )}
-            />
-          </FormField>
-          <Controller
+        <FieldsContainer rowGap="5px" alignItems="end">
+          <ControlledNumber width="200px" name="price" label="Precio" price />
+          <ControlledIconedButton
+            width="fit-content"
+            name="editablePrice"
+            label="Precio Editable"
+            icon={ICONS.PENCIL}
+            disabled={isProductDeleted(product?.state)}
+          />
+          <ControlledIconedButton
+            width="fit-content"
+            name="fractionConfig.active"
+            label="Producto Fraccionable"
+            icon={ICONS.CUT}
+            disabled={isProductDeleted(product?.state)}
+          />
+          <ControlledDropdown
+          width="fit-content"
             name="fractionConfig.unit"
-            control={control}
-            render={({ field: { onChange, ...rest } }) => (
-              <FormField
-                {...rest}
-                width="20%"
-                label="Unidad de Medida"
-                control={Dropdown}
-                selection
-                options={Object.values(MEASSURE_UNITS)}
-                defaultValue={Object.values(MEASSURE_UNITS)[0].value}
-                onChange={(e, { value }) => onChange(value)}
-                disabled={!watchFractionable || isProductDeleted(product?.state)} />
-            )}
+            label="Unidad de Medida"
+            options={Object.values(MEASSURE_UNITS)}
+            defaultValue={Object.values(MEASSURE_UNITS)[0].value}
+            disabled={!watchFractionable || isProductDeleted(product?.state)}
           />
         </FieldsContainer>
         <ControlledComments disabled={isProductDeleted(product?.state)} />

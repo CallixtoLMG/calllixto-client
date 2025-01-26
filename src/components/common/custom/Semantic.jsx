@@ -28,7 +28,7 @@ export const Segment = styled(SSegment)`
 
 export const Input = styled(SInput)`
   width: ${({ width = '100%' }) => `${width}!important`};
-  height: ${({ height }) => height} !important;
+  height: ${({ height = '35px' }) => height} !important;
   text-align: ${({ textAlign }) => textAlign} !important;
 `;
 
@@ -57,7 +57,9 @@ export const TextArea = styled(STextarea)`
   padding: ${({ padding }) => `${padding}!important`};
 `;
 
-export const Dropdown = styled(SDropdown)``;
+export const Dropdown = styled(SDropdown)`
+  height: ${({ height = '35px' }) => `${height}!important`} ;
+`;
 
 export const DropdownOption = styled(SDropdown)`
 &&&&{
