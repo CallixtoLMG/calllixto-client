@@ -1,6 +1,6 @@
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Dropdown, FieldsContainer, Flex, Form, FormField, Label } from "@/components/common/custom";
-import { ControlledComments, ControlledInput, ControlledPrice } from "@/components/common/form";
+import { ControlledComments, ControlledInput, ControlledNumber } from "@/components/common/form";
 import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, PAGES, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { isProductDeleted, preventSend } from "@/utils";
@@ -246,7 +246,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             labelPosition='left'
             disabled={isProductDeleted(product?.state)}
           />
-          <ControlledPrice name="price" label="Precio" />
+          <ControlledNumber name="price" label="Precio" price />
           <Controller
             name="fractionConfig.unit"
             control={control}

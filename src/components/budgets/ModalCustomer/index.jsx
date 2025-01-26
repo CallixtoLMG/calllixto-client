@@ -1,6 +1,6 @@
 import { useEditCustomer } from "@/api/customers";
 import { IconnedButton } from "@/components/common/buttons";
-import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
 import { COLORS, ICONS, RULES } from "@/constants";
 import { useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -125,7 +125,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                           />
                         </FormField>
                         <Flex width="100%" rowGap="5px" columnGap="5px">
-                          <CurrencyFormatInput
+                          {/* <CurrencyFormatInput
                             $shadow
                             height="50px"
                             format="####"
@@ -136,8 +136,8 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                               const formattedValue = e.target.value.replace(/[^0-9]/g, '');
                               onChange([{ ...value?.[0], areaCode: formattedValue }]);
                             }}
-                          />
-                          <CurrencyFormatInput
+                          /> */}
+                          {/* <CurrencyFormatInput
                             $shadow
                             height="50px"
                             format="#######"
@@ -148,7 +148,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                               const formattedValue = e.target.value.replace(/[^0-9]/g, '');
                               onChange([{ ...value?.[0], number: formattedValue }]);
                             }}
-                          />
+                          /> */}
                         </Flex>
                       </FlexColumn>
                     )}

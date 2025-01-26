@@ -1,16 +1,16 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Box, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
-import { ControlledComments } from "@/components/common/form";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, PercentInput, Price } from "@/components/common/custom";
+import { ControlledComments, ControlledNumber } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
 import { ATTRIBUTES } from "@/components/products/products.common";
-import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
+import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
+import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from "@/utils";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
@@ -174,7 +174,7 @@ const BudgetForm = ({
               price: outdatedProduct.price,
               editablePrice: outdatedProduct.editablePrice,
               fractionConfig: {
-                ...product.fractionConfig, 
+                ...product.fractionConfig,
                 ...outdatedProduct.fractionConfig,
               },
               state: outdatedProduct.state,
@@ -337,26 +337,12 @@ const BudgetForm = ({
       id: 2,
       title: "Cantidad",
       value: (product, index) => (
-        <Controller
+        <ControlledNumber
           name={`products[${index}].quantity`}
-          control={control}
-          rules={RULES.REQUIRED}
-          render={({ field: { onChange, ...rest } }) => (
-            <CurrencyFormatInput
-              {...rest}
-              height="35px"
-              $shadow
-              decimalScale={2}
-              displayType="input"
-              onFocus={(e) => e.target.select()}
-              onChange={(e) => {
-                const value = Math.abs(e.target.value);
-                onChange(value);
-                calculateTotal();
-              }}
-              disabled={product.state === PRODUCT_STATES.OOS.id}
-            />
-          )}
+          onChange={() => {
+            calculateTotal();
+          }}
+          disabled={product.state === PRODUCT_STATES.OOS.id}
         />
       ),
       width: 2
@@ -384,29 +370,16 @@ const BudgetForm = ({
       id: 4,
       title: "Medida", value: (product, index) => (
         <>
-          {product.fractionConfig?.active ? (
-            <Flex alignItems="center">
-              <Controller name={`products[${index}].fractionConfig.value`} control={control}
-                render={({ field: { onChange, ...rest } }) => (
-                  <CurrencyFormatInput
-                    {...rest}
-                    height="35px"
-                    $shadow
-                    decimalScale={2}
-                    displayType="number"
-                    onFocus={(e) => e.target.select()} onChange={(e) => {
-                      const value = Math.abs(e.target.value);
-                      onChange(value);
-                      setValue(`products[${index}].fractionConfig.price`, value * product.price);
-                      calculateTotal();
-                    }}
-                  />
-                )}
-              />
-              <Box marginRight="5px" marginLeft="5px">{` ${product.fractionConfig.unit}`}</Box>
-            </Flex>
-          ) : (
-            ''
+          {product.fractionConfig?.active && (
+            <ControlledNumber
+              name={`products[${index}].fractionConfig.value`}
+              unit={product.fractionConfig.unit}
+              iconPosition="right"
+              onChange={value => {
+                setValue(`products[${index}].fractionConfig.price`, value * product.price);
+                calculateTotal();
+              }}
+            />
           )}
         </>
       ),
@@ -416,32 +389,9 @@ const BudgetForm = ({
       id: 5,
       title: "Precio",
       value: (product, index) => {
-        return product.editablePrice ?
-          <Controller
-            name={`products[${index}].price`}
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <Flex alignItems="center" columnGap="5px">
-                <Icon positionRelative name={ICONS.DOLLAR} />
-                <CurrencyFormatInput
-                  height="35px"
-                  displayType="input"
-                  thousandSeparator={true}
-                  decimalScale={2}
-                  allowNegative={false}
-                  customInput={Input}
-                  $marginBottom
-                  textAlignLast="right"
-                  onValueChange={value => {
-                    onChange(value.floatValue);
-                    calculateTotal();
-                  }}
-                  value={value || 0}
-                  placeholder="Precio"
-                />
-              </Flex>
-            )}
-          /> : <Price value={getPrice(product)} />
+        return product.editablePrice
+          ? <ControlledNumber name={`products[${index}].price`} price />
+          : <Price value={getPrice(product)} />
       },
       width: 2
     },
@@ -450,39 +400,18 @@ const BudgetForm = ({
       title: "Descuento",
       value: (product, index) => (
         <Flex alignItems="center" columnGap="5px">
-          <Controller name={`products[${index}].discount`} control={control} defaultValue={product.discount || 0}
+          <Controller
+            name={`products[${index}].discount`}
+            defaultValue={product.discount || 0}
             render={({ field: { onChange, ...rest } }) => (
-              <Input
+              <PercentInput
                 {...rest}
                 width="80px"
-                height="35px"
-                iconPosition='right'
-                onChange={(e) => {
-                  let value = e.target.value;
-                  value = value.replace(/,/g, '.');
-                  const regex = /^[0-9]+([.,][0-9]*)?$/;
-                  if (regex.test(value) || value === '') {
-                    const parts = value.split(".");
-                    if (parts[1] && parts[1].length > 2) {
-                      value = parts[0] + "." + parts[1].substring(0, 2);
-                    }
-                    if (value > 100) {
-                      onChange(100);
-                      return;
-                    }
-                    if (value < 0) {
-                      onChange(0);
-                      return;
-                    }
-                    onChange(value);
-                    calculateTotal();
-                  }
+                height="35px" onChange={value => {
+                  onChange(value);
+                  calculateTotal();
                 }}
-                onFocus={(e) => e.target.select()}
-              >
-                <Icon name='percent' size='small' />
-                <input />
-              </Input>
+              />
             )}
           />
         </Flex>
@@ -552,7 +481,6 @@ const BudgetForm = ({
             <FormField width="350px">
               <Controller
                 name="pickUpInStore"
-                control={control}
                 render={({ field: { onChange, value } }) => (
                   <ButtonGroup size="small">
                     <IconnedButton
@@ -577,44 +505,34 @@ const BudgetForm = ({
             </FormField>
           </FieldsContainer>
           <FieldsContainer justifyContent="space-between">
-            <Controller name="seller" control={control} rules={RULES.REQUIRED}
+            <Controller
+              name="seller"
+              rules={RULES.REQUIRED}
               render={({ field: { value } }) => (
-                <FormField width="300px" label="Vendedor" control={Input} readonly value={value} />)}
+                <FormField width="300px" label="Vendedor" control={Input} readonly value={value} />
+              )}
             />
             <FieldsContainer>
-              <Controller name="expirationOffsetDays" control={control}
+              <ControlledNumber
+                name="expirationOffsetDays"
                 rules={RULES.REQUIRED}
-                render={({ field }) => (
-                  <FormField
-                    {...field}
-                    maxLength={3}
-                    flex="1"
-                    label="Dias para el vencimiento"
-                    placeholder="Cantidad en días"
-                    control={Input}
-                    onChange={(e) => {
-                      let value = e.target.value;
-                      value = value.replace(/\D/g, '');
-                      if (parseInt(value, 10) > 365) value = TIME_IN_DAYS.YEAR;
-                      field.onChange(value);
-                      setExpiration(value);
-                    }}
-                    required
-                    error={errors?.expirationOffsetDays ? {
-                      content: errors.expirationOffsetDays.message,
-                      pointing: 'above',
-                    } : null}
-                  />
-                )}
+                maxLength={3}
+                label="Dias para el vencimiento"
+                placeholder="Cantidad en días"
+                onChange={setExpiration}
               />
-              <FormField flex="1" label="Fecha de vencimiento" control={Input} readOnly value={formatedDateOnly(expirationDate(expiration || 0))} />
+              <FormField
+                flex="1"
+                label="Fecha de vencimiento"
+                control={Input}
+                readOnly
+                value={formatedDateOnly(expirationDate(expiration ?? 0))}
+              />
             </FieldsContainer>
           </FieldsContainer>
           <FieldsContainer>
-            {/* message={errors?.customer?.message || (isCustomerInactive ? `El cliente está inactivo, solo ${isBudgetDraft(budget?.state) ? "actualizar" : "crear"} borradores esta permitido.` : '')} */}
             <Controller
               name="customer"
-              control={control}
               rules={{ validate: value => value?.id ? true : "Campo requerido." }}
               render={({ field: { onChange, value } }) => (
                 <FormField
@@ -683,7 +601,6 @@ const BudgetForm = ({
             />
           </FieldsContainer>
           <Controller name="products"
-            control={control}
             rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
             render={() => (
               <FormField
@@ -739,7 +656,6 @@ const BudgetForm = ({
             ) : (
               <Controller
                 name="paymentMethods"
-                control={control}
                 rules={RULES.REQUIRED}
                 render={({ field: { onChange, value } }) => (
                   <FormField flex="1" label="Metodos de pago" control={Input}>

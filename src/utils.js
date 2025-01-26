@@ -13,8 +13,8 @@ export const now = () => {
   return date;
 };
 
-export const threeMonthsDate = (date) => {
-  return dayjs(date).add(3, 'month').format('YYYY-MM-DD');
+export const getDateWithOffset = (date, offset, unit) => {
+  return dayjs(date).add(offset, unit).format('YYYY-MM-DD');
 };
 
 export const expirationDate = (expirationOffsetDays, createdAt = dayjs().format()) => {
@@ -31,6 +31,9 @@ export const formatedPrice = (number) => {
     style: 'currency',
     currency: 'ARS',
   });
+};
+export const formatedNumber = (number) => {
+  return Number(number).toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 };
 
 export function encodeUri(value) {
@@ -65,7 +68,7 @@ export const formatedPercentage = (number = 0) => {
 };
 
 export const getPrice = (product) => {
-  const { editablePrice, fractionConfig, price } = product;
+  const { fractionConfig, price } = product;
   return fractionConfig?.active ? fractionConfig?.value * price : price;
 };
 
@@ -86,12 +89,7 @@ export const getSubtotal = (total, discountOrCharge) => {
   return subtotal;
 };
 
-export const removeDecimal = (value) => {
-  return value.replace(/\./g, '');
-};
-
 export const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
-
 export const handleNaN = (value, defaultValue = 'Valor incorrecto') => isNaN(value) ? defaultValue : formatedPrice(value);
 
 export const formatedSimplePhone = (phone) => {
@@ -214,15 +212,6 @@ export const isItemDeleted = (state) => {
 
 export const isProductDeleted = (status) => {
   return status === PRODUCT_STATES.DELETED.id;
-};
-
-export const filterProductsBySupplierId = (products, supplierId) => {
-  if (!products) return [];
-
-  return products.filter(product => {
-    const productSupplierId = product.code.substring(0, supplierId.length);
-    return productSupplierId !== supplierId;
-  });
 };
 
 export const renderContent = (content) => {

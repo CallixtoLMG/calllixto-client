@@ -4,7 +4,7 @@ import { IconnedButton } from "@/components/common/buttons";
 import { FieldsContainer, Form, FormField, Input, TextArea, ViewContainer } from "@/components/common/custom";
 import { PriceField } from "@/components/common/form";
 import { ICONS, MEASSURE_UNITS, PRODUCT_STATES } from "@/constants";
-import { threeMonthsDate } from "@/utils";
+import { getDateWithOffset } from "@/utils";
 
 const ProductView = ({ product }) => {
   return (
@@ -13,7 +13,7 @@ const ProductView = ({ product }) => {
         {product?.state === PRODUCT_STATES.DELETED.id && (
           <FieldsContainer>
             <Message negative>
-              <p>Este producto se eliminará <b>PERMANENTEMENTE</b> de forma automática el día {threeMonthsDate(product.updateAt)} (90 días desde que se marco como eliminado).</p>
+              <p>Este producto se eliminará <b>PERMANENTEMENTE</b> de forma automática el día {getDateWithOffset(product.updateAt, 3, 'month')} (90 días desde que se marco como eliminado).</p>
             </Message>
           </FieldsContainer>
         )}
@@ -30,7 +30,7 @@ const ProductView = ({ product }) => {
         <FieldsContainer>
           <FormField width="20%" label="Código" control={Input} value={product?.code} readOnly />
           <FormField flex="1" label="Nombre" control={Input} value={product?.name} readOnly />
-          <PriceField width="20%"  label="Precio" value={product?.price} />
+          <PriceField width="20%" label="Precio" value={product?.price} />
           <FormField
             width="20%"
             label="Unidad de Medida"

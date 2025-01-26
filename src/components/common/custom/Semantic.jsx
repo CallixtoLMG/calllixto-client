@@ -29,12 +29,11 @@ export const Segment = styled(SSegment)`
 export const Input = styled(SInput)`
   width: ${({ width = '100%' }) => `${width}!important`};
   height: ${({ height }) => height} !important;
+  text-align: ${({ textAlign }) => textAlign} !important;
 `;
 
 export const FormField = styled(Form.Field)`
-  display:flex;
-  width: ${({ width = '200px' }) => `${width}!important`};
-  min-width: ${({ minWidth = '200px' }) => `${minWidth}!important`};
+  display: flex;
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
