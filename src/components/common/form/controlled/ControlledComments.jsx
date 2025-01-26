@@ -1,12 +1,10 @@
 import { FormField, TextArea } from "@/components/common/custom";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
 export const ControlledComments = ({ disabled }) => {
-  const { control } = useFormContext();
   return (
     <Controller
       name="comments"
-      control={control}
       render={({ field }) => (
         <FormField
           {...field}

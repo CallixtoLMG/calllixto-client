@@ -2,7 +2,7 @@ import { COLORS, ICONS } from "@/constants";
 import { MessageText } from "../../changePassword/styled";
 import { Flex, FlexColumn, Icon } from "../custom";
 
-const PasswordRequirements = ({ requirements, password }) => {
+export const PasswordRequirements = ({ requirements, password }) => {
   return (
     <FlexColumn marginBottom="1em" marginLeft="1em" rowGap="3px">
       {requirements.map((req, index) => (
@@ -20,5 +20,3 @@ const PasswordRequirements = ({ requirements, password }) => {
     </FlexColumn>
   );
 };
-
-export default PasswordRequirements;

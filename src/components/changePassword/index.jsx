@@ -9,10 +9,10 @@ import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Button, Form } from "semantic-ui-react";
-import PasswordRequirements from "../common/components/PasswordRequirements";
 import { Flex, FlexColumn, Label, Message } from "../common/custom";
 import PasswordInput from "../common/custom/PasswordInput";
 import { ModGrid, ModGridColumn, ModHeader } from "./styled";
+import { PasswordRequirements } from "../common/form";
 
 const ChangePasswordForm = () => {
   const { push } = useRouter();
@@ -38,7 +38,7 @@ const ChangePasswordForm = () => {
       confirmPassword: "",
     });
   }, [reset]);
-  
+
   useEffect(() => {
     if (!isCodeRequested) {
       resetInputs();

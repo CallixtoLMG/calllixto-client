@@ -440,4 +440,3 @@ export const PASSWORD_REQUIREMENTS = [
   { label: "Un número.", test: /\d/ },
   { label: "Un carácter especial.", test: /[@$!%*?&]/ },
 ];
-

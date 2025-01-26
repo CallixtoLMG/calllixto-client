@@ -2,11 +2,11 @@ import { formatedSimplePhone, validateEmail, validatePhone } from "@/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Form, Popup } from "semantic-ui-react";
-import { COLORS, ICONS } from "../../../constants";
-import { IconnedButton } from "../buttons";
-import { Box, FieldsContainer, Flex, FormField, Input } from '../custom';
-import { Table } from '../table';
-import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "./form.common";
+import { COLORS, ICONS } from "../../../../constants";
+import { IconnedButton } from "../../buttons";
+import { Box, FieldsContainer, Flex, FormField, Input } from '../../custom';
+import { Table } from '../../table';
+import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "../form.common";
 
 const EMPTY_PHONE = { ref: '', areaCode: '', number: '' };
 const EMPTY_ADDRESS = { ref: '', address: '' };

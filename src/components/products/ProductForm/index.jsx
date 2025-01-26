@@ -21,6 +21,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
       ...product,
     }
   });
+
   const { handleSubmit, control, reset, watch, formState: { isDirty, errors, isSubmitted }, clearErrors, setError } = methods;
   const [supplier, setSupplier] = useState();
   const [brand, setBrand] = useState();
@@ -190,6 +191,31 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             } : null}
             control={Dropdown}
           />
+          <ControlledInput
+            width="20%"
+            name="code"
+            label="Código"
+            placeholder="Código"
+            rules={RULES.REQUIRED_BRAND_AND_SUPPLIER(brand, supplier)}
+            innerWidth="0"
+            onChange={(e) => e.target.value.toUpperCase()}
+            labelPosition='left'
+            disabled={isProductDeleted(product?.state)}
+          />
+          <ControlledInput
+            flex="1"
+            name="name"
+            label="Nombre"
+            placeholder="Nombre"
+            rules={RULES.REQUIRED}
+            innerWidth="0"
+            onChange={(e) => e.target.value.toUpperCase()}
+            labelPosition='left'
+            disabled={isProductDeleted(product?.state)}
+          />
+        </FieldsContainer>
+        <FieldsContainer rowGap="5px">
+          <ControlledNumber name="price" label="Precio" price />
           <FormField width="20%">
             <Controller
               name="editablePrice"
@@ -222,31 +248,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
               )}
             />
           </FormField>
-        </FieldsContainer>
-        <FieldsContainer rowGap="5px">
-          <ControlledInput
-            width="20%"
-            name="code"
-            label="Código"
-            placeholder="Código"
-            rules={RULES.REQUIRED_BRAND_AND_SUPPLIER(brand, supplier)}
-            innerWidth="0"
-            onChange={(e) => e.target.value.toUpperCase()}
-            labelPosition='left'
-            disabled={isProductDeleted(product?.state)}
-          />
-          <ControlledInput
-            flex="1"
-            name="name"
-            label="Nombre"
-            placeholder="Nombre"
-            rules={RULES.REQUIRED}
-            innerWidth="0"
-            onChange={(e) => e.target.value.toUpperCase()}
-            labelPosition='left'
-            disabled={isProductDeleted(product?.state)}
-          />
-          <ControlledNumber name="price" label="Precio" price />
           <Controller
             name="fractionConfig.unit"
             control={control}
