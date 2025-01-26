@@ -33,6 +33,7 @@ export const Input = styled(SInput)`
 `;
 
 export const FormField = styled(Form.Field)`
+  width: ${({ width = '100%' }) => `${width}!important`};
   display: flex;
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: ${({ margin = "0" }) => margin} !important;

@@ -79,11 +79,7 @@ const Customer = ({ params }) => {
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction("delete"), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: async (customer) => {
-      const data = await editCustomer(customer);
-
-      return data;
-    },
+    mutationFn: (customer) => editCustomer(customer),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente actualizado!");
@@ -98,10 +94,7 @@ const Customer = ({ params }) => {
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: async ({ customer }) => {
-      const response = await activeCustomer(customer);
-      return response;
-    },
+    mutationFn: ({ customer }) => activeCustomer(customer),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente activado!");
@@ -116,10 +109,7 @@ const Customer = ({ params }) => {
   });
 
   const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: async ({ customer, reason }) => {
-      const response = await inactiveCustomer(customer, reason);
-      return response;
-    },
+    mutationFn: ({ customer, reason }) => inactiveCustomer(customer, reason),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente desactivado!");
@@ -134,9 +124,7 @@ const Customer = ({ params }) => {
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: () => {
-      return deleteCustomer(params.id);
-    },
+    mutationFn: () => deleteCustomer(params.id),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente eliminado permanentemente!");
@@ -152,20 +140,22 @@ const Customer = ({ params }) => {
   });
 
   const handleActionConfirm = async () => {
-    if (modalAction === "inactive") {
-      if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar al cliente.");
-        return;
-      }
+    if (modalAction === "inactive" && !reason) {
+      toast.error("Debe proporcionar una razón para desactivar al cliente.");
+      return;
     }
 
     setActiveAction(modalAction);
 
     if (modalAction === "delete") {
       mutateDelete();
-    } else if (modalAction === "inactive") {
+    }
+
+    if (modalAction === "inactive") {
       mutateInactive({ customer, reason });
-    } else if (modalAction === "active") {
+    }
+
+    if (modalAction === "active") {
       mutateActive({ customer });
     }
 

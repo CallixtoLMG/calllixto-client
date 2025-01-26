@@ -1,33 +1,27 @@
 "use client";
-import { FieldsContainer, Form, FormField, Input, TextArea, ViewContainer } from "@/components/common/custom";
+import { FieldsContainer, Form, ViewContainer } from "@/components/common/custom";
+import { TextAreaField, TextField } from "@/components/common/form";
 
 const BrandView = ({ brand }) => {
   return (
     <Form>
       <ViewContainer>
         <FieldsContainer>
-          <FormField
+          <TextField
             width="150px"
             label="Código"
-            control={Input}
             value={brand?.id}
-            readOnly
           />
-          <FormField
+          <TextField
             width="40%"
             label="Nombre"
-            control={Input}
             value={brand?.name}
-            readOnly
           />
         </FieldsContainer>
-        <FormField
-          control={TextArea}
+        <TextAreaField
           label="Comentarios"
           width="100%"
-          placeholder="Comentarios"
           value={brand?.comments}
-          readOnly
         />
       </ViewContainer>
     </Form>

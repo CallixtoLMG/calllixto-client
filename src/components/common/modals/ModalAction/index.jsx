@@ -79,7 +79,7 @@ const ModalAction = ({
                 value={confirmationText}
                 onChange={handleConfirmationTextChange}
                 ref={inputElement}
-                width="230px"
+                width="300px"
                 tabIndex="0"
               />
             )}

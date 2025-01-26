@@ -1,11 +1,28 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
-import { useActiveSupplier, useDeleteSupplier, useEditSupplier, useGetSupplier, useInactiveSupplier } from "@/api/suppliers";
-import { Flex, Icon, Input, Message, MessageHeader } from "@/components/common/custom";
+import {
+  useActiveSupplier,
+  useDeleteSupplier,
+  useEditSupplier,
+  useGetSupplier,
+  useInactiveSupplier,
+} from "@/api/suppliers";
+import {
+  Flex,
+  Icon,
+  Input,
+  Message,
+  MessageHeader,
+} from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction } from "@/components/common/modals";
-import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import {
+  Loader,
+  OnlyPrint,
+  useBreadcrumContext,
+  useNavActionsContext,
+} from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import SupplierView from "@/components/suppliers/SupplierView";
 import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
@@ -24,10 +41,13 @@ const Supplier = ({ params }) => {
   const { role } = useUserContext();
   const { push } = useRouter();
   const { data: supplier, isLoading, refetch } = useGetSupplier(params.id);
-  const { data: products, isLoading: loadingProducts } = useProductsBySupplierId(params.id);
+  const { data: products, isLoading: loadingProducts } =
+    useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { isUpdating, toggleButton } = useAllowUpdate({
+    canUpdate: RULES.canUpdate[role],
+  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -56,10 +76,19 @@ const Supplier = ({ params }) => {
 
   const handleDownloadExcel = useCallback(() => {
     if (!products) return;
-    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Estado', 'Comentarios'];
+    const headers = [
+      'Código',
+      'Nombre',
+      'Marca',
+      'Proveedor',
+      'Precio',
+      'Estado',
+      'Comentarios',
+    ];
 
-    const mappedProducts = products.map(product => {
-      const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
+    const mappedProducts = products.map((product) => {
+      const productState =
+        PRODUCT_STATES[product.state]?.singularTitle || product.state;
       return [
         product.code,
         product.name,
@@ -67,10 +96,13 @@ const Supplier = ({ params }) => {
         product.supplierName,
         formatedPrice(product.price),
         productState,
-        product.comments
+        product.comments,
       ];
     });
-    downloadExcel([headers, ...mappedProducts], `Lista de productos de ${supplier.name}`);
+    downloadExcel(
+      [headers, ...mappedProducts],
+      `Lista de productos de ${supplier.name}`,
+    );
   }, [products, supplier]);
 
   const handlePrint = useReactToPrint({
@@ -83,12 +115,14 @@ const Supplier = ({ params }) => {
       header: `¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
-      tooltip: hasAssociatedProducts ? "No se puede eliminar este proveedor, existen productos asociados." : false,
+      tooltip: hasAssociatedProducts
+        ? 'No se puede eliminar este proveedor, existen productos asociados.'
+        : false,
     },
     deleteBatch: {
       header: `¿Está seguro que desea eliminar los ${products?.length || ""} productos del proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
-      icon: ICONS.TRASH
+      icon: ICONS.TRASH,
     },
     active: {
       header: `¿Está seguro que desea activar el proveedor "${supplier?.name}"?`,
@@ -97,7 +131,7 @@ const Supplier = ({ params }) => {
     inactive: {
       header: `¿Está seguro que desea desactivar el proveedor "${supplier?.name}"?`,
       icon: ICONS.PAUSE_CIRCLE,
-    }
+    },
   };
 
   const handleModalClose = () => {
@@ -111,16 +145,25 @@ const Supplier = ({ params }) => {
     setIsModalOpen(true);
   }, []);
 
-  const handleActivateClick = useCallback(() => handleOpenModalWithAction("active"), [handleOpenModalWithAction]);
-  const handleInactivateClick = useCallback(() => handleOpenModalWithAction("inactive"), [handleOpenModalWithAction]);
-  const handleDeleteClick = useCallback(() => handleOpenModalWithAction("deleteSupplier"), [handleOpenModalWithAction]);
-  const handleDeleteBatchClick = useCallback(() => handleOpenModalWithAction("deleteBatch"), [handleOpenModalWithAction]);
+  const handleActivateClick = useCallback(
+    () => handleOpenModalWithAction('active'),
+    [handleOpenModalWithAction],
+  );
+  const handleInactivateClick = useCallback(
+    () => handleOpenModalWithAction('inactive'),
+    [handleOpenModalWithAction],
+  );
+  const handleDeleteClick = useCallback(
+    () => handleOpenModalWithAction('deleteSupplier'),
+    [handleOpenModalWithAction],
+  );
+  const handleDeleteBatchClick = useCallback(
+    () => handleOpenModalWithAction('deleteBatch'),
+    [handleOpenModalWithAction],
+  );
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: async (supplier) => {
-      const data = await editSupplier(supplier);
-      return data;
-    },
+    mutationFn: (supplier) => editSupplier(supplier),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Proveedor actualizado!');
@@ -135,10 +178,7 @@ const Supplier = ({ params }) => {
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: async ({ supplier }) => {
-      const response = await activeSupplier(supplier);
-      return response;
-    },
+    mutationFn: ({ supplier }) => activeSupplier(supplier),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Proveedor activado!");
@@ -153,10 +193,7 @@ const Supplier = ({ params }) => {
   });
 
   const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: async ({ supplier, reason }) => {
-      const response = await inactiveSupplier(supplier, reason);
-      return response;
-    },
+    mutationFn: ({ supplier, reason }) => inactiveSupplier(supplier, reason),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Proveedor desactivado!");
@@ -173,66 +210,75 @@ const Supplier = ({ params }) => {
     },
   });
 
-  const { mutate: mutateDeleteBatch, isPending: isDeleteBatchPending } = useMutation({
-    mutationFn: async () => {
-      const response = await deleteBySupplierId(params.id);
-      return response;
-    },
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success('Lista de productos del proveedor eliminada!');
+  const { mutate: mutateDeleteBatch, isPending: isDeleteBatchPending } =
+    useMutation({
+      mutationFn: () => deleteBySupplierId(params.id),
+      onSuccess: (response) => {
+        if (response.statusOk) {
+          toast.success('Lista de productos del proveedor eliminada!');
+          handleModalClose();
+        } else {
+          toast.error(response.error.message);
+        }
+      },
+      onSettled: () => {
+        setActiveAction(null);
         handleModalClose();
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
-  });
+      },
+    });
 
-  const { mutate: mutateDelete, isPending: isDeleteSupplierPending } = useMutation({
-    mutationFn: async () => {
-      const response = await deleteSupplier(params.id);
-      return response;
-    },
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success('Proveedor eliminado permanentemente!');
-        push(PAGES.SUPPLIERS.BASE);
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
-  });
+  const { mutate: mutateDelete, isPending: isDeleteSupplierPending } =
+    useMutation({
+      mutationFn: () => deleteSupplier(params.id),
+      onSuccess: (response) => {
+        if (response.statusOk) {
+          toast.success('Proveedor eliminado permanentemente!');
+          push(PAGES.SUPPLIERS.BASE);
+        } else {
+          toast.error(response.error.message);
+        }
+      },
+      onSettled: () => {
+        setActiveAction(null);
+        handleModalClose();
+      },
+    });
 
   const handleActionConfirm = async () => {
     setActiveAction(modalAction);
 
     if (modalAction === "deleteBatch") {
       mutateDeleteBatch();
-    } else if (modalAction === "deleteSupplier") {
+    }
+
+    if (modalAction === "deleteSupplier") {
       mutateDelete();
-    } else if (modalAction === "inactive") {
+    }
+
+    if (modalAction === "inactive") {
       if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar al proveedor.");
+        toast.error(
+          'Debe proporcionar una razón para desactivar al proveedor.',
+        );
         return;
       }
       mutateInactive({ supplier, reason });
-    } else if (modalAction === "active") {
+    }
+
+    if (modalAction === "active") {
       mutateActive({ supplier });
     }
 
     handleModalClose();
   };
 
-  const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
-  const requiresConfirmation = modalAction === "deleteSupplier" || modalAction === "deleteBatch";
+  const {
+    header,
+    confirmText = '',
+    icon = ICONS.QUESTION,
+  } = modalConfig[modalAction] || {};
+  const requiresConfirmation =
+    modalAction === "deleteSupplier" || modalAction === "deleteBatch";
 
   useEffect(() => {
     const handleBarCodePrint = () => {
@@ -242,81 +288,130 @@ const Supplier = ({ params }) => {
         setActiveAction(null);
       } else {
         toast("No hay productos de este proveedor.", {
-          icon: <Icon margin="0" toast name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />,
+          icon: (
+            <Icon
+              margin="0"
+              toast
+              name={ICONS.INFO_CIRCLE}
+              color={COLORS.BLUE}
+            />
+          ),
         });
       }
     };
 
-    const actions = RULES.canRemove[role] ? [
-      {
-        id: 1,
-        icon: ICONS.BARCODE,
-        color: COLORS.BLUE,
-        text: "Códigos",
-        onClick: handleBarCodePrint,
-        loading: activeAction === "print",
-        disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
-        tooltip: !hasAssociatedProducts ? "No existen productos de este proveedor." : false,
-      },
-      {
-        id: 2,
-        icon: isItemInactive(supplier?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
-        color: COLORS.GREY,
-        text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
-        onClick: isItemInactive(supplier?.state) ? handleActivateClick : handleInactivateClick,
-        loading: (activeAction === "active" || activeAction === "inactive"),
-        disabled: !!activeAction || isEditPending,
-        width: "fit-content",
-      },
-      {
-        id: 3,
-        icon: ICONS.FILE_EXCEL,
-        color: COLORS.SOFT_GREY,
-        text: "Descargar productos",
-        onClick: () => {
-          if (products?.length) {
-            setIsExcelLoading(true);
-            handleDownloadExcel();
-            setIsExcelLoading(false);
-          } else {
-            toast("No hay productos de este proveedor para descargar.", {
-              icon: <Icon margin="0" toast name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />,
-            });
-          }
-        },
-        loading: isExcelLoading,
-        disabled: isExcelLoading || !!activeAction || loadingProducts || isEditPending || !hasAssociatedProducts,
-        tooltip: !hasAssociatedProducts ? "No existen productos de este proveedor." : false,
-        width: "fit-content",
-      },
-      {
-        id: 4,
-        icon: ICONS.LIST_UL,
-        color: COLORS.RED,
-        text: "Eliminar productos",
-        onClick: handleDeleteBatchClick,
-        loading: activeAction === "deleteBatch",
-        disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
-        tooltip: !hasAssociatedProducts ? "No existen productos de este proveedor." : false,
-        width: "fit-content",
-      },
-      {
-        id: 5,
-        icon: ICONS.TRASH,
-        color: COLORS.RED,
-        text: "Eliminar",
-        onClick: handleDeleteClick,
-        loading: activeAction === "deleteSupplier",
-        disabled: hasAssociatedProducts || !!activeAction || isEditPending,
-        tooltip: hasAssociatedProducts ? "No se puede eliminar este proveedor, existen productos asociados." : false,
-        width: "fit-content",
-        basic: true,
-      },
-    ] : [];
+    const actions = RULES.canRemove[role]
+      ? [
+          {
+            id: 1,
+            icon: ICONS.BARCODE,
+            color: COLORS.BLUE,
+            text: "Códigos",
+            onClick: handleBarCodePrint,
+            loading: activeAction === "print",
+            disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
+            tooltip: !hasAssociatedProducts
+              ? 'No existen productos de este proveedor.'
+              : false,
+          },
+          {
+            id: 2,
+            icon: isItemInactive(supplier?.state)
+              ? ICONS.PLAY_CIRCLE
+              : ICONS.PAUSE_CIRCLE,
+            color: COLORS.GREY,
+            text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
+            onClick: isItemInactive(supplier?.state)
+              ? handleActivateClick
+              : handleInactivateClick,
+            loading: activeAction === 'active' || activeAction === 'inactive',
+            disabled: !!activeAction || isEditPending,
+            width: "fit-content",
+          },
+          {
+            id: 3,
+            icon: ICONS.FILE_EXCEL,
+            color: COLORS.SOFT_GREY,
+            text: "Descargar productos",
+            onClick: () => {
+              if (products?.length) {
+                setIsExcelLoading(true);
+                handleDownloadExcel();
+                setIsExcelLoading(false);
+              } else {
+                toast("No hay productos de este proveedor para descargar.", {
+                  icon: (
+                    <Icon
+                      margin="0"
+                      toast
+                      name={ICONS.INFO_CIRCLE}
+                      color={COLORS.BLUE}
+                    />
+                  ),
+                });
+              }
+            },
+            loading: isExcelLoading,
+            disabled:
+              isExcelLoading ||
+              !!activeAction ||
+              loadingProducts ||
+              isEditPending ||
+              !hasAssociatedProducts,
+            tooltip: !hasAssociatedProducts
+              ? 'No existen productos de este proveedor.'
+              : false,
+            width: "fit-content",
+          },
+          {
+            id: 4,
+            icon: ICONS.LIST_UL,
+            color: COLORS.RED,
+            text: "Eliminar productos",
+            onClick: handleDeleteBatchClick,
+            loading: activeAction === "deleteBatch",
+            disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
+            tooltip: !hasAssociatedProducts
+              ? 'No existen productos de este proveedor.'
+              : false,
+            width: "fit-content",
+          },
+          {
+            id: 5,
+            icon: ICONS.TRASH,
+            color: COLORS.RED,
+            text: "Eliminar",
+            onClick: handleDeleteClick,
+            loading: activeAction === "deleteSupplier",
+            disabled: hasAssociatedProducts || !!activeAction || isEditPending,
+            tooltip: hasAssociatedProducts
+              ? 'No se puede eliminar este proveedor, existen productos asociados.'
+              : false,
+            width: "fit-content",
+            basic: true,
+          },
+        ]
+      : [];
 
     setActions(actions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, activeAction, hasAssociatedProducts, isActivePending, isExcelLoading, isEditPending, handleDeleteBatchClick, loadingProducts, supplier?.name, handleDeleteClick, handleActivateClick, handleInactivateClick, products, supplier?.state, setActions]);
+  }, [
+    role,
+    activeAction,
+    hasAssociatedProducts,
+    isActivePending,
+    isExcelLoading,
+    isEditPending,
+    handleDeleteBatchClick,
+    loadingProducts,
+    supplier?.name,
+    handleDeleteClick,
+    handleActivateClick,
+    handleInactivateClick,
+    products,
+    supplier?.state,
+    setActions,
+  ]);
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);
@@ -334,7 +429,12 @@ const Supplier = ({ params }) => {
         </Flex>
       )}
       {isUpdating ? (
-        <SupplierForm supplier={supplier} onSubmit={mutateEdit} isLoading={isEditPending} isUpdating />
+        <SupplierForm
+          supplier={supplier}
+          onSubmit={mutateEdit}
+          isLoading={isEditPending}
+          isUpdating
+        />
       ) : (
         <>
           <SupplierView supplier={supplier} />
@@ -350,7 +450,12 @@ const Supplier = ({ params }) => {
         confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
-        isLoading={isDeleteBatchPending || isDeleteSupplierPending || isActivePending || isInactivePending}
+        isLoading={
+          isDeleteBatchPending ||
+          isDeleteSupplierPending ||
+          isActivePending ||
+          isInactivePending
+        }
         noConfirmation={!requiresConfirmation}
         bodyContent={
           modalAction === "inactive" && (

@@ -5,5 +5,7 @@ export * from './ControlledComments';
 export * from './ControlledInput';
 export * from './ControlledNumber';
 export * from './PriceField';
+export * from './TextField';
+export * from './TextAreaField';
 export * from './Payments';
 

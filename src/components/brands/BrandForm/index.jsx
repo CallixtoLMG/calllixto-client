@@ -11,7 +11,7 @@ const EMPTY_BRAND = { name: '', id: '', comments: '' };
 
 const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
   const methods = useForm({ defaultValues: brand });
-  const { handleSubmit, control, reset, formState: { isDirty, errors } } = methods;
+  const { handleSubmit, reset, formState: { isDirty } } = methods;
 
   const handleReset = useCallback((brand) => {
     reset(brand);

@@ -115,10 +115,7 @@ const Product = ({ params }) => {
   const handleHardDeleteClick = useCallback(() => handleOpenModalWithAction("hardDelete"), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: async (product) => {
-      const data = await editProduct(product);
-      return data;
-    },
+    mutationFn: (product) => editProduct(product),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto actualizado!");
@@ -136,10 +133,7 @@ const Product = ({ params }) => {
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: async ({ product }) => {
-      const response = await activeProduct(product);
-      return response;
-    },
+    mutationFn: ({ product }) => activeProduct(product),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto activado!");
@@ -157,10 +151,7 @@ const Product = ({ params }) => {
   });
 
   const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: async ({ product, reason }) => {
-      const response = await inactiveProduct(product, reason);
-      return response;
-    },
+    mutationFn: ({ product, reason }) => inactiveProduct(product, reason),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto desactivado!");
@@ -178,10 +169,7 @@ const Product = ({ params }) => {
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: async () => {
-      const response = await deleteProduct(product.code);
-      return response;
-    },
+    mutationFn: () => deleteProduct(product.code),
     onSuccess: (response) => {
       if (response.statusOk) {
         if (product.state === PRODUCT_STATES.DELETED.id) {
@@ -207,32 +195,41 @@ const Product = ({ params }) => {
     setActiveAction(modalAction);
     if (modalAction === "hardDelete") {
       mutateDelete();
-    } else if (modalAction === "softDelete") {
+    }
+
+    if (modalAction === "softDelete") {
       if (product.state === PRODUCT_STATES.DELETED.id) {
         mutateDelete();
       } else {
         const updatedProduct = { ...product, state: PRODUCT_STATES.DELETED.id };
         mutateEdit(updatedProduct);
       }
-    } else if (modalAction === INACTIVE) {
+    }
+
+    if (modalAction === INACTIVE) {
       if (!reason) {
         toast.error("Debe proporcionar una razón para desactivar el producto.");
         return;
       }
       mutateInactive({ product, reason });
 
-    } else if (modalAction === ACTIVE) {
-      mutateActive({ product });
+    }
 
-    } else if (modalAction === "outOfStock") {
+    if (modalAction === ACTIVE) {
+      mutateActive({ product });
+    }
+
+    if (modalAction === "outOfStock") {
       const updatedProduct = { ...product, state: PRODUCT_STATES.OOS.id };
       mutateEdit(updatedProduct);
+    }
 
-    } else if (modalAction === "inStock") {
+    if (modalAction === "inStock") {
       const updatedProduct = { ...product, state: PRODUCT_STATES.ACTIVE.id };
       mutateEdit(updatedProduct);
+    }
 
-    } else if (modalAction === "recover") {
+    if (modalAction === "recover") {
       const updatedProduct = { ...product, state: PRODUCT_STATES.ACTIVE.id };
       mutateEdit(updatedProduct);
     }

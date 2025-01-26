@@ -2,7 +2,7 @@
 import { FormField, Input } from "@/components/common/custom";
 import { Controller, useFormContext } from "react-hook-form";
 
-export const ControlledInput = ({ name, rules, onChange, ...inputProps }) => {
+export const ControlledInput = ({ name, rules, onChange, width, ...inputProps }) => {
   const { control, formState: { errors } } = useFormContext();
   return (
     <Controller
@@ -11,6 +11,7 @@ export const ControlledInput = ({ name, rules, onChange, ...inputProps }) => {
       rules={rules}
       render={({ field }) => (
         <FormField
+          width={width}
           {...field}
           {...inputProps}
           {...(onChange && { onChange: (e) => field.onChange(onChange(e)) })}

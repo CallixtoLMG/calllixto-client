@@ -77,10 +77,7 @@ const Brand = ({ params }) => {
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction("delete"), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: async (brand) => {
-      const data = await editBrand(brand);
-      return data;
-    },
+    mutationFn: (brand) => editBrand(brand),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca actualizada!");
@@ -95,10 +92,7 @@ const Brand = ({ params }) => {
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: async ({ brand }) => {
-      const response = await activeBrand(brand);
-      return response;
-    },
+    mutationFn: ({ brand }) => activeBrand(brand),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca activada!");
@@ -113,10 +107,7 @@ const Brand = ({ params }) => {
   });
 
   const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: async ({ brand, reason }) => {
-      const response = await inactiveBrand(brand, reason);
-      return response;
-    },
+    mutationFn: ({ brand, reason }) => inactiveBrand(brand, reason),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca desactivada!");
@@ -131,9 +122,7 @@ const Brand = ({ params }) => {
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: () => {
-      return deleteBrand(params.id);
-    },
+    mutationFn: () => deleteBrand(params.id),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca eliminada permanentemente!");
@@ -153,13 +142,17 @@ const Brand = ({ params }) => {
 
     if (modalAction === "delete") {
       mutateDelete();
-    } else if (modalAction === "inactive") {
+    }
+
+    if (modalAction === "inactive") {
       if (!reason) {
         toast.error("Debe proporcionar una razón para desactivar la marca.");
         return;
       }
       mutateInactive({ brand, reason });
-    } else if (modalAction === "active") {
+    }
+
+    if (modalAction === "active") {
       mutateActive({ brand });
     }
 

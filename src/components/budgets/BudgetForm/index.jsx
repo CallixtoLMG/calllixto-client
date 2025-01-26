@@ -419,7 +419,7 @@ const BudgetForm = ({
       width: 1
     },
     { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 7, width: 3 },
-  ], [control, calculateTotal, setValue]);
+  ], [calculateTotal, setValue]);
 
   const handleDraft = async (data) => {
     setValue("state", BUDGET_STATES.DRAFT.id);

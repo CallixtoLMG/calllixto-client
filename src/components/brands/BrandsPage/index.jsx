@@ -1,4 +1,4 @@
-import { Dropdown, Flex, Input } from "@/components/common/custom";
+import { Dropdown, Flex } from "@/components/common/custom";
 import { Filters, Table } from "@/components/common/table";
 import { BRANDS_STATES, PAGES } from "@/constants";
 import { useFilters } from "@/hooks/useFilters";
@@ -6,6 +6,7 @@ import { createFilter } from "@/utils";
 import { Controller, FormProvider } from "react-hook-form";
 import { Form, Label } from "semantic-ui-react";
 import { BRAND_COLUMNS } from "../brands.common";
+import { ControlledInput } from "@/components/common/form";
 
 const EMPTY_FILTERS = { id: '', name: '', state: BRANDS_STATES.ACTIVE.id };
 const STATE_OPTIONS = [
@@ -57,30 +58,8 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
                 />
               )}
             />
-            <Controller
-              name="id"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Id"
-                />
-              )}
-            />
-            <Controller
-              name="name"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Nombre"
-                />
-              )}
-            />
+            <ControlledInput name="id" placeholder="Código" width="80px" />
+            <ControlledInput name="name" placeholder="Nombre" width="300px" />
           </Filters>
         </Form>
       </FormProvider>

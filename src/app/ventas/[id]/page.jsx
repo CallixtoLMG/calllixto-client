@@ -306,7 +306,7 @@ const Budget = ({ params }) => {
   };
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (dataToSend) => {
+    mutationFn: (dataToSend) => {
       const { pickUpInStore, paymentsMade, total } = dataToSend;
       const confirmationData = {
         confirmedBy: `${userData.name}`,
@@ -315,8 +315,7 @@ const Budget = ({ params }) => {
         paymentsMade,
         total
       };
-      const response = await confirmBudget(confirmationData, budget?.id);
-      return response;
+      return confirmBudget(confirmationData, budget?.id);
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -329,14 +328,13 @@ const Budget = ({ params }) => {
   });
 
   const { mutate: mutateCancel, isPending: isPendingCancel } = useMutation({
-    mutationFn: async (cancelReason) => {
+    mutationFn: (cancelReason) => {
       const cancelData = {
         cancelledBy: `${userData.name}`,
         cancelledAt: now(),
         cancelledMsg: cancelReason
       };
-      const response = await cancelBudget({ cancelData, id: budget?.id });
-      return response;
+      return cancelBudget({ cancelData, id: budget?.id });
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -352,10 +350,7 @@ const Budget = ({ params }) => {
   });
 
   const { mutate: mutateEdit, isPending: isPendingEdit } = useMutation({
-    mutationFn: async (budget) => {
-      const data = await editBudget({ ...budget, id: params.id });
-      return data;
-    },
+    mutationFn: (budget) => editBudget({ ...budget, id: params.id }),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Presupuesto actualizado!');
