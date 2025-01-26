@@ -1,8 +1,8 @@
 "use client";
 import { Message } from "@/components/budgets/BudgetView/styles";
 import { IconnedButton } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, TextArea, ViewContainer } from "@/components/common/custom";
-import { PriceField } from "@/components/common/form";
+import { FieldsContainer, Form, FormField, ViewContainer } from "@/components/common/custom";
+import { PriceField, TextField, TextAreaField } from "@/components/common/form";
 import { ICONS, MEASSURE_UNITS, PRODUCT_STATES } from "@/constants";
 import { getDateWithOffset } from "@/utils";
 
@@ -18,8 +18,8 @@ const ProductView = ({ product }) => {
           </FieldsContainer>
         )}
         <FieldsContainer alignItems="flex-end">
-          <FormField flex="1" label="Proveedor" control={Input} value={product?.supplierName} readOnly />
-          <FormField flex="1" label="Marca" control={Input} value={product?.brandName} readOnly />
+          <TextField flex="1" label="Proveedor" value={product?.supplierName} />
+          <TextField flex="1" label="Marca" value={product?.brandName} />
           <FormField width="20%">
             <IconnedButton icon={ICONS.PENCIL} basic={!product?.editablePrice} disabled text="Precio Editable" />
           </FormField>
@@ -28,24 +28,19 @@ const ProductView = ({ product }) => {
           </FormField>
         </FieldsContainer>
         <FieldsContainer>
-          <FormField width="20%" label="Código" control={Input} value={product?.code} readOnly />
-          <FormField flex="1" label="Nombre" control={Input} value={product?.name} readOnly />
+          <TextField width="20%" label="Código" value={product?.code} />
+          <TextField flex="1" label="Nombre" value={product?.name} />
           <PriceField width="20%" label="Precio" value={product?.price} />
-          <FormField
+          <TextField
             width="20%"
             label="Unidad de Medida"
-            control={Input}
             value={MEASSURE_UNITS[product?.fractionConfig?.unit?.toUpperCase()]?.text}
-            readOnly
           />
         </FieldsContainer>
-        <FormField
-          control={TextArea}
+        <TextAreaField
           label="Comentarios"
           width="100%"
           maxLength="2000"
-          placeholder="Comentarios"
-          readOnly
           value={product?.comments}
         />
       </ViewContainer>

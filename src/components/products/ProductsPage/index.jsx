@@ -16,6 +16,7 @@ import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form, Label } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
+import { ControlledInput } from "@/components/common/form";
 
 const EMPTY_FILTERS = { code: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
 const STATE_OPTIONS = [
@@ -159,7 +160,7 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
     <>
       <Flex flexDirection="column" rowGap="15px">
         <FormProvider {...methods}>
-          <Form onSubmit={onSubmit(() => { })}>
+          <Form onSubmit={onSubmit(() => {})}>
             <Filters onRefetch={onRefetch} clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
               <Controller
                 name="state"
@@ -180,30 +181,8 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
                   />
                 )}
               />
-              <Controller
-                name="code"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    $marginBottom
-                    $maxWidth
-                    height="35px"
-                    placeholder="Código"
-                  />
-                )}
-              />
-              <Controller
-                name="name"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    $marginBottom
-                    $maxWidth
-                    height="35px"
-                    placeholder="Nombre"
-                  />
-                )}
-              />
+              <ControlledInput name="code" placeholder="Código" width="200px" />
+              <ControlledInput name="name" placeholder="Nombre" width="350px" />
             </Filters>
           </Form>
         </FormProvider>

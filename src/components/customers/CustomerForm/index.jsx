@@ -14,7 +14,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
       ...customer,
     }
   });
-  const { handleSubmit, control, reset, formState: { isDirty, errors } } = methods;
+  const { handleSubmit, reset, formState: { isDirty } } = methods;
 
   const handleReset = useCallback((customer) => {
     reset(customer);

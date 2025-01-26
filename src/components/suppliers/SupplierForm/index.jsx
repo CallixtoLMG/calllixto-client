@@ -12,7 +12,7 @@ const EMPTY_SUPPLIER = { id: '', name: '', emails: [], phoneNumbers: [], address
 const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
   const methods = useForm({ defaultValues: supplier });
 
-  const { handleSubmit, control, reset, formState: { errors, isDirty } } = methods;
+  const { handleSubmit, reset, formState: { isDirty } } = methods;
 
   const handleReset = useCallback((supplier) => {
     reset(supplier);

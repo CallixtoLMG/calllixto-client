@@ -58,7 +58,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
                 />
               )}
             />
-            <ControlledInput name="id" placeholder="Código" width="80px" />
+            <ControlledInput name="id" placeholder="Id" width="80px" />
             <ControlledInput name="name" placeholder="Nombre" width="300px" />
           </Filters>
         </Form>

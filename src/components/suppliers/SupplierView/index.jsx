@@ -1,35 +1,28 @@
 "use client";
-import { FieldsContainer, Form, FormField, Input, TextArea, ViewContainer } from "@/components/common/custom";
-import { ContactView } from "@/components/common/form";
+import { FieldsContainer, Form, ViewContainer } from "@/components/common/custom";
+import { ContactView, TextAreaField, TextField } from "@/components/common/form";
 
 const SupplierView = ({ supplier }) => {
   return (
     <Form>
       <ViewContainer>
         <FieldsContainer>
-          <FormField
+          <TextField
             width="150px"
             label="Código"
-            control={Input}
             value={supplier?.id}
-            readOnly
           />
-          <FormField
+          <TextField
             width="40%"
             label="Nombre"
-            control={Input}
             value={supplier?.name}
-            readOnly
           />
         </FieldsContainer>
         <ContactView {...supplier} />
-        <FormField
-          control={TextArea}
+        <TextAreaField
           label="Comentarios"
           width="100%"
-          placeholder="Comentarios"
           value={supplier?.comments}
-          readOnly
         />
       </ViewContainer>
     </Form>

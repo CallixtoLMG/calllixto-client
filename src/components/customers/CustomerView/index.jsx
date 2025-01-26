@@ -1,26 +1,21 @@
 "use client";
-import { Form, FormField, Input, TextArea, ViewContainer } from "@/components/common/custom";
-import { ContactView } from "@/components/common/form";
+import { Form, ViewContainer } from "@/components/common/custom";
+import { ContactView, TextAreaField, TextField } from "@/components/common/form";
 
 const CustomerView = ({ customer }) => {
   return (
     <Form>
       <ViewContainer>
-        <FormField
+        <TextField
           width="40%"
           label="Nombre"
-          control={Input}
           value={customer?.name}
-          readOnly
         />
         <ContactView {...customer} />
-        <FormField
-          control={TextArea}
+        <TextAreaField
           label="Comentarios"
           width="100%"
-          placeholder="Comentarios"
           value={customer?.comments}
-          readOnly
         />
       </ViewContainer>
     </Form>
