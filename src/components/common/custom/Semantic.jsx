@@ -28,7 +28,7 @@ export const Segment = styled(SSegment)`
 
 export const Input = styled(SInput)`
   width: ${({ width = '100%' }) => `${width}!important`};
-  height: ${({ height = '35px' }) => height} !important;
+  height: ${({ height = '38px' }) => height} !important;
   text-align: ${({ textAlign }) => textAlign} !important;
 `;
 
@@ -87,7 +87,7 @@ export const DropdownItem = styled(SDropdown.Item)`
   font-weight: 400;
   width: 100%;
   &&&&&&{
-    padding: 13px 10px!important;
+    padding: 10px 10px!important;
   }
   &:hover {
     background-color: #f5f5f5!important;

@@ -148,9 +148,9 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
-        <FieldsContainer rowGap="5px" alignItems="flex-end">
+        <FieldsContainer rowGap="5px">
           <FormField
-            flex="1"
+            width="25%"
             required
             name="supplier"
             placeholder={PAGES.SUPPLIERS.NAME}
@@ -171,7 +171,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             control={Dropdown}
           />
           <FormField
-            flex="1"
+            width="25%"
             required
             name="brand"
             placeholder={PAGES.BRANDS.NAME}
@@ -192,25 +192,21 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             control={Dropdown}
           />
           <ControlledInput
-            width="20%"
+            width="250px"
             name="code"
             label="Código"
-            placeholder="Código"
             rules={RULES.REQUIRED_BRAND_AND_SUPPLIER(brand, supplier)}
-            innerWidth="0"
             onChange={(e) => e.target.value.toUpperCase()}
-            labelPosition='left'
             disabled={isProductDeleted(product?.state)}
           />
+        </FieldsContainer>
+        <FieldsContainer rowGap="5px" alignItems="flex-end">
           <ControlledInput
-            flex="1"
+            width="40%"
             name="name"
             label="Nombre"
-            placeholder="Nombre"
             rules={RULES.REQUIRED}
-            innerWidth="0"
             onChange={(e) => e.target.value.toUpperCase()}
-            labelPosition='left'
             disabled={isProductDeleted(product?.state)}
           />
         </FieldsContainer>
@@ -231,7 +227,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             disabled={isProductDeleted(product?.state)}
           />
           <ControlledDropdown
-          width="fit-content"
+            width="fit-content"
             name="fractionConfig.unit"
             label="Unidad de Medida"
             options={Object.values(MEASSURE_UNITS)}

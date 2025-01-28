@@ -16,6 +16,7 @@ export const ControlledIconedButton = ({
         <FormField width={width}>
           <IconnedButton
             {...rest}
+            height="38px"
             text={label}
             icon={icon}
             onClick={() => onChange(!value)}
