@@ -1,6 +1,6 @@
 import { FormField, Input } from "@/components/common/custom";
 
-export const TextField = ({ width, flex, label, placeholder, value }) => {
+export const TextField = ({ width, flex, label, disabled = true, onChange, placeholder, value }) => {
   return (
     <FormField
       flex={flex}
@@ -9,7 +9,8 @@ export const TextField = ({ width, flex, label, placeholder, value }) => {
       placeholder={placeholder ?? label}
       control={Input}
       value={value}
-      readOnly
+      readOnly={disabled}
+      onChange={onChange}
     />
   );
 };

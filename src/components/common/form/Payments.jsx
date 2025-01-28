@@ -5,9 +5,12 @@ import { useMemo, useState } from "react";
 import { registerLocale } from "react-datepicker";
 import { useFieldArray } from "react-hook-form";
 import { Header } from "semantic-ui-react";
-import { Dropdown, FieldsContainer, Flex, FlexColumn, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
+import { FieldsContainer, Flex, FlexColumn, FormField, IconedButton, Price, Segment } from "../custom";
 import DatePicker from "../custom/DatePicker";
 import { Table, TotalList } from "../table";
+import { DropdownField } from "./fields/DropdownField";
+import { PriceField } from "./fields/PriceField";
+import { TextField } from "./fields/TextField";
 
 registerLocale("es", es);
 
@@ -71,9 +74,8 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
         </Header>
         <FlexColumn rowGap="15px">
           {update && (
-            <FieldsContainer width="100%" alignItems="center" rowGap="5px">
-              <FormField height="80px" flex="1">
-                <Label>Fecha de Pago</Label>
+            <FieldsContainer>
+              <FormField label="Fecha" width="150px">
                 <DatePicker
                   selected={payment.date}
                   onChange={(date) => setPayment({ ...payment, date })}
@@ -83,48 +85,33 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
                   maxDate={new Date()}
                 />
               </FormField>
-              <FormField flex="2">
-                <Label>Método</Label>
-                <Dropdown
-                  placeholder="Seleccione método de pago"
-                  fluid
-                  selection
-                  options={PAYMENT_METHODS.filter((method) => method.key !== 'dolares')}
-                  value={payment.method}
-                  onChange={(e, { value }) => setPayment({ ...payment, method: value })}
-                  disabled={isTotalCovered}
-                />
-              </FormField>
-              <FormField flex="1">
-                <RuledLabel title="Monto" message={errors.amount} required />
-                {/* Usar controlled input */}
-                {/* <CurrencyFormatInput
-                  height="50px"
-                  textAlignLast="right"
-                  customInput={Input}
-                  displayType="input"
-                  thousandSeparator
-                  decimalScale={2}
-                  allowNegative={false}
-                  value={payment.amount || 0}
-                  prefix="$ "
-                  onValueChange={(values) => {
-                    const { floatValue } = values;
-                    setPayment({ ...payment, amount: parseFloat(floatValue) || 0 });
-                  }}
-                  disabled={isTotalCovered || !payment.method}
-                /> */}
-              </FormField>
-              <FormField flex="3">
-                <Label>Comentarios</Label>
-                <Input
-                  type="text"
-                  placeholder="Comentarios"
-                  disabled={isTotalCovered || !payment.method}
-                  value={payment.comments}
-                  onChange={(e, { value }) => setPayment({ ...payment, comments: value })}
-                />
-              </FormField>
+              <DropdownField
+                width="fit-content"
+                label="Método de Pago"
+                options={PAYMENT_METHODS.filter((method) => method.key !== 'dolares')}
+                value={payment.method}
+                onChange={(e, { value }) => setPayment({ ...payment, method: value })}
+                disabled={isTotalCovered}
+
+              />
+              <PriceField
+                width="150px"
+                label="Monto"
+                value={payment.amount || 0}
+                onChange={value => {
+                  setPayment({ ...payment, amount: value });
+                }}
+                disabled={false}
+              />
+              <TextField
+                flex="1"
+                label="Comentarios"
+                disabled={isTotalCovered || !payment.method}
+                value={payment.comments}
+                onChange={e => {
+                  setPayment({ ...payment, comments: e.target.value });
+                }}
+              />
               <FormField minWidth="fit-content" width="fit-content">
                 <IconedButton
                   padding="3px 18px 3px 40px"

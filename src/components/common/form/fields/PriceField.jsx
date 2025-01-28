@@ -2,7 +2,7 @@ import { FormField, Input } from "@/components/common/custom";
 import { formatedNumber } from "@/utils";
 import { Icon } from "semantic-ui-react";
 
-export const PriceField = ({ label, width, value, ...inputProps }) => {
+export const PriceField = ({ label, width, value, disabled = true, ...inputProps }) => {
   return (
     <FormField
       label={label}
@@ -12,7 +12,7 @@ export const PriceField = ({ label, width, value, ...inputProps }) => {
       <Input
         {...inputProps}
         value={formatedNumber(value)}
-        readOnly
+        readOnly={disabled}
         iconPosition="left"
       >
         <Icon name="dollar" />
