@@ -8,6 +8,7 @@ export * from './controlled/ControlledIconedButton';
 export * from './fields/PriceField';
 export * from './fields/TextField';
 export * from './fields/TextAreaField';
+export * from './fields/DropdownField';
 export * from './Payments';
 export * from './PasswordRequirements';
 

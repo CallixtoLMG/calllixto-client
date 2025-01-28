@@ -1,6 +1,6 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Dropdown, FieldsContainer, Flex, Form, FormField, Label } from "@/components/common/custom";
-import { ControlledComments, ControlledDropdown, ControlledIconedButton, ControlledInput, ControlledNumber } from "@/components/common/form";
+import { ControlledComments, ControlledDropdown, ControlledIconedButton, ControlledInput, ControlledNumber, DropdownField, TextField } from "@/components/common/form";
 import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, PAGES, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { isProductDeleted, preventSend } from "@/utils";
@@ -149,56 +149,50 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
         <FieldsContainer rowGap="5px">
-          <FormField
-            width="25%"
-            required
-            name="supplier"
-            placeholder={PAGES.SUPPLIERS.NAME}
-            search
-            selection
-            minCharacters={2}
-            noResultsMessage="Sin resultados!"
-            options={supplierOptions}
-            clearable
-            value={supplier?.name}
-            onChange={(e, { value }) => handleSupplierChange(value)}
-            disabled={isProductDeleted(product?.state)}
-            label="Proveedor"
-            error={errors?.supplier ? {
-              content: errors.supplier.message,
-              pointing: 'above',
-            } : null}
-            control={Dropdown}
-          />
-          <FormField
-            width="25%"
-            required
-            name="brand"
-            placeholder={PAGES.BRANDS.NAME}
-            search
-            selection
-            minCharacters={2}
-            noResultsMessage="Sin resultados!"
-            options={brandOptions}
-            clearable
-            value={brand?.name}
-            onChange={(e, { value }) => handleBrandChange(value)}
-            disabled={isProductDeleted(product?.state)}
-            label="Marca"
-            error={errors?.brand ? {
-              content: errors.brand.message,
-              pointing: 'above',
-            } : null}
-            control={Dropdown}
-          />
-          <ControlledInput
-            width="250px"
-            name="code"
-            label="Código"
-            rules={RULES.REQUIRED_BRAND_AND_SUPPLIER(brand, supplier)}
-            onChange={(e) => e.target.value.toUpperCase()}
-            disabled={isProductDeleted(product?.state)}
-          />
+          {isUpdating ? (
+            <>
+              <TextField width="25%" label="Proveedor" value={product?.supplierName} />
+              <TextField width="25%" label="Marca" value={product?.brandName} />
+              <TextField width="250px" label="Código" value={product?.code} />
+            </>
+          ) : (
+            <>
+              <DropdownField
+                width="25%"
+                required
+                options={supplierOptions}
+                value={supplier?.name}
+                onChange={(e, { value }) => handleSupplierChange(value)}
+                disabled={isProductDeleted(product?.state)}
+                label="Proveedor"
+                error={errors?.supplier ? {
+                  content: errors.supplier.message,
+                  pointing: 'above',
+                } : null}
+              />
+              <DropdownField
+                width="25%"
+                required
+                options={brandOptions}
+                value={brand?.name}
+                onChange={(e, { value }) => handleBrandChange(value)}
+                disabled={isProductDeleted(product?.state)}
+                label="Marca"
+                error={errors?.brand ? {
+                  content: errors.brand.message,
+                  pointing: 'above',
+                } : null}
+              />
+              <ControlledInput
+                width="250px"
+                name="code"
+                label="Código"
+                rules={RULES.REQUIRED_BRAND_AND_SUPPLIER(brand, supplier)}
+                onChange={(e) => e.target.value.toUpperCase()}
+                disabled={isProductDeleted(product?.state)}
+              />
+            </>
+          )}
         </FieldsContainer>
         <FieldsContainer rowGap="5px" alignItems="flex-end">
           <ControlledInput
@@ -210,7 +204,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             disabled={isProductDeleted(product?.state)}
           />
         </FieldsContainer>
-        <FieldsContainer rowGap="5px" alignItems="end">
+        <FieldsContainer alignItems="end">
           <ControlledNumber width="200px" name="price" label="Precio" price />
           <ControlledIconedButton
             width="fit-content"
@@ -227,7 +221,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             disabled={isProductDeleted(product?.state)}
           />
           <ControlledDropdown
-            width="fit-content"
+            width="200px"
             name="fractionConfig.unit"
             label="Unidad de Medida"
             options={Object.values(MEASSURE_UNITS)}

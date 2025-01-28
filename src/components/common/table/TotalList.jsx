@@ -1,8 +1,7 @@
-import { Divider } from '@/components/budgets/PDFfile/styles';
+import { Divider, Title } from '@/components/budgets/PDFfile/styles';
 import { renderContent } from '@/utils';
 import styled from 'styled-components';
 import { Flex, FlexColumn } from '../custom';
-import { Title } from '@/app/styles';
 
 const SubTitle = styled.p`
   font-style: italic;

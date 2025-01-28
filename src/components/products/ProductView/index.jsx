@@ -17,22 +17,36 @@ const ProductView = ({ product }) => {
             </Message>
           </FieldsContainer>
         )}
-        <FieldsContainer alignItems="flex-end">
-          <TextField flex="1" label="Proveedor" value={product?.supplierName} />
-          <TextField flex="1" label="Marca" value={product?.brandName} />
-          <FormField width="20%">
-            <IconnedButton icon={ICONS.PENCIL} basic={!product?.editablePrice} disabled text="Precio Editable" />
-          </FormField>
-          <FormField width="20%">
-            <IconnedButton icon={ICONS.CUT} basic={!product?.fractionConfig?.active} disabled text="Producto Fraccionable" />
-          </FormField>
+        <FieldsContainer>
+          <TextField width="25%" label="Proveedor" value={product?.supplierName} />
+          <TextField width="25%" label="Marca" value={product?.brandName} />
+          <TextField width="250px" label="Código" value={product?.code} />
         </FieldsContainer>
         <FieldsContainer>
-          <TextField width="20%" label="Código" value={product?.code} />
-          <TextField flex="1" label="Nombre" value={product?.name} />
-          <PriceField width="20%" label="Precio" value={product?.price} />
+          <TextField width="40%" label="Nombre" value={product?.name} />
+        </FieldsContainer>
+        <FieldsContainer alignItems="end">
+          <PriceField width="200px" label="Precio" value={product?.price} />
+          <FormField width="fit-content">
+            <IconnedButton
+              height="38px"
+              text="Precio Editable"
+              icon={ICONS.PENCIL}
+              basic={!product?.editablePrice}
+              disabled
+            />
+          </FormField>
+          <FormField width="fit-content">
+            <IconnedButton
+              height="38px"
+              icon={ICONS.CUT}
+              basic={!product?.fractionConfig?.active}
+              disabled
+              text="Producto Fraccionable"
+            />
+          </FormField>
           <TextField
-            width="20%"
+            width="200px"
             label="Unidad de Medida"
             value={MEASSURE_UNITS[product?.fractionConfig?.unit?.toUpperCase()]?.text}
           />
