@@ -4,7 +4,7 @@ import { IconnedButton } from "@/components/common/buttons";
 import { FieldsContainer, Form, FormField, ViewContainer } from "@/components/common/custom";
 import { PriceField, TextField, TextAreaField } from "@/components/common/form";
 import { ICONS, MEASSURE_UNITS, PRODUCT_STATES } from "@/constants";
-import { getDateWithOffset } from "@/utils";
+import { getBrandCode, getDateWithOffset, getProductCode, getSupplierCode } from "@/utils";
 
 const ProductView = ({ product }) => {
   return (
@@ -20,7 +20,12 @@ const ProductView = ({ product }) => {
         <FieldsContainer>
           <TextField width="25%" label="Proveedor" value={product?.supplierName} />
           <TextField width="25%" label="Marca" value={product?.brandName} />
-          <TextField width="250px" label="Código" value={product?.code} />
+          <TextField
+            width="250px"
+            label="Código"
+            value={getProductCode(product?.code)}
+            iconLabel={`${getSupplierCode(product?.code)} ${getBrandCode(product?.code)}`}
+          />
         </FieldsContainer>
         <FieldsContainer>
           <TextField width="40%" label="Nombre" value={product?.name} />

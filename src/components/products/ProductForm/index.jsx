@@ -1,11 +1,11 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Dropdown, FieldsContainer, Flex, Form, FormField, Label } from "@/components/common/custom";
+import { FieldsContainer, Flex, Form, Label } from "@/components/common/custom";
 import { ControlledComments, ControlledDropdown, ControlledIconedButton, ControlledInput, ControlledNumber, DropdownField, TextField } from "@/components/common/form";
-import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, PAGES, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
+import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { isProductDeleted, preventSend } from "@/utils";
-import { useCallback, useMemo, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted, preventSend } from "@/utils";
+import { useCallback, useMemo } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
@@ -22,13 +22,10 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     }
   });
 
-  const { handleSubmit, reset, watch, formState: { isDirty, errors }, clearErrors, setError } = methods;
-  const [supplier, setSupplier] = useState();
-  const [brand, setBrand] = useState();
-  const [watchFractionable] = watch(["fractionConfig.active"]);
+  const { handleSubmit, reset, watch, formState: { isDirty, errors } } = methods;
+  const [watchFractionable, watchSupplier, watchBrand] = watch(['fractionConfig.active', 'supplier', 'brand']);
 
   const handleReset = useCallback((product) => {
-    setSupplier({ name: "", id: "" });
     setBrand({ name: "", id: "" });
 
     if (isUpdating) {
@@ -43,16 +40,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   }, [reset, isUpdating]);
 
   const handleForm = async (data) => {
-    if (supplier?.state === SUPPLIER_STATES.INACTIVE.id) {
-      setError("supplier", { type: "manual", message: "Este proveedor está inactivo." });
-      return;
-    }
-
-    if (brand?.state === BRANDS_STATES.INACTIVE.id) {
-      setError("brand", { type: "manual", message: "Esta marca está inactiva." });
-      return;
-    }
-
     const filteredData = { ...data };
 
     if (data.fractionConfig && !data.fractionConfig.active && product?.fractionConfig?.active === false) {
@@ -64,7 +51,9 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     }
 
     if (!isUpdating) {
-      filteredData.code = `${supplier?.id}${brand?.id}${data.code}`;
+      filteredData.code = `${data.supplier}${data.brand}${data.code.toUpperCase()}`;
+      delete filteredData.supplier;
+      delete filteredData.brand;
     }
 
     await onSubmit(filteredData);
@@ -76,7 +65,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   const supplierOptions = useMemo(() => {
     return suppliers?.map(({ id, name, state, deactivationReason }) => ({
       key: id,
-      value: name,
+      value: id,
       text: name,
       content: (
         <Flex justifyContent="space-between" alignItems="center">
@@ -99,7 +88,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   const brandOptions = useMemo(() => {
     return brands?.map(({ id, name, state, deactivationReason }) => ({
       key: id,
-      value: name,
+      value: id,
       text: name,
       content: (
         <Flex justifyContent="space-between" alignItems="center">
@@ -119,32 +108,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     }));
   }, [brands]);
 
-  const handleSupplierChange = (value) => {
-    const selectedSupplier = suppliers.find((supplier) => supplier.name === value);
-    setSupplier(selectedSupplier);
-
-    if (selectedSupplier?.state === SUPPLIER_STATES.INACTIVE.id) {
-      setError("supplier", { type: "manual", message: "No es posible crear un producto con un proveedor inactivo." });
-    } else {
-      clearErrors("supplier");
-    }
-
-    clearErrors("code");
-  };
-
-  const handleBrandChange = (value) => {
-    const selectedBrand = brands.find((brand) => brand.name === value);
-    setBrand(selectedBrand);
-
-    if (selectedBrand?.state === BRANDS_STATES.INACTIVE.id) {
-      setError("brand", { type: "manual", message: "No es posible crear un producto con una marca inactiva." });
-    } else {
-      clearErrors("brand");
-    }
-
-    clearErrors("code");
-  };
-
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
@@ -153,43 +116,66 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             <>
               <TextField width="25%" label="Proveedor" value={product?.supplierName} />
               <TextField width="25%" label="Marca" value={product?.brandName} />
-              <TextField width="250px" label="Código" value={product?.code} />
+              <TextField
+                width="250px"
+                label="Código"
+                value={getProductCode(product?.code)}
+                iconLabel={`${getSupplierCode(product?.code)} ${getBrandCode(product?.code)}`}
+              />
             </>
           ) : (
             <>
-              <DropdownField
-                width="25%"
-                required
-                options={supplierOptions}
-                value={supplier?.name}
-                onChange={(e, { value }) => handleSupplierChange(value)}
-                disabled={isProductDeleted(product?.state)}
-                label="Proveedor"
-                error={errors?.supplier ? {
-                  content: errors.supplier.message,
-                  pointing: 'above',
-                } : null}
+              <Controller
+                name="supplier"
+                control={methods.control}
+                rules={RULES.REQUIRED}
+                render={({ field: { onChange, ...rest } }) => {
+                  return (
+                    <DropdownField
+                      {...rest}
+                      width="25%"
+                      options={supplierOptions}
+                      onChange={(e, { value }) => {
+                        onChange(value);
+                      }}
+                      disabled={isProductDeleted(product?.state)}
+                      label="Proveedor"
+                      error={errors?.supplier ? {
+                        content: errors.supplier.message,
+                        pointing: 'above',
+                      } : null}
+                    />
+                  )
+                }}
               />
-              <DropdownField
-                width="25%"
-                required
-                options={brandOptions}
-                value={brand?.name}
-                onChange={(e, { value }) => handleBrandChange(value)}
-                disabled={isProductDeleted(product?.state)}
-                label="Marca"
-                error={errors?.brand ? {
-                  content: errors.brand.message,
-                  pointing: 'above',
-                } : null}
+              <Controller
+                name="brand"
+                rules={RULES.REQUIRED}
+                render={({ field: { onChange, ...rest } }) => {
+                  return (
+                    <DropdownField
+                      {...rest}
+                      width="25%"
+                      required
+                      options={brandOptions}
+                      onChange={(e, { value }) => onChange(value)}
+                      disabled={isProductDeleted(product?.state)}
+                      label="Marca"
+                      error={errors?.brand ? {
+                        content: errors.brand.message,
+                        pointing: 'above',
+                      } : null}
+                    />
+                  )
+                }}
               />
               <ControlledInput
                 width="250px"
                 name="code"
                 label="Código"
-                rules={RULES.REQUIRED_BRAND_AND_SUPPLIER(brand, supplier)}
-                onChange={(e) => e.target.value.toUpperCase()}
+                rules={RULES.REQUIRED}
                 disabled={isProductDeleted(product?.state)}
+                iconLabel={`${watchSupplier ?? ''} ${watchBrand ?? ''}`}
               />
             </>
           )}

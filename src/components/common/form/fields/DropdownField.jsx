@@ -27,7 +27,7 @@ export const DropdownField = ({
       onChange={onChange}
       disabled={disabled}
       control={Dropdown}
-      error
+      error={error}
     />
   );
 };
