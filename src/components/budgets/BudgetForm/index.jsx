@@ -338,6 +338,7 @@ const BudgetForm = ({
       title: "Cantidad",
       value: (product, index) => (
         <ControlledNumber
+          width="80px"
           name={`products[${index}].quantity`}
           onChange={() => {
             calculateTotal();
@@ -345,7 +346,7 @@ const BudgetForm = ({
           disabled={product.state === PRODUCT_STATES.OOS.id}
         />
       ),
-      width: 2
+      width: 1
     },
     {
       id: 3,
@@ -372,6 +373,7 @@ const BudgetForm = ({
         <>
           {product.fractionConfig?.active && (
             <ControlledNumber
+              width="100px"
               name={`products[${index}].fractionConfig.value`}
               unit={product.fractionConfig.unit}
               iconPosition="right"
@@ -383,15 +385,24 @@ const BudgetForm = ({
           )}
         </>
       ),
-      width: 2
+      width: 1
     },
     {
       id: 5,
       title: "Precio",
       value: (product, index) => {
         return product.editablePrice
-          ? <ControlledNumber name={`products[${index}].price`} price />
-          : <Price value={getPrice(product)} />
+          ? (
+            <ControlledNumber
+              width="100%"
+              name={`products[${index}].price`}
+              price
+              onChange={() => {
+                calculateTotal();
+              }}
+            />
+          )
+          : <Price width="100%" value={getPrice(product)} />
       },
       width: 2
     },
@@ -407,7 +418,8 @@ const BudgetForm = ({
               <PercentInput
                 {...rest}
                 width="80px"
-                height="35px" onChange={value => {
+                height="35px"
+                onChange={value => {
                   onChange(value);
                   calculateTotal();
                 }}
@@ -514,6 +526,7 @@ const BudgetForm = ({
             />
             <FieldsContainer>
               <ControlledNumber
+                width="200px"
                 name="expirationOffsetDays"
                 rules={RULES.REQUIRED}
                 maxLength={3}
@@ -522,7 +535,7 @@ const BudgetForm = ({
                 onChange={setExpiration}
               />
               <FormField
-                flex="1"
+                width="200px"
                 label="Fecha de vencimiento"
                 control={Input}
                 readOnly

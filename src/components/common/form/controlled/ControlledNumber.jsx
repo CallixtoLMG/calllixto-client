@@ -35,7 +35,7 @@ export const ControlledNumber = ({
             {...rest}
             value={value?.toLocaleString() ?? 0}
             placeholder={placeholder ?? label}
-            iconPosition={iconPosition}
+            {...(price || unit) && { iconPosition }}
             onChange={(e) => {
               let newValue = e.target.value.replace(/[^0-9.]/g, '');
               if (!isNaN(newValue)) {
