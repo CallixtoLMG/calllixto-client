@@ -16,7 +16,7 @@ import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form, Label } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
-import { ControlledInput } from "@/components/common/form";
+import { ControlledText } from "@/components/common/form";
 
 const EMPTY_FILTERS = { code: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
 const STATE_OPTIONS = [
@@ -181,8 +181,8 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
                   />
                 )}
               />
-              <ControlledInput name="code" placeholder="Código" width="200px" />
-              <ControlledInput name="name" placeholder="Nombre" width="350px" />
+              <ControlledText name="code" placeholder="Código" width="200px" />
+              <ControlledText name="name" placeholder="Nombre" width="350px" />
             </Filters>
           </Form>
         </FormProvider>

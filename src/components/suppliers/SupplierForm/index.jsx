@@ -1,6 +1,6 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Box, FieldsContainer, Form } from "@/components/common/custom";
-import { ContactFields, ControlledComments, ControlledInput } from "@/components/common/form";
+import { ContactFields, ControlledComments, ControlledText } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
@@ -38,7 +38,7 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleCreate)} onKeyDown={preventSend}>
         <FieldsContainer>
-          <ControlledInput
+          <ControlledText
             width="150px"
             name="id"
             label="Código"
@@ -48,7 +48,7 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
             disabled={isUpdating}
             maxLength={2}
           />
-          <ControlledInput
+          <ControlledText
             width="40%"
             name="name"
             label="Nombre"

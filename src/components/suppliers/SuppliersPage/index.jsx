@@ -6,7 +6,7 @@ import { createFilter } from "@/utils";
 import { Controller, FormProvider } from "react-hook-form";
 import { Form, Label } from "semantic-ui-react";
 import { SUPPLIERS_COLUMNS } from "../suppliers.common";
-import { ControlledInput } from "@/components/common/form";
+import { ControlledText } from "@/components/common/form";
 
 const EMPTY_FILTERS = { id: '', name: '', state: SUPPLIER_STATES.ACTIVE.id };
 const STATE_OPTIONS = [
@@ -58,8 +58,8 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
                 />
               )}
             />
-            <ControlledInput name="id" placeholder="Id" width="80px" />
-            <ControlledInput name="name" placeholder="Nombre" width="300px" />
+            <ControlledText name="id" placeholder="Id" width="80px" />
+            <ControlledText name="name" placeholder="Nombre" width="300px" />
           </Filters>
         </Form>
       </FormProvider>

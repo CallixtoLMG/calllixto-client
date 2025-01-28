@@ -1,6 +1,6 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, Label } from "@/components/common/custom";
-import { ControlledComments, ControlledDropdown, ControlledIconedButton, ControlledInput, ControlledNumber, DropdownField, TextField } from "@/components/common/form";
+import { ControlledComments, ControlledDropdown, ControlledIconedButton, ControlledText, ControlledNumber, DropdownField, TextField } from "@/components/common/form";
 import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted, preventSend } from "@/utils";
@@ -26,13 +26,13 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   const [watchFractionable, watchSupplier, watchBrand] = watch(['fractionConfig.active', 'supplier', 'brand']);
 
   const handleReset = useCallback((product) => {
-    setBrand({ name: "", id: "" });
-
     if (isUpdating) {
       reset(product);
     } else {
       reset({
         ...product,
+        supplier: '',
+        brand: '',
         fractionConfig: { active: false, unit: MEASSURE_UNITS.MT.value },
         editablePrice: false
       });
@@ -169,11 +169,12 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                   )
                 }}
               />
-              <ControlledInput
+              <ControlledText
                 width="250px"
                 name="code"
                 label="Código"
                 rules={RULES.REQUIRED}
+                onChange={value => value.toUpperCase()}
                 disabled={isProductDeleted(product?.state)}
                 iconLabel={`${watchSupplier ?? ''} ${watchBrand ?? ''}`}
               />
@@ -181,12 +182,12 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           )}
         </FieldsContainer>
         <FieldsContainer rowGap="5px" alignItems="flex-end">
-          <ControlledInput
+          <ControlledText
             width="40%"
             name="name"
             label="Nombre"
             rules={RULES.REQUIRED}
-            onChange={(e) => e.target.value.toUpperCase()}
+            onChange={value => value.toUpperCase()}
             disabled={isProductDeleted(product?.state)}
           />
         </FieldsContainer>

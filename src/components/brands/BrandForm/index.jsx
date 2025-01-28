@@ -5,7 +5,7 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { ControlledComments, ControlledInput } from "../../common/form";
+import { ControlledComments, ControlledText } from "../../common/form";
 
 const EMPTY_BRAND = { name: '', id: '', comments: '' };
 
@@ -28,7 +28,7 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
         <FieldsContainer>
-          <ControlledInput
+          <ControlledText
             width="150px"
             name="id"
             label="Código"
@@ -38,7 +38,7 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
             disabled={isUpdating}
             maxLength={2}
           />
-          <ControlledInput
+          <ControlledText
             width="40%"
             name="name"
             label="Nombre"

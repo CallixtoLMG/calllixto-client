@@ -6,7 +6,7 @@ import { createFilter } from '@/utils';
 import { Controller, FormProvider } from 'react-hook-form';
 import { Form, Label } from 'semantic-ui-react';
 import { HEADERS } from "../customers.common";
-import { ControlledInput } from '@/components/common/form';
+import { ControlledText } from '@/components/common/form';
 
 const EMPTY_FILTERS = { name: '', state: CUSTOMER_STATES.ACTIVE.id };
 const STATE_OPTIONS = [
@@ -58,7 +58,7 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
                 />
               )}
             />
-            <ControlledInput name="name" placeholder="Nombre" width="300px" />
+            <ControlledText name="name" placeholder="Nombre" width="300px" />
           </Filters>
         </Form>
       </FormProvider>
