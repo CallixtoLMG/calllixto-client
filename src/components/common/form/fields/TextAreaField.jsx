@@ -1,6 +1,14 @@
 import { FormField, TextArea } from "@/components/common/custom";
 
-export const TextAreaField = ({ width, label, placeholder, value }) => {
+export const TextAreaField = ({
+  width,
+  label,
+  placeholder,
+  value,
+  disabled,
+  onChange,
+  error
+}) => {
   return (
     <FormField
       control={TextArea}
@@ -8,6 +16,9 @@ export const TextAreaField = ({ width, label, placeholder, value }) => {
       width={width}
       placeholder={placeholder ?? label}
       value={value}
+      disabled={disabled}
+      onChange={onChange}
+      error={error}
     />
   );
 };

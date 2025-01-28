@@ -1,6 +1,6 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, Label } from "@/components/common/custom";
-import { ControlledComments, ControlledDropdown, ControlledIconedButton, ControlledText, ControlledNumber, DropdownField, TextField } from "@/components/common/form";
+import { ControlledTextArea, ControlledDropdown, ControlledIconedButton, ControlledText, ControlledNumber, DropdownField, TextField } from "@/components/common/form";
 import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted, preventSend } from "@/utils";
@@ -216,7 +216,12 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             disabled={!watchFractionable || isProductDeleted(product?.state)}
           />
         </FieldsContainer>
-        <ControlledComments disabled={isProductDeleted(product?.state)} />
+        <ControlledTextArea
+          name="comments"
+          disabled={isProductDeleted(product?.state)}
+          label="Comentarios"
+          rules={RULES.REQUIRED}
+        />
         <SubmitAndRestore
           isUpdating={isUpdating}
           isLoading={isLoading}

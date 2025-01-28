@@ -1,7 +1,7 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, PercentInput, Price } from "@/components/common/custom";
-import { ControlledComments, ControlledNumber } from "@/components/common/form";
+import { ControlledTextArea, ControlledNumber } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
@@ -715,7 +715,7 @@ const BudgetForm = ({
               />
             )}
           </FieldsContainer>
-          <ControlledComments />
+          <ControlledTextArea name="comments" label="Comentarios" />
           <SubmitAndRestore
             draft={draft}
             isLoading={isLoading && !isBudgetDraft(watchState)}

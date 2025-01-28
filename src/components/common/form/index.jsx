@@ -1,6 +1,6 @@
 export * from './fields/ContactFields';
 export * from './ContactView';
-export * from './controlled/ControlledComments';
+export * from './controlled/ControlledTextArea';
 export * from './controlled/ControlledText';
 export * from './controlled/ControlledNumber';
 export * from './controlled/ControlledDropdown';

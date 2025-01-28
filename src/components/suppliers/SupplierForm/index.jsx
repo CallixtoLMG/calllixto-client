@@ -1,6 +1,6 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { Box, FieldsContainer, Form } from "@/components/common/custom";
-import { ContactFields, ControlledComments, ControlledText } from "@/components/common/form";
+import { ContactFields, ControlledTextArea, ControlledText } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
@@ -57,7 +57,7 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
           />
         </FieldsContainer>
         <ContactFields />
-        <ControlledComments />
+        <ControlledTextArea name="comments" label="Comentarios" />
         <SubmitAndRestore
           isUpdating={isUpdating}
           isLoading={isLoading}

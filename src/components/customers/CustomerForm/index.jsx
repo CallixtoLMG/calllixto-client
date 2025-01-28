@@ -1,6 +1,6 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Form } from "@/components/common/custom";
-import { ContactFields, ControlledComments, ControlledText } from "@/components/common/form";
+import { ContactFields, ControlledTextArea, ControlledText } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useCallback } from "react";
@@ -34,7 +34,7 @@ const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdati
           <ControlledText width="40%"name="name" label="Nombre" placeholder="Nombre" rules={RULES.REQUIRED} />
         </FieldsContainer>
         <ContactFields />
-        <ControlledComments />
+        <ControlledTextArea name="comments" />
         <SubmitAndRestore
           isUpdating={isUpdating}
           isLoading={isLoading}

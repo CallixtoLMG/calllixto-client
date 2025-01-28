@@ -5,7 +5,7 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { ControlledComments, ControlledText } from "../../common/form";
+import { ControlledTextArea, ControlledText } from "../../common/form";
 
 const EMPTY_BRAND = { name: '', id: '', comments: '' };
 
@@ -46,7 +46,7 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating }) => {
             rules={RULES.REQUIRED}
           />
         </FieldsContainer>
-        <ControlledComments />
+        <ControlledTextArea name="comments" label="Comentarios" />
         <SubmitAndRestore
           isUpdating={isUpdating}
           isLoading={isLoading}
