@@ -1,20 +1,8 @@
 import { COLORS } from '@/constants';
 import { Icon } from 'semantic-ui-react';
+import { Button } from '../custom';
 
-const IconedButton = styled(SButton)`
-  font-weight: 500 !important;
-  &&&& {
-    text-align: center;
-    height: ${({ height = '35px' }) => `${height}!important`} ;
-    font-size: 13.5px !important;
-    width: ${({ width = '110px' }) => `${width}!important`} ;
-    padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
-    padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
-    margin-right: 0;
-  };
-`;
-
-const Iconned = ({
+const IconedButton = ({
   text,
   icon,
   color = COLORS.BLUE,
@@ -26,9 +14,8 @@ const Iconned = ({
   height,
   submit
 }) => {
-
   return (
-    <IconedButton
+    <Button
       size="small"
       icon
       labelPosition="left"
@@ -43,8 +30,8 @@ const Iconned = ({
     >
       <Icon name={icon} />
       {text}
-    </IconedButton>
+    </Button>
   );
 };
 
-export default Iconned;
+export default IconedButton;

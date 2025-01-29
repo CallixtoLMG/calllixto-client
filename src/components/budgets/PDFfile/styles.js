@@ -1,5 +1,5 @@
 import { Flex } from '@/components/common/custom';
-import { Header as SHeader, Image as SImage } from "semantic-ui-react";
+import { Header, Image as SImage } from "semantic-ui-react";
 import styled from "styled-components";
 
 const SectionContainer = styled(Flex)`
@@ -19,7 +19,7 @@ const DataContainer = styled(Flex)`
   width: ${({ width }) => width} !important;
 `;
 
-const Title = styled(SHeader)`
+const Title = styled(Header)`
   margin: 0!important;
   color: ${({ color }) => color ? "rgba(235,124,21,255)" : "black"} !important;
   align-content: center;

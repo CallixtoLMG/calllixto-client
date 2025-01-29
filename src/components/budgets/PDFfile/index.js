@@ -174,7 +174,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <DataContainer width="100%">
               <Title as="h4" alignSelf="left" textAlignLast="left" $slim>Detalles de Pago</Title>
               <Divider />
-              <TotalList labelWidth="200px" width="300px" readOnly items={TOTAL_LIST_ITEMS} />
+              <TotalList readOnly items={TOTAL_LIST_ITEMS} />
             </DataContainer>
             <DataContainer width="100%">
               <Title as="h4" alignSelf="left" textAlignLast="left" $slim>Formas de Pago</Title>

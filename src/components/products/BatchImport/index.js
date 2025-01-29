@@ -1,5 +1,5 @@
 import { useCreateBatch, useEditBatch, useGetBlackList, useListProducts } from "@/api/products";
-import { ButtonsContainer, FieldsContainer, FlexColumn, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
+import { Button, ButtonsContainer, FieldsContainer, FlexColumn, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { COLORS, ICONS } from "@/constants";
@@ -365,7 +365,7 @@ const BatchImport = ({ isCreating }) => {
         style={{ display: 'none' }}
         onChange={handleFileUpload}
       />
-      <IconedButton
+      <Button
         height="fit-content"
         width="fit-content"
         paddingLeft="0"
@@ -374,7 +374,7 @@ const BatchImport = ({ isCreating }) => {
         type="button"
       >
         <Icon marginRight name={importSettings.icon} />{importSettings.button}
-      </IconedButton>
+      </Button>
       <Transition animation="fade" duration={500} visible={open}>
         <Modal
           closeIcon

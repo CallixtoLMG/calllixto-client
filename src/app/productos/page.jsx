@@ -1,8 +1,7 @@
 "use client"
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
-import { IconedButton } from "@/components/common/buttons";
-import { DropdownItem, Icon } from "@/components/common/custom";
+import { Button, DropdownItem, Icon } from "@/components/common/custom";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
@@ -72,7 +71,7 @@ const Products = () => {
         button: (
           <Dropdown
             pointing
-            as={IconedButton}
+            as={Button}
             text='Excel'
             icon={ICONS.FILE_EXCEL}
             floating

@@ -138,3 +138,16 @@ export const MessageHeader = styled(SMessageHeader)`
 export const Message = styled(SMessage)`
   width: 100%;
 `;
+
+export const Button = styled(SButton)`
+  font-weight: 500 !important;
+  &&&& {
+    text-align: center;
+    height: ${({ height = '35px' }) => `${height}!important`} ;
+    font-size: 13.5px !important;
+    width: ${({ width = '110px' }) => `${width}!important`} ;
+    padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
+    padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
+    margin-right: 0;
+  };
+`;

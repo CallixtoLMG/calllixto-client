@@ -11,7 +11,7 @@ import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
 import { IconedButton } from "@/components/common/buttons";
-import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Input, Menu } from "@/components/common/custom";
+import { Box, Button, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Input, Menu } from "@/components/common/custom";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, COLORS, ICONS, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
@@ -199,7 +199,7 @@ const Budget = ({ params }) => {
           button: (
             <Dropdown
               pointing
-              as={IconedButton}
+              as={Button}
               text='PDFs'
               icon={ICONS.DOWNLOAD}
               floating

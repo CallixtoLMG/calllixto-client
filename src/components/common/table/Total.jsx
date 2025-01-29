@@ -1,8 +1,10 @@
 import { formatedPercentage } from '@/utils';
 import { TotalList } from './';
 import { PercentField, PriceLabel } from '../form';
+import styled from 'styled-components';
+import { Header } from 'semantic-ui-react';
 
-const Title = styled(SHeader)`
+const Title = styled(Header)`
   margin: 0!important;
   color: rgba(235,124,21,255) !important;
   align-content: center;
@@ -71,7 +73,6 @@ export const Total = ({
             value={globalDiscount}
             onChange={onGlobalDiscountChange}
             width="85px"
-            height="35px"
           />
         )
       },
@@ -88,7 +89,6 @@ export const Total = ({
             value={additionalCharge}
             onChange={onAdditionalChargeChange}
             width="85px"
-            height="35px"
           />
         )
       }
