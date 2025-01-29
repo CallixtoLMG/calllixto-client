@@ -1,15 +1,17 @@
 import { useEditCustomer } from "@/api/customers";
 import { IconedButton } from "@/components/common/buttons";
-import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Form } from "@/components/common/custom";
+import { NumberControlled, TextControlled, TextField } from "@/components/common/form";
 import { COLORS, ICONS, RULES } from "@/constants";
 import { useEffect, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Modal, Transition } from "semantic-ui-react";
 
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const { control, handleSubmit, formState: { errors }, reset } = useForm({ defaultValues: customer });
+  const methods = useForm({ defaultValues: customer });
+  const { handleSubmit, reset } = methods;
   const formRef = useRef(null);
   const editCustomer = useEditCustomer();
   useEffect(() => {
@@ -23,7 +25,17 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
     }
   }, [isModalOpen]);
 
-  const handleEdit = async (data) => {
+  const handleEdit = async ({ ref, address, areaCode, number }) => {
+    const data = {
+      addresses: [{
+        ref,
+        address
+      }],
+      phoneNumbers: [{
+        areaCode,
+        number
+      }]
+    }
     setIsLoading(true);
     try {
       const response = await editCustomer(data);
@@ -56,107 +68,37 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
           Es necesario completar los siguientes datos del cliente
         </Modal.Header>
         <Modal.Content>
-          <Form ref={formRef} onSubmit={handleSubmit(handleEdit)}>
-            <FieldsContainer>
-              <FormField flex="1">
-                <Label>Nombre</Label>
-                <Segment height="40px" placeholder>{customer?.name}</Segment>
-              </FormField>
-              <FormField flex="1" error={errors?.addresses?.message}>
-                <RuledLabel title="Dirección" message={errors?.addresses?.message} required />
-                <Controller
-                  name="addresses"
-                  control={control}
+          <FormProvider {...methods}>
+            <Form ref={formRef} onSubmit={handleSubmit(handleEdit)}>
+              <FieldsContainer>
+                <TextField flex="1" label="Nombre" value={customer?.name} />
+                <TextControlled
+                  flex="1"
+                  name="ref"
                   rules={RULES.REQUIRED}
-                  render={({ field: { value = [{}], onChange, ...rest } }) => (
-                    <>
-                      <Input
-                        {...rest}
-                        value={value?.[0]?.ref || ''}
-                        onChange={(e) => {
-                          const refValue = e.target.value;
-                          onChange([{ ...value?.[0], ref: refValue }]);
-                        }}
-                        placeholder="Referencia de Dirección"
-                      />
-                      <Input
-                        {...rest}
-                        value={value?.[0]?.address || ''}
-                        onChange={(e) => {
-                          const addressValue = e.target.value;
-                          if (!addressValue) {
-                            onChange(undefined);
-                            return;
-                          }
-                          onChange([{ ...value?.[0], address: addressValue }]);
-                        }}
-                        placeholder="Dirección"
-                      />
-                    </>
-                  )}
+                  label="Referencia"
                 />
-              </FormField>
-              <FormField width="200px" error={errors?.phoneNumbers?.[0]?.message}>
-                <RuledLabel title="Teléfono" message={errors?.phoneNumbers?.[0]?.message} required />
-                <PhoneContainer>
-                  <Controller
-                    name="phoneNumbers"
-                    control={control}
-                    rules={{
-                      validate: {
-                        correctLength: (value) => {
-                          if (!value?.[0]?.areaCode || !value?.[0]?.number) return 'Un teléfono es requerido';
-                          const areaCode = value[0].areaCode.replace(/[^0-9]/g, '');
-                          const number = value[0].number.replace(/[^0-9]/g, '');
-                          return (areaCode.length + number.length === 10) || "El número debe tener 10 caracteres";
-                        }
-                      }
-                    }}
-                    render={({ field: { value = [{}], onChange }, fieldState: { error } }) => (
-                      <FlexColumn rowGap="5px">
-                        <FormField flex="1">
-                          <Input
-                            value={value?.[0]?.ref || ''}
-                            onChange={(e) => {
-                              const refValue = e.target.value;
-                              onChange([{ ...value?.[0], ref: refValue }]);
-                            }}
-                            placeholder="Referencia de Teléfono"
-                          />
-                        </FormField>
-                        <Flex width="100%" rowGap="5px" columnGap="5px">
-                          {/* <CurrencyFormatInput
-                            $shadow
-                            height="50px"
-                            format="####"
-                            width="40%"
-                            placeholder="Área"
-                            value={value?.[0]?.areaCode || ''}
-                            onChange={(e) => {
-                              const formattedValue = e.target.value.replace(/[^0-9]/g, '');
-                              onChange([{ ...value?.[0], areaCode: formattedValue }]);
-                            }}
-                          /> */}
-                          {/* <CurrencyFormatInput
-                            $shadow
-                            height="50px"
-                            format="#######"
-                            width="60%"
-                            placeholder="Número"
-                            value={value?.[0]?.number || ''}
-                            onChange={(e) => {
-                              const formattedValue = e.target.value.replace(/[^0-9]/g, '');
-                              onChange([{ ...value?.[0], number: formattedValue }]);
-                            }}
-                          /> */}
-                        </Flex>
-                      </FlexColumn>
-                    )}
-                  />
-                </PhoneContainer>
-              </FormField>
-            </FieldsContainer>
-          </Form>
+                <TextControlled
+                  flex="1"
+                  name="address"
+                  rules={RULES.REQUIRED}
+                  label="Dirección"
+                />
+                <NumberControlled
+                  width="60px"
+                  label="Area"
+                  name="areaCode"
+                  rules={RULES.REQUIRED}
+                />
+                <NumberControlled
+                  width="100px"
+                  label="Número"
+                  name="number"
+                  rules={RULES.REQUIRED}
+                />
+              </FieldsContainer>
+            </Form>
+          </FormProvider>
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer width="100%">

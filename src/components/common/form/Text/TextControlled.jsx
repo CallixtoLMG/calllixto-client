@@ -2,7 +2,12 @@
 import { Controller, useFormContext } from "react-hook-form";
 import { TextField } from "./TextField";
 
-export const TextControlled = ({ name, rules, onChange, ...inputParams }) => {
+export const TextControlled = ({
+  name,
+  rules,
+  onChange = value => value,
+  ...inputParams
+}) => {
   const { formState: { errors } } = useFormContext();
   return (
     <Controller
@@ -16,7 +21,10 @@ export const TextControlled = ({ name, rules, onChange, ...inputParams }) => {
             content: errors[name].message,
             pointing: 'above',
           }}
-          onChange={(e) => onFormChange(onChange(e.target.value))}
+          onChange={(e) => {
+            const value = onChange(e.target.value);
+            onFormChange(value);
+          }}
         />
       )}
     />

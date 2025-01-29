@@ -1,6 +1,6 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
 import { IconedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/components/common/custom";
+import { Button, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/components/common/custom";
 import { PriceLabel, PriceControlled, TextAreaControlled, PercentControlled, NumberControlled } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
@@ -650,61 +650,61 @@ const BudgetForm = ({
               total={total}
             />
           </Loader>
-          <FieldsContainer width="100%" rowGap="15px">
-            {isBudgetConfirmed(watchState) && !isCloning ? (
+          {isBudgetConfirmed(watchState) && !isCloning && (
+            <FieldsContainer width="100%" rowGap="15px">
               <Payments
-                methods={methods}
                 total={total}
                 update
               />
-            ) : (
-              <Controller
-                name="paymentMethods"
-                rules={RULES.REQUIRED}
-                render={({ field: { onChange, value } }) => (
-                  <FormField flex="1" label="Metodos de pago" control={Input}>
-                    <Flex columnGap="5px" wrap="wrap" rowGap="5px">
-                      <IconedButton
+            </FieldsContainer>
+          )}
+          <FieldsContainer width="100%" rowGap="15px">
+            <Controller
+              name="paymentMethods"
+              rules={RULES.REQUIRED}
+              render={({ field: { onChange, value } }) => (
+                <FormField flex="1" label="Metodos de pago" control={Input}>
+                  <Flex columnGap="5px" wrap="wrap" rowGap="5px">
+                    <Button
+                      paddingLeft="fit-content"
+                      width="fit-content"
+                      type="button"
+                      basic={value.length !== PAYMENT_METHODS.length}
+                      color={COLORS.BLUE}
+                      onClick={() => {
+                        if (value.length === PAYMENT_METHODS.length) {
+                          onChange([]);
+                        } else {
+                          onChange(PAYMENT_METHODS.map(method => method.value));
+                        }
+                      }}
+                    >
+                      Todos
+                    </Button>
+                    <VerticalDivider />
+                    {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
+                      <Button
                         paddingLeft="fit-content"
                         width="fit-content"
-                        type="button"
-                        basic={value.length !== PAYMENT_METHODS.length}
+                        key={key}
+                        basic={!value.includes(methodValue)}
                         color={COLORS.BLUE}
+                        type="button"
                         onClick={() => {
-                          if (value.length === PAYMENT_METHODS.length) {
-                            onChange([]);
+                          if (value.includes(methodValue)) {
+                            onChange(value.filter(payment => payment !== methodValue));
                           } else {
-                            onChange(PAYMENT_METHODS.map(method => method.value));
+                            onChange([...value, methodValue]);
                           }
                         }}
                       >
-                        Todos
-                      </IconedButton>
-                      <VerticalDivider />
-                      {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
-                        <IconedButton
-                          paddingLeft="fit-content"
-                          width="fit-content"
-                          key={key}
-                          basic={!value.includes(methodValue)}
-                          color={COLORS.BLUE}
-                          type="button"
-                          onClick={() => {
-                            if (value.includes(methodValue)) {
-                              onChange(value.filter(payment => payment !== methodValue));
-                            } else {
-                              onChange([...value, methodValue]);
-                            }
-                          }}
-                        >
-                          {text}
-                        </IconedButton>
-                      ))}
-                    </Flex>
-                  </FormField>
-                )}
-              />
-            )}
+                        {text}
+                      </Button>
+                    ))}
+                  </Flex>
+                </FormField>
+              )}
+            />
           </FieldsContainer>
           <TextAreaControlled name="comments" label="Comentarios" />
           <SubmitAndRestore

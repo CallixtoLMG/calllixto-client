@@ -247,7 +247,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                 <Flex justifyContent="space-between">
                   {toggleButton}
                 </Flex>}
-              <Payments update={isUpdating} total={total} methods={methods}>
+              <Payments update={isUpdating} total={total}>
                 <SubmitAndRestore
                   isUpdating={isUpdating}
                   isLoading={isLoadingUpdatePayment}

@@ -1,5 +1,6 @@
 import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, Label, Segment } from "@/components/common/custom";
+import { TextField } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/constants";
 import { formatedSimplePhone, now } from "@/utils";
@@ -56,6 +57,7 @@ const ModalConfirmation = ({
           <Modal.Header>
             <Flex alignItems="center" justifyContent="space-between">
               Desea confirmar el presupuesto?
+              {/* TODO Controlled Grouped */}
               <Controller
                 name="pickUpInStore"
                 control={control}
@@ -81,25 +83,18 @@ const ModalConfirmation = ({
           <Modal.Content>
             <FlexColumn rowGap="15px">
               <FieldsContainer>
-                <FormField flex="1">
-                  <Label>ID</Label>
-                  <Segment placeholder alignContent="center" height="40px">{customer?.name}</Segment>
-                </FormField>
-                <FormField flex="1">
-                  <Label>Dirección</Label>
-                  <Segment placeholder alignContent="center" height="40px">
-                    {!watchPickUpInStore ? `${customer?.addresses?.[0]?.ref ? `${customer?.addresses?.[0]?.ref}:` : "(Sin referencia)"} ${customer?.addresses?.[0]?.address}` : PICK_UP_IN_STORE}
-                  </Segment>
-                </FormField>
-                <FormField width="200px">
-                  <Label>Teléfono</Label>
-                  <Segment placeholder alignContent="center" height="40px">
-                    {`${customer?.phoneNumbers?.[0]?.ref ? `${customer?.phoneNumbers?.[0]?.ref}:` : "(Sin referencia)"} ${formatedSimplePhone(customer?.phoneNumbers?.[0])}`}
-                  </Segment>
-                </FormField>
+                <TextField
+                  flex="2"
+                  label="Dirección"
+                  value={!watchPickUpInStore ? `${customer?.addresses?.[0]?.ref ? `${customer?.addresses?.[0]?.ref}:` : "(Sin referencia)"} ${customer?.addresses?.[0]?.address}` : PICK_UP_IN_STORE}
+                />
+                <TextField
+                  flex="1"
+                  label="Teléfono"
+                  value={`${formatedSimplePhone(customer?.phoneNumbers?.[0])}`}
+                />
               </FieldsContainer>
               <Payments
-                methods={methods}
                 total={parsedTotal}
                 maxHeight
                 update

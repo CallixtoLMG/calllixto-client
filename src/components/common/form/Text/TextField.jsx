@@ -7,7 +7,7 @@ export const TextField = ({
   placeholder,
   iconLabel,
   value,
-  disabled = true,
+  disabled,
   onChange,
   error
 }) => {
