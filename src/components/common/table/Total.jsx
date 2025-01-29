@@ -5,13 +5,7 @@ import styled from 'styled-components';
 import { Header } from 'semantic-ui-react';
 
 const Title = styled(Header)`
-  margin: 0!important;
-  color: rgba(235,124,21,255) !important;
-  align-content: center;
-  align-self: center !important;
-  text-align:  right !important;
-  width: ${({ width = 'auto' }) => width}!important;
-  font-weight: normal !important;
+  font-weight: bold !important;
 `;
 
 export const Total = ({
@@ -24,17 +18,18 @@ export const Total = ({
   onAdditionalChargeChange = () => {},
   total = 0,
 }) => {
-
   const items = [];
 
-  if (readOnly && (globalDiscount > 0 || additionalCharge > 0)) {
-    items.push(
-      {
-        id: 'sub-total',
-        title: "Sub total",
-        amount: <PriceLabel value={subtotal} />
-      }
-    );
+  if (readOnly) {
+    if (globalDiscount > 0 || additionalCharge > 0) {
+      items.push(
+        {
+          id: 'sub-total',
+          title: "Sub total",
+          amount: <PriceLabel value={subtotal} />
+        }
+      );
+    }
     if (globalDiscount > 0) {
       items.push(
         {
@@ -97,7 +92,7 @@ export const Total = ({
 
   items.push({
     id: 'total',
-    title: <Title as="h4" width="100px" textAlign="right">TOTAL</Title>,
+    title: <Title as="h3">TOTAL</Title>,
     amount: <Title as="h3"><PriceLabel value={total} /></Title>
   });
 
