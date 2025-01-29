@@ -1,7 +1,8 @@
-import { Flex, Price } from "@/components/common/custom";
+import { Flex } from "@/components/common/custom";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { getBrandCode, getProductCode, getSupplierCode } from "@/utils";
 import { Popup } from "semantic-ui-react";
+import { PriceLabel } from "../common/form";
 
 const ATTRIBUTES = {
   CODE: "code",
@@ -52,7 +53,7 @@ const PRODUCT_COLUMNS = [
     id: 3,
     title: "Precio",
     width: 2,
-    value: (product) => <Price value={product.price} />,
+    value: (product) => <PriceLabel value={product.price} />,
   }
 ];
 

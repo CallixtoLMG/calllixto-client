@@ -1,4 +1,4 @@
-import { IconnedButton } from "@/components/common/buttons";
+import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer } from "@/components/common/custom";
 import { COLORS, ICONS, PRODUCT_STATES } from "@/constants";
 import { formatedPrice } from "@/utils";
@@ -99,13 +99,13 @@ const ModalUpdates = ({
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer>
-            <IconnedButton
+            <IconedButton
               text="Cancelar"
               icon={ICONS.CANCEL}
               color={COLORS.RED}
               onClick={onCancel}
             />
-            <IconnedButton
+            <IconedButton
               text="Confirmar"
               icon={ICONS.CHECK}
               color={COLORS.GREEN}

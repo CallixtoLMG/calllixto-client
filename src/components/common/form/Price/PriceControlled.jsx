@@ -1,16 +1,13 @@
-import { Flex, FormField, Input } from "@/components/common/custom";
+import { FormField, Input } from "@/components/common/custom";
+import { ICONS } from "@/constants";
 import { Controller, useFormContext } from "react-hook-form";
-import { Header, Icon } from "semantic-ui-react";
+import { Icon } from "semantic-ui-react";
 
-export const ControlledNumber = ({
+export const PriceControlled = ({
   width,
   name,
   rules,
   label,
-  price,
-  unit,
-  iconPosition = 'left',
-  allowsDecimals,
   placeholder,
   onChange,
   ...inputProps
@@ -25,17 +22,17 @@ export const ControlledNumber = ({
           width={width}
           label={label}
           control={Input}
-          error={errors?.[name] ? {
+          error={errors?.[name] && {
             content: errors[name].message,
             pointing: 'above',
-          } : null}
+          }}
         >
           <Input
             {...inputProps}
             {...rest}
             value={value?.toLocaleString() ?? 0}
             placeholder={placeholder ?? label}
-            {...(price || unit) && { iconPosition }}
+            iconPosition="left"
             onChange={(e) => {
               let newValue = e.target.value.replace(/[^0-9.]/g, '');
               if (!isNaN(newValue)) {
@@ -46,14 +43,7 @@ export const ControlledNumber = ({
             }}
             onFocus={(e) => e.target.select()}
           >
-            {price && <Icon name='dollar' />}
-            {unit && (
-              <Icon>
-                <Flex height="100%" alignItems="center">
-                  <Header as="h5">{unit}</Header>
-                </Flex>
-              </Icon>
-            )}
+            <Icon name={ICONS.DOLLAR} />
             <input />
           </Input>
         </FormField>

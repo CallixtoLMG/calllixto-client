@@ -4,7 +4,7 @@ import { COLORS, ICONS } from "@/constants";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Header, Transition } from 'semantic-ui-react';
-import { IconnedButton } from "../../buttons";
+import { IconedButton } from "../../buttons";
 import { Form, Modal, ModalContent } from "./styles";
 
 const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title, icon, headers }) => {
@@ -48,14 +48,14 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
               width="220px"
             />
             <ButtonsContainer>
-              <IconnedButton
+              <IconedButton
                 text="Cancelar"
                 icon={ICONS.TIMES}
                 color={COLORS.GREY}
                 onClick={onClose}
                 disabled={isLoading}
               />
-              <IconnedButton
+              <IconedButton
                 text="Eliminar"
                 icon={ICONS.TRASH}
                 disabled={!isDeleteEnabled || isLoading}

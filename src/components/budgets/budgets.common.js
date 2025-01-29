@@ -1,8 +1,9 @@
-import { Box, Flex, Price } from "@/components/common/custom";
+import { Box, Flex } from "@/components/common/custom";
 import { BUDGET_STATES, COLORS, PRODUCT_STATES } from "@/constants";
 import { formatedDateAndHour, formatedDateOnly, formatedPercentage, getPrice, getTotal, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
 import { Label, Popup } from "semantic-ui-react";
 import { CommentTooltip } from "../common/tooltips";
+import { PriceLabel } from "../common/form";
 
 const ATTRIBUTES = {
   ID: "id",
@@ -120,7 +121,7 @@ const BUDGETS_COLUMNS = [
     title: "Total",
     width: 2,
     value: (budget) => (
-      <Price value={getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)} />
+      <PriceLabel value={getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)} />
     )
   },
   {
@@ -160,13 +161,13 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       id: 3,
       title: "Precio",
       width: 2,
-      value: (product) => <Price value={getPrice(product)} />
+      value: (product) => <PriceLabel value={getPrice(product)} />
     },
     !dispatchPdf && includeDiscount && {
       id: 4,
       title: "Subtotal",
       width: 2,
-      value: (product) => <Price value={getPrice(product) * product.quantity} />
+      value: (product) => <PriceLabel value={getPrice(product) * product.quantity} />
     },
     !dispatchPdf && includeDiscount && {
       id: 5,
@@ -178,7 +179,7 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
       id: 6,
       title: "Importe",
       width: 2,
-      value: (product) => <Price value={getTotal(product)} />
+      value: (product) => <PriceLabel value={getTotal(product)} />
     },
     includeDispatchComment && {
       id: 7,
@@ -210,7 +211,7 @@ const PAYMENT_TABLE_HEADERS = [
     width: 2
   },
   { id: 'method', width: 4, title: 'Método', value: (element) => element.method },
-  { id: 'amount', width: 3, title: 'Monto', value: (element) => <Price value={element.amount} /> },
+  { id: 'amount', width: 3, title: 'Monto', value: (element) => <PriceLabel value={element.amount} /> },
   { id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) => element.comments },
 ];
 

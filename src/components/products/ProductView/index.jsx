@@ -1,8 +1,8 @@
 "use client";
 import { Message } from "@/components/budgets/BudgetView/styles";
-import { IconnedButton } from "@/components/common/buttons";
+import { IconedButton } from "@/components/common/buttons";
 import { FieldsContainer, Form, FormField, ViewContainer } from "@/components/common/custom";
-import { PriceField, TextField, TextAreaField } from "@/components/common/form";
+import { TextField, TextAreaField, PriceField } from "@/components/common/form";
 import { ICONS, MEASSURE_UNITS, PRODUCT_STATES } from "@/constants";
 import { getBrandCode, getDateWithOffset, getProductCode, getSupplierCode } from "@/utils";
 
@@ -33,7 +33,7 @@ const ProductView = ({ product }) => {
         <FieldsContainer alignItems="end">
           <PriceField width="200px" label="Precio" value={product?.price} />
           <FormField width="fit-content">
-            <IconnedButton
+            <IconedButton
               height="38px"
               text="Precio Editable"
               icon={ICONS.PENCIL}
@@ -42,7 +42,7 @@ const ProductView = ({ product }) => {
             />
           </FormField>
           <FormField width="fit-content">
-            <IconnedButton
+            <IconedButton
               height="38px"
               icon={ICONS.CUT}
               basic={!product?.fractionConfig?.active}

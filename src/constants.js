@@ -394,7 +394,8 @@ export const ICONS = {
   ARCHIVE: "archive",
   OPTIONS: "options",
   REFRESH: "refresh",
-  MAIL_SQUARE: "mail square"
+  MAIL_SQUARE: "mail square",
+  PERCENT: 'percent',
 };
 
 export const PAGE_SIZE_OPTIONS = [

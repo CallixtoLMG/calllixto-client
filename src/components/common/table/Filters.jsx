@@ -3,7 +3,7 @@ import { COLORS, ICONS } from "@/constants";
 import { useFormContext } from 'react-hook-form';
 import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';
-import { IconnedButton } from '../buttons';
+import { IconedButton } from '../buttons';
 import { FiltersContainer } from './styles';
 
 const MainContainer = styled(Flex)`
@@ -39,14 +39,14 @@ const Filters = ({ children, onRestoreFilters, onRefetch }) => {
           {children}
         </FiltersContainer>
         <Flex columnGap="10px" alignSelf="center">
-          <IconnedButton
+          <IconedButton
             text="Buscar"
             icon={ICONS.SEARCH}
             submit
             color={isDirty ? COLORS.PRIMARY : COLORS.SOFT_GREY}
             width="130px"
           />
-          <IconnedButton
+          <IconedButton
             text="Actualizar"
             icon={ICONS.REFRESH}
             color={COLORS.SOFT_GREY}

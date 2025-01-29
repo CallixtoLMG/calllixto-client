@@ -1,8 +1,8 @@
 import { FormField } from "@/components/common/custom";
 import { Controller } from "react-hook-form";
-import { IconnedButton } from "../../buttons";
+import { IconedButton } from "../../buttons";
 
-export const ControlledIconedButton = ({
+export const IconedButtonControlled = ({
   width,
   name,
   icon,
@@ -14,7 +14,7 @@ export const ControlledIconedButton = ({
       name={name}
       render={({ field: { value, onChange, ...rest } }) => (
         <FormField width={width}>
-          <IconnedButton
+          <IconedButton
             {...rest}
             height="38px"
             text={label}

@@ -1,7 +1,16 @@
-import { Title } from '@/components/budgets/PDFfile/styles';
 import { formatedPercentage } from '@/utils';
-import { TotalList } from '.';
-import { PercentInput, Price } from '../custom';
+import { TotalList } from './';
+import { PercentField, PriceLabel } from '../form';
+
+const Title = styled(SHeader)`
+  margin: 0!important;
+  color: rgba(235,124,21,255) !important;
+  align-content: center;
+  align-self: center !important;
+  text-align:  right !important;
+  width: ${({ width = 'auto' }) => width}!important;
+  font-weight: normal !important;
+`;
 
 export const Total = ({
   readOnly,
@@ -21,7 +30,7 @@ export const Total = ({
       {
         id: 'sub-total',
         title: "Sub total",
-        amount: <Price value={subtotal} />
+        amount: <PriceLabel value={subtotal} />
       }
     );
     if (globalDiscount > 0) {
@@ -34,7 +43,7 @@ export const Total = ({
         {
           id: 'sub-total-after-discount',
           title: 'Sub total',
-          amount: <Price value={subtotalAfterDiscount} />
+          amount: <PriceLabel value={subtotalAfterDiscount} />
         }
       );
     }
@@ -52,13 +61,13 @@ export const Total = ({
       {
         id: 'sub-total',
         title: "Sub total",
-        amount: <Price value={subtotal} />
+        amount: <PriceLabel value={subtotal} />
       },
       {
         id: 'global-discount',
         title: "Descuento",
         amount: (
-          <PercentInput
+          <PercentField
             value={globalDiscount}
             onChange={onGlobalDiscountChange}
             width="85px"
@@ -69,13 +78,13 @@ export const Total = ({
       {
         id: 'sub-total-global-discount',
         title: "Sub total",
-        amount: <Price value={subtotalAfterDiscount} />
+        amount: <PriceLabel value={subtotalAfterDiscount} />
       },
       {
         id: 'recharge',
         title: "Recargo",
         amount: (
-          <PercentInput
+          <PercentField
             value={additionalCharge}
             onChange={onAdditionalChargeChange}
             width="85px"
@@ -89,7 +98,7 @@ export const Total = ({
   items.push({
     id: 'total',
     title: <Title as="h4" width="100px" textAlign="right">TOTAL</Title>,
-    amount: <Title as="h3"><Price value={total} /></Title>
+    amount: <Title as="h3"><PriceLabel value={total} /></Title>
   });
 
   return (

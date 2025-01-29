@@ -131,19 +131,6 @@ export const Modal = styled(SModal)`
   min-height: ${({ minHeight = '100px' }) => `${minHeight}!important`} ;
 `;
 
-export const IconedButton = styled(SButton)`
-  font-weight: 500 !important;
-  &&&& {
-    text-align: center;
-    height: ${({ height = '35px' }) => `${height}!important`} ;
-    font-size: 13.5px !important;
-    width: ${({ width = '110px' }) => `${width}!important`} ;
-    padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
-    padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
-    margin-right: 0;
-  };
-`;
-
 export const MessageHeader = styled(SMessageHeader)`
   font-size: 15px!important;
 `;

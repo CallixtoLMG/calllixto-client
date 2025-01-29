@@ -6,7 +6,7 @@ import { createFilter } from "@/utils";
 import { Controller, FormProvider } from "react-hook-form";
 import { Form, Label } from "semantic-ui-react";
 import { BRAND_COLUMNS } from "../brands.common";
-import { ControlledText } from "@/components/common/form";
+import { TextControlled } from "@/components/common/form";
 
 const EMPTY_FILTERS = { id: '', name: '', state: BRANDS_STATES.ACTIVE.id };
 const STATE_OPTIONS = [
@@ -58,8 +58,8 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
                 />
               )}
             />
-            <ControlledText name="id" placeholder="Id" width="80px" />
-            <ControlledText name="name" placeholder="Nombre" width="300px" />
+            <TextControlled name="id" placeholder="Id" width="80px" />
+            <TextControlled name="name" placeholder="Nombre" width="300px" />
           </Filters>
         </Form>
       </FormProvider>

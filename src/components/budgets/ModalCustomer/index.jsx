@@ -1,5 +1,5 @@
 import { useEditCustomer } from "@/api/customers";
-import { IconnedButton } from "@/components/common/buttons";
+import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, PhoneContainer, RuledLabel, Segment } from "@/components/common/custom";
 import { COLORS, ICONS, RULES } from "@/constants";
 import { useEffect, useRef, useState } from "react";
@@ -160,14 +160,14 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer width="100%">
-            <IconnedButton
+            <IconedButton
               text="Cancelar"
               icon={ICONS.CANCEL}
               disabled={isLoading}
               color={COLORS.RED}
               onClick={() => onClose(false)}
             />
-            <IconnedButton
+            <IconedButton
               text="Confirmar"
               icon={ICONS.CHECK}
               disabled={isLoading}

@@ -5,12 +5,11 @@ import { useMemo, useState } from "react";
 import { registerLocale } from "react-datepicker";
 import { useFieldArray } from "react-hook-form";
 import { Header } from "semantic-ui-react";
-import { FieldsContainer, Flex, FlexColumn, FormField, IconedButton, Price, Segment } from "../custom";
+import { FieldsContainer, Flex, FlexColumn, FormField, Segment } from "../custom";
 import DatePicker from "../custom/DatePicker";
 import { Table, TotalList } from "../table";
-import { DropdownField } from "./fields/DropdownField";
-import { PriceField } from "./fields/PriceField";
-import { TextField } from "./fields/TextField";
+import { PriceLabel, PriceField, TextField, DropdownField } from "@/components/common/form";
+import { IconedButton } from "../buttons";
 
 registerLocale("es", es);
 
@@ -61,9 +60,9 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
   };
 
   const TOTAL_LIST_ITEMS = [
-    { id: 1, title: "Pagado", amount: <Price value={totalAssigned} /> },
-    { id: 2, title: "Pendiente", amount: <Price value={totalPending} /> },
-    { id: 3, title: "Total", amount: <Price value={total} /> },
+    { id: 1, title: "Pagado", amount: <PriceLabel value={totalAssigned} /> },
+    { id: 2, title: "Pendiente", amount: <PriceLabel value={totalPending} /> },
+    { id: 3, title: "Total", amount: <PriceLabel value={total} /> },
   ];
 
   return (

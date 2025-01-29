@@ -1,7 +1,7 @@
 import { Box, Flex } from '@/components/common/custom';
 import { createContext, useContext, useState } from 'react';
 import { Popup } from 'semantic-ui-react';
-import { IconnedButton } from '../common/buttons';
+import { IconedButton } from '../common/buttons';
 
 const NavActionsContext = createContext();
 
@@ -40,7 +40,7 @@ const NavActions = () => {
                   size='tiny'
                   trigger={
                     <Box>
-                      <IconnedButton
+                      <IconedButton
                         text={text}
                         icon={icon}
                         color={color}
@@ -54,7 +54,7 @@ const NavActions = () => {
                   }
                 />
               ) : (
-                <IconnedButton
+                <IconedButton
                   text={text}
                   icon={icon}
                   color={color}

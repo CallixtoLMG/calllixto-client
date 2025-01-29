@@ -4,7 +4,7 @@ import { handleKeyPressWithSubmit } from "@/utils";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { Header, Modal, Transition } from 'semantic-ui-react';
-import { IconnedButton } from "../../buttons";
+import { IconedButton } from "../../buttons";
 import { Form, Message, ModalContent } from "./styles";
 
 const ModalAction = ({
@@ -84,7 +84,7 @@ const ModalAction = ({
               />
             )}
             <ButtonsContainer>
-              <IconnedButton
+              <IconedButton
                 text="Cancelar"
                 icon={ICONS.TIMES}
                 height="40px"
@@ -92,7 +92,7 @@ const ModalAction = ({
                 onClick={() => setShowModal(false)}
                 disabled={isLoading}
               />
-              <IconnedButton
+              <IconedButton
                 text={confirmButtonText}
                 icon={ICONS.CHECK}
                 height="40px"

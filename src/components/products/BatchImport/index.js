@@ -1,6 +1,5 @@
 import { useCreateBatch, useEditBatch, useGetBlackList, useListProducts } from "@/api/products";
-import { IconnedButton } from "@/components/common/buttons";
-import { ButtonsContainer, FieldsContainer, FlexColumn, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, FlexColumn, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
 import { COLORS, ICONS } from "@/constants";
@@ -12,6 +11,7 @@ import { toast } from "react-hot-toast";
 import { Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { Modal, ModalHeader, WaitMsg } from "./styles";
+import { IconedButton } from "@/components/common/buttons";
 
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts } = useListProducts();
@@ -395,13 +395,13 @@ const BatchImport = ({ isCreating }) => {
                 </Modal.Content>
                 <Modal.Actions>
                   <ButtonsContainer>
-                    <IconnedButton
+                    <IconedButton
                       text="Confirmar"
                       icon={ICONS.CHECK}
                       color={COLORS.GREEN}
                       onClick={handleDownloadConfirmation}
                     />
-                    <IconnedButton
+                    <IconedButton
                       text="Cancelar"
                       icon={ICONS.X}
                       color={COLORS.RED}
@@ -461,7 +461,7 @@ const BatchImport = ({ isCreating }) => {
               <Modal.Actions>
                 <ButtonsContainer>
                   {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
-                  <IconnedButton
+                  <IconedButton
                     text="Aceptar"
                     icon={ICONS.CHECK}
                     disabled={importSettings.isButtonDisabled(isPending)}
@@ -470,7 +470,7 @@ const BatchImport = ({ isCreating }) => {
                     color={COLORS.GREEN}
                     onClick={handleConfirmClick}
                   />
-                  <IconnedButton
+                  <IconedButton
                     text="Cancelar"
                     icon={ICONS.X}
                     disabled={isLoading || isPending}
@@ -491,7 +491,7 @@ const BatchImport = ({ isCreating }) => {
             <p>¿Deseas descargar un archivo de Excel con estos productos?</p>
           </Modal.Content>
           <Modal.Actions>
-            <IconnedButton
+            <IconedButton
               text="Confirmar"
               icon={ICONS.CHECK}
               color={COLORS.GREEN}
@@ -499,7 +499,7 @@ const BatchImport = ({ isCreating }) => {
                 handleUnprocessedDownload();
               }}
             />
-            <IconnedButton
+            <IconedButton
               text="Cancelar"
               icon={ICONS.X}
               color={COLORS.RED}

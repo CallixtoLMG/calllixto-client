@@ -10,8 +10,8 @@ import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
-import { IconnedButton } from "@/components/common/buttons";
-import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Input, Menu } from "@/components/common/custom";
+import { IconedButton } from "@/components/common/buttons";
+import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Input, Menu } from "@/components/common/custom";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, COLORS, ICONS, PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
@@ -365,7 +365,7 @@ const Budget = ({ params }) => {
       <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} justifyContent="space-between">
         {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
           <>
-            <IconnedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
+            <IconedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
             <ModalCustomer
               isModalOpen={isModalCustomerOpen}
               onClose={handleModalCustomerClose}
@@ -397,7 +397,7 @@ const Budget = ({ params }) => {
             value={formattedDolarRate}
             disabled={!showDolarExangeRate}
             action={
-              <IconnedButton
+              <IconedButton
                 text="Cotizar en USD"
                 icon={ICONS.DOLLAR}
                 color={COLORS.GREEN}

@@ -1,6 +1,6 @@
 import { useUpdatePayments } from "@/api/budgets";
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, Price, Segment, TextArea, ViewContainer } from "@/components/common/custom";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, TextArea, ViewContainer } from "@/components/common/custom";
 import Payments from "@/components/common/form/Payments";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
@@ -14,6 +14,7 @@ import { toast } from "react-hot-toast";
 import { Popup } from "semantic-ui-react";
 import { getBudgetState } from "../budgets.common";
 import { Container, Message, MessageHeader } from "./styles";
+import { PriceLabel } from "../../common/form";
 
 const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
   const methods = useForm({
@@ -115,7 +116,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
       },
       {
         title: "Precio",
-        value: (product) => <Price value={getPrice(product)} />,
+        value: (product) => <PriceLabel value={getPrice(product)} />,
         id: 4,
         width: 2,
       },
@@ -127,7 +128,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
       },
       {
         title: "Total",
-        value: (product) => <Price value={getTotal(product)} />,
+        value: (product) => <PriceLabel value={getTotal(product)} />,
         id: 6,
         width: 3
       },

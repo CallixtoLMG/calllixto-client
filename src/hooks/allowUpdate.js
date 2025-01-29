@@ -1,4 +1,4 @@
-import { IconnedButton } from "@/components/common/buttons";
+import { IconedButton } from "@/components/common/buttons";
 import { Box } from "@/components/common/custom";
 import { ICONS } from "@/constants";
 import { useState } from "react";
@@ -12,13 +12,13 @@ export const useAllowUpdate = ({ canUpdate }) => {
       {canUpdate && (
         <Box>
           <ButtonGroup size="small">
-            <IconnedButton
+            <IconedButton
               text="Actualizar"
               icon={ICONS.EDIT}
               onClick={() => setIsUpdating(true)} basic={!isUpdating}
               width="130px"
             />
-            <IconnedButton
+            <IconedButton
               text="Ver"
               icon={ICONS.EYE}
               basic={isUpdating}

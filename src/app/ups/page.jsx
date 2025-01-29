@@ -1,9 +1,10 @@
 "use client";
-import { IconnedButton } from '@/components/common/buttons';
+import { IconedButton } from '@/components/common/buttons';
 import { COLORS, ICONS } from "@/constants";
 import { useRouter } from 'next/navigation';
 import { Header, Icon } from 'semantic-ui-react';
 import { MainContainer } from "./styles";
+
 const NotFound = () => {
   const { back } = useRouter();
   const handleClick = () => {
@@ -16,7 +17,7 @@ const NotFound = () => {
         <Icon color={COLORS.RED} name="exclamation circle" />
         Página no encontrada o no está autorizado!
       </Header>
-      <IconnedButton text="Volver atrás" icon={ICONS.ARROW_LEFT} color={COLORS.RED} onClick={handleClick} />
+      <IconedButton text="Volver atrás" icon={ICONS.ARROW_LEFT} color={COLORS.RED} onClick={handleClick} />
     </MainContainer>
   );
 };

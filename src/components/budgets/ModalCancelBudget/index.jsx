@@ -1,4 +1,4 @@
-import { IconnedButton } from "@/components/common/buttons";
+import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer, Input } from "@/components/common/custom";
 import { COLORS, ICONS } from "@/constants";
 import { useState } from "react";
@@ -27,8 +27,8 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
         </ModalContent>
         <Modal.Actions>
           <ButtonsContainer width="100%" marginTop="10px">
-            <IconnedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} />
-            <IconnedButton
+            <IconedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} />
+            <IconedButton
               text="Anular"
               icon={ICONS.BAN}
               color={COLORS.RED}

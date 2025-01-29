@@ -1,6 +1,6 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, Label } from "@/components/common/custom";
-import { ControlledTextArea, ControlledDropdown, ControlledIconedButton, ControlledText, ControlledNumber, DropdownField, TextField } from "@/components/common/form";
+import { DropdownField, TextField, PriceControlled, TextControlled, TextAreaControlled, DropdownControlled, IconedButtonControlled } from "@/components/common/form";
 import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted, preventSend } from "@/utils";
@@ -169,7 +169,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
                   )
                 }}
               />
-              <ControlledText
+              <TextControlled
                 width="250px"
                 name="code"
                 label="Código"
@@ -182,7 +182,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           )}
         </FieldsContainer>
         <FieldsContainer rowGap="5px" alignItems="flex-end">
-          <ControlledText
+          <TextControlled
             width="40%"
             name="name"
             label="Nombre"
@@ -192,22 +192,22 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           />
         </FieldsContainer>
         <FieldsContainer alignItems="end">
-          <ControlledNumber width="200px" name="price" label="Precio" price />
-          <ControlledIconedButton
+          <PriceControlled width="200px" name="price" label="Precio" />
+          <IconedButtonControlled
             width="fit-content"
             name="editablePrice"
             label="Precio Editable"
             icon={ICONS.PENCIL}
             disabled={isProductDeleted(product?.state)}
           />
-          <ControlledIconedButton
+          <IconedButtonControlled
             width="fit-content"
             name="fractionConfig.active"
             label="Producto Fraccionable"
             icon={ICONS.CUT}
             disabled={isProductDeleted(product?.state)}
           />
-          <ControlledDropdown
+          <DropdownControlled
             width="200px"
             name="fractionConfig.unit"
             label="Unidad de Medida"
@@ -216,7 +216,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             disabled={!watchFractionable || isProductDeleted(product?.state)}
           />
         </FieldsContainer>
-        <ControlledTextArea
+        <TextAreaControlled
           name="comments"
           disabled={isProductDeleted(product?.state)}
           label="Comentarios"

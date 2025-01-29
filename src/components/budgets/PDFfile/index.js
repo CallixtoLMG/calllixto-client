@@ -1,5 +1,5 @@
 import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
-import { Box, Flex, FlexColumn, Price } from "@/components/common/custom";
+import { Box, Flex, FlexColumn } from "@/components/common/custom";
 import { Table, Total, TotalList } from '@/components/common/table';
 import { BUDGET_PDF_FORMAT, BUDGET_STATES, PICK_UP_IN_STORE } from "@/constants";
 import { expirationDate, formatedDateOnly, formatedSimplePhone, isBudgetCancelled, isBudgetDraft } from "@/utils";
@@ -14,6 +14,7 @@ import {
   SectionContainer,
   Title
 } from "./styles";
+import { PriceLabel } from "../../common/form";
 
 const Field = ({ label, value, ...rest }) => (
   <Flex columnGap="5px" minWidth="300px" {...rest}>
@@ -38,28 +39,28 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
     const items = paymentMethods.map((payment, index) => ({
       id: index + 1,
       title: payment.method,
-      amount: <Price value={payment.amount} />,
+      amount: <PriceLabel value={payment.amount} />,
       ...(payment.comments && { subtitle: payment.comments }),
     }));
 
     items.push({
       id: items.length + 1,
       title: "Total Pagado",
-      amount: <Price value={totalAssigned} />,
+      amount: <PriceLabel value={totalAssigned} />,
     });
 
     if (totalPending > 0) {
       items.push({
         id: items.length + 2,
         title: "Total Pendiente",
-        amount: <Price value={totalPending} />,
+        amount: <PriceLabel value={totalPending} />,
       });
     }
 
     items.push({
       id: items.length + (totalPending > 0 ? 3 : 2),
       title: "Total a Pagar",
-      amount: <Price value={roundedFinalTotal} />,
+      amount: <PriceLabel value={roundedFinalTotal} />,
     });
 
     return items;
@@ -145,7 +146,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <Title as="h4" alignSelf="left" $slim>Cotización en USD</Title>
             <Divider />
             <Title as="h4" alignSelf="left" width="fit-content" minHeight="30px">
-              <Price value={roundedFinalTotal / parseInt(dolarExchangeRate)} />
+              <PriceLabel value={roundedFinalTotal / parseInt(dolarExchangeRate)} />
             </Title>
           </DataContainer>
         )}

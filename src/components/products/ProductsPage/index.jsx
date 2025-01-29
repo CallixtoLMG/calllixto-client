@@ -1,6 +1,6 @@
 import { useBatchDeleteProducts, useDeleteProduct, useEditProduct } from "@/api/products";
-import { IconnedButton } from "@/components/common/buttons";
-import { Dropdown, Flex, Input } from "@/components/common/custom";
+import { IconedButton } from "@/components/common/buttons";
+import { Dropdown, Flex } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
@@ -16,7 +16,7 @@ import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form, Label } from "semantic-ui-react";
 import { PRODUCT_COLUMNS } from "../products.common";
-import { ControlledText } from "@/components/common/form";
+import { TextControlled } from "@/components/common/form";
 
 const EMPTY_FILTERS = { code: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
 const STATE_OPTIONS = [
@@ -134,7 +134,7 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
 
   const selectionActions = useMemo(() => {
     const actions = [
-      <IconnedButton
+      <IconedButton
         key={2}
         text="Descargar Códigos"
         icon={ICONS.BARCODE}
@@ -143,7 +143,7 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
     ];
     if (RULES.canRemove[role]) {
       actions.unshift(
-        <IconnedButton
+        <IconedButton
           key={1}
           text="Eliminar Productos"
           icon={ICONS.TRASH}
@@ -181,8 +181,8 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
                   />
                 )}
               />
-              <ControlledText name="code" placeholder="Código" width="200px" />
-              <ControlledText name="name" placeholder="Nombre" width="350px" />
+              <TextControlled name="code" placeholder="Código" width="200px" />
+              <TextControlled name="name" placeholder="Nombre" width="350px" />
             </Filters>
           </Form>
         </FormProvider>

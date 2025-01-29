@@ -1,6 +1,6 @@
 import { useUserContext } from "@/User";
 import { editBanProducts, useGetBlackList } from "@/api/products";
-import { IconnedButton } from "@/components/common/buttons";
+import { IconedButton } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, FormField, Icon, Input, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
@@ -149,14 +149,14 @@ const BanProduct = ({ open, setOpen }) => {
         </Modal.Content>
         <ModalActions>
           <Flex columnGap="5px">
-            <IconnedButton
+            <IconedButton
               text="Cancelar"
               icon={ICONS.CANCEL}
               disabled={isPending}
               onClick={() => setOpen(false)}
               color={COLORS.RED}
             />
-            <IconnedButton
+            <IconedButton
               text="Aceptar"
               icon={ICONS.CHECK}
               disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))}

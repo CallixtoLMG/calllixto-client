@@ -1,9 +1,9 @@
 import { COLORS, ICONS } from "@/constants";
-import { IconnedButton } from ".";
+import { IconedButton } from "./";
 
 export const Restore = ({ isUpdating, isLoading, isDirty, onClick, disabled }) => {
   return (
-    <IconnedButton
+    <IconedButton
       text={isUpdating ? "Restaurar" : "Limpiar"}
       icon={isUpdating ? ICONS.UNDO :ICONS.DELETE}
       disabled={isLoading || !isDirty || disabled}

@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Form, Popup } from "semantic-ui-react";
 import { COLORS, ICONS } from "../../../../constants";
-import { IconnedButton } from "../../buttons";
+import { IconedButton } from "../../buttons";
 import { Box, FieldsContainer, Flex, FormField, Input } from '../../custom';
 import { Table } from '../../table';
 import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "../form.common";
@@ -12,7 +12,7 @@ const EMPTY_PHONE = { ref: '', areaCode: '', number: '' };
 const EMPTY_ADDRESS = { ref: '', address: '' };
 const EMPTY_EMAIL = { ref: '', email: '' };
 
-export const ContactFields = () => {
+export const ContactControlled = () => {
   const [error, setError] = useState();
   const [phoneToAdd, setPhoneToAdd] = useState(EMPTY_PHONE);
   const [addressToAdd, setAddressToAdd] = useState(EMPTY_ADDRESS);
@@ -96,7 +96,7 @@ export const ContactFields = () => {
         <Popup
           trigger={
             <Box width="fit-content">
-              <IconnedButton
+              <IconedButton
                 text="Teléfono"
                 icon={ICONS.ADD}
                 color={COLORS.GREEN}
@@ -147,7 +147,7 @@ export const ContactFields = () => {
                 value={phoneToAdd.number}
                 onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'number', e.target.value)}
               />
-              <IconnedButton
+              <IconedButton
                 text="Agregar"
                 icon={ICONS.ADD}
                 color={COLORS.GREEN}
@@ -169,7 +169,7 @@ export const ContactFields = () => {
         <Popup
           trigger={
             <Box width="fit-content">
-              <IconnedButton
+              <IconedButton
                 text="Dirección"
                 icon={ICONS.ADD}
                 type="button"
@@ -205,7 +205,7 @@ export const ContactFields = () => {
                 value={addressToAdd.address}
                 onChange={(e) => updateFieldToAdd(setAddressToAdd, 'address', e.target.value)}
               />
-              <IconnedButton
+              <IconedButton
                 text="Agregar"
                 icon={ICONS.ADD}
                 color={COLORS.GREEN}
@@ -228,7 +228,7 @@ export const ContactFields = () => {
         <Popup
           trigger={
             <Box width="fit-content">
-              <IconnedButton
+              <IconedButton
                 text="Email"
                 icon={ICONS.ADD}
                 color={COLORS.GREEN}
@@ -263,7 +263,7 @@ export const ContactFields = () => {
                 value={emailToAdd.email}
                 onChange={(e) => updateFieldToAdd(setEmailToAdd, 'email', e.target.value)}
               />
-              <IconnedButton
+              <IconedButton
                 text="Agregar"
                 icon={ICONS.ADD}
                 color={COLORS.GREEN}

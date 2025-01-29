@@ -1,7 +1,7 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
-import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, PercentInput, Price } from "@/components/common/custom";
-import { ControlledTextArea, ControlledNumber } from "@/components/common/form";
+import { IconedButton, SubmitAndRestore } from "@/components/common/buttons";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/components/common/custom";
+import { PriceLabel, PriceControlled, TextAreaControlled, PercentControlled, NumberControlled } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
@@ -337,7 +337,7 @@ const BudgetForm = ({
       id: 2,
       title: "Cantidad",
       value: (product, index) => (
-        <ControlledNumber
+        <NumberControlled
           width="80px"
           name={`products[${index}].quantity`}
           onChange={() => {
@@ -372,7 +372,7 @@ const BudgetForm = ({
       title: "Medida", value: (product, index) => (
         <>
           {product.fractionConfig?.active && (
-            <ControlledNumber
+            <NumberControlled
               width="100px"
               name={`products[${index}].fractionConfig.value`}
               unit={product.fractionConfig.unit}
@@ -393,16 +393,15 @@ const BudgetForm = ({
       value: (product, index) => {
         return product.editablePrice
           ? (
-            <ControlledNumber
+            <PriceControlled
               width="100%"
               name={`products[${index}].price`}
-              price
               onChange={() => {
                 calculateTotal();
               }}
             />
           )
-          : <Price width="100%" value={getPrice(product)} />
+          : <PriceLabel width="100%" value={getPrice(product)} />
       },
       width: 2
     },
@@ -411,26 +410,18 @@ const BudgetForm = ({
       title: "Descuento",
       value: (product, index) => (
         <Flex alignItems="center" columnGap="5px">
-          <Controller
+          <PercentControlled
+            width="80px"
+            height="35px"
             name={`products[${index}].discount`}
-            defaultValue={product.discount || 0}
-            render={({ field: { onChange, ...rest } }) => (
-              <PercentInput
-                {...rest}
-                width="80px"
-                height="35px"
-                onChange={value => {
-                  onChange(value);
-                  calculateTotal();
-                }}
-              />
-            )}
+            defaultValue={product.discount ?? 0}
+            handleChange={calculateTotal}
           />
         </Flex>
       ),
       width: 1
     },
-    { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 7, width: 3 },
+    { title: "Total", value: (product) => <PriceLabel value={getTotal(product)} />, id: 7, width: 3 },
   ], [calculateTotal, setValue]);
 
   const handleDraft = async (data) => {
@@ -468,7 +459,7 @@ const BudgetForm = ({
           <FieldsContainer justifyContent="space-between">
             <FormField width="300px">
               <ButtonGroup size="small">
-                <IconnedButton
+                <IconedButton
                   text="Confirmado"
                   icon={ICONS.CHECK}
                   basic={!isConfirmed}
@@ -478,7 +469,7 @@ const BudgetForm = ({
                     setValue('state', BUDGET_STATES.CONFIRMED.id);
                   }}
                 />
-                <IconnedButton
+                <IconedButton
                   text="Pendiente"
                   icon={ICONS.HOURGLASS_HALF}
                   basic={isConfirmed}
@@ -495,7 +486,7 @@ const BudgetForm = ({
                 name="pickUpInStore"
                 render={({ field: { onChange, value } }) => (
                   <ButtonGroup size="small">
-                    <IconnedButton
+                    <IconedButton
                       text={PICK_UP_IN_STORE}
                       icon={ICONS.WAREHOUSE}
                       basic={!value}
@@ -503,7 +494,7 @@ const BudgetForm = ({
                         onChange(true);
                       }}
                     />
-                    <IconnedButton
+                    <IconedButton
                       text="Enviar a Dirección"
                       icon={ICONS.TRUCK}
                       basic={value}
@@ -525,7 +516,7 @@ const BudgetForm = ({
               )}
             />
             <FieldsContainer>
-              <ControlledNumber
+              <NumberControlled
                 width="200px"
                 name="expirationOffsetDays"
                 rules={RULES.REQUIRED}
@@ -715,7 +706,7 @@ const BudgetForm = ({
               />
             )}
           </FieldsContainer>
-          <ControlledTextArea name="comments" label="Comentarios" />
+          <TextAreaControlled name="comments" label="Comentarios" />
           <SubmitAndRestore
             draft={draft}
             isLoading={isLoading && !isBudgetDraft(watchState)}

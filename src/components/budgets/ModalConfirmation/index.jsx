@@ -1,4 +1,4 @@
-import { IconnedButton } from "@/components/common/buttons";
+import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, Label, Segment } from "@/components/common/custom";
 import Payments from "@/components/common/form/Payments";
 import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/constants";
@@ -61,13 +61,13 @@ const ModalConfirmation = ({
                 control={control}
                 render={({ field: { onChange, value } }) => (
                   <ButtonGroup size="small">
-                    <IconnedButton
+                    <IconedButton
                       text={PICK_UP_IN_STORE}
                       icon={ICONS.WAREHOUSE}
                       basic={!value}
                       onClick={() => onChange(true)}
                     />
-                    <IconnedButton
+                    <IconedButton
                       text="Enviar a Dirección"
                       icon={ICONS.TRUCK}
                       basic={value}
@@ -108,14 +108,14 @@ const ModalConfirmation = ({
           </Modal.Content>
           <Modal.Actions>
             <ButtonsContainer width="100%">
-              <IconnedButton
+              <IconedButton
                 text="Cancelar"
                 icon={ICONS.CANCEL}
                 disabled={isLoading}
                 color={COLORS.RED}
                 onClick={() => onClose(false)}
               />
-              <IconnedButton
+              <IconedButton
                 text="Confirmar"
                 icon={ICONS.CHECK}
                 disabled={isLoading}

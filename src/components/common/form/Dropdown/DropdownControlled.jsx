@@ -3,7 +3,7 @@ import { FormField } from "@/components/common/custom";
 import { Controller } from "react-hook-form";
 import { Dropdown } from "../../custom";
 
-export const ControlledDropdown = ({
+export const DropdownControlled = ({
   name,
   width,
   label,
