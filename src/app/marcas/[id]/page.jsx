@@ -77,7 +77,7 @@ const Brand = ({ params }) => {
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction("delete"), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: (brand) => editBrand(brand),
+    mutationFn: editBrand,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca actualizada!");
@@ -198,7 +198,7 @@ const Brand = ({ params }) => {
 
   return (
     <Loader active={isLoading || isLoadingProducts}>
-      {toggleButton}
+      {!isItemInactive(brand?.state) && toggleButton}
       {isItemInactive(brand?.state) && (
         <Message negative>
           <MessageHeader>Motivo de inactivación</MessageHeader>

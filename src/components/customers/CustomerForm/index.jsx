@@ -14,7 +14,6 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
     }
   });
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
-
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
 
   useKeyboardShortcuts(handleSubmit(onSubmit), SHORTKEYS.ENTER);
@@ -33,7 +32,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
             disabled={!isUpdating && view}
           />
         </FieldsContainer>
-        {isUpdating ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
+        {isUpdating || !view ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
         <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
         {(isUpdating || !view) && (
           <SubmitAndRestore

@@ -79,7 +79,7 @@ const Customer = ({ params }) => {
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction("delete"), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: (customer) => editCustomer(customer),
+    mutationFn: editCustomer,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente actualizado!");
@@ -202,7 +202,7 @@ const Customer = ({ params }) => {
 
   return (
     <Loader active={isLoading || isLoadingBudgets}>
-      {toggleButton}
+      {!isItemInactive(customer?.state) && toggleButton}
       {isItemInactive(customer?.state) && (
         <Message negative>
           <MessageHeader>Motivo de inactivación</MessageHeader>
@@ -213,7 +213,7 @@ const Customer = ({ params }) => {
         customer={customer}
         onSubmit={mutateEdit}
         isLoading={isEditPending}
-        isUpdating={isUpdating}
+        isUpdating={isUpdating && !isItemInactive(customer?.state)}
         view
       />
       <ModalAction

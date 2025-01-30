@@ -15,6 +15,7 @@ const CreateSupplier = () => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createSupplier = useCreateSupplier();
+
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -25,10 +26,7 @@ const CreateSupplier = () => {
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (supplier) => {
-      const response = await createSupplier(supplier);
-      return response;
-    },
+    mutationFn: createSupplier,
     onSuccess: async (response) => {
       if (response.statusOk) {
         push(PAGES.SUPPLIERS.SHOW(response.supplier.id))

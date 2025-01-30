@@ -9,9 +9,7 @@ import {
   useInactiveSupplier,
 } from "@/api/suppliers";
 import {
-  Flex,
   Icon,
-  Input,
   Message,
   MessageHeader,
 } from "@/components/common/custom";
@@ -24,7 +22,6 @@ import {
   useNavActionsContext,
 } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
-import SupplierView from "@/components/suppliers/SupplierView";
 import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
@@ -35,6 +32,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
+import { TextField } from "@/components/common/form";
 
 const Supplier = ({ params }) => {
   useValidateToken();
@@ -45,7 +43,7 @@ const Supplier = ({ params }) => {
     useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton } = useAllowUpdate({
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -54,6 +52,7 @@ const Supplier = ({ params }) => {
   const [isExcelLoading, setIsExcelLoading] = useState(false);
   const [reason, setReason] = useState("");
   const printRef = useRef(null);
+
   const editSupplier = useEditSupplier();
   const deleteSupplier = useDeleteSupplier();
   const deleteBySupplierId = useDeleteBySupplierId();
@@ -70,9 +69,7 @@ const Supplier = ({ params }) => {
     refetch();
   }, [setLabels, supplier, refetch]);
 
-  const hasAssociatedProducts = useMemo(() => {
-    return products?.length > 0;
-  }, [products]);
+  const hasAssociatedProducts = useMemo(() => !!products?.length, [products]);
 
   const handleDownloadExcel = useCallback(() => {
     if (!products) return;
@@ -163,10 +160,11 @@ const Supplier = ({ params }) => {
   );
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: (supplier) => editSupplier(supplier),
+    mutationFn: editSupplier,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Proveedor actualizado!');
+        setIsUpdating(false);
       } else {
         toast.error(response.error.message);
       }
@@ -282,7 +280,7 @@ const Supplier = ({ params }) => {
 
   useEffect(() => {
     const handleBarCodePrint = () => {
-      if (products?.length) {
+      if (hasAssociatedProducts) {
         setActiveAction("print");
         handlePrint();
         setActiveAction(null);
@@ -302,95 +300,95 @@ const Supplier = ({ params }) => {
 
     const actions = RULES.canRemove[role]
       ? [
-          {
-            id: 1,
-            icon: ICONS.BARCODE,
-            color: COLORS.BLUE,
-            text: "Códigos",
-            onClick: handleBarCodePrint,
-            loading: activeAction === "print",
-            disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
-            tooltip: !hasAssociatedProducts
-              ? 'No existen productos de este proveedor.'
-              : false,
+        {
+          id: 1,
+          icon: ICONS.BARCODE,
+          color: COLORS.BLUE,
+          text: "Códigos",
+          onClick: handleBarCodePrint,
+          loading: activeAction === "print",
+          disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
+          tooltip: !hasAssociatedProducts
+            ? 'No existen productos de este proveedor.'
+            : false,
+        },
+        {
+          id: 2,
+          icon: isItemInactive(supplier?.state)
+            ? ICONS.PLAY_CIRCLE
+            : ICONS.PAUSE_CIRCLE,
+          color: COLORS.GREY,
+          text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
+          onClick: isItemInactive(supplier?.state)
+            ? handleActivateClick
+            : handleInactivateClick,
+          loading: activeAction === 'active' || activeAction === 'inactive',
+          disabled: !!activeAction || isEditPending,
+          width: "fit-content",
+        },
+        {
+          id: 3,
+          icon: ICONS.FILE_EXCEL,
+          color: COLORS.SOFT_GREY,
+          text: "Descargar productos",
+          onClick: () => {
+            if (products?.length) {
+              setIsExcelLoading(true);
+              handleDownloadExcel();
+              setIsExcelLoading(false);
+            } else {
+              toast("No hay productos de este proveedor para descargar.", {
+                icon: (
+                  <Icon
+                    margin="0"
+                    toast
+                    name={ICONS.INFO_CIRCLE}
+                    color={COLORS.BLUE}
+                  />
+                ),
+              });
+            }
           },
-          {
-            id: 2,
-            icon: isItemInactive(supplier?.state)
-              ? ICONS.PLAY_CIRCLE
-              : ICONS.PAUSE_CIRCLE,
-            color: COLORS.GREY,
-            text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
-            onClick: isItemInactive(supplier?.state)
-              ? handleActivateClick
-              : handleInactivateClick,
-            loading: activeAction === 'active' || activeAction === 'inactive',
-            disabled: !!activeAction || isEditPending,
-            width: "fit-content",
-          },
-          {
-            id: 3,
-            icon: ICONS.FILE_EXCEL,
-            color: COLORS.SOFT_GREY,
-            text: "Descargar productos",
-            onClick: () => {
-              if (products?.length) {
-                setIsExcelLoading(true);
-                handleDownloadExcel();
-                setIsExcelLoading(false);
-              } else {
-                toast("No hay productos de este proveedor para descargar.", {
-                  icon: (
-                    <Icon
-                      margin="0"
-                      toast
-                      name={ICONS.INFO_CIRCLE}
-                      color={COLORS.BLUE}
-                    />
-                  ),
-                });
-              }
-            },
-            loading: isExcelLoading,
-            disabled:
-              isExcelLoading ||
-              !!activeAction ||
-              loadingProducts ||
-              isEditPending ||
-              !hasAssociatedProducts,
-            tooltip: !hasAssociatedProducts
-              ? 'No existen productos de este proveedor.'
-              : false,
-            width: "fit-content",
-          },
-          {
-            id: 4,
-            icon: ICONS.LIST_UL,
-            color: COLORS.RED,
-            text: "Eliminar productos",
-            onClick: handleDeleteBatchClick,
-            loading: activeAction === "deleteBatch",
-            disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
-            tooltip: !hasAssociatedProducts
-              ? 'No existen productos de este proveedor.'
-              : false,
-            width: "fit-content",
-          },
-          {
-            id: 5,
-            icon: ICONS.TRASH,
-            color: COLORS.RED,
-            text: "Eliminar",
-            onClick: handleDeleteClick,
-            loading: activeAction === "deleteSupplier",
-            disabled: hasAssociatedProducts || !!activeAction || isEditPending,
-            tooltip: hasAssociatedProducts
-              ? 'No se puede eliminar este proveedor, existen productos asociados.'
-              : false,
-            width: "fit-content",
-            basic: true,
-          },
-        ]
+          loading: isExcelLoading,
+          disabled:
+            isExcelLoading ||
+            !!activeAction ||
+            loadingProducts ||
+            isEditPending ||
+            !hasAssociatedProducts,
+          tooltip: !hasAssociatedProducts
+            ? 'No existen productos de este proveedor.'
+            : false,
+          width: "fit-content",
+        },
+        {
+          id: 4,
+          icon: ICONS.LIST_UL,
+          color: COLORS.RED,
+          text: "Eliminar productos",
+          onClick: handleDeleteBatchClick,
+          loading: activeAction === "deleteBatch",
+          disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
+          tooltip: !hasAssociatedProducts
+            ? 'No existen productos de este proveedor.'
+            : false,
+          width: "fit-content",
+        },
+        {
+          id: 5,
+          icon: ICONS.TRASH,
+          color: COLORS.RED,
+          text: "Eliminar",
+          onClick: handleDeleteClick,
+          loading: activeAction === "deleteSupplier",
+          disabled: hasAssociatedProducts || !!activeAction || isEditPending,
+          tooltip: hasAssociatedProducts
+            ? 'No se puede eliminar este proveedor, existen productos asociados.'
+            : false,
+          width: "fit-content",
+          basic: true,
+        },
+      ]
       : [];
 
     setActions(actions);
@@ -419,29 +417,24 @@ const Supplier = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts}>
-      {toggleButton}
+      {!isItemInactive(supplier?.state) && toggleButton}
       {isItemInactive(supplier?.state) && (
-        <Flex>
-          <Message negative>
-            <MessageHeader>Motivo de inactivación</MessageHeader>
-            <p>{supplier.inactiveReason}</p>
-          </Message>
-        </Flex>
+        <Message negative>
+          <MessageHeader>Motivo de inactivación</MessageHeader>
+          <p>{supplier.inactiveReason}</p>
+        </Message>
       )}
-      {isUpdating ? (
-        <SupplierForm
-          supplier={supplier}
-          onSubmit={mutateEdit}
-          isLoading={isEditPending}
-          isUpdating
-        />
-      ) : (
-        <>
-          <SupplierView supplier={supplier} />
-          <OnlyPrint>
-            <PrintBarCodes ref={printRef} products={products} />
-          </OnlyPrint>
-        </>
+      <SupplierForm
+        supplier={supplier}
+        onSubmit={mutateEdit}
+        isLoading={isEditPending}
+        isUpdating={isUpdating && !isItemInactive(supplier?.state)}
+        view
+      />
+      {!isUpdating && (
+        <OnlyPrint>
+          <PrintBarCodes ref={printRef} products={products} />
+        </OnlyPrint>
       )}
       <ModalAction
         title={header}
@@ -459,9 +452,8 @@ const Supplier = ({ params }) => {
         noConfirmation={!requiresConfirmation}
         bodyContent={
           modalAction === "inactive" && (
-            <Input
-              type="text"
-              placeholder="Indique la razón de desactivación"
+            <TextField
+              placeholder="Motivo"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

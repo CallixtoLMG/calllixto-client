@@ -1,10 +1,10 @@
-import { Flex } from "@/components/common/custom";
+import { Flex, Label } from "@/components/common/custom";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "@/components/common/tooltips";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/utils";
 
-const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments", STATE: "state" };
+export const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments", STATE: "state" };
 
-const SUPPLIERS_COLUMNS = [
+export const SUPPLIERS_COLUMNS = [
   {
     id: 1,
     title: "Id",
@@ -50,5 +50,33 @@ const SUPPLIERS_COLUMNS = [
   },
 ];
 
-export { ATTRIBUTES, SUPPLIERS_COLUMNS };
+export const SUPPLIER_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
+};
 
+export const EMPTY_SUPPLIER = { id: '', name: '', emails: [], phoneNumbers: [], addresses: [], comments: '' };
+export const EMPTY_FILTERS = { id: '', name: '', state: SUPPLIER_STATES.ACTIVE.id };
+
+export const SUPPLIER_STATES_OPTIONS = Object.values(SUPPLIER_STATES)
+  .map(({ id, title, color }) => ({
+    key: id,
+    text: (
+      <Flex alignItems="center" justifyContent="space-between">
+        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+      </Flex>
+    ),
+    value: id
+  }));

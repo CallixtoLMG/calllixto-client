@@ -1,42 +1,23 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Form } from "@/components/common/custom";
-import { ContactControlled, TextAreaControlled, TextControlled } from "@/components/common/form";
+import { ContactControlled, ContactView, TextAreaControlled, TextControlled } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
-import { useCallback, } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { EMPTY_SUPPLIER } from "../suppliers.common";
 
-const EMPTY_SUPPLIER = { id: '', name: '', emails: [], phoneNumbers: [], addresses: [], comments: '' };
-
-const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
+const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading, view }) => {
   const methods = useForm({ defaultValues: supplier });
+  const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
+  const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
 
-  const { handleSubmit, reset, formState: { isDirty } } = methods;
-
-  const handleReset = useCallback((supplier) => {
-    reset(supplier);
-  }, [reset]);
-
-  const handleCreate = (data) => {
-    if (!data.addresses.length) {
-      data.addresses = [];
-    }
-    if (!data.phoneNumbers.length) {
-      data.phoneNumbers = [];
-    }
-    if (!data.emails.length) {
-      data.emails = [];
-    }
-    onSubmit(data);
-  };
-
-  useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_SUPPLIER, ...supplier } : EMPTY_SUPPLIER), SHORTKEYS.DELETE);
+  useKeyboardShortcuts(handleSubmit(onSubmit), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => reset({ ...EMPTY_SUPPLIER, ...supplier }), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(handleCreate)} onKeyDown={preventSend}>
+      <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
         <FieldsContainer>
           <TextControlled
             width="150px"
@@ -44,8 +25,8 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
             label="Código"
             placeholder="Código (A1)"
             rules={RULES.REQUIRED_TWO_DIGIT}
-            onChange={(e) => e.target.value.toUpperCase()}
-            disabled={isUpdating}
+            onChange={value => value.toUpperCase()}
+            disabled={view}
             maxLength={2}
           />
           <TextControlled
@@ -54,16 +35,19 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading }) => {
             label="Nombre"
             placeholder="Nombre"
             rules={RULES.REQUIRED}
+            disabled={!isUpdating && view}
           />
         </FieldsContainer>
-        <ContactControlled />
-        <TextAreaControlled name="comments" label="Comentarios" />
-        <SubmitAndRestore
-          isUpdating={isUpdating}
-          isLoading={isLoading}
-          isDirty={isDirty}
-          onReset={() => handleReset(isUpdating ? { ...EMPTY_SUPPLIER, ...supplier } : EMPTY_SUPPLIER)}
-        />
+        {(!view || isUpdating) ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
+        <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
+        {(isUpdating || !view) && (
+          <SubmitAndRestore
+            isUpdating={isUpdating}
+            isLoading={isLoading}
+            isDirty={isDirty}
+            onReset={() => reset({ ...EMPTY_SUPPLIER, ...supplier })}
+          />
+        )}
       </Form>
     </FormProvider>
   )
