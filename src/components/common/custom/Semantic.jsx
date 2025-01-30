@@ -30,6 +30,13 @@ export const Input = styled(SInput)`
   width: ${({ width = '100%' }) => `${width}!important`};
   height: ${({ height = '38px' }) => height} !important;
   text-align: ${({ textAlign }) => textAlign} !important;
+
+  &&& .disabled {
+    opacity: 1 !important;
+    input {
+      opacity: 0.8 !important;
+    }
+  }
 `;
 
 export const FormField = styled(Form.Field)`
@@ -55,6 +62,14 @@ export const Label = styled(SLabel)`
 export const TextArea = styled(STextarea)`
   resize: ${({ resize = "none" }) => `${resize}!important`};
   padding: ${({ padding }) => `${padding}!important`};
+  color: red;
+  background-color: red m !important;
+  &&&&& {
+    opacity: 1 !important;
+    textarea {
+      opacity: 0.1 !important;
+    }
+  }
 `;
 
 export const Dropdown = styled(SDropdown)`

@@ -16,7 +16,7 @@ export const TextAreaField = ({
       width={width}
       placeholder={placeholder ?? label}
       value={value}
-      disabled={disabled}
+      readOnly={disabled}
       onChange={onChange}
       error={error}
     />

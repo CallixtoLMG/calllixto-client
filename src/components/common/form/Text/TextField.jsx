@@ -9,6 +9,7 @@ export const TextField = ({
   value,
   disabled,
   onChange,
+  maxLength,
   error
 }) => {
   return (
@@ -23,8 +24,9 @@ export const TextField = ({
         placeholder={placeholder ?? label}
         {...(iconLabel && { labelPosition: 'left' })}
         value={value}
-        readOnly={disabled}
+        disabled={disabled}
         onChange={onChange}
+        maxLength={maxLength}
       >
         {iconLabel && <Label width="fit-content" height="100%">{iconLabel}</Label>}
         <input />
