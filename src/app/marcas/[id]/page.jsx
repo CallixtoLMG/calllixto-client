@@ -3,7 +3,7 @@ import { useUserContext } from "@/User";
 import { useActiveBrand, useDeleteBrand, useEditBrand, useGetBrand, useInactiveBrand } from "@/api/brands";
 import { useHasProductsByBrandId } from "@/api/products";
 import BrandForm from "@/components/brands/BrandForm";
-import { Flex, Message, MessageHeader } from "@/components/common/custom";
+import { Message, MessageHeader } from "@/components/common/custom";
 import { TextField } from "@/components/common/form";
 import ModalAction from "@/components/common/modals/ModalAction";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -200,12 +200,10 @@ const Brand = ({ params }) => {
     <Loader active={isLoading || isLoadingProducts}>
       {toggleButton}
       {isItemInactive(brand?.state) && (
-        <Flex>
-          <Message negative>
-            <MessageHeader>Motivo de inactivación</MessageHeader>
-            <p>{brand.inactiveReason}</p>
-          </Message>
-        </Flex>
+        <Message negative>
+          <MessageHeader>Motivo de inactivación</MessageHeader>
+          <p>{brand.inactiveReason}</p>
+        </Message>
       )}
       <BrandForm
         brand={brand}

@@ -1,9 +1,9 @@
-import { Flex } from '@/components/common/custom';
+import { Flex, Label } from '@/components/common/custom';
 import { CommentTooltip } from "@/components/common/tooltips";
 
-const ATTRIBUTES = { ID: "id", NAME: "name", COMMENT: "comments", STATE: "state" };
+export const ATTRIBUTES = { ID: "id", NAME: "name", COMMENT: "comments", STATE: "state" };
 
-const BRAND_COLUMNS = [
+export const BRAND_COLUMNS = [
   {
     id: 1,
     title: "Id",
@@ -22,7 +22,31 @@ const BRAND_COLUMNS = [
   }
 ];
 
-export {
-  ATTRIBUTES, BRAND_COLUMNS
+export const BRANDS_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
 };
 
+export const EMPTY_FILTERS = { id: '', name: '', state: BRANDS_STATES.ACTIVE.id };
+export const BRANDS_STATES_OPTIONS = Object.values(BRANDS_STATES)
+  .map(({ id, title, color }) => ({
+    key: id,
+    text: (
+      <Flex alignItems="center" justifyContent="space-between">
+        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+      </Flex>
+    ),
+    value: id
+  }));

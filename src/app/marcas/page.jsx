@@ -2,8 +2,9 @@
 import { useUserContext } from "@/User";
 import { useListBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
+import { BRANDS_STATES } from "@/components/brands/brands.common";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { BRANDS_STATES, COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -43,15 +44,18 @@ const Brands = () => {
   }, [brands]);
 
   useEffect(() => {
-    const actions = RULES.canCreate[role] ? [
-      {
+    const actions = [];
+
+    if (RULES.canCreate[role]) {
+      actions.push({
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.BRANDS.CREATE) },
         text: 'Crear'
-      }
-    ] : [];
+      })
+    }
+
     actions.push({
       id: 3,
       icon: ICONS.FILE_EXCEL,
@@ -60,6 +64,7 @@ const Brands = () => {
       text: 'Marcas',
       disabled: loading
     });
+
     setActions(actions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
@@ -71,7 +76,6 @@ const Brands = () => {
       onRefetch={refetch}
       isLoading={loading}
       brands={loading ? [] : brands}
-      role={role}
     />
   );
 };

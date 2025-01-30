@@ -293,23 +293,6 @@ export const SUPPLIER_STATES = {
   },
 };
 
-export const BRANDS_STATES = {
-  ACTIVE: {
-    id: 'ACTIVE',
-    title: 'Activos',
-    singularTitle: 'Activo',
-    color: 'green',
-    icon: 'check',
-  },
-  INACTIVE: {
-    id: 'INACTIVE',
-    title: 'Inactivos',
-    singularTitle: 'Inactivo',
-    color: 'grey',
-    icon: 'hourglass half',
-  },
-};
-
 export const SHORTKEYS = {
   ENTER: "Control+Enter",
   ALT_ENTER: "Control+Alt+Enter",

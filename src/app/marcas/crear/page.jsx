@@ -15,6 +15,7 @@ const CreateBrand = () => {
   const { resetActions } = useNavActionsContext();
   const { push } = useRouter();
   const createBrand = useCreateBrand();
+
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -25,10 +26,7 @@ const CreateBrand = () => {
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (brand) => {
-      const response = await createBrand(brand);
-      return response;
-    },
+    mutationFn: createBrand,
     onSuccess: async (response) => {
       if (response.statusOk) {
         push(PAGES.BRANDS.SHOW(response.brand.id))

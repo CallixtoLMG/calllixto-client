@@ -1,12 +1,13 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, Label } from "@/components/common/custom";
 import { DropdownField, TextField, PriceControlled, TextControlled, TextAreaControlled, DropdownControlled, IconedButtonControlled } from "@/components/common/form";
-import { BRANDS_STATES, COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
+import { COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted, preventSend } from "@/utils";
 import { useCallback, useMemo } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
+import { BRANDS_STATES } from "@/components/brands/brands.common";
 
 const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 

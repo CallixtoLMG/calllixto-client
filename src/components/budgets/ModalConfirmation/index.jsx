@@ -1,5 +1,5 @@
 import { IconedButton } from "@/components/common/buttons";
-import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, FormField, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, FieldsContainer, Flex, FlexColumn } from "@/components/common/custom";
 import { TextField } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/constants";

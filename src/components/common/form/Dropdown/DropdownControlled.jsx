@@ -9,6 +9,7 @@ export const DropdownControlled = ({
   label,
   options = [],
   defaultValue,
+  afterChange,
   disabled
 }) => {
   return (
@@ -23,7 +24,10 @@ export const DropdownControlled = ({
           selection
           options={options}
           defaultValue={defaultValue}
-          onChange={(e, { value }) => onChange(value)}
+          onChange={(e, { value}) => {
+            onChange(value);
+            afterChange?.(value);
+          }}
           disabled={disabled}
         />
       )}
