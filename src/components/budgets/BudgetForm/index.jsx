@@ -22,7 +22,7 @@ import { Container, Icon, VerticalDivider } from "./styles";
 import { CUSTOMER_STATES } from "../../customers/customers.common";
 
 const EMPTY_BUDGET = (user) => ({
-  seller: `${user?.firstName} ${user?.lastName}`,
+  seller: user?.name,
   customer: { name: '', addresses: [], phoneNumbers: [] },
   products: [],
   comments: '',
