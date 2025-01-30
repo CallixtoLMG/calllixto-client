@@ -1,9 +1,10 @@
 import { Box, Flex } from "@/components/common/custom";
-import { BUDGET_STATES, COLORS, PRODUCT_STATES } from "@/constants";
+import { BUDGET_STATES, COLORS } from "@/constants";
 import { formatedDateAndHour, formatedDateOnly, formatedPercentage, getPrice, getTotal, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "@/utils";
 import { Label, Popup } from "semantic-ui-react";
 import { CommentTooltip } from "../common/tooltips";
 import { PriceLabel } from "../common/form";
+import { PRODUCT_STATES } from "@/components/products/products.common";
 
 const ATTRIBUTES = {
   ID: "id",

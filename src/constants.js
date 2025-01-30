@@ -228,37 +228,6 @@ export const BUDGET_STATES = {
   },
 };
 
-export const PRODUCT_STATES = {
-  ACTIVE: {
-    id: 'ACTIVE',
-    title: 'Activos',
-    singularTitle: 'Activo',
-    color: 'green',
-    icon: 'check',
-  },
-  DELETED: {
-    id: 'DELETED',
-    title: 'Eliminados',
-    singularTitle: 'Eliminado',
-    color: 'red',
-    icon: 'ban',
-  },
-  OOS: {
-    id: 'OOS',
-    title: 'Sin stock',
-    singularTitle: 'Sin stock',
-    color: 'orange',
-    icon: 'expired',
-  },
-  INACTIVE: {
-    id: 'INACTIVE',
-    title: 'Inactivos',
-    singularTitle: 'Inactivo',
-    color: 'grey',
-    icon: 'hourglass half',
-  },
-};
-
 export const SHORTKEYS = {
   ENTER: "Control+Enter",
   ALT_ENTER: "Control+Alt+Enter",

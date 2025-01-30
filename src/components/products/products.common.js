@@ -1,10 +1,10 @@
-import { Flex } from "@/components/common/custom";
+import { Flex, Label } from "@/components/common/custom";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { getBrandCode, getProductCode, getSupplierCode } from "@/utils";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../common/form";
 
-const ATTRIBUTES = {
+export const ATTRIBUTES = {
   CODE: "code",
   NAME: "name",
   PRICE: "price",
@@ -16,7 +16,7 @@ const ATTRIBUTES = {
   STATE: "state",
 };
 
-const PRODUCT_COLUMNS = [
+export const PRODUCT_COLUMNS = [
   {
     id: 1,
     title: "Código",
@@ -57,7 +57,7 @@ const PRODUCT_COLUMNS = [
   }
 ];
 
-const IMPORT_PRODUCTS_COLUMNS = [
+export const IMPORT_PRODUCTS_COLUMNS = [
   {
     id: 1,
     title: "Código",
@@ -80,7 +80,7 @@ const IMPORT_PRODUCTS_COLUMNS = [
   }
 ];
 
-const BAN_PRODUCTS_COLUMNS = [
+export const BAN_PRODUCTS_COLUMNS = [
   {
     id: 1,
     title: "Código",
@@ -89,9 +89,58 @@ const BAN_PRODUCTS_COLUMNS = [
   },
 ];
 
-const BAN_FILTERS = [
+export const BAN_FILTERS = [
   { value: 'code', placeholder: 'Código' },
 ];
 
-export { ATTRIBUTES, BAN_FILTERS, BAN_PRODUCTS_COLUMNS, IMPORT_PRODUCTS_COLUMNS, PRODUCT_COLUMNS };
+export const EXAMPLE_TEMPLATE_DATA = [
+  ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
+  ['AABB001', "Producto 1", 200, 'Comentarios...'],
+  ['AABB002', "Producto 2", 300, 'Comentarios...'],
+  ['AABB003', "Producto 3", 400, 'Comentarios...'],
+];
 
+export const PRODUCT_STATES = {
+  ACTIVE: {
+    id: 'ACTIVE',
+    title: 'Activos',
+    singularTitle: 'Activo',
+    color: 'green',
+    icon: 'check',
+  },
+  DELETED: {
+    id: 'DELETED',
+    title: 'Eliminados',
+    singularTitle: 'Eliminado',
+    color: 'red',
+    icon: 'ban',
+  },
+  OOS: {
+    id: 'OOS',
+    title: 'Sin stock',
+    singularTitle: 'Sin stock',
+    color: 'orange',
+    icon: 'expired',
+  },
+  INACTIVE: {
+    id: 'INACTIVE',
+    title: 'Inactivos',
+    singularTitle: 'Inactivo',
+    color: 'grey',
+    icon: 'hourglass half',
+  },
+};
+
+export const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
+export const EMPTY_FILTERS = { code: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
+
+export const PRODUCT_STATES_OPTIONS = Object.values(PRODUCT_STATES)
+  .map(({ id, title, color }) => ({
+    key: id,
+    text: (
+      <Flex alignItems="center" justifyContent="space-between">
+        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+      </Flex>
+    ),
+    value: id
+  }));

@@ -1,7 +1,7 @@
 import { COLORS, ICONS, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from 'next/navigation';
-import { IconedButton } from "./";
+import IconedButton from "./Iconed";
 
 const GoBack = () => {
   const { back } = useRouter();
@@ -9,7 +9,7 @@ const GoBack = () => {
     back();
   };
 
-  useKeyboardShortcuts(handleClick, SHORTKEYS.BACKSPACE)
+  useKeyboardShortcuts(handleClick, SHORTKEYS?.BACKSPACE)
 
   return (
     <IconedButton

@@ -1,4 +1,4 @@
-import { ButtonsContainer, Input } from "@/components/common/custom";
+import { ButtonsContainer } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { COLORS, ICONS } from "@/constants";
 import { useEffect, useRef, useState } from 'react';
@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { Header, Transition } from 'semantic-ui-react';
 import { IconedButton } from "../../buttons";
 import { Form, Modal, ModalContent } from "./styles";
+import { TextField } from "../../form";
 
 const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title, icon, headers }) => {
   const [confirmationText, setConfirmationText] = useState('');
@@ -38,14 +39,12 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
         </ModalContent>
         <Modal.Actions>
           <Form onSubmit={handleSubmit(onConfirm)}>
-            <Input
-              height="40px"
+            <TextField
               placeholder="Escriba 'eliminar' para confirmar"
-              type="text"
               value={confirmationText}
               onChange={handleConfirmationTextChange}
               ref={inputElement}
-              width="220px"
+              width="250px"
             />
             <ButtonsContainer>
               <IconedButton

@@ -1,9 +1,10 @@
-import { COLORS, PRODUCT_STATES } from "@/constants";
+import { COLORS } from "@/constants";
 import { formatProductCode } from "@/utils";
 import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { CommentTooltip } from "../tooltips";
 import { Container, Label, Search, Text } from "./styles";
+import { PRODUCT_STATES } from "@/components/products/products.common";
 
 const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');

@@ -3,7 +3,8 @@ import timezone from "dayjs/plugin/timezone";
 import utc from "dayjs/plugin/utc";
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
-import { BUDGET_STATES, PRODUCT_STATES, REGEX } from "./constants";
+import { BUDGET_STATES, REGEX } from "./constants";
+import { PRODUCT_STATES } from "@/components/products/products.common";
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

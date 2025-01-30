@@ -6,7 +6,7 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
-import { COLORS, ICONS, PAGES, PRODUCT_STATES, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -14,13 +14,7 @@ import { downloadExcel, formatedPrice } from "@/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Dropdown } from "semantic-ui-react";
-
-const mockData = [
-  ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
-  ['AABB001', "Producto 1", 200, 'Comentarios...'],
-  ['AABB002', "Producto 2", 300, 'Comentarios...'],
-  ['AABB003', "Producto 3", 400, 'Comentarios...'],
-];
+import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.common";
 
 const Products = () => {
   useValidateToken();
@@ -58,8 +52,10 @@ const Products = () => {
   }, [products]);
 
   useEffect(() => {
-    const actions = RULES.canCreate[role] ? [
-      {
+    const actions = [];
+
+    if (RULES.canCreate[role]) {
+      actions.push({
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
@@ -89,7 +85,7 @@ const Products = () => {
               <DropdownItem onClick={handleDownloadExcel}>
                 <Icon name={ICONS.DOWNLOAD} />Productos
               </DropdownItem>
-              <DropdownItem onClick={() => downloadExcel(mockData, "Ejemplo de tabla")}>
+              <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA, "Ejemplo de tabla")}>
                 <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla
               </DropdownItem>
             </Dropdown.Menu>
@@ -103,8 +99,9 @@ const Products = () => {
         onClick: () => setOpen(true),
         text: 'Bloquear',
         basic: true
-      },
-    ] : [];
+      });
+    }
+
     setActions(actions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
@@ -118,7 +115,6 @@ const Products = () => {
         onRefetch={refetch}
         isLoading={loading}
         products={loading ? [] : products}
-        role={role}
       />
     </>
   );

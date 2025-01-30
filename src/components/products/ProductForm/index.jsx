@@ -1,17 +1,17 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, Label } from "@/components/common/custom";
-import { DropdownField, TextField, PriceControlled, TextControlled, TextAreaControlled, DropdownControlled, IconedButtonControlled } from "@/components/common/form";
-import { COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
+import { DropdownField, PriceControlled, TextControlled, TextAreaControlled, DropdownControlled, IconedButtonControlled, TextField } from "@/components/common/form";
+import { COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted, preventSend } from "@/utils";
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { BRANDS_STATES } from "@/components/brands/brands.common";
+import { EMPTY_PRODUCT } from "../products.common";
+import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.common";
 
-const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
-
-const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading }) => {
+const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view }) => {
   const methods = useForm({
     defaultValues: {
       fractionConfig: {
@@ -25,20 +25,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   const { handleSubmit, reset, watch, formState: { isDirty, errors } } = methods;
   const [watchFractionable, watchSupplier, watchBrand] = watch(['fractionConfig.active', 'supplier', 'brand']);
-
-  const handleReset = useCallback((product) => {
-    if (isUpdating) {
-      reset(product);
-    } else {
-      reset({
-        ...product,
-        supplier: '',
-        brand: '',
-        fractionConfig: { active: false, unit: MEASSURE_UNITS.MT.value },
-        editablePrice: false
-      });
-    }
-  }, [reset, isUpdating]);
 
   const handleForm = async (data) => {
     const filteredData = { ...data };
@@ -61,7 +47,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT), SHORTKEYS.DELETE);
+  useKeyboardShortcuts(() => reset({ ...EMPTY_PRODUCT, ...product }), SHORTKEYS.DELETE);
 
   const supplierOptions = useMemo(() => {
     return suppliers?.map(({ id, name, state, deactivationReason }) => ({
@@ -75,7 +61,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             {state === SUPPLIER_STATES.INACTIVE.id && (
               <Popup
                 trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
-                content={deactivationReason || 'Motivo no especificado'}
+                content={deactivationReason ?? 'Motivo no especificado'}
                 position="top center"
                 size="mini"
               />
@@ -98,7 +84,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             {state === BRANDS_STATES.INACTIVE.id && (
               <Popup
                 trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
-                content={deactivationReason || 'Motivo no especificado'}
+                content={deactivationReason ?? 'Motivo no especificado'}
                 position="top center"
                 size="mini"
               />
@@ -113,62 +99,33 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
         <FieldsContainer rowGap="5px">
-          {isUpdating ? (
+          {view ? (
             <>
-              <TextField width="25%" label="Proveedor" value={product?.supplierName} />
-              <TextField width="25%" label="Marca" value={product?.brandName} />
+              <TextField width="25%" label="Proveedor" value={product?.supplierName} disabled />
+              <TextField width="25%" label="Marca" value={product?.brandName} disabled />
               <TextField
                 width="250px"
                 label="Código"
                 value={getProductCode(product?.code)}
                 iconLabel={`${getSupplierCode(product?.code)} ${getBrandCode(product?.code)}`}
+                disabled
               />
             </>
           ) : (
             <>
-              <Controller
+              <DropdownControlled
+                width="25%"
                 name="supplier"
-                control={methods.control}
+                label="Proveedor"
                 rules={RULES.REQUIRED}
-                render={({ field: { onChange, ...rest } }) => {
-                  return (
-                    <DropdownField
-                      {...rest}
-                      width="25%"
-                      options={supplierOptions}
-                      onChange={(e, { value }) => {
-                        onChange(value);
-                      }}
-                      disabled={isProductDeleted(product?.state)}
-                      label="Proveedor"
-                      error={errors?.supplier ? {
-                        content: errors.supplier.message,
-                        pointing: 'above',
-                      } : null}
-                    />
-                  )
-                }}
+                options={supplierOptions}
               />
-              <Controller
+              <DropdownControlled
+                width="25%"
                 name="brand"
+                label="Marca"
                 rules={RULES.REQUIRED}
-                render={({ field: { onChange, ...rest } }) => {
-                  return (
-                    <DropdownField
-                      {...rest}
-                      width="25%"
-                      required
-                      options={brandOptions}
-                      onChange={(e, { value }) => onChange(value)}
-                      disabled={isProductDeleted(product?.state)}
-                      label="Marca"
-                      error={errors?.brand ? {
-                        content: errors.brand.message,
-                        pointing: 'above',
-                      } : null}
-                    />
-                  )
-                }}
+                options={brandOptions}
               />
               <TextControlled
                 width="250px"
@@ -189,24 +146,24 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             label="Nombre"
             rules={RULES.REQUIRED}
             onChange={value => value.toUpperCase()}
-            disabled={isProductDeleted(product?.state)}
+            disabled={!isUpdating && view}
           />
         </FieldsContainer>
         <FieldsContainer alignItems="end">
-          <PriceControlled width="200px" name="price" label="Precio" />
+          <PriceControlled width="200px" name="price" label="Precio" disabled={!isUpdating && view} />
           <IconedButtonControlled
             width="fit-content"
             name="editablePrice"
             label="Precio Editable"
             icon={ICONS.PENCIL}
-            disabled={isProductDeleted(product?.state)}
+            disabled={!isUpdating && view}
           />
           <IconedButtonControlled
             width="fit-content"
             name="fractionConfig.active"
             label="Producto Fraccionable"
             icon={ICONS.CUT}
-            disabled={isProductDeleted(product?.state)}
+            disabled={!isUpdating && view}
           />
           <DropdownControlled
             width="200px"
@@ -214,22 +171,24 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             label="Unidad de Medida"
             options={Object.values(MEASSURE_UNITS)}
             defaultValue={Object.values(MEASSURE_UNITS)[0].value}
-            disabled={!watchFractionable || isProductDeleted(product?.state)}
+            disabled={(!isUpdating && view) || !watchFractionable}
           />
         </FieldsContainer>
         <TextAreaControlled
           name="comments"
-          disabled={isProductDeleted(product?.state)}
           label="Comentarios"
           rules={RULES.REQUIRED}
+          disabled={!isUpdating && view}
         />
-        <SubmitAndRestore
-          isUpdating={isUpdating}
-          isLoading={isLoading}
-          isDirty={isDirty}
-          onReset={() => handleReset(isUpdating ? { ...EMPTY_PRODUCT, ...product } : EMPTY_PRODUCT)}
-          disabled={isProductDeleted(product?.state)}
-        />
+        {(isUpdating || !view) && (
+          <SubmitAndRestore
+            isUpdating={isUpdating}
+            isLoading={isLoading}
+            isDirty={isDirty}
+            onReset={() => reset({ ...EMPTY_PRODUCT, ...product })}
+            disabled={isProductDeleted(product?.state)}
+          />
+        )}
       </Form>
     </FormProvider>
   );

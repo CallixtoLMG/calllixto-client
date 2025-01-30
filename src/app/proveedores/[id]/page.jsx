@@ -22,7 +22,7 @@ import {
   useNavActionsContext,
 } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
-import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
+import { COLORS, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -33,6 +33,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { TextField } from "@/components/common/form";
+import { PRODUCT_STATES } from "@/components/products/products.common";
 
 const Supplier = ({ params }) => {
   useValidateToken();

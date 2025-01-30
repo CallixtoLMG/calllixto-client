@@ -7,6 +7,7 @@ export const DropdownControlled = ({
   name,
   width,
   label,
+  placeholder,
   options = [],
   defaultValue,
   afterChange,
@@ -20,6 +21,7 @@ export const DropdownControlled = ({
           {...rest}
           width={width}
           label={label}
+          placeholder={placeholder ?? label}
           control={Dropdown}
           selection
           options={options}

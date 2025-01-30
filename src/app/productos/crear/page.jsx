@@ -46,10 +46,7 @@ const CreateProduct = () => {
   })), [suppliers]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (product) => {
-      const response = await createProduct(product);
-      return response;
-    },
+    mutationFn: createProduct,
     onSuccess: async (response) => {
       if (response.statusOk) {
         push(PAGES.PRODUCTS.SHOW(response.product.code))

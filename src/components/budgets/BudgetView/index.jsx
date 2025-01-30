@@ -4,7 +4,7 @@ import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, T
 import Payments from "@/components/common/form/Payments";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
-import { COLORS, ICONS, PICK_UP_IN_STORE, PRODUCT_STATES } from "@/constants";
+import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed, isProductOOS, now } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
@@ -15,6 +15,7 @@ import { Popup } from "semantic-ui-react";
 import { getBudgetState } from "../budgets.common";
 import { Container, Message, MessageHeader } from "./styles";
 import { PriceLabel } from "../../common/form";
+import { PRODUCT_STATES } from "@/components/products/products.common";
 
 const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
   const methods = useForm({
