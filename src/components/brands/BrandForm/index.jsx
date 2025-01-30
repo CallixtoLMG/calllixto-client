@@ -5,8 +5,7 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/utils";
 import { FormProvider, useForm } from "react-hook-form";
 import { TextAreaControlled, TextControlled } from "@/components/common/form";
-
-const EMPTY_BRAND = { name: '', id: '', comments: '' };
+import { EMPTY_BRAND } from "../brands.common";
 
 const BrandForm = ({ brand, onSubmit, isLoading, isUpdating, view }) => {
   const methods = useForm({ defaultValues: brand });

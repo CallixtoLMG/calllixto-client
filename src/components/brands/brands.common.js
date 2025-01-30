@@ -39,7 +39,9 @@ export const BRANDS_STATES = {
   },
 };
 
+export const EMPTY_BRAND = { name: '', id: '', comments: '' };
 export const EMPTY_FILTERS = { id: '', name: '', state: BRANDS_STATES.ACTIVE.id };
+
 export const BRANDS_STATES_OPTIONS = Object.values(BRANDS_STATES)
   .map(({ id, title, color }) => ({
     key: id,

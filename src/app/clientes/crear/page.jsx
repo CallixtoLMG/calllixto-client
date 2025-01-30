@@ -26,10 +26,7 @@ const CreateCustomer = () => {
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (customer) => {
-      const response = await createCustomer(customer);
-      return response;
-    },
+    mutationFn: createCustomer,
     onSuccess: async (response) => {
       if (response.statusOk) {
         push(PAGES.CUSTOMERS.SHOW(response.customer.id))

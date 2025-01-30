@@ -1,4 +1,4 @@
-import { ButtonsContainer, Input } from "@/components/common/custom";
+import { ButtonsContainer } from "@/components/common/custom";
 import { COLORS, ICONS } from "@/constants";
 import { handleKeyPressWithSubmit } from "@/utils";
 import { useEffect, useRef, useState } from 'react';
@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { Header, Modal, Transition } from 'semantic-ui-react';
 import { IconedButton } from "../../buttons";
 import { Form, Message, ModalContent } from "./styles";
+import { TextField } from "../../form";
 
 const ModalAction = ({
   title,
@@ -72,15 +73,13 @@ const ModalAction = ({
         <Modal.Actions>
           <Form onSubmit={handleSubmit(onConfirm)}>
             {!noConfirmation && !disableButtons && !requireReason && (
-              <Input
-                height="40px"
+              <TextField
+                ref={inputElement}
                 placeholder={placeholder}
-                type="text"
                 value={confirmationText}
                 onChange={handleConfirmationTextChange}
-                ref={inputElement}
-                width="300px"
                 tabIndex="0"
+                width="300px"
               />
             )}
             <ButtonsContainer>

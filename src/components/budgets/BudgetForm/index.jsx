@@ -8,7 +8,7 @@ import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
 import { ATTRIBUTES } from "@/components/products/products.common";
-import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS } from "@/constants";
+import { BUDGET_STATES, COLORS, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from "@/utils";
 import { omit, pick } from "lodash";
@@ -19,6 +19,7 @@ import { v4 as uuid } from 'uuid';
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
 import { Container, Icon, VerticalDivider } from "./styles";
+import { CUSTOMER_STATES } from "../../customers/customers.common";
 
 const EMPTY_BUDGET = (user) => ({
   seller: `${user?.firstName} ${user?.lastName}`,

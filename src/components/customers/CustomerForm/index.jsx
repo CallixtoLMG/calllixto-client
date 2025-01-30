@@ -1,47 +1,48 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Form } from "@/components/common/custom";
-import { ContactControlled, TextAreaControlled, TextControlled } from "@/components/common/form";
+import { ContactControlled, ContactView, TextAreaControlled, TextControlled } from "@/components/common/form";
 import { RULES, SHORTKEYS } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
+import { EMPTY_CUSTOMER } from "../customers.common";
 
-const EMPTY_CUSTOMER = { name: '', phoneNumbers: [], addresses: [], emails: [], comments: '' };
-
-const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdating }) => {
+const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
   const methods = useForm({
     defaultValues: {
       ...EMPTY_CUSTOMER,
       ...customer,
     }
   });
-  const { handleSubmit, reset, formState: { isDirty } } = methods;
+  const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
 
-  const handleReset = useCallback((customer) => {
-    reset(customer);
-  }, [reset]);
+  const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
 
-  const handleCreate = (data) => {
-    onSubmit(data);
-  };
-
-  useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_CUSTOMER, ...customer } : EMPTY_CUSTOMER), SHORTKEYS.DELETE);
+  useKeyboardShortcuts(handleSubmit(onSubmit), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => reset({ ...EMPTY_CUSTOMER, ...customer }), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(handleCreate)}>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <FieldsContainer>
-          <TextControlled width="40%"name="name" label="Nombre" placeholder="Nombre" rules={RULES.REQUIRED} />
+          <TextControlled
+            width="40%"
+            name="name"
+            label="Nombre"
+            placeholder="Nombre"
+            rules={RULES.REQUIRED}
+            disabled={!isUpdating && view}
+          />
         </FieldsContainer>
-        <ContactControlled />
-        <TextAreaControlled name="comments" />
-        <SubmitAndRestore
-          isUpdating={isUpdating}
-          isLoading={isLoading}
-          isDirty={isDirty}
-          onReset={() => handleReset(isUpdating ? { ...EMPTY_CUSTOMER, ...customer } : EMPTY_CUSTOMER)}
-        />
+        {isUpdating ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
+        <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
+        {(isUpdating || !view) && (
+          <SubmitAndRestore
+            isUpdating={isUpdating}
+            isLoading={isLoading}
+            isDirty={isDirty}
+            onReset={() => reset({ ...EMPTY_CUSTOMER, ...customer })}
+          />
+        )}
       </Form>
     </FormProvider>
   )

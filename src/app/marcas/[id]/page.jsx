@@ -225,7 +225,7 @@ const Brand = ({ params }) => {
         bodyContent={
           modalAction === "inactive" && (
             <TextField
-              placeholder="Indique la razón de desactivación"
+              placeholder="Motivo"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

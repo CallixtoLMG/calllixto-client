@@ -1,11 +1,10 @@
 "use client";
-
 import { useListBudgets } from "@/api/budgets";
 import { useActiveCustomer, useDeleteCustomer, useEditCustomer, useGetCustomer, useInactiveCustomer } from "@/api/customers";
-import { Flex, Input, Message, MessageHeader } from "@/components/common/custom";
+import { Message, MessageHeader } from "@/components/common/custom";
+import { TextField } from "@/components/common/form";
 import ModalAction from "@/components/common/modals/ModalAction";
 import CustomerForm from "@/components/customers/CustomerForm";
-import CustomerView from "@/components/customers/CustomerView";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { COLORS, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
@@ -23,11 +22,12 @@ const Customer = ({ params }) => {
   const { data: budgetData, isLoading: isLoadingBudgets } = useListBudgets();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: true });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({ canUpdate: true });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
+
   const editCustomer = useEditCustomer();
   const deleteCustomer = useDeleteCustomer();
   const inactiveCustomer = useInactiveCustomer();
@@ -83,6 +83,7 @@ const Customer = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente actualizado!");
+        setIsUpdating(false);
       } else {
         toast.error(response.error.message);
       }
@@ -203,23 +204,18 @@ const Customer = ({ params }) => {
     <Loader active={isLoading || isLoadingBudgets}>
       {toggleButton}
       {isItemInactive(customer?.state) && (
-        <Flex>
-          <Message negative>
-            <MessageHeader>Motivo de inactivación</MessageHeader>
-            <p>{customer.inactiveReason}</p>
-          </Message>
-        </Flex>
+        <Message negative>
+          <MessageHeader>Motivo de inactivación</MessageHeader>
+          <p>{customer.inactiveReason}</p>
+        </Message>
       )}
-      {isUpdating ? (
-        <CustomerForm
-          customer={customer}
-          onSubmit={mutateEdit}
-          isLoading={isEditPending}
-          isUpdating
-        />
-      ) : (
-        <CustomerView customer={customer} />
-      )}
+      <CustomerForm
+        customer={customer}
+        onSubmit={mutateEdit}
+        isLoading={isEditPending}
+        isUpdating={isUpdating}
+        view
+      />
       <ModalAction
         title={header}
         onConfirm={handleActionConfirm}
@@ -232,9 +228,8 @@ const Customer = ({ params }) => {
         disableButtons={!reason && modalAction === "inactive"}
         bodyContent={
           modalAction === "inactive" && (
-            <Input
-              type="text"
-              placeholder="Motivo de inactivación"
+            <TextField
+              placeholder="Motivo"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
