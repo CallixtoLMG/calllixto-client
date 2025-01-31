@@ -1,5 +1,4 @@
-import { IconnedButton } from "@/components/common/buttons";
-import { Box, Flex, FlexColumn } from "@/components/common/custom";
+import { Box, Button, Flex, FlexColumn } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { COLORS, ICONS, SEMANTIC_COLORS } from "@/common/constants";
 import { useState } from "react";
@@ -72,7 +71,7 @@ const Categories = () => {
               value={categoryToAdd.description}
               onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
             />
-            <IconnedButton
+            <Button
               text="Agregar"
               icon={ICONS.ADD}
               color={COLORS.GREEN}
