@@ -1,6 +1,6 @@
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
-import { REGEX } from "../constants";
+import { INACTIVE, REGEX } from "../constants";
 
 export const getFormatedPrice = (number) => {
   return Number(number).toLocaleString('es-AR', {
@@ -87,11 +87,7 @@ export const validatePhone = (phone) => {
 };
 
 export const isItemInactive = (state) => {
-  return state === "INACTIVE";
-};
-
-export const isItemDeleted = (state) => {
-  return state === "DELETED";
+  return state === INACTIVE;
 };
 
 export const renderContent = (content) => {
