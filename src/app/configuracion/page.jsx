@@ -104,7 +104,7 @@ const Settings = () => {
         />
         <SubmitAndRestore
           isLoading={isPending}
-          onReset={() => reset(data[activeEntity])}  // Resetear a los valores iniciales
+          onReset={() => reset(data[activeEntity])} 
           isDirty={isDirty}
           text="Actualizar"
         />
