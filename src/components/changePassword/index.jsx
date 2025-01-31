@@ -6,17 +6,18 @@ import { COLORS, ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/common/con
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Button, Form } from "semantic-ui-react";
 import { Flex, FlexColumn, Label, Message } from "../common/custom";
-import PasswordInput from "../common/custom/PasswordInput";
+import PasswordInput from "../common/form/Password/PasswordField";
 import { ModGrid, ModGridColumn, ModHeader } from "./styled";
-import { PasswordRequirements } from "../common/form";
+import { PasswordControlled, PasswordRequirements, TextControlled } from "../common/form";
 
 const ChangePasswordForm = () => {
   const { push } = useRouter();
-  const { handleSubmit, control, watch, reset } = useForm();
+  const methods = useForm();
+  const { handleSubmit, watch, reset } = methods;
   const [email, setEmail] = useState("");
   const [isCodeRequested, setIsCodeRequested] = useState(false);
 
@@ -116,90 +117,57 @@ const ChangePasswordForm = () => {
               Al solicitar el código, recibirás un enlace en tu correo para validar el cambio de contraseña.
             </Message>
           </Flex>
-          <Form onSubmit={handleSubmit(handleConfirmReset)}>
-            <Controller
-              name="confirmationCode"
-              control={control}
-              rules={{ required: "El código es obligatorio" }}
-              render={({ field, fieldState: { error } }) => (
-                <Form.Input
-                  {...field}
-                  placeholder="Código de recuperación"
+          <FormProvider {...methods}>
+            <Form onSubmit={handleSubmit(handleConfirmReset)}>
+              <TextControlled
+                name="confirmationCode"
+                placeholder="Código de recuperación"
+                icon={ICONS.MAIL_SQUARE}
+                iconPosition="left"
+                disabled={!isCodeRequested}
+                rules={RULES.REQUIRED}
+              />
+              <PasswordControlled
+                name="newPassword"
+                rules={{
+                  ...RULES.REQUIRED,
+                  validate: (value) => {
+                    const failedRequirements = PASSWORD_REQUIREMENTS.filter(
+                      (req) => !req.test.test(value)
+                    );
+                    return (
+                      failedRequirements.length === 0 ||
+                      "La contraseña no cumple con los requisitos."
+                    );
+                  },
+                }}
+                placeholder="Nuevo Contraseña"
+                showPasswordRequirements
+              />
+              <PasswordControlled
+                name="confirmPassword"
+                placeholder="Confirmar Nueva Contraseña"
+                rules={{
+                  ...RULES.REQUIRED,
+                  validate: (value) =>
+                    value === newPassword || "Las contraseñas no coinciden",
+                }}
+              />
+              <FlexColumn rowGap="14px">
+                <Button
+                  loading={isOnConfirmResetPending}
+                  disabled={isOnConfirmResetPending || isRequestCodePending || !isCodeRequested}
                   fluid
-                  icon={ICONS.MAIL_SQUARE}
-                  iconPosition="left"
-                  disabled={!isCodeRequested}
-                  error={
-                    error
-                      ? { content: error.message, pointing: "below" }
-                      : false
-                  }
-                />
-              )}
-            />
-            <Controller
-              name="newPassword"
-              control={control}
-              rules={{
-                required: "La nueva contraseña es obligatoria",
-                validate: (value) => {
-                  const failedRequirements = PASSWORD_REQUIREMENTS.filter(
-                    (req) => !req.test.test(value)
-                  );
-                  return (
-                    failedRequirements.length === 0 ||
-                    "La contraseña no cumple con los requisitos."
-                  );
-                },
-              }}
-              render={({ field, fieldState: { error } }) => (
-                <>
-                  <PasswordInput
-                    field={field}
-                    placeholder="Nueva contraseña"
-                    error={error}
-                    disabled={!isCodeRequested}
-                  />
-                  {isCodeRequested && (
-                    <PasswordRequirements
-                      requirements={PASSWORD_REQUIREMENTS}
-                      password={newPassword}
-                    />
-                  )}
-                </>
-              )}
-            />
-            <Controller
-              name="confirmPassword"
-              control={control}
-              rules={{
-                ...RULES.REQUIRED,
-                validate: (value) =>
-                  value === newPassword || "Las contraseñas no coinciden",
-              }}
-              render={({ field, fieldState: { error } }) => (
-                <PasswordInput
-                  field={field}
-                  placeholder="Confirmar nueva contraseña"
-                  error={error}
-                  disabled={!isCodeRequested}
-                />
-              )}
-            />
-            <FlexColumn rowGap="14px">
-              <Button
-                loading={isOnConfirmResetPending}
-                disabled={isOnConfirmResetPending || isRequestCodePending || !isCodeRequested}
-                fluid
-                color={COLORS.GREEN}
-              >
-                Confirmar
-              </Button>
-              <Flex justifyContent="center">
-                <GoBackButton />
-              </Flex>
-            </FlexColumn>
-          </Form>
+                  color={COLORS.GREEN}
+                >
+                  Confirmar
+                </Button>
+                <Flex justifyContent="center">
+                  <GoBackButton />
+                </Flex>
+              </FlexColumn>
+            </Form>
+          </FormProvider>
         </ModGridColumn>
       </ModGrid>
     </Loader>

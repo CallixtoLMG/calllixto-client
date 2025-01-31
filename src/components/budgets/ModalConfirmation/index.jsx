@@ -5,10 +5,11 @@ import Payments from "@/components/common/form/Payments";
 import { COLORS, ICONS } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { useMemo, useRef } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { ButtonGroup, Form, Modal, Transition } from "semantic-ui-react";
+import { FormProvider, useForm } from "react-hook-form";
+import { Form, Modal, Transition } from "semantic-ui-react";
 import { now } from "@/common/utils/dates";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
+import { GroupedButtonsControlled } from "../../common/form";
 
 const ModalConfirmation = ({
   isModalOpen,
@@ -26,11 +27,11 @@ const ModalConfirmation = ({
       ...customer
     },
   });
-  const { control, watch } = methods;
+  const { watch } = methods;
   const formRef = useRef(null);
   const parsedTotal = useMemo(() => parseFloat(total.toFixed(2)), [total]);
 
-  const watchPickUpInStore = watch("pickUpInStore")
+  const watchPickUpInStore = watch("pickUpInStore");
 
   const handleConfirmClick = () => {
     if (formRef.current) {
@@ -40,7 +41,6 @@ const ModalConfirmation = ({
 
   const handleConfirm = (data) => {
     const { paymentsMade, pickUpInStore } = data;
-
     const payload = {
       paymentsMade: paymentsMade?.map((payment) => ({
         ...payment,
@@ -54,77 +54,65 @@ const ModalConfirmation = ({
 
   return (
     <Transition visible={isModalOpen} animation='scale' duration={500}>
-      <Form ref={formRef} onSubmit={methods.handleSubmit(handleConfirm)}>
-        <Modal size="large" closeIcon open={isModalOpen} onClose={() => onClose(false)}>
-          <Modal.Header>
-            <Flex alignItems="center" justifyContent="space-between">
-              Desea confirmar el presupuesto?
-              {/* TODO Controlled Grouped */}
-              <Controller
-                name="pickUpInStore"
-                control={control}
-                render={({ field: { onChange, value } }) => (
-                  <ButtonGroup size="small">
-                    <IconedButton
-                      text={PICK_UP_IN_STORE}
-                      icon={ICONS.WAREHOUSE}
-                      basic={!value}
-                      onClick={() => onChange(true)}
-                    />
-                    <IconedButton
-                      text="Enviar a Dirección"
-                      icon={ICONS.TRUCK}
-                      basic={value}
-                      onClick={() => onChange(false)}
-                    />
-                  </ButtonGroup>
-                )}
-              />
-            </Flex>
-          </Modal.Header>
-          <Modal.Content>
-            <FlexColumn rowGap="15px">
-              <FieldsContainer>
-                <TextField
-                  flex="2"
-                  label="Dirección"
-                  value={!watchPickUpInStore ? `${customer?.addresses?.[0]?.ref ? `${customer?.addresses?.[0]?.ref}:` : "(Sin referencia)"} ${customer?.addresses?.[0]?.address}` : PICK_UP_IN_STORE}
+      <FormProvider {...methods}>
+        <Form ref={formRef} onSubmit={methods.handleSubmit(handleConfirm)}>
+          <Modal size="large" closeIcon open={isModalOpen} onClose={() => onClose(false)}>
+            <Modal.Header>
+              <Flex alignItems="center" justifyContent="space-between">
+                Desea confirmar el presupuesto?
+                <GroupedButtonsControlled
+                  name="pickUpInStore"
+                  buttons={[
+                    { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
+                    { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
+                  ]}
                 />
-                <TextField
-                  flex="1"
-                  label="Teléfono"
-                  value={`${getFormatedPhone(customer?.phoneNumbers?.[0])}`}
+              </Flex>
+            </Modal.Header>
+            <Modal.Content>
+              <FlexColumn rowGap="15px">
+                <FieldsContainer>
+                  <TextField
+                    flex="2"
+                    label="Dirección"
+                    value={!watchPickUpInStore ? `${customer?.addresses?.[0]?.ref ? `${customer?.addresses?.[0]?.ref}:` : "(Sin referencia)"} ${customer?.addresses?.[0]?.address}` : PICK_UP_IN_STORE}
+                  />
+                  <TextField
+                    flex="1"
+                    label="Teléfono"
+                    value={`${getFormatedPhone(customer?.phoneNumbers?.[0])}`}
+                  />
+                </FieldsContainer>
+                <Payments
+                  total={parsedTotal}
+                  maxHeight
+                  update
                 />
-              </FieldsContainer>
-              <Payments
-                total={parsedTotal}
-                maxHeight
-                update
-              />
-            </FlexColumn>
-          </Modal.Content>
-          <Modal.Actions>
-            <ButtonsContainer width="100%">
-              <IconedButton
-                text="Cancelar"
-                icon={ICONS.CANCEL}
-                disabled={isLoading}
-                color={COLORS.RED}
-                onClick={() => onClose(false)}
-              />
-              <IconedButton
-                text="Confirmar"
-                icon={ICONS.CHECK}
-                disabled={isLoading}
-                loading={isLoading}
-                submit
-                color={COLORS.GREEN}
-                onClick={handleConfirmClick}
-              />
-            </ButtonsContainer>
-          </Modal.Actions>
-        </Modal>
-      </Form>
+              </FlexColumn>
+            </Modal.Content>
+            <Modal.Actions>
+              <ButtonsContainer width="100%">
+                <IconedButton
+                  text="Cancelar"
+                  icon={ICONS.CANCEL}
+                  disabled={isLoading}
+                  color={COLORS.RED}
+                  onClick={() => onClose(false)}
+                />
+                <IconedButton
+                  text="Confirmar"
+                  icon={ICONS.CHECK}
+                  disabled={isLoading}
+                  loading={isLoading}
+                  submit
+                  color={COLORS.GREEN}
+                  onClick={handleConfirmClick}
+                />
+              </ButtonsContainer>
+            </Modal.Actions>
+          </Modal>
+        </Form>
+      </FormProvider>
     </Transition>
   );
 };

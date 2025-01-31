@@ -8,3 +8,5 @@ export * from './Contact';
 export * from './Number';
 export * from './Dropdown';
 export * from './IconedButton';
+export * from './GroupedButtons';
+export * from './Password';

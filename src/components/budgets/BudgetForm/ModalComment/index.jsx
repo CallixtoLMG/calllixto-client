@@ -2,12 +2,13 @@ import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Label, Segment } from "@/components/common/custom";
 import { COLORS, ICONS } from "@/common/constants";
 import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 import { TextControlled } from "@/components/common/form";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
-  const { control, handleSubmit, formState: { isDirty }, reset } = useForm();
+  const methods = useForm();
+  const { handleSubmit, formState: { isDirty }, reset } = methods;
 
   useEffect(() => {
     reset({ dispatchComment: '', ...product });
@@ -37,15 +38,17 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
                 <Segment placeholder>{product?.quantity}</Segment>
               </FormField>
             </FieldsContainer>
-            <Form onSubmit={handleSubmit(onAddComment)}>
-              <FieldsContainer>
-                <TextControlled
-                  flex="1"
-                  name="dispatchComment"
-                  placeholder="Comentario"
-                />
-              </FieldsContainer>
-            </Form>
+            <FormProvider {...methods}>
+              <Form onSubmit={handleSubmit(onAddComment)}>
+                <FieldsContainer>
+                  <TextControlled
+                    flex="1"
+                    name="dispatchComment"
+                    placeholder="Comentario"
+                  />
+                </FieldsContainer>
+              </Form>
+            </FormProvider>
           </Flex>
         </Modal.Content>
         <Modal.Actions>

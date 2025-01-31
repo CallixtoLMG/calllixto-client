@@ -4,16 +4,17 @@ import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
-import PasswordInput from "../common/custom/PasswordInput";
+import PasswordInput from "../common/form/Password/PasswordField";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text } from "./styles";
-import { PasswordRequirements } from "../common/form";
+import { PasswordControlled, PasswordRequirements, TextControlled } from "../common/form";
 
 const RecoverPasswordForm = () => {
   const { push } = useRouter();
-  const { handleSubmit, control, reset, watch, getValues, setValue } = useForm();
+  const methods = useForm();
+  const { handleSubmit, control, reset, watch } = methods;
   const [isCodeSent, setIsCodeSent] = useState(false);
 
   const newPassword = watch("newPassword", "");
@@ -65,117 +66,76 @@ const RecoverPasswordForm = () => {
         <ModHeader as="h3">
           <Text>{isCodeSent ? "Cambiar Contraseña" : "Recuperar Contraseña"}</Text>
         </ModHeader>
-        <Form
-          onSubmit={handleSubmit((data) => {
-            isCodeSent ? onConfirmReset(data) : onRecoverPassword(data);
-          })}
-          size="large"
-        >
-          {!isCodeSent ? (
-            <Controller
-              name="username"
-              control={control}
-              rules={{
-                required: "El correo electrónico es obligatorio",
-                pattern: {
-                  value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                  message: "El correo electrónico no es válido",
-                },
-              }}
-              render={({ field, fieldState: { error } }) => (
-                <Form.Input
-                  {...field}
-                  placeholder="Correo electrónico"
-                  fluid
-                  icon={ICONS.USER}
-                  iconPosition="left"
-                  error={
-                    error
-                      ? { content: error.message, pointing: "below" }
-                      : false
-                  }
-                />
-              )}
-            />
-          ) : (
-            <>
-              <Controller
-                name="confirmationCode"
-                control={control}
-                rules={{ required: "El código es obligatorio" }}
-                render={({ field, fieldState: { error } }) => (
-                  <Form.Input
-                    {...field}
-                    placeholder="Código de recuperación"
-                    fluid
-                    icon={ICONS.MAIL_SQUARE}
-                    iconPosition="left"
-                    error={
-                      error
-                        ? { content: error.message, pointing: "below" }
-                        : false
-                    }
-                  />
-                )}
-              />
-              <Controller
-                name="newPassword"
-                control={control}
-                rules={{
-                  required: "La nueva contraseña es obligatoria",
-                  validate: (value) => {
-                    const failedRequirements = PASSWORD_REQUIREMENTS.filter(
-                      (req) => !req.test.test(value)
-                    );
-                    return (
-                      failedRequirements.length === 0 ||
-                      "La contraseña no cumple con los requisitos."
-                    );
-                  },
-                }}
-                render={({ field, fieldState: { error } }) => (
-                  <>
-                    <PasswordInput
-                      field={field}
-                      placeholder="Nueva contraseña"
-                      error={error}
-                    />
-                    <PasswordRequirements
-                      requirements={PASSWORD_REQUIREMENTS}
-                      password={newPassword}
-                    />
-                  </>
-                )}
-              />
-              <Controller
-                name="confirmPassword"
-                control={control}
-                rules={{
-                  ...RULES.REQUIRED,
-                  validate: (value) =>
-                    value === newPassword || "Las contraseñas no coinciden",
-                }}
-                render={({ field, fieldState: { error } }) => (
-                  <PasswordInput
-                    field={field}
-                    placeholder="Confirmar nueva contraseña"
-                    error={error}
-                  />
-                )}
-              />
-            </>
-          )}
-          <ModButton
-            loading={isCodeSent ? isConfirmResetPending : isRecoverPasswordPending}
-            fluid="true"
+        <FormProvider {...methods}>
+          <Form
+            onSubmit={handleSubmit((data) => {
+              isCodeSent ? onConfirmReset(data) : onRecoverPassword(data);
+            })}
             size="large"
           >
-            {isCodeSent ? "Cambiar Contraseña" : "Enviar"}
-          </ModButton>
-          <RedirectLink onClick={() => push(PAGES.LOGIN.BASE)}>
-            Volver al inicio de sesión
-          </RedirectLink>
-        </Form>
+            {!isCodeSent ? (
+              <TextControlled
+                name="username"
+                rules={{
+                  ...RULES.REQUIRED,
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "El correo electrónico no es válido",
+                  },
+                }}
+                placeholder="Correo electrónico"
+                icon={ICONS.USER}
+                iconPosition="left"
+              />
+            ) : (
+              <>
+                <TextControlled
+                  name="confirmationCode"
+                  rules={RULES.REQUIRED}
+                  placeholder="Código de recuperación"
+                  icon={ICONS.MAIL_SQUARE}
+                  iconPosition="left"
+                />
+                <PasswordControlled
+                  name="newPassword"
+                  rules={{
+                    ...RULES.REQUIRED,
+                    validate: (value) => {
+                      const failedRequirements = PASSWORD_REQUIREMENTS.filter(
+                        (req) => !req.test.test(value)
+                      );
+                      return (
+                        failedRequirements.length === 0 ||
+                        "La contraseña no cumple con los requisitos."
+                      );
+                    },
+                  }}
+                  placeholder="Nuevo Contraseña"
+                  showPasswordRequirements
+                />
+                <PasswordControlled
+                  name="confirmPassword"
+                  placeholder="Confirmar Nueva Contraseña"
+                  rules={{
+                    ...RULES.REQUIRED,
+                    validate: (value) =>
+                      value === newPassword || "Las contraseñas no coinciden",
+                  }}
+                />
+              </>
+            )}
+            <ModButton
+              loading={isCodeSent ? isConfirmResetPending : isRecoverPasswordPending}
+              fluid="true"
+              size="large"
+            >
+              {isCodeSent ? "Cambiar Contraseña" : "Enviar"}
+            </ModButton>
+            <RedirectLink onClick={() => push(PAGES.LOGIN.BASE)}>
+              Volver al inicio de sesión
+            </RedirectLink>
+          </Form>
+        </FormProvider>
       </ModGridColumn>
     </ModGrid>
   );

@@ -1,14 +1,14 @@
 import { PAYMENT_METHODS } from "@/components/budgets/budgets.constants";
 import { IconedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Button, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/components/common/custom";
-import { PriceLabel, PriceControlled, TextAreaControlled, PercentControlled, NumberControlled } from "@/components/common/form";
+import { PriceLabel, PriceControlled, TextAreaControlled, PercentControlled, NumberControlled, GroupedButtonsControlled, TextControlled, DropdownControlled } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
 import { ATTRIBUTES } from "@/components/products/products.constants";
-import { COLORS, ICONS, PAGES, RULES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { getFormatedPhone } from "@/common/utils";
 import { omit, pick } from "lodash";
@@ -37,6 +37,7 @@ const EMPTY_BUDGET = (user) => ({
   paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
   expirationOffsetDays: '',
   paymentsMade: [],
+  pickUpInStore: false,
 });
 
 const BudgetForm = ({
@@ -113,21 +114,21 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers.map(({ id, name, state, deactivationReason }) => ({
-      key: id,
-      value: id,
-      text: name,
+    return customers.map((customer) => ({
+      key: customer.id,
+      value: customer,
+      text: customer.name,
       content: (
         <Flex justifyContent="space-between" alignItems="center">
-          <span>{name}</span>
-          {state === CUSTOMER_STATES.INACTIVE.id && (
+          <span>{customer.name}</span>
+          {customer.state === CUSTOMER_STATES.INACTIVE.id && (
             <Flex>
               <Popup
                 trigger={
                   <Label color={COLORS.GREY} size="mini">
                     Desactivado
                   </Label>}
-                content={deactivationReason || 'Motivo no especificado'}
+                content={customer.deactivationReason || 'Motivo no especificado'}
                 position="top center"
                 size="mini"
               />
@@ -500,39 +501,22 @@ const BudgetForm = ({
                 />
               </ButtonGroup>
             </FormField>
-            <FormField width="350px">
-              <Controller
-                name="pickUpInStore"
-                render={({ field: { onChange, value } }) => (
-                  <ButtonGroup size="small">
-                    <IconedButton
-                      text={PICK_UP_IN_STORE}
-                      icon={ICONS.WAREHOUSE}
-                      basic={!value}
-                      onClick={() => {
-                        onChange(true);
-                      }}
-                    />
-                    <IconedButton
-                      text="Enviar a Dirección"
-                      icon={ICONS.TRUCK}
-                      basic={value}
-                      onClick={() => {
-                        onChange(false);
-                      }}
-                    />
-                  </ButtonGroup>
-                )}
-              />
-            </FormField>
+            <GroupedButtonsControlled
+              name="pickUpInStore"
+              width="350px"
+              buttons={[
+                { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
+                { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
+              ]}
+            />
           </FieldsContainer>
           <FieldsContainer justifyContent="space-between">
-            <Controller
+            <TextControlled
               name="seller"
+              label="Vendedor"
               rules={RULES.REQUIRED}
-              render={({ field: { value } }) => (
-                <FormField width="300px" label="Vendedor" control={Input} readonly value={value} />
-              )}
+              width="300px"
+              disabled
             />
             <FieldsContainer>
               <NumberControlled
@@ -554,35 +538,12 @@ const BudgetForm = ({
             </FieldsContainer>
           </FieldsContainer>
           <FieldsContainer>
-            <Controller
+            <DropdownControlled
               name="customer"
-              rules={{ validate: value => value?.id ? true : "Campo requerido." }}
-              render={({ field: { onChange, value } }) => (
-                <FormField
-                  width="300px"
-                  label="Cliente"
-                  required
-                  control={Dropdown}
-                  error={errors?.customer ? { content: errors.customer.message, pointing: 'above' } : null}
-                  placeholder={PAGES.CUSTOMERS.NAME}
-                  search
-                  clearable
-                  selection
-                  minCharacters={2}
-                  noResultsMessage="No se han encontrado resultados!"
-                  options={customerOptions}
-                  value={value?.id || null}
-                  onChange={(e, { value }) => {
-                    clearErrors(["customer"]);
-                    if (!value) {
-                      onChange(null);
-                      return;
-                    };
-                    const customer = customers.find(opt => opt.id === value);
-                    onChange(customer);
-                  }}
-                />
-              )}
+              rules={{ validate: value => !!value?.id || 'Campo requerido.' }}
+              width="300px"
+              label="Cliente"
+              options={customerOptions}
             />
             <FormField
               flex="2"
