@@ -10,7 +10,7 @@ import { Loader } from "@/components/layout";
 import { ATTRIBUTES } from "@/components/products/products.constants";
 import { COLORS, ICONS, PAGES, RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { formatProductCodePopup, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from "@/common/utils";
+import { formatedSimplePhone, getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from "@/common/utils";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
@@ -23,6 +23,7 @@ import { CUSTOMER_STATES } from "../../customers/customers.constants";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getDateWithOffset } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from '@/components/budgets/budgets.constants';
+import { getBrandCode, getProductCode, getSupplierCode, getPrice, getTotal } from "@/components/products/products.utils";
 
 const EMPTY_BUDGET = (user) => ({
   seller: user?.name,
@@ -327,11 +328,23 @@ const BudgetForm = ({
       title: "Código",
       value: (product) => (
         <>
-          <Popup size="tiny" trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>} position="top center" on="hover" content={product.brandName} />
+          <Popup
+            size="tiny"
+            trigger={<span>{getSupplierCode(product.code)}</span>}
+            position="top center"
+            on="hover"
+            content={product.supplierName}
+          />
           {'-'}
-          <Popup size="tiny" trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>} position="top center" on="hover" content={product.supplierName} />
+          <Popup
+            size="tiny"
+            trigger={<span>{getBrandCode(product.code)}</span>}
+            position="top center"
+            on="hover"
+            content={product.brandName}
+          />
           {'-'}
-          <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
+          <span>{getProductCode(product.code)}</span>
         </>
       ),
       width: 1,

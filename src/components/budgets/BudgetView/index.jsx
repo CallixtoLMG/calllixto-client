@@ -6,7 +6,7 @@ import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { COLORS, ICONS } from "@/common/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { formatProductCodePopup, formatedPercentage, formatedSimplePhone, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed, isProductOOS } from "@/common/utils";
+import { formatedPercentage, formatedSimplePhone, isBudgetCancelled, isBudgetConfirmed } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -14,10 +14,12 @@ import { toast } from "react-hot-toast";
 import { Popup } from "semantic-ui-react";
 import { getBudgetState } from "../budgets.utils";
 import { Container, Message, MessageHeader } from "./styles";
-import { PriceLabel } from "../../common/form";
+import { PriceLabel } from "@/components/common/form";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { now, getDateWithOffset } from "@/common/utils/dates";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
+import { getBrandCode, getProductCode, getSupplierCode } from "@/components/products/products.utils";
+import { isProductOOS, getPrice, getTotal } from "@/components/products/products.utils";
 
 const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
   const methods = useForm({
@@ -64,7 +66,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           <>
             <Popup
               size="tiny"
-              trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>}
+              trigger={<span>{getSupplierCode(product.code)}</span>}
               position="top center"
               on="hover"
               content={product.supplierName}
@@ -72,13 +74,13 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             -
             <Popup
               size="tiny"
-              trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>}
+              trigger={<span>{getBrandCode(product.code)}</span>}
               position="top center"
               on="hover"
               content={product.brandName}
             />
             -
-            <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
+            <span>{getProductCode(product.code)}</span>
           </>
         ),
         id: 1,

@@ -1,10 +1,11 @@
 import { COLORS } from "@/common/constants";
-import { formatProductCode } from "@/common/utils";
 import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { CommentTooltip } from "../tooltips";
 import { Container, Label, Search, Text } from "./styles";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
+import { formatProductCode } from "@/components/products/products.utils";
+import { formatedPrice } from "@/common/utils";
 
 const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -71,7 +72,7 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
           <Container marginTop="5px" flexDir="column">
             <Text>Código: {formatProductCode(product.code)}</Text>
             <Container flexDir="row">
-              <Text>Precio: {`$ ${product?.price?.toFixed(2)}`}</Text>
+              <Text>Precio: {formatedPrice(product?.price)}</Text>
             </Container>
             <Container flexDir="row">
               {product.state === PRODUCT_STATES.OOS.id && <Label size="tiny" color={COLORS.ORANGE}>Sin Stock</Label>}

@@ -1,6 +1,6 @@
 import { Flex, Label } from "@/components/common/custom";
 import { CommentTooltip } from "@/components/common/tooltips";
-import { getBrandCode, getProductCode, getSupplierCode } from "@/common/utils";
+import { getBrandCode, getProductCode, getSupplierCode } from "./products.utils";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../common/form";
 

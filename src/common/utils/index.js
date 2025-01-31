@@ -1,7 +1,6 @@
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
 import { REGEX } from "../constants";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
 
 export const formatedPrice = (number) => {
@@ -22,44 +21,14 @@ export function encodeUri(value) {
   return undefined;
 };
 
-export const formatProductCodePopup = (code, brand, supplier) => {
-  const firstPart = code ? code?.substring(0, 2) : "";
-  const secondPart = code ? code?.substring(2, 4) : "";
-  const thirdPart = code ? code?.substring(4) : "";
-
-  return {
-    formattedCode: `${firstPart}-${secondPart}-${thirdPart}`,
-    brandName: brand,
-    supplierName: supplier,
-  };
-};
-
-export const formatProductCode = (code) => {
-  const firstPart = code ? code?.substring(0, 2) : "";
-  const secondPart = code ? code?.substring(2, 4) : "";
-  const thirdPart = code ? code?.substring(4) : "";
-
-  return `${firstPart}-${secondPart}-${thirdPart}`
-};
-
 export const formatedPercentage = (number = 0) => {
   return number + " %"
 };
 
-export const getPrice = (product) => {
-  const { fractionConfig, price } = product;
-  return fractionConfig?.active ? fractionConfig?.value * price : price;
-};
-
-export const getTotal = (product) => {
-  const price = getPrice(product);
-  return price * product.quantity * (1 - (product.discount / 100)) || 0;
-};
-
 export const getTotalSum = (products, discount = 0, additionalCharge = 0) => {
-  const subtotal = products?.reduce((a, b) => a + getTotal(b), 0);
-  const discountedsubtotal = subtotal - (subtotal * (discount / 100));
-  const total = discountedsubtotal + (discountedsubtotal * (additionalCharge / 100));
+  const subtotal = products?.reduce((a, b) => a + getTotal(b), 0) ?? 0;
+  const discountedSubtotal = subtotal - (subtotal * (discount / 100));
+  const total = discountedSubtotal + (discountedSubtotal * (additionalCharge / 100));
   return total;
 };
 
@@ -69,7 +38,6 @@ export const getSubtotal = (total, discountOrCharge) => {
 };
 
 export const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
-export const handleNaN = (value, defaultValue = 'Valor incorrecto') => isNaN(value) ? defaultValue : formatedPrice(value);
 
 export const formatedSimplePhone = (phone) => {
   if (!phone) return '';
@@ -96,18 +64,6 @@ export const getAddressesForDisplay = (addresses) => {
   return { primaryAddress, additionalAddresses };
 };
 
-export const getSupplierCode = (code) => {
-  return code?.slice(0, 2);
-};
-
-export const getBrandCode = (code) => {
-  return code?.slice(2, 4);
-};
-
-export const getProductCode = (code) => {
-  return code?.slice(4);
-};
-
 export const downloadExcel = (data, fileName) => {
   const ws = XLSX.utils.aoa_to_sheet(data);
   const wb = XLSX.utils.book_new();
@@ -125,12 +81,6 @@ export const handleEnterKeyPress = (e, action) => {
   if (e.key === 'Enter') {
     e.preventDefault();
     action(e);
-  }
-};
-
-export const handleConfirmKeyPress = (e, isActionEnabled, handleSubmit, onConfirm) => {
-  if (e.key === 'Enter' && isActionEnabled) {
-    handleSubmit(onConfirm)();
   }
 };
 
@@ -169,28 +119,12 @@ export const isBudgetExpired = (status) => {
   return status === BUDGET_STATES.EXPIRED.id;
 };
 
-export const isProductActive = (status) => {
-  return status === PRODUCT_STATES.ACTIVE.id;
-};
-
-export const isProductOOS = (status) => {
-  return status === PRODUCT_STATES.OOS.id;
-};
-
-export const isProductInactive = (status) => {
-  return status === PRODUCT_STATES.INACTIVE.id;
-};
-
 export const isItemInactive = (state) => {
   return state === "INACTIVE";
 };
 
 export const isItemDeleted = (state) => {
   return state === "DELETED";
-};
-
-export const isProductDeleted = (status) => {
-  return status === PRODUCT_STATES.DELETED.id;
 };
 
 export const renderContent = (content) => {

@@ -6,10 +6,11 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
-import { downloadExcel, getTotal, getTotalSum, handleNaN, handleUndefined } from "@/common/utils";
+import { downloadExcel, getTotalSum, handleUndefined } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
+import { getTotal } from "@/components/products/products.utils";
 
 const Budgets = () => {
   useValidateToken();
@@ -45,7 +46,7 @@ const Budgets = () => {
         handleUndefined(translatedState),
         handleUndefined(budget.customer.name),
         handleUndefined(getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)),
-        handleNaN(getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)),
+        getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge),
         `% ${budget.globalDiscount ?? 0}`,
         `% ${budget.additionalCharge ?? 0}`,
         handleUndefined(budget.seller)
@@ -56,7 +57,7 @@ const Budgets = () => {
         if (product.fractionConfig?.active) {
           productName = `${product.name} x ${product.fractionConfig.value} ${product.fractionConfig.unit}`;
         }
-        return `Código: ${handleUndefined(product.code)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${handleNaN(product.price)}, Descuento: % ${product.discount ?? 0}, Total: ${handleNaN(getTotal(product))};`;
+        return `Código: ${handleUndefined(product.code)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${product.price ?? 0}, Descuento: % ${product.discount ?? 0}, Total: ${getTotal(product)};`;
       });
 
       while (productData.length < maxProductCount) {

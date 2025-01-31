@@ -10,14 +10,14 @@ import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { isProductDeleted, isProductInactive, isProductOOS } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { TextField } from "../../../components/common/form";
+import { TextField } from "@/components/common/form";
+import { isProductOOS, isProductDeleted, isProductInactive } from "@/components/products/products.utils";
 
 const Product = ({ params }) => {
   useValidateToken();

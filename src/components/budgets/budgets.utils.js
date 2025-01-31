@@ -1,9 +1,10 @@
 import { Flex } from "@/components/common/custom";
 import { COLORS, DATE_FORMATS } from "@/common/constants";
-import { formatedPercentage, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed } from "@/common/utils";
+import { formatedPercentage, isBudgetCancelled, isBudgetConfirmed } from "@/common/utils";
 import { Label } from "semantic-ui-react";
 import { PriceLabel } from "../common/form";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
+import { getPrice, getTotal } from "@/components/products/products.utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES } from "./budgets.constants";
 
