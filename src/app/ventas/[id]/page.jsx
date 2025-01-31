@@ -13,7 +13,7 @@ import PDFfile from "@/components/budgets/PDFfile";
 import { IconedButton } from "@/components/common/buttons";
 import { Box, Button, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Input, Menu } from "@/components/common/custom";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { APIS, COLORS, ICONS, PAGES } from "@/common/constants";
+import { EXTERNAL_APIS, COLORS, ICONS, PAGES } from "@/common/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { getFormatedPhone } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
@@ -175,8 +175,8 @@ const Budget = ({ params }) => {
           iconName: 'whatsapp',
           color: COLORS.GREEN,
           subOptions: budget?.customer?.phoneNumbers?.map(({ ref, areaCode, number }) => ({
-            key: `${APIS.WSP(`${areaCode}${number}`)}`,
-            href: `${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`,
+            key: `${EXTERNAL_APIS.WSP(`${areaCode}${number}`)}`,
+            href: `${EXTERNAL_APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`,
             text: `${ref ? `${ref} - ` : ''}${areaCode} ${number}`,
             iconName: 'whatsapp',
             color: COLORS.GREEN,
@@ -187,8 +187,8 @@ const Budget = ({ params }) => {
           iconName: 'mail',
           color: COLORS.RED,
           subOptions: budget?.customer?.emails?.map(({ ref, email }) => ({
-            key: `${APIS.MAIL(email, budget?.customer?.name)}`,
-            href: `${APIS.MAIL(email, budget?.customer?.name)}`,
+            key: `${EXTERNAL_APIS.MAIL(email, budget?.customer?.name)}`,
+            href: `${EXTERNAL_APIS.MAIL(email, budget?.customer?.name)}`,
             text: `${ref ? `${ref} - ` : ''}${email}`,
             iconName: 'mail',
             color: COLORS.RED,

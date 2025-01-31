@@ -1,4 +1,4 @@
-import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.utils";
+import { getProductsColumns } from "@/components/budgets/budgets.utils";
 import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
 import { Box, Flex, FlexColumn } from "@/components/common/custom";
 import { Table, Total, TotalList } from '@/components/common/table';
@@ -30,7 +30,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL, [printPdfMode]);
-  const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
+  const filteredColumns = useMemo(() => getProductsColumns(dispatchPdf, budget), [budget, dispatchPdf]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
   const roundedFinalTotal = parseFloat(total?.toFixed(2));
