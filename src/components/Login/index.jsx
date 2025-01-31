@@ -18,7 +18,6 @@ const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [showPasswordReset, setShowPasswordReset] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const { handleSubmit, control, reset } = useForm();
 
   const handleScreenChange = (isResetScreen) => {

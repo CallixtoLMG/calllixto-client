@@ -1,6 +1,7 @@
 import {
   Form,
   Button as SButton,
+  Divider as SDivider,
   Dropdown as SDropdown,
   Icon as SIcon,
   Input as SInput,
@@ -167,6 +168,7 @@ export const Icon = styled(SIcon)`
   position: ${({ dollar, toast }) => (dollar || toast) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
+  cursor: ${({ pointer }) => pointer && "pointer"} !important;;
 `;
 
 export const Modal = styled(SModal)`
@@ -194,4 +196,8 @@ export const MessageHeader = styled(SMessageHeader)`
 
 export const Message = styled(SMessage)`
   width: 100%;
+`;
+
+export const Divider = styled(SDivider)`
+  margin: 10px!important;
 `;

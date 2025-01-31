@@ -15,7 +15,7 @@ const ModLink = styled(Link)`
   };
 `;
 
-const LogDiv = styled(Flex)`
+const LeftHeaderDiv = styled(Flex)`
   position: relative;
   padding: ${({ padding = "0" }) => padding}!important;
   align-items: center;
@@ -24,11 +24,14 @@ const LogDiv = styled(Flex)`
   &:hover {
     background-color: #f5f5f5!important;
   };
-  a {
-    &:hover {
-      background-color: #f5f5f5!important;
-    };
-  };
+`;
+
+const RigthHeaderDiv = styled(Flex)`
+  position: relative;
+  padding: ${({ padding = "0.5rem" }) => padding}!important;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+  font-size: 15px;
 `;
 
 const Container = styled(SContainer)`
@@ -64,5 +67,5 @@ const Text = styled.p`
   };
 `;
 
-export { Container, LogDiv, ModLink, Text };
+export { Container, LeftHeaderDiv, ModLink, RigthHeaderDiv, Text };
 

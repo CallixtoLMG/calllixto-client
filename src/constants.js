@@ -45,6 +45,10 @@ export const PAGES = {
   LOGIN: {
     BASE: "/login"
   },
+  SETTINGS: {
+    BASE: "/configuracion",
+    NAME: 'Configuración',
+  },
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"
   },
@@ -179,6 +183,7 @@ export const ENTITIES = {
   BUDGETS: 'budgets',
   BUDGET: 'budget',
   EVENTS: 'events',
+  SETTINGS: "settings",
   USERS: 'users'
 };
 
@@ -394,8 +399,25 @@ export const ICONS = {
   ARCHIVE: "archive",
   OPTIONS: "options",
   REFRESH: "refresh",
+  SETTINGS: "settings",
   MAIL_SQUARE: "mail square"
 };
+
+export const SEMANTIC_COLORS = [
+  { key: "yellow", text: "Amarillo", value: "yellow" },
+  { key: "blue", text: "Azul", value: "blue" },
+  { key: "brown", text: "Marrón", value: "brown" },
+  { key: "grey", text: "Gris", value: "grey" },
+  { key: "black", text: "Negro", value: "black" },
+  { key: "olive", text: "Oliva", value: "olive" },
+  { key: "orange", text: "Naranja", value: "orange" },
+  { key: "pink", text: "Rosa", value: "pink" },
+  { key: "purple", text: "Púrpura", value: "purple" },
+  { key: "red", text: "Rojo", value: "red" },
+  { key: "green", text: "Verde", value: "green" },
+  { key: "teal", text: "Turquesa", value: "teal" },
+  { key: "violet", text: "Violeta", value: "violet" },
+];
 
 export const PAGE_SIZE_OPTIONS = [
   { key: 10, text: '10', value: 10 },

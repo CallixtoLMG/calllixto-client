@@ -1,47 +1,27 @@
 import { useUserContext } from "@/User";
-import { LIST_BRANDS_QUERY_KEY } from "@/api/brands";
-import { LIST_BUDGETS_QUERY_KEY } from "@/api/budgets";
-import { LIST_CUSTOMERS_QUERY_KEY } from "@/api/customers";
-import { LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
-import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
-import { Flex } from '@/components/common/custom';
+import { Flex, Icon } from "@/components/common/custom";
 import { KeyboardShortcuts } from "@/components/common/modals";
-import OptionsDropdown from "@/components/layout/OptionsHeader";
-import { COLORS, DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES } from "@/constants";
+import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { RULES, isCallixtoUser } from "@/roles";
-import { usePathname, useRouter } from 'next/navigation';
-import { Dropdown, Icon, Menu } from 'semantic-ui-react';
-import { Container, LogDiv, ModLink, Text } from "./styles";
+import { usePathname, useRouter } from "next/navigation";
+import { Button, Label, Menu } from "semantic-ui-react";
+import UserMenu from "../UserMenu";
+import { Container, LeftHeaderDiv, ModLink, RigthHeaderDiv, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const entityMapping = {
-    [PAGES.CUSTOMERS.BASE]: { entity: ENTITIES.CUSTOMERS, queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
-    [PAGES.PRODUCTS.BASE]: { entity: ENTITIES.PRODUCTS, queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
-    [PAGES.BUDGETS.BASE]: { entity: ENTITIES.BUDGETS, queryKey: LIST_BUDGETS_QUERY_KEY, text: PAGES.BUDGETS.NAME },
-    [PAGES.BRANDS.BASE]: { entity: ENTITIES.BRANDS, queryKey: LIST_BRANDS_QUERY_KEY, text: PAGES.BRANDS.NAME },
-    [PAGES.SUPPLIERS.BASE]: { entity: ENTITIES.SUPPLIERS, queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
-  };
 
-  const currentEntity = Object.keys(entityMapping).find(key => pathname.includes(key))
-    ? entityMapping[pathname]
-    : null;
-
-  const handleClientChange = (event, data) => {
+  const handleClientChange = (client) => {
     const userData = JSON.parse(sessionStorage.getItem("userData"));
-    sessionStorage.setItem("userData", JSON.stringify({ ...userData, selectedClientId: data.value }));
+    sessionStorage.setItem("userData", JSON.stringify({ ...userData, selectedClientId: client }));
     location.reload();
   };
 
   const handleLogout = () => {
     push(PAGES.LOGIN.BASE);
-  };
-
-  const handleUserManagement = () => {
-    push(PAGES.CHANGE_PASSWORD.BASE);
   };
 
   const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE];
@@ -57,74 +37,63 @@ const Header = () => {
   useKeyboardShortcuts(shortcutMapping);
   return (
     <>
-      {showHeader &&
-        <Menu fixed='top'>
+      {showHeader && (
+        <Menu fixed="top">
           <Container>
             {!userData?.isAuthorized ? (
               <Flex>
-                <LogDiv>
-                  <Menu.Item onClick={handleLogout}><Text>Ingresar</Text></Menu.Item>
-                </LogDiv>
+                <LeftHeaderDiv>
+                  <Menu.Item onClick={handleLogout}>
+                    <Text>Ingresar</Text>
+                  </Menu.Item>
+                </LeftHeaderDiv>
               </Flex>
             ) : (
               <>
                 <Flex>
-                  {Object.values(PAGES).filter(page => !!page.NAME).map(page => (
-                    <ModLink key={page.BASE} $active={pathname.includes(page.BASE)} href={page.BASE}>
-                      <Menu.Item><Text $active={pathname.includes(page.BASE)}>{page.NAME}</Text></Menu.Item>
-                    </ModLink>
-                  ))}
+                  {Object.values(PAGES)
+                    .filter((page) => {
+                      if (!page.NAME) return false;
+                      if (page.NAME === PAGES.SETTINGS.NAME) {
+                        return RULES.canUpdate[role];
+                      }
+                      return true;
+                    })
+                    .map((page) => (
+                      <ModLink key={page.BASE} $active={pathname.includes(page.BASE)} href={page.BASE}>
+                        <Menu.Item>
+                          <Text $active={pathname.includes(page.BASE)}>{page.NAME}</Text>
+                        </Menu.Item>
+                      </ModLink>
+                    ))}
                 </Flex>
                 <Flex>
-                  <KeyboardShortcuts />
-                  {currentEntity?.entity && currentEntity?.queryKey && (
-                    <OptionsDropdown entity={currentEntity.entity} queryKey={currentEntity.queryKey} text={currentEntity.text} />
-                  )}
+                  <RigthHeaderDiv>
+                    <KeyboardShortcuts />
+                  </RigthHeaderDiv>
                   {isCallixtoUser(role) && (
-                    <LogDiv padding="8px">
-                      <Dropdown
-                        search
-                        selection
-                        defaultValue={userData.selectedClientId || DEFAULT_SELECTED_CLIENT}
-                        options={userData.callixtoClients.map((client) => ({
-                          key: client,
-                          text: client,
-                          value: client,
-                        }))}
-                        onChange={handleClientChange}
-                      />
-                    </LogDiv>
+                    <RigthHeaderDiv>
+                      <Label>{userData.selectedClientId || DEFAULT_SELECTED_CLIENT}</Label>
+                    </RigthHeaderDiv>
                   )}
-                  <LogDiv>
-                    <Dropdown
-                      text={(
-                        <>
-                          <Icon color={COLORS.GREY} name="user" />
-                          {`${userData.name}` || 'Usuario'}
-                        </>
-                      )}
-                      pointing="top right"
-                      className="link item"
-                    >
-                      <Dropdown.Menu>
-                        <Dropdown.Item onClick={handleLogout}>
-                          <Icon color={COLORS.RED} name="log out" />
-                          Cerrar sesión
-                        </Dropdown.Item>
-                        {RULES.canUpdate[role] &&
-                          <Dropdown.Item onClick={handleUserManagement}>
-                            <Icon color={COLORS.ORANGE} name="settings" />
-                            Cambiar contraseña
-                          </Dropdown.Item>}
-                      </Dropdown.Menu>
-                    </Dropdown>
-                  </LogDiv>
+                  <RigthHeaderDiv>
+                    <UserMenu
+                      trigger={
+                        <Button icon>
+                          <Icon name={ICONS.USER} /> Usuario
+                        </Button>
+                      }
+                      onLogout={handleLogout}
+                      onClientChange={handleClientChange}
+                      userData={userData}
+                    />
+                  </RigthHeaderDiv>
                 </Flex>
               </>
             )}
           </Container>
         </Menu>
-      }
+      )}
     </>
   );
 };
