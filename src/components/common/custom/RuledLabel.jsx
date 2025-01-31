@@ -1,5 +1,5 @@
 import { Flex } from '@/components/common/custom';
-import { COLORS, ICONS } from "@/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { Popup, Icon as SIcon, Label as SLabel } from "semantic-ui-react";
 import styled from "styled-components";
 

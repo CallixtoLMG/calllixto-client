@@ -1,4 +1,4 @@
-import { ENTITIES } from "./constants";
+import { ENTITIES } from "./common/constants";
 
 export const PATHS = {
   BUDGETS: ENTITIES.BUDGETS,

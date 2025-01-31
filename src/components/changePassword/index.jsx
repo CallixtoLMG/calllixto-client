@@ -2,7 +2,7 @@ import { confirmReset, recoverPassword } from "@/api/login";
 import { getUserData } from "@/api/userData";
 import { GoBackButton } from "@/components/common/buttons";
 import { Loader } from "@/components/layout";
-import { COLORS, ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/constants";
+import { COLORS, ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";

@@ -2,11 +2,12 @@ import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn } from "@/components/common/custom";
 import { TextField } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
-import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/constants";
-import { formatedSimplePhone, now } from "@/utils";
+import { COLORS, ICONS, PICK_UP_IN_STORE } from "@/common/constants";
+import { formatedSimplePhone } from "@/common/utils";
 import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ButtonGroup, Form, Modal, Transition } from "semantic-ui-react";
+import { now } from "@/common/utils/dates";
 
 const ModalConfirmation = ({
   isModalOpen,

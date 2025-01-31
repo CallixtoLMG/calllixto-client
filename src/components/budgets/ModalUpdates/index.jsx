@@ -1,7 +1,7 @@
 import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer } from "@/components/common/custom";
-import { COLORS, ICONS } from "@/constants";
-import { formatedPrice } from "@/utils";
+import { COLORS, ICONS } from "@/common/constants";
+import { formatedPrice } from "@/common/utils";
 import { useMemo } from "react";
 import { Message, Modal, Transition } from "semantic-ui-react";
 import { MessageHeader, MessageItem } from "./styles";

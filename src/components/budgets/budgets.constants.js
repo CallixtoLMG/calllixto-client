@@ -1,0 +1,159 @@
+import { Box, Flex } from "@/components/common/custom";
+import { DATE_FORMATS } from "@/common/constants";
+import { getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "@/common/utils";
+import { Label, Popup } from "semantic-ui-react";
+import { CommentTooltip } from "../common/tooltips";
+import { PriceLabel } from "../common/form";
+import { getFormatedDate } from "@/common/utils/dates";
+import { getLabelColor, getPopupContent } from "./budgets.utils";
+
+export const ATTRIBUTES = {
+  ID: "id",
+  CUSTOMER: "customer",
+  CREATED_AT: "createdAt",
+  UPDATED_AT: "updatedAt",
+  CONFIRMED: "confirmed",
+  SELLER: "seller",
+  PRODUCTS: "products",
+  DISCOUNT: "globalDiscount",
+  STATE: "state",
+  ADDITIONAL_CHARGE: "additionalCharge",
+  PAYMENT_METHODS: "paymentMethods",
+  PAYMENTS_MADE: "paymentsMade",
+  EXPIRATION_OFF_SET_DAYS: "expirationOffsetDays",
+  PICKUP_IN_STORE: "pickUpInStore",
+  TOTAL: "total",
+  CONFIRMED_AT: "confirmedAt",
+  CONFIRMED_BY: "confirmedBy",
+  CANCELLED_AT: "cancelledAt",
+  CANCELLED_BY: "cancelledBy",
+  COMMENTS: "comments"
+};
+
+export const BUDGET_STATES = {
+  CONFIRMED: {
+    id: 'CONFIRMED',
+    title: 'Confirmados',
+    singularTitle: 'Confirmado',
+    color: 'green',
+    icon: 'check',
+  },
+  PENDING: {
+    id: 'PENDING',
+    title: 'Pendientes',
+    singularTitle: 'Pendiente',
+    color: 'orange',
+    icon: 'hourglass half',
+  },
+  DRAFT: {
+    id: 'DRAFT',
+    title: 'Borradores',
+    singularTitle: 'Borrador',
+    color: 'teal',
+    icon: 'erase',
+  },
+  CANCELLED: {
+    id: 'CANCELLED',
+    title: 'Anulados',
+    singularTitle: 'Anulado',
+    color: 'red',
+    icon: 'ban',
+  },
+  EXPIRED: {
+    id: 'EXPIRED',
+    title: 'Expirados',
+    singularTitle: 'Expirado',
+    color: 'brown',
+    icon: 'expired',
+  },
+};
+
+export const BUDGETS_COLUMNS = [
+  {
+    id: 1,
+    title: "Id",
+    width: 1,
+    align: "left",
+    value: (budget) => (
+      <Box width="60px">
+        {isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state) ? (
+          <Popup
+            trigger={
+              <Label ribbon color={getLabelColor(budget)}>
+                {budget.id}
+              </Label>
+            }
+            content={getPopupContent(budget)}
+            position="right center"
+            size="mini"
+          />
+        ) : (
+          <Label ribbon color={getLabelColor(budget)}>
+            {budget.id}
+          </Label>
+        )}
+      </Box>
+    )
+  },
+  {
+    id: 2,
+    title: "Cliente",
+    align: "left",
+    value: (budget) => (
+      <Flex justifyContent="space-between">
+        {budget.customer.name}
+        {budget.comments && <CommentTooltip comment={budget.comments} />}
+      </Flex>
+    )
+  },
+  {
+    id: 3,
+    title: "Fecha",
+    width: 3,
+    value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)
+  },
+  {
+    id: 4,
+    title: "Total",
+    width: 2,
+    value: (budget) => (
+      <PriceLabel value={getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)} />
+    )
+  },
+  {
+    id: 5,
+    title: "Vendedor",
+    align: "left",
+    value: (budget) => budget.seller
+  },
+];
+
+export const PAYMENT_METHODS = [
+  { key: 'efectivo', text: 'Efectivo', value: 'Efectivo' },
+  { key: 'transferencia', text: 'Transferencia Bancaria', value: 'Transferencia Bancaria' },
+  { key: 'debito', text: 'Tarjeta de Débito', value: 'Tarjeta de Débito' },
+  { key: 'credito', text: 'Tarjeta de Crédito', value: 'Tarjeta de Crédito' },
+  { key: 'mercado_pago', text: 'Mercado Pago', value: 'Mercado Pago' },
+  { key: 'dolares', text: 'Dólares', value: 'Dólares' }
+];
+
+export const PAYMENT_TABLE_HEADERS = [
+  {
+    id: 'date',
+    title: 'Fecha de Pago',
+    value: (element) =>
+      element.date
+        ? getFormatedDate(element.date)
+        : "-",
+    width: 2
+  },
+  { id: 'method', width: 4, title: 'Método', value: (element) => element.method },
+  { id: 'amount', width: 3, title: 'Monto', value: (element) => <PriceLabel value={element.amount} /> },
+  { id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) => element.comments },
+];
+
+export const BUDGET_PDF_FORMAT = {
+  DISPATCH: "dispatch",
+  CLIENT: "client",
+  INTERNAL: "internal",
+};

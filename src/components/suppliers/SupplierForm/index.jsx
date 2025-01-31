@@ -1,9 +1,9 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Form } from "@/components/common/custom";
 import { ContactControlled, ContactView, TextAreaControlled, TextControlled } from "@/components/common/form";
-import { RULES, SHORTKEYS } from "@/constants";
+import { RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { preventSend } from "@/utils";
+import { preventSend } from "@/common/utils";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_SUPPLIER } from "../suppliers.common";
 

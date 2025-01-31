@@ -22,11 +22,11 @@ import {
   useNavActionsContext,
 } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
-import { COLORS, ICONS, PAGES } from "@/constants";
+import { COLORS, ICONS, PAGES } from "@/common/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { downloadExcel, formatedPrice, isItemInactive } from "@/utils";
+import { downloadExcel, formatedPrice, isItemInactive } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

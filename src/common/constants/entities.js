@@ -1,0 +1,14 @@
+export const ENTITIES = {
+  CUSTOMERS: 'customers',
+  CUSTOMER: 'customer',
+  SUPPLIERS: 'suppliers',
+  SUPPLIER: 'supplier',
+  BRANDS: 'brands',
+  BRAND: 'brand',
+  PRODUCTS: 'products',
+  PRODUCT: 'product',
+  BUDGETS: 'budgets',
+  BUDGET: 'budget',
+  EVENTS: 'events',
+  USERS: 'users'
+};

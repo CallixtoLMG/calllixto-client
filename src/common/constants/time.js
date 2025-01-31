@@ -1,0 +1,12 @@
+export const IN_MS = {
+  THREE_SECONDS: 3000,
+  ONE_MINUTE: 60000,
+  FIVE_MINUTES: 300000,
+  ONE_HOUR: 3600000,
+  FOUR_HOURS: 14400000,
+  ONE_DAY: 86400000,
+};
+
+export const IN_DAYS = {
+  ONE_YEAR: 365,
+};

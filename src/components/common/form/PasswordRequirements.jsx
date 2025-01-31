@@ -1,4 +1,4 @@
-import { COLORS, ICONS } from "@/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { MessageText } from "../../changePassword/styled";
 import { Flex, FlexColumn, Icon } from "../custom";
 

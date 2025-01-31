@@ -1,4 +1,4 @@
-import { COLORS, ICONS } from '@/constants';
+import { COLORS, ICONS } from '@/common/constants';
 import { useState } from 'react';
 import { List, Modal, Popup, Transition } from 'semantic-ui-react';
 import { IconedButton } from '../../buttons';

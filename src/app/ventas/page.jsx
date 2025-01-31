@@ -1,13 +1,15 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
+import { getFormatedDate } from "@/common/utils/dates";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { BUDGET_STATES, COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
-import { downloadExcel, formatedDateAndHour, getTotal, getTotalSum, handleNaN, handleUndefined } from "@/utils";
+import { downloadExcel, getTotal, getTotalSum, handleNaN, handleUndefined } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
+import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
 
 const Budgets = () => {
   useValidateToken();
@@ -42,7 +44,7 @@ const Budgets = () => {
         handleUndefined(budget.id),
         handleUndefined(translatedState),
         handleUndefined(budget.customer.name),
-        handleUndefined(formatedDateAndHour(budget.createdAt)),
+        handleUndefined(getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)),
         handleNaN(getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)),
         `% ${budget.globalDiscount ?? 0}`,
         `% ${budget.additionalCharge ?? 0}`,

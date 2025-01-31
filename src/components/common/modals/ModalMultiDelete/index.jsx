@@ -1,6 +1,6 @@
 import { ButtonsContainer } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
-import { COLORS, ICONS } from "@/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Header, Transition } from 'semantic-ui-react';

@@ -1,11 +1,11 @@
 import { useUserContext } from "@/User";
 import { editBanProducts, useGetBlackList } from "@/api/products";
 import { IconedButton } from "@/components/common/buttons";
-import { FieldsContainer, Flex, Form, FormField, Icon, Input, Label, Modal } from "@/components/common/custom";
+import { FieldsContainer, Flex, Form, FormField, Icon, Label, Modal } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
-import { COLORS, ICONS } from "@/constants";
-import { handleEnterKeyPress } from '@/utils';
+import { COLORS, ICONS } from "@/common/constants";
+import { handleEnterKeyPress } from '@/common/utils';
 import { useMutation } from "@tanstack/react-query";
 import { isEqual, sortBy } from 'lodash';
 import { useCallback, useEffect, useRef } from "react";
@@ -14,6 +14,7 @@ import { toast } from "react-hot-toast";
 import { Popup, Transition } from "semantic-ui-react";
 import { BAN_PRODUCTS_COLUMNS } from "../products.common";
 import { ModalActions } from "./styles";
+import { TextField } from "@/components/common/form";
 
 const BanProduct = ({ open, setOpen }) => {
   const { handleSubmit, setValue, watch } = useForm({ defaultValues: { products: [] } });
@@ -124,9 +125,7 @@ const BanProduct = ({ open, setOpen }) => {
                     trigger={<Icon margin="0 0 0 5px" name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />}
                   />
                 </Label>
-                <Input
-                  height="30px"
-                  type="text"
+                <TextField
                   placeholder="Código"
                   onKeyPress={(e) => handleEnterKeyPress(e, handleAddProduct)}
                 />

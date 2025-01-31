@@ -1,9 +1,9 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, Label } from "@/components/common/custom";
 import { DropdownField, PriceControlled, TextControlled, TextAreaControlled, DropdownControlled, IconedButtonControlled, TextField } from "@/components/common/form";
-import { COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted, preventSend } from "@/utils";
+import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted, preventSend } from "@/common/utils";
 import { useMemo } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";

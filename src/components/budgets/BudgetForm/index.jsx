@@ -1,4 +1,4 @@
-import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
+import { PAYMENT_METHODS } from "@/components/budgets/budgets.constants";
 import { IconedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Button, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/components/common/custom";
 import { PriceLabel, PriceControlled, TextAreaControlled, PercentControlled, NumberControlled } from "@/components/common/form";
@@ -8,9 +8,9 @@ import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
 import { ATTRIBUTES } from "@/components/products/products.common";
-import { BUDGET_STATES, COLORS, ICONS, PAGES, PICK_UP_IN_STORE, RULES, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, PAGES, PICK_UP_IN_STORE, RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from "@/utils";
+import { formatProductCodePopup, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from "@/common/utils";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
@@ -21,6 +21,8 @@ import ModalComment from "./ModalComment";
 import { Container, Icon, VerticalDivider } from "./styles";
 import { CUSTOMER_STATES } from "../../customers/customers.common";
 import { PRODUCT_STATES } from "@/components/products/products.common";
+import { getDateWithOffset } from "@/common/utils/dates";
+import { BUDGET_STATES } from '@/components/budgets/budgets.constants';
 
 const EMPTY_BUDGET = (user) => ({
   seller: user?.name,
@@ -532,7 +534,7 @@ const BudgetForm = ({
                 label="Fecha de vencimiento"
                 control={Input}
                 readOnly
-                value={formatedDateOnly(expirationDate(expiration ?? 0))}
+                value={getDateWithOffset(null, expiration, 'days')}
               />
             </FieldsContainer>
           </FieldsContainer>

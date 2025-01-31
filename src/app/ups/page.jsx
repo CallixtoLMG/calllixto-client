@@ -1,6 +1,6 @@
 "use client";
 import { IconedButton } from '@/components/common/buttons';
-import { COLORS, ICONS } from "@/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { useRouter } from 'next/navigation';
 import { Header, Icon } from 'semantic-ui-react';
 import { MainContainer } from "./styles";

@@ -2,10 +2,10 @@
 import { useListCustomers } from "@/api/customers";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
-import { downloadExcel, formatedSimplePhone } from "@/utils";
+import { downloadExcel, formatedSimplePhone } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { CUSTOMER_STATES } from "@/components/customers/customers.common";

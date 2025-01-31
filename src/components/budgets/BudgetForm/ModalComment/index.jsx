@@ -1,6 +1,6 @@
 import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Input, Label, Segment } from "@/components/common/custom";
-import { COLORS, ICONS } from "@/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";

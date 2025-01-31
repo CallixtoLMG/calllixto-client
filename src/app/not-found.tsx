@@ -1,5 +1,5 @@
 "use client";
-import { PAGES } from "@/constants";
+import { PAGES } from "@/common/constants";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from 'react';
 

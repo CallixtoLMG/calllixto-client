@@ -1,5 +1,5 @@
 import { FormField, Icon, Input } from "@/components/common/custom";
-import { ICONS } from "@/constants";
+import { ICONS } from "@/common/constants";
 
 export const PercentField = ({
   flex,

@@ -1,6 +1,6 @@
 import { Box } from "@/components/common/custom";
-import { COLORS, ICONS } from "@/constants";
-import { formatedSimplePhone } from "@/utils";
+import { COLORS, ICONS } from "@/common/constants";
+import { formatedSimplePhone } from "@/common/utils";
 import { Icon, List, ListItem, Popup } from "semantic-ui-react";
 
 export const PhonesTooltip = ({ phones }) => {

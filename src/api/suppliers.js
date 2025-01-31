@@ -1,8 +1,9 @@
 import { ATTRIBUTES } from "@/components/suppliers/suppliers.common";
-import { ACTIVE, ENTITIES, getDefaultListParams, ID, INACTIVE, TIME_IN_MS } from "@/constants";
+import { ACTIVE, ENTITIES, ID, INACTIVE, IN_MS } from "@/common/constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
+import { getDefaultListParams } from '@/common/utils';
 
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
@@ -26,7 +27,7 @@ export function useGetSupplier(id) {
     queryKey: [GET_SUPPLIER_QUERY_KEY, id],
     queryFn: () => getItemById({ id, url: PATHS.SUPPLIERS, entity: ENTITIES.SUPPLIERS }),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
+    staleTime: IN_MS.ONE_HOUR,
   });
 
   return query;

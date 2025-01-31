@@ -1,4 +1,4 @@
-import { COLORS } from '@/constants';
+import { COLORS } from '@/common/constants';
 import { Icon } from 'semantic-ui-react';
 import { Button } from '../custom';
 

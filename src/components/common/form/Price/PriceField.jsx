@@ -1,5 +1,5 @@
 import { FormField, Input } from "@/components/common/custom";
-import { formatedNumber } from "@/utils";
+import { formatedNumber } from "@/common/utils";
 import { Icon } from "semantic-ui-react";
 
 export const PriceField = ({ label, width, value, disabled = true, ...inputProps }) => {

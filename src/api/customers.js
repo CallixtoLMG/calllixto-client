@@ -1,8 +1,9 @@
 import { ATTRIBUTES } from "@/components/customers/customers.common";
-import { ACTIVE, ENTITIES, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
+import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
+import { getDefaultListParams } from '@/common/utils';
 
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
@@ -27,7 +28,7 @@ export function useGetCustomer(id) {
     queryKey: [GET_CUSTOMER_QUERY_KEY, id],
     queryFn: () => getItemById({ id, url: PATHS.CUSTOMERS, entity: ENTITIES.CUSTOMERS }),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
+    staleTime: IN_MS.ONE_HOUR,
   });
 
   return query;

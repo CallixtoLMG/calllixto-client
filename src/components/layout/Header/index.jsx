@@ -7,7 +7,7 @@ import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
 import { Flex } from '@/components/common/custom';
 import { KeyboardShortcuts } from "@/components/common/modals";
 import OptionsDropdown from "@/components/layout/OptionsHeader";
-import { COLORS, DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES } from "@/constants";
+import { COLORS, DEFAULT_SELECTED_CLIENT, ENTITIES, PAGES } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from 'next/navigation';

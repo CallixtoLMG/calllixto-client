@@ -1,4 +1,4 @@
-import { COLORS, ICONS } from "@/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { IconedButton } from "./";
 
 export const Restore = ({ isUpdating, isLoading, isDirty, onClick, disabled }) => {

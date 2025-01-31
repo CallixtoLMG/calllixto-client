@@ -1,4 +1,4 @@
-import { COLORS, ICONS } from '@/constants';
+import { COLORS, ICONS } from '@/common/constants';
 import { Icon, Popup } from 'semantic-ui-react';
 
 export const CommentTooltip = ({ comment }) => {

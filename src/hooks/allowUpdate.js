@@ -1,6 +1,6 @@
 import { IconedButton } from "@/components/common/buttons";
 import { Box } from "@/components/common/custom";
-import { ICONS } from "@/constants";
+import { ICONS } from "@/common/constants";
 import { useState } from "react";
 import { ButtonGroup } from "semantic-ui-react";
 

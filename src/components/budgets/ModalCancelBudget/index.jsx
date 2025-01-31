@@ -1,6 +1,6 @@
 import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer, Input } from "@/components/common/custom";
-import { COLORS, ICONS } from "@/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
 import { Message, ModalContent } from "./styles";

@@ -2,7 +2,7 @@ import { useEditCustomer } from "@/api/customers";
 import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer, FieldsContainer, Form } from "@/components/common/custom";
 import { NumberControlled, TextControlled, TextField } from "@/components/common/form";
-import { COLORS, ICONS, RULES } from "@/constants";
+import { COLORS, ICONS, RULES } from "@/common/constants";
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";

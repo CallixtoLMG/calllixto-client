@@ -1,4 +1,4 @@
-import { ICONS } from "@/constants";
+import { ICONS } from "@/common/constants";
 import { useState } from "react";
 import { Form } from "semantic-ui-react";
 

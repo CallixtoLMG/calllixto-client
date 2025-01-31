@@ -1,5 +1,5 @@
 import { Divider, Title } from '@/components/budgets/PDFfile/styles';
-import { renderContent } from '@/utils';
+import { renderContent } from '@/common/utils';
 import styled from 'styled-components';
 import { Flex, FlexColumn } from '../custom';
 

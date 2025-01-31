@@ -1,5 +1,5 @@
-import { COLORS } from "@/constants";
-import { formatProductCode } from "@/utils";
+import { COLORS } from "@/common/constants";
+import { formatProductCode } from "@/common/utils";
 import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { CommentTooltip } from "../tooltips";

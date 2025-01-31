@@ -1,5 +1,5 @@
-import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.common";
-import { COLORS, ICONS } from "@/constants";
+import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
+import { COLORS, ICONS } from "@/common/constants";
 import es from "date-fns/locale/es";
 import { useMemo, useState } from "react";
 import { registerLocale } from "react-datepicker";

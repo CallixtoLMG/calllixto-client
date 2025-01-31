@@ -1,8 +1,8 @@
-import { formatedSimplePhone, validateEmail, validatePhone } from "@/utils";
+import { formatedSimplePhone, validateEmail, validatePhone } from "@/common/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Form, Popup } from "semantic-ui-react";
-import { COLORS, ICONS } from "../../../../constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { IconedButton } from "../../buttons";
 import { Box, FieldsContainer, Flex, FormField, Input } from '../../custom';
 import { Table } from '../../table';

@@ -1,6 +1,6 @@
 "use client";
 import { confirmReset, recoverPassword } from "@/api/login";
-import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/constants";
+import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";

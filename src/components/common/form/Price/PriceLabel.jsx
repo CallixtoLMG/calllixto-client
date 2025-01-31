@@ -1,6 +1,6 @@
-import { ICONS } from "@/constants";
+import { ICONS } from "@/common/constants";
 import { Flex, Icon } from "../../custom";
-import { formatedNumber } from "@/utils";
+import { formatedNumber } from "@/common/utils";
 
 export const PriceLabel = ({ value }) => {
   return (

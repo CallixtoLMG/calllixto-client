@@ -4,11 +4,11 @@ import { useListBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { BRANDS_STATES } from "@/components/brands/brands.common";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { downloadExcel } from "@/utils";
+import { downloadExcel } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 

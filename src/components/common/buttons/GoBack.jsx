@@ -1,4 +1,4 @@
-import { COLORS, ICONS, SHORTKEYS } from "@/constants";
+import { COLORS, ICONS, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from 'next/navigation';
 import IconedButton from "./Iconed";

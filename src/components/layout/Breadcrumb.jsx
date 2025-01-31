@@ -1,4 +1,4 @@
-import { ICONS } from '@/constants';
+import { ICONS } from '@/common/constants';
 import { createContext, useContext, useState } from 'react';
 import { BreadcrumbDivider, BreadcrumbSection, Breadcrumb as SBreadcrumb, Label as SLabel } from 'semantic-ui-react';
 import styled from "styled-components";

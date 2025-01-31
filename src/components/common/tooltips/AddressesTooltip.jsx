@@ -1,5 +1,5 @@
 import { Box } from "@/components/common/custom";
-import { COLORS, ICONS } from "@/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { Icon, List, ListItem, Popup } from "semantic-ui-react";
 
 export const AddressesTooltip = ({ addresses }) => {

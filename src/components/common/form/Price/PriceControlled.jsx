@@ -1,5 +1,5 @@
 import { FormField, Input } from "@/components/common/custom";
-import { ICONS } from "@/constants";
+import { ICONS } from "@/common/constants";
 import { Controller, useFormContext } from "react-hook-form";
 import { Icon } from "semantic-ui-react";
 

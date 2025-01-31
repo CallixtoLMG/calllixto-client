@@ -1,4 +1,8 @@
-import { encodeUri } from "@/utils";
+import { encodeUri } from "@/common/utils";
+
+export * from './time';
+export * from './dates';
+export * from './entities';
 
 export const PAGES = {
   BASE: "/",
@@ -56,7 +60,7 @@ export const PAGES = {
   },
 };
 
-export const APIS = {
+export const EXTERNAL_APIS = {
   MAIL: (email, name) => `mailto:${email}?Subject=${encodeUri(`Hola estimado/a ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
   WSP: (phone, name) => `https://api.whatsapp.com/send?phone=${phone}&text=${encodeUri(`Hola estimado ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
 };
@@ -94,139 +98,11 @@ export const RULES = {
       return true;
     }
   }),
-  REQUIRED_THREE_NUMBERS: {
-    required: 'Campo requerido.',
-    pattern: { value: REGEX.THREE_NUMBERS_CODE, message: 'El valor puede ser hasta un máximo de 3 números' }
-  },
-  PHONE: {
-    AREA_CODE: {
-      minLength: { value: 3, message: 'El código de área debe tener 3 o 4 cifras' },
-      maxLength: { value: 4, message: 'El código de área debe tener 3 o 4 cifras' },
-    },
-    AREA_CODE_REQUIRED: {
-      required: 'Campo requerido.',
-      minLength: { value: 3, message: 'El código de área debe tener 3 o 4 cifras' },
-      maxLength: { value: 4, message: 'El código de área debe tener 3 o 4 cifras' },
-    },
-    NUMBER: {
-      minLength: { value: 6, message: 'El número completo debe tener 10 cifras' },
-      maxLength: { value: 7, message: 'El número completo debe tener 10 cifras' },
-    },
-    NUMBER_REQUIRED: {
-      required: 'Campo requerido.',
-      minLength: { value: 6, message: 'El número completo debe tener 10 cifras' },
-      maxLength: { value: 7, message: 'El número completo debe tener 10 cifras' },
-    }
-  },
-  EMAIL: {
-    pattern: { value: REGEX.EMAIL, message: 'El email no es válido' }
-  },
-  REQUIRED_PRICE: {
-    required: 'Campo requerido.',
-    min: { value: 0.01, message: 'El precio debe ser mayor a 0' }
-  },
-  REQUIRED_POSITIVE: {
-    required: 'Campo requerido.',
-    min: { value: 1, message: 'El campo debe ser mayor a 0' }
-  },
-  REQUIRED_FOR_PASSWORD: {
-    required: "La nueva contraseña es obligatoria",
-    validate: (value) => {
-      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-      return (
-        regex.test(value) ||
-        "La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una minúscula, un número y un carácter especial."
-      );
-    }
-  }
-};
-
-export const TIME_IN_MS = {
-  THREE_SECONDS: 3000,
-  ONE_MINUTE: 60000,
-  FIVE_MINUTES: 300000,
-  ONE_HOUR: 3600000,
-  FOUR_HOURS: 14400000,
-  ONE_DAY: 86400000,
-};
-
-export const TIME_IN_DAYS = {
-  YEAR: '365',
 };
 
 export const DEFAULT_PAGE_SIZE = 20;
 
-export const getDefaultListParams = (attributes, sort, order) => {
-  const params = {
-    attributes: encodeUri(Object.values(attributes)),
-  };
-
-  if (sort) params.sort = sort;
-  if (typeof order !== 'undefined') params.order = order;
-
-  return params;
-};
-
-export const ENTITIES = {
-  CUSTOMERS: 'customers',
-  CUSTOMER: 'customer',
-  SUPPLIERS: 'suppliers',
-  SUPPLIER: 'supplier',
-  BRANDS: 'brands',
-  BRAND: 'brand',
-  PRODUCTS: 'products',
-  PRODUCT: 'product',
-  BUDGETS: 'budgets',
-  BUDGET: 'budget',
-  EVENTS: 'events',
-  USERS: 'users'
-};
-
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
-
-export const BUDGET_PDF_FORMAT = {
-  DISPATCH: "dispatch",
-  CLIENT: "client",
-  INTERNAL: "internal",
-};
-
-export const BUDGET_STATES = {
-  CONFIRMED: {
-    id: 'CONFIRMED',
-    title: 'Confirmados',
-    singularTitle: 'Confirmado',
-    color: 'green',
-    icon: 'check',
-  },
-  PENDING: {
-    id: 'PENDING',
-    title: 'Pendientes',
-    singularTitle: 'Pendiente',
-    color: 'orange',
-    icon: 'hourglass half',
-  },
-  DRAFT: {
-    id: 'DRAFT',
-    title: 'Borradores',
-    singularTitle: 'Borrador',
-    color: 'teal',
-    icon: 'erase',
-  },
-  CANCELLED: {
-    id: 'CANCELLED',
-    title: 'Anulados',
-    singularTitle: 'Anulado',
-    color: 'red',
-    icon: 'ban',
-  },
-  EXPIRED: {
-    id: 'EXPIRED',
-    title: 'Expirados',
-    singularTitle: 'Expirado',
-    color: 'brown',
-    icon: 'expired',
-  },
-};
 
 export const SHORTKEYS = {
   ENTER: "Control+Enter",

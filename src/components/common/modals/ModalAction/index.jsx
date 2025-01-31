@@ -1,6 +1,6 @@
 import { ButtonsContainer } from "@/components/common/custom";
-import { COLORS, ICONS } from "@/constants";
-import { handleKeyPressWithSubmit } from "@/utils";
+import { COLORS, ICONS } from "@/common/constants";
+import { handleKeyPressWithSubmit } from "@/common/utils";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { Header, Modal, Transition } from 'semantic-ui-react';

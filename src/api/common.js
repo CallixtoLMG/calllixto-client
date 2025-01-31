@@ -1,10 +1,10 @@
 import { config } from "@/config";
-import { ALL, DEFAULT_LAST_EVENT_ID, ENTITIES, EVENT_KEYS, ID } from "@/constants";
+import { ALL, DEFAULT_LAST_EVENT_ID, ENTITIES, EVENT_KEYS, ID } from "@/common/constants";
 import { EVENTS, PATHS } from "@/fetchUrls";
-import { now } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import localforage from "./local-forage";
+import { now } from "@/common/utils/dates";
 
 export function removeStorageEntity(entity) {
   return localforage.removeItem(`${config.APP_ENV}-${entity}`);

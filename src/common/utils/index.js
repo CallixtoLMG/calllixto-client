@@ -1,31 +1,8 @@
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
-import { BUDGET_STATES, REGEX } from "./constants";
+import { REGEX } from "../constants";
 import { PRODUCT_STATES } from "@/components/products/products.common";
-
-dayjs.extend(utc)
-dayjs.extend(timezone)
-
-export const now = () => {
-  const date = dayjs().tz(dayjs.tz.guess()).toISOString();
-  return date;
-};
-
-export const getDateWithOffset = (date, offset, unit) => {
-  return dayjs(date).add(offset, unit).format('YYYY-MM-DD');
-};
-
-export const expirationDate = (expirationOffsetDays, createdAt = dayjs().format()) => {
-  const dateCreated = dayjs(createdAt);
-  const dueDate = dateCreated.add(expirationOffsetDays, 'day');
-  return dueDate.format('YYYY-MM-DDTHH:mm:ss.SSSZ');
-};
-
-export const formatedDateAndHour = (date) => dayjs(date).format('DD-MM-YYYY - hh:mm A');
-export const formatedDateOnly = (date) => dayjs(date).format('DD-MM-YYYY');
+import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
 
 export const formatedPrice = (number) => {
   return Number(number).toLocaleString('es-AR', {
@@ -33,6 +10,7 @@ export const formatedPrice = (number) => {
     currency: 'ARS',
   });
 };
+
 export const formatedNumber = (number) => {
   return Number(number).toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
 };
@@ -246,4 +224,15 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
 
     return true;
   };
+};
+
+export const getDefaultListParams = (attributes, sort, order) => {
+  const params = {
+    attributes: encodeUri(Object.values(attributes)),
+  };
+
+  if (sort) params.sort = sort;
+  if (typeof order !== 'undefined') params.order = order;
+
+  return params;
 };

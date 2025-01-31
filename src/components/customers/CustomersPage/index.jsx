@@ -1,7 +1,7 @@
 import { Filters, Table } from '@/components/common/table';
-import { PAGES } from "@/constants";
+import { PAGES } from "@/common/constants";
 import { useFilters } from '@/hooks/useFilters';
-import { createFilter } from '@/utils';
+import { createFilter } from '@/common/utils';
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
 import { CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS } from "../customers.common";

@@ -1,5 +1,5 @@
 import { Flex } from '@/components/common/custom';
-import { COLORS, ICONS } from "@/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { useFormContext } from 'react-hook-form';
 import { Button, Icon, Popup, Segment as SSegment } from 'semantic-ui-react';
 import styled from 'styled-components';

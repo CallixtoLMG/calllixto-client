@@ -2,7 +2,7 @@
 import { UserProvider } from "@/User";
 import { GoBackButton } from "@/components/common/buttons";
 import { BreadcrumProvider, Breadcrumb, Header, NavActions, NavActionsProvider, Toaster } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { PAGES } from "@/common/constants";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Inter } from 'next/font/google';
 import { usePathname } from "next/navigation";

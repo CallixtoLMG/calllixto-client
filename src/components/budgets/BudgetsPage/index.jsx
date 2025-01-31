@@ -1,12 +1,12 @@
 import { Dropdown, Flex, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
-import { ALL, BUDGET_STATES, COLORS, ICONS, PAGES } from "@/constants";
+import { ALL, COLORS, ICONS, PAGES } from "@/common/constants";
 import { useFilters } from "@/hooks/useFilters";
-import { createFilter } from '@/utils';
+import { createFilter } from '@/common/utils';
 import { useRouter } from "next/navigation";
 import { Controller, FormProvider } from 'react-hook-form';
 import { Form, Label } from 'semantic-ui-react';
-import { BUDGETS_COLUMNS } from "../budgets.common";
+import { BUDGET_STATES, BUDGETS_COLUMNS } from "../budgets.constants";
 
 const DEFAULT_STATE = { key: ALL, value: ALL, text: 'Todos' };
 const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: DEFAULT_STATE.value };

@@ -1,4 +1,4 @@
-import { formatedPercentage } from '@/utils';
+import { formatedPercentage } from '@/common/utils';
 import { TotalList } from './';
 import { PercentField, PriceLabel } from '../form';
 import styled from 'styled-components';

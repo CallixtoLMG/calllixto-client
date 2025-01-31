@@ -2,7 +2,7 @@
 import { useCreateBrand } from "@/api/brands";
 import BrandForm from "@/components/brands/BrandForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { PAGES } from "@/constants";
+import { PAGES } from "@/common/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
