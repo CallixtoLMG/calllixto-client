@@ -2,7 +2,8 @@ import { COLORS, ICONS } from '@/common/constants';
 import { useState } from 'react';
 import { List, Modal, Popup, Transition } from 'semantic-ui-react';
 import { IconedButton } from '../../buttons';
-import { HelpIcon, StyledListContent, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader } from "./styles";
+import { StyledListContent, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader } from "./styles";
+import { Icon } from '../../custom';
 
 const KeyboardShortcuts = () => {
   const [open, setOpen] = useState(false);
@@ -11,7 +12,7 @@ const KeyboardShortcuts = () => {
     <>
       <Popup
         content='Accesos rápidos'
-        trigger={<HelpIcon size='large' name={ICONS.KEYBOARD} color={COLORS.BLUE} onClick={() => setOpen(true)} />}
+        trigger={<Icon margin="0" pointer size='large' name={ICONS.KEYBOARD} color={COLORS.BLUE} onClick={() => setOpen(true)} />}
         position='bottom right'
         size='tiny'
       />
