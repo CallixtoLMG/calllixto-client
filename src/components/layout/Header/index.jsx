@@ -1,13 +1,13 @@
 import { useUserContext } from "@/User";
-import { Dropdown, Flex, Icon } from "@/components/common/custom";
+import { Flex, Icon } from "@/components/common/custom";
 import { KeyboardShortcuts } from "@/components/common/modals";
-import { COLORS, DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/constants";
+import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
 import { Button, Label, Menu } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
 import { Container, LeftHeaderDiv, ModLink, RigthHeaderDiv, Text } from "./styles";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 
 const Header = () => {
   const pathname = usePathname();
@@ -22,10 +22,6 @@ const Header = () => {
 
   const handleLogout = () => {
     push(PAGES.LOGIN.BASE);
-  };
-
-  const handleUserManagement = () => {
-    push(PAGES.CHANGE_PASSWORD.BASE);
   };
 
   const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE];
@@ -92,28 +88,6 @@ const Header = () => {
                       userData={userData}
                     />
                   </RigthHeaderDiv>
-                  <Dropdown
-                    text={(
-                      <>
-                        <Icon color={COLORS.GREY} name="user" />
-                        {`${userData.name}` || 'Usuario'}
-                      </>
-                    )}
-                    pointing="top right"
-                    className="link item"
-                  >
-                    <Dropdown.Menu>
-                      <Dropdown.Item onClick={handleLogout}>
-                        <Icon color={COLORS.RED} name="log out" />
-                        Cerrar sesión
-                      </Dropdown.Item>
-                      {RULES.canUpdate[role] &&
-                        <Dropdown.Item onClick={handleUserManagement}>
-                          <Icon color={COLORS.ORANGE} name="settings" />
-                          Cambiar contraseña
-                        </Dropdown.Item>}
-                    </Dropdown.Menu>
-                  </Dropdown>
                 </Flex>
               </>
             )}

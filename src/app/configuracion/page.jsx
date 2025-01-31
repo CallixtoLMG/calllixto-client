@@ -7,10 +7,10 @@ import SettingsTabs from "@/components/settings";
 import { PAGES } from "@/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
+import { pick } from "lodash";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { pick } from "lodash";
 
 const ENTITY_MAPPER = {
   PRODUCT: {
@@ -37,7 +37,7 @@ const ENTITY_MAPPER = {
 };
 
 export const SUPPORTED_SETTINGS = {
-  PRODUCT: ['tags', 'blacklist'],
+  PRODUCT: ['tags'],
   CUSTOMER: ['tags'],
   EXPENSE: ['tags', 'categories'],
 }
@@ -48,9 +48,9 @@ const Settings = () => {
   const { setActions } = useNavActionsContext();
   const { data } = useListSettings();
   const editSetting = useEditSetting();
-  const [activeEntity, setActiveEntity] = useState();
+  const [activeEntity, setActiveEntity] = useState({entity:"CUSTOMER", label: "Cliente"});
   const methods = useForm();
-  const { handleSubmit, reset } = methods;
+  const { handleSubmit, reset, formState: {isDirty}  } = methods;
 
   useEffect(() => {
     setActions([]);
@@ -74,9 +74,11 @@ const Settings = () => {
   });
 
   const handleEntityChange = useCallback((entity) => {
+    console.log(entity)
     setActiveEntity(entity);
     setLabels([PAGES.SETTINGS.NAME, entity.label]);
     reset(entity);
+   
   }, [reset, setLabels]);
 
   const settings = useMemo(() => {
@@ -87,7 +89,7 @@ const Settings = () => {
         ...entity,
         label: ENTITY_MAPPER[entity.entity].name
       }));
-    handleEntityChange(mappedEntities[0]);
+    // handleEntityChange(activeEntity);
     return mappedEntities;
   }, [data, handleEntityChange]);
 
@@ -98,12 +100,13 @@ const Settings = () => {
           activeEntity={activeEntity}
           onEntityChange={handleEntityChange}
           settings={settings}
+          isDirty={isDirty}
         />
         <SubmitAndRestore
-          isUpdating={true}
-          isLoading={false}
-          onReset={() => {}}
-          isDirty={true}
+          isLoading={isPending}
+          onReset={() => reset(data[activeEntity])}  // Resetear a los valores iniciales
+          isDirty={isDirty}
+          text="Actualizar"
         />
       </Form>
     </FormProvider>

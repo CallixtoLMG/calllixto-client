@@ -2,15 +2,16 @@ import { IconnedButton } from "@/components/common/buttons";
 import { Flex, FlexColumn } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { COLORS, ICONS, SEMANTIC_COLORS } from "@/constants";
-import {  useFieldArray } from "react-hook-form";
+import { useState } from "react";
+import { useFieldArray } from "react-hook-form";
 import { Accordion, Icon, Label, Segment } from "semantic-ui-react";
 import { FormInput, FormSelect } from "./styles";
-import { useState } from "react";
 
-const TagsModule = () => {
-  const [tagToAdd, setTagToAdd] = useState({ name: "", color: "", description: "" });
-  const { fields: tags, append, remove } = useFieldArray({
-    name: "tags"
+const Categories = () => {
+  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+  const [categoryToAdd, setCategoryToAdd] = useState({ name: "", color: "", description: "" });
+  const { fields: categories, append, remove } = useFieldArray({
+    name: "categories"
   });
 
   const headers = [
@@ -19,13 +20,13 @@ const TagsModule = () => {
       title: "Etiqueta",
       align: "left",
       width: 5,
-      value: (tag) => <Label color={tag.color}>{tag.name}</Label>,
+      value: (category) => <Label color={category.color}>{category.name}</Label>,
     },
     {
       id: "description",
       title: "Descripción",
       align: "left",
-      value: (tag) => <span>{tag.description}</span>,
+      value: (category) => <span>{category.description}</span>,
     },
   ];
 
@@ -34,46 +35,49 @@ const TagsModule = () => {
       id: "delete",
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      onClick: (tag, index) => remove(index),
+      onClick: (category, index) => remove(index),
       tooltip: "Eliminar",
     },
   ];
 
+  const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
+
+
   return (
     <Accordion fluid>
-      <Accordion.Title active={true} onClick={() => {}}>
+      <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
         <Icon name="dropdown" />
-        Etiquetas
+        Categorias
       </Accordion.Title>
-      <Accordion.Content active={true}>
+      <Accordion.Content active={isAccordionOpen}>
         <Segment>
           <Flex width="100%" paddingTop="20px" alignItems="flex-start" columnGap="15px">
             <FormInput
               width={4}
               label="Nombre"
               placeholder="Nombre de la etiqueta"
-              value={tagToAdd.name}
-              onChange={(e) => setTagToAdd({ ...tagToAdd, name: e.target.value })}
+              value={categoryToAdd.name}
+              onChange={(e) => setCategoryToAdd({ ...categoryToAdd, name: e.target.value })}
             />
             <FormSelect
               width={3}
               label="Color"
               options={SEMANTIC_COLORS}
-              value={tagToAdd.color}
-              onChange={(e, { value }) => setTagToAdd({ ...tagToAdd, color: value })}
+              value={categoryToAdd.color}
+              onChange={(e, { value }) => setCategoryToAdd({ ...categoryToAdd, color: value })}
             />
             <FormInput
               width={8}
               label="Descripción"
               placeholder="Descripción"
-              value={tagToAdd.description}
-              onChange={(e) => setTagToAdd({ ...tagToAdd, description: e.target.value })}
+              value={categoryToAdd.description}
+              onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
             />
             <IconnedButton
               text="Agregar"
               icon={ICONS.ADD}
               color={COLORS.GREEN}
-              onClick={() => append(tagToAdd)}
+              onClick={() => append(categoryToAdd)}
               height="38px"
             />
           </Flex>
@@ -81,7 +85,7 @@ const TagsModule = () => {
             <Table
               isLoading={false}
               headers={headers}
-              elements={tags}
+              elements={categories}
               mainKey="name"
               paginate={false}
               actions={actions}
@@ -95,4 +99,4 @@ const TagsModule = () => {
   );
 };
 
-export default TagsModule;
+export default Categories;

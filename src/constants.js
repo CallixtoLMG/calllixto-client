@@ -404,19 +404,19 @@ export const ICONS = {
 };
 
 export const SEMANTIC_COLORS = [
-  { key: "red", text: "Rojo", value: "red" },
-  { key: "orange", text: "Naranja", value: "orange" },
   { key: "yellow", text: "Amarillo", value: "yellow" },
-  { key: "olive", text: "Oliva", value: "olive" },
-  { key: "green", text: "Verde", value: "green" },
-  { key: "teal", text: "Turquesa", value: "teal" },
   { key: "blue", text: "Azul", value: "blue" },
-  { key: "violet", text: "Violeta", value: "violet" },
-  { key: "purple", text: "Púrpura", value: "purple" },
-  { key: "pink", text: "Rosa", value: "pink" },
   { key: "brown", text: "Marrón", value: "brown" },
   { key: "grey", text: "Gris", value: "grey" },
   { key: "black", text: "Negro", value: "black" },
+  { key: "olive", text: "Oliva", value: "olive" },
+  { key: "orange", text: "Naranja", value: "orange" },
+  { key: "pink", text: "Rosa", value: "pink" },
+  { key: "purple", text: "Púrpura", value: "purple" },
+  { key: "red", text: "Rojo", value: "red" },
+  { key: "green", text: "Verde", value: "green" },
+  { key: "teal", text: "Turquesa", value: "teal" },
+  { key: "violet", text: "Violeta", value: "violet" },
 ];
 
 export const PAGE_SIZE_OPTIONS = [
