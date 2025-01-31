@@ -1,4 +1,4 @@
-import { TIME_IN_MS } from "@/constants";
+import { IN_MS } from "@/common/constants";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -15,7 +15,7 @@ export function useDolarExangeRate({ enabled = false } = {}) {
   const query = useQuery({
     queryKey: ['dolar'],
     queryFn: () => getDolarExangeRate(),
-    staleTime: TIME_IN_MS.FIVE_MINUTES,
+    staleTime: IN_MS.FIVE_MINUTES,
     enabled,
   });
 

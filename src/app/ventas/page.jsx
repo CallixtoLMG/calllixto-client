@@ -1,13 +1,17 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
+import { getFormatedDate } from "@/common/utils/dates";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { BUDGET_STATES, COLORS, ICONS, PAGES, SHORTKEYS } from "@/constants";
+import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
-import { downloadExcel, formatedDateAndHour, getTotal, getTotalSum, handleNaN, handleUndefined } from "@/utils";
+import { downloadExcel, handleUndefined } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
+import { BUDGET_STATE_TRANSLATIONS } from "@/components/budgets/budgets.constants";
+import { getTotal } from "@/components/products/products.utils";
+import { getTotalSum } from "@/components/budgets/budgets.utils";
 
 const Budgets = () => {
   useValidateToken();
@@ -24,26 +28,19 @@ const Budgets = () => {
   const budgets = useMemo(() => data?.budgets, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const stateTranslations = useMemo(() => ({
-    CONFIRMED: BUDGET_STATES.CONFIRMED,
-    PENDING: BUDGET_STATES.PENDING,
-    EXPIRED: BUDGET_STATES.EXPIRED,
-    CANCELLED: BUDGET_STATES.CANCELLED,
-    DRAFT: BUDGET_STATES.DRAFT
-  }), []);
 
   const handleDownloadExcel = useCallback(() => {
     if (!budgets) return;
     let maxProductCount = 1;
     const mappedBudgets = budgets.map(budget => {
-      const translatedState = stateTranslations[budget.state].singularTitle || "";
+      const translatedState = BUDGET_STATE_TRANSLATIONS[budget.state].singularTitle || "";
       maxProductCount = Math.max(maxProductCount, budget.products?.length);
       const budgetRow = [
         handleUndefined(budget.id),
         handleUndefined(translatedState),
         handleUndefined(budget.customer.name),
-        handleUndefined(formatedDateAndHour(budget.createdAt)),
-        handleNaN(getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)),
+        handleUndefined(getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)),
+        getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge),
         `% ${budget.globalDiscount ?? 0}`,
         `% ${budget.additionalCharge ?? 0}`,
         handleUndefined(budget.seller)
@@ -54,7 +51,7 @@ const Budgets = () => {
         if (product.fractionConfig?.active) {
           productName = `${product.name} x ${product.fractionConfig.value} ${product.fractionConfig.unit}`;
         }
-        return `Código: ${handleUndefined(product.code)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${handleNaN(product.price)}, Descuento: % ${product.discount ?? 0}, Total: ${handleNaN(getTotal(product))};`;
+        return `Código: ${handleUndefined(product.code)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${product.price ?? 0}, Descuento: % ${product.discount ?? 0}, Total: ${getTotal(product)};`;
       });
 
       while (productData.length < maxProductCount) {
@@ -67,7 +64,7 @@ const Budgets = () => {
     const productsHeaders = Array.from(Array(maxProductCount).keys()).map((index) => `Producto ${index + 1}`);
     const headers = ['ID', 'Estado', 'Cliente', 'Fecha', "Total", "Descuento", "Cargo adicional", "Vendedor", ...productsHeaders];
     downloadExcel([headers, ...mappedBudgets], "Lista de Ventas");
-  }, [budgets, stateTranslations]);
+  }, [budgets]);
 
   useEffect(() => {
     const actions = [

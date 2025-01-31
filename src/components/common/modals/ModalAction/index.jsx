@@ -1,11 +1,12 @@
-import { ButtonsContainer, Input } from "@/components/common/custom";
-import { COLORS, ICONS } from "@/constants";
-import { handleKeyPressWithSubmit } from "@/utils";
+import { ButtonsContainer } from "@/components/common/custom";
+import { COLORS, ICONS } from "@/common/constants";
+import { handleKeyPressWithSubmit } from "@/common/utils";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { Header, Modal, Transition } from 'semantic-ui-react';
-import { IconnedButton } from "../../buttons";
+import { IconedButton } from "../../buttons";
 import { Form, Message, ModalContent } from "./styles";
+import { TextField } from "../../form";
 
 const ModalAction = ({
   title,
@@ -72,19 +73,17 @@ const ModalAction = ({
         <Modal.Actions>
           <Form onSubmit={handleSubmit(onConfirm)}>
             {!noConfirmation && !disableButtons && !requireReason && (
-              <Input
-                height="40px"
+              <TextField
+                ref={inputElement}
                 placeholder={placeholder}
-                type="text"
                 value={confirmationText}
                 onChange={handleConfirmationTextChange}
-                ref={inputElement}
-                width="230px"
                 tabIndex="0"
+                width="300px"
               />
             )}
             <ButtonsContainer>
-              <IconnedButton
+              <IconedButton
                 text="Cancelar"
                 icon={ICONS.TIMES}
                 height="40px"
@@ -92,7 +91,7 @@ const ModalAction = ({
                 onClick={() => setShowModal(false)}
                 disabled={isLoading}
               />
-              <IconnedButton
+              <IconedButton
                 text={confirmButtonText}
                 icon={ICONS.CHECK}
                 height="40px"

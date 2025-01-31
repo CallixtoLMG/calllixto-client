@@ -4,7 +4,7 @@ import { SubmitAndRestore } from "@/components/common/buttons";
 import { Form } from "@/components/common/custom";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
-import { PAGES } from "@/constants";
+import { PAGES } from "@/common/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { pick } from "lodash";
@@ -94,7 +94,7 @@ const Settings = () => {
         />
         <SubmitAndRestore
           isLoading={isPending}
-          onReset={() => reset(data[activeEntity])} 
+          onReset={() => reset(data[activeEntity])}
           isDirty={isDirty}
           text="Actualizar"
         />

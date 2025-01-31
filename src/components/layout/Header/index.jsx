@@ -1,7 +1,7 @@
 import { useUserContext } from "@/User";
 import { Flex, Icon } from "@/components/common/custom";
 import { KeyboardShortcuts } from "@/components/common/modals";
-import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/constants";
+import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";

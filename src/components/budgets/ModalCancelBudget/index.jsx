@@ -1,9 +1,10 @@
-import { IconnedButton } from "@/components/common/buttons";
-import { ButtonsContainer, Input } from "@/components/common/custom";
-import { COLORS, ICONS } from "@/constants";
+import { IconedButton } from "@/components/common/buttons";
+import { ButtonsContainer } from "@/components/common/custom";
+import { COLORS, ICONS } from "@/common/constants";
 import { useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
 import { Message, ModalContent } from "./styles";
+import { TextField } from "@/components/common/form";
 
 const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
   const [cancelReason, setCancelReason] = useState("");
@@ -15,10 +16,8 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
         </Modal.Header>
         <ModalContent>
           <Message>
-            <Input
-              height="40px"
-              placeholder="Motivo de anulación..."
-              type="text"
+            <TextField
+              placeholder="Motivo"
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               tabIndex="0"
@@ -27,8 +26,8 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
         </ModalContent>
         <Modal.Actions>
           <ButtonsContainer width="100%" marginTop="10px">
-            <IconnedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} />
-            <IconnedButton
+            <IconedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} />
+            <IconedButton
               text="Anular"
               icon={ICONS.BAN}
               color={COLORS.RED}
@@ -40,7 +39,7 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>
-    </Transition >
+    </Transition>
   );
 };
 

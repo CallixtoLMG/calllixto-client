@@ -1,4 +1,4 @@
-import { COLORS } from "@/constants";
+import { COLORS } from "@/common/constants";
 import { isCallixtoUser } from "@/roles";
 import { useUserContext } from "@/User";
 import { useRouter } from "next/navigation";
@@ -15,8 +15,8 @@ const AccordionMenu = styled(Menu)`
 const AccordionItem = styled(Menu.Item)`
   width: 100%;
   align-content: center;
-  padding-top: 0.8rem!important; 
-  padding-bottom: 0.7rem!important; 
+  padding-top: 0.8rem!important;
+  padding-bottom: 0.7rem!important;
   border-radius: 0!important;
 `;
 
@@ -30,8 +30,8 @@ const AccordionTitle = styled(Accordion.Title)`
 const UserMenu = ({ trigger, onLogout, onClientChange }) => {
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const [activeIndex, setActiveIndex] = useState(-1); 
-  const [searchTerm, setSearchTerm] = useState(""); 
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const handleAccordionClick = (index) => {
     setActiveIndex(activeIndex === index ? -1 : index);

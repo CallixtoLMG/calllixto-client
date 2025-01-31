@@ -1,4 +1,4 @@
-import { PAGE_SIZE_OPTIONS } from "@/constants";
+import { PAGE_SIZE_OPTIONS } from "@/common/constants";
 import { Popup, Pagination as SPagination } from "semantic-ui-react";
 import { Dropdown } from "../custom";
 import ElementCounter from "./ElementCounter";

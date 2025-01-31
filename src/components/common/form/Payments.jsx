@@ -1,14 +1,14 @@
-import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.common";
-
-import { COLORS, ICONS } from "@/constants";
+import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
+import { COLORS, ICONS } from "@/common/constants";
 import es from "date-fns/locale/es";
 import { useMemo, useState } from "react";
 import { registerLocale } from "react-datepicker";
-import { useFieldArray } from "react-hook-form";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header } from "semantic-ui-react";
-import { CurrencyFormatInput, Dropdown, FieldsContainer, Flex, FlexColumn, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "../custom";
+import { Button, FieldsContainer, Flex, FlexColumn, FormField, Segment } from "../custom";
 import DatePicker from "../custom/DatePicker";
 import { Table, TotalList } from "../table";
+import { PriceLabel, PriceField, TextField, DropdownField } from "@/components/common/form";
 
 registerLocale("es", es);
 
@@ -30,7 +30,8 @@ const calculateTotals = (payments, total) => {
   return { totalAssigned, totalPending };
 };
 
-const Payments = ({ total, maxHeight, methods, children, update }) => {
+const Payments = ({ total, maxHeight, children, update }) => {
+  const methods = useFormContext();
   const { control } = methods;
   const { fields: paymentsMade, append: appendPayment, remove: removePayment } = useFieldArray({
     control,
@@ -40,28 +41,24 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
   const { totalPending, totalAssigned } = useMemo(() => calculateTotals(paymentsMade, total), [total, paymentsMade]);
   const isTotalCovered = useMemo(() => totalPending <= 0, [totalPending]);
   const [payment, setPayment] = useState(EMPTY_PAYMENT());
-  const [errors, setErrors] = useState({});
 
   const handleAddPayment = async () => {
     if (!payment.method || payment.amount <= 0) {
-      setErrors({ ...errors, amount: "El monto debe ser mayor que 0" });
       return;
     }
 
     if (payment.amount > totalPending) {
-      setErrors({ ...errors, amount: `El monto no puede superar al total pendiente ($ ${totalPending})` });
       return;
     }
 
     appendPayment(payment);
     setPayment(EMPTY_PAYMENT());
-    setErrors({});
   };
 
   const TOTAL_LIST_ITEMS = [
-    { id: 1, title: "Pagado", amount: <Price value={totalAssigned} /> },
-    { id: 2, title: "Pendiente", amount: <Price value={totalPending} /> },
-    { id: 3, title: "Total", amount: <Price value={total} /> },
+    { id: 1, title: "Pagado", amount: <PriceLabel value={totalAssigned} /> },
+    { id: 2, title: "Pendiente", amount: <PriceLabel value={totalPending} /> },
+    { id: 3, title: "Total", amount: <PriceLabel value={total} /> },
   ];
 
   return (
@@ -72,9 +69,8 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
         </Header>
         <FlexColumn rowGap="15px">
           {update && (
-            <FieldsContainer width="100%" alignItems="center" rowGap="5px">
-              <FormField height="80px" flex="1">
-                <Label>Fecha de Pago</Label>
+            <FieldsContainer>
+              <FormField label="Fecha" width="150px">
                 <DatePicker
                   selected={payment.date}
                   onChange={(date) => setPayment({ ...payment, date })}
@@ -84,71 +80,58 @@ const Payments = ({ total, maxHeight, methods, children, update }) => {
                   maxDate={new Date()}
                 />
               </FormField>
-              <FormField flex="2">
-                <Label>Método</Label>
-                <Dropdown
-                  placeholder="Seleccione método de pago"
-                  fluid
-                  selection
-                  options={PAYMENT_METHODS.filter((method) => method.key !== 'dolares')}
-                  value={payment.method}
-                  onChange={(e, { value }) => setPayment({ ...payment, method: value })}
-                  disabled={isTotalCovered}
-                />
-              </FormField>
-              <FormField flex="1">
-                <RuledLabel title="Monto" message={errors.amount} required />
-                <CurrencyFormatInput
-                  height="50px"
-                  textAlignLast="right"
-                  customInput={Input}
-                  displayType="input"
-                  thousandSeparator
-                  decimalScale={2}
-                  allowNegative={false}
-                  value={payment.amount || 0}
-                  prefix="$ "
-                  onValueChange={(values) => {
-                    const { floatValue } = values;
-                    setPayment({ ...payment, amount: parseFloat(floatValue) || 0 });
-                  }}
-                  disabled={isTotalCovered || !payment.method}
-                />
-              </FormField>
-              <FormField flex="3">
-                <Label>Comentarios</Label>
-                <Input
-                  type="text"
-                  placeholder="Comentarios"
-                  disabled={isTotalCovered || !payment.method}
-                  value={payment.comments}
-                  onChange={(e, { value }) => setPayment({ ...payment, comments: value })}
-                />
-              </FormField>
+              <DropdownField
+                width="fit-content"
+                label="Método de Pago"
+                options={PAYMENT_METHODS.filter((method) => method.key !== 'dolares')}
+                value={payment.method}
+                onChange={(e, { value }) => setPayment({ ...payment, method: value })}
+                disabled={isTotalCovered}
+              />
+              <PriceField
+                width="150px"
+                label="Monto"
+                value={payment.amount || 0}
+                onChange={value => {
+                  setPayment({ ...payment, amount: value });
+                }}
+                disabled={false}
+              />
+              <TextField
+                flex="1"
+                label="Comentarios"
+                disabled={isTotalCovered || !payment.method}
+                value={payment.comments}
+                onChange={e => {
+                  setPayment({ ...payment, comments: e.target.value });
+                }}
+              />
               <FormField minWidth="fit-content" width="fit-content">
-                <IconedButton
-                  padding="3px 18px 3px 40px"
-                  size="small"
-                  content="Completar"
-                  icon={ICONS.CHECK}
-                  labelPosition="left"
-                  color={COLORS.BLUE}
-                  type="button"
-                  onClick={() => setPayment({ ...payment, amount: parseFloat(totalPending) })}
-                  disabled={isTotalCovered}
-                  width="fit-content"
-                />
-                <IconedButton
-                  size="small"
-                  icon={ICONS.ADD}
-                  content="Agregar"
-                  labelPosition="left"
-                  color={COLORS.GREEN}
-                  type="button"
-                  onClick={handleAddPayment}
-                  disabled={isTotalCovered}
-                  width="100%"
-                />
+                <FlexColumn rowGap="5px">
+                  <Button
+                    padding="3px 18px 3px 40px"
+                    size="small"
+                    content="Completar"
+                    icon={ICONS.CHECK}
+                    labelPosition="left"
+                    color={COLORS.BLUE}
+                    type="button"
+                    onClick={() => setPayment({ ...payment, amount: parseFloat(totalPending) })}
+                    disabled={isTotalCovered}
+                    width="fit-content"
+                  />
+                  <Button
+                    size="small"
+                    icon={ICONS.ADD}
+                    content="Agregar"
+                    labelPosition="left"
+                    color={COLORS.GREEN}
+                    type="button"
+                    onClick={handleAddPayment}
+                    disabled={isTotalCovered}
+                    width="100%"
+                  />
+                </FlexColumn>
               </FormField>
             </FieldsContainer>
           )}

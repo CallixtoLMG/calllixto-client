@@ -1,66 +1,47 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form, FormField, Input, RuledLabel } from "@/components/common/custom";
-import { ContactFields, ControlledComments } from "@/components/common/form";
-import { RULES, SHORTKEYS } from "@/constants";
+import { FieldsContainer, Form } from "@/components/common/custom";
+import { ContactControlled, ContactView, TextAreaControlled, TextControlled } from "@/components/common/form";
+import { RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { preventSend } from "@/utils";
-import { useCallback } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
-const EMPTY_CUSTOMER = { name: '', phoneNumbers: [], addresses: [], emails: [], comments: '' };
+import { FormProvider, useForm } from "react-hook-form";
+import { EMPTY_CUSTOMER } from "../customers.constants";
 
-const CustomerForm = ({ customer = EMPTY_CUSTOMER, onSubmit, isLoading, isUpdating }) => {
+const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
   const methods = useForm({
     defaultValues: {
       ...EMPTY_CUSTOMER,
       ...customer,
     }
   });
-  const { handleSubmit, control, reset, formState: { isDirty, errors } } = methods;
+  const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
+  const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
 
-  const handleReset = useCallback((customer) => {
-    reset(customer);
-  }, [reset]);
-
-  const handleCreate = (data) => {
-    if (!data.addresses.length) {
-      data.addresses = [];
-    }
-    if (!data.phoneNumbers.length) {
-      data.phoneNumbers = [];
-    }
-    if (!data.emails.length) {
-      data.emails = [];
-    }
-    onSubmit(data);
-  };
-
-  useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_CUSTOMER, ...customer } : EMPTY_CUSTOMER), SHORTKEYS.DELETE);
+  useKeyboardShortcuts(handleSubmit(onSubmit), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => reset({ ...EMPTY_CUSTOMER, ...customer }), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(handleCreate)}>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <FieldsContainer>
-          <FormField width="33%" error={errors?.name?.message}>
-            <RuledLabel title="Nombre" message={errors?.name?.message} required />
-            <Controller
-              name="name"
-              control={control}
-              rules={RULES.REQUIRED}
-              render={({ field }) => <Input {...field} placeholder="Nombre" onKeyPress={preventSend} />}
-            />
-          </FormField>
+          <TextControlled
+            width="40%"
+            name="name"
+            label="Nombre"
+            placeholder="Nombre"
+            rules={RULES.REQUIRED}
+            disabled={!isUpdating && view}
+          />
         </FieldsContainer>
-        <ContactFields />
-        <FieldsContainer>
-          <ControlledComments control={control} />
-        </FieldsContainer>
-        <SubmitAndRestore
-          isUpdating={isUpdating}
-          isLoading={isLoading}
-          isDirty={isDirty}
-          onReset={() => handleReset(isUpdating ? { ...EMPTY_CUSTOMER, ...customer } : EMPTY_CUSTOMER)}
-        />
+        {isUpdating || !view ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
+        <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
+        {(isUpdating || !view) && (
+          <SubmitAndRestore
+            isUpdating={isUpdating}
+            isLoading={isLoading}
+            isDirty={isDirty}
+            onReset={() => reset({ ...EMPTY_CUSTOMER, ...customer })}
+          />
+        )}
       </Form>
     </FormProvider>
   )

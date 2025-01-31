@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { getUserData } from "@/api/userData";
 import { Loader } from "@/components/layout";
-import { ICONS, PAGES, RULES } from "@/constants";
+import { ICONS, PAGES, RULES } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";

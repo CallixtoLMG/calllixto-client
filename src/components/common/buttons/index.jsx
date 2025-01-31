@@ -3,5 +3,5 @@ export { default as GoBackButton } from './GoBack';
 export { default as RestoreButton } from './Restore';
 export { default as SubmitButton } from './Submit';
 export { default as SubmitAndRestore } from './SubmitAndRestore';
-export { default as IconnedButton } from './Iconned';
+export { default as IconedButton } from './Iconed';
 

@@ -10,12 +10,12 @@ import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import PDFfile from "@/components/budgets/PDFfile";
-import { IconnedButton } from "@/components/common/buttons";
-import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, IconedButton, Input, Menu } from "@/components/common/custom";
+import { IconedButton } from "@/components/common/buttons";
+import { Box, Button, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Input, Menu } from "@/components/common/custom";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { APIS, BUDGET_PDF_FORMAT, BUDGET_STATES, COLORS, ICONS, PAGES } from "@/constants";
+import { EXTERNAL_APIS, COLORS, ICONS, PAGES } from "@/common/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, now } from "@/utils";
+import { getFormatedPhone } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -23,6 +23,9 @@ import toast from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Dropdown } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
+import { now } from "@/common/utils/dates";
+import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
+import { getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, getSubtotal } from "@/components/budgets/budgets.utils";
 
 const Budget = ({ params }) => {
   useValidateToken();
@@ -133,7 +136,7 @@ const Budget = ({ params }) => {
       setCustomerData(budget.customer);
       setSelectedContact({
         address: budget.customer?.addresses?.[0]?.address,
-        phone: formatedSimplePhone(budget.customer?.phoneNumbers?.[0])
+        phone: getFormatedPhone(budget.customer?.phoneNumbers?.[0])
       });
     }
   }, [setLabels, budget, push, isLoading]);
@@ -172,8 +175,8 @@ const Budget = ({ params }) => {
           iconName: 'whatsapp',
           color: COLORS.GREEN,
           subOptions: budget?.customer?.phoneNumbers?.map(({ ref, areaCode, number }) => ({
-            key: `${APIS.WSP(`${areaCode}${number}`)}`,
-            href: `${APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`,
+            key: `${EXTERNAL_APIS.WSP(`${areaCode}${number}`)}`,
+            href: `${EXTERNAL_APIS.WSP(`${areaCode}${number}`, budget?.customer?.name)}`,
             text: `${ref ? `${ref} - ` : ''}${areaCode} ${number}`,
             iconName: 'whatsapp',
             color: COLORS.GREEN,
@@ -184,8 +187,8 @@ const Budget = ({ params }) => {
           iconName: 'mail',
           color: COLORS.RED,
           subOptions: budget?.customer?.emails?.map(({ ref, email }) => ({
-            key: `${APIS.MAIL(email, budget?.customer?.name)}`,
-            href: `${APIS.MAIL(email, budget?.customer?.name)}`,
+            key: `${EXTERNAL_APIS.MAIL(email, budget?.customer?.name)}`,
+            href: `${EXTERNAL_APIS.MAIL(email, budget?.customer?.name)}`,
             text: `${ref ? `${ref} - ` : ''}${email}`,
             iconName: 'mail',
             color: COLORS.RED,
@@ -199,7 +202,7 @@ const Budget = ({ params }) => {
           button: (
             <Dropdown
               pointing
-              as={IconedButton}
+              as={Button}
               text='PDFs'
               icon={ICONS.DOWNLOAD}
               floating
@@ -306,7 +309,7 @@ const Budget = ({ params }) => {
   };
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (dataToSend) => {
+    mutationFn: (dataToSend) => {
       const { pickUpInStore, paymentsMade, total } = dataToSend;
       const confirmationData = {
         confirmedBy: `${userData.name}`,
@@ -315,8 +318,7 @@ const Budget = ({ params }) => {
         paymentsMade,
         total
       };
-      const response = await confirmBudget(confirmationData, budget?.id);
-      return response;
+      return confirmBudget(confirmationData, budget?.id);
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -329,14 +331,13 @@ const Budget = ({ params }) => {
   });
 
   const { mutate: mutateCancel, isPending: isPendingCancel } = useMutation({
-    mutationFn: async (cancelReason) => {
+    mutationFn: (cancelReason) => {
       const cancelData = {
         cancelledBy: `${userData.name}`,
         cancelledAt: now(),
         cancelledMsg: cancelReason
       };
-      const response = await cancelBudget({ cancelData, id: budget?.id });
-      return response;
+      return cancelBudget({ cancelData, id: budget?.id });
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -352,10 +353,7 @@ const Budget = ({ params }) => {
   });
 
   const { mutate: mutateEdit, isPending: isPendingEdit } = useMutation({
-    mutationFn: async (budget) => {
-      const data = await editBudget({ ...budget, id: params.id });
-      return data;
-    },
+    mutationFn: (budget) => editBudget({ ...budget, id: params.id }),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Presupuesto actualizado!');
@@ -370,7 +368,7 @@ const Budget = ({ params }) => {
       <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} justifyContent="space-between">
         {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
           <>
-            <IconnedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
+            <IconedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
             <ModalCustomer
               isModalOpen={isModalCustomerOpen}
               onClose={handleModalCustomerClose}
@@ -402,7 +400,7 @@ const Budget = ({ params }) => {
             value={formattedDolarRate}
             disabled={!showDolarExangeRate}
             action={
-              <IconnedButton
+              <IconedButton
                 text="Cotizar en USD"
                 icon={ICONS.DOLLAR}
                 color={COLORS.GREEN}
@@ -467,7 +465,7 @@ const Budget = ({ params }) => {
           selectedContact={selectedContact}
         />
       </OnlyPrint>
-    </Loader >
+    </Loader>
   );
 };
 

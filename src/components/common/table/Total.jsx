@@ -1,141 +1,99 @@
-import { Title } from '@/components/budgets/PDFfile/styles';
-import { formatedPercentage } from '@/utils';
-import { TotalList } from '.';
-import { Flex, Input, Price } from '../custom';
+import { getFormatedPercentage } from '@/common/utils';
+import { TotalList } from './';
+import { PercentField, PriceLabel } from '../form';
+import styled from 'styled-components';
+import { Header } from 'semantic-ui-react';
+
+const Title = styled(Header)`
+  font-weight: bold !important;
+`;
 
 export const Total = ({
   readOnly,
   subtotal = 0,
   subtotalAfterDiscount = 0,
   globalDiscount = 0,
-  onGlobalDiscountChange = () => { },
+  onGlobalDiscountChange = () => {},
   additionalCharge = 0,
-  onAdditionalChargeChange = () => { },
+  onAdditionalChargeChange = () => {},
   total = 0,
 }) => {
-
   const items = [];
 
   if (readOnly) {
-    if ((globalDiscount > 0 || additionalCharge > 0)) {
+    if (globalDiscount > 0 || additionalCharge > 0) {
       items.push(
         {
-          id: 1,
+          id: 'sub-total',
           title: "Sub total",
-          amount: <Price value={subtotal} />
+          amount: <PriceLabel value={subtotal} />
         }
       );
-
-      if (globalDiscount > 0) {
-        items.push(
-          {
-            id: 2,
-            title: "Descuento",
-            amount: formatedPercentage(globalDiscount),
-          },
-          {
-            id: 3,
-            title: "Sub total",
-            amount: <Price value={subtotalAfterDiscount} />
-          }
-        );
-      }
-
-      if (additionalCharge > 0) {
-        items.push(
-          {
-            id: globalDiscount > 0 ? 4 : 2,
-            title: "Recargo",
-            amount: formatedPercentage(additionalCharge),
-          }
-        );
-      }
+    }
+    if (globalDiscount > 0) {
+      items.push(
+        {
+          id: 'discount',
+          title: 'Descuento',
+          amount: getFormatedPercentage(globalDiscount),
+        },
+        {
+          id: 'sub-total-after-discount',
+          title: 'Sub total',
+          amount: <PriceLabel value={subtotalAfterDiscount} />
+        }
+      );
+    }
+    if (additionalCharge > 0) {
+      items.push(
+        {
+          id: 'recharge',
+          title: "Recargo",
+          amount: getFormatedPercentage(additionalCharge),
+        }
+      );
     }
   } else {
     items.push(
       {
-        id: 1,
+        id: 'sub-total',
         title: "Sub total",
-        amount: <Price value={subtotal} />
-      }
-    );
-
-    items.push(
+        amount: <PriceLabel value={subtotal} />
+      },
       {
-        id: 2,
+        id: 'global-discount',
         title: "Descuento",
         amount: (
-          <Flex rowGap="5px" alignItems="center" justifyContent="flex-end" columnGap="10px">
-            <Input
-              $marginBottom
-              width="80px"
-              center
-              height="30px"
-              type="number"
-              value={globalDiscount}
-              onFocus={(e) => e.target.select()}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value > 100) {
-                  onGlobalDiscountChange(100);
-                  return;
-                }
-                if (value < 0) {
-                  onGlobalDiscountChange(0);
-                  return;
-                }
-                onGlobalDiscountChange(value);
-              }}
-            />
-            %
-          </Flex>
+          <PercentField
+            value={globalDiscount}
+            onChange={onGlobalDiscountChange}
+            width="85px"
+          />
         )
       },
       {
-        id: 3,
+        id: 'sub-total-global-discount',
         title: "Sub total",
-        amount: <Price value={subtotalAfterDiscount} />
-      }
-    );
-
-    items.push(
+        amount: <PriceLabel value={subtotalAfterDiscount} />
+      },
       {
-        id: 4,
+        id: 'recharge',
         title: "Recargo",
         amount: (
-          <Flex alignItems="center" justifyContent="flex-end" columnGap="10px">
-            <Input
-              $marginBottom
-              width="80px"
-              center
-              height="30px"
-              type="number"
-              value={additionalCharge}
-              onFocus={(e) => e.target.select()}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value > 100) {
-                  onAdditionalChargeChange(100);
-                  return;
-                }
-                if (value < 0) {
-                  onAdditionalChargeChange(0);
-                  return;
-                }
-                onAdditionalChargeChange(value);
-              }}
-            />
-            %
-          </Flex>
+          <PercentField
+            value={additionalCharge}
+            onChange={onAdditionalChargeChange}
+            width="85px"
+          />
         )
       }
     );
   }
 
   items.push({
-    id: items.length + 1,
-    title: <Title as="h4" width="100px" textAlign="right">TOTAL</Title>,
-    amount: <Title as="h3"><Price value={total} /></Title>
+    id: 'total',
+    title: <Title as="h3">TOTAL</Title>,
+    amount: <Title as="h3"><PriceLabel value={total} /></Title>
   });
 
   return (

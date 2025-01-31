@@ -1,4 +1,4 @@
-import { DEFAULT_SELECTED_CLIENT } from "@/constants";
+import { DEFAULT_SELECTED_CLIENT } from "@/common/constants";
 import axios from 'axios';
 import { isCallixtoUser } from "../roles";
 

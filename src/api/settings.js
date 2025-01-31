@@ -1,4 +1,4 @@
-import { ENTITIES, TIME_IN_MS } from "@/constants";
+import { ENTITIES, IN_MS } from "@/common/constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getItemById, listItems, useEditItem } from "./common";
@@ -14,7 +14,7 @@ export function useListSettings() {
         entity: ENTITIES.SETTINGS,
         url: PATHS.SETTINGS,
       }),
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: IN_MS.ONE_DAY,
   });
   return query;
 };
@@ -27,8 +27,8 @@ export function useGetSetting(entity) {
         url: `${PATHS.SETTINGS}/${entity}`,
         entity: ENTITIES.SETTINGS,
       }),
-    staleTime: TIME_IN_MS.ONE_HOUR,
-    enabled: !!entity, 
+    staleTime: IN_MS.ONE_HOUR,
+    enabled: !!entity,
   });
 
   return query;

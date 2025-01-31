@@ -1,10 +1,11 @@
-import { IconnedButton } from "@/components/common/buttons";
+import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer } from "@/components/common/custom";
-import { COLORS, ICONS, PRODUCT_STATES } from "@/constants";
-import { formatedPrice } from "@/utils";
+import { COLORS, ICONS } from "@/common/constants";
+import { getFormatedPrice } from "@/common/utils";
 import { useMemo } from "react";
 import { Message, Modal, Transition } from "semantic-ui-react";
 import { MessageHeader, MessageItem } from "./styles";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
 
 const ModalUpdates = ({
   shouldShowModal,
@@ -29,9 +30,9 @@ const ModalUpdates = ({
           {`${p.code} | ${p.name} | `}
           {priceChanged && (
             <>
-              <span style={{ color: COLORS.RED }}>{formatedPrice(oldProduct.price)}</span>
+              <span style={{ color: COLORS.RED }}>{getFormatedPrice(oldProduct.price)}</span>
               {' -> '}
-              <span style={{ color: COLORS.GREEN }}>{formatedPrice(p.price)}</span>
+              <span style={{ color: COLORS.GREEN }}>{getFormatedPrice(p.price)}</span>
             </>
           )}
           {stateChanged && (
@@ -91,7 +92,7 @@ const ModalUpdates = ({
               <MessageHeader>Productos no disponibles</MessageHeader>
               <Message.List>
                 {removedProducts.map(p => (
-                  <MessageItem key={p.code}>{`${p.code} | ${p.name} | ${formatedPrice(p.price)}.`}</MessageItem>
+                  <MessageItem key={p.code}>{`${p.code} | ${p.name} | ${getFormatedPrice(p.price)}.`}</MessageItem>
                 ))}
               </Message.List>
             </Message>
@@ -99,13 +100,13 @@ const ModalUpdates = ({
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer>
-            <IconnedButton
+            <IconedButton
               text="Cancelar"
               icon={ICONS.CANCEL}
               color={COLORS.RED}
               onClick={onCancel}
             />
-            <IconnedButton
+            <IconedButton
               text="Confirmar"
               icon={ICONS.CHECK}
               color={COLORS.GREEN}

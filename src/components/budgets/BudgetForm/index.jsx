@@ -1,27 +1,34 @@
-import { PAYMENT_METHODS } from "@/components/budgets/budgets.common";
-import { IconnedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Box, CurrencyFormatInput, Dropdown, FieldsContainer, Flex, Form, FormField, IconedButton, Input, Label, Price, RuledLabel, Segment } from "@/components/common/custom";
-import { ControlledComments } from "@/components/common/form";
+import { PAYMENT_METHODS } from "@/components/budgets/budgets.constants";
+import { IconedButton, SubmitAndRestore } from "@/components/common/buttons";
+import { Button, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/components/common/custom";
+import { PriceLabel, PriceControlled, TextAreaControlled, PercentControlled, NumberControlled } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
-import { ATTRIBUTES } from "@/components/products/products.common";
-import { BUDGET_STATES, COLORS, CUSTOMER_STATES, ICONS, PAGES, PICK_UP_IN_STORE, PRODUCT_STATES, RULES, SHORTKEYS, TIME_IN_DAYS } from "@/constants";
+import { ATTRIBUTES } from "@/components/products/products.constants";
+import { COLORS, ICONS, PAGES, RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { expirationDate, formatProductCodePopup, formatedDateOnly, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft, removeDecimal } from "@/utils";
+import { getFormatedPhone } from "@/common/utils";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
+import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
 import { Container, Icon, VerticalDivider } from "./styles";
+import { CUSTOMER_STATES } from "../../customers/customers.constants";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
+import { getDateWithOffset } from "@/common/utils/dates";
+import { BUDGET_STATES, PICK_UP_IN_STORE } from '@/components/budgets/budgets.constants';
+import { getTotalSum, isBudgetConfirmed, isBudgetDraft, getSubtotal } from '@/components/budgets/budgets.utils';
+import { getBrandCode, getProductCode, getSupplierCode, getPrice, getTotal } from "@/components/products/products.utils";
+
 
 const EMPTY_BUDGET = (user) => ({
-  seller: `${user?.firstName} ${user?.lastName}`,
+  seller: user?.name,
   customer: { name: '', addresses: [], phoneNumbers: [] },
   products: [],
   comments: '',
@@ -114,7 +121,7 @@ const BudgetForm = ({
         <Flex justifyContent="space-between" alignItems="center">
           <span>{name}</span>
           {state === CUSTOMER_STATES.INACTIVE.id && (
-            <Flex >
+            <Flex>
               <Popup
                 trigger={
                   <Label color={COLORS.GREY} size="mini">
@@ -174,8 +181,8 @@ const BudgetForm = ({
               price: outdatedProduct.price,
               editablePrice: outdatedProduct.editablePrice,
               fractionConfig: {
+                ...product.fractionConfig,
                 ...outdatedProduct.fractionConfig,
-                value: outdatedProduct.fractionConfig?.value || 1
               },
               state: outdatedProduct.state,
               quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity
@@ -323,11 +330,23 @@ const BudgetForm = ({
       title: "Código",
       value: (product) => (
         <>
-          <Popup size="tiny" trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(0, 2)}</span>} position="top center" on="hover" content={product.brandName} />
+          <Popup
+            size="tiny"
+            trigger={<span>{getSupplierCode(product.code)}</span>}
+            position="top center"
+            on="hover"
+            content={product.supplierName}
+          />
           {'-'}
-          <Popup size="tiny" trigger={<span>{formatProductCodePopup(product.code).formattedCode.substring(3, 5)}</span>} position="top center" on="hover" content={product.supplierName} />
+          <Popup
+            size="tiny"
+            trigger={<span>{getBrandCode(product.code)}</span>}
+            position="top center"
+            on="hover"
+            content={product.brandName}
+          />
           {'-'}
-          <span>{formatProductCodePopup(product.code).formattedCode.substring(6)}</span>
+          <span>{getProductCode(product.code)}</span>
         </>
       ),
       width: 1,
@@ -337,29 +356,16 @@ const BudgetForm = ({
       id: 2,
       title: "Cantidad",
       value: (product, index) => (
-        <Controller
+        <NumberControlled
+          width="80px"
           name={`products[${index}].quantity`}
-          control={control}
-          rules={RULES.REQUIRED}
-          render={({ field: { onChange, ...rest } }) => (
-            <CurrencyFormatInput
-              {...rest}
-              height="35px"
-              $shadow
-              decimalScale={2}
-              displayType="input"
-              onFocus={(e) => e.target.select()}
-              onChange={(e) => {
-                const value = Math.abs(e.target.value);
-                onChange(value);
-                calculateTotal();
-              }}
-              disabled={product.state === PRODUCT_STATES.OOS.id}
-            />
-          )}
+          onChange={() => {
+            calculateTotal();
+          }}
+          disabled={product.state === PRODUCT_STATES.OOS.id}
         />
       ),
-      width: 2
+      width: 1
     },
     {
       id: 3,
@@ -384,64 +390,37 @@ const BudgetForm = ({
       id: 4,
       title: "Medida", value: (product, index) => (
         <>
-          {product.fractionConfig?.active ? (
-            <Flex alignItems="center">
-              <Controller name={`products[${index}].fractionConfig.value`} control={control}
-                render={({ field: { onChange, ...rest } }) => (
-                  <CurrencyFormatInput
-                    {...rest}
-                    height="35px"
-                    $shadow
-                    decimalScale={2}
-                    displayType="number"
-                    onFocus={(e) => e.target.select()} onChange={(e) => {
-                      const value = Math.abs(e.target.value);
-                      onChange(value);
-                      setValue(`products[${index}].fractionConfig.price`, value * product.price);
-                      calculateTotal();
-                    }}
-                  />
-                )}
-              />
-              <Box marginRight="5px" marginLeft="5px">{` ${product.fractionConfig.unit}`}</Box>
-            </Flex>
-          ) : (
-            ''
+          {product.fractionConfig?.active && (
+            <NumberControlled
+              width="100px"
+              name={`products[${index}].fractionConfig.value`}
+              unit={product.fractionConfig.unit}
+              iconPosition="right"
+              onChange={value => {
+                setValue(`products[${index}].fractionConfig.price`, value * product.price);
+                calculateTotal();
+              }}
+            />
           )}
         </>
       ),
-      width: 2
+      width: 1
     },
     {
       id: 5,
       title: "Precio",
       value: (product, index) => {
-        return product.editablePrice ?
-          <Controller
-            name={`products[${index}].price`}
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <Flex alignItems="center" columnGap="5px">
-                <Icon positionRelative name={ICONS.DOLLAR} />
-                <CurrencyFormatInput
-                  height="35px"
-                  displayType="input"
-                  thousandSeparator={true}
-                  decimalScale={2}
-                  allowNegative={false}
-                  customInput={Input}
-                  $marginBottom
-                  textAlignLast="right"
-                  onValueChange={value => {
-                    onChange(value.floatValue);
-                    calculateTotal();
-                  }}
-                  value={value || 0}
-                  placeholder="Precio"
-                />
-              </Flex>
-            )}
-          /> : <Price value={getPrice(product)} />
+        return product.editablePrice
+          ? (
+            <PriceControlled
+              width="100%"
+              name={`products[${index}].price`}
+              onChange={() => {
+                calculateTotal();
+              }}
+            />
+          )
+          : <PriceLabel width="100%" value={getPrice(product)} />
       },
       width: 2
     },
@@ -450,27 +429,19 @@ const BudgetForm = ({
       title: "Descuento",
       value: (product, index) => (
         <Flex alignItems="center" columnGap="5px">
-          <Controller name={`products[${index}].discount`} control={control} defaultValue={product.discount || 0}
-            render={({ field: { onChange, ...rest } }) => (
-              <Input
-                {...rest}
-                $marginBottom
-                height="35px"
-                type="number"
-                onFocus={(e) => e.target.select()} onChange={(e) => {
-                  const value = Math.abs(removeDecimal(e.target.value));
-                  if (value > 100) return;
-                  onChange(value);
-                  calculateTotal();
-                }} />
-            )}
-          /> %
+          <PercentControlled
+            width="80px"
+            height="35px"
+            name={`products[${index}].discount`}
+            defaultValue={product.discount ?? 0}
+            handleChange={calculateTotal}
+          />
         </Flex>
       ),
-      width: 2
+      width: 1
     },
-    { title: "Total", value: (product) => <Price value={getTotal(product)} />, id: 7, width: 3 },
-  ], [control, calculateTotal, setValue]);
+    { title: "Total", value: (product) => <PriceLabel value={getTotal(product)} />, id: 7, width: 3 },
+  ], [calculateTotal, setValue]);
 
   const handleDraft = async (data) => {
     setValue("state", BUDGET_STATES.DRAFT.id);
@@ -502,103 +473,97 @@ const BudgetForm = ({
         onCancel={handleCancelUpdate}
         onConfirm={handleConfirmUpdate}
       />
-      <Form onSubmit={handleSubmit(handleConfirm)}>
-        <FieldsContainer justifyContent="space-between">
-          <FormField width="300px">
-            <ButtonGroup size="small">
-              <IconnedButton
-                text="Confirmado"
-                icon={ICONS.CHECK}
-                basic={!isConfirmed}
-                color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
-                onClick={() => {
-                  setIsConfirmed(true);
-                  setValue('state', BUDGET_STATES.CONFIRMED.id);
-                }}
-              />
-              <IconnedButton
-                text="Pendiente"
-                icon={ICONS.HOURGLASS_HALF}
-                basic={isConfirmed}
-                color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
-                onClick={() => {
-                  setIsConfirmed(false);
-                  setValue('state', BUDGET_STATES.PENDING.id);
-                }}
-              />
-            </ButtonGroup>
-          </FormField>
-          <FormField width="350px">
-            <Controller
-              name="pickUpInStore"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <ButtonGroup size="small">
-                  <IconnedButton
-                    text={PICK_UP_IN_STORE}
-                    icon={ICONS.WAREHOUSE}
-                    basic={!value}
-                    onClick={() => {
-                      onChange(true);
-                    }}
-                  />
-                  <IconnedButton
-                    text="Enviar a Dirección"
-                    icon={ICONS.TRUCK}
-                    basic={value}
-                    onClick={() => {
-                      onChange(false);
-                    }}
-                  />
-                </ButtonGroup>
-              )}
-            />
-          </FormField>
-        </FieldsContainer>
-        <FieldsContainer justifyContent="space-between">
-          <FormField width="300px">
-            <Label>Vendedor</Label>
-            <Controller name="seller" control={control} rules={RULES.REQUIRED}
-              render={({ field: { value } }) => <Segment placeholder>{value}</Segment>}
-            />
-          </FormField>
-          <FieldsContainer >
-            <FormField flex={1}>
-              <RuledLabel title="Días para el vencimiento" message={errors?.expirationOffsetDays?.message} required />
-              <Controller name="expirationOffsetDays" control={control}
-                rules={RULES.REQUIRED}
-                render={({ field }) => (
-                  <Input {...field} maxLength={3} type="text" placeholder="Cant. en días (p. ej: 3, 10, etc)"
-                    onChange={(e) => {
-                      let value = e.target.value;
-                      value = value.replace(/\D/g, '');
-                      if (parseInt(value, 10) > 365) value = TIME_IN_DAYS.YEAR;
-                      field.onChange(value);
-                      setExpiration(value);
-                    }}
-                  />
+      <FormProvider {...methods}>
+        <Form onSubmit={handleSubmit(handleConfirm)}>
+          <FieldsContainer justifyContent="space-between">
+            <FormField width="300px">
+              <ButtonGroup size="small">
+                <IconedButton
+                  text="Confirmado"
+                  icon={ICONS.CHECK}
+                  basic={!isConfirmed}
+                  color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
+                  onClick={() => {
+                    setIsConfirmed(true);
+                    setValue('state', BUDGET_STATES.CONFIRMED.id);
+                  }}
+                />
+                <IconedButton
+                  text="Pendiente"
+                  icon={ICONS.HOURGLASS_HALF}
+                  basic={isConfirmed}
+                  color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
+                  onClick={() => {
+                    setIsConfirmed(false);
+                    setValue('state', BUDGET_STATES.PENDING.id);
+                  }}
+                />
+              </ButtonGroup>
+            </FormField>
+            <FormField width="350px">
+              <Controller
+                name="pickUpInStore"
+                render={({ field: { onChange, value } }) => (
+                  <ButtonGroup size="small">
+                    <IconedButton
+                      text={PICK_UP_IN_STORE}
+                      icon={ICONS.WAREHOUSE}
+                      basic={!value}
+                      onClick={() => {
+                        onChange(true);
+                      }}
+                    />
+                    <IconedButton
+                      text="Enviar a Dirección"
+                      icon={ICONS.TRUCK}
+                      basic={value}
+                      onClick={() => {
+                        onChange(false);
+                      }}
+                    />
+                  </ButtonGroup>
                 )}
               />
             </FormField>
-            <FormField flex={1}>
-              <Label>Fecha de vencimiento</Label>
-              <Segment placeholder>{formatedDateOnly(expirationDate(expiration || 0))}</Segment>
-            </FormField>
           </FieldsContainer>
-        </FieldsContainer>
-        <FieldsContainer>
-          <FormField width="300px">
-            <RuledLabel
-              title="Cliente"
-              message={errors?.customer?.message || (isCustomerInactive ? `El cliente está inactivo, solo ${isBudgetDraft(budget?.state) ? "actualizar" : "crear"} borradores esta permitido.` : '')}
-              required
+          <FieldsContainer justifyContent="space-between">
+            <Controller
+              name="seller"
+              rules={RULES.REQUIRED}
+              render={({ field: { value } }) => (
+                <FormField width="300px" label="Vendedor" control={Input} readonly value={value} />
+              )}
             />
+            <FieldsContainer>
+              <NumberControlled
+                width="200px"
+                name="expirationOffsetDays"
+                rules={RULES.REQUIRED}
+                maxLength={3}
+                label="Dias para el vencimiento"
+                placeholder="Cantidad en días"
+                onChange={setExpiration}
+              />
+              <FormField
+                width="200px"
+                label="Fecha de vencimiento"
+                control={Input}
+                readOnly
+                value={getDateWithOffset(null, expiration, 'days')}
+              />
+            </FieldsContainer>
+          </FieldsContainer>
+          <FieldsContainer>
             <Controller
               name="customer"
-              control={control}
               rules={{ validate: value => value?.id ? true : "Campo requerido." }}
               render={({ field: { onChange, value } }) => (
-                <Dropdown
+                <FormField
+                  width="300px"
+                  label="Cliente"
+                  required
+                  control={Dropdown}
+                  error={errors?.customer ? { content: errors.customer.message, pointing: 'above' } : null}
                   placeholder={PAGES.CUSTOMERS.NAME}
                   search
                   clearable
@@ -619,57 +584,54 @@ const BudgetForm = ({
                 />
               )}
             />
-          </FormField>
-          <FormField flex={2}>
-            <RuledLabel title="Dirección" message={shouldError && errors?.customer?.addresses?.message} required={isBudgetConfirmed(watchState) && !watchPickUp} />
-            {watchPickUp ? (
-              <Segment placeholder>{PICK_UP_IN_STORE}</Segment>
-            ) : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? (
-              <Segment placeholder>{`${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer?.addresses?.[0]?.ref}: ` : ''}${watchCustomer?.addresses?.[0]?.address ? watchCustomer?.addresses?.[0]?.address : ""}`} </Segment>
-            ) : (
-              <Dropdown
-                selection
-                options={watchCustomer?.addresses.map((address) => ({
-                  key: address.address,
-                  text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
-                  value: address.address,
-                }))}
-                value={selectedContact.address}
-                onChange={(e, { value }) => setSelectedContact({
-                  ...selectedContact,
-                  address: value,
-                })}
-              />
-            )}
-          </FormField>
-          <FormField flex={1}>
-            <RuledLabel title="Teléfono" message={shouldError && errors?.customer?.phoneNumbers?.message} required={isBudgetConfirmed(watchState)} />
-            {!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? (
-              <Segment placeholder>{`${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer?.phoneNumbers?.[0]?.ref}: ` : ''}${formatedSimplePhone(watchCustomer?.phoneNumbers?.[0])}`} </Segment>
-            ) : (
-              <Dropdown
-                selection
-                options={watchCustomer?.phoneNumbers.map((phone) => ({
-                  key: formatedSimplePhone(phone),
-                  text: `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`,
-                  value: formatedSimplePhone(phone),
-                }))}
-                value={selectedContact.phone}
-                onChange={(e, { value }) => setSelectedContact({
-                  ...selectedContact,
-                  phone: value,
-                })}
-              />
-            )}
-          </FormField>
-        </FieldsContainer>
-        <FormField width="300px">
-          <RuledLabel title="Agregar producto" message={errors?.products?.root?.message} required />
+            <FormField
+              flex="2"
+              control={Dropdown}
+              label="Dirección"
+              required={isBudgetConfirmed(watchState) && !watchPickUp}
+              error={errors?.customer?.addresses ? { content: errors.customer.addresses.message, pointing: 'above' } : null}
+              value={watchPickUp ? PICK_UP_IN_STORE : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer?.addresses?.[0]?.ref}: ` : ''}${watchCustomer?.addresses?.[0]?.address ? watchCustomer?.addresses?.[0]?.address : ""}` : selectedContact.address}
+              selection
+              options={watchCustomer?.addresses.map((address) => ({
+                key: address.address,
+                text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
+                value: address.address,
+              }))}
+              onChange={(e, { value }) => setSelectedContact({
+                ...selectedContact,
+                address: value,
+              })}
+              disabled={watchPickUp || !watchCustomer || watchCustomer.addresses?.length < 2}
+            />
+            <FormField
+              flex="1"
+              control={Dropdown}
+              label="Teléfono"
+              required={isBudgetConfirmed(watchState)}
+              error={shouldError && errors?.customer?.phoneNumbers ? { content: errors.customer.phoneNumbers.message, pointing: 'above' } : null}
+              value={!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer?.phoneNumbers?.[0]?.ref}: ` : ''}${getFormatedPhone(watchCustomer?.phoneNumbers?.[0])}` : selectedContact.phone}
+              selection
+              options={watchCustomer?.phoneNumbers.map((phone) => ({
+                key: getFormatedPhone(phone),
+                text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
+                value: getFormatedPhone(phone),
+              }))}
+              onChange={(e, { value }) => setSelectedContact({
+                ...selectedContact,
+                phone: value,
+              })}
+              disabled={!watchCustomer || watchCustomer.phoneNumbers?.length < 2}
+            />
+          </FieldsContainer>
           <Controller name="products"
-            control={control}
             rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
             render={() => (
-              <ProductSearch
+              <FormField
+                width="300px"
+                label="Productos"
+                required
+                error={errors?.products?.root ? { content: errors.products.root.message, pointing: 'above' } : null}
+                control={ProductSearch}
                 ref={productSearchRef}
                 products={products}
                 onProductSelect={(selectedProduct) => {
@@ -690,114 +652,108 @@ const BudgetForm = ({
               />
             )}
           />
-        </FormField>
-        <Loader active={isTableLoading}>
-          <Table
-            mainKey="key"
-            headers={BUDGET_FORM_PRODUCT_COLUMNS}
-            elements={watchProducts}
-            actions={actions}
-          />
-          <Total
-            subtotal={subtotal}
-            globalDiscount={watchGlobalDiscount}
-            subtotalAfterDiscount={subtotalAfterDiscount}
-            onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
-            additionalCharge={watchAdditionalCharge}
-            onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
-            total={total}
-          />
-        </Loader>
-        <FieldsContainer width="100%" rowGap="15px">
-          {isBudgetConfirmed(watchState) && !isCloning ? (
-            <Payments
-              methods={methods}
-              total={total}
-              update
+          <Loader active={isTableLoading}>
+            <Table
+              mainKey="key"
+              headers={BUDGET_FORM_PRODUCT_COLUMNS}
+              elements={watchProducts}
+              actions={actions}
             />
-          ) : (
-            <FormField flex={3}>
-              <Label>Métodos de pago</Label>
-              <Segment>
-                <Controller
-                  name="paymentMethods"
-                  control={control}
-                  rules={RULES.REQUIRED}
-                  render={({ field: { onChange, value } }) => (
-                    <Flex columnGap="5px" wrap="wrap" rowGap="5px">
-                      <IconedButton
+            <Total
+              subtotal={subtotal}
+              globalDiscount={watchGlobalDiscount}
+              subtotalAfterDiscount={subtotalAfterDiscount}
+              onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
+              additionalCharge={watchAdditionalCharge}
+              onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
+              total={total}
+            />
+          </Loader>
+          {isBudgetConfirmed(watchState) && !isCloning && (
+            <FieldsContainer width="100%" rowGap="15px">
+              <Payments
+                total={total}
+                update
+              />
+            </FieldsContainer>
+          )}
+          <FieldsContainer width="100%" rowGap="15px">
+            <Controller
+              name="paymentMethods"
+              rules={RULES.REQUIRED}
+              render={({ field: { onChange, value } }) => (
+                <FormField flex="1" label="Metodos de pago" control={Input}>
+                  <Flex columnGap="5px" wrap="wrap" rowGap="5px">
+                    <Button
+                      paddingLeft="fit-content"
+                      width="fit-content"
+                      type="button"
+                      basic={value.length !== PAYMENT_METHODS.length}
+                      color={COLORS.BLUE}
+                      onClick={() => {
+                        if (value.length === PAYMENT_METHODS.length) {
+                          onChange([]);
+                        } else {
+                          onChange(PAYMENT_METHODS.map(method => method.value));
+                        }
+                      }}
+                    >
+                      Todos
+                    </Button>
+                    <VerticalDivider />
+                    {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
+                      <Button
                         paddingLeft="fit-content"
                         width="fit-content"
-                        type="button"
-                        basic={value.length !== PAYMENT_METHODS.length}
+                        key={key}
+                        basic={!value.includes(methodValue)}
                         color={COLORS.BLUE}
+                        type="button"
                         onClick={() => {
-                          if (value.length === PAYMENT_METHODS.length) {
-                            onChange([]);
+                          if (value.includes(methodValue)) {
+                            onChange(value.filter(payment => payment !== methodValue));
                           } else {
-                            onChange(PAYMENT_METHODS.map(method => method.value));
+                            onChange([...value, methodValue]);
                           }
                         }}
                       >
-                        Todos
-                      </IconedButton>
-                      <VerticalDivider />
-                      {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
-                        <IconedButton
-                          paddingLeft="fit-content"
-                          width="fit-content"
-                          key={key}
-                          basic={!value.includes(methodValue)}
-                          color={COLORS.BLUE}
-                          type="button"
-                          onClick={() => {
-                            if (value.includes(methodValue)) {
-                              onChange(value.filter(payment => payment !== methodValue));
-                            } else {
-                              onChange([...value, methodValue]);
-                            }
-                          }}
-                        >
-                          {text}
-                        </IconedButton>
-                      ))}
-                    </Flex>
-                  )}
-                />
-              </Segment>
-            </FormField>
-          )}
-        </FieldsContainer>
-        <FieldsContainer rowGap="5px!important">
-          <ControlledComments control={control} />
-        </FieldsContainer>
-        <SubmitAndRestore
-          draft={draft}
-          isLoading={isLoading && !isBudgetDraft(watchState)}
-          disabled={isLoading}
-          isDirty={isDirty}
-          isUpdating={draft || isCloning}
-          onReset={handleReset}
-          color={currentState.color}
-          onSubmit={handleSubmit(handleConfirm)}
-          icon={currentState.icon}
-          text={currentState.singularTitle}
-          extraButton={
-            <IconedButton
-              icon
-              labelPosition="left"
-              disabled={isLoading || !isDirty}
-              loading={isLoading && isBudgetDraft(watchState)}
-              type="button"
-              onClick={handleSubmit(handleDraft)}
-              color={BUDGET_STATES.DRAFT.color}
-              width="fit-content"
-            >
-              <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.singularTitle}
-            </IconedButton>
-          }
-        />
-      </Form >
+                        {text}
+                      </Button>
+                    ))}
+                  </Flex>
+                </FormField>
+              )}
+            />
+          </FieldsContainer>
+          <TextAreaControlled name="comments" label="Comentarios" />
+          <SubmitAndRestore
+            draft={draft}
+            isLoading={isLoading && !isBudgetDraft(watchState)}
+            disabled={isLoading}
+            isDirty={isDirty}
+            isUpdating={draft || isCloning}
+            onReset={handleReset}
+            color={currentState.color}
+            onSubmit={handleSubmit(handleConfirm)}
+            icon={currentState.icon}
+            text={currentState.singularTitle}
+            extraButton={
+              <IconedButton
+                icon
+                labelPosition="left"
+                disabled={isLoading || !isDirty}
+                loading={isLoading && isBudgetDraft(watchState)}
+                type="button"
+                onClick={handleSubmit(handleDraft)}
+                color={BUDGET_STATES.DRAFT.color}
+                width="fit-content"
+              >
+                <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.singularTitle}
+              </IconedButton>
+            }
+          />
+        </Form>
+      </FormProvider>
     </>
   );
 };

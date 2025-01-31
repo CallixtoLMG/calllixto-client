@@ -2,14 +2,15 @@
 import { useUserContext } from "@/User";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
-import { COLORS, ICONS, PAGES, SHORTKEYS, SUPPLIER_STATES } from "@/constants";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { downloadExcel, formatedSimplePhone } from "@/utils";
+import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
-import { useListSuppliers } from "../../api/suppliers";
+import { useListSuppliers } from "@/api/suppliers";
+import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 
 const Suppliers = () => {
   useValidateToken();
@@ -36,22 +37,25 @@ const Suppliers = () => {
         supplier.name,
         supplierState,
         supplier.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
-        supplier.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
+        supplier.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`).join(' , ')
       ];
     });
     downloadExcel([headers, ...mappedSuppliers], "Lista de Proveedores");
   }, [suppliers]);
 
   useEffect(() => {
-    const actions = RULES.canCreate[role] ? [
-      {
+    const actions = [];
+
+    if (RULES.canCreate[role]) {
+      actions.push({
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.SUPPLIERS.CREATE) },
         text: 'Crear'
-      }
-    ] : [];
+      })
+    }
+
     actions.push({
       id: 3,
       icon: ICONS.FILE_EXCEL,
@@ -73,7 +77,6 @@ const Suppliers = () => {
       onRefetch={refetch}
       isLoading={loading}
       suppliers={loading ? [] : suppliers}
-      role={role}
     />
   );
 };

@@ -1,10 +1,10 @@
 import { Loader } from "@/components/layout";
-import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS } from "@/constants";
+import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
-import { IconnedButton, PopupActions } from "../buttons";
+import { IconedButton, PopupActions } from "../buttons";
 import { CenteredFlex } from "../custom";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
@@ -183,7 +183,7 @@ const CustomTable = ({
                                   position="left center"
                                   trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                   buttons={actions.map((action, idx) => (
-                                    <IconnedButton
+                                    <IconedButton
                                       key={idx}
                                       icon={action.icon}
                                       color={action.color}
@@ -226,7 +226,7 @@ const CustomTable = ({
                                 position="left center"
                                 trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                 buttons={actions.map((action, idx) => (
-                                  <IconnedButton
+                                  <IconedButton
                                     key={idx}
                                     icon={action.icon}
                                     color={action.color}

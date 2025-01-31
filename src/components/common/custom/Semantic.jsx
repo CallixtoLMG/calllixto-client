@@ -28,33 +28,24 @@ export const Segment = styled(SSegment)`
 `;
 
 export const Input = styled(SInput)`
-  margin: ${({ $marginBottom }) => $marginBottom && "5px 0"} !important;
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15);
-  border-radius: 0.28571429rem;
-  max-width: ${({ $maxWidth }) => $maxWidth && `200px!important;`};
-  height: ${({ height = '50px' }) => height} !important;
   width: ${({ width = '100%' }) => `${width}!important`};
-  display: flex!important;
-  input{
-    height: ${({ height }) => height || '50px'} !important;
-    padding: 0 14px!important;
-    text-align: ${({ center }) => (center ? 'center' : 'left')} !important;
-    width: ${({ innerWidth = '100%' }) => `${innerWidth}!important`};
-    text-align-last: ${({ textAlignLast }) => `${textAlignLast}!important`};
-  };
-  div{
-    line-height: 190%!important;
-  };
+  height: ${({ height = '38px' }) => height} !important;
+  text-align: ${({ textAlign }) => textAlign} !important;
+
+  &&& .disabled {
+    opacity: 1 !important;
+    input {
+      opacity: 0.8 !important;
+    }
+  }
 `;
 
 export const FormField = styled(Form.Field)`
-  display:flex;
-  width: ${({ width = '200px' }) => `${width}!important`};
-  min-width: ${({ minWidth = '200px' }) => `${minWidth}!important`};
+  width: ${({ width = '100%' }) => `${width}!important`};
+  display: flex;
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
-  row-gap: 5px!important;
   height: ${({ height }) => height} !important;
 `;
 
@@ -70,41 +61,20 @@ export const Label = styled(SLabel)`
 `;
 
 export const TextArea = styled(STextarea)`
-  box-shadow: 0 1px 2px 0 rgba(34,36,38,.15)!important;
-  border-radius: 0.28571429rem;
   resize: ${({ resize = "none" }) => `${resize}!important`};
-  width: ${({ width }) => `${width}!important`};
   padding: ${({ padding }) => `${padding}!important`};
+  color: red;
+  background-color: red m !important;
+  &&&&& {
+    opacity: 1 !important;
+    textarea {
+      opacity: 0.1 !important;
+    }
+  }
 `;
 
 export const Dropdown = styled(SDropdown)`
-  padding: ${({ padding }) => `${padding}!important`};
-  min-width: ${({ minWidth }) => `${minWidth}!important;`};
-  max-width: ${({ $maxWidth }) => $maxWidth && `200px!important;`};
-  margin: ${({ margin }) => `${margin}!important;`};
-  box-shadow: ${({ hideBorder }) => hideBorder ? "none" : "0 1px 2px 0 rgba(34,36,38,.15) !important"};
-  border-radius: ${({ hideBorder }) => hideBorder ? "0" : "0.28571429rem !important"};
-  background-color: ${({ bgColor }) => `${bgColor}!important`};
-  height: ${({ height = "50px" }) => `${height}!important`};
-  min-height: ${({ minHeight }) => `${minHeight}!important`};
-  display: flex!important;
-  flex-wrap: wrap;
-  align-content: center;
-  width: ${({ width = "100%" }) => `${width}!important`};
-  input {
-    min-width: ${({ minWidth }) => `${minWidth}!important;`};
-    height: ${({ height = "50px" }) => `${height}!important`};
-  };
-  i{
-    margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
-  }
-  i.dropdown.icon {
-    height: 50px!important;
-    top: ${({ top = "15px" }) => `${top}!important`};
-  };
-  &:hover {
-    background-color: ${({ noBgColor }) => `${noBgColor}!important`};
-  };
+  height: ${({ height = '35px' }) => `${height}!important`} ;
 `;
 
 export const DropdownOption = styled(SDropdown)`
@@ -133,7 +103,7 @@ export const DropdownItem = styled(SDropdown.Item)`
   font-weight: 400;
   width: 100%;
   &&&&&&{
-    padding: 13px 10px!important;
+    padding: 10px 10px!important;
   }
   &:hover {
     background-color: #f5f5f5!important;
@@ -178,24 +148,25 @@ export const Modal = styled(SModal)`
   min-height: ${({ minHeight = '100px' }) => `${minHeight}!important`} ;
 `;
 
-export const IconedButton = styled(SButton)`
-  &&&& {
-    text-align: center;
-    height: ${({ height = '35px' }) => `${height}!important`} ;
-    font-size: 13.5px;
-    width: ${({ width = '110px' }) => `${width}!important`} ;
-    padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
-    padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
-    margin-right: 0;
-  };
-`;
-
 export const MessageHeader = styled(SMessageHeader)`
   font-size: 15px!important;
 `;
 
 export const Message = styled(SMessage)`
   width: 100%;
+`;
+
+export const Button = styled(SButton)`
+  font-weight: 500 !important;
+  &&&& {
+    text-align: center;
+    height: ${({ height = '35px' }) => `${height}!important`} ;
+    font-size: 13.5px !important;
+    width: ${({ width = '110px' }) => `${width}!important`} ;
+    padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
+    padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
+    margin-right: 0;
+  };
 `;
 
 export const Divider = styled(SDivider)`

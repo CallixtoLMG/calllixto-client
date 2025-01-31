@@ -1,9 +1,9 @@
-import { COLORS, ICONS } from '@/constants';
+import { COLORS, ICONS } from '@/common/constants';
 import { useState } from 'react';
 import { List, Modal, Popup, Transition } from 'semantic-ui-react';
-import { IconnedButton } from '../../buttons';
-import { Icon } from '../../custom';
+import { IconedButton } from '../../buttons';
 import { StyledListContent, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader } from "./styles";
+import { Icon } from '../../custom';
 
 const KeyboardShortcuts = () => {
   const [open, setOpen] = useState(false);
@@ -68,7 +68,7 @@ const KeyboardShortcuts = () => {
             </List>
           </StyledModalContent>
           <Modal.Actions>
-            <IconnedButton
+            <IconedButton
               text="Cerrar"
               icon={ICONS.REMOVE}
               color={COLORS.GREY}

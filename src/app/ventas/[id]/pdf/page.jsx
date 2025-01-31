@@ -2,11 +2,13 @@
 import { useGetBudget } from "@/api/budgets";
 import PDFfile from "@/components/budgets/PDFfile";
 import { Loader } from "@/components/layout";
-import { BUDGET_PDF_FORMAT, PAGES } from "@/constants";
+import { PAGES } from "@/common/constants";
 import { useRouter } from "next/navigation";
 import { useValidateToken } from "@/hooks/userData";
 import { useUserContext } from "@/User";
-import { formatedSimplePhone, getTotalSum } from "@/utils";
+import { getFormatedPhone } from "@/common/utils";
+import { BUDGET_PDF_FORMAT } from "@/components/budgets/budgets.constants";
+import { getTotalSum } from "@/components/budgets/budgets.utils";
 
 const PDF = ({ params }) => {
   useValidateToken();
@@ -28,7 +30,7 @@ const PDF = ({ params }) => {
         printPdfMode={BUDGET_PDF_FORMAT.CLIENT}
         selectedContact={{
           address: budget?.customer?.addresses?.[0]?.address,
-          phone: formatedSimplePhone(budget?.customer?.phoneNumbers?.[0]),
+          phone: getFormatedPhone(budget?.customer?.phoneNumbers?.[0]),
         }}
       />
     </Loader>

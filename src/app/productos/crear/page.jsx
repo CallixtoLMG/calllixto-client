@@ -4,7 +4,7 @@ import { useCreateProduct } from "@/api/products";
 import { useListSuppliers } from "@/api/suppliers";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { PAGES } from "@/constants";
+import { PAGES } from "@/common/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -46,10 +46,7 @@ const CreateProduct = () => {
   })), [suppliers]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (product) => {
-      const response = await createProduct(product);
-      return response;
-    },
+    mutationFn: createProduct,
     onSuccess: async (response) => {
       if (response.statusOk) {
         push(PAGES.PRODUCTS.SHOW(response.product.code))

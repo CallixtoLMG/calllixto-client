@@ -1,37 +1,28 @@
 import { useBatchDeleteProducts, useDeleteProduct, useEditProduct } from "@/api/products";
-import { IconnedButton } from "@/components/common/buttons";
-import { Dropdown, Flex, Input } from "@/components/common/custom";
+import { IconedButton } from "@/components/common/buttons";
+import { Flex } from "@/components/common/custom";
 import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
 import { ModalAction, ModalMultiDelete } from "@/components/common/modals";
 import { Filters, Table } from "@/components/common/table";
 import { OnlyPrint } from "@/components/layout";
-import { COLORS, ICONS, PAGES, PRODUCT_STATES } from "@/constants";
+import { COLORS, ICONS, PAGES } from "@/common/constants";
 import { useFilters } from "@/hooks/useFilters";
 import { RULES } from "@/roles";
-import { createFilter } from "@/utils";
+import { createFilter } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, FormProvider } from "react-hook-form";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { FormProvider } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Form, Label } from "semantic-ui-react";
-import { PRODUCT_COLUMNS } from "../products.common";
+import { Form } from "semantic-ui-react";
+import { EMPTY_FILTERS, PRODUCT_COLUMNS, PRODUCT_STATES_OPTIONS, PRODUCT_STATES } from "../products.constants";
+import { DropdownControlled, TextControlled } from "@/components/common/form";
+import { useUserContext } from "@/User";
 
-const EMPTY_FILTERS = { code: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
-const STATE_OPTIONS = [
-  ...Object.entries(PRODUCT_STATES).map(([key, value]) => ({
-    key,
-    text: (
-      <Flex alignItems="center" justifyContent="space-between">
-        {value.title}&nbsp;<Label color={value.color} circular empty />
-      </Flex>
-    ),
-    value: key
-  }))
-];
-
-const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
+const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
+  const { role } = useUserContext();
   const printRef = useRef();
+
   const deleteProduct = useDeleteProduct();
   const batchDeleteProducts = useBatchDeleteProducts();
   const editProduct = useEditProduct();
@@ -99,10 +90,6 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
     }
   }, [selectedProducts]);
 
-  const clearSelection = () => {
-    setSelectedProducts({});
-  };
-
   const selectAllCurrentPageElements = (currentPageElements) => {
     const newSelectedProducts = {};
     currentPageElements.forEach(product => {
@@ -110,10 +97,6 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
     });
     setSelectedProducts(newSelectedProducts);
   };
-
-  useEffect(() => {
-    clearSelection();
-  }, [appliedFilters.state]);
 
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
     mutationFn: async () => {
@@ -133,16 +116,17 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
 
   const selectionActions = useMemo(() => {
     const actions = [
-      <IconnedButton
+      <IconedButton
         key={2}
         text="Descargar Códigos"
         icon={ICONS.BARCODE}
         onClick={handlePrint}
       />
     ];
+
     if (RULES.canRemove[role]) {
       actions.unshift(
-        <IconnedButton
+        <IconedButton
           key={1}
           text="Eliminar Productos"
           icon={ICONS.TRASH}
@@ -151,6 +135,7 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
         />
       );
     }
+
     return actions;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role]);
@@ -159,51 +144,20 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
     <>
       <Flex flexDirection="column" rowGap="15px">
         <FormProvider {...methods}>
-          <Form onSubmit={onSubmit(() => { })}>
-            <Filters onRefetch={onRefetch} clearSelection={clearSelection} onRestoreFilters={onRestoreFilters}>
-              <Controller
+          <Form onSubmit={onSubmit(() => {})}>
+            <Filters onRefetch={onRefetch} clearSelection={() => setSelectedProducts({})} onRestoreFilters={onRestoreFilters}>
+              <DropdownControlled
+                width="200px"
                 name="state"
-                render={({ field: { onChange, ...rest } }) => (
-                  <Dropdown
-                    {...rest}
-                    $maxWidth
-                    top="10px"
-                    height="35px"
-                    minHeight="35px"
-                    selection
-                    options={STATE_OPTIONS}
-                    defaultValue={EMPTY_FILTERS.state}
-                    onChange={(e, { value }) => {
-                      onChange(value);
-                      onSubmit(() => {})();
-                    }}
-                  />
-                )}
+                options={PRODUCT_STATES_OPTIONS}
+                defaultValue={EMPTY_FILTERS.state}
+                afterChange={() => {
+                  onSubmit(() => {})();
+                  setSelectedProducts({});
+                }}
               />
-              <Controller
-                name="code"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    $marginBottom
-                    $maxWidth
-                    height="35px"
-                    placeholder="Código"
-                  />
-                )}
-              />
-              <Controller
-                name="name"
-                render={({ field }) => (
-                  <Input
-                    {...field}
-                    $marginBottom
-                    $maxWidth
-                    height="35px"
-                    placeholder="Nombre"
-                  />
-                )}
-              />
+              <TextControlled name="code" placeholder="Código" width="200px" />
+              <TextControlled name="name" placeholder="Nombre" width="350px" />
             </Filters>
           </Form>
         </FormProvider>
@@ -217,7 +171,7 @@ const ProductsPage = ({ products = [], role, isLoading, onRefetch }) => {
           selection={selectedProducts}
           onSelectionChange={onSelectionChange}
           selectionActions={selectionActions}
-          clearSelection={clearSelection}
+          clearSelection={() => setSelectedProducts({})}
           selectAllCurrentPageElements={selectAllCurrentPageElements}
           onFilter={onFilter}
           color={PRODUCT_STATES[appliedFilters.state]?.color}

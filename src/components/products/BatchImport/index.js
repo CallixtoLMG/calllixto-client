@@ -1,17 +1,19 @@
 import { useCreateBatch, useEditBatch, useGetBlackList, useListProducts } from "@/api/products";
-import { IconnedButton } from "@/components/common/buttons";
-import { ButtonsContainer, CurrencyFormatInput, FieldsContainer, FlexColumn, Form, FormField, IconedButton, Input, Label, Segment } from "@/components/common/custom";
+import { Button, ButtonsContainer, FieldsContainer, FlexColumn, Form, FormField, Label, Segment } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { Loader } from "@/components/layout";
-import { COLORS, ICONS } from "@/constants";
-import { downloadExcel, now } from "@/utils";
+import { COLORS, ICONS } from "@/common/constants";
+import { downloadExcel } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { Modal, ModalHeader, WaitMsg } from "./styles";
+import { IconedButton } from "@/components/common/buttons";
+import { now } from "@/common/utils/dates";
+import { PriceControlled, TextControlled } from "@/components/common/form";
 
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts } = useListProducts();
@@ -307,47 +309,25 @@ const BatchImport = ({ isCreating }) => {
     },
     {
       title: "Nombre", value: (product, index) => (
-        <Controller
+        <TextControlled
           name={`importProducts[${index}].name`}
-          control={control}
-          render={({ field }) => (
-            <Input {...field} height="30px" width="100%" />
-          )}
+          placeholder="Nombre"
         />
       ), id: 2, align: 'left'
     },
     {
       title: "Precio", value: (product, index) => (
-        <Controller
+        <PriceControlled
           name={`importProducts[${index}].price`}
-          control={control}
-          render={({ field: { onChange, value } }) => (
-            <CurrencyFormatInput
-              height="30px"
-              displayType="input"
-              thousandSeparator={true}
-              decimalScale={2}
-              allowNegative={false}
-              prefix="$ "
-              customInput={Input}
-              onValueChange={value => {
-                onChange(value.floatValue);
-              }}
-              value={value || 0}
-              placeholder="Precio"
-            />
-          )}
+          placeholder="Precio"
         />
       ), id: 3, width: 3
     },
     {
       title: "Comentarios", value: (product, index) => (
-        <Controller
+        <TextControlled
           name={`importProducts[${index}].comments`}
-          control={control}
-          render={({ field }) => (
-            <Input {...field} height="30px" width="100%" />
-          )}
+          placeholder="Comentarios"
         />
       ), id: 4, align: 'left'
     },
@@ -363,7 +343,7 @@ const BatchImport = ({ isCreating }) => {
         style={{ display: 'none' }}
         onChange={handleFileUpload}
       />
-      <IconedButton
+      <Button
         height="fit-content"
         width="fit-content"
         paddingLeft="0"
@@ -372,7 +352,7 @@ const BatchImport = ({ isCreating }) => {
         type="button"
       >
         <Icon marginRight name={importSettings.icon} />{importSettings.button}
-      </IconedButton>
+      </Button>
       <Transition animation="fade" duration={500} visible={open}>
         <Modal
           closeIcon
@@ -393,13 +373,13 @@ const BatchImport = ({ isCreating }) => {
                 </Modal.Content>
                 <Modal.Actions>
                   <ButtonsContainer>
-                    <IconnedButton
+                    <IconedButton
                       text="Confirmar"
                       icon={ICONS.CHECK}
                       color={COLORS.GREEN}
                       onClick={handleDownloadConfirmation}
                     />
-                    <IconnedButton
+                    <IconedButton
                       text="Cancelar"
                       icon={ICONS.X}
                       color={COLORS.RED}
@@ -459,7 +439,7 @@ const BatchImport = ({ isCreating }) => {
               <Modal.Actions>
                 <ButtonsContainer>
                   {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
-                  <IconnedButton
+                  <IconedButton
                     text="Aceptar"
                     icon={ICONS.CHECK}
                     disabled={importSettings.isButtonDisabled(isPending)}
@@ -468,7 +448,7 @@ const BatchImport = ({ isCreating }) => {
                     color={COLORS.GREEN}
                     onClick={handleConfirmClick}
                   />
-                  <IconnedButton
+                  <IconedButton
                     text="Cancelar"
                     icon={ICONS.X}
                     disabled={isLoading || isPending}
@@ -489,7 +469,7 @@ const BatchImport = ({ isCreating }) => {
             <p>¿Deseas descargar un archivo de Excel con estos productos?</p>
           </Modal.Content>
           <Modal.Actions>
-            <IconnedButton
+            <IconedButton
               text="Confirmar"
               icon={ICONS.CHECK}
               color={COLORS.GREEN}
@@ -497,7 +477,7 @@ const BatchImport = ({ isCreating }) => {
                 handleUnprocessedDownload();
               }}
             />
-            <IconnedButton
+            <IconedButton
               text="Cancelar"
               icon={ICONS.X}
               color={COLORS.RED}
