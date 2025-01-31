@@ -111,25 +111,22 @@ const BanProduct = ({ open, setOpen }) => {
         <Modal.Content>
           <Form ref={formRef} onSubmit={handleSubmit(mutate)}>
             <FieldsContainer>
-              <FormField width="100%">
-                <Label>Agregar código
-                  <Popup
-                    position="top center"
-                    size="tiny"
-                    content={
-                      <div>
-                        <p>* Para añadir un código nuevo a la lista, anótelo y luego pulse &quot;enter&quot;. Cuando haya concluido de agregar códigos, clickeé &quot;Confirmar&quot;.</p>
-                        <p>* Existe la posibilidad de agregar múltiples códigos a la vez, para ello, debe escribirlos separados por una coma y un espacio, por ejemplo:</p>
-                        <p>  PCMU123, PCMU124, PCMU125</p>
-                      </div>}
-                    trigger={<Icon margin="0 0 0 5px" name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />}
-                  />
-                </Label>
                 <TextField
                   placeholder="Código"
+                  label="Código"
                   onKeyPress={(e) => handleEnterKeyPress(e, handleAddProduct)}
                 />
-              </FormField>
+                {/* <Popup
+                  position="top center"
+                  size="tiny"
+                  content={
+                    <div>
+                      <p>* Para añadir un código nuevo a la lista, anótelo y luego pulse &quot;enter&quot;. Cuando haya concluido de agregar códigos, clickeé &quot;Confirmar&quot;.</p>
+                      <p>* Existe la posibilidad de agregar múltiples códigos a la vez, para ello, debe escribirlos separados por una coma y un espacio, por ejemplo:</p>
+                      <p>  PCMU123, PCMU124, PCMU125</p>
+                    </div>}
+                  trigger={<Icon margin="0 0 0 5px" name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />}
+                /> */}
             </FieldsContainer>
             <FieldsContainer rowGap="5px">
               <Label>Productos vedados</Label>

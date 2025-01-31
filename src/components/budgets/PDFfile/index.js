@@ -3,7 +3,6 @@ import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.c
 import { Box, Flex, FlexColumn } from "@/components/common/custom";
 import { Table, Total, TotalList } from '@/components/common/table';
 import { getFormatedPhone } from "@/common/utils";
-import dayjs from "dayjs";
 import { get } from "lodash";
 import { forwardRef, useMemo } from "react";
 import { List } from "semantic-ui-react";
@@ -15,7 +14,7 @@ import {
   Title
 } from "./styles";
 import { PriceLabel } from "@/components/common/form";
-import { getDateWithOffset } from "@/common/utils/dates";
+import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
 import { isBudgetCancelled, isBudgetDraft } from "../budgets.utils";
 
@@ -105,7 +104,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         <SectionContainer alignItems="left" flexDirection="column" minHeight="50px">
           <Flex>
             <Field label="Vendedor/a" value={budget?.seller} flex="1" />
-            <Field label="Fecha" value={dayjs().format('DD-MM-YYYY')} />
+            <Field label="Fecha" value={getFormatedDate()} />
           </Flex>
           <Flex>
             <Field flex="1" label="Teléfonos" value={client?.phoneNumbers?.map(getFormatedPhone).join(' | ')} />

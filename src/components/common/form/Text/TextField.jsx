@@ -9,6 +9,7 @@ export const TextField = ({
   value,
   disabled,
   onChange,
+  onKeyPress,
   maxLength,
   error
 }) => {
@@ -27,6 +28,7 @@ export const TextField = ({
         disabled={disabled}
         onChange={onChange}
         maxLength={maxLength}
+        onKeyPress={onKeyPress}
       >
         {iconLabel && <Label width="fit-content" height="100%">{iconLabel}</Label>}
         <input />
