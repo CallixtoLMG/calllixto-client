@@ -4,7 +4,7 @@ import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { CommentTooltip } from "../tooltips";
 import { Container, Label, Search, Text } from "./styles";
-import { PRODUCT_STATES } from "@/components/products/products.common";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
 
 const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');

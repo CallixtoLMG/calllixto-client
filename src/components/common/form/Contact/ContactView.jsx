@@ -1,6 +1,6 @@
 import { FieldsContainer, FormField } from '../../custom';
 import { Table } from '../../table';
-import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from '../form.common';
+import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from '../form.constants';
 
 export const ContactView = ({ phoneNumbers = [], addresses = [], emails = [] }) => {
   return (

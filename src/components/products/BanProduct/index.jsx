@@ -12,7 +12,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Popup, Transition } from "semantic-ui-react";
-import { BAN_PRODUCTS_COLUMNS } from "../products.common";
+import { BAN_PRODUCTS_COLUMNS } from "../products.constants";
 import { ModalActions } from "./styles";
 import { TextField } from "@/components/common/form";
 

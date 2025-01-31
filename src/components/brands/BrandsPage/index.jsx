@@ -4,7 +4,7 @@ import { useFilters } from "@/hooks/useFilters";
 import { createFilter } from "@/common/utils";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { BRAND_COLUMNS, BRANDS_STATES_OPTIONS, EMPTY_FILTERS } from "../brands.common";
+import { BRAND_COLUMNS, BRANDS_STATES_OPTIONS, EMPTY_FILTERS } from "../brands.constants";
 import { DropdownControlled, TextControlled } from "@/components/common/form";
 
 const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {

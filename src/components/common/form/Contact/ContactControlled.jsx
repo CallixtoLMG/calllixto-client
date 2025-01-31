@@ -6,7 +6,7 @@ import { COLORS, ICONS } from "@/common/constants";
 import { IconedButton } from "../../buttons";
 import { Box, FieldsContainer, Flex, FormField, Input } from '../../custom';
 import { Table } from '../../table';
-import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "../form.common";
+import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from "../form.constants";
 
 const EMPTY_PHONE = { ref: '', areaCode: '', number: '' };
 const EMPTY_ADDRESS = { ref: '', address: '' };

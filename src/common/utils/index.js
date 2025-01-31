@@ -1,7 +1,7 @@
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
 import { REGEX } from "../constants";
-import { PRODUCT_STATES } from "@/components/products/products.common";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
 
 export const formatedPrice = (number) => {

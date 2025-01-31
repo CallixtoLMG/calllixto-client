@@ -2,7 +2,6 @@ import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.utils";
 import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
 import { Box, Flex, FlexColumn } from "@/components/common/custom";
 import { Table, Total, TotalList } from '@/components/common/table';
-import { PICK_UP_IN_STORE } from "@/common/constants";
 import { formatedSimplePhone, isBudgetCancelled, isBudgetDraft } from "@/common/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
@@ -17,6 +16,7 @@ import {
 } from "./styles";
 import { PriceLabel } from "@/components/common/form";
 import { getDateWithOffset } from "@/common/utils/dates";
+import { PICK_UP_IN_STORE } from "../budgets.constants";
 
 const Field = ({ label, value, ...rest }) => (
   <Flex columnGap="5px" minWidth="300px" {...rest}>

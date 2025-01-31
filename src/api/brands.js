@@ -1,5 +1,5 @@
-import { ATTRIBUTES } from "@/components/brands/brands.common";
-import { ACTIVE, ENTITIES, FILTERS_OPTIONS, INACTIVE, IN_MS } from "@/common/constants";
+import { ATTRIBUTES } from "@/components/brands/brands.constants";
+import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from './common';
@@ -8,7 +8,7 @@ import { getDefaultListParams } from '@/common/utils';
 export const GET_BRAND_QUERY_KEY = 'getBrand';
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 
-export function useListBrands({ sort = FILTERS_OPTIONS.NAME, order = true } = {}) {
+export function useListBrands({ sort = 'name', order = true } = {}) {
   const query = useQuery({
     queryKey: [LIST_BRANDS_QUERY_KEY],
     queryFn: () => listItems({

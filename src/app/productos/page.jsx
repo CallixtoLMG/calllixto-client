@@ -14,7 +14,7 @@ import { downloadExcel, formatedPrice } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Dropdown } from "semantic-ui-react";
-import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.common";
+import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.constants";
 
 const Products = () => {
   useValidateToken();

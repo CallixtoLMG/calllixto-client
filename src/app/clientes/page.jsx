@@ -8,7 +8,7 @@ import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel, formatedSimplePhone } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
-import { CUSTOMER_STATES } from "@/components/customers/customers.common";
+import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
 
 const Customers = () => {
   useValidateToken();

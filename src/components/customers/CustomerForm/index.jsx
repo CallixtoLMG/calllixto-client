@@ -4,7 +4,7 @@ import { ContactControlled, ContactView, TextAreaControlled, TextControlled } fr
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { FormProvider, useForm } from "react-hook-form";
-import { EMPTY_CUSTOMER } from "../customers.common";
+import { EMPTY_CUSTOMER } from "../customers.constants";
 
 const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
   const methods = useForm({

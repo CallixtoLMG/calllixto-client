@@ -1,15 +1,15 @@
 import { SubmitAndRestore } from "@/components/common/buttons";
 import { FieldsContainer, Flex, Form, Label } from "@/components/common/custom";
-import { DropdownField, PriceControlled, TextControlled, TextAreaControlled, DropdownControlled, IconedButtonControlled, TextField } from "@/components/common/form";
-import { COLORS, ICONS, MEASSURE_UNITS, RULES, SHORTKEYS } from "@/common/constants";
+import { PriceControlled, TextControlled, TextAreaControlled, DropdownControlled, IconedButtonControlled, TextField } from "@/components/common/form";
+import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted, preventSend } from "@/common/utils";
 import { useMemo } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
-import { BRANDS_STATES } from "@/components/brands/brands.common";
-import { EMPTY_PRODUCT } from "../products.common";
-import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.common";
+import { BRANDS_STATES } from "@/components/brands/brands.constants";
+import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
+import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view }) => {
   const methods = useForm({

@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { PRODUCT_STATES } from "@/components/products/products.common";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { TextField } from "../../../components/common/form";
 
 const Product = ({ params }) => {

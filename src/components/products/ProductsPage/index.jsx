@@ -15,7 +15,7 @@ import { FormProvider } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form } from "semantic-ui-react";
-import { EMPTY_FILTERS, PRODUCT_COLUMNS, PRODUCT_STATES_OPTIONS, PRODUCT_STATES } from "../products.common";
+import { EMPTY_FILTERS, PRODUCT_COLUMNS, PRODUCT_STATES_OPTIONS, PRODUCT_STATES } from "../products.constants";
 import { DropdownControlled, TextControlled } from "@/components/common/form";
 import { useUserContext } from "@/User";
 

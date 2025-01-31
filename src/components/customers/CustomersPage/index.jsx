@@ -4,7 +4,7 @@ import { useFilters } from '@/hooks/useFilters';
 import { createFilter } from '@/common/utils';
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS } from "../customers.common";
+import { CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS } from "../customers.constants";
 import { DropdownControlled, TextControlled } from '@/components/common/form';
 
 const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {

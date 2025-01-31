@@ -10,7 +10,7 @@ import { downloadExcel, formatedSimplePhone } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useListSuppliers } from "@/api/suppliers";
-import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.common";
+import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 
 const Suppliers = () => {
   useValidateToken();

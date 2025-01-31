@@ -1,5 +1,5 @@
-import { ATTRIBUTES } from "@/components/products/products.common";
-import { ACTIVE, ALL, CODE, ENTITIES, FILTERS_OPTIONS, INACTIVE, IN_MS } from "@/common/constants";
+import { ATTRIBUTES } from "@/components/products/products.constants";
+import { ACTIVE, ALL, CODE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import {
   BATCH,
   BLACK_LIST,
@@ -138,7 +138,7 @@ export const useEditProduct = () => {
 
 export function useProductsBySupplierId(supplierId) {
   const listBySupplierId = async () => {
-    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: FILTERS_OPTIONS.DATE } });
+    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: 'date' } });
     return products.filter((product) => product.code.startsWith(supplierId));
   }
 

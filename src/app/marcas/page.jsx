@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useListBrands } from "@/api/brands";
 import BrandsPage from "@/components/brands/BrandsPage";
-import { BRANDS_STATES } from "@/components/brands/brands.common";
+import { BRANDS_STATES } from "@/components/brands/brands.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";

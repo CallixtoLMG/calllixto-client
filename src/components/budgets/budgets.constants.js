@@ -157,3 +157,5 @@ export const BUDGET_PDF_FORMAT = {
   CLIENT: "client",
   INTERNAL: "internal",
 };
+
+export const PICK_UP_IN_STORE = "Retira en tienda";

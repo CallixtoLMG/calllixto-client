@@ -5,7 +5,7 @@ import { formatedPrice } from "@/common/utils";
 import { useMemo } from "react";
 import { Message, Modal, Transition } from "semantic-ui-react";
 import { MessageHeader, MessageItem } from "./styles";
-import { PRODUCT_STATES } from "@/components/products/products.common";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
 
 const ModalUpdates = ({
   shouldShowModal,

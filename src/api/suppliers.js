@@ -1,4 +1,4 @@
-import { ATTRIBUTES } from "@/components/suppliers/suppliers.common";
+import { ATTRIBUTES } from "@/components/suppliers/suppliers.constants";
 import { ACTIVE, ENTITIES, ID, INACTIVE, IN_MS } from "@/common/constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";

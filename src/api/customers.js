@@ -1,4 +1,4 @@
-import { ATTRIBUTES } from "@/components/customers/customers.common";
+import { ATTRIBUTES } from "@/components/customers/customers.constants";
 import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";

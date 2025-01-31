@@ -3,7 +3,7 @@ import { COLORS, DATE_FORMATS } from "@/common/constants";
 import { formatedPercentage, getPrice, getTotal, isBudgetCancelled, isBudgetConfirmed } from "@/common/utils";
 import { Label } from "semantic-ui-react";
 import { PriceLabel } from "../common/form";
-import { PRODUCT_STATES } from "@/components/products/products.common";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES } from "./budgets.constants";
 

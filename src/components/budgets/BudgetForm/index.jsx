@@ -7,8 +7,8 @@ import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
-import { ATTRIBUTES } from "@/components/products/products.common";
-import { COLORS, ICONS, PAGES, PICK_UP_IN_STORE, RULES, SHORTKEYS } from "@/common/constants";
+import { ATTRIBUTES } from "@/components/products/products.constants";
+import { COLORS, ICONS, PAGES, RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { formatProductCodePopup, formatedSimplePhone, getPrice, getSubtotal, getTotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from "@/common/utils";
 import { omit, pick } from "lodash";
@@ -19,10 +19,10 @@ import { v4 as uuid } from 'uuid';
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
 import { Container, Icon, VerticalDivider } from "./styles";
-import { CUSTOMER_STATES } from "../../customers/customers.common";
-import { PRODUCT_STATES } from "@/components/products/products.common";
+import { CUSTOMER_STATES } from "../../customers/customers.constants";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getDateWithOffset } from "@/common/utils/dates";
-import { BUDGET_STATES } from '@/components/budgets/budgets.constants';
+import { BUDGET_STATES, PICK_UP_IN_STORE } from '@/components/budgets/budgets.constants';
 
 const EMPTY_BUDGET = (user) => ({
   seller: user?.name,

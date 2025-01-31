@@ -144,3 +144,16 @@ export const PRODUCT_STATES_OPTIONS = Object.values(PRODUCT_STATES)
     ),
     value: id
   }));
+
+export const MEASSURE_UNITS = {
+  MT: {
+    key: 'mt',
+    value: 'mt',
+    text: 'Metros',
+  },
+  KG: {
+    key: 'kg',
+    value: 'kg',
+    text: 'Kilogramos',
+  },
+};
