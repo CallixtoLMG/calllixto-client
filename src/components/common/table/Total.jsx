@@ -1,4 +1,4 @@
-import { formatedPercentage } from '@/common/utils';
+import { getFormatedPercentage } from '@/common/utils';
 import { TotalList } from './';
 import { PercentField, PriceLabel } from '../form';
 import styled from 'styled-components';
@@ -35,7 +35,7 @@ export const Total = ({
         {
           id: 'discount',
           title: 'Descuento',
-          amount: formatedPercentage(globalDiscount),
+          amount: getFormatedPercentage(globalDiscount),
         },
         {
           id: 'sub-total-after-discount',
@@ -49,7 +49,7 @@ export const Total = ({
         {
           id: 'recharge',
           title: "Recargo",
-          amount: formatedPercentage(additionalCharge),
+          amount: getFormatedPercentage(additionalCharge),
         }
       );
     }

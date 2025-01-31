@@ -5,7 +5,7 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
-import { downloadExcel, formatedSimplePhone } from "@/common/utils";
+import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
@@ -33,7 +33,7 @@ const Customers = () => {
         customer.name,
         customerState,
         customer.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
-        customer.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
+        customer.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`).join(' , ')
       ];
     });
     downloadExcel([headers, ...mappedCustomers], "Lista de Clientes");

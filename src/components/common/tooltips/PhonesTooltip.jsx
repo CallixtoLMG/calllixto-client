@@ -1,6 +1,6 @@
 import { Box } from "@/components/common/custom";
 import { COLORS, ICONS } from "@/common/constants";
-import { formatedSimplePhone } from "@/common/utils";
+import { getFormatedPhone } from "@/common/utils";
 import { Icon, List, ListItem, Popup } from "semantic-ui-react";
 
 export const PhonesTooltip = ({ phones }) => {
@@ -11,7 +11,7 @@ export const PhonesTooltip = ({ phones }) => {
         <List>
           {phones.map(phone => (
             <ListItem key={`${phone.areaCode}-${phone.number}`}>
-              {phone.ref ? `${phone.ref}:` : "Contacto: "}<b>{formatedSimplePhone(phone)}</b>
+              {phone.ref ? `${phone.ref}:` : "Contacto: "}<b>{getFormatedPhone(phone)}</b>
             </ListItem>
           ))}
         </List>

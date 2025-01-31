@@ -10,7 +10,7 @@ import { Loader } from "@/components/layout";
 import { ATTRIBUTES } from "@/components/products/products.constants";
 import { COLORS, ICONS, PAGES, RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { formatedSimplePhone, getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from "@/common/utils";
+import { getFormatedPhone } from "@/common/utils";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
@@ -23,7 +23,9 @@ import { CUSTOMER_STATES } from "../../customers/customers.constants";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getDateWithOffset } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from '@/components/budgets/budgets.constants';
+import { getTotalSum, isBudgetConfirmed, isBudgetDraft, getSubtotal } from '@/components/budgets/budgets.utils';
 import { getBrandCode, getProductCode, getSupplierCode, getPrice, getTotal } from "@/components/products/products.utils";
+
 
 const EMPTY_BUDGET = (user) => ({
   seller: user?.name,
@@ -607,12 +609,12 @@ const BudgetForm = ({
               label="Teléfono"
               required={isBudgetConfirmed(watchState)}
               error={shouldError && errors?.customer?.phoneNumbers ? { content: errors.customer.phoneNumbers.message, pointing: 'above' } : null}
-              value={!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer?.phoneNumbers?.[0]?.ref}: ` : ''}${formatedSimplePhone(watchCustomer?.phoneNumbers?.[0])}` : selectedContact.phone}
+              value={!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer?.phoneNumbers?.[0]?.ref}: ` : ''}${getFormatedPhone(watchCustomer?.phoneNumbers?.[0])}` : selectedContact.phone}
               selection
               options={watchCustomer?.phoneNumbers.map((phone) => ({
-                key: formatedSimplePhone(phone),
-                text: `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`,
-                value: formatedSimplePhone(phone),
+                key: getFormatedPhone(phone),
+                text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
+                value: getFormatedPhone(phone),
               }))}
               onChange={(e, { value }) => setSelectedContact({
                 ...selectedContact,

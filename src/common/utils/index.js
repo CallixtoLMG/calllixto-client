@@ -1,17 +1,25 @@
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
 import { REGEX } from "../constants";
-import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
 
-export const formatedPrice = (number) => {
+export const getFormatedPrice = (number) => {
   return Number(number).toLocaleString('es-AR', {
     style: 'currency',
     currency: 'ARS',
   });
 };
 
-export const formatedNumber = (number) => {
+export const getFormatedNumber = (number) => {
   return Number(number).toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+};
+
+export const getFormatedPercentage = (number = 0) => {
+  return number + " %"
+};
+
+export const getFormatedPhone = (phone) => {
+  if (!phone) return '';
+  return `+54 ${phone.areaCode} ${phone.number}`;
 };
 
 export function encodeUri(value) {
@@ -21,33 +29,12 @@ export function encodeUri(value) {
   return undefined;
 };
 
-export const formatedPercentage = (number = 0) => {
-  return number + " %"
-};
-
-export const getTotalSum = (products, discount = 0, additionalCharge = 0) => {
-  const subtotal = products?.reduce((a, b) => a + getTotal(b), 0) ?? 0;
-  const discountedSubtotal = subtotal - (subtotal * (discount / 100));
-  const total = discountedSubtotal + (discountedSubtotal * (additionalCharge / 100));
-  return total;
-};
-
-export const getSubtotal = (total, discountOrCharge) => {
-  const subtotal = total + (total * (discountOrCharge / 100));
-  return subtotal;
-};
-
 export const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
-
-export const formatedSimplePhone = (phone) => {
-  if (!phone) return '';
-  return `+54 ${phone.areaCode} ${phone.number}`;
-};
 
 export const getPhonesForDisplay = (phoneNumbers) => {
   if (!phoneNumbers || phoneNumbers.length === 0) return { primaryPhone: '', additionalPhones: null };
 
-  const primaryPhone = formatedSimplePhone(phoneNumbers[0]);
+  const primaryPhone = getFormatedPhone(phoneNumbers[0]);
   if (phoneNumbers.length === 1) return { primaryPhone, additionalPhones: null };
 
   const additionalPhones = phoneNumbers.slice(1);
@@ -97,26 +84,6 @@ export const validateEmail = (email) => {
 
 export const validatePhone = (phone) => {
   return phone?.areaCode?.length + phone?.number?.length === 10;
-};
-
-export const isBudgetDraft = (status) => {
-  return status === BUDGET_STATES.DRAFT.id;
-};
-
-export const isBudgetConfirmed = (status) => {
-  return status === BUDGET_STATES.CONFIRMED.id;
-};
-
-export const isBudgetCancelled = (status) => {
-  return status === BUDGET_STATES.CANCELLED.id;
-};
-
-export const isBudgetPending = (status) => {
-  return status === BUDGET_STATES.PENDING.id;
-};
-
-export const isBudgetExpired = (status) => {
-  return status === BUDGET_STATES.EXPIRED.id;
 };
 
 export const isItemInactive = (state) => {

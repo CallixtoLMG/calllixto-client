@@ -6,11 +6,12 @@ import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
-import { downloadExcel, getTotalSum, handleUndefined } from "@/common/utils";
+import { downloadExcel, handleUndefined } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
 import { getTotal } from "@/components/products/products.utils";
+import { getTotalSum } from "@/components/budgets/budgets.utils";
 
 const Budgets = () => {
   useValidateToken();

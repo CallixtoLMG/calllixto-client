@@ -6,7 +6,7 @@ import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { downloadExcel, formatedSimplePhone } from "@/common/utils";
+import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { useListSuppliers } from "@/api/suppliers";
@@ -37,7 +37,7 @@ const Suppliers = () => {
         supplier.name,
         supplierState,
         supplier.addresses?.map(address => `${address.ref ? `${address.ref}: ` : ''}${address.address}`).join(' , '),
-        supplier.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`).join(' , ')
+        supplier.phoneNumbers?.map(phone => `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`).join(' , ')
       ];
     });
     downloadExcel([headers, ...mappedSuppliers], "Lista de Proveedores");

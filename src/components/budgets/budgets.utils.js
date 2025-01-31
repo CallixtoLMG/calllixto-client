@@ -1,6 +1,6 @@
 import { Flex } from "@/components/common/custom";
 import { COLORS, DATE_FORMATS } from "@/common/constants";
-import { formatedPercentage, isBudgetCancelled, isBudgetConfirmed } from "@/common/utils";
+import { getFormatedPercentage } from "@/common/utils";
 import { Label } from "semantic-ui-react";
 import { PriceLabel } from "../common/form";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
@@ -93,7 +93,7 @@ export const getProductsColumns = (dispatchPdf, budget) => {
       id: 5,
       title: "Desc.",
       width: 1,
-      value: (product) => formatedPercentage(product.discount || 0)
+      value: (product) => getFormatedPercentage(product.discount || 0)
     },
     !dispatchPdf && {
       id: 6,
@@ -109,4 +109,36 @@ export const getProductsColumns = (dispatchPdf, budget) => {
       value: (product) => product.dispatchComment || product?.dispatch?.comment
     }
   ].filter(Boolean);
+};
+
+export const getTotalSum = (products, discount = 0, additionalCharge = 0) => {
+  const subtotal = products?.reduce((a, b) => a + getTotal(b), 0) ?? 0;
+  const discountedSubtotal = subtotal - (subtotal * (discount / 100));
+  const total = discountedSubtotal + (discountedSubtotal * (additionalCharge / 100));
+  return total;
+};
+
+export const getSubtotal = (total, discountOrCharge) => {
+  const subtotal = total + (total * (discountOrCharge / 100));
+  return subtotal;
+};
+
+export const isBudgetDraft = (status) => {
+  return status === BUDGET_STATES.DRAFT.id;
+};
+
+export const isBudgetConfirmed = (status) => {
+  return status === BUDGET_STATES.CONFIRMED.id;
+};
+
+export const isBudgetCancelled = (status) => {
+  return status === BUDGET_STATES.CANCELLED.id;
+};
+
+export const isBudgetPending = (status) => {
+  return status === BUDGET_STATES.PENDING.id;
+};
+
+export const isBudgetExpired = (status) => {
+  return status === BUDGET_STATES.EXPIRED.id;
 };

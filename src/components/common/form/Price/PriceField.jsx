@@ -1,5 +1,5 @@
 import { FormField, Input } from "@/components/common/custom";
-import { formatedNumber } from "@/common/utils";
+import { getFormatedNumber } from "@/common/utils";
 import { Icon } from "semantic-ui-react";
 
 export const PriceField = ({ label, width, value, disabled = true, ...inputProps }) => {
@@ -11,7 +11,7 @@ export const PriceField = ({ label, width, value, disabled = true, ...inputProps
     >
       <Input
         {...inputProps}
-        value={formatedNumber(value)}
+        value={getFormatedNumber(value)}
         readOnly={disabled}
         iconPosition="left"
       >

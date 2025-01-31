@@ -10,7 +10,7 @@ import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { downloadExcel, formatedPrice } from "@/common/utils";
+import { downloadExcel, getFormatedPrice } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Dropdown } from "semantic-ui-react";
@@ -43,7 +43,7 @@ const Products = () => {
         product.name,
         product.brandName,
         product.supplierName,
-        formatedPrice(product.price),
+        getFormatedPrice(product.price),
         productState,
         product.comments
       ];

@@ -1,11 +1,10 @@
 import { Box, Flex } from "@/components/common/custom";
 import { DATE_FORMATS } from "@/common/constants";
-import { getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "@/common/utils";
 import { Label, Popup } from "semantic-ui-react";
 import { CommentTooltip } from "../common/tooltips";
 import { PriceLabel } from "../common/form";
 import { getFormatedDate } from "@/common/utils/dates";
-import { getLabelColor, getPopupContent } from "./budgets.utils";
+import { getLabelColor, getPopupContent, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
 
 export const ATTRIBUTES = {
   ID: "id",

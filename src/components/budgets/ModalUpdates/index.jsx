@@ -1,7 +1,7 @@
 import { IconedButton } from "@/components/common/buttons";
 import { ButtonsContainer } from "@/components/common/custom";
 import { COLORS, ICONS } from "@/common/constants";
-import { formatedPrice } from "@/common/utils";
+import { getFormatedPrice } from "@/common/utils";
 import { useMemo } from "react";
 import { Message, Modal, Transition } from "semantic-ui-react";
 import { MessageHeader, MessageItem } from "./styles";
@@ -30,9 +30,9 @@ const ModalUpdates = ({
           {`${p.code} | ${p.name} | `}
           {priceChanged && (
             <>
-              <span style={{ color: COLORS.RED }}>{formatedPrice(oldProduct.price)}</span>
+              <span style={{ color: COLORS.RED }}>{getFormatedPrice(oldProduct.price)}</span>
               {' -> '}
-              <span style={{ color: COLORS.GREEN }}>{formatedPrice(p.price)}</span>
+              <span style={{ color: COLORS.GREEN }}>{getFormatedPrice(p.price)}</span>
             </>
           )}
           {stateChanged && (
@@ -92,7 +92,7 @@ const ModalUpdates = ({
               <MessageHeader>Productos no disponibles</MessageHeader>
               <Message.List>
                 {removedProducts.map(p => (
-                  <MessageItem key={p.code}>{`${p.code} | ${p.name} | ${formatedPrice(p.price)}.`}</MessageItem>
+                  <MessageItem key={p.code}>{`${p.code} | ${p.name} | ${getFormatedPrice(p.price)}.`}</MessageItem>
                 ))}
               </Message.List>
             </Message>

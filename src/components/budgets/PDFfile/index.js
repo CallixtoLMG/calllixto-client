@@ -2,7 +2,7 @@ import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.utils";
 import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
 import { Box, Flex, FlexColumn } from "@/components/common/custom";
 import { Table, Total, TotalList } from '@/components/common/table';
-import { formatedSimplePhone, isBudgetCancelled, isBudgetDraft } from "@/common/utils";
+import { getFormatedPhone } from "@/common/utils";
 import dayjs from "dayjs";
 import { get } from "lodash";
 import { forwardRef, useMemo } from "react";
@@ -17,6 +17,7 @@ import {
 import { PriceLabel } from "@/components/common/form";
 import { getDateWithOffset } from "@/common/utils/dates";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
+import { isBudgetCancelled, isBudgetDraft } from "../budgets.utils";
 
 const Field = ({ label, value, ...rest }) => (
   <Flex columnGap="5px" minWidth="300px" {...rest}>
@@ -107,7 +108,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <Field label="Fecha" value={dayjs().format('DD-MM-YYYY')} />
           </Flex>
           <Flex>
-            <Field flex="1" label="Teléfonos" value={client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')} />
+            <Field flex="1" label="Teléfonos" value={client?.phoneNumbers?.map(getFormatedPhone).join(' | ')} />
             <Field label="Válido hasta" value={getDateWithOffset(budget?.createdAt, budget?.expirationOffsetDays, 'days')} />
           </Flex>
         </SectionContainer>

@@ -6,7 +6,7 @@ import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { COLORS, ICONS } from "@/common/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { formatedPercentage, formatedSimplePhone, isBudgetCancelled, isBudgetConfirmed } from "@/common/utils";
+import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
@@ -18,6 +18,7 @@ import { PriceLabel } from "@/components/common/form";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { now, getDateWithOffset } from "@/common/utils/dates";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
+import { isBudgetCancelled, isBudgetConfirmed } from "../budgets.utils";
 import { getBrandCode, getProductCode, getSupplierCode } from "@/components/products/products.utils";
 import { isProductOOS, getPrice, getTotal } from "@/components/products/products.utils";
 
@@ -127,7 +128,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
       },
       {
         title: "Descuento",
-        value: (product, index) => <p>{formatedPercentage(product?.discount)}</p>,
+        value: (product, index) => <p>{getFormatedPercentage(product?.discount)}</p>,
         id: 5,
         width: 1
       },
@@ -218,13 +219,13 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             flex="1"
             label="Teléfono"
             control={Dropdown}
-            value={!budget?.customer?.phoneNumbers?.length ? 'No existe un teléfono registrado' : budget?.customer?.phoneNumbers.length === 1 ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${formatedSimplePhone(budget.customer?.phoneNumbers?.[0])}` : selectedContact?.phone}
+            value={!budget?.customer?.phoneNumbers?.length ? 'No existe un teléfono registrado' : budget?.customer?.phoneNumbers.length === 1 ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${getFormatedPhone(budget.customer?.phoneNumbers?.[0])}` : selectedContact?.phone}
             readOnly
             selection
             options={budget?.customer?.phoneNumbers.map((phone) => ({
-              key: formatedSimplePhone(phone),
-              text: `${phone.ref ? `${phone.ref}: ` : ''}${formatedSimplePhone(phone)}`,
-              value: formatedSimplePhone(phone),
+              key: getFormatedPhone(phone),
+              text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
+              value: getFormatedPhone(phone),
             }))}
             onChange={(e, { value }) => setSelectedContact({
               ...selectedContact,

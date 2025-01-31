@@ -15,7 +15,7 @@ import { Box, Button, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, In
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { APIS, COLORS, ICONS, PAGES } from "@/common/constants";
 import { useValidateToken } from "@/hooks/userData";
-import { formatedSimplePhone, getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/common/utils";
+import { getFormatedPhone } from "@/common/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -25,6 +25,7 @@ import { Dropdown } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import { now } from "@/common/utils/dates";
 import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
+import { getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending, getSubtotal } from "@/components/budgets/budgets.utils";
 
 const Budget = ({ params }) => {
   useValidateToken();
@@ -135,7 +136,7 @@ const Budget = ({ params }) => {
       setCustomerData(budget.customer);
       setSelectedContact({
         address: budget.customer?.addresses?.[0]?.address,
-        phone: formatedSimplePhone(budget.customer?.phoneNumbers?.[0])
+        phone: getFormatedPhone(budget.customer?.phoneNumbers?.[0])
       });
     }
   }, [setLabels, budget, push, isLoading]);

@@ -3,7 +3,7 @@ import { ButtonsContainer, FieldsContainer, Flex, FlexColumn } from "@/component
 import { TextField } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import { COLORS, ICONS } from "@/common/constants";
-import { formatedSimplePhone } from "@/common/utils";
+import { getFormatedPhone } from "@/common/utils";
 import { useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { ButtonGroup, Form, Modal, Transition } from "semantic-ui-react";
@@ -93,7 +93,7 @@ const ModalConfirmation = ({
                 <TextField
                   flex="1"
                   label="Teléfono"
-                  value={`${formatedSimplePhone(customer?.phoneNumbers?.[0])}`}
+                  value={`${getFormatedPhone(customer?.phoneNumbers?.[0])}`}
                 />
               </FieldsContainer>
               <Payments
