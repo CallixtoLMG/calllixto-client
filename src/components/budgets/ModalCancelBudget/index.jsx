@@ -1,9 +1,10 @@
 import { IconedButton } from "@/components/common/buttons";
-import { ButtonsContainer, Input } from "@/components/common/custom";
+import { ButtonsContainer } from "@/components/common/custom";
 import { COLORS, ICONS } from "@/common/constants";
 import { useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
 import { Message, ModalContent } from "./styles";
+import { TextField } from "@/components/common/form";
 
 const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
   const [cancelReason, setCancelReason] = useState("");
@@ -15,10 +16,8 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
         </Modal.Header>
         <ModalContent>
           <Message>
-            <Input
-              height="40px"
-              placeholder="Motivo de anulación..."
-              type="text"
+            <TextField
+              placeholder="Motivo"
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               tabIndex="0"

@@ -1,28 +1,12 @@
-import { Dropdown, Flex, Input } from '@/components/common/custom';
 import { Filters, Table } from '@/components/common/table';
-import { ALL, COLORS, ICONS, PAGES } from "@/common/constants";
+import { ALL, COLORS, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { useFilters } from "@/hooks/useFilters";
 import { createFilter } from '@/common/utils';
 import { useRouter } from "next/navigation";
-import { Controller, FormProvider } from 'react-hook-form';
-import { Form, Label } from 'semantic-ui-react';
-import { BUDGET_STATES, BUDGETS_COLUMNS } from "../budgets.constants";
-
-const DEFAULT_STATE = { key: ALL, value: ALL, text: 'Todos' };
-const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: DEFAULT_STATE.value };
-const STATE_OPTIONS = [
-  DEFAULT_STATE,
-  ...Object.entries(BUDGET_STATES).map(([key, value]) => (
-    {
-      key,
-      text: (
-        <Flex alignItems="center" justifyContent="space-between">
-          {value.title}&nbsp;<Label color={value.color} circular empty />
-        </Flex>
-      ),
-      value: key
-    }))
-];
+import { FormProvider } from 'react-hook-form';
+import { Form } from 'semantic-ui-react';
+import { BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGETS_COLUMNS, EMPTY_FILTERS } from "../budgets.constants";
+import { DropdownControlled, TextControlled } from "@/components/common/form";
 
 const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const { push } = useRouter();
@@ -54,60 +38,29 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit(() => {})}>
           <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
-            <Controller
+            <DropdownControlled
+              width="200px"
               name="state"
-              render={({ field: { onChange, ...rest } }) => (
-                <Dropdown
-                  {...rest}
-                  $maxWidth
-                  top="10px"
-                  height="35px"
-                  minHeight="35px"
-                  selection
-                  options={STATE_OPTIONS}
-                  defaultValue={DEFAULT_STATE.value}
-                  onChange={(e, { value }) => {
-                    onChange(value);
-                    onSubmit(() => {})();
-                  }}
-                />
-              )}
+              options={BUDGET_STATES_OPTIONS}
+              defaultValue={SELECT_ALL_OPTION.state}
+              afterChange={() => {
+                onSubmit(() => {})();
+              }}
             />
-            <Controller
+            <TextControlled
+              width="120px"
               name="id"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Id"
-                />
-              )}
+              placeholder="Id"
             />
-            <Controller
+            <TextControlled
+              flex="1"
               name="customer"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  $maxWidth
-                  $marginBottom
-                  height="35px"
-                  placeholder="Cliente"
-                />
-              )}
+              placeholder="Cliente"
             />
-            <Controller
+            <TextControlled
+              flex="1"
               name="seller"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Vendedor"
-                />
-              )}
+              placeholder="Vendedor"
             />
           </Filters>
         </Form>

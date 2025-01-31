@@ -9,7 +9,7 @@ import { useValidateToken } from "@/hooks/userData";
 import { downloadExcel, handleUndefined } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
-import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
+import { BUDGET_STATE_TRANSLATIONS } from "@/components/budgets/budgets.constants";
 import { getTotal } from "@/components/products/products.utils";
 import { getTotalSum } from "@/components/budgets/budgets.utils";
 
@@ -28,19 +28,12 @@ const Budgets = () => {
   const budgets = useMemo(() => data?.budgets, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const stateTranslations = useMemo(() => ({
-    CONFIRMED: BUDGET_STATES.CONFIRMED,
-    PENDING: BUDGET_STATES.PENDING,
-    EXPIRED: BUDGET_STATES.EXPIRED,
-    CANCELLED: BUDGET_STATES.CANCELLED,
-    DRAFT: BUDGET_STATES.DRAFT
-  }), []);
 
   const handleDownloadExcel = useCallback(() => {
     if (!budgets) return;
     let maxProductCount = 1;
     const mappedBudgets = budgets.map(budget => {
-      const translatedState = stateTranslations[budget.state].singularTitle || "";
+      const translatedState = BUDGET_STATE_TRANSLATIONS[budget.state].singularTitle || "";
       maxProductCount = Math.max(maxProductCount, budget.products?.length);
       const budgetRow = [
         handleUndefined(budget.id),
@@ -71,7 +64,7 @@ const Budgets = () => {
     const productsHeaders = Array.from(Array(maxProductCount).keys()).map((index) => `Producto ${index + 1}`);
     const headers = ['ID', 'Estado', 'Cliente', 'Fecha', "Total", "Descuento", "Cargo adicional", "Vendedor", ...productsHeaders];
     downloadExcel([headers, ...mappedBudgets], "Lista de Ventas");
-  }, [budgets, stateTranslations]);
+  }, [budgets]);
 
   useEffect(() => {
     const actions = [

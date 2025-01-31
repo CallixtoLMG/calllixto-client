@@ -206,3 +206,6 @@ export const PASSWORD_REQUIREMENTS = [
   { label: "Un número.", test: /\d/ },
   { label: "Un carácter especial.", test: /[@$!%*?&]/ },
 ];
+
+export const SELECT_ALL_OPTION = { key: ALL, value: ALL, text: 'Todos' };
+
