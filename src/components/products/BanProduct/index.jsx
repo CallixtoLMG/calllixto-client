@@ -111,12 +111,13 @@ const BanProduct = ({ open, setOpen }) => {
         <Modal.Content>
           <Form ref={formRef} onSubmit={handleSubmit(mutate)}>
             <FieldsContainer>
-                <TextField
-                  placeholder="Código"
-                  label="Código"
-                  onKeyPress={(e) => handleEnterKeyPress(e, handleAddProduct)}
-                />
-                {/* <Popup
+              <TextField
+                placeholder="Código"
+                label="Código"
+                onKeyPress={(e) => handleEnterKeyPress(e, handleAddProduct)}
+              />
+              {/* TODO:
+                <Popup
                   position="top center"
                   size="tiny"
                   content={
