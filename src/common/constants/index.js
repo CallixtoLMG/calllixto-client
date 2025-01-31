@@ -229,4 +229,3 @@ export const PASSWORD_REQUIREMENTS = [
 ];
 
 export const SELECT_ALL_OPTION = { key: ALL, value: ALL, text: 'Todos' };
-

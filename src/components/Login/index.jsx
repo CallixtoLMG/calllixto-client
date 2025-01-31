@@ -12,6 +12,7 @@ import { toast } from "react-hot-toast";
 import { Form } from "semantic-ui-react";
 import PasswordInput from "../common/custom/PasswordInput";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styles";
+import { TextControlled } from "../common/form";
 
 const LoginForm = ({ onSubmit }) => {
   const { setUserData } = useUserContext();
@@ -83,9 +84,8 @@ const LoginForm = ({ onSubmit }) => {
           </ModHeader>
           {showPasswordReset ? (
             <Form onSubmit={handleSubmit(recoverPassword)} size="large">
-              <Controller
+              <TextControlled
                 name="username"
-                control={control}
                 rules={{
                   required: "El correo electrónico es obligatorio",
                   pattern: {
@@ -93,23 +93,9 @@ const LoginForm = ({ onSubmit }) => {
                     message: "El correo electrónico no es válido",
                   },
                 }}
-                render={({ field, fieldState: { error } }) => (
-                  <>
-                    <Form.Input
-                      {...field}
-                      placeholder="Correo electrónico"
-                      fluid
-                      icon={ICONS.USER}
-                      iconPosition="left"
-                      error={!!error}
-                    />
-                    {error && (
-                      <Text style={{ color: "red", marginTop: "5px" }}>
-                        {error.message}
-                      </Text>
-                    )}
-                  </>
-                )}
+                placeholder="Correo electrónico"
+                icon={ICONS.USER}
+                iconPosition="left"
               />
               <ModButton fluid="true" size="large">
                 Enviar
