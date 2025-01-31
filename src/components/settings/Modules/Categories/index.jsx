@@ -1,10 +1,10 @@
 import { IconnedButton } from "@/components/common/buttons";
-import { Flex, FlexColumn } from "@/components/common/custom";
+import { Box, Flex, FlexColumn } from "@/components/common/custom";
 import { Table } from "@/components/common/table";
 import { COLORS, ICONS, SEMANTIC_COLORS } from "@/constants";
 import { useState } from "react";
 import { useFieldArray } from "react-hook-form";
-import { Accordion, Icon, Label, Segment } from "semantic-ui-react";
+import { Accordion, Icon, Label } from "semantic-ui-react";
 import { FormInput, FormSelect } from "./styles";
 
 const Categories = () => {
@@ -42,7 +42,6 @@ const Categories = () => {
 
   const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
 
-
   return (
     <Accordion fluid>
       <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
@@ -50,8 +49,8 @@ const Categories = () => {
         Categorias
       </Accordion.Title>
       <Accordion.Content active={isAccordionOpen}>
-        <Segment>
-          <Flex width="100%" paddingTop="20px" alignItems="flex-start" columnGap="15px">
+        <Box>
+          <Flex width="100%" padding="0 10px 10px 10px!important" alignItems="flex-start" columnGap="15px">
             <FormInput
               width={4}
               label="Nombre"
@@ -93,7 +92,7 @@ const Categories = () => {
               deleteButtonInside
             />
           </FlexColumn>
-        </Segment>
+        </Box>
       </Accordion.Content>
     </Accordion>
   );

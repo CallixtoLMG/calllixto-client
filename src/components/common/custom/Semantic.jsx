@@ -1,6 +1,7 @@
 import {
   Form,
   Button as SButton,
+  Divider as SDivider,
   Dropdown as SDropdown,
   Icon as SIcon,
   Input as SInput,
@@ -195,4 +196,8 @@ export const MessageHeader = styled(SMessageHeader)`
 
 export const Message = styled(SMessage)`
   width: 100%;
+`;
+
+export const Divider = styled(SDivider)`
+  margin: 10px!important;
 `;

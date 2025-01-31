@@ -13,34 +13,20 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
 const ENTITY_MAPPER = {
-  PRODUCT: {
-    name: "Productos",
-  },
-  CUSTOMER: {
-    name: "Clientes",
-  },
-  BRAND: {
-    name: "Marcas",
-  },
-  BUDGET: {
-    name: "Ventas",
-  },
-  SUPPLIER: {
-    name: "Proveedores",
-  },
-  EXPENSE: {
-    name: "Gastos",
-  },
-  GENERAL: {
-    name: "General",
-  },
+  PRODUCT: { name: "Productos" },
+  CUSTOMER: { name: "Clientes" },
+  BRAND: { name: "Marcas" },
+  BUDGET: { name: "Ventas" },
+  SUPPLIER: { name: "Proveedores" },
+  EXPENSE: { name: "Gastos" },
+  GENERAL: { name: "General" },
 };
 
 export const SUPPORTED_SETTINGS = {
-  PRODUCT: ['tags'],
-  CUSTOMER: ['tags'],
-  EXPENSE: ['tags', 'categories'],
-}
+  PRODUCT: ["tags"],
+  CUSTOMER: ["tags"],
+  EXPENSE: ["tags"],
+};
 
 const Settings = () => {
   useValidateToken();
@@ -48,23 +34,22 @@ const Settings = () => {
   const { setActions } = useNavActionsContext();
   const { data } = useListSettings();
   const editSetting = useEditSetting();
-  const [activeEntity, setActiveEntity] = useState({entity:"CUSTOMER", label: "Cliente"});
+
   const methods = useForm();
-  const { handleSubmit, reset, formState: {isDirty}  } = methods;
+  const { handleSubmit, reset, formState: { isDirty } } = methods;
+  const [activeEntity, setActiveEntity] = useState(null);
 
   useEffect(() => {
     setActions([]);
     setLabels([PAGES.SETTINGS.NAME]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setActions, setLabels]);
 
   const { mutate: mutateEdit, isPending } = useMutation({
-    mutationFn: (data) => {
-      return editSetting({
-        entity: `${activeEntity.entity}S`,
-        value: pick(data, SUPPORTED_SETTINGS[activeEntity.entity])
-      });
-    },
+    mutationFn: (data) => editSetting({
+      entity: `${activeEntity?.entity}S`,
+      value: pick(data, SUPPORTED_SETTINGS[activeEntity?.entity]),
+    }),
     onSuccess: () => {
       toast.success("Cambios guardados correctamente.");
     },
@@ -74,24 +59,29 @@ const Settings = () => {
   });
 
   const handleEntityChange = useCallback((entity) => {
-    console.log(entity)
     setActiveEntity(entity);
     setLabels([PAGES.SETTINGS.NAME, entity.label]);
     reset(entity);
-   
   }, [reset, setLabels]);
 
   const settings = useMemo(() => {
     if (!data?.settings) return [];
-    const mappedEntities = data?.settings
-      .filter(entity => SUPPORTED_SETTINGS[entity.entity]?.some(setting => !!entity[setting]))
-      .map(entity => ({
+
+    const mappedEntities = data.settings
+      .filter((entity) => SUPPORTED_SETTINGS[entity.entity]?.some((setting) => !!entity[setting]))
+      .map((entity) => ({
         ...entity,
-        label: ENTITY_MAPPER[entity.entity].name
+        label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
       }));
-    // handleEntityChange(activeEntity);
+
     return mappedEntities;
-  }, [data, handleEntityChange]);
+  }, [data]);
+
+  useEffect(() => {
+    if (!activeEntity && settings.length) {
+      handleEntityChange(settings[0]);
+    }
+  }, [settings, activeEntity, handleEntityChange]);
 
   return (
     <FormProvider {...methods}>
