@@ -1,4 +1,4 @@
-import { COLORS } from "@/common/constants";
+import { COLORS, PAGES } from "@/common/constants";
 import { isCallixtoUser } from "@/roles";
 import { useUserContext } from "@/User";
 import { useRouter } from "next/navigation";
@@ -65,7 +65,7 @@ const UserMenu = ({ trigger, onLogout, onClientChange }) => {
         </Menu.Item>
         <Menu.Item
           onClick={() => {
-            push("/change-password");
+            push(PAGES.CHANGE_PASSWORD.BASE);
           }}
         >
           <Icon color={COLORS.YELLOW} name="lock" /> Cambiar contraseña

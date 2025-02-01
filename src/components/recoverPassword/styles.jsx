@@ -9,13 +9,6 @@ const Text = styled.p`
   color: #579294;
 `;
 
-const MessageText = styled.p`
-  display: flex;
-  font-size: 12px;
-  margin: 0!important;
-  color: #579294;
-`;
-
 const ModGrid = styled(Grid)`
   &&& {
     background-color: #C8E3DF!important;
@@ -74,5 +67,5 @@ const RedirectLink = styled.a`
   }
 `;
 
-export { MessageText, ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text };
+export { ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text };
 

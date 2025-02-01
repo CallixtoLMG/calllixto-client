@@ -550,7 +550,7 @@ const BudgetForm = ({
               control={Dropdown}
               label="Dirección"
               required={isBudgetConfirmed(watchState) && !watchPickUp}
-              error={errors?.customer?.addresses ? { content: errors.customer.addresses.message, pointing: 'above' } : null}
+              error={errors?.customer?.addresses ?? { content: errors.customer.addresses.message, pointing: 'above' }}
               value={watchPickUp ? PICK_UP_IN_STORE : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer?.addresses?.[0]?.ref}: ` : ''}${watchCustomer?.addresses?.[0]?.address ? watchCustomer?.addresses?.[0]?.address : ""}` : selectedContact.address}
               selection
               options={watchCustomer?.addresses.map((address) => ({
@@ -569,7 +569,7 @@ const BudgetForm = ({
               control={Dropdown}
               label="Teléfono"
               required={isBudgetConfirmed(watchState)}
-              error={shouldError && errors?.customer?.phoneNumbers ? { content: errors.customer.phoneNumbers.message, pointing: 'above' } : null}
+              error={(shouldError && errors?.customer?.phoneNumbers) ?? { content: errors.customer.phoneNumbers.message, pointing: 'above' }}
               value={!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer?.phoneNumbers?.[0]?.ref}: ` : ''}${getFormatedPhone(watchCustomer?.phoneNumbers?.[0])}` : selectedContact.phone}
               selection
               options={watchCustomer?.phoneNumbers.map((phone) => ({
@@ -591,7 +591,7 @@ const BudgetForm = ({
                 width="300px"
                 label="Productos"
                 required
-                error={errors?.products?.root ? { content: errors.products.root.message, pointing: 'above' } : null}
+                error={errors?.products?.root ?? { content: errors.products.root.message, pointing: 'above' }}
                 control={ProductSearch}
                 ref={productSearchRef}
                 products={products}

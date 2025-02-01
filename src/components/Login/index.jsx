@@ -8,9 +8,9 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Form } from "semantic-ui-react";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styles";
 import { PasswordControlled, TextControlled } from "../common/form";
+import { Form } from "../common/custom";
 
 const LoginForm = ({ onSubmit }) => {
   const { setUserData } = useUserContext();

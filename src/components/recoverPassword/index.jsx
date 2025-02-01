@@ -4,12 +4,11 @@ import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Form } from "semantic-ui-react";
-import PasswordInput from "../common/form/Password/PasswordField";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text } from "./styles";
-import { PasswordControlled, PasswordRequirements, TextControlled } from "../common/form";
+import { PasswordControlled, TextControlled } from "../common/form";
+import { Form } from "../common/custom";
 
 const RecoverPasswordForm = () => {
   const { push } = useRouter();
