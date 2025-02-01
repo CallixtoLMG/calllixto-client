@@ -75,6 +75,12 @@ export const TextArea = styled(STextarea)`
 
 export const Dropdown = styled(SDropdown)`
   height: ${({ height = '35px' }) => `${height}!important`} ;
+  padding: ${({ padding }) => `${padding}!important`} ;
+  background-color: ${({ bgColor }) => `${bgColor}!important`};
+  box-shadow: ${({ boxShadow }) => boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
+  i{
+    margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
+  }
 `;
 
 export const DropdownOption = styled(SDropdown)`

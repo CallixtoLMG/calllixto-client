@@ -41,9 +41,8 @@ const Pagination = ({
             onChange={onPageSizeChange}
             selection
             compact
+            boxShadow
             height="40px"
-            top="10px"
-            width="fit-content"
           />
         )}
         position="left center"

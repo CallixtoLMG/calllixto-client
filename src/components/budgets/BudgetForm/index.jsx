@@ -1,30 +1,28 @@
-import { PAYMENT_METHODS } from "@/components/budgets/budgets.constants";
+import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
+import { getFormatedPhone } from "@/common/utils";
+import { getDateWithOffset, now } from "@/common/utils/dates";
+import { BUDGET_STATES, PAYMENT_METHODS, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
+import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { IconedButton, SubmitAndRestore } from "@/components/common/buttons";
 import { Button, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/components/common/custom";
-import { PriceLabel, PriceControlled, TextAreaControlled, PercentControlled, NumberControlled, GroupedButtonsControlled, TextControlled, DropdownControlled } from "@/components/common/form";
+import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled } from "@/components/common/form";
 import Payments from "@/components/common/form/Payments";
 import ProductSearch from "@/components/common/search/search";
 import { Table, Total } from "@/components/common/table";
 import { CommentTooltip } from "@/components/common/tooltips";
 import { Loader } from "@/components/layout";
-import { ATTRIBUTES } from "@/components/products/products.constants";
-import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
+import { ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
+import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { getFormatedPhone } from "@/common/utils";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
+import { CUSTOMER_STATES } from "../../customers/customers.constants";
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
 import { Container, Icon, VerticalDivider } from "./styles";
-import { CUSTOMER_STATES } from "../../customers/customers.constants";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { getDateWithOffset } from "@/common/utils/dates";
-import { BUDGET_STATES, PICK_UP_IN_STORE } from '@/components/budgets/budgets.constants';
-import { getTotalSum, isBudgetConfirmed, isBudgetDraft, getSubtotal } from '@/components/budgets/budgets.utils';
-import { getBrandCode, getProductCode, getSupplierCode, getPrice, getTotal } from "@/components/products/products.utils";
 
 
 const EMPTY_BUDGET = (user) => ({
@@ -533,7 +531,8 @@ const BudgetForm = ({
                 label="Fecha de vencimiento"
                 control={Input}
                 readOnly
-                value={getDateWithOffset(null, expiration, 'days')}
+                value={expiration ? getDateWithOffset(now(), expiration, "days") : ""}
+                placeholder="dd/mm/aaaa"
               />
             </FieldsContainer>
           </FieldsContainer>
@@ -550,7 +549,7 @@ const BudgetForm = ({
               control={Dropdown}
               label="Dirección"
               required={isBudgetConfirmed(watchState) && !watchPickUp}
-              error={errors?.customer?.addresses ?? { content: errors.customer.addresses.message, pointing: 'above' }}
+              error={errors?.customer?.addresses ?? { content: errors.customer?.addresses.message, pointing: 'above' }}
               value={watchPickUp ? PICK_UP_IN_STORE : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer?.addresses?.[0]?.ref}: ` : ''}${watchCustomer?.addresses?.[0]?.address ? watchCustomer?.addresses?.[0]?.address : ""}` : selectedContact.address}
               selection
               options={watchCustomer?.addresses.map((address) => ({
@@ -591,7 +590,7 @@ const BudgetForm = ({
                 width="300px"
                 label="Productos"
                 required
-                error={errors?.products?.root ?? { content: errors.products.root.message, pointing: 'above' }}
+                error={errors?.products?.root ?? { content: errors.products?.root.message, pointing: 'above' }}
                 control={ProductSearch}
                 ref={productSearchRef}
                 products={products}
