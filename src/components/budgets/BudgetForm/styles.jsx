@@ -1,4 +1,4 @@
-import { Flex } from '@/components/common/custom';
+import { Flex } from '@/common/components/custom';
 import { Icon as SIcon, MessageHeader as SMessageHeader, MessageItem as SMessageItem, MessageList as SMessageList } from "semantic-ui-react";
 import styled from 'styled-components';
 

@@ -1,10 +1,10 @@
-import { IconedButton } from "@/components/common/buttons";
-import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Label, Segment } from "@/components/common/custom";
+import { IconedButton } from "@/common/components/buttons";
+import { ButtonsContainer, FieldsContainer, Flex, Form } from "@/common/components/custom";
+import { TextControlled, TextField } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { useEffect } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
-import { TextControlled } from "@/components/common/form";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const methods = useForm();
@@ -24,22 +24,13 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         <Modal.Header>Comentarios del producto</Modal.Header>
         <Modal.Content>
           <Flex flexDirection="column" rowGap="15px">
-            <FieldsContainer>
-              <FormField flex="1">
-                <Label>Código</Label>
-                <Segment placeholder>{product?.code}</Segment>
-              </FormField>
-              <FormField flex="1">
-                <Label>Nombre</Label>
-                <Segment placeholder>{product?.name}</Segment>
-              </FormField>
-              <FormField width="50px">
-                <Label>Cantidad</Label>
-                <Segment placeholder>{product?.quantity}</Segment>
-              </FormField>
-            </FieldsContainer>
             <FormProvider {...methods}>
               <Form onSubmit={handleSubmit(onAddComment)}>
+                <FieldsContainer>
+                  <TextField flex="1" label="Código" placeholder={product?.code} disabled />
+                  <TextField flex="1" label="Nombre" placeholder={product?.name} disabled />
+                  <TextField width="100px" label="Cantidad" placeholder={product?.quantity} disabled />
+                </FieldsContainer>
                 <FieldsContainer>
                   <TextControlled
                     flex="1"

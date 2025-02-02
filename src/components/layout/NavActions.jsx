@@ -1,7 +1,7 @@
-import { Box, Flex } from '@/components/common/custom';
+import { Box, Flex } from '@/common/components/custom';
 import { createContext, useContext, useState } from 'react';
 import { Popup } from 'semantic-ui-react';
-import { IconedButton } from '../common/buttons';
+import { IconedButton } from '../../common/components/buttons';
 
 const NavActionsContext = createContext();
 

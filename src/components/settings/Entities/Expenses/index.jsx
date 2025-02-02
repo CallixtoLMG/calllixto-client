@@ -1,5 +1,5 @@
-import { FlexColumn } from "@/components/common/custom";
-import { Divider } from "@/components/common/custom/Semantic";
+import { FlexColumn } from "@/common/components/custom";
+import { Divider } from "@/common/components/custom/Semantic";
 import Categories from "../../Modules/Categories";
 import Tags from "../../Modules/Tags";
 

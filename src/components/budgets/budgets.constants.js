@@ -1,9 +1,9 @@
-import { Box, Flex } from "@/components/common/custom";
+import { Box, Flex } from "@/common/components/custom";
 import { DATE_FORMATS, SELECT_ALL_OPTION } from "@/common/constants";
-import { Label, Popup } from "semantic-ui-react";
-import { CommentTooltip } from "../common/tooltips";
-import { PriceLabel } from "../common/form";
 import { getFormatedDate } from "@/common/utils/dates";
+import { Label, Popup } from "semantic-ui-react";
+import { PriceLabel } from "../../common/components/form";
+import { CommentTooltip } from "../../common/components/tooltips";
 import { getLabelColor, getPopupContent, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
 
 export const ATTRIBUTES = {

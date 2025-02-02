@@ -1,11 +1,11 @@
-import { IconedButton } from "@/components/common/buttons";
-import { ButtonsContainer } from "@/components/common/custom";
+import { IconedButton } from "@/common/components/buttons";
+import { ButtonsContainer } from "@/common/components/custom";
 import { COLORS, ICONS } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { useMemo } from "react";
 import { Message, Modal, Transition } from "semantic-ui-react";
 import { MessageHeader, MessageItem } from "./styles";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
 
 const ModalUpdates = ({
   shouldShowModal,

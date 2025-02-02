@@ -1,20 +1,20 @@
 import { useUserContext } from "@/User";
 import { editBanProducts, useGetBlackList } from "@/api/products";
-import { IconedButton } from "@/components/common/buttons";
-import { FieldsContainer, Flex, Form, FormField, Icon, Label, Modal } from "@/components/common/custom";
-import { Table } from "@/components/common/table";
-import { Loader } from "@/components/layout";
+import { IconedButton } from "@/common/components/buttons";
+import { FieldsContainer, Flex, Form, Label, Modal } from "@/common/components/custom";
+import { TextField } from "@/common/components/form";
+import { Table } from "@/common/components/table";
 import { COLORS, ICONS } from "@/common/constants";
 import { handleEnterKeyPress } from '@/common/utils';
+import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
 import { isEqual, sortBy } from 'lodash';
 import { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Popup, Transition } from "semantic-ui-react";
+import { Transition } from "semantic-ui-react";
 import { BAN_PRODUCTS_COLUMNS } from "../products.constants";
 import { ModalActions } from "./styles";
-import { TextField } from "@/components/common/form";
 
 const BanProduct = ({ open, setOpen }) => {
   const { handleSubmit, setValue, watch } = useForm({ defaultValues: { products: [] } });

@@ -1,8 +1,8 @@
-import { Flex, Label } from "@/components/common/custom";
-import { CommentTooltip } from "@/components/common/tooltips";
-import { getBrandCode, getProductCode, getSupplierCode } from "./products.utils";
+import { Flex, Label } from "@/common/components/custom";
+import { CommentTooltip } from "@/common/components/tooltips";
 import { Popup } from "semantic-ui-react";
-import { PriceLabel } from "../common/form";
+import { PriceLabel } from "../../common/components/form";
+import { getBrandCode, getProductCode, getSupplierCode } from "./products.utils";
 
 export const ATTRIBUTES = {
   CODE: "code",

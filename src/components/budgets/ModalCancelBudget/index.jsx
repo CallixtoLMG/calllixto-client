@@ -1,10 +1,10 @@
-import { IconedButton } from "@/components/common/buttons";
-import { ButtonsContainer } from "@/components/common/custom";
+import { IconedButton } from "@/common/components/buttons";
+import { ButtonsContainer } from "@/common/components/custom";
+import { TextField } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
 import { Message, ModalContent } from "./styles";
-import { TextField } from "@/components/common/form";
 
 const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
   const [cancelReason, setCancelReason] = useState("");

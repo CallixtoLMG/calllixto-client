@@ -1,9 +1,9 @@
+import ModalAction from '@/common/components/modals/ModalAction';
 import { COLORS, ICONS } from '@/common/constants';
-import ModalAction from '@/components/common/modals/ModalAction';
 import { useRestoreEntity } from '@/hooks/common';
 import { useState } from 'react';
 import { Icon } from 'semantic-ui-react';
-import { Dropdown } from '../common/custom';
+import { Dropdown } from '../../common/components/custom';
 
 const OptionsDropdown = ({ entity, queryKey, text }) => {
   const [showModal, setShowModal] = useState(false);

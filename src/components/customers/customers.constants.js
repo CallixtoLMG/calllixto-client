@@ -1,6 +1,6 @@
-import { Flex, Label } from "@/components/common/custom";
+import { Flex, Label } from "@/common/components/custom";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
-import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "../common/tooltips";
+import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "../../common/components/tooltips";
 
 export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value', STATE: "state", INACTIVE_REASON: "inactiveReason" };
 

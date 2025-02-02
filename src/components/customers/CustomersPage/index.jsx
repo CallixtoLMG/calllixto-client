@@ -1,11 +1,11 @@
-import { Filters, Table } from '@/components/common/table';
+import { DropdownControlled, TextControlled } from '@/common/components/form';
+import { Filters, Table } from '@/common/components/table';
 import { PAGES } from "@/common/constants";
-import { useFilters } from '@/hooks/useFilters';
 import { createFilter } from '@/common/utils';
+import { useFilters } from '@/hooks/useFilters';
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
 import { CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS } from "../customers.constants";
-import { DropdownControlled, TextControlled } from '@/components/common/form';
 
 const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
   const {

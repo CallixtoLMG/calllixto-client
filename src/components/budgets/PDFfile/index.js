@@ -1,22 +1,22 @@
-import { getProductsColumns } from "@/components/budgets/budgets.utils";
-import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
-import { Box, Flex, FlexColumn } from "@/components/common/custom";
-import { Table, Total, TotalList } from '@/components/common/table';
+import { Box, Flex, FlexColumn } from "@/common/components/custom";
+import { PriceLabel } from "@/common/components/form";
+import { Table, Total, TotalList } from '@/common/components/table';
 import { getFormatedPhone } from "@/common/utils";
+import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
+import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
+import { getProductsColumns } from "@/components/budgets/budgets.utils";
 import { get } from "lodash";
 import { forwardRef, useMemo } from "react";
 import { List } from "semantic-ui-react";
-import {
-  DataContainer,
-  Divider,
-  Image,
-  SectionContainer,
-  Title
-} from "./styles";
-import { PriceLabel } from "@/components/common/form";
-import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
 import { isBudgetCancelled, isBudgetDraft } from "../budgets.utils";
+import {
+    DataContainer,
+    Divider,
+    Image,
+    SectionContainer,
+    Title
+} from "./styles";
 
 const Field = ({ label, value, ...rest }) => (
   <Flex columnGap="5px" minWidth="300px" {...rest}>

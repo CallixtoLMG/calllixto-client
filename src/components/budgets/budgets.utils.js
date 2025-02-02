@@ -1,11 +1,11 @@
-import { Flex } from "@/components/common/custom";
+import { Flex } from "@/common/components/custom";
 import { COLORS, DATE_FORMATS } from "@/common/constants";
 import { getFormatedPercentage } from "@/common/utils";
-import { Label } from "semantic-ui-react";
-import { PriceLabel } from "../common/form";
+import { getFormatedDate } from "@/common/utils/dates";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getPrice, getTotal } from "@/components/products/products.utils";
-import { getFormatedDate } from "@/common/utils/dates";
+import { Label } from "semantic-ui-react";
+import { PriceLabel } from "../../common/components/form";
 import { BUDGET_STATES } from "./budgets.constants";
 
 export const getLabelColor = (budget) => BUDGET_STATES[budget?.state]?.color;

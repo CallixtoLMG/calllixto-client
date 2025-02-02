@@ -1,5 +1,5 @@
-import { Flex, Label } from '@/components/common/custom';
-import { CommentTooltip } from "@/components/common/tooltips";
+import { Flex, Label } from '@/common/components/custom';
+import { CommentTooltip } from "@/common/components/tooltips";
 
 export const ATTRIBUTES = { ID: "id", NAME: "name", COMMENT: "comments", STATE: "state" };
 

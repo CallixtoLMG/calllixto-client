@@ -1,26 +1,24 @@
 import { useUpdatePayments } from "@/api/budgets";
-import { SubmitAndRestore } from "@/components/common/buttons";
-import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, TextArea, ViewContainer } from "@/components/common/custom";
-import Payments from "@/components/common/form/Payments";
-import { Table, Total } from "@/components/common/table";
-import { CommentTooltip } from "@/components/common/tooltips";
+import { SubmitAndRestore } from "@/common/components/buttons";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, TextArea, ViewContainer } from "@/common/components/custom";
+import { PriceLabel } from "@/common/components/form";
+import Payments from "@/common/components/form/Payments";
+import { Table, Total } from "@/common/components/table";
+import { CommentTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS } from "@/common/constants";
-import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
+import { getDateWithOffset, now } from "@/common/utils/dates";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
+import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
+import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Popup } from "semantic-ui-react";
-import { getBudgetState } from "../budgets.utils";
-import { Container, Message, MessageHeader } from "./styles";
-import { PriceLabel } from "@/components/common/form";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { now, getDateWithOffset } from "@/common/utils/dates";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
-import { isBudgetCancelled, isBudgetConfirmed } from "../budgets.utils";
-import { getBrandCode, getProductCode, getSupplierCode } from "@/components/products/products.utils";
-import { isProductOOS, getPrice, getTotal } from "@/components/products/products.utils";
+import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../budgets.utils";
+import { Container, Message, MessageHeader } from "./styles";
 
 const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
   const methods = useForm({

@@ -1,5 +1,5 @@
-import { Box, Button, Flex, FlexColumn } from "@/components/common/custom";
-import { Table } from "@/components/common/table";
+import { Box, Button, Flex, FlexColumn } from "@/common/components/custom";
+import { Table } from "@/common/components/table";
 import { COLORS, ICONS, SEMANTIC_COLORS } from "@/common/constants";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";

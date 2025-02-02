@@ -1,10 +1,10 @@
-import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Form } from "@/components/common/custom";
+import { SubmitAndRestore } from "@/common/components/buttons";
+import { FieldsContainer, Form } from "@/common/components/custom";
+import { TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/common/utils";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { FormProvider, useForm } from "react-hook-form";
-import { TextAreaControlled, TextControlled } from "@/components/common/form";
 import { EMPTY_BRAND } from "../brands.constants";
 
 const BrandForm = ({ brand, onSubmit, isLoading, isUpdating, view }) => {

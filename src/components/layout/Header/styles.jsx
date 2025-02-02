@@ -1,4 +1,4 @@
-import { Flex } from "@/components/common/custom";
+import { Flex } from "@/common/components/custom";
 import Link from "next/link";
 import { Container as SContainer } from "semantic-ui-react";
 import styled from "styled-components";

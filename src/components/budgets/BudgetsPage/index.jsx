@@ -1,12 +1,12 @@
-import { Filters, Table } from '@/components/common/table';
+import { DropdownControlled, TextControlled } from "@/common/components/form";
+import { Filters, Table } from '@/common/components/table';
 import { ALL, COLORS, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
-import { useFilters } from "@/hooks/useFilters";
 import { createFilter } from '@/common/utils';
+import { useFilters } from "@/hooks/useFilters";
 import { useRouter } from "next/navigation";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
 import { BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGETS_COLUMNS, EMPTY_FILTERS } from "../budgets.constants";
-import { DropdownControlled, TextControlled } from "@/components/common/form";
 
 const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const { push } = useRouter();

@@ -1,15 +1,15 @@
-import { IconedButton } from "@/components/common/buttons";
-import { ButtonsContainer, FieldsContainer, Flex, FlexColumn } from "@/components/common/custom";
-import { TextField } from "@/components/common/form";
-import Payments from "@/components/common/form/Payments";
+import { IconedButton } from "@/common/components/buttons";
+import { ButtonsContainer, FieldsContainer, Flex, FlexColumn } from "@/common/components/custom";
+import { TextField } from "@/common/components/form";
+import Payments from "@/common/components/form/Payments";
 import { COLORS, ICONS } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
+import { now } from "@/common/utils/dates";
 import { useMemo, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Form, Modal, Transition } from "semantic-ui-react";
-import { now } from "@/common/utils/dates";
-import { PICK_UP_IN_STORE } from "../budgets.constants";
 import { GroupedButtonsControlled } from "../../common/form";
+import { PICK_UP_IN_STORE } from "../budgets.constants";
 
 const ModalConfirmation = ({
   isModalOpen,

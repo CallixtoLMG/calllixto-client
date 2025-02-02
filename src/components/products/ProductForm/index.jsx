@@ -1,16 +1,16 @@
-import { SubmitAndRestore } from "@/components/common/buttons";
-import { FieldsContainer, Flex, Form, Label } from "@/components/common/custom";
-import { PriceControlled, TextControlled, TextAreaControlled, DropdownControlled, IconedButtonControlled, TextField } from "@/components/common/form";
+import { SubmitAndRestore } from "@/common/components/buttons";
+import { FieldsContainer, Flex, Form, Label } from "@/common/components/custom";
+import { DropdownControlled, IconedButtonControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { preventSend } from "@/common/utils";
+import { BRANDS_STATES } from "@/components/brands/brands.constants";
+import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
-import { BRANDS_STATES } from "@/components/brands/brands.constants";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
-import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
-import { isProductDeleted, getBrandCode, getProductCode, getSupplierCode } from "../products.utils";
+import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view }) => {
   const methods = useForm({
