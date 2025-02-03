@@ -235,10 +235,10 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
   return item => {
     for (const key of keysToFilter) {
       if (filters[key]) {
-        const filterWords = filters[key].toLowerCase().split(/\s+/);
+        const filterWords = filters[key].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,"").split(/\s+/);
 
         const itemValue = typeof item[key] === 'string'
-          ? item[key].toLowerCase()
+          ? item[key].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,"")
           : typeof exceptions[key] === 'function'
             ? exceptions[key](item).toLowerCase()
             : '';
