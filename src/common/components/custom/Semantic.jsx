@@ -160,6 +160,7 @@ export const MessageHeader = styled(SMessageHeader)`
 
 export const Message = styled(SMessage)`
   width: 100%;
+  margin: ${({ margin }) => `${margin}!important`} ;
 `;
 
 export const Button = styled(SButton)`

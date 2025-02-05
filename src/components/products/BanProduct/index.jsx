@@ -1,7 +1,7 @@
 import { useUserContext } from "@/User";
 import { editBanProducts, useGetBlackList } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
-import { FieldsContainer, Flex, Form, Label, Modal } from "@/common/components/custom";
+import { FieldsContainer, Flex, Form, FormField, Modal } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, ICONS } from "@/common/constants";
@@ -115,32 +115,29 @@ const BanProduct = ({ open, setOpen }) => {
                 placeholder="Código"
                 label="Código"
                 onKeyPress={(e) => handleEnterKeyPress(e, handleAddProduct)}
+                showPopup
+                iconLabel
+                popupContent={
+                  <div>
+                    <p>* Para añadir un código nuevo a la lista, anótelo y luego pulse &quot;enter&quot;.</p>
+                    <p>* Puede agregar múltiples códigos separados por coma, por ejemplo: PCMU123, PCMU124.</p>
+                  </div>
+                }
               />
-              {/* TODO:
-                <Popup
-                  position="top center"
-                  size="tiny"
-                  content={
-                    <div>
-                      <p>* Para añadir un código nuevo a la lista, anótelo y luego pulse &quot;enter&quot;. Cuando haya concluido de agregar códigos, clickeé &quot;Confirmar&quot;.</p>
-                      <p>* Existe la posibilidad de agregar múltiples códigos a la vez, para ello, debe escribirlos separados por una coma y un espacio, por ejemplo:</p>
-                      <p>  PCMU123, PCMU124, PCMU125</p>
-                    </div>}
-                  trigger={<Icon margin="0 0 0 5px" name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />}
-                /> */}
             </FieldsContainer>
             <FieldsContainer rowGap="5px">
-              <Label>Productos vedados</Label>
-              <Loader $marginTop active={isLoading || isFetching} greyColor>
-                <Table
-                  deleteButtonInside
-                  tableHeight="40vh"
-                  mainKey="code"
-                  headers={BAN_PRODUCTS_COLUMNS}
-                  elements={watchProducts?.map(p => ({ code: p }))}
-                  actions={actions}
-                />
-              </Loader>
+              <FormField control={Loader} label="Productos vedados" >
+                <Loader $marginTop active={isLoading || isFetching} greyColor>
+                  <Table
+                    deleteButtonInside
+                    tableHeight="40vh"
+                    mainKey="code"
+                    headers={BAN_PRODUCTS_COLUMNS}
+                    elements={watchProducts?.map(p => ({ code: p }))}
+                    actions={actions}
+                  />
+                </Loader>
+              </FormField>
             </FieldsContainer>
           </Form>
         </Modal.Content>

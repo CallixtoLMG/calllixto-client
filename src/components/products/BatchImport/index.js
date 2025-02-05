@@ -1,6 +1,6 @@
 import { useCreateBatch, useEditBatch, useGetBlackList, useListProducts } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
-import { Button, ButtonsContainer, FieldsContainer, FlexColumn, Form, FormField, Label, Segment } from "@/common/components/custom";
+import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } from "@/common/components/custom";
 import { PriceControlled, TextControlled, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, ICONS } from "@/common/constants";
@@ -16,11 +16,11 @@ import * as XLSX from "xlsx";
 import { Modal, ModalHeader, WaitMsg } from "./styles";
 
 const BatchImport = ({ isCreating }) => {
-  const { data, isLoading: loadingProducts } = useListProducts();
+  const { data, isLoading: loadingProducts, refetch: refetchProducts } = useListProducts();
   const products = useMemo(() => data?.products, [data?.products]);
   const { refetch: refetchBlacklist } = useGetBlackList();
   const methods = useForm();
-  const { handleSubmit, formState: { isDirty }, reset, watch, setValue, control } = methods;
+  const { handleSubmit, formState: { isDirty }, reset, watch, setValue } = methods;
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,7 +63,6 @@ const BatchImport = ({ isCreating }) => {
       confirmation: isCreating ? "con errores o ya" : "no",
       onSubmit: handleBatchAction,
       processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
-        console.log("importProducts", importProducts)
         const productCode = formattedProduct.code.toUpperCase();
         if (productCounts[productCode] > 1) {
           downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra duplicado" });
@@ -82,7 +81,8 @@ const BatchImport = ({ isCreating }) => {
     };
   }, [isCreating, watchProducts, isLoading, handleBatchAction]);
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback(async () => {
+    await refetchProducts();
     inputRef.current.value = null;
     inputRef?.current?.click();
   }, [inputRef]);
@@ -127,11 +127,10 @@ const BatchImport = ({ isCreating }) => {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
 
-    // Mapear los encabezados del archivo
     const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
-    console.log("Original Headers:", headersRow);
 
     const columnMapping = {
+      Codigo: "code",
       Código: "code",
       Nombre: "name",
       Marca: "brand",
@@ -142,10 +141,24 @@ const BatchImport = ({ isCreating }) => {
       Comentarios: "comments",
     };
 
-    const transformedHeaders = headersRow.map(header => columnMapping[header] || header);
-    console.log("Transformed Headers:", transformedHeaders);
+    const transformedHeaders = [];
+    const seenMappedColumns = new Set();
 
-    // Reemplazar encabezados en la hoja
+    headersRow.forEach(header => {
+      const mappedColumn = columnMapping[header];
+
+      if (mappedColumn && seenMappedColumns.has(mappedColumn)) {
+        return;
+      }
+
+      if (mappedColumn) {
+        transformedHeaders.push(mappedColumn);
+        seenMappedColumns.add(mappedColumn);
+      } else {
+        transformedHeaders.push(header);
+      }
+    });
+
     for (let i = 0; i < transformedHeaders.length; i++) {
       sheet[XLSX.utils.encode_cell({ r: 0, c: i })] = {
         v: transformedHeaders[i],
@@ -153,9 +166,7 @@ const BatchImport = ({ isCreating }) => {
       };
     }
 
-    // Convertir la hoja a datos JSON
     let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
-    console.log("Parsed Data from Sheet:", parsedData);
 
     const importProducts = [];
     const downloadProducts = [];
@@ -165,16 +176,12 @@ const BatchImport = ({ isCreating }) => {
       acc[product.code?.toUpperCase()] = product;
       return acc;
     }, {});
-    console.log("Existing Products in System:", updatedExistingCodes);
 
-    // Contar duplicados
     parsedData.forEach(product => {
       const code = product.code ? String(product.code).toUpperCase() : "Sin código";
       productCounts[code] = (productCounts[code] || 0) + 1;
     });
-    console.log("Product Counts (for duplicates):", productCounts);
 
-    // Procesar cada producto
     parsedData.forEach(product => {
       const code = product.code ? String(product.code).toUpperCase() : "Sin código";
       const hasAtLeastOneValue = product.code || product.name || product.price;
@@ -183,18 +190,15 @@ const BatchImport = ({ isCreating }) => {
         const formattedProduct = {
           code,
           name: product.name,
-          price: parseFloat(product.price),
+          price: parseInt(product.price),
           comments: product.comments
         };
 
         if (code === "Sin código") {
-          console.log("Product without code:", formattedProduct);
           downloadProducts.push({ ...formattedProduct, msg: "Este producto no tiene código" });
         } else if (blacklist.some(item => item === code)) {
-          console.log("Product in blacklist:", formattedProduct);
           downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra en la lista de productos bloqueados" });
         } else if (productCounts[code] > 1) {
-          console.log("Duplicate Product:", formattedProduct);
           downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra duplicado" });
         } else if (updatedExistingCodes && updatedExistingCodes[code] && !isCreating) {
           importProducts.push(formattedProduct);
@@ -202,16 +206,12 @@ const BatchImport = ({ isCreating }) => {
           importProducts.push(formattedProduct);
         } else {
           const msg = isCreating ? "Este producto ya existe" : "Este producto no existe";
-          console.log("Product with error:", { ...formattedProduct, msg });
           downloadProducts.push({ ...formattedProduct, msg });
         }
       }
     });
 
-    console.log("Final Import Products:", importProducts);
-    console.log("Final Download Products:", downloadProducts);
 
-    // Actualizar valores en el formulario
     setValue('importProducts', importProducts);
     setImportedProductsCount(importProducts.length);
 
@@ -296,12 +296,10 @@ const BatchImport = ({ isCreating }) => {
       };
     },
     onSuccess: (response) => {
-      const unprocessedCount = response.unprocessed?.length;
-      const createdCount = importedProductsCount - unprocessedCount;
       if (response.statusOk) {
-        toast.success(isCreating ?
-          `Productos importados: ${importedProductsCount}.\nProductos creados exitosamente: ${createdCount}.\nProductos sin procesar: ${unprocessedCount}.`
-          : "Los productos se han actualizado con éxito!");
+        toast.success(
+          `Los productos se han ${isCreating ? "creado" : "actualizado"} con éxito!`
+        )
         handleModalClose();
       } else {
         toast.error(response.error.message);
@@ -400,6 +398,8 @@ const BatchImport = ({ isCreating }) => {
                   <p>
                     {`Se ha${downloadProducts.length === 1 ? '' : 'n'} encontrado ${downloadProducts.length} producto${downloadProducts.length === 1 ? '' : 's'} (de ${totalProducts}) ${importSettings.confirmation} existente${downloadProducts.length === 1 ? '' : 's'} en la lista...`}
                     <br />
+                    (incluídos los temporalmente eliminados)
+                    <br />
                     ¿Desea descargar un archivo de Excel con estos productos antes de continuar?
                   </p>
                 </Modal.Content>
@@ -429,22 +429,16 @@ const BatchImport = ({ isCreating }) => {
                   <Modal.Content>
                     <FormProvider {...methods}>
                       <Form ref={formRef} onSubmit={handleSubmit(mutate)}>
-                        <FlexColumn rowGap="5px">
-                          <FieldsContainer  >
-                            <TextField width={6} label="Archivo seleccionado:" value={selectedFile} disabled />
-                          </FieldsContainer>
-                          <FieldsContainer rowGap="5px">
-                            <TextField label={`${importSettings.label}: ${importedProductsCount}`} disabled />
-                            <Table
-                              deleteButtonInside
-                              tableHeight="50vh"
-                              mainKey="code"
-                              headers={PRODUCTS_COLUMNS}
-                              elements={watchProducts}
-                              actions={actions}
-                            />
-                          </FieldsContainer>
-                        </FlexColumn>
+                        <TextField width={6} label="Archivo seleccionado" value={selectedFile} disabled />
+                        <Label > {`${importSettings.label}: ${importedProductsCount}`}</Label>
+                        <Table
+                          deleteButtonInside
+                          tableHeight="50vh"
+                          mainKey="code"
+                          headers={PRODUCTS_COLUMNS}
+                          elements={watchProducts}
+                          actions={actions}
+                        />
                       </Form>
                     </FormProvider>
                   </Modal.Content>
@@ -496,7 +490,7 @@ const BatchImport = ({ isCreating }) => {
         <Modal open={showUnprocessedModal} onClose={() => setShowUnprocessedModal(false)}>
           <ModalHeader>Confirmar descarga</ModalHeader>
           <Modal.Content>
-            <p> {`Se han encontrado ${unprocessedProductsCount} productos con errores que no pueden ser importados`}.</p>
+            <p> {`Se han encontrado ${unprocessedProductsCount} de ${selectedFile} productos con errores que no pueden ser importados`}.</p>
             <p>¿Deseas descargar un archivo de Excel con estos productos?</p>
           </Modal.Content>
           <Modal.Actions>

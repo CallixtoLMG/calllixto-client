@@ -8,7 +8,7 @@ import { now } from "@/common/utils/dates";
 import { useMemo, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Form, Modal, Transition } from "semantic-ui-react";
-import { GroupedButtonsControlled } from "../../common/form";
+import { GroupedButtonsControlled } from "../../../common/components/form";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
 
 const ModalConfirmation = ({

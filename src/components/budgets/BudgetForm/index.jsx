@@ -590,7 +590,7 @@ const BudgetForm = ({
                 width="300px"
                 label="Productos"
                 required
-                error={errors?.products?.root ?? { content: errors.products?.root.message, pointing: 'above' }}
+                error={errors?.products?.root ?? { content: errors.products?.message, pointing: 'above' }}
                 control={ProductSearch}
                 ref={productSearchRef}
                 products={products}
@@ -699,7 +699,7 @@ const BudgetForm = ({
             text={currentState.singularTitle}
             extraButton={
               <IconedButton
-                icon
+                icon={BUDGET_STATES.DRAFT.icon}
                 labelPosition="left"
                 disabled={isLoading || !isDirty}
                 loading={isLoading && isBudgetDraft(watchState)}
@@ -707,8 +707,8 @@ const BudgetForm = ({
                 onClick={handleSubmit(handleDraft)}
                 color={BUDGET_STATES.DRAFT.color}
                 width="fit-content"
+                text={BUDGET_STATES.DRAFT.singularTitle}
               >
-                <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.singularTitle}
               </IconedButton>
             }
           />
