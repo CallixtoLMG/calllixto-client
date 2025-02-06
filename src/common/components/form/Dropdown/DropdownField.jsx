@@ -1,6 +1,7 @@
 import { Dropdown, FormField } from "@/common/components/custom";
 
 export const DropdownField = ({
+  flex,
   width,
   required,
   label,
@@ -13,6 +14,7 @@ export const DropdownField = ({
 }) => {
   return (
     <FormField
+      flex={flex}
       width={width}
       required={required}
       label={label}

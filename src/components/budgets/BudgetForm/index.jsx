@@ -1,6 +1,6 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
 import { Button, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/common/components/custom";
-import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled } from "@/common/components/form";
+import { DropdownControlled, DropdownField, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
 import { Table, Total } from "@/common/components/table";
@@ -24,7 +24,6 @@ import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
 import { Container, Icon, VerticalDivider } from "./styles";
 
-
 const EMPTY_BUDGET = (user) => ({
   seller: user?.name,
   customer: { name: '', addresses: [], phoneNumbers: [] },
@@ -47,9 +46,8 @@ const BudgetForm = ({
   isLoading,
   isCloning,
   draft,
-  selectedContact,
-  setSelectedContact,
 }) => {
+  console.log(budget)
   const methods = useForm({
     defaultValues: isCloning && budget
       ? {
@@ -65,13 +63,13 @@ const BudgetForm = ({
             }
           })
         })),
-        seller: `${user?.firstName} ${user?.lastName}`,
+        seller: user?.name,
         paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
       }
       : budget && draft
         ? {
           ...budget,
-          seller: `${user?.firstName} ${user?.lastName}`,
+          seller: user?.name,
           paymentsMade: budget.paymentsMade || [],
         }
         : {
@@ -102,6 +100,7 @@ const BudgetForm = ({
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
   const isCustomerInactive = watchCustomer?.state === CUSTOMER_STATES.INACTIVE.id;
+  const [selectedContact, setSelectedContact] = useState({});
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -136,8 +135,6 @@ const BudgetForm = ({
       ),
     }));
   }, [customers]);
-
-  const shouldError = useMemo(() => isBudgetConfirmed(watchState) && !draft && !watchPickUp, [draft, watchPickUp, watchState]);
 
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
@@ -278,13 +275,13 @@ const BudgetForm = ({
       reset({
         ...EMPTY_BUDGET(user),
         ...budget,
-        seller: `${user?.firstName} ${user?.lastName}`,
+        seller: user?.name,
       });
     } else {
       reset({
         ...EMPTY_BUDGET(user),
         state: watchState,
-        seller: `${user?.firstName} ${user?.lastName}`,
+        seller: user?.name,
       });
     }
 
@@ -540,46 +537,68 @@ const BudgetForm = ({
             <DropdownControlled
               name="customer"
               rules={{ validate: value => !!value?.id || 'Campo requerido.' }}
-              width="300px"
               label="Cliente"
+              width="300px"
               options={customerOptions}
+              value={watchCustomer}
+              afterChange={(value) => {
+                const firstAddress = value?.addresses?.[0]?.address || '';
+                const firstPhone = value?.phoneNumbers?.[0]
+                  ? getFormatedPhone(value.phoneNumbers[0])
+                  : '';
+
+                setSelectedContact({
+                  address: firstAddress,
+                  phone: firstPhone,
+                });
+              }}
             />
-            <FormField
-              flex="2"
+            <DropdownField
+              flex="3"
               control={Dropdown}
               label="Dirección"
-              required={isBudgetConfirmed(watchState) && !watchPickUp}
-              error={errors?.customer?.addresses ?? { content: errors.customer?.addresses.message, pointing: 'above' }}
-              value={watchPickUp ? PICK_UP_IN_STORE : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer?.addresses?.[0]?.ref}: ` : ''}${watchCustomer?.addresses?.[0]?.address ? watchCustomer?.addresses?.[0]?.address : ""}` : selectedContact.address}
+              value={watchPickUp ? PICK_UP_IN_STORE : selectedContact.address}
               selection
-              options={watchCustomer?.addresses.map((address) => ({
-                key: address.address,
-                text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
-                value: address.address,
-              }))}
-              onChange={(e, { value }) => setSelectedContact({
-                ...selectedContact,
-                address: value,
-              })}
+              options={
+                watchPickUp
+                  ? [{ key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE }]
+                  : watchCustomer?.addresses.map((address) => ({
+                    key: address.address,
+                    text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
+                    value: address.address,
+                  }))
+              }
+              onChange={(e, { value }) => {
+                if (!watchPickUp) {
+                  setSelectedContact((prev) => ({
+                    ...prev,
+                    address: value,
+                  }));
+                }
+              }}
+              error={isBudgetConfirmed(watchState) && !watchCustomer.addresses?.length && "Campo requerido para confirmar un presupuesto"}
               disabled={watchPickUp || !watchCustomer || watchCustomer.addresses?.length < 2}
             />
-            <FormField
-              flex="1"
+            <DropdownField
+              flex="2"
               control={Dropdown}
               label="Teléfono"
-              required={isBudgetConfirmed(watchState)}
-              error={(shouldError && errors?.customer?.phoneNumbers) ?? { content: errors.customer.phoneNumbers.message, pointing: 'above' }}
-              value={!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer?.phoneNumbers?.[0]?.ref}: ` : ''}${getFormatedPhone(watchCustomer?.phoneNumbers?.[0])}` : selectedContact.phone}
+              value={selectedContact.phone}
               selection
-              options={watchCustomer?.phoneNumbers.map((phone) => ({
-                key: getFormatedPhone(phone),
-                text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
-                value: getFormatedPhone(phone),
-              }))}
-              onChange={(e, { value }) => setSelectedContact({
-                ...selectedContact,
-                phone: value,
-              })}
+              options={
+                watchCustomer?.phoneNumbers?.map((phone) => ({
+                  key: getFormatedPhone(phone),
+                  text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
+                  value: getFormatedPhone(phone),
+                }))
+              }
+              onChange={(e, { value }) => {
+                setSelectedContact((prev) => ({
+                  ...prev,
+                  phone: value,
+                }));
+              }}
+              error={isBudgetConfirmed(watchState) && !watchCustomer.phoneNumbers?.length && "Campo requerido para confirmar un presupuesto"}
               disabled={!watchCustomer || watchCustomer.phoneNumbers?.length < 2}
             />
           </FieldsContainer>
@@ -589,8 +608,7 @@ const BudgetForm = ({
               <FormField
                 width="300px"
                 label="Productos"
-                required
-                error={errors?.products?.root ?? { content: errors.products?.message, pointing: 'above' }}
+                error={!watchProducts.length && "Al menos 1 producto es requerido."}
                 control={ProductSearch}
                 ref={productSearchRef}
                 products={products}
