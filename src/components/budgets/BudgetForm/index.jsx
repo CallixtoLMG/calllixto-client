@@ -536,9 +536,14 @@ const BudgetForm = ({
           <FieldsContainer>
             <DropdownControlled
               name="customer"
-              rules={{ validate: value => !!value?.id || 'Campo requerido.' }}
+              rules={{
+                validate: {
+                  required: value => !!value?.id || 'Campo requerido.',
+                }
+              }}
               label="Cliente"
               width="300px"
+              clearable
               options={customerOptions}
               value={watchCustomer}
               afterChange={(value) => {
@@ -558,7 +563,6 @@ const BudgetForm = ({
               control={Dropdown}
               label="Dirección"
               value={watchPickUp ? PICK_UP_IN_STORE : selectedContact.address}
-              selection
               options={
                 watchPickUp
                   ? [{ key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE }]
@@ -602,13 +606,14 @@ const BudgetForm = ({
               disabled={!watchCustomer || watchCustomer.phoneNumbers?.length < 2}
             />
           </FieldsContainer>
+          {console.log(errors)}
           <Controller name="products"
             rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
             render={() => (
               <FormField
                 width="300px"
                 label="Productos"
-                error={!watchProducts.length && "Al menos 1 producto es requerido."}
+                error={errors.products?.root?.message}
                 control={ProductSearch}
                 ref={productSearchRef}
                 products={products}

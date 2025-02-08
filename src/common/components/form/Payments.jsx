@@ -1,5 +1,5 @@
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS, RULES } from "@/common/constants";
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
 import es from "date-fns/locale/es";
 import { useMemo, useState } from "react";
@@ -14,9 +14,9 @@ registerLocale("es", es);
 
 const EMPTY_PAYMENT = () => ({
   method: '',
-  amount: 0,
+  amount: '',  
   comments: '',
-  date: new Date()
+  date: new Date(),
 });
 
 const calculateTotals = (payments, total) => {
@@ -52,6 +52,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
     }
 
     appendPayment(payment);
+
     setPayment(EMPTY_PAYMENT());
   };
 
@@ -63,22 +64,22 @@ const Payments = ({ total, maxHeight, children, update }) => {
 
   return (
     <Flex width="100%" maxHeight={maxHeight ? "55vh" : ""}>
-      <Segment padding="20px 60px 20px 20px">
+      <Segment padding="25px 60px 25px 35px">
         <Header>
           Detalle de Pagos
         </Header>
         <FlexColumn rowGap="15px">
           {update && (
             <FieldsContainer>
-              <FormField label="Fecha" width="150px">
-                <DatePicker
-                  selected={payment.date}
-                  onChange={(date) => setPayment({ ...payment, date })}
-                  placeholder="Selecciona una fecha"
-                  dateFormat="dd-MM-yyyy"
-                  disabled={isTotalCovered}
-                  maxDate={new Date()}
-                />
+              <FormField
+                selected={payment.date}
+                onChange={(date) => setPayment({ ...payment, date })}
+                dateFormat="dd-MM-yyyy"
+                disabled={isTotalCovered}
+                maxDate={new Date()}
+                label="Fecha"
+                width="150px"
+                control={DatePicker}>
               </FormField>
               <DropdownField
                 width="fit-content"
@@ -87,15 +88,18 @@ const Payments = ({ total, maxHeight, children, update }) => {
                 value={payment.method}
                 onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                 disabled={isTotalCovered}
+                error={!payment.method && RULES.REQUIRED.required}
               />
               <PriceField
+                placeholder="Monto"
                 width="150px"
                 label="Monto"
-                value={payment.amount || 0}
-                onChange={value => {
-                  setPayment({ ...payment, amount: value });
+                value={payment.amount}   // Mantenemos este valor siempre sincronizado
+                onChange={(value) => {
+                  setPayment({ ...payment, amount: value || 0 });  // Asignamos siempre el valor actualizado
                 }}
                 disabled={false}
+                error={!payment.amount && RULES.REQUIRED.required}
               />
               <TextField
                 flex="1"

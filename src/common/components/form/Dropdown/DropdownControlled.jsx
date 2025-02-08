@@ -12,7 +12,8 @@ export const DropdownControlled = ({
   options = [],
   defaultValue,
   afterChange,
-  disabled
+  disabled,
+  clearable
 }) => {
   const { formState: { errors } } = useFormContext();
   return (
@@ -27,6 +28,7 @@ export const DropdownControlled = ({
           placeholder={placeholder ?? label}
           control={Dropdown}
           selection
+          clearable={clearable}
           options={options}
           defaultValue={defaultValue}
           onChange={(e, { value}) => {

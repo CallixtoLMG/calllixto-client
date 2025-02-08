@@ -1,7 +1,7 @@
 import { useUpdatePayments } from "@/api/budgets";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, TextArea, ViewContainer } from "@/common/components/custom";
-import { PriceLabel } from "@/common/components/form";
+import { DropdownField, PriceLabel } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import { Table, Total } from "@/common/components/table";
 import { CommentTooltip } from "@/common/components/tooltips";
@@ -13,7 +13,7 @@ import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isPr
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Popup } from "semantic-ui-react";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
@@ -196,13 +196,14 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
             readOnly
           />
-          <FormField
+          <DropdownField
             flex="2"
             label="Dirección"
+            clearable
+            search
             control={Dropdown}
-            value={budget?.pickUpInStore ? PICK_UP_IN_STORE : !budget?.customer?.addresses?.length ? 'No existe una dirección registrada' : `${budget.customer?.addresses?.[0]?.ref ? `${budget.customer?.addresses?.[0]?.ref} :` : ""} ${budget.customer?.addresses?.[0]?.address}`}
-            readOnly
-            selection
+            value={budget?.pickUpInStore ? PICK_UP_IN_STORE : selectedContact.address || ''}
+            // value={budget?.pickUpInStore ? PICK_UP_IN_STORE : !budget?.customer?.addresses?.length ? 'No existe una dirección registrada' : `${budget.customer?.addresses?.[0]?.ref ? `${budget.customer?.addresses?.[0]?.ref} :` : ""} ${budget.customer?.addresses?.[0]?.address}`}
             options={budget?.customer?.addresses.map((address) => ({
               key: address.address,
               text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
@@ -213,13 +214,11 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
               address: value
             })}
           />
-          <FormField
+          <DropdownField
             flex="1"
             label="Teléfono"
             control={Dropdown}
             value={!budget?.customer?.phoneNumbers?.length ? 'No existe un teléfono registrado' : budget?.customer?.phoneNumbers.length === 1 ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${getFormatedPhone(budget.customer?.phoneNumbers?.[0])}` : selectedContact?.phone}
-            readOnly
-            selection
             options={budget?.customer?.phoneNumbers.map((phone) => ({
               key: getFormatedPhone(phone),
               text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
@@ -251,17 +250,19 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                 <Flex justifyContent="space-between">
                   {toggleButton}
                 </Flex>}
-              <Payments update={isUpdating} total={total}>
-                <SubmitAndRestore
-                  isUpdating={isUpdating}
-                  isLoading={isLoadingUpdatePayment}
-                  isDirty={isDirty}
-                  onSubmit={() => mutateUpdatePayment()}
-                  onReset={() => methods.reset({ paymentsMade: budget.paymentsMade })}
-                  disabled={!isDirty}
-                  text="Guardar"
-                />
-              </Payments>
+              <FormProvider {...methods}>
+                <Payments update={isUpdating} total={total}>
+                  <SubmitAndRestore
+                    isUpdating={isUpdating}
+                    isLoading={isLoadingUpdatePayment}
+                    isDirty={isDirty}
+                    onSubmit={() => mutateUpdatePayment()}
+                    onReset={() => methods.reset({ paymentsMade: budget.paymentsMade })}
+                    disabled={!isDirty}
+                    text="Guardar"
+                  />
+                </Payments>
+              </FormProvider>
             </>
           )
         }

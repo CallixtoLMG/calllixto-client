@@ -10,7 +10,8 @@ export const DropdownField = ({
   value,
   onChange,
   disabled,
-  error
+  error,
+  clearable
 }) => {
   return (
     <FormField
@@ -24,7 +25,7 @@ export const DropdownField = ({
       minCharacters={2}
       noResultsMessage="Sin resultados!"
       options={options}
-      clearable
+      clearable={clearable}
       value={value}
       onChange={onChange}
       disabled={disabled}
