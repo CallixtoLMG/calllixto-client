@@ -199,11 +199,12 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           <DropdownField
             flex="2"
             label="Dirección"
-            clearable
             search
             control={Dropdown}
-            value={budget?.pickUpInStore ? PICK_UP_IN_STORE : selectedContact.address || ''}
-            // value={budget?.pickUpInStore ? PICK_UP_IN_STORE : !budget?.customer?.addresses?.length ? 'No existe una dirección registrada' : `${budget.customer?.addresses?.[0]?.ref ? `${budget.customer?.addresses?.[0]?.ref} :` : ""} ${budget.customer?.addresses?.[0]?.address}`}
+            value={budget?.pickUpInStore
+              ? PICK_UP_IN_STORE
+              : selectedContact.address || (budget?.customer?.addresses?.length ? '' : 'No existe una dirección registrada')
+            }
             options={budget?.customer?.addresses.map((address) => ({
               key: address.address,
               text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
@@ -213,6 +214,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
               ...selectedContact,
               address: value
             })}
+            disabled={!budget?.customer?.addresses?.length}
           />
           <DropdownField
             flex="1"
@@ -228,6 +230,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
               ...selectedContact,
               phone: value
             })}
+            disabled={!budget?.customer?.phoneNumbers?.length}
           />
         </FieldsContainer>
         <Table

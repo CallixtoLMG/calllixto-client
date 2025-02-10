@@ -197,6 +197,7 @@ const Budget = ({ params }) => {
       ];
 
       const actions = [
+        !isBudgetDraft(budget.state) && 
         {
           id: 1,
           button: (

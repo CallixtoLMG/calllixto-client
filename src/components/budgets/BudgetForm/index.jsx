@@ -1,6 +1,6 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
 import { Button, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/common/components/custom";
-import { DropdownControlled, DropdownField, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled } from "@/common/components/form";
+import { DropdownControlled, DropdownField, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
 import { Table, Total } from "@/common/components/table";
@@ -47,7 +47,6 @@ const BudgetForm = ({
   isCloning,
   draft,
 }) => {
-  console.log(budget)
   const methods = useForm({
     defaultValues: isCloning && budget
       ? {
@@ -539,13 +538,14 @@ const BudgetForm = ({
               rules={{
                 validate: {
                   required: value => !!value?.id || 'Campo requerido.',
+                  requiredAddress: value => !!value?.addresses.length || 'Dirección requerida.',
+                  requiredPhone: value => !!value?.phoneNumbers.length || 'Teléfono requerido.',
                 }
               }}
               label="Cliente"
               width="300px"
-              clearable
               options={customerOptions}
-              value={watchCustomer}
+              value={watchCustomer ? watchCustomer : "No se selecciono ningun cliente"}
               afterChange={(value) => {
                 const firstAddress = value?.addresses?.[0]?.address || '';
                 const firstPhone = value?.phoneNumbers?.[0]
@@ -565,8 +565,8 @@ const BudgetForm = ({
               value={watchPickUp ? PICK_UP_IN_STORE : selectedContact.address}
               options={
                 watchPickUp
-                  ? [{ key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE }]
-                  : watchCustomer?.addresses.map((address) => ({
+                  ? [{ key: PICK_UP_IN_STORE, text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE }]
+                  : watchCustomer?.addresses?.map((address) => ({
                     key: address.address,
                     text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
                     value: address.address,
@@ -580,10 +580,11 @@ const BudgetForm = ({
                   }));
                 }
               }}
-              error={isBudgetConfirmed(watchState) && !watchCustomer.addresses?.length && "Campo requerido para confirmar un presupuesto"}
-              disabled={watchPickUp || !watchCustomer || watchCustomer.addresses?.length < 2}
+              error={isBudgetConfirmed(watchState) && !watchCustomer.addresses?.length && (errors.customer?.type === "requiredAddress") && errors.customer?.message}
+              disabled={watchPickUp || !watchCustomer || watchCustomer.addresses?.length < 1}
             />
-            <DropdownField
+            {console.log(errors.customer?.type)}
+            {!isBudgetDraft(budget.state) ? <DropdownField
               flex="2"
               control={Dropdown}
               label="Teléfono"
@@ -602,9 +603,16 @@ const BudgetForm = ({
                   phone: value,
                 }));
               }}
-              error={isBudgetConfirmed(watchState) && !watchCustomer.phoneNumbers?.length && "Campo requerido para confirmar un presupuesto"}
+              error={isBudgetConfirmed(watchState) && !watchCustomer.phoneNumbers?.length && (errors.customer?.type === "requiredPhone") && errors.customer?.message}
               disabled={!watchCustomer || watchCustomer.phoneNumbers?.length < 2}
-            />
+            /> :
+              <TextField
+                flex="2"
+                label="Teléfono"
+                placeholder="Teléfono"
+                value={selectedContact.phone}
+              ></TextField>
+            }
           </FieldsContainer>
           {console.log(errors)}
           <Controller name="products"

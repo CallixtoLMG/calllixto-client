@@ -16,6 +16,8 @@ export const DropdownControlled = ({
   clearable
 }) => {
   const { formState: { errors } } = useFormContext();
+  const showError = errors?.[name]?.type === "required";
+  const errorMessage = errors?.[name]?.message;
   return (
     <Controller
       name={name}
@@ -31,13 +33,13 @@ export const DropdownControlled = ({
           clearable={clearable}
           options={options}
           defaultValue={defaultValue}
-          onChange={(e, { value}) => {
+          onChange={(e, { value }) => {
             onChange(value);
             afterChange?.(value);
           }}
           disabled={disabled}
-          error={!!errors?.[name] && {
-            content: errors[name].message,
+          error={showError && {
+            content: errorMessage,
             pointing: 'above',
           }}
         />
