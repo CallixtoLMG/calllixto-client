@@ -14,7 +14,7 @@ registerLocale("es", es);
 
 const EMPTY_PAYMENT = () => ({
   method: '',
-  amount: '',  
+  amount: '',
   comments: '',
   date: new Date(),
 });
@@ -41,8 +41,12 @@ const Payments = ({ total, maxHeight, children, update }) => {
   const { totalPending, totalAssigned } = useMemo(() => calculateTotals(paymentsMade, total), [total, paymentsMade]);
   const isTotalCovered = useMemo(() => totalPending <= 0, [totalPending]);
   const [payment, setPayment] = useState(EMPTY_PAYMENT());
+  const [showErrors, setShowErrors] = useState(false);
 
   const handleAddPayment = async () => {
+
+    setShowErrors(true);
+
     if (!payment.method || payment.amount <= 0) {
       return;
     }
@@ -54,6 +58,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
     appendPayment(payment);
 
     setPayment(EMPTY_PAYMENT());
+    setShowErrors(false);
   };
 
   const TOTAL_LIST_ITEMS = [
@@ -63,7 +68,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
   ];
 
   return (
-    <Flex width="100%" maxHeight={maxHeight ? "55vh" : ""}>
+    <Flex width="100%" maxHeight={maxHeight ? "55vh" : ""} className="ui form">
       <Segment padding="25px 60px 25px 35px">
         <Header>
           Detalle de Pagos
@@ -88,18 +93,18 @@ const Payments = ({ total, maxHeight, children, update }) => {
                 value={payment.method}
                 onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                 disabled={isTotalCovered}
-                error={!payment.method && RULES.REQUIRED.required}
+                error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
               />
               <PriceField
                 placeholder="Monto"
                 width="150px"
                 label="Monto"
-                value={payment.amount}   // Mantenemos este valor siempre sincronizado
+                value={payment.amount}  
                 onChange={(value) => {
-                  setPayment({ ...payment, amount: value || 0 });  // Asignamos siempre el valor actualizado
+                  setPayment({ ...payment, amount: value || 0 }); 
                 }}
                 disabled={false}
-                error={!payment.amount && RULES.REQUIRED.required}
+                error={showErrors && !payment.amount ? RULES.REQUIRED.required : undefined}
               />
               <TextField
                 flex="1"

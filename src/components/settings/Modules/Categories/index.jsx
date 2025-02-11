@@ -1,22 +1,36 @@
 import { Box, Button, Flex, FlexColumn } from "@/common/components/custom";
+import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, ICONS, SEMANTIC_COLORS } from "@/common/constants";
-import { useState } from "react";
-import { useFieldArray } from "react-hook-form";
+import { useEffect, useState } from "react";
+import { useFieldArray, useFormContext } from "react-hook-form";
 import { Accordion, Icon, Label } from "semantic-ui-react";
-import { FormInput, FormSelect } from "./styles";
+
+const EMPTY_CATEGORY = {
+  name: "",
+  color: "yellow",
+  description: "",
+};
 
 const Categories = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
-  const [categoryToAdd, setCategoryToAdd] = useState({ name: "", color: "", description: "" });
+  const [categoryToAdd, setCategoryToAdd] = useState(EMPTY_CATEGORY);
+  const { formState: { isDirty } } = useFormContext();
+  const [error, setError] = useState(null);
   const { fields: categories, append, remove } = useFieldArray({
     name: "categories"
   });
 
+  useEffect(() => {
+    if (!isDirty) {
+      setCategoryToAdd(EMPTY_CATEGORY)
+    }
+  }, [isDirty])
+
   const headers = [
     {
       id: "name",
-      title: "Etiqueta",
+      title: "Categoria",
       align: "left",
       width: 5,
       value: (category) => <Label color={category.color}>{category.name}</Label>,
@@ -41,59 +55,91 @@ const Categories = () => {
 
   const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
 
+  const handleAddCategory = () => {
+    const isDuplicate = categories.some((category) => category.name.trim().toLowerCase() === categoryToAdd.name.trim().toLowerCase());
+
+    if (!categoryToAdd.name.trim()) {
+      setError("El nombre es obligatorio.");
+      return;
+    }
+
+    if (isDuplicate) {
+      setError("Ya existe una etiqueta con este nombre.");
+      return;
+    }
+
+    append(categoryToAdd);
+    setCategoryToAdd(EMPTY_CATEGORY);
+    setError(null); 
+  };
+
+  const handleNameChange = (e) => {
+    const name = e.target.value;
+    setCategoryToAdd({ ...categoryToAdd, name });
+
+    if (error) {
+      setError(null);
+    }
+  };
+
   return (
-    <Accordion fluid>
-      <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
-        <Icon name="dropdown" />
-        Categorias
-      </Accordion.Title>
-      <Accordion.Content active={isAccordionOpen}>
-        <Box>
-          <Flex width="100%" padding="0 10px 10px 10px!important" alignItems="flex-start" columnGap="15px">
-            <FormInput
-              width={4}
-              label="Nombre"
-              placeholder="Nombre de la etiqueta"
-              value={categoryToAdd.name}
-              onChange={(e) => setCategoryToAdd({ ...categoryToAdd, name: e.target.value })}
-            />
-            <FormSelect
-              width={3}
-              label="Color"
-              options={SEMANTIC_COLORS}
-              value={categoryToAdd.color}
-              onChange={(e, { value }) => setCategoryToAdd({ ...categoryToAdd, color: value })}
-            />
-            <FormInput
-              width={8}
-              label="Descripción"
-              placeholder="Descripción"
-              value={categoryToAdd.description}
-              onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
-            />
-            <Button
-              text="Agregar"
-              icon={ICONS.ADD}
-              color={COLORS.GREEN}
-              onClick={() => append(categoryToAdd)}
-              height="38px"
-            />
-          </Flex>
-          <FlexColumn rowGap="15px">
-            <Table
-              isLoading={false}
-              headers={headers}
-              elements={categories}
-              mainKey="name"
-              paginate={false}
-              actions={actions}
-              tableHeight="40vh"
-              deleteButtonInside
-            />
-          </FlexColumn>
-        </Box>
-      </Accordion.Content>
-    </Accordion>
+    <Box marginBottom="5px">
+      <Accordion fluid>
+        <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
+          <Icon name="dropdown" />
+          Categorias
+        </Accordion.Title>
+        <Accordion.Content active={isAccordionOpen}>
+          <Box>
+            <Flex width="100%" padding="0 10px 10px 10px!important" alignItems="flex-start" columnGap="15px">
+              <TextField
+                width={4}
+                label="Nombre"
+                placeholder="Nombre de la categoria"
+                value={categoryToAdd.name}
+                onChange={handleNameChange}
+                error={error} 
+              />
+              <DropdownField
+                flex={1}
+                label="Color"
+                options={SEMANTIC_COLORS}
+                value={categoryToAdd.color}
+                onChange={(e, { value }) => setCategoryToAdd({ ...categoryToAdd, color: value })}
+              />
+              <TextField
+                flex={2}
+                label="Descripción"
+                placeholder="Descripción"
+                value={categoryToAdd.description}
+                onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
+              />
+              <Button
+                size="small"
+                icon={ICONS.ADD}
+                content="Agregar"
+                labelPosition="left"
+                color={COLORS.GREEN}
+                type="button"
+                onClick={handleAddCategory}
+              />
+            </Flex>
+            <FlexColumn rowGap="15px">
+              <Table
+                isLoading={false}
+                headers={headers}
+                elements={categories}
+                mainKey="name"
+                paginate={false}
+                actions={actions}
+                tableHeight="40vh"
+                deleteButtonInside
+              />
+            </FlexColumn>
+          </Box>
+        </Accordion.Content>
+      </Accordion>
+    </Box>
   );
 };
 

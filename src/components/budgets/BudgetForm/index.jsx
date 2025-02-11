@@ -1,6 +1,6 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Button, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/common/components/custom";
-import { DropdownControlled, DropdownField, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
+import { Button, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/common/components/custom";
+import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
 import { Table, Total } from "@/common/components/table";
@@ -77,7 +77,7 @@ const BudgetForm = ({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  const { control, handleSubmit, setValue, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = methods;
+  const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
     control,
     name: "products"
@@ -99,7 +99,6 @@ const BudgetForm = ({
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
   const isCustomerInactive = watchCustomer?.state === CUSTOMER_STATES.INACTIVE.id;
-  const [selectedContact, setSelectedContact] = useState({});
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -235,17 +234,14 @@ const BudgetForm = ({
   }, [watchProducts, calculateTotal]);
 
   const handleCreate = async (data, state) => {
-    const isvalid = validateCustomer();
-    if (isvalid) {
-      const { customer } = data;
-      await onSubmit({
-        ...data,
-        customer: { id: customer.id, name: customer.name },
-        products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment"])),
-        total: Number(total.toFixed(2)),
-        state
-      });
-    }
+    const { customer } = data;
+    await onSubmit({
+      ...data,
+      customer: { id: customer.id, name: customer.name },
+      products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment"])),
+      total: Number(total.toFixed(2)),
+      state
+    });
   };
 
   const currentState = useMemo(() => {
@@ -254,20 +250,6 @@ const BudgetForm = ({
     }
     return BUDGET_STATES.PENDING;
   }, [watchState]);
-
-  const validateCustomer = () => {
-    if (isBudgetConfirmed(watchState) && !watchPickUp && (!watchCustomer.addresses.length || !watchCustomer.phoneNumbers.length)) {
-      if (!watchCustomer.addresses.length) {
-        setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
-      };
-      if (!watchCustomer.phoneNumbers.length) {
-        setError('customer.phoneNumbers', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
-      };
-      return false;
-    }
-    clearErrors('customer');
-    return true;
-  };
 
   const handleReset = useCallback(() => {
     if (draft || isCloning) {
@@ -442,13 +424,7 @@ const BudgetForm = ({
     setValue("state", BUDGET_STATES.DRAFT.id);
     await handleCreate({ ...data, total: Number(total.toFixed(2)) }, BUDGET_STATES.DRAFT.id);
   };
-
   const handleConfirm = async (data) => {
-    if (isCustomerInactive) {
-      setError('customer', { type: 'manual', message: `No es posible confirmar ni dejar pendientes presupuestos con clientes inactivos, solo borradores.` });
-      return;
-    }
-
     setValue('state', isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
     await handleCreate({ ...data, total: Number(total.toFixed(2)) }, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
   };
@@ -527,7 +503,13 @@ const BudgetForm = ({
                 label="Fecha de vencimiento"
                 control={Input}
                 readOnly
-                value={expiration ? getDateWithOffset(now(), expiration, "days") : ""}
+                value={
+                  expiration
+                    ? getDateWithOffset(now(), expiration, "days")
+                    : budget?.expirationOffsetDays
+                      ? getDateWithOffset(now(), expiration, "days")
+                      : ""
+                }
                 placeholder="dd/mm/aaaa"
               />
             </FieldsContainer>
@@ -537,84 +519,65 @@ const BudgetForm = ({
               name="customer"
               rules={{
                 validate: {
-                  required: value => !!value?.id || 'Campo requerido.',
-                  requiredAddress: value => !!value?.addresses.length || 'Dirección requerida.',
-                  requiredPhone: value => !!value?.phoneNumbers.length || 'Teléfono requerido.',
+                  required: value => {
+                    return !!value?.id || 'Campo requerido.';
+                  },
+                  activeCustomer: value => {
+                    return value?.state === CUSTOMER_STATES.ACTIVE.id || 'No es posible confirmar ni dejar pendiente presupuestos con clientes inactivos, solo borradores.';
+                  },
+                  requiredAddress: value => {
+                    return (
+                      isBudgetConfirmed(watchState) &&
+                      (!value?.addresses.length && !watchPickUp)
+                    )
+                      ? 'Dirección requerida.'
+                      : true;
+                  },
+                  requiredPhone: value => {
+                    return (
+                      isBudgetConfirmed(watchState) &&
+                      !value?.phoneNumbers.length
+                    )
+                      ? 'Teléfono requerido.'
+                      : true;
+                  },
                 }
               }}
+              pickErrors={["required", "activeCustomer"]}
               label="Cliente"
+              placeholder="Seleccione un cliente"
               width="300px"
               options={customerOptions}
-              value={watchCustomer ? watchCustomer : "No se selecciono ningun cliente"}
-              afterChange={(value) => {
-                const firstAddress = value?.addresses?.[0]?.address || '';
-                const firstPhone = value?.phoneNumbers?.[0]
-                  ? getFormatedPhone(value.phoneNumbers[0])
-                  : '';
-
-                setSelectedContact({
-                  address: firstAddress,
-                  phone: firstPhone,
-                });
-              }}
+              value={watchCustomer ? watchCustomer : "No se seleccionó ningún cliente"}
+              search
             />
-            <DropdownField
-              flex="3"
-              control={Dropdown}
-              label="Dirección"
-              value={watchPickUp ? PICK_UP_IN_STORE : selectedContact.address}
-              options={
-                watchPickUp
-                  ? [{ key: PICK_UP_IN_STORE, text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE }]
-                  : watchCustomer?.addresses?.map((address) => ({
-                    key: address.address,
-                    text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
-                    value: address.address,
-                  }))
-              }
-              onChange={(e, { value }) => {
-                if (!watchPickUp) {
-                  setSelectedContact((prev) => ({
-                    ...prev,
-                    address: value,
-                  }));
-                }
-              }}
-              error={isBudgetConfirmed(watchState) && !watchCustomer.addresses?.length && (errors.customer?.type === "requiredAddress") && errors.customer?.message}
-              disabled={watchPickUp || !watchCustomer || watchCustomer.addresses?.length < 1}
-            />
-            {console.log(errors.customer?.type)}
-            {!isBudgetDraft(budget.state) ? <DropdownField
+            <TextField
               flex="2"
-              control={Dropdown}
-              label="Teléfono"
-              value={selectedContact.phone}
-              selection
-              options={
-                watchCustomer?.phoneNumbers?.map((phone) => ({
-                  key: getFormatedPhone(phone),
-                  text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
-                  value: getFormatedPhone(phone),
-                }))
+              label="Dirección"
+              placeholder="Dirección"
+              disabled
+              error={!watchCustomer?.addresses?.length && (errors.customer?.type === "requiredAddress") && errors.customer?.message}
+              value={
+                watchPickUp
+                  ? PICK_UP_IN_STORE
+                  : watchCustomer?.addresses?.length > 0
+                    ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
+                    : 'Cliente sin dirección'
               }
-              onChange={(e, { value }) => {
-                setSelectedContact((prev) => ({
-                  ...prev,
-                  phone: value,
-                }));
-              }}
-              error={isBudgetConfirmed(watchState) && !watchCustomer.phoneNumbers?.length && (errors.customer?.type === "requiredPhone") && errors.customer?.message}
-              disabled={!watchCustomer || watchCustomer.phoneNumbers?.length < 2}
-            /> :
-              <TextField
-                flex="2"
-                label="Teléfono"
-                placeholder="Teléfono"
-                value={selectedContact.phone}
-              ></TextField>
-            }
+            />
+            <TextField
+              flex="2"
+              label="Teléfono"
+              placeholder="Teléfono"
+              error={!watchCustomer?.phoneNumbers?.length && (errors.customer?.type === "requiredPhone") && errors.customer?.message}
+              disabled
+              value={
+                watchCustomer?.phoneNumbers?.length > 0
+                  ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
+                  : 'Cliente sin teléfono'
+              }
+            />
           </FieldsContainer>
-          {console.log(errors)}
           <Controller name="products"
             rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
             render={() => (

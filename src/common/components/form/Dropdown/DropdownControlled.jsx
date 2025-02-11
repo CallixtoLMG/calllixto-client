@@ -13,10 +13,12 @@ export const DropdownControlled = ({
   defaultValue,
   afterChange,
   disabled,
-  clearable
+  clearable,
+  search,
+  pickErrors
 }) => {
   const { formState: { errors } } = useFormContext();
-  const showError = errors?.[name]?.type === "required";
+  const showError = errors?.[name] && (pickErrors ? pickErrors.includes(errors[name]?.type) : true);
   const errorMessage = errors?.[name]?.message;
   return (
     <Controller
@@ -29,7 +31,9 @@ export const DropdownControlled = ({
           label={label}
           placeholder={placeholder ?? label}
           control={Dropdown}
+          search={search}
           selection
+          noResultsMessage="No se encontraron resultados"
           clearable={clearable}
           options={options}
           defaultValue={defaultValue}

@@ -27,7 +27,7 @@ const MessageList = styled(SMessageList)`
 `;
 
 const VerticalDivider = styled.div`
-  height: 30px;
+  height: 35px;
   width: 1px;
   background-color: #ccc;
   margin: 0 10px;

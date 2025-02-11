@@ -85,7 +85,7 @@ const BatchImport = ({ isCreating }) => {
     await refetchProducts();
     inputRef.current.value = null;
     inputRef?.current?.click();
-  }, [inputRef]);
+  }, [inputRef, refetchProducts]);
 
   const handleModalClose = () => {
     setOpen(false);

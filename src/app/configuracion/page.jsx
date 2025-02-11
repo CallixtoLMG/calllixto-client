@@ -25,7 +25,7 @@ const ENTITY_MAPPER = {
 export const SUPPORTED_SETTINGS = {
   PRODUCT: ["tags"],
   CUSTOMER: ["tags"],
-  EXPENSE: ["tags"],
+  EXPENSE: ["tags", "categories"],
 };
 
 const Settings = () => {

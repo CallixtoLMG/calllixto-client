@@ -197,30 +197,37 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             readOnly
           />
           <DropdownField
-            flex="2"
+            flex="3"
             label="Dirección"
             search
             control={Dropdown}
-            value={budget?.pickUpInStore
-              ? PICK_UP_IN_STORE
-              : selectedContact.address || (budget?.customer?.addresses?.length ? '' : 'No existe una dirección registrada')
+            value={
+              budget?.pickUpInStore
+                ? PICK_UP_IN_STORE
+                : selectedContact.address || (budget?.customer?.addresses?.length ? '' : 'Cliente sin dirección')
             }
-            options={budget?.customer?.addresses.map((address) => ({
-              key: address.address,
-              text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
-              value: address.address,
-            }))}
+            options={[
+              { key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE },
+              ...(
+                budget?.customer?.addresses?.map((address) => ({
+                  key: address.address,
+                  text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
+                  value: address.address,
+                })) || []
+              )
+            ]}
             onChange={(e, { value }) => setSelectedContact({
               ...selectedContact,
-              address: value
+              address: value,
             })}
-            disabled={!budget?.customer?.addresses?.length}
+            disabled={!budget?.customer?.addresses?.length && !budget?.pickUpInStore}
           />
+
           <DropdownField
-            flex="1"
+            flex="2"
             label="Teléfono"
             control={Dropdown}
-            value={!budget?.customer?.phoneNumbers?.length ? 'No existe un teléfono registrado' : budget?.customer?.phoneNumbers.length === 1 ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${getFormatedPhone(budget.customer?.phoneNumbers?.[0])}` : selectedContact?.phone}
+            value={!budget?.customer?.phoneNumbers?.length ? 'Cliente sin teléfono' : budget?.customer?.phoneNumbers.length === 1 ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${getFormatedPhone(budget.customer?.phoneNumbers?.[0])}` : selectedContact?.phone}
             options={budget?.customer?.phoneNumbers.map((phone) => ({
               key: getFormatedPhone(phone),
               text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
