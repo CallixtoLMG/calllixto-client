@@ -1,14 +1,14 @@
 import { confirmReset, recoverPassword } from "@/api/login";
 import { getUserData } from "@/api/userData";
-import { Loader } from "@/components/layout";
+import { Button, FlexColumn, Form, Message } from "@/common/components/custom";
+import { PasswordControlled, TextControlled } from "@/common/components/form";
 import { COLORS, ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/common/constants";
+import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Button, FlexColumn, Form, Message } from "../common/custom";
-import { PasswordControlled, TextControlled } from "../common/form";
 
 const ChangePasswordForm = () => {
   const { push } = useRouter();

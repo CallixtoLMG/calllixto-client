@@ -1,6 +1,6 @@
+import { Flex } from "@/common/components/custom";
 import { Container, Modal as SModal } from "semantic-ui-react";
 import styled from "styled-components";
-import { Flex } from "@/components/common/custom";
 
 const Modal = styled(SModal)`
   max-width: 90%!important;

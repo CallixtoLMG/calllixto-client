@@ -1,7 +1,13 @@
 import { useUserContext } from "@/User";
-import { Flex, Icon } from "@/components/common/custom";
-import { KeyboardShortcuts } from "@/components/common/modals";
-import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/common/constants";
+import { LIST_BRANDS_QUERY_KEY } from "@/api/brands";
+import { LIST_BUDGETS_QUERY_KEY } from "@/api/budgets";
+import { LIST_CUSTOMERS_QUERY_KEY } from "@/api/customers";
+import { LIST_PRODUCTS_QUERY_KEY } from "@/api/products";
+import { LIST_SUPPLIERS_QUERY_KEY } from "@/api/suppliers";
+import { Flex, Icon } from "@/common/components/custom";
+import { KeyboardShortcuts } from "@/common/components/modals";
+import { DEFAULT_SELECTED_CLIENT, ENTITIES, ICONS, PAGES } from "@/common/constants";
+import OptionsDropdown from "@/components/layout/OptionsHeader";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
@@ -13,6 +19,18 @@ const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
+
+  const entityMapping = {
+    [PAGES.CUSTOMERS.BASE]: { entity: ENTITIES.CUSTOMERS, queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
+    [PAGES.PRODUCTS.BASE]: { entity: ENTITIES.PRODUCTS, queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
+    [PAGES.BUDGETS.BASE]: { entity: ENTITIES.BUDGETS, queryKey: LIST_BUDGETS_QUERY_KEY, text: PAGES.BUDGETS.NAME },
+    [PAGES.BRANDS.BASE]: { entity: ENTITIES.BRANDS, queryKey: LIST_BRANDS_QUERY_KEY, text: PAGES.BRANDS.NAME },
+    [PAGES.SUPPLIERS.BASE]: { entity: ENTITIES.SUPPLIERS, queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
+  };
+
+  const currentEntity = Object.keys(entityMapping).find(key => pathname.includes(key))
+    ? entityMapping[pathname]
+    : null;
 
   const handleClientChange = (client) => {
     const userData = JSON.parse(sessionStorage.getItem("userData"));
@@ -34,7 +52,9 @@ const Header = () => {
     [PAGES.PRODUCTS.SHORTKEYS]: () => push(PAGES.PRODUCTS.BASE),
     [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
   };
+
   useKeyboardShortcuts(shortcutMapping);
+  
   return (
     <>
       {showHeader && (
@@ -70,6 +90,9 @@ const Header = () => {
                 <Flex>
                   <RigthHeaderDiv>
                     <KeyboardShortcuts />
+                    {currentEntity?.entity && currentEntity?.queryKey && (
+                      <OptionsDropdown entity={currentEntity.entity} queryKey={currentEntity.queryKey} text={currentEntity.text} />
+                    )}
                   </RigthHeaderDiv>
                   {isCallixtoUser(role) && (
                     <RigthHeaderDiv>

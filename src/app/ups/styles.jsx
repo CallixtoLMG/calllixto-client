@@ -1,4 +1,4 @@
-import { Flex } from '@/components/common/custom';
+import { Flex } from '@/common/components/custom';
 import styled from 'styled-components';
 
 const MainContainer = styled(Flex)`
@@ -10,5 +10,6 @@ const MainContainer = styled(Flex)`
 `;
 
 export {
-  MainContainer
+    MainContainer
 };
+

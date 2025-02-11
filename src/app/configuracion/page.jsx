@@ -1,10 +1,10 @@
 "use client";
 import { useEditSetting, useListSettings } from "@/api/settings";
-import { SubmitAndRestore } from "@/components/common/buttons";
-import { Form } from "@/components/common/custom";
+import { SubmitAndRestore } from "@/common/components/buttons";
+import { Form } from "@/common/components/custom";
+import { PAGES } from "@/common/constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
-import { PAGES } from "@/common/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { pick } from "lodash";
@@ -25,7 +25,7 @@ const ENTITY_MAPPER = {
 export const SUPPORTED_SETTINGS = {
   PRODUCT: ["tags"],
   CUSTOMER: ["tags"],
-  EXPENSE: ["tags"],
+  EXPENSE: ["tags", "categories"],
 };
 
 const Settings = () => {

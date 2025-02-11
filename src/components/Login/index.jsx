@@ -1,16 +1,16 @@
 "use client";
 import { useUserContext } from "@/User";
 import { getUserData } from "@/api/userData";
-import { Loader } from "@/components/layout";
 import { ICONS, PAGES, RULES } from "@/common/constants";
+import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
+import { Form } from "../../common/components/custom";
+import { PasswordControlled, TextControlled } from "../../common/components/form";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styles";
-import { PasswordControlled, TextControlled } from "../common/form";
-import { Form } from "../common/custom";
 
 const LoginForm = ({ onSubmit }) => {
   const { setUserData } = useUserContext();

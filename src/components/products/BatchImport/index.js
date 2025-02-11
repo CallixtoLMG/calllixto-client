@@ -1,25 +1,26 @@
 import { useCreateBatch, useEditBatch, useGetBlackList, useListProducts } from "@/api/products";
-import { Button, ButtonsContainer, FieldsContainer, FlexColumn, Form, FormField, Label, Segment } from "@/components/common/custom";
-import { Table } from "@/components/common/table";
-import { Loader } from "@/components/layout";
+import { IconedButton } from "@/common/components/buttons";
+import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } from "@/common/components/custom";
+import { PriceControlled, TextControlled, TextField } from "@/common/components/form";
+import { Table } from "@/common/components/table";
 import { COLORS, ICONS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
+import { now } from "@/common/utils/dates";
+import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { Modal, ModalHeader, WaitMsg } from "./styles";
-import { IconedButton } from "@/components/common/buttons";
-import { now } from "@/common/utils/dates";
-import { PriceControlled, TextControlled } from "@/components/common/form";
 
 const BatchImport = ({ isCreating }) => {
-  const { data, isLoading: loadingProducts } = useListProducts();
+  const { data, isLoading: loadingProducts, refetch: refetchProducts } = useListProducts();
   const products = useMemo(() => data?.products, [data?.products]);
   const { refetch: refetchBlacklist } = useGetBlackList();
-  const { handleSubmit, control, reset, setValue, watch } = useForm();
+  const methods = useForm();
+  const { handleSubmit, formState: { isDirty }, reset, watch, setValue } = methods;
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,10 +81,11 @@ const BatchImport = ({ isCreating }) => {
     };
   }, [isCreating, watchProducts, isLoading, handleBatchAction]);
 
-  const handleClick = useCallback(() => {
+  const handleClick = useCallback(async () => {
+    await refetchProducts();
     inputRef.current.value = null;
     inputRef?.current?.click();
-  }, [inputRef]);
+  }, [inputRef, refetchProducts]);
 
   const handleModalClose = () => {
     setOpen(false);
@@ -124,21 +126,48 @@ const BatchImport = ({ isCreating }) => {
     const workbook = XLSX.read(data, { type: "binary" });
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
+
     const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
+
     const columnMapping = {
       Codigo: "code",
+      Código: "code",
       Nombre: "name",
+      Marca: "brand",
+      Proveedor: "supplier",
+      Costo: "cost",
       Precio: "price",
+      Estado: "state",
       Comentarios: "comments",
     };
-    const transformedHeaders = headersRow.map(header => columnMapping[header] || header);
+
+    const transformedHeaders = [];
+    const seenMappedColumns = new Set();
+
+    headersRow.forEach(header => {
+      const mappedColumn = columnMapping[header];
+
+      if (mappedColumn && seenMappedColumns.has(mappedColumn)) {
+        return;
+      }
+
+      if (mappedColumn) {
+        transformedHeaders.push(mappedColumn);
+        seenMappedColumns.add(mappedColumn);
+      } else {
+        transformedHeaders.push(header);
+      }
+    });
+
     for (let i = 0; i < transformedHeaders.length; i++) {
       sheet[XLSX.utils.encode_cell({ r: 0, c: i })] = {
         v: transformedHeaders[i],
         t: 's',
       };
-    };
+    }
+
     let parsedData = XLSX.utils.sheet_to_json(sheet, { header: transformedHeaders, range: 1 });
+
     const importProducts = [];
     const downloadProducts = [];
     const productCounts = {};
@@ -156,11 +185,12 @@ const BatchImport = ({ isCreating }) => {
     parsedData.forEach(product => {
       const code = product.code ? String(product.code).toUpperCase() : "Sin código";
       const hasAtLeastOneValue = product.code || product.name || product.price;
+
       if (hasAtLeastOneValue) {
         const formattedProduct = {
           code,
           name: product.name,
-          price: parseFloat(product.price),
+          price: parseInt(product.price),
           comments: product.comments
         };
 
@@ -181,8 +211,10 @@ const BatchImport = ({ isCreating }) => {
       }
     });
 
+
     setValue('importProducts', importProducts);
     setImportedProductsCount(importProducts.length);
+
     if (downloadProducts.length) {
       setShowConfirmationModal(true);
       setDownloadProducts(downloadProducts);
@@ -264,12 +296,10 @@ const BatchImport = ({ isCreating }) => {
       };
     },
     onSuccess: (response) => {
-      const unprocessedCount = response.unprocessed?.length;
-      const createdCount = importedProductsCount - unprocessedCount;
       if (response.statusOk) {
-        toast.success(isCreating ?
-          `Productos importados: ${importedProductsCount}.\nProductos creados exitosamente: ${createdCount}.\nProductos sin procesar: ${unprocessedCount}.`
-          : "Los productos se han actualizado con éxito!");
+        toast.success(
+          `Los productos se han ${isCreating ? "creado" : "actualizado"} con éxito!`
+        )
         handleModalClose();
       } else {
         toast.error(response.error.message);
@@ -368,6 +398,8 @@ const BatchImport = ({ isCreating }) => {
                   <p>
                     {`Se ha${downloadProducts.length === 1 ? '' : 'n'} encontrado ${downloadProducts.length} producto${downloadProducts.length === 1 ? '' : 's'} (de ${totalProducts}) ${importSettings.confirmation} existente${downloadProducts.length === 1 ? '' : 's'} en la lista...`}
                     <br />
+                    (incluídos los temporalmente eliminados)
+                    <br />
                     ¿Desea descargar un archivo de Excel con estos productos antes de continuar?
                   </p>
                 </Modal.Content>
@@ -395,27 +427,20 @@ const BatchImport = ({ isCreating }) => {
               {watchProducts.length <= 50 ? (
                 <>
                   <Modal.Content>
-                    <Form ref={formRef} onSubmit={handleSubmit(mutate)}>
-                      <FlexColumn rowGap="5px">
-                        <FieldsContainer  >
-                          <FormField width={6}>
-                            <Label >Archivo seleccionado:</Label>
-                            <Segment>{selectedFile}</Segment>
-                          </FormField>
-                        </FieldsContainer>
-                        <FieldsContainer rowGap="5px">
-                          <Label>{`${importSettings.label}: ${importedProductsCount}`}</Label>
-                          <Table
-                            deleteButtonInside
-                            tableHeight="50vh"
-                            mainKey="code"
-                            headers={PRODUCTS_COLUMNS}
-                            elements={watchProducts}
-                            actions={actions}
-                          />
-                        </FieldsContainer>
-                      </FlexColumn>
-                    </Form>
+                    <FormProvider {...methods}>
+                      <Form ref={formRef} onSubmit={handleSubmit(mutate)}>
+                        <TextField width={6} label="Archivo seleccionado" value={selectedFile} disabled />
+                        <Label > {`${importSettings.label}: ${importedProductsCount}`}</Label>
+                        <Table
+                          deleteButtonInside
+                          tableHeight="50vh"
+                          mainKey="code"
+                          headers={PRODUCTS_COLUMNS}
+                          elements={watchProducts}
+                          actions={actions}
+                        />
+                      </Form>
+                    </FormProvider>
                   </Modal.Content>
                 </>
               ) : (
@@ -465,7 +490,7 @@ const BatchImport = ({ isCreating }) => {
         <Modal open={showUnprocessedModal} onClose={() => setShowUnprocessedModal(false)}>
           <ModalHeader>Confirmar descarga</ModalHeader>
           <Modal.Content>
-            <p> {`Se han encontrado ${unprocessedProductsCount} productos con errores que no pueden ser importados`}.</p>
+            <p> {`Se han encontrado ${unprocessedProductsCount} de ${selectedFile} productos con errores que no pueden ser importados`}.</p>
             <p>¿Deseas descargar un archivo de Excel con estos productos?</p>
           </Modal.Content>
           <Modal.Actions>

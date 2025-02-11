@@ -1,26 +1,24 @@
 import { useUpdatePayments } from "@/api/budgets";
-import { SubmitAndRestore } from "@/components/common/buttons";
-import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, TextArea, ViewContainer } from "@/components/common/custom";
-import Payments from "@/components/common/form/Payments";
-import { Table, Total } from "@/components/common/table";
-import { CommentTooltip } from "@/components/common/tooltips";
+import { SubmitAndRestore } from "@/common/components/buttons";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, TextArea, ViewContainer } from "@/common/components/custom";
+import { DropdownField, PriceLabel } from "@/common/components/form";
+import Payments from "@/common/components/form/Payments";
+import { Table, Total } from "@/common/components/table";
+import { CommentTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS } from "@/common/constants";
-import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
+import { getDateWithOffset, now } from "@/common/utils/dates";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
+import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
+import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Popup } from "semantic-ui-react";
-import { getBudgetState } from "../budgets.utils";
-import { Container, Message, MessageHeader } from "./styles";
-import { PriceLabel } from "@/components/common/form";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { now, getDateWithOffset } from "@/common/utils/dates";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
-import { isBudgetCancelled, isBudgetConfirmed } from "../budgets.utils";
-import { getBrandCode, getProductCode, getSupplierCode } from "@/components/products/products.utils";
-import { isProductOOS, getPrice, getTotal } from "@/components/products/products.utils";
+import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../budgets.utils";
+import { Container, Message, MessageHeader } from "./styles";
 
 const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
   const methods = useForm({
@@ -198,30 +196,38 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
             readOnly
           />
-          <FormField
-            flex="2"
+          <DropdownField
+            flex="3"
             label="Dirección"
+            search
             control={Dropdown}
-            value={budget?.pickUpInStore ? PICK_UP_IN_STORE : !budget?.customer?.addresses?.length ? 'No existe una dirección registrada' : `${budget.customer?.addresses?.[0]?.ref ? `${budget.customer?.addresses?.[0]?.ref} :` : ""} ${budget.customer?.addresses?.[0]?.address}`}
-            readOnly
-            selection
-            options={budget?.customer?.addresses.map((address) => ({
-              key: address.address,
-              text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
-              value: address.address,
-            }))}
+            value={
+              budget?.pickUpInStore
+                ? PICK_UP_IN_STORE
+                : selectedContact.address || (budget?.customer?.addresses?.length ? '' : 'Cliente sin dirección')
+            }
+            options={[
+              { key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE },
+              ...(
+                budget?.customer?.addresses?.map((address) => ({
+                  key: address.address,
+                  text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
+                  value: address.address,
+                })) || []
+              )
+            ]}
             onChange={(e, { value }) => setSelectedContact({
               ...selectedContact,
-              address: value
+              address: value,
             })}
+            disabled={!budget?.customer?.addresses?.length && !budget?.pickUpInStore}
           />
-          <FormField
-            flex="1"
+
+          <DropdownField
+            flex="2"
             label="Teléfono"
             control={Dropdown}
-            value={!budget?.customer?.phoneNumbers?.length ? 'No existe un teléfono registrado' : budget?.customer?.phoneNumbers.length === 1 ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${getFormatedPhone(budget.customer?.phoneNumbers?.[0])}` : selectedContact?.phone}
-            readOnly
-            selection
+            value={!budget?.customer?.phoneNumbers?.length ? 'Cliente sin teléfono' : budget?.customer?.phoneNumbers.length === 1 ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${getFormatedPhone(budget.customer?.phoneNumbers?.[0])}` : selectedContact?.phone}
             options={budget?.customer?.phoneNumbers.map((phone) => ({
               key: getFormatedPhone(phone),
               text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
@@ -231,6 +237,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
               ...selectedContact,
               phone: value
             })}
+            disabled={!budget?.customer?.phoneNumbers?.length}
           />
         </FieldsContainer>
         <Table
@@ -253,17 +260,19 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                 <Flex justifyContent="space-between">
                   {toggleButton}
                 </Flex>}
-              <Payments update={isUpdating} total={total}>
-                <SubmitAndRestore
-                  isUpdating={isUpdating}
-                  isLoading={isLoadingUpdatePayment}
-                  isDirty={isDirty}
-                  onSubmit={() => mutateUpdatePayment()}
-                  onReset={() => methods.reset({ paymentsMade: budget.paymentsMade })}
-                  disabled={!isDirty}
-                  text="Guardar"
-                />
-              </Payments>
+              <FormProvider {...methods}>
+                <Payments update={isUpdating} total={total}>
+                  <SubmitAndRestore
+                    isUpdating={isUpdating}
+                    isLoading={isLoadingUpdatePayment}
+                    isDirty={isDirty}
+                    onSubmit={() => mutateUpdatePayment()}
+                    onReset={() => methods.reset({ paymentsMade: budget.paymentsMade })}
+                    disabled={!isDirty}
+                    text="Guardar"
+                  />
+                </Payments>
+              </FormProvider>
             </>
           )
         }

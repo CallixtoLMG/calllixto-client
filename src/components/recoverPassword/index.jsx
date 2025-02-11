@@ -1,5 +1,7 @@
 "use client";
 import { confirmReset, recoverPassword } from "@/api/login";
+import { Form } from "@/common/components/custom";
+import { PasswordControlled, TextControlled } from "@/common/components/form";
 import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -7,8 +9,6 @@ import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text } from "./styles";
-import { PasswordControlled, TextControlled } from "../common/form";
-import { Form } from "../common/custom";
 
 const RecoverPasswordForm = () => {
   const { push } = useRouter();

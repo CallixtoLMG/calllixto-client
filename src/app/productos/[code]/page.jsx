@@ -1,12 +1,15 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useActiveProduct, useDeleteProduct, useEditProduct, useGetProduct, useInactiveProduct } from "@/api/products";
-import { Message, MessageHeader } from "@/components/common/custom";
-import PrintBarCodes from "@/components/common/custom/PrintBarCodes";
-import { ModalAction } from "@/components/common/modals";
+import { Message, MessageHeader } from "@/common/components/custom";
+import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
+import { TextField } from "@/common/components/form";
+import { ModalAction } from "@/common/components/modals";
+import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
+import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -15,9 +18,6 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { TextField } from "@/components/common/form";
-import { isProductOOS, isProductDeleted, isProductInactive } from "@/components/products/products.utils";
 
 const Product = ({ params }) => {
   useValidateToken();

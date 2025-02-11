@@ -1,31 +1,28 @@
-import { PAYMENT_METHODS } from "@/components/budgets/budgets.constants";
-import { IconedButton, SubmitAndRestore } from "@/components/common/buttons";
-import { Button, Dropdown, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/components/common/custom";
-import { PriceLabel, PriceControlled, TextAreaControlled, PercentControlled, NumberControlled, GroupedButtonsControlled, TextControlled, DropdownControlled } from "@/components/common/form";
-import Payments from "@/components/common/form/Payments";
-import ProductSearch from "@/components/common/search/search";
-import { Table, Total } from "@/components/common/table";
-import { CommentTooltip } from "@/components/common/tooltips";
-import { Loader } from "@/components/layout";
-import { ATTRIBUTES } from "@/components/products/products.constants";
+import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
+import { Button, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/common/components/custom";
+import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
+import Payments from "@/common/components/form/Payments";
+import ProductSearch from "@/common/components/search/search";
+import { Table, Total } from "@/common/components/table";
+import { CommentTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { getFormatedPhone } from "@/common/utils";
+import { getDateWithOffset, now } from "@/common/utils/dates";
+import { BUDGET_STATES, PAYMENT_METHODS, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
+import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
+import { Loader } from "@/components/layout";
+import { ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
+import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal } from "@/components/products/products.utils";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
+import { CUSTOMER_STATES } from "../../customers/customers.constants";
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
 import { Container, Icon, VerticalDivider } from "./styles";
-import { CUSTOMER_STATES } from "../../customers/customers.constants";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { getDateWithOffset } from "@/common/utils/dates";
-import { BUDGET_STATES, PICK_UP_IN_STORE } from '@/components/budgets/budgets.constants';
-import { getTotalSum, isBudgetConfirmed, isBudgetDraft, getSubtotal } from '@/components/budgets/budgets.utils';
-import { getBrandCode, getProductCode, getSupplierCode, getPrice, getTotal } from "@/components/products/products.utils";
-
 
 const EMPTY_BUDGET = (user) => ({
   seller: user?.name,
@@ -49,8 +46,6 @@ const BudgetForm = ({
   isLoading,
   isCloning,
   draft,
-  selectedContact,
-  setSelectedContact,
 }) => {
   const methods = useForm({
     defaultValues: isCloning && budget
@@ -67,13 +62,13 @@ const BudgetForm = ({
             }
           })
         })),
-        seller: `${user?.firstName} ${user?.lastName}`,
+        seller: user?.name,
         paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
       }
       : budget && draft
         ? {
           ...budget,
-          seller: `${user?.firstName} ${user?.lastName}`,
+          seller: user?.name,
           paymentsMade: budget.paymentsMade || [],
         }
         : {
@@ -82,7 +77,7 @@ const BudgetForm = ({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  const { control, handleSubmit, setValue, watch, reset, setError, clearErrors, formState: { isDirty, errors } } = methods;
+  const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
     control,
     name: "products"
@@ -138,8 +133,6 @@ const BudgetForm = ({
       ),
     }));
   }, [customers]);
-
-  const shouldError = useMemo(() => isBudgetConfirmed(watchState) && !draft && !watchPickUp, [draft, watchPickUp, watchState]);
 
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
@@ -241,17 +234,14 @@ const BudgetForm = ({
   }, [watchProducts, calculateTotal]);
 
   const handleCreate = async (data, state) => {
-    const isvalid = validateCustomer();
-    if (isvalid) {
-      const { customer } = data;
-      await onSubmit({
-        ...data,
-        customer: { id: customer.id, name: customer.name },
-        products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment"])),
-        total: Number(total.toFixed(2)),
-        state
-      });
-    }
+    const { customer } = data;
+    await onSubmit({
+      ...data,
+      customer: { id: customer.id, name: customer.name },
+      products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment"])),
+      total: Number(total.toFixed(2)),
+      state
+    });
   };
 
   const currentState = useMemo(() => {
@@ -261,32 +251,18 @@ const BudgetForm = ({
     return BUDGET_STATES.PENDING;
   }, [watchState]);
 
-  const validateCustomer = () => {
-    if (isBudgetConfirmed(watchState) && !watchPickUp && (!watchCustomer.addresses.length || !watchCustomer.phoneNumbers.length)) {
-      if (!watchCustomer.addresses.length) {
-        setError('customer.addresses', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
-      };
-      if (!watchCustomer.phoneNumbers.length) {
-        setError('customer.phoneNumbers', { type: 'manual', message: 'Campo requerido para confirmar un presupuesto.' });
-      };
-      return false;
-    }
-    clearErrors('customer');
-    return true;
-  };
-
   const handleReset = useCallback(() => {
     if (draft || isCloning) {
       reset({
         ...EMPTY_BUDGET(user),
         ...budget,
-        seller: `${user?.firstName} ${user?.lastName}`,
+        seller: user?.name,
       });
     } else {
       reset({
         ...EMPTY_BUDGET(user),
         state: watchState,
-        seller: `${user?.firstName} ${user?.lastName}`,
+        seller: user?.name,
       });
     }
 
@@ -448,13 +424,7 @@ const BudgetForm = ({
     setValue("state", BUDGET_STATES.DRAFT.id);
     await handleCreate({ ...data, total: Number(total.toFixed(2)) }, BUDGET_STATES.DRAFT.id);
   };
-
   const handleConfirm = async (data) => {
-    if (isCustomerInactive) {
-      setError('customer', { type: 'manual', message: `No es posible confirmar ni dejar pendientes presupuestos con clientes inactivos, solo borradores.` });
-      return;
-    }
-
     setValue('state', isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
     await handleCreate({ ...data, total: Number(total.toFixed(2)) }, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
   };
@@ -533,55 +503,77 @@ const BudgetForm = ({
                 label="Fecha de vencimiento"
                 control={Input}
                 readOnly
-                value={getDateWithOffset(null, expiration, 'days')}
+                value={
+                  expiration || budget?.expirationOffsetDays
+                    ? getDateWithOffset(now(), expiration || budget?.expirationOffsetDays, "days")
+                    : ""
+                }
+                placeholder="dd/mm/aaaa"
               />
             </FieldsContainer>
           </FieldsContainer>
           <FieldsContainer>
             <DropdownControlled
               name="customer"
-              rules={{ validate: value => !!value?.id || 'Campo requerido.' }}
-              width="300px"
+              rules={{
+                validate: {
+                  required: value => {
+                    return !!value?.id || 'Campo requerido.';
+                  },
+                  activeCustomer: value => {
+                    return value?.state === CUSTOMER_STATES.ACTIVE.id || 'No es posible confirmar ni dejar pendiente presupuestos con clientes inactivos, solo borradores.';
+                  },
+                  requiredAddress: value => {
+                    return (
+                      isBudgetConfirmed(watchState) &&
+                      (!value?.addresses.length && !watchPickUp)
+                    )
+                      ? 'Dirección requerida.'
+                      : true;
+                  },
+                  requiredPhone: value => {
+                    return (
+                      isBudgetConfirmed(watchState) &&
+                      !value?.phoneNumbers.length
+                    )
+                      ? 'Teléfono requerido.'
+                      : true;
+                  },
+                }
+              }}
+              pickErrors={["required", "activeCustomer"]}
               label="Cliente"
+              placeholder="Seleccione un cliente"
+              width="300px"
               options={customerOptions}
+              value={watchCustomer ?? "No se seleccionó ningún cliente"}
+              search
             />
-            <FormField
+            <TextField
               flex="2"
-              control={Dropdown}
               label="Dirección"
-              required={isBudgetConfirmed(watchState) && !watchPickUp}
-              error={errors?.customer?.addresses ?? { content: errors.customer.addresses.message, pointing: 'above' }}
-              value={watchPickUp ? PICK_UP_IN_STORE : !draft || !watchCustomer?.addresses?.length || watchCustomer.addresses.length === 1 ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer?.addresses?.[0]?.ref}: ` : ''}${watchCustomer?.addresses?.[0]?.address ? watchCustomer?.addresses?.[0]?.address : ""}` : selectedContact.address}
-              selection
-              options={watchCustomer?.addresses.map((address) => ({
-                key: address.address,
-                text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
-                value: address.address,
-              }))}
-              onChange={(e, { value }) => setSelectedContact({
-                ...selectedContact,
-                address: value,
-              })}
-              disabled={watchPickUp || !watchCustomer || watchCustomer.addresses?.length < 2}
+              placeholder="Dirección"
+              disabled
+              error={!watchCustomer?.addresses?.length && (errors.customer?.type === "requiredAddress") && errors.customer?.message}
+              value={
+                watchPickUp
+                  ? PICK_UP_IN_STORE
+                  : watchCustomer?.addresses?.length > 0
+                    ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
+                    : 'Cliente sin dirección'
+              }
             />
-            <FormField
-              flex="1"
-              control={Dropdown}
+            <TextField
+              flex="2"
               label="Teléfono"
-              required={isBudgetConfirmed(watchState)}
-              error={(shouldError && errors?.customer?.phoneNumbers) ?? { content: errors.customer.phoneNumbers.message, pointing: 'above' }}
-              value={!draft || !watchCustomer?.phoneNumbers?.length || watchCustomer?.phoneNumbers.length === 1 ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer?.phoneNumbers?.[0]?.ref}: ` : ''}${getFormatedPhone(watchCustomer?.phoneNumbers?.[0])}` : selectedContact.phone}
-              selection
-              options={watchCustomer?.phoneNumbers.map((phone) => ({
-                key: getFormatedPhone(phone),
-                text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
-                value: getFormatedPhone(phone),
-              }))}
-              onChange={(e, { value }) => setSelectedContact({
-                ...selectedContact,
-                phone: value,
-              })}
-              disabled={!watchCustomer || watchCustomer.phoneNumbers?.length < 2}
+              placeholder="Teléfono"
+              error={!watchCustomer?.phoneNumbers?.length && (errors.customer?.type === "requiredPhone") && errors.customer?.message}
+              disabled
+              value={
+                watchCustomer?.phoneNumbers?.length > 0
+                  ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
+                  : 'Cliente sin teléfono'
+              }
             />
           </FieldsContainer>
           <Controller name="products"
@@ -590,8 +582,7 @@ const BudgetForm = ({
               <FormField
                 width="300px"
                 label="Productos"
-                required
-                error={errors?.products?.root ?? { content: errors.products.root.message, pointing: 'above' }}
+                error={errors.products?.root?.message}
                 control={ProductSearch}
                 ref={productSearchRef}
                 products={products}
@@ -700,7 +691,7 @@ const BudgetForm = ({
             text={currentState.singularTitle}
             extraButton={
               <IconedButton
-                icon
+                icon={BUDGET_STATES.DRAFT.icon}
                 labelPosition="left"
                 disabled={isLoading || !isDirty}
                 loading={isLoading && isBudgetDraft(watchState)}
@@ -708,8 +699,8 @@ const BudgetForm = ({
                 onClick={handleSubmit(handleDraft)}
                 color={BUDGET_STATES.DRAFT.color}
                 width="fit-content"
+                text={BUDGET_STATES.DRAFT.singularTitle}
               >
-                <Icon name={BUDGET_STATES.DRAFT.icon} />{BUDGET_STATES.DRAFT.singularTitle}
               </IconedButton>
             }
           />
