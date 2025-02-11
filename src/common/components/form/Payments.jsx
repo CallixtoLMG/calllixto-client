@@ -101,7 +101,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
                 label="Monto"
                 value={payment.amount}  
                 onChange={(value) => {
-                  setPayment({ ...payment, amount: value || 0 }); 
+                  setPayment({ ...payment, amount: value ?? 0 }); 
                 }}
                 disabled={false}
                 error={showErrors && !payment.amount ? RULES.REQUIRED.required : undefined}

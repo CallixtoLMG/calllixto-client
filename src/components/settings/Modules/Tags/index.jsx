@@ -1,4 +1,4 @@
-import { Box, Button, Flex, FlexColumn } from "@/common/components/custom";
+import { Box, Button, Flex } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, ICONS, SEMANTIC_COLORS } from "@/common/constants";
@@ -16,11 +16,11 @@ const Tags = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [tagToAdd, setTagToAdd] = useState(EMPTY_TAG);
   const { formState: { isDirty } } = useFormContext();
-  const [error, setError] = useState(null); 
+  const [error, setError] = useState(null);
   const { fields: tags, append, remove } = useFieldArray({
     name: "tags"
   });
-  
+
   useEffect(() => {
     if (!isDirty) {
       setTagToAdd(EMPTY_TAG);
@@ -70,7 +70,7 @@ const Tags = () => {
 
     append(tagToAdd);
     setTagToAdd(EMPTY_TAG);
-    setError(null); 
+    setError(null);
   };
 
   const handleNameChange = (e) => {
@@ -98,7 +98,7 @@ const Tags = () => {
                 placeholder="Nombre de la etiqueta"
                 value={tagToAdd.name}
                 onChange={handleNameChange}
-                error={error} 
+                error={error}
               />
               <DropdownField
                 flex={1}
@@ -124,18 +124,16 @@ const Tags = () => {
                 onClick={handleAddTag}
               />
             </Flex>
-            <FlexColumn rowGap="15px">
-              <Table
-                isLoading={false}
-                headers={headers}
-                elements={tags}
-                mainKey="name"
-                paginate={false}
-                actions={actions}
-                tableHeight="40vh"
-                deleteButtonInside
-              />
-            </FlexColumn>
+            <Table
+              isLoading={false}
+              headers={headers}
+              elements={tags}
+              mainKey="name"
+              paginate={false}
+              actions={actions}
+              tableHeight="40vh"
+              deleteButtonInside
+            />
           </Box>
         </Accordion.Content>
       </Accordion>

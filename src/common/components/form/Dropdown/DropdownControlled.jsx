@@ -1,4 +1,3 @@
-
 import { FormField } from "@/common/components/custom";
 import { Controller, useFormContext } from "react-hook-form";
 import { Dropdown } from "../../custom";
@@ -18,8 +17,7 @@ export const DropdownControlled = ({
   pickErrors
 }) => {
   const { formState: { errors } } = useFormContext();
-  const showError = errors?.[name] && (pickErrors ? pickErrors.includes(errors[name]?.type) : true);
-  const errorMessage = errors?.[name]?.message;
+
   return (
     <Controller
       name={name}
@@ -42,8 +40,8 @@ export const DropdownControlled = ({
             afterChange?.(value);
           }}
           disabled={disabled}
-          error={showError && {
-            content: errorMessage,
+          error={errors?.[name] && (pickErrors ? pickErrors.includes(errors[name]?.type) : true) && {
+            content: errors[name]?.message,
             pointing: 'above',
           }}
         />
@@ -51,5 +49,3 @@ export const DropdownControlled = ({
     />
   );
 };
-
-

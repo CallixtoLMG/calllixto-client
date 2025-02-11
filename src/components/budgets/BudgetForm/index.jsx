@@ -504,11 +504,9 @@ const BudgetForm = ({
                 control={Input}
                 readOnly
                 value={
-                  expiration
-                    ? getDateWithOffset(now(), expiration, "days")
-                    : budget?.expirationOffsetDays
-                      ? getDateWithOffset(now(), expiration, "days")
-                      : ""
+                  expiration || budget?.expirationOffsetDays
+                    ? getDateWithOffset(now(), expiration || budget?.expirationOffsetDays, "days")
+                    : ""
                 }
                 placeholder="dd/mm/aaaa"
               />
@@ -548,7 +546,7 @@ const BudgetForm = ({
               placeholder="Seleccione un cliente"
               width="300px"
               options={customerOptions}
-              value={watchCustomer ? watchCustomer : "No se seleccionó ningún cliente"}
+              value={watchCustomer ?? "No se seleccionó ningún cliente"}
               search
             />
             <TextField

@@ -1,4 +1,4 @@
-import { Box, Button, Flex, FlexColumn } from "@/common/components/custom";
+import { Box, Button, Flex } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, ICONS, SEMANTIC_COLORS } from "@/common/constants";
@@ -70,7 +70,7 @@ const Categories = () => {
 
     append(categoryToAdd);
     setCategoryToAdd(EMPTY_CATEGORY);
-    setError(null); 
+    setError(null);
   };
 
   const handleNameChange = (e) => {
@@ -98,7 +98,7 @@ const Categories = () => {
                 placeholder="Nombre de la categoria"
                 value={categoryToAdd.name}
                 onChange={handleNameChange}
-                error={error} 
+                error={error}
               />
               <DropdownField
                 flex={1}
@@ -124,18 +124,16 @@ const Categories = () => {
                 onClick={handleAddCategory}
               />
             </Flex>
-            <FlexColumn rowGap="15px">
-              <Table
-                isLoading={false}
-                headers={headers}
-                elements={categories}
-                mainKey="name"
-                paginate={false}
-                actions={actions}
-                tableHeight="40vh"
-                deleteButtonInside
-              />
-            </FlexColumn>
+            <Table
+              isLoading={false}
+              headers={headers}
+              elements={categories}
+              mainKey="name"
+              paginate={false}
+              actions={actions}
+              tableHeight="40vh"
+              deleteButtonInside
+            />
           </Box>
         </Accordion.Content>
       </Accordion>
