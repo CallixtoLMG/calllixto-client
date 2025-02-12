@@ -14,7 +14,9 @@ export const DropdownControlled = ({
   disabled,
   clearable,
   search,
-  pickErrors
+  pickErrors,
+  multiple,
+  renderLabel
 }) => {
   const { formState: { errors } } = useFormContext();
 
@@ -31,6 +33,8 @@ export const DropdownControlled = ({
           control={Dropdown}
           search={search}
           selection
+          renderLabel={renderLabel}
+          multiple={multiple}
           noResultsMessage="No se encontraron resultados"
           clearable={clearable}
           options={options}

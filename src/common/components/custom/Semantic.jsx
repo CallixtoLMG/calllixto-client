@@ -81,6 +81,21 @@ export const Dropdown = styled(SDropdown)`
   i{
     margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
   }
+  ${({ multiple }) => multiple && `
+    &&&&&& div.item {
+      padding: 0.35rem 0.4rem!important;
+      width: fit-content!important;
+      background-color: white;
+      font-size: 12px!important;
+      &:hover {
+        background-color: white;
+      }
+    }
+    a.ui.label {
+      font-size: 12px!important;
+      padding: 0.5rem 0.8rem!important;
+    }
+  `}
 `;
 
 export const DropdownOption = styled(SDropdown)`

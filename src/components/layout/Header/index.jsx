@@ -103,7 +103,7 @@ const Header = () => {
                     <UserMenu
                       trigger={
                         <Button icon>
-                          <Icon name={ICONS.USER} /> Usuario
+                          <Icon name={ICONS.USER} /> {userData.name}
                         </Button>
                       }
                       onLogout={handleLogout}

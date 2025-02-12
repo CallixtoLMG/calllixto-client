@@ -1,27 +1,61 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form } from "@/common/components/custom";
-import { ContactControlled, ContactView, TextAreaControlled, TextControlled } from "@/common/components/form";
+import { FieldsContainer, Form, FormField, Label } from "@/common/components/custom";
+import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { useCallback, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
 
-const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
+const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags }) => {
+  console.log(tags)
   const methods = useForm({
     defaultValues: {
+      tags: [],
       ...EMPTY_CUSTOMER,
       ...customer,
     }
   });
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
+  const [localCustomer, setLocalCustomer] = useState(customer);
 
-  useKeyboardShortcuts(handleSubmit(onSubmit), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset({ ...EMPTY_CUSTOMER, ...customer }), SHORTKEYS.DELETE);
+  const handleReset = useCallback((customer) => {
+    reset(customer);
+  }, [reset]);
+
+  const handleCreate = (data) => {
+    const { previousVersions, ...filteredData } = data;
+
+    if (!filteredData.addresses.length) {
+      filteredData.addresses = [];
+    }
+    if (!filteredData.phoneNumbers.length) {
+      filteredData.phoneNumbers = [];
+    }
+    if (!filteredData.emails.length) {
+      filteredData.emails = [];
+    }
+
+    onSubmit(filteredData);
+    const updatedCustomer = { ...localCustomer, tags: filteredData.tags };
+    setLocalCustomer(updatedCustomer);
+  };
+
+  const filteredTags = useMemo(() => {
+    const customerTagNames = localCustomer?.tags?.map((tag) => tag.name) || [];
+    const uniqueTags = tags?.filter((tag) => !customerTagNames.includes(tag.name)) || [];
+    return [...(localCustomer?.tags || []), ...uniqueTags];
+  }, [tags, localCustomer]);
+
+  useKeyboardShortcuts(handleSubmit(handleCreate), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => handleReset({ ...EMPTY_CUSTOMER, ...customer }), SHORTKEYS.DELETE);
+
+
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+      <Form onSubmit={handleSubmit(handleCreate)}>
         <FieldsContainer>
           <TextControlled
             width="40%"
@@ -33,6 +67,41 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
           />
         </FieldsContainer>
         {isUpdating || !view ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
+        <FieldsContainer>
+          <FormField flex="1" >
+            {/* <DropdownControlled
+              width="25%"
+              name="supplier"
+              label="Proveedor"
+              rules={RULES.REQUIRED}
+              options={supplierOptions}
+            /> */}
+            {console.log(filteredTags)}
+            <DropdownControlled
+              name="tags"
+              label="Etiquetas"
+              placeholder="Selecciona etiquetas"
+              multiple
+              search
+              selection
+              // value={value.map((tag) => JSON.stringify(tag))}
+              options={filteredTags?.map((tag) => ({
+                key: tag.name,
+                value: JSON.stringify(tag),
+                text: tag.name,
+                content: (
+                  <Label color={tag.color} >
+                    {tag.name}
+                  </Label>
+                ),
+              }))}
+              renderLabel={(label) => ({
+                color: filteredTags.find((tag) => tag.name === label.text)?.color || 'grey',
+                content: label.text,
+              })}
+            />
+          </FormField>
+        </FieldsContainer>
         <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
         {(isUpdating || !view) && (
           <SubmitAndRestore

@@ -1,6 +1,7 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
 import { useActiveCustomer, useDeleteCustomer, useEditCustomer, useGetCustomer, useInactiveCustomer } from "@/api/customers";
+import { useGetSetting } from "@/api/settings";
 import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
@@ -27,11 +28,11 @@ const Customer = ({ params }) => {
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
-
   const editCustomer = useEditCustomer();
   const deleteCustomer = useDeleteCustomer();
   const inactiveCustomer = useInactiveCustomer();
   const activeCustomer = useActiveCustomer();
+  const { data: customersSettings, refetch: refetchCustomerSettings } = useGetSetting("CUSTOMERS");
 
   useEffect(() => {
     resetActions();
@@ -41,7 +42,15 @@ const Customer = ({ params }) => {
   useEffect(() => {
     setLabels([PAGES.CUSTOMERS.NAME, customer?.name]);
     refetch();
+    refetchCustomerSettings();
   }, [customer, setLabels, refetch]);
+
+  const mappedTags = useMemo(() => customersSettings?.settings?.tags?.map(tag => ({
+    ...tag,
+    key: tag.id,
+    value: tag.name,
+    text: tag.name,
+  })), [customersSettings]);
 
   const hasAssociatedBudgets = useMemo(() => {
     return budgetData?.budgets?.some(budget => budget.customer?.id === customer?.id);
@@ -210,6 +219,7 @@ const Customer = ({ params }) => {
         </Message>
       )}
       <CustomerForm
+        tags={mappedTags}
         customer={customer}
         onSubmit={mutateEdit}
         isLoading={isEditPending}
