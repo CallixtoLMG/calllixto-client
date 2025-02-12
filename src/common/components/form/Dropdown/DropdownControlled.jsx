@@ -16,7 +16,7 @@ export const DropdownControlled = ({
   search,
   pickErrors,
   multiple,
-  renderLabel
+  renderLabel // VER ESTO
 }) => {
   const { formState: { errors } } = useFormContext();
 

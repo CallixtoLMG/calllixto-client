@@ -20,6 +20,8 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags })
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
   const [localCustomer, setLocalCustomer] = useState(customer);
 
+
+  // VER QUE ONDA HANDLERESET Y EL CREATE
   const handleReset = useCallback((customer) => {
     reset(customer);
   }, [reset]);
