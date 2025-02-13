@@ -7,8 +7,7 @@ import { useCallback, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
 
-const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags }) => {
-  console.log(tags)
+const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, isCustomerSettingsFetching }) => {
   const methods = useForm({
     defaultValues: {
       tags: [],
@@ -19,7 +18,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags })
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
   const [localCustomer, setLocalCustomer] = useState(customer);
-
+  console.log(localCustomer)
 
   // VER QUE ONDA HANDLERESET Y EL CREATE
   const handleReset = useCallback((customer) => {
@@ -53,8 +52,6 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags })
   useKeyboardShortcuts(handleSubmit(handleCreate), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset({ ...EMPTY_CUSTOMER, ...customer }), SHORTKEYS.DELETE);
 
-
-
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleCreate)}>
@@ -71,22 +68,18 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags })
         {isUpdating || !view ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
         <FieldsContainer>
           <FormField flex="1" >
-            {/* <DropdownControlled
-              width="25%"
-              name="supplier"
-              label="Proveedor"
-              rules={RULES.REQUIRED}
-              options={supplierOptions}
-            /> */}
-            {console.log(filteredTags)}
+            {/* {console.log(filteredTags)} */}
             <DropdownControlled
+              width="40%"
               name="tags"
               label="Etiquetas"
               placeholder="Selecciona etiquetas"
+              height="fit-content"
               multiple
               search
               selection
-              // value={value.map((tag) => JSON.stringify(tag))}
+              loading={isCustomerSettingsFetching}
+
               options={filteredTags?.map((tag) => ({
                 key: tag.name,
                 value: JSON.stringify(tag),
@@ -97,6 +90,10 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags })
                   </Label>
                 ),
               }))}
+              afterChange={(data) => {
+                const selectedTags = data.map((item) => JSON.parse(item));
+                return selectedTags
+              }}
               renderLabel={(label) => ({
                 color: filteredTags.find((tag) => tag.name === label.text)?.color || 'grey',
                 content: label.text,

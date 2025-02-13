@@ -5,6 +5,7 @@ import { Dropdown } from "../../custom";
 export const DropdownControlled = ({
   name,
   width,
+  height,
   label,
   rules,
   placeholder,
@@ -16,6 +17,7 @@ export const DropdownControlled = ({
   search,
   pickErrors,
   multiple,
+  loading,
   renderLabel // VER ESTO
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -27,7 +29,9 @@ export const DropdownControlled = ({
       render={({ field: { onChange, ...rest } }) => (
         <FormField
           {...rest}
+          height={height}
           width={width}
+          loading={loading}
           label={label}
           placeholder={placeholder ?? label}
           control={Dropdown}

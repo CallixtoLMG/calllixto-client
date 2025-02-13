@@ -16,7 +16,7 @@ const CreateCustomer = () => {
   const { resetActions } = useNavActionsContext();
   const { push } = useRouter();
   const createCustomer = useCreateCustomer();
-  const { data: customersSettings } = useGetSetting(ENTITIES.CUSTOMERS);
+  const { data: customersSettings, isFetching: isCustomerSettingsFetching } = useGetSetting(ENTITIES.CUSTOMERS);
 
   useEffect(() => {
     resetActions();
@@ -53,6 +53,7 @@ const CreateCustomer = () => {
     <CustomerForm
       onSubmit={mutate}
       isLoading={isPending}
+      isCustomerSettingsFetching={isCustomerSettingsFetching}
       tags={mappedTags}
     />
   )
