@@ -20,7 +20,7 @@ export const Segment = styled(SSegment)`
   padding: ${({ height, padding }) => padding || (height && "10px")} !important;
   margin: ${({ margin = "0" }) => margin} !important;
   width: ${({ width = '100%' }) => width} !important;
-  min-height: 50px!important;
+  min-height: 35px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
   overflow: auto;
   align-content: center;

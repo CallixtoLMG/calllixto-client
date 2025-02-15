@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form, FormField, Label } from "@/common/components/custom";
+import { FieldsContainer, Form, FormField, Label, Segment } from "@/common/components/custom";
 import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -18,7 +18,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
   const [localCustomer, setLocalCustomer] = useState(customer);
-  console.log(localCustomer)
+  console.log("customer", customer)
 
   // VER QUE ONDA HANDLERESET Y EL CREATE
   const handleReset = useCallback((customer) => {
@@ -27,6 +27,14 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
 
   const handleCreate = (data) => {
     const { previousVersions, ...filteredData } = data;
+
+    // Obtener las etiquetas seleccionadas desde el formulario
+    const selectedTags = data.tags || [];
+
+    // Convertirlas correctamente en objetos
+    filteredData.tags = selectedTags.map((tag) =>
+      typeof tag === "string" ? JSON.parse(tag) : tag
+    );
 
     if (!filteredData.addresses.length) {
       filteredData.addresses = [];
@@ -38,6 +46,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
       filteredData.emails = [];
     }
 
+    console.log("filteredData", filteredData); // Verifica qué etiquetas se están enviando
     onSubmit(filteredData);
     const updatedCustomer = { ...localCustomer, tags: filteredData.tags };
     setLocalCustomer(updatedCustomer);
@@ -65,40 +74,49 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
             disabled={!isUpdating && view}
           />
         </FieldsContainer>
-        {isUpdating || !view ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
+        {isUpdating || !view
+          ? <ContactControlled />
+          : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
         <FieldsContainer>
           <FormField flex="1" >
             {/* {console.log(filteredTags)} */}
-            <DropdownControlled
-              width="40%"
-              name="tags"
-              label="Etiquetas"
-              placeholder="Selecciona etiquetas"
-              height="fit-content"
-              multiple
-              search
-              selection
-              loading={isCustomerSettingsFetching}
-
-              options={filteredTags?.map((tag) => ({
-                key: tag.name,
-                value: JSON.stringify(tag),
-                text: tag.name,
-                content: (
-                  <Label color={tag.color} >
+            {isUpdating || !view
+              ? < DropdownControlled
+                width="40%"
+                name="tags"
+                label="Etiquetas"
+                placeholder="Selecciona etiquetas"
+                height="fit-content"
+                multiple
+                search
+                selection
+                loading={isCustomerSettingsFetching}
+                options={filteredTags?.map((tag) => ({
+                  key: tag.name,
+                  value: JSON.stringify(tag),
+                  text: tag.name,
+                  content: (
+                    <Label color={tag.color} >
+                      {tag.name}
+                    </Label>
+                  ),
+                }))}
+                afterChange={(data) => {
+                  const selectedTags = data.map((item) => JSON.parse(item));
+                  return selectedTags
+                }}
+                renderLabel={(label) => ({
+                  color: filteredTags.find((tag) => tag.name === label.text)?.color || 'grey',
+                  content: label.text,
+                })}
+              />
+              : <Segment width="fit-content" height="38px" padding="5px">
+                {customer?.tags?.map((tag) => (
+                  <Label margin="0 5px 0 0" width="fit-content" key={tag.name} color={tag.color}>
                     {tag.name}
                   </Label>
-                ),
-              }))}
-              afterChange={(data) => {
-                const selectedTags = data.map((item) => JSON.parse(item));
-                return selectedTags
-              }}
-              renderLabel={(label) => ({
-                color: filteredTags.find((tag) => tag.name === label.text)?.color || 'grey',
-                content: label.text,
-              })}
-            />
+                ))}
+              </Segment>}
           </FormField>
         </FieldsContainer>
         <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
