@@ -18,7 +18,12 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
   const [localCustomer, setLocalCustomer] = useState(customer);
-  console.log("customer", customer)
+  const selectedTags = watch("tags") || [];
+
+  console.log("🟢 [CustomerForm] selectedTags en watch:", selectedTags);
+  console.log("🟢 [CustomerForm] tags disponibles:", tags);
+  console.log("🟢 [CustomerForm] customer.tags iniciales:", customer?.tags);
+  // console.log("customer", customer)
 
   // VER QUE ONDA HANDLERESET Y EL CREATE
   const handleReset = useCallback((customer) => {
@@ -53,10 +58,19 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
   };
 
   const filteredTags = useMemo(() => {
-    const customerTagNames = localCustomer?.tags?.map((tag) => tag.name) || [];
-    const uniqueTags = tags?.filter((tag) => !customerTagNames.includes(tag.name)) || [];
-    return [...(localCustomer?.tags || []), ...uniqueTags];
-  }, [tags, localCustomer]);
+    const customerTagNames = customer?.tags?.map(tag => tag.name) || [];
+    const uniqueTags = tags?.filter(tag => !customerTagNames.includes(tag.name)) || [];
+    return [...(customer?.tags || []), ...uniqueTags];
+  }, [tags, customer]);
+
+  const dropdownOptions = filteredTags.map(tag => ({
+    key: tag.name,
+    value: JSON.stringify(tag), // ✅ Asegura que `options` sean JSON
+    text: tag.name,
+    content: <Label color={tag.color}>{tag.name}</Label>,
+  }));
+
+  console.log("✅ [CustomerForm] availableTags después del filtrado:", filteredTags);
 
   useKeyboardShortcuts(handleSubmit(handleCreate), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset({ ...EMPTY_CUSTOMER, ...customer }), SHORTKEYS.DELETE);
@@ -81,7 +95,8 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
           <FormField flex="1" >
             {/* {console.log(filteredTags)} */}
             {isUpdating || !view
-              ? < DropdownControlled
+              ?
+              <DropdownControlled
                 width="40%"
                 name="tags"
                 label="Etiquetas"
@@ -91,22 +106,13 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
                 search
                 selection
                 loading={isCustomerSettingsFetching}
-                options={filteredTags?.map((tag) => ({
-                  key: tag.name,
-                  value: JSON.stringify(tag),
-                  text: tag.name,
-                  content: (
-                    <Label color={tag.color} >
-                      {tag.name}
-                    </Label>
-                  ),
-                }))}
-                afterChange={(data) => {
-                  const selectedTags = data.map((item) => JSON.parse(item));
-                  return selectedTags
+                options={dropdownOptions}
+                afterChange={(selectedTags) => {
+                  console.log("✅ [CustomerForm] afterChange - selectedTags:", selectedTags);
+                  methods.setValue("tags", selectedTags);
                 }}
                 renderLabel={(label) => ({
-                  color: filteredTags.find((tag) => tag.name === label.text)?.color || 'grey',
+                  color: filteredTags.find(tag => tag.name === label.text)?.color || 'grey',
                   content: label.text,
                 })}
               />
