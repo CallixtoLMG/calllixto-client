@@ -1,6 +1,6 @@
-import { Flex, Label } from "@/common/components/custom";
+import { Flex, Label, OverflowCell, } from "@/common/components/custom";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
-import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "../../common/components/tooltips";
+import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "../../common/components/tooltips";
 
 export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value', STATE: "state", INACTIVE_REASON: "inactiveReason", TAGS: "tags" };
 
@@ -9,11 +9,18 @@ export const HEADERS = [
     id: 1,
     title: 'Nombre',
     align: 'left',
-    value: (customer) =>
-      <Flex justifyContent="space-between">
-        {customer.name}
-        {customer.comments && <CommentTooltip comment={customer.comments} />}
-      </Flex>
+    value: (customer) => {
+      const { tags, name, comments } = customer;
+      return (
+        <Flex justifyContent="space-between" alignItems="center">
+          <OverflowCell maxWidth="40vw" text={name} />
+          <Flex columnGap="7px" alignItems="center" justifyContent="flex-end">
+            {tags && <TagsTooltip tags={tags} />}
+            {comments && <CommentTooltip comment={comments} />}
+          </Flex>
+        </Flex>
+      );
+    }
   },
   {
     id: 2,

@@ -28,9 +28,8 @@ const CreateCustomer = () => {
   }, [setLabels]);
 
   const mappedTags = useMemo(() => customersSettings?.settings?.tags?.map(tag => ({
-    ...tag,
-    key: tag.id,
-    value: tag.name,
+    key: tag.name,
+    value: tag,
     text: tag.name,
   })), [customersSettings]);
 

@@ -1,8 +1,8 @@
 import { encodeUri } from "@/common/utils";
 
-export * from './time';
 export * from './dates';
 export * from './entities';
+export * from './time';
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
 
@@ -191,6 +191,7 @@ export const ICONS = {
   EYE_SLASH: "eye slash",
   COG: "cog",
   EXCLAMATION_CIRCLE: "exclamation circle",
+  TAGS: "tags",
   ADDRESS_CARD: "address card",
   ARCHIVE: "archive",
   OPTIONS: "options",

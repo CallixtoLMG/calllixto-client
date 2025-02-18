@@ -46,9 +46,8 @@ const Customer = ({ params }) => {
   }, [customer, setLabels, refetch]);
 
   const mappedTags = useMemo(() => customersSettings?.settings?.tags?.map(tag => ({
-    ...tag,
-    key: tag.id,
-    value: tag.name,
+    key: tag.name,
+    value: tag,
     text: tag.name,
   })), [customersSettings]);
 
@@ -220,7 +219,7 @@ const Customer = ({ params }) => {
       )}
       <CustomerForm
         tags={mappedTags}
-        customer={customer}
+        customer={{ ...customer, tags: customer?.tags?.map((tag) => ({ ...tag })) }}
         onSubmit={mutateEdit}
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(customer?.state)}

@@ -12,9 +12,10 @@ import { Popup } from "semantic-ui-react";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
 import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
-const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view }) => {
+const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isProductSettingsFetching, tags }) => {
   const methods = useForm({
     defaultValues: {
+      tags: [],
       fractionConfig: {
         active: false,
         unit: MEASSURE_UNITS.MT.value,
@@ -29,6 +30,12 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   const handleForm = async (data) => {
     const filteredData = { ...data };
+
+    const selectedTags = data.tags || [];
+
+    filteredData.tags = selectedTags.map((tag) =>
+      typeof tag === "string" ? JSON.parse(tag) : tag
+    );
 
     if (data.fractionConfig && !data.fractionConfig.active && product?.fractionConfig?.active === false) {
       delete filteredData.fractionConfig;
@@ -46,6 +53,11 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
     await onSubmit(filteredData);
   };
+
+  const tagsOptions = tags?.map(tag => ({
+    ...tag,
+    content: <Label color={tag?.value?.color}>{tag?.value?.name}</Label>,
+  }));
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => reset({ ...EMPTY_PRODUCT, ...product }), SHORTKEYS.DELETE);
@@ -173,6 +185,28 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             options={Object.values(MEASSURE_UNITS)}
             defaultValue={Object.values(MEASSURE_UNITS)[0].value}
             disabled={(!isUpdating && view) || !watchFractionable}
+          />
+        </FieldsContainer>
+        <FieldsContainer>
+          <DropdownControlled
+            width="40%"
+            name="tags"
+            label="Etiquetas"
+            placeholder="Selecciona etiquetas"
+            height="fit-content"
+            multiple
+            clearable
+            search
+            selection
+            defaultValue={product?.tags}
+            loading={isProductSettingsFetching}
+            options={tagsOptions}
+            renderLabel={(item) => {
+              return {
+                color: item.value.color,
+                content: item.text,
+              }
+            }}
           />
         </FieldsContainer>
         <TextAreaControlled
