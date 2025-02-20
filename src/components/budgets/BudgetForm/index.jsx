@@ -1,12 +1,13 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
 import { Button, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/common/components/custom";
-import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
+import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled } from "@/common/components/form";
+import { ContentField } from "@/common/components/form/Content";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
 import { Table, Total } from "@/common/components/table";
-import { CommentTooltip } from "@/common/components/tooltips";
+import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
-import { getFormatedPhone } from "@/common/utils";
+import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
 import { getDateWithOffset, now } from "@/common/utils/dates";
 import { BUDGET_STATES, PAYMENT_METHODS, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
@@ -23,7 +24,6 @@ import { CUSTOMER_STATES } from "../../customers/customers.constants";
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
 import { Container, Icon, VerticalDivider } from "./styles";
-
 const EMPTY_BUDGET = (user) => ({
   seller: user?.name,
   customer: { name: '', addresses: [], phoneNumbers: [] },
@@ -549,7 +549,7 @@ const BudgetForm = ({
               value={watchCustomer ?? "No se seleccionó ningún cliente"}
               search
             />
-            <TextField
+            <ContentField
               flex="2"
               label="Dirección"
               placeholder="Dirección"
@@ -562,8 +562,12 @@ const BudgetForm = ({
                     ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
                     : 'Cliente sin dirección'
               }
+              extraContent={() => {
+                const { additionalAddresses } = getAddressesForDisplay(watchCustomer?.addresses || []);
+                return additionalAddresses ? <AddressesTooltip input addresses={additionalAddresses} /> : null;
+              }}
             />
-            <TextField
+            <ContentField
               flex="2"
               label="Teléfono"
               placeholder="Teléfono"
@@ -574,6 +578,10 @@ const BudgetForm = ({
                   ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
                   : 'Cliente sin teléfono'
               }
+              extraContent={() => {
+                const { additionalPhones } = getPhonesForDisplay(watchCustomer?.phoneNumbers);
+                return additionalPhones ? <PhonesTooltip input phones={additionalPhones} /> : null;
+              }}
             />
           </FieldsContainer>
           <Controller name="products"

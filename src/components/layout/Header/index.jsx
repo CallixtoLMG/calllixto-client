@@ -13,7 +13,7 @@ import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
 import { Button, Label, Menu } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
-import { Container, LeftHeaderDiv, ModLink, RigthHeaderDiv, Text } from "./styles";
+import { Container, ModLink, RigthHeaderDiv, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -52,9 +52,9 @@ const Header = () => {
     [PAGES.PRODUCTS.SHORTKEYS]: () => push(PAGES.PRODUCTS.BASE),
     [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
   };
-
+// sacar HOVER EN BOTON IRNGRSAR y sacar la raya de la derecha
+// ver si puedo acomodar las rayitas de header
   useKeyboardShortcuts(shortcutMapping);
-  
   return (
     <>
       {showHeader && (
@@ -62,11 +62,13 @@ const Header = () => {
           <Container>
             {!userData?.isAuthorized ? (
               <Flex>
-                <LeftHeaderDiv>
+                <RigthHeaderDiv>
                   <Menu.Item onClick={handleLogout}>
-                    <Text>Ingresar</Text>
+                    <Button icon> 
+                      <Icon name={ICONS.USER} /> Ingresar 
+                    </Button>
                   </Menu.Item>
-                </LeftHeaderDiv>
+                </RigthHeaderDiv>
               </Flex>
             ) : (
               <>
@@ -103,7 +105,7 @@ const Header = () => {
                     <UserMenu
                       trigger={
                         <Button icon>
-                          <Icon name={ICONS.USER} /> Usuario
+                          <Icon name={ICONS.USER} />{userData.name}
                         </Button>
                       }
                       onLogout={handleLogout}
