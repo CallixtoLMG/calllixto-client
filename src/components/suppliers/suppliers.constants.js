@@ -2,6 +2,9 @@ import { Flex, Label } from "@/common/components/custom";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "@/common/components/tooltips";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 
+export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
+export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
+
 export const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments", STATE: "state" };
 
 export const SUPPLIERS_COLUMNS = [

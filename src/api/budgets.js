@@ -1,13 +1,10 @@
-import { ATTRIBUTES } from "@/components/budgets/budgets.constants";
 import { ENTITIES, IN_MS } from "@/common/constants";
+import { getDefaultListParams } from '@/common/utils';
+import { ATTRIBUTES, GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { CANCEL, CONFIRM, PATHS, PAYMENTS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import { listItems, useCreateItem, useEditItem } from "./common";
-import { getDefaultListParams } from '@/common/utils';
-
-export const LIST_BUDGETS_QUERY_KEY = 'lisAllBudgets';
-export const GET_BUDGET_QUERY_KEY = 'getBudget';
 
 export function useListBudgets() {
   const query = useQuery({

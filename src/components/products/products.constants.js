@@ -4,6 +4,10 @@ import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { getBrandCode, getProductCode, getSupplierCode } from "./products.utils";
 
+export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
+export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
+export const GET_PRODUCT_QUERY_KEY = "getProduct";
+
 export const ATTRIBUTES = {
   CODE: "code",
   NAME: "name",
