@@ -30,7 +30,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
 
   const restoreEntity = useRestoreEntity({ entity, key: queryKey });
 
-  const handleStrongUpdateClick = () => {
+  const handleHardUpdate = () => {
     setShowModal(true);
   };
 
@@ -63,7 +63,6 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
           />
           {children}
         </FiltersContainer>
-
         <Flex columnGap="10px" alignSelf="center">
           <IconedButton
             text="Buscar"
@@ -72,13 +71,12 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
             color={isDirty ? COLORS.PRIMARY : COLORS.SOFT_GREY}
             width="130px"
           />
-
           <Dropdown width="130px" pointing as={CustomButton} text='Actualizar' icon={ICONS.REFRESH} floating labeled button className='icon'>
             <Dropdown.Menu>
               <DropdownItem onClick={onRefetch}>
                 <Icon color={COLORS.BLUE} name={ICONS.DOWNLOAD} />Actualización rápida
               </DropdownItem>
-              <DropdownItem onClick={handleStrongUpdateClick}>
+              <DropdownItem onClick={handleHardUpdate}>
                 <Icon color={COLORS.RED} name={ICONS.DOWNLOAD} />Actualización completa
               </DropdownItem>
             </Dropdown.Menu>
