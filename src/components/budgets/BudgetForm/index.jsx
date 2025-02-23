@@ -1,7 +1,6 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
 import { Button, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/common/components/custom";
-import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled } from "@/common/components/form";
-import { ContentField } from "@/common/components/form/Content";
+import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
 import { Table, Total } from "@/common/components/table";
@@ -24,6 +23,7 @@ import { CUSTOMER_STATES } from "../../customers/customers.constants";
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
 import { Container, Icon, VerticalDivider } from "./styles";
+
 const EMPTY_BUDGET = (user) => ({
   seller: user?.name,
   customer: { name: '', addresses: [], phoneNumbers: [] },
@@ -549,7 +549,7 @@ const BudgetForm = ({
               value={watchCustomer ?? "No se seleccionó ningún cliente"}
               search
             />
-            <ContentField
+            <TextField
               flex="2"
               label="Dirección"
               placeholder="Dirección"
@@ -567,7 +567,7 @@ const BudgetForm = ({
                 return additionalAddresses ? <AddressesTooltip input addresses={additionalAddresses} /> : null;
               }}
             />
-            <ContentField
+            <TextField
               flex="2"
               label="Teléfono"
               placeholder="Teléfono"

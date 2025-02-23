@@ -1,10 +1,8 @@
 import { ENTITIES, IN_MS } from "@/common/constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
+import { GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY } from "../components/settings/settings.constants";
 import { getItemById, listItems, useEditItem } from "./common";
-
-export const LIST_SETTINGS_QUERY_KEY = "listSettings";
-export const GET_SETTING_QUERY_KEY = "getSetting";
 
 export function useListSettings() {
   const query = useQuery({
