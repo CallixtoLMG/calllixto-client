@@ -1,6 +1,6 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { PAGES } from "@/common/constants";
+import { ENTITIES, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { useFilters } from "@/hooks/useFilters";
 import { FormProvider } from "react-hook-form";
@@ -20,8 +20,9 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit(() => {})}>
+        <Form onSubmit={onSubmit(() => { })}>
           <Filters
+            entity={ENTITIES.BRANDS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
           >
@@ -31,7 +32,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
               options={BRANDS_STATES_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
               afterChange={() => {
-                onSubmit(() => {})();
+                onSubmit(() => { })();
               }}
             />
             <TextControlled name="id" placeholder="Id" width="80px" />

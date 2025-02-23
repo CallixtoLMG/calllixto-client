@@ -6,6 +6,9 @@ import { PriceLabel } from "../../common/components/form";
 import { CommentTooltip } from "../../common/components/tooltips";
 import { getLabelColor, getPopupContent, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
 
+export const LIST_BUDGETS_QUERY_KEY = 'listAllBudgets';
+export const GET_BUDGET_QUERY_KEY = 'getBudget';
+
 export const ATTRIBUTES = {
   ID: "id",
   CUSTOMER: "customer",

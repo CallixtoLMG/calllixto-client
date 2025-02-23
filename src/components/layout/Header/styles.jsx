@@ -1,6 +1,6 @@
 import { Flex } from "@/common/components/custom";
 import Link from "next/link";
-import { Container as SContainer } from "semantic-ui-react";
+import { Container as SContainer, Menu as SMenu } from "semantic-ui-react";
 import styled from "styled-components";
 
 const ModLink = styled(Link)`
@@ -9,10 +9,16 @@ const ModLink = styled(Link)`
   align-items: center;
   transition: all 0.2s ease-in-out;
   font-size: 15px;
-  background-color: ${({ $active }) => ($active ? '#f5f5f5' : 'transparent')};
+`;
+
+const MenuItem = styled(SMenu.Item)`
+  background-color: ${({ $active }) => ($active ? '#f5f5f5' : 'transparent')}!important;
   &:hover {
-    background-color: #f5f5f5;
+    background-color: ${({ backgroundColor }) => backgroundColor && "#f5f5f5"}!important;
   };
+  &::before {
+    display: ${({ displayNone }) => displayNone && "none"}!important;
+  }
 `;
 
 const LeftHeaderDiv = styled(Flex)`
@@ -32,6 +38,9 @@ const RigthHeaderDiv = styled(Flex)`
   align-items: center;
   transition: all 0.2s ease-in-out;
   font-size: 15px;
+  &::before {
+    color:red;
+  }
 `;
 
 const Container = styled(SContainer)`
@@ -67,5 +76,5 @@ const Text = styled.p`
   };
 `;
 
-export { Container, LeftHeaderDiv, ModLink, RigthHeaderDiv, Text };
+export { Container, LeftHeaderDiv, MenuItem, ModLink, RigthHeaderDiv, Text };
 
