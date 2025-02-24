@@ -4,11 +4,11 @@ import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { formatProductCode } from "@/components/products/products.utils";
 import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
-import { Flex, FlexColumn } from "../custom";
+import { Flex, FlexColumn, Label } from "../custom";
 import { CommentTooltip, TagsTooltip } from "../tooltips";
-import { Label, Search, Text } from "./styles";
+import { Search, Text } from "./styles";
 
-const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
+const ProductSearch = forwardRef(({ products, onProductSelect, tooltip }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -76,9 +76,9 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
               <Text>Precio: {getFormatedPrice(product?.price)}</Text>
             </FlexColumn>
             <Flex width="100%" justifyContent="space-between" height="20px" marginTop="auto" columnGap="5px" alignItems="center">
-              {product.state === PRODUCT_STATES.OOS.id ? <Label size="tiny" color={COLORS.ORANGE}>Sin Stock</Label> : <Flex marginLeft="20px" />}
-              {product.tags ? <TagsTooltip tags={product.tags} /> : <Flex />}
-              {product.comments ? <CommentTooltip comment={product.comments} /> : <Flex height="1rem" />}
+              {product.state === PRODUCT_STATES.OOS.id ? <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>Sin Stock</Label> : <Flex marginLeft="20px" />}
+              {product.tags ? <TagsTooltip tooltip={tooltip} tags={product.tags} /> : <Flex />}
+              {product.comments ? <CommentTooltip tooltip={tooltip} comment={product.comments} /> : <Flex height="1rem" />}
             </Flex>
           </FlexColumn>
         ),

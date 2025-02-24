@@ -3,12 +3,12 @@ import { Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Labe
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
+import { Text } from "@/common/components/search/styles";
 import { Table, Total } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { getDateWithOffset, now } from "@/common/utils/dates";
-import { Text } from "@/components/Login/styles";
 import { BUDGET_STATES, PAYMENT_METHODS, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
@@ -99,7 +99,6 @@ const BudgetForm = ({
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
-  const isCustomerInactive = watchCustomer?.state === CUSTOMER_STATES.INACTIVE.id;
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -520,6 +519,7 @@ const BudgetForm = ({
           <FieldsContainer>
             <DropdownControlled
               name="customer"
+              border
               rules={{
                 validate: {
                   required: value => {
@@ -590,6 +590,7 @@ const BudgetForm = ({
                 error={errors.products?.root?.message}
                 control={ProductSearch}
                 ref={productSearchRef}
+                tooltip
                 products={products}
                 onProductSelect={(selectedProduct) => {
                   appendProduct({

@@ -155,8 +155,8 @@ export const DropdownMenu = styled(SDropdown.Menu)`
 export const Icon = styled(SIcon)`
   align-self: center!important;
   margin-right: ${({ marginRight }) => marginRight && `11px!important`} ;
-  top: ${({ dollar, toast }) => (dollar ? `-3px` : toast ? `-2px` : 'initial')} !important;
-  position: ${({ dollar, toast }) => (dollar || toast) && `relative!important`} ;
+  top: ${({ dollar, tooltip }) => (dollar ? `-3px` : tooltip ? `-2px` : 'initial')} !important;
+  position: ${({ dollar, tooltip }) => (dollar || tooltip) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
   cursor: ${({ pointer }) => pointer && "pointer"} !important;;

@@ -2,7 +2,7 @@ import { COLORS, ICONS } from "@/common/constants";
 import { Popup } from "semantic-ui-react";
 import { Flex, Icon, Label } from "../custom";
 
-export const TagsTooltip = ({ tags }) => {
+export const TagsTooltip = ({ tags, tooltip }) => {
   if (!tags || tags.length === 0) return null;
 
   return (
@@ -22,7 +22,7 @@ export const TagsTooltip = ({ tags }) => {
         <Popup
           size="mini"
           hoverable
-          trigger={<Icon margin="0" name={ICONS.TAGS} color={COLORS.BLUE} />}
+          trigger={<Icon tooltip={tooltip} margin="0" name={ICONS.TAGS} color={COLORS.BLUE} />}
           content={
             <Flex columnGap="5px" >
               {tags.slice(1).map((tag, index) => (

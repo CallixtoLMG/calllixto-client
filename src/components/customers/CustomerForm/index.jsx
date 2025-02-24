@@ -18,8 +18,27 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
   const [localCustomer, setLocalCustomer] = useState(customer);
+  const customerTags = customer?.tags || [];
+  const allTags = tags || [];
 
-  // VER HANDLERESET Y EL CREATE
+  const formattedCustomerTags = customerTags.map(tag => ({
+    key: tag.name,
+    value: tag, 
+    text: tag.name,
+    content: <Label color={tag.color}>{tag.name}</Label>,
+  }));
+
+  const availableTags = allTags
+    .filter(tag => !customerTags.some(customerTag => customerTag.name === tag.value.name))
+    .map(tag => ({
+      ...tag,
+      content: <Label color={tag?.value?.color}>{tag?.value?.name}</Label>,
+    }));
+
+  const tagsOptions = [...formattedCustomerTags, ...availableTags]; 
+
+  console.log("tagsOptions", tagsOptions);
+  console.log("formattedCustomerTags (defaultValue)", formattedCustomerTags);
   const handleReset = useCallback((customer) => {
     reset(customer);
   }, [reset]);
@@ -47,11 +66,6 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
     const updatedCustomer = { ...localCustomer, tags: filteredData.tags };
     setLocalCustomer(updatedCustomer);
   };
-
-  const tagsOptions = tags?.map(tag => ({
-    ...tag,
-    content: <Label color={tag?.value?.color}>{tag?.value?.name}</Label>,
-  }));
 
   useKeyboardShortcuts(handleSubmit(handleCreate), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => handleReset({ ...EMPTY_CUSTOMER, ...customer }), SHORTKEYS.DELETE);
@@ -83,16 +97,13 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
             clearable
             search
             selection
-            defaultValue={customer?.tags}
-            // disabled={true}
+            defaultValue={formattedCustomerTags.map(tag => tag.value)}
             loading={isCustomerSettingsFetching}
-            options={tagsOptions}
-            renderLabel={(item) => {
-              return {
-                color: item.value.color,
-                content: item.text,
-              }
-            }}
+            options={tagsOptions} 
+            renderLabel={(item) => ({
+              color: item.value.color, 
+              content: item.value.name, 
+            })}
           />
         </FieldsContainer>
         <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
