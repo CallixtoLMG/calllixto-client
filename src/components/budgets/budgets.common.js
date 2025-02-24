@@ -196,7 +196,9 @@ const PAYMENT_METHODS = [
   { key: 'debito', text: 'Tarjeta de Débito', value: 'Tarjeta de Débito' },
   { key: 'credito', text: 'Tarjeta de Crédito', value: 'Tarjeta de Crédito' },
   { key: 'mercado_pago', text: 'Mercado Pago', value: 'Mercado Pago' },
-  { key: 'dolares', text: 'Dólares', value: 'Dólares' }
+  { key: 'dolares', text: 'Dólares', value: 'Dólares' },
+  { key: 'others', text: 'Otros', value: 'Otros' },
+  { key: 'multi', text: 'Varios', value: 'Varios' }
 ];
 
 const PAYMENT_TABLE_HEADERS = [
