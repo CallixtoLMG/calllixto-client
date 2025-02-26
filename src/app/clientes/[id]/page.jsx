@@ -6,6 +6,7 @@ import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import { COLORS, ICONS, PAGES } from "@/common/constants";
+import { ENTITIES } from "@/common/constants/";
 import { isItemInactive } from "@/common/utils";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -32,7 +33,7 @@ const Customer = ({ params }) => {
   const deleteCustomer = useDeleteCustomer();
   const inactiveCustomer = useInactiveCustomer();
   const activeCustomer = useActiveCustomer();
-  const { data: customersSettings, refetch: refetchCustomerSettings } = useGetSetting("CUSTOMERS");
+  const { data: customersSettings, refetch: refetchCustomerSettings } = useGetSetting(ENTITIES.CUSTOMERS);
 
   useEffect(() => {
     resetActions();
@@ -45,11 +46,6 @@ const Customer = ({ params }) => {
     refetchCustomerSettings();
   }, [customer, setLabels, refetch]);
 
-  const mappedTags = useMemo(() => customersSettings?.settings?.tags?.map(tag => ({
-    key: tag.name,
-    value: tag,
-    text: tag.name,
-  })), [customersSettings]);
 
   const hasAssociatedBudgets = useMemo(() => {
     return budgetData?.budgets?.some(budget => budget.customer?.id === customer?.id);
@@ -218,7 +214,7 @@ const Customer = ({ params }) => {
         </Message>
       )}
       <CustomerForm
-        tags={mappedTags}
+        tags={customersSettings?.settings?.tags}
         customer={{ ...customer, tags: customer?.tags?.map((tag) => ({ ...tag })) }}
         onSubmit={mutateEdit}
         isLoading={isEditPending}

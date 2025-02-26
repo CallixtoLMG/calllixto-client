@@ -189,6 +189,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
         </FieldsContainer>
         <FieldsContainer>
           <DropdownControlled
+            disabled={!isUpdating}
             width="40%"
             name="tags"
             label="Etiquetas"

@@ -18,6 +18,7 @@ export const DropdownControlled = ({
   multiple,
   loading,
   renderLabel,
+  optionsMapper
 }) => {
   const { formState: { errors } } = useFormContext();
 
@@ -26,6 +27,10 @@ export const DropdownControlled = ({
       name={name}
       rules={rules}
       render={({ field: { onChange, value, ...rest } }) => {
+        const normalizedValue = Array.isArray(value)
+          ? value.map(v => (typeof v === "object" ? v.name : v))
+          : [];
+
         return (
           <FormField
             {...rest}
@@ -38,15 +43,37 @@ export const DropdownControlled = ({
             selection
             control={Dropdown}
             multiple={multiple}
-            renderLabel={renderLabel}
+            // renderLabel={renderLabel}
+            renderLabel={(item) => {
+              const tagName = typeof item === "object" ? item.value : item;
+
+              return {
+                color: optionsMapper[tagName]?.color || "grey",
+                content: optionsMapper[tagName]?.name || tagName,
+              };
+            }}
             noResultsMessage="No se encontraron resultados"
             clearable={clearable}
             options={options}
             defaultValue={defaultValue}
-            value={value?.name}
+            // value={value.name}
+            value={normalizedValue}
+            // onChange={(e, { value }) => {
+            //   console.log({ value, options, optionsMapper })
+            //   if (optionsMapper) {
+            //     onChange(value.map((v) => optionsMapper[v]));
+            //     afterChange?.(value);
+            //   } else {
+            //     onChange(value);
+            //     afterChange?.(value);
+            //   }
+            // }}
             onChange={(e, { value }) => {
-              onChange(value);
-              afterChange?.(value);
+
+              const newValue = value.map(v => (optionsMapper[v] ? v : v.name)); // 🔥 Convertimos a string
+
+              onChange(newValue);
+              afterChange?.(newValue);
             }}
             disabled={disabled}
             error={errors?.[name] && (pickErrors ? pickErrors.includes(errors[name]?.type) : true) && {

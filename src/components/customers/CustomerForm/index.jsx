@@ -3,11 +3,11 @@ import { FieldsContainer, Form, Label } from "@/common/components/custom";
 import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
 
-const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, isCustomerSettingsFetching }) => {
+const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags = [], isCustomerSettingsFetching }) => {
   const methods = useForm({
     defaultValues: {
       tags: [],
@@ -16,29 +16,44 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
     }
   });
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
-  const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
+  const [phones, addresses, emails, watchTags] = watch(['phoneNumbers', 'addresses', 'emails', "tags"]);
   const [localCustomer, setLocalCustomer] = useState(customer);
-  const customerTags = customer?.tags || [];
-  const allTags = tags || [];
+  const defaultSelectedTags = customer?.tags?.map(tag => tag.name) || [];
 
-  const formattedCustomerTags = customerTags.map(tag => ({
+  const [tagsOptions, optionsMapper] = useMemo(() => {
+    const uniqueTags = {};
+
+    [...tags, ...(customer?.tags ?? [])].forEach((tag) => {
+      
+      if (!uniqueTags[tag.name]) {
+        uniqueTags[tag.name] = tag;
+
+      }
+    });
+
+    console.log("uniqueTags", uniqueTags)
+    const options = Object.values(uniqueTags).map((tag) => ({
+      key: tag.name,
+      value: tag.name,
+      text: tag.name,
+      content: <Label color={tag.color}>{tag.name}</Label>,
+    }))
+    return [options, uniqueTags];
+  }, [tags, customer?.tags]);
+
+
+
+  const Alloptions = Object.values(tags).map((tag) => ({
     key: tag.name,
-    value: tag, 
+    value: tag.name,
     text: tag.name,
     content: <Label color={tag.color}>{tag.name}</Label>,
-  }));
+  }))
 
-  const availableTags = allTags
-    .filter(tag => !customerTags.some(customerTag => customerTag.name === tag.value.name))
-    .map(tag => ({
-      ...tag,
-      content: <Label color={tag?.value?.color}>{tag?.value?.name}</Label>,
-    }));
+  console.log("tagsOptions", tagsOptions)
+  console.log("Alloptions", Alloptions)
+  console.log("tags", tags)
 
-  const tagsOptions = [...formattedCustomerTags, ...availableTags]; 
-
-  console.log("tagsOptions", tagsOptions);
-  console.log("formattedCustomerTags (defaultValue)", formattedCustomerTags);
   const handleReset = useCallback((customer) => {
     reset(customer);
   }, [reset]);
@@ -88,6 +103,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
           : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
         <FieldsContainer>
           <DropdownControlled
+            // disabled={!isUpdating}
             width="40%"
             name="tags"
             label="Etiquetas"
@@ -97,12 +113,13 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags, i
             clearable
             search
             selection
-            defaultValue={formattedCustomerTags.map(tag => tag.value)}
+            optionsMapper={optionsMapper}
+            defaultValue={defaultSelectedTags}
             loading={isCustomerSettingsFetching}
-            options={tagsOptions} 
+            options={Object.values(tagsOptions)}
             renderLabel={(item) => ({
-              color: item.value.color, 
-              content: item.value.name, 
+              color: item.value.color,
+              content: item.value.name,
             })}
           />
         </FieldsContainer>

@@ -77,8 +77,8 @@ const ProductSearch = forwardRef(({ products, onProductSelect, tooltip }, ref) =
             </FlexColumn>
             <Flex width="100%" justifyContent="space-between" height="20px" marginTop="auto" columnGap="5px" alignItems="center">
               {product.state === PRODUCT_STATES.OOS.id ? <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>Sin Stock</Label> : <Flex marginLeft="20px" />}
-              {product.tags ? <TagsTooltip tooltip={tooltip} tags={product.tags} /> : <Flex />}
-              {product.comments ? <CommentTooltip tooltip={tooltip} comment={product.comments} /> : <Flex height="1rem" />}
+              {product.tags ? <TagsTooltip tags={product.tags} /> : <Flex />}
+              {product.comments ? <CommentTooltip comment={product.comments} /> : <Flex height="1rem" />}
             </Flex>
           </FlexColumn>
         ),
