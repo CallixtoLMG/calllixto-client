@@ -1,9 +1,8 @@
 "use client";
 import { useListBrands } from "@/api/brands";
 import { useCreateProduct } from "@/api/products";
-import { useGetSetting } from "@/api/settings";
 import { useListSuppliers } from "@/api/suppliers";
-import { ENTITIES, PAGES } from "@/common/constants";
+import { PAGES } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { useValidateToken } from "@/hooks/userData";
@@ -20,7 +19,6 @@ const CreateProduct = () => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createProduct = useCreateProduct();
-  const { data: productsSettings, isFetching: isProductSettingsFetching } = useGetSetting(ENTITIES.PRODUCTS);
 
   useEffect(() => {
     resetActions();
@@ -32,12 +30,6 @@ const CreateProduct = () => {
   useEffect(() => {
     setLabels(['Productos', 'Crear']);
   }, [setLabels]);
-
-  const mappedTags = useMemo(() => productsSettings?.settings?.tags?.map(tag => ({
-    key: tag.name,
-    value: tag,
-    text: tag.name,
-  })), [productsSettings]);
 
   const mappedBrands = useMemo(() => brands?.brands?.map(brand => ({
     ...brand,
@@ -75,8 +67,6 @@ const CreateProduct = () => {
         suppliers={mappedSuppliers}
         onSubmit={mutate}
         isLoading={isPending}
-        tags={mappedTags}
-        isProductSettingsFetching={isProductSettingsFetching}
       />
     </Loader>
   )

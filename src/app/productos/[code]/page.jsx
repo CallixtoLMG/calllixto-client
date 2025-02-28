@@ -1,13 +1,11 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useActiveProduct, useDeleteProduct, useEditProduct, useGetProduct, useInactiveProduct } from "@/api/products";
-import { useGetSetting } from "@/api/settings";
 import { Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
-import { ENTITIES } from "@/common/constants/";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
@@ -38,7 +36,6 @@ const Product = ({ params }) => {
   const deleteProduct = useDeleteProduct();
   const activeProduct = useActiveProduct();
   const inactiveProduct = useInactiveProduct();
-  const { data: productsSettings, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
 
   useEffect(() => {
     resetActions();
@@ -53,16 +50,7 @@ const Product = ({ params }) => {
         : null
     ].filter(Boolean));
     refetch();
-    refetchProductSettings();
   }, [setLabels, product, refetch]);
-
-  //ver porque lo saque a esto de Customers
-  const mappedTags = useMemo(() => productsSettings?.settings?.tags?.map(tag => ({
-    key: tag.name,
-    value: tag,
-    text: tag.name,
-  })), [productsSettings]);
-
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -337,7 +325,6 @@ const Product = ({ params }) => {
         </Message>
       )}
       <ProductForm
-        tags={mappedTags}
         product={product}
         onSubmit={mutateEdit}
         isUpdating={isUpdating && !isProductInactive(product?.state)}

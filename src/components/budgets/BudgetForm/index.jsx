@@ -356,14 +356,14 @@ const BudgetForm = ({
           <Flex alignItems="center" marginLeft="5px" columnGap="5px">
             {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
             {product.tags && <TagsTooltip tags={product.tags} />}
-            {product.comments && <CommentTooltip comment={product.comments} />}
+            {product.comments && <CommentTooltip tooltip comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
               <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />} />
             )}
           </Flex>
         </Container>
       ),
-      width: 6,
+      width: 7,
       wrap: true,
       align: 'left'
     },

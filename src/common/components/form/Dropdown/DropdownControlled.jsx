@@ -17,8 +17,8 @@ export const DropdownControlled = ({
   pickErrors,
   multiple,
   loading,
-  renderLabel,
-  optionsMapper
+  optionsMapper,
+  icon
 }) => {
   const { formState: { errors } } = useFormContext();
 
@@ -29,11 +29,12 @@ export const DropdownControlled = ({
       render={({ field: { onChange, value, ...rest } }) => {
         const normalizedValue = Array.isArray(value)
           ? value.map(v => (typeof v === "object" ? v.name : v))
-          : [];
+          : value;
 
         return (
           <FormField
             {...rest}
+            icon={icon}
             height={height}
             width={width}
             loading={loading}
@@ -43,37 +44,29 @@ export const DropdownControlled = ({
             selection
             control={Dropdown}
             multiple={multiple}
-            // renderLabel={renderLabel}
             renderLabel={(item) => {
-              const tagName = typeof item === "object" ? item.value : item;
+              if (typeof item === "string")
+                return item
 
               return {
-                color: optionsMapper[tagName]?.color || "grey",
-                content: optionsMapper[tagName]?.name || tagName,
+                color: optionsMapper[item.value]?.color,
+                content: optionsMapper[item.value]?.name,
               };
             }}
             noResultsMessage="No se encontraron resultados"
             clearable={clearable}
             options={options}
             defaultValue={defaultValue}
-            // value={value.name}
             value={normalizedValue}
-            // onChange={(e, { value }) => {
-            //   console.log({ value, options, optionsMapper })
-            //   if (optionsMapper) {
-            //     onChange(value.map((v) => optionsMapper[v]));
-            //     afterChange?.(value);
-            //   } else {
-            //     onChange(value);
-            //     afterChange?.(value);
-            //   }
-            // }}
             onChange={(e, { value }) => {
-
-              const newValue = value.map(v => (optionsMapper[v] ? v : v.name)); // 🔥 Convertimos a string
-
-              onChange(newValue);
-              afterChange?.(newValue);
+              if (optionsMapper) {
+                const values = value.map((v) => optionsMapper[v])
+                onChange(values);
+                afterChange?.(values);
+                return
+              }
+              onChange(value);
+              afterChange?.(value);
             }}
             disabled={disabled}
             error={errors?.[name] && (pickErrors ? pickErrors.includes(errors[name]?.type) : true) && {

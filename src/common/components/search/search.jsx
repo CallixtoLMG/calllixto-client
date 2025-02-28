@@ -76,9 +76,19 @@ const ProductSearch = forwardRef(({ products, onProductSelect, tooltip }, ref) =
               <Text>Precio: {getFormatedPrice(product?.price)}</Text>
             </FlexColumn>
             <Flex width="100%" justifyContent="space-between" height="20px" marginTop="auto" columnGap="5px" alignItems="center">
-              {product.state === PRODUCT_STATES.OOS.id ? <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>Sin Stock</Label> : <Flex marginLeft="20px" />}
-              {product.tags ? <TagsTooltip tags={product.tags} /> : <Flex />}
-              {product.comments ? <CommentTooltip comment={product.comments} /> : <Flex height="1rem" />}
+              <div style={{ width: "80px", textAlign: "center" }}>
+                {product.state === PRODUCT_STATES.OOS.id ? (
+                  <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>Sin Stock</Label>
+                ) : (
+                  <div style={{ visibility: "hidden" }}>Sin Stock</div>
+                )}
+              </div>
+              <div style={{ width: "100px", textAlign: "center" }}>
+                {product.tags ? <TagsTooltip tags={product.tags} /> : <div style={{ visibility: "hidden" }} />}
+              </div>
+              <div style={{ width: "40px", textAlign: "center" }}>
+                {product.comments ? <CommentTooltip comment={product.comments} /> : <div style={{ visibility: "hidden" }} />}
+              </div>
             </Flex>
           </FlexColumn>
         ),

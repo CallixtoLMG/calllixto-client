@@ -1,12 +1,10 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
 import { useActiveCustomer, useDeleteCustomer, useEditCustomer, useGetCustomer, useInactiveCustomer } from "@/api/customers";
-import { useGetSetting } from "@/api/settings";
 import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import { COLORS, ICONS, PAGES } from "@/common/constants";
-import { ENTITIES } from "@/common/constants/";
 import { isItemInactive } from "@/common/utils";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -33,7 +31,6 @@ const Customer = ({ params }) => {
   const deleteCustomer = useDeleteCustomer();
   const inactiveCustomer = useInactiveCustomer();
   const activeCustomer = useActiveCustomer();
-  const { data: customersSettings, refetch: refetchCustomerSettings } = useGetSetting(ENTITIES.CUSTOMERS);
 
   useEffect(() => {
     resetActions();
@@ -43,7 +40,6 @@ const Customer = ({ params }) => {
   useEffect(() => {
     setLabels([PAGES.CUSTOMERS.NAME, customer?.name]);
     refetch();
-    refetchCustomerSettings();
   }, [customer, setLabels, refetch]);
 
 
@@ -214,8 +210,7 @@ const Customer = ({ params }) => {
         </Message>
       )}
       <CustomerForm
-        tags={customersSettings?.settings?.tags}
-        customer={{ ...customer, tags: customer?.tags?.map((tag) => ({ ...tag })) }}
+        customer={customer}
         onSubmit={mutateEdit}
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(customer?.state)}

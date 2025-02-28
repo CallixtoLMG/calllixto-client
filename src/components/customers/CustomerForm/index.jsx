@@ -1,13 +1,15 @@
+import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form, Label } from "@/common/components/custom";
+import { FieldsContainer, Form } from "@/common/components/custom";
 import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
-import { RULES, SHORTKEYS } from "@/common/constants";
+import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
+import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
 
-const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags = [], isCustomerSettingsFetching }) => {
+const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
   const methods = useForm({
     defaultValues: {
       tags: [],
@@ -15,44 +17,11 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags = 
       ...customer,
     }
   });
+
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
-  const [phones, addresses, emails, watchTags] = watch(['phoneNumbers', 'addresses', 'emails', "tags"]);
-  const [localCustomer, setLocalCustomer] = useState(customer);
-  const defaultSelectedTags = customer?.tags?.map(tag => tag.name) || [];
-
-  const [tagsOptions, optionsMapper] = useMemo(() => {
-    const uniqueTags = {};
-
-    [...tags, ...(customer?.tags ?? [])].forEach((tag) => {
-      
-      if (!uniqueTags[tag.name]) {
-        uniqueTags[tag.name] = tag;
-
-      }
-    });
-
-    console.log("uniqueTags", uniqueTags)
-    const options = Object.values(uniqueTags).map((tag) => ({
-      key: tag.name,
-      value: tag.name,
-      text: tag.name,
-      content: <Label color={tag.color}>{tag.name}</Label>,
-    }))
-    return [options, uniqueTags];
-  }, [tags, customer?.tags]);
-
-
-
-  const Alloptions = Object.values(tags).map((tag) => ({
-    key: tag.name,
-    value: tag.name,
-    text: tag.name,
-    content: <Label color={tag.color}>{tag.name}</Label>,
-  }))
-
-  console.log("tagsOptions", tagsOptions)
-  console.log("Alloptions", Alloptions)
-  console.log("tags", tags)
+  const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
+  const { data: customersSettings, isFetching: isCustomerSettingsFetching } = useGetSetting(ENTITIES.CUSTOMERS);
+  const { tagsOptions, optionsMapper, defaultSelectedTags } = useArrayTags(ENTITIES.CUSTOMERS, customersSettings);
 
   const handleReset = useCallback((customer) => {
     reset(customer);
@@ -60,12 +29,6 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags = 
 
   const handleCreate = (data) => {
     const { previousVersions, ...filteredData } = data;
-
-    const selectedTags = data.tags || [];
-
-    filteredData.tags = selectedTags.map((tag) =>
-      typeof tag === "string" ? JSON.parse(tag) : tag
-    );
 
     if (!filteredData.addresses.length) {
       filteredData.addresses = [];
@@ -78,8 +41,6 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags = 
     }
 
     onSubmit(filteredData);
-    const updatedCustomer = { ...localCustomer, tags: filteredData.tags };
-    setLocalCustomer(updatedCustomer);
   };
 
   useKeyboardShortcuts(handleSubmit(handleCreate), SHORTKEYS.ENTER);
@@ -103,18 +64,19 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, tags = 
           : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
         <FieldsContainer>
           <DropdownControlled
-            // disabled={!isUpdating}
-            width="40%"
+            disabled={!isUpdating && view}
+            width={(!isUpdating && view) ? "fit-content" : "40%"}
             name="tags"
             label="Etiquetas"
             placeholder="Selecciona etiquetas"
             height="fit-content"
             multiple
-            clearable
-            search
+            clearable={isUpdating && !view}
+            icon={(!isUpdating && view) ? null : undefined}
+            search={isUpdating && !view}
             selection
             optionsMapper={optionsMapper}
-            defaultValue={defaultSelectedTags}
+            value={defaultSelectedTags}
             loading={isCustomerSettingsFetching}
             options={Object.values(tagsOptions)}
             renderLabel={(item) => ({

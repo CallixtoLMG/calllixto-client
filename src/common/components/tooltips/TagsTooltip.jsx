@@ -10,7 +10,7 @@ export const TagsTooltip = ({ tags }) => {
       <Popup
         size="mini"
         trigger={
-          <Label size="tiny" color={tags[0]?.color}>
+          <Label width="fit-contents" size="tiny" color={tags[0]?.color}>
             {tags[0]?.name}
           </Label>
         }
