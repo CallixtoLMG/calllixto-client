@@ -1,12 +1,9 @@
-import { ATTRIBUTES } from "@/components/customers/customers.constants";
 import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
+import { getDefaultListParams } from '@/common/utils';
+import { ATTRIBUTES, GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
-import { getDefaultListParams } from '@/common/utils';
-
-export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
-export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 
 export function useListCustomers({ sort = 'name', order = true } = {}) {
   const query = useQuery({

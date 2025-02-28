@@ -1,6 +1,6 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from '@/common/components/table';
-import { ALL, COLORS, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
+import { ALL, COLORS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter } from '@/common/utils';
 import { useFilters } from "@/hooks/useFilters";
 import { useRouter } from "next/navigation";
@@ -36,15 +36,19 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit(() => {})}>
-          <Filters onRefetch={onRefetch} onRestoreFilters={onRestoreFilters}>
+        <Form onSubmit={onSubmit(() => { })}>
+          <Filters
+            entity={ENTITIES.BUDGETS}
+            onRefetch={onRefetch}
+            onRestoreFilters={onRestoreFilters}
+          >
             <DropdownControlled
               width="200px"
               name="state"
               options={BUDGET_STATES_OPTIONS}
               defaultValue={SELECT_ALL_OPTION.state}
               afterChange={() => {
-                onSubmit(() => {})();
+                onSubmit(() => { })();
               }}
             />
             <TextControlled

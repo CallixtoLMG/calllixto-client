@@ -117,5 +117,19 @@ const LinkCell = styled(STable.Cell)`
   }
 `;
 
-export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, InnerActionsContainer, LinkCell, Pagination, PaginationContainer, Segment, Table, TableHeader, TableRow };
+const MainContainer = styled(Flex)`
+  column-gap: 10px;
+`;
+
+const HeaderSegment = styled(SSegment)`
+  display: flex;
+  flex: ${({ flex = 'none' }) => `${flex}!important`};
+  padding: 5px 10px !important;
+  margin: 0 !important;
+  column-gap: 10px;
+  align-content: center;
+  justify-content: space-between;
+`;
+
+export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, HeaderSegment, InnerActionsContainer, LinkCell, MainContainer, Pagination, PaginationContainer, Segment, Table, TableHeader, TableRow };
 

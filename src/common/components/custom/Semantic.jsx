@@ -163,7 +163,8 @@ export const Icon = styled(SIcon)`
   position: ${({ dollar, tooltip }) => (dollar || tooltip) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
-  cursor: ${({ pointer }) => pointer && "pointer"} !important;;
+  cursor: ${({ pointer }) => pointer && "pointer"} !important;
+  pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
 `;
 
 export const Modal = styled(SModal)`

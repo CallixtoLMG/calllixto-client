@@ -5,9 +5,9 @@ import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
 import { Text } from "@/common/components/search/styles";
 import { Table, Total } from "@/common/components/table";
-import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
+import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
-import { getFormatedPhone } from "@/common/utils";
+import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
 import { getDateWithOffset, now } from "@/common/utils/dates";
 import { BUDGET_STATES, PAYMENT_METHODS, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
@@ -580,6 +580,10 @@ const BudgetForm = ({
                     ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
                     : 'Cliente sin dirección'
               }
+              extraContent={() => {
+                const { additionalAddresses } = getAddressesForDisplay(watchCustomer?.addresses || []);
+                return additionalAddresses ? <AddressesTooltip input addresses={additionalAddresses} /> : null;
+              }}
             />
             <TextField
               flex="2"
@@ -592,6 +596,10 @@ const BudgetForm = ({
                   ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
                   : 'Cliente sin teléfono'
               }
+              extraContent={() => {
+                const { additionalPhones } = getPhonesForDisplay(watchCustomer?.phoneNumbers);
+                return additionalPhones ? <PhonesTooltip input phones={additionalPhones} /> : null;
+              }}
             />
           </FieldsContainer>
           <Controller name="products"

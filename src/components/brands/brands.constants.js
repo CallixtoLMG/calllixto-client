@@ -1,6 +1,9 @@
 import { Flex, Label } from '@/common/components/custom';
 import { CommentTooltip } from "@/common/components/tooltips";
 
+export const GET_BRAND_QUERY_KEY = 'getBrand';
+export const LIST_BRANDS_QUERY_KEY = 'listBrands';
+
 export const ATTRIBUTES = { ID: "id", NAME: "name", COMMENT: "comments", STATE: "state" };
 
 export const BRAND_COLUMNS = [

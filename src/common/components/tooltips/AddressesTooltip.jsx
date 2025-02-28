@@ -1,8 +1,8 @@
-import { Box } from "@/common/components/custom";
+import { Box, Icon } from "@/common/components/custom";
 import { COLORS, ICONS } from "@/common/constants";
-import { Icon, List, ListItem, Popup } from "semantic-ui-react";
+import { List, ListItem, Popup } from "semantic-ui-react";
 
-export const AddressesTooltip = ({ addresses }) => {
+export const AddressesTooltip = ({ addresses, input }) => {
   return (
     <Popup
       size="mini"
@@ -17,9 +17,11 @@ export const AddressesTooltip = ({ addresses }) => {
       }
       position="top center"
       trigger={
-        <Box marginLeft="5px" marginRight="5px">
-          <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />
-        </Box>
+        input
+          ? <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />
+          : <Box marginLeft="5px" marginRight="5px">
+            <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />
+          </Box>
       }
     />
   );

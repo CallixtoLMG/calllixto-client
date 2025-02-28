@@ -5,7 +5,7 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { ModalAction, ModalMultiDelete } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
-import { COLORS, ICONS, PAGES } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { OnlyPrint } from "@/components/layout";
 import { useFilters } from "@/hooks/useFilters";
@@ -144,15 +144,20 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
     <>
       <Flex flexDirection="column" rowGap="15px">
         <FormProvider {...methods}>
-          <Form onSubmit={onSubmit(() => {})}>
-            <Filters onRefetch={onRefetch} clearSelection={() => setSelectedProducts({})} onRestoreFilters={onRestoreFilters}>
+          <Form onSubmit={onSubmit(() => { })}>
+            <Filters
+              entity={ENTITIES.PRODUCTS}
+              onRefetch={onRefetch}
+              clearSelection={() => setSelectedProducts({})}
+              onRestoreFilters={onRestoreFilters}
+            >
               <DropdownControlled
                 width="200px"
                 name="state"
                 options={PRODUCT_STATES_OPTIONS}
                 defaultValue={EMPTY_FILTERS.state}
                 afterChange={() => {
-                  onSubmit(() => {})();
+                  onSubmit(() => { })();
                   setSelectedProducts({});
                 }}
               />

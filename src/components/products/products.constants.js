@@ -4,6 +4,10 @@ import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { getBrandCode, getProductCode, getSupplierCode } from "./products.utils";
 
+export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
+export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
+export const GET_PRODUCT_QUERY_KEY = "getProduct";
+
 export const ATTRIBUTES = {
   CODE: "code",
   NAME: "name",
@@ -49,7 +53,7 @@ export const PRODUCT_COLUMNS = [
         <Flex justifyContent="space-between" alignItems="center">
           <OverflowCell maxWidth="50vw" text={name} />
           <Flex columnGap="7px" alignItems="center" justifyContent="flex-end">
-            {tags && <TagsTooltip tags={tags} />}
+            {tags && <TagsTooltip tooltip tags={tags} />}
             {comments && <CommentTooltip tooltip comment={comments} />}
           </Flex>
         </Flex>

@@ -1,7 +1,7 @@
 import { ACTIVE, ALL, CODE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { now } from "@/common/utils/dates";
-import { ATTRIBUTES } from "@/components/products/products.constants";
+import { ATTRIBUTES, GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
 import {
   BATCH,
   BLACK_LIST,
@@ -18,9 +18,6 @@ import { useMemo } from "react";
 import { getInstance } from "./axios";
 import { getItemById, listItems, removeStorageItemsByCustomFilter, useActiveItem, useBatchDeleteItems, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
-export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
-export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
-export const GET_PRODUCT_QUERY_KEY = "getProduct";
 
 export function useListProducts() {
   const query = useQuery({

@@ -2,6 +2,9 @@ import { Flex, Label, OverflowCell, } from "@/common/components/custom";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "../../common/components/tooltips";
 
+export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
+export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
+
 export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value', STATE: "state", INACTIVE_REASON: "inactiveReason", TAGS: "tags" };
 
 export const HEADERS = [

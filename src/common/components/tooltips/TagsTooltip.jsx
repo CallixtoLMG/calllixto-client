@@ -25,19 +25,20 @@ export const TagsTooltip = ({ tags, tooltip }) => {
           trigger={<Icon tooltip={tooltip} margin="0" name={ICONS.TAGS} color={COLORS.BLUE} />}
           content={
             <Flex columnGap="5px" >
-              {tags.slice(1).map((tag, index) => (
-                tag.description ? <Popup
-                  key={index}
-                  size="mini"
-                  trigger={
-                    <Label size="mini" color={tag.color}>
-                      {tag.name}
-                    </Label>
-                  }
-                  content={tag.description}
-                  position="top center"
-                /> :
-                  <Label size="mini" color={tag.color}>
+              {tags.slice(1).map((tag) => (
+                tag.description
+                  ? <Popup
+                    key={tag.name}
+                    size="mini"
+                    trigger={
+                      <Label size="mini" color={tag.color}>
+                        {tag.name}
+                      </Label>
+                    }
+                    content={tag.description}
+                    position="top center"
+                  /> :
+                  <Label key={tag.name} size="mini" color={tag.color}>
                     {tag.name}
                   </Label>
               ))}
