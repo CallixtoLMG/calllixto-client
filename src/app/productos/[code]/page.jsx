@@ -32,7 +32,6 @@ const Product = ({ params }) => {
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
   const printRef = useRef(null);
-
   const editProduct = useEditProduct();
   const deleteProduct = useDeleteProduct();
   const activeProduct = useActiveProduct();
@@ -50,7 +49,7 @@ const Product = ({ params }) => {
         ? { id: product.code, title: PRODUCT_STATES[product.state]?.singularTitle, color: PRODUCT_STATES[product.state]?.color }
         : null
     ].filter(Boolean));
-    refetch()
+    refetch();
   }, [setLabels, product, refetch]);
 
   const handlePrint = useReactToPrint({

@@ -25,6 +25,7 @@ export const Flex = styled(Common)`
   align-items: ${({ alignItems }) => alignItems};
   justify-content: ${({ justifyContent }) => justifyContent};
   align-self: ${({ alignSelf }) => alignSelf};
+  text-align: ${({ textAlign }) => textAlign};
   flex-wrap: ${({ wrap }) => wrap};
   flex-direction: ${({ flexDirection = "row" }) => flexDirection};
   overflow-y: ${({ overflowY }) => overflowY};
@@ -36,6 +37,7 @@ export const FlexColumn = styled(Flex)`
 
 export const Box = styled(Common)`
   display: block;
+  visibility: ${({ visibility }) => visibility};
 `;
 
 export const CenteredFlex = styled(Flex)`

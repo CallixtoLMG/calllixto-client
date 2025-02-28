@@ -21,7 +21,7 @@ export const SUPPLIERS_COLUMNS = [
     value: (supplier) =>
       <Flex justifyContent="space-between">
         {supplier.name}
-        {supplier.comments && <CommentTooltip comment={supplier.comments} />}
+        {supplier.comments && <CommentTooltip tooltip comment={supplier.comments} />}
       </Flex>
   },
   {

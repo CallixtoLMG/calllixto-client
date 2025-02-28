@@ -1,10 +1,12 @@
+import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Flex, Form, Label } from "@/common/components/custom";
 import { DropdownControlled, IconedButtonControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { BRANDS_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
+import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -15,6 +17,7 @@ import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted } from 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view }) => {
   const methods = useForm({
     defaultValues: {
+      tags: [],
       fractionConfig: {
         active: false,
         unit: MEASSURE_UNITS.MT.value,
@@ -23,7 +26,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
       ...product,
     }
   });
-
+  const { data: productsSettings, isFetching: isProductSettingsFetching } = useGetSetting(ENTITIES.PRODUCTS);
+  const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
   const { handleSubmit, reset, watch, formState: { isDirty, errors } } = methods;
   const [watchFractionable, watchSupplier, watchBrand] = watch(['fractionConfig.active', 'supplier', 'brand']);
 
@@ -46,6 +50,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
     await onSubmit(filteredData);
   };
+
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => reset({ ...EMPTY_PRODUCT, ...product }), SHORTKEYS.DELETE);
@@ -175,10 +180,31 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             disabled={(!isUpdating && view) || !watchFractionable}
           />
         </FieldsContainer>
+        <FieldsContainer>
+          <DropdownControlled
+            disabled={!isUpdating && view}
+            width={(!isUpdating && view) ? "fit-content" : "40%"}
+            name="tags"
+            label="Etiquetas"
+            placeholder="Selecciona etiquetas"
+            height="fit-content"
+            multiple
+            clearable={isUpdating && !view}
+            icon={(!isUpdating && view) ? null : undefined}
+            search={isUpdating && !view}
+            selection
+            optionsMapper={optionsMapper}
+            loading={isProductSettingsFetching}
+            options={Object.values(tagsOptions)}
+            renderLabel={(item) => ({
+              color: item.value.color,
+              content: item.value.name,
+            })}
+          />
+        </FieldsContainer>
         <TextAreaControlled
           name="comments"
           label="Comentarios"
-          rules={RULES.REQUIRED}
           disabled={!isUpdating && view}
         />
         {(isUpdating || !view) && (

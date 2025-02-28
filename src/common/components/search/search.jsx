@@ -1,13 +1,14 @@
 import { COLORS } from "@/common/constants";
-import debounce from 'lodash/debounce';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
-import { CommentTooltip } from "../tooltips";
-import { Container, Label, Search, Text } from "./styles";
+import { getFormatedPrice } from "@/common/utils";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { formatProductCode } from "@/components/products/products.utils";
-import { getFormatedPrice } from "@/common/utils";
+import debounce from 'lodash/debounce';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { Box, Flex, FlexColumn, Label } from "../custom";
+import { CommentTooltip, TagsTooltip } from "../tooltips";
+import { Search, Text } from "./styles";
 
-const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
+const ProductSearch = forwardRef(({ products, onProductSelect, tooltip }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -69,16 +70,27 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
         key: product.code,
         title: product.name,
         description: (
-          <Container marginTop="5px" flexDir="column">
-            <Text>Código: {formatProductCode(product.code)}</Text>
-            <Container flexDir="row">
+          <FlexColumn marginTop="5px" rowGap="5px">
+            <FlexColumn >
+              <Text>Código: {formatProductCode(product.code)}</Text>
               <Text>Precio: {getFormatedPrice(product?.price)}</Text>
-            </Container>
-            <Container flexDir="row">
-              {product.state === PRODUCT_STATES.OOS.id && <Label size="tiny" color={COLORS.ORANGE}>Sin Stock</Label>}
-              {product.comments && <CommentTooltip comment={product.comments} />}
-            </Container>
-          </Container>
+            </FlexColumn>
+            <Flex width="100%" justifyContent="space-between" height="20px" marginTop="auto" columnGap="5px" alignItems="center">
+              <Box width="80px">
+                {product.state === PRODUCT_STATES.OOS.id ? (
+                  <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>Sin Stock</Label>
+                ) : (
+                  <Box visibility="hidden">Sin Stock</Box>
+                )}
+              </Box>
+              <Box width="100px" >
+                {product.tags ? <TagsTooltip tooltip tags={product.tags} /> : <Box visibility="hidden" />}
+              </Box>
+              <Box width="fit-content">
+                {product.comments ? <CommentTooltip comment={product.comments} /> : <Box visibility="hidden" />}
+              </Box>
+            </Flex>
+          </FlexColumn>
         ),
         value: product,
       }))}

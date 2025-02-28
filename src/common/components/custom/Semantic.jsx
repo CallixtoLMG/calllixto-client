@@ -20,7 +20,7 @@ export const Segment = styled(SSegment)`
   padding: ${({ height, padding }) => padding || (height && "10px")} !important;
   margin: ${({ margin = "0" }) => margin} !important;
   width: ${({ width = '100%' }) => width} !important;
-  min-height: 50px!important;
+  min-height: 35px!important;
   font-family: Lato, "Helvetica Neue", Arial, Helvetica, sans-serif;
   overflow: auto;
   align-content: center;
@@ -47,6 +47,10 @@ export const FormField = styled(Form.Field)`
   margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
   height: ${({ height }) => height} !important;
+
+    &.disabled {
+    opacity: 1 !important;
+  }
 `;
 
 export const Label = styled(SLabel)`
@@ -81,6 +85,21 @@ export const Dropdown = styled(SDropdown)`
   i{
     margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
   }
+  ${({ multiple }) => multiple && `
+    &&&&&& div.item {
+      padding: 0.35rem 0.4rem!important;
+      width: fit-content!important;
+      background-color: white;
+      font-size: 12px!important;
+      &:hover {
+        background-color: white;
+      }
+    }
+    a.ui.label {
+      font-size: 12px!important;
+      padding: 0.5rem 0.8rem!important;
+    }
+  `}
 `;
 
 export const DropdownOption = styled(SDropdown)`
@@ -140,12 +159,12 @@ export const DropdownMenu = styled(SDropdown.Menu)`
 export const Icon = styled(SIcon)`
   align-self: center!important;
   margin-right: ${({ marginRight }) => marginRight && `11px!important`} ;
-  top: ${({ dollar, toast }) => (dollar ? `-3px` : toast ? `-2px` : 'initial')} !important;
-  position: ${({ dollar, toast }) => (dollar || toast) && `relative!important`} ;
+  top: ${({ dollar, tooltip }) => (dollar ? `-3px` : tooltip ? `-2px` : 'initial')} !important;
+  position: ${({ dollar, tooltip }) => (dollar || tooltip) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
   cursor: ${({ pointer }) => pointer && "pointer"} !important;
-  pointer-events: ${({ enablePointerEvents }) => (enablePointerEvents ? "all" : "none")} !important;
+  pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
 `;
 
 export const Modal = styled(SModal)`

@@ -16,7 +16,6 @@ export const TextField = ({
   error,
   showPopup = false,
   popupContent,
-  extraContent
 }) => {
   const showIconLabel = () => (
     <Label width="fit-content" height="100%">
@@ -48,9 +47,9 @@ export const TextField = ({
         onChange={onChange}
         maxLength={maxLength}
         onKeyPress={onKeyPress}
-        icon={extraContent ? extraContent : null}
       >
         {iconLabel && showIconLabel()}
+        <input />
       </Input>
     </FormField>
   );

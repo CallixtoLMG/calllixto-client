@@ -1,10 +1,11 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Button, FieldsContainer, Flex, Form, FormField, Input, Label } from "@/common/components/custom";
+import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, OverflowCell } from "@/common/components/custom";
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
+import { Text } from "@/common/components/search/styles";
 import { Table, Total } from "@/common/components/table";
-import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "@/common/components/tooltips";
+import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
 import { getDateWithOffset, now } from "@/common/utils/dates";
@@ -98,7 +99,6 @@ const BudgetForm = ({
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
-  const isCustomerInactive = watchCustomer?.state === CUSTOMER_STATES.INACTIVE.id;
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -109,27 +109,44 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers.map((customer) => ({
-      key: customer.id,
-      value: customer,
-      text: customer.name,
+    return customers.map(({ id, name, state, inactiveReason, tags, comments }) => ({
+      key: id,
+      value: id,
+      text: name,
       content: (
-        <Flex justifyContent="space-between" alignItems="center">
-          <span>{customer.name}</span>
-          {customer.state === CUSTOMER_STATES.INACTIVE.id && (
-            <Flex>
-              <Popup
-                trigger={
-                  <Label color={COLORS.GREY} size="mini">
-                    Desactivado
-                  </Label>}
-                content={customer.deactivationReason || 'Motivo no especificado'}
-                position="top center"
-                size="mini"
-              />
-            </Flex>
-          )}
-        </Flex>
+        <FlexColumn marginTop="5px" rowGap="5px">
+          <FlexColumn>
+            <Text>{name}</Text>
+          </FlexColumn>
+          <Flex justifyContent="space-between" alignItems="center" columnGap="5px">
+            <Box >
+              {state === CUSTOMER_STATES.INACTIVE.id ? (
+                <Popup
+                  trigger={<Label width="fit-content" color={COLORS.GREY} size="tiny">Desactivado</Label>}
+                  content={inactiveReason || 'Motivo no especificado'}
+                  position="top center"
+                  size="mini"
+                />
+              ) : (
+                <Box visibility="hidden" >Desactivado</Box>
+              )}
+            </Box>
+            <Box >
+              {tags ? (
+                <TagsTooltip tags={tags} />
+              ) : (
+                <Box visibility="hidden">🔖</Box>
+              )}
+            </Box>
+            <Box style={{ width: "30px", textAlign: "center" }}>
+              {comments ? (
+                <CommentTooltip comment={comments} />
+              ) : (
+                <Box visibility="hidden">ℹ️</Box>
+              )}
+            </Box>
+          </Flex>
+        </FlexColumn>
       ),
     }));
   }, [customers]);
@@ -349,17 +366,18 @@ const BudgetForm = ({
       title: "Nombre",
       value: (product) => (
         <Container>
-          {product.name}
-          <Flex marginLeft="3px" marginRight="3px" columnGap="3px">
-            {product.comments && <CommentTooltip comment={product.comments} />}
+          <OverflowCell text={product.name} />
+          <Flex alignItems="center" marginLeft="5px" columnGap="5px">
+            {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
+            {product.tags && <TagsTooltip tooltip tags={product.tags} />}
+            {product.comments && <CommentTooltip tooltip comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
               <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />} />
             )}
-            {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
           </Flex>
         </Container>
       ),
-      width: 6,
+      width: 7,
       wrap: true,
       align: 'left'
     },
@@ -408,7 +426,6 @@ const BudgetForm = ({
         <Flex alignItems="center" columnGap="5px">
           <PercentControlled
             width="80px"
-            height="35px"
             name={`products[${index}].discount`}
             defaultValue={product.discount ?? 0}
             handleChange={calculateTotal}
@@ -515,6 +532,7 @@ const BudgetForm = ({
           <FieldsContainer>
             <DropdownControlled
               name="customer"
+              border
               rules={{
                 validate: {
                   required: value => {
@@ -593,6 +611,7 @@ const BudgetForm = ({
                 error={errors.products?.root?.message}
                 control={ProductSearch}
                 ref={productSearchRef}
+                tooltip
                 products={products}
                 onProductSelect={(selectedProduct) => {
                   appendProduct({

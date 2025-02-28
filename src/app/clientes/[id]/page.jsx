@@ -27,7 +27,6 @@ const Customer = ({ params }) => {
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
-
   const editCustomer = useEditCustomer();
   const deleteCustomer = useDeleteCustomer();
   const inactiveCustomer = useInactiveCustomer();
@@ -42,6 +41,7 @@ const Customer = ({ params }) => {
     setLabels([PAGES.CUSTOMERS.NAME, customer?.name]);
     refetch();
   }, [customer, setLabels, refetch]);
+
 
   const hasAssociatedBudgets = useMemo(() => {
     return budgetData?.budgets?.some(budget => budget.customer?.id === customer?.id);

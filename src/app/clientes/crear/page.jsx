@@ -1,8 +1,8 @@
 "use client";
 import { useCreateCustomer } from "@/api/customers";
+import { PAGES } from "@/common/constants";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { PAGES } from "@/common/constants";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -41,7 +41,10 @@ const CreateCustomer = () => {
   });
 
   return (
-    <CustomerForm onSubmit={mutate} isLoading={isPending} />
+    <CustomerForm
+      onSubmit={mutate}
+      isLoading={isPending}
+    />
   )
 };
 

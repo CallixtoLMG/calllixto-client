@@ -21,10 +21,12 @@ export function useGetSetting(entity) {
   const query = useQuery({
     queryKey: [GET_SETTING_QUERY_KEY, entity],
     queryFn: () =>
-      getItemById({
-        url: `${PATHS.SETTINGS}/${entity}`,
-        entity: ENTITIES.SETTINGS,
-      }),
+    getItemById({
+      key: "entity",
+      id: entity,
+      url: `${PATHS.SETTINGS}`,
+      entity: ENTITIES.SETTINGS,
+    }),
     staleTime: IN_MS.ONE_HOUR,
     enabled: !!entity,
   });
