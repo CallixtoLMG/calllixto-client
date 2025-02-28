@@ -1,33 +1,25 @@
 import { useGetSetting } from "@/api/settings";
 import { Label } from "@/common/components/custom";
-import { useMemo } from "react";
 
-export const useArrayTags = (entity, tags = []) => {
+export const useArrayTags = (entity) => {
   const { data: settings, isFetching } = useGetSetting(entity);
 
-  const [tagsOptions, optionsMapper, defaultSelectedTags] = useMemo(() => {
-    const uniqueTags = {};
+  const uniqueTags = {};
 
-    const entityTags = settings?.settings?.tags ?? []; 
-    const tagsArray = Array.isArray(tags) ? tags : []; 
+  const entityTags = settings?.settings?.tags ?? [];
 
-    const defaultSelectedTags = tagsArray.map(tag => tag.name); 
+    [...entityTags].forEach((tag) => {
+    if (tag?.name) {
+      uniqueTags[tag.name] = tag;
+    }
+  });
 
-    [...entityTags, ...tagsArray].forEach((tag) => {
-      if (tag?.name) {
-        uniqueTags[tag.name] = tag;
-      }
-    });
+  const tagsOptions = Object.values(uniqueTags).map((tag) => ({
+    key: tag.name,
+    value: tag.name,
+    text: tag.name,
+    content: <Label color={tag.color}>{tag.name}</Label>,
+  }));
 
-    const options = Object.values(uniqueTags).map((tag) => ({
-      key: tag.name,
-      value: tag.name,
-      text: tag.name,
-      content: <Label color={tag.color}>{tag.name}</Label>,
-    }));
-
-    return [options, uniqueTags, defaultSelectedTags];
-  }, [settings, tags]);
-
-  return { tagsOptions, optionsMapper, defaultSelectedTags, isFetching };
+  return { tagsOptions, optionsMapper: uniqueTags, isFetching };
 };

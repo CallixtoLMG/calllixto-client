@@ -205,7 +205,7 @@ export const ALL = "all";
 
 export const ACTIVE = "active";
 
-export const INACTIVE = "inactive";
+export const INACTIVE = "INACTIVE";
 
 export const EVENT_KEYS = {
   UPDATE: 'U',

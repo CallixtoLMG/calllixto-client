@@ -21,7 +21,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
   const { data: customersSettings, isFetching: isCustomerSettingsFetching } = useGetSetting(ENTITIES.CUSTOMERS);
-  const { tagsOptions, optionsMapper, defaultSelectedTags } = useArrayTags(ENTITIES.CUSTOMERS, customersSettings);
+  const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.CUSTOMERS, customersSettings);
 
   const handleReset = useCallback((customer) => {
     reset(customer);
@@ -76,7 +76,6 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
             search={isUpdating && !view}
             selection
             optionsMapper={optionsMapper}
-            value={defaultSelectedTags}
             loading={isCustomerSettingsFetching}
             options={Object.values(tagsOptions)}
             renderLabel={(item) => ({

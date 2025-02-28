@@ -27,18 +27,12 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     }
   });
   const { data: productsSettings, isFetching: isProductSettingsFetching } = useGetSetting(ENTITIES.PRODUCTS);
-  const { tagsOptions, optionsMapper, defaultSelectedTags } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
+  const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
   const { handleSubmit, reset, watch, formState: { isDirty, errors } } = methods;
   const [watchFractionable, watchSupplier, watchBrand] = watch(['fractionConfig.active', 'supplier', 'brand']);
 
   const handleForm = async (data) => {
     const filteredData = { ...data };
-
-    const selectedTags = data.tags || [];
-
-    filteredData.tags = selectedTags.map((tag) =>
-      typeof tag === "string" ? JSON.parse(tag) : tag
-    );
 
     if (data.fractionConfig && !data.fractionConfig.active && product?.fractionConfig?.active === false) {
       delete filteredData.fractionConfig;
@@ -189,17 +183,17 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
         <FieldsContainer>
           <DropdownControlled
             disabled={!isUpdating && view}
-            width="40%"
+            width={(!isUpdating && view) ? "fit-content" : "40%"}
             name="tags"
             label="Etiquetas"
             placeholder="Selecciona etiquetas"
             height="fit-content"
             multiple
-            clearable
-            search
+            clearable={isUpdating && !view}
+            icon={(!isUpdating && view) ? null : undefined}
+            search={isUpdating && !view}
             selection
             optionsMapper={optionsMapper}
-            value={defaultSelectedTags}
             loading={isProductSettingsFetching}
             options={Object.values(tagsOptions)}
             renderLabel={(item) => ({
