@@ -1,5 +1,5 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, OverflowCell } from "@/common/components/custom";
+import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, OverflowCell } from "@/common/components/custom";
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
@@ -119,18 +119,32 @@ const BudgetForm = ({
             <Text>{name}</Text>
           </FlexColumn>
           <Flex justifyContent="space-between" alignItems="center" columnGap="5px">
-            {state === CUSTOMER_STATES.INACTIVE.id ? (
-              <Popup
-                trigger={<Label width="fit-content" color={COLORS.GREY} size="tiny">Desactivado</Label>}
-                content={inactiveReason || 'Motivo no especificado'}
-                position="top center"
-                size="mini"
-              />
-            ) : (
-              <div />
-            )}
-            {tags ? <TagsTooltip tags={tags} /> : <Flex />}
-            {comments ? <CommentTooltip comment={comments} /> : <Flex />}
+            <Box >
+              {state === CUSTOMER_STATES.INACTIVE.id ? (
+                <Popup
+                  trigger={<Label width="fit-content" color={COLORS.GREY} size="tiny">Desactivado</Label>}
+                  content={inactiveReason || 'Motivo no especificado'}
+                  position="top center"
+                  size="mini"
+                />
+              ) : (
+                <Box visibility="hidden" >Desactivado</Box>
+              )}
+            </Box>
+            <Box >
+              {tags ? (
+                <TagsTooltip tags={tags} />
+              ) : (
+                <Box visibility="hidden">🔖</Box>
+              )}
+            </Box>
+            <Box style={{ width: "30px", textAlign: "center" }}>
+              {comments ? (
+                <CommentTooltip comment={comments} />
+              ) : (
+                <Box visibility="hidden">ℹ️</Box>
+              )}
+            </Box>
           </Flex>
         </FlexColumn>
       ),
@@ -412,7 +426,6 @@ const BudgetForm = ({
         <Flex alignItems="center" columnGap="5px">
           <PercentControlled
             width="80px"
-            height="35px"
             name={`products[${index}].discount`}
             defaultValue={product.discount ?? 0}
             handleChange={calculateTotal}

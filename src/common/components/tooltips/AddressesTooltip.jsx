@@ -18,7 +18,7 @@ export const AddressesTooltip = ({ addresses }) => {
       position="top center"
       trigger={
         <Box marginLeft="5px" marginRight="5px">
-          <Icon name={ICONS.LIST_UL} color={COLORS.YELLOW} />
+          <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />
         </Box>
       }
     />

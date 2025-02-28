@@ -15,7 +15,7 @@ export const HEADERS = [
         <Flex justifyContent="space-between" alignItems="center">
           <OverflowCell maxWidth="40vw" text={name} />
           <Flex columnGap="7px" alignItems="center" justifyContent="flex-end">
-            {tags && <TagsTooltip tags={tags} />}
+            {tags && <TagsTooltip tooltip tags={tags} />}
             {comments && <CommentTooltip tooltip comment={comments} />}
           </Flex>
         </Flex>
