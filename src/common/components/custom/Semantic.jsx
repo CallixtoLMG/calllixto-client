@@ -164,6 +164,7 @@ export const Icon = styled(SIcon)`
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
   cursor: ${({ pointer }) => pointer && "pointer"} !important;
+  justify-items: ${({ justifyItems }) => `${justifyItems}!important;`};
   pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
 `;
 

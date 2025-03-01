@@ -1,6 +1,6 @@
-import { Flex, FormField, Input } from "@/common/components/custom";
+import { Flex, FormField, Icon, Input } from "@/common/components/custom";
 import { Controller, useFormContext } from "react-hook-form";
-import { Header, Icon } from "semantic-ui-react";
+import { Header, } from "semantic-ui-react";
 
 export const NumberControlled = ({
   width,
@@ -11,6 +11,7 @@ export const NumberControlled = ({
   iconPosition = 'left',
   placeholder,
   onChange,
+  justifyItems,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -45,7 +46,7 @@ export const NumberControlled = ({
             onFocus={(e) => e.target.select()}
           >
             {unit && (
-              <Icon>
+              <Icon justifyItems={justifyItems}>
                 <Flex height="100%" alignItems="center">
                   <Header as="h5">{unit}</Header>
                 </Flex>
