@@ -1,18 +1,21 @@
-import { PRODUCTS_COLUMNS } from "@/components/budgets/budgets.common";
-import { Box, Flex, FlexColumn, Price } from "@/components/common/custom";
-import { Table, Total, TotalList } from '@/components/common/table';
-import { BUDGET_PDF_FORMAT, BUDGET_STATES, PICK_UP_IN_STORE } from "@/constants";
-import { expirationDate, formatedDateOnly, formatedSimplePhone, isBudgetCancelled, isBudgetDraft } from "@/utils";
-import dayjs from "dayjs";
+import { Box, Flex, FlexColumn } from "@/common/components/custom";
+import { PriceLabel } from "@/common/components/form";
+import { Table, Total, TotalList } from '@/common/components/table';
+import { getFormatedPhone } from "@/common/utils";
+import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
+import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
+import { getProductsColumns } from "@/components/budgets/budgets.utils";
 import { get } from "lodash";
 import { forwardRef, useMemo } from "react";
 import { List } from "semantic-ui-react";
+import { PICK_UP_IN_STORE } from "../budgets.constants";
+import { isBudgetCancelled, isBudgetDraft } from "../budgets.utils";
 import {
-  DataContainer,
-  Divider,
-  Image,
-  SectionContainer,
-  Title
+    DataContainer,
+    Divider,
+    Image,
+    SectionContainer,
+    Title
 } from "./styles";
 
 const Field = ({ label, value, ...rest }) => (
@@ -26,7 +29,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
   const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL, [printPdfMode]);
-  const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
+  const filteredColumns = useMemo(() => getProductsColumns(dispatchPdf, budget), [budget, dispatchPdf]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
   const roundedFinalTotal = parseFloat(total?.toFixed(2));
@@ -38,28 +41,28 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
     const items = paymentMethods.map((payment, index) => ({
       id: index + 1,
       title: payment.method,
-      amount: <Price value={payment.amount} />,
+      amount: <PriceLabel value={payment.amount} />,
       ...(payment.comments && { subtitle: payment.comments }),
     }));
 
     items.push({
       id: items.length + 1,
       title: "Total Pagado",
-      amount: <Price value={totalAssigned} />,
+      amount: <PriceLabel value={totalAssigned} />,
     });
 
     if (totalPending > 0) {
       items.push({
         id: items.length + 2,
         title: "Total Pendiente",
-        amount: <Price value={totalPending} />,
+        amount: <PriceLabel value={totalPending} />,
       });
     }
 
     items.push({
       id: items.length + (totalPending > 0 ? 3 : 2),
       title: "Total a Pagar",
-      amount: <Price value={roundedFinalTotal} />,
+      amount: <PriceLabel value={roundedFinalTotal} />,
     });
 
     return items;
@@ -101,11 +104,11 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         <SectionContainer alignItems="left" flexDirection="column" minHeight="50px">
           <Flex>
             <Field label="Vendedor/a" value={budget?.seller} flex="1" />
-            <Field label="Fecha" value={dayjs().format('DD-MM-YYYY')} />
+            <Field label="Fecha" value={getFormatedDate()} />
           </Flex>
           <Flex>
-            <Field flex="1" label="Teléfonos" value={client?.phoneNumbers?.map(formatedSimplePhone).join(' | ')} />
-            <Field label="Válido hasta" value={formatedDateOnly(expirationDate(budget?.expirationOffsetDays, budget?.createdAt))} />
+            <Field flex="1" label="Teléfonos" value={client?.phoneNumbers?.map(getFormatedPhone).join(' | ')} />
+            <Field label="Válido hasta" value={getDateWithOffset(budget?.createdAt, budget?.expirationOffsetDays, 'days')} />
           </Flex>
         </SectionContainer>
         <Divider />
@@ -145,7 +148,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <Title as="h4" alignSelf="left" $slim>Cotización en USD</Title>
             <Divider />
             <Title as="h4" alignSelf="left" width="fit-content" minHeight="30px">
-              <Price value={roundedFinalTotal / parseInt(dolarExchangeRate)} />
+              <PriceLabel value={roundedFinalTotal / parseInt(dolarExchangeRate)} />
             </Title>
           </DataContainer>
         )}
@@ -173,7 +176,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <DataContainer width="100%">
               <Title as="h4" alignSelf="left" textAlignLast="left" $slim>Detalles de Pago</Title>
               <Divider />
-              <TotalList labelWidth="200px" width="300px" readOnly items={TOTAL_LIST_ITEMS} />
+              <TotalList readOnly items={TOTAL_LIST_ITEMS} />
             </DataContainer>
             <DataContainer width="100%">
               <Title as="h4" alignSelf="left" textAlignLast="left" $slim>Formas de Pago</Title>

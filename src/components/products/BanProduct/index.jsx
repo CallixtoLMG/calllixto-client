@@ -1,18 +1,19 @@
 import { useUserContext } from "@/User";
 import { editBanProducts, useGetBlackList } from "@/api/products";
-import { IconnedButton } from "@/components/common/buttons";
-import { FieldsContainer, Flex, Form, FormField, Icon, Input, Label, Modal } from "@/components/common/custom";
-import { Table } from "@/components/common/table";
+import { IconedButton } from "@/common/components/buttons";
+import { FieldsContainer, Flex, Form, FormField, Modal } from "@/common/components/custom";
+import { TextField } from "@/common/components/form";
+import { Table } from "@/common/components/table";
+import { COLORS, ICONS } from "@/common/constants";
+import { handleEnterKeyPress } from '@/common/utils';
 import { Loader } from "@/components/layout";
-import { COLORS, ICONS } from "@/constants";
-import { handleEnterKeyPress } from '@/utils';
 import { useMutation } from "@tanstack/react-query";
 import { isEqual, sortBy } from 'lodash';
 import { useCallback, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Popup, Transition } from "semantic-ui-react";
-import { BAN_PRODUCTS_COLUMNS } from "../products.common";
+import { Transition } from "semantic-ui-react";
+import { BAN_PRODUCTS_COLUMNS } from "../products.constants";
 import { ModalActions } from "./styles";
 
 const BanProduct = ({ open, setOpen }) => {
@@ -110,53 +111,46 @@ const BanProduct = ({ open, setOpen }) => {
         <Modal.Content>
           <Form ref={formRef} onSubmit={handleSubmit(mutate)}>
             <FieldsContainer>
-              <FormField width="100%">
-                <Label>Agregar código
-                  <Popup
-                    position="top center"
-                    size="tiny"
-                    content={
-                      <div>
-                        <p>* Para añadir un código nuevo a la lista, anótelo y luego pulse &quot;enter&quot;. Cuando haya concluido de agregar códigos, clickeé &quot;Confirmar&quot;.</p>
-                        <p>* Existe la posibilidad de agregar múltiples códigos a la vez, para ello, debe escribirlos separados por una coma y un espacio, por ejemplo:</p>
-                        <p>  PCMU123, PCMU124, PCMU125</p>
-                      </div>}
-                    trigger={<Icon margin="0 0 0 5px" name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />}
-                  />
-                </Label>
-                <Input
-                  height="30px"
-                  type="text"
-                  placeholder="Código"
-                  onKeyPress={(e) => handleEnterKeyPress(e, handleAddProduct)}
-                />
-              </FormField>
+              <TextField
+                placeholder="Código"
+                label="Código"
+                onKeyPress={(e) => handleEnterKeyPress(e, handleAddProduct)}
+                showPopup
+                iconLabel
+                popupContent={
+                  <div>
+                    <p>* Para añadir un código nuevo a la lista, anótelo y luego pulse &quot;enter&quot;.</p>
+                    <p>* Puede agregar múltiples códigos separados por coma, por ejemplo: PCMU123, PCMU124.</p>
+                  </div>
+                }
+              />
             </FieldsContainer>
             <FieldsContainer rowGap="5px">
-              <Label>Productos vedados</Label>
-              <Loader $marginTop active={isLoading || isFetching} greyColor>
-                <Table
-                  deleteButtonInside
-                  tableHeight="40vh"
-                  mainKey="code"
-                  headers={BAN_PRODUCTS_COLUMNS}
-                  elements={watchProducts?.map(p => ({ code: p }))}
-                  actions={actions}
-                ></Table>
-              </Loader>
+              <FormField control={Loader} label="Productos vedados" >
+                <Loader $marginTop active={isLoading || isFetching} greyColor>
+                  <Table
+                    deleteButtonInside
+                    tableHeight="40vh"
+                    mainKey="code"
+                    headers={BAN_PRODUCTS_COLUMNS}
+                    elements={watchProducts?.map(p => ({ code: p }))}
+                    actions={actions}
+                  />
+                </Loader>
+              </FormField>
             </FieldsContainer>
           </Form>
         </Modal.Content>
         <ModalActions>
           <Flex columnGap="5px">
-            <IconnedButton
+            <IconedButton
               text="Cancelar"
               icon={ICONS.CANCEL}
               disabled={isPending}
               onClick={() => setOpen(false)}
               color={COLORS.RED}
             />
-            <IconnedButton
+            <IconedButton
               text="Aceptar"
               icon={ICONS.CHECK}
               disabled={isPending || isEqual(sortBy(blacklist), sortBy(watchProducts))}

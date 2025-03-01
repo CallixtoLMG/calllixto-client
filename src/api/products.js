@@ -1,5 +1,7 @@
-import { ATTRIBUTES } from "@/components/products/products.common";
-import { ACTIVE, ALL, CODE, ENTITIES, FILTERS_OPTIONS, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
+import { ACTIVE, ALL, CODE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
+import { getDefaultListParams } from '@/common/utils';
+import { now } from "@/common/utils/dates";
+import { ATTRIBUTES, GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
 import {
   BATCH,
   BLACK_LIST,
@@ -9,16 +11,13 @@ import {
   URL,
   VALIDATE
 } from "@/fetchUrls";
-import { now } from "@/utils";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
 import { chunk } from "lodash";
 import { useMemo } from "react";
 import { getInstance } from "./axios";
 import { getItemById, listItems, removeStorageItemsByCustomFilter, useActiveItem, useBatchDeleteItems, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
-export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
-export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
-export const GET_PRODUCT_QUERY_KEY = "getProduct";
 
 export function useListProducts() {
   const query = useQuery({
@@ -29,7 +28,7 @@ export function useListProducts() {
       url: PATHS.PRODUCTS,
       params: getDefaultListParams(ATTRIBUTES)
     }),
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: IN_MS.ONE_DAY,
   });
 
   return query;
@@ -56,7 +55,7 @@ export function useGetProduct(id) {
     queryKey: [GET_PRODUCT_QUERY_KEY, id],
     queryFn: () => getItemById({ id, url: PATHS.PRODUCTS, entity: ENTITIES.PRODUCTS, key: CODE }),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: IN_MS.ONE_DAY,
   });
 
   return query;
@@ -137,14 +136,14 @@ export const useEditProduct = () => {
 
 export function useProductsBySupplierId(supplierId) {
   const listBySupplierId = async () => {
-    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: FILTERS_OPTIONS.DATE } });
+    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: 'date' } });
     return products.filter((product) => product.code.startsWith(supplierId));
   }
 
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId],
     queryFn: () => listBySupplierId(),
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: IN_MS.ONE_DAY,
   });
 
   return query;

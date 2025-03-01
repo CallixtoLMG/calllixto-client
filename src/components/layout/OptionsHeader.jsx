@@ -1,9 +1,9 @@
-import ModalAction from '@/components/common/modals/ModalAction';
-import { COLORS, ICONS } from '@/constants';
+import ModalAction from '@/common/components/modals/ModalAction';
+import { COLORS, ICONS } from '@/common/constants';
 import { useRestoreEntity } from '@/hooks/common';
 import { useState } from 'react';
 import { Icon } from 'semantic-ui-react';
-import { Dropdown } from '../common/custom';
+import { Dropdown } from '../../common/components/custom';
 
 const OptionsDropdown = ({ entity, queryKey, text }) => {
   const [showModal, setShowModal] = useState(false);
@@ -36,9 +36,10 @@ const OptionsDropdown = ({ entity, queryKey, text }) => {
     <>
       <Dropdown
         hideBorder
-        noBgColor="transparent"
+        bgColor="transparent"
         width="fit-content"
         height="100%"
+        padding="2em 0.5em"
         iconMargin="0"
         item
         icon={<Icon size='large' name={ICONS.OPTIONS} color={COLORS.ORANGE} />}

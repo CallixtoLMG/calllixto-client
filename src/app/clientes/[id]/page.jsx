@@ -1,16 +1,15 @@
 "use client";
-
 import { useListBudgets } from "@/api/budgets";
 import { useActiveCustomer, useDeleteCustomer, useEditCustomer, useGetCustomer, useInactiveCustomer } from "@/api/customers";
-import { Input } from "@/components/common/custom";
-import ModalAction from "@/components/common/modals/ModalAction";
+import { Message, MessageHeader } from "@/common/components/custom";
+import { TextField } from "@/common/components/form";
+import ModalAction from "@/common/components/modals/ModalAction";
+import { COLORS, ICONS, PAGES } from "@/common/constants";
+import { isItemInactive } from "@/common/utils";
 import CustomerForm from "@/components/customers/CustomerForm";
-import CustomerView from "@/components/customers/CustomerView";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { COLORS, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
-import { isItemInactive } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -23,7 +22,7 @@ const Customer = ({ params }) => {
   const { data: budgetData, isLoading: isLoadingBudgets } = useListBudgets();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: true });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({ canUpdate: true });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -42,6 +41,7 @@ const Customer = ({ params }) => {
     setLabels([PAGES.CUSTOMERS.NAME, customer?.name]);
     refetch();
   }, [customer, setLabels, refetch]);
+
 
   const hasAssociatedBudgets = useMemo(() => {
     return budgetData?.budgets?.some(budget => budget.customer?.id === customer?.id);
@@ -79,14 +79,11 @@ const Customer = ({ params }) => {
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction("delete"), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: async (customer) => {
-      const data = await editCustomer(customer);
-
-      return data;
-    },
+    mutationFn: editCustomer,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente actualizado!");
+        setIsUpdating(false);
       } else {
         toast.error(response.error.message);
       }
@@ -98,10 +95,7 @@ const Customer = ({ params }) => {
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: async ({ customer }) => {
-      const response = await activeCustomer(customer);
-      return response;
-    },
+    mutationFn: ({ customer }) => activeCustomer(customer),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente activado!");
@@ -116,10 +110,7 @@ const Customer = ({ params }) => {
   });
 
   const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: async ({ customer, reason }) => {
-      const response = await inactiveCustomer(customer, reason);
-      return response;
-    },
+    mutationFn: ({ customer, reason }) => inactiveCustomer(customer, reason),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente desactivado!");
@@ -134,9 +125,7 @@ const Customer = ({ params }) => {
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: () => {
-      return deleteCustomer(params.id);
-    },
+    mutationFn: () => deleteCustomer(params.id),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Cliente eliminado permanentemente!");
@@ -152,20 +141,22 @@ const Customer = ({ params }) => {
   });
 
   const handleActionConfirm = async () => {
-    if (modalAction === "inactive") {
-      if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar al cliente.");
-        return;
-      }
+    if (modalAction === "inactive" && !reason) {
+      toast.error("Debe proporcionar una razón para desactivar al cliente.");
+      return;
     }
 
     setActiveAction(modalAction);
 
     if (modalAction === "delete") {
       mutateDelete();
-    } else if (modalAction === "inactive") {
+    }
+
+    if (modalAction === "inactive") {
       mutateInactive({ customer, reason });
-    } else if (modalAction === "active") {
+    }
+
+    if (modalAction === "active") {
       mutateActive({ customer });
     }
 
@@ -211,17 +202,20 @@ const Customer = ({ params }) => {
 
   return (
     <Loader active={isLoading || isLoadingBudgets}>
-      {toggleButton}
-      {isUpdating ? (
-        <CustomerForm
-          customer={customer}
-          onSubmit={mutateEdit}
-          isLoading={isEditPending}
-          isUpdating
-        />
-      ) : (
-        <CustomerView customer={customer} />
+      {!isItemInactive(customer?.state) && toggleButton}
+      {isItemInactive(customer?.state) && (
+        <Message negative>
+          <MessageHeader>Motivo de inactivación</MessageHeader>
+          <p>{customer.inactiveReason}</p>
+        </Message>
       )}
+      <CustomerForm
+        customer={customer}
+        onSubmit={mutateEdit}
+        isLoading={isEditPending}
+        isUpdating={isUpdating && !isItemInactive(customer?.state)}
+        view
+      />
       <ModalAction
         title={header}
         onConfirm={handleActionConfirm}
@@ -234,9 +228,8 @@ const Customer = ({ params }) => {
         disableButtons={!reason && modalAction === "inactive"}
         bodyContent={
           modalAction === "inactive" && (
-            <Input
-              type="text"
-              placeholder="Indique la razón de desactivación"
+            <TextField
+              placeholder="Motivo"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

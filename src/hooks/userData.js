@@ -1,5 +1,5 @@
 import { useUserContext } from '@/User';
-import { PAGES } from '@/constants';
+import { PAGES } from '@/common/constants';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 

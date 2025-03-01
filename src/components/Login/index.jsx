@@ -1,48 +1,48 @@
 "use client";
+import { useUserContext } from "@/User";
+import { getUserData } from "@/api/userData";
+import { ICONS, PAGES, RULES } from "@/common/constants";
 import { Loader } from "@/components/layout";
-import { ICONS, PAGES, RULES } from "@/constants";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Form } from "semantic-ui-react";
-import { ModButton, ModGrid, ModGridColumn, ModHeader, Text } from "./styled";
-import { useUserContext } from "@/User";
+import { Form } from "../../common/components/custom";
+import { PasswordControlled, TextControlled } from "../../common/components/form";
+import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styles";
 
 const LoginForm = ({ onSubmit }) => {
-  const { push } = useRouter();
-  const { handleSubmit, control } = useForm();
-  const [isLoading, setIsLoading] = useState(false);
   const { setUserData } = useUserContext();
+  const { push } = useRouter();
+  const methods = useForm();
+  const { handleSubmit } = methods;
 
-  const { mutate } = useMutation({
+  const { mutate: login, isPending } = useMutation({
     mutationFn: async (dataLogin) => {
-      setIsLoading(true);
-      const data = await onSubmit(dataLogin);
+      await onSubmit(dataLogin);
+      const data = await getUserData();
       return data;
     },
     onSuccess: (userData) => {
       if (userData) {
         setUserData(userData);
+        toast.success("Ingreso exitoso!");
         push(PAGES.BUDGETS.BASE);
       } else {
         toast.error("Los datos ingresados no son correctos!");
-        setIsLoading(false);
       }
     },
     onError: () => {
       toast.error("Hubo un error al intentar ingresar, por favor intenta de nuevo.");
-      setIsLoading(false);
     },
   });
 
   return (
-    <Loader active={isLoading}>
-      <ModGrid >
-        <ModGridColumn >
-          <ModHeader as='h3'>
+    <Loader active={isPending}>
+      <ModGrid>
+        <ModGridColumn>
+          <ModHeader as="h3">
             <div>
               <Image
                 src="/Callixto.png"
@@ -54,40 +54,34 @@ const LoginForm = ({ onSubmit }) => {
               <Text>Ingresa a tu cuenta</Text>
             </div>
           </ModHeader>
-          <Form onSubmit={handleSubmit(mutate)} size='large'>
-            <Controller
-              name="email"
-              control={control}
-              rules={RULES.REQUIRED}
-              render={({ field }) => (
-                <Form.Input
-                  {...field}
-                  placeholder='Correo electrónico'
-                  fluid
-                  icon={ICONS.USER}
-                  iconPosition='left'
-                />
-              )}
-            />
-            <Controller
-              name="password"
-              control={control}
-              rules={RULES.REQUIRED}
-              render={({ field }) => (
-                <Form.Input
-                  {...field}
-                  type='password'
-                  placeholder='Contraseña'
-                  fluid
-                  icon={ICONS.LOCK}
-                  iconPosition='left'
-                />
-              )}
-            />
-            <ModButton fluid="true" size='large'>
-              Ingresar
-            </ModButton>
-          </Form>
+          <FormProvider {...methods}>
+            <Form onSubmit={handleSubmit(login)} size="large">
+              <TextControlled
+                name="username"
+                rules={{
+                  ...RULES.REQUIRED,
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "El correo electrónico no es válido",
+                  },
+                }}
+                placeholder="Correo electrónico"
+                icon={ICONS.USER}
+                iconPosition="left"
+              />
+              <PasswordControlled
+                name="password"
+                rules={RULES.REQUIRED}
+                placeholder="Contraseña"
+              />
+              <ModButton fluid="true" size="large">
+                Ingresar
+              </ModButton>
+              <PasswordLink onClick={() => push(PAGES.RESTORE_PASSWORD.BASE)}>
+                ¿Olvidaste tu contraseña?
+              </PasswordLink>
+            </Form>
+          </FormProvider>
         </ModGridColumn>
       </ModGrid>
     </Loader>

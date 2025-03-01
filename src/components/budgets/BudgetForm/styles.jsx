@@ -1,4 +1,4 @@
-import { Flex } from '@/components/common/custom';
+import { Flex } from '@/common/components/custom';
 import { Icon as SIcon, MessageHeader as SMessageHeader, MessageItem as SMessageItem, MessageList as SMessageList } from "semantic-ui-react";
 import styled from 'styled-components';
 
@@ -26,5 +26,12 @@ const MessageList = styled(SMessageList)`
   overflow-y: auto;
 `;
 
-export { Container, Icon, MessageHeader, MessageItem, MessageList };
+const VerticalDivider = styled.div`
+  height: 35px;
+  width: 1px;
+  background-color: #ccc;
+  margin: 0 10px;
+`;
+
+export { Container, Icon, MessageHeader, MessageItem, MessageList, VerticalDivider };
 

@@ -1,7 +1,7 @@
-import { Box, Flex } from '@/components/common/custom';
+import { Box, Flex } from '@/common/components/custom';
 import { createContext, useContext, useState } from 'react';
 import { Popup } from 'semantic-ui-react';
-import { IconnedButton } from '../common/buttons';
+import { IconedButton } from '../../common/components/buttons';
 
 const NavActionsContext = createContext();
 
@@ -30,7 +30,7 @@ const NavActions = () => {
     <Flex columnGap="10px">
       {actions.map(({ id, icon, color, onClick, text, button, disabled, width, basic, loading, tooltip }) => {
         return (
-          <Box key={`action_${id}`} >
+          <Box key={`action_${id}`}>
             {button ? button : (
               tooltip ? (
                 <Popup
@@ -40,7 +40,7 @@ const NavActions = () => {
                   size='tiny'
                   trigger={
                     <Box>
-                      <IconnedButton
+                      <IconedButton
                         text={text}
                         icon={icon}
                         color={color}
@@ -54,7 +54,7 @@ const NavActions = () => {
                   }
                 />
               ) : (
-                <IconnedButton
+                <IconedButton
                   text={text}
                   icon={icon}
                   color={color}

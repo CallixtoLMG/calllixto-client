@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-export const useKeyboardShortcuts = (shortcuts, key) => {
+export const useKeyboardShortcuts = (shortcuts, key = '') => {
   useEffect(() => {
     const handleKeyDown = (event) => {
       let action;

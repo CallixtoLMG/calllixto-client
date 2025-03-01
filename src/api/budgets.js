@@ -1,12 +1,10 @@
-import { ATTRIBUTES } from "@/components/budgets/budgets.common";
-import { ENTITIES, getDefaultListParams, TIME_IN_MS } from "@/constants";
+import { ENTITIES, IN_MS } from "@/common/constants";
+import { getDefaultListParams } from '@/common/utils';
+import { ATTRIBUTES, GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { CANCEL, CONFIRM, PATHS, PAYMENTS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import { listItems, useCreateItem, useEditItem } from "./common";
-
-export const LIST_BUDGETS_QUERY_KEY = 'lisAllBudgets';
-export const GET_BUDGET_QUERY_KEY = 'getBudget';
 
 export function useListBudgets() {
   const query = useQuery({
@@ -16,7 +14,7 @@ export function useListBudgets() {
       url: PATHS.BUDGETS,
       params: getDefaultListParams(ATTRIBUTES)
     }),
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: IN_MS.ONE_DAY,
   });
 
   return query;
@@ -45,7 +43,7 @@ export function useGetBudget(id) {
     queryKey: [GET_BUDGET_QUERY_KEY, id],
     queryFn: () => getBudget(id),
     retry: false,
-    staleTime: TIME_IN_MS.FIVE_MINUTES,
+    staleTime: IN_MS.FIVE_MINUTES,
     enabled: !!id,
   });
 

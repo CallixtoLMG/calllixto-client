@@ -1,24 +1,11 @@
-import { Dropdown, Flex, Input } from '@/components/common/custom';
-import { Filters, Table } from '@/components/common/table';
-import { CUSTOMER_STATES, PAGES } from "@/constants";
+import { DropdownControlled, TextControlled } from '@/common/components/form';
+import { Filters, Table } from '@/common/components/table';
+import { ENTITIES, PAGES } from "@/common/constants";
+import { createFilter } from '@/common/utils';
 import { useFilters } from '@/hooks/useFilters';
-import { createFilter } from '@/utils';
-import { Controller, FormProvider } from 'react-hook-form';
-import { Form, Label } from 'semantic-ui-react';
-import { HEADERS } from "../customers.common";
-
-const EMPTY_FILTERS = { name: '', state: CUSTOMER_STATES.ACTIVE.id };
-const STATE_OPTIONS = [
-  ...Object.entries(CUSTOMER_STATES).map(([key, value]) => ({
-    key,
-    text: (
-      <Flex alignItems="center" justifyContent="space-between">
-        {value.title}&nbsp;<Label color={value.color} circular empty />
-      </Flex>
-    ),
-    value: key
-  }))
-];
+import { FormProvider } from 'react-hook-form';
+import { Form } from 'semantic-ui-react';
+import { CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS } from "../customers.constants";
 
 const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
   const {
@@ -33,45 +20,25 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit(() => {})}>
+        <Form onSubmit={onSubmit(() => { })}>
           <Filters
+            entity={ENTITIES.CUSTOMERS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
           >
-            <Controller
+            <DropdownControlled
+              width="200px"
               name="state"
-              render={({ field: { onChange, ...rest } }) => (
-                <Dropdown
-                  {...rest}
-                  $maxWidth
-                  top="10px"
-                  height="35px"
-                  minHeight="35px"
-                  selection
-                  options={STATE_OPTIONS}
-                  defaultValue={EMPTY_FILTERS.state}
-                  onChange={(e, { value }) => {
-                    onChange(value);
-                    onSubmit(() => {})();
-                  }}
-                />
-              )}
+              options={CUSTOMER_STATES_OPTIONS}
+              defaultValue={EMPTY_FILTERS.state}
+              afterChange={() => {
+                onSubmit(() => { })();
+              }}
             />
-            <Controller
-              name="name"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  $maxWidth
-                  $marginBottom
-                  height="35px"
-                  placeholder="Nombre"
-                />
-              )}
-            />
+            <TextControlled name="name" placeholder="Nombre" width="300px" />
           </Filters>
         </Form>
-      </FormProvider>
+      </FormProvider >
       <Table
         isLoading={isLoading}
         headers={HEADERS}

@@ -1,4 +1,4 @@
-import { Flex } from "@/components/common/custom";
+import { Flex } from "@/common/components/custom";
 import { Header as SHeader, Modal as SModal } from "semantic-ui-react";
 import styled from "styled-components";
 

@@ -1,13 +1,12 @@
-import { ATTRIBUTES } from "@/components/brands/brands.common";
-import { ACTIVE, ENTITIES, FILTERS_OPTIONS, getDefaultListParams, INACTIVE, TIME_IN_MS } from "@/constants";
+import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
+import { getDefaultListParams } from '@/common/utils';
+import { ATTRIBUTES, GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from './common';
 
-export const GET_BRAND_QUERY_KEY = 'getBrand';
-export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 
-export function useListBrands({ sort = FILTERS_OPTIONS.NAME, order = true } = {}) {
+export function useListBrands({ sort = 'name', order = true } = {}) {
   const query = useQuery({
     queryKey: [LIST_BRANDS_QUERY_KEY],
     queryFn: () => listItems({
@@ -15,7 +14,7 @@ export function useListBrands({ sort = FILTERS_OPTIONS.NAME, order = true } = {}
       url: PATHS.BRANDS,
       params: getDefaultListParams(ATTRIBUTES, sort, order)
     }),
-    staleTime: TIME_IN_MS.ONE_DAY,
+    staleTime: IN_MS.ONE_DAY,
   });
 
   return query;
@@ -26,7 +25,7 @@ export function useGetBrand(id) {
     queryKey: [GET_BRAND_QUERY_KEY, id],
     queryFn: () => getItemById({ id, url: PATHS.BRANDS, entity: ENTITIES.BRANDS }),
     retry: false,
-    staleTime: TIME_IN_MS.ONE_HOUR,
+    staleTime: IN_MS.ONE_HOUR,
   });
 
   return query;

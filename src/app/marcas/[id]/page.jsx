@@ -2,16 +2,16 @@
 import { useUserContext } from "@/User";
 import { useActiveBrand, useDeleteBrand, useEditBrand, useGetBrand, useInactiveBrand } from "@/api/brands";
 import { useHasProductsByBrandId } from "@/api/products";
+import { Message, MessageHeader } from "@/common/components/custom";
+import { TextField } from "@/common/components/form";
+import ModalAction from "@/common/components/modals/ModalAction";
+import { COLORS, ICONS, PAGES } from "@/common/constants";
+import { isItemInactive } from "@/common/utils";
 import BrandForm from "@/components/brands/BrandForm";
-import BrandView from "@/components/brands/BrandView";
-import { Input } from "@/components/common/custom";
-import ModalAction from "@/components/common/modals/ModalAction";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { COLORS, ICONS, PAGES } from "@/constants";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { isItemInactive } from "@/utils";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -24,7 +24,7 @@ const Brand = ({ params }) => {
   const { data: brand, isLoading, refetch } = useGetBrand(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -77,13 +77,11 @@ const Brand = ({ params }) => {
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction("delete"), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: async (brand) => {
-      const data = await editBrand(brand);
-      return data;
-    },
+    mutationFn: editBrand,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca actualizada!");
+        setIsUpdating(false);
       } else {
         toast.error(response.error.message);
       }
@@ -95,10 +93,7 @@ const Brand = ({ params }) => {
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: async ({ brand }) => {
-      const response = await activeBrand(brand);
-      return response;
-    },
+    mutationFn: ({ brand }) => activeBrand(brand),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca activada!");
@@ -113,10 +108,7 @@ const Brand = ({ params }) => {
   });
 
   const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: async ({ brand, reason }) => {
-      const response = await inactiveBrand(brand, reason);
-      return response;
-    },
+    mutationFn: ({ brand, reason }) => inactiveBrand(brand, reason),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca desactivada!");
@@ -131,9 +123,7 @@ const Brand = ({ params }) => {
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: () => {
-      return deleteBrand(params.id);
-    },
+    mutationFn: () => deleteBrand(params.id),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca eliminada permanentemente!");
@@ -153,13 +143,17 @@ const Brand = ({ params }) => {
 
     if (modalAction === "delete") {
       mutateDelete();
-    } else if (modalAction === "inactive") {
+    }
+
+    if (modalAction === "inactive") {
       if (!reason) {
         toast.error("Debe proporcionar una razón para desactivar la marca.");
         return;
       }
       mutateInactive({ brand, reason });
-    } else if (modalAction === "active") {
+    }
+
+    if (modalAction === "active") {
       mutateActive({ brand });
     }
 
@@ -194,7 +188,6 @@ const Brand = ({ params }) => {
           tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
         },
       ] : [];
-
       setActions(actions);
     }
   }, [role, brand, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions, hasAssociatedProducts]);
@@ -205,12 +198,20 @@ const Brand = ({ params }) => {
 
   return (
     <Loader active={isLoading || isLoadingProducts}>
-      {toggleButton}
-      {isUpdating ? (
-        <BrandForm brand={brand} onSubmit={mutateEdit} isLoading={isEditPending} isUpdating />
-      ) : (
-        <BrandView brand={brand} />
+      {!isItemInactive(brand?.state) && toggleButton}
+      {isItemInactive(brand?.state) && (
+        <Message negative>
+          <MessageHeader>Motivo de inactivación</MessageHeader>
+          <p>{brand.inactiveReason}</p>
+        </Message>
       )}
+      <BrandForm
+        brand={brand}
+        onSubmit={mutateEdit}
+        isLoading={isEditPending}
+        isUpdating={isUpdating && !isItemInactive(brand?.state)}
+        view
+      />
       <ModalAction
         title={header}
         onConfirm={handleActionConfirm}
@@ -223,9 +224,8 @@ const Brand = ({ params }) => {
         disableButtons={!reason && modalAction === "inactive"}
         bodyContent={
           modalAction === "inactive" && (
-            <Input
-              type="text"
-              placeholder="Indique la razón de desactivación"
+            <TextField
+              placeholder="Motivo"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

@@ -1,7 +1,7 @@
+import { ALL, DEFAULT_LAST_EVENT_ID, ENTITIES, EVENT_KEYS, ID } from "@/common/constants";
+import { now } from "@/common/utils/dates";
 import { config } from "@/config";
-import { ALL, DEFAULT_LAST_EVENT_ID, ENTITIES, EVENT_KEYS, ID } from "@/constants";
 import { EVENTS, PATHS } from "@/fetchUrls";
-import { now } from "@/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import localforage from "./local-forage";
@@ -130,7 +130,7 @@ export async function listItems({ entity, url, params, key = ID }) {
 };
 
 export async function getItemById({ id, url, entity, key = ID, params }) {
-  await listItems({ entity, url, params, key })
+  await listItems({ entity, url, params, key });
   const getEntity = async (id) => {
     try {
       const { data } = await getInstance().get(`${url}/${id}`);
@@ -142,11 +142,11 @@ export async function getItemById({ id, url, entity, key = ID, params }) {
     }
   };
 
-  let value = (await localforage.getItem(`${config.APP_ENV}-${entity}`)).find((item) => item[key] === id);
+  let value = (await localforage.getItem(`${config.APP_ENV}-${entity}`))?.find((item) => item[key] === id);
   if (value) {
     return value;
   }
-  return getEntity();
+  return getEntity(id);
 }
 
 export function useCreateItem() {
@@ -321,7 +321,7 @@ export async function addStorageItem({ entity, value }) {
 
 export async function updateStorageItem({ entity, value, key = ID }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  const updatedArray = values.map(item => item[key] === value[key] ? { ...item, ...value } : item)
+  const updatedArray = values.map(item => item[key] === value[key] ? { ...item, ...value } : item);
   await localforage.setItem(`${config.APP_ENV}-${entity}`, updatedArray);
 };
 

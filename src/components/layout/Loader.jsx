@@ -1,6 +1,6 @@
 import { Loader as LoaderComp } from "semantic-ui-react";
 import styled from "styled-components";
-import { Box } from "../common/custom";
+import { Box } from "../../common/components/custom";
 
 const SLoader = styled(LoaderComp)`
   &::before {

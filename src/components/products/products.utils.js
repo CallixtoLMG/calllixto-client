@@ -1,0 +1,43 @@
+import { PRODUCT_STATES } from "./products.constants";
+
+export const getSupplierCode = (code) => {
+  return code?.slice(0, 2);
+};
+
+export const getBrandCode = (code) => {
+  return code?.slice(2, 4);
+};
+
+export const getProductCode = (code) => {
+  return code?.slice(4);
+};
+
+export const formatProductCode = (code) => {
+  const supplierCode = getSupplierCode(code);
+  const brandCode = getBrandCode(code);
+  const productCode = getProductCode(code);
+
+  return `${supplierCode}-${brandCode}-${productCode}`;
+};
+
+export const isProductOOS = (status) => {
+  return status === PRODUCT_STATES.OOS.id;
+};
+
+export const isProductInactive = (status) => {
+  return status === PRODUCT_STATES.INACTIVE.id;
+};
+
+export const isProductDeleted = (status) => {
+  return status === PRODUCT_STATES.DELETED.id;
+};
+
+export const getPrice = (product) => {
+  const { fractionConfig, price } = product;
+  return fractionConfig?.active ? fractionConfig?.value * price : price;
+};
+
+export const getTotal = (product) => {
+  const price = getPrice(product);
+  return price * product.quantity * (1 - (product.discount / 100)) ?? 0;
+};
