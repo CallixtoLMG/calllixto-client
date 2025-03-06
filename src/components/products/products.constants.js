@@ -18,6 +18,8 @@ export const ATTRIBUTES = {
   EDITABLE_PRICE: "editablePrice",
   FRACTION_CONFIG: "fractionConfig",
   STATE: "state",
+  COST: "cost",
+  MARGIN: "margin",
 };
 
 export const PRODUCT_COLUMNS = [
@@ -105,10 +107,10 @@ export const BAN_FILTERS = [
 ];
 
 export const EXAMPLE_TEMPLATE_DATA = [
-  ['Codigo', 'Nombre', 'Precio', 'Comentarios'],
-  ['AABB001', "Producto 1", 200, 'Comentarios...'],
-  ['AABB002', "Producto 2", 300, 'Comentarios...'],
-  ['AABB003', "Producto 3", 400, 'Comentarios...'],
+  ['Codigo', 'Nombre', 'Costo', 'Precio', 'Comentarios'],
+  ['AABB001', "Producto 1", 100, 200, 'Comentarios...'],
+  ['AABB002', "Producto 2", 200, 300, 'Comentarios...'],
+  ['AABB003', "Producto 3", 300, 400, 'Comentarios...'],
 ];
 
 export const PRODUCT_STATES = {
@@ -142,7 +144,7 @@ export const PRODUCT_STATES = {
   },
 };
 
-export const EMPTY_PRODUCT = { name: '', price: 0, code: '', comments: '', supplierId: '', brandId: '' };
+export const EMPTY_PRODUCT = { name: '', cost: 0, price: 0, code: '', comments: '', supplierId: '', brandId: '' };
 export const EMPTY_FILTERS = { code: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
 
 export const PRODUCT_STATES_OPTIONS = Object.values(PRODUCT_STATES)
