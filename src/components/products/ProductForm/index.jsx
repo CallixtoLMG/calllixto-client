@@ -49,7 +49,8 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     const cost = watch('cost') ?? 0;
     if (cost > 0) {
       const newMargin = ((newPrice / cost) - 1) * 100;
-      methods.setValue('margin', newMargin);
+      const roundedMargin = parseFloat(newMargin.toFixed(2)); 
+      methods.setValue('margin', roundedMargin);
     }
   };
 

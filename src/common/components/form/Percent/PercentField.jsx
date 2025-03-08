@@ -9,10 +9,11 @@ export const PercentField = ({
   value,
   onChange,
   error,
-  largeValue
+  largeValue,
+  disabled
 }) => {
 
-  const maxValue = largeValue ? 1000000 : 100; 
+  const maxValue = largeValue ? 1000000 : 100;
 
   return (
     <FormField
@@ -25,6 +26,7 @@ export const PercentField = ({
     >
       <Input
         value={value}
+        disabled={disabled}
         iconPosition="right"
         onChange={(e) => {
           const value = e.target.value;

@@ -1,17 +1,13 @@
 import { Controller } from "react-hook-form";
 import { PercentField } from "./PercentField";
 
-const formatNumber = (value) => {
-  const num = parseFloat(value);
-  if (Number.isNaN(num)) return '';
-  if (Number.isInteger(num)) {
-    return num.toString();
-  }
-  return num.toFixed(2);
-};
-
-export const PercentControlled = ({ name, defaultValue, handleChange, ...inputParams }) => {
-
+export const PercentControlled = ({
+  name,
+  defaultValue,
+  handleChange,
+  disabled,
+  ...inputParams
+}) => {
   return (
     <Controller
       name={name}
@@ -20,13 +16,20 @@ export const PercentControlled = ({ name, defaultValue, handleChange, ...inputPa
         <PercentField
           {...rest}
           {...inputParams}
-          value={formatNumber(value)}
-          onChange={value => {
-            onChange(value);
+          disabled={disabled}
+          value={value} 
+          onChange={(newValue) => {
+            onChange(newValue);
             handleChange?.();
+          }}
+          onBlur={() => {
+            if (value !== '') {
+              const formattedValue = parseFloat(value).toFixed(2); 
+              onChange(formattedValue);
+            }
           }}
         />
       )}
     />
-  )
+  );
 };
