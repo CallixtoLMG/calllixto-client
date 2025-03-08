@@ -16,8 +16,6 @@ import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
 import { getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view }) => {
-  console.log(product)
-  
   const initialCost = product?.cost ?? 0;
   const initialPrice = product?.price ?? 0;
   const initialMargin = getMargin(initialPrice, initialCost);
@@ -43,14 +41,15 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   const handleMarginChange = (newMargin) => {
     const cost = watch('cost') ?? 0;
     const newPrice = cost * (1 + (newMargin / 100));
-    methods.setValue('price', newPrice, { shouldDirty: true });
+    const roundedPrice = parseFloat(newPrice.toFixed(2));
+    methods.setValue('price', roundedPrice);
   };
 
   const handlePriceChange = (newPrice) => {
     const cost = watch('cost') ?? 0;
     if (cost > 0) {
       const newMargin = ((newPrice / cost) - 1) * 100;
-      methods.setValue('margin', newMargin, { shouldDirty: true });
+      methods.setValue('margin', newMargin);
     }
   };
 
@@ -185,7 +184,13 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             name="cost"
             label="Costo"
             disabled={!isUpdating && view}
-            onChange={() => { }} 
+          />
+          <PriceControlled
+            width="200px"
+            name="price"
+            label="Precio"
+            disabled={!isUpdating && view}
+            onAfterChange={handlePriceChange}
           />
           <PercentControlled
             width="150px"
@@ -193,13 +198,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             label="Margen"
             disabled={!isUpdating && view}
             handleChange={() => handleMarginChange(watch('margin'))}
-          />
-          <PriceControlled
-            width="200px"
-            name="price"
-            label="Precio"
-            disabled={!isUpdating && view}
-            onChange={handlePriceChange}
+            largeValue
           />
           <IconedButtonControlled
             width="fit-content"

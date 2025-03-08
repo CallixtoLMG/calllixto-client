@@ -184,13 +184,14 @@ const BatchImport = ({ isCreating }) => {
 
     parsedData.forEach(product => {
       const code = product.code ? String(product.code).toUpperCase() : "Sin código";
-      const hasAtLeastOneValue = product.code || product.name || product.price;
+      const hasAtLeastOneValue = product.code || product.name || product.cost || product.price;
 
       if (hasAtLeastOneValue) {
         const formattedProduct = {
           code,
           name: product.name,
-          price: parseInt(product.price),
+          cost: isNaN(parseFloat(product.cost)) ? 0 : parseFloat(product.cost),
+          price: isNaN(parseFloat(product.price)) ? 0 : parseFloat(product.price),
           comments: product.comments
         };
 
@@ -211,7 +212,6 @@ const BatchImport = ({ isCreating }) => {
       }
     });
 
-
     setValue('importProducts', importProducts);
     setImportedProductsCount(importProducts.length);
 
@@ -223,10 +223,11 @@ const BatchImport = ({ isCreating }) => {
 
   const handleDownloadConfirmation = () => {
     const data = [
-      ['Código', 'Nombre', 'Precio', 'Comentarios', 'Error'],
+      ['Código', 'Nombre', 'Costo', 'Precio', 'Comentarios', 'Error'],
       ...downloadProducts.map((product) => [
         product.code,
         product.name,
+        product.cost,
         product.price,
         product.comments,
         product.msg || "",
@@ -245,10 +246,11 @@ const BatchImport = ({ isCreating }) => {
         msg: product?.msg || "Este producto tiene errores"
       }));
       const formattedData = [
-        ["Código", "Nombre", "Precio", "Comentarios", "Mensaje de error"],
+        ["Código", "Nombre", "Costo", "Precio", "Comentarios", "Mensaje de error"],
         ...data.map(product => [
           product.code,
           product.name,
+          product.cost,
           product.price,
           product.comments,
           product.msg
@@ -346,12 +348,23 @@ const BatchImport = ({ isCreating }) => {
       ), id: 2, align: 'left'
     },
     {
+      title: "Costo", value: (product, index) => (
+        <PriceControlled
+          name={`importProducts[${index}].cost`}
+          placeholder="Costo"
+          afterChange={(newValue) => {
+            console.log(`[COSTO] Cambio en producto ${index}:`, newValue);
+          }}
+        />
+      ), id: 3, width: 2
+    },
+    {
       title: "Precio", value: (product, index) => (
         <PriceControlled
           name={`importProducts[${index}].price`}
           placeholder="Precio"
         />
-      ), id: 3, width: 3
+      ), id: 4, width: 2
     },
     {
       title: "Comentarios", value: (product, index) => (
@@ -359,7 +372,7 @@ const BatchImport = ({ isCreating }) => {
           name={`importProducts[${index}].comments`}
           placeholder="Comentarios"
         />
-      ), id: 4, align: 'left'
+      ), id: 5, align: 'left'
     },
   ];
 

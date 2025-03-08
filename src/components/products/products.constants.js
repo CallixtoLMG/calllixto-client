@@ -17,6 +17,7 @@ export const ATTRIBUTES = {
   SUPPLIER_NAME: "supplierName",
   EDITABLE_PRICE: "editablePrice",
   FRACTION_CONFIG: "fractionConfig",
+  PREVIOUS_VERSIONS: "previousVersions",
   STATE: "state",
   COST: "cost",
   MARGIN: "margin",

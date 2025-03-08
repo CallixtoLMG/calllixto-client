@@ -3,7 +3,8 @@ import * as XLSX from "xlsx";
 import { INACTIVE, REGEX } from "../constants";
 
 export const getFormatedPrice = (number) => {
-  return Number(number).toLocaleString('es-AR', {
+  const safeNumber = Number(number) || 0;
+  return safeNumber.toLocaleString('es-AR', {
     style: 'currency',
     currency: 'ARS',
   });
@@ -30,6 +31,14 @@ export function encodeUri(value) {
 };
 
 export const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
+
+export const addPercentage = (value, fallback = 0) => {
+  const safeValue = Number(value);
+  if (isNaN(safeValue)) {
+    return `% ${fallback}`;
+  }
+  return `% ${safeValue}`;
+};
 
 export const getPhonesForDisplay = (phoneNumbers) => {
   if (!phoneNumbers || phoneNumbers.length === 0) return { primaryPhone: '', additionalPhones: null };

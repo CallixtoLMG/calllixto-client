@@ -8,8 +8,12 @@ export const PercentField = ({
   label,
   value,
   onChange,
-  error
+  error,
+  largeValue
 }) => {
+
+  const maxValue = largeValue ? 1000000 : 100; 
+
   return (
     <FormField
       flex={flex}
@@ -24,7 +28,7 @@ export const PercentField = ({
         iconPosition="right"
         onChange={(e) => {
           const value = e.target.value;
-          if (!isNaN(value) && value <= 100 && value >= 0) {
+          if (!isNaN(value) && value <= maxValue && value >= 0) {
             onChange(Number(value));
           }
         }}

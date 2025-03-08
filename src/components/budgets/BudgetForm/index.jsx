@@ -242,7 +242,8 @@ const BudgetForm = ({
   };
 
   const calculateTotal = useCallback(() => {
-    const totalSum = getTotalSum(watchProducts);
+    const currentProducts = watch('products');
+    const totalSum = getTotalSum(currentProducts);
     setSubtotal(totalSum);
   }, [watchProducts]);
 
@@ -410,9 +411,8 @@ const BudgetForm = ({
             <PriceControlled
               width="100%"
               name={`products[${index}].price`}
-              onChange={() => {
-                calculateTotal();
-              }}
+              onAfterChange={calculateTotal}
+
             />
           )
           : <PriceLabel width="100%" value={getPrice(product)} />

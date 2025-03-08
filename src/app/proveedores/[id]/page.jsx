@@ -2,16 +2,16 @@
 import { useUserContext } from "@/User";
 import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
 import {
-    useActiveSupplier,
-    useDeleteSupplier,
-    useEditSupplier,
-    useGetSupplier,
-    useInactiveSupplier,
+  useActiveSupplier,
+  useDeleteSupplier,
+  useEditSupplier,
+  useGetSupplier,
+  useInactiveSupplier,
 } from "@/api/suppliers";
 import {
-    Icon,
-    Message,
-    MessageHeader,
+  Icon,
+  Message,
+  MessageHeader,
 } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
@@ -19,12 +19,13 @@ import { ModalAction } from "@/common/components/modals";
 import { COLORS, ICONS, PAGES } from "@/common/constants";
 import { downloadExcel, getFormatedPrice, isItemInactive } from "@/common/utils";
 import {
-    Loader,
-    OnlyPrint,
-    useBreadcrumContext,
-    useNavActionsContext,
+  Loader,
+  OnlyPrint,
+  useBreadcrumContext,
+  useNavActionsContext,
 } from "@/components/layout";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
+import { getMarginWithPercentaje } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
@@ -79,7 +80,9 @@ const Supplier = ({ params }) => {
       'Nombre',
       'Marca',
       'Proveedor',
+      'Cost ',
       'Precio',
+      'Margen',
       'Estado',
       'Comentarios',
     ];
@@ -92,7 +95,9 @@ const Supplier = ({ params }) => {
         product.name,
         product.brandName,
         product.supplierName,
+        getFormatedPrice(product.cost),
         getFormatedPrice(product.price),
+        getMarginWithPercentaje(product.price, product.cost),
         productState,
         product.comments,
       ];

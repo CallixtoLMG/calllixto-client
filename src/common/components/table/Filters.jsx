@@ -34,13 +34,20 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
     setShowModal(true);
   };
 
-  const handleConfirm = async () => {
+  const handleConfirmHardUpdate = async () => {
 
     setIsLoading(true);
 
     if (!entity || !queryKey || typeof restoreEntity !== "function") {
       setIsLoading(false);
       return;
+    }
+
+    try {
+      await restoreEntity();
+
+    } catch (error) {
+      console.error("Error en restoreEntity:", error);
     }
 
     setIsLoading(false);
@@ -85,7 +92,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
       </HeaderSegment>
       <ModalAction
         title={`¿Quieres realizar una actualización completa de ${text} ?  `}
-        onConfirm={handleConfirm}
+        onConfirm={handleConfirmHardUpdate}
         confirmButtonText="Sí, Actualizar"
         confirmButtonIcon={ICONS.REFRESH}
         showModal={showModal}
