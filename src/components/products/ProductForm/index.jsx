@@ -11,12 +11,17 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
+import { PercentControlled } from "../../../common/components/form";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
-import { getBrandCode, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
+import { getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view }) => {
+  const initialMargin = getMargin(product?.price, product?.cost);
+
   const methods = useForm({
     defaultValues: {
+      cost: product?.cost ?? 0,
+      margin: initialMargin,
       tags: [],
       fractionConfig: {
         active: false,
@@ -28,8 +33,27 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   });
   const { data: productsSettings, isFetching: isProductSettingsFetching } = useGetSetting(ENTITIES.PRODUCTS);
   const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
-  const { handleSubmit, reset, watch, formState: { isDirty, errors } } = methods;
-  const [watchFractionable, watchSupplier, watchBrand] = watch(['fractionConfig.active', 'supplier', 'brand']);
+  const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
+  const [watchFractionable, watchSupplier, watchBrand, watchCost] = watch([
+    'fractionConfig.active',
+    'supplier',
+    'brand',
+    'cost'
+  ]);
+
+  const handleMarginChange = (newMargin) => {
+    const newPrice = watchCost * (1 + (newMargin / 100));
+    const roundedPrice = parseFloat(newPrice.toFixed(2));
+    methods.setValue('price', roundedPrice);
+  };
+  
+  const handlePriceChange = (newPrice) => {
+    if (watchCost > 0) {
+      const newMargin = ((newPrice / watchCost) - 1) * 100;
+      const roundedMargin = parseFloat(newMargin.toFixed(2));
+      methods.setValue('margin', roundedMargin);
+    }
+  };
 
   const handleForm = async (data) => {
     const filteredData = { ...data };
@@ -50,7 +74,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
     await onSubmit(filteredData);
   };
-
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => reset({ ...EMPTY_PRODUCT, ...product }), SHORTKEYS.DELETE);
@@ -156,7 +179,27 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
           />
         </FieldsContainer>
         <FieldsContainer alignItems="end">
-          <PriceControlled width="200px" name="price" label="Precio" disabled={!isUpdating && view} />
+          <PriceControlled
+            width="200px"
+            name="cost"
+            label="Costo"
+            disabled={!isUpdating && view}
+          />
+          <PriceControlled
+            width="200px"
+            name="price"
+            label="Precio"
+            disabled={!isUpdating && view}
+            onAfterChange={handlePriceChange}
+          />
+          <PercentControlled
+            width="150px"
+            name="margin"
+            label="Margen"
+            disabled={!isUpdating && view}
+            handleChange={() => handleMarginChange(watch('margin'))}
+            maxValue={1000000}
+          />
           <IconedButtonControlled
             width="fit-content"
             name="editablePrice"

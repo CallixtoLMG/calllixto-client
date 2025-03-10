@@ -8,8 +8,11 @@ export const PercentField = ({
   label,
   value,
   onChange,
-  error
+  error,
+  maxValue = 100,
+  disabled
 }) => {
+
   return (
     <FormField
       flex={flex}
@@ -21,10 +24,11 @@ export const PercentField = ({
     >
       <Input
         value={value}
+        disabled={disabled}
         iconPosition="right"
         onChange={(e) => {
           const value = e.target.value;
-          if (!isNaN(value) && value <= 100 && value >= 0) {
+          if (!isNaN(value) && value <= maxValue && value >= 0) {
             onChange(Number(value));
           }
         }}

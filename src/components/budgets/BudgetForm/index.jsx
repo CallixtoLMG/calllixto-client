@@ -410,9 +410,8 @@ const BudgetForm = ({
             <PriceControlled
               width="100%"
               name={`products[${index}].price`}
-              onChange={() => {
-                calculateTotal();
-              }}
+              onAfterChange={calculateTotal}
+
             />
           )
           : <PriceLabel width="100%" value={getPrice(product)} />

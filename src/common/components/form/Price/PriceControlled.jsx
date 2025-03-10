@@ -1,7 +1,5 @@
-import { FormField, Input } from "@/common/components/custom";
-import { ICONS } from "@/common/constants";
 import { Controller, useFormContext } from "react-hook-form";
-import { Icon } from "semantic-ui-react";
+import { PriceField } from "./PriceField";
 
 export const PriceControlled = ({
   width,
@@ -10,44 +8,37 @@ export const PriceControlled = ({
   label,
   placeholder,
   onChange,
+  disabled,
+  onAfterChange,
+  handlePriceChange,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
+
   return (
     <Controller
       name={name}
       rules={rules}
-      render={({ field: { onChange: onChangeController, value, ...rest } }) => (
-        <FormField
-          width={width}
-          label={label}
-          control={Input}
-          error={errors?.[name] && {
-            content: errors[name].message,
-            pointing: 'above',
-          }}
-        >
-          <Input
+      render={({ field: { onChange, value } }) => {
+        return (
+          <PriceField
             {...inputProps}
-            {...rest}
-            value={value?.toLocaleString() ?? 0}
-            placeholder={placeholder ?? label}
-            iconPosition="left"
-            onChange={(e) => {
-              let newValue = e.target.value.replace(/[^0-9.]/g, '');
-              if (!isNaN(newValue)) {
-                newValue = Number(newValue);
-                onChangeController(newValue);
-                onChange?.(newValue);
-              }
+            label={label}
+            width={width}
+            value={value}
+            onChange={(newValue) => {
+              onChange(newValue);   
+              onAfterChange?.(newValue);    
             }}
-            onFocus={(e) => e.target.select()}
-          >
-            <Icon name={ICONS.DOLLAR} />
-            <input />
-          </Input>
-        </FormField>
-      )}
+            disabled={disabled}
+            placeholder={placeholder ?? label}
+            error={errors?.[name] && {
+              content: errors[name].message,
+              pointing: 'above',
+            }}
+          />
+        );
+      }}
     />
   );
 };

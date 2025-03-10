@@ -12,6 +12,27 @@ export const getProductCode = (code) => {
   return code?.slice(4);
 };
 
+export const getFormatedMargin = (price, cost) => {
+  const safePrice = Number(price) || 0;
+  const safeCost = Number(cost) || 0;
+
+  if (safeCost === 0) return '% 0';
+
+  const margin = ((safePrice / safeCost) - 1) * 100;
+  const roundedMargin = Math.round(margin * 100) / 100;
+
+  return `% ${roundedMargin}`; 
+};
+
+export const getMargin = (price, cost) => {
+  const safePrice = Number(price) || 0;
+  const safeCost = Number(cost) || 0;
+
+  if (safeCost === 0) return 0; 
+  const margin = ((safePrice / safeCost) - 1) * 100;
+  return Math.round(margin * 100) / 100;
+};
+
 export const formatProductCode = (code) => {
   const supplierCode = getSupplierCode(code);
   const brandCode = getBrandCode(code);

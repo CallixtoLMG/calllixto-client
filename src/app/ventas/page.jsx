@@ -1,7 +1,7 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
 import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
-import { downloadExcel, handleUndefined } from "@/common/utils";
+import { downloadExcel, getFormatedPercentage, handleUndefined } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { BUDGET_STATE_TRANSLATIONS } from "@/components/budgets/budgets.constants";
@@ -27,7 +27,6 @@ const Budgets = () => {
 
   const budgets = useMemo(() => data?.budgets, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
-
   const handleDownloadExcel = useCallback(() => {
     if (!budgets) return;
     let maxProductCount = 1;
@@ -40,8 +39,8 @@ const Budgets = () => {
         handleUndefined(budget.customer.name),
         handleUndefined(getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)),
         getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge),
-        `% ${budget.globalDiscount ?? 0}`,
-        `% ${budget.additionalCharge ?? 0}`,
+        getFormatedPercentage(budget.globalDiscount),
+        getFormatedPercentage(budget.additionalCharge),
         handleUndefined(budget.seller)
       ];
 

@@ -9,6 +9,7 @@ import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
 import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.constants";
+import { getFormatedMargin } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -35,7 +36,7 @@ const Products = () => {
 
   const handleDownloadExcel = useCallback(() => {
     if (!products) return;
-    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Precio', 'Estado', 'Comentarios'];
+    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', "Costo", "Margen", 'Precio', 'Estado', 'Comentarios'];
     const mappedPRoducts = products.map(product => {
       const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
       return [
@@ -43,7 +44,9 @@ const Products = () => {
         product.name,
         product.brandName,
         product.supplierName,
+        getFormatedPrice(product.cost),
         getFormatedPrice(product.price),
+        getFormatedMargin(product.price, product.cost),
         productState,
         product.comments
       ];
@@ -62,44 +65,44 @@ const Products = () => {
         onClick: () => { push(PAGES.PRODUCTS.CREATE) },
         text: 'Crear'
       },
-      {
-        id: 2,
-        button: (
-          <Dropdown
-            pointing
-            as={Button}
-            text='Excel'
-            icon={ICONS.FILE_EXCEL}
-            floating
-            labeled
-            button
-            className='icon'
-          >
-            <Dropdown.Menu>
-              <DropdownItem>
-                <BatchImport key="batch-create" isCreating />
-              </DropdownItem>
-              <DropdownItem>
-                <BatchImport key="batch-update" />
-              </DropdownItem>
-              <DropdownItem onClick={handleDownloadExcel}>
-                <Icon name={ICONS.DOWNLOAD} />Productos
-              </DropdownItem>
-              <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA, "Ejemplo de tabla")}>
-                <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla
-              </DropdownItem>
-            </Dropdown.Menu>
-          </Dropdown>
-        )
-      },
-      {
-        id: 3,
-        icon: ICONS.BAN,
-        color: COLORS.RED,
-        onClick: () => setOpen(true),
-        text: 'Bloquear',
-        basic: true
-      });
+        {
+          id: 2,
+          button: (
+            <Dropdown
+              pointing
+              as={Button}
+              text='Excel'
+              icon={ICONS.FILE_EXCEL}
+              floating
+              labeled
+              button
+              className='icon'
+            >
+              <Dropdown.Menu>
+                <DropdownItem>
+                  <BatchImport key="batch-create" isCreating />
+                </DropdownItem>
+                <DropdownItem>
+                  <BatchImport key="batch-update" />
+                </DropdownItem>
+                <DropdownItem onClick={handleDownloadExcel}>
+                  <Icon name={ICONS.DOWNLOAD} />Productos
+                </DropdownItem>
+                <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA, "Ejemplo de tabla")}>
+                  <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla
+                </DropdownItem>
+              </Dropdown.Menu>
+            </Dropdown>
+          )
+        },
+        {
+          id: 3,
+          icon: ICONS.BAN,
+          color: COLORS.RED,
+          onClick: () => setOpen(true),
+          text: 'Bloquear',
+          basic: true
+        });
     }
 
     setActions(actions);
