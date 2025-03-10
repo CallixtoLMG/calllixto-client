@@ -242,8 +242,7 @@ const BudgetForm = ({
   };
 
   const calculateTotal = useCallback(() => {
-    const currentProducts = watch('products');
-    const totalSum = getTotalSum(currentProducts);
+    const totalSum = getTotalSum(watchProducts);
     setSubtotal(totalSum);
   }, [watchProducts]);
 

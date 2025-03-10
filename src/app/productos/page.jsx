@@ -9,7 +9,7 @@ import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
 import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.constants";
-import { getMarginWithPercentaje } from "@/components/products/products.utils";
+import { getFormatedMargin } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -46,7 +46,7 @@ const Products = () => {
         product.supplierName,
         getFormatedPrice(product.cost),
         getFormatedPrice(product.price),
-        getMarginWithPercentaje(product.price, product.cost),
+        getFormatedMargin(product.price, product.cost),
         productState,
         product.comments
       ];

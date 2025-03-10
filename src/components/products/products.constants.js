@@ -20,7 +20,6 @@ export const ATTRIBUTES = {
   PREVIOUS_VERSIONS: "previousVersions",
   STATE: "state",
   COST: "cost",
-  MARGIN: "margin",
 };
 
 export const PRODUCT_COLUMNS = [

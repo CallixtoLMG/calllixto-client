@@ -3,7 +3,7 @@ import * as XLSX from "xlsx";
 import { INACTIVE, REGEX } from "../constants";
 
 export const getFormatedPrice = (number) => {
-  const safeNumber = Number(number) || 0;
+  const safeNumber = Number(number) ?? 0;
   return safeNumber.toLocaleString('es-AR', {
     style: 'currency',
     currency: 'ARS',
@@ -12,10 +12,6 @@ export const getFormatedPrice = (number) => {
 
 export const getFormatedNumber = (number) => {
   return Number(number).toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
-};
-
-export const getFormatedPercentage = (number = 0) => {
-  return number + " %"
 };
 
 export const getFormatedPhone = (phone) => {
@@ -32,12 +28,12 @@ export function encodeUri(value) {
 
 export const handleUndefined = (value, defaultValue = 'Sin definir') => value ?? defaultValue;
 
-export const addPercentage = (value, fallback = 0) => {
+export const getFormatedPercentage = (value) => {
   const safeValue = Number(value);
   if (isNaN(safeValue)) {
-    return `% ${fallback}`;
+    return `0 %`;
   }
-  return `% ${safeValue}`;
+  return `${safeValue} % `;
 };
 
 export const getPhonesForDisplay = (phoneNumbers) => {

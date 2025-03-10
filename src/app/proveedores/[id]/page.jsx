@@ -25,7 +25,7 @@ import {
   useNavActionsContext,
 } from "@/components/layout";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { getMarginWithPercentaje } from "@/components/products/products.utils";
+import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
@@ -97,7 +97,7 @@ const Supplier = ({ params }) => {
         product.supplierName,
         getFormatedPrice(product.cost),
         getFormatedPrice(product.price),
-        getMarginWithPercentaje(product.price, product.cost),
+        getFormatedMargin(product.price, product.cost),
         productState,
         product.comments,
       ];

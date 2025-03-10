@@ -12,7 +12,7 @@ export const getProductCode = (code) => {
   return code?.slice(4);
 };
 
-export const getMarginWithPercentaje = (price, cost) => {
+export const getFormatedMargin = (price, cost) => {
   const safePrice = Number(price) || 0;
   const safeCost = Number(cost) || 0;
 

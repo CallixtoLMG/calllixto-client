@@ -16,9 +16,7 @@ import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
 import { getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
 const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view }) => {
-  const initialCost = product?.cost ?? 0;
-  const initialPrice = product?.price ?? 0;
-  const initialMargin = getMargin(initialPrice, initialCost);
+  const initialMargin = getMargin(product?.price, product?.cost);
 
   const methods = useForm({
     defaultValues: {
@@ -36,20 +34,23 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   const { data: productsSettings, isFetching: isProductSettingsFetching } = useGetSetting(ENTITIES.PRODUCTS);
   const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
-  const [watchFractionable, watchSupplier, watchBrand] = watch(['fractionConfig.active', 'supplier', 'brand']);
+  const [watchFractionable, watchSupplier, watchBrand, watchCost] = watch([
+    'fractionConfig.active',
+    'supplier',
+    'brand',
+    'cost'
+  ]);
 
   const handleMarginChange = (newMargin) => {
-    const cost = watch('cost') ?? 0;
-    const newPrice = cost * (1 + (newMargin / 100));
+    const newPrice = watchCost * (1 + (newMargin / 100));
     const roundedPrice = parseFloat(newPrice.toFixed(2));
     methods.setValue('price', roundedPrice);
   };
-
+  
   const handlePriceChange = (newPrice) => {
-    const cost = watch('cost') ?? 0;
-    if (cost > 0) {
-      const newMargin = ((newPrice / cost) - 1) * 100;
-      const roundedMargin = parseFloat(newMargin.toFixed(2)); 
+    if (watchCost > 0) {
+      const newMargin = ((newPrice / watchCost) - 1) * 100;
+      const roundedMargin = parseFloat(newMargin.toFixed(2));
       methods.setValue('margin', roundedMargin);
     }
   };
@@ -70,8 +71,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
       delete filteredData.supplier;
       delete filteredData.brand;
     }
-    filteredData.cost = data.cost;
-    filteredData.margin = data.margin;
 
     await onSubmit(filteredData);
   };
@@ -199,7 +198,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             label="Margen"
             disabled={!isUpdating && view}
             handleChange={() => handleMarginChange(watch('margin'))}
-            largeValue
+            maxValue={1000000}
           />
           <IconedButtonControlled
             width="fit-content"

@@ -1,7 +1,7 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
 import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
-import { addPercentage, downloadExcel, handleUndefined } from "@/common/utils";
+import { downloadExcel, getFormatedPercentage, handleUndefined } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { BUDGET_STATE_TRANSLATIONS } from "@/components/budgets/budgets.constants";
@@ -39,8 +39,8 @@ const Budgets = () => {
         handleUndefined(budget.customer.name),
         handleUndefined(getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)),
         getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge),
-        addPercentage(budget.globalDiscount),
-        addPercentage(budget.additionalCharge),
+        getFormatedPercentage(budget.globalDiscount),
+        getFormatedPercentage(budget.additionalCharge),
         handleUndefined(budget.seller)
       ];
 

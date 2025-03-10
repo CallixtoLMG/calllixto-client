@@ -9,11 +9,9 @@ export const PercentField = ({
   value,
   onChange,
   error,
-  largeValue,
+  maxValue = 100,
   disabled
 }) => {
-
-  const maxValue = largeValue ? 1000000 : 100;
 
   return (
     <FormField

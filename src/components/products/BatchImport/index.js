@@ -352,9 +352,6 @@ const BatchImport = ({ isCreating }) => {
         <PriceControlled
           name={`importProducts[${index}].cost`}
           placeholder="Costo"
-          afterChange={(newValue) => {
-            console.log(`[COSTO] Cambio en producto ${index}:`, newValue);
-          }}
         />
       ), id: 3, width: 2
     },
