@@ -6,6 +6,7 @@ import { LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
 import { LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
 import { LIST_SUPPLIERS_QUERY_KEY } from '@/components/suppliers/suppliers.constants';
+import { LIST_USERS_QUERY_KEY } from '@/components/users/users.constants';
 import { useRestoreEntity } from '@/hooks/common';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -21,7 +22,9 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
     [ENTITIES.BUDGETS]: { queryKey: LIST_BUDGETS_QUERY_KEY, text: PAGES.BUDGETS.NAME },
     [ENTITIES.BRANDS]: { queryKey: LIST_BRANDS_QUERY_KEY, text: PAGES.BRANDS.NAME },
     [ENTITIES.SUPPLIERS]: { queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
+    [ENTITIES.USERS]: { queryKey: LIST_USERS_QUERY_KEY, text: PAGES.USERS.NAME },
   };
+  
   const { formState: { isDirty } } = useFormContext();
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);

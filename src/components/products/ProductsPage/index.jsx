@@ -1,3 +1,4 @@
+import { useUserContext } from "@/User";
 import { useBatchDeleteProducts, useDeleteProduct, useEditProduct } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
 import { Flex } from "@/common/components/custom";
@@ -10,7 +11,6 @@ import { createFilter } from "@/common/utils";
 import { OnlyPrint } from "@/components/layout";
 import { useFilters } from "@/hooks/useFilters";
 import { RULES } from "@/roles";
-import { useUserContext } from "@/User";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { FormProvider } from "react-hook-form";

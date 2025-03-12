@@ -1,4 +1,4 @@
-const ROLES = {
+export const ROLES = {
   CALLIXTO: 'callixto',
   SUPER_ADMIN: 'sadmin',
   ADMIN: 'admin',
