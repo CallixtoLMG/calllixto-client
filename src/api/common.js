@@ -135,7 +135,7 @@ export async function getItemById({ id, url, entity, key = ID, params }) {
     try {
       const { data } = await getInstance().get(`${url}/${id}`);
       if (data.statusOk) {
-        return data;
+        return data[entity];
       }
     } catch (error) {
       throw error;
@@ -148,6 +148,27 @@ export async function getItemById({ id, url, entity, key = ID, params }) {
   }
   return getEntity(id);
 }
+
+export async function getItemByParam({ paramKey, paramValue, url, entitySingular, entityPlural }) {
+  await listItems({ entity: entityPlural, url, params: { [paramKey]: paramValue } });
+
+  const getEntity = async () => {
+    try {
+      const { data } = await getInstance().get(`${url}`, { params: { [paramKey]: paramValue } });
+      if (data.statusOk) {
+        return data[entitySingular]; 
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  let cachedData = await localforage.getItem(`${config.APP_ENV}-${entityPlural}`);
+  let value = cachedData?.find((item) => item[paramKey] === paramValue);
+
+  return value || getEntity(); 
+}
+
 
 export function useCreateItem() {
   const queryClient = useQueryClient();
@@ -252,6 +273,38 @@ export function useEditItem() {
   return editItem;
 }
 
+export function useEditItemByParam() {
+  const queryClient = useQueryClient();
+
+  const editItemByParam = async ({ entity, paramKey, paramValue, url, responseEntity, invalidateQueries = [] }) => {
+    const updatedItem = {
+      ...paramValue,
+      updatedAt: now(),
+    };
+
+    const requestUrl = `${url}?${paramKey}=${encodeURIComponent(paramValue[paramKey])}`;
+    console.log("🚀 Enviando PUT a:", requestUrl);
+
+    const { data } = await getInstance().put(requestUrl, updatedItem);
+
+    if (data.statusOk) {
+      if (data[responseEntity]) {
+        await updateStorageItem({ entity, key: paramKey, value: data[responseEntity] });
+      }
+
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      });
+    } else {
+      console.error("⚠️ Error en la respuesta:", data.message);
+    }
+
+    return data;
+  };
+
+  return editItemByParam;
+}
+
 export function useDeleteItem() {
   const queryClient = useQueryClient();
 
@@ -266,6 +319,31 @@ export function useDeleteItem() {
   }
   return deleteItem;
 };
+
+export function useDeleteItemByParam() {
+  const queryClient = useQueryClient();
+
+  const deleteItemByParam = async ({ entity, paramKey, paramValue, url, invalidateQueries = [] }) => {
+    const requestUrl = `${url}?${paramKey}=${paramValue}`;
+    console.log("🚀 Enviando DELETE a:", requestUrl);
+
+    const { data } = await getInstance().delete(requestUrl);
+
+    if (data.statusOk) {
+      await removeStorageItem({ entity, id: cleanValue, key: paramKey });
+    }
+
+    invalidateQueries.forEach((query) => {
+      queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+    });
+
+    return data;
+  };
+
+  return deleteItemByParam;
+};
+
+
 
 export function useBatchDeleteItems() {
   const queryClient = useQueryClient();

@@ -3,7 +3,7 @@ import { getDefaultListParams } from '@/common/utils';
 import { ATTRIBUTES, GET_USER_QUERY_KEY, LIST_USERS_QUERY_KEY } from "@/components/users/users.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
-import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from './common';
+import { getItemByParam, listItems, useActiveItem, useCreateItem, useDeleteItemByParam, useEditItemByParam, useInactiveItem } from './common';
 
 export function useListUsers() {
   const query = useQuery({
@@ -18,16 +18,35 @@ export function useListUsers() {
   return query;
 };
 
-export function useGetUser(id) {
+// export function useGetUser(username) {
+//   const query = useQuery({
+//     queryKey: [GET_USER_QUERY_KEY, username],
+//     queryFn: () => getItemById({ key: "username", id: "", url: PATHS.USER, entity: ENTITIES.USER, params: { username } }),
+//     retry: false,
+//     staleTime: IN_MS.ONE_HOUR,
+//   });
+
+//   return query;
+// };
+export function useGetUser(username) {
+
   const query = useQuery({
-    queryKey: [GET_USER_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PATHS.USER, entity: ENTITIES.USERS }),
+    queryKey: [GET_USER_QUERY_KEY, username],
+    queryFn: () => {
+      return getItemByParam({
+        paramKey: "username",
+        paramValue: username,
+        url: PATHS.USER,
+        entitySingular: ENTITIES.USER,
+        entityPlural: ENTITIES.USERS
+      });
+    },
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
   });
 
   return query;
-};
+}
 
 export const useCreateUser = () => {
   const createItem = useCreateItem();
@@ -47,15 +66,34 @@ export const useCreateUser = () => {
   return createUser;
 };
 
-export const useDeleteUser = () => {
-  const deleteItem = useDeleteItem();
+export const useEditUser = () => {
+  const editItemByParam = useEditItemByParam();
 
-  const deleteUser = async (id) => {
-    const response = await deleteItem({
+  const editUser = async (user) => {
+    const response = await editItemByParam({
       entity: ENTITIES.USERS,
-      id,
       url: PATHS.USERS,
-      key: "id",
+      paramKey: "username",
+      paramValue: user,
+      responseEntity: ENTITIES.USER,
+      invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, user.username]]
+    });
+
+    return response;
+  };
+
+  return editUser;
+};
+
+export const useDeleteUser = () => {
+  const deleteItemByParam = useDeleteItemByParam();
+
+  const deleteUser = async (username) => {
+    const response = await deleteItemByParam({
+      entity: ENTITIES.USERS,
+      url: PATHS.USER,
+      paramKey: "username",
+      paramValue: username,
       invalidateQueries: [[LIST_USERS_QUERY_KEY]]
     });
 
@@ -63,25 +101,6 @@ export const useDeleteUser = () => {
   };
 
   return deleteUser;
-};
-
-export const useEditUser = () => {
-  const editItem = useEditItem();
-
-  const editUser = async (user) => {
-    const response = await editItem({
-      entity: ENTITIES.USERS,
-      url: `${PATHS.USERS}/${user.id}`,
-      value: user,
-      key: "id",
-      responseEntity: ENTITIES.USER,
-      invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, user.id]]
-    });
-
-    return response;
-  };
-
-  return editUser;
 };
 
 

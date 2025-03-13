@@ -25,7 +25,7 @@ const User = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { data: user, isLoading, refetch } = useGetUser(params.username);
+  const { data: user, isLoading, refetch } = useGetUser(decodeURIComponent(params.username));
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
@@ -37,29 +37,29 @@ const User = ({ params }) => {
   const deleteUser = useDeleteUser();
   const activeUser = useActiveUser();
   const inactiveUser = useInactiveUser();
-
+  console.log("params", params)
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.USERS.NAME, user?.name]);
+    setLabels([PAGES.USERS.NAME, user?.username]);
     refetch();
   }, [setLabels, user, refetch]);
 
   const modalConfig = useMemo(() => ({
     delete: {
-      header: `¿Está seguro que desea eliminar el usuario "${user?.name}"?`,
+      header: `¿Está seguro que desea eliminar el usuario "${user?.username}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
     },
     active: {
-      header: `¿Está seguro que desea activar el usuario ${user?.id}?`,
+      header: `¿Está seguro que desea activar el usuario ${user?.username}?`,
       icon: ICONS.PLAY_CIRCLE
     },
     inactive: {
-      header: `¿Está seguro que desea desactivar el usuario ${user?.id}?`,
+      header: `¿Está seguro que desea desactivar el usuario ${user?.username}?`,
       icon: ICONS.PAUSE_CIRCLE
     },
   }), [user]);
@@ -135,7 +135,7 @@ const User = ({ params }) => {
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
     mutationFn: () => {
-      return deleteUser(params.id);
+      return deleteUser(decodeURIComponent(params.username));
     },
     onSuccess: (response) => {
       if (response.statusOk) {
@@ -201,9 +201,9 @@ const User = ({ params }) => {
     }
   }, [role, user, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions]);
 
-  if (!isLoading && !user) {
-    push(PAGES.NOT_FOUND.BASE);
-  }
+  // if (!isLoading && !user) {
+  //   push(PAGES.NOT_FOUND.BASE);
+  // }
 
   return (
     <Loader active={isLoading}>

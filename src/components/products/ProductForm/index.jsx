@@ -4,7 +4,7 @@ import { FieldsContainer, Flex, Form, Label } from "@/common/components/custom";
 import { DropdownControlled, IconedButtonControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
-import { BRANDS_STATES } from "@/components/brands/brands.constants";
+import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -110,7 +110,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
         <Flex justifyContent="space-between" alignItems="center">
           <span>{name}</span>
           <Flex>
-            {state === BRANDS_STATES.INACTIVE.id && (
+            {state === BRAND_STATES.INACTIVE.id && (
               <Popup
                 trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
                 content={deactivationReason ?? 'Motivo no especificado'}

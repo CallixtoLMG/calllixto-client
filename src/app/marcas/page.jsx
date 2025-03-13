@@ -4,7 +4,7 @@ import { useListBrands } from "@/api/brands";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import BrandsPage from "@/components/brands/BrandsPage";
-import { BRANDS_STATES } from "@/components/brands/brands.constants";
+import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
@@ -32,7 +32,7 @@ const Brands = () => {
     if (!brands) return;
     const headers = ['ID', 'Nombre', 'Estado', 'Comentarios'];
     const mappedBrands = brands.map(brand => {
-      const brandState = BRANDS_STATES[brand.state]?.singularTitle || brand.state;
+      const brandState = BRAND_STATES[brand.state]?.singularTitle || brand.state;
       return [
         brand.id,
         brand.name,

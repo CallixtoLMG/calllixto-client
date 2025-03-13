@@ -14,11 +14,15 @@ const DatePicker = ({
   maxDate,
   disabled = false,
   showMonthDropdown,
-  showYearDropdown
+  showYearDropdown,
+  showIcon,
+  icon
 }) => {
 
   return (
     <ReactDatePicker
+      icon={icon}
+      showIcon={showIcon}
       selected={selected}
       onChange={onChange}
       dateFormat={dateFormat}

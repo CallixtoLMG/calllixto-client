@@ -9,7 +9,6 @@ export const GET_USER_QUERY_KEY = 'getUser';
 export const LIST_USERS_QUERY_KEY = 'listUsers';
 
 const ATTRIBUTES = {
-  ID: "id",
   FIRST_NAME: "firstName",
   LAST_NAME: "lastName",
   ADDRESS: 'address',

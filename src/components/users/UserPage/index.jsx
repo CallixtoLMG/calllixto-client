@@ -48,6 +48,7 @@ const UsersPage = ({ users = [], isLoading, onRefetch }) => {
         page={PAGES.USERS}
         onFilter={onFilter}
         paginate
+        mainKey="username"
       />
     </>
   )

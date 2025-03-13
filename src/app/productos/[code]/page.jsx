@@ -312,6 +312,7 @@ const Product = ({ params }) => {
   }, [product, activeAction, isEditPending, handleRecoverClick, handleActiveClick, handleInactiveClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, setActions]);
 
   if (!isLoading && !product) {
+    // TODO cambiar esto como en el video...
     push(PAGES.NOT_FOUND.BASE);
   }
 
