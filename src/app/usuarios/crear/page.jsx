@@ -31,7 +31,7 @@ const CreateUser = () => {
     },
     onSuccess: async (response) => {
       if (response.statusOk) {
-        push(PAGES.USERS.SHOW(response.user.id))
+        push(PAGES.USERS.SHOW(response.user.username))
         toast.success('Usuario creado!');
       } else {
         toast.error(response.error.message);

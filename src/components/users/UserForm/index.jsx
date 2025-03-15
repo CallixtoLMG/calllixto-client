@@ -1,13 +1,13 @@
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 // import { preventSend } from "@/utils";
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form } from "@/common/components/custom";
-import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
-import { RULES, SHORTKEYS } from "@/common/constants";
+import { FieldsContainer, Form, FormField } from "@/common/components/custom";
+import DatePicker from "@/common/components/custom/DatePicker";
+import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
+import { DATE_FORMATS, RULES, SHORTKEYS } from "@/common/constants";
+import { getEighteenYearsAgo, getFormatedDate } from "@/common/utils/dates";
 import { useCallback } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
-import { FormField } from "../../../common/components/custom";
-import DatePicker from "../../../common/components/custom/DatePicker";
 import { EMPTY_USER, getRoleOptions } from "../users.constants";
 
 const GET_ROLES = getRoleOptions();
@@ -22,30 +22,18 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view }) 
     defaultValues: {
       ...EMPTY_USER,
       ...user,
+      role: user?.role || ROLE_OPTIONS.find(option => option.value === "user")?.value,
+      birthDate: user?.birthDate ? new Date(user.birthDate) : getEighteenYearsAgo(),
     },
-    // mode: "onChange", // Para validar en tiempo real
-    // reValidateMode: "onChange",
   });
-  const { handleSubmit, control, reset, formState: { isDirty, errors } } = methods;
+
+  const { handleSubmit, control, reset, formState: { isDirty } } = methods;
 
   const handleReset = useCallback((user) => {
     reset(user);
   }, [reset]);
 
   const handleCreate = (data) => {
-    // if (Array.isArray(data.phoneNumbers) && data.phoneNumbers.length === 0) {
-    //   delete data.phoneNumbers;
-    // }
-    // const fullPhone = `${data.phoneNumber.areaCode}${data.phoneNumber.number}`;
-
-    // if (fullPhone.length !== 10) {
-    //   methods.setError("phoneNumber.number", {
-    //     type: "manual",
-    //     message: "El área y el número deben sumar 10 dígitos.",
-    //   });
-    //   return;
-    // }
-
     onSubmit(data);
   };
 
@@ -57,83 +45,93 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view }) 
       <Form onSubmit={handleSubmit(handleCreate)}>
         <FieldsContainer>
           <TextControlled
-            flex="3"
-            name="firstName"
-            label="Nombre"
-            placeholder="Nombre"
-            rules={RULES.REQUIRED}
-            onChange={value => value.toUpperCase()}
-            disabled={view}
-          />
-          <TextControlled
-            flex="3"
-            name="lastName"
-            label="Apellido"
-            placeholder="Apellido"
-            rules={RULES.REQUIRED}
-            onChange={value => value.toUpperCase()}
-            disabled={view}
-          />
-
-          <DropdownControlled
-            width="200px"
-            name="role"
-            label="Rol"
-            rules={RULES.REQUIRED}
-            options={ROLE_OPTIONS}
-          />
-          <Controller
-            name="birthDate"
-            control={control}
-            render={({ field }) => (
-              <FormField
-
-                selected={field.value ? new Date(field.value) : null}
-                onChange={(date) => field.onChange(date)}
-                dateFormat="dd-MM-yyyy"
-                // disabled={isTotalCovered}
-                maxDate={new Date()}
-                label="Fecha de nacimiento"
-                width="180px"
-                showMonthDropdown
-                showYearDropdown
-                control={DatePicker}>
-              </FormField>
-            )}
-          />
-        </FieldsContainer>
-        <FieldsContainer>
-          {/* Nombre de usuario */}
-          <TextControlled
-            flex="3"
+            width="35%"
             name="username"
             label="Usuario"
             placeholder="Usuario"
             rules={RULES.REQUIRED}
             disabled={view}
           />
-
-          {/* Dirección */}
+          {!isUpdating && view
+            ? <TextField
+              width="25%"
+              label="Rol"
+              value={ROLE_OPTIONS.find(option => option.value === user?.role)?.text || user?.role}
+              disabled
+            />
+            : <DropdownControlled
+              width="25%"
+              name="role"
+              label="Rol"
+              defaultValue={user?.role || "user"}
+              rules={RULES.REQUIRED}
+              options={ROLE_OPTIONS}
+              disabled={!isUpdating && view}
+            />
+          }
+        </FieldsContainer>
+        <FieldsContainer>
           <TextControlled
-            flex="3"
+            width="30%"
+            name="firstName"
+            label="Nombre"
+            placeholder="Nombre"
+            rules={RULES.REQUIRED}
+            onChange={value => value.toUpperCase()}
+            disabled={!isUpdating && view}
+          />
+          <TextControlled
+            width="30%"
+            name="lastName"
+            label="Apellido"
+            placeholder="Apellido"
+            rules={RULES.REQUIRED}
+            onChange={value => value.toUpperCase()}
+            disabled={!isUpdating && view}
+          />
+          {!isUpdating && view
+            ?
+            <TextField width="150px" label="Fecha de nacimiento" value={getFormatedDate(user?.birthDate, DATE_FORMATS.ONLY_DATE)} disabled />
+            :
+            <Controller
+              name="birthDate"
+              control={control}
+              render={({ field }) => (
+                <FormField
+                  selected={field.value ? new Date(field.value) : null}
+                  onChange={(date) => field.onChange(date)}
+                  dateFormat="dd-MM-yyyy"
+                  maxDate={new Date()}
+                  label="Fecha de nacimiento"
+                  width="180px"
+                  showMonthDropdown
+                  showYearDropdown
+                  control={DatePicker}>
+                </FormField>
+              )}
+            />
+          }
+        </FieldsContainer>
+        <FieldsContainer>
+          <TextControlled
+            width="40%"
             name="address"
             label="Dirección"
             placeholder="Dirección"
-            disabled={view}
+            disabled={!isUpdating && view}
           />
           <NumberControlled
             width="130px"
             name="phoneNumber.areaCode"
             label="Código de Área"
             placeholder="Ej: 011"
-
             rules={{
               required: "El código de área es requerido.",
               validate: (value, { phoneNumber }) =>
                 (value + (phoneNumber?.number || "")).length === 10 ||
                 "El área y el número deben sumar 10 dígitos.",
             }}
-            disabled={view}
+            disabled={!isUpdating && view}
             maxLength="4"
             normalMode
           />
@@ -148,7 +146,7 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view }) 
                 ((phoneNumber?.areaCode || "") + value).length === 10 ||
                 "El área y el número deben sumar 10 dígitos.",
             }}
-            disabled={view}
+            disabled={!isUpdating && view}
             maxLength="7"
             normalMode
           />
@@ -156,12 +154,14 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view }) 
         <FieldsContainer>
           <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
         </FieldsContainer>
-        <SubmitAndRestore
-          isUpdating={isUpdating}
-          isLoading={isLoading}
-          isDirty={isDirty}
-          onReset={() => handleReset(isUpdating ? { ...EMPTY_USER, ...user } : EMPTY_USER)}
-        />
+        {(isUpdating || !view) && (
+          <SubmitAndRestore
+            isUpdating={isUpdating}
+            isLoading={isLoading}
+            isDirty={isDirty}
+            onReset={() => handleReset(isUpdating ? { ...EMPTY_USER, ...user } : EMPTY_USER)}
+          />
+        )}
       </Form>
     </FormProvider>
   );

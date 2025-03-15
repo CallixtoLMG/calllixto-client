@@ -53,7 +53,7 @@ export const useCreateUser = () => {
 
   const createUser = async (user) => {
     const response = await createItem({
-      entity: ENTITIES.USER,
+      entity: ENTITIES.USERS,
       url: PATHS.USER,
       value: user,
       responseEntity: ENTITIES.USER,
@@ -72,7 +72,7 @@ export const useEditUser = () => {
   const editUser = async (user) => {
     const response = await editItemByParam({
       entity: ENTITIES.USERS,
-      url: PATHS.USERS,
+      url: PATHS.USER,
       paramKey: "username",
       paramValue: user,
       responseEntity: ENTITIES.USER,
@@ -96,7 +96,6 @@ export const useDeleteUser = () => {
       paramValue: username,
       invalidateQueries: [[LIST_USERS_QUERY_KEY]]
     });
-
     return response;
   };
 

@@ -1,8 +1,8 @@
 
 import { PASSWORD_REQUIREMENTS } from "@/common/constants";
 import { Controller, useFormContext } from "react-hook-form";
-import PasswordField from "./PasswordField";
 import { PasswordRequirements } from "../PasswordRequirements";
+import PasswordField from "./PasswordField";
 
 export const PasswordControlled = ({
   name,
@@ -13,7 +13,6 @@ export const PasswordControlled = ({
   const { formState: { errors } } = useFormContext();
   return (
     <>
-
       <Controller
         name={name}
         rules={rules}

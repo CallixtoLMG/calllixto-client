@@ -23,9 +23,9 @@ const ATTRIBUTES = {
 const USER_COLUMNS = [
   {
     id: 1,
-    title: "Id",
+    title: "Mail",
     width: 3,
-    value: (user) => user.username
+    value: (user) => user?.username
   },
   {
     id: 2,
@@ -34,7 +34,7 @@ const USER_COLUMNS = [
     width: 2,
     value: (user) =>
       <Flex justifyContent="space-between">
-        {user.firstName}
+        {user?.firstName}
       </Flex>
   }, {
     id: 3,
@@ -43,14 +43,14 @@ const USER_COLUMNS = [
     width: 2,
     value: (user) =>
       <Flex justifyContent="space-between">
-        {user.lastName}
+        {user?.lastName}
       </Flex>
   }, {
     id: 4,
     title: "Direccion",
     width: 4,
     align: "left",
-    value: (user) => user.address
+    value: (user) => user?.address
     // value: (user) => {
     //   const { primaryAddress, additionalAddresses } = getAddressesForDisplay(user.addresses || []);
     //   return (
@@ -65,7 +65,7 @@ const USER_COLUMNS = [
     id: 5,
     title: "Teléfono",
     width: 2,
-    value: (user) => getFormatedPhone(user.phoneNumber)
+    value: (user) => getFormatedPhone(user?.phoneNumber)
     //   value: (user) => {
     //     const { primaryPhone, additionalPhones } = getPhonesForDisplay(user.phoneNumbers);
     //     return (
@@ -119,27 +119,16 @@ export const USER_STATE_OPTIONS = Object.values(USER_STATES)
     value: id
   }));
 
-// export const USERS_STATE_OPTIONS = [
-//   ...Object.entries(USER_STATES).map(([key, value]) => ({
-//     key,
-//     text: (
-//       <Flex alignItems="center" justifyContent="space-between">
-//         {value.title}&nbsp;<Label color={value.color} circular empty />
-//       </Flex>
-//     ),
-//     value: key
-//   }))
-// ];
-
 export const ROLE_LABELS = {
   ADMIN: 'Administrador',
-  SUPER_ADMIN: 'Super Administrador',
+  // SUPER_ADMIN: 'Super Administrador',
+  // no se cuando se borra esto
   USER: 'Usuario',
 };
 
 export const getRoleOptions = () => {
   return Object.entries(ROLES)
-    .filter(([key]) => key !== 'CALLIXTO')
+    .filter(([key]) => !["CALLIXTO", "SUPER_ADMIN"].includes(key)) // 🔥 Filtra ambos roles
     .map(([key, value]) => ({
       key: value,
       text: ROLE_LABELS[key] || key,

@@ -156,7 +156,7 @@ export async function getItemByParam({ paramKey, paramValue, url, entitySingular
     try {
       const { data } = await getInstance().get(`${url}`, { params: { [paramKey]: paramValue } });
       if (data.statusOk) {
-        return data[entitySingular]; 
+        return data[entitySingular];
       }
     } catch (error) {
       throw error;
@@ -166,7 +166,7 @@ export async function getItemByParam({ paramKey, paramValue, url, entitySingular
   let cachedData = await localforage.getItem(`${config.APP_ENV}-${entityPlural}`);
   let value = cachedData?.find((item) => item[paramKey] === paramValue);
 
-  return value || getEntity(); 
+  return value || getEntity();
 }
 
 
@@ -283,7 +283,6 @@ export function useEditItemByParam() {
     };
 
     const requestUrl = `${url}?${paramKey}=${encodeURIComponent(paramValue[paramKey])}`;
-    console.log("🚀 Enviando PUT a:", requestUrl);
 
     const { data } = await getInstance().put(requestUrl, updatedItem);
 
@@ -325,25 +324,28 @@ export function useDeleteItemByParam() {
 
   const deleteItemByParam = async ({ entity, paramKey, paramValue, url, invalidateQueries = [] }) => {
     const requestUrl = `${url}?${paramKey}=${paramValue}`;
-    console.log("🚀 Enviando DELETE a:", requestUrl);
 
-    const { data } = await getInstance().delete(requestUrl);
+    try {
+      const { data } = await getInstance().delete(requestUrl);
 
-    if (data.statusOk) {
-      await removeStorageItem({ entity, id: cleanValue, key: paramKey });
+      if (data.statusOk) {
+        await removeStorageItem({ entity, id: paramValue, key: paramKey });
+      } else {
+      }
+
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      });
+
+      return data;
+    } catch (error) {
+      console.error("❌ Error en la petición DELETE:", error);
+      throw error;
     }
-
-    invalidateQueries.forEach((query) => {
-      queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
-    });
-
-    return data;
   };
 
   return deleteItemByParam;
 };
-
-
 
 export function useBatchDeleteItems() {
   const queryClient = useQueryClient();

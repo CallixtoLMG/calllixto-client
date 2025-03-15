@@ -37,14 +37,13 @@ const User = ({ params }) => {
   const deleteUser = useDeleteUser();
   const activeUser = useActiveUser();
   const inactiveUser = useInactiveUser();
-  console.log("params", params)
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.USERS.NAME, user?.username]);
+    setLabels([PAGES.USERS.NAME, `${user?.firstName} ${user?.lastName}`]);
     refetch();
   }, [setLabels, user, refetch]);
 
@@ -134,9 +133,7 @@ const User = ({ params }) => {
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: () => {
-      return deleteUser(decodeURIComponent(params.username));
-    },
+    mutationFn: () => deleteUser(decodeURIComponent(params.username)),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Usuario eliminado permanentemente!");
@@ -201,9 +198,9 @@ const User = ({ params }) => {
     }
   }, [role, user, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions]);
 
-  // if (!isLoading && !user) {
-  //   push(PAGES.NOT_FOUND.BASE);
-  // }
+  if (!isLoading && !user) {
+    push(PAGES.NOT_FOUND.BASE);
+  }
 
   return (
     <Loader active={isLoading}>
