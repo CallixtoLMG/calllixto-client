@@ -1,4 +1,4 @@
-import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
+import { ACTIVE, ENTITIES, INACTIVE_LOW_CASE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { ATTRIBUTES, GET_USER_QUERY_KEY, LIST_USERS_QUERY_KEY } from "@/components/users/users.constants";
 import { PATHS } from "@/fetchUrls";
@@ -18,16 +18,6 @@ export function useListUsers() {
   return query;
 };
 
-// export function useGetUser(username) {
-//   const query = useQuery({
-//     queryKey: [GET_USER_QUERY_KEY, username],
-//     queryFn: () => getItemById({ key: "username", id: "", url: PATHS.USER, entity: ENTITIES.USER, params: { username } }),
-//     retry: false,
-//     staleTime: IN_MS.ONE_HOUR,
-//   });
-
-//   return query;
-// };
 export function useGetUser(username) {
 
   const query = useQuery({
@@ -108,16 +98,17 @@ export const useInactiveUser = () => {
 
   const inactiveUser = async (user, reason) => {
     const updatedUser = {
-      ...user,
+      username: user.username,
       inactiveReason: reason
     }
 
     const response = await inactiveItem({
       entity: ENTITIES.USERS,
-      url: `${PATHS.USERS}/${user.id}/${INACTIVE}`,
+      url: `${PATHS.USERS}/${user.username}/${INACTIVE_LOW_CASE}`,
       value: updatedUser,
+      key: "username",
       responseEntity: ENTITIES.USER,
-      invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, user.id]]
+      invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, user.username]]
     });
 
     return response;
@@ -135,10 +126,11 @@ export const useActiveUser = () => {
 
     const response = await activeItem({
       entity: ENTITIES.USERS,
-      url: `${PATHS.USERS}/${user.id}/${ACTIVE}`,
+      url: `${PATHS.USERS}/${user.username}/${ACTIVE}`,
       value: updatedUser,
+      key: "username",
       responseEntity: ENTITIES.USER,
-      invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, user.id]]
+      invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, user.username]]
     });
 
     return response;

@@ -1,4 +1,4 @@
-import { ALL, DEFAULT_LAST_EVENT_ID, ENTITIES, EVENT_KEYS, ID } from "@/common/constants";
+import { ALL, DEFAULT_LAST_EVENT_ID, DELETE, ENTITIES, EVENT_KEYS, ID } from "@/common/constants";
 import { now } from "@/common/utils/dates";
 import { config } from "@/config";
 import { EVENTS, PATHS } from "@/fetchUrls";
@@ -365,7 +365,7 @@ export function useBatchDeleteItems() {
         if (data.statusOk) {
           deletedCount += 1;
 
-          if (data.product?.state === "delete") {
+          if (data.product?.state === DELETE) {
             successfulDeletes.push(code);
           }
         } else {

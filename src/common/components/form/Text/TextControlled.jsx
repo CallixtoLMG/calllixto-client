@@ -5,6 +5,10 @@ import { TextField } from "./TextField";
 export const TextControlled = ({
   name,
   rules,
+  iconLabel,
+  showPopup = false, 
+  popupContent = "", 
+  popupPosition,
   onChange = value => value,
   ...inputParams
 }) => {
@@ -17,6 +21,10 @@ export const TextControlled = ({
         <TextField
           {...rest}
           {...inputParams}
+          showPopup={showPopup}
+          popupContent={popupContent}
+          popupPosition={popupPosition}
+          iconLabel={iconLabel}
           error={!!errors?.[name] && {
             content: errors[name].message,
             pointing: 'above',

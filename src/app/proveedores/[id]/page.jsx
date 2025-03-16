@@ -16,7 +16,7 @@ import {
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
-import { COLORS, ICONS, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
 import { downloadExcel, getFormatedPrice, isItemInactive } from "@/common/utils";
 import {
   Loader,
@@ -231,7 +231,7 @@ const Supplier = ({ params }) => {
       },
     });
 
-  const { mutate: mutateDelete, isPending: isDeleteSupplierPending } =
+  const { mutate: mutateDelete, isPending: isDeletePending } =
     useMutation({
       mutationFn: () => deleteSupplier(params.id),
       onSuccess: (response) => {
@@ -259,7 +259,7 @@ const Supplier = ({ params }) => {
       mutateDelete();
     }
 
-    if (modalAction === "inactive") {
+    if (modalAction === INACTIVE_LOW_CASE) {
       if (!reason) {
         toast.error(
           'Debe proporcionar una razón para desactivar al proveedor.',
@@ -269,7 +269,7 @@ const Supplier = ({ params }) => {
       mutateInactive({ supplier, reason });
     }
 
-    if (modalAction === "active") {
+    if (modalAction === ACTIVE) {
       mutateActive({ supplier });
     }
 
@@ -436,6 +436,7 @@ const Supplier = ({ params }) => {
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(supplier?.state)}
         view
+        isDeletePending={isDeletePending} 
       />
       {!isUpdating && (
         <OnlyPrint>
@@ -451,7 +452,7 @@ const Supplier = ({ params }) => {
         setShowModal={handleModalClose}
         isLoading={
           isDeleteBatchPending ||
-          isDeleteSupplierPending ||
+          isDeletePending ||
           isActivePending ||
           isInactivePending
         }

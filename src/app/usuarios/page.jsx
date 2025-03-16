@@ -29,12 +29,15 @@ const Users = () => {
 
   const handleDownloadExcel = useCallback(() => {
     if (!users) return;
-    const headers = ['ID', 'Nombre', 'Estado', 'Comentarios'];
+    const headers = ['Usuario', 'Nombre', 'Apellido', 'Dirección', 'Telefono', 'Estado', 'Comentarios'];
     const mappedUsers = users.map(user => {
       const usersState = USER_STATES[user.state]?.singularTitle || user.state;
       return [
-        user.id,
-        user.name,
+        user.username,
+        user.firstname,
+        user.lastname,
+        user.address,
+        user.phoneNumber,
         usersState,
         user.comments,
       ];

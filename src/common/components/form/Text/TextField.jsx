@@ -15,13 +15,14 @@ export const TextField = ({
   maxLength,
   error,
   showPopup = false,
-  popupContent,
+  popupContent = "top center",
+  popupPosition
 }) => {
   const showIconLabel = () => (
     <Label width="fit-content" height="100%">
       {showPopup ? (
         <Popup
-          position="top center"
+          position={popupPosition}
           size="tiny"
           content={popupContent}
           trigger={

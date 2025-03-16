@@ -5,7 +5,7 @@ import { useHasProductsByBrandId } from "@/api/products";
 import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
-import { COLORS, ICONS, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import BrandForm from "@/components/brands/BrandForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -72,9 +72,9 @@ const Brand = ({ params }) => {
     setIsModalOpen(true);
   }, []);
 
-  const handleActivateClick = useCallback(() => handleOpenModalWithAction("active"), [handleOpenModalWithAction]);
-  const handleInactiveClick = useCallback(() => handleOpenModalWithAction("inactive"), [handleOpenModalWithAction]);
-  const handleDeleteClick = useCallback(() => handleOpenModalWithAction("delete"), [handleOpenModalWithAction]);
+  const handleActivateClick = useCallback(() => handleOpenModalWithAction(ACTIVE), [handleOpenModalWithAction]);
+  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE_LOW_CASE), [handleOpenModalWithAction]);
+  const handleDeleteClick = useCallback(() => handleOpenModalWithAction(DELETE), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editBrand,
@@ -141,11 +141,11 @@ const Brand = ({ params }) => {
   const handleActionConfirm = async () => {
     setActiveAction(modalAction);
 
-    if (modalAction === "delete") {
+    if (modalAction === DELETE) {
       mutateDelete();
     }
 
-    if (modalAction === "inactive") {
+    if (modalAction === INACTIVE_LOW_CASE) {
       if (!reason) {
         toast.error("Debe proporcionar una razón para desactivar la marca.");
         return;
@@ -153,7 +153,7 @@ const Brand = ({ params }) => {
       mutateInactive({ brand, reason });
     }
 
-    if (modalAction === "active") {
+    if (modalAction === ACTIVE) {
       mutateActive({ brand });
     }
 
@@ -161,7 +161,7 @@ const Brand = ({ params }) => {
   };
 
   const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
-  const requiresConfirmation = modalAction === "delete";
+  const requiresConfirmation = modalAction === DELETE;
 
   useEffect(() => {
     if (brand) {
@@ -172,7 +172,7 @@ const Brand = ({ params }) => {
           color: COLORS.GREY,
           text: isItemInactive(brand?.state) ? "Activar" : "Desactivar",
           onClick: isItemInactive(brand?.state) ? handleActivateClick : handleInactiveClick,
-          loading: (activeAction === "active" || activeAction === "inactive"),
+          loading: (activeAction === ACTIVE || activeAction === INACTIVE_LOW_CASE),
           disabled: !!activeAction,
           width: "fit-content",
         },
@@ -183,7 +183,7 @@ const Brand = ({ params }) => {
           text: "Eliminar",
           basic: true,
           onClick: handleDeleteClick,
-          loading: activeAction === "delete",
+          loading: activeAction === DELETE,
           disabled: hasAssociatedProducts || !!activeAction,
           tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
         },
@@ -211,6 +211,7 @@ const Brand = ({ params }) => {
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(brand?.state)}
         view
+        isDeletePending={isDeletePending} 
       />
       <ModalAction
         title={header}
@@ -221,9 +222,9 @@ const Brand = ({ params }) => {
         setShowModal={handleModalClose}
         isLoading={isDeletePending || isInactivePending || isActivePending}
         noConfirmation={!requiresConfirmation}
-        disableButtons={!reason && modalAction === "inactive"}
+        disableButtons={!reason && modalAction === INACTIVE_LOW_CASE}
         bodyContent={
-          modalAction === "inactive" && (
+          modalAction === INACTIVE_LOW_CASE && (
             <TextField
               placeholder="Motivo"
               value={reason}

@@ -7,7 +7,7 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_BRAND } from "../brands.constants";
 
-const BrandForm = ({ brand, onSubmit, isLoading, isUpdating, view }) => {
+const BrandForm = ({ brand, onSubmit, isLoading, isUpdating, view, isDeletePending }) => {
   const methods = useForm({ defaultValues: brand });
   const { handleSubmit, reset, formState: { isDirty } } = methods;
 
@@ -44,6 +44,7 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating, view }) => {
             isLoading={isLoading}
             isDirty={isDirty}
             onReset={() => reset({ ...EMPTY_BRAND, ...brand })}
+            disabled={isDeletePending}
           />
         )}
       </Form>

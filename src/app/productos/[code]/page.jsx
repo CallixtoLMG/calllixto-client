@@ -5,7 +5,7 @@ import { Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
@@ -59,36 +59,36 @@ const Product = ({ params }) => {
 
   const modalConfig = useMemo(() => ({
     softDelete: {
-      header: "¿Está seguro que desea eliminar este producto?",
+      header: `¿Está seguro que desea eliminar el producto "${product?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH
     },
     hardDelete: {
-      header: "¿Está seguro que desea eliminar PERMANENTEMENTE este producto?",
+      header: `¿Está seguro que desea eliminar PERMANENTEMENTE el producto "${product?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
     },
     recover: {
-      header: "¿Está seguro que desea recuperar el producto?",
+      header: `¿Está seguro que desea recuperar el producto "${product?.name}"?`,
       icon: ICONS.UNDO
     },
     active: {
-      header: "¿Está seguro que desea activar el producto?",
+      header: `¿Está seguro que desea activar el producto "${product?.name}"?`,
       icon: ICONS.PLAY_CIRCLE
     },
     inactive: {
-      header: "¿Está seguro que desea desactivar el producto?",
+      header: `¿Está seguro que desea desactivar el producto "${product?.name}"?`,
       icon: ICONS.PAUSE_CIRCLE
     },
     outOfStock: {
-      header: "¿Está seguro que desea cambiar el estado a sin stock?",
+      header: `¿Está seguro que desea cambiar el estado a sin stock el producto "${product?.name}"?`,
       icon: ICONS.BAN
     },
     inStock: {
-      header: "¿Está seguro que desea cambiar el estado a en stock?",
+      header: `¿Está seguro que desea cambiar el estado a en stock el producto "${product?.name}"?`,
       icon: ICONS.BOX
     }
-  }), []);
+  }), [product]);
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -103,7 +103,7 @@ const Product = ({ params }) => {
 
   const handleRecoverClick = useCallback(() => handleOpenModalWithAction("recover"), [handleOpenModalWithAction]);
   const handleActiveClick = useCallback(() => handleOpenModalWithAction(ACTIVE), [handleOpenModalWithAction]);
-  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE), [handleOpenModalWithAction]);
+  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE_LOW_CASE), [handleOpenModalWithAction]);
   const handleStockChangeClick = useCallback(() => handleOpenModalWithAction(isProductOOS(product?.state) ? "inStock" : "outOfStock"), [handleOpenModalWithAction, product?.state]);
   const handleSoftDeleteClick = useCallback(() => handleOpenModalWithAction("softDelete"), [handleOpenModalWithAction]);
   const handleHardDeleteClick = useCallback(() => handleOpenModalWithAction("hardDelete"), [handleOpenModalWithAction]);
@@ -196,18 +196,16 @@ const Product = ({ params }) => {
       if (product.state === PRODUCT_STATES.DELETED.id) {
         mutateDelete();
       } else {
-        const updatedProduct = { ...product, state: PRODUCT_STATES.DELETED.id };
-        mutateEdit(updatedProduct);
+        mutateEdit({ code: product.code, state: PRODUCT_STATES.DELETED.id });
       }
     }
 
-    if (modalAction === INACTIVE) {
+    if (modalAction === INACTIVE_LOW_CASE) {
       if (!reason) {
         toast.error("Debe proporcionar una razón para desactivar el producto.");
         return;
       }
       mutateInactive({ product, reason });
-
     }
 
     if (modalAction === ACTIVE) {
@@ -215,25 +213,22 @@ const Product = ({ params }) => {
     }
 
     if (modalAction === "outOfStock") {
-      const updatedProduct = { ...product, state: PRODUCT_STATES.OOS.id };
-      mutateEdit(updatedProduct);
+      mutateEdit({ code: product.code, state: PRODUCT_STATES.OOS.id });
     }
 
     if (modalAction === "inStock") {
-      const updatedProduct = { ...product, state: PRODUCT_STATES.ACTIVE.id };
-      mutateEdit(updatedProduct);
+      mutateEdit({ code: product.code, state: PRODUCT_STATES.ACTIVE.id });
     }
 
     if (modalAction === "recover") {
-      const updatedProduct = { ...product, state: PRODUCT_STATES.ACTIVE.id };
-      mutateEdit(updatedProduct);
+      mutateEdit({ code: product.code, state: PRODUCT_STATES.ACTIVE.id });
     }
 
     handleModalClose();
   };
 
 
-  const { header = "", confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
+  const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
   const requiresConfirmation = modalAction === "softDelete" || modalAction === "hardDelete";
 
   useEffect(() => {
@@ -269,7 +264,7 @@ const Product = ({ params }) => {
           onClick: isProductInactive(product?.state) ? handleActiveClick : handleInactiveClick,
           text: isProductInactive(product?.state) ? "Activar" : "Desactivar",
           width: "fit-content",
-          loading: (activeAction === ACTIVE || activeAction === INACTIVE),
+          loading: (activeAction === ACTIVE || activeAction === INACTIVE_LOW_CASE),
           disabled: !!activeAction || isEditPending,
         });
         actions.push({
@@ -312,7 +307,6 @@ const Product = ({ params }) => {
   }, [product, activeAction, isEditPending, handleRecoverClick, handleActiveClick, handleInactiveClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, setActions]);
 
   if (!isLoading && !product) {
-    // TODO cambiar esto como en el video...
     push(PAGES.NOT_FOUND.BASE);
   }
 
@@ -331,6 +325,7 @@ const Product = ({ params }) => {
         isUpdating={isUpdating && !isProductInactive(product?.state)}
         isLoading={isEditPending}
         view
+        isDeletePending={isDeletePending}
       />
       {product && (
         <OnlyPrint>
@@ -345,9 +340,9 @@ const Product = ({ params }) => {
         showModal={isModalOpen}
         setShowModal={setIsModalOpen}
         isLoading={isInactivePending || isActivePending || isDeletePending || isEditPending}
-        noConfirmation={!requiresConfirmation && modalAction !== INACTIVE}
+        noConfirmation={!requiresConfirmation && modalAction !== INACTIVE_LOW_CASE}
         bodyContent={
-          modalAction === INACTIVE ? (
+          modalAction === INACTIVE_LOW_CASE ? (
             <TextField
               placeholder="Motivo"
               value={reason}
@@ -355,7 +350,7 @@ const Product = ({ params }) => {
             />
           ) : null
         }
-        requireReason={modalAction === INACTIVE}
+        requireReason={modalAction === INACTIVE_LOW_CASE}
         reason={reason}
       />
     </Loader>

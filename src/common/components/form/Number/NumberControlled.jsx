@@ -15,7 +15,7 @@ export const NumberControlled = ({
   onChange,
   maxLength,
   justifyItems,
-  normalMode = false,  // 🔥 Nuevo flag para activar el "modo normal" de input numérico
+  normalMode = false,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -40,11 +40,11 @@ export const NumberControlled = ({
             {...inputProps}
             {...rest}
             maxLength={maxLength}
-            value={normalMode ? value ?? '' : value?.toLocaleString() ?? 0} // 🔥 Si normalMode es true, muestra el número sin formateo
+            value={normalMode ? value ?? '' : value?.toLocaleString() ?? 0}
             placeholder={placeholder ?? label}
             {...(unit && { iconPosition })}
             onChange={(e) => {
-              let newValue = e.target.value.replace(/[^0-9]/g, ''); // 🔥 Solo números (sin puntos ni comas)
+              let newValue = e.target.value.replace(/[^0-9]/g, ''); 
 
               if (!normalMode) {
                 newValue = newValue ? Number(newValue).toLocaleString() : '';

@@ -8,7 +8,6 @@ import { Form } from "semantic-ui-react";
 import { EMPTY_FILTERS, USER_COLUMNS, USER_STATE_OPTIONS } from "../users.constants";
 
 const UsersPage = ({ users = [], isLoading, onRefetch }) => {
-
   const {
     onRestoreFilters,
     onSubmit,
@@ -16,8 +15,9 @@ const UsersPage = ({ users = [], isLoading, onRefetch }) => {
     methods
   } = useFilters(EMPTY_FILTERS);
 
-  const onFilter = createFilter(appliedFilters, ['firstName']);
-  
+  // TODO borra "state" cuando el back envie los estados, en esta caso esta siendo la excepción.
+  const onFilter = createFilter(appliedFilters, ['username', 'firstName', 'lastName'], "state");
+
   return (
     <>
       <FormProvider {...methods}>
@@ -36,8 +36,9 @@ const UsersPage = ({ users = [], isLoading, onRefetch }) => {
                 onSubmit(() => { })();
               }}
             />
-            <TextControlled name="username" placeholder="Nombre de usuario" width="200px" />
-            <TextControlled name="firstName" placeholder="Nombre" width="200px" />
+            <TextControlled name="username" placeholder="Usuario" width="180px" />
+            <TextControlled name="firstName" placeholder="Nombre" width="180px" />
+            <TextControlled name="lastName" placeholder="Apellido" width="180px" />
           </Filters>
         </Form>
       </FormProvider>

@@ -7,7 +7,7 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_SUPPLIER } from "../suppliers.constants";
 
-const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading, view }) => {
+const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading, view, isDeletePending }) => {
   const methods = useForm({ defaultValues: supplier });
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
@@ -46,6 +46,7 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading, view }) => {
             isLoading={isLoading}
             isDirty={isDirty}
             onReset={() => reset({ ...EMPTY_SUPPLIER, ...supplier })}
+            disabled={isDeletePending}
           />
         )}
       </Form>

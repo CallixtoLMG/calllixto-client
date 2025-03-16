@@ -1,9 +1,6 @@
-// import { Flex } from '@/components/common/custom';
 import { Flex, Label } from '@/common/components/custom';
 import { getFormatedPhone } from '@/common/utils';
 import { ROLES } from '@/roles';
-// import { getAddressesForDisplay, getPhonesForDisplay } from '@/utils';
-// import { AddressesTooltip, PhonesTooltip } from '../common/tooltips';
 
 export const GET_USER_QUERY_KEY = 'getUser';
 export const LIST_USERS_QUERY_KEY = 'listUsers';
@@ -23,7 +20,7 @@ const ATTRIBUTES = {
 const USER_COLUMNS = [
   {
     id: 1,
-    title: "Mail",
+    title: "Usuario",
     width: 3,
     value: (user) => user?.username
   },
@@ -51,30 +48,12 @@ const USER_COLUMNS = [
     width: 4,
     align: "left",
     value: (user) => user?.address
-    // value: (user) => {
-    //   const { primaryAddress, additionalAddresses } = getAddressesForDisplay(user.addresses || []);
-    //   return (
-    //     <Flex justifyContent="space-between">
-    //       {primaryAddress}
-    //       {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
-    //     </Flex>
-    //   );
-    // }
   },
   {
     id: 5,
     title: "Teléfono",
     width: 2,
     value: (user) => getFormatedPhone(user?.phoneNumber)
-    //   value: (user) => {
-    //     const { primaryPhone, additionalPhones } = getPhonesForDisplay(user.phoneNumbers);
-    //     return (
-    //       <Flex justifyContent="space-between">
-    //         {primaryPhone}
-    //         {additionalPhones && <PhonesTooltip phones={additionalPhones} />}
-    //       </Flex>
-    //     );
-    //   }
   }
 ];
 
@@ -95,8 +74,8 @@ export const USER_STATES = {
   },
 };
 
-export const EMPTY_FILTERS = { username: '', firstName: ''};
-// export const EMPTY_FILTERS = { id: '', name: '', state: USER_STATES.ACTIVE.id };
+// TODO agregar estado cuando el back lo envie
+export const EMPTY_FILTERS = { username: '', firstName: '' };
 export const EMPTY_USER = {
   firstName: '',
   lastName: '',
@@ -118,17 +97,16 @@ export const USER_STATE_OPTIONS = Object.values(USER_STATES)
     ),
     value: id
   }));
-
+// TODO borrar SUPER_ADMIN si gawain ya lo elimino 
 export const ROLE_LABELS = {
   ADMIN: 'Administrador',
-  // SUPER_ADMIN: 'Super Administrador',
-  // no se cuando se borra esto
+  SUPER_ADMIN: 'Super Administrador',
   USER: 'Usuario',
 };
-
+// TODO borrar SUPER_ADMIN si gawain ya lo elimino 
 export const getRoleOptions = () => {
   return Object.entries(ROLES)
-    .filter(([key]) => !["CALLIXTO", "SUPER_ADMIN"].includes(key)) // 🔥 Filtra ambos roles
+    .filter(([key]) => !["CALLIXTO", "SUPER_ADMIN"].includes(key))
     .map(([key, value]) => ({
       key: value,
       text: ROLE_LABELS[key] || key,

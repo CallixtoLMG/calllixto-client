@@ -9,7 +9,7 @@ import { useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
 
-const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
+const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, isDeletePending }) => {
   const methods = useForm({
     defaultValues: {
       tags: [],
@@ -91,6 +91,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view }) => {
             isLoading={isLoading}
             isDirty={isDirty}
             onReset={() => reset({ ...EMPTY_CUSTOMER, ...customer })}
+            disabled={isDeletePending}
           />
         )}
       </Form>

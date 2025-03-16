@@ -1,4 +1,4 @@
-import { ACTIVE, ALL, CODE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
+import { ACTIVE, ALL, CODE, ENTITIES, INACTIVE_LOW_CASE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { now } from "@/common/utils/dates";
 import { ATTRIBUTES, GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
@@ -288,13 +288,13 @@ export const useInactiveProduct = () => {
 
   const inactiveProduct = async (product, reason) => {
     const updatedProduct = {
-      ...product,
+      code: product.code,
       inactiveReason: reason
     }
 
     const response = await inactiveItem({
       entity: ENTITIES.PRODUCTS,
-      url: `${PATHS.PRODUCTS}/${product.code}/${INACTIVE}`,
+      url: `${PATHS.PRODUCTS}/${product.code}/${INACTIVE_LOW_CASE}`,
       value: updatedProduct,
       key: CODE,
       responseEntity: ENTITIES.PRODUCT,
@@ -312,7 +312,7 @@ export const useActiveProduct = () => {
 
   const activeProduct = async (product) => {
     const updatedProduct = {
-      ...product,
+      code: product.code,
     }
 
     const response = await activeItem({

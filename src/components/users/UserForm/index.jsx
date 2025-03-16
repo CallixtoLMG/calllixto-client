@@ -1,13 +1,12 @@
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-// import { preventSend } from "@/utils";
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form, FormField } from "@/common/components/custom";
-import DatePicker from "@/common/components/custom/DatePicker";
+import { FieldsContainer, Form } from "@/common/components/custom";
 import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
+import { DatepickerControlled } from "@/common/components/form/Datepicker";
 import { DATE_FORMATS, RULES, SHORTKEYS } from "@/common/constants";
 import { getEighteenYearsAgo, getFormatedDate } from "@/common/utils/dates";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useCallback } from "react";
-import { Controller, FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_USER, getRoleOptions } from "../users.constants";
 
 const GET_ROLES = getRoleOptions();
@@ -17,7 +16,7 @@ const ROLE_OPTIONS = GET_ROLES.map((role, index) => ({
   value: role.value,
 })).reverse();
 
-const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view }) => {
+const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending  }) => {
   const methods = useForm({
     defaultValues: {
       ...EMPTY_USER,
@@ -51,6 +50,10 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view }) 
             placeholder="Usuario"
             rules={RULES.REQUIRED}
             disabled={view}
+            iconLabel
+            popupPosition="bottom left"
+            showPopup={true}
+            popupContent="Este será el nombre del Usuario, introduce un email válido por favor."
           />
           {!isUpdating && view
             ? <TextField
@@ -93,22 +96,14 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view }) 
             ?
             <TextField width="150px" label="Fecha de nacimiento" value={getFormatedDate(user?.birthDate, DATE_FORMATS.ONLY_DATE)} disabled />
             :
-            <Controller
+            <DatepickerControlled
               name="birthDate"
-              control={control}
-              render={({ field }) => (
-                <FormField
-                  selected={field.value ? new Date(field.value) : null}
-                  onChange={(date) => field.onChange(date)}
-                  dateFormat="dd-MM-yyyy"
-                  maxDate={new Date()}
-                  label="Fecha de nacimiento"
-                  width="180px"
-                  showMonthDropdown
-                  showYearDropdown
-                  control={DatePicker}>
-                </FormField>
-              )}
+              label="Fecha de nacimiento"
+              width="180px"
+              defaultValue={getEighteenYearsAgo()}
+              maxDate={new Date()}
+              showMonthDropdown
+              showYearDropdown
             />
           }
         </FieldsContainer>
@@ -159,6 +154,7 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view }) 
             isUpdating={isUpdating}
             isLoading={isLoading}
             isDirty={isDirty}
+            disabled={isDeletePending}
             onReset={() => handleReset(isUpdating ? { ...EMPTY_USER, ...user } : EMPTY_USER)}
           />
         )}

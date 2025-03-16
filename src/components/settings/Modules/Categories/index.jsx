@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, ICONS, SEMANTIC_COLORS } from "@/common/constants";
+import { COLORS, DELETE, ICONS, SEMANTIC_COLORS } from "@/common/constants";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Accordion, Icon, Label } from "semantic-ui-react";
@@ -45,7 +45,7 @@ const Categories = () => {
 
   const actions = [
     {
-      id: "delete",
+      id: DELETE,
       icon: ICONS.TRASH,
       color: COLORS.RED,
       onClick: (category, index) => remove(index),
