@@ -20,7 +20,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
 
   const methods = useForm({
     defaultValues: {
-      cost: product?.cost ?? 0,
       margin: initialMargin,
       tags: [],
       fractionConfig: {

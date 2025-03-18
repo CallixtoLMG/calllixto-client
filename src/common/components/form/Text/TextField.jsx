@@ -39,7 +39,14 @@ export const TextField = ({
   );
 
   return (
-    <FormField flex={flex} width={width} label={label} control={Input} error={error}>
+    <FormField
+      flex={flex}
+      width={width}
+      label={label}
+      control={Input}
+      error={error}
+      disabled={disabled}
+    >
       <Input
         placeholder={placeholder ?? label}
         {...(iconLabel && { labelPosition: 'left' })}

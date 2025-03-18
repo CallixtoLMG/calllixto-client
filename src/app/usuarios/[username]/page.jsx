@@ -211,7 +211,7 @@ const User = ({ params }) => {
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(user?.state)}
         view
-        isDeletePending={isDeletePending} 
+        isDeletePending={isDeletePending}
       />
       <ModalAction
         title={header}

@@ -15,8 +15,7 @@ const UsersPage = ({ users = [], isLoading, onRefetch }) => {
     methods
   } = useFilters(EMPTY_FILTERS);
 
-  // TODO borra "state" cuando el back envie los estados, en esta caso esta siendo la excepción.
-  const onFilter = createFilter(appliedFilters, ['username', 'firstName', 'lastName'], "state");
+  const onFilter = createFilter(appliedFilters, ['username', 'firstName', 'lastName']);
 
   return (
     <>

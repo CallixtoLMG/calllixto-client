@@ -11,6 +11,7 @@ export const TextAreaField = ({
 }) => {
   return (
     <FormField
+      disabled={disabled}
       control={TextArea}
       label={label}
       width={width}

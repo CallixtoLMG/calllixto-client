@@ -17,7 +17,7 @@ export const PriceField = ({
   value = '',
   onChange,
   disabled = false,
-  placeholder
+  placeholder,
 }) => {
   const inputRef = useRef(null);
   const [internalValue, setInternalValue] = useState(value.toString());
@@ -58,7 +58,13 @@ export const PriceField = ({
   };
 
   return (
-    <FormField label={label} width={width} control={Input} error={error}>
+    <FormField
+      disabled={disabled}
+      label={label}
+      width={width}
+      control={Input}
+      error={error}
+    >
       <Input
         ref={inputRef}
         value={internalValue}

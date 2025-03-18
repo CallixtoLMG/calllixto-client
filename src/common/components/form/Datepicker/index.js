@@ -1,2 +1,2 @@
-export * from './DatepickerControlled';
+export * from './DatePickerControlled';
 

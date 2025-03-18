@@ -218,6 +218,8 @@ export const INACTIVE = "INACTIVE";
 
 export const INACTIVE_LOW_CASE = "inactive";
 
+export const RECOVER = "recover";
+
 export const EVENT_KEYS = {
   UPDATE: 'U',
   CREATE: "C",

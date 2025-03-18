@@ -116,6 +116,7 @@ export const useInactiveUser = () => {
 
   return inactiveUser;
 };
+
 export const useActiveUser = () => {
   const activeItem = useActiveItem();
 

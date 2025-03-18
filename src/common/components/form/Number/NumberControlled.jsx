@@ -16,6 +16,7 @@ export const NumberControlled = ({
   maxLength,
   justifyItems,
   normalMode = false,
+  disabled,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -27,6 +28,7 @@ export const NumberControlled = ({
       rules={rules}
       render={({ field: { onChange: onChangeController, value, ...rest } }) => (
         <FormField
+          disabled={disabled}
           flex={flex}
           width={width}
           label={label}
@@ -44,7 +46,7 @@ export const NumberControlled = ({
             placeholder={placeholder ?? label}
             {...(unit && { iconPosition })}
             onChange={(e) => {
-              let newValue = e.target.value.replace(/[^0-9]/g, ''); 
+              let newValue = e.target.value.replace(/[^0-9]/g, '');
 
               if (!normalMode) {
                 newValue = newValue ? Number(newValue).toLocaleString() : '';

@@ -13,8 +13,6 @@ const DatePicker = ({
   minDate,
   maxDate,
   disabled = false,
-  showMonthDropdown,
-  showYearDropdown,
   showIcon,
   icon
 }) => {
@@ -32,8 +30,6 @@ const DatePicker = ({
       minDate={minDate}
       maxDate={maxDate}
       disabled={disabled}
-      showMonthDropdown={showMonthDropdown}
-      showYearDropdown={showYearDropdown}
     />
   );
 };

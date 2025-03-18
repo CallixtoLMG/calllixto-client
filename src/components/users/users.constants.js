@@ -1,11 +1,14 @@
 import { Flex, Label } from '@/common/components/custom';
+import { CommentTooltip } from '@/common/components/tooltips';
+import { DATE_FORMATS } from '@/common/constants';
 import { getFormatedPhone } from '@/common/utils';
+import { getFormatedDate } from '@/common/utils/dates';
 import { ROLES } from '@/roles';
 
 export const GET_USER_QUERY_KEY = 'getUser';
 export const LIST_USERS_QUERY_KEY = 'listUsers';
 
-const ATTRIBUTES = {
+export const ATTRIBUTES = {
   FIRST_NAME: "firstName",
   LAST_NAME: "lastName",
   ADDRESS: 'address',
@@ -17,31 +20,30 @@ const ATTRIBUTES = {
   ROLE: "role"
 };
 
-const USER_COLUMNS = [
+export const USER_COLUMNS = [
   {
     id: 1,
     title: "Usuario",
     width: 3,
-    value: (user) => user?.username
+    align: "left",
+    value: (user) =>
+      <Flex justifyContent="space-between">
+        {user.username}
+        {user.comments && <CommentTooltip comment={user.comments} />}
+      </Flex>
   },
   {
     id: 2,
     title: "Nombre",
     align: "left",
     width: 2,
-    value: (user) =>
-      <Flex justifyContent="space-between">
-        {user?.firstName}
-      </Flex>
+    value: (user) => user?.firstName
   }, {
     id: 3,
     title: "Apellido",
     align: "left",
     width: 2,
-    value: (user) =>
-      <Flex justifyContent="space-between">
-        {user?.lastName}
-      </Flex>
+    value: (user) => user?.lastName
   }, {
     id: 4,
     title: "Direccion",
@@ -54,6 +56,12 @@ const USER_COLUMNS = [
     title: "Teléfono",
     width: 2,
     value: (user) => getFormatedPhone(user?.phoneNumber)
+  },
+  {
+    id: 6,
+    title: "Nacimiento",
+    width: 1,
+    value: (user) => getFormatedDate(user?.birthDate, DATE_FORMATS.ONLY_DATE)
   }
 ];
 
@@ -74,8 +82,7 @@ export const USER_STATES = {
   },
 };
 
-// TODO agregar estado cuando el back lo envie
-export const EMPTY_FILTERS = { username: '', firstName: '' };
+export const EMPTY_FILTERS = { username: '', firstName: '', state: USER_STATES.ACTIVE.id };
 export const EMPTY_USER = {
   firstName: '',
   lastName: '',
@@ -97,16 +104,15 @@ export const USER_STATE_OPTIONS = Object.values(USER_STATES)
     ),
     value: id
   }));
-// TODO borrar SUPER_ADMIN si gawain ya lo elimino 
+
 export const ROLE_LABELS = {
   ADMIN: 'Administrador',
-  SUPER_ADMIN: 'Super Administrador',
   USER: 'Usuario',
 };
-// TODO borrar SUPER_ADMIN si gawain ya lo elimino 
-export const getRoleOptions = () => {
+
+export const getUsersRoleOptions = () => {
   return Object.entries(ROLES)
-    .filter(([key]) => !["CALLIXTO", "SUPER_ADMIN"].includes(key))
+    .filter(([key]) => !["CALLIXTO"].includes(key))
     .map(([key, value]) => ({
       key: value,
       text: ROLE_LABELS[key] || key,
@@ -114,7 +120,10 @@ export const getRoleOptions = () => {
     }));
 };
 
-export {
-  ATTRIBUTES, USER_COLUMNS
-};
-
+export const USERS_ROLE_OPTIONS = getUsersRoleOptions()
+  .map((role, index) => ({
+    key: `${role.value}-${index}`,
+    text: role.text,
+    value: role.value,
+  }))
+  .reverse();

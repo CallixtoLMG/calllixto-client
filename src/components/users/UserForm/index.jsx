@@ -1,81 +1,71 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
-import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import { DatepickerControlled } from "@/common/components/form/Datepicker";
-import { DATE_FORMATS, RULES, SHORTKEYS } from "@/common/constants";
-import { getEighteenYearsAgo, getFormatedDate } from "@/common/utils/dates";
+import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
+import { RULES, SHORTKEYS } from "@/common/constants";
+import { getEighteenYearsAgo } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { useCallback } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { EMPTY_USER, getRoleOptions } from "../users.constants";
+import { DatePickerControlled } from "../../../common/components/form/DatePicker";
+import { EMPTY_USER, USERS_ROLE_OPTIONS } from "../users.constants";
 
-const GET_ROLES = getRoleOptions();
-const ROLE_OPTIONS = GET_ROLES.map((role, index) => ({
-  key: `${role.value}-${index}`,
-  text: role.text,
-  value: role.value,
-})).reverse();
-
-const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending  }) => {
+const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending }) => {
   const methods = useForm({
     defaultValues: {
       ...EMPTY_USER,
       ...user,
-      role: user?.role || ROLE_OPTIONS.find(option => option.value === "user")?.value,
+      role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
       birthDate: user?.birthDate ? new Date(user.birthDate) : getEighteenYearsAgo(),
     },
   });
 
-  const { handleSubmit, control, reset, formState: { isDirty } } = methods;
+  const { handleSubmit, reset, formState: { isDirty } } = methods;
 
-  const handleReset = useCallback((user) => {
-    reset(user);
-  }, [reset]);
+  const handleReset = () => {
+    reset({
+      ...EMPTY_USER,
+      ...user,
+      role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
+      birthDate: user?.birthDate ? new Date(user.birthDate) : getEighteenYearsAgo(),
+    });
+  };
 
   const handleCreate = (data) => {
     onSubmit(data);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_USER, ...user } : EMPTY_USER), SHORTKEYS.DELETE);
+  useKeyboardShortcuts(handleReset, SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleCreate)}>
         <FieldsContainer>
           <TextControlled
-            width="35%"
+            width="25%"
             name="username"
             label="Usuario"
-            placeholder="Usuario"
+            placeholder="nombre@empresa.com"
             rules={RULES.REQUIRED}
             disabled={view}
             iconLabel
             popupPosition="bottom left"
             showPopup={true}
-            popupContent="Este será el nombre del Usuario, introduce un email válido por favor."
+            popupContent="Introduce el email del usuario."
           />
-          {!isUpdating && view
-            ? <TextField
-              width="25%"
-              label="Rol"
-              value={ROLE_OPTIONS.find(option => option.value === user?.role)?.text || user?.role}
-              disabled
-            />
-            : <DropdownControlled
-              width="25%"
-              name="role"
-              label="Rol"
-              defaultValue={user?.role || "user"}
-              rules={RULES.REQUIRED}
-              options={ROLE_OPTIONS}
-              disabled={!isUpdating && view}
-            />
-          }
+          <DropdownControlled
+            width={(!isUpdating && view) ? "fit-content" : "25%"}
+            name="role"
+            label="Rol"
+            icon={(!isUpdating && view) ? null : undefined}
+            defaultValue={user?.role || "user"}
+            rules={RULES.REQUIRED}
+            options={USERS_ROLE_OPTIONS}
+            disabled={!isUpdating && view}
+          />
         </FieldsContainer>
         <FieldsContainer>
           <TextControlled
-            width="30%"
+            width="25%"
             name="firstName"
             label="Nombre"
             placeholder="Nombre"
@@ -84,7 +74,7 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, is
             disabled={!isUpdating && view}
           />
           <TextControlled
-            width="30%"
+            width="25%"
             name="lastName"
             label="Apellido"
             placeholder="Apellido"
@@ -92,27 +82,35 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, is
             onChange={value => value.toUpperCase()}
             disabled={!isUpdating && view}
           />
-          {!isUpdating && view
-            ?
-            <TextField width="150px" label="Fecha de nacimiento" value={getFormatedDate(user?.birthDate, DATE_FORMATS.ONLY_DATE)} disabled />
-            :
-            <DatepickerControlled
-              name="birthDate"
-              label="Fecha de nacimiento"
-              width="180px"
-              defaultValue={getEighteenYearsAgo()}
-              maxDate={new Date()}
-              showMonthDropdown
-              showYearDropdown
-            />
-          }
+          <DatePickerControlled
+            disabled={!isUpdating && view}
+            name="birthDate"
+            label="Fecha de nacimiento"
+            width="180px"
+            defaultValue={getEighteenYearsAgo()}
+            maxDate={new Date()}
+            showMonthDropdown
+            showYearDropdown
+            scrollableYearDropdown
+            yearDropdownItemNumber={80}
+            rules={{
+              required: "Campo requerido.",
+              validate: (value) => {
+                const today = new Date();
+                const minBirthDate = new Date();
+                minBirthDate.setFullYear(today.getFullYear() - 18);
+                return value <= minBirthDate || "El usuario debe tener al menos 18 años.";
+              }
+            }}
+          />
         </FieldsContainer>
         <FieldsContainer>
           <TextControlled
-            width="40%"
+            width="51%"
             name="address"
             label="Dirección"
             placeholder="Dirección"
+            rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
           />
           <NumberControlled
@@ -155,7 +153,7 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, is
             isLoading={isLoading}
             isDirty={isDirty}
             disabled={isDeletePending}
-            onReset={() => handleReset(isUpdating ? { ...EMPTY_USER, ...user } : EMPTY_USER)}
+            onReset={handleReset}
           />
         )}
       </Form>

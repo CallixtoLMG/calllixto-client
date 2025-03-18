@@ -20,6 +20,7 @@ export const PercentField = ({
       height={height}
       label={label}
       control={Input}
+      disabled={disabled}
       error={error}
     >
       <Input

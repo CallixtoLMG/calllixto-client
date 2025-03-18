@@ -1,10 +1,12 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListUsers } from "@/api/users";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { downloadExcel, getFormatedPhone } from "@/common/utils";
+import { getFormatedDate } from "@/common/utils/dates";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UsersPage from "@/components/users/UserPage";
-import { USER_STATES } from "@/components/users/users.constants";
+import { USERS_ROLE_OPTIONS, USER_STATES } from "@/components/users/users.constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
@@ -18,7 +20,6 @@ const Users = () => {
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
-
   useEffect(() => {
     setLabels([PAGES.USERS.NAME]);
     refetch();
@@ -29,16 +30,19 @@ const Users = () => {
 
   const handleDownloadExcel = useCallback(() => {
     if (!users) return;
-    const headers = ['Usuario', 'Nombre', 'Apellido', 'Dirección', 'Telefono', 'Estado', 'Comentarios'];
+    const headers = ['Usuario', 'Nombre', 'Apellido', 'Rol', 'Dirección', 'Telefono', 'Estado', 'Nacimiento', 'Comentarios'];
     const mappedUsers = users.map(user => {
       const usersState = USER_STATES[user.state]?.singularTitle || user.state;
+      const roleText = USERS_ROLE_OPTIONS.find(option => option.value === user.role)?.text || user.role;
       return [
         user.username,
-        user.firstname,
-        user.lastname,
+        user.firstName,
+        user.lastName,
+        roleText,
         user.address,
-        user.phoneNumber,
+        getFormatedPhone(user.phoneNumber),
         usersState,
+        getFormatedDate(user.birthDate, DATE_FORMATS.ONLY_DATE),
         user.comments,
       ];
     });

@@ -1,11 +1,11 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useActiveProduct, useDeleteProduct, useEditProduct, useGetProduct, useInactiveProduct } from "@/api/products";
+import { useActiveProduct, useDeleteProduct, useEditProduct, useGetProduct, useInactiveProduct, useRecoverProduct } from "@/api/products";
 import { Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
-import { ACTIVE, COLORS, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE_LOW_CASE, PAGES, RECOVER } from "@/common/constants";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
@@ -36,6 +36,7 @@ const Product = ({ params }) => {
   const deleteProduct = useDeleteProduct();
   const activeProduct = useActiveProduct();
   const inactiveProduct = useInactiveProduct();
+  const recoverProduct = useRecoverProduct();
 
   useEffect(() => {
     resetActions();
@@ -163,6 +164,24 @@ const Product = ({ params }) => {
     },
   });
 
+  const { mutate: mutateRecover, isPending: isRecoverPending } = useMutation({
+    mutationFn: () => recoverProduct(product),
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Producto activado!");
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+    onError: (error) => {
+      toast.error(`Error al activar el producto: ${error.message || error}`);
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
+  });
+
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
     mutationFn: () => deleteProduct(product.code),
     onSuccess: (response) => {
@@ -220,8 +239,8 @@ const Product = ({ params }) => {
       mutateEdit({ code: product.code, state: PRODUCT_STATES.ACTIVE.id });
     }
 
-    if (modalAction === "recover") {
-      mutateEdit({ code: product.code, state: PRODUCT_STATES.ACTIVE.id });
+    if (modalAction === RECOVER) {
+      mutateRecover();
     }
 
     handleModalClose();
@@ -339,7 +358,7 @@ const Product = ({ params }) => {
         confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={setIsModalOpen}
-        isLoading={isInactivePending || isActivePending || isDeletePending || isEditPending}
+        isLoading={isInactivePending || isActivePending || isDeletePending || isEditPending || isRecoverPending}
         noConfirmation={!requiresConfirmation && modalAction !== INACTIVE_LOW_CASE}
         bodyContent={
           modalAction === INACTIVE_LOW_CASE ? (

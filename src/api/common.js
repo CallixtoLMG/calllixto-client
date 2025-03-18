@@ -245,6 +245,31 @@ export function useActiveItem() {
   return activeItem;
 };
 
+export function useRecoverItem() {
+  const queryClient = useQueryClient();
+
+  const recoverItem = async ({ entity, url, responseEntity, invalidateQueries = [], key }) => {
+    const body = {
+      updatedAt: now(),
+    };
+
+    const { data } = await getInstance().post(url, body);
+
+    if (data.statusOk) {
+
+      await updateStorageItem({ entity, value: data[responseEntity], key });
+
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      });
+    }
+
+    return data;
+  };
+
+  return recoverItem;
+};
+
 export function useEditItem() {
   const queryClient = useQueryClient();
 

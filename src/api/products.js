@@ -1,4 +1,4 @@
-import { ACTIVE, ALL, CODE, ENTITIES, INACTIVE_LOW_CASE, IN_MS } from "@/common/constants";
+import { ACTIVE, ALL, CODE, ENTITIES, INACTIVE_LOW_CASE, IN_MS, RECOVER } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { now } from "@/common/utils/dates";
 import { ATTRIBUTES, GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
@@ -16,7 +16,7 @@ import axios from "axios";
 import { chunk } from "lodash";
 import { useMemo } from "react";
 import { getInstance } from "./axios";
-import { getItemById, listItems, removeStorageItemsByCustomFilter, useActiveItem, useBatchDeleteItems, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
+import { getItemById, listItems, removeStorageItemsByCustomFilter, useActiveItem, useBatchDeleteItems, useCreateItem, useDeleteItem, useEditItem, useInactiveItem, useRecoverItem } from "./common";
 
 
 export function useListProducts() {
@@ -329,3 +329,23 @@ export const useActiveProduct = () => {
 
   return activeProduct;
 };
+
+export const useRecoverProduct = () => {
+  const recoverItem = useRecoverItem();
+
+  const recoverProduct = async (product) => {
+
+    const response = await recoverItem({
+      entity: ENTITIES.PRODUCTS,
+      url: `${PATHS.PRODUCTS}/${product.code}/${RECOVER}`,
+      key: CODE,
+      responseEntity: ENTITIES.PRODUCT,
+      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, product.code]]
+    });
+
+    return response;
+  };
+
+  return recoverProduct;
+};
+
