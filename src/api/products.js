@@ -119,10 +119,12 @@ export const useEditProduct = () => {
   const editItem = useEditItem();
 
   const editProduct = async (product) => {
+    const { previousVersions, ...cleanProduct } = product;
+    
     const response = await editItem({
       entity: ENTITIES.PRODUCTS,
       url: `${PATHS.PRODUCTS}/${product.code}`,
-      value: product,
+      value: cleanProduct,
       key: CODE,
       responseEntity: ENTITIES.PRODUCT,
       invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, product.code]]
