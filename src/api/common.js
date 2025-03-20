@@ -6,10 +6,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import localforage from "./local-forage";
 
-export function removeStorageEntity(entity) {
-  return localforage.removeItem(`${config.APP_ENV}-${entity}`);
-}
-
 async function entityList({ entity, url, params }) {
   try {
     let values = [];
@@ -38,7 +34,7 @@ async function entityList({ entity, url, params }) {
     console.error("entityList - Error fetching data:", error);
     throw error;
   }
-}
+};
 
 async function handleEvents({ entity, values, key = ID }) {
   let lastEventId = await localforage.getItem(`${config.APP_ENV}-${entity}-lastEventId`);
@@ -99,10 +95,10 @@ async function handleEvents({ entity, values, key = ID }) {
         values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
       }
     }
-  }
+  };
 
   return values;
-}
+};
 
 export async function listItems({ entity, url, params, key = ID }) {
   let values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
@@ -147,11 +143,11 @@ export async function getItemById({ id, url, entity, key = ID, params }) {
     return value;
   }
   return getEntity(id);
-}
+};
 
-export async function getItemByParam({ params, url, entitySingular, entityPlural }) {
+export async function getItemByParam({ params, url, entitySingular, entityPlural, key }) {
 
-  await listItems({ entity: entityPlural, url, params });
+  await listItems({ entity: entityPlural, url, params, key });
 
   const getEntity = async () => {
     try {
@@ -164,9 +160,9 @@ export async function getItemByParam({ params, url, entitySingular, entityPlural
     }
   };
 
-  let cachedData = await localforage.getItem(`${config.APP_ENV}-${entityPlural}`);
+  const cachedData = await localforage.getItem(`${config.APP_ENV}-${entityPlural}`);
 
-  let value = cachedData?.find((item) =>
+  const value = cachedData?.find((item) =>
     Object.entries(params).every(([key, val]) => item[key] === val)
   );
 
@@ -239,7 +235,7 @@ export function useInactiveItemByParam() {
   };
 
   return inactiveItem;
-}
+};
 
 export function useActiveItemByParam() {
   const queryClient = useQueryClient();
@@ -258,7 +254,7 @@ export function useActiveItemByParam() {
   };
 
   return activeItem;
-}
+};
 
 export function useActiveItem() {
   const queryClient = useQueryClient();
@@ -334,10 +330,10 @@ export function useEditItem() {
     }
 
     return data;
-  }
+  };
 
   return editItem;
-}
+};
 
 export function useEditItemByParam() {
   const queryClient = useQueryClient();
@@ -353,7 +349,6 @@ export function useEditItemByParam() {
 
     if (data.statusOk) {
       if (data[responseEntity]) {
-        console.log("📢 Enviando a updateStorageItem:", { entity, key: "username", value: data[responseEntity] });
 
         if (!data[responseEntity].username) {
           console.error("❌ Error: El usuario editado no tiene ID:", data[responseEntity]);
@@ -373,7 +368,7 @@ export function useEditItemByParam() {
   };
 
   return editItemByParam;
-}
+};
 
 export function useDeleteItem() {
   const queryClient = useQueryClient();
@@ -386,7 +381,7 @@ export function useDeleteItem() {
     }
     invalidateQueries.forEach((query) => { queryClient.invalidateQueries({ queryKey: query, refetchType: ALL }); })
     return data;
-  }
+  };
   return deleteItem;
 };
 
@@ -459,40 +454,20 @@ export function useBatchDeleteItems() {
   };
 
   return batchDeleteItems;
-}
-
+};
 
 export async function addStorageItem({ entity, value }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
   await localforage.setItem(`${config.APP_ENV}-${entity}`, [value, ...values]);
 };
 
-export async function updateStorageItem({ entity, value, key = "username" }) {
-  console.log("🔍 updateStorageItem - Antes de actualizar:", { entity, value, key });
-
-  if (!value[key]) {
-    console.error("❌ Error: key no válida en updateStorageItem", { value, key });
-    return;
-  }
-
-  let values = (await localforage.getItem(`${config.APP_ENV}-${entity}`)) || [];
-  console.log("📂 Valores actuales en localforage antes de actualizar:", values);
-
-  // 🔥 Filtrar el usuario viejo para eliminarlo antes de agregar el nuevo
-  values = values.filter(item => item[key] !== value[key]);
-
-  // 🔥 Ahora agregamos el usuario actualizado SIN eliminar otros usuarios
-  values.push(value);
-
-  console.log("✅ updatedArray después de actualizar:", values);
-
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
-}
-
-
-
-
-
+export async function updateStorageItem({ entity, value, key = ID }) {
+  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
+  const updatedArray = values.map(item => {
+    return item[key] === value[key] ? { ...item, ...value } : item;
+  })
+  await localforage.setItem(`${config.APP_ENV}-${entity}`, updatedArray);
+};
 
 export async function removeStorageItem({ entity, id, key = ID }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
@@ -507,4 +482,8 @@ export async function removeStorageItemsByCustomFilter({ entity, filter }) {
   }
   const filteredValues = values.filter(filter);
   await localforage.setItem(`${config.APP_ENV}-${entity}`, filteredValues);
+};
+
+export function removeStorageEntity(entity) {
+  return localforage.removeItem(`${config.APP_ENV}-${entity}`);
 };

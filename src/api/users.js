@@ -12,6 +12,7 @@ export function useListUsers() {
     queryFn: () => listItems({
       entity: ENTITIES.USERS,
       url: PATHS.USERS,
+      key: USERNAME,
       params: getDefaultListParams(ATTRIBUTES)
     }),
     staleTime: IN_MS.ONE_DAY,
@@ -25,6 +26,7 @@ export function useGetUser(username) {
     queryFn: () => getItemByParam({
       params: { username },
       url: PATHS.USER,
+      key: USERNAME,
       entitySingular: ENTITIES.USER,
       entityPlural: ENTITIES.USERS
     }),
@@ -62,7 +64,7 @@ export const useEditUser = () => {
       entity: ENTITIES.USERS,
       url: PATHS.USER,
       value: cleanUser,
-      username:  user.username ,
+      username: user.username,
       responseEntity: ENTITIES.USER,
       invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, user.username]]
     });
