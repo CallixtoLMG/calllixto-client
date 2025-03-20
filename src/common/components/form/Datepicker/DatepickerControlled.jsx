@@ -42,7 +42,6 @@ export const DatePickerControlled = ({
           label={label}
           icon={icon}
           control={ReactDatePicker}
-          placeholder={placeholder ?? label}
           error={!!errors?.[name] && {
             content: errors[name].message,
             pointing: 'above',

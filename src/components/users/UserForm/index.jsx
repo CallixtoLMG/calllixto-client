@@ -2,7 +2,7 @@ import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
 import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
-import { getEighteenYearsAgo } from "@/common/utils/dates";
+import { getPastDate } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { FormProvider, useForm } from "react-hook-form";
 import { DatePickerControlled } from "../../../common/components/form/DatePicker";
@@ -14,7 +14,7 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, is
       ...EMPTY_USER,
       ...user,
       role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
-      birthDate: user?.birthDate ? new Date(user.birthDate) : getEighteenYearsAgo(),
+      birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
     },
   });
 
@@ -25,7 +25,7 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, is
       ...EMPTY_USER,
       ...user,
       role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
-      birthDate: user?.birthDate ? new Date(user.birthDate) : getEighteenYearsAgo(),
+      birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
     });
   };
 
@@ -87,7 +87,7 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, is
             name="birthDate"
             label="Fecha de nacimiento"
             width="180px"
-            defaultValue={getEighteenYearsAgo()}
+            defaultValue={getPastDate(18, "years")}
             maxDate={new Date()}
             showMonthDropdown
             showYearDropdown

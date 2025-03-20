@@ -220,6 +220,8 @@ export const INACTIVE_LOW_CASE = "inactive";
 
 export const RECOVER = "recover";
 
+export const USERNAME = "username";
+
 export const EVENT_KEYS = {
   UPDATE: 'U',
   CREATE: "C",

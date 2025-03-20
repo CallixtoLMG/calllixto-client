@@ -92,7 +92,7 @@ const User = ({ params }) => {
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
     mutationFn: async ({ user }) => {
-      const response = await activeUser(user);
+      const response = await activeUser(user.username);
       return response;
     },
     onSuccess: (response) => {
@@ -110,7 +110,7 @@ const User = ({ params }) => {
 
   const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
     mutationFn: async ({ user, reason }) => {
-      const response = await inactiveUser(user, reason);
+      const response = await inactiveUser(user.username, reason);
       return response;
     },
     onSuccess: (response) => {
@@ -144,21 +144,28 @@ const User = ({ params }) => {
 
   const handleActionConfirm = async () => {
     setActiveAction(modalAction);
-
+  
     if (modalAction === DELETE) {
       mutateDelete();
-    } else if (modalAction === INACTIVE_LOW_CASE) {
-      if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar el usuario.");
-        return;
-      }
+    }
+  
+    if (modalAction === INACTIVE_LOW_CASE && !reason) {
+      toast.error("Debe proporcionar una razón para desactivar el usuario.");
+      return;
+    }
+  
+    if (modalAction === INACTIVE_LOW_CASE) {
       mutateInactive({ user, reason });
-    } else if (modalAction === ACTIVE) {
+    }
+  
+    if (modalAction === ACTIVE) {
       mutateActive({ user });
     }
-
+  
     handleModalClose();
   };
+  
+  
 
   const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
   const requiresConfirmation = modalAction === DELETE;

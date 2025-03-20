@@ -1,4 +1,4 @@
-import { ALL, DEFAULT_LAST_EVENT_ID, DELETE, ENTITIES, EVENT_KEYS, ID } from "@/common/constants";
+import { ALL, DEFAULT_LAST_EVENT_ID, DELETE, ENTITIES, EVENT_KEYS, ID, USERNAME } from "@/common/constants";
 import { now } from "@/common/utils/dates";
 import { config } from "@/config";
 import { EVENTS, PATHS } from "@/fetchUrls";
@@ -149,12 +149,13 @@ export async function getItemById({ id, url, entity, key = ID, params }) {
   return getEntity(id);
 }
 
-export async function getItemByParam({ paramKey, paramValue, url, entitySingular, entityPlural }) {
-  await listItems({ entity: entityPlural, url, params: { [paramKey]: paramValue } });
+export async function getItemByParam({ params, url, entitySingular, entityPlural }) {
+
+  await listItems({ entity: entityPlural, url, params });
 
   const getEntity = async () => {
     try {
-      const { data } = await getInstance().get(`${url}`, { params: { [paramKey]: paramValue } });
+      const { data } = await getInstance().get(url, { params });
       if (data.statusOk) {
         return data[entitySingular];
       }
@@ -164,11 +165,13 @@ export async function getItemByParam({ paramKey, paramValue, url, entitySingular
   };
 
   let cachedData = await localforage.getItem(`${config.APP_ENV}-${entityPlural}`);
-  let value = cachedData?.find((item) => item[paramKey] === paramValue);
+
+  let value = cachedData?.find((item) =>
+    Object.entries(params).every(([key, val]) => item[key] === val)
+  );
 
   return value || getEntity();
 }
-
 
 export function useCreateItem() {
   const queryClient = useQueryClient();
@@ -218,6 +221,44 @@ export function useInactiveItem() {
 
   return inactiveItem;
 };
+
+export function useInactiveItemByParam() {
+  const queryClient = useQueryClient();
+
+  const inactiveItem = async ({ entity, value, url, params = {}, responseEntity, invalidateQueries = [], key }) => {
+    const { data } = await getInstance().post(url, value, { params });
+
+    if (data.statusOk) {
+      await updateStorageItem({ entity, value: data[responseEntity], key });
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      });
+    }
+
+    return data;
+  };
+
+  return inactiveItem;
+}
+
+export function useActiveItemByParam() {
+  const queryClient = useQueryClient();
+
+  const activeItem = async ({ entity, value, url, params = {}, responseEntity, invalidateQueries = [], key }) => {
+    const { data } = await getInstance().post(url, value, { params });
+
+    if (data.statusOk) {
+      await updateStorageItem({ entity, value: data[responseEntity], key });
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      });
+    }
+
+    return data;
+  };
+
+  return activeItem;
+}
 
 export function useActiveItem() {
   const queryClient = useQueryClient();
@@ -301,19 +342,24 @@ export function useEditItem() {
 export function useEditItemByParam() {
   const queryClient = useQueryClient();
 
-  const editItemByParam = async ({ entity, paramKey, paramValue, url, responseEntity, invalidateQueries = [] }) => {
+  const editItemByParam = async ({ entity, url, value, username, responseEntity, invalidateQueries = [] }) => {
+
     const updatedItem = {
-      ...paramValue,
+      ...value,
       updatedAt: now(),
     };
 
-    const requestUrl = `${url}?${paramKey}=${encodeURIComponent(paramValue[paramKey])}`;
-
-    const { data } = await getInstance().put(requestUrl, updatedItem);
+    const { data } = await getInstance().put(url, updatedItem, { params: { username } });
 
     if (data.statusOk) {
       if (data[responseEntity]) {
-        await updateStorageItem({ entity, key: paramKey, value: data[responseEntity] });
+        console.log("📢 Enviando a updateStorageItem:", { entity, key: "username", value: data[responseEntity] });
+
+        if (!data[responseEntity].username) {
+          console.error("❌ Error: El usuario editado no tiene ID:", data[responseEntity]);
+          return;
+        }
+        await updateStorageItem({ entity, key: "username", value: data[responseEntity] });
       }
 
       invalidateQueries.forEach((query) => {
@@ -347,15 +393,12 @@ export function useDeleteItem() {
 export function useDeleteItemByParam() {
   const queryClient = useQueryClient();
 
-  const deleteItemByParam = async ({ entity, paramKey, paramValue, url, invalidateQueries = [] }) => {
-    const requestUrl = `${url}?${paramKey}=${paramValue}`;
-
+  const deleteItemByParam = async ({ entity, url, params = {}, invalidateQueries = [] }) => {
     try {
-      const { data } = await getInstance().delete(requestUrl);
+      const { data } = await getInstance().delete(url, { params });
 
       if (data.statusOk) {
-        await removeStorageItem({ entity, id: paramValue, key: paramKey });
-      } else {
+        await removeStorageItem({ entity, id: params.username, key: USERNAME });
       }
 
       invalidateQueries.forEach((query) => {
@@ -424,11 +467,32 @@ export async function addStorageItem({ entity, value }) {
   await localforage.setItem(`${config.APP_ENV}-${entity}`, [value, ...values]);
 };
 
-export async function updateStorageItem({ entity, value, key = ID }) {
-  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  const updatedArray = values.map(item => item[key] === value[key] ? { ...item, ...value } : item);
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, updatedArray);
-};
+export async function updateStorageItem({ entity, value, key = "username" }) {
+  console.log("🔍 updateStorageItem - Antes de actualizar:", { entity, value, key });
+
+  if (!value[key]) {
+    console.error("❌ Error: key no válida en updateStorageItem", { value, key });
+    return;
+  }
+
+  let values = (await localforage.getItem(`${config.APP_ENV}-${entity}`)) || [];
+  console.log("📂 Valores actuales en localforage antes de actualizar:", values);
+
+  // 🔥 Filtrar el usuario viejo para eliminarlo antes de agregar el nuevo
+  values = values.filter(item => item[key] !== value[key]);
+
+  // 🔥 Ahora agregamos el usuario actualizado SIN eliminar otros usuarios
+  values.push(value);
+
+  console.log("✅ updatedArray después de actualizar:", values);
+
+  await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
+}
+
+
+
+
+
 
 export async function removeStorageItem({ entity, id, key = ID }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
