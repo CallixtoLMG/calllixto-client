@@ -7,8 +7,8 @@ import { registerLocale } from "react-datepicker";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 import { Button, FieldsContainer, Flex, FlexColumn, FormField, Segment } from "../custom";
-import DatePicker from "../custom/DatePicker";
 import { Table, TotalList } from "../table";
+import DatePicker from "./DatePicker/DatePicker";
 
 registerLocale("es", es);
 
@@ -99,9 +99,9 @@ const Payments = ({ total, maxHeight, children, update }) => {
                 placeholder="Monto"
                 width="150px"
                 label="Monto"
-                value={payment.amount}  
+                value={payment.amount}
                 onChange={(value) => {
-                  setPayment({ ...payment, amount: value ?? 0 }); 
+                  setPayment({ ...payment, amount: value ?? 0 });
                 }}
                 disabled={false}
                 error={showErrors && !payment.amount ? RULES.REQUIRED.required : undefined}

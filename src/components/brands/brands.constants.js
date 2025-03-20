@@ -25,7 +25,7 @@ export const BRAND_COLUMNS = [
   }
 ];
 
-export const BRANDS_STATES = {
+export const BRAND_STATES = {
   ACTIVE: {
     id: 'ACTIVE',
     title: 'Activos',
@@ -43,9 +43,9 @@ export const BRANDS_STATES = {
 };
 
 export const EMPTY_BRAND = { name: '', id: '', comments: '' };
-export const EMPTY_FILTERS = { id: '', name: '', state: BRANDS_STATES.ACTIVE.id };
+export const EMPTY_FILTERS = { id: '', name: '', state: BRAND_STATES.ACTIVE.id };
 
-export const BRANDS_STATES_OPTIONS = Object.values(BRANDS_STATES)
+export const BRAND_STATES_OPTIONS = Object.values(BRAND_STATES)
   .map(({ id, title, color }) => ({
     key: id,
     text: (

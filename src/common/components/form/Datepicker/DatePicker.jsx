@@ -13,10 +13,14 @@ const DatePicker = ({
   minDate,
   maxDate,
   disabled = false,
+  showIcon,
+  icon
 }) => {
 
   return (
     <ReactDatePicker
+      icon={icon}
+      showIcon={showIcon}
       selected={selected}
       onChange={onChange}
       dateFormat={dateFormat}

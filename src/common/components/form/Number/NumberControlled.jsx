@@ -1,9 +1,11 @@
 import { Flex, FormField, Icon, Input } from "@/common/components/custom";
+import { get } from "lodash";
 import { Controller, useFormContext } from "react-hook-form";
-import { Header, } from "semantic-ui-react";
+import { Header } from "semantic-ui-react";
 
 export const NumberControlled = ({
   width,
+  flex,
   name,
   rules,
   label,
@@ -11,37 +13,47 @@ export const NumberControlled = ({
   iconPosition = 'left',
   placeholder,
   onChange,
+  maxLength,
   justifyItems,
+  normalMode = false,
+  disabled,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
+  const fieldError = get(errors, name);
+
   return (
     <Controller
       name={name}
       rules={rules}
       render={({ field: { onChange: onChangeController, value, ...rest } }) => (
         <FormField
+          disabled={disabled}
+          flex={flex}
           width={width}
           label={label}
           control={Input}
-          error={errors?.[name] && {
-            content: errors[name].message,
-            pointing: 'above',
+          error={fieldError && {
+            content: fieldError.message,
+            pointing: "above",
           }}
         >
           <Input
             {...inputProps}
             {...rest}
-            value={value?.toLocaleString() ?? 0}
+            maxLength={maxLength}
+            value={normalMode ? value ?? '' : value?.toLocaleString() ?? 0}
             placeholder={placeholder ?? label}
             {...(unit && { iconPosition })}
             onChange={(e) => {
-              let newValue = e.target.value.replace(/[^0-9.]/g, '');
-              if (!isNaN(newValue)) {
-                newValue = Number(newValue);
-                onChangeController(newValue);
-                onChange?.(newValue);
+              let newValue = e.target.value.replace(/[^0-9]/g, '');
+
+              if (!normalMode) {
+                newValue = newValue ? Number(newValue).toLocaleString() : '';
               }
+
+              onChangeController(newValue);
+              onChange?.(newValue);
             }}
             onFocus={(e) => e.target.select()}
           >

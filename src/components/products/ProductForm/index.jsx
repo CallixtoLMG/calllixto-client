@@ -4,7 +4,7 @@ import { FieldsContainer, Flex, Form, Label } from "@/common/components/custom";
 import { DropdownControlled, IconedButtonControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
-import { BRANDS_STATES } from "@/components/brands/brands.constants";
+import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
@@ -15,12 +15,11 @@ import { PercentControlled } from "../../../common/components/form";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
 import { getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
-const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view }) => {
+const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending }) => {
   const initialMargin = getMargin(product?.price, product?.cost);
 
   const methods = useForm({
     defaultValues: {
-      cost: product?.cost ?? 0,
       margin: initialMargin,
       tags: [],
       fractionConfig: {
@@ -46,7 +45,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     const roundedPrice = parseFloat(newPrice.toFixed(2));
     methods.setValue('price', roundedPrice);
   };
-  
+
   const handlePriceChange = (newPrice) => {
     if (watchCost > 0) {
       const newMargin = ((newPrice / watchCost) - 1) * 100;
@@ -110,7 +109,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
         <Flex justifyContent="space-between" alignItems="center">
           <span>{name}</span>
           <Flex>
-            {state === BRANDS_STATES.INACTIVE.id && (
+            {state === BRAND_STATES.INACTIVE.id && (
               <Popup
                 trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
                 content={deactivationReason ?? 'Motivo no especificado'}
@@ -256,7 +255,7 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             isLoading={isLoading}
             isDirty={isDirty}
             onReset={() => reset({ ...EMPTY_PRODUCT, ...product })}
-            disabled={isProductDeleted(product?.state)}
+            disabled={isProductDeleted(product?.state) || isDeletePending}
           />
         )}
       </Form>

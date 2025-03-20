@@ -11,5 +11,6 @@ export const ENTITIES = {
   BUDGET: 'budget',
   EVENTS: 'events',
   USERS: 'users',
+  USER: 'user',
   SETTINGS: "settings",
 };

@@ -1,5 +1,5 @@
-import { Loader } from "@/components/layout";
 import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS } from "@/common/constants";
+import { Loader } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";

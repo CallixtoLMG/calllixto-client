@@ -1,0 +1,164 @@
+import { SubmitAndRestore } from "@/common/components/buttons";
+import { FieldsContainer, Form } from "@/common/components/custom";
+import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
+import { RULES, SHORTKEYS } from "@/common/constants";
+import { getPastDate } from "@/common/utils/dates";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { FormProvider, useForm } from "react-hook-form";
+import { DatePickerControlled } from "../../../common/components/form/DatePicker";
+import { EMPTY_USER, USERS_ROLE_OPTIONS } from "../users.constants";
+
+const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending }) => {
+  const methods = useForm({
+    defaultValues: {
+      ...EMPTY_USER,
+      ...user,
+      role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
+      birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
+    },
+  });
+
+  const { handleSubmit, reset, formState: { isDirty } } = methods;
+
+  const handleReset = () => {
+    reset({
+      ...EMPTY_USER,
+      ...user,
+      role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
+      birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
+    });
+  };
+
+  const handleCreate = (data) => {
+    onSubmit(data);
+  };
+
+  useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(handleReset, SHORTKEYS.DELETE);
+
+  return (
+    <FormProvider {...methods}>
+      <Form onSubmit={handleSubmit(handleCreate)}>
+        <FieldsContainer>
+          <TextControlled
+            width="25%"
+            name="username"
+            label="Usuario"
+            placeholder="nombre@empresa.com"
+            rules={RULES.REQUIRED}
+            disabled={view}
+            iconLabel
+            popupPosition="bottom left"
+            showPopup={true}
+            popupContent="Introduce el email del usuario."
+          />
+          <DropdownControlled
+            width={(!isUpdating && view) ? "fit-content" : "25%"}
+            name="role"
+            label="Rol"
+            icon={(!isUpdating && view) ? null : undefined}
+            defaultValue={user?.role || "user"}
+            rules={RULES.REQUIRED}
+            options={USERS_ROLE_OPTIONS}
+            disabled={!isUpdating && view}
+          />
+        </FieldsContainer>
+        <FieldsContainer>
+          <TextControlled
+            width="25%"
+            name="firstName"
+            label="Nombre"
+            placeholder="Nombre"
+            rules={RULES.REQUIRED}
+            onChange={value => value.toUpperCase()}
+            disabled={!isUpdating && view}
+          />
+          <TextControlled
+            width="25%"
+            name="lastName"
+            label="Apellido"
+            placeholder="Apellido"
+            rules={RULES.REQUIRED}
+            onChange={value => value.toUpperCase()}
+            disabled={!isUpdating && view}
+          />
+          <DatePickerControlled
+            disabled={!isUpdating && view}
+            name="birthDate"
+            label="Fecha de nacimiento"
+            width="180px"
+            defaultValue={getPastDate(18, "years")}
+            maxDate={new Date()}
+            showMonthDropdown
+            showYearDropdown
+            scrollableYearDropdown
+            yearDropdownItemNumber={80}
+            rules={{
+              required: "Campo requerido.",
+              validate: (value) => {
+                const today = new Date();
+                const minBirthDate = new Date();
+                minBirthDate.setFullYear(today.getFullYear() - 18);
+                return value <= minBirthDate || "El usuario debe tener al menos 18 años.";
+              }
+            }}
+          />
+        </FieldsContainer>
+        <FieldsContainer>
+          <TextControlled
+            width="51%"
+            name="address"
+            label="Dirección"
+            placeholder="Dirección"
+            rules={RULES.REQUIRED}
+            disabled={!isUpdating && view}
+          />
+          <NumberControlled
+            width="130px"
+            name="phoneNumber.areaCode"
+            label="Código de Área"
+            placeholder="Ej: 011"
+            rules={{
+              required: "El código de área es requerido.",
+              validate: (value, { phoneNumber }) =>
+                (value + (phoneNumber?.number || "")).length === 10 ||
+                "El área y el número deben sumar 10 dígitos.",
+            }}
+            disabled={!isUpdating && view}
+            maxLength="4"
+            normalMode
+          />
+          <NumberControlled
+            width="150px"
+            name="phoneNumber.number"
+            label="Número de Teléfono"
+            placeholder="Ej: 12345678"
+            rules={{
+              required: "El número de teléfono es requerido.",
+              validate: (value, { phoneNumber }) =>
+                ((phoneNumber?.areaCode || "") + value).length === 10 ||
+                "El área y el número deben sumar 10 dígitos.",
+            }}
+            disabled={!isUpdating && view}
+            maxLength="7"
+            normalMode
+          />
+        </FieldsContainer>
+        <FieldsContainer>
+          <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
+        </FieldsContainer>
+        {(isUpdating || !view) && (
+          <SubmitAndRestore
+            isUpdating={isUpdating}
+            isLoading={isLoading}
+            isDirty={isDirty}
+            disabled={isDeletePending}
+            onReset={handleReset}
+          />
+        )}
+      </Form>
+    </FormProvider>
+  );
+};
+
+export default UserForm;

@@ -1,14 +1,14 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListBrands } from "@/api/brands";
-import BrandsPage from "@/components/brands/BrandsPage";
-import { BRANDS_STATES } from "@/components/brands/brands.constants";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { downloadExcel } from "@/common/utils";
+import BrandsPage from "@/components/brands/BrandsPage";
+import { BRAND_STATES } from "@/components/brands/brands.constants";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { downloadExcel } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
@@ -32,7 +32,7 @@ const Brands = () => {
     if (!brands) return;
     const headers = ['ID', 'Nombre', 'Estado', 'Comentarios'];
     const mappedBrands = brands.map(brand => {
-      const brandState = BRANDS_STATES[brand.state]?.singularTitle || brand.state;
+      const brandState = BRAND_STATES[brand.state]?.singularTitle || brand.state;
       return [
         brand.id,
         brand.name,

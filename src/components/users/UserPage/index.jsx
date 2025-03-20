@@ -5,9 +5,9 @@ import { createFilter } from "@/common/utils";
 import { useFilters } from "@/hooks/useFilters";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { BRAND_COLUMNS, BRAND_STATES_OPTIONS, EMPTY_FILTERS } from "../brands.constants";
+import { EMPTY_FILTERS, USER_COLUMNS, USER_STATE_OPTIONS } from "../users.constants";
 
-const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
+const UsersPage = ({ users = [], isLoading, onRefetch }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -15,41 +15,43 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
     methods
   } = useFilters(EMPTY_FILTERS);
 
-  const onFilter = createFilter(appliedFilters, ['name', 'id']);
+  const onFilter = createFilter(appliedFilters, ['username', 'firstName', 'lastName']);
 
   return (
     <>
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit(() => { })}>
           <Filters
-            entity={ENTITIES.BRANDS}
+            entity={ENTITIES.USERS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
           >
             <DropdownControlled
               width="200px"
               name="state"
-              options={BRAND_STATES_OPTIONS}
+              options={USER_STATE_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
               afterChange={() => {
                 onSubmit(() => { })();
               }}
             />
-            <TextControlled name="id" placeholder="Id" width="80px" />
-            <TextControlled name="name" placeholder="Nombre" width="300px" />
+            <TextControlled name="username" placeholder="Usuario" width="180px" />
+            <TextControlled name="firstName" placeholder="Nombre" width="180px" />
+            <TextControlled name="lastName" placeholder="Apellido" width="180px" />
           </Filters>
         </Form>
       </FormProvider>
       <Table
         isLoading={isLoading}
-        headers={BRAND_COLUMNS}
-        elements={brands}
-        page={PAGES.BRANDS}
+        headers={USER_COLUMNS}
+        elements={users}
+        page={PAGES.USERS}
         onFilter={onFilter}
         paginate
+        mainKey="username"
       />
     </>
-  );
+  )
 };
 
-export default BrandsPage;
+export default UsersPage;

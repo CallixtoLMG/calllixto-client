@@ -1,6 +1,5 @@
-const ROLES = {
+export const ROLES = {
   CALLIXTO: 'callixto',
-  SUPER_ADMIN: 'sadmin',
   ADMIN: 'admin',
   USER: 'user',
 }
@@ -9,14 +8,9 @@ const CALLIXTO = {
   [ROLES.CALLIXTO]: true,
 }
 
-const SUPER_ADMIN = {
-  [ROLES.SUPER_ADMIN]: true,
-  ...CALLIXTO
-}
-
 const ADMIN = {
   [ROLES.ADMIN]: true,
-  ...SUPER_ADMIN
+  ...CALLIXTO
 }
 
 export const RULES = {

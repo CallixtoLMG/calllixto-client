@@ -48,6 +48,13 @@ export const PAGES = {
     NAME: 'Ventas',
     SHORTKEYS: 'Control+5'
   },
+  USERS: {
+    BASE: "/usuarios",
+    CREATE: "/usuarios/crear",
+    SHOW: (id) => `/usuarios/${id}`,
+    NAME: 'Usuarios',
+    SHORTKEYS: 'Control+6'
+  },
   LOGIN: {
     BASE: "/login"
   },
@@ -205,7 +212,15 @@ export const ALL = "all";
 
 export const ACTIVE = "active";
 
+export const DELETE = "delete";
+
 export const INACTIVE = "INACTIVE";
+
+export const INACTIVE_LOW_CASE = "inactive";
+
+export const RECOVER = "recover";
+
+export const USERNAME = "username";
 
 export const EVENT_KEYS = {
   UPDATE: 'U',

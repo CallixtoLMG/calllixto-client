@@ -1,14 +1,10 @@
-import { ALL, DEFAULT_LAST_EVENT_ID, ENTITIES, EVENT_KEYS, ID } from "@/common/constants";
+import { ALL, DEFAULT_LAST_EVENT_ID, DELETE, ENTITIES, EVENT_KEYS, ID, USERNAME } from "@/common/constants";
 import { now } from "@/common/utils/dates";
 import { config } from "@/config";
 import { EVENTS, PATHS } from "@/fetchUrls";
 import { useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import localforage from "./local-forage";
-
-export function removeStorageEntity(entity) {
-  return localforage.removeItem(`${config.APP_ENV}-${entity}`);
-}
 
 async function entityList({ entity, url, params }) {
   try {
@@ -38,7 +34,7 @@ async function entityList({ entity, url, params }) {
     console.error("entityList - Error fetching data:", error);
     throw error;
   }
-}
+};
 
 async function handleEvents({ entity, values, key = ID }) {
   let lastEventId = await localforage.getItem(`${config.APP_ENV}-${entity}-lastEventId`);
@@ -99,10 +95,10 @@ async function handleEvents({ entity, values, key = ID }) {
         values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
       }
     }
-  }
+  };
 
   return values;
-}
+};
 
 export async function listItems({ entity, url, params, key = ID }) {
   let values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
@@ -135,7 +131,7 @@ export async function getItemById({ id, url, entity, key = ID, params }) {
     try {
       const { data } = await getInstance().get(`${url}/${id}`);
       if (data.statusOk) {
-        return data;
+        return data[entity];
       }
     } catch (error) {
       throw error;
@@ -147,6 +143,30 @@ export async function getItemById({ id, url, entity, key = ID, params }) {
     return value;
   }
   return getEntity(id);
+};
+
+export async function getItemByParam({ params, url, entitySingular, entityPlural, key }) {
+
+  await listItems({ entity: entityPlural, url, params, key });
+
+  const getEntity = async () => {
+    try {
+      const { data } = await getInstance().get(url, { params });
+      if (data.statusOk) {
+        return data[entitySingular];
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const cachedData = await localforage.getItem(`${config.APP_ENV}-${entityPlural}`);
+
+  const value = cachedData?.find((item) =>
+    Object.entries(params).every(([key, val]) => item[key] === val)
+  );
+
+  return value || getEntity();
 }
 
 export function useCreateItem() {
@@ -198,6 +218,44 @@ export function useInactiveItem() {
   return inactiveItem;
 };
 
+export function useInactiveItemByParam() {
+  const queryClient = useQueryClient();
+
+  const inactiveItem = async ({ entity, value, url, params = {}, responseEntity, invalidateQueries = [], key }) => {
+    const { data } = await getInstance().post(url, value, { params });
+
+    if (data.statusOk) {
+      await updateStorageItem({ entity, value: data[responseEntity], key });
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      });
+    }
+
+    return data;
+  };
+
+  return inactiveItem;
+};
+
+export function useActiveItemByParam() {
+  const queryClient = useQueryClient();
+
+  const activeItem = async ({ entity, value, url, params = {}, responseEntity, invalidateQueries = [], key }) => {
+    const { data } = await getInstance().post(url, value, { params });
+
+    if (data.statusOk) {
+      await updateStorageItem({ entity, value: data[responseEntity], key });
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      });
+    }
+
+    return data;
+  };
+
+  return activeItem;
+};
+
 export function useActiveItem() {
   const queryClient = useQueryClient();
 
@@ -224,6 +282,31 @@ export function useActiveItem() {
   return activeItem;
 };
 
+export function useRecoverItem() {
+  const queryClient = useQueryClient();
+
+  const recoverItem = async ({ entity, url, responseEntity, invalidateQueries = [], key }) => {
+    const body = {
+      updatedAt: now(),
+    };
+
+    const { data } = await getInstance().post(url, body);
+
+    if (data.statusOk) {
+
+      await updateStorageItem({ entity, value: data[responseEntity], key });
+
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      });
+    }
+
+    return data;
+  };
+
+  return recoverItem;
+};
+
 export function useEditItem() {
   const queryClient = useQueryClient();
 
@@ -247,10 +330,45 @@ export function useEditItem() {
     }
 
     return data;
-  }
+  };
 
   return editItem;
-}
+};
+
+export function useEditItemByParam() {
+  const queryClient = useQueryClient();
+
+  const editItemByParam = async ({ entity, url, value, username, responseEntity, invalidateQueries = [] }) => {
+
+    const updatedItem = {
+      ...value,
+      updatedAt: now(),
+    };
+
+    const { data } = await getInstance().put(url, updatedItem, { params: { username } });
+
+    if (data.statusOk) {
+      if (data[responseEntity]) {
+
+        if (!data[responseEntity].username) {
+          console.error("❌ Error: El usuario editado no tiene ID:", data[responseEntity]);
+          return;
+        }
+        await updateStorageItem({ entity, key: "username", value: data[responseEntity] });
+      }
+
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      });
+    } else {
+      console.error("⚠️ Error en la respuesta:", data.message);
+    }
+
+    return data;
+  };
+
+  return editItemByParam;
+};
 
 export function useDeleteItem() {
   const queryClient = useQueryClient();
@@ -263,8 +381,33 @@ export function useDeleteItem() {
     }
     invalidateQueries.forEach((query) => { queryClient.invalidateQueries({ queryKey: query, refetchType: ALL }); })
     return data;
-  }
+  };
   return deleteItem;
+};
+
+export function useDeleteItemByParam() {
+  const queryClient = useQueryClient();
+
+  const deleteItemByParam = async ({ entity, url, params = {}, invalidateQueries = [] }) => {
+    try {
+      const { data } = await getInstance().delete(url, { params });
+
+      if (data.statusOk) {
+        await removeStorageItem({ entity, id: params.username, key: USERNAME });
+      }
+
+      invalidateQueries.forEach((query) => {
+        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      });
+
+      return data;
+    } catch (error) {
+      console.error("❌ Error en la petición DELETE:", error);
+      throw error;
+    }
+  };
+
+  return deleteItemByParam;
 };
 
 export function useBatchDeleteItems() {
@@ -285,7 +428,7 @@ export function useBatchDeleteItems() {
         if (data.statusOk) {
           deletedCount += 1;
 
-          if (data.product?.state === "delete") {
+          if (data.product?.state === DELETE) {
             successfulDeletes.push(code);
           }
         } else {
@@ -311,8 +454,7 @@ export function useBatchDeleteItems() {
   };
 
   return batchDeleteItems;
-}
-
+};
 
 export async function addStorageItem({ entity, value }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
@@ -321,7 +463,9 @@ export async function addStorageItem({ entity, value }) {
 
 export async function updateStorageItem({ entity, value, key = ID }) {
   const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  const updatedArray = values.map(item => item[key] === value[key] ? { ...item, ...value } : item);
+  const updatedArray = values.map(item => {
+    return item[key] === value[key] ? { ...item, ...value } : item;
+  })
   await localforage.setItem(`${config.APP_ENV}-${entity}`, updatedArray);
 };
 
@@ -338,4 +482,8 @@ export async function removeStorageItemsByCustomFilter({ entity, filter }) {
   }
   const filteredValues = values.filter(filter);
   await localforage.setItem(`${config.APP_ENV}-${entity}`, filteredValues);
+};
+
+export function removeStorageEntity(entity) {
+  return localforage.removeItem(`${config.APP_ENV}-${entity}`);
 };
