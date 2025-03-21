@@ -6,7 +6,7 @@ export const useArrayTags = (entity) => {
 
   const uniqueTags = {};
 
-  const entityTags = settings?.settings?.tags ?? [];
+  const entityTags = settings?.tags ?? [];
 
     entityTags.forEach((tag) => {
     if (tag?.name) {
