@@ -13,7 +13,11 @@ export const DropdownField = ({
   error,
   clearable
 }) => {
+  console.log(value)
+
+  
   return (
+
     <FormField
       flex={flex}
       width={width}

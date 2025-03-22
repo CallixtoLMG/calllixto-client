@@ -12,7 +12,7 @@ import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useMutation } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Popup } from "semantic-ui-react";
@@ -21,6 +21,15 @@ import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../budgets
 import { Container, Message, MessageHeader } from "./styles";
 
 const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
+  useEffect(() => {
+    if (!selectedContact?.phone && budget?.customer?.phoneNumbers?.length === 1) {
+      setSelectedContact((prev) => ({
+        ...prev,
+        phone: getFormatedPhone(budget.customer.phoneNumbers[0])
+      }));
+    }
+  }, [budget?.customer?.phoneNumbers, selectedContact, setSelectedContact]);
+
   const methods = useForm({
     defaultValues: {
       paymentsMade: budget?.paymentsMade || [],
@@ -28,7 +37,6 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
     mode: "onChange",
   });
   const { formState: { isDirty } } = methods;
-
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({ canUpdate: true });
   const updatePayment = useUpdatePayments();
@@ -199,7 +207,6 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           <DropdownField
             flex="3"
             label="Dirección"
-            search
             control={Dropdown}
             value={
               budget?.pickUpInStore
@@ -222,21 +229,28 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             })}
             disabled={!budget?.customer?.addresses?.length && !budget?.pickUpInStore}
           />
-
           <DropdownField
             flex="2"
             label="Teléfono"
             control={Dropdown}
-            value={!budget?.customer?.phoneNumbers?.length ? 'Cliente sin teléfono' : budget?.customer?.phoneNumbers.length === 1 ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref} : ` : ""} ${getFormatedPhone(budget.customer?.phoneNumbers?.[0])}` : selectedContact?.phone}
+            value={
+              !budget?.customer?.phoneNumbers?.length
+                ? 'Cliente sin teléfono'
+                : budget?.customer?.phoneNumbers.length === 1
+                  ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref}: ` : ''}${getFormatedPhone(budget.customer?.phoneNumbers?.[0])}`
+                  : selectedContact?.phone
+            }
             options={budget?.customer?.phoneNumbers.map((phone) => ({
-              key: getFormatedPhone(phone),
+              key: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
               text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
-              value: getFormatedPhone(phone),
+              value: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`
             }))}
-            onChange={(e, { value }) => setSelectedContact({
-              ...selectedContact,
-              phone: value
-            })}
+            onChange={(e, { value }) => {
+              setSelectedContact((prev) => ({
+                ...prev,
+                phone: value,
+              }));
+            }}
             disabled={!budget?.customer?.phoneNumbers?.length}
           />
         </FieldsContainer>

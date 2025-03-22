@@ -22,11 +22,13 @@ export const DropdownControlled = ({
 }) => {
   const { formState: { errors } } = useFormContext();
 
+
   return (
     <Controller
       name={name}
       rules={rules}
       render={({ field: { onChange, value, ...rest } }) => {
+        console.log("value", value)
         const normalizedValue = Array.isArray(value)
           ? value.map(v => (typeof v === "object" ? v.name : v))
           : value;
