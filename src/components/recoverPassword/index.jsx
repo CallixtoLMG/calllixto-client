@@ -28,10 +28,7 @@ const RecoverPasswordForm = () => {
   }, [isCodeSent, reset]);
 
   const { mutate: onRecoverPassword, isPending: isRecoverPasswordPending } = useMutation({
-    mutationFn: async (emailData) => {
-      const data = await recoverPassword(emailData);
-      return data;
-    },
+    mutationFn: recoverPassword,
     onSuccess: (_, emailData) => {
       toast.success("Se ha enviado un enlace de recuperación a tu correo electrónico.");
       setIsCodeSent(true);

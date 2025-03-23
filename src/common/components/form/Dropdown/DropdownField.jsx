@@ -13,8 +13,6 @@ export const DropdownField = ({
   error,
   clearable
 }) => {
-  console.log(value)
-
   
   return (
 

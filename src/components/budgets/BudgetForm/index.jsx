@@ -13,7 +13,7 @@ import { BUDGET_STATES, PAYMENT_METHODS, PICK_UP_IN_STORE } from "@/components/b
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
 import { ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
-import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal } from "@/components/products/products.utils";
+import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -154,7 +154,6 @@ const BudgetForm = ({
   const normalizedCustomer = useMemo(() => {
     if (!watchCustomer || !watchCustomer.id) return null;
 
-    // Extraemos solo las propiedades necesarias
     return customerOptions.find(option => option.key === watchCustomer.id)?.value || {
       id: watchCustomer.id,
       name: watchCustomer.name,
@@ -375,7 +374,7 @@ const BudgetForm = ({
           onChange={() => {
             calculateTotal();
           }}
-          disabled={product.state === PRODUCT_STATES.OOS.id}
+          disabled={isProductOOS(product.state)}
         />
       ),
       width: 1
@@ -447,6 +446,7 @@ const BudgetForm = ({
             name={`products[${index}].discount`}
             defaultValue={product.discount ?? 0}
             handleChange={calculateTotal}
+            disabled={isProductOOS(product.state)}
           />
         </Flex>
       ),
@@ -585,8 +585,6 @@ const BudgetForm = ({
               value={normalizedCustomer ?? "No se seleccionó ningún cliente"}
               search
             />
-            {console.log("watchCustomer", watchCustomer)}
-            {console.log("customerOptions", customerOptions)}
             <TextField
               flex="2"
               label="Dirección"

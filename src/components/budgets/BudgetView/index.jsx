@@ -21,14 +21,23 @@ import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../budgets
 import { Container, Message, MessageHeader } from "./styles";
 
 const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
+
   useEffect(() => {
     if (!selectedContact?.phone && budget?.customer?.phoneNumbers?.length === 1) {
       setSelectedContact((prev) => ({
         ...prev,
-        phone: getFormatedPhone(budget.customer.phoneNumbers[0])
+        phone: getFormatedPhone(budget.customer.phoneNumbers[0]),
       }));
     }
-  }, [budget?.customer?.phoneNumbers, selectedContact, setSelectedContact]);
+
+    if (!selectedContact?.address && budget?.customer?.addresses?.length === 1) {
+      setSelectedContact((prev) => ({
+        ...prev,
+        address: budget.customer.addresses[0].address,
+      }));
+    }
+  }, [budget?.customer?.phoneNumbers, budget?.customer?.addresses, selectedContact, setSelectedContact]);
+
 
   const methods = useForm({
     defaultValues: {
@@ -208,43 +217,38 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             flex="3"
             label="Dirección"
             control={Dropdown}
-            value={
-              budget?.pickUpInStore
-                ? PICK_UP_IN_STORE
-                : selectedContact.address || (budget?.customer?.addresses?.length ? '' : 'Cliente sin dirección')
-            }
+            value={selectedContact?.address || ''}
             options={[
               { key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE },
-              ...(
-                budget?.customer?.addresses?.map((address) => ({
-                  key: address.address,
-                  text: `${address.ref ? `${address.ref}: ` : ''}${address.address}`,
-                  value: address.address,
-                })) || []
-              )
+              ...(budget?.customer?.addresses?.map((address) => ({
+                key: address.address,
+                text: address.ref ? `${address.ref}: ${address.address}` : address.address,
+                value: address.address,
+              })) || [])
             ]}
-            onChange={(e, { value }) => setSelectedContact({
-              ...selectedContact,
-              address: value,
-            })}
+            onChange={(e, { value }) =>
+              setSelectedContact((prev) => ({
+                ...prev,
+                address: value,
+              }))
+            }
             disabled={!budget?.customer?.addresses?.length && !budget?.pickUpInStore}
           />
           <DropdownField
             flex="2"
             label="Teléfono"
             control={Dropdown}
-            value={
-              !budget?.customer?.phoneNumbers?.length
-                ? 'Cliente sin teléfono'
-                : budget?.customer?.phoneNumbers.length === 1
-                  ? `${budget.customer?.phoneNumbers?.[0]?.ref ? `${budget.customer?.phoneNumbers?.[0]?.ref}: ` : ''}${getFormatedPhone(budget.customer?.phoneNumbers?.[0])}`
-                  : selectedContact?.phone
-            }
-            options={budget?.customer?.phoneNumbers.map((phone) => ({
-              key: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
-              text: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`,
-              value: `${phone.ref ? `${phone.ref}: ` : ''}${getFormatedPhone(phone)}`
-            }))}
+            value={selectedContact?.phone || ''}
+            options={budget?.customer?.phoneNumbers.map((phone) => {
+              const formattedPhone = getFormatedPhone(phone);
+              const label = phone.ref ? `${phone.ref}: ${formattedPhone}` : formattedPhone;
+
+              return {
+                key: formattedPhone,
+                text: label,
+                value: formattedPhone,
+              };
+            })}
             onChange={(e, { value }) => {
               setSelectedContact((prev) => ({
                 ...prev,
