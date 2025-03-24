@@ -3,6 +3,7 @@ import { useUserContext } from "@/User";
 import { useActiveUser, useDeleteUser, useEditUser, useGetUser, useInactiveUser } from "@/api/users";
 import { Input, Message, MessageHeader } from "@/common/components/custom";
 import { ModalAction } from "@/common/components/modals";
+import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -12,8 +13,9 @@ import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
+import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const User = ({ params }) => {
   useValidateToken();
@@ -22,7 +24,6 @@ const User = ({ params }) => {
   const { data: user, isLoading, refetch } = useGetUser(decodeURIComponent(params.username));
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -31,6 +32,30 @@ const User = ({ params }) => {
   const deleteUser = useDeleteUser();
   const activeUser = useActiveUser();
   const inactiveUser = useInactiveUser();
+
+  const formRef = useRef(null);
+  const {
+    showModal: showUnsavedModal,
+    onBeforeView,
+    handleDiscard,
+    handleSave,
+    isSaving
+  } = useUnsavedChanges({
+    formRef,
+    onDiscard: () => {
+      formRef.current?.resetForm();
+      setIsUpdating(false);
+    },
+    onSave: async () => {
+      await formRef.current?.submitForm();
+      setIsUpdating(false);
+    }
+  });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
+    canUpdate: RULES.canUpdate[role],
+    onBeforeView,
+  });
+
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -144,28 +169,21 @@ const User = ({ params }) => {
 
   const handleActionConfirm = async () => {
     setActiveAction(modalAction);
-  
     if (modalAction === DELETE) {
       mutateDelete();
     }
-  
     if (modalAction === INACTIVE_LOW_CASE && !reason) {
       toast.error("Debe proporcionar una razón para desactivar el usuario.");
       return;
     }
-  
     if (modalAction === INACTIVE_LOW_CASE) {
       mutateInactive({ user, reason });
     }
-  
     if (modalAction === ACTIVE) {
       mutateActive({ user });
     }
-  
     handleModalClose();
   };
-  
-  
 
   const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
   const requiresConfirmation = modalAction === DELETE;
@@ -213,12 +231,19 @@ const User = ({ params }) => {
         </Message>
       )}
       <UserForm
+        ref={formRef}
         user={user}
         onSubmit={mutateEdit}
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(user?.state)}
         view
         isDeletePending={isDeletePending}
+      />
+      <UnsavedChangesModal
+        open={showUnsavedModal}
+        onSave={handleSave}
+        onDiscard={handleDiscard}
+        isSaving={isSaving}
       />
       <ModalAction
         title={header}

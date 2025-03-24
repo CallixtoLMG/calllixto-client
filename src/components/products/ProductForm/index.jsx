@@ -8,14 +8,16 @@ import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { useMemo } from "react";
+import { forwardRef, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { PercentControlled } from "../../../common/components/form";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
 import { getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
-const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending }) => {
+const ProductForm = forwardRef(({
+  product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending },
+  ref) => {
   const initialMargin = getMargin(product?.price, product?.cost);
 
   const methods = useForm({
@@ -33,6 +35,11 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
   const { data: productsSettings, isFetching: isProductSettingsFetching } = useGetSetting(ENTITIES.PRODUCTS);
   const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
+  useImperativeHandle(ref, () => ({
+    isDirty: () => isDirty,
+    submitForm: () => handleSubmit(handleForm)(),
+    resetForm: () => reset(product),
+  }));
   const [watchFractionable, watchSupplier, watchBrand, watchCost] = watch([
     'fractionConfig.active',
     'supplier',
@@ -66,12 +73,16 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     }
 
     if (!isUpdating) {
-      filteredData.code = `${data.supplier}${data.brand}${data.code.toUpperCase()}`;
+      const safeSupplier = data.supplier ?? "";
+      const safeBrand = data.brand ?? "";
+      const safeCode = data.code?.toUpperCase() ?? "";
+      filteredData.code = `${safeSupplier}${safeBrand}${safeCode}`;
       delete filteredData.supplier;
       delete filteredData.brand;
     }
 
     await onSubmit(filteredData);
+    reset(filteredData);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
@@ -261,6 +272,6 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
       </Form>
     </FormProvider>
   );
-};
+});
 
 export default ProductForm;

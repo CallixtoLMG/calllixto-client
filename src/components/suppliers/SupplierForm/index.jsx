@@ -4,20 +4,34 @@ import { ContactControlled, ContactView, TextAreaControlled, TextControlled } fr
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_SUPPLIER } from "../suppliers.constants";
 
-const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading, view, isDeletePending }) => {
+const SupplierForm = forwardRef(({ 
+  supplier, onSubmit, isUpdating, isLoading, view, isDeletePending 
+}, ref) => {
   const methods = useForm({ defaultValues: supplier });
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
+  useImperativeHandle(ref, () => ({
+    isDirty: () => isDirty,
+    submitForm: () => handleSubmit(handleForm)(),
+    resetForm: () => reset(supplier)
+  }));
+
+  const handleForm = async (data) => {
+    await onSubmit(data);
+    reset(data); 
+  };
+
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
 
-  useKeyboardShortcuts(handleSubmit(onSubmit), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(handleSubmit(handleForm), SHORTKEYS.ENTER);
   useKeyboardShortcuts(() => reset({ ...EMPTY_SUPPLIER, ...supplier }), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
+      <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
         <FieldsContainer>
           <TextControlled
             width="150px"
@@ -52,6 +66,6 @@ const SupplierForm = ({ supplier, onSubmit, isUpdating, isLoading, view, isDelet
       </Form>
     </FormProvider>
   )
-};
+});
 
 export default SupplierForm;

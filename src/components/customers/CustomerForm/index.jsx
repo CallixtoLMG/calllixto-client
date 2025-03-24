@@ -5,11 +5,13 @@ import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled,
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { useCallback } from "react";
+import { forwardRef, useCallback, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
 
-const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, isDeletePending }) => {
+const CustomerForm = forwardRef(({
+   customer, onSubmit, isLoading, isUpdating, view, isDeletePending },
+    ref) => {
   const methods = useForm({
     defaultValues: {
       tags: [],
@@ -19,6 +21,11 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, isDelet
   });
 
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
+  useImperativeHandle(ref, () => ({
+    isDirty: () => isDirty,
+    submitForm: () => handleSubmit(handleCreate)(),
+    resetForm: () => reset(customer)
+  }));
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
   const { data: customersSettings, isFetching: isCustomerSettingsFetching } = useGetSetting(ENTITIES.CUSTOMERS);
   const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.CUSTOMERS, customersSettings);
@@ -41,6 +48,7 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, isDelet
     }
 
     onSubmit(filteredData);
+    reset(filteredData);
   };
 
   useKeyboardShortcuts(handleSubmit(handleCreate), SHORTKEYS.ENTER);
@@ -97,6 +105,6 @@ const CustomerForm = ({ customer, onSubmit, isLoading, isUpdating, view, isDelet
       </Form>
     </FormProvider>
   )
-};
+});
 
 export default CustomerForm;

@@ -4,6 +4,7 @@ import { useActiveCustomer, useDeleteCustomer, useEditCustomer, useGetCustomer, 
 import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
+import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import CustomerForm from "@/components/customers/CustomerForm";
@@ -12,8 +13,9 @@ import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
+import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Customer = ({ params }) => {
   useValidateToken();
@@ -22,7 +24,6 @@ const Customer = ({ params }) => {
   const { data: budgetData, isLoading: isLoadingBudgets } = useListBudgets();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({ canUpdate: true });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -31,6 +32,28 @@ const Customer = ({ params }) => {
   const deleteCustomer = useDeleteCustomer();
   const inactiveCustomer = useInactiveCustomer();
   const activeCustomer = useActiveCustomer();
+  const formRef = useRef(null);
+  const {
+    showModal: showUnsavedModal,
+    onBeforeView,
+    handleDiscard,
+    handleSave,
+    isSaving
+  } = useUnsavedChanges({
+    formRef,
+    onDiscard: () => {
+      formRef.current?.resetForm();
+      setIsUpdating(false);
+    },
+    onSave: async () => {
+      await formRef.current?.submitForm();
+      setIsUpdating(false);
+    }
+  });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
+    canUpdate: true,
+    onBeforeView,
+  });
 
   useEffect(() => {
     resetActions();
@@ -210,12 +233,19 @@ const Customer = ({ params }) => {
         </Message>
       )}
       <CustomerForm
+        ref={formRef}
         customer={customer}
         onSubmit={mutateEdit}
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(customer?.state)}
         view
         isDeletePending={isDeletePending}
+      />
+      <UnsavedChangesModal
+        open={showUnsavedModal}
+        onDiscard={handleDiscard}
+        onSave={handleSave}
+        isSaving={isSaving}
       />
       <ModalAction
         title={header}

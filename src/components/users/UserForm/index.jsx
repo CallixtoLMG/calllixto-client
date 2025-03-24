@@ -4,11 +4,14 @@ import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlle
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { getPastDate } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { DatePickerControlled } from "../../../common/components/form/DatePicker";
 import { EMPTY_USER, USERS_ROLE_OPTIONS } from "../users.constants";
 
-const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending }) => {
+const UserForm = forwardRef(({
+  user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending
+}, ref) => {
   const methods = useForm({
     defaultValues: {
       ...EMPTY_USER,
@@ -19,6 +22,11 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, is
   });
 
   const { handleSubmit, reset, formState: { isDirty } } = methods;
+  useImperativeHandle(ref, () => ({
+    isDirty: () => isDirty,
+    submitForm: () => handleSubmit(handleCreate)(),
+    resetForm: () => reset(user)
+  }));
 
   const handleReset = () => {
     reset({
@@ -31,6 +39,7 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, is
 
   const handleCreate = (data) => {
     onSubmit(data);
+    reset(data);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
@@ -159,6 +168,6 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, is
       </Form>
     </FormProvider>
   );
-};
+});
 
 export default UserForm;

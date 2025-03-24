@@ -5,6 +5,7 @@ import { useHasProductsByBrandId } from "@/api/products";
 import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
+import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import BrandForm from "@/components/brands/BrandForm";
@@ -14,8 +15,9 @@ import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
+import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Brand = ({ params }) => {
   useValidateToken();
@@ -24,12 +26,33 @@ const Brand = ({ params }) => {
   const { data: brand, isLoading, refetch } = useGetBrand(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
   const editBrand = useEditBrand();
+  const formRef = useRef(null);
+  const {
+    showModal: showUnsavedModal,
+    onBeforeView,
+    handleDiscard,
+    handleSave,
+    isSaving
+  } = useUnsavedChanges({
+    formRef,
+    onDiscard: () => {
+      formRef.current?.resetForm();
+      setIsUpdating(false);
+    },
+    onSave: async () => {
+      await formRef.current?.submitForm();
+      setIsUpdating(false);
+    }
+  });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
+    canUpdate: RULES.canUpdate[role],
+    onBeforeView,
+  });
   const deleteBrand = useDeleteBrand();
   const activeBrand = useActiveBrand();
   const inactiveBrand = useInactiveBrand();
@@ -206,12 +229,19 @@ const Brand = ({ params }) => {
         </Message>
       )}
       <BrandForm
+        ref={formRef}
         brand={brand}
         onSubmit={mutateEdit}
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(brand?.state)}
         view
-        isDeletePending={isDeletePending} 
+        isDeletePending={isDeletePending}
+      />
+      <UnsavedChangesModal
+        open={showUnsavedModal}
+        onDiscard={handleDiscard}
+        onSave={handleSave}
+        isSaving={isSaving}
       />
       <ModalAction
         title={header}
