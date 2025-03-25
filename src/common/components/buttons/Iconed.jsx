@@ -12,13 +12,17 @@ const IconedButton = ({
   loading,
   width = 'fit-content',
   height,
-  submit
+  submit,
+  position,
+  alignSelf
 }) => {
   return (
     <Button
       size="small"
       icon
+      alignSelf={alignSelf}
       labelPosition="left"
+      position={position}
       basic={basic}
       width={width}
       height={height}
