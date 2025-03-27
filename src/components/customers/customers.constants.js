@@ -1,4 +1,5 @@
-import { Flex, Label, OverflowCell, } from "@/common/components/custom";
+import { Flex, Label } from "@/common/components/custom";
+import OverflowWrapper from "@/common/components/custom/OverflowWrapper";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "../../common/components/tooltips";
 
@@ -16,7 +17,9 @@ export const HEADERS = [
       const { tags, name, comments } = customer;
       return (
         <Flex justifyContent="space-between" alignItems="center">
-          <OverflowCell maxWidth="45vw" text={name} />
+          <OverflowWrapper maxWidth="45vw" popupContent={name}>
+            {name}
+          </OverflowWrapper>
           <Flex columnGap="7px" alignItems="center" justifyContent="flex-end">
             {tags && <TagsTooltip tooltip tags={tags} />}
             {comments && <CommentTooltip tooltip comment={comments} />}

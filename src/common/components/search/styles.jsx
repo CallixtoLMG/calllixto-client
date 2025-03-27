@@ -32,6 +32,7 @@ div.content{
 
 const Text = styled.p`
    margin: 0;
+   display: inline;
 `;
 
 const Label = styled(SLabel)`
@@ -40,6 +41,6 @@ const Label = styled(SLabel)`
 `;
 
 export {
-    Container, Label, Search, Text
+  Container, Label, Search, Text
 };
 

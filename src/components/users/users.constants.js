@@ -41,8 +41,8 @@ export const USER_COLUMNS = [
     align: "left",
     width: 3,
     value: (user) => (
-      < OverflowWrapper maxWidth="15vw" popupContent={user?.firstName} >
-        {user?.firstName}
+      < OverflowWrapper maxWidth="15vw" popupContent={user.firstName} >
+        {user.firstName}
       </OverflowWrapper >)
   }, {
     id: 3,
@@ -50,8 +50,8 @@ export const USER_COLUMNS = [
     align: "left",
     width: 3,
     value: (user) => (
-      < OverflowWrapper maxWidth="15vw" popupContent={user?.lastName} >
-        {user?.lastName}
+      < OverflowWrapper maxWidth="15vw" popupContent={user.lastName} >
+        {user.lastName}
       </OverflowWrapper >)
   }, {
     id: 4,
@@ -59,21 +59,21 @@ export const USER_COLUMNS = [
     width: 3,
     align: "left",
     value: (user) => (
-      < OverflowWrapper maxWidth="20vw" popupContent={user?.address} >
-        {user?.address}
+      < OverflowWrapper maxWidth="20vw" popupContent={user.address} >
+        {user.address}
       </OverflowWrapper >)
   },
   {
     id: 5,
     title: "Teléfono",
     width: 2,
-    value: (user) => getFormatedPhone(user?.phoneNumber)
+    value: (user) => getFormatedPhone(user.phoneNumber)
   },
   {
     id: 6,
     title: "Nacimiento",
     width: 1,
-    value: (user) => getFormatedDate(user?.birthDate, DATE_FORMATS.ONLY_DATE)
+    value: (user) => getFormatedDate(user.birthDate, DATE_FORMATS.ONLY_DATE)
   }
 ];
 

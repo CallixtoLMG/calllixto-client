@@ -83,7 +83,7 @@ const Header = () => {
                     <UserMenu
                       trigger={
                         <Button icon>
-                          <Icon name={ICONS.USER} />{userData.name}
+                          <Icon padding="0 20px 0 0" name={ICONS.USER} />{userData.name}
                         </Button>
                       }
                       onLogout={handleLogout}

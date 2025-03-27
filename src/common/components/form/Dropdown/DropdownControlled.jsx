@@ -1,4 +1,3 @@
-import { useTruncationPopupRenderer } from "@/hooks/useTruncationPopupRenderer";
 import { Controller, useFormContext } from "react-hook-form";
 import { Dropdown, FormField } from "../../custom";
 export const DropdownControlled = ({
@@ -21,11 +20,6 @@ export const DropdownControlled = ({
   icon
 }) => {
   const { formState: { errors } } = useFormContext();
-
-  const renderWithTruncation = useTruncationPopupRenderer({
-    maxWidth: "150px", // Ajustá según tu diseño
-    position: "top center"
-  });
 
   return (
     <Controller
@@ -50,17 +44,12 @@ export const DropdownControlled = ({
             control={Dropdown}
             multiple={multiple}
             renderLabel={(item) => {
-              const labelText = typeof item === "string"
-                ? item
-                : optionsMapper[item.value]?.name || "";
-
-              const color = typeof item === "string"
-                ? undefined
-                : optionsMapper[item.value]?.color;
+              if (typeof item === "string")
+                return item
 
               return {
-                color,
-                content: renderWithTruncation(labelText),
+                color: optionsMapper[item.value]?.color,
+                content: optionsMapper[item.value]?.name,
               };
             }}
             noResultsMessage="No se encontraron resultados"

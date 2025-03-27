@@ -117,7 +117,9 @@ const BudgetForm = ({
       content: (
         <FlexColumn marginTop="5px" rowGap="5px">
           <FlexColumn>
-            <Text>{name}</Text>
+            <OverflowWrapper maxWidth="100%" popupContent={name}>
+              <Text>{name}</Text>
+            </OverflowWrapper>
           </FlexColumn>
           <Flex justifyContent="space-between" alignItems="center" columnGap="5px">
             <Box >
