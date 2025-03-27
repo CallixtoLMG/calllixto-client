@@ -1,4 +1,5 @@
 import { Flex, Label } from "@/common/components/custom";
+import OverflowWrapper from "@/common/components/custom/OverflowWrapper";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "@/common/components/tooltips";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 
@@ -20,13 +21,16 @@ export const SUPPLIERS_COLUMNS = [
     align: "left",
     value: (supplier) =>
       <Flex justifyContent="space-between">
-        {supplier.name}
+        <OverflowWrapper maxWidth="40vw" popupContent={supplier.name}>
+          {supplier.name}
+        </OverflowWrapper>
         {supplier.comments && <CommentTooltip tooltip comment={supplier.comments} />}
       </Flex>
   },
   {
     id: 3,
     title: "Dirección",
+    width: 4,
     value: (supplier) => {
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(supplier.addresses || []);
       return (
@@ -40,7 +44,7 @@ export const SUPPLIERS_COLUMNS = [
   {
     id: 4,
     title: "Teléfono",
-    width: 3,
+    width: 2,
     value: (supplier) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(supplier.phoneNumbers);
       return (

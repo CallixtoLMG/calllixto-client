@@ -3,5 +3,6 @@ export * from '../form/Password/PasswordField';
 export * from './Containers';
 export * from './Flex';
 export * from './OverflowCell';
+export * from './OverflowWrapper';
 export * from './Semantic';
 

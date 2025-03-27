@@ -1,5 +1,6 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, OverflowCell } from "@/common/components/custom";
+import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label } from "@/common/components/custom";
+import OverflowWrapper from "@/common/components/custom/OverflowWrapper";
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
@@ -366,7 +367,9 @@ const BudgetForm = ({
       title: "Nombre",
       value: (product) => (
         <Container>
-          <OverflowCell text={product.name} />
+          <OverflowWrapper maxWidth="30vw" popupContent={product.name}>
+            {product.name}
+          </OverflowWrapper>
           <Flex alignItems="center" marginLeft="5px" columnGap="5px">
             {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
             {product.tags && <TagsTooltip tooltip tags={product.tags} />}
@@ -433,7 +436,12 @@ const BudgetForm = ({
       ),
       width: 1
     },
-    { title: "Total", value: (product) => <PriceLabel value={getTotal(product)} />, id: 7, width: 3 },
+    {
+      id: 7,
+      title: "Total",
+      value: (product) => <PriceLabel value={getTotal(product)} />,
+      width: 3
+    },
   ], [calculateTotal, setValue]);
 
   const handleDraft = async (data) => {

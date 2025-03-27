@@ -1,4 +1,5 @@
 import { Box, Flex } from "@/common/components/custom";
+import OverflowWrapper from "@/common/components/custom/OverflowWrapper";
 import { DATE_FORMATS, SELECT_ALL_OPTION } from "@/common/constants";
 import { getFormatedDate } from "@/common/utils/dates";
 import { Label, Popup } from "semantic-ui-react";
@@ -101,9 +102,12 @@ export const BUDGETS_COLUMNS = [
     id: 2,
     title: "Cliente",
     align: "left",
+    width: 6,
     value: (budget) => (
       <Flex justifyContent="space-between">
-        {budget.customer.name}
+        <OverflowWrapper maxWidth="25vw" popupContent={budget.customer.name}>
+          {budget.customer.name}
+        </OverflowWrapper>
         {budget.comments && <CommentTooltip comment={budget.comments} />}
       </Flex>
     )
@@ -126,7 +130,12 @@ export const BUDGETS_COLUMNS = [
     id: 5,
     title: "Vendedor",
     align: "left",
-    value: (budget) => budget.seller
+    width: 4,
+    value: (budget) => (
+      <OverflowWrapper maxWidth="25vw" popupContent={budget.seller}>
+        {budget.seller}
+      </OverflowWrapper>
+    )
   },
 ];
 

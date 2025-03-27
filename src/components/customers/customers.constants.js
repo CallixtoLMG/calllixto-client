@@ -16,7 +16,7 @@ export const HEADERS = [
       const { tags, name, comments } = customer;
       return (
         <Flex justifyContent="space-between" alignItems="center">
-          <OverflowCell maxWidth="40vw" text={name} />
+          <OverflowCell maxWidth="45vw" text={name} />
           <Flex columnGap="7px" alignItems="center" justifyContent="flex-end">
             {tags && <TagsTooltip tooltip tags={tags} />}
             {comments && <CommentTooltip tooltip comment={comments} />}
@@ -43,7 +43,7 @@ export const HEADERS = [
   {
     id: 3,
     title: "Teléfono",
-    width: 3,
+    width: 2,
     value: (customer) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(customer.phoneNumbers);
       return (

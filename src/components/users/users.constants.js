@@ -1,4 +1,5 @@
 import { Flex, Label } from '@/common/components/custom';
+import OverflowWrapper from '@/common/components/custom/OverflowWrapper';
 import { CommentTooltip } from '@/common/components/tooltips';
 import { DATE_FORMATS } from '@/common/constants';
 import { getFormatedPhone } from '@/common/utils';
@@ -28,7 +29,9 @@ export const USER_COLUMNS = [
     align: "left",
     value: (user) =>
       <Flex justifyContent="space-between">
-        {user.username}
+        < OverflowWrapper maxWidth="15vw" popupContent={user.username} >
+          {user.username}
+        </OverflowWrapper >
         {user.comments && <CommentTooltip comment={user.comments} />}
       </Flex>
   },
@@ -36,20 +39,29 @@ export const USER_COLUMNS = [
     id: 2,
     title: "Nombre",
     align: "left",
-    width: 2,
-    value: (user) => user?.firstName
+    width: 3,
+    value: (user) => (
+      < OverflowWrapper maxWidth="15vw" popupContent={user?.firstName} >
+        {user?.firstName}
+      </OverflowWrapper >)
   }, {
     id: 3,
     title: "Apellido",
     align: "left",
-    width: 2,
-    value: (user) => user?.lastName
+    width: 3,
+    value: (user) => (
+      < OverflowWrapper maxWidth="15vw" popupContent={user?.lastName} >
+        {user?.lastName}
+      </OverflowWrapper >)
   }, {
     id: 4,
     title: "Direccion",
-    width: 4,
+    width: 3,
     align: "left",
-    value: (user) => user?.address
+    value: (user) => (
+      < OverflowWrapper maxWidth="20vw" popupContent={user?.address} >
+        {user?.address}
+      </OverflowWrapper >)
   },
   {
     id: 5,

@@ -73,6 +73,22 @@ export const Dropdown = styled(SDropdown)`
   padding: ${({ padding }) => `${padding}!important`} ;
   background-color: ${({ bgColor }) => `${bgColor}!important`};
   box-shadow: ${({ boxShadow }) => boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
+
+  .ui.dropdown .menu > .item {
+    max-width: 200px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color:red;
+  }
+
+  .menu > .item,
+  > .text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
   i{
     margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
   }
