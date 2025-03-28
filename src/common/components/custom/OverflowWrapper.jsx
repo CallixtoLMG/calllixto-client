@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Popup } from "semantic-ui-react";
 import styled, { css } from "styled-components";
 
@@ -32,7 +32,7 @@ const OverflowWrapper = ({
   const textRef = useRef(null);
   const [isTruncated, setIsTruncated] = useState(false);
 
-  const detectOverflow = () => {
+  const detectOverflow = useCallback(() => {
     const el = textRef.current;
     if (!el) return;
 
@@ -43,7 +43,7 @@ const OverflowWrapper = ({
     } else {
       setIsTruncated(el.scrollWidth > el.clientWidth);
     }
-  };
+  }, [lineClamp]);
 
   useEffect(() => {
     const el = textRef.current;
@@ -59,7 +59,7 @@ const OverflowWrapper = ({
       clearTimeout(timeout);
       resizeObserver.disconnect();
     };
-  }, [children, popupContent, lineClamp]);
+  }, [children, popupContent, lineClamp, detectOverflow]);
 
   return (
     <Popup
