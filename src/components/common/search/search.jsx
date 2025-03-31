@@ -1,5 +1,5 @@
 import { COLORS, PRODUCT_STATES } from "@/constants";
-import { formatProductCode } from "@/utils";
+import { formatProductCode, normalizeText } from "@/utils";
 import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { CommentTooltip } from "../tooltips";
@@ -22,11 +22,12 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((query) => {
-      const queryWords = query.toLowerCase().split(' ').filter(Boolean);
+      const queryWords = normalizeText(query).split(' ').filter(Boolean);
       setFilteredProducts(products?.filter((product) => {
-        const name = product?.name?.toLowerCase();
-        const code = product?.code?.toLowerCase();
-        return queryWords.every(word => name?.includes(word)) || code?.includes(query.toLowerCase());
+        const name = normalizeText(product?.name);
+        const code = normalizeText(product?.code);
+
+        return queryWords.every(word => name.includes(word) || code.includes(word));
       }));
       setLoading(false);
     }, 300), [products]
