@@ -5,34 +5,29 @@ import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled,
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { forwardRef, useCallback, useImperativeHandle } from "react";
+import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
 
 const CustomerForm = forwardRef(({
-   customer, onSubmit, isLoading, isUpdating, view, isDeletePending },
-    ref) => {
+  customer, onSubmit, isLoading, isUpdating, view, isDeletePending },
+  ref) => {
+
+  const getInitialValues = (customer) => ({ ...EMPTY_CUSTOMER, tags: [], ...customer });
+
   const methods = useForm({
-    defaultValues: {
-      tags: [],
-      ...EMPTY_CUSTOMER,
-      ...customer,
-    }
+    defaultValues: getInitialValues(customer),
   });
 
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleCreate)(),
-    resetForm: () => reset(customer)
+    resetForm: () => reset(getInitialValues(customer))
   }));
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
   const { data: customersSettings, isFetching: isCustomerSettingsFetching } = useGetSetting(ENTITIES.CUSTOMERS);
   const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.CUSTOMERS, customersSettings);
-
-  const handleReset = useCallback((customer) => {
-    reset(customer);
-  }, [reset]);
 
   const handleCreate = (data) => {
     const { previousVersions, ...filteredData } = data;
@@ -52,7 +47,7 @@ const CustomerForm = forwardRef(({
   };
 
   useKeyboardShortcuts(handleSubmit(handleCreate), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => handleReset({ ...EMPTY_CUSTOMER, ...customer }), SHORTKEYS.DELETE);
+  useKeyboardShortcuts(() => reset(getInitialValues(customer)), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
@@ -98,7 +93,7 @@ const CustomerForm = forwardRef(({
             isUpdating={isUpdating}
             isLoading={isLoading}
             isDirty={isDirty}
-            onReset={() => reset({ ...EMPTY_CUSTOMER, ...customer })}
+            onReset={() => reset(getInitialValues(customer))}
             disabled={isDeletePending}
           />
         )}

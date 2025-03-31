@@ -36,10 +36,12 @@ const User = ({ params }) => {
   const formRef = useRef(null);
   const {
     showModal: showUnsavedModal,
+    closeModal,   
     onBeforeView,
     handleDiscard,
     handleSave,
-    isSaving
+    handleCancel,
+    isSaving,
   } = useUnsavedChanges({
     formRef,
     onDiscard: () => {
@@ -47,8 +49,7 @@ const User = ({ params }) => {
       setIsUpdating(false);
     },
     onSave: async () => {
-      await formRef.current?.submitForm();
-      setIsUpdating(false);
+      await formRef.current?.submitForm(); 
     }
   });
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
@@ -105,6 +106,7 @@ const User = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Usuario actualizado!");
+        setIsUpdating(false);
       } else {
         toast.error(response.error.message);
       }
@@ -112,6 +114,7 @@ const User = ({ params }) => {
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
+      closeModal();
     },
   });
 
@@ -244,6 +247,7 @@ const User = ({ params }) => {
         onSave={handleSave}
         onDiscard={handleDiscard}
         isSaving={isSaving}
+        onCancel={handleCancel} 
       />
       <ModalAction
         title={header}

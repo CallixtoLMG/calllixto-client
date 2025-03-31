@@ -19,18 +19,22 @@ const ProductForm = forwardRef(({
   product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending },
   ref) => {
   const initialMargin = getMargin(product?.price, product?.cost);
+  const getInitialValues = (product) => ({
+    ...EMPTY_PRODUCT,
+    margin: initialMargin,
+    tags: [],
+    fractionConfig: {
+      active: false,
+      unit: MEASSURE_UNITS.MT.value,
+    },
+    editablePrice: false,
+    supplier: product?.supplier ?? null, 
+    brand: product?.brand ?? null,
+    ...product,
+  });
 
   const methods = useForm({
-    defaultValues: {
-      margin: initialMargin,
-      tags: [],
-      fractionConfig: {
-        active: false,
-        unit: MEASSURE_UNITS.MT.value,
-      },
-      editablePrice: false,
-      ...product,
-    }
+    defaultValues: getInitialValues(product)
   });
   const { data: productsSettings, isFetching: isProductSettingsFetching } = useGetSetting(ENTITIES.PRODUCTS);
   const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
@@ -38,7 +42,7 @@ const ProductForm = forwardRef(({
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleForm)(),
-    resetForm: () => reset(product),
+    resetForm: () => reset(getInitialValues(product))
   }));
   const [watchFractionable, watchSupplier, watchBrand, watchCost] = watch([
     'fractionConfig.active',
@@ -73,10 +77,7 @@ const ProductForm = forwardRef(({
     }
 
     if (!isUpdating) {
-      const safeSupplier = data.supplier ?? "";
-      const safeBrand = data.brand ?? "";
-      const safeCode = data.code?.toUpperCase() ?? "";
-      filteredData.code = `${safeSupplier}${safeBrand}${safeCode}`;
+      filteredData.code = `${data.supplier}${data.brand}${data.code.toUpperCase()}`;
       delete filteredData.supplier;
       delete filteredData.brand;
     }
@@ -86,7 +87,7 @@ const ProductForm = forwardRef(({
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset({ ...EMPTY_PRODUCT, ...product }), SHORTKEYS.DELETE);
+  useKeyboardShortcuts(() => reset(getInitialValues(product)), SHORTKEYS.DELETE);
 
   const supplierOptions = useMemo(() => {
     return suppliers?.map(({ id, name, state, deactivationReason }) => ({
@@ -265,7 +266,7 @@ const ProductForm = forwardRef(({
             isUpdating={isUpdating}
             isLoading={isLoading}
             isDirty={isDirty}
-            onReset={() => reset({ ...EMPTY_PRODUCT, ...product })}
+            onReset={() => reset(getInitialValues(product))}
             disabled={isProductDeleted(product?.state) || isDeletePending}
           />
         )}

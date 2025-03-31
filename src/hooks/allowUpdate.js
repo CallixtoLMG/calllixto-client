@@ -8,10 +8,9 @@ export const useAllowUpdate = ({ canUpdate, onBeforeView }) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleViewClick = async () => {
-    if (typeof onBeforeView === "function") {
-      const canView = await onBeforeView();
-      if (!canView) return;
-    }
+    const canView = await onBeforeView?.();
+    if (!canView) return;
+  
     setIsUpdating(false);
   };
 

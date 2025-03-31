@@ -11,16 +11,15 @@ import { EMPTY_BRAND } from "../brands.constants";
 const BrandForm = forwardRef(({
   brand, onSubmit, isUpdating, isLoading, view, isDeletePending
 }, ref) => {
+  const getInitialValues = (brand) => ({ ...EMPTY_BRAND, ...brand });
   const methods = useForm({
-    defaultValues: {
-      ...brand
-    }
+    defaultValues:getInitialValues(brand)
   });
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleForm)(),
-    resetForm: () => reset(brand)
+    resetForm: () => reset(getInitialValues(brand))
   }));
 
   const handleForm = async (data) => {
@@ -29,7 +28,7 @@ const BrandForm = forwardRef(({
   };
 
   useKeyboardShortcuts(handleSubmit(handleForm), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset({ ...EMPTY_BRAND, ...brand }), SHORTKEYS.DELETE);
+  useKeyboardShortcuts(() => reset(getInitialValues(brand)), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
@@ -60,7 +59,7 @@ const BrandForm = forwardRef(({
             isUpdating={isUpdating}
             isLoading={isLoading}
             isDirty={isDirty}
-            onReset={() => reset({ ...EMPTY_BRAND, ...brand })}
+            onReset={() => reset(getInitialValues(brand))}
             disabled={isDeletePending}
           />
         )}

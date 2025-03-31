@@ -35,10 +35,12 @@ const Customer = ({ params }) => {
   const formRef = useRef(null);
   const {
     showModal: showUnsavedModal,
+    closeModal,   
     onBeforeView,
     handleDiscard,
     handleSave,
-    isSaving
+    handleCancel,
+    isSaving,
   } = useUnsavedChanges({
     formRef,
     onDiscard: () => {
@@ -46,8 +48,7 @@ const Customer = ({ params }) => {
       setIsUpdating(false);
     },
     onSave: async () => {
-      await formRef.current?.submitForm();
-      setIsUpdating(false);
+      await formRef.current?.submitForm(); 
     }
   });
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
@@ -114,6 +115,7 @@ const Customer = ({ params }) => {
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
+      closeModal();
     },
   });
 
@@ -245,6 +247,7 @@ const Customer = ({ params }) => {
         open={showUnsavedModal}
         onDiscard={handleDiscard}
         onSave={handleSave}
+        onCancel={handleCancel} 
         isSaving={isSaving}
       />
       <ModalAction

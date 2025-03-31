@@ -1,15 +1,11 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 
-export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
-  const skipNext = useRef(false);
+export const useUnsavedChanges = ({ formRef, onDiscard, onSave  }) => {
+
   const [showModal, setShowModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
   const onBeforeView = useCallback(async () => {
-    if (skipNext.current) {
-      skipNext.current = false;
-      return true;
-    }
 
     const isDirty = formRef.current?.isDirty?.();
 
@@ -22,31 +18,36 @@ export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
   }, [formRef]);
 
   const handleDiscard = useCallback(() => {
-    skipNext.current = true;
     onDiscard?.();
     setShowModal(false);
   }, [onDiscard]);
 
+  const handleCancel = useCallback(() => {
+    setShowModal(false);
+  }, []);
+
   const handleSave = useCallback(async () => {
     setIsSaving(true);
-    console.log("⏳ isSaving now TRUE");
-
-    skipNext.current = true;
     try {
       await onSave?.();
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setShowModal(false);
-    } finally {
-      setIsSaving(false);
+    } catch (err) {
+      console.error(err);
     }
+
   }, [onSave]);
+
+  const closeModal = useCallback(() => {
+    setShowModal(false);
+    setIsSaving(false);
+  }, []);
 
   return {
     showModal,
+    closeModal,
     isSaving,
-    setShowModal,
     onBeforeView,
     handleDiscard,
     handleSave,
+    handleCancel,
   };
 };

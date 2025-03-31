@@ -11,12 +11,13 @@ import { EMPTY_SUPPLIER } from "../suppliers.constants";
 const SupplierForm = forwardRef(({ 
   supplier, onSubmit, isUpdating, isLoading, view, isDeletePending 
 }, ref) => {
-  const methods = useForm({ defaultValues: supplier });
+  const getInitialValues = (supplier) => ({ ...EMPTY_SUPPLIER, ...supplier });
+  const methods = useForm({ defaultValues: getInitialValues(supplier) });
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleForm)(),
-    resetForm: () => reset(supplier)
+    resetForm: () => reset(getInitialValues(supplier))
   }));
 
   const handleForm = async (data) => {
@@ -27,7 +28,7 @@ const SupplierForm = forwardRef(({
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
 
   useKeyboardShortcuts(handleSubmit(handleForm), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset({ ...EMPTY_SUPPLIER, ...supplier }), SHORTKEYS.DELETE);
+  useKeyboardShortcuts(() => reset(getInitialValues(supplier)), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
@@ -59,7 +60,7 @@ const SupplierForm = forwardRef(({
             isUpdating={isUpdating}
             isLoading={isLoading}
             isDirty={isDirty}
-            onReset={() => reset({ ...EMPTY_SUPPLIER, ...supplier })}
+            onReset={() => reset(getInitialValues(supplier))}
             disabled={isDeletePending}
           />
         )}

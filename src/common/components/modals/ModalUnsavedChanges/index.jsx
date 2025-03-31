@@ -3,7 +3,7 @@ import { COLORS, ICONS } from "@/common/constants";
 import { Transition } from "semantic-ui-react";
 import { IconedButton } from "../../buttons";
 
-const UnsavedChangesModal = ({ open, onSave, onDiscard, isSaving }) => (
+const UnsavedChangesModal = ({ open, onSave, onDiscard, isSaving, onCancel  }) => (
   <Transition visible={open} animation="scale" duration={500}>
     <Modal width="50%" open={open} onClose={isSaving ? null : onDiscard}>
       <Modal.Header>Existen cambios sin guardar!</Modal.Header>
@@ -11,7 +11,16 @@ const UnsavedChangesModal = ({ open, onSave, onDiscard, isSaving }) => (
       <Modal.Actions>
         <ButtonsContainer>
           <IconedButton
-            text="Cancelar"
+            text="Continuar actualizando"
+            icon={ICONS.EDIT}
+            height="40px"
+            color={COLORS.BLUE}
+            basic
+            onClick={onCancel}
+            disabled={isSaving}
+          />
+          <IconedButton
+            text="Descartar cambios"
             icon={ICONS.TIMES}
             height="40px"
             color={COLORS.RED}
@@ -19,7 +28,7 @@ const UnsavedChangesModal = ({ open, onSave, onDiscard, isSaving }) => (
             disabled={isSaving}
           />
           <IconedButton
-            text="Guardar"
+            text="Guardar cambios"
             icon={ICONS.CHECK}
             height="40px"
             loading={isSaving}

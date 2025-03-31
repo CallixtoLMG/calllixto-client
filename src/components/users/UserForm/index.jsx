@@ -12,30 +12,24 @@ import { EMPTY_USER, USERS_ROLE_OPTIONS } from "../users.constants";
 const UserForm = forwardRef(({
   user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending
 }, ref) => {
+
+  const getInitialValues = (user) => ({
+    ...EMPTY_USER,
+    ...user,
+    role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
+    birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
+  });
+
   const methods = useForm({
-    defaultValues: {
-      ...EMPTY_USER,
-      ...user,
-      role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
-      birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
-    },
+    defaultValues: getInitialValues(user),
   });
 
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleCreate)(),
-    resetForm: () => reset(user)
+    resetForm: () => reset(getInitialValues(user))
   }));
-
-  const handleReset = () => {
-    reset({
-      ...EMPTY_USER,
-      ...user,
-      role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
-      birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
-    });
-  };
 
   const handleCreate = (data) => {
     onSubmit(data);
@@ -43,7 +37,7 @@ const UserForm = forwardRef(({
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(handleReset, SHORTKEYS.DELETE);
+  useKeyboardShortcuts(() => reset(getInitialValues(user)), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
@@ -162,7 +156,7 @@ const UserForm = forwardRef(({
             isLoading={isLoading}
             isDirty={isDirty}
             disabled={isDeletePending}
-            onReset={handleReset}
+            onReset={() => reset(getInitialValues(user))}
           />
         )}
       </Form>

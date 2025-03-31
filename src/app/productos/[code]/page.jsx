@@ -41,10 +41,12 @@ const Product = ({ params }) => {
   const formRef = useRef(null);
   const {
     showModal: showUnsavedModal,
+    closeModal,   
     onBeforeView,
     handleDiscard,
     handleSave,
-    isSaving
+    handleCancel,
+    isSaving,
   } = useUnsavedChanges({
     formRef,
     onDiscard: () => {
@@ -52,8 +54,7 @@ const Product = ({ params }) => {
       setIsUpdating(false);
     },
     onSave: async () => {
-      await formRef.current?.submitForm();
-      setIsUpdating(false);
+      await formRef.current?.submitForm(); 
     }
   });
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
@@ -148,6 +149,7 @@ const Product = ({ params }) => {
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
+      closeModal();
     },
   });
 
@@ -375,6 +377,7 @@ const Product = ({ params }) => {
         onDiscard={handleDiscard}
         onSave={handleSave}
         isSaving={isSaving}
+        onCancel={handleCancel} 
       />
       {product && (
         <OnlyPrint>
