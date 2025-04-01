@@ -1,6 +1,5 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label } from "@/common/components/custom";
-import OverflowWrapper from "@/common/components/custom/OverflowWrapper";
+import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
@@ -117,7 +116,7 @@ const BudgetForm = ({
       content: (
         <FlexColumn marginTop="5px" rowGap="5px">
           <FlexColumn>
-            <OverflowWrapper maxWidth="100%" popupContent={name}>
+            <OverflowWrapper popupContent={name}>
               <Text>{name}</Text>
             </OverflowWrapper>
           </FlexColumn>

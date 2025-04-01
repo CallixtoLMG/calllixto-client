@@ -1,5 +1,4 @@
-import { Box, Flex } from "@/common/components/custom";
-import OverflowWrapper from "@/common/components/custom/OverflowWrapper";
+import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
 import { DATE_FORMATS, SELECT_ALL_OPTION } from "@/common/constants";
 import { getFormatedDate } from "@/common/utils/dates";
 import { Label, Popup } from "semantic-ui-react";

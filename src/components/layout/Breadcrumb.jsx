@@ -1,4 +1,4 @@
-import OverflowWrapper from '@/common/components/custom/OverflowWrapper';
+import { OverflowWrapper } from '@/common/components/custom';
 import { ICONS } from '@/common/constants';
 import { createContext, useContext, useState } from 'react';
 import { BreadcrumbDivider, BreadcrumbSection, Breadcrumb as SBreadcrumb, Label as SLabel } from 'semantic-ui-react';

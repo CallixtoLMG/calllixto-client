@@ -1,5 +1,4 @@
-import { Flex, Label } from "@/common/components/custom";
-import OverflowWrapper from "@/common/components/custom/OverflowWrapper";
+import { Flex, Label, OverflowWrapper } from "@/common/components/custom";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";

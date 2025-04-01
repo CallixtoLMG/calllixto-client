@@ -22,7 +22,7 @@ const OverflowText = styled.div`
         `}
 `;
 
-const OverflowWrapper = ({
+export const OverflowWrapper = ({
   children,
   popupContent,
   position = "top center",
@@ -79,4 +79,3 @@ const OverflowWrapper = ({
   );
 };
 
-export default OverflowWrapper;

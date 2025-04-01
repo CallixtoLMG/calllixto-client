@@ -1,5 +1,4 @@
-import { Flex, Label } from "@/common/components/custom";
-import OverflowWrapper from "@/common/components/custom/OverflowWrapper";
+import { Flex, Label, OverflowWrapper } from "@/common/components/custom";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "@/common/components/tooltips";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 

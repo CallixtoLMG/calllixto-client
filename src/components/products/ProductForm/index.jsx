@@ -1,7 +1,6 @@
 import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Flex, Form, Label } from "@/common/components/custom";
-import OverflowWrapper from "@/common/components/custom/OverflowWrapper";
+import { FieldsContainer, Flex, Form, Label, OverflowWrapper } from "@/common/components/custom";
 import { DropdownControlled, IconedButtonControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { Text } from "@/common/components/search/styles";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";

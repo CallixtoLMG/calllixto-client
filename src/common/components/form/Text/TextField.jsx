@@ -1,8 +1,7 @@
-import { FormField, Icon, Input, Label } from "@/common/components/custom";
+import { FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import { COLORS, ICONS } from "@/common/constants";
 import { Popup } from "semantic-ui-react";
 import styled from "styled-components";
-import OverflowWrapper from "../../custom/OverflowWrapper";
 
 const TruncateInput = styled.div`
   width: 100%;
