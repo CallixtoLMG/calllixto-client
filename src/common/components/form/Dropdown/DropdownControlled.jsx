@@ -1,6 +1,5 @@
 import { Controller, useFormContext } from "react-hook-form";
 import { Dropdown, FormField } from "../../custom";
-
 export const DropdownControlled = ({
   name,
   width,
@@ -64,7 +63,7 @@ export const DropdownControlled = ({
                 const values = value.map((v) => optionsMapper[v])
                 onChange(values);
                 afterChange?.(values);
-                return
+                return;
               }
               onChange(value);
               afterChange?.(value);

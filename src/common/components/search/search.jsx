@@ -4,7 +4,7 @@ import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { formatProductCode } from "@/components/products/products.utils";
 import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
-import { Box, Flex, FlexColumn, Label } from "../custom";
+import { Box, Flex, FlexColumn, Label, OverflowWrapper, } from "../custom";
 import { CommentTooltip, TagsTooltip } from "../tooltips";
 import { Search, Text } from "./styles";
 
@@ -68,7 +68,11 @@ const ProductSearch = forwardRef(({ products, onProductSelect, tooltip }, ref) =
       placeholder="Nombre, código"
       results={filteredProducts?.slice(0, MAX_RESULTS).map((product) => ({
         key: product.code,
-        title: product.name,
+        title: (
+          <OverflowWrapper lineClamp={2} popupContent={product.name} >
+            {product.name}
+          </OverflowWrapper>
+        ),
         description: (
           <FlexColumn marginTop="5px" rowGap="5px">
             <FlexColumn >

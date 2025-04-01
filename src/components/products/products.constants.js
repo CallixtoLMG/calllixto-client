@@ -1,4 +1,4 @@
-import { Flex, Label, OverflowCell } from "@/common/components/custom";
+import { Flex, Label, OverflowWrapper } from "@/common/components/custom";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
@@ -53,7 +53,9 @@ export const PRODUCT_COLUMNS = [
       const { tags, name, comments } = product;
       return (
         <Flex justifyContent="space-between" alignItems="center">
-          <OverflowCell maxWidth="50vw" text={name} />
+          <OverflowWrapper maxWidth="50vw" popupContent={name}>
+            {name}
+          </OverflowWrapper>
           <Flex columnGap="7px" alignItems="center" justifyContent="flex-end">
             {tags && <TagsTooltip tooltip tags={tags} />}
             {comments && <CommentTooltip tooltip comment={comments} />}

@@ -73,6 +73,15 @@ export const Dropdown = styled(SDropdown)`
   padding: ${({ padding }) => `${padding}!important`} ;
   background-color: ${({ bgColor }) => `${bgColor}!important`};
   box-shadow: ${({ boxShadow }) => boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
+
+  .menu > .item,
+  > .text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width:100%;
+  }
+
   i{
     margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
   }
@@ -154,6 +163,7 @@ export const Icon = styled(SIcon)`
   position: ${({ dollar, tooltip }) => (dollar || tooltip) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
+  padding: ${({ padding }) => `${padding}!important;`};
   cursor: ${({ pointer }) => pointer && "pointer"} !important;
   justify-items: ${({ justifyItems }) => `${justifyItems}!important;`};
   pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
