@@ -110,7 +110,7 @@ const Product = ({ params }) => {
   const handleHardDeleteClick = useCallback(() => handleOpenModalWithAction("hardDelete"), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: (product) => editProduct(product),
+    mutationFn: editProduct,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto actualizado!");

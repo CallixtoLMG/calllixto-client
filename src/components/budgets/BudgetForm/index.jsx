@@ -13,7 +13,7 @@ import { BUDGET_STATES, PAYMENT_METHODS, PICK_UP_IN_STORE } from "@/components/b
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
 import { ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
-import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal } from "@/components/products/products.utils";
+import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -109,9 +109,9 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers.map(({ id, name, state, inactiveReason, tags, comments }) => ({
+    return customers.map(({ id, name, state, inactiveReason, tags, comments, phoneNumbers, addresses }) => ({
       key: id,
-      value: id,
+      value: { phoneNumbers, addresses, id, state, name },
       text: name,
       content: (
         <FlexColumn marginTop="5px" rowGap="5px">
@@ -150,6 +150,24 @@ const BudgetForm = ({
       ),
     }));
   }, [customers]);
+
+  const normalizedCustomer = useMemo(() => {
+    if (!watchCustomer ?? !watchCustomer?.id) return null;
+
+    return customerOptions.find(option => option.key === watchCustomer.id)?.value || {
+      id: watchCustomer.id,
+      name: watchCustomer.name,
+      state: watchCustomer.state,
+      addresses: watchCustomer.addresses,
+      phoneNumbers: watchCustomer.phoneNumbers
+    };
+  }, [watchCustomer, customerOptions]);
+
+  useEffect(() => {
+    if (normalizedCustomer && normalizedCustomer?.id) {
+      setValue("customer", normalizedCustomer, { shouldValidate: true });
+    }
+  }, [normalizedCustomer, setValue]);
 
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
@@ -356,7 +374,7 @@ const BudgetForm = ({
           onChange={() => {
             calculateTotal();
           }}
-          disabled={product.state === PRODUCT_STATES.OOS.id}
+          disabled={isProductOOS(product.state)}
         />
       ),
       width: 1
@@ -428,6 +446,7 @@ const BudgetForm = ({
             name={`products[${index}].discount`}
             defaultValue={product.discount ?? 0}
             handleChange={calculateTotal}
+            disabled={isProductOOS(product.state)}
           />
         </Flex>
       ),
@@ -563,7 +582,7 @@ const BudgetForm = ({
               placeholder="Seleccione un cliente"
               width="300px"
               options={customerOptions}
-              value={watchCustomer ?? "No se seleccionó ningún cliente"}
+              value={normalizedCustomer ?? "No se seleccionó ningún cliente"}
               search
             />
             <TextField
