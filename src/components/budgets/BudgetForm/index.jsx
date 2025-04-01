@@ -152,7 +152,7 @@ const BudgetForm = ({
   }, [customers]);
 
   const normalizedCustomer = useMemo(() => {
-    if (!watchCustomer || !watchCustomer.id) return null;
+    if (!watchCustomer ?? !watchCustomer?.id) return null;
 
     return customerOptions.find(option => option.key === watchCustomer.id)?.value || {
       id: watchCustomer.id,
@@ -164,7 +164,7 @@ const BudgetForm = ({
   }, [watchCustomer, customerOptions]);
 
   useEffect(() => {
-    if (normalizedCustomer && normalizedCustomer.id) {
+    if (normalizedCustomer && normalizedCustomer?.id) {
       setValue("customer", normalizedCustomer, { shouldValidate: true });
     }
   }, [normalizedCustomer, setValue]);

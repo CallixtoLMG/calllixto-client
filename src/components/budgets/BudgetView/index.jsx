@@ -217,7 +217,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             flex="3"
             label="Dirección"
             control={Dropdown}
-            value={selectedContact?.address || ''}
+            value={selectedContact?.address ?? ''}
             options={[
               { key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE },
               ...(budget?.customer?.addresses?.map((address) => ({
