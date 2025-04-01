@@ -12,7 +12,7 @@ import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Popup } from "semantic-ui-react";
@@ -21,23 +21,6 @@ import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../budgets
 import { Container, Message, MessageHeader } from "./styles";
 
 const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
-
-  useEffect(() => {
-    if (!selectedContact?.phone && budget?.customer?.phoneNumbers?.length === 1) {
-      setSelectedContact((prev) => ({
-        ...prev,
-        phone: getFormatedPhone(budget.customer.phoneNumbers[0]),
-      }));
-    }
-
-    if (!selectedContact?.address && budget?.customer?.addresses?.length === 1) {
-      setSelectedContact((prev) => ({
-        ...prev,
-        address: budget.customer.addresses[0].address,
-      }));
-    }
-  }, [budget?.customer?.phoneNumbers, budget?.customer?.addresses, selectedContact, setSelectedContact]);
-
 
   const methods = useForm({
     defaultValues: {
@@ -238,7 +221,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             flex="2"
             label="Teléfono"
             control={Dropdown}
-            value={selectedContact?.phone || ''}
+            value={selectedContact?.phone ?? ''}
             options={budget?.customer?.phoneNumbers.map((phone) => {
               const formattedPhone = getFormatedPhone(phone);
               const label = phone.ref ? `${phone.ref}: ${formattedPhone}` : formattedPhone;
