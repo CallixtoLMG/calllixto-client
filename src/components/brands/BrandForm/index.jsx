@@ -68,4 +68,6 @@ const BrandForm = forwardRef(({
   )
 });
 
+BrandForm.displayName = "BrandForm";
+
 export default BrandForm;

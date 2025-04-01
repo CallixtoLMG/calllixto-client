@@ -280,4 +280,6 @@ const ProductForm = forwardRef(({
   );
 });
 
+ProductForm.displayName = "ProductForm";
+
 export default ProductForm;

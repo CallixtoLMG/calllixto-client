@@ -102,4 +102,6 @@ const CustomerForm = forwardRef(({
   )
 });
 
+CustomerForm.displayName = "CustomerForm";
+
 export default CustomerForm;

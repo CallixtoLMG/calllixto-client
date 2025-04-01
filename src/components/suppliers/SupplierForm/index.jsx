@@ -69,4 +69,6 @@ const SupplierForm = forwardRef(({
   )
 });
 
+SupplierForm.displayName = "SupplierForm";
+
 export default SupplierForm;
