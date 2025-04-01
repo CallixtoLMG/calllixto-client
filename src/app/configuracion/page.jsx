@@ -2,9 +2,11 @@
 import { useEditSetting, useListSettings } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
-import { PAGES } from "@/common/constants";
+import { ENTITIES, PAGES } from "@/common/constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
+import { LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
+import { useRestoreEntity } from "@/hooks/common";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { pick } from "lodash";
@@ -34,15 +36,35 @@ const Settings = () => {
   const { setActions } = useNavActionsContext();
   const { data } = useListSettings();
   const editSetting = useEditSetting();
-
+  const [isLoading, setIsLoading] = useState(false);
   const methods = useForm();
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   const [activeEntity, setActiveEntity] = useState(null);
 
+  const restoreSettings = useRestoreEntity({
+    entity: ENTITIES.SETTINGS,
+    key: LIST_SETTINGS_QUERY_KEY,
+  });
+
+  const handleSettingsRefresh = async () => {
+    setIsLoading(true)
+    if (typeof restoreSettings !== "function") {
+      return;
+    }
+    try {
+      await restoreSettings();
+      toast.success("Configuración actualizada correctamente.");
+    } catch (error) {
+      console.error("Error al actualizar configuración:", error);
+      toast.error("Hubo un error al actualizar la configuración.");
+    }
+    setIsLoading(false)
+  };
+
   useEffect(() => {
     setActions([]);
     setLabels([PAGES.SETTINGS.NAME]);
-     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setActions, setLabels]);
 
   const { mutate: mutateEdit, isPending } = useMutation({
@@ -87,10 +109,10 @@ const Settings = () => {
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(mutateEdit)}>
         <SettingsTabs
-          activeEntity={activeEntity}
           onEntityChange={handleEntityChange}
           settings={settings}
-          isDirty={isDirty}
+          onRefresh={handleSettingsRefresh}
+          isLoading={isLoading}
         />
         <SubmitAndRestore
           isLoading={isPending}

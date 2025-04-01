@@ -25,10 +25,7 @@ const CreateUser = () => {
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (user) => {
-      const response = await createUser(user);
-      return response;
-    },
+    mutationFn: createUser,
     onSuccess: async (response) => {
       if (response.statusOk) {
         push(PAGES.USERS.SHOW(response.user.username))

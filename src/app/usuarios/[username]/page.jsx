@@ -99,10 +99,7 @@ const User = ({ params }) => {
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction(DELETE), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: async (user) => {
-      const data = await editUser(user);
-      return data;
-    },
+    mutationFn: editUser,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Usuario actualizado!");
@@ -172,19 +169,24 @@ const User = ({ params }) => {
 
   const handleActionConfirm = async () => {
     setActiveAction(modalAction);
+
     if (modalAction === DELETE) {
       mutateDelete();
     }
+
     if (modalAction === INACTIVE_LOW_CASE && !reason) {
       toast.error("Debe proporcionar una razón para desactivar el usuario.");
       return;
     }
+
     if (modalAction === INACTIVE_LOW_CASE) {
       mutateInactive({ user, reason });
     }
+
     if (modalAction === ACTIVE) {
       mutateActive({ user });
     }
+
     handleModalClose();
   };
 

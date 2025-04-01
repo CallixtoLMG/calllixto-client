@@ -47,10 +47,7 @@ const CreateBudget = () => {
   })), [products]);
 
   const { mutate, isPending } = useMutation({
-    mutationFn: async (budget) => {
-      const response = await createBudget(budget);
-      return response;
-    },
+    mutationFn: createBudget,
     onSuccess: async (response) => {
       if (response.statusOk) {
         push(PAGES.BUDGETS.SHOW(response.budget.id))

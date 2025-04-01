@@ -1,4 +1,4 @@
-import { Flex, Label } from '@/common/components/custom';
+import { Flex, Label, OverflowWrapper } from '@/common/components/custom';
 import { CommentTooltip } from "@/common/components/tooltips";
 
 export const GET_BRAND_QUERY_KEY = 'getBrand';
@@ -19,7 +19,9 @@ export const BRAND_COLUMNS = [
     align: "left",
     value: (brand) =>
       <Flex justifyContent="space-between">
-        {brand.name}
+        <OverflowWrapper maxWidth="70vw" popupContent={brand.name}>
+          {brand.name}
+        </OverflowWrapper>
         {brand.comments && <CommentTooltip comment={brand.comments} />}
       </Flex>
   }

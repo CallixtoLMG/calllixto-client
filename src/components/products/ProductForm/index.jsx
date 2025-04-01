@@ -1,7 +1,8 @@
 import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Flex, Form, Label } from "@/common/components/custom";
+import { FieldsContainer, Flex, Form, Label, OverflowWrapper } from "@/common/components/custom";
 import { DropdownControlled, IconedButtonControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
+import { Text } from "@/common/components/search/styles";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { BRAND_STATES } from "@/components/brands/brands.constants";
@@ -96,7 +97,9 @@ const ProductForm = forwardRef(({
       text: name,
       content: (
         <Flex justifyContent="space-between" alignItems="center">
-          <span>{name}</span>
+          <OverflowWrapper maxWidth="80%" popupContent={name}>
+            <Text>{name}</Text>
+          </OverflowWrapper>
           <Flex>
             {state === SUPPLIER_STATES.INACTIVE.id && (
               <Popup
@@ -119,7 +122,9 @@ const ProductForm = forwardRef(({
       text: name,
       content: (
         <Flex justifyContent="space-between" alignItems="center">
-          <span>{name}</span>
+          <OverflowWrapper maxWidth="80%" popupContent={name}>
+            <Text>{name}</Text>
+          </OverflowWrapper>
           <Flex>
             {state === BRAND_STATES.INACTIVE.id && (
               <Popup

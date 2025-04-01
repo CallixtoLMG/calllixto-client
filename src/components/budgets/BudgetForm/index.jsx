@@ -1,5 +1,5 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, OverflowCell } from "@/common/components/custom";
+import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
@@ -13,7 +13,7 @@ import { BUDGET_STATES, PAYMENT_METHODS, PICK_UP_IN_STORE } from "@/components/b
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
 import { ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
-import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal } from "@/components/products/products.utils";
+import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { omit, pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -109,14 +109,16 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers.map(({ id, name, state, inactiveReason, tags, comments }) => ({
+    return customers.map(({ id, name, state, inactiveReason, tags, comments, phoneNumbers, addresses }) => ({
       key: id,
-      value: id,
+      value: { phoneNumbers, addresses, id, state, name },
       text: name,
       content: (
         <FlexColumn marginTop="5px" rowGap="5px">
           <FlexColumn>
-            <Text>{name}</Text>
+            <OverflowWrapper popupContent={name}>
+              <Text>{name}</Text>
+            </OverflowWrapper>
           </FlexColumn>
           <Flex justifyContent="space-between" alignItems="center" columnGap="5px">
             <Box >
@@ -150,6 +152,24 @@ const BudgetForm = ({
       ),
     }));
   }, [customers]);
+
+  const normalizedCustomer = useMemo(() => {
+    if (!watchCustomer ?? !watchCustomer?.id) return null;
+
+    return customerOptions.find(option => option.key === watchCustomer.id)?.value || {
+      id: watchCustomer.id,
+      name: watchCustomer.name,
+      state: watchCustomer.state,
+      addresses: watchCustomer.addresses,
+      phoneNumbers: watchCustomer.phoneNumbers
+    };
+  }, [watchCustomer, customerOptions]);
+
+  useEffect(() => {
+    if (normalizedCustomer && normalizedCustomer?.id) {
+      setValue("customer", normalizedCustomer, { shouldValidate: true });
+    }
+  }, [normalizedCustomer, setValue]);
 
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
@@ -356,7 +376,7 @@ const BudgetForm = ({
           onChange={() => {
             calculateTotal();
           }}
-          disabled={product.state === PRODUCT_STATES.OOS.id}
+          disabled={isProductOOS(product.state)}
         />
       ),
       width: 1
@@ -366,7 +386,9 @@ const BudgetForm = ({
       title: "Nombre",
       value: (product) => (
         <Container>
-          <OverflowCell text={product.name} />
+          <OverflowWrapper maxWidth="30vw" popupContent={product.name}>
+            {product.name}
+          </OverflowWrapper>
           <Flex alignItems="center" marginLeft="5px" columnGap="5px">
             {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
             {product.tags && <TagsTooltip tooltip tags={product.tags} />}
@@ -428,12 +450,18 @@ const BudgetForm = ({
             name={`products[${index}].discount`}
             defaultValue={product.discount ?? 0}
             handleChange={calculateTotal}
+            disabled={isProductOOS(product.state)}
           />
         </Flex>
       ),
       width: 1
     },
-    { title: "Total", value: (product) => <PriceLabel value={getTotal(product)} />, id: 7, width: 3 },
+    {
+      id: 7,
+      title: "Total",
+      value: (product) => <PriceLabel value={getTotal(product)} />,
+      width: 3
+    },
   ], [calculateTotal, setValue]);
 
   const handleDraft = async (data) => {
@@ -563,7 +591,7 @@ const BudgetForm = ({
               placeholder="Seleccione un cliente"
               width="300px"
               options={customerOptions}
-              value={watchCustomer ?? "No se seleccionó ningún cliente"}
+              value={normalizedCustomer ?? "No se seleccionó ningún cliente"}
               search
             />
             <TextField

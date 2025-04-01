@@ -1,11 +1,11 @@
 import { useUserContext } from "@/User";
-import { Flex, Icon } from "@/common/components/custom";
+import { Flex, Icon, Label } from "@/common/components/custom";
 import { KeyboardShortcuts } from "@/common/components/modals";
 import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
-import { Button, Label, Menu } from "semantic-ui-react";
+import { Button, Menu } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
 import { Container, MenuItem, ModLink, RigthHeaderDiv, Text } from "./styles";
 
@@ -63,7 +63,7 @@ const Header = () => {
                       return true;
                     })
                     .map((page) => (
-                      <ModLink key={page.BASE}  href={page.BASE}>
+                      <ModLink key={page.BASE} href={page.BASE}>
                         <MenuItem backgroundColor $active={pathname.includes(page.BASE)}>
                           <Text $active={pathname.includes(page.BASE)}>{page.NAME}</Text>
                         </MenuItem>
@@ -76,14 +76,14 @@ const Header = () => {
                   </RigthHeaderDiv>
                   {isCallixtoUser(role) && (
                     <RigthHeaderDiv>
-                      <Label>{userData.selectedClientId || DEFAULT_SELECTED_CLIENT}</Label>
+                      <Label height="36px">{userData.selectedClientId || DEFAULT_SELECTED_CLIENT}</Label>
                     </RigthHeaderDiv>
                   )}
                   <RigthHeaderDiv>
                     <UserMenu
                       trigger={
                         <Button icon>
-                          <Icon name={ICONS.USER} />{userData.name}
+                          <Icon padding="0 20px 0 0" name={ICONS.USER} />{userData.name}
                         </Button>
                       }
                       onLogout={handleLogout}
