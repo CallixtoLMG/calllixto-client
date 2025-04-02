@@ -4,12 +4,14 @@ import { useRouter } from 'next/navigation';
 import IconedButton from "./Iconed";
 
 const GoBack = () => {
-  const { back } = useRouter();
+  const router = useRouter();
+
   const handleClick = () => {
-    back();
+    const prev = document.referrer || "/"; // podés usar un path fijo si lo preferís
+    router.push(prev); // Esto será interceptado por nuestro hook si hay cambios
   };
 
-  useKeyboardShortcuts(handleClick, SHORTKEYS?.BACKSPACE)
+  useKeyboardShortcuts(handleClick, SHORTKEYS?.BACKSPACE);
 
   return (
     <IconedButton

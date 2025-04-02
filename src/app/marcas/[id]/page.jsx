@@ -40,9 +40,10 @@ const Brand = ({ params }) => {
     handleSave,
     handleCancel,
     isSaving,
+    resolveNavigation
   } = useUnsavedChanges({
     formRef,
-    onDiscard: () => {
+    onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
     },
@@ -106,6 +107,7 @@ const Brand = ({ params }) => {
       if (response.statusOk) {
         toast.success("Marca actualizada!");
         setIsUpdating(false);
+        resolveNavigation();
       } else {
         toast.error(response.error.message);
       }
@@ -113,7 +115,7 @@ const Brand = ({ params }) => {
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
-      closeModal();
+      // closeModal();
     },
   });
 
