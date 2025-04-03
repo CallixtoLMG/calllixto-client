@@ -3,7 +3,7 @@ import { COLORS, ICONS } from "@/common/constants";
 import { Transition } from "semantic-ui-react";
 import { IconedButton } from "../../buttons";
 
-const UnsavedChangesModal = ({ open, onSave, onDiscard, isSaving, onCancel  }) => (
+const UnsavedChangesModal = ({ open, onSave, onDiscard, isSaving, onCancel }) => (
   <Transition visible={open} animation="scale" duration={500}>
     <Modal width="50%" open={open} onClose={isSaving ? null : onDiscard}>
       <Modal.Header>Existen cambios sin guardar!</Modal.Header>

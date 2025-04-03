@@ -56,21 +56,23 @@ const Supplier = ({ params }) => {
   const formRef = useRef(null);
   const {
     showModal: showUnsavedModal,
-    closeModal,   
-    onBeforeView,
     handleDiscard,
     handleSave,
+    resolveSave,
+    rejectSave,
     handleCancel,
     isSaving,
+    onBeforeView,
+    closeModal,
   } = useUnsavedChanges({
     formRef,
-    onDiscard: () => {
+    onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
     },
-    onSave: async () => {
-      await formRef.current?.submitForm(); 
-    }
+    onSave: () => {
+      formRef.current?.submitForm();
+    },
   });
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
@@ -192,8 +194,10 @@ const Supplier = ({ params }) => {
       if (response.statusOk) {
         toast.success('Proveedor actualizado!');
         setIsUpdating(false);
+        resolveSave(); 
       } else {
         toast.error(response.error.message);
+        rejectSave(); 
       }
     },
     onSettled: () => {

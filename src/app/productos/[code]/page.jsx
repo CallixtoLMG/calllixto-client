@@ -41,21 +41,23 @@ const Product = ({ params }) => {
   const formRef = useRef(null);
   const {
     showModal: showUnsavedModal,
-    closeModal,   
-    onBeforeView,
     handleDiscard,
     handleSave,
+    resolveSave,
+    rejectSave,
     handleCancel,
     isSaving,
+    onBeforeView,
+    closeModal,
   } = useUnsavedChanges({
     formRef,
-    onDiscard: () => {
+    onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
     },
-    onSave: async () => {
-      await formRef.current?.submitForm(); 
-    }
+    onSave: () => {
+      formRef.current?.submitForm();
+    },
   });
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
@@ -158,8 +160,10 @@ const Product = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto activado!");
+        resolveSave(); 
       } else {
         toast.error(response.error.message);
+        rejectSave(); 
       }
     },
     onError: (error) => {

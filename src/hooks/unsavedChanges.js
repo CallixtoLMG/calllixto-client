@@ -1,28 +1,20 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouteHistory } from "./useRouteHistory"; // o donde lo pongas
 
 export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
   const [showModal, setShowModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [nextRoute, setNextRoute] = useState(null);
-  const { getLast } = useRouteHistory();
+
   const router = useRouter();
   const isDirtyRef = useRef(false);
-  const skipDirtyCheckRef = useRef(false); // 👈 nueva bandera
-
-  const closeModal = useCallback(() => {
-    setShowModal(false);
-    setNextRoute(null);
-    setIsSaving(false);
-  }, []);
+  const skipNextNavigation = useRef(false);
+  const submitPromiseRef = useRef(null);
 
   useEffect(() => {
-    const checkDirty = () => {
+    const interval = setInterval(() => {
       isDirtyRef.current = formRef.current?.isDirty?.() ?? false;
-    };
+    }, 300);
 
-    const interval = setInterval(checkDirty, 300);
     return () => clearInterval(interval);
   }, [formRef]);
 
@@ -38,55 +30,28 @@ export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
 
-  const resolveNavigation = () => {
-    if (nextRoute) {
-      skipDirtyCheckRef.current = true;
-      router.push(nextRoute.url, nextRoute.options);
-      setNextRoute(null);
-      setTimeout(() => {
-        skipDirtyCheckRef.current = false;
-      }, 1000); // vuelve al control normal
-    }
-  };
-
-  useEffect(() => {
-    const handlePopState = () => {
-      if (isDirtyRef.current) {
-        setNextRoute({ url: getLast(), options: {} }); // usamos historial propio
-        setShowModal(true);
-        router.push(window.location.pathname); // quedamos donde estamos
-      }
-    };
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
-
   useEffect(() => {
     const originalPush = router.push;
 
-    router.push = (url, options = {}) => {
-      if (!skipDirtyCheckRef.current && isDirtyRef.current) {
-        setNextRoute({ url, options });
+    router.push = (...args) => {
+      if (isDirtyRef.current && !skipNextNavigation.current && !showModal) {
         setShowModal(true);
       } else {
-        originalPush(url, options);
+        originalPush(...args);
       }
     };
 
     return () => {
       router.push = originalPush;
     };
-  }, [router]);
+  }, []);
 
   useEffect(() => {
-    const handlePopState = (event) => {
+    const handlePopState = (e) => {
       if (isDirtyRef.current) {
-        // Previene navegación si hay cambios
-        setNextRoute({ url: document.referrer || "/", options: {} });
+        e.preventDefault?.();
         setShowModal(true);
-        // Empuja de nuevo a la misma ruta para cancelar el retroceso
-        router.push(window.location.pathname);
+        history.pushState(null, "", window.location.href); 
       }
     };
 
@@ -94,50 +59,70 @@ export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
 
-  const handleDiscard = useCallback(async () => {
-    if (onDiscard) {
-      await onDiscard();
-    }
-
-    setTimeout(() => {
-      closeModal();
-      resolveNavigation();
-    }, 0);
-  }, [onDiscard, resolveNavigation]);
-
-  const handleCancel = useCallback(() => {
+  const closeModal = useCallback(() => {
     setShowModal(false);
-    setNextRoute(null);
   }, []);
+
+  const handleDiscard = useCallback(async () => {
+    await onDiscard?.();
+    closeModal();
+  }, [onDiscard, closeModal]);
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
     try {
-      await onSave?.();
-      resolveNavigation();
+      const result = await new Promise((resolve, reject) => {
+        submitPromiseRef.current = { resolve, reject };
+        const maybePromise = onSave?.();
+        if (maybePromise instanceof Promise) {
+          maybePromise.then(resolve).catch(reject);
+        }
+      });
+      closeModal();
+      return result;
     } catch (err) {
-      console.error(err);
+      console.error("Error al guardar:", err);
     } finally {
       setIsSaving(false);
-      closeModal();
     }
-  }, [onSave, resolveNavigation]);
+  }, [onSave, closeModal]);
+
+  const resolveSave = useCallback(() => {
+    if (submitPromiseRef.current) {
+      submitPromiseRef.current.resolve();
+      submitPromiseRef.current = null;
+    }
+  }, []);
+
+  const rejectSave = useCallback((error) => {
+    if (submitPromiseRef.current) {
+      submitPromiseRef.current.reject(error);
+      submitPromiseRef.current = null;
+    }
+  }, []);
+
+  const handleCancel = useCallback(() => {
+    setShowModal(false);
+  }, []);
+
+  const onBeforeView = useCallback(async () => {
+    const isDirty = formRef.current?.isDirty?.();
+    if (isDirty) {
+      setShowModal(true);
+      return false;
+    }
+    return true;
+  }, [formRef]);
 
   return {
     showModal,
     isSaving,
-    onBeforeView: async () => {
-      const isDirty = formRef.current?.isDirty?.();
-      if (isDirty) {
-        setShowModal(true);
-        return false;
-      }
-      return true;
-    },
     handleDiscard,
     handleSave,
     handleCancel,
-    resolveNavigation,
+    onBeforeView,
     closeModal,
+    resolveSave,
+    rejectSave,
   };
 };

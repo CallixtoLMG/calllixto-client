@@ -1,14 +1,20 @@
-import { COLORS, ICONS, SHORTKEYS } from "@/common/constants";
+import { useRouteHistory } from "@/app/RouteHistoryContext";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import IconedButton from "./Iconed";
 
-const GoBack = () => {
+const GoBackButton = () => {
   const router = useRouter();
+  const { goBackRoute } = useRouteHistory();
 
   const handleClick = () => {
-    const prev = document.referrer || "/"; // podés usar un path fijo si lo preferís
-    router.push(prev); // Esto será interceptado por nuestro hook si hay cambios
+    const previous = goBackRoute();
+    if (previous && previous !== location.pathname) {
+      router.push(previous);
+    } else {
+      router.push(PAGES.BASE); 
+    }
   };
 
   useKeyboardShortcuts(handleClick, SHORTKEYS?.BACKSPACE);
@@ -23,4 +29,4 @@ const GoBack = () => {
   );
 };
 
-export default GoBack;
+export default GoBackButton;

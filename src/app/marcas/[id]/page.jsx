@@ -34,22 +34,23 @@ const Brand = ({ params }) => {
   const formRef = useRef(null);
   const {
     showModal: showUnsavedModal,
-    closeModal,   
-    onBeforeView,
     handleDiscard,
     handleSave,
+    resolveSave,
+    rejectSave,
     handleCancel,
     isSaving,
-    resolveNavigation
+    onBeforeView,
+    closeModal,
   } = useUnsavedChanges({
     formRef,
     onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
     },
-    onSave: async () => {
-      await formRef.current?.submitForm(); 
-    }
+    onSave: () => {
+      formRef.current?.submitForm();
+    },
   });
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
@@ -107,15 +108,15 @@ const Brand = ({ params }) => {
       if (response.statusOk) {
         toast.success("Marca actualizada!");
         setIsUpdating(false);
-        resolveNavigation();
+        resolveSave(); 
       } else {
         toast.error(response.error.message);
+        rejectSave(); 
       }
     },
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
-      // closeModal();
     },
   });
 
@@ -246,7 +247,7 @@ const Brand = ({ params }) => {
         onDiscard={handleDiscard}
         onSave={handleSave}
         isSaving={isSaving}
-        onCancel={handleCancel} 
+        onCancel={handleCancel}
       />
       <ModalAction
         title={header}
