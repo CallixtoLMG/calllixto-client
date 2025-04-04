@@ -1,7 +1,7 @@
 import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Flex, Form, Label, OverflowWrapper } from "@/common/components/custom";
-import { DropdownControlled, IconedButtonControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
+import { DropdownControlled, IconedButtonControlled, PercentField, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { Text } from "@/common/components/search/styles";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
@@ -12,9 +12,8 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { forwardRef, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
-import { PercentControlled } from "../../../common/components/form";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
-import { getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
+import { calculateMargin, calculatePriceFromMargin, getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
 const ProductForm = forwardRef(({
   product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending },
@@ -29,7 +28,7 @@ const ProductForm = forwardRef(({
       unit: MEASSURE_UNITS.MT.value,
     },
     editablePrice: false,
-    supplier: product?.supplier ?? null, 
+    supplier: product?.supplier ?? null,
     brand: product?.brand ?? null,
     ...product,
   });
@@ -45,26 +44,13 @@ const ProductForm = forwardRef(({
     submitForm: () => handleSubmit(handleForm)(),
     resetForm: () => reset(getInitialValues(product))
   }));
-  const [watchFractionable, watchSupplier, watchBrand, watchCost] = watch([
+  const [watchFractionable, watchSupplier, watchBrand, watchCost, watchPrice] = watch([
     'fractionConfig.active',
     'supplier',
     'brand',
-    'cost'
+    'cost',
+    'price',
   ]);
-
-  const handleMarginChange = (newMargin) => {
-    const newPrice = watchCost * (1 + (newMargin / 100));
-    const roundedPrice = parseFloat(newPrice.toFixed(2));
-    methods.setValue('price', roundedPrice);
-  };
-
-  const handlePriceChange = (newPrice) => {
-    if (watchCost > 0) {
-      const newMargin = ((newPrice / watchCost) - 1) * 100;
-      const roundedMargin = parseFloat(newMargin.toFixed(2));
-      methods.setValue('margin', roundedMargin);
-    }
-  };
 
   const handleForm = async (data) => {
     const filteredData = { ...data };
@@ -206,14 +192,19 @@ const ProductForm = forwardRef(({
             name="price"
             label="Precio"
             disabled={!isUpdating && view}
-            onAfterChange={handlePriceChange}
           />
-          <PercentControlled
+          <PercentField
             width="150px"
-            name="margin"
             label="Margen"
+            value={calculateMargin(watchPrice, watchCost)}
             disabled={!isUpdating && view}
-            handleChange={() => handleMarginChange(watch('margin'))}
+            onChange={(newMargin) => {
+              if (!newMargin || !watchCost) {
+                return;
+              }
+              const newPrice = calculatePriceFromMargin(watchCost, newMargin);
+              methods.setValue('price', newPrice);
+            }}
             maxValue={1000000}
           />
           <IconedButtonControlled

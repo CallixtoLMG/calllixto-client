@@ -62,3 +62,14 @@ export const getTotal = (product) => {
   const price = getPrice(product);
   return price * product.quantity * (1 - (product.discount / 100)) ?? 0;
 };
+
+export const calculateMargin = (price, cost) => {
+  if (!cost) return 0;
+  const margin = ((price / cost - 1) * 100);
+  return parseFloat(margin.toFixed(2));
+};
+
+export const calculatePriceFromMargin = (cost, margin) => {
+  const price = cost * (1 + margin / 100);
+  return parseFloat(price.toFixed(2));
+};
