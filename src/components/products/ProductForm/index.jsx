@@ -1,7 +1,7 @@
 import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Flex, Form, Label, OverflowWrapper } from "@/common/components/custom";
-import { DropdownControlled, IconedButtonControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
+import { DropdownControlled, IconedButtonControlled, PercentField, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { Text } from "@/common/components/search/styles";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
@@ -12,7 +12,6 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { forwardRef, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
-import { PercentControlled } from "../../../common/components/form";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
 import { calculateMargin, calculatePriceFromMargin, getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
@@ -45,11 +44,12 @@ const ProductForm = forwardRef(({
     submitForm: () => handleSubmit(handleForm)(),
     resetForm: () => reset(getInitialValues(product))
   }));
-  const [watchFractionable, watchSupplier, watchBrand, watchCost] = watch([
+  const [watchFractionable, watchSupplier, watchBrand, watchCost, watchPrice] = watch([
     'fractionConfig.active',
     'supplier',
     'brand',
     'cost',
+    'price',
   ]);
 
   const handleForm = async (data) => {
@@ -186,34 +186,23 @@ const ProductForm = forwardRef(({
             name="cost"
             label="Costo"
             disabled={!isUpdating && view}
-            onAfterChange={(newCost) => {
-              const currentPrice = methods.getValues('price');
-              const newMargin = calculateMargin(currentPrice, newCost);
-              methods.setValue('margin', newMargin);
-            }}
           />
           <PriceControlled
             width="200px"
             name="price"
             label="Precio"
             disabled={!isUpdating && view}
-            onAfterChange={(newPrice) => {
-              const currentCost = methods.getValues('cost');
-              const newMargin = calculateMargin(newPrice, currentCost);
-              methods.setValue('margin', newMargin);
-            }}
           />
-          <PercentControlled
+          <PercentField
             width="150px"
-            name="margin"
             label="Margen"
+            value={calculateMargin(watchPrice, watchCost)}
             disabled={!isUpdating && view}
-            handleChange={(newMargin) => {
-              const currentCost = watchCost;
-              if (!newMargin || !currentCost) {
+            onChange={(newMargin) => {
+              if (!newMargin || !watchCost) {
                 return;
               }
-              const newPrice = calculatePriceFromMargin(currentCost, newMargin);
+              const newPrice = calculatePriceFromMargin(watchCost, newMargin);
               methods.setValue('price', newPrice);
             }}
             maxValue={1000000}
