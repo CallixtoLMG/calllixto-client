@@ -1,4 +1,4 @@
-import { ACTIVE, ENTITIES, INACTIVE_LOW_CASE, IN_MS, USERNAME } from "@/common/constants";
+import { ACTIVE, ENTITIES, INACTIVE, IN_MS, USERNAME } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { now } from "@/common/utils/dates";
 import { ATTRIBUTES, GET_USER_QUERY_KEY, LIST_USERS_QUERY_KEY } from "@/components/users/users.constants";
@@ -96,7 +96,7 @@ export const useInactiveUser = () => {
   const inactiveUser = async (username, reason) => {
     const response = await inactiveItem({
       entity: ENTITIES.USERS,
-      url: `${PATHS.USER}/${INACTIVE_LOW_CASE}`,
+      url: `${PATHS.USER}/${INACTIVE}`,
       params: { username },
       value: {
         inactiveReason: reason,

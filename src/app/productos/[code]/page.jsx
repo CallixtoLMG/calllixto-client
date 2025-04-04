@@ -6,7 +6,7 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, ICONS, INACTIVE_LOW_CASE, PAGES, RECOVER } from "@/common/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, RECOVER } from "@/common/constants";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
@@ -129,7 +129,7 @@ const Product = ({ params }) => {
 
   const handleRecoverClick = useCallback(() => handleOpenModalWithAction("recover"), [handleOpenModalWithAction]);
   const handleActiveClick = useCallback(() => handleOpenModalWithAction(ACTIVE), [handleOpenModalWithAction]);
-  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE_LOW_CASE), [handleOpenModalWithAction]);
+  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE), [handleOpenModalWithAction]);
   const handleStockChangeClick = useCallback(() => handleOpenModalWithAction(isProductOOS(product?.state) ? "inStock" : "outOfStock"), [handleOpenModalWithAction, product?.state]);
   const handleSoftDeleteClick = useCallback(() => handleOpenModalWithAction("softDelete"), [handleOpenModalWithAction]);
   const handleHardDeleteClick = useCallback(() => handleOpenModalWithAction("hardDelete"), [handleOpenModalWithAction]);
@@ -246,7 +246,7 @@ const Product = ({ params }) => {
       }
     }
 
-    if (modalAction === INACTIVE_LOW_CASE) {
+    if (modalAction === INACTIVE) {
       if (!reason) {
         toast.error("Debe proporcionar una razón para desactivar el producto.");
         return;
@@ -310,7 +310,7 @@ const Product = ({ params }) => {
           onClick: isProductInactive(product?.state) ? handleActiveClick : handleInactiveClick,
           text: isProductInactive(product?.state) ? "Activar" : "Desactivar",
           width: "fit-content",
-          loading: (activeAction === ACTIVE || activeAction === INACTIVE_LOW_CASE),
+          loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction || isEditPending,
         });
         actions.push({
@@ -394,9 +394,9 @@ const Product = ({ params }) => {
         showModal={isModalOpen}
         setShowModal={setIsModalOpen}
         isLoading={isInactivePending || isActivePending || isDeletePending || isEditPending || isRecoverPending}
-        noConfirmation={!requiresConfirmation && modalAction !== INACTIVE_LOW_CASE}
+        noConfirmation={!requiresConfirmation && modalAction !== INACTIVE}
         bodyContent={
-          modalAction === INACTIVE_LOW_CASE ? (
+          modalAction === INACTIVE ? (
             <TextField
               placeholder="Motivo"
               value={reason}
@@ -404,7 +404,7 @@ const Product = ({ params }) => {
             />
           ) : null
         }
-        requireReason={modalAction === INACTIVE_LOW_CASE}
+        requireReason={modalAction === INACTIVE}
         reason={reason}
       />
     </Loader>
