@@ -9,7 +9,7 @@ import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { forwardRef, useImperativeHandle, useMemo } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { PercentControlled } from "../../../common/components/form";
@@ -45,12 +45,21 @@ const ProductForm = forwardRef(({
     submitForm: () => handleSubmit(handleForm)(),
     resetForm: () => reset(getInitialValues(product))
   }));
-  const [watchFractionable, watchSupplier, watchBrand, watchCost] = watch([
+  const [watchFractionable, watchSupplier, watchBrand, watchCost, watchPrice] = watch([
     'fractionConfig.active',
     'supplier',
     'brand',
-    'cost'
+    'cost',
+    'price',
   ]);
+
+  useEffect(() => {
+    if (watchCost > 0 && watchPrice >= 0) {
+      const newMargin = ((watchPrice / watchCost) - 1) * 100;
+      const roundedMargin = parseFloat(newMargin.toFixed(2));
+      methods.setValue('margin', roundedMargin, { shouldValidate: false, shouldDirty: true });
+    }
+  }, [watchCost, watchPrice, methods]);
 
   const handleMarginChange = (newMargin) => {
     const newPrice = watchCost * (1 + (newMargin / 100));
