@@ -92,7 +92,7 @@ export const validatePhone = (phone) => {
 };
 
 export const isItemInactive = (state) => {
-  return state === INACTIVE;
+  return state === toUpperCase(INACTIVE);
 };
 
 export const renderContent = (content) => {
@@ -137,4 +137,9 @@ export const getDefaultListParams = (attributes, sort, order) => {
   if (typeof order !== 'undefined') params.order = order;
 
   return params;
+};
+
+export const toUpperCase = (text = "") => {
+  if (typeof text !== "string") return "";
+  return text.toUpperCase();
 };

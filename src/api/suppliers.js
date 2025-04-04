@@ -1,4 +1,4 @@
-import { ACTIVE, ENTITIES, ID, INACTIVE_LOW_CASE, IN_MS } from "@/common/constants";
+import { ACTIVE, ENTITIES, ID, INACTIVE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { ATTRIBUTES, GET_SUPPLIER_QUERY_KEY, LIST_SUPPLIERS_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
 import { PATHS } from "@/fetchUrls";
@@ -99,7 +99,7 @@ export const useInactiveSupplier = () => {
 
     const response = await inactiveItem({
       entity: ENTITIES.SUPPLIERS,
-      url: `${PATHS.SUPPLIERS}/${supplier.id}/${INACTIVE_LOW_CASE}`,
+      url: `${PATHS.SUPPLIERS}/${supplier.id}/${INACTIVE}`,
       value: updatedSupplier,
       key: "id",
       responseEntity: ENTITIES.SUPPLIER,

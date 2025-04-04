@@ -1,15 +1,15 @@
-import { ACTIVE, ALL, CODE, ENTITIES, INACTIVE_LOW_CASE, IN_MS, RECOVER } from "@/common/constants";
+import { ACTIVE, ALL, CODE, ENTITIES, INACTIVE, IN_MS, RECOVER } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { now } from "@/common/utils/dates";
 import { ATTRIBUTES, GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
 import {
-  BATCH,
-  BLACK_LIST,
-  EDIT_BATCH,
-  PATHS,
-  SUPPLIER,
-  URL,
-  VALIDATE
+    BATCH,
+    BLACK_LIST,
+    EDIT_BATCH,
+    PATHS,
+    SUPPLIER,
+    URL,
+    VALIDATE
 } from "@/fetchUrls";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -296,7 +296,7 @@ export const useInactiveProduct = () => {
 
     const response = await inactiveItem({
       entity: ENTITIES.PRODUCTS,
-      url: `${PATHS.PRODUCTS}/${product.code}/${INACTIVE_LOW_CASE}`,
+      url: `${PATHS.PRODUCTS}/${product.code}/${INACTIVE}`,
       value: updatedProduct,
       key: CODE,
       responseEntity: ENTITIES.PRODUCT,

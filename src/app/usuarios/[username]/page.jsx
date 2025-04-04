@@ -4,7 +4,7 @@ import { useActiveUser, useDeleteUser, useEditUser, useGetUser, useInactiveUser 
 import { Input, Message, MessageHeader } from "@/common/components/custom";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UserForm from "@/components/users/UserForm";
@@ -96,7 +96,7 @@ const User = ({ params }) => {
   }, []);
 
   const handleActivateClick = useCallback(() => handleOpenModalWithAction(ACTIVE), [handleOpenModalWithAction]);
-  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE_LOW_CASE), [handleOpenModalWithAction]);
+  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE), [handleOpenModalWithAction]);
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction(DELETE), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
@@ -176,12 +176,12 @@ const User = ({ params }) => {
       mutateDelete();
     }
 
-    if (modalAction === INACTIVE_LOW_CASE && !reason) {
+    if (modalAction === INACTIVE && !reason) {
       toast.error("Debe proporcionar una razón para desactivar el usuario.");
       return;
     }
 
-    if (modalAction === INACTIVE_LOW_CASE) {
+    if (modalAction === INACTIVE) {
       mutateInactive({ user, reason });
     }
 
@@ -204,7 +204,7 @@ const User = ({ params }) => {
           color: COLORS.GREY,
           text: isItemInactive(user?.state) ? "Activar" : "Desactivar",
           onClick: isItemInactive(user?.state) ? handleActivateClick : handleInactiveClick,
-          loading: (activeAction === ACTIVE || activeAction === INACTIVE_LOW_CASE),
+          loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction,
           width: "fit-content",
         },
@@ -262,9 +262,9 @@ const User = ({ params }) => {
         setShowModal={handleModalClose}
         isLoading={isDeletePending || isInactivePending || isActivePending}
         noConfirmation={!requiresConfirmation}
-        disableButtons={!reason && modalAction === INACTIVE_LOW_CASE}
+        disableButtons={!reason && modalAction === INACTIVE}
         bodyContent={
-          modalAction === INACTIVE_LOW_CASE && (
+          modalAction === INACTIVE && (
             <Input
               type="text"
               placeholder="Indique el razón de desactivación"

@@ -214,9 +214,7 @@ export const ACTIVE = "active";
 
 export const DELETE = "delete";
 
-export const INACTIVE = "INACTIVE";
-
-export const INACTIVE_LOW_CASE = "inactive";
+export const INACTIVE = "inactive";
 
 export const RECOVER = "recover";
 

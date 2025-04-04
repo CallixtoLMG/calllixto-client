@@ -17,7 +17,7 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
 import { downloadExcel, getFormatedPrice, isItemInactive } from "@/common/utils";
 import {
   Loader,
@@ -283,7 +283,7 @@ const Supplier = ({ params }) => {
       mutateDelete();
     }
 
-    if (modalAction === INACTIVE_LOW_CASE) {
+    if (modalAction === INACTIVE) {
       if (!reason) {
         toast.error(
           'Debe proporcionar una razón para desactivar al proveedor.',
@@ -490,7 +490,7 @@ const Supplier = ({ params }) => {
         }
         noConfirmation={!requiresConfirmation}
         bodyContent={
-          modalAction === "inactive" && (
+          modalAction === INACTIVE && (
             <TextField
               placeholder="Motivo"
               value={reason}

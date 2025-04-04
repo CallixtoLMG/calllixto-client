@@ -1,4 +1,4 @@
-import { ACTIVE, ENTITIES, INACTIVE_LOW_CASE, IN_MS } from "@/common/constants";
+import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { ATTRIBUTES, GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
 import { PATHS } from "@/fetchUrls";
@@ -96,7 +96,7 @@ export const useInactiveCustomer = () => {
 
     const response = await inactiveItem({
       entity: ENTITIES.CUSTOMERS,
-      url: `${PATHS.CUSTOMERS}/${customer.id}/${INACTIVE_LOW_CASE}`,
+      url: `${PATHS.CUSTOMERS}/${customer.id}/${INACTIVE}`,
       value: updatedCustomer,
       responseEntity: ENTITIES.CUSTOMER,
       invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]

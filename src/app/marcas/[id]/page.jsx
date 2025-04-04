@@ -6,7 +6,7 @@ import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import BrandForm from "@/components/brands/BrandForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -98,7 +98,7 @@ const Brand = ({ params }) => {
   }, []);
 
   const handleActivateClick = useCallback(() => handleOpenModalWithAction(ACTIVE), [handleOpenModalWithAction]);
-  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE_LOW_CASE), [handleOpenModalWithAction]);
+  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE), [handleOpenModalWithAction]);
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction(DELETE), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
@@ -172,7 +172,7 @@ const Brand = ({ params }) => {
       mutateDelete();
     }
 
-    if (modalAction === INACTIVE_LOW_CASE) {
+    if (modalAction === INACTIVE) {
       if (!reason) {
         toast.error("Debe proporcionar una razón para desactivar la marca.");
         return;
@@ -199,7 +199,7 @@ const Brand = ({ params }) => {
           color: COLORS.GREY,
           text: isItemInactive(brand?.state) ? "Activar" : "Desactivar",
           onClick: isItemInactive(brand?.state) ? handleActivateClick : handleInactiveClick,
-          loading: (activeAction === ACTIVE || activeAction === INACTIVE_LOW_CASE),
+          loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction,
           width: "fit-content",
         },
@@ -257,9 +257,9 @@ const Brand = ({ params }) => {
         setShowModal={handleModalClose}
         isLoading={isDeletePending || isInactivePending || isActivePending}
         noConfirmation={!requiresConfirmation}
-        disableButtons={!reason && modalAction === INACTIVE_LOW_CASE}
+        disableButtons={!reason && modalAction === INACTIVE}
         bodyContent={
-          modalAction === INACTIVE_LOW_CASE && (
+          modalAction === INACTIVE && (
             <TextField
               placeholder="Motivo"
               value={reason}

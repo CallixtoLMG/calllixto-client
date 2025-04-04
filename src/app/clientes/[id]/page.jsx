@@ -5,7 +5,7 @@ import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -100,7 +100,7 @@ const Customer = ({ params }) => {
   }, []);
 
   const handleActivateClick = useCallback(() => handleOpenModalWithAction(ACTIVE), [handleOpenModalWithAction]);
-  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE_LOW_CASE), [handleOpenModalWithAction]);
+  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE), [handleOpenModalWithAction]);
   const handleDeleteClick = useCallback(() => handleOpenModalWithAction(DELETE), [handleOpenModalWithAction]);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
@@ -168,7 +168,7 @@ const Customer = ({ params }) => {
   });
 
   const handleActionConfirm = async () => {
-    if (modalAction === INACTIVE_LOW_CASE && !reason) {
+    if (modalAction === INACTIVE && !reason) {
       toast.error("Debe proporcionar una razón para desactivar al cliente.");
       return;
     }
@@ -179,7 +179,7 @@ const Customer = ({ params }) => {
       mutateDelete();
     }
 
-    if (modalAction === INACTIVE_LOW_CASE) {
+    if (modalAction === INACTIVE) {
       mutateInactive({ customer, reason });
     }
 
@@ -202,7 +202,7 @@ const Customer = ({ params }) => {
           color: COLORS.GREY,
           onClick: isItemInactive(customer.state) ? handleActivateClick : handleInactiveClick,
           text: isItemInactive(customer.state) ? "Activar" : "Desactivar",
-          loading: (activeAction === ACTIVE || activeAction === INACTIVE_LOW_CASE),
+          loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction || isEditPending,
           width: "fit-content",
         },
@@ -261,9 +261,9 @@ const Customer = ({ params }) => {
         setShowModal={handleModalClose}
         isLoading={isDeletePending || isInactivePending || isActivePending}
         noConfirmation={!requiresConfirmation}
-        disableButtons={!reason && modalAction === INACTIVE_LOW_CASE}
+        disableButtons={!reason && modalAction === INACTIVE}
         bodyContent={
-          modalAction === INACTIVE_LOW_CASE && (
+          modalAction === INACTIVE && (
             <TextField
               placeholder="Motivo"
               value={reason}
