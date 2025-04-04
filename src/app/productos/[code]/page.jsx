@@ -44,7 +44,6 @@ const Product = ({ params }) => {
     handleDiscard,
     handleSave,
     resolveSave,
-    rejectSave,
     handleCancel,
     isSaving,
     onBeforeView,
@@ -160,10 +159,9 @@ const Product = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto activado!");
-        resolveSave(); 
+        resolveSave();
       } else {
         toast.error(response.error.message);
-        rejectSave(); 
       }
     },
     onError: (error) => {
@@ -381,7 +379,7 @@ const Product = ({ params }) => {
         onDiscard={handleDiscard}
         onSave={handleSave}
         isSaving={isSaving}
-        onCancel={handleCancel} 
+        onCancel={handleCancel}
       />
       {product && (
         <OnlyPrint>

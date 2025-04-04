@@ -44,14 +44,14 @@ export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
     return () => {
       router.push = originalPush;
     };
-  }, []);
+  }, [router, showModal]);
 
   useEffect(() => {
     const handlePopState = (e) => {
       if (isDirtyRef.current) {
         e.preventDefault?.();
         setShowModal(true);
-        history.pushState(null, "", window.location.href); 
+        history.pushState(null, "", window.location.href);
       }
     };
 
@@ -70,20 +70,20 @@ export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
+
     try {
       const result = await new Promise((resolve, reject) => {
         submitPromiseRef.current = { resolve, reject };
-        const maybePromise = onSave?.();
-        if (maybePromise instanceof Promise) {
-          maybePromise.then(resolve).catch(reject);
-        }
+        onSave?.(); 
       });
+
       closeModal();
       return result;
     } catch (err) {
       console.error("Error al guardar:", err);
     } finally {
       setIsSaving(false);
+      submitPromiseRef.current = null;
     }
   }, [onSave, closeModal]);
 
@@ -94,16 +94,9 @@ export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
     }
   }, []);
 
-  const rejectSave = useCallback((error) => {
-    if (submitPromiseRef.current) {
-      submitPromiseRef.current.reject(error);
-      submitPromiseRef.current = null;
-    }
-  }, []);
-
   const handleCancel = useCallback(() => {
-    setShowModal(false);
-  }, []);
+    closeModal();
+  }, [closeModal]);
 
   const onBeforeView = useCallback(async () => {
     const isDirty = formRef.current?.isDirty?.();
@@ -123,6 +116,5 @@ export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
     onBeforeView,
     closeModal,
     resolveSave,
-    rejectSave,
   };
 };

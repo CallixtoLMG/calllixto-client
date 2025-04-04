@@ -37,7 +37,6 @@ const Brand = ({ params }) => {
     handleDiscard,
     handleSave,
     resolveSave,
-    rejectSave,
     handleCancel,
     isSaving,
     onBeforeView,
@@ -111,7 +110,6 @@ const Brand = ({ params }) => {
         resolveSave(); 
       } else {
         toast.error(response.error.message);
-        rejectSave(); 
       }
     },
     onSettled: () => {
@@ -132,6 +130,7 @@ const Brand = ({ params }) => {
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
+      closeModal();
     },
   });
 

@@ -38,7 +38,6 @@ const Customer = ({ params }) => {
     handleDiscard,
     handleSave,
     resolveSave,
-    rejectSave,
     handleCancel,
     isSaving,
     onBeforeView,
@@ -113,7 +112,6 @@ const Customer = ({ params }) => {
         resolveSave(); 
       } else {
         toast.error(response.error.message);
-        rejectSave(); 
       }
     },
     onSettled: () => {
