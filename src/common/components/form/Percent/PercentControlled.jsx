@@ -20,7 +20,7 @@ export const PercentControlled = ({
           value={value} 
           onChange={(newValue) => {
             onChange(newValue);
-            handleChange?.();
+            if (handleChange) handleChange(newValue);
           }}
           onBlur={() => {
             if (value !== '') {

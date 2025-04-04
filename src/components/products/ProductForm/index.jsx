@@ -9,12 +9,12 @@ import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
+import { forwardRef, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { PercentControlled } from "../../../common/components/form";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
-import { getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
+import { calculateMargin, calculatePriceFromMargin, getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
 const ProductForm = forwardRef(({
   product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending },
@@ -29,7 +29,7 @@ const ProductForm = forwardRef(({
       unit: MEASSURE_UNITS.MT.value,
     },
     editablePrice: false,
-    supplier: product?.supplier ?? null, 
+    supplier: product?.supplier ?? null,
     brand: product?.brand ?? null,
     ...product,
   });
@@ -45,27 +45,12 @@ const ProductForm = forwardRef(({
     submitForm: () => handleSubmit(handleForm)(),
     resetForm: () => reset(getInitialValues(product))
   }));
-  const [watchFractionable, watchSupplier, watchBrand, watchCost, watchPrice] = watch([
+  const [watchFractionable, watchSupplier, watchBrand, watchCost] = watch([
     'fractionConfig.active',
     'supplier',
     'brand',
     'cost',
-    'price',
   ]);
-
-  useEffect(() => {
-    if (watchCost > 0 && watchPrice >= 0) {
-      const newMargin = ((watchPrice / watchCost) - 1) * 100;
-      const roundedMargin = parseFloat(newMargin.toFixed(2));
-      methods.setValue('margin', roundedMargin, { shouldValidate: false, shouldDirty: true });
-    }
-  }, [watchCost, watchPrice, methods]);
-
-  const handleMarginChange = (newMargin) => {
-    const newPrice = watchCost * (1 + (newMargin / 100));
-    const roundedPrice = parseFloat(newPrice.toFixed(2));
-    methods.setValue('price', roundedPrice);
-  };
 
   const handleForm = async (data) => {
     const filteredData = { ...data };
@@ -201,19 +186,36 @@ const ProductForm = forwardRef(({
             name="cost"
             label="Costo"
             disabled={!isUpdating && view}
+            onAfterChange={(newCost) => {
+              const currentPrice = methods.getValues('price');
+              const newMargin = calculateMargin(currentPrice, newCost);
+              methods.setValue('margin', newMargin);
+            }}
           />
           <PriceControlled
             width="200px"
             name="price"
             label="Precio"
             disabled={!isUpdating && view}
+            onAfterChange={(newPrice) => {
+              const currentCost = methods.getValues('cost');
+              const newMargin = calculateMargin(newPrice, currentCost);
+              methods.setValue('margin', newMargin);
+            }}
           />
           <PercentControlled
             width="150px"
             name="margin"
             label="Margen"
             disabled={!isUpdating && view}
-            handleChange={() => handleMarginChange(watch('margin'))}
+            handleChange={(newMargin) => {
+              const currentCost = watchCost;
+              if (!newMargin || !currentCost) {
+                return;
+              }
+              const newPrice = calculatePriceFromMargin(currentCost, newMargin);
+              methods.setValue('price', newPrice);
+            }}
             maxValue={1000000}
           />
           <IconedButtonControlled
