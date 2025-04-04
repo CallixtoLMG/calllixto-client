@@ -67,14 +67,6 @@ const ProductForm = forwardRef(({
     methods.setValue('price', roundedPrice);
   };
 
-  const handlePriceChange = (newPrice) => {
-    if (watchCost > 0) {
-      const newMargin = ((newPrice / watchCost) - 1) * 100;
-      const roundedMargin = parseFloat(newMargin.toFixed(2));
-      methods.setValue('margin', roundedMargin);
-    }
-  };
-
   const handleForm = async (data) => {
     const filteredData = { ...data };
 
@@ -215,7 +207,6 @@ const ProductForm = forwardRef(({
             name="price"
             label="Precio"
             disabled={!isUpdating && view}
-            onAfterChange={handlePriceChange}
           />
           <PercentControlled
             width="150px"
