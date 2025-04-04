@@ -5,7 +5,6 @@ import { Button, DropdownItem, Icon } from "@/common/components/custom";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, getFormatedPrice } from "@/common/utils";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import BanProduct from "@/components/products/BanProduct";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
 import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.constants";
@@ -14,7 +13,7 @@ import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { Dropdown } from "semantic-ui-react";
 
 const Products = () => {
@@ -24,7 +23,6 @@ const Products = () => {
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
-  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     setLabels(['Productos']);
@@ -94,14 +92,6 @@ const Products = () => {
               </Dropdown.Menu>
             </Dropdown>
           )
-        },
-        {
-          id: 3,
-          icon: ICONS.BAN,
-          color: COLORS.RED,
-          onClick: () => setOpen(true),
-          text: 'Bloquear',
-          basic: true
         });
     }
 
@@ -113,7 +103,6 @@ const Products = () => {
 
   return (
     <>
-      {open && <BanProduct open={open} setOpen={setOpen} />}
       <ProductsPage
         onRefetch={refetch}
         isLoading={loading}

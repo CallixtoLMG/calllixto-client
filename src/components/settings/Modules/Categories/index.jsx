@@ -122,6 +122,7 @@ const Categories = () => {
                 color={COLORS.GREEN}
                 type="button"
                 onClick={handleAddCategory}
+                marginTop="25px"
               />
             </Flex>
             <Table

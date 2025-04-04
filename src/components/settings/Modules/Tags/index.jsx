@@ -122,6 +122,7 @@ const Tags = () => {
                 color={COLORS.GREEN}
                 type="button"
                 onClick={handleAddTag}
+                marginTop="25px"
               />
             </Flex>
             <Table

@@ -25,7 +25,7 @@ const ENTITY_MAPPER = {
 };
 
 export const SUPPORTED_SETTINGS = {
-  PRODUCT: ["tags"],
+  PRODUCT: ["tags", "blacklist"],
   CUSTOMER: ["tags"],
   EXPENSE: ["tags", "categories"],
 };
@@ -68,10 +68,18 @@ const Settings = () => {
   }, [setActions, setLabels]);
 
   const { mutate: mutateEdit, isPending } = useMutation({
-    mutationFn: (data) => editSetting({
-      entity: `${activeEntity?.entity}S`,
-      value: pick(data, SUPPORTED_SETTINGS[activeEntity?.entity]),
-    }),
+    mutationFn: (data) => {
+      const pickedData = pick(data, SUPPORTED_SETTINGS[activeEntity?.entity]);
+    
+      if (pickedData.blacklist) {
+        pickedData.blacklist = pickedData.blacklist.map(item => item.value); 
+      }
+  
+      return editSetting({
+        entity: `${activeEntity?.entity}S`,
+        value: pickedData,
+      });
+    },
     onSuccess: () => {
       toast.success("Cambios guardados correctamente.");
     },
@@ -83,7 +91,11 @@ const Settings = () => {
   const handleEntityChange = useCallback((entity) => {
     setActiveEntity(entity);
     setLabels([PAGES.SETTINGS.NAME, entity.label]);
-    reset(entity);
+    const transformedEntity = {
+      ...entity,
+      blacklist: entity.blacklist?.map(value => ({ value })) || [],
+    };
+    reset(transformedEntity);
   }, [reset, setLabels]);
 
   const settings = useMemo(() => {

@@ -190,6 +190,7 @@ export const Button = styled(SButton)`
   &&&& {
     text-align: center;
     height: ${({ height = '35px' }) => `${height}!important`} ;
+    margin-top: ${({ marginTop }) => `${marginTop}!important`} ;
     align-self: ${({ alignSelf }) => `${alignSelf}!important`} ;
     font-size: 13.5px !important;
     width: ${({ width = '110px' }) => `${width}!important`} ;

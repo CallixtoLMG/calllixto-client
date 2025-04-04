@@ -65,18 +65,20 @@ export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
 
   const handleDiscard = useCallback(async () => {
     await onDiscard?.();
+    isDirtyRef.current = false; 
     closeModal();
   }, [onDiscard, closeModal]);
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
-
+  
     try {
       const result = await new Promise((resolve, reject) => {
         submitPromiseRef.current = { resolve, reject };
-        onSave?.(); 
+        onSave?.();
       });
-
+  
+      isDirtyRef.current = false;
       closeModal();
       return result;
     } catch (err) {

@@ -30,12 +30,8 @@ const UserProvider = ({ children }) => {
     }
   }, [userData]);
 
-  const getBlacklist = useCallback(() => {
-    return userData?.client?.blacklist || [];
-  }, [userData]);
-
   return (
-    <UserContext.Provider value={{ userData, setUserData, role, updateSessionData, getBlacklist }}>
+    <UserContext.Provider value={{ userData, setUserData, role, updateSessionData }}>
       {children}
     </UserContext.Provider>
   );
