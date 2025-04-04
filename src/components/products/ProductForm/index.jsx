@@ -9,31 +9,42 @@ import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { useMemo } from "react";
+import { forwardRef, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { PercentControlled } from "../../../common/components/form";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
 import { getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
-const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending }) => {
+const ProductForm = forwardRef(({
+  product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending },
+  ref) => {
   const initialMargin = getMargin(product?.price, product?.cost);
+  const getInitialValues = (product) => ({
+    ...EMPTY_PRODUCT,
+    margin: initialMargin,
+    tags: [],
+    fractionConfig: {
+      active: false,
+      unit: MEASSURE_UNITS.MT.value,
+    },
+    editablePrice: false,
+    supplier: product?.supplier ?? null, 
+    brand: product?.brand ?? null,
+    ...product,
+  });
 
   const methods = useForm({
-    defaultValues: {
-      margin: initialMargin,
-      tags: [],
-      fractionConfig: {
-        active: false,
-        unit: MEASSURE_UNITS.MT.value,
-      },
-      editablePrice: false,
-      ...product,
-    }
+    defaultValues: getInitialValues(product)
   });
   const { data: productsSettings, isFetching: isProductSettingsFetching } = useGetSetting(ENTITIES.PRODUCTS);
   const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
+  useImperativeHandle(ref, () => ({
+    isDirty: () => isDirty,
+    submitForm: () => handleSubmit(handleForm)(),
+    resetForm: () => reset(getInitialValues(product))
+  }));
   const [watchFractionable, watchSupplier, watchBrand, watchCost] = watch([
     'fractionConfig.active',
     'supplier',
@@ -73,10 +84,11 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
     }
 
     await onSubmit(filteredData);
+    reset(filteredData);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset({ ...EMPTY_PRODUCT, ...product }), SHORTKEYS.DELETE);
+  useKeyboardShortcuts(() => reset(getInitialValues(product)), SHORTKEYS.DELETE);
 
   const supplierOptions = useMemo(() => {
     return suppliers?.map(({ id, name, state, deactivationReason }) => ({
@@ -259,13 +271,15 @@ const ProductForm = ({ product, onSubmit, brands, suppliers, isUpdating, isLoadi
             isUpdating={isUpdating}
             isLoading={isLoading}
             isDirty={isDirty}
-            onReset={() => reset({ ...EMPTY_PRODUCT, ...product })}
+            onReset={() => reset(getInitialValues(product))}
             disabled={isProductDeleted(product?.state) || isDeletePending}
           />
         )}
       </Form>
     </FormProvider>
   );
-};
+});
+
+ProductForm.displayName = "ProductForm";
 
 export default ProductForm;

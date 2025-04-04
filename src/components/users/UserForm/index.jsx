@@ -4,37 +4,40 @@ import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlle
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { getPastDate } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { DatePickerControlled } from "../../../common/components/form/DatePicker";
 import { EMPTY_USER, USERS_ROLE_OPTIONS } from "../users.constants";
 
-const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending }) => {
+const UserForm = forwardRef(({
+  user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending
+}, ref) => {
+
+  const getInitialValues = (user) => ({
+    ...EMPTY_USER,
+    ...user,
+    role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
+    birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
+  });
+
   const methods = useForm({
-    defaultValues: {
-      ...EMPTY_USER,
-      ...user,
-      role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
-      birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
-    },
+    defaultValues: getInitialValues(user),
   });
 
   const { handleSubmit, reset, formState: { isDirty } } = methods;
-
-  const handleReset = () => {
-    reset({
-      ...EMPTY_USER,
-      ...user,
-      role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
-      birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
-    });
-  };
+  useImperativeHandle(ref, () => ({
+    isDirty: () => isDirty,
+    submitForm: () => handleSubmit(handleCreate)(),
+    resetForm: () => reset(getInitialValues(user))
+  }));
 
   const handleCreate = (data) => {
     onSubmit(data);
+    reset(data);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(handleReset, SHORTKEYS.DELETE);
+  useKeyboardShortcuts(() => reset(getInitialValues(user)), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
@@ -153,12 +156,15 @@ const UserForm = ({ user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, is
             isLoading={isLoading}
             isDirty={isDirty}
             disabled={isDeletePending}
-            onReset={handleReset}
+            onReset={() => reset(getInitialValues(user))}
           />
         )}
       </Form>
     </FormProvider>
   );
-};
+});
+
+UserForm.displayName = "UserForm";
+
 
 export default UserForm;

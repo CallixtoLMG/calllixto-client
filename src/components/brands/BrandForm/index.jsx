@@ -4,19 +4,35 @@ import { TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_BRAND } from "../brands.constants";
 
-const BrandForm = ({ brand, onSubmit, isLoading, isUpdating, view, isDeletePending }) => {
-  const methods = useForm({ defaultValues: brand });
+const BrandForm = forwardRef(({
+  brand, onSubmit, isUpdating, isLoading, view, isDeletePending
+}, ref) => {
+  const getInitialValues = (brand) => ({ ...EMPTY_BRAND, ...brand });
+  const methods = useForm({
+    defaultValues:getInitialValues(brand)
+  });
   const { handleSubmit, reset, formState: { isDirty } } = methods;
+  useImperativeHandle(ref, () => ({
+    isDirty: () => isDirty,
+    submitForm: () => handleSubmit(handleForm)(),
+    resetForm: () => reset(getInitialValues(brand))
+  }));
 
-  useKeyboardShortcuts(handleSubmit(onSubmit), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset({ ...EMPTY_BRAND, ...brand }), SHORTKEYS.DELETE);
+  const handleForm = async (data) => {
+    await onSubmit(data);
+    reset(data);
+  };
+
+  useKeyboardShortcuts(handleSubmit(handleForm), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => reset(getInitialValues(brand)), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
+      <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
         <FieldsContainer>
           <TextControlled
             width="150px"
@@ -43,13 +59,15 @@ const BrandForm = ({ brand, onSubmit, isLoading, isUpdating, view, isDeletePendi
             isUpdating={isUpdating}
             isLoading={isLoading}
             isDirty={isDirty}
-            onReset={() => reset({ ...EMPTY_BRAND, ...brand })}
+            onReset={() => reset(getInitialValues(brand))}
             disabled={isDeletePending}
           />
         )}
       </Form>
     </FormProvider>
   )
-};
+});
+
+BrandForm.displayName = "BrandForm";
 
 export default BrandForm;

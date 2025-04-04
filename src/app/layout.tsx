@@ -1,5 +1,6 @@
 "use client";
 import { UserProvider } from "@/User";
+import { RouteHistoryProvider } from "@/app/RouteHistoryContext";
 import { GoBackButton } from "@/common/components/buttons";
 import { PAGES } from "@/common/constants";
 import { BreadcrumProvider, Breadcrumb, Header, NavActions, NavActionsProvider, Toaster } from "@/components/layout";
@@ -64,23 +65,25 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             }} />
           <QueryClientProvider client={queryClient}>
             <UserProvider>
-              <Header />
-              <NavActionsProvider>
-                <BreadcrumProvider>
-                  {show && (
-                    <NavigationContainer>
-                      <BreadcrumbContainer>
-                        <GoBackButton />
-                        <Breadcrumb />
-                      </BreadcrumbContainer>
-                      <NavActions />
-                    </NavigationContainer>
-                  )}
-                  <LayoutChildrenContainer>
-                    {children}
-                  </LayoutChildrenContainer>
-                </BreadcrumProvider>
-              </NavActionsProvider>
+              <RouteHistoryProvider>
+                <Header />
+                <NavActionsProvider>
+                  <BreadcrumProvider>
+                    {show && (
+                      <NavigationContainer>
+                        <BreadcrumbContainer>
+                          <GoBackButton />
+                          <Breadcrumb />
+                        </BreadcrumbContainer>
+                        <NavActions />
+                      </NavigationContainer>
+                    )}
+                    <LayoutChildrenContainer>
+                      {children}
+                    </LayoutChildrenContainer>
+                  </BreadcrumProvider>
+                </NavActionsProvider>
+              </RouteHistoryProvider>
             </UserProvider>
           </QueryClientProvider>
         </body>

@@ -5,6 +5,7 @@ import { Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
+import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, ICONS, INACTIVE_LOW_CASE, PAGES, RECOVER } from "@/common/constants";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
@@ -18,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
+import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -26,7 +28,6 @@ const Product = ({ params }) => {
   const { data: product, isLoading, refetch } = useGetProduct(params.code);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -37,6 +38,30 @@ const Product = ({ params }) => {
   const activeProduct = useActiveProduct();
   const inactiveProduct = useInactiveProduct();
   const recoverProduct = useRecoverProduct();
+  const formRef = useRef(null);
+  const {
+    showModal: showUnsavedModal,
+    handleDiscard,
+    handleSave,
+    resolveSave,
+    handleCancel,
+    isSaving,
+    onBeforeView,
+    closeModal,
+  } = useUnsavedChanges({
+    formRef,
+    onDiscard: async () => {
+      formRef.current?.resetForm();
+      setIsUpdating(false);
+    },
+    onSave: () => {
+      formRef.current?.submitForm();
+    },
+  });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
+    canUpdate: RULES.canUpdate[role],
+    onBeforeView,
+  });
 
   useEffect(() => {
     resetActions();
@@ -125,6 +150,7 @@ const Product = ({ params }) => {
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
+      closeModal();
     },
   });
 
@@ -133,6 +159,7 @@ const Product = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto activado!");
+        resolveSave();
       } else {
         toast.error(response.error.message);
       }
@@ -339,12 +366,20 @@ const Product = ({ params }) => {
         </Message>
       )}
       <ProductForm
+        ref={formRef}
         product={product}
         onSubmit={mutateEdit}
         isUpdating={isUpdating && !isProductInactive(product?.state)}
         isLoading={isEditPending}
         view
         isDeletePending={isDeletePending}
+      />
+      <UnsavedChangesModal
+        open={showUnsavedModal}
+        onDiscard={handleDiscard}
+        onSave={handleSave}
+        isSaving={isSaving}
+        onCancel={handleCancel}
       />
       {product && (
         <OnlyPrint>

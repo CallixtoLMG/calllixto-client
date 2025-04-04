@@ -16,6 +16,7 @@ import {
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
+import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, ICONS, INACTIVE_LOW_CASE, PAGES } from "@/common/constants";
 import { downloadExcel, getFormatedPrice, isItemInactive } from "@/common/utils";
 import {
@@ -35,6 +36,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
+import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Supplier = ({ params }) => {
   useValidateToken();
@@ -45,16 +47,36 @@ const Supplier = ({ params }) => {
     useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
-    canUpdate: RULES.canUpdate[role],
-  });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
   const [isExcelLoading, setIsExcelLoading] = useState(false);
   const [reason, setReason] = useState("");
   const printRef = useRef(null);
-
+  const formRef = useRef(null);
+  const {
+    showModal: showUnsavedModal,
+    handleDiscard,
+    handleSave,
+    resolveSave,
+    handleCancel,
+    isSaving,
+    onBeforeView,
+    closeModal,
+  } = useUnsavedChanges({
+    formRef,
+    onDiscard: async () => {
+      formRef.current?.resetForm();
+      setIsUpdating(false);
+    },
+    onSave: () => {
+      formRef.current?.submitForm();
+    },
+  });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
+    canUpdate: RULES.canUpdate[role],
+    onBeforeView,
+  });
   const editSupplier = useEditSupplier();
   const deleteSupplier = useDeleteSupplier();
   const deleteBySupplierId = useDeleteBySupplierId();
@@ -171,6 +193,7 @@ const Supplier = ({ params }) => {
       if (response.statusOk) {
         toast.success('Proveedor actualizado!');
         setIsUpdating(false);
+        resolveSave(); 
       } else {
         toast.error(response.error.message);
       }
@@ -178,6 +201,7 @@ const Supplier = ({ params }) => {
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
+      closeModal();
     },
   });
 
@@ -431,6 +455,7 @@ const Supplier = ({ params }) => {
         </Message>
       )}
       <SupplierForm
+        ref={formRef}
         supplier={supplier}
         onSubmit={mutateEdit}
         isLoading={isEditPending}
@@ -443,6 +468,13 @@ const Supplier = ({ params }) => {
           <PrintBarCodes ref={printRef} products={products} />
         </OnlyPrint>
       )}
+      <UnsavedChangesModal
+        open={showUnsavedModal}
+        onDiscard={handleDiscard}
+        onSave={handleSave}
+        isSaving={isSaving}
+        onCancel={handleCancel} 
+      />
       <ModalAction
         title={header}
         onConfirm={handleActionConfirm}

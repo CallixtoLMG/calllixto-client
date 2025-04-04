@@ -1,5 +1,4 @@
-import { Flex, Label } from '@/common/components/custom';
-import OverflowWrapper from '@/common/components/custom/OverflowWrapper';
+import { Flex, Label, OverflowWrapper } from '@/common/components/custom';
 import { CommentTooltip } from '@/common/components/tooltips';
 import { DATE_FORMATS } from '@/common/constants';
 import { getFormatedPhone } from '@/common/utils';
