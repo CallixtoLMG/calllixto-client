@@ -31,6 +31,9 @@ export const Input = styled(SInput)`
   width: ${({ width = '100%' }) => `${width}!important`};
   height: ${({ height = '38px' }) => height} !important;
   text-align: ${({ textAlign }) => textAlign} !important;
+  &&& input{
+    border-left: ${({ showPopup }) => (showPopup) && "none"} !important;
+  }
 `;
 
 export const FormField = styled(Form.Field)`

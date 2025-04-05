@@ -2,8 +2,8 @@ import { Box, Button, Flex } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS } from "@/common/constants";
-import { useEffect, useState } from "react";
-import { useFieldArray, useFormContext } from "react-hook-form";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { Accordion, Icon } from "semantic-ui-react";
 
 const EMPTY_INPUT = "";
@@ -12,10 +12,8 @@ const Blacklist = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [inputValue, setInputValue] = useState(EMPTY_INPUT);
   const [error, setError] = useState(null);
-  const { formState: { isDirty } } = useFormContext();
-  const { fields: blacklist, append, remove } = useFieldArray({
-    name: "blacklist"
-  });
+  const { setValue, watch, formState: { isDirty } } = useFormContext();
+  const blacklist = watch("blacklist") || [];
 
   useEffect(() => {
     if (!isDirty) {
@@ -26,15 +24,21 @@ const Blacklist = () => {
 
   const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
 
+  const updateBlacklist = useCallback((newList) => {
+    setValue("blacklist", newList, { shouldValidate: true, shouldDirty: true });
+  }, [setValue]);
+
   const handleAddBlacklist = () => {
-    const codes = inputValue.split(",").map(code => code.trim().toUpperCase()).filter(Boolean);
-    const existingCodes = blacklist.map(item => item.value);
-  
+    const codes = inputValue
+      .split(",")
+      .map(code => code.trim().toUpperCase())
+      .filter(Boolean);
+
     const uniqueCodes = [...new Set(codes)];
     const validCodes = [];
     const errorCodes = [];
     const detailedErrors = {};
-  
+
     uniqueCodes.forEach(code => {
       if (code.includes(" ")) {
         errorCodes.push(code);
@@ -46,16 +50,18 @@ const Blacklist = () => {
         detailedErrors[code] = `El código [${code}] debe tener más de 5 caracteres!`;
         return;
       }
-      if (existingCodes.includes(code)) {
+      if (blacklist.includes(code)) {
         errorCodes.push(code);
         detailedErrors[code] = `El código [${code}] ya existe en la lista!`;
         return;
       }
       validCodes.push(code);
     });
-  
-    validCodes.forEach(code => append({ value: code }));
-  
+
+    if (validCodes.length > 0) {
+      updateBlacklist([...blacklist, ...validCodes]);
+    }
+
     if (errorCodes.length > 0) {
       if (errorCodes.length === 1) {
         setError(detailedErrors[errorCodes[0]]);
@@ -68,7 +74,11 @@ const Blacklist = () => {
       setInputValue(EMPTY_INPUT);
     }
   };
-  
+
+  const handleRemoveCode = useCallback((codeToRemove) => {
+    const updatedBlacklist = (watch("blacklist") || []).filter(code => code !== codeToRemove);
+    updateBlacklist(updatedBlacklist);
+  }, [watch, updateBlacklist]);
 
   const handleInputKeyDown = (e) => {
     if (e.key === "Enter") {
@@ -77,24 +87,24 @@ const Blacklist = () => {
     }
   };
 
-  const headers = [
+  const headers = useMemo(() => [
     {
       id: "code",
       title: "Productos Bloqueados",
       align: "left",
-      value: (item) => item.value,
+      value: (code) => code,
     },
-  ];
+  ], []);
 
-  const actions = [
+  const actions = useMemo(() => [
     {
       id: DELETE,
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      onClick: (code, index) => remove(index),
+      onClick: handleRemoveCode,
       tooltip: "Eliminar",
     },
-  ];
+  ], [handleRemoveCode]);
 
   return (
     <Box marginBottom="5px">
@@ -113,7 +123,7 @@ const Blacklist = () => {
                 value={inputValue}
                 onChange={(e) => {
                   setInputValue(e.target.value);
-                  if (error) setError(null); 
+                  if (error) setError(null);
                 }}
                 onKeyPress={handleInputKeyDown}
                 error={error}
@@ -141,7 +151,7 @@ const Blacklist = () => {
               isLoading={false}
               headers={headers}
               elements={blacklist}
-              mainKey={(item) => item.value}
+              mainKey={(item) => item}
               paginate={false}
               actions={actions}
               tableHeight="40vh"

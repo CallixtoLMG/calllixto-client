@@ -115,6 +115,7 @@ const Brand = ({ params }) => {
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
+      closeModal();
     },
   });
 
@@ -130,7 +131,6 @@ const Brand = ({ params }) => {
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
-      closeModal();
     },
   });
 

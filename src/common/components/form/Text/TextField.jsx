@@ -1,7 +1,8 @@
 import { FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import { COLORS, ICONS } from "@/common/constants";
+import { useState } from "react";
 import { Popup } from "semantic-ui-react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 const TruncateInput = styled.div`
   width: 100%;
@@ -21,6 +22,23 @@ const TruncateInput = styled.div`
   opacity: 0.45;
 `;
 
+const StyledLabel = styled(Label)`
+  ${({ $hasError, $isFocused }) => css`
+    border: 1px solid
+      ${$hasError
+      ? 'rgb(224, 180, 180)!important'
+      : $isFocused
+        ? '#85b7d9!important'
+        : '#d4d4d5'}; 
+    border-radius: 4px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    margin: 0;
+  `}
+`;
+
 export const TextField = ({
   flex,
   width,
@@ -34,12 +52,18 @@ export const TextField = ({
   maxLength,
   error,
   showPopup = false,
-  popupContent = "top center",
-  popupPosition
+  popupContent,
+  popupPosition = "top center",
 }) => {
+  const [isFocused, setIsFocused] = useState(false);
   const showIconLabel = () => (
-    <Label width="fit-content" height="100%">
-      {showPopup ? (
+    <StyledLabel
+      $hasError={!!error}
+      $isFocused={isFocused}
+      width="fit-content"
+      height="100%"
+    >
+      {showPopup && (
         <Popup
           position={popupPosition}
           size="tiny"
@@ -52,9 +76,9 @@ export const TextField = ({
             />
           }
         />
-      ) : null}
+      )}
       {iconLabel}
-    </Label>
+    </StyledLabel>
   );
 
   return (
@@ -73,10 +97,7 @@ export const TextField = ({
         >
           {iconLabel && showIconLabel()}
           <TruncateInput>
-            <OverflowWrapper
-              popupContent={value}
-              maxWidth="100%"
-            >
+            <OverflowWrapper popupContent={value} maxWidth="100%">
               {value}
             </OverflowWrapper>
           </TruncateInput>
@@ -89,6 +110,10 @@ export const TextField = ({
           onChange={onChange}
           maxLength={maxLength}
           onKeyPress={onKeyPress}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          iconLabel
+          showPopup={showPopup}
         >
           {iconLabel && showIconLabel()}
           <input />
