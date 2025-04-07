@@ -3,16 +3,12 @@ import { getDefaultListParams } from '@/common/utils';
 import { now } from "@/common/utils/dates";
 import { ATTRIBUTES, GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
 import {
-    BATCH,
-    BLACK_LIST,
-    EDIT_BATCH,
-    PATHS,
-    SUPPLIER,
-    URL,
-    VALIDATE
+  BATCH,
+  EDIT_BATCH,
+  PATHS,
+  SUPPLIER
 } from "@/fetchUrls";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
 import { chunk } from "lodash";
 import { useMemo } from "react";
 import { getInstance } from "./axios";
@@ -227,40 +223,6 @@ export const useEditBatch = () => {
   };
 
   return editBatch;
-};
-
-export function useGetBlackList() {
-  async function getBlackList() {
-    try {
-      const response = await axios({
-        url: `${URL}${VALIDATE}`,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          authorization: `Bearer ${localStorage.getItem("token")}`
-        }
-      });
-
-      if (response.data) {
-        sessionStorage.setItem("userData", JSON.stringify(response.data));
-        return response.data.client?.blacklist || [];
-      }
-    } catch (e) {
-      console.error("Error fetching blackList from server:", e);
-      return [];
-    }
-  };
-
-  const query = useQuery({
-    queryKey: ["PEPITO"],
-    queryFn: getBlackList,
-  });
-
-  return query;
-};
-
-export function editBanProducts(products) {
-  return getInstance().put(BLACK_LIST, products);
 };
 
 export const useDeleteBySupplierId = () => {

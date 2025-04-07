@@ -2,15 +2,17 @@
 import { useEditSetting, useListSettings } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
+import { UnsavedChangesModal } from "@/common/components/modals";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
 import { LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
 import { useRestoreEntity } from "@/hooks/common";
+import { useUnsavedChanges } from "@/hooks/unsavedChanges";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { pick } from "lodash";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 
@@ -25,7 +27,7 @@ const ENTITY_MAPPER = {
 };
 
 export const SUPPORTED_SETTINGS = {
-  PRODUCT: ["tags"],
+  PRODUCT: ["tags", "blacklist"],
   CUSTOMER: ["tags"],
   EXPENSE: ["tags", "categories"],
 };
@@ -38,8 +40,28 @@ const Settings = () => {
   const editSetting = useEditSetting();
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm();
+
+  const formRef = useRef(null);
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   const [activeEntity, setActiveEntity] = useState(null);
+  const {
+    showModal,
+    handleDiscard,
+    handleSave,
+    resolveSave,
+    handleCancel,
+    isSaving,
+    onBeforeView,
+    closeModal,
+  } = useUnsavedChanges({
+    formRef,
+    onDiscard: async () => {
+      methods.reset(data[activeEntity]);
+    },
+    onSave: () => {
+      methods.handleSubmit(mutateEdit)();
+    },
+  });
 
   const restoreSettings = useRestoreEntity({
     entity: ENTITIES.SETTINGS,
@@ -74,17 +96,33 @@ const Settings = () => {
     }),
     onSuccess: () => {
       toast.success("Cambios guardados correctamente.");
+      methods.reset(methods.getValues());
+      resolveSave();
     },
     onError: (error) => {
       toast.error(`Error al guardar cambios: ${error.message || error}`);
     },
+    onSettled: () => {
+      closeModal();
+    },
   });
 
-  const handleEntityChange = useCallback((entity) => {
+  useEffect(() => {
+    formRef.current = {
+      isDirty: () => methods.formState.isDirty,
+      submitForm: () => methods.handleSubmit(mutateEdit)(),
+      resetForm: () => methods.reset(data[activeEntity]),
+    };
+  }, [methods, mutateEdit, data, activeEntity]);
+
+  const handleEntityChange = useCallback(async (entity) => {
+    const canView = await onBeforeView();
+    if (!canView) return;
+
     setActiveEntity(entity);
     setLabels([PAGES.SETTINGS.NAME, entity.label]);
     reset(entity);
-  }, [reset, setLabels]);
+  }, [onBeforeView, reset, setLabels]);
 
   const settings = useMemo(() => {
     if (!data?.settings) return [];
@@ -107,18 +145,26 @@ const Settings = () => {
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(mutateEdit)}>
+      <Form ref={formRef} onSubmit={handleSubmit(mutateEdit)}>
         <SettingsTabs
           onEntityChange={handleEntityChange}
           settings={settings}
           onRefresh={handleSettingsRefresh}
           isLoading={isLoading}
+          onBeforeView={onBeforeView}
         />
         <SubmitAndRestore
           isLoading={isPending}
           onReset={() => reset(data[activeEntity])}
           isDirty={isDirty}
           text="Actualizar"
+        />
+        <UnsavedChangesModal
+          open={showModal}
+          onDiscard={handleDiscard}
+          onSave={handleSave}
+          isSaving={isSaving}
+          onCancel={handleCancel}
         />
       </Form>
     </FormProvider>

@@ -16,7 +16,7 @@ import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
 import { calculateMargin, calculatePriceFromMargin, getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
 
 const ProductForm = forwardRef(({
-  product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending },
+  product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending, blacklist },
   ref) => {
   const initialMargin = getMargin(product?.price, product?.cost);
   const getInitialValues = (product) => ({
@@ -162,7 +162,15 @@ const ProductForm = forwardRef(({
                 width="250px"
                 name="code"
                 label="Código"
-                rules={RULES.REQUIRED}
+                rules={{
+                  required: "Este campo es obligatorio.",
+                  validate: (value) => {
+                    if (blacklist?.includes(value.trim().toUpperCase())) {
+                      return "Este código se encuentra dentro de la lista de productos bloqueados.";
+                    }
+                    return true;
+                  },
+                }}
                 onChange={value => value.toUpperCase()}
                 disabled={isProductDeleted(product?.state)}
                 iconLabel={`${watchSupplier ?? ''} ${watchBrand ?? ''}`}

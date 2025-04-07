@@ -1,8 +1,9 @@
 "use client";
 import { useListBrands } from "@/api/brands";
 import { useCreateProduct } from "@/api/products";
+import { useGetSetting } from "@/api/settings";
 import { useListSuppliers } from "@/api/suppliers";
-import { PAGES } from "@/common/constants";
+import { ENTITIES, PAGES } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { useValidateToken } from "@/hooks/userData";
@@ -16,6 +17,7 @@ const CreateProduct = () => {
   const { push } = useRouter();
   const { data: brands, isLoading: isLoadingBrands, refetch: refetchBrands, isRefetching: isBrandsRefetching } = useListBrands();
   const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers, isRefetching: isSupplierRefetching } = useListSuppliers();
+  const { data: blacklist, refetch: refetchBlacklist } = useGetSetting(ENTITIES.PRODUCTS);
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createProduct = useCreateProduct();
@@ -24,6 +26,7 @@ const CreateProduct = () => {
     resetActions();
     refetchBrands();
     refetchSuppliers();
+    refetchBlacklist();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -67,6 +70,7 @@ const CreateProduct = () => {
         suppliers={mappedSuppliers}
         onSubmit={mutate}
         isLoading={isPending}
+        blacklist={blacklist?.blacklist}
       />
     </Loader>
   )

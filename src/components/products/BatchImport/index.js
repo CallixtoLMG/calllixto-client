@@ -1,9 +1,10 @@
-import { useCreateBatch, useEditBatch, useGetBlackList, useListProducts } from "@/api/products";
+import { useCreateBatch, useEditBatch, useListProducts } from "@/api/products";
+import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
 import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Label, Segment } from "@/common/components/custom";
 import { PriceControlled, TextControlled, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import { Loader } from "@/components/layout";
@@ -18,7 +19,6 @@ import { Modal, ModalHeader, WaitMsg } from "./styles";
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts, refetch: refetchProducts } = useListProducts();
   const products = useMemo(() => data?.products, [data?.products]);
-  const { refetch: refetchBlacklist } = useGetBlackList();
   const methods = useForm();
   const { handleSubmit, formState: { isDirty }, reset, watch, setValue } = methods;
   const [open, setOpen] = useState(false);
@@ -31,6 +31,7 @@ const BatchImport = ({ isCreating }) => {
   const [unprocessedProductsCount, setUnprocessedProductsCount] = useState(0);
   const [importedProductsCount, setImportedProductsCount] = useState(0);
   const watchProducts = watch("importProducts", []);
+  const { refetch: refetchBlacklist } = useGetSetting(ENTITIES.PRODUCTS);
   const inputRef = useRef();
   const formRef = useRef(null);
   const [existingCodes, setExistingCodes] = useState({});
@@ -103,7 +104,7 @@ const BatchImport = ({ isCreating }) => {
     setIsLoading(true);
     try {
       setSelectedFile(file.name);
-      const updatedBlacklist = await refetchBlacklist().then(result => result.data || []);
+      const updatedBlacklist = await refetchBlacklist().then(result => result.data.blacklist || []);
       const reader = new FileReader();
       reader.onload = async (event) => {
         try {
