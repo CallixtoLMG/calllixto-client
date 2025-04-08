@@ -2,6 +2,7 @@ import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
 import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
+import { validateEmail } from "@/common/utils";
 import { getPastDate } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { forwardRef, useImperativeHandle } from "react";
@@ -48,7 +49,12 @@ const UserForm = forwardRef(({
             name="username"
             label="Usuario"
             placeholder="nombre@empresa.com"
-            rules={RULES.REQUIRED}
+            rules={{
+              required: "Este campo es obligatorio.",
+              validate: {
+                email: (value) => validateEmail(value) || "El correo electrónico no es válido.",
+              },
+            }}
             disabled={view}
             iconLabel
             popupPosition="bottom left"

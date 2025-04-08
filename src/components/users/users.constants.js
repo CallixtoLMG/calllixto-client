@@ -28,7 +28,7 @@ export const USER_COLUMNS = [
     align: "left",
     value: (user) =>
       <Flex justifyContent="space-between">
-        < OverflowWrapper maxWidth="15vw" popupContent={user.username} >
+        < OverflowWrapper position="top left" maxWidth="15vw" popupContent={user.username} >
           {user.username}
         </OverflowWrapper >
         {user.comments && <CommentTooltip comment={user.comments} />}
