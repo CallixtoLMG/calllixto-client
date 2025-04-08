@@ -45,6 +45,8 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
               onChange={handleConfirmationTextChange}
               ref={inputElement}
               width="250px"
+              disabled={isLoading}
+              textAlign="left"
             />
             <ButtonsContainer>
               <IconedButton

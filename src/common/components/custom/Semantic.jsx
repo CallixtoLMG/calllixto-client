@@ -32,7 +32,7 @@ export const Input = styled(SInput)`
   height: ${({ height = '38px' }) => height} !important;
   text-align: ${({ textAlign }) => textAlign} !important;
   &&& input{
-    border-left: ${({ showPopup }) => (showPopup) && "none"} !important;
+    border-left: ${({ iconLabel }) => (iconLabel) && "none"} !important;
   }
 `;
 
