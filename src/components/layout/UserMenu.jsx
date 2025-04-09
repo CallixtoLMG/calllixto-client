@@ -1,11 +1,10 @@
+import { useUserContext } from "@/User";
 import { COLORS, PAGES } from "@/common/constants";
 import { isCallixtoUser } from "@/roles";
-import { useUserContext } from "@/User";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Accordion, Dropdown, Icon, Menu, Popup } from "semantic-ui-react";
 import styled from "styled-components";
-
 const AccordionMenu = styled(Menu)`
   border-radius: 0!important;
   border: 0!important;
@@ -27,29 +26,28 @@ const AccordionTitle = styled(Accordion.Title)`
   }
 `;
 
-const UserMenu = ({ trigger, onLogout, onClientChange }) => {
+const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
   const { push } = useRouter();
   const { userData, role } = useUserContext();
   const [activeIndex, setActiveIndex] = useState(-1);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const handleAccordionClick = (index) => {
     setActiveIndex(activeIndex === index ? -1 : index);
   };
 
-  const filteredClients = useMemo(() => {
-    return userData.callixtoClients?.filter((client) =>
-      client.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [searchTerm, userData.callixtoClients]);
-
   const clientOptions = useMemo(() => {
-    return filteredClients?.map((client) => ({
+    const clients = userData.callixtoClients || [];
+    const filteredClients = searchTerm
+      ? clients.filter(client => client.toLowerCase().includes(searchTerm.toLowerCase()))
+      : clients;
+  
+    return filteredClients.map(client => ({
       key: client,
       value: client,
       text: client,
     }));
-  }, [filteredClients]);
+  }, [searchTerm, userData.callixtoClients]);
 
   return (
     <Popup
@@ -58,6 +56,9 @@ const UserMenu = ({ trigger, onLogout, onClientChange }) => {
       position="bottom right"
       wide="very"
       style={{ padding: 0 }}
+      open={isPopupOpen}
+      onClose={() => setIsPopupOpen(false)}
+      onOpen={() => setIsPopupOpen(true)}
     >
       <Menu vertical style={{ minWidth: "250px" }}>
         <Menu.Item onClick={onLogout}>
@@ -65,6 +66,7 @@ const UserMenu = ({ trigger, onLogout, onClientChange }) => {
         </Menu.Item>
         <Menu.Item
           onClick={() => {
+            setIsPopupOpen(false);
             push(PAGES.CHANGE_PASSWORD.BASE);
           }}
         >
@@ -85,12 +87,11 @@ const UserMenu = ({ trigger, onLogout, onClientChange }) => {
                   placeholder="Selecciona un cliente"
                   search
                   selection
-                  clearable
                   fluid
                   minCharacters={2}
                   noResultsMessage="No se han encontrado resultados."
                   options={clientOptions}
-                  value={userData.selectedClientId || null}
+                  value={selectedClient || null} 
                   onSearchChange={(e, { searchQuery }) => setSearchTerm(searchQuery)}
                   onChange={(e, { value }) => {
                     onClientChange(value);

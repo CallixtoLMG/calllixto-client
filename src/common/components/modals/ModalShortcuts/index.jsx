@@ -2,8 +2,8 @@ import { COLORS, ICONS } from '@/common/constants';
 import { useState } from 'react';
 import { List, Modal, Popup, Transition } from 'semantic-ui-react';
 import { IconedButton } from '../../buttons';
-import { StyledListContent, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader } from "./styles";
 import { Icon } from '../../custom';
+import { StyledListContent, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader } from "./styles";
 
 const KeyboardShortcuts = () => {
   const [open, setOpen] = useState(false);
@@ -24,7 +24,7 @@ const KeyboardShortcuts = () => {
               <List.Item>
                 <StyledListIcon name={ICONS.KEYBOARD} />
                 <StyledListContent>
-                  <StyledListHeader>Control + 1,2,3,4,5</StyledListHeader>
+                  <StyledListHeader>Control + 1,2,3,4,5...</StyledListHeader>
                   <List.Description>Me desplazo por las distintas pestañas de la página.</List.Description>
                 </StyledListContent>
               </List.Item>

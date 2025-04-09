@@ -9,6 +9,7 @@ import { isItemInactive } from "@/common/utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UserForm from "@/components/users/UserForm";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
+import { useProtectedAction } from "@/hooks/useProtectedAction";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
@@ -57,6 +58,7 @@ const User = ({ params }) => {
     canUpdate: RULES.canUpdate[role],
     onBeforeView,
   });
+  const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
 
   useEffect(() => {
     resetActions();
@@ -95,9 +97,20 @@ const User = ({ params }) => {
     setIsModalOpen(true);
   }, []);
 
-  const handleActivateClick = useCallback(() => handleOpenModalWithAction(ACTIVE), [handleOpenModalWithAction]);
-  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE), [handleOpenModalWithAction]);
-  const handleDeleteClick = useCallback(() => handleOpenModalWithAction(DELETE), [handleOpenModalWithAction]);
+const handleActivateClick = useCallback(
+  () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
+  [handleProtectedAction, handleOpenModalWithAction],
+);
+
+const handleInactiveClick = useCallback(
+  () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
+  [handleProtectedAction, handleOpenModalWithAction],
+);
+
+const handleDeleteClick = useCallback(
+  () => handleProtectedAction(() => handleOpenModalWithAction(DELETE)),
+  [handleProtectedAction, handleOpenModalWithAction],
+);
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editUser,

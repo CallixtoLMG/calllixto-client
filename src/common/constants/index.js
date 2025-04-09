@@ -61,6 +61,7 @@ export const PAGES = {
   SETTINGS: {
     BASE: "/configuracion",
     NAME: 'Configuración',
+    SHORTKEYS: 'Control+7'
   },
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"

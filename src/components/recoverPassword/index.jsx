@@ -124,6 +124,7 @@ const RecoverPasswordForm = () => {
               loading={isCodeSent ? isConfirmResetPending : isRecoverPasswordPending}
               fluid="true"
               size="large"
+              disabled={isCodeSent ? isConfirmResetPending : isRecoverPasswordPending}
             >
               {isCodeSent ? "Cambiar Contraseña" : "Enviar"}
             </ModButton>
