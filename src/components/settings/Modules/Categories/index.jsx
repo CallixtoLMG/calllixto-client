@@ -1,4 +1,4 @@
-import { Box, Button, Flex } from "@/common/components/custom";
+import { Box, Button, Flex, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SEMANTIC_COLORS } from "@/common/constants";
@@ -33,13 +33,24 @@ const Categories = () => {
       title: "Categoria",
       align: "left",
       width: 5,
-      value: (category) => <Label color={category.color}>{category.name}</Label>,
+      value: (category) => (
+        <Label color={category.color}>
+          <OverflowWrapper maxWidth="40vw" popupContent={category.name}>
+            {category.name}
+          </OverflowWrapper>
+        </Label >)
     },
     {
       id: "description",
       title: "Descripción",
       align: "left",
-      value: (category) => <span>{category.description}</span>,
+      value: (category) => (
+        <span>
+          <OverflowWrapper maxWidth="40vw" popupContent={category.description}>
+            {category.description}
+          </OverflowWrapper>
+        </span>
+      ),
     },
   ];
 
@@ -60,6 +71,11 @@ const Categories = () => {
 
     if (!categoryToAdd.name.trim()) {
       setError("El nombre es obligatorio.");
+      return;
+    }
+
+    if (categoryToAdd.name.length > 50) {
+      setError("El nombre no debe superar los 50 caracteres.");
       return;
     }
 

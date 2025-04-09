@@ -9,7 +9,7 @@ import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { forwardRef, useImperativeHandle, useMemo } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
@@ -36,7 +36,7 @@ const ProductForm = forwardRef(({
   const methods = useForm({
     defaultValues: getInitialValues(product)
   });
-  const { data: productsSettings, isFetching: isProductSettingsFetching } = useGetSetting(ENTITIES.PRODUCTS);
+  const { data: productsSettings, isFetching: isProductSettingsFetching, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
   const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
@@ -51,6 +51,10 @@ const ProductForm = forwardRef(({
     'cost',
     'price',
   ]);
+
+  useEffect(() => {
+    refetchProductSettings();
+  }, []);
 
   const handleForm = async (data) => {
     const filteredData = { ...data };

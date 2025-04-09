@@ -5,14 +5,13 @@ import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled,
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { forwardRef, useImperativeHandle } from "react";
+import { forwardRef, useEffect, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
 
 const CustomerForm = forwardRef(({
   customer, onSubmit, isLoading, isUpdating, view, isDeletePending },
   ref) => {
-
   const getInitialValues = (customer) => ({ ...EMPTY_CUSTOMER, tags: [], ...customer });
 
   const methods = useForm({
@@ -26,8 +25,12 @@ const CustomerForm = forwardRef(({
     resetForm: () => reset(getInitialValues(customer))
   }));
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
-  const { data: customersSettings, isFetching: isCustomerSettingsFetching } = useGetSetting(ENTITIES.CUSTOMERS);
+  const { data: customersSettings, isFetching: isCustomerSettingsFetching, refetch: refetchCustomersSettings } = useGetSetting(ENTITIES.CUSTOMERS);
   const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.CUSTOMERS, customersSettings);
+
+  useEffect(() => {
+    refetchCustomersSettings();
+  }, []);
 
   const handleCreate = (data) => {
     const { previousVersions, ...filteredData } = data;
