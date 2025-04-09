@@ -166,10 +166,20 @@ const BudgetForm = ({
   }, [watchCustomer, customerOptions]);
 
   useEffect(() => {
-    if (normalizedCustomer && normalizedCustomer?.id) {
+    const currentCustomer = watch("customer");
+  
+    if (
+      normalizedCustomer &&
+      normalizedCustomer.id &&
+      (
+        !currentCustomer ||
+        normalizedCustomer.id !== currentCustomer.id ||
+        JSON.stringify(normalizedCustomer) !== JSON.stringify(currentCustomer)
+      )
+    ) {
       setValue("customer", normalizedCustomer, { shouldValidate: true });
     }
-  }, [normalizedCustomer, setValue]);
+  }, [normalizedCustomer, setValue, watch]);
 
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
@@ -446,7 +456,7 @@ const BudgetForm = ({
       value: (product, index) => (
         <Flex alignItems="center" columnGap="5px">
           <PercentControlled
-            width="80px"
+            width="90px"
             name={`products[${index}].discount`}
             defaultValue={product.discount ?? 0}
             handleChange={calculateTotal}
@@ -566,7 +576,7 @@ const BudgetForm = ({
                     return !!value?.id || 'Campo requerido.';
                   },
                   activeCustomer: value => {
-                    return value?.state === CUSTOMER_STATES.ACTIVE.id || 'No es posible confirmar ni dejar pendiente presupuestos con clientes inactivos, solo borradores.';
+                    return value?.state === CUSTOMER_STATES.ACTIVE.id || 'No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.';
                   },
                   requiredAddress: value => {
                     return (

@@ -54,6 +54,7 @@ export const TextField = ({
   showPopup = false,
   popupContent,
   popupPosition = "top center",
+  readOnly
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const showIconLabel = () => (
@@ -108,6 +109,7 @@ export const TextField = ({
           {...(iconLabel && { labelPosition: 'left' })}
           value={value}
           onChange={onChange}
+          readOnly={readOnly}
           maxLength={maxLength}
           onKeyPress={onKeyPress}
           onFocus={() => setIsFocused(true)}

@@ -158,6 +158,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
               control={Input}
               value={budget?.seller}
               readOnly
+              disabled
             />
             {budgetState && (
               <FormField
@@ -166,6 +167,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                 control={Input}
                 value={budgetState.person}
                 readOnly
+                disabled
               />
             )}
           </FieldsContainer>
@@ -195,6 +197,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             control={Input}
             value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
             readOnly
+            disabled
           />
           <DropdownField
             flex="3"
@@ -284,6 +287,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           placeholder="Comentarios"
           value={budget?.comments}
           readOnly
+          disabled
         />
         <FormField
           control={Input}
@@ -291,6 +295,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           width="100%"
           value={formattedPaymentMethods}
           readOnly
+          disabled
         />
       </ViewContainer>
     </Form>
