@@ -48,7 +48,7 @@ export const TextField = ({
   value,
   disabled,
   onChange,
-  onKeyPress,
+  onKeyDown,
   maxLength,
   error,
   showPopup = false,
@@ -109,7 +109,7 @@ export const TextField = ({
           value={value}
           onChange={onChange}
           maxLength={maxLength}
-          onKeyPress={onKeyPress}
+          onKeyDown={onKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           iconLabel

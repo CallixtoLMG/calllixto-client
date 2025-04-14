@@ -69,7 +69,7 @@ export const preventSend = (event) => {
   };
 };
 
-export const handleEnterKeyPress = (e, action) => {
+export const handleEnterKeyDown = (e, action) => {
   if (e.key === 'Enter') {
     e.preventDefault();
     action(e);

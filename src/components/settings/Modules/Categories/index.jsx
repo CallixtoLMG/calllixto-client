@@ -2,6 +2,7 @@ import { Box, Button, Flex, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SEMANTIC_COLORS } from "@/common/constants";
+import { handleEnterKeyDown } from "@/common/utils";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Accordion, Icon, Label } from "semantic-ui-react";
@@ -113,6 +114,7 @@ const Categories = () => {
                 label="Nombre"
                 placeholder="Nombre de la categoria"
                 value={categoryToAdd.name}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
                 onChange={handleNameChange}
                 error={error}
               />

@@ -3,11 +3,12 @@ import { useEditSetting, useListSettings } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
-import { ENTITIES, PAGES } from "@/common/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/common/constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
 import { LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
 import { useRestoreEntity } from "@/hooks/common";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useUnsavedChanges } from "@/hooks/unsavedChanges";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
@@ -141,6 +142,9 @@ const Settings = () => {
       handleEntityChange(settings[0]);
     }
   }, [settings, activeEntity, handleEntityChange]);
+
+  useKeyboardShortcuts(() => handleSubmit(mutateEdit)(), SHORTKEYS.ENTER);
+  useKeyboardShortcuts(() => reset(data[activeEntity]), SHORTKEYS.DELETE);
 
   return (
     <FormProvider {...methods}>

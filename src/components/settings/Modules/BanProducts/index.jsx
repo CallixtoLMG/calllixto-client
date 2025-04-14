@@ -125,7 +125,7 @@ const Blacklist = () => {
                   setInputValue(e.target.value);
                   if (error) setError(null);
                 }}
-                onKeyPress={handleInputKeyDown}
+                onKeyDown={handleInputKeyDown}
                 error={error}
                 showPopup
                 iconLabel
