@@ -70,7 +70,6 @@ const ProductForm = forwardRef(({
     }
 
     await onSubmit(filteredData);
-    // reset(getInitialValues(product));
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
