@@ -29,6 +29,7 @@ import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
+import { useProtectedAction } from "@/hooks/useProtectedAction";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
@@ -77,6 +78,7 @@ const Supplier = ({ params }) => {
     canUpdate: RULES.canUpdate[role],
     onBeforeView,
   });
+  const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
   const editSupplier = useEditSupplier();
   const deleteSupplier = useDeleteSupplier();
   const deleteBySupplierId = useDeleteBySupplierId();
@@ -172,20 +174,23 @@ const Supplier = ({ params }) => {
   }, []);
 
   const handleActivateClick = useCallback(
-    () => handleOpenModalWithAction('active'),
-    [handleOpenModalWithAction],
+    () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
+    [handleProtectedAction, handleOpenModalWithAction],
   );
+  
   const handleInactivateClick = useCallback(
-    () => handleOpenModalWithAction('inactive'),
-    [handleOpenModalWithAction],
+    () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
+    [handleProtectedAction, handleOpenModalWithAction],
   );
+  
   const handleDeleteClick = useCallback(
-    () => handleOpenModalWithAction('deleteSupplier'),
-    [handleOpenModalWithAction],
+    () => handleProtectedAction(() => handleOpenModalWithAction('deleteSupplier')),
+    [handleProtectedAction, handleOpenModalWithAction],
   );
+  
   const handleDeleteBatchClick = useCallback(
-    () => handleOpenModalWithAction('deleteBatch'),
-    [handleOpenModalWithAction],
+    () => handleProtectedAction(() => handleOpenModalWithAction('deleteBatch')),
+    [handleProtectedAction, handleOpenModalWithAction],
   );
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({

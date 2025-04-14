@@ -12,6 +12,7 @@ import ProductForm from "@/components/products/ProductForm";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
+import { useProtectedAction } from "@/hooks/useProtectedAction";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
@@ -62,6 +63,7 @@ const Product = ({ params }) => {
     canUpdate: RULES.canUpdate[role],
     onBeforeView,
   });
+  const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
 
   useEffect(() => {
     resetActions();
@@ -127,12 +129,34 @@ const Product = ({ params }) => {
     setIsModalOpen(true);
   }, []);
 
-  const handleRecoverClick = useCallback(() => handleOpenModalWithAction("recover"), [handleOpenModalWithAction]);
-  const handleActiveClick = useCallback(() => handleOpenModalWithAction(ACTIVE), [handleOpenModalWithAction]);
-  const handleInactiveClick = useCallback(() => handleOpenModalWithAction(INACTIVE), [handleOpenModalWithAction]);
-  const handleStockChangeClick = useCallback(() => handleOpenModalWithAction(isProductOOS(product?.state) ? "inStock" : "outOfStock"), [handleOpenModalWithAction, product?.state]);
-  const handleSoftDeleteClick = useCallback(() => handleOpenModalWithAction("softDelete"), [handleOpenModalWithAction]);
-  const handleHardDeleteClick = useCallback(() => handleOpenModalWithAction("hardDelete"), [handleOpenModalWithAction]);
+  const handleActiveClick = useCallback(
+    () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
+    [handleOpenModalWithAction]
+  );
+
+  const handleRecoverClick = useCallback(
+    () => handleProtectedAction(() => handleOpenModalWithAction("recover")),
+    [handleOpenModalWithAction]
+  );
+
+  const handleInactiveClick = useCallback(
+    () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
+    [handleOpenModalWithAction]
+  );
+  const handleStockChangeClick = useCallback(
+    () => handleProtectedAction(() => handleOpenModalWithAction(isProductOOS(product?.state) ? "inStock" : "outOfStock")),
+    [handleOpenModalWithAction, product?.state]
+  );
+
+  const handleSoftDeleteClick = useCallback(
+    () => handleProtectedAction(() => handleOpenModalWithAction("softDelete")),
+    [handleOpenModalWithAction]
+  );
+
+  const handleHardDeleteClick = useCallback(
+    () => handleProtectedAction(() => handleOpenModalWithAction("hardDelete")),
+    [handleOpenModalWithAction]
+  );
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editProduct,

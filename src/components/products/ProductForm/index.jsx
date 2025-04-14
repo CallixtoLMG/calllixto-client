@@ -201,7 +201,6 @@ const ProductForm = forwardRef(({
             name="name"
             label="Nombre"
             rules={RULES.REQUIRED}
-            onChange={value => value.toUpperCase()}
             disabled={!isUpdating && view}
           />
         </FieldsContainer>

@@ -83,7 +83,6 @@ const UserForm = forwardRef(({
             label="Nombre"
             placeholder="Nombre"
             rules={RULES.REQUIRED}
-            onChange={value => value.toUpperCase()}
             disabled={!isUpdating && view}
           />
           <TextControlled
@@ -92,7 +91,6 @@ const UserForm = forwardRef(({
             label="Apellido"
             placeholder="Apellido"
             rules={RULES.REQUIRED}
-            onChange={value => value.toUpperCase()}
             disabled={!isUpdating && view}
           />
           <DatePickerControlled
