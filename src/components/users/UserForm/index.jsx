@@ -19,6 +19,10 @@ const UserForm = forwardRef(({
     ...user,
     role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
     birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
+    phoneNumber: {
+      areaCode: user?.phoneNumber?.areaCode ?? '',
+      number: user?.phoneNumber?.number ?? '',
+    },
   });
 
   const methods = useForm({
