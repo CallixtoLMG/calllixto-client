@@ -64,7 +64,7 @@ const ProductForm = forwardRef(({
     }
 
     if (!isUpdating) {
-      filteredData.code = `${data.supplier?.id || ''}${data.brand?.id || ''}${data.code.toUpperCase()}`;
+      filteredData.code = `${data.supplier?.id ?? ''}${data.brand?.id ?? ''}${data.code.toUpperCase()}`;
       delete filteredData.supplier;
       delete filteredData.brand;
     }
