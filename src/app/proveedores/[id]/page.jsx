@@ -42,8 +42,8 @@ const Supplier = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { data: supplier, isLoading, refetch } = useGetSupplier(params.id);
-  const { data: products, isLoading: loadingProducts } =
+  const { data: supplier, isLoading, refetch: refetchSupplier } = useGetSupplier(params.id);
+  const { data: products, isLoading: loadingProducts, refetch: refetchProducts } =
     useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
@@ -90,8 +90,9 @@ const Supplier = ({ params }) => {
 
   useEffect(() => {
     setLabels([PAGES.SUPPLIERS.NAME, supplier?.name]);
-    refetch();
-  }, [setLabels, supplier, refetch]);
+    refetchSupplier();
+    refetchProducts();
+  }, [setLabels, supplier, refetchProducts, refetchSupplier]);
 
   const hasAssociatedProducts = useMemo(() => !!products?.length, [products]);
 
