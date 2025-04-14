@@ -17,6 +17,7 @@ export const NumberControlled = ({
   justifyItems,
   normalMode = false,
   disabled,
+  defaultValueFallback,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -26,48 +27,62 @@ export const NumberControlled = ({
     <Controller
       name={name}
       rules={rules}
-      render={({ field: { onChange: onChangeController, value, ...rest } }) => (
-        <FormField
-          disabled={disabled}
-          flex={flex}
-          width={width}
-          label={label}
-          control={Input}
-          error={fieldError && {
-            content: fieldError.message,
-            pointing: "above",
-          }}
-        >
-          <Input
-            {...inputProps}
-            {...rest}
-            maxLength={maxLength}
-            value={normalMode ? value ?? '' : value?.toLocaleString() ?? 0}
-            placeholder={placeholder ?? label}
-            {...(unit && { iconPosition })}
-            onChange={(e) => {
-              let newValue = e.target.value.replace(/[^0-9]/g, '');
+      render={({ field: { onChange: onChangeController, value, ...rest } }) => {
+        const safeValue =
+          value !== undefined && value !== null
+            ? value
+            : defaultValueFallback !== undefined
+              ? defaultValueFallback
+              : '';
 
-              if (!normalMode) {
-                newValue = newValue ? Number(newValue).toLocaleString() : '';
-              }
-
-              onChangeController(newValue);
-              onChange?.(newValue);
+        return (
+          <FormField
+            disabled={disabled}
+            flex={flex}
+            width={width}
+            label={label}
+            control={Input}
+            error={fieldError && {
+              content: fieldError.message,
+              pointing: "above",
             }}
-            onFocus={(e) => e.target.select()}
           >
-            {unit && (
-              <Icon justifyItems={justifyItems}>
-                <Flex height="100%" alignItems="center">
-                  <Header as="h5">{unit}</Header>
-                </Flex>
-              </Icon>
-            )}
-            <input />
-          </Input>
-        </FormField>
-      )}
+            <Input
+              {...inputProps}
+              {...rest}
+              maxLength={maxLength}
+              value={normalMode
+                ? safeValue
+                : (typeof safeValue === 'number'
+                    ? safeValue.toLocaleString()
+                    : safeValue)
+              }
+              placeholder={placeholder ?? label}
+              {...(unit && { iconPosition })}
+              onChange={(e) => {
+                let newValue = e.target.value.replace(/[^0-9]/g, '');
+
+                if (!normalMode) {
+                  newValue = newValue ? Number(newValue).toLocaleString() : '';
+                }
+
+                onChangeController(newValue);
+                onChange?.(newValue);
+              }}
+              onFocus={(e) => e.target.select()}
+            >
+              {unit && (
+                <Icon justifyItems={justifyItems}>
+                  <Flex height="100%" alignItems="center">
+                    <Header as="h5">{unit}</Header>
+                  </Flex>
+                </Icon>
+              )}
+              <input />
+            </Input>
+          </FormField>
+        );
+      }}
     />
   );
 };

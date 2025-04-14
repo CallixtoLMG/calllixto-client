@@ -74,7 +74,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
       phone: defaultPhone,
     });
   
-    setInitializedContact(true); // ✅ Marcar como inicializado
+    setInitializedContact(true);
   }, [budget, initializedContact, setSelectedContact]);
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
