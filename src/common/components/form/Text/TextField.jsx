@@ -54,6 +54,7 @@ export const TextField = ({
   showPopup = false,
   popupContent,
   popupPosition = "top center",
+  textAlign
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const showIconLabel = () => (
@@ -94,6 +95,7 @@ export const TextField = ({
           value={value}
           disabled
           labelPosition={iconLabel ? 'left' : undefined}
+          textAlign={textAlign}
         >
           {iconLabel && showIconLabel()}
           <TruncateInput>
@@ -112,7 +114,7 @@ export const TextField = ({
           onKeyPress={onKeyPress}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          iconLabel
+          iconLabel={iconLabel}
           showPopup={showPopup}
         >
           {iconLabel && showIconLabel()}
