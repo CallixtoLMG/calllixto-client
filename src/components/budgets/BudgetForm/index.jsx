@@ -473,9 +473,29 @@ const BudgetForm = ({
     await handleCreate({ ...data, total: Number(total.toFixed(2)) }, isConfirmed ? BUDGET_STATES.CONFIRMED.id : BUDGET_STATES.PENDING.id);
   };
 
-  useKeyboardShortcuts(() => handleSubmit(handleDraft)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => handleSubmit(handleConfirm)(), SHORTKEYS.ALT_ENTER);
-  useKeyboardShortcuts(() => handleReset(), SHORTKEYS.DELETE);
+  const validateShortcuts = {
+    canDraft: () => !isLoading && isDirty,
+    canConfirm: () => !isLoading,
+    canReset: () => isDirty,
+  };
+
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: () => handleSubmit(handleDraft)(),
+      condition: validateShortcuts.canDraft
+    },
+    {
+      key: SHORTKEYS.ALT_ENTER,
+      action: () => handleSubmit(handleConfirm)(),
+      condition: validateShortcuts.canConfirm
+    },
+    {
+      key: SHORTKEYS.DELETE,
+      action: () => handleReset(),
+      condition: validateShortcuts.canReset
+    },
+  ]);
 
   return (
     <>

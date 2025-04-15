@@ -1,6 +1,6 @@
 import { FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import { COLORS, ICONS } from "@/common/constants";
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 import { Popup } from "semantic-ui-react";
 import styled, { css } from "styled-components";
 
@@ -39,7 +39,7 @@ const StyledLabel = styled(Label)`
   `}
 `;
 
-export const TextField = ({
+export const TextField = forwardRef(({
   flex,
   width,
   label,
@@ -48,14 +48,14 @@ export const TextField = ({
   value,
   disabled,
   onChange,
-  onKeyPress,
+  onKeyDown,
   maxLength,
   error,
   showPopup = false,
   popupContent,
   popupPosition = "top center",
-  textAlign
-}) => {
+  textAlign,
+}, ref) => {
   const [isFocused, setIsFocused] = useState(false);
   const showIconLabel = () => (
     <StyledLabel
@@ -111,16 +111,18 @@ export const TextField = ({
           value={value}
           onChange={onChange}
           maxLength={maxLength}
-          onKeyPress={onKeyPress}
+          onKeyDown={onKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           iconLabel={iconLabel}
           showPopup={showPopup}
         >
           {iconLabel && showIconLabel()}
-          <input />
+          <input ref={ref}/>
         </Input>
       )}
     </FormField>
   );
-};
+});
+
+TextField.displayName = 'TextField';

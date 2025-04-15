@@ -69,7 +69,7 @@ export const preventSend = (event) => {
   };
 };
 
-export const handleEnterKeyPress = (e, action) => {
+export const handleEnterKeyDown = (e, action) => {
   if (e.key === 'Enter') {
     e.preventDefault();
     action(e);
@@ -80,6 +80,13 @@ export const handleKeyPressWithSubmit = (e, isActionEnabled, isLoading, handleSu
   if (e.key === 'Enter' && isActionEnabled && !isLoading) {
     e.preventDefault();
     handleSubmit(onConfirm)();
+  }
+};
+
+export const handleEscapeKeyDown = (e, action) => {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    action(e);
   }
 };
 

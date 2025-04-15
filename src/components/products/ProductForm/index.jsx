@@ -4,7 +4,6 @@ import { FieldsContainer, Flex, Form, Label, OverflowWrapper } from "@/common/co
 import { DropdownControlled, IconedButtonControlled, PercentField, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { Text } from "@/common/components/search/styles";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
-import { preventSend } from "@/common/utils";
 import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useArrayTags } from "@/hooks/arrayTags";
@@ -72,8 +71,23 @@ const ProductForm = forwardRef(({
     await onSubmit(filteredData);
   };
 
-  useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset(getInitialValues(product)), SHORTKEYS.DELETE);
+  const validateShortcuts = {
+    canConfirm: () => !isLoading && isDirty,
+    canReset: () => isDirty,
+  };
+
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: handleSubmit(handleForm),
+      condition: validateShortcuts.canConfirm,
+    },
+    {
+      key: SHORTKEYS.DELETE,
+      action: () => reset(getInitialValues(product)),
+      condition: validateShortcuts.canReset,
+    }
+  ]);
 
   const supplierOptions = useMemo(() => {
     return suppliers?.map(({ id, name, state, deactivationReason }) => ({
@@ -127,7 +141,7 @@ const ProductForm = forwardRef(({
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
+      <Form onSubmit={handleSubmit(handleForm)}>
         <FieldsContainer rowGap="5px">
           {view ? (
             <>

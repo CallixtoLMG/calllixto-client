@@ -2,6 +2,7 @@ import { Box, Button, Flex } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SEMANTIC_COLORS } from "@/common/constants";
+import { handleEnterKeyDown } from "@/common/utils";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Accordion, Icon, Label } from "semantic-ui-react";
@@ -99,6 +100,7 @@ const Tags = () => {
                 value={tagToAdd.name}
                 onChange={handleNameChange}
                 error={error}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
               />
               <DropdownField
                 flex={1}
@@ -113,6 +115,7 @@ const Tags = () => {
                 placeholder="Descripción"
                 value={tagToAdd.description}
                 onChange={(e) => setTagToAdd({ ...tagToAdd, description: e.target.value })}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
               />
               <Button
                 size="small"
