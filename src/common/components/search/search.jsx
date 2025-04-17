@@ -74,12 +74,12 @@ const ProductSearch = forwardRef(({ products, onProductSelect, tooltip }, ref) =
           </OverflowWrapper>
         ),
         description: (
-          <FlexColumn marginTop="5px" rowGap="5px">
+          <FlexColumn $marginTop="5px" $rowGap="5px">
             <FlexColumn >
               <Text>Código: {formatProductCode(product.code)}</Text>
               <Text>Precio: {getFormatedPrice(product?.price)}</Text>
             </FlexColumn>
-            <Flex width="100%" justifyContent="space-between" height="20px" marginTop="auto" columnGap="5px" alignItems="center">
+            <Flex width="100%" $justifyContent="space-between" height="20px" $marginTop="auto" $columnGap="5px" $alignItems="center">
               <Box width="80px">
                 {product.state === PRODUCT_STATES.OOS.id ? (
                   <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>Sin Stock</Label>

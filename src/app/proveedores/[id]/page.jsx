@@ -365,7 +365,6 @@ const Supplier = ({ params }) => {
         {
           id: 3,
           icon: ICONS.FILE_EXCEL,
-          color: COLORS.SOFT_GREY,
           text: "Descargar productos",
           onClick: () => {
             if (products?.length) {

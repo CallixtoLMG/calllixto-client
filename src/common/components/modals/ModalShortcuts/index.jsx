@@ -12,7 +12,7 @@ const KeyboardShortcuts = () => {
     <>
       <Popup
         content='Accesos rápidos'
-        trigger={<Icon margin="0" pointer size='large' name={ICONS.KEYBOARD} color={COLORS.BLUE} onClick={() => setOpen(true)} />}
+        trigger={<Icon margin="0" pointer="true" size='large' name={ICONS.KEYBOARD} color={COLORS.BLUE} onClick={() => setOpen(true)} />}
         position='bottom right'
         size='tiny'
       />

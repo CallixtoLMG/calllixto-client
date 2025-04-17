@@ -11,15 +11,15 @@ import { List } from "semantic-ui-react";
 import { PICK_UP_IN_STORE } from "../budgets.constants";
 import { isBudgetCancelled, isBudgetDraft } from "../budgets.utils";
 import {
-    DataContainer,
-    Divider,
-    Image,
-    SectionContainer,
-    Title
+  DataContainer,
+  Divider,
+  Image,
+  SectionContainer,
+  Title
 } from "./styles";
 
 const Field = ({ label, value, ...rest }) => (
-  <Flex columnGap="5px" minWidth="300px" {...rest}>
+  <Flex $columnGap="5px" minWidth="300px" {...rest}>
     <Title as="h4" width="100px" textAlign="right" $slim>{label} |</Title>
     <Title as="h4">{value?.toUpperCase() || '-'}</Title>
   </Flex>
@@ -71,9 +71,9 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   const TOTAL_LIST_ITEMS = createTotalListItems(budget?.paymentsMade, roundedFinalTotal);
 
   return (
-    <FlexColumn ref={ref} padding="30px" rowGap="15px">
+    <FlexColumn ref={ref} padding="30px" $rowGap="15px">
       <Box>
-        <Flex alignItems="center" marginBottom="15px" justifyContent="space-between">
+        <Flex $alignItems="center" marginBottom="15px" $justifyContent="space-between">
           <FlexColumn width="150px">
             <Title as="h3" $cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
             {clientPdf && (
@@ -89,7 +89,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             {isBudgetDraft(budget?.state) && <Title as="h2">{BUDGET_STATES.DRAFT.title.toUpperCase()}</Title>}
             {dispatchPdf && <Title as="h2">REMITO</Title>}
             {clientPdf && (
-              <FlexColumn rowGap="10px">
+              <FlexColumn $rowGap="10px">
                 <Title as="h2">X</Title>
                 <Title as="h5">DOCUMENTO NO VÁLIDO COMO FACTURA</Title>
               </FlexColumn>
@@ -142,7 +142,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
           />
         )
       }
-      <FlexColumn rowGap="15px">
+      <FlexColumn $rowGap="15px">
         {!!dolarExchangeRate && !dispatchPdf && (
           <DataContainer width="100%">
             <Title as="h4" alignSelf="left" $slim>Cotización en USD</Title>
@@ -159,7 +159,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <Title as="h4" alignSelf="left" textAlignLast="left" minHeight="30px">
               {budget?.comments}
               {comments?.length > 0 && !dispatchPdf && (
-                <Box marginTop="2px">
+                <Box $marginTop="2px">
                   <strong>Envío:</strong>
                   <List style={{ margin: '0' }}>
                     {comments.map((comment, index) => (

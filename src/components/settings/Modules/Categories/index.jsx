@@ -91,7 +91,7 @@ const Categories = () => {
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
           <Box>
-            <Flex width="100%" padding="0 10px 10px 10px!important" alignItems="flex-start" columnGap="15px">
+            <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
               <TextField
                 width={4}
                 label="Nombre"

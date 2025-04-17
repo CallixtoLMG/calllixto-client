@@ -32,7 +32,7 @@ const PaginationContainer = styled(Flex)`
   align-self: center;
   max-height: ${({ height = 'none' }) => `${height}!important`};
   flex-direction: row;
-  justify-content: ${({ justifyContent = "flex-end" }) => justifyContent && justifyContent}!important;
+  justify-content: ${({ $justifyContent = "flex-end" }) => $justifyContent && $justifyContent}!important;
   column-gap: 10px;
   justify-content: center;
 `;
@@ -63,7 +63,7 @@ const TableHeader = styled(STable.Header)`
 const HeaderCell = styled(STable.HeaderCell)`
   background-color: ${({ $basic }) => !$basic && '#EEEEEE!important'};
   text-align: ${({ textAlign = "center" }) => `${textAlign}!important`};
-  width: ${({ width }) => width}!important;
+  width: ${({ $width }) => $width}!important;
   padding: ${({ padding }) => padding}!important;
   max-height: ${({ maxhHeight }) => maxhHeight}!important;
 `;

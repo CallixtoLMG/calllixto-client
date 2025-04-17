@@ -96,7 +96,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         value: (product) => (
           <Container>
             {product.name} {product.fractionConfig?.active && `x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}`}
-            <Flex marginLeft="7px">
+            <Flex $marginLeft="7px">
               {product.comments && <CommentTooltip comment={product.comments} />}
               {isProductOOS(product.state) && (
                 <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
@@ -150,7 +150,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             </Message>
           </Flex>
         )}
-        <Flex justifyContent="space-between">
+        <Flex $justifyContent="space-between">
           <FieldsContainer>
             <FormField
               width="300px"
@@ -258,7 +258,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           (isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state)) && (
             <>
               {isBudgetConfirmed(budget?.state) &&
-                <Flex justifyContent="space-between">
+                <Flex $justifyContent="space-between">
                   {toggleButton}
                 </Flex>}
               <FormProvider {...methods}>

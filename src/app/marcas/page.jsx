@@ -59,7 +59,6 @@ const Brands = () => {
     actions.push({
       id: 3,
       icon: ICONS.FILE_EXCEL,
-      color: COLORS.SOFT_GREY,
       onClick: handleDownloadExcel,
       text: 'Marcas',
       disabled: loading

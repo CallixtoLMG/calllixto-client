@@ -8,7 +8,6 @@ export const DropdownControlled = ({
   rules,
   placeholder,
   options = [],
-  defaultValue,
   afterChange,
   disabled,
   clearable,
@@ -36,7 +35,7 @@ export const DropdownControlled = ({
             {...rest}
             icon={icon}
             height={height}
-            width={width}
+            $width={width}
             loading={loading}
             label={label}
             placeholder={placeholder ?? label}
@@ -56,7 +55,6 @@ export const DropdownControlled = ({
             noResultsMessage="No se encontraron resultados"
             clearable={clearable}
             options={options}
-            defaultValue={defaultValue}
             value={normalizedValue}
             onChange={(e, { value }) => {
               if (optionsMapper) {

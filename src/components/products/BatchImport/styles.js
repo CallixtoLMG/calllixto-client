@@ -1,5 +1,5 @@
 import { Flex } from "@/common/components/custom";
-import { Header as SHeader, Modal as SModal } from "semantic-ui-react";
+import { Header as SHeader, Icon as SIcon, Modal as SModal } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Modal = styled(SModal)`
@@ -8,8 +8,15 @@ const Modal = styled(SModal)`
   max-height: 90vh!important;
 `;
 
+const BatchImportIcon = styled(SIcon)`
+  && {
+    font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    font-size 13.5px;
+  }
+`;
+
 const ModalHeader = styled(SModal.Header)`
- margin-bottom: 20px;
+  margin-bottom: 20px;
 `;
 
 const WaitMsg = styled.p`
@@ -19,8 +26,8 @@ const WaitMsg = styled.p`
 `;
 
 const Header = styled(SHeader)`
-padding:5px!important;
-border-bottom: groove!important;
+  padding:5px!important;
+  border-bottom: groove!important;
 `;
 
 const ModalActions = styled(SModal.Actions)`
@@ -42,5 +49,5 @@ const ContainerModal = styled(Flex)`
   max-width: 100%!important;
 `;
 
-export { ContainerModal, Header, Modal, ModalActions, ModalHeader, WaitMsg };
+export { BatchImportIcon, ContainerModal, Header, Modal, ModalActions, ModalHeader, WaitMsg };
 

@@ -1,16 +1,16 @@
 "use client";
 import { useUserContext } from "@/User";
+import { useListSuppliers } from "@/api/suppliers";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
-import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
-import { useListSuppliers } from "@/api/suppliers";
-import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 
 const Suppliers = () => {
   useValidateToken();
@@ -59,7 +59,6 @@ const Suppliers = () => {
     actions.push({
       id: 3,
       icon: ICONS.FILE_EXCEL,
-      color: COLORS.SOFT_GREY,
       width: "fit-content",
       onClick: handleDownloadExcel,
       text: 'Proveedores',

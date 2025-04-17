@@ -27,7 +27,7 @@ export const USER_COLUMNS = [
     width: 1,
     align: "left",
     value: (user) =>
-      <Flex justifyContent="space-between">
+      <Flex $justifyContent="space-between">
         <>
           < OverflowWrapper position="top left" maxWidth="15vw" popupContent={user.username} >
             {user.username}
@@ -108,7 +108,7 @@ export const USER_STATE_OPTIONS = Object.values(USER_STATES)
   .map(({ id, title, color }) => ({
     key: id,
     text: (
-      <Flex alignItems="center" justifyContent="space-between">
+      <Flex $alignItems="center" $justifyContent="space-between">
         {title}&nbsp;<Label width="fit-content" color={color} circular empty />
       </Flex>
     ),

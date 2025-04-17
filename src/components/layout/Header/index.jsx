@@ -54,7 +54,7 @@ const Header = () => {
             {!userData?.isAuthorized ? (
               <Flex>
                 <RigthHeaderDiv>
-                  <MenuItem displayNone onClick={handleLogout}>
+                  <MenuItem $displayNone onClick={handleLogout}>
                     <Button icon>
                       <Icon name={ICONS.USER} /> Ingresar
                     </Button>
@@ -74,7 +74,7 @@ const Header = () => {
                     })
                     .map((page) => (
                       <ModLink key={page.BASE} href={page.BASE}>
-                        <MenuItem backgroundColor $active={pathname.includes(page.BASE)}>
+                        <MenuItem $backgroundColor $active={pathname.includes(page.BASE)}>
                           <Text $active={pathname.includes(page.BASE)}>{page.NAME}</Text>
                         </MenuItem>
                       </ModLink>

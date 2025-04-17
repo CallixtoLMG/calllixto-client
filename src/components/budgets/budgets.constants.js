@@ -103,7 +103,7 @@ export const BUDGETS_COLUMNS = [
     align: "left",
     width: 6,
     value: (budget) => (
-      <Flex justifyContent="space-between">
+      <Flex $justifyContent="space-between">
         <OverflowWrapper maxWidth="25vw" popupContent={budget.customer.name}>
           {budget.customer.name}
         </OverflowWrapper>
@@ -180,7 +180,7 @@ export const BUDGET_STATES_OPTIONS = [
     {
       key: id,
       text: (
-        <Flex alignItems="center" justifyContent="space-between">
+        <Flex $alignItems="center" $justifyContent="space-between">
           {title}&nbsp;<Label color={color} circular empty />
         </Flex>
       ),

@@ -1,5 +1,5 @@
-import { Divider, Title } from '@/components/budgets/PDFfile/styles';
 import { renderContent } from '@/common/utils';
+import { Divider, Title } from '@/components/budgets/PDFfile/styles';
 import styled from 'styled-components';
 import { Flex, FlexColumn } from '../custom';
 
@@ -13,10 +13,7 @@ const Field = ({
   children,
 }) => {
   return (
-    <Flex
-      justifyContent="space-between"
-      height="30px"
-    >
+    <Flex $justifyContent="space-between" height="30px"    >
       <Title as="h4" $slim>{label}</Title>
       {value ? (
         <Title as="h4">{value.toUpperCase()}</Title>
@@ -29,15 +26,15 @@ const Field = ({
 
 export const TotalList = ({ items = [], readOnly, width }) => {
   return (
-    <FlexColumn marginLeft="auto" rowGap={!readOnly ? "5px" : "0"} width={!width ? "250px" : width}>
+    <FlexColumn $marginLeft="auto" $rowGap={!readOnly ? "5px" : "0"} width={!width ? "250px" : width}>
       {items
         .map(({ title, amount, subtitle }, index) => (
-          <FlexColumn rowGap={!readOnly ? "5px" : "0"} key={index}>
+          <FlexColumn $rowGap={!readOnly ? "5px" : "0"} key={index}>
             <Field label={renderContent(title)}>
               {renderContent(amount)}
             </Field>
             {subtitle && (
-              <Flex justifyContent="right">
+              <Flex $justifyContent="right">
                 <SubTitle>
                   {`(${subtitle})`}
                 </SubTitle>

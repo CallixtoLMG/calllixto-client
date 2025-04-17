@@ -37,7 +37,7 @@ export const Input = styled(SInput)`
 `;
 
 export const FormField = styled(Form.Field)`
-  width: ${({ width = '100%' }) => `${width}!important`};
+  width: ${({ $width = '100%' }) => $width};
   display: flex;
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: ${({ margin = "0" }) => margin} !important;
@@ -75,7 +75,12 @@ export const Dropdown = styled(SDropdown)`
   height: ${({ height = '35px' }) => `${height}!important`} ;
   padding: ${({ padding }) => `${padding}!important`} ;
   background-color: ${({ bgColor }) => `${bgColor}!important`};
-  box-shadow: ${({ boxShadow }) => boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
+  box-shadow: ${({ $boxShadow }) => $boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
+  width: ${({ width }) => `${width}!important`};
+
+  .text{
+    text-align: ${({ $textAlign }) => `${$textAlign}!important`};
+  }
 
   .menu > .item,
   > .text {
@@ -107,7 +112,7 @@ export const Dropdown = styled(SDropdown)`
 
 export const DropdownOption = styled(SDropdown)`
 &&&&{
-  padding-left: ${({ paddingLeft }) => paddingLeft}!important;
+  padding-left: ${({ $paddingLeft }) => $paddingLeft}!important;
 }
   justify-content: space-between!important;
   margin:0!important;
@@ -161,7 +166,7 @@ export const DropdownMenu = styled(SDropdown.Menu)`
 
 export const Icon = styled(SIcon)`
   align-self: center!important;
-  margin-right: ${({ marginRight }) => marginRight && `11px!important`} ;
+  margin-right: ${({ $marginRight }) => $marginRight && `11px!important`} ;
   top: ${({ dollar, tooltip }) => (dollar ? `-3px` : tooltip ? `-2px` : 'initial')} !important;
   position: ${({ dollar, tooltip }) => (dollar || tooltip) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
@@ -197,7 +202,7 @@ export const Button = styled(SButton)`
     align-self: ${({ alignSelf }) => `${alignSelf}!important`} ;
     font-size: 13.5px !important;
     width: ${({ width = '110px' }) => `${width}!important`} ;
-    padding-left: ${({ paddingLeft = '40px' }) => `${paddingLeft}!important`} ;
+    padding-left: ${({ $paddingLeft = '40px' }) => `${$paddingLeft}!important`} ;
     padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
     margin-right: 0;
     position: ${({ position }) => `${position}!important`} ;

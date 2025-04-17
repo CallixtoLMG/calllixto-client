@@ -69,7 +69,7 @@ export const getProductsColumns = (dispatchPdf, budget) => {
       align: "left",
       wrap: true,
       value: (product) => (
-        <Flex justifyContent="space-between">
+        <Flex $justifyContent="space-between">
           <span>{`${product.name} ${product.fractionConfig?.active ? ` x ${product.fractionConfig.value} ${product.fractionConfig.unit}` : ''}`}</span>
           {product.state === PRODUCT_STATES.OOS.id && (
             <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>

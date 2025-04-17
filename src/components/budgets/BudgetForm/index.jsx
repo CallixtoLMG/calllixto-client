@@ -114,13 +114,13 @@ const BudgetForm = ({
       value: { phoneNumbers, addresses, id, state, name },
       text: name,
       content: (
-        <FlexColumn marginTop="5px" rowGap="5px">
+        <FlexColumn $marginTop="5px" $rowGap="5px">
           <FlexColumn>
             <OverflowWrapper popupContent={name}>
               <Text>{name}</Text>
             </OverflowWrapper>
           </FlexColumn>
-          <Flex justifyContent="space-between" alignItems="center" columnGap="5px">
+          <Flex $justifyContent="space-between" $alignItems="center" $columnGap="5px">
             <Box >
               {state === CUSTOMER_STATES.INACTIVE.id ? (
                 <Popup
@@ -389,7 +389,7 @@ const BudgetForm = ({
           <OverflowWrapper maxWidth="30vw" popupContent={product.name}>
             {product.name}
           </OverflowWrapper>
-          <Flex alignItems="center" marginLeft="5px" columnGap="5px">
+          <Flex $alignItems="center" $marginLeft="5px" $columnGap="5px">
             {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
             {product.tags && <TagsTooltip tooltip tags={product.tags} />}
             {product.comments && <CommentTooltip tooltip comment={product.comments} />}
@@ -444,7 +444,7 @@ const BudgetForm = ({
       id: 6,
       title: "Descuento",
       value: (product, index) => (
-        <Flex alignItems="center" columnGap="5px">
+        <Flex $alignItems="center" $columnGap="5px">
           <PercentControlled
             width="80px"
             name={`products[${index}].discount`}
@@ -490,7 +490,7 @@ const BudgetForm = ({
       />
       <FormProvider {...methods}>
         <Form onSubmit={handleSubmit(handleConfirm)}>
-          <FieldsContainer justifyContent="space-between">
+          <FieldsContainer $justifyContent="space-between">
             <FormField width="300px">
               <ButtonGroup size="small">
                 <IconedButton
@@ -524,7 +524,7 @@ const BudgetForm = ({
               ]}
             />
           </FieldsContainer>
-          <FieldsContainer justifyContent="space-between">
+          <FieldsContainer $justifyContent="space-between">
             <TextControlled
               name="seller"
               label="Vendedor"
@@ -689,7 +689,7 @@ const BudgetForm = ({
               rules={RULES.REQUIRED}
               render={({ field: { onChange, value } }) => (
                 <FormField flex="1" label="Metodos de pago" control={Input}>
-                  <Flex columnGap="5px" wrap="wrap" rowGap="5px">
+                  <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                     <Button
                       paddingLeft="fit-content"
                       width="fit-content"

@@ -73,7 +73,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
         <Header>
           Detalle de Pagos
         </Header>
-        <FlexColumn rowGap="15px">
+        <FlexColumn $rowGap="15px">
           {update && (
             <FieldsContainer>
               <FormField
@@ -116,7 +116,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
                 }}
               />
               <FormField minWidth="fit-content" width="fit-content">
-                <FlexColumn rowGap="5px">
+                <FlexColumn $rowGap="5px">
                   <Button
                     padding="3px 18px 3px 40px"
                     size="small"

@@ -81,7 +81,7 @@ const ProductForm = forwardRef(({
       value: { id, state },
       text: name,
       content: (
-        <Flex justifyContent="space-between" alignItems="center">
+        <Flex $justifyContent="space-between" $alignItems="center">
           <OverflowWrapper maxWidth="80%" popupContent={name}>
             <Text>{name}</Text>
           </OverflowWrapper>
@@ -106,7 +106,7 @@ const ProductForm = forwardRef(({
       value: { id, state },
       text: name,
       content: (
-        <Flex justifyContent="space-between" alignItems="center">
+        <Flex $justifyContent="space-between" $alignItems="center">
           <OverflowWrapper maxWidth="80%" popupContent={name}>
             <Text>{name}</Text>
           </OverflowWrapper>
@@ -128,7 +128,7 @@ const ProductForm = forwardRef(({
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
-        <FieldsContainer rowGap="5px">
+        <FieldsContainer $rowGap="5px">
           {view ? (
             <>
               <TextField width="25%" label="Proveedor" value={product?.supplierName} disabled />
@@ -195,7 +195,7 @@ const ProductForm = forwardRef(({
             </>
           )}
         </FieldsContainer>
-        <FieldsContainer rowGap="5px" alignItems="flex-end">
+        <FieldsContainer $rowGap="5px" $alignItems="flex-end">
           <TextControlled
             width="40%"
             name="name"
@@ -204,7 +204,7 @@ const ProductForm = forwardRef(({
             disabled={!isUpdating && view}
           />
         </FieldsContainer>
-        <FieldsContainer alignItems="end">
+        <FieldsContainer $alignItems="end">
           <PriceControlled
             width="200px"
             name="cost"

@@ -14,10 +14,10 @@ const ModLink = styled(Link)`
 const MenuItem = styled(SMenu.Item)`
   background-color: ${({ $active }) => ($active ? '#f5f5f5' : 'transparent')}!important;
   &:hover {
-    background-color: ${({ backgroundColor }) => backgroundColor && "#f5f5f5"}!important;
+    background-color: ${({ $backgroundColor }) => $backgroundColor && "#f5f5f5"}!important;
   };
   &::before {
-    display: ${({ displayNone }) => displayNone && "none"}!important;
+    display: ${({ $displayNone }) => $displayNone && "none"}!important;
   }
 `;
 

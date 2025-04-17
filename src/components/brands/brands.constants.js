@@ -18,7 +18,7 @@ export const BRAND_COLUMNS = [
     title: "Nombre",
     align: "left",
     value: (brand) =>
-      <Flex justifyContent="space-between">
+      <Flex $justifyContent="space-between">
         <OverflowWrapper maxWidth="70vw" popupContent={brand.name}>
           {brand.name}
         </OverflowWrapper>
@@ -51,7 +51,7 @@ export const BRAND_STATES_OPTIONS = Object.values(BRAND_STATES)
   .map(({ id, title, color }) => ({
     key: id,
     text: (
-      <Flex alignItems="center" justifyContent="space-between">
+      <Flex $alignItems="center" $justifyContent="space-between">
         {title}&nbsp;<Label width="fit-content" color={color} circular empty />
       </Flex>
     ),

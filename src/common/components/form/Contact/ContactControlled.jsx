@@ -1,8 +1,8 @@
+import { COLORS, ICONS } from "@/common/constants";
 import { getFormatedPhone, validateEmail, validatePhone } from "@/common/utils";
 import { useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Form, Popup } from "semantic-ui-react";
-import { COLORS, ICONS } from "@/common/constants";
 import { IconedButton } from "../../buttons";
 import { Box, FieldsContainer, Flex, FormField, Input } from '../../custom';
 import { Table } from '../../table';
@@ -91,8 +91,8 @@ export const ContactControlled = () => {
   };
 
   return (
-    <FieldsContainer columnGap="50px">
-      <Flex flex="1" flexDirection="column">
+    <FieldsContainer $columnGap="50px">
+      <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
             <Box width="fit-content">
@@ -110,7 +110,7 @@ export const ContactControlled = () => {
           }}
           position='top left'>
           <Form>
-            <FieldsContainer width="60vw" alignItems="center" rowGap="5px">
+            <FieldsContainer width="60vw" $alignItems="center" $rowGap="5px">
               <FormField
                 flex="1"
                 label="Referencia"
@@ -156,7 +156,7 @@ export const ContactControlled = () => {
             </FieldsContainer>
           </Form>
         </Popup>
-        <Box marginTop="8px" />
+        <Box $marginTop="8px" />
         <Table
           headers={PHONE_TABLE_HEADERS}
           actions={[
@@ -165,7 +165,7 @@ export const ContactControlled = () => {
           elements={phoneFields}
         />
       </Flex>
-      <Flex flex="1" flexDirection="column">
+      <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
             <Box width="fit-content">
@@ -183,7 +183,7 @@ export const ContactControlled = () => {
           }}
           position='top left'>
           <Form>
-            <FieldsContainer width="45vw" alignItems="center" rowGap="5px">
+            <FieldsContainer width="45vw" $alignItems="center" $rowGap="5px">
               <FormField
                 flex="1"
                 label="Referencia"
@@ -214,7 +214,7 @@ export const ContactControlled = () => {
             </FieldsContainer>
           </Form>
         </Popup>
-        <Box marginTop="8px" />
+        <Box $marginTop="8px" />
         <Table
           $wrap
           headers={ADDRESS_TABLE_HEADERS}
@@ -224,7 +224,7 @@ export const ContactControlled = () => {
           elements={addressFields}
         />
       </Flex>
-      <Flex flex="1" flexDirection="column">
+      <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
             <Box width="fit-content">
@@ -241,7 +241,7 @@ export const ContactControlled = () => {
           }}
           position='top left'>
           <Form>
-            <FieldsContainer width="50vw" alignItems="center" rowGap="5px">
+            <FieldsContainer width="50vw" $alignItems="center" $rowGap="5px">
               <FormField
                 flex="1"
                 label="Referencia"
@@ -272,7 +272,7 @@ export const ContactControlled = () => {
             </FieldsContainer>
           </Form>
         </Popup>
-        <Box marginTop="8px" />
+        <Box $marginTop="8px" />
         <Table
           $wrap={true}
           headers={EMAIL_TABLE_HEADERS}

@@ -4,6 +4,7 @@ import { TextField } from "./TextField";
 
 export const TextControlled = ({
   name,
+  width,
   rules,
   iconLabel,
   showPopup = false, 
@@ -22,6 +23,7 @@ export const TextControlled = ({
         <TextField
           {...rest}
           {...inputParams}
+          width={width}
           disabled={disabled}
           showPopup={showPopup}
           popupContent={popupContent}

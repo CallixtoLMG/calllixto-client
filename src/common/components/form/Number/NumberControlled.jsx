@@ -59,7 +59,7 @@ export const NumberControlled = ({
           >
             {unit && (
               <Icon justifyItems={justifyItems}>
-                <Flex height="100%" alignItems="center">
+                <Flex height="100%" $alignItems="center">
                   <Header as="h5">{unit}</Header>
                 </Flex>
               </Icon>

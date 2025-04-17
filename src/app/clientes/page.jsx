@@ -1,14 +1,14 @@
 "use client";
 import { useListCustomers } from "@/api/customers";
-import CustomersPage from "@/components/customers/CustomersPage";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { downloadExcel, getFormatedPhone } from "@/common/utils";
+import CustomersPage from "@/components/customers/CustomersPage";
+import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
+import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useValidateToken } from "@/hooks/userData";
-import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
-import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
 
 const Customers = () => {
   useValidateToken();
@@ -51,7 +51,6 @@ const Customers = () => {
       {
         id: 3,
         icon: ICONS.FILE_EXCEL,
-        color: COLORS.SOFT_GREY,
         onClick: handleDownloadExcel,
         text: 'Clientes',
         disabled: loading

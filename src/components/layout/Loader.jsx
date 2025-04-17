@@ -14,7 +14,7 @@ export const Loader = ({ children, active, message, $greyColor, $marginTop }) =>
     <>
       {active ? (
         <Box height="150px">
-          <SLoader $marginTop={$marginTop} $greyColor active size="large">{message && message}</SLoader>
+          <SLoader $marginTop={$marginTop} $greyColor={$greyColor} active size="large">{message && message}</SLoader>
         </Box>
       ) : children}
     </>
