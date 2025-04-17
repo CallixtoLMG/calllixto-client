@@ -29,7 +29,7 @@ const StyledLabel = styled(Label)`
       ? 'rgb(224, 180, 180)!important'
       : $isFocused
         ? '#85b7d9!important'
-        : '#d4d4d5'}; 
+        : '#d4d4d5'};
     border-radius: 4px;
     height: 100%;
     display: flex;
@@ -57,6 +57,7 @@ export const TextField = forwardRef(({
   textAlign
 }, ref) => {
   const [isFocused, setIsFocused] = useState(false);
+
   const showIconLabel = () => (
     <StyledLabel
       $hasError={!!error}
@@ -78,7 +79,7 @@ export const TextField = forwardRef(({
           }
         />
       )}
-      {iconLabel}
+      {typeof iconLabel === "string" || typeof iconLabel === "object" ? iconLabel : null}
     </StyledLabel>
   );
 
@@ -114,7 +115,7 @@ export const TextField = forwardRef(({
           onKeyPress={onKeyPress}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
-          iconLabel={iconLabel}
+          $iconLabel={iconLabel}
           ref={ref}
         >
           {iconLabel && showIconLabel()}

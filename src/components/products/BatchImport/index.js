@@ -445,8 +445,8 @@ const BatchImport = ({ isCreating }) => {
                         <TextField width={6} label="Archivo seleccionado" value={selectedFile} disabled />
                         <Label > {`${importSettings.label}: ${importedProductsCount}`}</Label>
                         <Table
-                          deleteButtonInside
-                          tableHeight="50vh"
+                          $deleteButtonInside
+                          $tableHeight="50vh"
                           mainKey="code"
                           headers={PRODUCTS_COLUMNS}
                           elements={watchProducts}

@@ -38,7 +38,7 @@ export const DatePickerControlled = ({
         <FormField
           flex={flex}
           height={height}
-          width={width}
+          $width={width}
           label={label}
           icon={icon}
           control={ReactDatePicker}

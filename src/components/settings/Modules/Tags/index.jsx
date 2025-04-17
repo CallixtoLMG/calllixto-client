@@ -83,7 +83,7 @@ const Tags = () => {
   };
 
   return (
-    <Box marginBottom="5px">
+    <Box $marginBottom="5px">
       <Accordion fluid>
         <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
           <Icon name="dropdown" />
@@ -122,7 +122,7 @@ const Tags = () => {
                 color={COLORS.GREEN}
                 type="button"
                 onClick={handleAddTag}
-                marginTop="25px"
+                $marginTop="25px"
               />
             </Flex>
             <Table
@@ -132,8 +132,8 @@ const Tags = () => {
               mainKey="name"
               paginate={false}
               actions={actions}
-              tableHeight="40vh"
-              deleteButtonInside
+              $tableHeight="40vh"
+              $deleteButtonInside
             />
           </Box>
         </Accordion.Content>

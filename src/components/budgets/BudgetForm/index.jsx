@@ -391,8 +391,8 @@ const BudgetForm = ({
           </OverflowWrapper>
           <Flex $alignItems="center" $marginLeft="5px" $columnGap="5px">
             {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
-            {product.tags && <TagsTooltip tooltip tags={product.tags} />}
-            {product.comments && <CommentTooltip tooltip comment={product.comments} />}
+            {product.tags && <TagsTooltip tooltip="true" tags={product.tags} />}
+            {product.comments && <CommentTooltip tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
               <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />} />
             )}
@@ -412,7 +412,6 @@ const BudgetForm = ({
               width="100px"
               name={`products[${index}].fractionConfig.value`}
               unit={product.fractionConfig.unit}
-              iconPosition="right"
               onChange={value => {
                 setValue(`products[${index}].fractionConfig.price`, value * product.price);
                 calculateTotal();
@@ -491,7 +490,7 @@ const BudgetForm = ({
       <FormProvider {...methods}>
         <Form onSubmit={handleSubmit(handleConfirm)}>
           <FieldsContainer $justifyContent="space-between">
-            <FormField width="300px">
+            <FormField $width="300px">
               <ButtonGroup size="small">
                 <IconedButton
                   text="Confirmado"
@@ -518,6 +517,7 @@ const BudgetForm = ({
             <GroupedButtonsControlled
               name="pickUpInStore"
               width="350px"
+              color={COLORS.BLUE}
               buttons={[
                 { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
                 { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
@@ -543,7 +543,7 @@ const BudgetForm = ({
                 onChange={setExpiration}
               />
               <FormField
-                width="200px"
+                $width="200px"
                 label="Fecha de vencimiento"
                 control={Input}
                 readOnly
@@ -633,7 +633,7 @@ const BudgetForm = ({
             rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
             render={() => (
               <FormField
-                width="300px"
+                $width="300px"
                 label="Productos"
                 error={errors.products?.root?.message}
                 control={ProductSearch}
@@ -676,14 +676,14 @@ const BudgetForm = ({
             />
           </Loader>
           {isBudgetConfirmed(watchState) && !isCloning && (
-            <FieldsContainer width="100%" rowGap="15px">
+            <FieldsContainer width="100%" $rowGap="15px">
               <Payments
                 total={total}
                 update
               />
             </FieldsContainer>
           )}
-          <FieldsContainer width="100%" rowGap="15px">
+          <FieldsContainer width="100%" $rowGap="15px">
             <Controller
               name="paymentMethods"
               rules={RULES.REQUIRED}
@@ -691,7 +691,7 @@ const BudgetForm = ({
                 <FormField flex="1" label="Metodos de pago" control={Input}>
                   <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                     <Button
-                      paddingLeft="fit-content"
+                      $paddingLeft="fit-content"
                       width="fit-content"
                       type="button"
                       basic={value.length !== PAYMENT_METHODS.length}
@@ -709,7 +709,7 @@ const BudgetForm = ({
                     <VerticalDivider />
                     {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
                       <Button
-                        paddingLeft="fit-content"
+                        $paddingLeft="fit-content"
                         width="fit-content"
                         key={key}
                         basic={!value.includes(methodValue)}

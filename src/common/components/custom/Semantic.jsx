@@ -32,7 +32,7 @@ export const Input = styled(SInput)`
   height: ${({ height = '38px' }) => height} !important;
   text-align: ${({ textAlign }) => textAlign} !important;
   &&& input{
-    border-left: ${({ iconLabel }) => (iconLabel) && "none"} !important;
+    border-left: ${({ $iconLabel }) => ($iconLabel) && "none"} !important;
   }
 `;
 
@@ -117,7 +117,7 @@ export const DropdownOption = styled(SDropdown)`
   justify-content: space-between!important;
   margin:0!important;
   font-size: 13.5px!important;
-  padding: ${({ menu }) => menu ? "9px 10px" : "13px 10px"} !important ;
+  padding: ${({ $menu }) => $menu ? "9px 10px" : "13px 10px"} !important ;
   width: ${({ width = '100%' }) => `${width}!important`} ;
   justify-content: space-between!important;
   align-content: center;
@@ -198,12 +198,13 @@ export const Button = styled(SButton)`
   &&&& {
     text-align: center;
     height: ${({ height = '35px' }) => `${height}!important`} ;
-    margin-top: ${({ marginTop }) => `${marginTop}!important`} ;
-    align-self: ${({ alignSelf }) => `${alignSelf}!important`} ;
+    margin-top: ${({ $marginTop }) => `${$marginTop}!important`} ;
+    align-self: ${({ $alignSelf }) => `${$alignSelf}!important`} ;
     font-size: 13.5px !important;
     width: ${({ width = '110px' }) => `${width}!important`} ;
     padding-left: ${({ $paddingLeft = '40px' }) => `${$paddingLeft}!important`} ;
-    padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
+    // padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
+    padding: ${({ padding }) => padding ? padding : "0 18px 0 40px"}!important ;
     margin-right: 0;
     position: ${({ position }) => `${position}!important`} ;
   };

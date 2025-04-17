@@ -19,7 +19,7 @@ export const FieldsContainer = styled(Flex)`
   column-gap: ${({ $columnGap = '15px' }) => $columnGap } !important;
   row-gap: ${({ $rowGap = 'auto' }) => $rowGap} !important;
   width: ${({ width = 'auto' }) => width} !important;
-  min-height: ${({ minHeight = 'auto' }) => minHeight} !important;
+  min-height: ${({ $minHeight = 'auto' }) => $minHeight} !important;
   height: ${({ height = 'auto' }) => height} !important;
   align-items: ${({ $alignItems = 'auto' }) => $alignItems} !important;
 `;

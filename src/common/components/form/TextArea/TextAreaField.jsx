@@ -21,6 +21,7 @@ export const TextAreaField = forwardRef(({
       readOnly={disabled}
       onChange={onChange}
       error={error}
+      ref={ref}
     />
   );
 });

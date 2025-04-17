@@ -68,7 +68,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
   ];
 
   return (
-    <Flex width="100%" maxHeight={maxHeight ? "55vh" : ""} className="ui form">
+    <Flex width="100%" $maxHeight={maxHeight ? "55vh" : ""} className="ui form">
       <Segment padding="25px 60px 25px 35px">
         <Header>
           Detalle de Pagos
@@ -83,7 +83,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
                 disabled={isTotalCovered}
                 maxDate={new Date()}
                 label="Fecha"
-                width="150px"
+                $width="150px"
                 control={DatePicker}>
               </FormField>
               <DropdownField
@@ -115,7 +115,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
                   setPayment({ ...payment, comments: e.target.value });
                 }}
               />
-              <FormField minWidth="fit-content" width="fit-content">
+              <FormField $width="fit-content">
                 <FlexColumn $rowGap="5px">
                   <Button
                     padding="3px 18px 3px 40px"

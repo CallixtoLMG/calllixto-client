@@ -14,7 +14,7 @@ const BarCodeSubContainer = styled.div`
   page-break-inside: avoid;
   height: 300px !important;
   padding: 0px !important;
-  max-width: ${({ singleProduct }) => (singleProduct ? "50%" : "100%")};
+  max-width: ${({ $singleProduct }) => ($singleProduct ? "50%" : "100%")};
 `;
 
 const ProductName = styled.p`
@@ -38,5 +38,5 @@ const Barcode = styled.img`
   padding: 0 3px !important;
 `;
 
-export { BarCodeContainer, BarCodeSubContainer, Barcode, ProductCode, ProductName };
+export { Barcode, BarCodeContainer, BarCodeSubContainer, ProductCode, ProductName };
 

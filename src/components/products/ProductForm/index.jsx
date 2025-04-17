@@ -236,6 +236,7 @@ const ProductForm = forwardRef(({
             name="editablePrice"
             label="Precio Editable"
             icon={ICONS.PENCIL}
+            color={COLORS.BLUE}
             disabled={!isUpdating && view}
           />
           <IconedButtonControlled
@@ -244,6 +245,7 @@ const ProductForm = forwardRef(({
             label="Producto Fraccionable"
             icon={ICONS.CUT}
             disabled={!isUpdating && view}
+            color={COLORS.BLUE}
           />
           <DropdownControlled
             width="200px"

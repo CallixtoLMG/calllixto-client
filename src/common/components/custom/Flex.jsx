@@ -2,11 +2,11 @@ import styled from "styled-components";
 
 const Common = styled.div`
   height: ${({ height = 'auto' }) => height};
-  max-height: ${({ maxHeight }) => maxHeight};
+  max-height: ${({ $maxHeight }) => $maxHeight};
   width: ${({ width = 'auto' }) => width};
-  min-width: ${({ minWidth = 'auto' }) => minWidth};
-  margin: ${({ margin = '0' }) => margin};
-  margin-bottom: ${({ marginBottom = '0' }) => marginBottom};
+  min-width: ${({ $minWidth = 'auto' }) => $minWidth};
+  margin: ${({ $margin = '0' }) => $margin};
+  margin-bottom: ${({ $marginBottom = '0' }) => $marginBottom};
   margin-top: ${({ $marginTop = '0' }) => $marginTop};
   margin-left: ${({ $marginLeft = '0' }) => $marginLeft};
   margin-right: ${({ $marginRight = '0' }) => $marginRight};

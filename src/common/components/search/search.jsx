@@ -8,7 +8,7 @@ import { Box, Flex, FlexColumn, Label, OverflowWrapper, } from "../custom";
 import { CommentTooltip, TagsTooltip } from "../tooltips";
 import { Search, Text } from "./styles";
 
-const ProductSearch = forwardRef(({ products, onProductSelect, tooltip }, ref) => {
+const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -60,7 +60,6 @@ const ProductSearch = forwardRef(({ products, onProductSelect, tooltip }, ref) =
     <Search
       selectFirstResult
       minCharacters={2}
-      searchDelay={1000}
       loading={loading}
       onSearchChange={handleSearchChange}
       value={selectedProduct ? '' : searchQuery}
@@ -88,7 +87,7 @@ const ProductSearch = forwardRef(({ products, onProductSelect, tooltip }, ref) =
                 )}
               </Box>
               <Box width="100px" >
-                {product.tags ? <TagsTooltip tooltip tags={product.tags} /> : <Box visibility="hidden" />}
+                {product.tags ? <TagsTooltip tooltip="true" tags={product.tags} /> : <Box visibility="hidden" />}
               </Box>
               <Box width="fit-content">
                 {product.comments ? <CommentTooltip comment={product.comments} /> : <Box visibility="hidden" />}

@@ -17,8 +17,8 @@ const CustomTable = ({
   page,
   actions = [],
   mainKey = 'id',
-  tableHeight,
-  deleteButtonInside,
+  $tableHeight,
+  $deleteButtonInside,
   color,
   selection = {},
   onSelectionChange,
@@ -94,7 +94,7 @@ const CustomTable = ({
   });
 
   return (
-    <Container tableHeight={tableHeight}>
+    <Container $tableHeight={$tableHeight}>
       {paginate && (
         <Pagination
           activePage={activePage}
@@ -173,8 +173,8 @@ const CustomTable = ({
                           </LinkCell>
                         ))}
                         {!!actions.length && (
-                          <ActionsContainer deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
-                            <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
+                          <ActionsContainer $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
+                            <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
                               {actions.length > 1 ? (
                                 <PopupActions
                                   open={popupOpenId === element[mainKey]}
@@ -216,8 +216,8 @@ const CustomTable = ({
                         </Cell>
                       ))}
                       {!!actions.length && (
-                        <ActionsContainer stillShow deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
-                          <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
+                        <ActionsContainer $stillShow $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
+                          <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
                             {actions.length > 1 ? (
                               <PopupActions
                                 open={popupOpenId === element[mainKey]}
