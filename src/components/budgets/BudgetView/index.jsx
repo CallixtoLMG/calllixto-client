@@ -37,6 +37,14 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
   const updatePayment = useUpdatePayments();
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
+
+  useEffect(() => {
+    const current = methods.getValues("paymentsMade");
+    if (JSON.stringify(current) !== JSON.stringify(budget?.paymentsMade)) {
+      methods.reset({ paymentsMade: budget.paymentsMade });
+    }
+  }, [budget?.paymentsMade]);
+
   const { mutate: mutateUpdatePayment, isPending: isLoadingUpdatePayment } = useMutation({
     mutationFn: async () => {
       const formData = methods.getValues();
@@ -62,18 +70,18 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
 
   useEffect(() => {
     if (!budget || initializedContact) return;
-  
+
     const defaultAddress = budget.pickUpInStore
       ? PICK_UP_IN_STORE
       : budget.customer?.addresses?.[0]?.address || '';
-  
+
     const defaultPhone = getFormatedPhone(budget.customer?.phoneNumbers?.[0]);
-  
+
     setSelectedContact({
       address: defaultAddress,
       phone: defaultPhone,
     });
-  
+
     setInitializedContact(true);
   }, [budget, initializedContact, setSelectedContact]);
 
