@@ -26,7 +26,10 @@ const CustomerForm = forwardRef(({
   }));
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
   const { data: customersSettings, isFetching: isCustomerSettingsFetching, refetch: refetchCustomersSettings } = useGetSetting(ENTITIES.CUSTOMERS);
-  const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.CUSTOMERS, customersSettings);
+  const { tagsOptions, optionsMapper } = useArrayTags(
+    ENTITIES.CUSTOMERS,
+    customer?.tags || [] 
+  );
 
   useEffect(() => {
     refetchCustomersSettings();

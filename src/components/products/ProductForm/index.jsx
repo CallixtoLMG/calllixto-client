@@ -37,7 +37,10 @@ const ProductForm = forwardRef(({
     defaultValues: getInitialValues(product)
   });
   const { data: productsSettings, isFetching: isProductSettingsFetching, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
-  const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
+  const { tagsOptions, optionsMapper } = useArrayTags(
+    ENTITIES.PRODUCTS,
+    product?.tags || []
+  );
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
