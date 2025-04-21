@@ -43,7 +43,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
     if (JSON.stringify(current) !== JSON.stringify(budget?.paymentsMade)) {
       methods.reset({ paymentsMade: budget.paymentsMade });
     }
-  }, [budget?.paymentsMade]);
+  }, [budget?.paymentsMade, methods]);
 
   const { mutate: mutateUpdatePayment, isPending: isLoadingUpdatePayment } = useMutation({
     mutationFn: async () => {

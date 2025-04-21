@@ -166,20 +166,17 @@ const BudgetForm = ({
   }, [watchCustomer, customerOptions]);
 
   useEffect(() => {
-    const currentCustomer = watch("customer");
-  
+
     if (
       normalizedCustomer &&
-      normalizedCustomer.id &&
+      normalizedCustomer?.id &&
       (
-        !currentCustomer ||
-        normalizedCustomer.id !== currentCustomer.id ||
-        JSON.stringify(normalizedCustomer) !== JSON.stringify(currentCustomer)
+        JSON.stringify(normalizedCustomer) !== JSON.stringify(watchCustomer)
       )
     ) {
       setValue("customer", normalizedCustomer, { shouldValidate: true });
     }
-  }, [normalizedCustomer, setValue, watch]);
+  }, [normalizedCustomer, setValue, watch, watchCustomer]);
 
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
@@ -424,16 +421,16 @@ const BudgetForm = ({
               name={`products[${index}].fractionConfig.value`}
               unit={product.fractionConfig.unit}
               iconPosition="right"
-          defaultValueFallback={1}
-          onChange={(value) => {
-            const safeValue = value ?? 1;
-            setValue(`products[${index}].fractionConfig.price`, safeValue * product.price);
+              defaultValueFallback={1}
+              onChange={(value) => {
+                const safeValue = value ?? 1;
+                setValue(`products[${index}].fractionConfig.price`, safeValue * product.price);
                 calculateTotal();
               }}
             />
-            )}
-            </>
-          ),
+          )}
+        </>
+      ),
       width: 1
     },
     {
