@@ -28,7 +28,7 @@ export const DropdownControlled = ({
       rules={rules}
       render={({ field: { onChange, value, ...rest } }) => {
         const normalizedValue = Array.isArray(value)
-          ? value.map(v => (typeof v === "object" ? v.name : v))
+          ? value.map(v => (typeof v === "object" ? v?.name : v))
           : value;
 
         return (

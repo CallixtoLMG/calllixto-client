@@ -5,6 +5,7 @@ import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Button, Menu } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
 import { Container, MenuItem, ModLink, RigthHeaderDiv, Text } from "./styles";
@@ -13,10 +14,17 @@ const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
+  const [selectedClientId, setSelectedClientId] = useState(null);
+
+  useEffect(() => {
+    const storedData = JSON.parse(sessionStorage.getItem("userData"));
+    setSelectedClientId(storedData?.selectedClientId || DEFAULT_SELECTED_CLIENT);
+  }, []);
 
   const handleClientChange = (client) => {
-    const userData = JSON.parse(sessionStorage.getItem("userData"));
-    sessionStorage.setItem("userData", JSON.stringify({ ...userData, selectedClientId: client }));
+    const storedData = JSON.parse(sessionStorage.getItem("userData"));
+    sessionStorage.setItem("userData", JSON.stringify({ ...storedData, selectedClientId: client }));
+    setSelectedClientId(client);
     location.reload();
   };
 
@@ -33,6 +41,8 @@ const Header = () => {
     [PAGES.BRANDS.SHORTKEYS]: () => push(PAGES.BRANDS.BASE),
     [PAGES.PRODUCTS.SHORTKEYS]: () => push(PAGES.PRODUCTS.BASE),
     [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
+    [PAGES.USERS.SHORTKEYS]: () => push(PAGES.USERS.BASE),
+    [PAGES.SETTINGS.SHORTKEYS]: () => push(PAGES.SETTINGS.BASE),
   };
 
   useKeyboardShortcuts(shortcutMapping);
@@ -89,6 +99,7 @@ const Header = () => {
                       onLogout={handleLogout}
                       onClientChange={handleClientChange}
                       userData={userData}
+                      selectedClient={selectedClientId}
                     />
                   </RigthHeaderDiv>
                 </Flex>

@@ -29,6 +29,7 @@ import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
+import { useProtectedAction } from "@/hooks/useProtectedAction";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
@@ -42,8 +43,8 @@ const Supplier = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { data: supplier, isLoading, refetch } = useGetSupplier(params.id);
-  const { data: products, isLoading: loadingProducts } =
+  const { data: supplier, isLoading, refetch: refetchSupplier } = useGetSupplier(params.id);
+  const { data: products, isLoading: loadingProducts, refetch: refetchProducts } =
     useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
@@ -77,6 +78,7 @@ const Supplier = ({ params }) => {
     canUpdate: RULES.canUpdate[role],
     onBeforeView,
   });
+  const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
   const editSupplier = useEditSupplier();
   const deleteSupplier = useDeleteSupplier();
   const deleteBySupplierId = useDeleteBySupplierId();
@@ -90,8 +92,9 @@ const Supplier = ({ params }) => {
 
   useEffect(() => {
     setLabels([PAGES.SUPPLIERS.NAME, supplier?.name]);
-    refetch();
-  }, [setLabels, supplier, refetch]);
+    refetchSupplier();
+    refetchProducts();
+  }, [setLabels, supplier, refetchProducts, refetchSupplier]);
 
   const hasAssociatedProducts = useMemo(() => !!products?.length, [products]);
 
@@ -171,20 +174,23 @@ const Supplier = ({ params }) => {
   }, []);
 
   const handleActivateClick = useCallback(
-    () => handleOpenModalWithAction('active'),
-    [handleOpenModalWithAction],
+    () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
+    [handleProtectedAction, handleOpenModalWithAction],
   );
+  
   const handleInactivateClick = useCallback(
-    () => handleOpenModalWithAction('inactive'),
-    [handleOpenModalWithAction],
+    () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
+    [handleProtectedAction, handleOpenModalWithAction],
   );
+  
   const handleDeleteClick = useCallback(
-    () => handleOpenModalWithAction('deleteSupplier'),
-    [handleOpenModalWithAction],
+    () => handleProtectedAction(() => handleOpenModalWithAction('deleteSupplier')),
+    [handleProtectedAction, handleOpenModalWithAction],
   );
+  
   const handleDeleteBatchClick = useCallback(
-    () => handleOpenModalWithAction('deleteBatch'),
-    [handleOpenModalWithAction],
+    () => handleProtectedAction(() => handleOpenModalWithAction('deleteBatch')),
+    [handleProtectedAction, handleOpenModalWithAction],
   );
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
