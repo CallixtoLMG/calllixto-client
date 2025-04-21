@@ -196,6 +196,8 @@ const Budget = ({ params }) => {
         }
       ];
 
+      const hasValidSendOptions = sendButtons.some(button => button.subOptions.length > 0);
+
       const actions = [
         !isBudgetDraft(budget.state) && 
         {
@@ -227,7 +229,7 @@ const Budget = ({ params }) => {
             </Dropdown>
           )
         },
-        {
+        hasValidSendOptions && {
           id: 2,
           button: (
             <Menu>

@@ -42,23 +42,26 @@ const Payments = ({ total, maxHeight, children, update }) => {
   const isTotalCovered = useMemo(() => totalPending <= 0, [totalPending]);
   const [payment, setPayment] = useState(EMPTY_PAYMENT());
   const [showErrors, setShowErrors] = useState(false);
+  const [exceedAmountError, setExceedAmountError] = useState(false);
 
   const handleAddPayment = async () => {
-
     setShowErrors(true);
-
+  
     if (!payment.method || payment.amount <= 0) {
+      setExceedAmountError(false); 
       return;
     }
-
+  
     if (payment.amount > totalPending) {
+      setExceedAmountError(true);
       return;
     }
-
+  
     appendPayment(payment);
-
+  
     setPayment(EMPTY_PAYMENT());
     setShowErrors(false);
+    setExceedAmountError(false);
   };
 
   const TOTAL_LIST_ITEMS = [
@@ -102,9 +105,16 @@ const Payments = ({ total, maxHeight, children, update }) => {
                 value={payment.amount}
                 onChange={(value) => {
                   setPayment({ ...payment, amount: value ?? 0 });
+                  setExceedAmountError(false); 
                 }}
                 disabled={false}
-                error={showErrors && !payment.amount ? RULES.REQUIRED.required : undefined}
+                error={
+                  showErrors && !payment.amount
+                    ? RULES.REQUIRED.required
+                    : exceedAmountError
+                      ? "El monto no puede superar el total pendiente."
+                      : undefined
+                }
               />
               <TextField
                 flex="1"
