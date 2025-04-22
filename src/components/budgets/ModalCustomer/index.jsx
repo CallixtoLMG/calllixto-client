@@ -12,17 +12,28 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm({ defaultValues: customer });
   const { handleSubmit, reset, watch } = methods;
+  const addressRefInputRef = useRef(null);
   const formRef = useRef(null);
+  const inputRef = useRef(null);
   const editCustomer = useEditCustomer();
 
   const watchedAreaCode = watch('areaCode');
   const watchedNumber = watch('number');
 
+
+  useEffect(() => {
+    if (isModalOpen) {
+      const timeout = setTimeout(() => {
+        addressRefInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [isModalOpen]);
+
   useEffect(() => {
     reset(customer);
   }, [customer, isModalOpen, reset]);
 
-  const inputRef = useRef(null);
   useEffect(() => {
     if (isModalOpen) {
       inputRef.current?.focus();
@@ -77,12 +88,17 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
           <FormProvider {...methods}>
             <Form ref={formRef} onSubmit={handleSubmit(handleEdit)}>
               <FieldsContainer>
-                <TextField flex="1" label="Nombre" value={customer?.name} />
+                <TextField
+                  flex="1"
+                  label="Nombre"
+                  value={customer?.name}
+                />
                 <TextControlled
                   width="30%"
                   name="refA"
                   rules={RULES.REQUIRED}
-                  label="Referencia de dirección"
+                  label="Referencia"
+                  ref={addressRefInputRef}
                 />
                 <TextControlled
                   flex="1"

@@ -2,13 +2,23 @@ import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, Form } from "@/common/components/custom";
 import { TextControlled, TextField } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const methods = useForm();
   const { handleSubmit, formState: { isDirty }, reset } = methods;
+  const commentInputRef = useRef(null);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      const timeout = setTimeout(() => {
+        commentInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     reset({ dispatchComment: '', ...product });
@@ -36,6 +46,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
                     flex="1"
                     name="dispatchComment"
                     placeholder="Comentario"
+                    ref={commentInputRef}
                   />
                 </FieldsContainer>
               </Form>

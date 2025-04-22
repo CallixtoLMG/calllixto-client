@@ -3,6 +3,7 @@ import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
 import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
+import { preventSend } from "@/common/utils";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { forwardRef, useImperativeHandle } from "react";
@@ -46,12 +47,27 @@ const CustomerForm = forwardRef(({
     reset(filteredData);
   };
 
-  useKeyboardShortcuts(handleSubmit(handleCreate), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset(getInitialValues(customer)), SHORTKEYS.DELETE);
+  const validateShortcuts = {
+    canConfirm: () => !isLoading && isDirty,
+    canReset: () => isDirty,
+  };
+
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: handleSubmit(handleCreate),
+      condition: validateShortcuts.canConfirm,
+    },
+    {
+      key: SHORTKEYS.DELETE,
+      action: () => reset(getInitialValues(customer)),
+      condition: validateShortcuts.canReset,
+    }
+  ]);
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(handleCreate)}>
+      <Form onSubmit={handleSubmit(handleCreate)} onKeyDown={preventSend}>
         <FieldsContainer>
           <TextControlled
             width="40%"
