@@ -41,7 +41,6 @@ const Settings = () => {
   const editSetting = useEditSetting();
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm();
-
   const formRef = useRef(null);
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   const [activeEntity, setActiveEntity] = useState(null);

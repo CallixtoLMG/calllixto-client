@@ -1,14 +1,16 @@
 import { useGetSetting } from "@/api/settings";
 import { Label } from "@/common/components/custom";
 
-export const useArrayTags = (entity) => {
+export const useArrayTags = (entity, externalTags = []) => {
   const { data: settings, isFetching } = useGetSetting(entity);
 
   const uniqueTags = {};
 
   const entityTags = settings?.tags ?? [];
 
-    entityTags.forEach((tag) => {
+  const combinedTags = [...entityTags, ...externalTags];
+
+  combinedTags.forEach((tag) => {
     if (tag?.name) {
       uniqueTags[tag.name] = tag;
     }

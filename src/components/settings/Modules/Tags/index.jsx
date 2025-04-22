@@ -1,4 +1,4 @@
-import { Box, Button, Flex } from "@/common/components/custom";
+import { Box, Button, Flex, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SEMANTIC_COLORS } from "@/common/constants";
@@ -34,13 +34,25 @@ const Tags = () => {
       title: "Etiqueta",
       align: "left",
       width: 5,
-      value: (tag) => <Label color={tag.color}>{tag.name}</Label>,
+      value: (tag) => (
+        <Label color={tag.color}>
+          <OverflowWrapper maxWidth="40vw" popupContent={tag.name}>
+            {tag.name}
+          </OverflowWrapper>
+        </Label >
+      )
     },
     {
       id: "description",
       title: "Descripción",
       align: "left",
-      value: (tag) => <span>{tag.description}</span>,
+      value: (tag) => (
+        <span>
+          <OverflowWrapper maxWidth="40vw" popupContent={tag.description}>
+            {tag.description}
+          </OverflowWrapper>
+        </span>
+      ),
     },
   ];
 
@@ -61,6 +73,11 @@ const Tags = () => {
 
     if (!tagToAdd.name.trim()) {
       setError("El nombre es obligatorio.");
+      return;
+    }
+
+    if (tagToAdd.name.length > 50) {
+      setError("El nombre no debe superar los 50 caracteres.");
       return;
     }
 
@@ -99,6 +116,7 @@ const Tags = () => {
                 placeholder="Nombre de la etiqueta"
                 value={tagToAdd.name}
                 onChange={handleNameChange}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
                 error={error}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
               />
