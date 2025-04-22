@@ -142,7 +142,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
 
   return (
     <>
-      <Flex flexDirection="column" rowGap="15px">
+      <Flex $flexDirection="column" $rowGap="15px">
         <FormProvider {...methods}>
           <Form onSubmit={onSubmit(() => { })}>
             <Filters

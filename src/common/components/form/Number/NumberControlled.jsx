@@ -10,7 +10,7 @@ export const NumberControlled = ({
   rules,
   label,
   unit,
-  iconPosition = 'left',
+  iconPosition,
   placeholder,
   onChange,
   maxLength,
@@ -39,7 +39,7 @@ export const NumberControlled = ({
           <FormField
             disabled={disabled}
             flex={flex}
-            width={width}
+            $width={width}
             label={label}
             control={Input}
             error={fieldError && {
@@ -50,12 +50,13 @@ export const NumberControlled = ({
             <Input
               {...inputProps}
               {...rest}
+              icon
               maxLength={maxLength}
               value={normalMode
                 ? safeValue
                 : (typeof safeValue === 'number'
-                    ? safeValue.toLocaleString()
-                    : safeValue)
+                  ? safeValue.toLocaleString()
+                  : safeValue)
               }
               placeholder={placeholder ?? label}
               {...(unit && { iconPosition })}
@@ -73,7 +74,7 @@ export const NumberControlled = ({
             >
               {unit && (
                 <Icon justifyItems={justifyItems}>
-                  <Flex height="100%" alignItems="center">
+                  <Flex height="100%" $alignItems="center">
                     <Header as="h5">{unit}</Header>
                   </Flex>
                 </Icon>

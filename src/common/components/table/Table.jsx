@@ -17,8 +17,8 @@ const CustomTable = ({
   page,
   actions = [],
   mainKey = 'id',
-  tableHeight,
-  deleteButtonInside,
+  $tableHeight,
+  $deleteButtonInside,
   color,
   selection = {},
   onSelectionChange,
@@ -94,7 +94,7 @@ const CustomTable = ({
   });
 
   return (
-    <Container tableHeight={tableHeight}>
+    <Container $tableHeight={$tableHeight}>
       {paginate && (
         <Pagination
           activePage={activePage}
@@ -105,41 +105,41 @@ const CustomTable = ({
           onPageSizeChange={handlePageSizeChange}
         />
       )}
-      <Table celled compact striped={!basic} color={color} definition={isSelectable}>
-        <TableHeader fullWidth>
-          <TableRow>
-            {isSelectable && (
-              <HeaderCell width="50px" padding="0">
-                <CenteredFlex>
-                  <Checkbox
-                    indeterminate={!!Object.keys(selection).length && !allSelected}
-                    checked={!isLoading && allSelected}
-                    onChange={handleToggleAll}
-                  />
-                </CenteredFlex>
-              </HeaderCell>
-            )}
-            {headers.map((header) => (
-              <HeaderCell key={`header_${header.id}`} $basic={basic}>{header.title}</HeaderCell>
-            ))}
-            {!!Object.keys(selection).length && (
-              <ActionsContainer $header $open={isPopupOpen}>
-                <InnerActionsContainer $header>
-                  <PopupActions
-                    position="right center"
-                    trigger={<Button icon circular color={COLORS.YELLOW} size="mini"><Icon name={ICONS.COG} /></Button>}
-                    buttons={selectionActions}
-                    open={isPopupOpen}
-                    onOpen={() => setIsPopupOpen(true)}
-                    onClose={() => setIsPopupOpen(false)}
-                  />
-                </InnerActionsContainer>
-              </ActionsContainer>
-            )}
-          </TableRow>
-        </TableHeader>
-        {hydrated && (
-          <Loader active={isLoading} $greyColor>
+      <Loader active={isLoading} $greyColor>
+        <Table celled compact striped={!basic} color={color} definition={isSelectable}>
+          <TableHeader fullWidth>
+            <TableRow>
+              {isSelectable && (
+                <HeaderCell $width="50px" padding="0">
+                  <CenteredFlex>
+                    <Checkbox
+                      indeterminate={!!Object.keys(selection).length && !allSelected}
+                      checked={!isLoading && allSelected}
+                      onChange={handleToggleAll}
+                    />
+                  </CenteredFlex>
+                </HeaderCell>
+              )}
+              {headers.map((header) => (
+                <HeaderCell key={`header_${header.id}`} $basic={basic}>{header.title}</HeaderCell>
+              ))}
+              {!!Object.keys(selection).length && (
+                <ActionsContainer $header $open={isPopupOpen}>
+                  <InnerActionsContainer $header>
+                    <PopupActions
+                      position="right center"
+                      trigger={<Button icon circular color={COLORS.YELLOW} size="mini"><Icon name={ICONS.COG} /></Button>}
+                      buttons={selectionActions}
+                      open={isPopupOpen}
+                      onOpen={() => setIsPopupOpen(true)}
+                      onClose={() => setIsPopupOpen(false)}
+                    />
+                  </InnerActionsContainer>
+                </ActionsContainer>
+              )}
+            </TableRow>
+          </TableHeader>
+          {hydrated && (
             <Table.Body>
               {!currentPageElements.length ? (
                 <Table.Row>
@@ -173,8 +173,8 @@ const CustomTable = ({
                           </LinkCell>
                         ))}
                         {!!actions.length && (
-                          <ActionsContainer deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
-                            <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
+                          <ActionsContainer $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
+                            <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
                               {actions.length > 1 ? (
                                 <PopupActions
                                   open={popupOpenId === element[mainKey]}
@@ -216,8 +216,8 @@ const CustomTable = ({
                         </Cell>
                       ))}
                       {!!actions.length && (
-                        <ActionsContainer stillShow deleteButtonInside={deleteButtonInside} $open={isPopupOpen}>
-                          <InnerActionsContainer deleteButtonInside={deleteButtonInside}>
+                        <ActionsContainer $stillShow $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
+                          <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
                             {actions.length > 1 ? (
                               <PopupActions
                                 open={popupOpenId === element[mainKey]}
@@ -248,9 +248,9 @@ const CustomTable = ({
                 })
               )}
             </Table.Body>
-          </Loader>
-        )}
-      </Table>
+          )}
+        </Table>
+      </Loader>
     </Container>
   );
 };

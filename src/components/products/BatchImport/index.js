@@ -14,7 +14,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Icon, Transition } from "semantic-ui-react";
 import * as XLSX from "xlsx";
-import { Modal, ModalHeader, WaitMsg } from "./styles";
+import { BatchImportIcon, Modal, ModalHeader, WaitMsg } from "./styles";
 
 const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts, refetch: refetchProducts } = useListProducts();
@@ -388,12 +388,13 @@ const BatchImport = ({ isCreating }) => {
       <Button
         height="fit-content"
         width="fit-content"
-        paddingLeft="0"
-        as="Icon"
+        $paddingLeft="0"
+        as={BatchImportIcon}
         onClick={handleClick}
         type="button"
       >
-        <Icon marginRight name={importSettings.icon} />{importSettings.button}
+        <Icon name={importSettings.icon} />
+        {importSettings.button}
       </Button>
       <Transition animation="fade" duration={500} visible={open}>
         <Modal
@@ -445,8 +446,8 @@ const BatchImport = ({ isCreating }) => {
                         <TextField width={6} label="Archivo seleccionado" value={selectedFile} disabled />
                         <Label > {`${importSettings.label}: ${importedProductsCount}`}</Label>
                         <Table
-                          deleteButtonInside
-                          tableHeight="50vh"
+                          $deleteButtonInside
+                          $tableHeight="50vh"
                           mainKey="code"
                           headers={PRODUCTS_COLUMNS}
                           elements={watchProducts}

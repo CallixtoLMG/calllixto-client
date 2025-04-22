@@ -30,7 +30,7 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
               width="200px"
               name="state"
               options={CUSTOMER_STATES_OPTIONS}
-              defaultValue={EMPTY_FILTERS.state}
+              value={EMPTY_FILTERS.state}
               afterChange={() => {
                 onSubmit(() => { })();
               }}

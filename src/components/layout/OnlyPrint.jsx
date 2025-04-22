@@ -6,7 +6,7 @@ const OnlyPrintContainer = styled.div`
     display: block;
 
     @page {
-      margin-top: ${({ marginTop = "30px" }) => marginTop};
+      margin-top: ${({ $marginTop = "30px" }) => $marginTop};
       margin-bottom: 25px;
       margin-left: 30px;
       margin-right: 30px;
@@ -23,7 +23,7 @@ const OnlyPrintContainer = styled.div`
 
 export const OnlyPrint = ({ children, marginTop, firstPageMarginTop }) => {
   return (
-    <OnlyPrintContainer marginTop={marginTop} firstPageMarginTop={firstPageMarginTop}>
+    <OnlyPrintContainer $marginTop={marginTop} firstPageMarginTop={firstPageMarginTop}>
       {children}
     </OnlyPrintContainer>
   )

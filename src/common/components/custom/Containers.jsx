@@ -14,14 +14,14 @@ export const ViewContainer = styled(Flex)`
 `;
 
 export const FieldsContainer = styled(Flex)`
-  justify-content: ${({ justifyContent }) => justifyContent};
+  justify-content: ${({ $justifyContent }) => $justifyContent};
   flex-wrap: wrap;
-  column-gap: ${({ columnGap = '15px' }) => columnGap } !important;
-  row-gap: ${({ rowGap = 'auto' }) => rowGap} !important;
+  column-gap: ${({ $columnGap = '15px' }) => $columnGap } !important;
+  row-gap: ${({ $rowGap = 'auto' }) => $rowGap} !important;
   width: ${({ width = 'auto' }) => width} !important;
-  min-height: ${({ minHeight = 'auto' }) => minHeight} !important;
+  min-height: ${({ $minHeight = 'auto' }) => $minHeight} !important;
   height: ${({ height = 'auto' }) => height} !important;
-  align-items: ${({ alignItems = 'auto' }) => alignItems} !important;
+  align-items: ${({ $alignItems = 'auto' }) => $alignItems} !important;
 `;
 
 export const ButtonsContainer = styled(Flex)`

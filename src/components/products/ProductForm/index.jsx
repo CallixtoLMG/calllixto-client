@@ -57,7 +57,7 @@ const ProductForm = forwardRef(({
 
   useEffect(() => {
     refetchProductSettings();
-  }, []);
+  }, [refetchProductSettings]);
 
   const handleForm = async (data) => {
     const filteredData = { ...data };
@@ -103,7 +103,7 @@ const ProductForm = forwardRef(({
       value: { id, state },
       text: name,
       content: (
-        <Flex justifyContent="space-between" alignItems="center">
+        <Flex $justifyContent="space-between" $alignItems="center">
           <OverflowWrapper maxWidth="80%" popupContent={name}>
             <Text>{name}</Text>
           </OverflowWrapper>
@@ -128,7 +128,7 @@ const ProductForm = forwardRef(({
       value: { id, state },
       text: name,
       content: (
-        <Flex justifyContent="space-between" alignItems="center">
+        <Flex $justifyContent="space-between" $alignItems="center">
           <OverflowWrapper maxWidth="80%" popupContent={name}>
             <Text>{name}</Text>
           </OverflowWrapper>
@@ -217,7 +217,7 @@ const ProductForm = forwardRef(({
             </>
           )}
         </FieldsContainer>
-        <FieldsContainer rowGap="5px" alignItems="flex-end">
+        <FieldsContainer $rowGap="5px" $alignItems="flex-end">
           <TextControlled
             width="40%"
             name="name"
@@ -226,7 +226,7 @@ const ProductForm = forwardRef(({
             disabled={!isUpdating && view}
           />
         </FieldsContainer>
-        <FieldsContainer alignItems="end">
+        <FieldsContainer $alignItems="end">
           <PriceControlled
             width="200px"
             name="cost"
@@ -258,6 +258,7 @@ const ProductForm = forwardRef(({
             name="editablePrice"
             label="Precio Editable"
             icon={ICONS.PENCIL}
+            color={COLORS.BLUE}
             disabled={!isUpdating && view}
           />
           <IconedButtonControlled
@@ -266,6 +267,7 @@ const ProductForm = forwardRef(({
             label="Producto Fraccionable"
             icon={ICONS.CUT}
             disabled={!isUpdating && view}
+            color={COLORS.BLUE}
           />
           <DropdownControlled
             width="200px"

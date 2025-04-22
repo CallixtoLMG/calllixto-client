@@ -1,18 +1,20 @@
 import { IconedButton } from "@/common/components/buttons";
 import { Controller } from "react-hook-form";
-import { ButtonGroup, FormField } from "semantic-ui-react";
+import { ButtonGroup } from "semantic-ui-react";
+import { FormField } from "../../custom";
 
-export const GroupedButtonsControlled = ({ name, width, buttons }) => {
+export const GroupedButtonsControlled = ({ name, width, buttons, color }) => {
   return (
     <Controller
       name={name}
       render={({ field: { onChange, value: formValue, ...rest } }) => (
-        <FormField width={width}>
+        <FormField $width={width}>
           <ButtonGroup size="small">
             {buttons?.map(({ text, icon, value }) => (
               <IconedButton
                 {...rest}
                 key={value}
+                color={color}
                 text={text}
                 icon={icon}
                 basic={formValue !== value}

@@ -100,7 +100,7 @@ const Categories = () => {
   };
 
   return (
-    <Box marginBottom="5px">
+    <Box $marginBottom="5px">
       <Accordion fluid>
         <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
           <Icon name="dropdown" />
@@ -108,7 +108,7 @@ const Categories = () => {
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
           <Box>
-            <Flex width="100%" padding="0 10px 10px 10px!important" alignItems="flex-start" columnGap="15px">
+            <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
               <TextField
                 width={4}
                 label="Nombre"
@@ -117,7 +117,6 @@ const Categories = () => {
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
                 onChange={handleNameChange}
                 error={error}
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
               />
               <DropdownField
                 flex={1}
@@ -142,7 +141,7 @@ const Categories = () => {
                 color={COLORS.GREEN}
                 type="button"
                 onClick={handleAddCategory}
-                marginTop="25px"
+                $marginTop="25px"
               />
             </Flex>
             <Table
@@ -152,8 +151,8 @@ const Categories = () => {
               mainKey="name"
               paginate={false}
               actions={actions}
-              tableHeight="40vh"
-              deleteButtonInside
+              $tableHeight="40vh"
+              $deleteButtonInside
             />
           </Box>
         </Accordion.Content>

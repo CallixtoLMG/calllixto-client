@@ -1,6 +1,6 @@
 import { IconedButton } from "@/common/components/buttons";
 import { Box } from "@/common/components/custom";
-import { ICONS } from "@/common/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { useState } from "react";
 import { ButtonGroup } from "semantic-ui-react";
 
@@ -24,12 +24,14 @@ export const useAllowUpdate = ({ canUpdate, onBeforeView }) => {
               icon={ICONS.EDIT}
               onClick={() => setIsUpdating(true)}
               basic={!isUpdating}
+              color={COLORS.BLUE}
               width="130px"
             />
             <IconedButton
               text="Ver"
               icon={ICONS.EYE}
               basic={isUpdating}
+              color={COLORS.BLUE}
               onClick={handleViewClick}
               width="130px"
             />

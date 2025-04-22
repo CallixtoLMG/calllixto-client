@@ -26,7 +26,7 @@ const PrintBarCodes = forwardRef(({ products }, ref) => {
   return (
     <BarCodeContainer ref={ref}>
       {products?.map(product => (
-        <BarCodeSubContainer singleProduct={products?.length === 1} key={product?.code}>
+        <BarCodeSubContainer $singleProduct={products?.length === 1} key={product?.code}>
           <ProductName>{product?.name}</ProductName>
           <Barcode id={`barcode-${product?.code}`}></Barcode>
           <ProductCode>{product?.code}</ProductCode>

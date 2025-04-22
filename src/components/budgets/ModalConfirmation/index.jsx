@@ -58,7 +58,7 @@ const ModalConfirmation = ({
         <Form ref={formRef} onSubmit={methods.handleSubmit(handleConfirm)}>
           <Modal size="large" closeIcon open={isModalOpen} onClose={() => onClose(false)}>
             <Modal.Header>
-              <Flex alignItems="center" justifyContent="space-between">
+              <Flex $alignItems="center" $justifyContent="space-between">
                 Desea confirmar el presupuesto?
                 <GroupedButtonsControlled
                   name="pickUpInStore"
@@ -70,7 +70,7 @@ const ModalConfirmation = ({
               </Flex>
             </Modal.Header>
             <Modal.Content>
-              <FlexColumn rowGap="15px">
+              <FlexColumn $rowGap="15px">
                 <FieldsContainer>
                   <TextField
                     flex="2"

@@ -15,13 +15,13 @@ export const HEADERS = [
     value: (customer) => {
       const { tags, name, comments } = customer;
       return (
-        <Flex justifyContent="space-between" alignItems="center">
+        <Flex $justifyContent="space-between" $alignItems="center">
           <OverflowWrapper maxWidth="45vw" popupContent={name}>
             {name}
           </OverflowWrapper>
-          <Flex columnGap="7px" alignItems="center" justifyContent="flex-end">
-            {tags && <TagsTooltip tooltip tags={tags} />}
-            {comments && <CommentTooltip tooltip comment={comments} />}
+          <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
+            {tags && <TagsTooltip tooltip="true" tags={tags} />}
+            {comments && <CommentTooltip tooltip="true" comment={comments} />}
           </Flex>
         </Flex>
       );
@@ -35,7 +35,7 @@ export const HEADERS = [
     value: (customer) => {
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(customer.addresses || []);
       return (
-        <Flex justifyContent="space-between">
+        <Flex $justifyContent="space-between">
           {primaryAddress}
           {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
         </Flex>
@@ -49,7 +49,7 @@ export const HEADERS = [
     value: (customer) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(customer.phoneNumbers);
       return (
-        <Flex justifyContent="space-between">
+        <Flex $justifyContent="space-between">
           {primaryPhone}
           {additionalPhones && <PhonesTooltip phones={additionalPhones} />}
         </Flex>
@@ -82,7 +82,7 @@ export const CUSTOMER_STATES_OPTIONS = Object.values(CUSTOMER_STATES)
   .map(({ id, title, color }) => ({
     key: id,
     text: (
-      <Flex alignItems="center" justifyContent="space-between">
+      <Flex $alignItems="center" $justifyContent="space-between">
         {title}&nbsp;<Label width="fit-content" color={color} circular empty />
       </Flex>
     ),

@@ -62,7 +62,6 @@ const Users = () => {
     actions.push({
       id: 3,
       icon: ICONS.FILE_EXCEL,
-      color: COLORS.SOFT_GREY,
       onClick: handleDownloadExcel,
       text: 'Usuarios',
       disabled: loading

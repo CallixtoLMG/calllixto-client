@@ -234,7 +234,7 @@ const Budget = ({ params }) => {
           button: (
             <Menu>
               <DropdownOption
-                menu
+                $menu={true}
                 pointing
                 text='Enviar'
                 icon={ICONS.SEND}
@@ -242,9 +242,9 @@ const Budget = ({ params }) => {
                 labeled
                 button
                 className='icon blue'
-                paddingLeft="45px">
+                $paddingLeft="45px">
                 <Dropdown.Menu>
-                  {sendButtons.map(({ text, iconName, color, subOptions }) => (
+                  {sendButtons.map(({ text, iconName, subOptions }) => (
                     <Flex key={iconName}>
                       {subOptions.length > 0 && (
                         <DropdownOption text={text} pointing="left" className="link item">
@@ -368,7 +368,7 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      <Flex margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} justifyContent="space-between">
+      <Flex $margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} $justifyContent="space-between">
         {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
           <>
             <IconedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
@@ -392,8 +392,6 @@ const Budget = ({ params }) => {
         ) : <Box />}
         {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
           <Input
-            textAlignLast="right"
-            innerWidth="90px"
             type="text"
             height="35px"
             width="fit-content"

@@ -1,6 +1,6 @@
 import { COLORS, ICONS } from "@/common/constants";
-import { Flex, FlexColumn, Icon } from "../custom";
 import styled from "styled-components";
+import { Flex, FlexColumn, Icon } from "../custom";
 
 const MessageText = styled.p`
   display: flex;
@@ -11,9 +11,9 @@ const MessageText = styled.p`
 
 export const PasswordRequirements = ({ requirements, password }) => {
   return (
-    <FlexColumn marginLeft="1em" rowGap="3px">
+    <FlexColumn $marginLeft="1em" $rowGap="3px">
       {requirements.map((req, index) => (
-        <Flex columnGap="5px" key={index}>
+        <Flex $columnGap="5px" key={index}>
           <MessageText>
             {req.test.test(password) ? (
               <Icon name={ICONS.CHECK} color={COLORS.GREEN} />

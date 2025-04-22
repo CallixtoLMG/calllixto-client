@@ -76,7 +76,6 @@ const Budgets = () => {
       {
         id: 3,
         icon: ICONS.FILE_EXCEL,
-        color: COLORS.SOFT_GREY,
         width: "fit-content",
         onClick: handleDownloadExcel,
         text: 'Presupuestos',

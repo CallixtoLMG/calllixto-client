@@ -18,7 +18,7 @@ export const DropdownField = ({
 
     <FormField
       flex={flex}
-      width={width}
+      $width={width}
       required={required}
       label={label}
       placeholder={placeholder ?? label}

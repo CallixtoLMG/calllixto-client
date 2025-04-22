@@ -89,7 +89,7 @@ const ChangePasswordForm = () => {
 
   return (
     <Loader active={false}>
-      <FlexColumn alignItems="center" justifyContent="center" marginTop="90px">
+      <FlexColumn $alignItems="center" justifyContent="center" $marginTop="90px">
         <FlexColumn width="350px">
           <Button
             color="blue"
@@ -141,7 +141,7 @@ const ChangePasswordForm = () => {
                 }}
                 disabled={!isCodeRequested}
               />
-              <FlexColumn rowGap="14px">
+              <FlexColumn $rowGap="14px">
                 <Button
                   loading={isOnConfirmResetPending}
                   disabled={isOnConfirmResetPending || isRequestCodePending || !isCodeRequested}

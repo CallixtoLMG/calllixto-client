@@ -19,7 +19,7 @@ export const AddressesTooltip = ({ addresses, input }) => {
       trigger={
         input
           ? <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />
-          : <Box marginLeft="5px" marginRight="5px">
+          : <Box $marginLeft="5px" $marginRight="5px">
             <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />
           </Box>
       }

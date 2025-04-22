@@ -24,11 +24,10 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
     [ENTITIES.SUPPLIERS]: { queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
     [ENTITIES.USERS]: { queryKey: LIST_USERS_QUERY_KEY, text: PAGES.USERS.NAME },
   };
-  
+
   const { formState: { isDirty } } = useFormContext();
   const [showModal, setShowModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
   const { queryKey, text } = ENTITY_MAPPING[entity] || {};
 
   const restoreEntity = useRestoreEntity({ entity, key: queryKey });
@@ -73,12 +72,12 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
           />
           {children}
         </FiltersContainer>
-        <Flex columnGap="10px" alignSelf="center">
+        <Flex $columnGap="10px" $alignSelf="center">
           <IconedButton
             text="Buscar"
             icon={ICONS.SEARCH}
             submit
-            color={isDirty ? COLORS.PRIMARY : COLORS.SOFT_GREY}
+            color={isDirty ? COLORS.BLUE : undefined}
             width="130px"
           />
           <Dropdown width="130px" pointing as={CustomButton} text='Actualizar' icon={ICONS.REFRESH} floating labeled button className='icon'>

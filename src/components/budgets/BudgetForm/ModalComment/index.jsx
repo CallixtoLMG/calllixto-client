@@ -33,7 +33,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
       >
         <Modal.Header>Comentarios del producto</Modal.Header>
         <Modal.Content>
-          <Flex flexDirection="column" rowGap="15px">
+          <Flex $flexDirection="column" $rowGap="15px">
             <FormProvider {...methods}>
               <Form onSubmit={handleSubmit(onAddComment)}>
                 <FieldsContainer>

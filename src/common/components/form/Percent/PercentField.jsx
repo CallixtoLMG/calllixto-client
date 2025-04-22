@@ -1,7 +1,8 @@
 import { FormField, Icon, Input } from "@/common/components/custom";
 import { ICONS } from "@/common/constants";
+import { forwardRef } from "react";
 
-export const PercentField = ({
+export const PercentField = forwardRef(({
   flex,
   width,
   height,
@@ -11,12 +12,12 @@ export const PercentField = ({
   error,
   maxValue = 100,
   disabled
-}) => {
+}, ref) => {
 
   return (
     <FormField
       flex={flex}
-      width={width}
+      $width={width}
       height={height}
       label={label}
       control={Input}
@@ -25,8 +26,8 @@ export const PercentField = ({
     >
       <Input
         value={value}
+        icon
         disabled={disabled}
-        iconPosition="right"
         onChange={(e) => {
           const inputValue = e.target.value;
         
@@ -45,10 +46,13 @@ export const PercentField = ({
           }
         }}
         onFocus={(e) => e.target.select()}
+        ref={ref}
       >
-        <Icon name={ICONS.PERCENT} size='small' />
         <input />
+        <Icon name={ICONS.PERCENT} size='small' />
       </Input>
     </FormField>
   );
-}
+})
+
+PercentField.displayName = 'PercentField';

@@ -15,9 +15,9 @@ const Cell = styled(STable.Cell)`
 const Container = styled(Flex)`
   flex-direction: column;
   width: 100% !important;
-  max-height: ${({ tableHeight = 'none' }) => `${tableHeight}!important`};
-  overflow-y: ${({ tableHeight }) => tableHeight && "auto"} !important;
-  overflow-x: ${({ tableHeight }) => tableHeight && "auto"} !important;
+  max-height: ${({ $tableHeight = 'none' }) => `${$tableHeight}!important`};
+  overflow-y: ${({ $tableHeight }) => $tableHeight && "auto"} !important;
+  overflow-x: ${({ $tableHeight }) => $tableHeight && "auto"} !important;
   padding: 2px 0;
 `;
 
@@ -32,7 +32,7 @@ const PaginationContainer = styled(Flex)`
   align-self: center;
   max-height: ${({ height = 'none' }) => `${height}!important`};
   flex-direction: row;
-  justify-content: ${({ justifyContent = "flex-end" }) => justifyContent && justifyContent}!important;
+  justify-content: ${({ $justifyContent = "flex-end" }) => $justifyContent && $justifyContent}!important;
   column-gap: 10px;
   justify-content: center;
 `;
@@ -50,7 +50,7 @@ const Segment = styled(SSegment)`
 `;
 
 const Table = styled(STable)`
-  max-height: ${({ tableHeight = "none" }) => `${tableHeight}!important`};
+  max-height: ${({ $tableHeight = "none" }) => `${$tableHeight}!important`};
   overflow-y: auto!important;
   overflow-x: hidden!important;
   border: 1px solid black;
@@ -63,7 +63,7 @@ const TableHeader = styled(STable.Header)`
 const HeaderCell = styled(STable.HeaderCell)`
   background-color: ${({ $basic }) => !$basic && '#EEEEEE!important'};
   text-align: ${({ textAlign = "center" }) => `${textAlign}!important`};
-  width: ${({ width }) => width}!important;
+  width: ${({ $width }) => $width}!important;
   padding: ${({ padding }) => padding}!important;
   max-height: ${({ maxhHeight }) => maxhHeight}!important;
 `;
@@ -73,23 +73,23 @@ const ActionsContainer = styled.td`
   right: ${({ $header }) => $header ? "auto" : "0"};
   left: ${({ $header }) => $header ? "-100px" : "auto"};
   top: ${({ $header }) => $header ? "0px" : "50%"};
-  transform: ${({ deleteButtonInside, $header }) => {
-    if (deleteButtonInside) return 'translateY(-50%)';
+  transform: ${({ $deleteButtonInside, $header }) => {
+    if ($deleteButtonInside) return 'translateY(-50%)';
     return $header ? 'translateX(calc(100%))' : "translateY(-50%) translateX(calc(100%))";
   }} !important;
   transition: all 0.1s ease-in-out!important;
   opacity: ${({ $header, $open }) => $header || $open ? "1" : "0"};
-  visibility: ${({ $header, $open, stillShow }) => $header || $open && stillShow ? "visible" : "hidden"};
+  visibility: ${({ $header, $open, $stillShow }) => $header || $open && $stillShow ? "visible" : "hidden"};
   border: none!important;
   padding: ${({ $header }) => $header && "0!important"};
   padding-left: 5px !important;
 `;
 
 const InnerActionsContainer = styled(Flex)`
-  border: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "1px solid #d4d4d5"} !important;
-  background-color: ${({ deleteButtonInside }) => deleteButtonInside ? 'none' : "#f7f7f7"} !important;
-  padding: ${({ deleteButtonInside, $header }) => {
-    if (deleteButtonInside) return '0';
+  border: ${({ $deleteButtonInside }) => $deleteButtonInside ? 'none' : "1px solid #d4d4d5"} !important;
+  background-color: ${({ $deleteButtonInside }) => $deleteButtonInside ? 'none' : "#f7f7f7"} !important;
+  padding: ${({ $deleteButtonInside, $header }) => {
+    if ($deleteButtonInside) return '0';
     return $header ? '8px 5px' : '5px';
   }} !important;
   border-radius: ${({ $header }) => $header ? "10px 0 0 10px" : "0 10px 10px 0"};

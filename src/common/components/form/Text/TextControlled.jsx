@@ -5,6 +5,7 @@ import { TextField } from "./TextField";
 
 export const TextControlled = forwardRef(({
   name,
+  width,
   rules,
   iconLabel,
   showPopup = false,
@@ -23,6 +24,7 @@ export const TextControlled = forwardRef(({
         <TextField
           {...rest}
           {...inputParams}
+          width={width}
           ref={ref}
           disabled={disabled}
           showPopup={showPopup}

@@ -127,8 +127,8 @@ export const ContactControlled = () => {
   };
 
   return (
-    <FieldsContainer columnGap="50px">
-      <Flex flex="1" flexDirection="column">
+    <FieldsContainer $columnGap="50px">
+      <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
             <Box
@@ -161,7 +161,7 @@ export const ContactControlled = () => {
           position='top left'
         >
           <Form>
-            <FieldsContainer width="60vw" alignItems="center" rowGap="5px">
+            <FieldsContainer width="60vw" $alignItems="center" $rowGap="5px">
               <FormField
                 flex="1"
                 label="Referencia"
@@ -220,7 +220,7 @@ export const ContactControlled = () => {
             </FieldsContainer>
           </Form>
         </Popup>
-        <Box marginTop="8px" />
+        <Box $marginTop="8px" />
         <Table
           headers={PHONE_TABLE_HEADERS}
           actions={[
@@ -229,7 +229,7 @@ export const ContactControlled = () => {
           elements={phoneFields}
         />
       </Flex>
-      <Flex flex="1" flexDirection="column">
+      <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
             <Box
@@ -261,7 +261,7 @@ export const ContactControlled = () => {
           position='top left'
         >
           <Form>
-            <FieldsContainer width="45vw" alignItems="center" rowGap="5px">
+            <FieldsContainer width="45vw" $alignItems="center" $rowGap="5px">
               <FormField
                 flex="1"
                 label="Referencia"
@@ -300,7 +300,7 @@ export const ContactControlled = () => {
             </FieldsContainer>
           </Form>
         </Popup>
-        <Box marginTop="8px" />
+        <Box $marginTop="8px" />
         <Table
           $wrap
           headers={ADDRESS_TABLE_HEADERS}
@@ -310,7 +310,7 @@ export const ContactControlled = () => {
           elements={addressFields}
         />
       </Flex>
-      <Flex flex="1" flexDirection="column">
+      <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
             <Box
@@ -342,7 +342,7 @@ export const ContactControlled = () => {
           closeOnDocumentClick
         >
           <Form>
-            <FieldsContainer width="50vw" alignItems="center" rowGap="5px">
+            <FieldsContainer width="50vw" $alignItems="center" $rowGap="5px">
               <FormField
                 flex="1"
                 label="Referencia"
@@ -381,7 +381,7 @@ export const ContactControlled = () => {
             </FieldsContainer>
           </Form>
         </Popup>
-        <Box marginTop="8px" />
+        <Box $marginTop="8px" />
         <Table
           $wrap={true}
           headers={EMAIL_TABLE_HEADERS}

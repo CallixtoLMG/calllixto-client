@@ -79,11 +79,11 @@ const UserForm = forwardRef(({
             disabled={view}
             iconLabel
             popupPosition="bottom left"
-            showPopup={true}
+            showPopup
             popupContent="Introduce el email del usuario."
           />
           <DropdownControlled
-            width={(!isUpdating && view) ? "fit-content" : "25%"}
+            width="25%"
             name="role"
             label="Rol"
             icon={(!isUpdating && view) ? null : undefined}

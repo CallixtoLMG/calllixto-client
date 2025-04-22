@@ -7,7 +7,7 @@ export const TagsTooltip = ({ tags, tooltip }) => {
   if (!tags || tags.length === 0) return null;
 
   return (
-    <Flex columnGap="7px" alignItems="center">
+    <Flex $columnGap="7px" $alignItems="center">
       <Popup
         size="mini"
         trigger={
@@ -25,14 +25,14 @@ export const TagsTooltip = ({ tags, tooltip }) => {
           hoverable
           trigger={<Icon tooltip={tooltip} margin="0" name={ICONS.TAGS} color={COLORS.BLUE} />}
           content={
-            <Flex columnGap="5px" >
+            <Flex $columnGap="5px" >
               {validTags.slice(1).map((tag) => (
                 tag?.description
                   ? <Popup
                     key={tag.name}
                     size="mini"
                     trigger={
-                      <Label size="mini" color={tag.color}>
+                      <Label size="mini" color={tag?.color}>
                         {tag.name}
                       </Label>
                     }

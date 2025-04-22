@@ -3,10 +3,10 @@ import { Header, Image as SImage } from "semantic-ui-react";
 import styled from "styled-components";
 
 const SectionContainer = styled(Flex)`
-  flex-direction: ${({ flexDirection }) => flexDirection};
+  flex-direction: ${({ $flexDirection }) => $flexDirection};
   justify-content: space-between;
-  min-height: ${({ minHeight = '35px' }) => minHeight};
-  align-items: ${({ alignItems = "center" }) => alignItems};
+  min-height: ${({ $minHeight = '35px' }) => $minHeight};
+  align-items: ${({ $alignItems = "center" }) => $alignItems};
 
   & > * {
     flex: 1;
@@ -23,13 +23,13 @@ const Title = styled(Header)`
   margin: 0!important;
   color: ${({ color }) => color ? "rgba(235,124,21,255)" : "black"} !important;
   align-content: center;
-  align-self: ${({ alignSelf = "center" }) => alignSelf} !important;
-  text-align: ${({ textAlign }) => textAlign || "right"} !important;
-  text-align-last: ${({ textAlignLast }) => textAlignLast || ""};
+  align-self: ${({ $alignSelf = "center" }) => $alignSelf} !important;
+  text-align: ${({ $textAlign }) => $textAlign || "right"} !important;
+  text-align-last: ${({ $textAlignLast }) => $textAlignLast || ""};
   text-decoration: ${({ $cancelled }) => $cancelled ? 'line-through' : 'none'};
   width: ${({ width }) => width || "auto"}!important;
   font-weight: ${({ $slim }) => $slim ? 'normal' : "bold"} !important;
-  min-height: ${({ minHeight }) => minHeight || ""};
+  min-height: ${({ $minHeight }) => $minHeight || ""};
   min-width: ${({ minWidth }) => minWidth || ""};
 `;
 

@@ -61,7 +61,7 @@ export const PriceField = ({
     <FormField
       disabled={disabled}
       label={label}
-      width={width}
+      $width={width}
       control={Input}
       error={error}
     >

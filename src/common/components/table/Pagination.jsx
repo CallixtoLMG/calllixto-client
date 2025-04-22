@@ -13,7 +13,7 @@ const Pagination = ({
   onPageSizeChange,
 }) => {
   return (
-    <PaginationContainer justifyContent="space-between" center>
+    <PaginationContainer $justifyContent="space-between">
       <ElementCounter
         fontWeight
         currentPage={activePage}
@@ -41,8 +41,10 @@ const Pagination = ({
             onChange={onPageSizeChange}
             selection
             compact
-            boxShadow
+            $boxShadow
             height="40px"
+            width="110px"
+            $textAlign="center"
           />
         )}
         position="left center"

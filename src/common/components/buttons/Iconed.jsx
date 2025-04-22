@@ -1,4 +1,3 @@
-import { COLORS } from '@/common/constants';
 import { forwardRef } from 'react';
 import { Icon } from 'semantic-ui-react';
 import { Button } from '../custom';
@@ -6,7 +5,7 @@ import { Button } from '../custom';
 const IconedButton = forwardRef(({
   text,
   icon,
-  color = COLORS.BLUE,
+  color,
   onClick,
   basic,
   disabled,
@@ -16,17 +15,19 @@ const IconedButton = forwardRef(({
   submit,
   position,
   alignSelf,
-  onKeyDown
+  onKeyDown,
+  padding
 }, ref) => {
   return (
     <Button
       size="small"
       icon
-      alignSelf={alignSelf}
+      $alignSelf={alignSelf}
       labelPosition="left"
       position={position}
       basic={basic}
       width={width}
+      padding={padding}
       height={height}
       color={color}
       onClick={onClick}

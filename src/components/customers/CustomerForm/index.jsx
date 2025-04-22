@@ -34,7 +34,7 @@ const CustomerForm = forwardRef(({
 
   useEffect(() => {
     refetchCustomersSettings();
-  }, []);
+  }, [refetchCustomersSettings]);
 
   const handleCreate = (data) => {
     const { previousVersions, ...filteredData } = data;

@@ -124,7 +124,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         value: (product) => (
           <Container>
             {product.name} {product.fractionConfig?.active && `x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}`}
-            <Flex marginLeft="7px">
+            <Flex $marginLeft="7px">
               {product.comments && <CommentTooltip comment={product.comments} />}
               {isProductOOS(product.state) && (
                 <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
@@ -178,10 +178,10 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             </Message>
           </Flex>
         )}
-        <Flex justifyContent="space-between">
+        <Flex $justifyContent="space-between">
           <FieldsContainer>
             <FormField
-              width="300px"
+              $width="300px"
               label="Vendedor"
               control={Input}
               value={budget?.seller}
@@ -190,7 +190,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             />
             {budgetState && (
               <FormField
-                width="300px"
+                $width="300px"
                 label={budgetState.label}
                 control={Input}
                 value={budgetState.person}
@@ -220,7 +220,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         </Flex>
         <FieldsContainer>
           <FormField
-            width="300px"
+            $width="300px"
             label="Cliente"
             control={Input}
             value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
@@ -289,7 +289,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           (isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state)) && (
             <>
               {isBudgetConfirmed(budget?.state) &&
-                <Flex justifyContent="space-between">
+                <Flex $justifyContent="space-between">
                   {toggleButton}
                 </Flex>}
               <FormProvider {...methods}>
@@ -311,7 +311,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         <FormField
           control={TextArea}
           label="Comentarios"
-          width="100%"
+          $width="100%"
           placeholder="Comentarios"
           value={budget?.comments}
           readOnly
@@ -320,7 +320,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         <FormField
           control={Input}
           label="Métodos de pago"
-          width="100%"
+          $width="100%"
           value={formattedPaymentMethods}
           readOnly
           disabled

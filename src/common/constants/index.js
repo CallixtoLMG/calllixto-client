@@ -136,7 +136,6 @@ export const COLORS = {
   BLUE: 'blue',
   ORANGE: 'orange',
   GREY: 'grey',
-  SOFT_GREY: 'softgrey',
   BROWN: 'brown',
   TEAL: 'teal',
   YELLOW: "yellow"

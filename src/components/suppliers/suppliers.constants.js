@@ -19,11 +19,11 @@ export const SUPPLIERS_COLUMNS = [
     title: "Nombre",
     align: "left",
     value: (supplier) =>
-      <Flex justifyContent="space-between">
+      <Flex $justifyContent="space-between">
         <OverflowWrapper maxWidth="40vw" popupContent={supplier.name}>
           {supplier.name}
         </OverflowWrapper>
-        {supplier.comments && <CommentTooltip tooltip comment={supplier.comments} />}
+        {supplier.comments && <CommentTooltip tooltip="true" comment={supplier.comments} />}
       </Flex>
   },
   {
@@ -33,7 +33,7 @@ export const SUPPLIERS_COLUMNS = [
     value: (supplier) => {
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(supplier.addresses || []);
       return (
-        <Flex justifyContent="space-between">
+        <Flex $justifyContent="space-between">
           {primaryAddress}
           {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
         </Flex>
@@ -47,7 +47,7 @@ export const SUPPLIERS_COLUMNS = [
     value: (supplier) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(supplier.phoneNumbers);
       return (
-        <Flex justifyContent="space-between">
+        <Flex $justifyContent="space-between">
           {primaryPhone}
           {additionalPhones && <PhonesTooltip phones={additionalPhones} />}
         </Flex>
@@ -80,7 +80,7 @@ export const SUPPLIER_STATES_OPTIONS = Object.values(SUPPLIER_STATES)
   .map(({ id, title, color }) => ({
     key: id,
     text: (
-      <Flex alignItems="center" justifyContent="space-between">
+      <Flex $alignItems="center" $justifyContent="space-between">
         {title}&nbsp;<Label width="fit-content" color={color} circular empty />
       </Flex>
     ),

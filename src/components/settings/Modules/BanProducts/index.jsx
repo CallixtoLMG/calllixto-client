@@ -101,7 +101,7 @@ const Blacklist = () => {
   ], [handleRemoveCode]);
 
   return (
-    <Box marginBottom="5px">
+    <Box $marginBottom="5px">
       <Accordion fluid>
         <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
           <Icon name="dropdown" />
@@ -109,7 +109,7 @@ const Blacklist = () => {
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
           <Box>
-            <Flex width="100%" padding="0 10px 10px 10px!important" alignItems="flex-start" columnGap="15px">
+            <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
               <TextField
                 width="50%"
                 label="Código(s)"
@@ -138,7 +138,7 @@ const Blacklist = () => {
                 color={COLORS.GREEN}
                 type="button"
                 onClick={handleAddBlacklist}
-                marginTop="25px"
+                $marginTop="25px"
               />
             </Flex>
             <Table
@@ -148,8 +148,8 @@ const Blacklist = () => {
               mainKey={(item) => item}
               paginate={false}
               actions={actions}
-              tableHeight="40vh"
-              deleteButtonInside
+              $tableHeight="40vh"
+              $deleteButtonInside
             />
           </Box>
         </Accordion.Content>

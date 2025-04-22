@@ -1,6 +1,7 @@
 import { FormField, TextArea } from "@/common/components/custom";
+import { forwardRef } from "react";
 
-export const TextAreaField = ({
+export const TextAreaField = forwardRef(({
   width,
   label,
   placeholder,
@@ -8,7 +9,7 @@ export const TextAreaField = ({
   disabled,
   onChange,
   error
-}) => {
+}, ref) => {
   return (
     <FormField
       disabled={disabled}
@@ -20,6 +21,9 @@ export const TextAreaField = ({
       readOnly={disabled}
       onChange={onChange}
       error={error}
+      ref={ref}
     />
   );
-};
+});
+
+TextAreaField.displayName = 'TextAreaField';
