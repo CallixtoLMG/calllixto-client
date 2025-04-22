@@ -54,7 +54,7 @@ export const TextField = ({
   showPopup = false,
   popupContent,
   popupPosition = "top center",
-  readOnly
+  readOnly,
   textAlign
 }) => {
   const [isFocused, setIsFocused] = useState(false);
