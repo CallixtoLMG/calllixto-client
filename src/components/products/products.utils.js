@@ -53,10 +53,10 @@ export const isProductDeleted = (status) => {
   return status === PRODUCT_STATES.DELETED.id;
 };
 
-export const getPrice = (product) => {
-  const { fractionConfig, price } = product;
-  return fractionConfig?.active ? fractionConfig?.value * price : price;
-};
+export const getPrice = ({ fractionConfig, price }) =>
+  fractionConfig?.active && fractionConfig?.value != null
+    ? fractionConfig.value * price
+    : price;
 
 export const getTotal = (product) => {
   const price = getPrice(product);

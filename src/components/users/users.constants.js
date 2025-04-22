@@ -24,52 +24,51 @@ export const USER_COLUMNS = [
   {
     id: 1,
     title: "Usuario",
-    width: 3,
+    width: 1,
     align: "left",
     value: (user) =>
       <Flex justifyContent="space-between">
-        < OverflowWrapper maxWidth="15vw" popupContent={user.username} >
-          {user.username}
-        </OverflowWrapper >
+        <>
+          < OverflowWrapper position="top left" maxWidth="15vw" popupContent={user.username} >
+            {user.username}
+          </OverflowWrapper >
+        </>
         {user.comments && <CommentTooltip comment={user.comments} />}
       </Flex>
   },
   {
     id: 2,
-    title: "Nombre",
+    title: "Nombre y Apellido",
     align: "left",
     width: 3,
     value: (user) => (
-      < OverflowWrapper maxWidth="15vw" popupContent={user.firstName} >
-        {user.firstName}
-      </OverflowWrapper >)
+      <>
+        < OverflowWrapper maxWidth="30vw" popupContent={`${user.firstName} ${user.lastName}`} >
+          {user.firstName} {user.lastName}
+        </OverflowWrapper >
+      </>
+    )
   }, {
     id: 3,
-    title: "Apellido",
-    align: "left",
-    width: 3,
-    value: (user) => (
-      < OverflowWrapper maxWidth="15vw" popupContent={user.lastName} >
-        {user.lastName}
-      </OverflowWrapper >)
-  }, {
-    id: 4,
     title: "Direccion",
-    width: 3,
+    width: 1,
     align: "left",
     value: (user) => (
-      < OverflowWrapper maxWidth="20vw" popupContent={user.address} >
-        {user.address}
-      </OverflowWrapper >)
+      <>
+        < OverflowWrapper maxWidth="20vw" popupContent={user.address} >
+          {user.address}
+        </OverflowWrapper >
+      </>
+    )
   },
   {
-    id: 5,
+    id: 4,
     title: "Teléfono",
-    width: 2,
+    width: 1,
     value: (user) => getFormatedPhone(user.phoneNumber)
   },
   {
-    id: 6,
+    id: 5,
     title: "Nacimiento",
     width: 1,
     value: (user) => getFormatedDate(user.birthDate, DATE_FORMATS.ONLY_DATE)

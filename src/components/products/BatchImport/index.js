@@ -304,6 +304,7 @@ const BatchImport = ({ isCreating }) => {
           `Los productos se han ${isCreating ? "creado" : "actualizado"} con éxito!`
         )
         handleModalClose();
+        refetchProducts();
       } else {
         toast.error(response.error.message);
       }

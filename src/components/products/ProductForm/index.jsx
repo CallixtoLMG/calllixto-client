@@ -26,10 +26,11 @@ const ProductForm = forwardRef(({
     fractionConfig: {
       active: false,
       unit: MEASSURE_UNITS.MT.value,
+      value: 1
     },
     editablePrice: false,
-    supplier: product?.supplier ?? null,
-    brand: product?.brand ?? null,
+    supplier: product?.supplier ? { id: product.supplier, state: product.supplierState } : null,
+    brand: product?.brand ? { id: product.brand, state: product.brandState } : null,
     ...product,
   });
 
@@ -71,13 +72,12 @@ const ProductForm = forwardRef(({
     }
 
     if (!isUpdating) {
-      filteredData.code = `${data.supplier}${data.brand}${data.code.toUpperCase()}`;
+      filteredData.code = `${data.supplier?.id ?? ''}${data.brand?.id ?? ''}${data.code.toUpperCase()}`;
       delete filteredData.supplier;
       delete filteredData.brand;
     }
 
     await onSubmit(filteredData);
-    reset(filteredData);
   };
 
   useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
@@ -86,7 +86,7 @@ const ProductForm = forwardRef(({
   const supplierOptions = useMemo(() => {
     return suppliers?.map(({ id, name, state, deactivationReason }) => ({
       key: id,
-      value: id,
+      value: { id, state },
       text: name,
       content: (
         <Flex justifyContent="space-between" alignItems="center">
@@ -111,7 +111,7 @@ const ProductForm = forwardRef(({
   const brandOptions = useMemo(() => {
     return brands?.map(({ id, name, state, deactivationReason }) => ({
       key: id,
-      value: id,
+      value: { id, state },
       text: name,
       content: (
         <Flex justifyContent="space-between" alignItems="center">
@@ -155,14 +155,32 @@ const ProductForm = forwardRef(({
                 width="25%"
                 name="supplier"
                 label="Proveedor"
-                rules={RULES.REQUIRED}
+                rules={{
+                  validate: {
+                    required: value => {
+                      return !!value?.id || 'Campo requerido.';
+                    },
+                    activeSupplier: value => {
+                      return value?.state === SUPPLIER_STATES.ACTIVE.id || 'No es posible usar un proveedor inactivo.';
+                    },
+                  }
+                }}
                 options={supplierOptions}
               />
               <DropdownControlled
                 width="25%"
                 name="brand"
                 label="Marca"
-                rules={RULES.REQUIRED}
+                rules={{
+                  validate: {
+                    required: value => {
+                      return !!value?.id || 'Campo requerido.';
+                    },
+                    activeBrand: value => {
+                      return value?.state === BRAND_STATES.ACTIVE.id || 'No es posible usar una marca inactiva.';
+                    },
+                  }
+                }}
                 options={brandOptions}
               />
               <TextControlled
@@ -180,7 +198,7 @@ const ProductForm = forwardRef(({
                 }}
                 onChange={value => value.toUpperCase()}
                 disabled={isProductDeleted(product?.state)}
-                iconLabel={`${watchSupplier ?? ''} ${watchBrand ?? ''}`}
+                iconLabel={`${watchSupplier?.id ?? ''} ${watchBrand?.id ?? ''}`}
               />
             </>
           )}
@@ -191,7 +209,6 @@ const ProductForm = forwardRef(({
             name="name"
             label="Nombre"
             rules={RULES.REQUIRED}
-            onChange={value => value.toUpperCase()}
             disabled={!isUpdating && view}
           />
         </FieldsContainer>

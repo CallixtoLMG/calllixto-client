@@ -2,6 +2,7 @@ import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
 import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
+import { validateEmail } from "@/common/utils";
 import { getPastDate } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { forwardRef, useImperativeHandle } from "react";
@@ -18,6 +19,10 @@ const UserForm = forwardRef(({
     ...user,
     role: user?.role || USERS_ROLE_OPTIONS.find(option => option.value === "user")?.value,
     birthDate: user?.birthDate ? new Date(user.birthDate) : getPastDate(18, "years"),
+    phoneNumber: {
+      areaCode: user?.phoneNumber?.areaCode ?? '',
+      number: user?.phoneNumber?.number ?? '',
+    },
   });
 
   const methods = useForm({
@@ -48,7 +53,12 @@ const UserForm = forwardRef(({
             name="username"
             label="Usuario"
             placeholder="nombre@empresa.com"
-            rules={RULES.REQUIRED}
+            rules={{
+              required: "Este campo es obligatorio.",
+              validate: {
+                email: (value) => validateEmail(value) || "El correo electrónico no es válido.",
+              },
+            }}
             disabled={view}
             iconLabel
             popupPosition="bottom left"
@@ -73,7 +83,6 @@ const UserForm = forwardRef(({
             label="Nombre"
             placeholder="Nombre"
             rules={RULES.REQUIRED}
-            onChange={value => value.toUpperCase()}
             disabled={!isUpdating && view}
           />
           <TextControlled
@@ -82,7 +91,6 @@ const UserForm = forwardRef(({
             label="Apellido"
             placeholder="Apellido"
             rules={RULES.REQUIRED}
-            onChange={value => value.toUpperCase()}
             disabled={!isUpdating && view}
           />
           <DatePickerControlled

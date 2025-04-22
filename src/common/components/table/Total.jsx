@@ -67,7 +67,7 @@ export const Total = ({
           <PercentField
             value={globalDiscount}
             onChange={onGlobalDiscountChange}
-            width="85px"
+            width="100px"
           />
         )
       },
@@ -83,7 +83,7 @@ export const Total = ({
           <PercentField
             value={additionalCharge}
             onChange={onAdditionalChargeChange}
-            width="85px"
+            width="100px"
           />
         )
       }

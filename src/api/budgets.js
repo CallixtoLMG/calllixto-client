@@ -28,8 +28,8 @@ export function useGetBudget(id) {
       const budget = data?.budget
         ? {
           ...data.budget,
-          globalDiscount: data.budget.globalDiscount || 0,
-          additionalCharge: data.budget.additionalCharge || 0
+          globalDiscount: data.budget.globalDiscount ?? 0,
+          additionalCharge: data.budget.additionalCharge ?? 0
         }
         : null;
 

@@ -5,7 +5,7 @@ import { IconedButton } from "../../buttons";
 
 const UnsavedChangesModal = ({ open, onSave, onDiscard, isSaving, onCancel }) => (
   <Transition visible={open} animation="scale" duration={500}>
-    <Modal width="50%" open={open} onClose={isSaving ? null : onDiscard}>
+    <Modal width="50%" open={open} onClose={isSaving ? null : onCancel}>
       <Modal.Header>Existen cambios sin guardar!</Modal.Header>
       <Modal.Content>¿Deseás guardar los cambios antes de salir del modo edición?</Modal.Content>
       <Modal.Actions>
