@@ -206,7 +206,6 @@ export const Button = styled(SButton)`
     font-size: 13.5px !important;
     width: ${({ width = '110px' }) => `${width}!important`} ;
     padding-left: ${({ $paddingLeft = '40px' }) => `${$paddingLeft}!important`} ;
-    // padding: ${({ padding }) => padding && "0 18px 0 40px"}!important ;
     padding: ${({ padding }) => padding ? padding : "0 18px 0 40px"}!important ;
     margin-right: 0;
     position: ${({ position }) => `${position}!important`} ;

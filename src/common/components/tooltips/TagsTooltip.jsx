@@ -27,7 +27,7 @@ export const TagsTooltip = ({ tags, tooltip }) => {
           content={
             <Flex $columnGap="5px" >
               {validTags.slice(1).map((tag) => (
-                tag??.description
+                tag?.description
                   ? <Popup
                     key={tag.name}
                     size="mini"

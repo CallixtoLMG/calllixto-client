@@ -57,7 +57,7 @@ const ProductForm = forwardRef(({
 
   useEffect(() => {
     refetchProductSettings();
-  }, []);
+  }, [refetchProductSettings]);
 
   const handleForm = async (data) => {
     const filteredData = { ...data };

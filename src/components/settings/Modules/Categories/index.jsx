@@ -117,7 +117,6 @@ const Categories = () => {
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
                 onChange={handleNameChange}
                 error={error}
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
               />
               <DropdownField
                 flex={1}

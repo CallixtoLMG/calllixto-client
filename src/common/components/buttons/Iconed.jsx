@@ -15,7 +15,8 @@ const IconedButton = forwardRef(({
   submit,
   position,
   alignSelf,
-  onKeyDown
+  onKeyDown,
+  padding
 }, ref) => {
   return (
     <Button
