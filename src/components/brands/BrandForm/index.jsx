@@ -2,7 +2,6 @@ import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
 import { TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
-import { preventSend } from "@/common/utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -13,7 +12,7 @@ const BrandForm = forwardRef(({
 }, ref) => {
   const getInitialValues = (brand) => ({ ...EMPTY_BRAND, ...brand });
   const methods = useForm({
-    defaultValues:getInitialValues(brand)
+    defaultValues: getInitialValues(brand)
   });
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
@@ -27,12 +26,27 @@ const BrandForm = forwardRef(({
     reset(data);
   };
 
-  useKeyboardShortcuts(handleSubmit(handleForm), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset(getInitialValues(brand)), SHORTKEYS.DELETE);
+  const validateShortcuts = {
+    canConfirm: () => !isLoading && isDirty,
+    canReset: () => isDirty,
+  };
+
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: handleSubmit(handleForm),
+      condition: validateShortcuts.canConfirm,
+    },
+    {
+      key: SHORTKEYS.DELETE,
+      action: () => reset(getInitialValues(brand)),
+      condition: validateShortcuts.canReset,
+    }
+  ]);
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
+      <Form onSubmit={handleSubmit(handleForm)}>
         <FieldsContainer>
           <TextControlled
             width="150px"

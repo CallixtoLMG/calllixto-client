@@ -15,7 +15,7 @@ const IconedButton = forwardRef(({
   submit,
   position,
   alignSelf,
-  padding
+  onKeyDown
 }, ref) => {
   return (
     <Button
@@ -33,6 +33,7 @@ const IconedButton = forwardRef(({
       disabled={disabled}
       loading={loading}
       type={submit ? 'submit' : 'button'}
+      onKeyDown={onKeyDown}
       ref={ref}
     >
       <Icon name={icon} />
@@ -41,6 +42,6 @@ const IconedButton = forwardRef(({
   );
 });
 
-export default IconedButton;
-
 IconedButton.displayName = 'IconedButton';
+
+export default IconedButton;

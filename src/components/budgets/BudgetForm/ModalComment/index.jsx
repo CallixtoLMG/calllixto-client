@@ -2,13 +2,23 @@ import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, Form } from "@/common/components/custom";
 import { TextControlled, TextField } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 
 const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
   const methods = useForm();
   const { handleSubmit, formState: { isDirty }, reset } = methods;
+  const commentInputRef = useRef(null);
+
+  useEffect(() => {
+    if (isModalOpen) {
+      const timeout = setTimeout(() => {
+        commentInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     reset({ dispatchComment: '', ...product });
@@ -27,15 +37,16 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
             <FormProvider {...methods}>
               <Form onSubmit={handleSubmit(onAddComment)}>
                 <FieldsContainer>
-                  <TextField flex="1" label="Código" placeholder={product?.code} disabled />
-                  <TextField flex="1" label="Nombre" placeholder={product?.name} disabled />
-                  <TextField width="100px" label="Cantidad" placeholder={product?.quantity} disabled />
+                  <TextField flex="1" label="Código" placeholder={product?.code} readOnly/>
+                  <TextField flex="1" label="Nombre" placeholder={product?.name} readOnly />
+                  <TextField width="100px" label="Cantidad" placeholder={product?.quantity} readOnly />
                 </FieldsContainer>
                 <FieldsContainer>
                   <TextControlled
                     flex="1"
                     name="dispatchComment"
                     placeholder="Comentario"
+                    ref={commentInputRef}
                   />
                 </FieldsContainer>
               </Form>

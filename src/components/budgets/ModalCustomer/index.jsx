@@ -11,27 +11,44 @@ import { Modal, Transition } from "semantic-ui-react";
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm({ defaultValues: customer });
-  const { handleSubmit, reset } = methods;
+  const { handleSubmit, reset, watch } = methods;
+  const addressRefInputRef = useRef(null);
   const formRef = useRef(null);
+  const inputRef = useRef(null);
   const editCustomer = useEditCustomer();
+
+  const watchedAreaCode = watch('areaCode');
+  const watchedNumber = watch('number');
+
+
+  useEffect(() => {
+    if (isModalOpen) {
+      const timeout = setTimeout(() => {
+        addressRefInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [isModalOpen]);
+
   useEffect(() => {
     reset(customer);
   }, [customer, isModalOpen, reset]);
 
-  const inputRef = useRef(null);
   useEffect(() => {
     if (isModalOpen) {
       inputRef.current?.focus();
     }
   }, [isModalOpen]);
 
-  const handleEdit = async ({ ref, address, areaCode, number }) => {
+  const handleEdit = async ({ refA, refP, address, areaCode, number }) => {
     const data = {
+      id: customer.id,
       addresses: [{
-        ref,
+        ref: refA,
         address
       }],
       phoneNumbers: [{
+        ref: refP,
         areaCode,
         number
       }]
@@ -71,12 +88,17 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
           <FormProvider {...methods}>
             <Form ref={formRef} onSubmit={handleSubmit(handleEdit)}>
               <FieldsContainer>
-                <TextField flex="1" label="Nombre" value={customer?.name} />
-                <TextControlled
+                <TextField
                   flex="1"
-                  name="ref"
+                  label="Nombre"
+                  value={customer?.name}
+                />
+                <TextControlled
+                  width="30%"
+                  name="refA"
                   rules={RULES.REQUIRED}
                   label="Referencia"
+                  ref={addressRefInputRef}
                 />
                 <TextControlled
                   flex="1"
@@ -84,17 +106,43 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   rules={RULES.REQUIRED}
                   label="Dirección"
                 />
-                <NumberControlled
-                  width="60px"
-                  label="Area"
-                  name="areaCode"
+              </FieldsContainer>
+              <FieldsContainer>
+                <TextControlled
+                  width="30%"
+                  name="refP"
                   rules={RULES.REQUIRED}
+                  label="Referencia de teléfono"
                 />
                 <NumberControlled
-                  width="100px"
-                  label="Número"
+                  width="130px"
+                  label="Código de área"
+                  placeholder="Ej: 011"
+                  name="areaCode"
+                  maxLength="4"
+                  rules={{
+                    required: "El código de área es requerido.",
+                    validate: (value) => {
+                      const number = watchedNumber || '';
+                      return (value + number).length === 10 || "El área y el número deben sumar 10 dígitos.";
+                    },
+                  }}
+                  normalMode
+                />
+                <NumberControlled
+                  width="150px"
+                  label="Número de teléfono"
                   name="number"
-                  rules={RULES.REQUIRED}
+                  placeholder="Ej: 12345678"
+                  rules={{
+                    required: "El número de teléfono es requerido.",
+                    validate: (value) => {
+                      const areaCode = watchedAreaCode || '';
+                      return (areaCode + value).length === 10 || "El área y el número deben sumar 10 dígitos.";
+                    },
+                  }}
+                  maxLength="7"
+                  normalMode
                 />
               </FieldsContainer>
             </Form>

@@ -3,11 +3,12 @@ import { useEditSetting, useListSettings } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
-import { ENTITIES, PAGES } from "@/common/constants";
+import { ENTITIES, PAGES, SHORTKEYS } from "@/common/constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
 import { LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
 import { useRestoreEntity } from "@/hooks/common";
+import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useUnsavedChanges } from "@/hooks/unsavedChanges";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
@@ -40,7 +41,6 @@ const Settings = () => {
   const editSetting = useEditSetting();
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm();
-
   const formRef = useRef(null);
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   const [activeEntity, setActiveEntity] = useState(null);
@@ -142,6 +142,24 @@ const Settings = () => {
       handleEntityChange(settings[0]);
     }
   }, [settings, activeEntity, handleEntityChange]);
+
+  const validateShortcuts = {
+    canConfirm: () => !isPending && isDirty,
+    canReset: () => isDirty,
+  };
+
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: handleSubmit(mutateEdit),
+      condition: validateShortcuts.canConfirm,
+    },
+    {
+      key: SHORTKEYS.DELETE,
+      action: () => reset(data[activeEntity]),
+      condition: validateShortcuts.canReset,
+    }
+  ]);
 
   return (
     <FormProvider {...methods}>

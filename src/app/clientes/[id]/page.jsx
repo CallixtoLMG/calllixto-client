@@ -33,6 +33,7 @@ const Customer = ({ params }) => {
   const deleteCustomer = useDeleteCustomer();
   const inactiveCustomer = useInactiveCustomer();
   const activeCustomer = useActiveCustomer();
+  const reasonInputRef = useRef(null);
   const formRef = useRef(null);
   const {
     showModal: showUnsavedModal,
@@ -58,7 +59,7 @@ const Customer = ({ params }) => {
     onBeforeView,
   });
   const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
-  
+
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,12 +106,12 @@ const Customer = ({ params }) => {
     () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
     [handleProtectedAction, handleOpenModalWithAction],
   );
-  
+
   const handleInactiveClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
     [handleProtectedAction, handleOpenModalWithAction],
   );
-  
+
   const handleDeleteClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction(DELETE)),
     [handleProtectedAction, handleOpenModalWithAction],
@@ -122,7 +123,7 @@ const Customer = ({ params }) => {
       if (response.statusOk) {
         toast.success("Cliente actualizado!");
         setIsUpdating(false);
-        resolveSave(); 
+        resolveSave();
       } else {
         toast.error(response.error.message);
       }
@@ -262,7 +263,7 @@ const Customer = ({ params }) => {
         open={showUnsavedModal}
         onDiscard={handleDiscard}
         onSave={handleSave}
-        onCancel={handleCancel} 
+        onCancel={handleCancel}
         isSaving={isSaving}
       />
       <ModalAction
@@ -275,9 +276,11 @@ const Customer = ({ params }) => {
         isLoading={isDeletePending || isInactivePending || isActivePending}
         noConfirmation={!requiresConfirmation}
         disableButtons={!reason && modalAction === INACTIVE}
+        reasonInputRef={reasonInputRef}
         bodyContent={
           modalAction === INACTIVE && (
             <TextField
+              ref={reasonInputRef}
               placeholder="Motivo"
               value={reason}
               onChange={(e) => setReason(e.target.value)}

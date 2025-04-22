@@ -2,14 +2,13 @@ import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
 import { ContactControlled, ContactView, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
-import { preventSend } from "@/common/utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_SUPPLIER } from "../suppliers.constants";
 
-const SupplierForm = forwardRef(({ 
-  supplier, onSubmit, isUpdating, isLoading, view, isDeletePending 
+const SupplierForm = forwardRef(({
+  supplier, onSubmit, isUpdating, isLoading, view, isDeletePending
 }, ref) => {
   const getInitialValues = (supplier) => ({ ...EMPTY_SUPPLIER, ...supplier });
   const methods = useForm({ defaultValues: getInitialValues(supplier) });
@@ -22,17 +21,32 @@ const SupplierForm = forwardRef(({
 
   const handleForm = async (data) => {
     await onSubmit(data);
-    reset(data); 
+    reset(data);
   };
 
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
 
-  useKeyboardShortcuts(handleSubmit(handleForm), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset(getInitialValues(supplier)), SHORTKEYS.DELETE);
+  const validateShortcuts = {
+    canConfirm: () => !isLoading && isDirty,
+    canReset: () => isDirty,
+  };
+
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: handleSubmit(handleForm),
+      condition: validateShortcuts.canConfirm,
+    },
+    {
+      key: SHORTKEYS.DELETE,
+      action: () => reset(getInitialValues(supplier)),
+      condition: validateShortcuts.canReset,
+    }
+  ]);
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
+      <Form onSubmit={handleSubmit(handleForm)}>
         <FieldsContainer>
           <TextControlled
             width="150px"

@@ -1,19 +1,20 @@
 
+import { forwardRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { TextField } from "./TextField";
 
-export const TextControlled = ({
+export const TextControlled = forwardRef(({
   name,
   width,
   rules,
   iconLabel,
-  showPopup = false, 
-  popupContent = "", 
+  showPopup = false,
+  popupContent = "",
   popupPosition,
   disabled,
   onChange = value => value,
   ...inputParams
-}) => {
+}, ref) => {
   const { formState: { errors } } = useFormContext();
   return (
     <Controller
@@ -24,6 +25,7 @@ export const TextControlled = ({
           {...rest}
           {...inputParams}
           width={width}
+          ref={ref}
           disabled={disabled}
           showPopup={showPopup}
           popupContent={popupContent}
@@ -41,6 +43,6 @@ export const TextControlled = ({
       )}
     />
   );
-};
+});
 
-
+TextControlled.displayName = 'TextControlled';

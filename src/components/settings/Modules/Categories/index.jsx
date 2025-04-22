@@ -1,7 +1,8 @@
-import { Box, Button, Flex } from "@/common/components/custom";
+import { Box, Button, Flex, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SEMANTIC_COLORS } from "@/common/constants";
+import { handleEnterKeyDown } from "@/common/utils";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Accordion, Icon, Label } from "semantic-ui-react";
@@ -33,13 +34,24 @@ const Categories = () => {
       title: "Categoria",
       align: "left",
       width: 5,
-      value: (category) => <Label color={category.color}>{category.name}</Label>,
+      value: (category) => (
+        <Label color={category.color}>
+          <OverflowWrapper maxWidth="40vw" popupContent={category.name}>
+            {category.name}
+          </OverflowWrapper>
+        </Label >)
     },
     {
       id: "description",
       title: "Descripción",
       align: "left",
-      value: (category) => <span>{category.description}</span>,
+      value: (category) => (
+        <span>
+          <OverflowWrapper maxWidth="40vw" popupContent={category.description}>
+            {category.description}
+          </OverflowWrapper>
+        </span>
+      ),
     },
   ];
 
@@ -60,6 +72,11 @@ const Categories = () => {
 
     if (!categoryToAdd.name.trim()) {
       setError("El nombre es obligatorio.");
+      return;
+    }
+
+    if (categoryToAdd.name.length > 50) {
+      setError("El nombre no debe superar los 50 caracteres.");
       return;
     }
 
@@ -97,8 +114,10 @@ const Categories = () => {
                 label="Nombre"
                 placeholder="Nombre de la categoria"
                 value={categoryToAdd.name}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
                 onChange={handleNameChange}
                 error={error}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
               />
               <DropdownField
                 flex={1}
@@ -113,6 +132,7 @@ const Categories = () => {
                 placeholder="Descripción"
                 value={categoryToAdd.description}
                 onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
               />
               <Button
                 size="small"

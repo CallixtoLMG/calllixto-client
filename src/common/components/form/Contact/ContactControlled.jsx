@@ -1,6 +1,6 @@
 import { COLORS, ICONS } from "@/common/constants";
-import { getFormatedPhone, validateEmail, validatePhone } from "@/common/utils";
-import { useState } from "react";
+import { getFormatedPhone, handleEnterKeyDown, handleEscapeKeyDown, validateEmail, validatePhone } from "@/common/utils";
+import { useEffect, useRef, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Form, Popup } from "semantic-ui-react";
 import { IconedButton } from "../../buttons";
@@ -14,10 +14,46 @@ const EMPTY_EMAIL = { ref: '', email: '' };
 
 export const ContactControlled = () => {
   const [error, setError] = useState();
+  const [openPhone, setOpenPhone] = useState(false);
+  const [openAddress, setOpenAddress] = useState(false);
+  const [openEmail, setOpenEmail] = useState(false);
   const [phoneToAdd, setPhoneToAdd] = useState(EMPTY_PHONE);
   const [addressToAdd, setAddressToAdd] = useState(EMPTY_ADDRESS);
   const [emailToAdd, setEmailToAdd] = useState(EMPTY_EMAIL);
   const { control } = useFormContext();
+  const phoneButtonRef = useRef(null);
+  const addressButtonRef = useRef(null);
+  const emailButtonRef = useRef(null);
+  const phoneInputRef = useRef(null);
+  const addressInputRef = useRef(null);
+  const emailInputRef = useRef(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (openPhone) setOpenPhone(false);
+        if (openAddress) setOpenAddress(false);
+        if (openEmail) setOpenEmail(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [openPhone, openAddress, openEmail]);
+
+  useEffect(() => {
+    if (openPhone && phoneInputRef.current) {
+      phoneInputRef.current.focus();
+    }
+    if (openAddress && addressInputRef.current) {
+      addressInputRef.current.focus();
+    }
+    if (openEmail && emailInputRef.current) {
+      emailInputRef.current.focus();
+    }
+  }, [openPhone, openAddress, openEmail]);
 
   const { fields: phoneFields, append: appendPhone, remove: removePhone } = useFieldArray({
     control,
@@ -95,7 +131,17 @@ export const ContactControlled = () => {
       <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
-            <Box width="fit-content">
+            <Box
+              width="fit-content"
+              tabIndex={0}
+              role="button"
+              ref={phoneButtonRef}
+              onClick={() => setOpenPhone(true)}
+              onKeyDown={(e) => {
+                handleEscapeKeyDown(e, () => setOpenPhone(false))
+                handleEnterKeyDown(e, () => setOpenPhone(true))
+              }}
+            >
               <IconedButton
                 text="Teléfono"
                 icon={ICONS.ADD}
@@ -103,12 +149,17 @@ export const ContactControlled = () => {
               />
             </Box>
           }
+          open={openPhone}
           on='click'
           onClose={() => {
             setPhoneToAdd(EMPTY_PHONE);
             setError();
+            setOpenPhone(false);
+            phoneButtonRef.current?.focus(); 
           }}
-          position='top left'>
+          closeOnDocumentClick
+          position='top left'
+        >
           <Form>
             <FieldsContainer width="60vw" $alignItems="center" $rowGap="5px">
               <FormField
@@ -118,7 +169,10 @@ export const ContactControlled = () => {
                 placeholder="Referencia"
                 value={phoneToAdd.ref}
                 onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'ref', e.target.value)}
-              />
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddPhone)}
+              >
+                <input ref={phoneInputRef} />
+              </FormField>
               <FormField
                 flex="1"
                 label="Área"
@@ -131,7 +185,12 @@ export const ContactControlled = () => {
                 maxLength="4"
                 placeholder="Área"
                 value={phoneToAdd.areaCode}
-                onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'areaCode', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateFieldToAdd(setPhoneToAdd, 'areaCode', value);
+                  if (validatePhone({ ...phoneToAdd, areaCode: value })) setError(undefined);
+                }}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddPhone)}
               />
               <FormField
                 flex="1"
@@ -145,7 +204,12 @@ export const ContactControlled = () => {
                 maxLength="7"
                 placeholder="Número"
                 value={phoneToAdd.number}
-                onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'number', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateFieldToAdd(setPhoneToAdd, 'number', value);
+                  if (validatePhone({ ...phoneToAdd, number: value })) setError(undefined);
+                }}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddPhone)}
               />
               <IconedButton
                 text="Agregar"
@@ -168,20 +232,34 @@ export const ContactControlled = () => {
       <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
-            <Box width="fit-content">
+            <Box
+              width="fit-content"
+              tabIndex={0}
+              role="button"
+              ref={addressButtonRef}
+              onClick={() => setOpenAddress(true)}
+              onKeyDown={(e) => {
+                handleEscapeKeyDown(e, () => setOpenAddress(false))
+                handleEnterKeyDown(e, () => setOpenAddress(true))
+              }}
+            >
               <IconedButton
                 text="Dirección"
                 icon={ICONS.ADD}
-                type="button"
                 color={COLORS.GREEN}
               />
             </Box>
           }
+          open={openAddress}
           on='click'
           onClose={() => {
             setAddressToAdd(EMPTY_ADDRESS);
+            setOpenAddress(false);
+            addressButtonRef.current?.focus();
           }}
-          position='top left'>
+          closeOnDocumentClick
+          position='top left'
+        >
           <Form>
             <FieldsContainer width="45vw" $alignItems="center" $rowGap="5px">
               <FormField
@@ -191,7 +269,10 @@ export const ContactControlled = () => {
                 placeholder="Referencia"
                 value={addressToAdd.ref}
                 onChange={(e) => updateFieldToAdd(setAddressToAdd, 'ref', e.target.value)}
-              />
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddAddress)}
+              >
+                <input ref={addressInputRef} />
+              </FormField>
               <FormField
                 flex="2"
                 label="Dirección"
@@ -203,7 +284,12 @@ export const ContactControlled = () => {
                 required
                 placeholder="Dirección"
                 value={addressToAdd.address}
-                onChange={(e) => updateFieldToAdd(setAddressToAdd, 'address', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateFieldToAdd(setAddressToAdd, 'address', value);
+                  if (value.trim()) setError(undefined);
+                }}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddAddress)}
               />
               <IconedButton
                 text="Agregar"
@@ -227,7 +313,17 @@ export const ContactControlled = () => {
       <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
-            <Box width="fit-content">
+            <Box
+              width="fit-content"
+              tabIndex={0}
+              role="button"
+              ref={emailButtonRef}
+              onClick={() => setOpenEmail(true)}
+              onKeyDown={(e) => {
+                handleEscapeKeyDown(e, () => setOpenEmail(false))
+                handleEnterKeyDown(e, () => setOpenEmail(true))
+              }}
+            >
               <IconedButton
                 text="Email"
                 icon={ICONS.ADD}
@@ -235,11 +331,16 @@ export const ContactControlled = () => {
               />
             </Box>
           }
+          open={openEmail}
           on='click'
           onClose={() => {
             setEmailToAdd(EMPTY_EMAIL);
+            setOpenEmail(false);
+            emailButtonRef.current?.focus();
           }}
-          position='top left'>
+          position='top left'
+          closeOnDocumentClick
+        >
           <Form>
             <FieldsContainer width="50vw" $alignItems="center" $rowGap="5px">
               <FormField
@@ -249,7 +350,10 @@ export const ContactControlled = () => {
                 placeholder="Referencia"
                 value={emailToAdd.ref}
                 onChange={(e) => updateFieldToAdd(setEmailToAdd, 'ref', e.target.value)}
-              />
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddEmail)}
+              >
+                <input ref={emailInputRef} />
+              </FormField>
               <FormField
                 flex="2"
                 label="Email"
@@ -261,7 +365,12 @@ export const ContactControlled = () => {
                 required
                 placeholder="Email"
                 value={emailToAdd.email}
-                onChange={(e) => updateFieldToAdd(setEmailToAdd, 'email', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateFieldToAdd(setEmailToAdd, 'email', value);
+                  if (validateEmail(value)) setError(undefined);
+                }}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddEmail)}
               />
               <IconedButton
                 text="Agregar"

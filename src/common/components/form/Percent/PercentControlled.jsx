@@ -24,8 +24,12 @@ export const PercentControlled = ({
           }}
           onBlur={() => {
             if (value !== '') {
-              const formattedValue = parseFloat(value).toFixed(2); 
-              onChange(formattedValue);
+              const numericValue = Number(value);
+              const fixedValue = numericValue.toFixed(2);
+          
+              if (numericValue !== Number(fixedValue)) {
+                onChange(Number(fixedValue));
+              }
             }
           }}
         />

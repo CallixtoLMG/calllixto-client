@@ -41,8 +41,25 @@ const UserForm = forwardRef(({
     reset(data);
   };
 
-  useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset(getInitialValues(user)), SHORTKEYS.DELETE);
+  const validateShortcuts = {
+    canConfirm: () => !isLoading && isDirty,
+    canReset: () => isDirty,
+  };
+
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: handleSubmit(handleCreate),
+      condition: validateShortcuts.canConfirm,
+    },
+    {
+      key: SHORTKEYS.DELETE,
+      action: () => reset(getInitialValues(user)),
+      condition: validateShortcuts.canReset,
+    }
+  ]);
+
+  
 
   return (
     <FormProvider {...methods}>

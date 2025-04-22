@@ -4,12 +4,11 @@ import { FieldsContainer, Flex, Form, Label, OverflowWrapper } from "@/common/co
 import { DropdownControlled, IconedButtonControlled, PercentField, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { Text } from "@/common/components/search/styles";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
-import { preventSend } from "@/common/utils";
 import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useArrayTags } from "@/hooks/arrayTags";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { forwardRef, useImperativeHandle, useMemo } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
@@ -26,6 +25,7 @@ const ProductForm = forwardRef(({
     fractionConfig: {
       active: false,
       unit: MEASSURE_UNITS.MT.value,
+      value: 1
     },
     editablePrice: false,
     supplier: product?.supplier ? { id: product.supplier, state: product.supplierState } : null,
@@ -36,8 +36,11 @@ const ProductForm = forwardRef(({
   const methods = useForm({
     defaultValues: getInitialValues(product)
   });
-  const { data: productsSettings, isFetching: isProductSettingsFetching } = useGetSetting(ENTITIES.PRODUCTS);
-  const { tagsOptions, optionsMapper } = useArrayTags(ENTITIES.PRODUCTS, productsSettings);
+  const { data: productsSettings, isFetching: isProductSettingsFetching, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
+  const { tagsOptions, optionsMapper } = useArrayTags(
+    ENTITIES.PRODUCTS,
+    product?.tags || []
+  );
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
@@ -51,6 +54,10 @@ const ProductForm = forwardRef(({
     'cost',
     'price',
   ]);
+
+  useEffect(() => {
+    refetchProductSettings();
+  }, []);
 
   const handleForm = async (data) => {
     const filteredData = { ...data };
@@ -72,8 +79,23 @@ const ProductForm = forwardRef(({
     await onSubmit(filteredData);
   };
 
-  useKeyboardShortcuts(() => handleSubmit(handleForm)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset(getInitialValues(product)), SHORTKEYS.DELETE);
+  const validateShortcuts = {
+    canConfirm: () => !isLoading && isDirty,
+    canReset: () => isDirty,
+  };
+
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: handleSubmit(handleForm),
+      condition: validateShortcuts.canConfirm,
+    },
+    {
+      key: SHORTKEYS.DELETE,
+      action: () => reset(getInitialValues(product)),
+      condition: validateShortcuts.canReset,
+    }
+  ]);
 
   const supplierOptions = useMemo(() => {
     return suppliers?.map(({ id, name, state, deactivationReason }) => ({
@@ -127,8 +149,8 @@ const ProductForm = forwardRef(({
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
-        <FieldsContainer $rowGap="5px">
+      <Form onSubmit={handleSubmit(handleForm)}>
+        <FieldsContainer rowGap="5px">
           {view ? (
             <>
               <TextField width="25%" label="Proveedor" value={product?.supplierName} disabled />

@@ -3,7 +3,7 @@ import { ButtonsContainer } from "@/common/components/custom";
 import { COLORS, ICONS } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Message, Modal, Transition } from "semantic-ui-react";
 import { MessageHeader, MessageItem } from "./styles";
 
@@ -15,6 +15,17 @@ const ModalUpdates = ({
   onCancel,
   onConfirm
 }) => {
+  const confirmButtonRef = useRef(null);
+
+  useEffect(() => {
+    if (shouldShowModal) {
+      const timeout = setTimeout(() => {
+        confirmButtonRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [shouldShowModal]);
+
   const messageItems = useMemo(() => (
     outdatedProducts.map(p => {
       const oldProduct = budget.products.find(op => op.code === p.code);
@@ -111,6 +122,7 @@ const ModalUpdates = ({
               icon={ICONS.CHECK}
               color={COLORS.GREEN}
               onClick={onConfirm}
+              ref={confirmButtonRef}
             />
           </ButtonsContainer>
         </Modal.Actions>

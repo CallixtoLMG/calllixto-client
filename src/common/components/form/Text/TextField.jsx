@@ -48,13 +48,14 @@ export const TextField = forwardRef(({
   value,
   disabled,
   onChange,
-  onKeyPress,
+  onKeyDown,
   maxLength,
   error,
   showPopup = false,
   popupContent,
   popupPosition = "top center",
-  textAlign
+  readOnly,
+  textAlign,
 }, ref) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -111,15 +112,16 @@ export const TextField = forwardRef(({
           {...(iconLabel && { labelPosition: 'left' })}
           value={value}
           onChange={onChange}
+          readOnly={readOnly}
           maxLength={maxLength}
-          onKeyPress={onKeyPress}
+          onKeyDown={onKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           $iconLabel={iconLabel}
           ref={ref}
         >
           {iconLabel && showIconLabel()}
-          <input />
+          <input ref={ref}/>
         </Input>
       )}
     </FormField>

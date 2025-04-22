@@ -24,6 +24,7 @@ const ModalAction = ({
   requireReason = false,
   warning,
   reason = '',
+  reasonInputRef
 }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isActionEnabled, setIsActionEnabled] = useState(false);
@@ -36,6 +37,15 @@ const ModalAction = ({
     }
     setConfirmationText('');
   }, [showModal, noConfirmation]);
+
+  useEffect(() => {
+    if (showModal && reasonInputRef?.current) {
+      const timeout = setTimeout(() => {
+        reasonInputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timeout);
+    }
+  }, [showModal, reasonInputRef]);
 
   useEffect(() => {
     const isReasonValid = requireReason ? reason.trim().length > 0 : true;

@@ -3,21 +3,28 @@ import { useEffect } from 'react';
 export const useKeyboardShortcuts = (shortcuts, key = '') => {
   useEffect(() => {
     const handleKeyDown = (event) => {
-      let action;
+      const keyCombo = `${event.ctrlKey ? 'Control+' : ''}${event.altKey ? 'Alt+' : ''}${event.key}`;
 
-      if (typeof shortcuts === 'function') {
-        const keyCombo = `${event.ctrlKey ? 'Control+' : ''}${event.altKey ? 'Alt+' : ''}${event.key}`;
-        if (keyCombo === key) {
-          event.preventDefault();
-          action = shortcuts;
+      let action;
+      let conditionFn = () => true; 
+
+      if (Array.isArray(shortcuts)) {
+        const shortcut = shortcuts.find(s => s.key === keyCombo);
+        if (shortcut) {
+          action = shortcut.action;
+          conditionFn = shortcut.condition || (() => true);
         }
       }
-      if (typeof shortcuts === 'object') {
-        const keyCombo = `${event.ctrlKey ? 'Control+' : ''}${event.altKey ? 'Alt+' : ''}${event.key}`;
+
+      if (typeof shortcuts === 'object' && !Array.isArray(shortcuts)) {
         action = shortcuts[keyCombo];
       }
 
-      if (action) {
+      if (typeof shortcuts === 'function' && keyCombo === key) {
+        action = shortcuts;
+      }
+
+      if (action && conditionFn()) {
         event.preventDefault();
         action();
       }
