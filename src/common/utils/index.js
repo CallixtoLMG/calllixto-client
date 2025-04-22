@@ -83,6 +83,13 @@ export const handleKeyPressWithSubmit = (e, isActionEnabled, isLoading, handleSu
   }
 };
 
+export const handleEscapeKeyDown = (e, action) => {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    action(e);
+  }
+};
+
 export const validateEmail = (email) => {
   return REGEX.EMAIL.test(email);
 };

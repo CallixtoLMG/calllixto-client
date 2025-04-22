@@ -118,6 +118,7 @@ const Tags = () => {
                 onChange={handleNameChange}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
                 error={error}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
               />
               <DropdownField
                 flex={1}
@@ -132,6 +133,7 @@ const Tags = () => {
                 placeholder="Descripción"
                 value={tagToAdd.description}
                 onChange={(e) => setTagToAdd({ ...tagToAdd, description: e.target.value })}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
               />
               <Button
                 size="small"

@@ -422,6 +422,7 @@ const BatchImport = ({ isCreating }) => {
                       icon={ICONS.CHECK}
                       color={COLORS.GREEN}
                       onClick={handleDownloadConfirmation}
+                      onKeyDown={handleDownloadConfirmation}
                     />
                     <IconedButton
                       text="Cancelar"
@@ -513,6 +514,7 @@ const BatchImport = ({ isCreating }) => {
               onClick={() => {
                 handleUnprocessedDownload();
               }}
+              onKeyDown={handleUnprocessedDownload}
             />
             <IconedButton
               text="Cancelar"

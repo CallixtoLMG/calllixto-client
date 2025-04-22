@@ -131,31 +131,31 @@ const Product = ({ params }) => {
 
   const handleActiveClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
-    [handleOpenModalWithAction]
+    [handleOpenModalWithAction, handleProtectedAction]
   );
 
   const handleRecoverClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction("recover")),
-    [handleOpenModalWithAction]
+    [handleOpenModalWithAction, handleProtectedAction]
   );
 
   const handleInactiveClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
-    [handleOpenModalWithAction]
+    [handleOpenModalWithAction, handleProtectedAction]
   );
   const handleStockChangeClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction(isProductOOS(product?.state) ? "inStock" : "outOfStock")),
-    [handleOpenModalWithAction, product?.state]
+    [handleOpenModalWithAction, product?.state, handleProtectedAction]
   );
 
   const handleSoftDeleteClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction("softDelete")),
-    [handleOpenModalWithAction]
+    [handleOpenModalWithAction, handleProtectedAction]
   );
 
   const handleHardDeleteClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction("hardDelete")),
-    [handleOpenModalWithAction]
+    [handleOpenModalWithAction, handleProtectedAction]
   );
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({

@@ -2,6 +2,7 @@ import { Box, Button, Flex } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS } from "@/common/constants";
+import { handleEnterKeyDown } from "@/common/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion, Icon } from "semantic-ui-react";
@@ -80,13 +81,6 @@ const Blacklist = () => {
     updateBlacklist(updatedBlacklist);
   }, [watch, updateBlacklist]);
 
-  const handleInputKeyDown = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddBlacklist();
-    }
-  };
-
   const headers = useMemo(() => [
     {
       id: "code",
@@ -125,7 +119,7 @@ const Blacklist = () => {
                   setInputValue(e.target.value);
                   if (error) setError(null);
                 }}
-                onKeyDown={handleInputKeyDown}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddBlacklist)}
                 error={error}
                 showPopup
                 iconLabel

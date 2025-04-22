@@ -143,8 +143,23 @@ const Settings = () => {
     }
   }, [settings, activeEntity, handleEntityChange]);
 
-  useKeyboardShortcuts(() => handleSubmit(mutateEdit)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => reset(data[activeEntity]), SHORTKEYS.DELETE);
+  const validateShortcuts = {
+    canConfirm: () => !isPending && isDirty,
+    canReset: () => isDirty,
+  };
+
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: handleSubmit(mutateEdit),
+      condition: validateShortcuts.canConfirm,
+    },
+    {
+      key: SHORTKEYS.DELETE,
+      action: () => reset(data[activeEntity]),
+      condition: validateShortcuts.canReset,
+    }
+  ]);
 
   return (
     <FormProvider {...methods}>
