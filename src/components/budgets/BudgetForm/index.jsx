@@ -166,10 +166,17 @@ const BudgetForm = ({
   }, [watchCustomer, customerOptions]);
 
   useEffect(() => {
-    if (normalizedCustomer && normalizedCustomer?.id) {
+
+    if (
+      normalizedCustomer &&
+      normalizedCustomer?.id &&
+      (
+        JSON.stringify(normalizedCustomer) !== JSON.stringify(watchCustomer)
+      )
+    ) {
       setValue("customer", normalizedCustomer, { shouldValidate: true });
     }
-  }, [normalizedCustomer, setValue]);
+  }, [normalizedCustomer, setValue, watch, watchCustomer]);
 
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
@@ -405,7 +412,8 @@ const BudgetForm = ({
     },
     {
       id: 4,
-      title: "Medida", value: (product, index) => (
+      title: "Medida",
+      value: (product, index) => (
         <>
           {product.fractionConfig?.active && (
             <NumberControlled
@@ -413,8 +421,10 @@ const BudgetForm = ({
               name={`products[${index}].fractionConfig.value`}
               unit={product.fractionConfig.unit}
               iconPosition="right"
-              onChange={value => {
-                setValue(`products[${index}].fractionConfig.price`, value * product.price);
+              defaultValueFallback={1}
+              onChange={(value) => {
+                const safeValue = value ?? 1;
+                setValue(`products[${index}].fractionConfig.price`, safeValue * product.price);
                 calculateTotal();
               }}
             />
@@ -433,7 +443,6 @@ const BudgetForm = ({
               width="100%"
               name={`products[${index}].price`}
               onAfterChange={calculateTotal}
-
             />
           )
           : <PriceLabel width="100%" value={getPrice(product)} />
@@ -446,7 +455,7 @@ const BudgetForm = ({
       value: (product, index) => (
         <Flex alignItems="center" columnGap="5px">
           <PercentControlled
-            width="80px"
+            width="90px"
             name={`products[${index}].discount`}
             defaultValue={product.discount ?? 0}
             handleChange={calculateTotal}
@@ -586,7 +595,7 @@ const BudgetForm = ({
                     return !!value?.id || 'Campo requerido.';
                   },
                   activeCustomer: value => {
-                    return value?.state === CUSTOMER_STATES.ACTIVE.id || 'No es posible confirmar ni dejar pendiente presupuestos con clientes inactivos, solo borradores.';
+                    return value?.state === CUSTOMER_STATES.ACTIVE.id || 'No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.';
                   },
                   requiredAddress: value => {
                     return (

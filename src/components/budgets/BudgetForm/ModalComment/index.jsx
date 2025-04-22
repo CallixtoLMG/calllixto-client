@@ -37,9 +37,9 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
             <FormProvider {...methods}>
               <Form onSubmit={handleSubmit(onAddComment)}>
                 <FieldsContainer>
-                  <TextField flex="1" label="Código" placeholder={product?.code} disabled />
-                  <TextField flex="1" label="Nombre" placeholder={product?.name} disabled />
-                  <TextField width="100px" label="Cantidad" placeholder={product?.quantity} disabled />
+                  <TextField flex="1" label="Código" placeholder={product?.code} readOnly/>
+                  <TextField flex="1" label="Nombre" placeholder={product?.name} readOnly />
+                  <TextField width="100px" label="Cantidad" placeholder={product?.quantity} readOnly />
                 </FieldsContainer>
                 <FieldsContainer>
                   <TextControlled

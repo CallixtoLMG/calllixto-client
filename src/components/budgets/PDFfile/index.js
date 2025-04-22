@@ -8,14 +8,13 @@ import { getProductsColumns } from "@/components/budgets/budgets.utils";
 import { get } from "lodash";
 import { forwardRef, useMemo } from "react";
 import { List } from "semantic-ui-react";
-import { PICK_UP_IN_STORE } from "../budgets.constants";
 import { isBudgetCancelled, isBudgetDraft } from "../budgets.utils";
 import {
-    DataContainer,
-    Divider,
-    Image,
-    SectionContainer,
-    Title
+  DataContainer,
+  Divider,
+  Image,
+  SectionContainer,
+  Title
 } from "./styles";
 
 const Field = ({ label, value, ...rest }) => (
@@ -37,7 +36,6 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   const createTotalListItems = (paymentMethods = [], total) => {
     const totalAssigned = paymentMethods.reduce((acc, payment) => acc + payment.amount, 0) || 0;
     const totalPending = total - totalAssigned;
-
     const items = paymentMethods.map((payment, index) => ({
       id: index + 1,
       title: payment.method,
@@ -117,7 +115,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <Field width="100%" label="Cliente" value={(get(budget, "customer.name", ""))} />
           </Flex>
           <Flex>
-            <Field flex="1" width="fit-content" label="Dirección" value={budget?.pickUpInStore ? PICK_UP_IN_STORE : selectedContact?.address} />
+            <Field flex="1" width="fit-content" label="Dirección" value={selectedContact?.address} />
             <Field width="fit-content" label="Teléfono" value={selectedContact?.phone} />
           </Flex>
         </SectionContainer>

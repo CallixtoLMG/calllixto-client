@@ -12,7 +12,7 @@ import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useMutation } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Popup } from "semantic-ui-react";
@@ -30,9 +30,20 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
   });
   const { formState: { isDirty } } = methods;
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
-  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({ canUpdate: true });
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
+    canUpdate: true,
+    onBeforeView: () => Promise.resolve(true),
+  });
   const updatePayment = useUpdatePayments();
   const budgetState = getBudgetState(budget);
+  const [initializedContact, setInitializedContact] = useState(false);
+
+  useEffect(() => {
+    const current = methods.getValues("paymentsMade");
+    if (JSON.stringify(current) !== JSON.stringify(budget?.paymentsMade)) {
+      methods.reset({ paymentsMade: budget.paymentsMade });
+    }
+  }, [budget?.paymentsMade, methods]);
 
   const { mutate: mutateUpdatePayment, isPending: isLoadingUpdatePayment } = useMutation({
     mutationFn: async () => {
@@ -56,6 +67,23 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
       }
     },
   });
+
+  useEffect(() => {
+    if (!budget || initializedContact) return;
+
+    const defaultAddress = budget.pickUpInStore
+      ? PICK_UP_IN_STORE
+      : budget.customer?.addresses?.[0]?.address || '';
+
+    const defaultPhone = getFormatedPhone(budget.customer?.phoneNumbers?.[0]);
+
+    setSelectedContact({
+      address: defaultAddress,
+      phone: defaultPhone,
+    });
+
+    setInitializedContact(true);
+  }, [budget, initializedContact, setSelectedContact]);
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
@@ -158,6 +186,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
               control={Input}
               value={budget?.seller}
               readOnly
+              disabled
             />
             {budgetState && (
               <FormField
@@ -166,6 +195,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                 control={Input}
                 value={budgetState.person}
                 readOnly
+                disabled
               />
             )}
           </FieldsContainer>
@@ -195,12 +225,13 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
             control={Input}
             value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
             readOnly
+            disabled
           />
           <DropdownField
             flex="3"
             label="Dirección"
             control={Dropdown}
-            value={selectedContact?.address ?? ''}
+            value={selectedContact?.address || (budget?.pickUpInStore ? PICK_UP_IN_STORE : '')}
             options={[
               { key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE },
               ...(budget?.customer?.addresses?.map((address) => ({
@@ -284,6 +315,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           placeholder="Comentarios"
           value={budget?.comments}
           readOnly
+          disabled
         />
         <FormField
           control={Input}
@@ -291,6 +323,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           width="100%"
           value={formattedPaymentMethods}
           readOnly
+          disabled
         />
       </ViewContainer>
     </Form>

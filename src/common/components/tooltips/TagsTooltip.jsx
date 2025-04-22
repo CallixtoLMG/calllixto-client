@@ -26,7 +26,7 @@ export const TagsTooltip = ({ tags, tooltip }) => {
           content={
             <Flex columnGap="5px" >
               {tags.slice(1).map((tag) => (
-                tag.description
+                tag?.description
                   ? <Popup
                     key={tag.name}
                     size="mini"
@@ -38,8 +38,8 @@ export const TagsTooltip = ({ tags, tooltip }) => {
                     content={tag.description}
                     position="top center"
                   /> :
-                  <Label key={tag.name} size="mini" color={tag.color}>
-                    {tag.name}
+                  <Label key={tag?.name} size="mini" color={tag?.color}>
+                    {tag?.name}
                   </Label>
               ))}
             </Flex>

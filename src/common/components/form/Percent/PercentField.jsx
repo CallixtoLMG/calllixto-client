@@ -28,9 +28,20 @@ export const PercentField = ({
         disabled={disabled}
         iconPosition="right"
         onChange={(e) => {
-          const value = e.target.value;
-          if (!isNaN(value) && value <= maxValue && value >= 0) {
-            onChange(Number(value));
+          const inputValue = e.target.value;
+        
+          if (inputValue === '') {
+            onChange('');
+            return;
+          }
+        
+          const regex = /^\d*\.?\d{0,2}$/;
+        
+          if (regex.test(inputValue)) {
+            const numericValue = parseFloat(inputValue);
+            if (numericValue <= maxValue && numericValue >= 0) {
+              onChange(inputValue); 
+            }
           }
         }}
         onFocus={(e) => e.target.select()}

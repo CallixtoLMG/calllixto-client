@@ -80,7 +80,7 @@ const ModalConfirmation = ({
                   <TextField
                     flex="1"
                     label="Teléfono"
-                    value={`${getFormatedPhone(customer?.phoneNumbers?.[0])}`}
+                    value={`${customer?.phoneNumbers?.[0]?.ref ? `${customer?.phoneNumbers?.[0]?.ref}:` : "(Sin referencia)"} ${getFormatedPhone(customer?.phoneNumbers?.[0])}`}
                   />
                 </FieldsContainer>
                 <Payments

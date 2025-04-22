@@ -25,6 +25,7 @@ const ProductForm = forwardRef(({
     fractionConfig: {
       active: false,
       unit: MEASSURE_UNITS.MT.value,
+      value: 1
     },
     editablePrice: false,
     supplier: product?.supplier ? { id: product.supplier, state: product.supplierState } : null,
