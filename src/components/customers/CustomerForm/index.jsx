@@ -117,6 +117,7 @@ const CustomerForm = forwardRef(({
             isDirty={isDirty}
             onReset={() => reset(getInitialValues(customer))}
             disabled={isDeletePending}
+            submit
           />
         )}
       </Form>

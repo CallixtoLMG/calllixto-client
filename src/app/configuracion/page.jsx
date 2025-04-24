@@ -176,6 +176,7 @@ const Settings = () => {
           onReset={() => reset(data[activeEntity])}
           isDirty={isDirty}
           text="Actualizar"
+          submit
         />
         <UnsavedChangesModal
           open={showModal}

@@ -51,8 +51,15 @@ const RecoverPasswordForm = () => {
       toast.success("Contraseña cambiada con éxito.");
       push(PAGES.LOGIN.BASE);
     },
-    onError: () => {
-      toast.error("Hubo un error al cambiar la contraseña.");
+    onError: (error) => {
+      if (error.name.includes("LimitExceededException")) {
+        toast.error("Se ha excedido el límite de intentos permitidos, por favor pruebe más tarde.");
+      } else if (error.name.includes("CodeMismatchException")) {
+        toast.error("Hubo un error en el código de validación.");
+      } else {
+        toast.error("Hubo un error al cambiar la contraseña.");
+        console.error("Error:", error);
+      }
     },
   });
 

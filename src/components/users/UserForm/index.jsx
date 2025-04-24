@@ -182,6 +182,7 @@ const UserForm = forwardRef(({
             isDirty={isDirty}
             disabled={isDeletePending}
             onReset={() => reset(getInitialValues(user))}
+            submit
           />
         )}
       </Form>

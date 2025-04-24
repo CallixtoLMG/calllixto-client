@@ -312,6 +312,7 @@ const ProductForm = forwardRef(({
             isDirty={isDirty}
             onReset={() => reset(getInitialValues(product))}
             disabled={isProductDeleted(product?.state) || isDeletePending}
+            submit
           />
         )}
       </Form>
