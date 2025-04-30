@@ -3,7 +3,7 @@ import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 registerLocale("es", es);
 
-const DatePicker = ({
+export const DatePicker = ({
   selected,
   onChange,
   placeholder = "Selecciona una fecha",
@@ -16,7 +16,6 @@ const DatePicker = ({
   showIcon,
   icon
 }) => {
-
   return (
     <ReactDatePicker
       icon={icon}
@@ -33,5 +32,3 @@ const DatePicker = ({
     />
   );
 };
-
-export default DatePicker;

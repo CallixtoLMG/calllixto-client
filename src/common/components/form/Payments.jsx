@@ -8,7 +8,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 import { Button, FieldsContainer, Flex, FlexColumn, FormField, Segment } from "../custom";
 import { Table, TotalList } from "../table";
-import DatePicker from "./DatePicker/DatePicker";
+import DatePicker from "./DatePicker";
 
 registerLocale("es", es);
 
@@ -46,19 +46,19 @@ const Payments = ({ total, maxHeight, children, update }) => {
 
   const handleAddPayment = async () => {
     setShowErrors(true);
-  
+
     if (!payment.method || payment.amount <= 0) {
-      setExceedAmountError(false); 
+      setExceedAmountError(false);
       return;
     }
-  
+
     if (payment.amount > totalPending) {
       setExceedAmountError(true);
       return;
     }
-  
+
     appendPayment(payment);
-  
+
     setPayment(EMPTY_PAYMENT());
     setShowErrors(false);
     setExceedAmountError(false);
@@ -105,7 +105,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
                 value={payment.amount}
                 onChange={(value) => {
                   setPayment({ ...payment, amount: value ?? 0 });
-                  setExceedAmountError(false); 
+                  setExceedAmountError(false);
                 }}
                 disabled={false}
                 error={
