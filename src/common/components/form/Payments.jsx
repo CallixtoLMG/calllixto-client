@@ -6,7 +6,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 import { Button, FieldsContainer, Flex, FlexColumn, FormField, Segment } from "../custom";
 import { Table, TotalList } from "../table";
-import DatePicker from "./DatePicker";
+import { DatePicker } from "./DatePicker";
 
 const EMPTY_PAYMENT = () => ({
   method: '',
