@@ -1,16 +1,12 @@
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
 import { COLORS, ICONS, RULES } from "@/common/constants";
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
-import es from "date-fns/locale/es";
 import { useMemo, useState } from "react";
-import { registerLocale } from "react-datepicker";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 import { Button, FieldsContainer, Flex, FlexColumn, FormField, Segment } from "../custom";
 import { Table, TotalList } from "../table";
 import DatePicker from "./DatePicker";
-
-registerLocale("es", es);
 
 const EMPTY_PAYMENT = () => ({
   method: '',
