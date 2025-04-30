@@ -17,7 +17,7 @@ const Tags = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [tagToAdd, setTagToAdd] = useState(EMPTY_TAG);
   const { formState: { isDirty } } = useFormContext();
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState(null);
   const { fields: tags, append, remove } = useFieldArray({
     name: "tags"
   });
@@ -36,7 +36,7 @@ const Tags = () => {
       width: 5,
       value: (tag) => (
         <Label color={tag.color}>
-          <OverflowWrapper maxWidth="40vw" popupContent={tag.name}>
+          <OverflowWrapper height="13px" maxWidth="40vw" popupContent={tag.name}>
             {tag.name}
           </OverflowWrapper>
         </Label >
@@ -47,11 +47,9 @@ const Tags = () => {
       title: "Descripción",
       align: "left",
       value: (tag) => (
-        <span>
-          <OverflowWrapper maxWidth="40vw" popupContent={tag.description}>
-            {tag.description}
-          </OverflowWrapper>
-        </span>
+        <OverflowWrapper maxWidth="35vw" popupContent={tag.description}>
+          {tag.description}
+        </OverflowWrapper>
       ),
     },
   ];
@@ -70,33 +68,40 @@ const Tags = () => {
 
   const handleAddTag = () => {
     const isDuplicate = tags.some((tag) => tag.name.trim().toLowerCase() === tagToAdd.name.trim().toLowerCase());
-
+    const newErrors = {};
+  
     if (!tagToAdd.name.trim()) {
-      setError("El nombre es obligatorio.");
-      return;
+      newErrors.name = "El nombre es obligatorio.";
     }
-
+  
     if (tagToAdd.name.length > 50) {
-      setError("El nombre no debe superar los 50 caracteres.");
-      return;
+      newErrors.name = "El nombre no debe superar los 50 caracteres.";
     }
-
+  
+    if (tagToAdd.description.length > 250) {
+      newErrors.description = "La descripción no debe superar los 250 caracteres.";
+    }
+  
     if (isDuplicate) {
-      setError("Ya existe una etiqueta con este nombre.");
+      newErrors.name = "Ya existe una etiqueta con este nombre.";
+    }
+  
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
-
+  
     append(tagToAdd);
     setTagToAdd(EMPTY_TAG);
-    setError(null);
+    setErrors({});
   };
-
+  
   const handleNameChange = (e) => {
     const name = e.target.value;
     setTagToAdd({ ...tagToAdd, name });
 
-    if (error) {
-      setError(null);
+    if (errors) {
+      setErrors(null);
     }
   };
 
@@ -117,7 +122,7 @@ const Tags = () => {
                 value={tagToAdd.name}
                 onChange={handleNameChange}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
-                error={error}
+                error={errors?.name}
               />
               <DropdownField
                 flex={1}
@@ -133,6 +138,7 @@ const Tags = () => {
                 value={tagToAdd.description}
                 onChange={(e) => setTagToAdd({ ...tagToAdd, description: e.target.value })}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
+                error={errors?.description}
               />
               <Button
                 size="small"

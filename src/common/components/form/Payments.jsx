@@ -107,7 +107,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
                   setPayment({ ...payment, amount: value ?? 0 });
                   setExceedAmountError(false); 
                 }}
-                disabled={false}
+                disabled={isTotalCovered}
                 error={
                   showErrors && !payment.amount
                     ? RULES.REQUIRED.required

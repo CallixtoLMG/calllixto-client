@@ -12,15 +12,16 @@ export const HEADERS = [
     id: 1,
     title: 'Nombre',
     align: 'left',
+    width: 9,
     value: (customer) => {
       const { tags, name, comments } = customer;
       return (
         <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper maxWidth="45vw" popupContent={name}>
+          <OverflowWrapper  maxWidth="45vw" popupContent={name}>
             {name}
           </OverflowWrapper>
           <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
-            {tags && <TagsTooltip tooltip="true" tags={tags} />}
+            {tags && <TagsTooltip maxWidthOverflow="8vw" tooltip="true" tags={tags} />}
             {comments && <CommentTooltip tooltip="true" comment={comments} />}
           </Flex>
         </Flex>
@@ -30,7 +31,7 @@ export const HEADERS = [
   {
     id: 2,
     title: "Direccion",
-    width: 4,
+    width: 5,
     align: "left",
     value: (customer) => {
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(customer.addresses || []);
@@ -45,7 +46,7 @@ export const HEADERS = [
   {
     id: 3,
     title: "Teléfono",
-    width: 2,
+    width: 3,
     value: (customer) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(customer.phoneNumbers);
       return (

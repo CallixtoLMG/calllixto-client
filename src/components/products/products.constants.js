@@ -57,7 +57,7 @@ export const PRODUCT_COLUMNS = [
             {name}
           </OverflowWrapper>
           <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
-            {tags && <TagsTooltip tooltip="true" tags={tags} />}
+            {tags && <TagsTooltip maxWidthOverflow="8vw" tooltip="true" tags={tags} />}
             {comments && <CommentTooltip tooltip="true" comment={comments} />}
           </Flex>
         </Flex>

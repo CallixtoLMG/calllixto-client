@@ -3,7 +3,7 @@ import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
 import { Button, DropdownItem, Icon } from "@/common/components/custom";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
-import { downloadExcel, getFormatedPrice } from "@/common/utils";
+import { downloadExcel } from "@/common/utils";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BatchImport from "@/components/products/BatchImport";
 import ProductsPage from "@/components/products/ProductsPage";
@@ -34,7 +34,7 @@ const Products = () => {
 
   const handleDownloadExcel = useCallback(() => {
     if (!products) return;
-    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', "Costo", "Margen", 'Precio', 'Estado', 'Comentarios'];
+    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Costo', 'Precio', 'Margen', 'Estado', 'Comentarios'];
     const mappedPRoducts = products.map(product => {
       const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
       return [
@@ -42,8 +42,8 @@ const Products = () => {
         product.name,
         product.brandName,
         product.supplierName,
-        getFormatedPrice(product.cost),
-        getFormatedPrice(product.price),
+        product.cost,
+        product.price,
         getFormatedMargin(product.price, product.cost),
         productState,
         product.comments

@@ -6,6 +6,7 @@ export const PercentControlled = ({
   defaultValue,
   handleChange,
   disabled,
+  justifyItems,
   ...inputParams
 }) => {
   return (
@@ -16,6 +17,7 @@ export const PercentControlled = ({
         <PercentField
           {...rest}
           {...inputParams}
+          justifyItems={justifyItems}
           disabled={disabled}
           value={value} 
           onChange={(newValue) => {

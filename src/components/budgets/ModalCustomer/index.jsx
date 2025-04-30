@@ -16,7 +16,6 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const formRef = useRef(null);
   const inputRef = useRef(null);
   const editCustomer = useEditCustomer();
-
   const watchedAreaCode = watch('areaCode');
   const watchedNumber = watch('number');
 
@@ -56,16 +55,18 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
     setIsLoading(true);
     try {
       const response = await editCustomer(data);
-      if (response?.data?.statusOk) {
+      if (response?.statusOk) {
         toast.success('Cliente actualizado!');
-      };
       onClose(true, data);
+      } else {
+        toast.error('Error al actualizar el cliente.');
+      }
     } catch (error) {
       console.error('Error en la edición del cliente:', error?.message);
-      onClose(false);
+      toast.error('Error en la edición del cliente.');
     } finally {
       setIsLoading(false);
-    };
+    }
   };
 
   const handleConfirmClick = () => {
@@ -92,7 +93,10 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   flex="1"
                   label="Nombre"
                   value={customer?.name}
+                  disabled
                 />
+              </FieldsContainer>
+              <FieldsContainer>
                 <TextControlled
                   width="30%"
                   name="refA"
@@ -101,7 +105,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   ref={addressRefInputRef}
                 />
                 <TextControlled
-                  flex="1"
+                  width="50%"
                   name="address"
                   rules={RULES.REQUIRED}
                   label="Dirección"
@@ -112,12 +116,12 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   width="30%"
                   name="refP"
                   rules={RULES.REQUIRED}
-                  label="Referencia de teléfono"
+                  label="Referencia"
                 />
                 <NumberControlled
                   width="130px"
                   label="Código de área"
-                  placeholder="Ej: 011"
+                  placeholder="Ej: 351"
                   name="areaCode"
                   maxLength="4"
                   rules={{

@@ -6,8 +6,9 @@ const OverflowText = styled.div`
   display: inline-block;
   width: 100%;
   max-width: ${({ $maxWidth }) => $maxWidth};
+  height: ${({ $height }) => $height}!important;
 
-  ${({ $lineClamp }) =>
+  ${({ $lineClamp, }) =>
     $lineClamp > 1
       ? css`
           display: -webkit-box;
@@ -19,6 +20,7 @@ const OverflowText = styled.div`
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          vertical-align: ${({ $verticalAlign = "middle" }) => $verticalAlign};
         `}
 `;
 
@@ -27,7 +29,9 @@ export const OverflowWrapper = ({
   popupContent,
   position = "top center",
   maxWidth = "100%",
-  lineClamp = 1,
+  $lineClamp = 1,
+  height,
+  $verticalAlign
 }) => {
   const textRef = useRef(null);
   const [isTruncated, setIsTruncated] = useState(false);
@@ -36,14 +40,14 @@ export const OverflowWrapper = ({
     const el = textRef.current;
     if (!el) return;
 
-    if (lineClamp > 1) {
+    if ($lineClamp > 1) {
       const lineHeight = parseFloat(getComputedStyle(el).lineHeight);
-      const maxAllowedHeight = lineHeight * lineClamp;
+      const maxAllowedHeight = lineHeight * $lineClamp;
       setIsTruncated(el.scrollHeight > maxAllowedHeight);
     } else {
       setIsTruncated(el.scrollWidth > el.clientWidth);
     }
-  }, [lineClamp]);
+  }, [$lineClamp]);
 
   useEffect(() => {
     const el = textRef.current;
@@ -59,7 +63,7 @@ export const OverflowWrapper = ({
       clearTimeout(timeout);
       resizeObserver.disconnect();
     };
-  }, [children, popupContent, lineClamp, detectOverflow]);
+  }, [children, popupContent, $lineClamp, detectOverflow]);
 
   return (
     <Popup
@@ -70,7 +74,9 @@ export const OverflowWrapper = ({
         <OverflowText
           ref={textRef}
           $maxWidth={maxWidth}
-          $lineClamp={lineClamp}
+          $lineClamp={$lineClamp}
+          $height={height}
+          $verticalAlign={$verticalAlign}
         >
           {children}
         </OverflowText>

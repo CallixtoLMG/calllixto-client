@@ -33,6 +33,7 @@ export const Input = styled(SInput)`
   text-align: ${({ textAlign }) => textAlign} !important;
   &&& input{
     border-left: ${({ $iconLabel }) => ($iconLabel) && "none"} !important;
+    justify-items: ${({ justifyItems }) => justifyItems} !important;
   }
 `;
 
@@ -52,6 +53,7 @@ export const FormField = styled(Form.Field)`
   }
   label {
     opacity: 1 !important;
+    font-weight: bold;
   }
 `;
 
@@ -77,6 +79,10 @@ export const Dropdown = styled(SDropdown)`
   background-color: ${({ bgColor }) => `${bgColor}!important`};
   box-shadow: ${({ $boxShadow }) => $boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
   width: ${({ width }) => `${width}!important`};
+
+  .divider.text{
+    height: 15px;
+  }
 
   .text{
     text-align: ${({ $textAlign }) => `${$textAlign}!important`};
@@ -170,7 +176,7 @@ export const DropdownMenu = styled(SDropdown.Menu)`
 export const Icon = styled(SIcon)`
   align-self: center!important;
   margin-right: ${({ $marginRight }) => $marginRight && `11px!important`} ;
-  top: ${({ dollar, tooltip }) => (dollar ? `-3px` : tooltip ? `-2px` : 'initial')} !important;
+  top: ${({ dollar, tooltip }) => (dollar ? `-3px` : tooltip ? `-1px` : 'initial')} !important;
   position: ${({ dollar, tooltip }) => (dollar || tooltip) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
@@ -178,6 +184,7 @@ export const Icon = styled(SIcon)`
   cursor: ${({ pointer }) => pointer && "pointer"} !important;
   justify-items: ${({ justifyItems }) => `${justifyItems}!important;`};
   pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
+  line-height: ${({ lineHeight }) => `${lineHeight}!important;`};
 `;
 
 export const Modal = styled(SModal)`

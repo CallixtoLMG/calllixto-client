@@ -11,6 +11,7 @@ export const PriceControlled = ({
   disabled,
   onAfterChange,
   handlePriceChange,
+  justifyItems,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -23,6 +24,7 @@ export const PriceControlled = ({
         return (
           <PriceField
             {...inputProps}
+            justifyItems={justifyItems}
             label={label}
             width={width}
             value={value}

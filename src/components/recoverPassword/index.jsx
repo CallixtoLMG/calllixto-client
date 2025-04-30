@@ -4,6 +4,7 @@ import { Form } from "@/common/components/custom";
 import { PasswordControlled, TextControlled } from "@/common/components/form";
 import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -67,7 +68,16 @@ const RecoverPasswordForm = () => {
     <ModGrid>
       <ModGridColumn>
         <ModHeader as="h3">
+          <div>
+            <Image
+              src="/Callixto.png"
+              alt="Callixto.png Logo"
+              width={300}
+              height={100}
+              priority
+            />
           <Text>{isCodeSent ? "Cambiar Contraseña" : "Recuperar Contraseña"}</Text>
+          </div>
         </ModHeader>
         <FormProvider {...methods}>
           <Form

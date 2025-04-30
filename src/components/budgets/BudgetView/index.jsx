@@ -4,7 +4,7 @@ import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, T
 import { DropdownField, PriceLabel } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import { Table, Total } from "@/common/components/table";
-import { CommentTooltip } from "@/common/components/tooltips";
+import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS } from "@/common/constants";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
 import { getDateWithOffset, now } from "@/common/utils/dates";
@@ -124,8 +124,9 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
         value: (product) => (
           <Container>
             {product.name} {product.fractionConfig?.active && `x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}`}
-            <Flex $marginLeft="7px">
-              {product.comments && <CommentTooltip comment={product.comments} />}
+            <Flex $columnGap="5px" $marginLeft="7px">
+              {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
+              {product.comments && <CommentTooltip lineHeight="normal" comment={product.comments} />}
               {isProductOOS(product.state) && (
                 <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
               )}
@@ -205,7 +206,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                 label={budgetState.dateLabel}
                 control={Input}
                 value={budgetState.date}
-                readOnly
+                disabled
               />
             )}
             {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) && (
@@ -213,7 +214,7 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
                 label="Fecha de vencimiento"
                 control={Input}
                 value={getDateWithOffset(budget?.createdAt, budget?.expirationOffsetDays, 'days')}
-                readOnly
+                disabled
               />
             )}
           </FieldsContainer>
@@ -309,19 +310,19 @@ const BudgetView = ({ budget, subtotal, subtotalAfterDiscount, total, selectedCo
           )
         }
         <FormField
+          control={Input}
+          label="Métodos de pago"
+          $width="100%"
+          value={formattedPaymentMethods}
+          readOnly
+          disabled
+        />
+        <FormField
           control={TextArea}
           label="Comentarios"
           $width="100%"
           placeholder="Comentarios"
           value={budget?.comments}
-          readOnly
-          disabled
-        />
-        <FormField
-          control={Input}
-          label="Métodos de pago"
-          $width="100%"
-          value={formattedPaymentMethods}
           readOnly
           disabled
         />

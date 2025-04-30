@@ -109,16 +109,16 @@ export const renderContent = (content) => {
 };
 
 export const createFilter = (filters, keysToFilter, exceptions = {}) => {
-  return item => {
+  return (item) => {
     for (const key of keysToFilter) {
       if (filters[key]) {
-        const filterWords = filters[key].toLowerCase().split(/\s+/);
+        const filterWords = normalizeText(filters[key]).split(/\s+/);
 
-        const itemValue = typeof item[key] === 'string'
-          ? item[key].toLowerCase()
-          : typeof exceptions[key] === 'function'
-            ? exceptions[key](item).toLowerCase()
-            : '';
+        const itemValue = typeof item[key] === "string"
+          ? normalizeText(item[key])
+          : typeof exceptions[key] === "function"
+            ? normalizeText(exceptions[key](item))
+            : "";
 
         const allWordsMatch = filterWords.every(word => itemValue.includes(word));
         if (!allWordsMatch) {
@@ -134,6 +134,8 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
     return true;
   };
 };
+
+export const normalizeText = (text) => text?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() || "";
 
 export const getDefaultListParams = (attributes, sort, order) => {
   const params = {

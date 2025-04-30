@@ -18,6 +18,7 @@ export const PriceField = ({
   onChange,
   disabled = false,
   placeholder,
+  justifyItems
 }) => {
   const inputRef = useRef(null);
   const [internalValue, setInternalValue] = useState(value.toString());
@@ -72,6 +73,7 @@ export const PriceField = ({
         disabled={disabled}
         iconPosition="left"
         placeholder={placeholder}
+        justifyItems={justifyItems}
       >
         <Icon name="dollar" />
         <input />

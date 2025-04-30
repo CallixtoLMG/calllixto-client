@@ -464,6 +464,7 @@ const Budget = ({ params }) => {
           subtotalAfterDiscount={subtotalAfterDiscount}
           total={total}
           selectedContact={selectedContact}
+          dolarRate={dolarRate}
         />
       </OnlyPrint>
     </Loader>

@@ -1,5 +1,5 @@
 import { COLORS } from "@/common/constants";
-import { getFormatedPrice } from "@/common/utils";
+import { getFormatedPrice, normalizeText } from "@/common/utils";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { formatProductCode } from "@/components/products/products.utils";
 import debounce from 'lodash/debounce';
@@ -25,11 +25,11 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((query) => {
-      const queryWords = query.toLowerCase().split(' ').filter(Boolean);
+      const queryWords = normalizeText(query).split(' ').filter(Boolean);
       setFilteredProducts(products?.filter((product) => {
-        const name = product?.name?.toLowerCase();
-        const code = product?.code?.toLowerCase();
-        return queryWords.every(word => name?.includes(word)) || code?.includes(query.toLowerCase());
+        const name = normalizeText(product?.name);
+        const code = normalizeText(product?.code);
+        return queryWords.every(word => name.includes(word) || code.includes(word));
       }));
       setLoading(false);
     }, 300), [products]
@@ -68,7 +68,7 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
       results={filteredProducts?.slice(0, MAX_RESULTS).map((product) => ({
         key: product.code,
         title: (
-          <OverflowWrapper lineClamp={2} popupContent={product.name} >
+          <OverflowWrapper popupContent={product.name} >
             {product.name}
           </OverflowWrapper>
         ),
@@ -87,7 +87,7 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
                 )}
               </Box>
               <Box width="100px" >
-                {product.tags ? <TagsTooltip tooltip="true" tags={product.tags} /> : <Box visibility="hidden" />}
+                {product.tags ? <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} /> : <Box visibility="hidden" />}
               </Box>
               <Box width="fit-content">
                 {product.comments ? <CommentTooltip comment={product.comments} /> : <Box visibility="hidden" />}

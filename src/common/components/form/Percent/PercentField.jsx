@@ -11,7 +11,8 @@ export const PercentField = forwardRef(({
   onChange,
   error,
   maxValue = 100,
-  disabled
+  disabled,
+  justifyItems
 }, ref) => {
 
   return (
@@ -27,6 +28,7 @@ export const PercentField = forwardRef(({
       <Input
         value={value}
         icon
+        justifyItems={justifyItems}
         disabled={disabled}
         onChange={(e) => {
           const inputValue = e.target.value;

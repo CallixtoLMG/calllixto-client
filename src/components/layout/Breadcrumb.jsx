@@ -66,12 +66,12 @@ const Breadcrumb = () => {
         <BreadcrumbSection key={`label_${index}`}>
           {index !== 0 && label && <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />}
           {typeof label === 'string' ? (
-            <OverflowWrapper popupContent={label} maxWidth="25vw">
+            <OverflowWrapper $verticalAlign="baseline" popupContent={label} maxWidth="25vw">
               {label}
             </OverflowWrapper>
           ) : (
             label?.id && label?.title && (
-              <OverflowWrapper maxWidth="25vw" popupContent={label.title}>
+              <OverflowWrapper $verticalAlign="bottom" maxWidth="25vw" popupContent={label.title}>
                 <Span>
                   {label.id}
                 </Span>

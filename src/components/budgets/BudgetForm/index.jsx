@@ -1,5 +1,5 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, OverflowWrapper } from "@/common/components/custom";
+import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
@@ -23,7 +23,7 @@ import { v4 as uuid } from 'uuid';
 import { CUSTOMER_STATES } from "../../customers/customers.constants";
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
-import { Container, Icon, VerticalDivider } from "./styles";
+import { Container, VerticalDivider } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: user?.name,
@@ -109,48 +109,38 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers.map(({ id, name, state, inactiveReason, tags, comments, phoneNumbers, addresses }) => ({
-      key: id,
-      value: { phoneNumbers, addresses, id, state, name },
-      text: name,
-      content: (
-        <FlexColumn $marginTop="5px" $rowGap="5px">
-          <FlexColumn>
-            <OverflowWrapper popupContent={name}>
-              <Text>{name}</Text>
-            </OverflowWrapper>
+    return customers
+      .filter(({ state }) => state !== CUSTOMER_STATES.INACTIVE.id) // 👈 Filtrar desactivados
+      .map(({ id, name, state, tags, comments, phoneNumbers, addresses }) => ({
+        key: id,
+        value: { phoneNumbers, addresses, id, state, name },
+        text: name,
+        content: (
+          <FlexColumn $marginTop="5px" $rowGap="5px">
+            <FlexColumn>
+              <OverflowWrapper popupContent={name}>
+                <Text>{name}</Text>
+              </OverflowWrapper>
+            </FlexColumn>
+            <Flex $justifyContent="space-between" $alignItems="center" $columnGap="5px">
+              <Box style={{ width: "30px", textAlign: "center" }}>
+                {comments ? (
+                  <CommentTooltip comment={comments} />
+                ) : (
+                  <Box visibility="hidden">ℹ️</Box>
+                )}
+              </Box>
+              <Box>
+                {tags ? (
+                  <TagsTooltip maxWidthOverflow="5vw" tags={tags} />
+                ) : (
+                  <Box visibility="hidden">🔖</Box>
+                )}
+              </Box>
+            </Flex>
           </FlexColumn>
-          <Flex $justifyContent="space-between" $alignItems="center" $columnGap="5px">
-            <Box >
-              {state === CUSTOMER_STATES.INACTIVE.id ? (
-                <Popup
-                  trigger={<Label width="fit-content" color={COLORS.GREY} size="tiny">Desactivado</Label>}
-                  content={inactiveReason || 'Motivo no especificado'}
-                  position="top center"
-                  size="mini"
-                />
-              ) : (
-                <Box visibility="hidden" >Desactivado</Box>
-              )}
-            </Box>
-            <Box >
-              {tags ? (
-                <TagsTooltip tags={tags} />
-              ) : (
-                <Box visibility="hidden">🔖</Box>
-              )}
-            </Box>
-            <Box style={{ width: "30px", textAlign: "center" }}>
-              {comments ? (
-                <CommentTooltip comment={comments} />
-              ) : (
-                <Box visibility="hidden">ℹ️</Box>
-              )}
-            </Box>
-          </Flex>
-        </FlexColumn>
-      ),
-    }));
+        ),
+      }));
   }, [customers]);
 
   const normalizedCustomer = useMemo(() => {
@@ -282,7 +272,7 @@ const BudgetForm = ({
     await onSubmit({
       ...data,
       customer: { id: customer.id, name: customer.name },
-      products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment"])),
+      products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment", "tags"])),
       total: Number(total.toFixed(2)),
       state
     });
@@ -398,10 +388,10 @@ const BudgetForm = ({
           </OverflowWrapper>
           <Flex $alignItems="center" $marginLeft="5px" $columnGap="5px">
             {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
-            {product.tags && <TagsTooltip tooltip="true" tags={product.tags} />}
-            {product.comments && <CommentTooltip tooltip="true" comment={product.comments} />}
+            {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
+            {product.comments && <CommentTooltip lineHeight="normal" tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
-              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />} />
+              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon lineHeight="normal" name={ICONS.TRUCK} color={COLORS.BLUE} />} />
             )}
           </Flex>
         </Container>
@@ -442,6 +432,7 @@ const BudgetForm = ({
               width="100%"
               name={`products[${index}].price`}
               onAfterChange={calculateTotal}
+              justifyItems="right"
             />
           )
           : <PriceLabel width="100%" value={getPrice(product)} />
@@ -459,6 +450,7 @@ const BudgetForm = ({
             defaultValue={product.discount ?? 0}
             handleChange={calculateTotal}
             disabled={isProductOOS(product.state)}
+            justifyItems="left"
           />
         </Flex>
       ),
@@ -715,12 +707,11 @@ const BudgetForm = ({
           <FieldsContainer width="100%" $rowGap="15px">
             <Controller
               name="paymentMethods"
-              rules={RULES.REQUIRED}
               render={({ field: { onChange, value } }) => (
                 <FormField flex="1" label="Metodos de pago" control={Input}>
                   <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                     <Button
-                      $paddingLeft="fit-content"
+                      $paddingLeft="18px"
                       width="fit-content"
                       type="button"
                       basic={value.length !== PAYMENT_METHODS.length}
@@ -738,7 +729,7 @@ const BudgetForm = ({
                     <VerticalDivider />
                     {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
                       <Button
-                        $paddingLeft="fit-content"
+                        $paddingLeft="18px"
                         width="fit-content"
                         key={key}
                         basic={!value.includes(methodValue)}
@@ -772,6 +763,7 @@ const BudgetForm = ({
             onSubmit={handleSubmit(handleConfirm)}
             icon={currentState.icon}
             text={currentState.singularTitle}
+            submit
             extraButton={
               <IconedButton
                 icon={BUDGET_STATES.DRAFT.icon}

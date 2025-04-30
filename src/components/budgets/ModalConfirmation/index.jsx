@@ -53,14 +53,16 @@ const ModalConfirmation = ({
   };
 
   return (
-    <Transition visible={isModalOpen} animation='scale' duration={500}>
-      <FormProvider {...methods}>
-        <Form ref={formRef} onSubmit={methods.handleSubmit(handleConfirm)}>
+    <FormProvider {...methods}>
+      <Form ref={formRef} onSubmit={methods.handleSubmit(handleConfirm)}>
+        <Transition visible={isModalOpen} animation='scale' duration={500}>
           <Modal size="large" closeIcon open={isModalOpen} onClose={() => onClose(false)}>
             <Modal.Header>
               <Flex $alignItems="center" $justifyContent="space-between">
                 Desea confirmar el presupuesto?
                 <GroupedButtonsControlled
+                  color={COLORS.BLUE}
+                  width="fit-content"
                   name="pickUpInStore"
                   buttons={[
                     { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
@@ -75,11 +77,13 @@ const ModalConfirmation = ({
                   <TextField
                     flex="2"
                     label="Dirección"
+                    disabled
                     value={!watchPickUpInStore ? `${customer?.addresses?.[0]?.ref ? `${customer?.addresses?.[0]?.ref}:` : "(Sin referencia)"} ${customer?.addresses?.[0]?.address}` : PICK_UP_IN_STORE}
                   />
                   <TextField
                     flex="1"
                     label="Teléfono"
+                    disabled
                     value={`${customer?.phoneNumbers?.[0]?.ref ? `${customer?.phoneNumbers?.[0]?.ref}:` : "(Sin referencia)"} ${getFormatedPhone(customer?.phoneNumbers?.[0])}`}
                   />
                 </FieldsContainer>
@@ -111,9 +115,9 @@ const ModalConfirmation = ({
               </ButtonsContainer>
             </Modal.Actions>
           </Modal>
-        </Form>
-      </FormProvider>
-    </Transition>
+        </Transition>
+      </Form>
+    </FormProvider>
   );
 };
 
