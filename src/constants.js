@@ -165,7 +165,7 @@ export const ENTITIES = {
   EVENTS: 'events'
 };
 
-export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
+export const DEFAULT_SELECTED_CLIENT = "callixto";
 
 export const BUDGET_STATES = {
   CONFIRMED: {
@@ -410,18 +410,18 @@ export const FILTERS_OPTIONS = {
 
 export const BUDGET_PDF_FORMAT = {
   DISPATCH: {
-    iconName: ICONS.TRUCK,
+    icon: ICONS.TRUCK,
     key: "dispatch",
     title: "Remito"
   },
   CLIENT: {
     key: 'client',
-    iconName: ICONS.ADDRESS_CARD,
+    icon: ICONS.ADDRESS_CARD,
     title: 'Cliente',
   },
   INTERNAL: {
     key: "internal",
-    iconName: ICONS.ARCHIVE,
+    icon: ICONS.ARCHIVE,
     title: 'Interno'
   },
 };

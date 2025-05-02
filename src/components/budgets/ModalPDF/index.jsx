@@ -1,5 +1,5 @@
 import { IconnedButton } from "@/components/common/buttons";
-import { ButtonsContainer, Flex, FlexColumn, FormField, IconedButton, Label, Segment } from "@/components/common/custom";
+import { ButtonsContainer, Flex, FlexColumn } from "@/components/common/custom";
 import { BUDGET_PDF_FORMAT, COLORS, ICONS } from "@/constants";
 import { Modal, Transition } from "semantic-ui-react";
 import { Input } from "@/components/common/custom";
@@ -68,26 +68,24 @@ const ModalPDF = ({
   return (
     <>
       <Transition visible={isModalOpen} animation='scale' duration={500}>
-        <Modal size="large" closeIcon open={isModalOpen} onClose={() => onClose(false)}>
+        <Modal size="mini" closeIcon open={isModalOpen} onClose={() => onClose(false)}>
           <Modal.Header>Opciones de Impresión</Modal.Header>
           <Modal.Content>
             <FlexColumn rowGap="15px">
               <Flex columnGap="5px" wrap="wrap" rowGap="5px">
-                {Object.values(BUDGET_PDF_FORMAT).map(({ key, title }) => (
-                  <IconedButton
+                {Object.values(BUDGET_PDF_FORMAT).map(({ key, title, icon }) => (
+                  <IconnedButton
                     key={key}
+                    text={title}
+                    icon={icon}
                     paddingLeft="fit-content"
                     width="fit-content"
                     basic={printPdfMode !== key}
                     color={COLORS.BLUE}
-                    type="button"
                     onClick={() => {
-                      console.log({ printPdfMode, key });
                       setPrintPdfMode(key);
                     }}
-                  >
-                    {title}
-                  </IconedButton>
+                  />
                 ))}
               </Flex>
               <Input

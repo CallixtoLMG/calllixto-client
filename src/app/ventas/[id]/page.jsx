@@ -130,7 +130,7 @@ const Budget = ({ params }) => {
 
       const actions = [
         {
-          id: 8,
+          id: 1,
           icon: ICONS.DOWNLOAD,
           color: COLORS.BLUE,
           onClick: () => setIsModalPDFOpen(true),
