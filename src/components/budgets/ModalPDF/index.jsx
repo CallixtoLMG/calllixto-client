@@ -26,7 +26,7 @@ const ModalPDF = ({
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
   const [dolarRate, setDolarRate] = useState(dolar);
   const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
-  const [showPrices, setShowPrices] = useState(false);
+  const [showPrices, setShowPrices] = useState(true);
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {
