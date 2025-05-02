@@ -2,6 +2,7 @@ import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
 import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
+import { ModalAction } from "@/common/components/modals";
 import ProductSearch from "@/common/components/search/search";
 import { Text } from "@/common/components/search/styles";
 import { Table, Total } from "@/common/components/table";
@@ -99,6 +100,8 @@ const BudgetForm = ({
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
+  const [isConfirmResetModalOpen, setIsConfirmResetModalOpen] = useState(false);
+  const [hasAcceptedChanges, setHasAcceptedChanges] = useState(false);
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -235,6 +238,7 @@ const BudgetForm = ({
     setOriginalPrices({});
     setShouldShowModal(false);
     setIsTableLoading(false);
+    setHasAcceptedChanges(true); 
   };
 
   const handleCancelUpdate = () => {
@@ -368,6 +372,7 @@ const BudgetForm = ({
       title: "Cantidad",
       value: (product, index) => (
         <NumberControlled
+          padding="9px 14px"
           width="80px"
           name={`products[${index}].quantity`}
           onChange={() => {
@@ -407,7 +412,7 @@ const BudgetForm = ({
         <>
           {product.fractionConfig?.active && (
             <NumberControlled
-              width="100px"
+              width="130px"
               name={`products[${index}].fractionConfig.value`}
               unit={product.fractionConfig.unit}
               defaultValueFallback={1}
@@ -416,6 +421,7 @@ const BudgetForm = ({
                 setValue(`products[${index}].fractionConfig.price`, safeValue * product.price);
                 calculateTotal();
               }}
+              isMeasure
             />
           )}
         </>
@@ -497,6 +503,20 @@ const BudgetForm = ({
     },
   ]);
 
+  const handleConfirmReset = () => {
+    handleReset();
+    setHasAcceptedChanges(false);
+    setIsConfirmResetModalOpen(false);
+  };
+
+  const handleTryReset = () => {
+    if (isCloning && hasAcceptedChanges) {
+      setIsConfirmResetModalOpen(true);
+    } else {
+      handleReset();
+    }
+  };
+
   return (
     <>
       <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={setIsModalCommentOpen} product={selectedProduct} />
@@ -507,6 +527,18 @@ const BudgetForm = ({
         budget={budget}
         onCancel={handleCancelUpdate}
         onConfirm={handleConfirmUpdate}
+      />
+      <ModalAction
+        title="¿Restaurar valores originales?"
+        onConfirm={handleConfirmReset}
+        showModal={isConfirmResetModalOpen}
+        setShowModal={setIsConfirmResetModalOpen}
+        confirmButtonText="Restaurar"
+        confirmButtonIcon={ICONS.UNDO}
+        noConfirmation={true}
+        bodyContent="Se perderán los cambios aceptados sobre los productos actualizados al clonar el presupuesto. ¿Estás seguro de continuar?"
+        disableButtons={false}
+        warning
       />
       <FormProvider {...methods}>
         <Form onSubmit={handleSubmit(handleConfirm)}>
@@ -758,7 +790,7 @@ const BudgetForm = ({
             disabled={isLoading}
             isDirty={isDirty}
             isUpdating={draft || isCloning}
-            onReset={handleReset}
+            onReset={handleTryReset}
             color={currentState.color}
             onSubmit={handleSubmit(handleConfirm)}
             icon={currentState.icon}

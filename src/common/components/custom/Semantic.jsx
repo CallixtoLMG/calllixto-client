@@ -34,6 +34,7 @@ export const Input = styled(SInput)`
   &&& input{
     border-left: ${({ $iconLabel }) => ($iconLabel) && "none"} !important;
     justify-items: ${({ justifyItems }) => justifyItems} !important;
+    padding: ${({ padding }) => padding} !important;
   }
 `;
 

@@ -18,6 +18,8 @@ export const NumberControlled = ({
   normalMode = false,
   disabled,
   defaultValueFallback,
+  isMeasure = false,
+  padding,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -51,24 +53,38 @@ export const NumberControlled = ({
               {...inputProps}
               {...rest}
               icon
+              padding={padding}
               maxLength={maxLength}
-              value={normalMode
-                ? safeValue
-                : (typeof safeValue === 'number'
-                  ? safeValue.toLocaleString()
-                  : safeValue)
-              }
+              value={safeValue}
               placeholder={placeholder ?? label}
               {...(unit && { iconPosition })}
               onChange={(e) => {
-                let newValue = e.target.value.replace(/[^0-9]/g, '');
+                let newValue = e.target.value.replace(/[^0-9.,]/g, '').replace(',', '.');
 
-                if (!normalMode) {
-                  newValue = newValue ? Number(newValue).toLocaleString() : '';
+                if (isMeasure) {
+                  if (/^\d*\.?\d{0,2}$/.test(newValue)) {
+                    onChangeController(newValue);
+                    onChange?.(newValue);
+                  }
+                } else {
+                  newValue = newValue.replace(/\..*/, '');
+                  onChangeController(newValue);
+                  onChange?.(newValue);
                 }
-
-                onChangeController(newValue);
-                onChange?.(newValue);
+              }}
+              onBlur={(e) => {
+                const raw = e.target.value.replace(',', '.');
+                const value = parseFloat(raw);
+              
+                if (isMeasure) {
+                  if (!value || value === 0) {
+                    onChangeController("0.1");
+                  }
+                } else {
+                  if (!value || isNaN(value)) {
+                    onChangeController("0");
+                  }
+                }
               }}
               onFocus={(e) => e.target.select()}
             >

@@ -12,7 +12,8 @@ export const PercentField = forwardRef(({
   error,
   maxValue = 100,
   disabled,
-  justifyItems
+  justifyItems,
+  onBlur,
 }, ref) => {
 
   return (
@@ -32,22 +33,23 @@ export const PercentField = forwardRef(({
         disabled={disabled}
         onChange={(e) => {
           const inputValue = e.target.value;
-        
+
           if (inputValue === '') {
             onChange('');
             return;
           }
-        
+
           const regex = /^\d*\.?\d{0,2}$/;
-        
+
           if (regex.test(inputValue)) {
             const numericValue = parseFloat(inputValue);
             if (numericValue <= maxValue && numericValue >= 0) {
-              onChange(inputValue); 
+              onChange(inputValue);
             }
           }
         }}
         onFocus={(e) => e.target.select()}
+        onBlur={onBlur}
         ref={ref}
       >
         <input />
