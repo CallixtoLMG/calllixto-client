@@ -167,12 +167,6 @@ export const ENTITIES = {
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
 
-export const BUDGET_PDF_FORMAT = {
-  DISPATCH: "dispatch",
-  CLIENT: "client",
-  INTERNAL: "internal",
-};
-
 export const BUDGET_STATES = {
   CONFIRMED: {
     id: 'CONFIRMED',
@@ -412,5 +406,23 @@ export const CODE = "code";
 export const FILTERS_OPTIONS = {
   DATE: "date",
   NAME: "name"
+};
+
+export const BUDGET_PDF_FORMAT = {
+  DISPATCH: {
+    iconName: ICONS.TRUCK,
+    key: "dispatch",
+    title: "Remito"
+  },
+  CLIENT: {
+    key: 'client',
+    iconName: ICONS.ADDRESS_CARD,
+    title: 'Cliente',
+  },
+  INTERNAL: {
+    key: "internal",
+    iconName: ICONS.ARCHIVE,
+    title: 'Interno'
+  },
 };
 

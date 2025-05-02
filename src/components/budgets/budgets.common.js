@@ -131,7 +131,7 @@ const BUDGETS_COLUMNS = [
   },
 ];
 
-const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
+const PRODUCTS_COLUMNS = (dispatchPdf, budget, showPrices) => {
   const includeDiscount = budget?.products?.some(product => product.discount);
   const includeDispatchComment = dispatchPdf && budget?.products?.some(product => product.dispatchComment || product.dispatch?.comment);
 
@@ -156,25 +156,25 @@ const PRODUCTS_COLUMNS = (dispatchPdf, budget) => {
         </Flex>
       )
     },
-    !dispatchPdf && {
+    !dispatchPdf && showPrices && {
       id: 3,
       title: "Precio",
       width: 2,
       value: (product) => <Price value={getPrice(product)} />
     },
-    !dispatchPdf && includeDiscount && {
+    !dispatchPdf && showPrices && includeDiscount && {
       id: 4,
       title: "Subtotal",
       width: 2,
       value: (product) => <Price value={getPrice(product) * product.quantity} />
     },
-    !dispatchPdf && includeDiscount && {
+    !dispatchPdf && showPrices && includeDiscount && {
       id: 5,
       title: "Desc.",
       width: 1,
       value: (product) => formatedPercentage(product.discount || 0)
     },
-    !dispatchPdf && {
+    !dispatchPdf && showPrices && {
       id: 6,
       title: "Importe",
       width: 2,

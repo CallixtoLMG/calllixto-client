@@ -22,11 +22,11 @@ const Field = ({ label, value, ...rest }) => (
   </Flex>
 );
 
-const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, total, selectedContact }, ref) => {
-  const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT, [printPdfMode]);
-  const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH, [printPdfMode]);
-  const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL, [printPdfMode]);
-  const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget), [budget, dispatchPdf]);
+const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, total, selectedContact, showPrices }, ref) => {
+  const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT.key, [printPdfMode]);
+  const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH.key, [printPdfMode]);
+  const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL.key, [printPdfMode]);
+  const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget, showPrices), [budget, dispatchPdf, showPrices]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
   const roundedFinalTotal = parseFloat(total?.toFixed(2));
@@ -142,7 +142,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
       <FlexColumn rowGap="15px">
         {!!dolarExchangeRate && !dispatchPdf && (
           <DataContainer width="100%">
-            <Title as="h4" alignSelf="left" $slim>Cotización en USD</Title>
+            <Title as="h4" alignSelf="left" textAlignLast="left" $slim>Cotización en USD</Title>
             <Divider />
             <Title as="h4" alignSelf="left" width="fit-content" minHeight="30px">
               <Price value={roundedFinalTotal / parseInt(dolarExchangeRate)} />
