@@ -5,7 +5,7 @@ import { useListCustomers } from "@/api/customers";
 import { useDolarExangeRate } from "@/api/external";
 import { useListProducts } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
-import { Box, Button, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Input, Menu } from "@/common/components/custom";
+import { Box, Button, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu } from "@/common/components/custom";
 import { COLORS, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { now } from "@/common/utils/dates";
@@ -71,22 +71,6 @@ const Budget = ({ params }) => {
   const formatValue = (value) => {
     const formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
-  };
-
-  const handleDollarChange = (e) => {
-    let value = e.target.value;
-    value = value.replace(/[^0-9.]/g, '');
-    const parts = value.split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    if (parts.length > 1) {
-      value = parts[0] + '.' + parts[1].substring(0, 2);
-    } else {
-      value = parts[0];
-    }
-    const numericValue = parseFloat(value.replace(/,/g, ''));
-
-    setFormattedDolarRate(value);
-    setDolarRate(numericValue);
   };
 
   const products = useMemo(() => productsData?.products?.map(product => ({
@@ -199,7 +183,7 @@ const Budget = ({ params }) => {
       const hasValidSendOptions = sendButtons.some(button => button.subOptions.length > 0);
 
       const actions = [
-        !isBudgetDraft(budget.state) && 
+        !isBudgetDraft(budget.state) &&
         {
           id: 1,
           button: (
@@ -208,7 +192,6 @@ const Budget = ({ params }) => {
               as={Button}
               text='PDFs'
               icon={ICONS.DOWNLOAD}
-              floating
               labeled
               button
               className='icon blue'
@@ -238,7 +221,6 @@ const Budget = ({ params }) => {
                 pointing
                 text='Enviar'
                 icon={ICONS.SEND}
-                floating
                 labeled
                 button
                 className='icon blue'
@@ -368,58 +350,15 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      <Flex $margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} $justifyContent="space-between">
-        {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
-          <>
-            <IconedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
-            <ModalCustomer
-              isModalOpen={isModalCustomerOpen}
-              onClose={handleModalCustomerClose}
-              customer={customerData}
-            />
-            <ModalConfirmation
-              subtotal={subtotal}
-              subtotalAfterDiscount={subtotalAfterDiscount}
-              total={total}
-              isModalOpen={isModalConfirmationOpen}
-              onClose={handleModalConfirmationClose}
-              customer={customerData}
-              onConfirm={mutate}
-              isLoading={isPending}
-              pickUpInStore={budget?.pickUpInStore}
-            />
-          </>
-        ) : <Box />}
-        {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-          <Input
-            type="text"
-            height="35px"
-            width="fit-content"
-            onChange={handleDollarChange}
-            actionPosition='left'
-            placeholder="Precio"
-            value={formattedDolarRate}
-            disabled={!showDolarExangeRate}
-            action={
-              <IconedButton
-                text="Cotizar en USD"
-                icon={ICONS.DOLLAR}
-                color={COLORS.GREEN}
-                basic={!showDolarExangeRate}
-                onClick={() => {
-                  setShowDolarExangeRate(prev => !prev);
-                  if (!showDolarExangeRate) {
-                    setFormattedDolarRate(formatValue(dolarRate));
-                  } else {
-                    setFormattedDolarRate('');
-                    setDolarRate(0);
-                  }
-                }}
-              />
-            }
-          />
-        )}
-      </Flex>
+
+      {isBudgetPending(budget?.state) &&
+        <Flex $margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} $justifyContent="space-between">
+          {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
+            <>
+              <IconedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
+            </>
+          ) : <Box />}
+        </Flex>}
       {isBudgetDraft(budget?.state) ? (
         <BudgetForm
           onSubmit={mutateEdit}
@@ -434,23 +373,14 @@ const Budget = ({ params }) => {
           setSelectedContact={setSelectedContact}
         />
       ) : (
-        <>
-          <BudgetView
-            budget={{ ...budget, customer: customerData }}
-            subtotal={subtotal}
-            subtotalAfterDiscount={subtotalAfterDiscount}
-            total={total}
-            selectedContact={selectedContact}
-            setSelectedContact={setSelectedContact}
-          />
-          <ModalCancel
-            isModalOpen={isModalCancelOpen}
-            onClose={handleModalCancelClose}
-            onConfirm={mutateCancel}
-            isLoading={isPendingCancel}
-            id={budget?.id}
-          />
-        </>
+        <BudgetView
+          budget={{ ...budget, customer: customerData }}
+          subtotal={subtotal}
+          subtotalAfterDiscount={subtotalAfterDiscount}
+          total={total}
+          selectedContact={selectedContact}
+          setSelectedContact={setSelectedContact}
+        />
       )}
       <OnlyPrint marginTop="20px">
         <PDFfile
@@ -467,7 +397,30 @@ const Budget = ({ params }) => {
           dolarRate={dolarRate}
         />
       </OnlyPrint>
-    </Loader>
+      <ModalCustomer
+        isModalOpen={isModalCustomerOpen}
+        onClose={handleModalCustomerClose}
+        customer={customerData}
+      />
+      <ModalConfirmation
+        subtotal={subtotal}
+        subtotalAfterDiscount={subtotalAfterDiscount}
+        total={total}
+        isModalOpen={isModalConfirmationOpen}
+        onClose={handleModalConfirmationClose}
+        customer={customerData}
+        onConfirm={mutate}
+        isLoading={isPending}
+        pickUpInStore={budget?.pickUpInStore}
+      />
+      <ModalCancel
+        isModalOpen={isModalCancelOpen}
+        onClose={handleModalCancelClose}
+        onConfirm={mutateCancel}
+        isLoading={isPendingCancel}
+        id={budget?.id}
+      />
+    </Loader >
   );
 };
 

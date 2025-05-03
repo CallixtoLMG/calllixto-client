@@ -18,7 +18,7 @@ export const NumberControlled = ({
   normalMode = false,
   disabled,
   defaultValueFallback,
-  isMeasure = false,
+  allowsDecimal = false,
   padding,
   ...inputProps
 }) => {
@@ -61,7 +61,7 @@ export const NumberControlled = ({
               onChange={(e) => {
                 let newValue = e.target.value.replace(/[^0-9.,]/g, '').replace(',', '.');
 
-                if (isMeasure) {
+                if (allowsDecimal) {
                   if (/^\d*\.?\d{0,2}$/.test(newValue)) {
                     onChangeController(newValue);
                     onChange?.(newValue);
@@ -75,14 +75,14 @@ export const NumberControlled = ({
               onBlur={(e) => {
                 const raw = e.target.value.replace(',', '.');
                 const value = parseFloat(raw);
-              
-                if (isMeasure) {
+              // CAMBIAR ESTO POR QUE NO RECONOCE EL CAMBIO DESPUES DEL ONBLUR
+                if (allowsDecimal) {
                   if (!value || value === 0) {
-                    onChangeController("0.1");
+                    onChangeController("1");
                   }
                 } else {
                   if (!value || isNaN(value)) {
-                    onChangeController("0");
+                    onChangeController("1");
                   }
                 }
               }}

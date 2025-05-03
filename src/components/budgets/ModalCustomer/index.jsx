@@ -11,17 +11,15 @@ import { Modal, Transition } from "semantic-ui-react";
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm({ defaultValues: customer });
-  const { handleSubmit, reset, watch } = methods;
+  const { handleSubmit, reset, watch, trigger } = methods;
   const addressRefInputRef = useRef(null);
   const formRef = useRef(null);
-  const inputRef = useRef(null);
   const editCustomer = useEditCustomer();
-  const watchedAreaCode = watch('areaCode');
-  const watchedNumber = watch('number');
-
+  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
     if (isModalOpen) {
+      setHasSubmitted(false); 
       const timeout = setTimeout(() => {
         addressRefInputRef.current?.focus();
       }, 100);
@@ -33,15 +31,10 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
     reset(customer);
   }, [customer, isModalOpen, reset]);
 
-  useEffect(() => {
-    if (isModalOpen) {
-      inputRef.current?.focus();
-    }
-  }, [isModalOpen]);
-
   const handleEdit = async ({ refA, refP, address, areaCode, number }) => {
     const data = {
       id: customer.id,
+      name: customer.name,
       addresses: [{
         ref: refA,
         address
@@ -57,7 +50,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
       const response = await editCustomer(data);
       if (response?.statusOk) {
         toast.success('Cliente actualizado!');
-      onClose(true, data);
+        onClose(true, data);
       } else {
         toast.error('Error al actualizar el cliente.');
       }
@@ -70,6 +63,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   };
 
   const handleConfirmClick = () => {
+    setHasSubmitted(true); 
     if (formRef.current) {
       formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }
@@ -127,10 +121,11 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   rules={{
                     required: "El código de área es requerido.",
                     validate: (value) => {
-                      const number = watchedNumber || '';
+                      const number = watch("number") || '';
                       return (value + number).length === 10 || "El área y el número deben sumar 10 dígitos.";
                     },
                   }}
+                  onChange={() => hasSubmitted && trigger("number")}
                   normalMode
                 />
                 <NumberControlled
@@ -141,10 +136,11 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   rules={{
                     required: "El número de teléfono es requerido.",
                     validate: (value) => {
-                      const areaCode = watchedAreaCode || '';
+                      const areaCode = watch("areaCode") || '';
                       return (areaCode + value).length === 10 || "El área y el número deben sumar 10 dígitos.";
                     },
                   }}
+                  onChange={() => hasSubmitted && trigger("areaCode")}
                   maxLength="7"
                   normalMode
                 />

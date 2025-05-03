@@ -2,7 +2,6 @@ import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
 import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
-import { ModalAction } from "@/common/components/modals";
 import ProductSearch from "@/common/components/search/search";
 import { Text } from "@/common/components/search/styles";
 import { Table, Total } from "@/common/components/table";
@@ -100,7 +99,6 @@ const BudgetForm = ({
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
-  const [isConfirmResetModalOpen, setIsConfirmResetModalOpen] = useState(false);
   const [hasAcceptedChanges, setHasAcceptedChanges] = useState(false);
 
   useEffect(() => {
@@ -113,7 +111,7 @@ const BudgetForm = ({
 
   const customerOptions = useMemo(() => {
     return customers
-      .filter(({ state }) => state !== CUSTOMER_STATES.INACTIVE.id) // 👈 Filtrar desactivados
+      .filter(({ state }) => state !== CUSTOMER_STATES.INACTIVE.id)
       .map(({ id, name, state, tags, comments, phoneNumbers, addresses }) => ({
         key: id,
         value: { phoneNumbers, addresses, id, state, name },
@@ -234,11 +232,17 @@ const BudgetForm = ({
   }, [budget, isCloning, products, watchProducts, setValue]);
 
   const handleConfirmUpdate = () => {
-    setValue('products', temporaryProducts);
+    setValue(
+      'products',
+      temporaryProducts.filter(
+        (product) =>
+          !removedProducts.find((removed) => removed.code === product.code)
+      )
+    );
     setOriginalPrices({});
     setShouldShowModal(false);
     setIsTableLoading(false);
-    setHasAcceptedChanges(true); 
+    setHasAcceptedChanges(true);
   };
 
   const handleCancelUpdate = () => {
@@ -421,7 +425,7 @@ const BudgetForm = ({
                 setValue(`products[${index}].fractionConfig.price`, safeValue * product.price);
                 calculateTotal();
               }}
-              isMeasure
+              allowsDecimal
             />
           )}
         </>
@@ -503,15 +507,9 @@ const BudgetForm = ({
     },
   ]);
 
-  const handleConfirmReset = () => {
-    handleReset();
-    setHasAcceptedChanges(false);
-    setIsConfirmResetModalOpen(false);
-  };
-
   const handleTryReset = () => {
     if (isCloning && hasAcceptedChanges) {
-      setIsConfirmResetModalOpen(true);
+      setShouldShowModal(true);
     } else {
       handleReset();
     }
@@ -527,18 +525,6 @@ const BudgetForm = ({
         budget={budget}
         onCancel={handleCancelUpdate}
         onConfirm={handleConfirmUpdate}
-      />
-      <ModalAction
-        title="¿Restaurar valores originales?"
-        onConfirm={handleConfirmReset}
-        showModal={isConfirmResetModalOpen}
-        setShowModal={setIsConfirmResetModalOpen}
-        confirmButtonText="Restaurar"
-        confirmButtonIcon={ICONS.UNDO}
-        noConfirmation={true}
-        bodyContent="Se perderán los cambios aceptados sobre los productos actualizados al clonar el presupuesto. ¿Estás seguro de continuar?"
-        disableButtons={false}
-        warning
       />
       <FormProvider {...methods}>
         <Form onSubmit={handleSubmit(handleConfirm)}>
