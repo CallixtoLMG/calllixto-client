@@ -173,16 +173,17 @@ const BudgetForm = ({
     if (isCloning && !hasShownModal.current) {
       setIsTableLoading(true);
       let budgetProducts = [...budget.products];
+  
       const outdatedProducts = products.filter(product => {
-        const budgetProduct = budgetProducts.find(budgetProduct => budgetProduct.code === product.code);
-
+        const budgetProduct = budgetProducts.find(bp => bp.code === product.code);
+  
         if (budgetProduct) {
-          budgetProducts = budgetProducts.filter(budgetProduct => budgetProduct.code !== product.code);
-
+          budgetProducts = budgetProducts.filter(bp => bp.code !== product.code);
+  
           const priceChanged = budgetProduct.price !== product.price;
           const stateChanged = budgetProduct.state !== product.state;
           const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
-
+  
           const fractionConfigChanged =
             (budgetProduct.fractionConfig?.active !== product.fractionConfig?.active) ||
             (
@@ -190,37 +191,15 @@ const BudgetForm = ({
               product.fractionConfig?.active &&
               (budgetProduct.fractionConfig.value !== product.fractionConfig.value && product.fractionConfig.value !== undefined)
             );
-
+  
           return priceChanged || editableChanged || fractionConfigChanged || stateChanged;
         }
+  
         return false;
       });
-
+  
       if (outdatedProducts.length || budgetProducts.length) {
-        let newProducts = watchProducts.map(product => {
-          const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
-          if (outdatedProduct) {
-            setOriginalPrices(prev => ({
-              ...prev,
-              [product.code]: product.price
-            }));
-
-            return {
-              ...product,
-              price: outdatedProduct.price,
-              editablePrice: outdatedProduct.editablePrice,
-              fractionConfig: {
-                ...product.fractionConfig,
-                ...outdatedProduct.fractionConfig,
-              },
-              state: outdatedProduct.state,
-              quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity
-            };
-          }
-          return product;
-        });
-
-        setTemporaryProducts(newProducts);
+        setTemporaryProducts(watchProducts);
         setOutdatedProducts(outdatedProducts);
         setRemovedProducts(budgetProducts);
         setShouldShowModal(true);
@@ -232,13 +211,33 @@ const BudgetForm = ({
   }, [budget, isCloning, products, watchProducts, setValue]);
 
   const handleConfirmUpdate = () => {
+    const confirmedProducts = temporaryProducts.map(product => {
+      const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
+  
+      if (outdatedProduct) {
+        return {
+          ...product,
+          price: outdatedProduct.price,
+          editablePrice: outdatedProduct.editablePrice,
+          fractionConfig: {
+            ...product.fractionConfig,
+            ...outdatedProduct.fractionConfig,
+          },
+          state: outdatedProduct.state,
+          quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
+        };
+      }
+  
+      return product;
+    });
+  
     setValue(
-      'products',
-      temporaryProducts.filter(
-        (product) =>
-          !removedProducts.find((removed) => removed.code === product.code)
+      "products",
+      confirmedProducts.filter(
+        (product) => !removedProducts.find((removed) => removed.code === product.code)
       )
     );
+  
     setOriginalPrices({});
     setShouldShowModal(false);
     setIsTableLoading(false);

@@ -75,14 +75,15 @@ export const NumberControlled = ({
               onBlur={(e) => {
                 const raw = e.target.value.replace(',', '.');
                 const value = parseFloat(raw);
-              // CAMBIAR ESTO POR QUE NO RECONOCE EL CAMBIO DESPUES DEL ONBLUR
                 if (allowsDecimal) {
                   if (!value || value === 0) {
                     onChangeController("1");
+                    onChange?.("1");
                   }
                 } else {
                   if (!value || isNaN(value)) {
                     onChangeController("1");
+                    onChange?.("1");
                   }
                 }
               }}
