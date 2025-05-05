@@ -322,7 +322,6 @@ const Budget = ({ params }) => {
           budget={budget}
           isLoading={isPendingEdit}
           draft
-          printPdfMode={printPdfMode}
           selectedContact={selectedContact}
           setSelectedContact={setSelectedContact}
         />
