@@ -3,7 +3,7 @@ import { preventSend } from "@/common/utils";
 import { Loader } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
 import { IconedButton, PopupActions } from "../buttons";
 import { CenteredFlex } from "../custom";
@@ -40,6 +40,7 @@ const CustomTable = ({
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
   const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
+  const tableRef = useRef(null);
 
   const currentPageElements = useMemo(() => {
     if (!paginate) {
@@ -65,8 +66,8 @@ const CustomTable = ({
   }, [pages, activePage]);
 
   useEffect(() => {
-    const tableEl = document.getElementById('custom-table-wrapper');
-
+    const tableEl = tableRef.current;
+  
     const conditionalPreventSend = (e) => {
       const tag = e.target.tagName.toLowerCase();
       const isTextInput = ['input', 'textarea'].includes(tag);
@@ -74,11 +75,11 @@ const CustomTable = ({
         preventSend(e);
       }
     };
-
+  
     if (tableEl) {
       tableEl.addEventListener('keydown', conditionalPreventSend);
     }
-
+  
     return () => {
       if (tableEl) {
         tableEl.removeEventListener('keydown', conditionalPreventSend);
@@ -118,7 +119,7 @@ const CustomTable = ({
   });
 
   return (
-    <Container id="custom-table-wrapper" $tableHeight={$tableHeight}>
+    <Container ref={tableRef} $tableHeight={$tableHeight}>
       {paginate && (
         <Pagination
           activePage={activePage}

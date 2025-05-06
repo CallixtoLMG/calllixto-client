@@ -8,7 +8,7 @@ const OverflowText = styled.div`
   max-width: ${({ $maxWidth }) => $maxWidth};
   height: ${({ $height }) => $height}!important;
 
-  ${({ $lineClamp, }) =>
+  ${({ $lineClamp }) =>
     $lineClamp > 1
       ? css`
           display: -webkit-box;

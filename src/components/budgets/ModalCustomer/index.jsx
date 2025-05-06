@@ -11,15 +11,13 @@ import { Modal, Transition } from "semantic-ui-react";
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm({ defaultValues: customer });
-  const { handleSubmit, reset, watch, trigger } = methods;
+  const { handleSubmit, reset, watch, trigger, formState: { isSubmitted } } = methods;
   const addressRefInputRef = useRef(null);
   const formRef = useRef(null);
   const editCustomer = useEditCustomer();
-  const [hasSubmitted, setHasSubmitted] = useState(false);
 
   useEffect(() => {
     if (isModalOpen) {
-      setHasSubmitted(false); 
       const timeout = setTimeout(() => {
         addressRefInputRef.current?.focus();
       }, 100);
@@ -63,7 +61,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   };
 
   const handleConfirmClick = () => {
-    setHasSubmitted(true); 
+    setHasSubmitted(true);
     if (formRef.current) {
       formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }
@@ -121,11 +119,11 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   rules={{
                     required: "El código de área es requerido.",
                     validate: (value) => {
-                      const number = watch("number") || '';
+                      const number = watch("number") ?? '';
                       return (value + number).length === 10 || "El área y el número deben sumar 10 dígitos.";
                     },
                   }}
-                  onChange={() => hasSubmitted && trigger("number")}
+                  onChange={() => isSubmitted && trigger("number")}
                   normalMode
                 />
                 <NumberControlled
@@ -136,11 +134,11 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   rules={{
                     required: "El número de teléfono es requerido.",
                     validate: (value) => {
-                      const areaCode = watch("areaCode") || '';
+                      const areaCode = watch("areaCode") ?? '';
                       return (areaCode + value).length === 10 || "El área y el número deben sumar 10 dígitos.";
                     },
                   }}
-                  onChange={() => hasSubmitted && trigger("areaCode")}
+                  onChange={() => isSubmitted && trigger("areaCode")}
                   maxLength="7"
                   normalMode
                 />

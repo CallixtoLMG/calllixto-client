@@ -135,7 +135,7 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
   };
 };
 
-export const normalizeText = (text) => text?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() || "";
+export const normalizeText = (text) => text?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() ?? "";
 
 export const getDefaultListParams = (attributes, sort, order) => {
   const params = {
