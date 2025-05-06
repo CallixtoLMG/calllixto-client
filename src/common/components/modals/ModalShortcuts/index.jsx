@@ -48,7 +48,7 @@ const KeyboardShortcuts = () => {
                 <StyledListIcon name={ICONS.KEYBOARD} />
                 <StyledListContent>
                   <StyledListHeader>Control + suprimir</StyledListHeader>
-                  <List.Description>Durante la creación de un elemento, limpia el formulario.</List.Description>
+                  <List.Description>Durante la creación de un elemento, limpia o restaura el formulario.</List.Description>
                 </StyledListContent>
               </List.Item>
               <List.Item>
