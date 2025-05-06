@@ -2,10 +2,9 @@
 import { useUserContext } from "@/User";
 import { useCancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
-import { useDolarExangeRate } from "@/api/external";
 import { useListProducts } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
-import { Box, Button, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Input, Menu } from "@/common/components/custom";
+import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Input, Menu } from "@/common/components/custom";
 import { COLORS, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { now } from "@/common/utils/dates";
@@ -14,16 +13,15 @@ import BudgetView from "@/components/budgets/BudgetView";
 import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
-import PDFfile from "@/components/budgets/PDFfile";
-import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
+import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
-import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import ModalPDF from "@/components/budgets/ModalPDF";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
-import { useReactToPrint } from "react-to-print";
 import { Dropdown } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 
@@ -37,57 +35,20 @@ const Budget = ({ params }) => {
   const { data: budget, isLoading } = useGetBudget(params.id);
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
-  const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
-  const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
-  const [printPdfMode, setPrintPdfMode] = useState(BUDGET_PDF_FORMAT.CLIENT);
   const [customerData, setCustomerData] = useState();
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
-  const [dolarRate, setDolarRate] = useState(dolar);
-  const [formattedDolarRate, setFormattedDolarRate] = useState('');
-  const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
+  const [isModalPDFOpen, setIsModalPDFOpen] = useState(false);
+
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
   const [selectedContact, setSelectedContact] = useState({ phone: '', address: '' });
   const customerHasInfo = useMemo(() => !!customerData?.addresses?.length && !!customerData?.phoneNumbers?.length, [customerData]);
-  const printRef = useRef();
   const editBudget = useEditBudget();
   const confirmBudget = useConfirmBudget();
   const cancelBudget = useCancelBudget();
-
-  useEffect(() => {
-    if (dolar && showDolarExangeRate && !initialDolarRateSet) {
-      setDolarRate(dolar);
-      setFormattedDolarRate(formatValue(dolar));
-      setInitialDolarRateSet(true);
-    }
-    if (!showDolarExangeRate) {
-      setInitialDolarRateSet(false);
-    }
-  }, [dolar, showDolarExangeRate, initialDolarRateSet]);
-
-  const formatValue = (value) => {
-    const formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
-  };
-
-  const handleDollarChange = (e) => {
-    let value = e.target.value;
-    value = value.replace(/[^0-9.]/g, '');
-    const parts = value.split('.');
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    if (parts.length > 1) {
-      value = parts[0] + '.' + parts[1].substring(0, 2);
-    } else {
-      value = parts[0];
-    }
-    const numericValue = parseFloat(value.replace(/,/g, ''));
-
-    setFormattedDolarRate(value);
-    setDolarRate(numericValue);
-  };
 
   const products = useMemo(() => productsData?.products?.map(product => ({
     ...product,
@@ -141,34 +102,8 @@ const Budget = ({ params }) => {
     }
   }, [setLabels, budget, push, isLoading]);
 
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    removeAfterPrint: true,
-  });
-
   useEffect(() => {
     if (budget) {
-      const printButtons = [
-        {
-          mode: BUDGET_PDF_FORMAT.DISPATCH,
-          color: COLORS.BLUE,
-          iconName: ICONS.TRUCK,
-          text: 'Remito',
-        },
-        {
-          mode: BUDGET_PDF_FORMAT.CLIENT,
-          color: COLORS.BLUE,
-          iconName: ICONS.ADDRESS_CARD,
-          text: 'Cliente',
-        },
-        {
-          mode: BUDGET_PDF_FORMAT.INTERNAL,
-          color: COLORS.BLUE,
-          iconName: ICONS.ARCHIVE,
-          text: 'Interno'
-        }
-      ];
-
       const sendButtons = [
         {
           text: 'WhatsApp',
@@ -199,35 +134,13 @@ const Budget = ({ params }) => {
       const hasValidSendOptions = sendButtons.some(button => button.subOptions.length > 0);
 
       const actions = [
-        !isBudgetDraft(budget.state) && 
+        !isBudgetDraft(budget.state) &&
         {
           id: 1,
-          button: (
-            <Dropdown
-              pointing
-              as={Button}
-              text='PDFs'
-              icon={ICONS.DOWNLOAD}
-              floating
-              labeled
-              button
-              className='icon blue'
-            >
-              <Dropdown.Menu>
-                {printButtons.map(({ mode, iconName, text, color }) => (
-                  <DropdownItem
-                    key={mode}
-                    onClick={() => {
-                      setPrintPdfMode(mode);
-                      setTimeout(handlePrint);
-                    }}
-                  >
-                    <Icon color={color} name={iconName} /> {text}
-                  </DropdownItem>
-                ))}
-              </Dropdown.Menu>
-            </Dropdown>
-          )
+          icon: ICONS.DOWNLOAD,
+          color: COLORS.BLUE,
+          onClick: () => setIsModalPDFOpen(true),
+          text: 'PDF'
         },
         hasValidSendOptions && {
           id: 2,
@@ -368,6 +281,16 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
+      <ModalPDF
+        isModalOpen={isModalPDFOpen}
+        onClose={setIsModalPDFOpen}
+        budget={budget}
+        client={userData?.client}
+        total={total}
+        subtotal={subtotal}
+        selectedContact={selectedContact}
+        subtotalAfterDiscount={subtotalAfterDiscount}
+      />
       <Flex $margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} $justifyContent="space-between">
         {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
           <>
@@ -429,7 +352,6 @@ const Budget = ({ params }) => {
           budget={budget}
           isLoading={isPendingEdit}
           draft
-          printPdfMode={printPdfMode}
           selectedContact={selectedContact}
           setSelectedContact={setSelectedContact}
         />
@@ -452,21 +374,7 @@ const Budget = ({ params }) => {
           />
         </>
       )}
-      <OnlyPrint marginTop="20px">
-        <PDFfile
-          ref={printRef}
-          budget={budget}
-          client={userData?.client}
-          id={userData.client?.id}
-          printPdfMode={printPdfMode}
-          dolarExchangeRate={showDolarExangeRate && dolarRate}
-          subtotal={subtotal}
-          subtotalAfterDiscount={subtotalAfterDiscount}
-          total={total}
-          selectedContact={selectedContact}
-        />
-      </OnlyPrint>
-    </Loader>
+    </Loader >
   );
 };
 

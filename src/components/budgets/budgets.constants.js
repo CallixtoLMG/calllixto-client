@@ -166,9 +166,21 @@ export const PAYMENT_TABLE_HEADERS = [
 ];
 
 export const BUDGET_PDF_FORMAT = {
-  DISPATCH: "dispatch",
-  CLIENT: "client",
-  INTERNAL: "internal",
+  DISPATCH: {
+    icon: ICONS.TRUCK,
+    key: "dispatch",
+    title: "Remito"
+  },
+  CLIENT: {
+    key: 'client',
+    icon: ICONS.ADDRESS_CARD,
+    title: 'Cliente',
+  },
+  INTERNAL: {
+    key: "internal",
+    icon: ICONS.ARCHIVE,
+    title: 'Interno'
+  },
 };
 
 export const PICK_UP_IN_STORE = "Retira en tienda";

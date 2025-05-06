@@ -27,7 +27,7 @@ const PDF = ({ params }) => {
         budget={budget}
         client={userData?.client}
         subtotal={getTotalSum(budget?.products)}
-        printPdfMode={BUDGET_PDF_FORMAT.CLIENT}
+        printPdfMode={BUDGET_PDF_FORMAT.CLIENT.key}
         selectedContact={{
           address: budget?.customer?.addresses?.[0]?.address,
           phone: getFormatedPhone(budget?.customer?.phoneNumbers?.[0]),
