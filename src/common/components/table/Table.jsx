@@ -1,8 +1,9 @@
 import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS } from "@/common/constants";
+import { preventSend } from "@/common/utils";
 import { Loader } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
 import { IconedButton, PopupActions } from "../buttons";
 import { CenteredFlex } from "../custom";
@@ -39,6 +40,7 @@ const CustomTable = ({
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
   const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
+  const tableRef = useRef(null);
 
   const currentPageElements = useMemo(() => {
     if (!paginate) {
@@ -62,6 +64,29 @@ const CustomTable = ({
       setActivePage(1);
     }
   }, [pages, activePage]);
+
+  useEffect(() => {
+    const tableEl = tableRef.current;
+  
+    const conditionalPreventSend = (e) => {
+      const tag = e.target.tagName.toLowerCase();
+      const isTextInput = ['input', 'textarea'].includes(tag);
+      if (isTextInput) {
+        preventSend(e);
+      }
+    };
+  
+    if (tableEl) {
+      tableEl.addEventListener('keydown', conditionalPreventSend);
+    }
+  
+    return () => {
+      if (tableEl) {
+        tableEl.removeEventListener('keydown', conditionalPreventSend);
+      }
+    };
+  }, []);
+
 
   const handlePageChange = (e, { activePage }) => {
     clearSelection?.();
@@ -94,7 +119,7 @@ const CustomTable = ({
   });
 
   return (
-    <Container $tableHeight={$tableHeight}>
+    <Container ref={tableRef} $tableHeight={$tableHeight}>
       {paginate && (
         <Pagination
           activePage={activePage}
@@ -166,8 +191,10 @@ const CustomTable = ({
                         )}
                         {headers.map(header => (
                           <LinkCell
-                            key={`cell_${header.id}`} align={header.align}
-                            width={header.width} onClick={() => push(page.SHOW(element[mainKey]))}
+                            key={`cell_${header.id}_${element[mainKey]}`}
+                            align={header.align}
+                            width={header.width}
+                            onClick={() => push(page.SHOW(element[mainKey]))}
                           >
                             {header.value(element, index)}
                           </LinkCell>
@@ -184,7 +211,7 @@ const CustomTable = ({
                                   trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                   buttons={actions.map((action, idx) => (
                                     <IconedButton
-                                      key={idx}
+                                      key={`${action.icon}_${idx}`}
                                       icon={action.icon}
                                       color={action.color}
                                       onClick={() => action.onClick(element, index)}
@@ -227,7 +254,7 @@ const CustomTable = ({
                                 trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                 buttons={actions.map((action, idx) => (
                                   <IconedButton
-                                    key={idx}
+                                    key={`${action.icon}_${idx}`}
                                     icon={action.icon}
                                     color={action.color}
                                     onClick={() => action.onClick(element, index)}

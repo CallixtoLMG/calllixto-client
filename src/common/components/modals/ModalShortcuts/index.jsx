@@ -48,7 +48,7 @@ const KeyboardShortcuts = () => {
                 <StyledListIcon name={ICONS.KEYBOARD} />
                 <StyledListContent>
                   <StyledListHeader>Control + suprimir</StyledListHeader>
-                  <List.Description>Durante la creación de un elemento, limpia el formulario.</List.Description>
+                  <List.Description>Durante la creación de un elemento, limpia o restaura el formulario.</List.Description>
                 </StyledListContent>
               </List.Item>
               <List.Item>
@@ -61,7 +61,7 @@ const KeyboardShortcuts = () => {
               <List.Item>
                 <StyledListIcon name={ICONS.KEYBOARD} />
                 <StyledListContent>
-                  <StyledListHeader>Control + retroceder</StyledListHeader>
+                  <StyledListHeader>Control + retroceso</StyledListHeader>
                   <List.Description>Vuelve a la página anterior.</List.Description>
                 </StyledListContent>
               </List.Item>
@@ -71,9 +71,8 @@ const KeyboardShortcuts = () => {
             <IconedButton
               text="Cerrar"
               icon={ICONS.REMOVE}
-              color={COLORS.GREY}
+              color={COLORS.RED}
               onClick={() => setOpen(false)}
-              basic
             />
           </Modal.Actions>
         </Modal>

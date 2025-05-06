@@ -164,6 +164,7 @@ const Product = ({ params }) => {
       if (response.statusOk) {
         toast.success("Producto actualizado!");
         setIsUpdating(false);
+        resolveSave(); 
       } else {
         toast.error(response.error.message);
       }
@@ -183,7 +184,6 @@ const Product = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto activado!");
-        resolveSave();
       } else {
         toast.error(response.error.message);
       }

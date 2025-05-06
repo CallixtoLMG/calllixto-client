@@ -1,5 +1,5 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Input, Label, OverflowWrapper } from "@/common/components/custom";
+import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
@@ -23,7 +23,7 @@ import { v4 as uuid } from 'uuid';
 import { CUSTOMER_STATES } from "../../customers/customers.constants";
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
-import { Container, Icon, VerticalDivider } from "./styles";
+import { Container, VerticalDivider } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
   seller: user?.name,
@@ -99,6 +99,7 @@ const BudgetForm = ({
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
+  const [hasAcceptedChanges, setHasAcceptedChanges] = useState(false);
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -109,48 +110,38 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers.map(({ id, name, state, inactiveReason, tags, comments, phoneNumbers, addresses }) => ({
-      key: id,
-      value: { phoneNumbers, addresses, id, state, name },
-      text: name,
-      content: (
-        <FlexColumn $marginTop="5px" $rowGap="5px">
-          <FlexColumn>
-            <OverflowWrapper popupContent={name}>
-              <Text>{name}</Text>
-            </OverflowWrapper>
+    return customers
+      .filter(({ state }) => state !== CUSTOMER_STATES.INACTIVE.id)
+      .map(({ id, name, state, tags, comments, phoneNumbers, addresses }) => ({
+        key: id,
+        value: { phoneNumbers, addresses, id, state, name },
+        text: name,
+        content: (
+          <FlexColumn $marginTop="5px" $rowGap="5px">
+            <FlexColumn>
+              <OverflowWrapper popupContent={name}>
+                <Text>{name}</Text>
+              </OverflowWrapper>
+            </FlexColumn>
+            <Flex $justifyContent="space-between" $alignItems="center" $columnGap="5px">
+              <Box style={{ width: "30px", textAlign: "center" }}>
+                {comments ? (
+                  <CommentTooltip comment={comments} />
+                ) : (
+                  <Box visibility="hidden">ℹ️</Box>
+                )}
+              </Box>
+              <Box>
+                {tags ? (
+                  <TagsTooltip maxWidthOverflow="5vw" tags={tags} />
+                ) : (
+                  <Box visibility="hidden">🔖</Box>
+                )}
+              </Box>
+            </Flex>
           </FlexColumn>
-          <Flex $justifyContent="space-between" $alignItems="center" $columnGap="5px">
-            <Box >
-              {state === CUSTOMER_STATES.INACTIVE.id ? (
-                <Popup
-                  trigger={<Label width="fit-content" color={COLORS.GREY} size="tiny">Desactivado</Label>}
-                  content={inactiveReason || 'Motivo no especificado'}
-                  position="top center"
-                  size="mini"
-                />
-              ) : (
-                <Box visibility="hidden" >Desactivado</Box>
-              )}
-            </Box>
-            <Box >
-              {tags ? (
-                <TagsTooltip tags={tags} />
-              ) : (
-                <Box visibility="hidden">🔖</Box>
-              )}
-            </Box>
-            <Box style={{ width: "30px", textAlign: "center" }}>
-              {comments ? (
-                <CommentTooltip comment={comments} />
-              ) : (
-                <Box visibility="hidden">ℹ️</Box>
-              )}
-            </Box>
-          </Flex>
-        </FlexColumn>
-      ),
-    }));
+        ),
+      }));
   }, [customers]);
 
   const normalizedCustomer = useMemo(() => {
@@ -182,16 +173,24 @@ const BudgetForm = ({
     if (isCloning && !hasShownModal.current) {
       setIsTableLoading(true);
       let budgetProducts = [...budget.products];
+  
+      // Detectar productos removidos
+      const existingProductCodes = new Set(products.map(p => p.code));
+      const removedProducts = budgetProducts.filter(p => !existingProductCodes.has(p.code));
+      const validProducts = budgetProducts.filter(p => existingProductCodes.has(p.code));
+  
+      // Actualizar los productos válidos en el formulario
+      setValue("products", validProducts);
+  
+      // Detectar productos desactualizados
       const outdatedProducts = products.filter(product => {
-        const budgetProduct = budgetProducts.find(budgetProduct => budgetProduct.code === product.code);
-
+        const budgetProduct = validProducts.find(bp => bp.code === product.code);
+  
         if (budgetProduct) {
-          budgetProducts = budgetProducts.filter(budgetProduct => budgetProduct.code !== product.code);
-
           const priceChanged = budgetProduct.price !== product.price;
           const stateChanged = budgetProduct.state !== product.state;
           const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
-
+  
           const fractionConfigChanged =
             (budgetProduct.fractionConfig?.active !== product.fractionConfig?.active) ||
             (
@@ -199,39 +198,17 @@ const BudgetForm = ({
               product.fractionConfig?.active &&
               (budgetProduct.fractionConfig.value !== product.fractionConfig.value && product.fractionConfig.value !== undefined)
             );
-
+  
           return priceChanged || editableChanged || fractionConfigChanged || stateChanged;
         }
+  
         return false;
       });
-
-      if (outdatedProducts.length || budgetProducts.length) {
-        let newProducts = watchProducts.map(product => {
-          const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
-          if (outdatedProduct) {
-            setOriginalPrices(prev => ({
-              ...prev,
-              [product.code]: product.price
-            }));
-
-            return {
-              ...product,
-              price: outdatedProduct.price,
-              editablePrice: outdatedProduct.editablePrice,
-              fractionConfig: {
-                ...product.fractionConfig,
-                ...outdatedProduct.fractionConfig,
-              },
-              state: outdatedProduct.state,
-              quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity
-            };
-          }
-          return product;
-        });
-
-        setTemporaryProducts(newProducts);
+  
+      if (outdatedProducts.length || removedProducts.length) {
+        setTemporaryProducts(validProducts);
         setOutdatedProducts(outdatedProducts);
-        setRemovedProducts(budgetProducts);
+        setRemovedProducts(removedProducts); 
         setShouldShowModal(true);
         hasShownModal.current = true;
       } else {
@@ -241,10 +218,37 @@ const BudgetForm = ({
   }, [budget, isCloning, products, watchProducts, setValue]);
 
   const handleConfirmUpdate = () => {
-    setValue('products', temporaryProducts);
+    const confirmedProducts = temporaryProducts.map(product => {
+      const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
+  
+      if (outdatedProduct) {
+        return {
+          ...product,
+          price: outdatedProduct.price,
+          editablePrice: outdatedProduct.editablePrice,
+          fractionConfig: {
+            ...product.fractionConfig,
+            ...outdatedProduct.fractionConfig,
+          },
+          state: outdatedProduct.state,
+          quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
+        };
+      }
+  
+      return product;
+    });
+  
+    setValue(
+      "products",
+      confirmedProducts.filter(
+        (product) => !removedProducts.find((removed) => removed.code === product.code)
+      )
+    );
+  
     setOriginalPrices({});
     setShouldShowModal(false);
     setIsTableLoading(false);
+    setHasAcceptedChanges(true);
   };
 
   const handleCancelUpdate = () => {
@@ -282,7 +286,7 @@ const BudgetForm = ({
     await onSubmit({
       ...data,
       customer: { id: customer.id, name: customer.name },
-      products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment"])),
+      products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment", "tags"])),
       total: Number(total.toFixed(2)),
       state
     });
@@ -296,24 +300,21 @@ const BudgetForm = ({
   }, [watchState]);
 
   const handleReset = useCallback(() => {
-    if (draft || isCloning) {
-      reset({
-        ...EMPTY_BUDGET(user),
-        ...budget,
-        seller: user?.name,
-      });
-    } else {
-      reset({
-        ...EMPTY_BUDGET(user),
-        state: watchState,
-        seller: user?.name,
-      });
+    let baseBudget = draft || isCloning
+      ? { ...EMPTY_BUDGET(user), ...budget, seller: user?.name }
+      : { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
+  
+    if (isCloning && removedProducts.length > 0) {
+      const removedCodes = removedProducts.map(p => p.code);
+      baseBudget.products = baseBudget.products.filter(p => !removedCodes.includes(p.code));
     }
-
+  
+    reset(baseBudget);
+  
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [draft, isCloning, reset, user, budget, watchState]);
+  }, [draft, isCloning, reset, user, budget, watchState, removedProducts]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));
@@ -378,6 +379,7 @@ const BudgetForm = ({
       title: "Cantidad",
       value: (product, index) => (
         <NumberControlled
+          padding="9px 14px"
           width="80px"
           name={`products[${index}].quantity`}
           onChange={() => {
@@ -398,10 +400,10 @@ const BudgetForm = ({
           </OverflowWrapper>
           <Flex $alignItems="center" $marginLeft="5px" $columnGap="5px">
             {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
-            {product.tags && <TagsTooltip tooltip="true" tags={product.tags} />}
-            {product.comments && <CommentTooltip tooltip="true" comment={product.comments} />}
+            {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
+            {product.comments && <CommentTooltip lineHeight="normal" tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
-              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />} />
+              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon lineHeight="normal" name={ICONS.TRUCK} color={COLORS.BLUE} />} />
             )}
           </Flex>
         </Container>
@@ -417,7 +419,7 @@ const BudgetForm = ({
         <>
           {product.fractionConfig?.active && (
             <NumberControlled
-              width="100px"
+              width="130px"
               name={`products[${index}].fractionConfig.value`}
               unit={product.fractionConfig.unit}
               defaultValueFallback={1}
@@ -426,6 +428,7 @@ const BudgetForm = ({
                 setValue(`products[${index}].fractionConfig.price`, safeValue * product.price);
                 calculateTotal();
               }}
+              allowsDecimal
             />
           )}
         </>
@@ -442,6 +445,7 @@ const BudgetForm = ({
               width="100%"
               name={`products[${index}].price`}
               onAfterChange={calculateTotal}
+              justifyItems="right"
             />
           )
           : <PriceLabel width="100%" value={getPrice(product)} />
@@ -459,6 +463,7 @@ const BudgetForm = ({
             defaultValue={product.discount ?? 0}
             handleChange={calculateTotal}
             disabled={isProductOOS(product.state)}
+            justifyItems="left"
           />
         </Flex>
       ),
@@ -504,6 +509,14 @@ const BudgetForm = ({
       condition: validateShortcuts.canReset
     },
   ]);
+
+  const handleTryReset = () => {
+    if (isCloning && hasAcceptedChanges) {
+      setShouldShowModal(true);
+    } else {
+      handleReset();
+    }
+  };
 
   return (
     <>
@@ -715,12 +728,11 @@ const BudgetForm = ({
           <FieldsContainer width="100%" $rowGap="15px">
             <Controller
               name="paymentMethods"
-              rules={RULES.REQUIRED}
               render={({ field: { onChange, value } }) => (
                 <FormField flex="1" label="Metodos de pago" control={Input}>
                   <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                     <Button
-                      $paddingLeft="fit-content"
+                      $paddingLeft="18px"
                       width="fit-content"
                       type="button"
                       basic={value.length !== PAYMENT_METHODS.length}
@@ -738,7 +750,7 @@ const BudgetForm = ({
                     <VerticalDivider />
                     {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
                       <Button
-                        $paddingLeft="fit-content"
+                        $paddingLeft="18px"
                         width="fit-content"
                         key={key}
                         basic={!value.includes(methodValue)}
@@ -767,11 +779,12 @@ const BudgetForm = ({
             disabled={isLoading}
             isDirty={isDirty}
             isUpdating={draft || isCloning}
-            onReset={handleReset}
+            onReset={handleTryReset}
             color={currentState.color}
             onSubmit={handleSubmit(handleConfirm)}
             icon={currentState.icon}
             text={currentState.singularTitle}
+            submit
             extraButton={
               <IconedButton
                 icon={BUDGET_STATES.DRAFT.icon}

@@ -5,7 +5,7 @@ import { Button, ButtonsContainer, FieldsContainer, Form, FormField, Label, Segm
 import { PriceControlled, TextControlled, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, ENTITIES, ICONS } from "@/common/constants";
-import { downloadExcel } from "@/common/utils";
+import { downloadExcel, normalizeText } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
@@ -20,7 +20,7 @@ const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts, refetch: refetchProducts } = useListProducts();
   const products = useMemo(() => data?.products, [data?.products]);
   const methods = useForm();
-  const { handleSubmit, formState: { isDirty }, reset, watch, setValue } = methods;
+  const { handleSubmit, reset, watch, setValue } = methods;
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -131,27 +131,27 @@ const BatchImport = ({ isCreating }) => {
     const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
 
     const columnMapping = {
-      Codigo: "code",
-      Código: "code",
-      Nombre: "name",
-      Marca: "brand",
-      Proveedor: "supplier",
-      Costo: "cost",
-      Precio: "price",
-      Estado: "state",
-      Comentarios: "comments",
+      codigo: "code",
+      nombre: "name",
+      marca: "brand",
+      proveedor: "supplier",
+      costo: "cost",
+      precio: "price",
+      estado: "state",
+      comentarios: "comments",
     };
 
     const transformedHeaders = [];
     const seenMappedColumns = new Set();
 
     headersRow.forEach(header => {
-      const mappedColumn = columnMapping[header];
-
+      const normalizedHeader = normalizeText(header);
+      const mappedColumn = columnMapping[normalizedHeader];
+    
       if (mappedColumn && seenMappedColumns.has(mappedColumn)) {
         return;
       }
-
+    
       if (mappedColumn) {
         transformedHeaders.push(mappedColumn);
         seenMappedColumns.add(mappedColumn);
@@ -396,7 +396,7 @@ const BatchImport = ({ isCreating }) => {
         <Icon name={importSettings.icon} />
         {importSettings.button}
       </Button>
-      <Transition animation="fade" duration={500} visible={open}>
+      <Transition animation="scale" duration={500} visible={open}>
         <Modal
           closeIcon
           open={open}

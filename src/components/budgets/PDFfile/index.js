@@ -1,7 +1,7 @@
 import { Box, Flex, FlexColumn } from "@/common/components/custom";
 import { PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from '@/common/components/table';
-import { getFormatedPhone } from "@/common/utils";
+import { getFormatedPhone, getFormatedPrice } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
 import { getProductsColumns } from "@/components/budgets/budgets.utils";
@@ -143,7 +143,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
       <FlexColumn $rowGap="15px">
         {!!dolarExchangeRate && !dispatchPdf && (
           <DataContainer width="100%">
-            <Title as="h4" $alignSelf="left" textAlignLast="left" $slim>Cotización en USD</Title>
+            <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Cotización en USD</Title>
             <Divider />
             <Title as="h4" $alignSelf="left" width="fit-content" $minHeight="30px">
               <PriceLabel value={roundedFinalTotal / parseInt(dolarExchangeRate)} />
@@ -158,7 +158,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
               {budget?.comments}
               {comments?.length > 0 && !dispatchPdf && (
                 <Box $marginTop="2px">
-                  <strong>Envío:</strong>
+                  <strong>Detalle producto:</strong>
                   <List style={{ margin: '0' }}>
                     {comments.map((comment, index) => (
                       <List.Item key={index}>{comment}</List.Item>

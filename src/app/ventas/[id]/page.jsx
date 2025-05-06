@@ -4,7 +4,7 @@ import { useCancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "
 import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
-import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Input, Menu } from "@/common/components/custom";
+import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu } from "@/common/components/custom";
 import { COLORS, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { now } from "@/common/utils/dates";
@@ -151,7 +151,6 @@ const Budget = ({ params }) => {
                 pointing
                 text='Enviar'
                 icon={ICONS.SEND}
-                floating
                 labeled
                 button
                 className='icon blue'
@@ -281,40 +280,14 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      <ModalPDF
-        isModalOpen={isModalPDFOpen}
-        onClose={setIsModalPDFOpen}
-        budget={budget}
-        client={userData?.client}
-        total={total}
-        subtotal={subtotal}
-        selectedContact={selectedContact}
-        subtotalAfterDiscount={subtotalAfterDiscount}
-      />
-      <Flex $margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} $justifyContent="space-between">
-        {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
-          <>
-            <IconedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
-            <ModalCustomer
-              isModalOpen={isModalCustomerOpen}
-              onClose={handleModalCustomerClose}
-              customer={customerData}
-            />
-            <ModalConfirmation
-              subtotal={subtotal}
-              subtotalAfterDiscount={subtotalAfterDiscount}
-              total={total}
-              isModalOpen={isModalConfirmationOpen}
-              onClose={handleModalConfirmationClose}
-              customer={customerData}
-              onConfirm={mutate}
-              isLoading={isPending}
-              pickUpInStore={budget?.pickUpInStore}
-            />
-          </>
-        ) : <Box />
-        }
-      </Flex>
+      {isBudgetPending(budget?.state) &&
+        <Flex $margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} $justifyContent="space-between">
+          {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
+            <>
+              <IconedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
+            </>
+          ) : <Box />}
+        </Flex>}
       {isBudgetDraft(budget?.state) ? (
         <BudgetForm
           onSubmit={mutateEdit}
@@ -328,24 +301,48 @@ const Budget = ({ params }) => {
           setSelectedContact={setSelectedContact}
         />
       ) : (
-        <>
-          <BudgetView
-            budget={{ ...budget, customer: customerData }}
-            subtotal={subtotal}
-            subtotalAfterDiscount={subtotalAfterDiscount}
-            total={total}
-            selectedContact={selectedContact}
-            setSelectedContact={setSelectedContact}
-          />
-          <ModalCancel
-            isModalOpen={isModalCancelOpen}
-            onClose={handleModalCancelClose}
-            onConfirm={mutateCancel}
-            isLoading={isPendingCancel}
-            id={budget?.id}
-          />
-        </>
+        <BudgetView
+          budget={{ ...budget, customer: customerData }}
+          subtotal={subtotal}
+          subtotalAfterDiscount={subtotalAfterDiscount}
+          total={total}
+          selectedContact={selectedContact}
+          setSelectedContact={setSelectedContact}
+        />
       )}
+      <ModalPDF
+        isModalOpen={isModalPDFOpen}
+        onClose={setIsModalPDFOpen}
+        budget={budget}
+        client={userData?.client}
+        total={total}
+        subtotal={subtotal}
+        selectedContact={selectedContact}
+        subtotalAfterDiscount={subtotalAfterDiscount}
+      />
+      <ModalCustomer
+        isModalOpen={isModalCustomerOpen}
+        onClose={handleModalCustomerClose}
+        customer={customerData}
+      />
+      <ModalConfirmation
+        subtotal={subtotal}
+        subtotalAfterDiscount={subtotalAfterDiscount}
+        total={total}
+        isModalOpen={isModalConfirmationOpen}
+        onClose={handleModalConfirmationClose}
+        customer={customerData}
+        onConfirm={mutate}
+        isLoading={isPending}
+        pickUpInStore={budget?.pickUpInStore}
+      />
+      <ModalCancel
+        isModalOpen={isModalCancelOpen}
+        onClose={handleModalCancelClose}
+        onConfirm={mutateCancel}
+        isLoading={isPendingCancel}
+        id={budget?.id}
+      />
     </Loader >
   );
 };

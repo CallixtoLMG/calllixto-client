@@ -77,6 +77,7 @@ const ProductForm = forwardRef(({
     }
 
     await onSubmit(filteredData);
+    reset(getInitialValues({ ...product, ...filteredData }));
   };
 
   const validateShortcuts = {
@@ -150,7 +151,7 @@ const ProductForm = forwardRef(({
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleForm)}>
-        <FieldsContainer rowGap="5px">
+        <FieldsContainer $rowGap="5px">
           {view ? (
             <>
               <TextField width="25%" label="Proveedor" value={product?.supplierName} disabled />
@@ -312,6 +313,7 @@ const ProductForm = forwardRef(({
             isDirty={isDirty}
             onReset={() => reset(getInitialValues(product))}
             disabled={isProductDeleted(product?.state) || isDeletePending}
+            submit
           />
         )}
       </Form>

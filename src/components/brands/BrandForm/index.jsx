@@ -75,6 +75,7 @@ const BrandForm = forwardRef(({
             isDirty={isDirty}
             onReset={() => reset(getInitialValues(brand))}
             disabled={isDeletePending}
+            submit
           />
         )}
       </Form>

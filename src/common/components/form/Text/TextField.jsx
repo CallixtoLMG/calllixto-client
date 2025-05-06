@@ -91,6 +91,7 @@ export const TextField = forwardRef(({
       label={label}
       control={Input}
       error={error}
+      disabled={disabled}
     >
       {disabled ? (
         <Input

@@ -163,7 +163,7 @@ export const PAYMENT_TABLE_HEADERS = [
   { id: 'amount', width: 3, title: 'Monto', value: (element) => <PriceLabel value={element.amount} /> },
   {
     id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) =>
-      <OverflowWrapper maxWidth="35vw" popupContent={element.comments}> {element.comments} </OverflowWrapper>
+      <OverflowWrapper maxWidth="30vw" popupContent={element.comments}> {element.comments} </OverflowWrapper>
   },
 ];
 

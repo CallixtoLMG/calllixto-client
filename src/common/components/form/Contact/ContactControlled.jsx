@@ -216,6 +216,7 @@ export const ContactControlled = () => {
                 icon={ICONS.ADD}
                 color={COLORS.GREEN}
                 onClick={handleAddPhone}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddPhone)}
               />
             </FieldsContainer>
           </Form>
@@ -296,6 +297,7 @@ export const ContactControlled = () => {
                 icon={ICONS.ADD}
                 color={COLORS.GREEN}
                 onClick={handleAddAddress}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddAddress)}
               />
             </FieldsContainer>
           </Form>
@@ -377,6 +379,8 @@ export const ContactControlled = () => {
                 icon={ICONS.ADD}
                 color={COLORS.GREEN}
                 onClick={handleAddEmail}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddEmail)}
+
               />
             </FieldsContainer>
           </Form>

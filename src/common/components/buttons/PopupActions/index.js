@@ -22,7 +22,7 @@ const PopupActions = ({ width, title, color, buttons, icon, position = "bottom c
         </ButtonsContainer>
       )}
       content={
-        <Flex rowGap="5px" $flexDirection="column">
+        <Flex $rowGap="5px" $flexDirection="column">
           {buttons?.map((child) =>
             cloneElement(child, {
               onClick: () => {

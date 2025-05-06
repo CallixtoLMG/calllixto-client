@@ -11,15 +11,10 @@ import { Modal, Transition } from "semantic-ui-react";
 const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm({ defaultValues: customer });
-  const { handleSubmit, reset, watch } = methods;
+  const { handleSubmit, reset, watch, trigger, formState: { isSubmitted } } = methods;
   const addressRefInputRef = useRef(null);
   const formRef = useRef(null);
-  const inputRef = useRef(null);
   const editCustomer = useEditCustomer();
-
-  const watchedAreaCode = watch('areaCode');
-  const watchedNumber = watch('number');
-
 
   useEffect(() => {
     if (isModalOpen) {
@@ -34,15 +29,10 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
     reset(customer);
   }, [customer, isModalOpen, reset]);
 
-  useEffect(() => {
-    if (isModalOpen) {
-      inputRef.current?.focus();
-    }
-  }, [isModalOpen]);
-
   const handleEdit = async ({ refA, refP, address, areaCode, number }) => {
     const data = {
       id: customer.id,
+      name: customer.name,
       addresses: [{
         ref: refA,
         address
@@ -56,16 +46,18 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
     setIsLoading(true);
     try {
       const response = await editCustomer(data);
-      if (response?.data?.statusOk) {
+      if (response?.statusOk) {
         toast.success('Cliente actualizado!');
-      };
-      onClose(true, data);
+        onClose(true, data);
+      } else {
+        toast.error('Error al actualizar el cliente.');
+      }
     } catch (error) {
       console.error('Error en la edición del cliente:', error?.message);
-      onClose(false);
+      toast.error('Error en la edición del cliente.');
     } finally {
       setIsLoading(false);
-    };
+    }
   };
 
   const handleConfirmClick = () => {
@@ -92,7 +84,10 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   flex="1"
                   label="Nombre"
                   value={customer?.name}
+                  disabled
                 />
+              </FieldsContainer>
+              <FieldsContainer>
                 <TextControlled
                   width="30%"
                   name="refA"
@@ -101,7 +96,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   ref={addressRefInputRef}
                 />
                 <TextControlled
-                  flex="1"
+                  width="50%"
                   name="address"
                   rules={RULES.REQUIRED}
                   label="Dirección"
@@ -112,21 +107,22 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   width="30%"
                   name="refP"
                   rules={RULES.REQUIRED}
-                  label="Referencia de teléfono"
+                  label="Referencia"
                 />
                 <NumberControlled
                   width="130px"
                   label="Código de área"
-                  placeholder="Ej: 011"
+                  placeholder="Ej: 351"
                   name="areaCode"
                   maxLength="4"
                   rules={{
                     required: "El código de área es requerido.",
                     validate: (value) => {
-                      const number = watchedNumber || '';
+                      const number = watch("number") ?? '';
                       return (value + number).length === 10 || "El área y el número deben sumar 10 dígitos.";
                     },
                   }}
+                  onChange={() => isSubmitted && trigger("number")}
                   normalMode
                 />
                 <NumberControlled
@@ -137,10 +133,11 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   rules={{
                     required: "El número de teléfono es requerido.",
                     validate: (value) => {
-                      const areaCode = watchedAreaCode || '';
+                      const areaCode = watch("areaCode") ?? '';
                       return (areaCode + value).length === 10 || "El área y el número deben sumar 10 dígitos.";
                     },
                   }}
+                  onChange={() => isSubmitted && trigger("areaCode")}
                   maxLength="7"
                   normalMode
                 />

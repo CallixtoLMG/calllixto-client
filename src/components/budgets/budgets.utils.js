@@ -2,9 +2,7 @@ import { Flex } from "@/common/components/custom";
 import { COLORS, DATE_FORMATS } from "@/common/constants";
 import { getFormatedPercentage } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getPrice, getTotal } from "@/components/products/products.utils";
-import { Label } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { BUDGET_STATES } from "./budgets.constants";
 
@@ -71,9 +69,6 @@ export const getProductsColumns = (dispatchPdf, budget, showPrices) => {
       value: (product) => (
         <Flex $justifyContent="space-between">
           <span>{`${product.name} ${product.fractionConfig?.active ? ` x ${product.fractionConfig.value} ${product.fractionConfig.unit}` : ''}`}</span>
-          {product.state === PRODUCT_STATES.OOS.id && (
-            <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
-          )}
         </Flex>
       )
     },

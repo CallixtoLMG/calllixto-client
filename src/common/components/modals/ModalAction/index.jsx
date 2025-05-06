@@ -96,7 +96,6 @@ const ModalAction = ({
               <IconedButton
                 text="Cancelar"
                 icon={ICONS.TIMES}
-                height="40px"
                 color={COLORS.RED}
                 onClick={() => setShowModal(false)}
                 disabled={isLoading}
@@ -104,7 +103,6 @@ const ModalAction = ({
               <IconedButton
                 text={confirmButtonText}
                 icon={ICONS.CHECK}
-                height="40px"
                 disabled={!isActionEnabled || isLoading || disableButtons}
                 loading={isLoading}
                 color={COLORS.GREEN}

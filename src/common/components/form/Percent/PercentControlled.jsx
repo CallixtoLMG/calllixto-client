@@ -6,6 +6,7 @@ export const PercentControlled = ({
   defaultValue,
   handleChange,
   disabled,
+  justifyItems,
   ...inputParams
 }) => {
   return (
@@ -16,19 +17,24 @@ export const PercentControlled = ({
         <PercentField
           {...rest}
           {...inputParams}
+          justifyItems={justifyItems}
           disabled={disabled}
           value={value} 
           onChange={(newValue) => {
             onChange(newValue);
             if (handleChange) handleChange(newValue);
           }}
-          onBlur={() => {
-            if (value !== '') {
+          onBlur={(e) => {
+            if (value === '' || value == null) {
+              onChange(0);
+              handleChange?.(0);
+            } else {
               const numericValue = Number(value);
               const fixedValue = numericValue.toFixed(2);
           
               if (numericValue !== Number(fixedValue)) {
                 onChange(Number(fixedValue));
+                handleChange?.(Number(fixedValue));
               }
             }
           }}

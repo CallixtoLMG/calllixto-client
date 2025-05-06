@@ -26,13 +26,13 @@ const calculateTotals = (payments, total) => {
   return { totalAssigned, totalPending };
 };
 
-const Payments = ({ total, maxHeight, children, update }) => {
-  const methods = useFormContext();
-  const { control } = methods;
-  const { fields: paymentsMade, append: appendPayment, remove: removePayment } = useFieldArray({
-    control,
-    name: "paymentsMade"
-  });
+const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, padding, deleteButtonInside }) => {
+    const methods = useFormContext();
+    const { control } = methods;
+    const { fields: paymentsMade, append: appendPayment, remove: removePayment } = useFieldArray({
+      control,
+      name: "paymentsMade"
+    });
 
   const { totalPending, totalAssigned } = useMemo(() => calculateTotals(paymentsMade, total), [total, paymentsMade]);
   const isTotalCovered = useMemo(() => totalPending <= 0, [totalPending]);
@@ -68,7 +68,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
 
   return (
     <Flex width="100%" $maxHeight={maxHeight ? "55vh" : ""} className="ui form">
-      <Segment padding="25px 60px 25px 35px">
+      <Segment noBorder={noBorder} noBoxShadow={noBoxShadow} padding={padding ? padding : "25px 60px 25px 35px"}>
         <Header>
           Detalle de Pagos
         </Header>
@@ -103,7 +103,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
                   setPayment({ ...payment, amount: value ?? 0 });
                   setExceedAmountError(false);
                 }}
-                disabled={false}
+                disabled={isTotalCovered}
                 error={
                   showErrors && !payment.amount
                     ? RULES.REQUIRED.required
@@ -163,6 +163,7 @@ const Payments = ({ total, maxHeight, children, update }) => {
                   tooltip: 'Eliminar',
                 },
               ]}
+              $deleteButtonInside={deleteButtonInside}
             />
           </Flex>
           <TotalList readOnly items={TOTAL_LIST_ITEMS} />

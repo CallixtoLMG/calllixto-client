@@ -76,6 +76,7 @@ const SupplierForm = forwardRef(({
             isDirty={isDirty}
             onReset={() => reset(getInitialValues(supplier))}
             disabled={isDeletePending}
+            submit
           />
         )}
       </Form>

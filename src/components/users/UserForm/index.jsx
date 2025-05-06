@@ -29,7 +29,7 @@ const UserForm = forwardRef(({
     defaultValues: getInitialValues(user),
   });
 
-  const { handleSubmit, reset, formState: { isDirty } } = methods;
+  const { trigger, watch, handleSubmit, reset, formState: { isDirty, isSubmitted } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleCreate)(),
@@ -58,8 +58,6 @@ const UserForm = forwardRef(({
       condition: validateShortcuts.canReset,
     }
   ]);
-
-  
 
   return (
     <FormProvider {...methods}>
@@ -145,15 +143,17 @@ const UserForm = forwardRef(({
             width="130px"
             name="phoneNumber.areaCode"
             label="Código de Área"
-            placeholder="Ej: 011"
+            placeholder="Ej: 351"
+            maxLength="4"
             rules={{
               required: "El código de área es requerido.",
-              validate: (value, { phoneNumber }) =>
-                (value + (phoneNumber?.number || "")).length === 10 ||
-                "El área y el número deben sumar 10 dígitos.",
+              validate: (value) => {
+                const number = watch("phoneNumber.number") ?? '';
+                return (value + number).length === 10 || "El área y el número deben sumar 10 dígitos.";
+              },
             }}
+            onChange={() => isSubmitted && trigger("phoneNumber.number")}
             disabled={!isUpdating && view}
-            maxLength="4"
             normalMode
           />
           <NumberControlled
@@ -163,10 +163,12 @@ const UserForm = forwardRef(({
             placeholder="Ej: 12345678"
             rules={{
               required: "El número de teléfono es requerido.",
-              validate: (value, { phoneNumber }) =>
-                ((phoneNumber?.areaCode || "") + value).length === 10 ||
-                "El área y el número deben sumar 10 dígitos.",
+              validate: (value) => {
+                const areaCode = watch("phoneNumber.areaCode") ?? '';
+                return (areaCode + value).length === 10 || "El área y el número deben sumar 10 dígitos.";
+              },
             }}
+            onChange={() => isSubmitted && trigger("phoneNumber.areaCode")}
             disabled={!isUpdating && view}
             maxLength="7"
             normalMode
@@ -182,6 +184,7 @@ const UserForm = forwardRef(({
             isDirty={isDirty}
             disabled={isDeletePending}
             onReset={() => reset(getInitialValues(user))}
+            submit
           />
         )}
       </Form>

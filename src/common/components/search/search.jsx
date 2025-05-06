@@ -29,7 +29,6 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
       setFilteredProducts(products?.filter((product) => {
         const name = normalizeText(product?.name);
         const code = normalizeText(product?.code);
-
         return queryWords.every(word => name.includes(word) || code.includes(word));
       }));
       setLoading(false);
@@ -69,7 +68,7 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
       results={filteredProducts?.slice(0, MAX_RESULTS).map((product) => ({
         key: product.code,
         title: (
-          <OverflowWrapper lineClamp={2} popupContent={product.name} >
+          <OverflowWrapper popupContent={product.name} >
             {product.name}
           </OverflowWrapper>
         ),
@@ -88,7 +87,7 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
                 )}
               </Box>
               <Box width="100px" >
-                {product.tags ? <TagsTooltip tooltip="true" tags={product.tags} /> : <Box visibility="hidden" />}
+                {product.tags ? <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} /> : <Box visibility="hidden" />}
               </Box>
               <Box width="fit-content">
                 {product.comments ? <CommentTooltip comment={product.comments} /> : <Box visibility="hidden" />}

@@ -18,7 +18,7 @@ import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
-import { downloadExcel, getFormatedPrice, isItemInactive } from "@/common/utils";
+import { downloadExcel, isItemInactive } from "@/common/utils";
 import {
   Loader,
   OnlyPrint,
@@ -113,15 +113,14 @@ const Supplier = ({ params }) => {
     ];
 
     const mappedProducts = products.map((product) => {
-      const productState =
-        PRODUCT_STATES[product.state]?.singularTitle || product.state;
+      const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
       return [
         product.code,
         product.name,
         product.brandName,
         product.supplierName,
-        getFormatedPrice(product.cost),
-        getFormatedPrice(product.price),
+        product.cost,
+        product.price,
         getFormatedMargin(product.price, product.cost),
         productState,
         product.comments,
@@ -177,17 +176,17 @@ const Supplier = ({ params }) => {
     () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
     [handleProtectedAction, handleOpenModalWithAction],
   );
-  
+
   const handleInactivateClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
     [handleProtectedAction, handleOpenModalWithAction],
   );
-  
+
   const handleDeleteClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction('deleteSupplier')),
     [handleProtectedAction, handleOpenModalWithAction],
   );
-  
+
   const handleDeleteBatchClick = useCallback(
     () => handleProtectedAction(() => handleOpenModalWithAction('deleteBatch')),
     [handleProtectedAction, handleOpenModalWithAction],
@@ -199,7 +198,7 @@ const Supplier = ({ params }) => {
       if (response.statusOk) {
         toast.success('Proveedor actualizado!');
         setIsUpdating(false);
-        resolveSave(); 
+        resolveSave();
       } else {
         toast.error(response.error.message);
       }
@@ -466,7 +465,7 @@ const Supplier = ({ params }) => {
         isLoading={isEditPending}
         isUpdating={isUpdating && !isItemInactive(supplier?.state)}
         view
-        isDeletePending={isDeletePending} 
+        isDeletePending={isDeletePending}
       />
       {!isUpdating && (
         <OnlyPrint>
@@ -478,7 +477,7 @@ const Supplier = ({ params }) => {
         onDiscard={handleDiscard}
         onSave={handleSave}
         isSaving={isSaving}
-        onCancel={handleCancel} 
+        onCancel={handleCancel}
       />
       <ModalAction
         title={header}
