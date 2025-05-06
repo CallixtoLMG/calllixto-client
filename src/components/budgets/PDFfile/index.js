@@ -141,15 +141,31 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         )
       }
       <FlexColumn $rowGap="15px">
-        {!!dolarExchangeRate && !dispatchPdf && (
-          <DataContainer width="100%">
-            <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Cotización en USD</Title>
-            <Divider />
-            <Title as="h4" $alignSelf="left" width="fit-content" $minHeight="30px">
-              <PriceLabel value={roundedFinalTotal / parseInt(dolarExchangeRate)} />
-            </Title>
-          </DataContainer>
-        )}
+        {!dispatchPdf &&
+          <>
+            <DataContainer width="100%">
+              <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Detalles de Pago</Title>
+              <Divider />
+              <TotalList readOnly items={TOTAL_LIST_ITEMS} />
+            </DataContainer>
+            {!!dolarExchangeRate && (
+              <DataContainer width="100%">
+                <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Cotización en USD a Tasa de Cambio: <b>{getFormatedPrice(dolarExchangeRate)}</b></Title>
+                <Divider />
+                <Title as="h4" $alignSelf="left" width="fit-content" $minHeight="30px">
+                  <PriceLabel value={roundedFinalTotal / parseInt(dolarExchangeRate)} />
+                </Title>
+              </DataContainer>
+            )}
+            <DataContainer width="100%">
+              <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Formas de Pago</Title>
+              <Divider />
+              <Title as="h4" $alignSelf="left" $textAlignLast="left" $minHeight="30px">
+                {budget?.paymentMethods?.join(" | ")}
+              </Title>
+            </DataContainer>
+          </>
+        }
         {(budget?.comments?.trim() || (!dispatchPdf && comments?.length > 0)) && (
           <DataContainer width="100%">
             <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Comentarios</Title>
@@ -169,22 +185,6 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             </Title>
           </DataContainer>
         )}
-        {!dispatchPdf &&
-          <>
-            <DataContainer width="100%">
-              <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Detalles de Pago</Title>
-              <Divider />
-              <TotalList readOnly items={TOTAL_LIST_ITEMS} />
-            </DataContainer>
-            <DataContainer width="100%">
-              <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Formas de Pago</Title>
-              <Divider />
-              <Title as="h4" $alignSelf="left" $textAlignLast="left" $minHeight="30px">
-                {budget?.paymentMethods?.join(" | ")}
-              </Title>
-            </DataContainer>
-          </>
-        }
       </FlexColumn>
     </FlexColumn >
   )
