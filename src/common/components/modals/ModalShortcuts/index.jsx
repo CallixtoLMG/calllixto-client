@@ -61,7 +61,7 @@ const KeyboardShortcuts = () => {
               <List.Item>
                 <StyledListIcon name={ICONS.KEYBOARD} />
                 <StyledListContent>
-                  <StyledListHeader>Control + retroceder</StyledListHeader>
+                  <StyledListHeader>Control + retroceso</StyledListHeader>
                   <List.Description>Vuelve a la página anterior.</List.Description>
                 </StyledListContent>
               </List.Item>
