@@ -174,12 +174,19 @@ const BudgetForm = ({
       setIsTableLoading(true);
       let budgetProducts = [...budget.products];
   
+      // Detectar productos removidos
+      const existingProductCodes = new Set(products.map(p => p.code));
+      const removedProducts = budgetProducts.filter(p => !existingProductCodes.has(p.code));
+      const validProducts = budgetProducts.filter(p => existingProductCodes.has(p.code));
+  
+      // Actualizar los productos válidos en el formulario
+      setValue("products", validProducts);
+  
+      // Detectar productos desactualizados
       const outdatedProducts = products.filter(product => {
-        const budgetProduct = budgetProducts.find(bp => bp.code === product.code);
+        const budgetProduct = validProducts.find(bp => bp.code === product.code);
   
         if (budgetProduct) {
-          budgetProducts = budgetProducts.filter(bp => bp.code !== product.code);
-  
           const priceChanged = budgetProduct.price !== product.price;
           const stateChanged = budgetProduct.state !== product.state;
           const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
@@ -198,10 +205,10 @@ const BudgetForm = ({
         return false;
       });
   
-      if (outdatedProducts.length || budgetProducts.length) {
-        setTemporaryProducts(watchProducts);
+      if (outdatedProducts.length || removedProducts.length) {
+        setTemporaryProducts(validProducts);
         setOutdatedProducts(outdatedProducts);
-        setRemovedProducts(budgetProducts);
+        setRemovedProducts(removedProducts); 
         setShouldShowModal(true);
         hasShownModal.current = true;
       } else {
@@ -293,24 +300,21 @@ const BudgetForm = ({
   }, [watchState]);
 
   const handleReset = useCallback(() => {
-    if (draft || isCloning) {
-      reset({
-        ...EMPTY_BUDGET(user),
-        ...budget,
-        seller: user?.name,
-      });
-    } else {
-      reset({
-        ...EMPTY_BUDGET(user),
-        state: watchState,
-        seller: user?.name,
-      });
+    let baseBudget = draft || isCloning
+      ? { ...EMPTY_BUDGET(user), ...budget, seller: user?.name }
+      : { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
+  
+    if (isCloning && removedProducts.length > 0) {
+      const removedCodes = removedProducts.map(p => p.code);
+      baseBudget.products = baseBudget.products.filter(p => !removedCodes.includes(p.code));
     }
-
+  
+    reset(baseBudget);
+  
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [draft, isCloning, reset, user, budget, watchState]);
+  }, [draft, isCloning, reset, user, budget, watchState, removedProducts]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));

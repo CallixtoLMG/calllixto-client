@@ -13,7 +13,6 @@ const UnsavedChangesModal = ({ open, onSave, onDiscard, isSaving, onCancel }) =>
           <IconedButton
             text="Continuar actualizando"
             icon={ICONS.EDIT}
-            height="40px"
             color={COLORS.BLUE}
             basic
             onClick={onCancel}
@@ -22,7 +21,6 @@ const UnsavedChangesModal = ({ open, onSave, onDiscard, isSaving, onCancel }) =>
           <IconedButton
             text="Descartar cambios"
             icon={ICONS.TIMES}
-            height="40px"
             color={COLORS.RED}
             onClick={onDiscard}
             disabled={isSaving}
@@ -30,7 +28,6 @@ const UnsavedChangesModal = ({ open, onSave, onDiscard, isSaving, onCancel }) =>
           <IconedButton
             text="Guardar cambios"
             icon={ICONS.CHECK}
-            height="40px"
             loading={isSaving}
             disabled={isSaving}
             color={COLORS.GREEN}

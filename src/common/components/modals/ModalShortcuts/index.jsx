@@ -71,9 +71,8 @@ const KeyboardShortcuts = () => {
             <IconedButton
               text="Cerrar"
               icon={ICONS.REMOVE}
-              color={COLORS.GREY}
+              color={COLORS.RED}
               onClick={() => setOpen(false)}
-              basic
             />
           </Modal.Actions>
         </Modal>

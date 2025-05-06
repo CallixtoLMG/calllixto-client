@@ -17,7 +17,7 @@ const Categories = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const [categoryToAdd, setCategoryToAdd] = useState(EMPTY_CATEGORY);
   const { formState: { isDirty } } = useFormContext();
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState(null);
   const { fields: categories, append, remove } = useFieldArray({
     name: "categories"
   });
@@ -69,33 +69,41 @@ const Categories = () => {
 
   const handleAddCategory = () => {
     const isDuplicate = categories.some((category) => category.name.trim().toLowerCase() === categoryToAdd.name.trim().toLowerCase());
+    const newErrors = {};
 
     if (!categoryToAdd.name.trim()) {
-      setError("El nombre es obligatorio.");
-      return;
+         newErrors.name = "El nombre es obligatorio.";
     }
 
     if (categoryToAdd.name.length > 50) {
-      setError("El nombre no debe superar los 50 caracteres.");
-      return;
+      newErrors.name = "El nombre no debe superar los 50 caracteres.";
+    }
+
+    if (categoryToAdd.description.length > 250) {
+      newErrors.description = "La descripción no debe superar los 250 caracteres.";
     }
 
     if (isDuplicate) {
-      setError("Ya existe una etiqueta con este nombre.");
+      newErrors.name = "Ya existe una categoria con este nombre.";
+      return;
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
 
     append(categoryToAdd);
     setCategoryToAdd(EMPTY_CATEGORY);
-    setError(null);
+    setErrors({});
   };
 
   const handleNameChange = (e) => {
     const name = e.target.value;
     setCategoryToAdd({ ...categoryToAdd, name });
 
-    if (error) {
-      setError(null);
+    if (errors) {
+      setErrors(null);
     }
   };
 
@@ -116,7 +124,7 @@ const Categories = () => {
                 value={categoryToAdd.name}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
                 onChange={handleNameChange}
-                error={error}
+                error={errors?.name}
               />
               <DropdownField
                 flex={1}
@@ -132,6 +140,7 @@ const Categories = () => {
                 value={categoryToAdd.description}
                 onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
+                error={errors?.description}
               />
               <Button
                 size="small"

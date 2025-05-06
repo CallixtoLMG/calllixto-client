@@ -20,7 +20,7 @@ const BatchImport = ({ isCreating }) => {
   const { data, isLoading: loadingProducts, refetch: refetchProducts } = useListProducts();
   const products = useMemo(() => data?.products, [data?.products]);
   const methods = useForm();
-  const { handleSubmit, formState: { isDirty }, reset, watch, setValue } = methods;
+  const { handleSubmit, reset, watch, setValue } = methods;
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -396,7 +396,7 @@ const BatchImport = ({ isCreating }) => {
         <Icon name={importSettings.icon} />
         {importSettings.button}
       </Button>
-      <Transition animation="fade" duration={500} visible={open}>
+      <Transition animation="scale" duration={500} visible={open}>
         <Modal
           closeIcon
           open={open}

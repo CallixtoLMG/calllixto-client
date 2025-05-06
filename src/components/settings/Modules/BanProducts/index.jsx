@@ -123,6 +123,7 @@ const Blacklist = () => {
                 error={error}
                 showPopup
                 iconLabel
+                popupPosition="top right"
                 popupContent={
                   <div>
                     <p>* Para añadir un código nuevo a la lista, anótelo y luego pulse &quot;enter&quot;.</p>

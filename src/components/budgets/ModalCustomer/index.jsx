@@ -61,7 +61,6 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
   };
 
   const handleConfirmClick = () => {
-    setHasSubmitted(true);
     if (formRef.current) {
       formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
     }
