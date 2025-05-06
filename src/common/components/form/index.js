@@ -1,4 +1,3 @@
-export * from './Payments';
 export * from './PasswordRequirements';
 export * from './Price';
 export * from './Text';
