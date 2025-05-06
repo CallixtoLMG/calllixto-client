@@ -28,7 +28,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT.key, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH.key, [printPdfMode]);
   const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL.key, [printPdfMode]);
-  const filteredColumns = useMemo(() => PRODUCTS_COLUMNS(dispatchPdf, budget, showPrices), [budget, dispatchPdf, showPrices]);
+  const filteredColumns = useMemo(() => getProductsColumns(dispatchPdf, budget, showPrices), [budget, dispatchPdf, showPrices]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
   const roundedFinalTotal = parseFloat(total?.toFixed(2));

@@ -1,13 +1,13 @@
-import { IconnedButton } from "@/components/common/buttons";
-import { ButtonsContainer, Flex, FlexColumn } from "@/components/common/custom";
-import { BUDGET_PDF_FORMAT, COLORS, ICONS } from "@/constants";
 import { Modal, Transition } from "semantic-ui-react";
-import { Input } from "@/components/common/custom";
 import { useEffect, useRef, useState } from "react";
 import { useDolarExangeRate } from "@/api/external";
 import { OnlyPrint } from "@/components/layout";
 import PDFfile from "../PDFfile";
 import { useReactToPrint } from "react-to-print";
+import { IconedButton } from "@/common/components/buttons";
+import { ButtonsContainer, Flex, FlexColumn, Input } from "@/common/components/custom";
+import { BUDGET_PDF_FORMAT } from "../budgets.constants";
+import { COLORS, ICONS } from "@/common/constants";
 
 const ModalPDF = ({
   budget,
@@ -71,10 +71,10 @@ const ModalPDF = ({
         <Modal size="mini" closeIcon open={isModalOpen} onClose={() => onClose(false)}>
           <Modal.Header>Opciones de Impresión</Modal.Header>
           <Modal.Content>
-            <FlexColumn rowGap="15px">
-              <Flex columnGap="5px" wrap="wrap" rowGap="5px">
+            <FlexColumn $rowGap="15px">
+              <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                 {Object.values(BUDGET_PDF_FORMAT).map(({ key, title, icon }) => (
-                  <IconnedButton
+                  <IconedButton
                     key={key}
                     text={title}
                     icon={icon}
@@ -100,7 +100,7 @@ const ModalPDF = ({
                 value={formattedDolarRate}
                 disabled={!showDolarExangeRate}
                 action={
-                  <IconnedButton
+                  <IconedButton
                     text="Cotizar en USD"
                     icon={ICONS.DOLLAR}
                     color={COLORS.GREEN}
@@ -117,9 +117,10 @@ const ModalPDF = ({
                   />
                 }
               />
-              <IconnedButton
+              <IconedButton
                 text="Mostrar Precios"
                 icon={ICONS.EYE}
+                color={COLORS.BLUE}
                 onClick={() => setShowPrices(prev => !prev)}
                 basic={!showPrices}
               />
@@ -127,13 +128,13 @@ const ModalPDF = ({
           </Modal.Content>
           <Modal.Actions>
             <ButtonsContainer width="100%">
-              <IconnedButton
+              <IconedButton
                 text="Cancelar"
                 icon={ICONS.CANCEL}
                 color={COLORS.RED}
                 onClick={() => onClose(false)}
               />
-              <IconnedButton
+              <IconedButton
                 text="Imprimir"
                 icon={ICONS.CHECK}
                 submit

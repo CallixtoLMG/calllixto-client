@@ -312,36 +312,8 @@ const Budget = ({ params }) => {
               pickUpInStore={budget?.pickUpInStore}
             />
           </>
-        ) : <Box />}
-        {!isBudgetDraft(budget?.state) && !isBudgetCancelled(budget?.state) && (
-          <Input
-            type="text"
-            height="35px"
-            width="fit-content"
-            onChange={handleDollarChange}
-            actionPosition='left'
-            placeholder="Precio"
-            value={formattedDolarRate}
-            disabled={!showDolarExangeRate}
-            action={
-              <IconedButton
-                text="Cotizar en USD"
-                icon={ICONS.DOLLAR}
-                color={COLORS.GREEN}
-                basic={!showDolarExangeRate}
-                onClick={() => {
-                  setShowDolarExangeRate(prev => !prev);
-                  if (!showDolarExangeRate) {
-                    setFormattedDolarRate(formatValue(dolarRate));
-                  } else {
-                    setFormattedDolarRate('');
-                    setDolarRate(0);
-                  }
-                }}
-              />
-            }
-          />
-        )}
+        ) : <Box />
+        }
       </Flex>
       {isBudgetDraft(budget?.state) ? (
         <BudgetForm
