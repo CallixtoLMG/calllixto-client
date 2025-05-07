@@ -99,7 +99,6 @@ const BudgetForm = ({
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
-  const [hasAcceptedChanges, setHasAcceptedChanges] = useState(false);
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -245,7 +244,6 @@ const BudgetForm = ({
     setOriginalPrices({});
     setShouldShowModal(false);
     setIsTableLoading(false);
-    setHasAcceptedChanges(true);
   };
 
   const handleCancelUpdate = () => {
@@ -512,7 +510,7 @@ const BudgetForm = ({
   ]);
 
   const handleTryReset = () => {
-    if (isCloning && hasAcceptedChanges) {
+    if (isCloning) {
       setShouldShowModal(true);
     } else {
       handleReset();
