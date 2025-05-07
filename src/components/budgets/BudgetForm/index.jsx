@@ -250,13 +250,17 @@ const BudgetForm = ({
 
   const handleCancelUpdate = () => {
     const restoredProducts = temporaryProducts.map(product => {
-      if (originalPrices[product.code] !== undefined) {
-        return {
-          ...product,
-          price: originalPrices[product.code],
-        };
-      }
-      return product;
+      const originalProduct = budget.products.find(p => p.code === product.code);
+      if (!originalProduct) return product;
+  
+      return {
+        ...product,
+        price: originalPrices[product.code] ?? product.price,
+        editablePrice: originalProduct.editablePrice,
+        fractionConfig: originalProduct.fractionConfig,
+        state: products.find(p => p.code === product.code)?.state ?? product.state,
+        quantity: (products.find(p => p.code === product.code)?.state === PRODUCT_STATES.OOS.id) ? 0 : product.quantity,
+      };
     });
 
     setValue(
