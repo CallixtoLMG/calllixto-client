@@ -67,9 +67,15 @@ const Header = () => {
                   {Object.values(PAGES)
                     .filter((page) => {
                       if (!page.NAME) return false;
+
+                      if (page.NAME === PAGES.USERS.NAME) {
+                        return isCallixtoUser(role);
+                      }
+
                       if (page.NAME === PAGES.SETTINGS.NAME) {
                         return RULES.canUpdate[role];
                       }
+
                       return true;
                     })
                     .map((page) => (
