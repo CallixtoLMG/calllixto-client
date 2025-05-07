@@ -174,15 +174,12 @@ const BudgetForm = ({
       setIsTableLoading(true);
       let budgetProducts = [...budget.products];
   
-      // Detectar productos removidos
       const existingProductCodes = new Set(products.map(p => p.code));
       const removedProducts = budgetProducts.filter(p => !existingProductCodes.has(p.code));
       const validProducts = budgetProducts.filter(p => existingProductCodes.has(p.code));
   
-      // Actualizar los productos válidos en el formulario
       setValue("products", validProducts);
   
-      // Detectar productos desactualizados
       const outdatedProducts = products.filter(product => {
         const budgetProduct = validProducts.find(bp => bp.code === product.code);
   
@@ -717,7 +714,7 @@ const BudgetForm = ({
               total={total}
             />
           </Loader>
-          {isBudgetConfirmed(watchState) && !isCloning && (
+          {isBudgetConfirmed(watchState) && (
             <FieldsContainer width="100%" $rowGap="15px">
               <Payments
                 total={total}
@@ -729,7 +726,7 @@ const BudgetForm = ({
             <Controller
               name="paymentMethods"
               render={({ field: { onChange, value } }) => (
-                <FormField flex="1" label="Metodos de pago" control={Input}>
+                <FormField flex="1" label="Métodos de pago" control={Input}>
                   <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                     <Button
                       $paddingLeft="18px"
