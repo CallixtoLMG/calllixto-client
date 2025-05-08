@@ -27,15 +27,15 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
 
   useEffect(() => {
     if (customer) {
-      const address = customer.addresses?.[0] || {};
-      const phone = customer.phoneNumbers?.[0] || {};
+      const address = customer.addresses?.[0] ?? {};
+      const phone = customer.phoneNumbers?.[0] ?? {};
   
       reset({
-        refA: address.ref || '',
-        address: address.address || '',
-        refP: phone.ref || '',
-        areaCode: phone.areaCode || '',
-        number: phone.number || '',
+        refA: address.ref ?? '',
+        address: address.address ?? '',
+        refP: phone.ref ?? '',
+        areaCode: phone.areaCode ?? '',
+        number: phone.number ?? '',
       });
     }
   }, [customer, isModalOpen, reset]);

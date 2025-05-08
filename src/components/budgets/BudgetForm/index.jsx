@@ -15,7 +15,7 @@ import { Loader } from "@/components/layout";
 import { ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
 import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { omit, pick } from "lodash";
+import { pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Popup } from "semantic-ui-react";
@@ -52,7 +52,6 @@ const BudgetForm = ({
     if (!isCloning || !budget) return EMPTY_BUDGET(user);
 
     return {
-      ...omit(budget, ['id', 'comments', 'paymentsMade', 'customer', 'expirationOffsetDays', 'paymentMethods']),
       products: budget.products.map((product) => ({
         ...product,
         quantity: product.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
@@ -114,11 +113,11 @@ const BudgetForm = ({
   const [total, setTotal] = useState(0);
   const watchExpirationOffsetDays = watch("expirationOffsetDays");
 
-  const getRestoredProducts = (sourceProducts) => {
+  const getRestoredProducts = useCallback((sourceProducts) => {
     return sourceProducts.map(product => {
       const latestProduct = products.find(p => p.code === product.code);
       const updatedState = latestProduct?.state ?? product.state;
-
+  
       return {
         ...product,
         state: updatedState,
@@ -129,7 +128,7 @@ const BudgetForm = ({
       product.state !== PRODUCT_STATES.DELETED.id &&
       products.some(p => p.code === product.code)
     );
-  };
+  }, [products]);
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -323,7 +322,7 @@ const BudgetForm = ({
 
   const handleReset = useCallback(() => {
     let baseBudget;
-
+  
     if (isCloning) {
       const restoredProducts = getRestoredProducts(clonedInitialValues.products);
       baseBudget = {
@@ -335,14 +334,14 @@ const BudgetForm = ({
     } else {
       baseBudget = { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
     }
-
+  
     reset(baseBudget);
     setValue("expirationOffsetDays", '', { shouldDirty: false });
-
+  
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [reset, user, draft, budget, watchState, isCloning, clonedInitialValues, products]);
+  }, [reset, setValue, user, draft, budget, watchState, isCloning, clonedInitialValues, getRestoredProducts]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));
