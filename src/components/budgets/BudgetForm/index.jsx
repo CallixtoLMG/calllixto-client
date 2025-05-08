@@ -65,6 +65,7 @@ const BudgetForm = ({
         })),
         seller: user?.name,
         paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
+        state: BUDGET_STATES.PENDING.id
       }
       : budget && draft
         ? {
@@ -510,7 +511,7 @@ const BudgetForm = ({
   ]);
 
   const handleTryReset = () => {
-    if (isCloning) {
+    if (isCloning && (outdatedProducts.length > 0 || removedProducts.length > 0)) {
       setShouldShowModal(true);
     } else {
       handleReset();
