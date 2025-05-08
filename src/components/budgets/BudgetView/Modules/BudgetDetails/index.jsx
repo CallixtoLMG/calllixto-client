@@ -1,4 +1,4 @@
-import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, TextArea, ViewContainer } from "@/common/components/custom";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
 import { DropdownField, PriceLabel } from "@/common/components/form";
 import { Table, Total } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
@@ -19,7 +19,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
 
-    useEffect(() => {
+  useEffect(() => {
     if (!budget || initializedContact) return;
 
     const defaultAddress = budget.pickUpInStore
@@ -68,31 +68,36 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
       {
         title: "Cantidad", value: (product, index) => <p>{product?.quantity}</p>,
         id: 2,
-        width: 2
+        width: 1
       },
       {
         title: "Nombre",
-        value: (product) => (
-          <Container>
-            {product.name} {product.fractionConfig?.active && `x ${product.fractionConfig?.value} ${product.fractionConfig?.unit}`}
-            <Flex $columnGap="5px" $marginLeft="7px">
-              {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
-              {product.comments && <CommentTooltip lineHeight="normal" comment={product.comments} />}
-              {isProductOOS(product.state) && (
-                <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
-              )}
-              {product.dispatchComment && (
-                <Popup
-                  size="mini"
-                  content={product.dispatchComment}
-                  position="top center"
-                  trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />
-                  }
-                />
-              )}
-            </Flex>
-          </Container>
-        ),
+        value: (product) => {
+          const displayName = `${product.name}${product.fractionConfig?.active ? ` x ${product.fractionConfig.value} ${product.fractionConfig.unit}` : ''}`;
+
+          return (
+            <Container>
+              <OverflowWrapper maxWidth="30vw" popupContent={displayName}>
+                {displayName}
+              </OverflowWrapper>
+              <Flex $columnGap="5px" $marginLeft="7px">
+                {isProductOOS(product.state) && (
+                  <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
+                )}
+                {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
+                {product.comments && <CommentTooltip lineHeight="normal" comment={product.comments} />}
+                {product.dispatchComment && (
+                  <Popup
+                    size="mini"
+                    content={product.dispatchComment}
+                    position="top center"
+                    trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />}
+                  />
+                )}
+              </Flex>
+            </Container>
+          );
+        },
         id: 3,
         width: 7,
         wrap: true,

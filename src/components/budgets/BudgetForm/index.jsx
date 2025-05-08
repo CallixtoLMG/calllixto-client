@@ -82,17 +82,17 @@ const BudgetForm = ({
       ? clonedInitialValues
       : budget && draft
         ? {
-            ...budget,
-            seller: user?.name,
-            paymentsMade: budget.paymentsMade || [],
-          }
+          ...budget,
+          seller: user?.name,
+          paymentsMade: budget.paymentsMade || [],
+        }
         : {
-            ...EMPTY_BUDGET(user),
-          },
+          ...EMPTY_BUDGET(user),
+        },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
-  
+
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
     control,
@@ -108,17 +108,17 @@ const BudgetForm = ({
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [shouldShowModal, setShouldShowModal] = useState(false);
-  const [expiration, setExpiration] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
+  const watchExpirationOffsetDays = watch("expirationOffsetDays");
 
   const getRestoredProducts = (sourceProducts) => {
     return sourceProducts.map(product => {
       const latestProduct = products.find(p => p.code === product.code);
       const updatedState = latestProduct?.state ?? product.state;
-  
+
       return {
         ...product,
         state: updatedState,
@@ -247,7 +247,7 @@ const BudgetForm = ({
   const handleConfirmUpdate = () => {
     const updatedProducts = temporaryProducts.map(product => {
       const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
-  
+
       if (outdatedProduct) {
         return {
           ...product,
@@ -261,35 +261,35 @@ const BudgetForm = ({
           quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
         };
       }
-  
+
       return product;
     });
-  
+
     const restoredProducts = getRestoredProducts(updatedProducts).filter(
       product => !removedProducts.find(rp => rp.code === product.code)
     );
-  
+
     const restoredForm = {
       ...clonedInitialValues,
       products: restoredProducts,
     };
-  
+
     reset(restoredForm);
-    setExpiration("");
+    setValue("expirationOffsetDays", '', { shouldDirty: false });
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
-  
+
   const handleCancelUpdate = () => {
     const restoredProducts = getRestoredProducts(budget.products);
-  
+
     const baseBudget = {
       ...clonedInitialValues,
       products: restoredProducts
     };
-  
+
     reset(baseBudget);
-    setExpiration("");
+    setValue("expirationOffsetDays", '', { shouldDirty: false });
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
@@ -323,7 +323,7 @@ const BudgetForm = ({
 
   const handleReset = useCallback(() => {
     let baseBudget;
-  
+
     if (isCloning) {
       const restoredProducts = getRestoredProducts(clonedInitialValues.products);
       baseBudget = {
@@ -335,10 +335,10 @@ const BudgetForm = ({
     } else {
       baseBudget = { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
     }
-  
+
     reset(baseBudget);
-    setExpiration("");
-  
+    setValue("expirationOffsetDays", '', { shouldDirty: false });
+
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
@@ -427,7 +427,7 @@ const BudgetForm = ({
             {product.name}
           </OverflowWrapper>
           <Flex $alignItems="center" $marginLeft="5px" $columnGap="5px">
-            {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
+            {isProductOOS(product.state) && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
             {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
             {product.comments && <CommentTooltip lineHeight="normal" tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
@@ -610,7 +610,6 @@ const BudgetForm = ({
                 maxLength={3}
                 label="Dias para el vencimiento"
                 placeholder="Cantidad en días"
-                onChange={setExpiration}
               />
               <FormField
                 $width="200px"
@@ -618,8 +617,8 @@ const BudgetForm = ({
                 control={Input}
                 readOnly
                 value={
-                  expiration || budget?.expirationOffsetDays
-                    ? getDateWithOffset(now(), expiration || budget?.expirationOffsetDays, "days")
+                  watchExpirationOffsetDays
+                    ? getDateWithOffset(now(), watchExpirationOffsetDays, "days")
                     : ""
                 }
                 placeholder="dd/mm/aaaa"
