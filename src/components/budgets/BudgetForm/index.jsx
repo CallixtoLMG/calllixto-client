@@ -79,6 +79,36 @@ const BudgetForm = ({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
+
+  const clonedInitialValues = useMemo(() => {
+    if (!isCloning || !budget) return EMPTY_BUDGET(user);
+
+    return {
+      ...omit(budget, ['id', 'comments', 'paymentsMade', 'customer', 'expirationOffsetDays', 'paymentMethods']),
+      products: budget.products.map((product) => ({
+        ...product,
+        quantity: product.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
+        ...(product.fractionConfig?.active && {
+          fractionConfig: {
+            ...product.fractionConfig,
+            value: product.fractionConfig.value || 1,
+            price: product.price,
+          }
+        })
+      })),
+      seller: user?.name,
+      paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
+      state: BUDGET_STATES.PENDING.id,
+      customer: { name: '', addresses: [], phoneNumbers: [] },
+      comments: '',
+      globalDiscount: 0,
+      additionalCharge: 0,
+      expirationOffsetDays: '',
+      paymentsMade: [],
+      pickUpInStore: false,
+    };
+  }, [budget, isCloning, user]);
+
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
     control,
@@ -88,7 +118,6 @@ const BudgetForm = ({
   const hasShownModal = useRef(false);
   const productSearchRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [originalPrices, setOriginalPrices] = useState({});
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [temporaryProducts, setTemporaryProducts] = useState([]);
@@ -173,21 +202,21 @@ const BudgetForm = ({
     if (isCloning && !hasShownModal.current) {
       setIsTableLoading(true);
       let budgetProducts = [...budget.products];
-  
+
       const existingProductCodes = new Set(products.map(p => p.code));
       const removedProducts = budgetProducts.filter(p => !existingProductCodes.has(p.code));
       const validProducts = budgetProducts.filter(p => existingProductCodes.has(p.code));
-  
+
       setValue("products", validProducts);
-  
+
       const outdatedProducts = products.filter(product => {
         const budgetProduct = validProducts.find(bp => bp.code === product.code);
-  
+
         if (budgetProduct) {
           const priceChanged = budgetProduct.price !== product.price;
           const stateChanged = budgetProduct.state !== product.state;
           const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
-  
+
           const fractionConfigChanged =
             (budgetProduct.fractionConfig?.active !== product.fractionConfig?.active) ||
             (
@@ -195,17 +224,17 @@ const BudgetForm = ({
               product.fractionConfig?.active &&
               (budgetProduct.fractionConfig.value !== product.fractionConfig.value && product.fractionConfig.value !== undefined)
             );
-  
+
           return priceChanged || editableChanged || fractionConfigChanged || stateChanged;
         }
-  
+
         return false;
       });
-  
+
       if (outdatedProducts.length || removedProducts.length) {
         setTemporaryProducts(validProducts);
         setOutdatedProducts(outdatedProducts);
-        setRemovedProducts(removedProducts); 
+        setRemovedProducts(removedProducts);
         setShouldShowModal(true);
         hasShownModal.current = true;
       } else {
@@ -217,7 +246,7 @@ const BudgetForm = ({
   const handleConfirmUpdate = () => {
     const confirmedProducts = temporaryProducts.map(product => {
       const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
-  
+
       if (outdatedProduct) {
         return {
           ...product,
@@ -231,46 +260,50 @@ const BudgetForm = ({
           quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
         };
       }
-  
+
       return product;
     });
-  
-    setValue(
-      "products",
-      confirmedProducts.filter(
+
+    const restoredForm = {
+      ...clonedInitialValues,
+      products: confirmedProducts.filter(
         (product) => !removedProducts.find((removed) => removed.code === product.code)
       )
-    );
-  
-    setOriginalPrices({});
+    };
+
+    reset(restoredForm);
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
 
   const handleCancelUpdate = () => {
-    const restoredProducts = temporaryProducts.map(product => {
-      const originalProduct = budget.products.find(p => p.code === product.code);
-      if (!originalProduct) return product;
+    const restoredProducts = budget.products.map((product) => {
+      const latestProduct = products.find(p => p.code === product.code);
+      const updatedState = latestProduct?.state ?? product.state;
   
       return {
         ...product,
-        price: originalPrices[product.code] ?? product.price,
-        editablePrice: originalProduct.editablePrice,
-        fractionConfig: originalProduct.fractionConfig,
-        state: products.find(p => p.code === product.code)?.state ?? product.state,
-        quantity: (products.find(p => p.code === product.code)?.state === PRODUCT_STATES.OOS.id) ? 0 : product.quantity,
+        state: updatedState,
+        quantity: updatedState === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
       };
-    });
-
-    setValue(
-      "products",
-      restoredProducts.filter(product =>
-        product.state !== PRODUCT_STATES.DELETED.id && product.state !== PRODUCT_STATES.INACTIVE.id
-      )
+    }).filter(product =>
+      product.state !== PRODUCT_STATES.INACTIVE.id &&
+      product.state !== PRODUCT_STATES.DELETED.id &&
+      products.some(p => p.code === product.code)
     );
+  
+    const baseBudget = {
+      ...clonedInitialValues,
+      products: restoredProducts
+    };
+  
+    reset(baseBudget);
+    setExpiration("");
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
+  
+  
 
   const calculateTotal = useCallback(() => {
     const totalSum = getTotalSum(watchProducts);
@@ -300,21 +333,27 @@ const BudgetForm = ({
   }, [watchState]);
 
   const handleReset = useCallback(() => {
-    let baseBudget = draft || isCloning
-      ? { ...EMPTY_BUDGET(user), ...budget, seller: user?.name }
-      : { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
-  
-    if (isCloning && removedProducts.length > 0) {
-      const removedCodes = removedProducts.map(p => p.code);
-      baseBudget.products = baseBudget.products.filter(p => !removedCodes.includes(p.code));
+    let baseBudget;
+
+    if (isCloning) {
+      baseBudget = {
+        ...clonedInitialValues,
+        products: clonedInitialValues.products.filter(p =>
+          !removedProducts.find(removed => removed.code === p.code)
+        )
+      };
+    } else if (draft) {
+      baseBudget = { ...EMPTY_BUDGET(user), ...budget, seller: user?.name };
+    } else {
+      baseBudget = { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
     }
-  
+
     reset(baseBudget);
-  
+
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [draft, isCloning, reset, user, budget, watchState, removedProducts]);
+  }, [reset, user, draft, budget, watchState, isCloning, clonedInitialValues, removedProducts]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));
