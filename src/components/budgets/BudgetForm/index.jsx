@@ -15,7 +15,7 @@ import { Loader } from "@/components/layout";
 import { ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
 import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { omit, pick } from "lodash";
+import { pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Popup } from "semantic-ui-react";
@@ -48,24 +48,37 @@ const BudgetForm = ({
   isCloning,
   draft,
 }) => {
+  const clonedInitialValues = useMemo(() => {
+    if (!isCloning || !budget) return EMPTY_BUDGET(user);
+
+    return {
+      products: budget.products.map((product) => ({
+        ...product,
+        quantity: product.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
+        ...(product.fractionConfig?.active && {
+          fractionConfig: {
+            ...product.fractionConfig,
+            value: product.fractionConfig.value || 1,
+            price: product.price,
+          }
+        })
+      })),
+      seller: user?.name,
+      paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
+      state: BUDGET_STATES.PENDING.id,
+      customer: { name: '', addresses: [], phoneNumbers: [] },
+      comments: '',
+      globalDiscount: 0,
+      additionalCharge: 0,
+      expirationOffsetDays: '',
+      paymentsMade: [],
+      pickUpInStore: false,
+    };
+  }, [budget, isCloning, user]);
+
   const methods = useForm({
     defaultValues: isCloning && budget
-      ? {
-        ...omit(budget, ['id', 'comments', 'paymentsMade', 'customer', 'expirationOffsetDays', 'paymentMethods']),
-        products: budget.products.map((product) => ({
-          ...product,
-          quantity: product.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
-          ...(product.fractionConfig?.active && {
-            fractionConfig: {
-              ...product.fractionConfig,
-              value: product.fractionConfig.value || 1,
-              price: product.price,
-            }
-          })
-        })),
-        seller: user?.name,
-        paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
-      }
+      ? clonedInitialValues
       : budget && draft
         ? {
           ...budget,
@@ -78,6 +91,7 @@ const BudgetForm = ({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
+
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
     control,
@@ -87,19 +101,34 @@ const BudgetForm = ({
   const hasShownModal = useRef(false);
   const productSearchRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [originalPrices, setOriginalPrices] = useState({});
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
   const [temporaryProducts, setTemporaryProducts] = useState([]);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [shouldShowModal, setShouldShowModal] = useState(false);
-  const [expiration, setExpiration] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState(false);
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
-  const [hasAcceptedChanges, setHasAcceptedChanges] = useState(false);
+  const watchExpirationOffsetDays = watch("expirationOffsetDays");
+
+  const getRestoredProducts = useCallback((sourceProducts) => {
+    return sourceProducts.map(product => {
+      const latestProduct = products.find(p => p.code === product.code);
+      const updatedState = latestProduct?.state ?? product.state;
+  
+      return {
+        ...product,
+        state: updatedState,
+        quantity: updatedState === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
+      };
+    }).filter(product =>
+      product.state !== PRODUCT_STATES.INACTIVE.id &&
+      product.state !== PRODUCT_STATES.DELETED.id &&
+      products.some(p => p.code === product.code)
+    );
+  }, [products]);
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -173,24 +202,21 @@ const BudgetForm = ({
     if (isCloning && !hasShownModal.current) {
       setIsTableLoading(true);
       let budgetProducts = [...budget.products];
-  
-      // Detectar productos removidos
+
       const existingProductCodes = new Set(products.map(p => p.code));
       const removedProducts = budgetProducts.filter(p => !existingProductCodes.has(p.code));
       const validProducts = budgetProducts.filter(p => existingProductCodes.has(p.code));
-  
-      // Actualizar los productos válidos en el formulario
+
       setValue("products", validProducts);
-  
-      // Detectar productos desactualizados
+
       const outdatedProducts = products.filter(product => {
         const budgetProduct = validProducts.find(bp => bp.code === product.code);
-  
+
         if (budgetProduct) {
           const priceChanged = budgetProduct.price !== product.price;
           const stateChanged = budgetProduct.state !== product.state;
           const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
-  
+
           const fractionConfigChanged =
             (budgetProduct.fractionConfig?.active !== product.fractionConfig?.active) ||
             (
@@ -198,17 +224,17 @@ const BudgetForm = ({
               product.fractionConfig?.active &&
               (budgetProduct.fractionConfig.value !== product.fractionConfig.value && product.fractionConfig.value !== undefined)
             );
-  
+
           return priceChanged || editableChanged || fractionConfigChanged || stateChanged;
         }
-  
+
         return false;
       });
-  
+
       if (outdatedProducts.length || removedProducts.length) {
         setTemporaryProducts(validProducts);
         setOutdatedProducts(outdatedProducts);
-        setRemovedProducts(removedProducts); 
+        setRemovedProducts(removedProducts);
         setShouldShowModal(true);
         hasShownModal.current = true;
       } else {
@@ -218,9 +244,9 @@ const BudgetForm = ({
   }, [budget, isCloning, products, watchProducts, setValue]);
 
   const handleConfirmUpdate = () => {
-    const confirmedProducts = temporaryProducts.map(product => {
+    const updatedProducts = temporaryProducts.map(product => {
       const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
-  
+
       if (outdatedProduct) {
         return {
           ...product,
@@ -234,40 +260,35 @@ const BudgetForm = ({
           quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
         };
       }
-  
+
       return product;
     });
-  
-    setValue(
-      "products",
-      confirmedProducts.filter(
-        (product) => !removedProducts.find((removed) => removed.code === product.code)
-      )
+
+    const restoredProducts = getRestoredProducts(updatedProducts).filter(
+      product => !removedProducts.find(rp => rp.code === product.code)
     );
-  
-    setOriginalPrices({});
+
+    const restoredForm = {
+      ...clonedInitialValues,
+      products: restoredProducts,
+    };
+
+    reset(restoredForm);
+    setValue("expirationOffsetDays", '', { shouldDirty: false });
     setShouldShowModal(false);
     setIsTableLoading(false);
-    setHasAcceptedChanges(true);
   };
 
   const handleCancelUpdate = () => {
-    const restoredProducts = temporaryProducts.map(product => {
-      if (originalPrices[product.code] !== undefined) {
-        return {
-          ...product,
-          price: originalPrices[product.code],
-        };
-      }
-      return product;
-    });
+    const restoredProducts = getRestoredProducts(budget.products);
 
-    setValue(
-      "products",
-      restoredProducts.filter(product =>
-        product.state !== PRODUCT_STATES.DELETED.id && product.state !== PRODUCT_STATES.INACTIVE.id
-      )
-    );
+    const baseBudget = {
+      ...clonedInitialValues,
+      products: restoredProducts
+    };
+
+    reset(baseBudget);
+    setValue("expirationOffsetDays", '', { shouldDirty: false });
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
@@ -300,21 +321,27 @@ const BudgetForm = ({
   }, [watchState]);
 
   const handleReset = useCallback(() => {
-    let baseBudget = draft || isCloning
-      ? { ...EMPTY_BUDGET(user), ...budget, seller: user?.name }
-      : { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
+    let baseBudget;
   
-    if (isCloning && removedProducts.length > 0) {
-      const removedCodes = removedProducts.map(p => p.code);
-      baseBudget.products = baseBudget.products.filter(p => !removedCodes.includes(p.code));
+    if (isCloning) {
+      const restoredProducts = getRestoredProducts(clonedInitialValues.products);
+      baseBudget = {
+        ...clonedInitialValues,
+        products: restoredProducts
+      };
+    } else if (draft) {
+      baseBudget = { ...EMPTY_BUDGET(user), ...budget, seller: user?.name };
+    } else {
+      baseBudget = { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
     }
   
     reset(baseBudget);
+    setValue("expirationOffsetDays", '', { shouldDirty: false });
   
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [draft, isCloning, reset, user, budget, watchState, removedProducts]);
+  }, [reset, setValue, user, draft, budget, watchState, isCloning, clonedInitialValues, getRestoredProducts]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));
@@ -399,7 +426,7 @@ const BudgetForm = ({
             {product.name}
           </OverflowWrapper>
           <Flex $alignItems="center" $marginLeft="5px" $columnGap="5px">
-            {product.state === PRODUCT_STATES.OOS.id && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
+            {isProductOOS(product.state) && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
             {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
             {product.comments && <CommentTooltip lineHeight="normal" tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
@@ -511,7 +538,7 @@ const BudgetForm = ({
   ]);
 
   const handleTryReset = () => {
-    if (isCloning && hasAcceptedChanges) {
+    if (isCloning && (outdatedProducts.length > 0 || removedProducts.length > 0)) {
       setShouldShowModal(true);
     } else {
       handleReset();
@@ -582,7 +609,6 @@ const BudgetForm = ({
                 maxLength={3}
                 label="Dias para el vencimiento"
                 placeholder="Cantidad en días"
-                onChange={setExpiration}
               />
               <FormField
                 $width="200px"
@@ -590,8 +616,8 @@ const BudgetForm = ({
                 control={Input}
                 readOnly
                 value={
-                  expiration || budget?.expirationOffsetDays
-                    ? getDateWithOffset(now(), expiration || budget?.expirationOffsetDays, "days")
+                  watchExpirationOffsetDays
+                    ? getDateWithOffset(now(), watchExpirationOffsetDays, "days")
                     : ""
                 }
                 placeholder="dd/mm/aaaa"
@@ -717,7 +743,7 @@ const BudgetForm = ({
               total={total}
             />
           </Loader>
-          {isBudgetConfirmed(watchState) && !isCloning && (
+          {isBudgetConfirmed(watchState) && (
             <FieldsContainer width="100%" $rowGap="15px">
               <Payments
                 total={total}
@@ -729,7 +755,7 @@ const BudgetForm = ({
             <Controller
               name="paymentMethods"
               render={({ field: { onChange, value } }) => (
-                <FormField flex="1" label="Metodos de pago" control={Input}>
+                <FormField flex="1" label="Métodos de pago" control={Input}>
                   <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                     <Button
                       $paddingLeft="18px"

@@ -48,7 +48,7 @@ const ModalUpdates = ({
           )}
           {stateChanged && (
             <>
-              {' | Estado: '}
+              {' Estado: '}
               <span style={{ color: PRODUCT_STATES[oldProduct.state].color }}>{PRODUCT_STATES[oldProduct.state].singularTitle}</span>
               {' -> '}
               <span style={{ color: PRODUCT_STATES[p.state].color }}>{PRODUCT_STATES[p.state].singularTitle}</span>
