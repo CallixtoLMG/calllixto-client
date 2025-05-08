@@ -48,38 +48,6 @@ const BudgetForm = ({
   isCloning,
   draft,
 }) => {
-  const methods = useForm({
-    defaultValues: isCloning && budget
-      ? {
-        ...omit(budget, ['id', 'comments', 'paymentsMade', 'customer', 'expirationOffsetDays', 'paymentMethods']),
-        products: budget.products.map((product) => ({
-          ...product,
-          quantity: product.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
-          ...(product.fractionConfig?.active && {
-            fractionConfig: {
-              ...product.fractionConfig,
-              value: product.fractionConfig.value || 1,
-              price: product.price,
-            }
-          })
-        })),
-        seller: user?.name,
-        paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
-        state: BUDGET_STATES.PENDING.id
-      }
-      : budget && draft
-        ? {
-          ...budget,
-          seller: user?.name,
-          paymentsMade: budget.paymentsMade || [],
-        }
-        : {
-          ...EMPTY_BUDGET(user),
-        },
-    mode: 'onSubmit',
-    reValidateMode: 'onChange',
-  });
-
   const clonedInitialValues = useMemo(() => {
     if (!isCloning || !budget) return EMPTY_BUDGET(user);
 
@@ -109,6 +77,22 @@ const BudgetForm = ({
     };
   }, [budget, isCloning, user]);
 
+  const methods = useForm({
+    defaultValues: isCloning && budget
+      ? clonedInitialValues
+      : budget && draft
+        ? {
+            ...budget,
+            seller: user?.name,
+            paymentsMade: budget.paymentsMade || [],
+          }
+        : {
+            ...EMPTY_BUDGET(user),
+          },
+    mode: 'onSubmit',
+    reValidateMode: 'onChange',
+  });
+  
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
     control,
@@ -129,6 +113,23 @@ const BudgetForm = ({
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
+
+  const getRestoredProducts = (sourceProducts) => {
+    return sourceProducts.map(product => {
+      const latestProduct = products.find(p => p.code === product.code);
+      const updatedState = latestProduct?.state ?? product.state;
+  
+      return {
+        ...product,
+        state: updatedState,
+        quantity: updatedState === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
+      };
+    }).filter(product =>
+      product.state !== PRODUCT_STATES.INACTIVE.id &&
+      product.state !== PRODUCT_STATES.DELETED.id &&
+      products.some(p => p.code === product.code)
+    );
+  };
 
   useEffect(() => {
     const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
@@ -244,9 +245,9 @@ const BudgetForm = ({
   }, [budget, isCloning, products, watchProducts, setValue]);
 
   const handleConfirmUpdate = () => {
-    const confirmedProducts = temporaryProducts.map(product => {
+    const updatedProducts = temporaryProducts.map(product => {
       const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
-
+  
       if (outdatedProduct) {
         return {
           ...product,
@@ -260,37 +261,27 @@ const BudgetForm = ({
           quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
         };
       }
-
+  
       return product;
     });
-
+  
+    const restoredProducts = getRestoredProducts(updatedProducts).filter(
+      product => !removedProducts.find(rp => rp.code === product.code)
+    );
+  
     const restoredForm = {
       ...clonedInitialValues,
-      products: confirmedProducts.filter(
-        (product) => !removedProducts.find((removed) => removed.code === product.code)
-      )
+      products: restoredProducts,
     };
-
+  
     reset(restoredForm);
+    setExpiration("");
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
-
-  const handleCancelUpdate = () => {
-    const restoredProducts = budget.products.map((product) => {
-      const latestProduct = products.find(p => p.code === product.code);
-      const updatedState = latestProduct?.state ?? product.state;
   
-      return {
-        ...product,
-        state: updatedState,
-        quantity: updatedState === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
-      };
-    }).filter(product =>
-      product.state !== PRODUCT_STATES.INACTIVE.id &&
-      product.state !== PRODUCT_STATES.DELETED.id &&
-      products.some(p => p.code === product.code)
-    );
+  const handleCancelUpdate = () => {
+    const restoredProducts = getRestoredProducts(budget.products);
   
     const baseBudget = {
       ...clonedInitialValues,
@@ -302,8 +293,6 @@ const BudgetForm = ({
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
-  
-  
 
   const calculateTotal = useCallback(() => {
     const totalSum = getTotalSum(watchProducts);
@@ -334,26 +323,26 @@ const BudgetForm = ({
 
   const handleReset = useCallback(() => {
     let baseBudget;
-
+  
     if (isCloning) {
+      const restoredProducts = getRestoredProducts(clonedInitialValues.products);
       baseBudget = {
         ...clonedInitialValues,
-        products: clonedInitialValues.products.filter(p =>
-          !removedProducts.find(removed => removed.code === p.code)
-        )
+        products: restoredProducts
       };
     } else if (draft) {
       baseBudget = { ...EMPTY_BUDGET(user), ...budget, seller: user?.name };
     } else {
       baseBudget = { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
     }
-
+  
     reset(baseBudget);
-
+    setExpiration("");
+  
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [reset, user, draft, budget, watchState, isCloning, clonedInitialValues, removedProducts]);
+  }, [reset, user, draft, budget, watchState, isCloning, clonedInitialValues, products]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));
