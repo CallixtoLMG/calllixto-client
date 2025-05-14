@@ -343,7 +343,7 @@ const Budget = ({ params }) => {
         isLoading={isPendingCancel}
         id={budget?.id}
       />
-    </Loader >
+    </Loader>
   );
 };
 
