@@ -117,7 +117,7 @@ const BudgetForm = ({
     return sourceProducts.map(product => {
       const latestProduct = products.find(p => p.code === product.code);
       const updatedState = latestProduct?.state ?? product.state;
-  
+
       return {
         ...product,
         state: updatedState,
@@ -186,7 +186,6 @@ const BudgetForm = ({
   }, [watchCustomer, customerOptions]);
 
   useEffect(() => {
-
     if (
       normalizedCustomer &&
       normalizedCustomer?.id &&
@@ -241,7 +240,7 @@ const BudgetForm = ({
         setIsTableLoading(false);
       }
     }
-  }, [budget, isCloning, products, watchProducts, setValue]);
+  }, [budget, isCloning, products, setValue]);
 
   const handleConfirmUpdate = () => {
     const updatedProducts = temporaryProducts.map(product => {
@@ -322,7 +321,7 @@ const BudgetForm = ({
 
   const handleReset = useCallback(() => {
     let baseBudget;
-  
+
     if (isCloning) {
       const restoredProducts = getRestoredProducts(clonedInitialValues.products);
       baseBudget = {
@@ -334,10 +333,10 @@ const BudgetForm = ({
     } else {
       baseBudget = { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
     }
-  
+
     reset(baseBudget);
     setValue("expirationOffsetDays", '', { shouldDirty: false });
-  
+
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
@@ -353,7 +352,7 @@ const BudgetForm = ({
       id: 1,
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      onClick: (element, index) => removeProduct(index),
+      onClick: (element, index) => { removeProduct(index)},
       tooltip: 'Eliminar',
       width: "100%"
     },
