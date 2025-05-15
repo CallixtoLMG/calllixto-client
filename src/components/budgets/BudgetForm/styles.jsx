@@ -28,4 +28,3 @@ const VerticalDivider = styled.div`
 `;
 
 export { Container, MessageHeader, MessageItem, MessageList, VerticalDivider };
-
