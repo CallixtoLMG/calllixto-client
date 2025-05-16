@@ -231,7 +231,7 @@ export const EVENT_KEYS = {
 export const DEFAULT_LAST_EVENT_ID = "A0000";
 
 export const ID = "id";
-
+export const LAST_EVENT_ID = "lastEventId";
 export const CODE = "code";
 
 export const PASSWORD_REQUIREMENTS = [

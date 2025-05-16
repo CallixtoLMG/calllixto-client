@@ -1,4 +1,4 @@
-import { ALL, DEFAULT_LAST_EVENT_ID, DELETE, ENTITIES, EVENT_KEYS, ID, USERNAME } from "@/common/constants";
+import { ALL, DEFAULT_LAST_EVENT_ID, DELETE, ENTITIES, EVENT_KEYS, ID, LAST_EVENT_ID, USERNAME } from "@/common/constants";
 import { now } from "@/common/utils/dates";
 import { config } from "@/config";
 import { EVENTS, PATHS } from "@/fetchUrls";
@@ -104,9 +104,7 @@ export async function listItems({ entity, url, params, key = ID }) {
 
   if (values?.length) {
     values = await handleEvents({ entity, values, key });
-  }
-
-  if (!values?.length) {
+  } else {
     values = await entityList({ entity, url, params });
 
     await bulkAddStorageItems({ entity, values });

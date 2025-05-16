@@ -1,5 +1,5 @@
 import Dexie from 'dexie';
-import { ID, LAST_EVENT_ID } from './constants';
+import { ID, LAST_EVENT_ID } from '@/common/constants';
 
 export const db = new Dexie('Callixto');
 
