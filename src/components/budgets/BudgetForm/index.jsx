@@ -412,6 +412,7 @@ const BudgetForm = ({
             calculateTotal();
           }}
           disabled={isProductOOS(product.state)}
+          allowsDecimal
         />
       ),
       width: 1
