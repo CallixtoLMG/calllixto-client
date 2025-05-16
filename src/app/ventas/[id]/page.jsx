@@ -14,7 +14,7 @@ import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import ModalPDF from "@/components/budgets/ModalPDF";
-import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
+import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useValidateToken } from "@/hooks/userData";
@@ -95,7 +95,7 @@ const Budget = ({ params }) => {
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
       ].filter(Boolean));
       setCustomerData(budget.customer);
-      setSelectedContact({
+      setSelectedContact(budget.pickUpInStore ? PICK_UP_IN_STORE :{
         address: budget.customer?.addresses?.[0]?.address,
         phone: getFormatedPhone(budget.customer?.phoneNumbers?.[0])
       });
@@ -285,7 +285,7 @@ const Budget = ({ params }) => {
           $margin={(isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state)) ? "0" : undefined}
           $justifyContent="space-between"
         >
-          <IconedButton 
+          <IconedButton
             text="Confirmar"
             icon={ICONS.CHECK}
             color={COLORS.GREEN}
