@@ -26,8 +26,7 @@ const Products = () => {
 
   useEffect(() => {
     setLabels(['Productos']);
-    refetch();
-  }, [setLabels, refetch]);
+  }, [setLabels]);
 
   const products = useMemo(() => data?.products, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);

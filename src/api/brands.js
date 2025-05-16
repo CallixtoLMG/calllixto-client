@@ -22,11 +22,10 @@ export function useListBrands({ sort = 'name', order = true } = {}) {
 export function useGetBrand(id) {
   const query = useQuery({
     queryKey: [GET_BRAND_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PATHS.BRANDS, entity: ENTITIES.BRANDS }),
+    queryFn: () => getItemById({ id, url: PATHS.BRANDS, entity: ENTITIES.BRANDS, singular: ENTITIES.BRAND }),
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
   });
-
   return query;
 };
 

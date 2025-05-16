@@ -23,7 +23,7 @@ export function useListCustomers({ sort = 'name', order = true } = {}) {
 export function useGetCustomer(id) {
   const query = useQuery({
     queryKey: [GET_CUSTOMER_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PATHS.CUSTOMERS, entity: ENTITIES.CUSTOMERS }),
+    queryFn: () => getItemById({ id, url: PATHS.CUSTOMERS, entity: ENTITIES.CUSTOMERS, singular: ENTITIES.CUSTOMER }),
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
   });

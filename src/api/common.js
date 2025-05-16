@@ -4,7 +4,7 @@ import { config } from "@/config";
 import { EVENTS, PATHS } from "@/fetchUrls";
 import { useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
-import localforage from "./local-forage";
+import { addStorageItem, bulkAddStorageItems, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
 
 async function entityList({ entity, url, params }) {
   try {
@@ -37,16 +37,15 @@ async function entityList({ entity, url, params }) {
 };
 
 async function handleEvents({ entity, values, key = ID }) {
-  let lastEventId = await localforage.getItem(`${config.APP_ENV}-${entity}-lastEventId`);
-
+  let lastEventId = await getStorageItem({ entity: LAST_EVENT_ID, id: entity });
 
   if (!lastEventId) {
-    lastEventId = DEFAULT_LAST_EVENT_ID;
-    await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
+    lastEventId = { lastEventId: DEFAULT_LAST_EVENT_ID };
+    await updateOrCreateStorageItem({ entity: LAST_EVENT_ID, id: entity, value: lastEventId });
   }
 
   const { data: eventsData } = await getInstance().get(`${EVENTS}/${entity}`, {
-    params: { lastEventId },
+    params: { lastEventId: lastEventId.lastEventId },
   });
 
   if (eventsData.statusOk) {
@@ -54,7 +53,7 @@ async function handleEvents({ entity, values, key = ID }) {
 
     lastEventId = newEvents[newEvents.length - 1]?.id;
     if (lastEventId) {
-      await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
+      await updateOrCreateStorageItem({ entity: LAST_EVENT_ID, id: entity, value: { lastEventId } });
     }
 
     if (newEvents.some((event) => event.action === EVENT_KEYS.UPDATE_ALL)) {
@@ -92,7 +91,7 @@ async function handleEvents({ entity, values, key = ID }) {
           filter: (product) => product.code.slice(0, 2) !== supplierIdToDelete
         });
 
-        values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
+        values = await getAllStorageItems(entity);
       }
     }
   };
@@ -101,72 +100,47 @@ async function handleEvents({ entity, values, key = ID }) {
 };
 
 export async function listItems({ entity, url, params, key = ID }) {
-  let values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
+  let values = await getAllStorageItems(entity);
 
   if (values?.length) {
     values = await handleEvents({ entity, values, key });
   }
 
-  if (!values || values.length === 0) {
+  if (!values?.length) {
     values = await entityList({ entity, url, params });
 
-    await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
+    await bulkAddStorageItems({ entity, values });
 
     const { data } = await getInstance().get(`${PATHS.EVENTS}/${entity}`, { params: { order: false, pageSize: 1 } });
     const lastEventId = data?.events?.[0]?.id;
 
     if (lastEventId) {
-      await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
+      await updateOrCreateStorageItem({ entity: LAST_EVENT_ID, id: entity, value: { lastEventId } });
     }
   }
-
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
 
   return { [entity]: values };
 };
 
-export async function getItemById({ id, url, entity, key = ID, params }) {
-  await listItems({ entity, url, params, key });
-  const getEntity = async (id) => {
+export async function getItemById({ id, url, entity, singular }) {
+  const getEntity = async () => {
     try {
       const { data } = await getInstance().get(`${url}/${id}`);
       if (data.statusOk) {
-        return data[entity];
+        await updateOrCreateStorageItem({ entity, id, value: data[singular] });
+        return data[singular];
       }
     } catch (error) {
       throw error;
     }
   };
 
-  let value = (await localforage.getItem(`${config.APP_ENV}-${entity}`))?.find((item) => item[key] === id);
+  const value = await getStorageItem({ entity, id });
   if (value) {
     return value;
   }
-  return getEntity(id);
-};
 
-export async function getItemByParam({ params, url, entitySingular, entityPlural, key }) {
-
-  await listItems({ entity: entityPlural, url, params, key });
-
-  const getEntity = async () => {
-    try {
-      const { data } = await getInstance().get(url, { params });
-      if (data.statusOk) {
-        return data[entitySingular];
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const cachedData = await localforage.getItem(`${config.APP_ENV}-${entityPlural}`);
-
-  const value = cachedData?.find((item) =>
-    Object.entries(params).every(([key, val]) => item[key] === val)
-  );
-
-  return value || getEntity();
+  return getEntity();
 }
 
 export function useCreateItem() {
@@ -206,7 +180,7 @@ export function useInactiveItem() {
     const { data } = await getInstance().post(url, body);
 
     if (data.statusOk) {
-      await updateStorageItem({ entity, value: data[responseEntity], key });
+      await updateOrCreateStorageItem({ entity, id: data[responseEntity][key], key, value: data[responseEntity] });
       invalidateQueries.forEach((query) => {
         queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
       });
@@ -268,9 +242,7 @@ export function useActiveItem() {
     const { data } = await getInstance().post(url, body);
 
     if (data.statusOk) {
-
-      await updateStorageItem({ entity, value: data[responseEntity], key });
-
+      await updateOrCreateStorageItem({ entity, id: data[responseEntity][key], key, value: data[responseEntity] });
       invalidateQueries.forEach((query) => {
         queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
       });
@@ -377,7 +349,7 @@ export function useDeleteItem() {
     const { data } = await getInstance().delete(`${url}/${id}`);
 
     if (data.statusOk) {
-      await removeStorageItem({ entity, id, key });
+      await removeStorageItem({ entity, id });
     }
     invalidateQueries.forEach((query) => { queryClient.invalidateQueries({ queryKey: query, refetchType: ALL }); })
     return data;
@@ -454,36 +426,14 @@ export function useBatchDeleteItems() {
   };
 
   return batchDeleteItems;
-};
-
-export async function addStorageItem({ entity, value }) {
-  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, [value, ...values]);
-};
-
-export async function updateStorageItem({ entity, value, key = ID }) {
-  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  const updatedArray = values.map(item => {
-    return item[key] === value[key] ? { ...item, ...value } : item;
-  })
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, updatedArray);
-};
-
-export async function removeStorageItem({ entity, id, key = ID }) {
-  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, values.filter((item) => item[key] !== id));
-};
+}
 
 export async function removeStorageItemsByCustomFilter({ entity, filter }) {
-  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  if (!values) {
-    console.warn("No se encontraron valores en el storage para la entidad:", entity);
-    return;
-  }
-  const filteredValues = values.filter(filter);
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, filteredValues);
-};
-
-export function removeStorageEntity(entity) {
-  return localforage.removeItem(`${config.APP_ENV}-${entity}`);
+  // const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
+  // if (!values) {
+  //   console.warn("No se encontraron valores en el storage para la entidad:", entity);
+  //   return;
+  // }
+  // const filteredValues = values.filter(filter);
+  // await localforage.setItem(`${config.APP_ENV}-${entity}`, filteredValues);
 };

@@ -23,7 +23,7 @@ export function useListSuppliers({ sort = ID, order = true } = {}) {
 export function useGetSupplier(id) {
   const query = useQuery({
     queryKey: [GET_SUPPLIER_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PATHS.SUPPLIERS, entity: ENTITIES.SUPPLIERS }),
+    queryFn: () => getItemById({ id, url: PATHS.SUPPLIERS, entity: ENTITIES.SUPPLIERS, singular: ENTITIES.SUPPLIER }),
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
   });

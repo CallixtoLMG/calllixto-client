@@ -49,7 +49,7 @@ export function useHasProductsByBrandId(brandId) {
 export function useGetProduct(id) {
   const query = useQuery({
     queryKey: [GET_PRODUCT_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PATHS.PRODUCTS, entity: ENTITIES.PRODUCTS, key: CODE }),
+    queryFn: () => getItemById({ id, url: PATHS.PRODUCTS, entity: ENTITIES.PRODUCTS, singular: ENTITIES.PRODUCT }),
     retry: false,
     staleTime: IN_MS.ONE_DAY,
   });
@@ -229,12 +229,12 @@ export const useDeleteBySupplierId = () => {
   const queryClient = useQueryClient();
 
   const deleteBatchProducts = async (supplierId) => {
+    const { data } = await getInstance().delete(`${PATHS.PRODUCTS}/${SUPPLIER}/${supplierId}`);
 
-    const { data } = await getInstance().delete(`${PATHS.PRODUCTS}/${SUPPLIER}/${supplierId}`)
     if (data.statusOk) {
       await removeStorageItemsByCustomFilter({
         entity: ENTITIES.PRODUCTS, filter: ((product) => !product.code.startsWith(supplierId))
-      })
+      });
 
       queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId], refetchType: ALL });
       queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: ALL });
