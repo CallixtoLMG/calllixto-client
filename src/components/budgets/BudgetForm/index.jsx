@@ -456,6 +456,7 @@ const BudgetForm = ({
                 calculateTotal();
               }}
               allowsDecimal
+              defaultValue={1}
             />
           )}
         </>
