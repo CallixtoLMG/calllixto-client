@@ -27,23 +27,23 @@ export const PriceField = ({
 
   const handleChange = (e) => {
     const inputElement = e.target;
-    const rawValue = e.target.value;
+    const rawValue = inputElement.value;
     const cursorPosition = inputElement.selectionStart;
-  
+
     const unformatted = rawValue.replace(/[^0-9.]/g, '');
-  
+
     const charsBeforeCursor = rawValue.slice(0, cursorPosition).replace(/[^0-9.]/g, '');
-  
+
     const [integerPart, decimalPart = ''] = unformatted.split('.');
     const trimmedValue = decimalPart.length > 2
       ? `${integerPart}.${decimalPart.slice(0, 2)}`
       : unformatted;
-  
+
     const formattedValue = formatNumberWithThousands(trimmedValue);
-  
+
     let validCharCount = 0;
     let newCursorPosition = formattedValue.length;
-  
+
     for (let i = 0; i < formattedValue.length; i++) {
       if (formattedValue[i].match(/[0-9.]/)) {
         validCharCount++;
@@ -53,10 +53,10 @@ export const PriceField = ({
         break;
       }
     }
-  
+
     setInternalValue(formattedValue);
     onChange(parseFloat(trimmedValue) || 0);
-  
+
     window.requestAnimationFrame(() => {
       inputElement.setSelectionRange(newCursorPosition, newCursorPosition);
     });
