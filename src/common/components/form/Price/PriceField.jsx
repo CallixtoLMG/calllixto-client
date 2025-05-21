@@ -1,5 +1,6 @@
 import { FormField, Input } from "@/common/components/custom";
-import { useState } from "react";
+import { getNumberFormated } from "@/common/utils";
+import { useEffect, useState } from "react";
 import { Icon } from "semantic-ui-react";
 
 export const PriceField = ({
@@ -7,30 +8,24 @@ export const PriceField = ({
   label,
   width,
   value = '',
+  updateFromParent,
   onChange,
   disabled = false,
   placeholder,
   justifyItems
 }) => {
-  const [formatedValue, setFormatedValue] = useState(value);
+  const [formattedValue, setFormattedValue] = useState(getNumberFormated(value ?? 0)[0]);
 
   const handleChange = (event) => {
-    const strNumber = event.target.value
-      .replace(/[^0-9.]/g, "")
-      .replace(/(\..*?)\./g, "$1");
-
-    let [integerPart, decimalPart] = strNumber.split(".");
-
-    if (decimalPart !== undefined) {
-      decimalPart = decimalPart.slice(0, 2);
-    }
-
-    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    const formattedValue = decimalPart !== undefined ? `${formattedInteger}.${decimalPart}` : formattedInteger;
-
-    setFormatedValue(formattedValue);
-    onChange(Number(`${integerPart}.${decimalPart || ""}`));
+    const [asString, asNumber] = getNumberFormated(event.target.value);
+    setFormattedValue(asString);
+    onChange(asNumber);
   };
+
+  useEffect(() => {
+    setFormattedValue(getNumberFormated(value ?? 0)[0]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateFromParent]);
 
   return (
     <FormField
@@ -41,7 +36,7 @@ export const PriceField = ({
       error={error}
     >
       <Input
-        value={formatedValue}
+        value={formattedValue}
         onChange={handleChange}
         disabled={disabled}
         iconPosition="left"
