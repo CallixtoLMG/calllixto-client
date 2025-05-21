@@ -1,13 +1,13 @@
-import { Modal, Transition } from "semantic-ui-react";
-import { useEffect, useRef, useState } from "react";
 import { useDolarExangeRate } from "@/api/external";
-import { OnlyPrint } from "@/components/layout";
-import PDFfile from "../PDFfile";
-import { useReactToPrint } from "react-to-print";
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, Flex, FlexColumn, Input } from "@/common/components/custom";
-import { BUDGET_PDF_FORMAT } from "../budgets.constants";
 import { COLORS, ICONS } from "@/common/constants";
+import { OnlyPrint } from "@/components/layout";
+import { useEffect, useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
+import { Modal, Transition } from "semantic-ui-react";
+import PDFfile from "../PDFfile";
+import { BUDGET_PDF_FORMAT } from "../budgets.constants";
 
 const ModalPDF = ({
   budget,
@@ -89,11 +89,9 @@ const ModalPDF = ({
                 ))}
               </Flex>
               <Input
-                textAlignLast="right"
-                innerWidth="90px"
                 type="text"
                 height="35px"
-                width="fit-content"
+                width="150px"
                 onChange={handleDollarChange}
                 actionPosition='left'
                 placeholder="Precio"
