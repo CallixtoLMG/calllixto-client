@@ -8,8 +8,6 @@ const formatNumberWithThousands = (value) => {
   return decimal !== undefined ? `${formattedInteger}.${decimal}` : formattedInteger;
 };
 
-const getThousandSeparatorCount = (value) => (value.match(/,/g) || []).length;
-
 export const PriceField = ({
   error,
   label,
@@ -29,32 +27,38 @@ export const PriceField = ({
 
   const handleChange = (e) => {
     const inputElement = e.target;
+    const rawValue = e.target.value;
     const cursorPosition = inputElement.selectionStart;
-
-    let inputValue = e.target.value;
-
-    inputValue = inputValue.replace(/[^0-9.]/g, '');
-
-    const normalizedValue = inputValue.split('.').reduce((acc, part, index) => {
-      return index === 0 ? part : `${acc}.${part}`;
-    });
-
-    const [integerPart, decimalPart = ''] = normalizedValue.split('.');
+  
+    const unformatted = rawValue.replace(/[^0-9.]/g, '');
+  
+    const charsBeforeCursor = rawValue.slice(0, cursorPosition).replace(/[^0-9.]/g, '');
+  
+    const [integerPart, decimalPart = ''] = unformatted.split('.');
     const trimmedValue = decimalPart.length > 2
       ? `${integerPart}.${decimalPart.slice(0, 2)}`
-      : normalizedValue;
-
-    const separatorCountBefore = getThousandSeparatorCount(internalValue);
+      : unformatted;
+  
     const formattedValue = formatNumberWithThousands(trimmedValue);
-    const separatorCountAfter = getThousandSeparatorCount(formattedValue);
-
-    const cursorAdjustment = separatorCountAfter - separatorCountBefore;
-
+  
+    let validCharCount = 0;
+    let newCursorPosition = formattedValue.length;
+  
+    for (let i = 0; i < formattedValue.length; i++) {
+      if (formattedValue[i].match(/[0-9.]/)) {
+        validCharCount++;
+      }
+      if (validCharCount === charsBeforeCursor.length) {
+        newCursorPosition = i + 1;
+        break;
+      }
+    }
+  
     setInternalValue(formattedValue);
     onChange(parseFloat(trimmedValue) || 0);
-
+  
     window.requestAnimationFrame(() => {
-      inputElement.setSelectionRange(cursorPosition + cursorAdjustment, cursorPosition + cursorAdjustment);
+      inputElement.setSelectionRange(newCursorPosition, newCursorPosition);
     });
   };
 
