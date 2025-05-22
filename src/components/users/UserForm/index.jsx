@@ -175,7 +175,7 @@ const UserForm = forwardRef(({
           />
         </FieldsContainer>
         <FieldsContainer>
-          <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
+          <TextAreaControlled name="comments" label="Comentarios" readOnly={!isUpdating && view} />
         </FieldsContainer>
         {(isUpdating || !view) && (
           <SubmitAndRestore

@@ -34,14 +34,29 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   const roundedFinalTotal = parseFloat(total?.toFixed(2));
 
   const createTotalListItems = (paymentMethods = [], total) => {
-    const totalAssigned = paymentMethods.reduce((acc, payment) => acc + payment.amount, 0) || 0;
+
+    const sortedPayments = [...paymentMethods].sort((a, b) => {
+      const dateA = new Date(a.date || 0).getTime();
+      const dateB = new Date(b.date || 0).getTime();
+      return dateA - dateB;
+    });
+
+    const totalAssigned = sortedPayments.reduce((acc, payment) => acc + payment.amount, 0) || 0;
     const totalPending = total - totalAssigned;
-    const items = paymentMethods.map((payment, index) => ({
-      id: index + 1,
-      title: payment.method,
-      amount: <PriceLabel value={payment.amount} />,
-      ...(payment.comments && { subtitle: payment.comments }),
-    }));
+    const items = sortedPayments.map((payment, index) => {
+      const date = payment.date ? getFormatedDate(payment.date) : null;
+      const subtitleParts = [];
+
+      if (date) subtitleParts.push(date);
+      if (payment.comments) subtitleParts.push(payment.comments);
+
+      return {
+        id: index + 1,
+        title: payment.method,
+        amount: <PriceLabel value={payment.amount} />,
+        ...(subtitleParts.length > 0 && { subtitle: subtitleParts.join(" | ") }),
+      };
+    });
 
     items.push({
       id: items.length + 1,
@@ -67,7 +82,6 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   };
 
   const TOTAL_LIST_ITEMS = createTotalListItems(budget?.paymentsMade, roundedFinalTotal);
-
   return (
     <FlexColumn ref={ref} $rowGap="15px">
       <Box>
