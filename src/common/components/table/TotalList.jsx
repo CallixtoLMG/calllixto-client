@@ -36,7 +36,7 @@ export const TotalList = ({ items = [], readOnly, width }) => {
             {subtitle && (
               <Flex $justifyContent="left">
                 <SubTitle>
-                  {`${subtitle}`}
+                  {subtitle}
                 </SubTitle>
               </Flex>
             )}

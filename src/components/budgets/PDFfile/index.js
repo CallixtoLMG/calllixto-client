@@ -5,6 +5,7 @@ import { getFormatedPhone, getFormatedPrice } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_PDF_FORMAT, BUDGET_STATES } from "@/components/budgets/budgets.constants";
 import { getProductsColumns } from "@/components/budgets/budgets.utils";
+import dayjs from "dayjs";
 import { get } from "lodash";
 import { forwardRef, useMemo } from "react";
 import { List } from "semantic-ui-react";
@@ -35,11 +36,9 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
 
   const createTotalListItems = (paymentMethods = [], total) => {
 
-    const sortedPayments = [...paymentMethods].sort((a, b) => {
-      const dateA = new Date(a.date || 0).getTime();
-      const dateB = new Date(b.date || 0).getTime();
-      return dateA - dateB;
-    });
+    const sortedPayments = [...paymentMethods].sort((a, b) =>
+    dayjs(a.date || 0).valueOf() - dayjs(b.date || 0).valueOf()
+  );
 
     const totalAssigned = sortedPayments.reduce((acc, payment) => acc + payment.amount, 0) || 0;
     const totalPending = total - totalAssigned;
