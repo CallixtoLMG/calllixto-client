@@ -4,7 +4,7 @@ import { useCancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "
 import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
-import { Box, DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu } from "@/common/components/custom";
+import { DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu } from "@/common/components/custom";
 import { COLORS, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { now } from "@/common/utils/dates";
@@ -13,10 +13,10 @@ import BudgetView from "@/components/budgets/BudgetView";
 import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
-import { BUDGET_STATES } from "@/components/budgets/budgets.constants";
+import ModalPDF from "@/components/budgets/ModalPDF";
+import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import ModalPDF from "@/components/budgets/ModalPDF";
 import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -40,7 +40,6 @@ const Budget = ({ params }) => {
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
   const [isModalPDFOpen, setIsModalPDFOpen] = useState(false);
-
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
@@ -96,7 +95,9 @@ const Budget = ({ params }) => {
       ].filter(Boolean));
       setCustomerData(budget.customer);
       setSelectedContact({
-        address: budget.customer?.addresses?.[0]?.address,
+        address: budget.pickUpInStore
+          ? PICK_UP_IN_STORE
+          : budget.customer?.addresses?.[0]?.address,
         phone: getFormatedPhone(budget.customer?.phoneNumbers?.[0])
       });
     }
@@ -280,14 +281,19 @@ const Budget = ({ params }) => {
 
   return (
     <Loader active={isLoading || loadingProducts || loadingCustomers}>
-      {isBudgetPending(budget?.state) &&
-        <Flex $margin={isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state) && "0"} $justifyContent="space-between">
-          {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) ? (
-            <>
-              <IconedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleConfirm} />
-            </>
-          ) : <Box />}
-        </Flex>}
+      {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) && (
+        <Flex
+          $margin={(isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state)) ? "0" : undefined}
+          $justifyContent="space-between"
+        >
+          <IconedButton
+            text="Confirmar"
+            icon={ICONS.CHECK}
+            color={COLORS.GREEN}
+            onClick={handleConfirm}
+          />
+        </Flex>
+      )}
       {isBudgetDraft(budget?.state) ? (
         <BudgetForm
           onSubmit={mutateEdit}
@@ -343,7 +349,7 @@ const Budget = ({ params }) => {
         isLoading={isPendingCancel}
         id={budget?.id}
       />
-    </Loader >
+    </Loader>
   );
 };
 

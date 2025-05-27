@@ -24,6 +24,7 @@ export const TextControlled = forwardRef(({
         <TextField
           {...rest}
           {...inputParams}
+          name={name}
           width={width}
           ref={ref}
           disabled={disabled}

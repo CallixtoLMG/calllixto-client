@@ -1,5 +1,5 @@
 import { Flex, FormField, Icon, Input } from "@/common/components/custom";
-import { get } from "lodash";
+import { get, isNil } from "lodash";
 import { Controller, useFormContext } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 
@@ -18,6 +18,7 @@ export const NumberControlled = ({
   normalMode = false,
   disabled,
   defaultValueFallback,
+  defaultValue = 0,
   allowsDecimal = false,
   padding,
   ...inputProps
@@ -30,12 +31,7 @@ export const NumberControlled = ({
       name={name}
       rules={rules}
       render={({ field: { onChange: onChangeController, value, ...rest } }) => {
-        const safeValue =
-          value !== undefined && value !== null
-            ? value
-            : defaultValueFallback !== undefined
-              ? defaultValueFallback
-              : '';
+        const safeValue = !isNil(value) ? value : defaultValueFallback ?? '';
 
         return (
           <FormField
@@ -75,16 +71,9 @@ export const NumberControlled = ({
               onBlur={(e) => {
                 const raw = e.target.value.replace(',', '.');
                 const value = parseFloat(raw);
-                if (allowsDecimal) {
-                  if (!value || value === 0) {
-                    onChangeController("1");
-                    onChange?.("1");
-                  }
-                } else {
-                  if (!value || isNaN(value)) {
-                    onChangeController("1");
-                    onChange?.("1");
-                  }
+                if (!value || isNaN(value)) {
+                  onChangeController(String(defaultValue));
+                  onChange?.(String(defaultValue));
                 }
               }}
               onFocus={(e) => e.target.select()}

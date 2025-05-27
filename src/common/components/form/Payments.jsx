@@ -39,6 +39,8 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
   const [payment, setPayment] = useState(EMPTY_PAYMENT());
   const [showErrors, setShowErrors] = useState(false);
   const [exceedAmountError, setExceedAmountError] = useState(false);
+  // this flag is just used to trigger the price field update when the user clicks on "Completar" button
+  const [updatePrice, setUpdatePrice] = useState(false);
 
   const handleAddPayment = async () => {
     setShowErrors(true);
@@ -98,6 +100,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
                 placeholder="Monto"
                 width="150px"
                 label="Monto"
+                updateFromParent={updatePrice}
                 value={payment.amount}
                 onChange={(value) => {
                   setPayment({ ...payment, amount: value ?? 0 });
@@ -131,7 +134,10 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
                     labelPosition="left"
                     color={COLORS.BLUE}
                     type="button"
-                    onClick={() => setPayment({ ...payment, amount: parseFloat(totalPending) })}
+                    onClick={() => {
+                      setPayment({ ...payment, amount: parseFloat(totalPending) });
+                      setUpdatePrice(prev => !prev);
+                    }}
                     disabled={isTotalCovered}
                     width="fit-content"
                   />

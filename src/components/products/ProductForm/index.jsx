@@ -304,7 +304,7 @@ const ProductForm = forwardRef(({
         <TextAreaControlled
           name="comments"
           label="Comentarios"
-          disabled={!isUpdating && view}
+          readOnly={!isUpdating && view}
         />
         {(isUpdating || !view) && (
           <SubmitAndRestore

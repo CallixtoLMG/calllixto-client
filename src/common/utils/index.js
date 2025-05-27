@@ -115,10 +115,10 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
         const filterWords = normalizeText(filters[key]).split(/\s+/);
 
         const itemValue = typeof item[key] === "string"
-        ? normalizeText(item[key])
-        : typeof exceptions[key] === "function"
-          ? normalizeText(exceptions[key](item))
-          : "";
+          ? normalizeText(item[key])
+          : typeof exceptions[key] === "function"
+            ? normalizeText(exceptions[key](item))
+            : "";
 
         const allWordsMatch = filterWords.every(word => itemValue.includes(word));
         if (!allWordsMatch) {
@@ -151,4 +151,23 @@ export const getDefaultListParams = (attributes, sort, order) => {
 export const toUpperCase = (text = "") => {
   if (typeof text !== "string") return "";
   return text.toUpperCase();
+};
+
+export const getNumberFormated = (value) => {
+  const strNumber = String(value)
+    .replace(/[^0-9.]/g, "")
+    .replace(/(\..*?)\./g, "$1");
+
+  let [integerPart, decimalPart] = strNumber.split(".");
+
+  if (decimalPart !== undefined) {
+    decimalPart = decimalPart.slice(0, 2);
+  }
+
+  const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  const asString = decimalPart !== undefined ? `${formattedInteger}.${decimalPart}` : formattedInteger;
+  const asNumber = Number(`${integerPart}.${decimalPart || ""}`);
+
+  return [asString, asNumber];
 };

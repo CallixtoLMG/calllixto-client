@@ -12,4 +12,3 @@ const MainContainer = styled(Flex)`
 export {
     MainContainer
 };
-

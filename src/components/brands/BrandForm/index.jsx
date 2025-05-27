@@ -67,7 +67,7 @@ const BrandForm = forwardRef(({
             disabled={view && !isUpdating}
           />
         </FieldsContainer>
-        <TextAreaControlled name="comments" label="Comentarios" disabled={view && !isUpdating} />
+        <TextAreaControlled name="comments" label="Comentarios" readOnly={view && !isUpdating} />
         {(isUpdating || !view) && (
           <SubmitAndRestore
             isUpdating={isUpdating}

@@ -257,7 +257,6 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           placeholder="Comentarios"
           value={budget?.comments}
           readOnly
-          disabled
         />
       </ViewContainer>
     </Form>
