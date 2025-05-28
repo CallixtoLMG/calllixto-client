@@ -40,7 +40,7 @@ export function useGetSupplier(id) {
     enabled: !!id,
   });
 
-  return query
+  return query;
 };
 
 export const useCreateSupplier = () => {

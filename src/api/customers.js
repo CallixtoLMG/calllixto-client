@@ -40,7 +40,7 @@ export function useGetCustomer(id) {
     enabled: !!id,
   });
 
-  return query
+  return query;
 };
 
 export const useCreateCustomer = () => {

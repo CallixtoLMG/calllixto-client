@@ -39,7 +39,7 @@ export function useGetBrand(id) {
     enabled: !!id,
   });
 
-  return query
+  return query;
 };
 
 export const useCreateBrand = () => {

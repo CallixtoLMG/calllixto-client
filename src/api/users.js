@@ -43,7 +43,7 @@ export function useGetUser(username) {
     enabled: !!username,
   });
 
-  return query
+  return query;
 }
 
 export const useCreateUser = () => {

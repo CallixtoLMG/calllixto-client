@@ -1,8 +1,8 @@
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
 import { COLORS, ICONS, RULES } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
+import { getSortedPaymentsByDate } from "@/common/utils/dates";
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
-import dayjs from "dayjs";
 import { useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header } from "semantic-ui-react";
@@ -160,9 +160,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
           <Flex width="100%">
             <Table
               headers={PAYMENT_TABLE_HEADERS}
-              elements={[...paymentsMade].sort((a, b) =>
-                dayjs(a.date || 0).valueOf() - dayjs(b.date || 0).valueOf()
-              )}
+              elements={getSortedPaymentsByDate(paymentsMade)}
               actions={update && [
                 {
                   id: 1,
