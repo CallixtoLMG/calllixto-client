@@ -109,7 +109,7 @@ const CustomerForm = forwardRef(({
             })}
           />
         </FieldsContainer>
-        <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
+        <TextAreaControlled name="comments" label="Comentarios" readOnly={!isUpdating && view} />
         {(isUpdating || !view) && (
           <SubmitAndRestore
             isUpdating={isUpdating}

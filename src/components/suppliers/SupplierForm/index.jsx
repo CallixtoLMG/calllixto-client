@@ -68,7 +68,7 @@ const SupplierForm = forwardRef(({
           />
         </FieldsContainer>
         {(!view || isUpdating) ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
-        <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
+        <TextAreaControlled name="comments" label="Comentarios" readOnly={!isUpdating && view} />
         {(isUpdating || !view) && (
           <SubmitAndRestore
             isUpdating={isUpdating}
