@@ -3,7 +3,8 @@ import { getDefaultListParams } from '@/common/utils';
 import { ATTRIBUTES, GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
-import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
+import { getInstance } from "./axios";
+import { listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
 export function useListCustomers({ sort = 'name', order = true } = {}) {
   const query = useQuery({
@@ -21,11 +22,22 @@ export function useListCustomers({ sort = 'name', order = true } = {}) {
 }
 
 export function useGetCustomer(id) {
+  const getCustomer = async (id) => {
+    try {
+      const { data } = await getInstance().get(`${PATHS.CUSTOMERS}/${id}`);
+      
+      return data?.customer ?? null;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const query = useQuery({
     queryKey: [GET_CUSTOMER_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PATHS.CUSTOMERS, entity: ENTITIES.CUSTOMERS }),
+    queryFn: () => getCustomer(id),
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
+    enabled: !!id,
   });
 
   return query;

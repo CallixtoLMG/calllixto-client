@@ -1,18 +1,15 @@
 import { useUpdatePayments } from "@/api/budgets";
-import { SubmitAndRestore } from "@/common/components/buttons";
-import { Flex } from "@/common/components/custom";
-import Payments from "@/common/components/form/Payments";
-import { UnsavedChangesModal } from "@/common/components/modals";
 import { now } from "@/common/utils/dates";
 import BudgetDetails from "@/components/budgets/BudgetView/Modules/BudgetDetails";
+import BudgetPayments from "@/components/budgets/BudgetView/Modules/BudgetPayments";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
 import { useUnsavedChanges } from "@/hooks/unsavedChanges";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Form, Tab } from "semantic-ui-react";
-import { isBudgetCancelled, isBudgetExpired, isBudgetPending } from "../budgets.utils";
+import { Tab } from "semantic-ui-react";
+import { isBudgetExpired, isBudgetPending } from "../budgets.utils";
 
 const BudgetView = ({
   budget,
@@ -129,34 +126,22 @@ const BudgetView = ({
           key: "payments",
           label: "Pagos",
           component: (
-            <>
-              {!isBudgetCancelled(budget.state) && <Flex $justifyContent="space-between">{toggleButton}</Flex>}
-              <FormProvider {...methods}>
-                <Form onSubmit={methods.handleSubmit(() => mutateUpdatePayment())}>
-                  <Payments deleteButtonInside padding="14px 0" noBorder noBoxShadow update={isUpdating} total={total} />
-                  {isUpdating && (
-                    <SubmitAndRestore
-                      isUpdating={isUpdating}
-                      isLoading={isLoadingUpdatePayment}
-                      isDirty={isDirty}
-                      onReset={() =>
-                        methods.reset({ paymentsMade: budget.paymentsMade })
-                      }
-                      disabled={!isDirty}
-                      text="Guardar"
-                      submit
-                    />
-                  )}
-                </Form>
-              </FormProvider>
-              <UnsavedChangesModal
-                open={showUnsavedModal}
-                onDiscard={handleDiscard}
-                onSave={handleSave}
-                onCancel={handleCancel}
-                isSaving={isSaving}
-              />
-            </>
+            <BudgetPayments
+              budget={budget}
+              total={total}
+              methods={methods}
+              formRef={formRef}
+              isUpdating={isUpdating}
+              toggleButton={toggleButton}
+              mutateUpdatePayment={mutateUpdatePayment}
+              isLoadingUpdatePayment={isLoadingUpdatePayment}
+              isDirty={isDirty}
+              showUnsavedModal={showUnsavedModal}
+              handleDiscard={handleDiscard}
+              handleSave={handleSave}
+              handleCancel={handleCancel}
+              isSaving={isSaving}
+            />
           ),
         },
       ]
