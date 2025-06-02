@@ -212,13 +212,19 @@ export const ALL = "all";
 
 export const ACTIVE = "active";
 
+export const SPANISH_ACTIVE = "Activado";
+
 export const DELETE = "delete";
 
 export const INACTIVE = "inactive";
 
+export const SPANISH_INACTIVE = "Desactivado ";
+
 export const RECOVER = "recover";
 
 export const USERNAME = "username";
+
+export const SPANISH_UNKNOWN = "Desconocido";
 
 export const EVENT_KEYS = {
   UPDATE: 'U',

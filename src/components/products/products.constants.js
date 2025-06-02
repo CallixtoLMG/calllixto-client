@@ -172,3 +172,27 @@ export const MEASSURE_UNITS = {
     text: 'Kilogramos',
   },
 };
+
+export const FIELD_LABELS = {
+  name: "Nombre",
+  comments: "Comentario",
+  state: "Estado",
+  fractionConfig: "Medida",
+  tags: "Etiquetas",
+  editablePrice: "Precio editable",
+  price: "Precio",
+  cost: "Costo",
+};
+
+export const getLabel = (key) => FIELD_LABELS[key] || key;
+
+export const getDiffValue = (value, key) => {
+  if (value === null || value === undefined || value === "") {
+    if (key === ATTRIBUTES.COMMENTS) return "Sin comentario";
+    if (key === ATTRIBUTES.NAME) return "Sin nombre";
+    if (key === "tags") return "Sin etiquetas";
+    if (key === ATTRIBUTES.FRACTION_CONFIG) return "Sin medida";
+    return "—";
+  }
+  return value;
+};

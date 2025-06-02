@@ -8,8 +8,8 @@ import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, RECOVER } from "@/common/constants";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import ProductChanges from "@/components/products/ProductChanges";
 import ProductForm from "@/components/products/ProductForm";
-import RenderChangeHistory from "@/components/products/ProductRecord";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
@@ -412,7 +412,7 @@ const Product = ({ params }) => {
       menuItem: "Historial de cambios",
       render: () => (
         <Tab.Pane>
-          <RenderChangeHistory product={product} />
+          <ProductChanges product={product} />
         </Tab.Pane>
       ),
     },
