@@ -1,26 +1,108 @@
 import { Divider, FlexColumn, OverflowWrapper } from "@/common/components/custom";
-import { COLORS, DATE_FORMATS, INACTIVE, SPANISH_ACTIVE, SPANISH_INACTIVE, SPANISH_UNKNOWN } from "@/common/constants";
+import { COLORS, DATE_FORMATS, INACTIVE, LABELS } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
-import { ATTRIBUTES, getDiffValue, getLabel } from "@/components/products/products.constants";
+import { ATTRIBUTES, PRODUCT_LABELS, getLabel } from "@/components/products/products.constants";
 import { MessageItem } from "../../budgets/ModalUpdates/styles";
 import { PRODUCT_STATES } from "../products.constants";
-import { List, ListItem, Span } from "./styles";
+import { List, Span } from "./styles";
+
+const withOverflow = (value, color = "inherit") => (
+  <OverflowWrapper $verticalAlign="bottom" popupContent={value} maxWidth="45%">
+    <Span color={color}>{value}</Span>
+  </OverflowWrapper>
+);
+
+const renderName = ({ oldValue, newValue }) => (
+  <Span key={ATTRIBUTES.NAME}>
+    {getLabel(ATTRIBUTES.NAME)}: {withOverflow(oldValue, COLORS.GREY)} → {withOverflow(newValue)}
+  </Span>
+);
+
+const renderComments = ({ oldValue, newValue }) => (
+  <Span key={ATTRIBUTES.COMMENTS}>
+    {getLabel(ATTRIBUTES.COMMENTS)}: {withOverflow(oldValue, COLORS.GREY)} → {withOverflow(newValue)}
+  </Span>
+);
+
+const renderState = ({ oldValue, newValue }) => {
+  const prevLabel = PRODUCT_STATES[oldValue]?.singularTitle || LABELS.UNKNOWN;
+  const newLabel = PRODUCT_STATES[newValue]?.singularTitle || LABELS.UNKNOWN;
+  const newColor = PRODUCT_STATES[newValue]?.color || "inherit";
+
+  return (
+    <Span key={ATTRIBUTES.STATE}>
+      {getLabel(ATTRIBUTES.STATE)}: <Span color={COLORS.GREY}>{prevLabel}</Span> → <Span color={newColor}>{newLabel}</Span>
+    </Span>
+  );
+};
+
+const renderEditablePrice = ({ oldValue, newValue }) => (
+  <Span key={ATTRIBUTES.EDITABLE_PRICE}>
+    {getLabel(ATTRIBUTES.EDITABLE_PRICE)}: <Span color={COLORS.GREY}>{oldValue ? LABELS.ACTIVE : LABELS.INACTIVE}</Span> → {newValue ? LABELS.ACTIVE : LABELS.INACTIVE}
+  </Span>
+);
+
+const renderPrice = ({ oldValue, newValue }) => (
+  <Span key={ATTRIBUTES.PRICE}>
+    {getLabel(ATTRIBUTES.PRICE)}: <Span color={COLORS.GREY}>{getFormatedPrice(oldValue)}</Span> → {getFormatedPrice(newValue)}
+  </Span>
+);
+
+const renderCost = ({ oldValue, newValue }) => (
+  <Span key={ATTRIBUTES.COST}>
+    {getLabel(ATTRIBUTES.COST)}: <Span color={COLORS.GREY}>{getFormatedPrice(oldValue)}</Span> → {getFormatedPrice(newValue)}
+  </Span>
+);
+
+const renderFractionConfig = ({ oldValue, newValue }) => {
+  const oldMeasure = oldValue?.active ? oldValue.unit : PRODUCT_LABELS.NO_MEASURE;
+  const newMeasure = newValue?.active ? newValue.unit : PRODUCT_LABELS.NO_MEASURE;
+  return (
+    <Span key={ATTRIBUTES.FRACTION_CONFIG}>
+      {getLabel(ATTRIBUTES.FRACTION_CONFIG)}: <Span color={COLORS.GREY}>{oldMeasure}</Span> → {newMeasure}
+    </Span>
+  );
+};
+
+const renderTags = ({ oldValue, newValue }) => {
+  const prevTags = (oldValue || []).map((t) => t.name).join(", ") || PRODUCT_LABELS.NO_TAGS;
+  const newTags = (newValue || []).map((t) => t.name).join(", ") || PRODUCT_LABELS.NO_TAGS;
+  return (
+    <Span key="tags">
+      {getLabel("tags")}: <Span color={COLORS.GREY}>{prevTags}</Span> → {newTags}
+    </Span>
+  );
+};
+
+const renderInactiveReason = (reason) => (
+  <Span key="inactiveReason" color={COLORS.RED}>
+    Motivo de inactivación: {reason}
+  </Span>
+);
+
+const renderFunctions = {
+  [ATTRIBUTES.NAME]: renderName,
+  [ATTRIBUTES.COMMENTS]: renderComments,
+  [ATTRIBUTES.STATE]: renderState,
+  [ATTRIBUTES.EDITABLE_PRICE]: renderEditablePrice,
+  [ATTRIBUTES.PRICE]: renderPrice,
+  [ATTRIBUTES.COST]: renderCost,
+  [ATTRIBUTES.FRACTION_CONFIG]: renderFractionConfig,
+  tags: renderTags,
+};
 
 const ProductChanges = ({ product }) => {
-  const createdAt = product?.createdAt;
-  const createdBy = product?.createdBy;
-  const previousVersions = product?.previousVersions || [];
-
-  if (!previousVersions.length) return null;
+  const { createdAt, createdBy, previousVersions = [] } = product ?? {};
 
   const fullHistory = [...previousVersions, { ...product }];
-
   const reconstructedVersions = fullHistory
     .slice()
     .reverse()
     .reduce((acc, curr, index) => {
-      const nextVersion = acc[index - 1] || {};
+      const nextVersion = { ...acc[index - 1] };
+      delete nextVersion.updatedBy;
+      delete nextVersion.updatedAt;
       const complete = { ...nextVersion, ...curr };
       return [...acc, complete];
     }, [])
@@ -31,120 +113,50 @@ const ProductChanges = ({ product }) => {
     .slice(1)
     .reverse();
 
-    return (
+  return (
     <List>
-      <ListItem>
-        <strong>Producto creado el {getFormatedDate(createdAt, DATE_FORMATS.DATE_WITH_TIME)} {createdBy && `por ${createdBy}`}</strong>
-      </ListItem>
-      <Divider />
+      {createdAt && (
+        <>
+          <li>
+            <strong>
+              Producto creado el {getFormatedDate(createdAt, DATE_FORMATS.DATE_WITH_TIME)} {createdBy && `por ${createdBy}`}
+            </strong>
+          </li>
+        </>
+      )}
+
       {historyToRender.map(({ version, prevVersion }, index) => {
         const changes = [];
-        const date = version.updatedAt
-          ? getFormatedDate(version.updatedAt, DATE_FORMATS.DATE_WITH_TIME)
-          : `Versión ${index + 1}`;
 
-        [ATTRIBUTES.NAME, ATTRIBUTES.COMMENTS, ATTRIBUTES.STATE, ATTRIBUTES.EDITABLE_PRICE, ATTRIBUTES.PRICE, ATTRIBUTES.COST].forEach((key) => {
-          if (prevVersion[key] !== version[key]) {
-            const label = getLabel(key);
-            const isPrice = key === ATTRIBUTES.PRICE || key === ATTRIBUTES.COST;
-            const isEditable = key === ATTRIBUTES.EDITABLE_PRICE;
-            const shouldUseOverflow = key === ATTRIBUTES.NAME || key === ATTRIBUTES.COMMENTS;
-
-            const prevValue =
-              key === ATTRIBUTES.STATE
-                ? PRODUCT_STATES[prevVersion[key]]?.singularTitle || SPANISH_UNKNOWN
-                : isPrice
-                  ? getFormatedPrice(prevVersion[key])
-                  : isEditable
-                    ? prevVersion[key] ? SPANISH_ACTIVE : SPANISH_INACTIVE
-                    : getDiffValue(prevVersion[key], key);
-
-            const newValue =
-              key === ATTRIBUTES.STATE
-                ? PRODUCT_STATES[version[key]]?.singularTitle || SPANISH_UNKNOWN
-                : isPrice
-                  ? getFormatedPrice(version[key])
-                  : isEditable
-                    ? version[key] ? SPANISH_ACTIVE : SPANISH_INACTIVE
-                    : getDiffValue(version[key], key);
-
-            const prevColor = COLORS.GREY;
-
-            const newColor =
-              key === ATTRIBUTES.STATE
-                ? PRODUCT_STATES[version[key]]?.color || "inherit"
-                : "inherit";
-
-            const renderValue = (value, color) =>
-              shouldUseOverflow ? (
-                <OverflowWrapper popupContent={value} maxWidth="45%">
-                  <Span color={color}>{value}</Span>
-                </OverflowWrapper>
-              ) : (
-                <Span color={color}>{value}</Span>
-              );
-
-            changes.push(
-              <Span key={`${key}-${index}`}>
-                {label}: {renderValue(prevValue, prevColor)} → {renderValue(newValue, newColor)}
-              </Span>
-            );
+        Object.entries(renderFunctions).forEach(([key, renderer]) => {
+          const oldValue = prevVersion[key];
+          const newValue = version[key];
+          const hasChanged = JSON.stringify(oldValue) !== JSON.stringify(newValue);
+          if (hasChanged) {
+            changes.push(renderer({ oldValue, newValue }));
           }
         });
 
         if (version.state === INACTIVE.toUpperCase() && version.inactiveReason) {
-          changes.push(
-            <Span key={`inactiveReason-${index}`} color={COLORS.RED}>
-              Motivo de inactivación: {version.inactiveReason}
-            </Span>
-          );
-        }
-
-        if (
-          JSON.stringify(prevVersion.fractionConfig) !==
-          JSON.stringify(version.fractionConfig)
-        ) {
-          const prevMeasure = prevVersion.fractionConfig?.active
-            ? prevVersion.fractionConfig.unit
-            : "Sin medida";
-          const newMeasure = version.fractionConfig?.active
-            ? version.fractionConfig.unit
-            : "Sin medida";
-          changes.push(
-            <Span key={`${ATTRIBUTES.FRACTION_CONFIG}}-${index}`}>
-              {getLabel(ATTRIBUTES.FRACTION_CONFIG)}:{" "}
-              <Span color={COLORS.GREY}>{prevMeasure}</Span> → {newMeasure}
-            </Span>
-          );
-        }
-
-        if (
-          JSON.stringify(prevVersion.tags) !== JSON.stringify(version.tags)
-        ) {
-          const prevTags =
-            (prevVersion.tags || []).map((t) => t.name).join(", ") || "Sin etiquetas";
-          const newTags = (version.tags || []).map((t) => t.name).join(", ") || "Sin etiquetas";
-
-          changes.push(
-            <Span key={`tags-${index}`}>
-              {getLabel("tags")}: <Span color={COLORS.GREY}>{prevTags}</Span> → {newTags}
-            </Span>
-          );
+          changes.push(renderInactiveReason(version.inactiveReason));
         }
 
         if (!changes.length) return null;
 
-        const updatedBy = version.updatedBy
+        const date = version.updatedAt
+          ? getFormatedDate(version.updatedAt, DATE_FORMATS.DATE_WITH_TIME)
+          : `Sin fecha`;
+        const updatedBy = prevVersion?.updatedBy;
 
         return (
           <FlexColumn key={index}>
+            <Divider />
             <MessageItem>
               <strong>🕒 {date} {updatedBy && `por ${updatedBy}`}</strong>
               <FlexColumn $margin="5px 0 0 1.5rem!important" $rowGap="5px">
                 {changes}
               </FlexColumn>
             </MessageItem>
-            <Divider />
           </FlexColumn>
         );
       })}

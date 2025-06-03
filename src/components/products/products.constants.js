@@ -184,14 +184,21 @@ export const FIELD_LABELS = {
   cost: "Costo",
 };
 
-export const getLabel = (key) => FIELD_LABELS[key] || key;
+export const PRODUCT_LABELS = {
+  NO_MEASURE: "Sin medida",
+  NO_TAGS: "Sin etiquetas",
+  NO_NAME: "Sin nombre",
+  NO_COMMENT: "Sin comentario",
+};
+
+export const getLabel = (key) => FIELD_LABELS[key] ?? key;
 
 export const getDiffValue = (value, key) => {
   if (value === null || value === undefined || value === "") {
-    if (key === ATTRIBUTES.COMMENTS) return "Sin comentario";
-    if (key === ATTRIBUTES.NAME) return "Sin nombre";
-    if (key === "tags") return "Sin etiquetas";
-    if (key === ATTRIBUTES.FRACTION_CONFIG) return "Sin medida";
+    if (key === ATTRIBUTES.COMMENTS) return PRODUCT_LABELS.NO_COMMENT;
+    if (key === ATTRIBUTES.NAME) return PRODUCT_LABELS.NO_NAME;
+    if (key === "tags") return PRODUCT_LABELS.NO_TAGS;
+    if (key === ATTRIBUTES.FRACTION_CONFIG) return PRODUCT_LABELS.NO_MEASURE;
     return "—";
   }
   return value;

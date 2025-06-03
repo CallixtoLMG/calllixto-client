@@ -6,10 +6,6 @@ export const List = styled.ul`
   margin-left: 5px;
 `;
 
-export const ListItem = styled.li`
-  margin-bottom: 10px;
-`;
-
 export const Span = styled.span`
   color: ${({ color }) => color && color}
 `;
