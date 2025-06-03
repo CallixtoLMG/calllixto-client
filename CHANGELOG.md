@@ -3,15 +3,15 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)  
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.2] - 2025-06-02
+## [1.0.2] - 2025-06-03
 
 ### Added
 
 - Implemented product change history component (`ProductChanges`).
 
-- Added `FIELD_LABELS`, `getLabel`, `getDiffValue` to products.constants.
+- Added `FIELD_LABELS`, `getLabel`, `PRODUCT_LABELS` to products.constants.
 
-- Added `SPANISH_ACTIVE`, `SPANISH_INACTIVE`, `SPANISH_UNKNOWN` to common/constants.
+- Added const `LABELS` to common/constants.
 
 
 ### Changed

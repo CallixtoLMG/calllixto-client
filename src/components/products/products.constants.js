@@ -192,14 +192,3 @@ export const PRODUCT_LABELS = {
 };
 
 export const getLabel = (key) => FIELD_LABELS[key] ?? key;
-
-export const getDiffValue = (value, key) => {
-  if (value === null || value === undefined || value === "") {
-    if (key === ATTRIBUTES.COMMENTS) return PRODUCT_LABELS.NO_COMMENT;
-    if (key === ATTRIBUTES.NAME) return PRODUCT_LABELS.NO_NAME;
-    if (key === "tags") return PRODUCT_LABELS.NO_TAGS;
-    if (key === ATTRIBUTES.FRACTION_CONFIG) return PRODUCT_LABELS.NO_MEASURE;
-    return "—";
-  }
-  return value;
-};
