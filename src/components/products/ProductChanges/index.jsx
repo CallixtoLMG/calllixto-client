@@ -1,8 +1,9 @@
 import { Divider, FlexColumn, OverflowWrapper } from "@/common/components/custom";
-import { COLORS, DATE_FORMATS, INACTIVE, LABELS } from "@/common/constants";
+import { COLORS, DATE_FORMATS, LABELS } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { ATTRIBUTES, PRODUCT_LABELS, getLabel } from "@/components/products/products.constants";
+import isEqual from "lodash/isEqual";
 import { MessageItem } from "../../budgets/ModalUpdates/styles";
 import { PRODUCT_STATES } from "../products.constants";
 import { List, Span } from "./styles";
@@ -69,15 +70,15 @@ const renderTags = ({ oldValue, newValue }) => {
   const prevTags = (oldValue || []).map((t) => t.name).join(", ") || PRODUCT_LABELS.NO_TAGS;
   const newTags = (newValue || []).map((t) => t.name).join(", ") || PRODUCT_LABELS.NO_TAGS;
   return (
-    <Span key="tags">
-      {getLabel("tags")}: <Span color={COLORS.GREY}>{prevTags}</Span> → {newTags}
+    <Span key={ATTRIBUTES.TAGS}>
+      {getLabel(ATTRIBUTES.TAGS)}: <Span color={COLORS.GREY}>{prevTags}</Span> → {newTags}
     </Span>
   );
 };
 
-const renderInactiveReason = (reason) => (
-  <Span key="inactiveReason" color={COLORS.RED}>
-    Motivo de inactivación: {reason}
+const renderInactiveReason = ({ newValue }) => (
+  <Span key={ATTRIBUTES.INACTIVE_REASON} color={COLORS.RED}>
+    Motivo de inactivación: {newValue}
   </Span>
 );
 
@@ -89,7 +90,8 @@ const renderFunctions = {
   [ATTRIBUTES.PRICE]: renderPrice,
   [ATTRIBUTES.COST]: renderCost,
   [ATTRIBUTES.FRACTION_CONFIG]: renderFractionConfig,
-  tags: renderTags,
+  [ATTRIBUTES.TAGS]: renderTags,
+  [ATTRIBUTES.INACTIVE_REASON]: renderInactiveReason,
 };
 
 const ProductChanges = ({ product }) => {
@@ -116,13 +118,11 @@ const ProductChanges = ({ product }) => {
   return (
     <List>
       {createdAt && (
-        <>
-          <li>
-            <strong>
-              Producto creado el {getFormatedDate(createdAt, DATE_FORMATS.DATE_WITH_TIME)} {createdBy && `por ${createdBy}`}
-            </strong>
-          </li>
-        </>
+        <li>
+          <strong>
+            Producto creado el {getFormatedDate(createdAt, DATE_FORMATS.DATE_WITH_TIME)} {createdBy && `por ${createdBy}`}
+          </strong>
+        </li>
       )}
 
       {historyToRender.map(({ version, prevVersion }, index) => {
@@ -131,15 +131,13 @@ const ProductChanges = ({ product }) => {
         Object.entries(renderFunctions).forEach(([key, renderer]) => {
           const oldValue = prevVersion[key];
           const newValue = version[key];
-          const hasChanged = JSON.stringify(oldValue) !== JSON.stringify(newValue);
+
+          const hasChanged = !isEqual(oldValue, newValue);
+
           if (hasChanged) {
             changes.push(renderer({ oldValue, newValue }));
           }
         });
-
-        if (version.state === INACTIVE.toUpperCase() && version.inactiveReason) {
-          changes.push(renderInactiveReason(version.inactiveReason));
-        }
 
         if (!changes.length) return null;
 

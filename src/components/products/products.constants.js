@@ -20,6 +20,8 @@ export const ATTRIBUTES = {
   PREVIOUS_VERSIONS: "previousVersions",
   STATE: "state",
   COST: "cost",
+  TAGS: "tags",
+  INACTIVE_REASON: "inactiveReason",
 };
 
 export const PRODUCT_COLUMNS = [
