@@ -1,6 +1,6 @@
 import { useUserContext } from "@/User";
 import { Flex, Icon, Label } from "@/common/components/custom";
-import { KeyboardShortcuts } from "@/common/components/modals";
+import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
 import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
 import { RULES, isCallixtoUser } from "@/roles";
@@ -88,6 +88,7 @@ const Header = () => {
                 </Flex>
                 <Flex>
                   <RigthHeaderDiv>
+                    <ModalUpdates />
                     <KeyboardShortcuts />
                   </RigthHeaderDiv>
                   {isCallixtoUser(role) && (
