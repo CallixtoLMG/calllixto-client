@@ -88,8 +88,10 @@ const Header = () => {
                 </Flex>
                 <Flex>
                   <RigthHeaderDiv>
-                    <ModalUpdates />
-                    <KeyboardShortcuts />
+                    <Flex $columnGap ="10px">
+                      <ModalUpdates />
+                      <KeyboardShortcuts />
+                    </Flex>
                   </RigthHeaderDiv>
                   {isCallixtoUser(role) && (
                     <RigthHeaderDiv>
