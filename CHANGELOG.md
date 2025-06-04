@@ -3,6 +3,21 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)  
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2025-06-03
+
+### Added
+
+- Implemented product change history component (`ProductChanges`).
+
+- Added `FIELD_LABELS`, `getLabel`, `PRODUCT_LABELS` to products.constants.
+
+- Added const `LABELS` to common/constants.
+
+
+### Changed
+
+- Updated product detail view layout: now displayed in tab format with separate tabs for "Producto" and "Historial de cambios" (`ProductChanges`).
+
 ## [1.0.1] - 2025-05-28
 
 ### Added

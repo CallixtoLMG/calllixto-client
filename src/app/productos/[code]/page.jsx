@@ -1,13 +1,14 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useActiveProduct, useDeleteProduct, useEditProduct, useGetProduct, useInactiveProduct, useRecoverProduct } from "@/api/products";
-import { Message, MessageHeader } from "@/common/components/custom";
+import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, RECOVER } from "@/common/constants";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import ProductChanges from "@/components/products/ProductChanges";
 import ProductForm from "@/components/products/ProductForm";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
@@ -20,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
+import { Tab } from "semantic-ui-react";
 import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Product = ({ params }) => {
@@ -164,7 +166,7 @@ const Product = ({ params }) => {
       if (response.statusOk) {
         toast.success("Producto actualizado!");
         setIsUpdating(false);
-        resolveSave(); 
+        resolveSave();
       } else {
         toast.error(response.error.message);
       }
@@ -380,24 +382,45 @@ const Product = ({ params }) => {
     push(PAGES.NOT_FOUND.BASE);
   }
 
+  const panes = [
+    {
+      menuItem: "Producto",
+      render: () => (
+        <Tab.Pane>
+          <Flex $marginBottom="15px">
+            {!isProductDeleted(product?.state) && !isProductInactive(product?.state) && toggleButton}
+          </Flex>
+          {isProductInactive(product?.state) && (
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{product.inactiveReason}</p>
+            </Message>
+          )}
+          <ProductForm
+            ref={formRef}
+            product={product}
+            onSubmit={mutateEdit}
+            isUpdating={isUpdating && !isProductInactive(product?.state)}
+            isLoading={isEditPending}
+            view
+            isDeletePending={isDeletePending}
+          />
+        </Tab.Pane>
+      ),
+    },
+    {
+      menuItem: "Historial de cambios",
+      render: () => (
+        <Tab.Pane>
+          <ProductChanges product={product} />
+        </Tab.Pane>
+      ),
+    },
+  ];
+
   return (
     <Loader active={isLoading}>
-      {!isProductDeleted(product?.state) && !isProductInactive(product?.state) && toggleButton}
-      {isProductInactive(product?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{product.inactiveReason}</p>
-        </Message>
-      )}
-      <ProductForm
-        ref={formRef}
-        product={product}
-        onSubmit={mutateEdit}
-        isUpdating={isUpdating && !isProductInactive(product?.state)}
-        isLoading={isEditPending}
-        view
-        isDeletePending={isDeletePending}
-      />
+      <Tab panes={panes} />
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}

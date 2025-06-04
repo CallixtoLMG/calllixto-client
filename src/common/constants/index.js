@@ -220,6 +220,12 @@ export const RECOVER = "recover";
 
 export const USERNAME = "username";
 
+export const LABELS = {
+  ACTIVE: "Activado",
+  INACTIVE: "Desactivado",
+  UNKNOWN: "Desconocido",
+};
+
 export const EVENT_KEYS = {
   UPDATE: 'U',
   CREATE: "C",
