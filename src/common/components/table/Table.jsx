@@ -62,8 +62,13 @@ const CustomTable = ({
   }, []);
 
   useEffect(() => {
-    if (!isLoading && activePage > pages) {
-      setActivePage(1);
+    if (!isLoading) {
+      if (activePage > pages) {
+        setActivePage(1);
+      }
+      if (filters?.pageSize !== activePage) {
+        setPageSize(filters?.pageSize ?? DEFAULT_PAGE_SIZE);
+      }
     }
   }, [pages, activePage]);
 
@@ -106,6 +111,7 @@ const CustomTable = ({
 
   const handlePageSizeChange = (e, { value }) => {
     setPageSize(value);
+    setFilters({ ...filters, pageSize: value, page: 1 });
     setActivePage(1);
     clearSelection?.();
   };

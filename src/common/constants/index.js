@@ -81,7 +81,7 @@ export const PAGE_SIZE_OPTIONS = [
   { key: 100, text: '100', value: 100 }
 ];
 
-export const DEFAULT_PAGE_SIZE = 2;
+export const DEFAULT_PAGE_SIZE = 20;
 
 export const EXTERNAL_APIS = {
   MAIL: (email, name) => `mailto:${email}?Subject=${encodeUri(`Hola estimado/a ${name}, aqui esta el presupuesto que nos has pedido!`)}`,
