@@ -387,9 +387,11 @@ const Product = ({ params }) => {
       menuItem: "Producto",
       render: () => (
         <Tab.Pane>
-          <Flex $marginBottom="15px">
-            {!isProductDeleted(product?.state) && !isProductInactive(product?.state) && toggleButton}
-          </Flex>
+          {(!isProductDeleted(product?.state) && !isProductInactive(product?.state)) &&
+            <Flex Flex $marginBottom="15px">
+              {toggleButton}
+            </Flex>
+          }
           {isProductInactive(product?.state) && (
             <Message negative>
               <MessageHeader>Motivo de inactivación</MessageHeader>

@@ -9,6 +9,7 @@ import {
   useInactiveSupplier,
 } from "@/api/suppliers";
 import {
+  Flex,
   Icon,
   Message,
   MessageHeader,
@@ -37,6 +38,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
+import { Tab } from "semantic-ui-react";
 import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Supplier = ({ params }) => {
@@ -449,9 +451,51 @@ const Supplier = ({ params }) => {
     push(PAGES.NOT_FOUND.BASE);
   }
 
+  const panes = [
+    {
+      menuItem: "Proveedor",
+      render: () => (
+        <Tab.Pane>
+          {!isItemInactive(supplier?.state) &&
+            <Flex Flex $marginBottom="15px">
+              {toggleButton}
+            </Flex>
+          }
+          {isItemInactive(supplier?.state) && (
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{supplier.inactiveReason}</p>
+            </Message>
+          )}
+          <SupplierForm
+            ref={formRef}
+            supplier={supplier}
+            onSubmit={mutateEdit}
+            isLoading={isEditPending}
+            isUpdating={isUpdating && !isItemInactive(supplier?.state)}
+            view
+            isDeletePending={isDeletePending}
+          />
+        </Tab.Pane >
+      ),
+    },
+    {
+      menuItem: "Productos del Proveedor",
+      render: () => (
+        <Tab.Pane>
+          <Message negative>
+            <MessageHeader>Motivo de inactivación</MessageHeader>
+            <p>{supplier.inactiveReason}</p>
+          </Message>
+        </Tab.Pane>
+      ),
+    },
+  ];
+
   return (
     <Loader active={isLoading || loadingProducts}>
-      {!isItemInactive(supplier?.state) && toggleButton}
+      <Tab panes={panes} />
+      {/* {!isItemInactive(supplier?.state) && toggleButton}
       {isItemInactive(supplier?.state) && (
         <Message negative>
           <MessageHeader>Motivo de inactivación</MessageHeader>
@@ -466,7 +510,7 @@ const Supplier = ({ params }) => {
         isUpdating={isUpdating && !isItemInactive(supplier?.state)}
         view
         isDeletePending={isDeletePending}
-      />
+      /> */}
       {!isUpdating && (
         <OnlyPrint>
           <PrintBarCodes ref={printRef} products={products} />
