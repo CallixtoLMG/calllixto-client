@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import useFilterParams from "./useFilterParams";
 
@@ -19,8 +19,9 @@ const useFilters = ({ defaultFilters, key }) => {
   };
 
   const onSubmit = handleSubmit(data => {
-    reset(data);
-    setFilters(data);
+    const mergedData = { ...filters, ...data };
+    reset(mergedData);
+    setFilters(mergedData);
   });
 
   useEffect(() => {

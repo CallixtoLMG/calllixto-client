@@ -22,11 +22,9 @@ import { EMPTY_FILTERS, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS,
 const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
   const { role } = useUserContext();
   const printRef = useRef();
-
   const deleteProduct = useDeleteProduct();
   const batchDeleteProducts = useBatchDeleteProducts();
   const editProduct = useEditProduct();
-
   const [showModal, setShowModal] = useState(false);
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
