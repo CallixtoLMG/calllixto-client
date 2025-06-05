@@ -5,7 +5,7 @@ import { UnsavedChangesModal } from "@/common/components/modals";
 import { SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { isBudgetCancelled } from "@/components/budgets/budgets.utils";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { useKeyboardShortcuts } from "@/hooks";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 

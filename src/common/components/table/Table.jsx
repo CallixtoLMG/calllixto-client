@@ -1,7 +1,7 @@
 import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { Loader } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
@@ -29,12 +29,14 @@ const CustomTable = ({
   clearSelection,
   selectAllCurrentPageElements,
   paginate,
+  filters = {},
+  setFilters = () => {},
   onFilter = () => true,
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
-  const [activePage, setActivePage] = useState(1);
+  const [activePage, setActivePage] = useState(filters?.page ?? 1);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupOpenId, setPopupOpenId] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
@@ -60,14 +62,14 @@ const CustomTable = ({
   }, []);
 
   useEffect(() => {
-    if (activePage > pages) {
+    if (!isLoading && activePage > pages) {
       setActivePage(1);
     }
   }, [pages, activePage]);
 
   useEffect(() => {
     const tableEl = tableRef.current;
-  
+
     const conditionalPreventSend = (e) => {
       const tag = e.target.tagName.toLowerCase();
       const isTextInput = ['input', 'textarea'].includes(tag);
@@ -75,11 +77,11 @@ const CustomTable = ({
         preventSend(e);
       }
     };
-  
+
     if (tableEl) {
       tableEl.addEventListener('keydown', conditionalPreventSend);
     }
-  
+
     return () => {
       if (tableEl) {
         tableEl.removeEventListener('keydown', conditionalPreventSend);
@@ -90,6 +92,7 @@ const CustomTable = ({
 
   const handlePageChange = (e, { activePage }) => {
     clearSelection?.();
+    setFilters({ ...filters, page: activePage });
     setActivePage(activePage);
   };
 

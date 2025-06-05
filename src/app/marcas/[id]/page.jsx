@@ -10,15 +10,12 @@ import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constan
 import { isItemInactive } from "@/common/utils";
 import BrandForm from "@/components/brands/BrandForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useProtectedAction } from "@/hooks/useProtectedAction";
-import { useValidateToken } from "@/hooks/userData";
+import { useValidateToken, useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
-import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Brand = ({ params }) => {
   useValidateToken();
@@ -33,6 +30,7 @@ const Brand = ({ params }) => {
   const [reason, setReason] = useState("");
   const editBrand = useEditBrand();
   const formRef = useRef(null);
+
   const {
     showModal: showUnsavedModal,
     handleDiscard,
@@ -52,10 +50,12 @@ const Brand = ({ params }) => {
       formRef.current?.submitForm();
     },
   });
+
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
     onBeforeView,
   });
+
   const deleteBrand = useDeleteBrand();
   const activeBrand = useActiveBrand();
   const inactiveBrand = useInactiveBrand();
@@ -94,33 +94,13 @@ const Brand = ({ params }) => {
     setReason("");
   };
 
-  const handleOpenModalWithAction = useCallback((action) => {
-    setModalAction(action);
-    setIsModalOpen(true);
-  }, []);
-
-const handleActivateClick = useCallback(
-  () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
-  [handleProtectedAction, handleOpenModalWithAction],
-);
-
-const handleInactiveClick = useCallback(
-  () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
-  [handleProtectedAction, handleOpenModalWithAction],
-);
-
-const handleDeleteClick = useCallback(
-  () => handleProtectedAction(() => handleOpenModalWithAction(DELETE)),
-  [handleProtectedAction, handleOpenModalWithAction],
-);
-
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editBrand,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Marca actualizada!");
         setIsUpdating(false);
-        resolveSave(); 
+        resolveSave();
       } else {
         toast.error(response.error.message);
       }
@@ -205,13 +185,18 @@ const handleDeleteClick = useCallback(
 
   useEffect(() => {
     if (brand) {
+      const handleClick = (action) => () => handleProtectedAction(() => {
+        setModalAction(action);
+        setIsModalOpen(true);
+      });
+
       const actions = RULES.canRemove[role] ? [
         {
           id: 1,
           icon: isItemInactive(brand?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
           color: COLORS.GREY,
           text: isItemInactive(brand?.state) ? "Activar" : "Desactivar",
-          onClick: isItemInactive(brand?.state) ? handleActivateClick : handleInactiveClick,
+          onClick: handleClick(isItemInactive(brand?.state) ? ACTIVE : INACTIVE),
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction,
           width: "fit-content",
@@ -222,7 +207,7 @@ const handleDeleteClick = useCallback(
           color: COLORS.RED,
           text: "Eliminar",
           basic: true,
-          onClick: handleDeleteClick,
+          onClick: handleClick(DELETE),
           loading: activeAction === DELETE,
           disabled: hasAssociatedProducts || !!activeAction,
           tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
@@ -230,7 +215,7 @@ const handleDeleteClick = useCallback(
       ] : [];
       setActions(actions);
     }
-  }, [role, brand, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions, hasAssociatedProducts]);
+  }, [role, brand, activeAction, isActivePending, isInactivePending, isDeletePending, setActions, hasAssociatedProducts]);
 
   if (!isLoading && !brand) {
     push(PAGES.NOT_FOUND.BASE);

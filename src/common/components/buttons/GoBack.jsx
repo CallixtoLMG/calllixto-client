@@ -1,6 +1,6 @@
 import { useRouteHistory } from "@/app/RouteHistoryContext";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
 import IconedButton from "./Iconed";
 
@@ -13,7 +13,7 @@ const GoBackButton = () => {
     if (previous && previous !== location.pathname) {
       router.push(previous);
     } else {
-      router.push(PAGES.BASE); 
+      router.push(PAGES.BASE);
     }
   };
 

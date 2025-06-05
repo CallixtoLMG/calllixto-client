@@ -28,16 +28,13 @@ import {
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
-import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useProtectedAction } from "@/hooks/useProtectedAction";
-import { useValidateToken } from "@/hooks/userData";
+import { useProtectedAction, useValidateToken, useUnsavedChanges, useAllowUpdate } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Supplier = ({ params }) => {
   useValidateToken();
@@ -98,40 +95,6 @@ const Supplier = ({ params }) => {
 
   const hasAssociatedProducts = useMemo(() => !!products?.length, [products]);
 
-  const handleDownloadExcel = useCallback(() => {
-    if (!products) return;
-    const headers = [
-      'Código',
-      'Nombre',
-      'Marca',
-      'Proveedor',
-      'Cost ',
-      'Precio',
-      'Margen',
-      'Estado',
-      'Comentarios',
-    ];
-
-    const mappedProducts = products.map((product) => {
-      const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
-      return [
-        product.code,
-        product.name,
-        product.brandName,
-        product.supplierName,
-        product.cost,
-        product.price,
-        getFormatedMargin(product.price, product.cost),
-        productState,
-        product.comments,
-      ];
-    });
-    downloadExcel(
-      [headers, ...mappedProducts],
-      `Lista de productos de ${supplier.name}`,
-    );
-  }, [products, supplier]);
-
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
     removeAfterPrint: true,
@@ -166,31 +129,6 @@ const Supplier = ({ params }) => {
     setModalAction(null);
     setReason("");
   };
-
-  const handleOpenModalWithAction = useCallback((action) => {
-    setModalAction(action);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleActivateClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
-    [handleProtectedAction, handleOpenModalWithAction],
-  );
-
-  const handleInactivateClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
-    [handleProtectedAction, handleOpenModalWithAction],
-  );
-
-  const handleDeleteClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction('deleteSupplier')),
-    [handleProtectedAction, handleOpenModalWithAction],
-  );
-
-  const handleDeleteBatchClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction('deleteBatch')),
-    [handleProtectedAction, handleOpenModalWithAction],
-  );
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editSupplier,
@@ -333,117 +271,139 @@ const Supplier = ({ params }) => {
       }
     };
 
-    const actions = RULES.canRemove[role]
-      ? [
-        {
-          id: 1,
-          icon: ICONS.BARCODE,
-          color: COLORS.BLUE,
-          text: "Códigos",
-          onClick: handleBarCodePrint,
-          loading: activeAction === "print",
-          disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
-          tooltip: !hasAssociatedProducts
-            ? 'No existen productos de este proveedor.'
-            : false,
+    const handleDownloadExcel = () => {
+      if (!products) return;
+      const headers = [
+        'Código',
+        'Nombre',
+        'Marca',
+        'Proveedor',
+        'Cost ',
+        'Precio',
+        'Margen',
+        'Estado',
+        'Comentarios',
+      ];
+
+      const mappedProducts = products.map((product) => {
+        const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
+        return [
+          product.code,
+          product.name,
+          product.brandName,
+          product.supplierName,
+          product.cost,
+          product.price,
+          getFormatedMargin(product.price, product.cost),
+          productState,
+          product.comments,
+        ];
+      });
+      downloadExcel(
+        [headers, ...mappedProducts],
+        `Lista de productos de ${supplier.name}`,
+      );
+    };
+
+    let actions = [];
+
+    if (RULES.canRemove[role]) {
+      const handleClick = (action) => () => handleProtectedAction(() => {
+        setModalAction(action);
+        setIsModalOpen(true);
+      });
+
+      actions = [{
+        id: 1,
+        icon: ICONS.BARCODE,
+        color: COLORS.BLUE,
+        text: "Códigos",
+        onClick: handleBarCodePrint,
+        loading: activeAction === "print",
+        disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
+        tooltip: !hasAssociatedProducts
+          ? 'No existen productos de este proveedor.'
+          : false,
+      },
+      {
+        id: 2,
+        icon: isItemInactive(supplier?.state)
+          ? ICONS.PLAY_CIRCLE
+          : ICONS.PAUSE_CIRCLE,
+        color: COLORS.GREY,
+        text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
+        onClick: handleClick(isItemInactive(supplier?.state) ? ACTIVE : INACTIVE),
+        loading: activeAction === ACTIVE || activeAction === INACTIVE,
+        disabled: !!activeAction || isEditPending,
+        width: "fit-content",
+      },
+      {
+        id: 3,
+        icon: ICONS.FILE_EXCEL,
+        text: "Descargar productos",
+        onClick: () => {
+          if (products?.length) {
+            setIsExcelLoading(true);
+            handleDownloadExcel();
+            setIsExcelLoading(false);
+          } else {
+            toast("No hay productos de este proveedor para descargar.", {
+              icon: (
+                <Icon
+                  margin="0"
+                  toast
+                  name={ICONS.INFO_CIRCLE}
+                  color={COLORS.BLUE}
+                />
+              ),
+            });
+          }
         },
-        {
-          id: 2,
-          icon: isItemInactive(supplier?.state)
-            ? ICONS.PLAY_CIRCLE
-            : ICONS.PAUSE_CIRCLE,
-          color: COLORS.GREY,
-          text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
-          onClick: isItemInactive(supplier?.state)
-            ? handleActivateClick
-            : handleInactivateClick,
-          loading: activeAction === 'active' || activeAction === 'inactive',
-          disabled: !!activeAction || isEditPending,
-          width: "fit-content",
-        },
-        {
-          id: 3,
-          icon: ICONS.FILE_EXCEL,
-          text: "Descargar productos",
-          onClick: () => {
-            if (products?.length) {
-              setIsExcelLoading(true);
-              handleDownloadExcel();
-              setIsExcelLoading(false);
-            } else {
-              toast("No hay productos de este proveedor para descargar.", {
-                icon: (
-                  <Icon
-                    margin="0"
-                    toast
-                    name={ICONS.INFO_CIRCLE}
-                    color={COLORS.BLUE}
-                  />
-                ),
-              });
-            }
-          },
-          loading: isExcelLoading,
-          disabled:
-            isExcelLoading ||
-            !!activeAction ||
-            loadingProducts ||
-            isEditPending ||
-            !hasAssociatedProducts,
-          tooltip: !hasAssociatedProducts
-            ? 'No existen productos de este proveedor.'
-            : false,
-          width: "fit-content",
-        },
-        {
-          id: 4,
-          icon: ICONS.LIST_UL,
-          color: COLORS.RED,
-          text: "Eliminar productos",
-          onClick: handleDeleteBatchClick,
-          loading: activeAction === "deleteBatch",
-          disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
-          tooltip: !hasAssociatedProducts
-            ? 'No existen productos de este proveedor.'
-            : false,
-          width: "fit-content",
-        },
-        {
-          id: 5,
-          icon: ICONS.TRASH,
-          color: COLORS.RED,
-          text: "Eliminar",
-          onClick: handleDeleteClick,
-          loading: activeAction === "deleteSupplier",
-          disabled: hasAssociatedProducts || !!activeAction || isEditPending,
-          tooltip: hasAssociatedProducts
-            ? 'No se puede eliminar este proveedor, existen productos asociados.'
-            : false,
-          width: "fit-content",
-          basic: true,
-        },
-      ]
-      : [];
+        loading: isExcelLoading,
+        disabled:
+          isExcelLoading ||
+          !!activeAction ||
+          loadingProducts ||
+          isEditPending ||
+          !hasAssociatedProducts,
+        tooltip: !hasAssociatedProducts
+          ? 'No existen productos de este proveedor.'
+          : false,
+        width: "fit-content",
+      },
+      {
+        id: 4,
+        icon: ICONS.LIST_UL,
+        color: COLORS.RED,
+        text: "Eliminar productos",
+        onClick: handleClick('deleteBatch'),
+        loading: activeAction === "deleteBatch",
+        disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
+        tooltip: !hasAssociatedProducts
+          ? 'No existen productos de este proveedor.'
+          : false,
+        width: "fit-content",
+      },
+      {
+        id: 5,
+        icon: ICONS.TRASH,
+        color: COLORS.RED,
+        text: "Eliminar",
+        onClick: handleClick('deleteSupplier'),
+        loading: activeAction === "deleteSupplier",
+        disabled: hasAssociatedProducts || !!activeAction || isEditPending,
+        tooltip: hasAssociatedProducts
+          ? 'No se puede eliminar este proveedor, existen productos asociados.'
+          : false,
+        width: "fit-content",
+        basic: true,
+      }];
+    }
 
     setActions(actions);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    role,
-    activeAction,
-    hasAssociatedProducts,
-    isActivePending,
-    isExcelLoading,
-    isEditPending,
-    handleDeleteBatchClick,
-    loadingProducts,
-    supplier?.name,
-    handleDeleteClick,
-    handleActivateClick,
-    handleInactivateClick,
-    products,
-    supplier?.state,
-    setActions,
-  ]);
+  }, [role, supplier, products, hasAssociatedProducts, activeAction, isEditPending, loadingProducts, isExcelLoading]);
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);

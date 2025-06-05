@@ -5,8 +5,7 @@ import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { useValidateToken } from "@/hooks/userData";
+import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 

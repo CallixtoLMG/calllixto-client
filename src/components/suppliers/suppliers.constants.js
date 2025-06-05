@@ -4,6 +4,7 @@ import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
+export const SUPPLIERS_FILTERS_KEY = 'suppliersFilters';
 
 export const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments", STATE: "state" };
 

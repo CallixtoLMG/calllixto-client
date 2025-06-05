@@ -7,6 +7,7 @@ import { getBrandCode, getProductCode, getSupplierCode } from "./products.utils"
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
+export const PRODUCTS_FILTERS_KEY = "productsFilters";
 
 export const ATTRIBUTES = {
   CODE: "code",

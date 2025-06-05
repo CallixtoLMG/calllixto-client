@@ -8,15 +8,12 @@ import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constan
 import { isItemInactive } from "@/common/utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UserForm from "@/components/users/UserForm";
-import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useProtectedAction } from "@/hooks/useProtectedAction";
-import { useValidateToken } from "@/hooks/userData";
+import { useAllowUpdate, useProtectedAction, useValidateToken, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
-import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const User = ({ params }) => {
   useValidateToken();
@@ -33,8 +30,8 @@ const User = ({ params }) => {
   const deleteUser = useDeleteUser();
   const activeUser = useActiveUser();
   const inactiveUser = useInactiveUser();
-
   const formRef = useRef(null);
+
   const {
     showModal: showUnsavedModal,
     handleDiscard,
@@ -54,6 +51,7 @@ const User = ({ params }) => {
       formRef.current?.submitForm();
     },
   });
+
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
     onBeforeView,
@@ -92,33 +90,13 @@ const User = ({ params }) => {
     setReason("");
   };
 
-  const handleOpenModalWithAction = useCallback((action) => {
-    setModalAction(action);
-    setIsModalOpen(true);
-  }, []);
-
-const handleActivateClick = useCallback(
-  () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
-  [handleProtectedAction, handleOpenModalWithAction],
-);
-
-const handleInactiveClick = useCallback(
-  () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
-  [handleProtectedAction, handleOpenModalWithAction],
-);
-
-const handleDeleteClick = useCallback(
-  () => handleProtectedAction(() => handleOpenModalWithAction(DELETE)),
-  [handleProtectedAction, handleOpenModalWithAction],
-);
-
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editUser,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Usuario actualizado!");
         setIsUpdating(false);
-        resolveSave(); 
+        resolveSave();
       } else {
         toast.error(response.error.message);
       }
@@ -210,32 +188,41 @@ const handleDeleteClick = useCallback(
 
   useEffect(() => {
     if (user) {
-      const actions = RULES.canRemove[role] ? [
-        {
-          id: 1,
-          icon: isItemInactive(user?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
-          color: COLORS.GREY,
-          text: isItemInactive(user?.state) ? "Activar" : "Desactivar",
-          onClick: isItemInactive(user?.state) ? handleActivateClick : handleInactiveClick,
-          loading: (activeAction === ACTIVE || activeAction === INACTIVE),
-          disabled: !!activeAction,
-          width: "fit-content",
-        },
-        {
-          id: 2,
-          icon: ICONS.TRASH,
-          color: COLORS.RED,
-          text: "Eliminar",
-          basic: true,
-          onClick: handleDeleteClick,
-          loading: activeAction === DELETE,
-          disabled: !!activeAction,
-        },
-      ] : [];
+      const handleClick = (action) => () => handleProtectedAction(() => {
+        setModalAction(action);
+        setIsModalOpen(true);
+      });
+
+      let actions = [];
+
+      if (RULES.canUpdate[role]) {
+        actions = [
+          {
+            id: 1,
+            icon: isItemInactive(user?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
+            color: COLORS.GREY,
+            text: isItemInactive(user?.state) ? "Activar" : "Desactivar",
+            onClick: handleClick(isItemInactive(user?.state) ? ACTIVE : INACTIVE),
+            loading: (activeAction === ACTIVE || activeAction === INACTIVE),
+            disabled: !!activeAction,
+            width: "fit-content",
+          },
+          {
+            id: 2,
+            icon: ICONS.TRASH,
+            color: COLORS.RED,
+            text: "Eliminar",
+            basic: true,
+            onClick: handleClick(DELETE),
+            loading: activeAction === DELETE,
+            disabled: !!activeAction,
+          },
+        ];
+      }
 
       setActions(actions);
     }
-  }, [role, user, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions]);
+  }, [role, user, activeAction, isActivePending, isInactivePending, isDeletePending, setActions]);
 
   if (!isLoading && !user) {
     push(PAGES.NOT_FOUND.BASE);
@@ -264,7 +251,7 @@ const handleDeleteClick = useCallback(
         onSave={handleSave}
         onDiscard={handleDiscard}
         isSaving={isSaving}
-        onCancel={handleCancel} 
+        onCancel={handleCancel}
       />
       <ModalAction
         title={header}

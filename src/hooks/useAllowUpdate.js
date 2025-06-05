@@ -4,13 +4,12 @@ import { COLORS, ICONS } from "@/common/constants";
 import { useState } from "react";
 import { ButtonGroup } from "semantic-ui-react";
 
-export const useAllowUpdate = ({ canUpdate, onBeforeView }) => {
+const useAllowUpdate = ({ canUpdate, onBeforeView }) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleViewClick = async () => {
     const canView = await onBeforeView?.();
     if (!canView) return;
-  
     setIsUpdating(false);
   };
 
@@ -43,3 +42,5 @@ export const useAllowUpdate = ({ canUpdate, onBeforeView }) => {
 
   return { isUpdating, toggleButton, setIsUpdating };
 };
+
+export default useAllowUpdate;

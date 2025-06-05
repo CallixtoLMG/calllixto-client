@@ -2,7 +2,7 @@ import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
 import { TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { useKeyboardShortcuts } from "@/hooks";
 import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_BRAND } from "../brands.constants";
