@@ -30,7 +30,7 @@ const CustomTable = ({
   selectAllCurrentPageElements,
   paginate,
   filters = {},
-  setFilters = () => {},
+  setFilters = () => { },
   onFilter = () => true,
 }) => {
   const { push } = useRouter();
@@ -62,15 +62,15 @@ const CustomTable = ({
   }, []);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (hydrated && !isLoading) {
       if (activePage > pages) {
         setActivePage(1);
       }
-      if (filters?.pageSize !== activePage) {
+      if (filters?.pageSize !== pageSize) {
         setPageSize(filters?.pageSize ?? DEFAULT_PAGE_SIZE);
       }
     }
-  }, [pages, activePage]);
+  }, [hydrated, isLoading, filters?.pageSize, pageSize, pages, activePage]);
 
   useEffect(() => {
     const tableEl = tableRef.current;
