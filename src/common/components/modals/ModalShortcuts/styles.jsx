@@ -22,15 +22,11 @@ const HelpIcon = styled(SIcon)`
   margin-right: 10px !important;
 `;
 
-const StyledListContent = styled(SList.Content)`
-  margin-bottom: 15px !important;
-`;
-
 const StyledListHeader = styled(SList.Header)`
   margin-bottom: 5px !important;
 `;
 
 export {
-  HelpIcon, StyledListContent, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader
+  HelpIcon, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader
 };
 
