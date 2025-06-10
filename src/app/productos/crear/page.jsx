@@ -6,7 +6,7 @@ import { useListSuppliers } from "@/api/suppliers";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";

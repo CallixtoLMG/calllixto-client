@@ -7,6 +7,7 @@ export const TextAreaField = forwardRef(({
   placeholder,
   value,
   disabled,
+  readOnly,
   onChange,
   error
 }, ref) => {
@@ -18,7 +19,7 @@ export const TextAreaField = forwardRef(({
       width={width}
       placeholder={placeholder ?? label}
       value={value}
-      readOnly={disabled}
+      readOnly={readOnly}
       onChange={onChange}
       error={error}
       ref={ref}

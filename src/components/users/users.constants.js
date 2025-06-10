@@ -7,6 +7,7 @@ import { ROLES } from '@/roles';
 
 export const GET_USER_QUERY_KEY = 'getUser';
 export const LIST_USERS_QUERY_KEY = 'listUsers';
+export const USERS_FILTERS_KEY = 'usersFilters';
 
 export const ATTRIBUTES = {
   FIRST_NAME: "firstName",

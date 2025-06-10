@@ -4,7 +4,7 @@ import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlle
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { validateEmail } from "@/common/utils";
 import { getPastDate } from "@/common/utils/dates";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { useKeyboardShortcuts } from "@/hooks";
 import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { DatePickerControlled } from "../../../common/components/form/DatePicker";
@@ -175,7 +175,7 @@ const UserForm = forwardRef(({
           />
         </FieldsContainer>
         <FieldsContainer>
-          <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating && view} />
+          <TextAreaControlled name="comments" label="Comentarios" readOnly={!isUpdating && view} />
         </FieldsContainer>
         {(isUpdating || !view) && (
           <SubmitAndRestore

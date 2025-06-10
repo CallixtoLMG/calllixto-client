@@ -4,7 +4,8 @@ import { now } from "@/common/utils/dates";
 import { ATTRIBUTES, GET_USER_QUERY_KEY, LIST_USERS_QUERY_KEY } from "@/components/users/users.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
-import { getItemByParam, listItems, useActiveItemByParam, useCreateItem, useDeleteItemByParam, useEditItemByParam, useInactiveItemByParam } from './common';
+import { getInstance } from "./axios";
+import { listItems, useActiveItemByParam, useCreateItem, useDeleteItemByParam, useEditItemByParam, useInactiveItemByParam } from './common';
 
 export function useListUsers() {
   const query = useQuery({
@@ -21,17 +22,25 @@ export function useListUsers() {
 };
 
 export function useGetUser(username) {
+
+  const getUser = async (username) => {
+    try {
+      const { data } = await getInstance().get(PATHS.USER, {
+        params: { username },
+      });
+      
+      return data?.user ?? null;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const query = useQuery({
     queryKey: [GET_USER_QUERY_KEY, username],
-    queryFn: () => getItemByParam({
-      params: { username },
-      url: PATHS.USER,
-      key: USERNAME,
-      entitySingular: ENTITIES.USER,
-      entityPlural: ENTITIES.USERS
-    }),
+    queryFn: () => getUser(username),
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
+    enabled: !!username,
   });
 
   return query;

@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 
-export const useKeyboardShortcuts = (shortcuts, key = '') => {
+const useKeyboardShortcuts = (shortcuts, key = '') => {
   useEffect(() => {
     const handleKeyDown = (event) => {
       const keyCombo = `${event.ctrlKey ? 'Control+' : ''}${event.altKey ? 'Alt+' : ''}${event.key}`;
 
       let action;
-      let conditionFn = () => true; 
+      let conditionFn = () => true;
 
       if (Array.isArray(shortcuts)) {
         const shortcut = shortcuts.find(s => s.key === keyCombo);
@@ -37,3 +37,5 @@ export const useKeyboardShortcuts = (shortcuts, key = '') => {
     };
   }, [shortcuts, key]);
 };
+
+export default useKeyboardShortcuts;

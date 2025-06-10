@@ -74,7 +74,7 @@ const LoginForm = ({ onSubmit }) => {
                 rules={RULES.REQUIRED}
                 placeholder="Contraseña"
               />
-              <ModButton fluid="true" size="large">
+              <ModButton $fluid size="large">
                 Ingresar
               </ModButton>
               <PasswordLink onClick={() => push(PAGES.RESTORE_PASSWORD.BASE)}>

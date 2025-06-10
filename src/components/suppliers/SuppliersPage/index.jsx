@@ -2,25 +2,26 @@ import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/hooks";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { EMPTY_FILTERS, SUPPLIER_STATES_OPTIONS, SUPPLIERS_COLUMNS } from "../suppliers.constants";
+import { EMPTY_FILTERS, SUPPLIER_STATES_OPTIONS, SUPPLIERS_COLUMNS, SUPPLIERS_FILTERS_KEY } from "../suppliers.constants";
 
 const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
   const {
     onRestoreFilters,
     onSubmit,
-    appliedFilters,
+    filters,
+    setFilters,
     methods
-  } = useFilters(EMPTY_FILTERS);
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: SUPPLIERS_FILTERS_KEY });
 
-  const onFilter = createFilter(appliedFilters, ['id', 'name']);
+  const onFilter = createFilter(filters, ['id', 'name']);
 
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit(() => { })}>
+        <Form onSubmit={onSubmit}>
           <Filters
             entity={ENTITIES.SUPPLIERS}
             onRefetch={onRefetch}
@@ -31,9 +32,7 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
               name="state"
               options={SUPPLIER_STATES_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
-              afterChange={() => {
-                onSubmit(() => { })();
-              }}
+              afterChange={onSubmit}
             />
             <TextControlled name="id" placeholder="Id" width="80px" />
             <TextControlled name="name" placeholder="Nombre" width="300px" />
@@ -47,6 +46,8 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
         page={PAGES.SUPPLIERS}
         onFilter={onFilter}
         paginate
+        filters={filters}
+        setFilters={setFilters}
       />
     </>
   );

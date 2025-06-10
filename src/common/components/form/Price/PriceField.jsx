@@ -1,6 +1,6 @@
 import { FormField, Input } from "@/common/components/custom";
 import { getNumberFormated } from "@/common/utils";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { Icon } from "semantic-ui-react";
 
 export const PriceField = ({
@@ -8,24 +8,26 @@ export const PriceField = ({
   label,
   width,
   value = '',
-  updateFromParent,
   onChange,
   disabled = false,
   placeholder,
+  onKeyDown,
   justifyItems
 }) => {
+  const isUserTyping = useRef(false);
   const [formattedValue, setFormattedValue] = useState(getNumberFormated(value ?? 0)[0]);
 
   const handleChange = (event) => {
     const [asString, asNumber] = getNumberFormated(event.target.value);
+    isUserTyping.current = true;
     setFormattedValue(asString);
     onChange(asNumber);
   };
 
-  useEffect(() => {
-    setFormattedValue(getNumberFormated(value ?? 0)[0]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [updateFromParent]);
+  const [expectedFormatted] = getNumberFormated(value ?? 0);
+  if (!isUserTyping.current && formattedValue !== expectedFormatted) {
+    setFormattedValue(expectedFormatted);
+  };
 
   return (
     <FormField
@@ -38,10 +40,12 @@ export const PriceField = ({
       <Input
         value={formattedValue}
         onChange={handleChange}
+        onBlur={() => { isUserTyping.current = false; }}
         disabled={disabled}
         iconPosition="left"
         placeholder={placeholder}
         justifyItems={justifyItems}
+        onKeyDown={onKeyDown}
       >
         <Icon name="dollar" />
         <input />

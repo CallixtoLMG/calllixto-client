@@ -1,26 +1,25 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useActiveProduct, useDeleteProduct, useEditProduct, useGetProduct, useInactiveProduct, useRecoverProduct } from "@/api/products";
-import { Message, MessageHeader } from "@/common/components/custom";
+import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, RECOVER } from "@/common/constants";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import ProductChanges from "@/components/products/ProductChanges";
 import ProductForm from "@/components/products/ProductForm";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
-import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useProtectedAction } from "@/hooks/useProtectedAction";
-import { useValidateToken } from "@/hooks/userData";
+import { useAllowUpdate, useProtectedAction, useValidateToken, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
+import { Tab } from "semantic-ui-react";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -40,6 +39,7 @@ const Product = ({ params }) => {
   const inactiveProduct = useInactiveProduct();
   const recoverProduct = useRecoverProduct();
   const formRef = useRef(null);
+
   const {
     showModal: showUnsavedModal,
     handleDiscard,
@@ -59,6 +59,7 @@ const Product = ({ params }) => {
       formRef.current?.submitForm();
     },
   });
+
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
     onBeforeView,
@@ -124,47 +125,13 @@ const Product = ({ params }) => {
     setReason("");
   };
 
-  const handleOpenModalWithAction = useCallback((action) => {
-    setModalAction(action);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleActiveClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
-    [handleOpenModalWithAction, handleProtectedAction]
-  );
-
-  const handleRecoverClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction("recover")),
-    [handleOpenModalWithAction, handleProtectedAction]
-  );
-
-  const handleInactiveClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
-    [handleOpenModalWithAction, handleProtectedAction]
-  );
-  const handleStockChangeClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(isProductOOS(product?.state) ? "inStock" : "outOfStock")),
-    [handleOpenModalWithAction, product?.state, handleProtectedAction]
-  );
-
-  const handleSoftDeleteClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction("softDelete")),
-    [handleOpenModalWithAction, handleProtectedAction]
-  );
-
-  const handleHardDeleteClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction("hardDelete")),
-    [handleOpenModalWithAction, handleProtectedAction]
-  );
-
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editProduct,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Producto actualizado!");
         setIsUpdating(false);
-        resolveSave(); 
+        resolveSave();
       } else {
         toast.error(response.error.message);
       }
@@ -297,12 +264,16 @@ const Product = ({ params }) => {
     handleModalClose();
   };
 
-
   const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
   const requiresConfirmation = modalAction === "softDelete" || modalAction === "hardDelete";
 
   useEffect(() => {
     if (product) {
+      const handleClick = (action) => () => handleProtectedAction(() => {
+        setModalAction(action);
+        setIsModalOpen(true);
+      });
+
       const actions = [
         {
           id: 1,
@@ -319,7 +290,7 @@ const Product = ({ params }) => {
           id: 2,
           icon: isProductOOS(product?.state) ? ICONS.BOX : ICONS.BAN,
           color: COLORS.ORANGE,
-          onClick: handleStockChangeClick,
+          onClick: handleClick(isProductOOS(product?.state) ? "inStock" : "outOfStock"),
           text: isProductOOS(product?.state) ? "En stock" : PRODUCT_STATES.OOS.singularTitle,
           width: "fit-content",
           loading: activeAction === "outOfStock",
@@ -331,7 +302,7 @@ const Product = ({ params }) => {
           id: 3,
           icon: isProductInactive(product?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
           color: COLORS.GREY,
-          onClick: isProductInactive(product?.state) ? handleActiveClick : handleInactiveClick,
+          onClick: handleClick(isProductInactive(product?.state) ? ACTIVE : INACTIVE),
           text: isProductInactive(product?.state) ? "Activar" : "Desactivar",
           width: "fit-content",
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
@@ -341,7 +312,7 @@ const Product = ({ params }) => {
           id: 4,
           icon: ICONS.TRASH,
           color: COLORS.RED,
-          onClick: handleSoftDeleteClick,
+          onClick: handleClick('softDelete'),
           text: "Eliminar",
           basic: true,
           loading: activeAction === "softDelete",
@@ -353,7 +324,7 @@ const Product = ({ params }) => {
           id: 5,
           icon: ICONS.UNDO,
           color: COLORS.GREEN,
-          onClick: handleRecoverClick,
+          onClick: handleClick('recover'),
           text: "Recuperar",
           width: "fit-content",
           loading: activeAction === "recover",
@@ -363,7 +334,7 @@ const Product = ({ params }) => {
           id: 6,
           icon: ICONS.TRASH,
           color: COLORS.RED,
-          onClick: handleHardDeleteClick,
+          onClick: handleClick('hardDelete'),
           text: "Eliminar",
           basic: true,
           loading: activeAction === "hardDelete",
@@ -374,30 +345,51 @@ const Product = ({ params }) => {
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product, activeAction, isEditPending, handleRecoverClick, handleActiveClick, handleInactiveClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, setActions]);
+  }, [product, activeAction, isEditPending, setActions]);
 
   if (!isLoading && !product) {
     push(PAGES.NOT_FOUND.BASE);
   }
 
+  const panes = [
+    {
+      menuItem: "Producto",
+      render: () => (
+        <Tab.Pane>
+          <Flex $marginBottom="15px">
+            {!isProductDeleted(product?.state) && !isProductInactive(product?.state) && toggleButton}
+          </Flex>
+          {isProductInactive(product?.state) && (
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{product.inactiveReason}</p>
+            </Message>
+          )}
+          <ProductForm
+            ref={formRef}
+            product={product}
+            onSubmit={mutateEdit}
+            isUpdating={isUpdating && !isProductInactive(product?.state)}
+            isLoading={isEditPending}
+            view
+            isDeletePending={isDeletePending}
+          />
+        </Tab.Pane>
+      ),
+    },
+    {
+      menuItem: "Historial de cambios",
+      render: () => (
+        <Tab.Pane>
+          <ProductChanges product={product} />
+        </Tab.Pane>
+      ),
+    },
+  ];
+
   return (
     <Loader active={isLoading}>
-      {!isProductDeleted(product?.state) && !isProductInactive(product?.state) && toggleButton}
-      {isProductInactive(product?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{product.inactiveReason}</p>
-        </Message>
-      )}
-      <ProductForm
-        ref={formRef}
-        product={product}
-        onSubmit={mutateEdit}
-        isUpdating={isUpdating && !isProductInactive(product?.state)}
-        isLoading={isEditPending}
-        view
-        isDeletePending={isDeletePending}
-      />
+      <Tab panes={panes} />
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}

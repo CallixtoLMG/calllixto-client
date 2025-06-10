@@ -4,7 +4,7 @@ import styled, { css } from "styled-components";
 
 const OverflowText = styled.div`
   display: inline-block;
-  width: 100%;
+  width: fit-content;
   max-width: ${({ $maxWidth }) => $maxWidth};
   height: ${({ $height }) => $height}!important;
   align-self: end;

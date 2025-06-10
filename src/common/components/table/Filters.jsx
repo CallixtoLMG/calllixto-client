@@ -7,7 +7,7 @@ import { LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.const
 import { LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
 import { LIST_SUPPLIERS_QUERY_KEY } from '@/components/suppliers/suppliers.constants';
 import { LIST_USERS_QUERY_KEY } from '@/components/users/users.constants';
-import { useRestoreEntity } from '@/hooks/common';
+import { useRestoreEntity } from '@/hooks';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Button, Dropdown, Icon, Popup } from 'semantic-ui-react';

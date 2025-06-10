@@ -3,7 +3,8 @@ import { getDefaultListParams } from '@/common/utils';
 import { ATTRIBUTES, GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
-import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from './common';
+import { getInstance } from "./axios";
+import { listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from './common';
 
 export function useListBrands({ sort = 'name', order = true } = {}) {
   const query = useQuery({
@@ -20,11 +21,22 @@ export function useListBrands({ sort = 'name', order = true } = {}) {
 };
 
 export function useGetBrand(id) {
+  const getBrand = async (id) => {
+    try {
+      const { data } = await getInstance().get(`${PATHS.BRANDS}/${id}`);
+      
+      return data?.brand ?? null;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const query = useQuery({
     queryKey: [GET_BRAND_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PATHS.BRANDS, entity: ENTITIES.BRANDS }),
+    queryFn: () => getBrand(id),
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
+    enabled: !!id,
   });
 
   return query;
