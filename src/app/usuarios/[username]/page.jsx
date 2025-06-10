@@ -222,6 +222,7 @@ const User = ({ params }) => {
 
       setActions(actions);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, user, activeAction, isActivePending, isInactivePending, isDeletePending, setActions]);
 
   if (!isLoading && !user) {

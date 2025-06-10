@@ -26,6 +26,7 @@ const useFilters = ({ defaultFilters, key }) => {
 
   useEffect(() => {
     onSubmit(filters);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

@@ -215,6 +215,7 @@ const Brand = ({ params }) => {
       ] : [];
       setActions(actions);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, brand, activeAction, isActivePending, isInactivePending, isDeletePending, setActions, hasAssociatedProducts]);
 
   if (!isLoading && !brand) {
