@@ -1,15 +1,16 @@
 
 import { PASSWORD_REQUIREMENTS } from "@/common/constants";
+import { forwardRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { PasswordRequirements } from "../PasswordRequirements";
 import PasswordField from "./PasswordField";
 
-export const PasswordControlled = ({
+export const PasswordControlled = forwardRef(({
   name,
   showPasswordRequirements,
   rules,
   ...inputParams
-}) => {
+}, ref) => {
   const { formState: { errors } } = useFormContext();
   return (
     <>
@@ -20,6 +21,7 @@ export const PasswordControlled = ({
           <>
             <PasswordField
               {...rest}
+              ref={ref}
               {...inputParams}
               value={value}
               error={!!errors?.[name] && {
@@ -38,6 +40,6 @@ export const PasswordControlled = ({
       />
     </>
   );
-};
+});
 
-
+PasswordControlled.displayName = 'PasswordControlled';
