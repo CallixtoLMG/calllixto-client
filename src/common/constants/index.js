@@ -206,6 +206,7 @@ export const ICONS = {
   MAIL_SQUARE: "mail square",
   PERCENT: 'percent',
   SETTINGS: "settings",
+  BULLHORN: "bullhorn"
 };
 
 export const ALL = "all";
