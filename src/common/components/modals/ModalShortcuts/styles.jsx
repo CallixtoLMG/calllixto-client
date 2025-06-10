@@ -26,7 +26,11 @@ const StyledListHeader = styled(SList.Header)`
   margin-bottom: 5px !important;
 `;
 
+const StyledListContent = styled(SList.Content)`
+  margin-bottom: 15px !important;
+`;
+
 export {
-  HelpIcon, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader
+  HelpIcon, StyledListHeader, StyledListIcon, StyledModalContent, StyledModalHeader, StyledListContent
 };
 
