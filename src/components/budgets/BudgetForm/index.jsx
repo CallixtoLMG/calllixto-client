@@ -428,7 +428,7 @@ const BudgetForm = ({
           <Flex $alignItems="center" $marginLeft="5px" $columnGap="5px">
             {isProductOOS(product.state) && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
             {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
-            {product.comments && <CommentTooltip lineHeight="normal" tooltip="true" comment={product.comments} />}
+            {product.comments && <CommentTooltip tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
               <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon lineHeight="normal" name={ICONS.TRUCK} color={COLORS.BLUE} />} />
             )}
