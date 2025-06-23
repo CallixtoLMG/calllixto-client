@@ -38,9 +38,35 @@ const CustomTable = ({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupOpenId, setPopupOpenId] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
-  const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
   const tableRef = useRef(null);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  const handleSort = (columnKey) => {
+    if (sortConfig.key === columnKey) {
+      setSortConfig({
+        key: columnKey,
+        direction: sortConfig.direction === 'ascending' ? 'descending' : 'ascending'
+      });
+    } else {
+      setSortConfig({ key: columnKey, direction: 'ascending' });
+    }
+  };
+
+  const filteredElements = useMemo(() => {
+    let result = elements.filter(onFilter);
+    if (sortConfig.key) {
+      result = [...result].sort((a, b) => {
+        const aVal = a[sortConfig.key];
+        const bVal = b[sortConfig.key];
+        if (aVal < bVal) return sortConfig.direction === 'ascending' ? -1 : 1;
+        if (aVal > bVal) return sortConfig.direction === 'ascending' ? 1 : -1;
+        return 0;
+      });
+    }
+    return result;
+  }, [elements, onFilter, sortConfig]);
+
+   const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
 
   const currentPageElements = useMemo(() => {
     if (!paginate) {
@@ -67,7 +93,7 @@ const CustomTable = ({
 
   useEffect(() => {
     const tableEl = tableRef.current;
-  
+
     const conditionalPreventSend = (e) => {
       const tag = e.target.tagName.toLowerCase();
       const isTextInput = ['input', 'textarea'].includes(tag);
@@ -75,11 +101,11 @@ const CustomTable = ({
         preventSend(e);
       }
     };
-  
+
     if (tableEl) {
       tableEl.addEventListener('keydown', conditionalPreventSend);
     }
-  
+
     return () => {
       if (tableEl) {
         tableEl.removeEventListener('keydown', conditionalPreventSend);
@@ -131,7 +157,7 @@ const CustomTable = ({
         />
       )}
       <Loader active={isLoading} $greyColor>
-        <Table celled compact striped={!basic} color={color} definition={isSelectable}>
+        <Table sortable celled compact striped={!basic} color={color} definition={isSelectable}>
           <TableHeader fullWidth>
             <TableRow>
               {isSelectable && (
@@ -146,7 +172,15 @@ const CustomTable = ({
                 </HeaderCell>
               )}
               {headers.map((header) => (
-                <HeaderCell key={`header_${header.id}`} $basic={basic}>{header.title}</HeaderCell>
+                <HeaderCell
+                  key={`header_${header.id}`}
+                  $basic={basic}
+                  sorted={sortConfig.key === header.key ? sortConfig.direction : null}
+                  onClick={() => header.sortable && handleSort(header.key)}
+                  style={{ cursor: header.sortable ? 'pointer' : 'default' }}
+                >
+                  {header.title}
+                </HeaderCell>
               ))}
               {!!Object.keys(selection).length && (
                 <ActionsContainer $header $open={isPopupOpen}>

@@ -418,6 +418,14 @@ const Product = ({ params }) => {
         </Tab.Pane>
       ),
     },
+    {
+      menuItem: "Control de stock",
+      render: () => (
+        <Tab.Pane>
+          <ProductChanges product={product} />
+        </Tab.Pane>
+      ),
+    },
   ];
 
   return (

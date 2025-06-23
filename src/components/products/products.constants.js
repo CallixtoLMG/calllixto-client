@@ -28,8 +28,10 @@ export const PRODUCT_COLUMNS = [
   {
     id: 1,
     title: "Código",
+    key: "code",
     align: "left",
     width: 2,
+    sortable: true,
     value: (product) =>
       <>
         <Popup
@@ -50,7 +52,9 @@ export const PRODUCT_COLUMNS = [
   {
     id: 2,
     title: "Nombre",
+    key: "name",
     align: "left",
+    sortable: true,
     value: (product) => {
       const { tags, name, comments } = product;
       return (
@@ -68,8 +72,18 @@ export const PRODUCT_COLUMNS = [
   },
   {
     id: 3,
+    title: "Stock",
+    width: 1,
+    sortable: true,
+    value: (product) => (product?.stock || 0)
+  },
+  {
+    id: 4,
     title: "Precio",
+    key: "price",
+
     width: 2,
+    sortable: true,
     value: (product) => <PriceLabel value={product.price} />,
   }
 ];

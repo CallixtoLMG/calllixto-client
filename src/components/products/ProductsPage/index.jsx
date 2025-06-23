@@ -22,11 +22,9 @@ import { EMPTY_FILTERS, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS 
 const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
   const { role } = useUserContext();
   const printRef = useRef();
-
   const deleteProduct = useDeleteProduct();
   const batchDeleteProducts = useBatchDeleteProducts();
   const editProduct = useEditProduct();
-
   const [showModal, setShowModal] = useState(false);
   const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -59,7 +57,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
     }
   ] : [];
 
-  const { mutate, isPending } = useMutation({
+  const { mutate: mutateDelete, isPending } = useMutation({
     mutationFn: async () => {
       let response;
       if (selectedProduct.state === PRODUCT_STATES.DELETED.id) {
@@ -186,7 +184,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
           showModal={showModal}
           setShowModal={setShowModal}
           title={`¿Está seguro que desea eliminar ${selectedProduct?.state === PRODUCT_STATES.DELETED.id ? "PERMANENTEMENTE" : ""} el producto "${selectedProduct?.name}"?`}
-          onConfirm={mutate}
+          onConfirm={mutateDelete}
           isLoading={isPending}
         />
       </Flex>

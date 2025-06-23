@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
+import { useBatchDeleteProducts, useDeleteBySupplierId, useDeleteProduct, useEditProduct, useProductsBySupplierId } from "@/api/products";
 import {
   useActiveSupplier,
   useDeleteSupplier,
@@ -8,6 +8,7 @@ import {
   useGetSupplier,
   useInactiveSupplier,
 } from "@/api/suppliers";
+import { IconedButton } from "@/common/components/buttons";
 import {
   Flex,
   Icon,
@@ -15,30 +16,33 @@ import {
   MessageHeader,
 } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
-import { TextField } from "@/common/components/form";
-import { ModalAction } from "@/common/components/modals";
+import { DropdownControlled, TextControlled, TextField } from "@/common/components/form";
+import { ModalAction, ModalMultiDelete } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
-import { downloadExcel, isItemInactive } from "@/common/utils";
+import { Filters, Table } from "@/common/components/table";
+import { ACTIVE, COLORS, ENTITIES, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { createFilter, downloadExcel, isItemInactive } from "@/common/utils";
 import {
   Loader,
   OnlyPrint,
   useBreadcrumContext,
   useNavActionsContext,
 } from "@/components/layout";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
+import { EMPTY_FILTERS, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
+import { useFilters } from "@/hooks/useFilters";
 import { useProtectedAction } from "@/hooks/useProtectedAction";
 import { useValidateToken } from "@/hooks/userData";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormProvider } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Tab } from "semantic-ui-react";
+import { Form, Tab } from "semantic-ui-react";
 import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Supplier = ({ params }) => {
@@ -48,8 +52,10 @@ const Supplier = ({ params }) => {
   const { data: supplier, isLoading, refetch: refetchSupplier } = useGetSupplier(params.id);
   const { data: products, isLoading: loadingProducts, refetch: refetchProducts } =
     useProductsBySupplierId(params.id);
+  console.log(products)
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
+  const [showModalDelete, setShowModalDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -57,6 +63,16 @@ const Supplier = ({ params }) => {
   const [reason, setReason] = useState("");
   const printRef = useRef(null);
   const formRef = useRef(null);
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState({});
+  const {
+    onRestoreFilters,
+    onSubmit,
+    appliedFilters,
+    methods
+  } = useFilters(EMPTY_FILTERS);
+  const onFilter = createFilter(appliedFilters, ['code', 'name']);
   const {
     showModal: showUnsavedModal,
     handleDiscard,
@@ -86,6 +102,9 @@ const Supplier = ({ params }) => {
   const deleteBySupplierId = useDeleteBySupplierId();
   const inactiveSupplier = useInactiveSupplier();
   const activeSupplier = useActiveSupplier();
+  const batchDeleteProducts = useBatchDeleteProducts();
+  const deleteProduct = useDeleteProduct();
+  const editProduct = useEditProduct();
 
   useEffect(() => {
     resetActions();
@@ -138,6 +157,19 @@ const Supplier = ({ params }) => {
     content: () => printRef.current,
     removeAfterPrint: true,
   });
+
+  const tableActions = RULES.canRemove[role] ? [
+    {
+      id: 1,
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
+      onClick: (product) => {
+        setSelectedProduct(product);
+        setShowModalDelete(true);
+      },
+      tooltip: 'Eliminar'
+    }
+  ] : [];
 
   const modalConfig = {
     deleteSupplier: {
@@ -262,7 +294,7 @@ const Supplier = ({ params }) => {
       },
     });
 
-  const { mutate: mutateDelete, isPending: isDeletePending } =
+  const { mutate: mutateDeleteSupplier, isPending: isDeletePending } =
     useMutation({
       mutationFn: () => deleteSupplier(params.id),
       onSuccess: (response) => {
@@ -279,6 +311,51 @@ const Supplier = ({ params }) => {
       },
     });
 
+  const onSelectionChange = useCallback(selected => {
+    const isSelected = !!selectedProducts[selected.code];
+    if (isSelected) {
+      const newProducts = { ...selectedProducts };
+      delete newProducts[selected.code];
+      setSelectedProducts(newProducts);
+    } else {
+      setSelectedProducts(prev => ({ ...prev, [selected.code]: selected }));
+    }
+  }, [selectedProducts]);
+
+  const selectionActions = useMemo(() => {
+    const actions = [
+      <IconedButton
+        key={2}
+        text="Descargar Códigos"
+        icon={ICONS.BARCODE}
+        onClick={handlePrint}
+      />
+    ];
+
+    if (RULES.canRemove[role]) {
+      actions.unshift(
+        <IconedButton
+          key={1}
+          text="Eliminar Productos"
+          icon={ICONS.TRASH}
+          color={COLORS.RED}
+          onClick={() => setShowConfirmDeleteModal(true)}
+        />
+      );
+    }
+
+    return actions;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role]);
+
+  const selectAllCurrentPageElements = (currentPageElements) => {
+    const newSelectedProducts = {};
+    currentPageElements.forEach(product => {
+      newSelectedProducts[product.code] = product;
+    });
+    setSelectedProducts(newSelectedProducts);
+  };
+
   const handleActionConfirm = async () => {
     setActiveAction(modalAction);
 
@@ -287,7 +364,7 @@ const Supplier = ({ params }) => {
     }
 
     if (modalAction === "deleteSupplier") {
-      mutateDelete();
+      mutateDeleteSupplier();
     }
 
     if (modalAction === INACTIVE) {
@@ -306,6 +383,26 @@ const Supplier = ({ params }) => {
 
     handleModalClose();
   };
+
+  const { mutate: mutateDeleteProduct, isPending } = useMutation({
+    mutationFn: async () => {
+      let response;
+      if (selectedProduct.state === PRODUCT_STATES.DELETED.id) {
+        response = await deleteProduct(selectedProduct?.code);
+      } else {
+        response = await editProduct({ ...selectedProduct, state: PRODUCT_STATES.DELETED.id });
+      }
+      return response;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success('Producto eliminado!');
+        setShowModalDelete(false);
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+  });
 
   const {
     header,
@@ -451,6 +548,22 @@ const Supplier = ({ params }) => {
     push(PAGES.NOT_FOUND.BASE);
   }
 
+  const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
+    mutationFn: async () => {
+      const codes = Object.keys(selectedProducts);
+      const response = await batchDeleteProducts(codes);
+      return response.deletedCount;
+    },
+    onSuccess: (deletedCount) => {
+      toast.success(`${deletedCount} productos eliminados!`);
+      setSelectedProducts({});
+      setShowConfirmDeleteModal(false);
+    },
+    onError: (error) => {
+      toast.error(`Error al eliminar productos: ${error.message}`);
+    }
+  });
+
   const panes = [
     {
       menuItem: "Proveedor",
@@ -483,10 +596,67 @@ const Supplier = ({ params }) => {
       menuItem: "Productos del Proveedor",
       render: () => (
         <Tab.Pane>
-          <Message negative>
-            <MessageHeader>Motivo de inactivación</MessageHeader>
-            <p>{supplier.inactiveReason}</p>
-          </Message>
+          <Flex $flexDirection="column" $rowGap="15px" $margin="15px">
+            <FormProvider {...methods}>
+              <Form onSubmit={onSubmit(() => { })}>
+                <Filters
+                  entity={ENTITIES.PRODUCTS}
+                  onRefetch={refetchProducts}
+                  clearSelection={() => setSelectedProducts({})}
+                  onRestoreFilters={onRestoreFilters}
+                >
+                  <DropdownControlled
+                    width="200px"
+                    name="state"
+                    options={PRODUCT_STATES_OPTIONS}
+                    defaultValue={EMPTY_FILTERS.state}
+                    afterChange={() => {
+                      onSubmit(() => { })();
+                      setSelectedProducts({});
+                    }}
+                  />
+                  <TextControlled name="code" placeholder="Código" width="200px" />
+                  <TextControlled name="name" placeholder="Nombre" width="350px" />
+                </Filters>
+              </Form>
+            </FormProvider>
+            <Table
+              isLoading={isLoading || deleteIsPending}
+              mainKey="code"
+              headers={PRODUCT_COLUMNS}
+              elements={products.map((p, index) => ({ ...p, _key: `${p.code}_${index}` }))}
+              page={PAGES.PRODUCTS}
+              actions={tableActions}
+              selection={selectedProducts}
+              onSelectionChange={onSelectionChange}
+              selectionActions={selectionActions}
+              clearSelection={() => setSelectedProducts({})}
+              selectAllCurrentPageElements={selectAllCurrentPageElements}
+              onFilter={onFilter}
+              color={PRODUCT_STATES[appliedFilters.state]?.color}
+              paginate
+            />
+            <ModalAction
+              showModal={showModalDelete}
+              setShowModal={setShowModalDelete}
+              title={`¿Está seguro que desea eliminar ${selectedProduct?.state === PRODUCT_STATES.DELETED.id ? "PERMANENTEMENTE" : ""} el producto "${selectedProduct?.name}"?`}
+              onConfirm={mutateDeleteProduct}
+              isLoading={isPending}
+            />
+          </Flex>
+          <OnlyPrint>
+            <PrintBarCodes ref={printRef} products={Object.values(selectedProducts)} />
+          </OnlyPrint>
+          <ModalMultiDelete
+            open={showConfirmDeleteModal}
+            onClose={() => setShowConfirmDeleteModal(false)}
+            onConfirm={deleteSelectedProducts}
+            elements={Object.values(selectedProducts)}
+            icon={ICONS.TRASH}
+            title="Estás seguro de que desea eliminar estos productos?"
+            isLoading={deleteIsPending}
+            headers={PRODUCT_COLUMNS}
+          />
         </Tab.Pane>
       ),
     },
@@ -495,22 +665,6 @@ const Supplier = ({ params }) => {
   return (
     <Loader active={isLoading || loadingProducts}>
       <Tab panes={panes} />
-      {/* {!isItemInactive(supplier?.state) && toggleButton}
-      {isItemInactive(supplier?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{supplier.inactiveReason}</p>
-        </Message>
-      )}
-      <SupplierForm
-        ref={formRef}
-        supplier={supplier}
-        onSubmit={mutateEdit}
-        isLoading={isEditPending}
-        isUpdating={isUpdating && !isItemInactive(supplier?.state)}
-        view
-        isDeletePending={isDeletePending}
-      /> */}
       {!isUpdating && (
         <OnlyPrint>
           <PrintBarCodes ref={printRef} products={products} />
