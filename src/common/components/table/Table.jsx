@@ -40,9 +40,55 @@ const CustomTable = ({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupOpenId, setPopupOpenId] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
-  const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
   const tableRef = useRef(null);
+
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+
+  const handleSort = (columnKey) => {
+    if (sortConfig.key === columnKey) {
+      setSortConfig({
+        key: columnKey,
+        direction: sortConfig.direction === 'ascending' ? 'descending' : 'ascending'
+      });
+    } else {
+      setSortConfig({ key: columnKey, direction: 'ascending' });
+    }
+  };
+
+  const filteredElements = useMemo(() => {
+    let result = elements.filter(onFilter);
+
+    if (sortConfig.key) {
+      const header = headers.find(h => h.key === sortConfig.key);
+
+      if (header) {
+        result = [...result].sort((a, b) => {
+          const header = headers.find(h => h.key === sortConfig.key);
+          const aVal = header?.sortValue ? header.sortValue(a) : a[sortConfig.key];
+          const bVal = header?.sortValue ? header.sortValue(b) : b[sortConfig.key];
+
+          if (typeof aVal === 'string' && typeof bVal === 'string') {
+            const cleanA = aVal.trim().toLowerCase();
+            const cleanB = bVal.trim().toLowerCase();
+
+            return sortConfig.direction === 'ascending'
+              ? cleanA.localeCompare(cleanB, 'es', { sensitivity: 'base' })
+              : cleanB.localeCompare(cleanA, 'es', { sensitivity: 'base' });
+          }
+
+          return sortConfig.direction === 'ascending'
+            ? aVal - bVal
+            : bVal - aVal;
+        });
+
+      }
+    }
+
+    return result;
+  }, [elements, headers, onFilter, sortConfig]);
+
+
+  const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
 
   const currentPageElements = useMemo(() => {
     if (!paginate) {
@@ -140,7 +186,7 @@ const CustomTable = ({
         />
       )}
       <Loader active={isLoading} $greyColor>
-        <Table celled compact striped={!basic} color={color} definition={isSelectable}>
+        <Table sortable celled compact striped={!basic} color={color} definition={isSelectable}>
           <TableHeader fullWidth>
             <TableRow>
               {isSelectable && (
@@ -155,7 +201,15 @@ const CustomTable = ({
                 </HeaderCell>
               )}
               {headers.map((header) => (
-                <HeaderCell key={`header_${header.id}`} $basic={basic}>{header.title}</HeaderCell>
+                <HeaderCell
+                  key={`header_${header.id}`}
+                  $basic={basic}
+                  sorted={sortConfig.key === header.key ? sortConfig.direction : null}
+                  onClick={() => header.sortable && handleSort(header.key)}
+                  style={{ cursor: header.sortable ? 'pointer' : 'default' }}
+                >
+                  {header.title}
+                </HeaderCell>
               ))}
               {!!Object.keys(selection).length && (
                 <ActionsContainer $header $open={isPopupOpen}>

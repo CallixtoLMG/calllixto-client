@@ -29,6 +29,8 @@ export const PRODUCT_COLUMNS = [
   {
     id: 1,
     title: "Código",
+    key: "code",
+    sortable: true,
     align: "left",
     width: 2,
     value: (product) =>
@@ -46,12 +48,15 @@ export const PRODUCT_COLUMNS = [
           trigger={<span>{getBrandCode(product.code)}</span>}
         />&nbsp;
         <span>{getProductCode(product.code)}</span>
-      </>
+      </>,
+    sortValue: (product) => product.code?.toLowerCase() ?? ""
   },
   {
     id: 2,
     title: "Nombre",
+    key: "name",
     align: "left",
+    sortable: true,
     value: (product) => {
       const { tags, name, comments } = product;
       return (
@@ -65,13 +70,18 @@ export const PRODUCT_COLUMNS = [
           </Flex>
         </Flex>
       );
-    }
+    },
+    sortValue: (product) => product.name?.trim().toLowerCase() ?? ""
+
   },
   {
     id: 3,
     title: "Precio",
     width: 2,
+    key: "price",
+    sortable: true,
     value: (product) => <PriceLabel value={product.price} />,
+    sortValue: (product) => product.price ?? ""
   }
 ];
 

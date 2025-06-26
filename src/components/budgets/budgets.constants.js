@@ -75,6 +75,8 @@ export const BUDGETS_COLUMNS = [
   {
     id: 1,
     title: "Id",
+    key: "id",
+    sortable: true,
     width: 1,
     align: "left",
     value: (budget) => (
@@ -96,11 +98,14 @@ export const BUDGETS_COLUMNS = [
           </Label>
         )}
       </Box>
-    )
+    ),
+    sortValue: (budget) => budget.id?.trim().toLowerCase() ?? ""
   },
   {
     id: 2,
     title: "Cliente",
+    key: "customer",
+    sortable: true,
     align: "left",
     width: 6,
     value: (budget) => (
@@ -110,32 +115,43 @@ export const BUDGETS_COLUMNS = [
         </OverflowWrapper>
         {budget.comments && <CommentTooltip comment={budget.comments} />}
       </Flex>
-    )
+    ),
+    sortValue: (budget) => budget.customer.name?.trim().toLowerCase() ?? ""
   },
   {
     id: 3,
     title: "Fecha",
+    key: "date",
+    sortable: true,
     width: 3,
-    value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)
+    value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME),
+    sortValue: (budget) => budget.createdAt?.trim().toLowerCase() ?? ""
+
   },
   {
     id: 4,
     title: "Total",
+    key: "total",
+    sortable: true,
     width: 2,
     value: (budget) => (
       <PriceLabel value={getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)} />
-    )
+    ),
+    sortValue: (budget) => getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge) ?? ""
   },
   {
     id: 5,
     title: "Vendedor",
     align: "left",
+    key: "seller",
+    sortable: true,
     width: 4,
     value: (budget) => (
       <OverflowWrapper maxWidth="25vw" popupContent={budget.seller}>
         {budget.seller}
       </OverflowWrapper>
-    )
+    ),
+    sortValue: (budget) => budget.seller?.trim().toLowerCase() ?? ""
   },
 ];
 

@@ -12,24 +12,32 @@ export const SUPPLIERS_COLUMNS = [
   {
     id: 1,
     title: "Id",
+    key: "id",
+    sortable: true,
     width: 1,
-    value: (supplier) => supplier?.id
+    value: (supplier) => supplier?.id,
+    sortValue: (supplier) => supplier.id?.trim().toLowerCase() ?? ""
   },
   {
     id: 2,
     title: "Nombre",
     align: "left",
+    key: "name",
+    sortable: true,
     value: (supplier) =>
       <Flex $justifyContent="space-between">
         <OverflowWrapper maxWidth="40vw" popupContent={supplier.name}>
           {supplier.name}
         </OverflowWrapper>
         {supplier.comments && <CommentTooltip tooltip="true" comment={supplier.comments} />}
-      </Flex>
+      </Flex>,
+    sortValue: (supplier) => supplier.name?.trim().toLowerCase() ?? ""
   },
   {
     id: 3,
     title: "Dirección",
+    key: "addresses",
+    sortable: true,
     width: 4,
     value: (supplier) => {
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(supplier.addresses || []);
@@ -39,7 +47,8 @@ export const SUPPLIERS_COLUMNS = [
           {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
         </Flex>
       );
-    }
+    },
+    sortValue: (customer) => customer.addresses?.[0]?.address?.trim().toLowerCase() ?? ""
   },
   {
     id: 4,
