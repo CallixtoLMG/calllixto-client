@@ -3,6 +3,14 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2025-06-26
+
+### Changed
+- Added display of the inactivation reason (inactiveReason) when the product status changes to Inactive.
+
+### Fixed
+- Fixxed version history logs, now displaying the user (updatedBy) who made each product update, enhancing traceability in the product change timeline.
+
 ## [1.0.3] - 2025-06-19
 
 ### Changed
