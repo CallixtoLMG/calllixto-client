@@ -3,6 +3,45 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)  
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2025-06-25
+
+### Added
+
+- New pane, in `productos[code]`.
+
+- New component `ProductStock`.
+
+- Added icons in common/constants for stock operations.
+
+- Added constants in products.constants.js:
+  * EXAMPLE_STOCK_TEMPLATE_DATA (temporary until backend is ready),
+  * EMPTY_STOCK_FILTERS,
+  * STOCK_TYPE_OPTIONS,
+  * STOCK_TABLE_HEADERS.
+
+### Changed
+
+- `Proveedores[id]` enhanced Excel dropdown menu.
+ Submenu under "Stock" includes: Import Inflows/Import Outflows/Download Template.
+
+- Refactored handleConfirm method for cleaner branching logic between modes (add, out, edit, delete).
+
+- Renamed internal stock.amount for better semantic clarity.
+
+- Changed icon colors in ModalActions usage across clientes, marcas, proveedores, productos, and usuarios views to align with consistent visual styles.
+
+### Fixed
+
+- Fixed margin overlap in react-datepicker by adjusting styles in src/app/stylesLayout.js.
+
+- Fixed an issue in api/products > useProductsBySupplierId by adding the missing code key required for indexdb operations.
+
+- Fixed support for titleIconColor in ModalActions component to apply icon color correctly.
+
+- Cleaned up duplicate row rendering logic in <Table> component.
+
+- Removed deprecated OptionsHeader component.
+
 ## [1.0.2] - 2025-06-03
 
 ### Added
@@ -12,7 +51,6 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Added `FIELD_LABELS`, `getLabel`, `PRODUCT_LABELS` to products.constants.
 
 - Added const `LABELS` to common/constants.
-
 
 ### Changed
 

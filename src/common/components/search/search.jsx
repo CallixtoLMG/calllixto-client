@@ -1,5 +1,6 @@
 import { COLORS } from "@/common/constants";
 import { getFormatedPrice, normalizeText } from "@/common/utils";
+import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { formatProductCode } from "@/components/products/products.utils";
 import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
@@ -79,8 +80,11 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
             </FlexColumn>
             <Flex width="100%" $justifyContent="space-between" height="20px" $marginTop="auto" $columnGap="5px" $alignItems="center">
               <Box width="80px">
-                <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>{`Stock: ${product.stock || 0}`} </Label> 
-        
+                {product.state === PRODUCT_STATES.OOS.id ? (
+                  <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>Sin Stock</Label>
+                ) : (
+                  <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>{`Stock: ${product.stock || 0}`} </Label>
+                )}
               </Box>
               <Flex $columnGap="7px">
                 {product.tags ? <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} /> : <Box visibility="hidden" />}
