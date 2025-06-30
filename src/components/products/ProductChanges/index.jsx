@@ -77,7 +77,6 @@ const renderTags = ({ oldValue, newValue }) => {
 };
 
 const renderInactiveReason = ({ newValue }) => {
-  if (!newValue) return null;
   return (
     <Span key={ATTRIBUTES.INACTIVE_REASON} color={COLORS.RED}>
       Motivo de inactivación: {newValue}
