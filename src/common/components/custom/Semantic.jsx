@@ -26,7 +26,7 @@ export const Segment = styled(SSegment)`
   align-content: center;
   opacity: ${({ show }) => show ? "0" : "1"} !important;
   border: ${({ noBorder }) => noBorder && "none"} !important;
-  box-shadow: ${({ noBoxShadow  }) => noBoxShadow && "none"} !important;
+  box-shadow: ${({ noBoxShadow }) => noBoxShadow && "none"} !important;
 `;
 
 export const Input = styled(SInput)`
@@ -68,6 +68,7 @@ export const Label = styled(SLabel)`
   align-content: center;
   opacity: ${({ show }) => show ? "0" : "1"} !important;
   font-weight: ${({ fontWeight }) => fontWeight} !important;
+  font-size: ${({ fontSize }) => fontSize} !important;
   box-shadow: ${({ fontWeight }) => fontWeight && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
 `;
 
@@ -167,6 +168,7 @@ export const Menu = styled(SMenu)`
     min-height:35px;
     font-size: 13px!important;
     border:none;
+    box-shadow:none;
   }
 `;
 
@@ -205,6 +207,9 @@ export const MessageHeader = styled(SMessageHeader)`
 export const Message = styled(SMessage)`
   width: 100%;
   margin: ${({ margin }) => `${margin}!important`} ;
+  height: ${({ height }) => `${height}!important`} ;
+  padding: ${({ padding }) => `${padding}!important`} ;
+  white-space: ${({ whiteSpace }) => `${whiteSpace}!important`} ;
 `;
 
 export const Button = styled(SButton)`

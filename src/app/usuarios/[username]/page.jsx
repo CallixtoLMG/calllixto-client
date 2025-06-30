@@ -75,14 +75,17 @@ const User = ({ params }) => {
       header: `¿Está seguro que desea eliminar el usuario "${user?.username}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
+      color: COLORS.RED
     },
     active: {
       header: `¿Está seguro que desea activar el usuario ${user?.username}?`,
-      icon: ICONS.PLAY_CIRCLE
+      icon: ICONS.PLAY_CIRCLE,
+      color: COLORS.GREEN
     },
     inactive: {
       header: `¿Está seguro que desea desactivar el usuario ${user?.username}?`,
-      icon: ICONS.PAUSE_CIRCLE
+      icon: ICONS.PAUSE_CIRCLE,
+      color: COLORS.GREY
     },
   }), [user]);
 
@@ -270,7 +273,7 @@ const handleDeleteClick = useCallback(
         title={header}
         onConfirm={handleActionConfirm}
         confirmationWord={requiresConfirmation ? confirmText : ""}
-        confirmButtonIcon={icon}
+        titleIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
         isLoading={isDeletePending || isInactivePending || isActivePending}

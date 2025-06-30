@@ -14,7 +14,6 @@ import { useMemo } from "react";
 import { getInstance } from "./axios";
 import { listItems, removeStorageItemsByCustomFilter, useActiveItem, useBatchDeleteItems, useCreateItem, useDeleteItem, useEditItem, useInactiveItem, useRecoverItem } from "./common";
 
-
 export function useListProducts() {
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_QUERY_KEY],
@@ -144,7 +143,7 @@ export const useEditProduct = () => {
 
 export function useProductsBySupplierId(supplierId) {
   const listBySupplierId = async () => {
-    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, params: { sort: 'date' } });
+    const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, key: CODE, params: { sort: 'date' } });
     return products.filter((product) => product.code.startsWith(supplierId));
   }
 

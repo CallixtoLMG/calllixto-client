@@ -1,5 +1,7 @@
-import { Flex, Label, OverflowWrapper } from "@/common/components/custom";
+import { Box, Flex, Icon, Label, OverflowWrapper } from "@/common/components/custom";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
+import { COLORS, ICONS } from "@/common/constants";
+import { getFormatedDate } from "@/common/utils/dates";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { getBrandCode, getProductCode, getSupplierCode } from "./products.utils";
@@ -28,10 +30,8 @@ export const PRODUCT_COLUMNS = [
   {
     id: 1,
     title: "Código",
-    key: "code",
     align: "left",
     width: 2,
-    sortable: true,
     value: (product) =>
       <>
         <Popup
@@ -52,9 +52,7 @@ export const PRODUCT_COLUMNS = [
   {
     id: 2,
     title: "Nombre",
-    key: "name",
     align: "left",
-    sortable: true,
     value: (product) => {
       const { tags, name, comments } = product;
       return (
@@ -74,16 +72,12 @@ export const PRODUCT_COLUMNS = [
     id: 3,
     title: "Stock",
     width: 1,
-    sortable: true,
     value: (product) => (product?.stock || 0)
   },
   {
     id: 4,
     title: "Precio",
-    key: "price",
-
     width: 2,
-    sortable: true,
     value: (product) => <PriceLabel value={product.price} />,
   }
 ];
@@ -129,6 +123,13 @@ export const EXAMPLE_TEMPLATE_DATA = [
   ['AABB001', "Producto 1", 100, 200, 'Comentarios...'],
   ['AABB002', "Producto 2", 200, 300, 'Comentarios...'],
   ['AABB003', "Producto 3", 300, 400, 'Comentarios...'],
+];
+
+export const EXAMPLE_STOCK_TEMPLATE_DATA = [
+  ['Fecha de pago', 'Cantidad', 'Detalle', 'Comentario'],
+  ['2025-01-01', 10, 'Ejemplo detalle 1', 'Comentario de muestra 1'],
+  ['2025-02-01', 20, 'Ejemplo detalle 2', 'Comentario de muestra 2'],
+  ['2025-03-01', 30, 'Ejemplo detalle 3', 'Comentario de muestra 3'],
 ];
 
 export const PRODUCT_STATES = {
@@ -208,3 +209,68 @@ export const PRODUCT_LABELS = {
 };
 
 export const getLabel = (key) => FIELD_LABELS[key] ?? key;
+
+export const EMPTY_STOCK_FILTERS = {
+  type: "all",
+  invoiceNumber: "",
+  comments: "",
+};
+
+export const STOCK_TYPE_OPTIONS = [
+  {
+    key: "all",
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        Todos&nbsp;
+      </Flex>
+    ),
+    value: "all",
+  },
+  {
+    key: "in",
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        Ingresos&nbsp;
+        <Icon name={ICONS.ARROW_DOWN} color={COLORS.GREEN} />
+      </Flex>
+    ),
+    value: "in",
+  },
+  {
+    key: "out",
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        Egresos&nbsp;
+        <Icon name={ICONS.ARROW_UP} color={COLORS.RED} />
+      </Flex>
+    ),
+    value: "out",
+  },
+
+];
+
+export const STOCK_TABLE_HEADERS = [
+  {
+    id: 'date',
+    title: 'Fecha de Pago',
+    value: (element) => (
+      <Flex whiteSpace="nowrap" $alignItems="center" >
+        < Label ribbon width="fit-content" color={element.quantity < 0 ? COLORS.RED : COLORS.GREEN} >
+          <Icon inverted name={element.quantity < 0 ? ICONS.ARROW_UP : ICONS.ARROW_DOWN} />
+        </Label>
+        <Box width="100%">
+          {element.date
+            ? getFormatedDate(element.date)
+            : "-"}
+        </Box>
+      </Flex>
+    ),
+    width: 2
+  },
+  { id: 'quantity', width: 2, title: 'Cantidad', value: (element) => Math.abs(element.quantity) },
+  { id: 'invoiceNumber', width: 3, title: 'Detalle', value: (element) => element.invoiceNumber },
+  {
+    id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) =>
+      <OverflowWrapper maxWidth="30vw" popupContent={element.comments}> {element.comments} </OverflowWrapper>
+  },
+];

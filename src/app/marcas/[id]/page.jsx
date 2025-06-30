@@ -77,14 +77,17 @@ const Brand = ({ params }) => {
       header: `¿Está seguro que desea eliminar la marca "${brand?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
+      color: COLORS.RED
     },
     active: {
       header: `¿Está seguro que desea activar el cliente ${brand?.id}?`,
-      icon: ICONS.PLAY_CIRCLE
+      icon: ICONS.PLAY_CIRCLE,
+      color: COLORS.GREEn
     },
     inactive: {
       header: `¿Está seguro que desea desactivar el cliente ${brand?.id}?`,
-      icon: ICONS.PAUSE_CIRCLE
+      icon: ICONS.PAUSE_CIRCLE,
+      color: COLORS.GREY
     },
   }), [brand]);
 
@@ -265,7 +268,7 @@ const handleDeleteClick = useCallback(
         title={header}
         onConfirm={handleActionConfirm}
         confirmationWord={requiresConfirmation ? confirmText : ""}
-        confirmButtonIcon={icon}
+        titleIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
         isLoading={isDeletePending || isInactivePending || isActivePending}

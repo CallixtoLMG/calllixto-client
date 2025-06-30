@@ -10,10 +10,14 @@ import {
 } from "@/api/suppliers";
 import { IconedButton } from "@/common/components/buttons";
 import {
+  DropdownItem,
+  DropdownMenu,
+  DropdownOption,
   Flex,
   Icon,
+  Menu,
   Message,
-  MessageHeader,
+  MessageHeader
 } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { DropdownControlled, TextControlled, TextField } from "@/common/components/form";
@@ -28,7 +32,7 @@ import {
   useBreadcrumContext,
   useNavActionsContext,
 } from "@/components/layout";
-import { EMPTY_FILTERS, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "@/components/products/products.constants";
+import { EMPTY_FILTERS, EXAMPLE_STOCK_TEMPLATE_DATA, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { useAllowUpdate } from "@/hooks/allowUpdate";
@@ -42,7 +46,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Form, Tab } from "semantic-ui-react";
+import { Dropdown, Form, Tab } from "semantic-ui-react";
 import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Supplier = ({ params }) => {
@@ -50,9 +54,7 @@ const Supplier = ({ params }) => {
   const { role } = useUserContext();
   const { push } = useRouter();
   const { data: supplier, isLoading, refetch: refetchSupplier } = useGetSupplier(params.id);
-  const { data: products, isLoading: loadingProducts, refetch: refetchProducts } =
-    useProductsBySupplierId(params.id);
-  console.log(products)
+  const { data: products, isLoading: loadingProducts, refetch: refetchProducts } = useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [showModalDelete, setShowModalDelete] = useState(false);
@@ -176,6 +178,7 @@ const Supplier = ({ params }) => {
       header: `¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
+      color: COLORS.RED,
       tooltip: hasAssociatedProducts
         ? 'No se puede eliminar este proveedor, existen productos asociados.'
         : false,
@@ -184,14 +187,17 @@ const Supplier = ({ params }) => {
       header: `¿Está seguro que desea eliminar los ${products?.length || ""} productos del proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
+      color: COLORS.RED
     },
     active: {
       header: `¿Está seguro que desea activar el proveedor "${supplier?.name}"?`,
       icon: ICONS.PLAY_CIRCLE,
+      color: COLORS.GREEN
     },
     inactive: {
       header: `¿Está seguro que desea desactivar el proveedor "${supplier?.name}"?`,
       icon: ICONS.PAUSE_CIRCLE,
+      color: COLORS.GREY
     },
   };
 
@@ -462,33 +468,53 @@ const Supplier = ({ params }) => {
         },
         {
           id: 3,
-          icon: ICONS.FILE_EXCEL,
-          text: "Descargar productos",
-          onClick: () => {
-            if (products?.length) {
-              setIsExcelLoading(true);
-              handleDownloadExcel();
-              setIsExcelLoading(false);
-            } else {
-              toast("No hay productos de este proveedor para descargar.", {
-                icon: (
-                  <Icon
-                    margin="0"
-                    toast
-                    name={ICONS.INFO_CIRCLE}
-                    color={COLORS.BLUE}
-                  />
-                ),
-              });
-            }
-          },
-          loading: isExcelLoading,
-          disabled:
-            isExcelLoading ||
-            !!activeAction ||
-            loadingProducts ||
-            isEditPending ||
-            !hasAssociatedProducts,
+          button: (
+            <Menu>
+              <DropdownOption
+                $menu={true}
+                pointing
+                text='Excel'
+                icon={ICONS.FILE_EXCEL}
+                labeled
+                button
+                className='icon'
+                $paddingLeft="45px"
+                disabled={isExcelLoading || !!activeAction || loadingProducts || isEditPending || !hasAssociatedProducts}
+              >
+                <Dropdown.Menu>
+                  <DropdownItem
+                    onClick={() => {
+                      if (products?.length) {
+                        setIsExcelLoading(true);
+                        handleDownloadExcel();
+                        setIsExcelLoading(false);
+                      } else {
+                        toast("No hay productos de este proveedor para descargar.", {
+                          icon: <Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />
+                        });
+                      }
+                    }}
+                  >
+                    <Icon name={ICONS.DOWNLOAD} /> Descargar productos
+                  </DropdownItem>
+
+                  <DropdownOption text="Stock" pointing="left" className="link item">
+                    <DropdownMenu icon={ICONS.UPLOAD}>
+                      <DropdownItem onClick={() => console.log("Importar ingresos")}>
+                        <Icon name={ICONS.UPLOAD} /> Importar ingresos
+                      </DropdownItem>
+                      <DropdownItem onClick={() => console.log("Importar egresos")}>
+                        <Icon name={ICONS.UPLOAD} /> Importar egresos
+                      </DropdownItem>
+                      <DropdownItem onClick={() => downloadExcel(EXAMPLE_STOCK_TEMPLATE_DATA, "Plantilla Stock")}>
+                        <Icon name={ICONS.FILE_EXCEL_OUTLINE} /> Plantilla
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </DropdownOption>
+                </Dropdown.Menu>
+              </DropdownOption>
+            </Menu>
+          ),
           tooltip: !hasAssociatedProducts
             ? 'No existen productos de este proveedor.'
             : false,
@@ -593,7 +619,7 @@ const Supplier = ({ params }) => {
       ),
     },
     {
-      menuItem: "Productos del Proveedor",
+      menuItem: "Productos del proveedor",
       render: () => (
         <Tab.Pane>
           <Flex $flexDirection="column" $rowGap="15px" $margin="15px">
@@ -644,9 +670,6 @@ const Supplier = ({ params }) => {
               isLoading={isPending}
             />
           </Flex>
-          <OnlyPrint>
-            <PrintBarCodes ref={printRef} products={Object.values(selectedProducts)} />
-          </OnlyPrint>
           <ModalMultiDelete
             open={showConfirmDeleteModal}
             onClose={() => setShowConfirmDeleteModal(false)}
@@ -665,11 +688,7 @@ const Supplier = ({ params }) => {
   return (
     <Loader active={isLoading || loadingProducts}>
       <Tab panes={panes} />
-      {!isUpdating && (
-        <OnlyPrint>
-          <PrintBarCodes ref={printRef} products={products} />
-        </OnlyPrint>
-      )}
+
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
@@ -681,7 +700,7 @@ const Supplier = ({ params }) => {
         title={header}
         onConfirm={handleActionConfirm}
         confirmationWord={requiresConfirmation ? confirmText : ""}
-        confirmButtonIcon={icon}
+        titleIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
         isLoading={
@@ -701,6 +720,14 @@ const Supplier = ({ params }) => {
           )
         }
       />
+      {!isUpdating && (
+        <OnlyPrint>
+          <PrintBarCodes
+            ref={printRef}
+            products={Object.values(selectedProducts).length > 0 ? Object.values(selectedProducts) : products}
+          />
+        </OnlyPrint>
+      )}
     </Loader>
   );
 };

@@ -29,6 +29,7 @@ export const Flex = styled(Common)`
   flex-wrap: ${({ wrap }) => wrap};
   flex-direction: ${({ $flexDirection = "row" }) => $flexDirection};
   overflow-y: ${({ overflowY }) => overflowY};
+  white-space:  ${({ whiteSpace }) => whiteSpace};
 `;
 
 export const FlexColumn = styled(Flex)`

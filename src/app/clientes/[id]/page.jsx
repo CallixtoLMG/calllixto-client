@@ -79,15 +79,18 @@ const Customer = ({ params }) => {
     delete: {
       header: `¿Está seguro que desea eliminar el cliente ${customer?.id}?`,
       confirmText: "eliminar",
-      icon: ICONS.TRASH
+      icon: ICONS.TRASH,
+      color: COLORS.RED
     },
     active: {
       header: `¿Está seguro que desea activar el cliente ${customer?.id}?`,
-      icon: ICONS.PLAY_CIRCLE
+      icon: ICONS.PLAY_CIRCLE,
+      color: COLORS.GREEN
     },
     inactive: {
       header: `¿Está seguro que desea desactivar el cliente ${customer?.id}?`,
-      icon: ICONS.PAUSE_CIRCLE
+      icon: ICONS.PAUSE_CIRCLE,
+      color: COLORS.GREY
     },
   }), [customer]);
 
@@ -268,9 +271,10 @@ const Customer = ({ params }) => {
       />
       <ModalAction
         title={header}
+        titleIcon={icon}
+        titleIconColor={icon}
         onConfirm={handleActionConfirm}
         confirmationWord={requiresConfirmation ? confirmText : ""}
-        confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
         isLoading={isDeletePending || isInactivePending || isActivePending}

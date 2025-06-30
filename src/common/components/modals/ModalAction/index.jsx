@@ -1,4 +1,4 @@
-import { ButtonsContainer } from "@/common/components/custom";
+import { ButtonsContainer, Icon } from "@/common/components/custom";
 import { COLORS, ICONS } from "@/common/constants";
 import { handleKeyPressWithSubmit } from "@/common/utils";
 import { useEffect, useRef, useState } from 'react';
@@ -10,11 +10,12 @@ import { Form, Message, ModalContent } from "./styles";
 
 const ModalAction = ({
   title,
+  titleIcon,
+  titleIconColor,
   onConfirm,
   confirmationWord = 'eliminar',
   placeholder = `Escriba "${confirmationWord}" para confirmar`,
   confirmButtonText = 'Confirmar',
-  confirmButtonIcon = 'check',
   showModal,
   setShowModal,
   isLoading,
@@ -74,7 +75,7 @@ const ModalAction = ({
   return (
     <Transition visible={showModal} animation='scale' duration={500}>
       <Modal closeIcon open={showModal} onClose={() => setShowModal(false)}>
-        <Header icon={confirmButtonIcon} content={title || ""} />
+        <Header icon={<Icon name={titleIcon} color={titleIconColor} />} content={title || ""} />
         {bodyContent && (
           <ModalContent>
             <Message negative={warning}>{bodyContent}</Message>

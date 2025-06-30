@@ -1,7 +1,7 @@
 import { useUserContext } from "@/User";
 import { useBatchDeleteProducts, useDeleteProduct, useEditProduct } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
-import { Flex } from "@/common/components/custom";
+import { FlexColumn } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { ModalAction, ModalMultiDelete } from "@/common/components/modals";
@@ -118,6 +118,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
         key={2}
         text="Descargar Códigos"
         icon={ICONS.BARCODE}
+        color={COLORS.BLUE}
         onClick={handlePrint}
       />
     ];
@@ -140,7 +141,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
 
   return (
     <>
-      <Flex $flexDirection="column" $rowGap="15px">
+      <FlexColumn $rowGap="15px">
         <FormProvider {...methods}>
           <Form onSubmit={onSubmit(() => { })}>
             <Filters
@@ -184,10 +185,12 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
           showModal={showModal}
           setShowModal={setShowModal}
           title={`¿Está seguro que desea eliminar ${selectedProduct?.state === PRODUCT_STATES.DELETED.id ? "PERMANENTEMENTE" : ""} el producto "${selectedProduct?.name}"?`}
+          titleIcon={ICONS.TRASH}
+          titleIconColor={COLORS.RED}
           onConfirm={mutateDelete}
           isLoading={isPending}
         />
-      </Flex>
+      </FlexColumn>
       <OnlyPrint>
         <PrintBarCodes ref={printRef} products={Object.values(selectedProducts)} />
       </OnlyPrint>

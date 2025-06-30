@@ -181,6 +181,10 @@ export const ICONS = {
   INFO_CIRCLE: "info circle",
   WAREHOUSE: "warehouse",
   ARROW_LEFT: "arrow left",
+  ARROW_RIGHT: "arrow right",
+  ARROW_DOWN: "arrow down",
+  ARROW_UP: "arrow up",
+  ARROWS_ALTERNATE_VERTICAL: "arrows alternate vertical",
   CANCEL: "cancel",
   DELETE: "delete",
   EDIT: "edit",
@@ -197,6 +201,7 @@ export const ICONS = {
   EYE: "eye",
   EYE_SLASH: "eye slash",
   COG: "cog",
+  BOX: "box",
   EXCLAMATION_CIRCLE: "exclamation circle",
   TAGS: "tags",
   ADDRESS_CARD: "address card",
@@ -206,6 +211,8 @@ export const ICONS = {
   MAIL_SQUARE: "mail square",
   PERCENT: 'percent',
   SETTINGS: "settings",
+  LIST: "list",
+  UPLOAD: "upload"
 };
 
 export const ALL = "all";

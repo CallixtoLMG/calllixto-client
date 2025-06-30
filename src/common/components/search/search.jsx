@@ -1,6 +1,5 @@
 import { COLORS } from "@/common/constants";
 import { getFormatedPrice, normalizeText } from "@/common/utils";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { formatProductCode } from "@/components/products/products.utils";
 import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
@@ -9,6 +8,7 @@ import { CommentTooltip, TagsTooltip } from "../tooltips";
 import { Search, Text } from "./styles";
 
 const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
+  // Ver como es el product.stock cuando este creado linea 81
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -21,7 +21,6 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
       setFilteredProducts(products);
     }
   }));
-
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const debouncedSearch = useCallback(
     debounce((query) => {
@@ -80,18 +79,13 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
             </FlexColumn>
             <Flex width="100%" $justifyContent="space-between" height="20px" $marginTop="auto" $columnGap="5px" $alignItems="center">
               <Box width="80px">
-                {product.state === PRODUCT_STATES.OOS.id ? (
-                  <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>Sin Stock</Label>
-                ) : (
-                  <Box visibility="hidden">Sin Stock</Box>
-                )}
+                <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>{`Stock: ${product.stock || 0}`} </Label> 
+        
               </Box>
-              <Box width="100px" >
+              <Flex $columnGap="7px">
                 {product.tags ? <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} /> : <Box visibility="hidden" />}
-              </Box>
-              <Box width="fit-content">
-                {product.comments ? <CommentTooltip comment={product.comments} /> : <Box visibility="hidden" />}
-              </Box>
+                {product.comments ? <CommentTooltip lineHeight="normal" comment={product.comments} /> : <Box visibility="hidden" />}
+              </Flex>
             </Flex>
           </FlexColumn>
         ),
