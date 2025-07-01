@@ -96,37 +96,40 @@ const ProductStock = () => {
     });
   }, [filters, stockList]);
 
-  const actions = RULES.canRemove[role] ? [
-    {
-      id: 1,
-      icon: ICONS.EDIT,
-      width: "100%",
-      color: COLORS.GREEN,
-      onClick: (item, index) => {
-        setStock({ ...item, amount: item.quantity });
-        setSelectedIndex(index);
-        setModalMode("edit");
-        setShowModal(true);
+  const elementsWithActions = useMemo(() => {
+    const actions = RULES.canRemove[role] ? [
+      {
+        id: 1,
+        icon: ICONS.EDIT,
+        width: "100%",
+        color: COLORS.GREEN,
+        onClick: (item, index) => {
+          setStock({ ...item, amount: item.quantity });
+          setSelectedIndex(index);
+          setModalMode("edit");
+          setShowModal(true);
+        },
+        tooltip: "Editar",
       },
-      tooltip: "Editar",
-    },
-    {
-      id: 2,
-      icon: ICONS.TRASH,
-      color: COLORS.RED,
-      onClick: (item, index) => {
-        setStock({ ...item });
-        setSelectedIndex(index);
-        setModalMode("delete");
-        setShowModal(true);
-      },
-      tooltip: "Eliminar",
-    }
-  ] : [];
-
-  const elementsWithActions = useMemo(() =>
-    filteredStockList.map(item => ({ ...item, _actions: item.quantity > 0 ? actions : [] }))
-    , [filteredStockList, actions]);
+      {
+        id: 2,
+        icon: ICONS.TRASH,
+        color: COLORS.RED,
+        onClick: (item, index) => {
+          setStock({ ...item });
+          setSelectedIndex(index);
+          setModalMode("delete");
+          setShowModal(true);
+        },
+        tooltip: "Eliminar",
+      }
+    ] : [];
+  
+    return filteredStockList.map(item => ({
+      ...item,
+      _actions: item.quantity > 0 ? actions : []
+    }));
+  }, [filteredStockList, role]);
 
   const handleConfirm = () => {
     setShowErrors(true);
