@@ -43,7 +43,6 @@ const CustomTable = ({
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
   const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
   const tableRef = useRef(null);
-
   const currentPageElements = useMemo(() => {
     if (!paginate) {
       return filteredElements;
@@ -74,7 +73,6 @@ const CustomTable = ({
 
   useEffect(() => {
     const tableEl = tableRef.current;
-
     const conditionalPreventSend = (e) => {
       const tag = e.target.tagName.toLowerCase();
       const isTextInput = ['input', 'textarea'].includes(tag);
@@ -83,9 +81,11 @@ const CustomTable = ({
       }
     };
 
+
     if (tableEl) {
       tableEl.addEventListener('keydown', conditionalPreventSend);
     }
+
 
     return () => {
       if (tableEl) {
@@ -93,7 +93,6 @@ const CustomTable = ({
       }
     };
   }, []);
-
 
   const handlePageChange = (e, { activePage }) => {
     clearSelection?.();
@@ -185,83 +184,41 @@ const CustomTable = ({
                 </Table.Row>
               ) : (
                 currentPageElements.map((element, index) => {
-                  if (page) {
-                    return (
-                      <TableRow key={element[mainKey]}>
-                        {isSelectable && (
-                          <Cell $basic={basic}>
-                            <CenteredFlex>
-                              <Checkbox
-                                checked={!!selection[element[mainKey]]}
-                                onChange={() => onSelectionChange(element)}
-                              />
-                            </CenteredFlex>
-                          </Cell>
-                        )}
-                        {headers.map(header => (
-                          <LinkCell
-                            key={`cell_${header.id}_${element[mainKey]}`}
-                            align={header.align}
-                            width={header.width}
-                            onClick={() => push(page.SHOW(element[mainKey]))}
-                          >
-                            {header.value(element, index)}
-                          </LinkCell>
-                        ))}
-                        {!!actions.length && (
-                          <ActionsContainer $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
-                            <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
-                              {actions.length > 1 ? (
-                                <PopupActions
-                                  open={popupOpenId === element[mainKey]}
-                                  onOpen={() => setPopupOpenId(element[mainKey])}
-                                  onClose={() => setPopupOpenId(null)}
-                                  position="left center"
-                                  trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
-                                  buttons={actions.map((action, idx) => (
-                                    <IconedButton
-                                      key={`${action.icon}_${idx}`}
-                                      icon={action.icon}
-                                      color={action.color}
-                                      onClick={() => action.onClick(element, index)}
-                                      text={action.tooltip}
-                                      width={action.width}
-                                    />
-                                  ))}
-                                />
-                              ) : (
-                                <Actions actions={actions} element={element} />
-                              )}
-                            </InnerActionsContainer>
-                          </ActionsContainer>
-                        )}
-                      </TableRow>
-                    );
-                  }
+                  const currentActions = typeof actions === 'function' ? actions(element) : actions;
+
                   return (
                     <TableRow key={element[mainKey]}>
+                      {isSelectable && (
+                        <Cell $basic={basic}>
+                          <CenteredFlex>
+                            <Checkbox
+                              checked={!!selection[element[mainKey]]}
+                              onChange={() => onSelectionChange(element)}
+                            />
+                          </CenteredFlex>
+                        </Cell>
+                      )}
                       {headers.map(header => (
-                        <Cell
-                          key={`cell_${header.id}`}
+                        <LinkCell
+                          key={`cell_${header.id}_${element[mainKey]}`}
                           align={header.align}
                           width={header.width}
-                          $wrap={$wrap}
-                          $basic={basic}
+                          onClick={() => page && push(page.SHOW(element[mainKey]))}
                         >
                           {header.value(element, index)}
-                        </Cell>
+                        </LinkCell>
                       ))}
-                      {!!actions.length && (
+                      {!!currentActions?.length && (
                         <ActionsContainer $stillShow $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
                           <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
-                            {actions.length > 1 ? (
+                            {currentActions.length > 1 ? (
                               <PopupActions
                                 open={popupOpenId === element[mainKey]}
                                 onOpen={() => setPopupOpenId(element[mainKey])}
                                 onClose={() => setPopupOpenId(null)}
                                 position="left center"
                                 trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
-                                buttons={actions.map((action, idx) => (
+                                buttons={currentActions.map((action, idx) => (
                                   <IconedButton
                                     key={`${action.icon}_${idx}`}
                                     icon={action.icon}
@@ -271,10 +228,9 @@ const CustomTable = ({
                                     width={action.width}
                                   />
                                 ))}
-
                               />
                             ) : (
-                              <Actions actions={actions} element={element} index={index} />
+                              <Actions actions={currentActions} element={element} index={index} />
                             )}
                           </InnerActionsContainer>
                         </ActionsContainer>

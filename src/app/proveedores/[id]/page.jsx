@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
+import { useBatchDeleteProducts, useDeleteBySupplierId, useDeleteProduct, useEditProduct, useProductsBySupplierId } from "@/api/products";
 import {
   useActiveSupplier,
   useDeleteSupplier,
@@ -8,43 +8,51 @@ import {
   useGetSupplier,
   useInactiveSupplier,
 } from "@/api/suppliers";
+import { IconedButton } from "@/common/components/buttons";
 import {
+  DropdownItem,
+  DropdownMenu,
+  DropdownOption,
+  Flex,
   Icon,
+  Menu,
   Message,
-  MessageHeader,
+  MessageHeader
 } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
-import { TextField } from "@/common/components/form";
-import { ModalAction } from "@/common/components/modals";
+import { DropdownControlled, TextControlled, TextField } from "@/common/components/form";
+import { ModalAction, ModalMultiDelete } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
-import { downloadExcel, isItemInactive } from "@/common/utils";
+import { Filters, Table } from "@/common/components/table";
+import { ACTIVE, COLORS, ENTITIES, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { createFilter, downloadExcel, isItemInactive } from "@/common/utils";
 import {
   Loader,
   OnlyPrint,
   useBreadcrumContext,
   useNavActionsContext,
 } from "@/components/layout";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { getFormatedMargin } from "@/components/products/products.utils";
+import { EMPTY_FILTERS, EXAMPLE_STOCK_TEMPLATE_DATA, PRODUCTS_FILTERS_KEY, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "@/components/products/products.constants";
 import SupplierForm from "@/components/suppliers/SupplierForm";
-import { useProtectedAction, useValidateToken, useUnsavedChanges, useAllowUpdate } from "@/hooks";
+import { useAllowUpdate, useFilters, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FormProvider } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
+import { Dropdown, Form, Tab } from "semantic-ui-react";
 
 const Supplier = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
   const { data: supplier, isLoading, refetch: refetchSupplier } = useGetSupplier(params.id);
-  const { data: products, isLoading: loadingProducts, refetch: refetchProducts } =
-    useProductsBySupplierId(params.id);
+  const { data: products, isLoading: loadingProducts, refetch: refetchProducts } = useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
+  const [showModalDelete, setShowModalDelete] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -52,6 +60,17 @@ const Supplier = ({ params }) => {
   const [reason, setReason] = useState("");
   const printRef = useRef(null);
   const formRef = useRef(null);
+  const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProducts, setSelectedProducts] = useState({});
+  const {
+    onRestoreFilters,
+    onSubmit,
+    filters,
+    setFilters,
+    methods
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: PRODUCTS_FILTERS_KEY });
+  const onFilter = createFilter(filters, ['code', 'name']);
   const {
     showModal: showUnsavedModal,
     handleDiscard,
@@ -81,6 +100,9 @@ const Supplier = ({ params }) => {
   const deleteBySupplierId = useDeleteBySupplierId();
   const inactiveSupplier = useInactiveSupplier();
   const activeSupplier = useActiveSupplier();
+  const batchDeleteProducts = useBatchDeleteProducts();
+  const deleteProduct = useDeleteProduct();
+  const editProduct = useEditProduct();
 
   useEffect(() => {
     resetActions();
@@ -100,11 +122,25 @@ const Supplier = ({ params }) => {
     removeAfterPrint: true,
   });
 
+  const tableActions = RULES.canRemove[role] ? [
+    {
+      id: 1,
+      icon: ICONS.TRASH,
+      color: COLORS.RED,
+      onClick: (product) => {
+        setSelectedProduct(product);
+        setShowModalDelete(true);
+      },
+      tooltip: 'Eliminar'
+    }
+  ] : [];
+
   const modalConfig = {
     deleteSupplier: {
       header: `¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
+      color: COLORS.RED,
       tooltip: hasAssociatedProducts
         ? 'No se puede eliminar este proveedor, existen productos asociados.'
         : false,
@@ -113,14 +149,17 @@ const Supplier = ({ params }) => {
       header: `¿Está seguro que desea eliminar los ${products?.length || ""} productos del proveedor "${supplier?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
+      color: COLORS.RED
     },
     active: {
       header: `¿Está seguro que desea activar el proveedor "${supplier?.name}"?`,
       icon: ICONS.PLAY_CIRCLE,
+      color: COLORS.GREEN
     },
     inactive: {
       header: `¿Está seguro que desea desactivar el proveedor "${supplier?.name}"?`,
       icon: ICONS.PAUSE_CIRCLE,
+      color: COLORS.GREY
     },
   };
 
@@ -129,7 +168,31 @@ const Supplier = ({ params }) => {
     setModalAction(null);
     setReason("");
   };
+  const handleOpenModalWithAction = useCallback((action) => {
+    setModalAction(action);
+    setIsModalOpen(true);
+  }, []);
 
+  const handleActivateClick = useCallback(
+    () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
+    [handleProtectedAction, handleOpenModalWithAction],
+  );
+
+  const handleInactivateClick = useCallback(
+    () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
+    [handleProtectedAction, handleOpenModalWithAction],
+  );
+
+  const handleDeleteClick = useCallback(
+    () => handleProtectedAction(() => handleOpenModalWithAction('deleteSupplier')),
+    [handleProtectedAction, handleOpenModalWithAction],
+  );
+
+  const handleDeleteBatchClick = useCallback(
+    () => handleProtectedAction(() => handleOpenModalWithAction('deleteBatch')),
+    [handleProtectedAction, handleOpenModalWithAction],
+  );
+  
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editSupplier,
     onSuccess: (response) => {
@@ -198,7 +261,7 @@ const Supplier = ({ params }) => {
       },
     });
 
-  const { mutate: mutateDelete, isPending: isDeletePending } =
+  const { mutate: mutateDeleteSupplier, isPending: isDeletePending } =
     useMutation({
       mutationFn: () => deleteSupplier(params.id),
       onSuccess: (response) => {
@@ -215,6 +278,51 @@ const Supplier = ({ params }) => {
       },
     });
 
+  const onSelectionChange = useCallback(selected => {
+    const isSelected = !!selectedProducts[selected.code];
+    if (isSelected) {
+      const newProducts = { ...selectedProducts };
+      delete newProducts[selected.code];
+      setSelectedProducts(newProducts);
+    } else {
+      setSelectedProducts(prev => ({ ...prev, [selected.code]: selected }));
+    }
+  }, [selectedProducts]);
+
+  const selectionActions = useMemo(() => {
+    const actions = [
+      <IconedButton
+        key={2}
+        text="Descargar Códigos"
+        icon={ICONS.BARCODE}
+        onClick={handlePrint}
+      />
+    ];
+
+    if (RULES.canRemove[role]) {
+      actions.unshift(
+        <IconedButton
+          key={1}
+          text="Eliminar Productos"
+          icon={ICONS.TRASH}
+          color={COLORS.RED}
+          onClick={() => setShowConfirmDeleteModal(true)}
+        />
+      );
+    }
+
+    return actions;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role]);
+
+  const selectAllCurrentPageElements = (currentPageElements) => {
+    const newSelectedProducts = {};
+    currentPageElements.forEach(product => {
+      newSelectedProducts[product.code] = product;
+    });
+    setSelectedProducts(newSelectedProducts);
+  };
+
   const handleActionConfirm = async () => {
     setActiveAction(modalAction);
 
@@ -223,7 +331,7 @@ const Supplier = ({ params }) => {
     }
 
     if (modalAction === "deleteSupplier") {
-      mutateDelete();
+      mutateDeleteSupplier();
     }
 
     if (modalAction === INACTIVE) {
@@ -242,6 +350,26 @@ const Supplier = ({ params }) => {
 
     handleModalClose();
   };
+
+  const { mutate: mutateDeleteProduct, isPending } = useMutation({
+    mutationFn: async () => {
+      let response;
+      if (selectedProduct.state === PRODUCT_STATES.DELETED.id) {
+        response = await deleteProduct(selectedProduct?.code);
+      } else {
+        response = await editProduct({ ...selectedProduct, state: PRODUCT_STATES.DELETED.id });
+      }
+      return response;
+    },
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success('Producto eliminado!');
+        setShowModalDelete(false);
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+  });
 
   const {
     header,
@@ -271,134 +399,117 @@ const Supplier = ({ params }) => {
       }
     };
 
-    const handleDownloadExcel = () => {
-      if (!products) return;
-      const headers = [
-        'Código',
-        'Nombre',
-        'Marca',
-        'Proveedor',
-        'Cost ',
-        'Precio',
-        'Margen',
-        'Estado',
-        'Comentarios',
-      ];
-
-      const mappedProducts = products.map((product) => {
-        const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
-        return [
-          product.code,
-          product.name,
-          product.brandName,
-          product.supplierName,
-          product.cost,
-          product.price,
-          getFormatedMargin(product.price, product.cost),
-          productState,
-          product.comments,
-        ];
-      });
-      downloadExcel(
-        [headers, ...mappedProducts],
-        `Lista de productos de ${supplier.name}`,
-      );
-    };
-
-    let actions = [];
-
-    if (RULES.canRemove[role]) {
-      const handleClick = (action) => () => handleProtectedAction(() => {
-        setModalAction(action);
-        setIsModalOpen(true);
-      });
-
-      actions = [{
-        id: 1,
-        icon: ICONS.BARCODE,
-        color: COLORS.BLUE,
-        text: "Códigos",
-        onClick: handleBarCodePrint,
-        loading: activeAction === "print",
-        disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
-        tooltip: !hasAssociatedProducts
-          ? 'No existen productos de este proveedor.'
-          : false,
-      },
-      {
-        id: 2,
-        icon: isItemInactive(supplier?.state)
-          ? ICONS.PLAY_CIRCLE
-          : ICONS.PAUSE_CIRCLE,
-        color: COLORS.GREY,
-        text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
-        onClick: handleClick(isItemInactive(supplier?.state) ? ACTIVE : INACTIVE),
-        loading: activeAction === ACTIVE || activeAction === INACTIVE,
-        disabled: !!activeAction || isEditPending,
-        width: "fit-content",
-      },
-      {
-        id: 3,
-        icon: ICONS.FILE_EXCEL,
-        text: "Descargar productos",
-        onClick: () => {
-          if (products?.length) {
-            setIsExcelLoading(true);
-            handleDownloadExcel();
-            setIsExcelLoading(false);
-          } else {
-            toast("No hay productos de este proveedor para descargar.", {
-              icon: (
-                <Icon
-                  margin="0"
-                  toast
-                  name={ICONS.INFO_CIRCLE}
-                  color={COLORS.BLUE}
-                />
-              ),
-            });
-          }
+    const actions = RULES.canRemove[role]
+      ? [
+        {
+          id: 1,
+          icon: ICONS.BARCODE,
+          color: COLORS.BLUE,
+          text: "Códigos",
+          onClick: handleBarCodePrint,
+          loading: activeAction === "print",
+          disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
+          tooltip: !hasAssociatedProducts
+            ? 'No existen productos de este proveedor.'
+            : false,
         },
-        loading: isExcelLoading,
-        disabled:
-          isExcelLoading ||
-          !!activeAction ||
-          loadingProducts ||
-          isEditPending ||
-          !hasAssociatedProducts,
-        tooltip: !hasAssociatedProducts
-          ? 'No existen productos de este proveedor.'
-          : false,
-        width: "fit-content",
-      },
-      {
-        id: 4,
-        icon: ICONS.LIST_UL,
-        color: COLORS.RED,
-        text: "Eliminar productos",
-        onClick: handleClick('deleteBatch'),
-        loading: activeAction === "deleteBatch",
-        disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
-        tooltip: !hasAssociatedProducts
-          ? 'No existen productos de este proveedor.'
-          : false,
-        width: "fit-content",
-      },
-      {
-        id: 5,
-        icon: ICONS.TRASH,
-        color: COLORS.RED,
-        text: "Eliminar",
-        onClick: handleClick('deleteSupplier'),
-        loading: activeAction === "deleteSupplier",
-        disabled: hasAssociatedProducts || !!activeAction || isEditPending,
-        tooltip: hasAssociatedProducts
-          ? 'No se puede eliminar este proveedor, existen productos asociados.'
-          : false,
-        width: "fit-content",
-        basic: true,
-      }];
-    }
+        {
+          id: 2,
+          icon: isItemInactive(supplier?.state)
+            ? ICONS.PLAY_CIRCLE
+            : ICONS.PAUSE_CIRCLE,
+          color: COLORS.GREY,
+          text: isItemInactive(supplier?.state) ? "Activar" : "Desactivar",
+          onClick: isItemInactive(supplier?.state)
+            ? handleActivateClick
+            : handleInactivateClick,
+          loading: activeAction === 'active' || activeAction === 'inactive',
+          disabled: !!activeAction || isEditPending,
+          width: "fit-content",
+        },
+        {
+          id: 3,
+          button: (
+            <Menu>
+              <DropdownOption
+                $menu={true}
+                pointing
+                text='Excel'
+                icon={ICONS.FILE_EXCEL}
+                labeled
+                button
+                className='icon'
+                $paddingLeft="45px"
+                disabled={isExcelLoading || !!activeAction || loadingProducts || isEditPending || !hasAssociatedProducts}
+              >
+                <Dropdown.Menu>
+                  <DropdownItem
+                    onClick={() => {
+                      if (products?.length) {
+                        setIsExcelLoading(true);
+                        handleDownloadExcel();
+                        setIsExcelLoading(false);
+                      } else {
+                        toast("No hay productos de este proveedor para descargar.", {
+                          icon: <Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />
+                        });
+                      }
+                    }}
+                  >
+                    <Icon name={ICONS.DOWNLOAD} /> Descargar productos
+                  </DropdownItem>
+
+                  <DropdownOption text="Stock" pointing="left" className="link item">
+                    <DropdownMenu icon={ICONS.UPLOAD}>
+                      <DropdownItem onClick={() => console.log("Importar ingresos")}>
+                        <Icon name={ICONS.UPLOAD} /> Importar ingresos
+                      </DropdownItem>
+                      <DropdownItem onClick={() => console.log("Importar egresos")}>
+                        <Icon name={ICONS.UPLOAD} /> Importar egresos
+                      </DropdownItem>
+                      <DropdownItem onClick={() => downloadExcel(EXAMPLE_STOCK_TEMPLATE_DATA, "Plantilla Stock")}>
+                        <Icon name={ICONS.FILE_EXCEL_OUTLINE} /> Plantilla
+                      </DropdownItem>
+                    </DropdownMenu>
+                  </DropdownOption>
+                </Dropdown.Menu>
+              </DropdownOption>
+            </Menu>
+          ),
+          tooltip: !hasAssociatedProducts
+            ? 'No existen productos de este proveedor.'
+            : false,
+          width: "fit-content",
+        },
+        {
+          id: 4,
+          icon: ICONS.LIST_UL,
+          color: COLORS.RED,
+          text: "Eliminar productos",
+          onClick: handleDeleteBatchClick,
+          loading: activeAction === "deleteBatch",
+          disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
+          tooltip: !hasAssociatedProducts
+            ? 'No existen productos de este proveedor.'
+            : false,
+          width: "fit-content",
+        },
+        {
+          id: 5,
+          icon: ICONS.TRASH,
+          color: COLORS.RED,
+          text: "Eliminar",
+          onClick: handleDeleteClick,
+          loading: activeAction === "deleteSupplier",
+          disabled: hasAssociatedProducts || !!activeAction || isEditPending,
+          tooltip: hasAssociatedProducts
+            ? 'No se puede eliminar este proveedor, existen productos asociados.'
+            : false,
+          width: "fit-content",
+          basic: true,
+        },
+      ]
+      : [];
 
     setActions(actions);
 
@@ -409,29 +520,123 @@ const Supplier = ({ params }) => {
     push(PAGES.NOT_FOUND.BASE);
   }
 
+  const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
+    mutationFn: async () => {
+      const codes = Object.keys(selectedProducts);
+      const response = await batchDeleteProducts(codes);
+      return response.deletedCount;
+    },
+    onSuccess: (deletedCount) => {
+      toast.success(`${deletedCount} productos eliminados!`);
+      setSelectedProducts({});
+      setShowConfirmDeleteModal(false);
+    },
+    onError: (error) => {
+      toast.error(`Error al eliminar productos: ${error.message}`);
+    }
+  });
+
+  const panes = [
+    {
+      menuItem: "Proveedor",
+      render: () => (
+        <Tab.Pane>
+          {!isItemInactive(supplier?.state) &&
+            <Flex Flex $marginBottom="15px">
+              {toggleButton}
+            </Flex>
+          }
+          {isItemInactive(supplier?.state) && (
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{supplier.inactiveReason}</p>
+            </Message>
+          )}
+          <SupplierForm
+            ref={formRef}
+            supplier={supplier}
+            onSubmit={mutateEdit}
+            isLoading={isEditPending}
+            isUpdating={isUpdating && !isItemInactive(supplier?.state)}
+            view
+            isDeletePending={isDeletePending}
+          />
+        </Tab.Pane >
+      ),
+    },
+    {
+      menuItem: "Productos del proveedor",
+      render: () => (
+        <Tab.Pane>
+          <Flex $flexDirection="column" $rowGap="15px" $margin="15px">
+            <FormProvider {...methods}>
+            <Form onSubmit={onSubmit}>
+                <Filters
+                  entity={ENTITIES.PRODUCTS}
+                  onRefetch={refetchProducts}
+                  clearSelection={() => setSelectedProducts({})}
+                  onRestoreFilters={onRestoreFilters}
+                >
+                  <DropdownControlled
+                    width="200px"
+                    name="state"
+                    options={PRODUCT_STATES_OPTIONS}
+                    defaultValue={EMPTY_FILTERS.state}
+                    afterChange={() => {
+                      onSubmit();
+                      setSelectedProducts({});
+                    }}
+                  />
+                  <TextControlled name="code" placeholder="Código" width="200px" />
+                  <TextControlled name="name" placeholder="Nombre" width="350px" />
+                </Filters>
+              </Form>
+            </FormProvider>
+            <Table
+              isLoading={isLoading || deleteIsPending}
+              mainKey="code"
+              headers={PRODUCT_COLUMNS}
+              elements={products.map((p, index) => ({ ...p, _key: `${p.code}_${index}` }))}
+              page={PAGES.PRODUCTS}
+              actions={tableActions}
+              selection={selectedProducts}
+              onSelectionChange={onSelectionChange}
+              selectionActions={selectionActions}
+              clearSelection={() => setSelectedProducts({})}
+              selectAllCurrentPageElements={selectAllCurrentPageElements}
+              onFilter={onFilter}
+              color={PRODUCT_STATES[filters.state]?.color}
+              paginate
+              filters={filters}
+              setFilters={setFilters}
+            />
+            <ModalAction
+              showModal={showModalDelete}
+              setShowModal={setShowModalDelete}
+              title={`¿Está seguro que desea eliminar ${selectedProduct?.state === PRODUCT_STATES.DELETED.id ? "PERMANENTEMENTE" : ""} el producto "${selectedProduct?.name}"?`}
+              onConfirm={mutateDeleteProduct}
+              isLoading={isPending}
+            />
+          </Flex>
+          <ModalMultiDelete
+            open={showConfirmDeleteModal}
+            onClose={() => setShowConfirmDeleteModal(false)}
+            onConfirm={deleteSelectedProducts}
+            elements={Object.values(selectedProducts)}
+            icon={ICONS.TRASH}
+            title="Estás seguro de que desea eliminar estos productos?"
+            isLoading={deleteIsPending}
+            headers={PRODUCT_COLUMNS}
+          />
+        </Tab.Pane>
+      ),
+    },
+  ];
+
   return (
     <Loader active={isLoading || loadingProducts}>
-      {!isItemInactive(supplier?.state) && toggleButton}
-      {isItemInactive(supplier?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{supplier.inactiveReason}</p>
-        </Message>
-      )}
-      <SupplierForm
-        ref={formRef}
-        supplier={supplier}
-        onSubmit={mutateEdit}
-        isLoading={isEditPending}
-        isUpdating={isUpdating && !isItemInactive(supplier?.state)}
-        view
-        isDeletePending={isDeletePending}
-      />
-      {!isUpdating && (
-        <OnlyPrint>
-          <PrintBarCodes ref={printRef} products={products} />
-        </OnlyPrint>
-      )}
+      <Tab panes={panes} />
+
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
@@ -443,7 +648,7 @@ const Supplier = ({ params }) => {
         title={header}
         onConfirm={handleActionConfirm}
         confirmationWord={requiresConfirmation ? confirmText : ""}
-        confirmButtonIcon={icon}
+        titleIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
         isLoading={
@@ -463,6 +668,14 @@ const Supplier = ({ params }) => {
           )
         }
       />
+      {!isUpdating && (
+        <OnlyPrint>
+          <PrintBarCodes
+            ref={printRef}
+            products={Object.values(selectedProducts).length > 0 ? Object.values(selectedProducts) : products}
+          />
+        </OnlyPrint>
+      )}
     </Loader>
   );
 };

@@ -14,7 +14,7 @@ import { Button, Dropdown, Icon, Popup } from 'semantic-ui-react';
 import { IconedButton } from '../buttons';
 import { FiltersContainer, HeaderSegment, MainContainer } from './styles';
 
-const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
+const Filters = ({ children, onRestoreFilters, onRefetch, entity, update = true }) => {
 
   const ENTITY_MAPPING = {
     [ENTITIES.CUSTOMERS]: { queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
@@ -47,7 +47,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
 
     try {
       await restoreEntity();
-
+      await onRefetch();
     } catch (error) {
       console.error("Error en restoreEntity:", error);
     }
@@ -80,23 +80,26 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
             color={isDirty ? COLORS.BLUE : undefined}
             width="130px"
           />
-          <Dropdown width="130px" pointing as={CustomButton} text='Actualizar' icon={ICONS.REFRESH} floating labeled button className='icon'>
-            <Dropdown.Menu>
-              <DropdownItem onClick={onRefetch}>
-                <Icon color={COLORS.BLUE} name={ICONS.DOWNLOAD} />Actualización rápida
-              </DropdownItem>
-              <DropdownItem onClick={handleHardUpdate}>
-                <Icon color={COLORS.RED} name={ICONS.DOWNLOAD} />Actualización completa
-              </DropdownItem>
-            </Dropdown.Menu>
-          </Dropdown>
+          {update &&
+            <Dropdown width="130px" pointing as={CustomButton} text='Actualizar' icon={ICONS.REFRESH} floating labeled button className='icon'>
+              <Dropdown.Menu>
+                <DropdownItem onClick={onRefetch}>
+                  <Icon color={COLORS.BLUE} name={ICONS.DOWNLOAD} />Actualización rápida
+                </DropdownItem>
+                <DropdownItem onClick={handleHardUpdate}>
+                  <Icon color={COLORS.RED} name={ICONS.DOWNLOAD} />Actualización completa
+                </DropdownItem>
+              </Dropdown.Menu>
+            </Dropdown>
+          }
         </Flex>
       </HeaderSegment>
       <ModalAction
         title={`¿Quieres realizar una actualización completa de ${text} ?  `}
+        titleIcon={ICONS.REFRESH}
+        titleIconColor={COLORS.GREY}
         onConfirm={handleConfirmHardUpdate}
         confirmButtonText="Sí, Actualizar"
-        confirmButtonIcon={ICONS.REFRESH}
         showModal={showModal}
         setShowModal={setShowModal}
         isLoading={isLoading}

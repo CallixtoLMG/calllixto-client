@@ -10,9 +10,10 @@ import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, RECOVER } from "@/common/consta
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductChanges from "@/components/products/ProductChanges";
 import ProductForm from "@/components/products/ProductForm";
+import ProductStock from "@/components/products/ProductStock";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
-import { useAllowUpdate, useProtectedAction, useValidateToken, useUnsavedChanges } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -90,32 +91,39 @@ const Product = ({ params }) => {
     softDelete: {
       header: `¿Está seguro que desea eliminar el producto "${product?.name}"?`,
       confirmText: "eliminar",
-      icon: ICONS.TRASH
+      icon: ICONS.TRASH,
+      color: COLORS.RED
     },
     hardDelete: {
       header: `¿Está seguro que desea eliminar PERMANENTEMENTE el producto "${product?.name}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
+      color: COLORS.RED
     },
     recover: {
       header: `¿Está seguro que desea recuperar el producto "${product?.name}"?`,
-      icon: ICONS.UNDO
+      icon: ICONS.UNDO,
+      color: COLORS.GREEN
     },
     active: {
       header: `¿Está seguro que desea activar el producto "${product?.name}"?`,
-      icon: ICONS.PLAY_CIRCLE
+      icon: ICONS.PLAY_CIRCLE,
+      color: COLORS.GREEN
     },
     inactive: {
       header: `¿Está seguro que desea desactivar el producto "${product?.name}"?`,
-      icon: ICONS.PAUSE_CIRCLE
+      icon: ICONS.PAUSE_CIRCLE,
+      color: COLORS.GREY
     },
     outOfStock: {
       header: `¿Está seguro que desea cambiar el estado a sin stock el producto "${product?.name}"?`,
-      icon: ICONS.BAN
+      icon: ICONS.BAN,
+      color: COLORS.ORANGE
     },
     inStock: {
       header: `¿Está seguro que desea cambiar el estado a en stock el producto "${product?.name}"?`,
-      icon: ICONS.BOX
+      icon: ICONS.BOX,
+      color: COLORS.GREEN
     }
   }), [product]);
 
@@ -264,7 +272,7 @@ const Product = ({ params }) => {
     handleModalClose();
   };
 
-  const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
+  const { header, confirmText = "", icon = ICONS.QUESTION, color } = modalConfig[modalAction] || {};
   const requiresConfirmation = modalAction === "softDelete" || modalAction === "hardDelete";
 
   useEffect(() => {
@@ -356,9 +364,11 @@ const Product = ({ params }) => {
       menuItem: "Producto",
       render: () => (
         <Tab.Pane>
-          <Flex $marginBottom="15px">
-            {!isProductDeleted(product?.state) && !isProductInactive(product?.state) && toggleButton}
-          </Flex>
+          {(!isProductDeleted(product?.state) && !isProductInactive(product?.state)) &&
+            <Flex Flex $marginBottom="15px">
+              {toggleButton}
+            </Flex>
+          }
           {isProductInactive(product?.state) && (
             <Message negative>
               <MessageHeader>Motivo de inactivación</MessageHeader>
@@ -385,6 +395,16 @@ const Product = ({ params }) => {
         </Tab.Pane>
       ),
     },
+    {
+      menuItem: "Control de stock",
+      render: () => (
+        <Tab.Pane>
+          <ProductStock
+            product={product}
+          />
+        </Tab.Pane>
+      ),
+    },
   ];
 
   return (
@@ -404,9 +424,10 @@ const Product = ({ params }) => {
       )}
       <ModalAction
         title={header}
+        titleIcon={icon}
+        titleIconColor={color}
         onConfirm={handleActionConfirm}
         confirmationWord={requiresConfirmation ? confirmText : ""}
-        confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={setIsModalOpen}
         isLoading={isInactivePending || isActivePending || isDeletePending || isEditPending || isRecoverPending}

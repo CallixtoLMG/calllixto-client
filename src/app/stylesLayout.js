@@ -28,6 +28,10 @@ const GlobalStyle = createGlobalStyle`
     scrollbar-width: thin;
     scrollbar-color: #888 #f1f1f1;
   }
+
+  .react-datepicker {
+    left: 31px;
+  }
 `;
 
 const LayoutChildrenContainer = styled.div`
