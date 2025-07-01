@@ -2,25 +2,26 @@ import { DropdownControlled, TextControlled } from '@/common/components/form';
 import { Filters, Table } from '@/common/components/table';
 import { ENTITIES, PAGES } from "@/common/constants";
 import { createFilter } from '@/common/utils';
-import { useFilters } from '@/hooks/useFilters';
+import { useFilters } from "@/hooks";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS } from "../customers.constants";
+import { CUSTOMER_STATES_OPTIONS, CUSTOMERS_FILTERS_KEY, EMPTY_FILTERS, HEADERS } from "../customers.constants";
 
 const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
   const {
     onRestoreFilters,
     onSubmit,
-    appliedFilters,
-    methods
-  } = useFilters(EMPTY_FILTERS);
+    filters,
+    setFilters,
+    methods,
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CUSTOMERS_FILTERS_KEY });
 
-  const onFilter = createFilter(appliedFilters, ['name']);
+  const onFilter = createFilter(filters, ['name']);
 
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit(() => { })}>
+        <Form onSubmit={onSubmit}>
           <Filters
             entity={ENTITIES.CUSTOMERS}
             onRefetch={onRefetch}
@@ -31,9 +32,7 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
               name="state"
               options={CUSTOMER_STATES_OPTIONS}
               value={EMPTY_FILTERS.state}
-              afterChange={() => {
-                onSubmit(() => { })();
-              }}
+              afterChange={onSubmit}
             />
             <TextControlled name="name" placeholder="Nombre" width="300px" />
           </Filters>
@@ -46,6 +45,8 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
         elements={customers}
         onFilter={onFilter}
         paginate
+        filters={filters}
+        setFilters={setFilters}
       />
     </>
   );

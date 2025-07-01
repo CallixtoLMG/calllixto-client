@@ -32,13 +32,9 @@ import {
   useBreadcrumContext,
   useNavActionsContext,
 } from "@/components/layout";
-import { EMPTY_FILTERS, EXAMPLE_STOCK_TEMPLATE_DATA, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "@/components/products/products.constants";
-import { getFormatedMargin } from "@/components/products/products.utils";
+import { EMPTY_FILTERS, EXAMPLE_STOCK_TEMPLATE_DATA, PRODUCTS_FILTERS_KEY, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "@/components/products/products.constants";
 import SupplierForm from "@/components/suppliers/SupplierForm";
-import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useFilters } from "@/hooks/useFilters";
-import { useProtectedAction } from "@/hooks/useProtectedAction";
-import { useValidateToken } from "@/hooks/userData";
+import { useAllowUpdate, useFilters, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -47,7 +43,6 @@ import { FormProvider } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Dropdown, Form, Tab } from "semantic-ui-react";
-import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Supplier = ({ params }) => {
   useValidateToken();
@@ -71,10 +66,11 @@ const Supplier = ({ params }) => {
   const {
     onRestoreFilters,
     onSubmit,
-    appliedFilters,
+    filters,
+    setFilters,
     methods
-  } = useFilters(EMPTY_FILTERS);
-  const onFilter = createFilter(appliedFilters, ['code', 'name']);
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: PRODUCTS_FILTERS_KEY });
+  const onFilter = createFilter(filters, ['code', 'name']);
   const {
     showModal: showUnsavedModal,
     handleDiscard,
@@ -120,40 +116,6 @@ const Supplier = ({ params }) => {
   }, [setLabels, supplier, refetchProducts, refetchSupplier]);
 
   const hasAssociatedProducts = useMemo(() => !!products?.length, [products]);
-
-  const handleDownloadExcel = useCallback(() => {
-    if (!products) return;
-    const headers = [
-      'Código',
-      'Nombre',
-      'Marca',
-      'Proveedor',
-      'Cost ',
-      'Precio',
-      'Margen',
-      'Estado',
-      'Comentarios',
-    ];
-
-    const mappedProducts = products.map((product) => {
-      const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
-      return [
-        product.code,
-        product.name,
-        product.brandName,
-        product.supplierName,
-        product.cost,
-        product.price,
-        getFormatedMargin(product.price, product.cost),
-        productState,
-        product.comments,
-      ];
-    });
-    downloadExcel(
-      [headers, ...mappedProducts],
-      `Lista de productos de ${supplier.name}`,
-    );
-  }, [products, supplier]);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -206,7 +168,6 @@ const Supplier = ({ params }) => {
     setModalAction(null);
     setReason("");
   };
-
   const handleOpenModalWithAction = useCallback((action) => {
     setModalAction(action);
     setIsModalOpen(true);
@@ -231,7 +192,7 @@ const Supplier = ({ params }) => {
     () => handleProtectedAction(() => handleOpenModalWithAction('deleteBatch')),
     [handleProtectedAction, handleOpenModalWithAction],
   );
-
+  
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editSupplier,
     onSuccess: (response) => {
@@ -551,24 +512,9 @@ const Supplier = ({ params }) => {
       : [];
 
     setActions(actions);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    role,
-    activeAction,
-    hasAssociatedProducts,
-    isActivePending,
-    isExcelLoading,
-    isEditPending,
-    handleDeleteBatchClick,
-    loadingProducts,
-    supplier?.name,
-    handleDeleteClick,
-    handleActivateClick,
-    handleInactivateClick,
-    products,
-    supplier?.state,
-    setActions,
-  ]);
+  }, [role, supplier, products, hasAssociatedProducts, activeAction, isEditPending, loadingProducts, isExcelLoading]);
 
   if (!isLoading && !supplier) {
     push(PAGES.NOT_FOUND.BASE);
@@ -624,7 +570,7 @@ const Supplier = ({ params }) => {
         <Tab.Pane>
           <Flex $flexDirection="column" $rowGap="15px" $margin="15px">
             <FormProvider {...methods}>
-              <Form onSubmit={onSubmit(() => { })}>
+            <Form onSubmit={onSubmit}>
                 <Filters
                   entity={ENTITIES.PRODUCTS}
                   onRefetch={refetchProducts}
@@ -637,7 +583,7 @@ const Supplier = ({ params }) => {
                     options={PRODUCT_STATES_OPTIONS}
                     defaultValue={EMPTY_FILTERS.state}
                     afterChange={() => {
-                      onSubmit(() => { })();
+                      onSubmit();
                       setSelectedProducts({});
                     }}
                   />
@@ -659,8 +605,10 @@ const Supplier = ({ params }) => {
               clearSelection={() => setSelectedProducts({})}
               selectAllCurrentPageElements={selectAllCurrentPageElements}
               onFilter={onFilter}
-              color={PRODUCT_STATES[appliedFilters.state]?.color}
+              color={PRODUCT_STATES[filters.state]?.color}
               paginate
+              filters={filters}
+              setFilters={setFilters}
             />
             <ModalAction
               showModal={showModalDelete}

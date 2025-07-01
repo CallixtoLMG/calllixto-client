@@ -4,13 +4,12 @@ import { COLORS, ICONS } from "@/common/constants";
 import { useState } from "react";
 import { ButtonGroup } from "semantic-ui-react";
 
-export const useAllowUpdate = ({ canUpdate, onBeforeView, updateText = "Actualizar",  viewText = "Ver", }) => {
+const useAllowUpdate = ({ canUpdate, onBeforeView }) => {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleViewClick = async () => {
     const canView = await onBeforeView?.();
     if (!canView) return;
-
     setIsUpdating(false);
   };
 
@@ -20,7 +19,7 @@ export const useAllowUpdate = ({ canUpdate, onBeforeView, updateText = "Actualiz
         <Box>
           <ButtonGroup size="small">
             <IconedButton
-              text={updateText}
+              text="Actualizar"
               icon={ICONS.EDIT}
               onClick={() => setIsUpdating(true)}
               basic={!isUpdating}
@@ -28,7 +27,7 @@ export const useAllowUpdate = ({ canUpdate, onBeforeView, updateText = "Actualiz
               width="130px"
             />
             <IconedButton
-              text={viewText}
+              text="Ver"
               icon={ICONS.EYE}
               basic={isUpdating}
               color={COLORS.BLUE}
@@ -43,3 +42,5 @@ export const useAllowUpdate = ({ canUpdate, onBeforeView, updateText = "Actualiz
 
   return { isUpdating, toggleButton, setIsUpdating };
 };
+
+export default useAllowUpdate;

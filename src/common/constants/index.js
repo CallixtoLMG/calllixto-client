@@ -212,7 +212,8 @@ export const ICONS = {
   PERCENT: 'percent',
   SETTINGS: "settings",
   LIST: "list",
-  UPLOAD: "upload"
+  UPLOAD: "upload",
+  BULLHORN: "bullhorn"
 };
 
 export const ALL = "all";

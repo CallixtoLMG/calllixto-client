@@ -1,8 +1,8 @@
 import { useUserContext } from "@/User";
 import { Flex, Icon, Label } from "@/common/components/custom";
-import { KeyboardShortcuts } from "@/common/components/modals";
+import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
 import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/common/constants";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { useKeyboardShortcuts } from "@/hooks";
 import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -88,7 +88,10 @@ const Header = () => {
                 </Flex>
                 <Flex>
                   <RigthHeaderDiv>
-                    <KeyboardShortcuts />
+                    <Flex $columnGap ="10px">
+                      <ModalUpdates />
+                      <KeyboardShortcuts />
+                    </Flex>
                   </RigthHeaderDiv>
                   {isCallixtoUser(role) && (
                     <RigthHeaderDiv>

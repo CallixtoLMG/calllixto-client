@@ -2,25 +2,26 @@ import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/hooks";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { BRAND_COLUMNS, BRAND_STATES_OPTIONS, EMPTY_FILTERS } from "../brands.constants";
+import { BRAND_COLUMNS, BRAND_STATES_OPTIONS, BRANDS_FILTERS_KEY, EMPTY_FILTERS } from "../brands.constants";
 
 const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
   const {
     onRestoreFilters,
     onSubmit,
-    appliedFilters,
+    filters,
+    setFilters,
     methods
-  } = useFilters(EMPTY_FILTERS);
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BRANDS_FILTERS_KEY });
 
-  const onFilter = createFilter(appliedFilters, ['name', 'id']);
+  const onFilter = createFilter(filters, ['name', 'id']);
 
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit(() => { })}>
+        <Form onSubmit={onSubmit}>
           <Filters
             entity={ENTITIES.BRANDS}
             onRefetch={onRefetch}
@@ -31,9 +32,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
               name="state"
               options={BRAND_STATES_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
-              afterChange={() => {
-                onSubmit(() => { })();
-              }}
+              afterChange={onSubmit}
             />
             <TextControlled name="id" placeholder="Id" width="80px" />
             <TextControlled name="name" placeholder="Nombre" width="300px" />
@@ -47,6 +46,8 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
         page={PAGES.BRANDS}
         onFilter={onFilter}
         paginate
+        filters={filters}
+        setFilters={setFilters}
       />
     </>
   );

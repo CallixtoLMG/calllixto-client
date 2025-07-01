@@ -9,8 +9,8 @@ const Login = () => {
     signOut();
     localStorage.removeItem('token');
     sessionStorage.removeItem("userData");
-  }, [])
-  return (<LoginForm onSubmit={login} />)
+  }, []);
+  return <LoginForm onSubmit={login} />;
 };
 
 export default Login;

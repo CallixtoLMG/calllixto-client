@@ -3,7 +3,7 @@ import { PAGES } from '@/common/constants';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-export const useValidateToken = () => {
+const useValidateToken = () => {
   const { push } = useRouter();
   const { userData } = useUserContext();
 
@@ -13,7 +13,8 @@ export const useValidateToken = () => {
         push(PAGES.LOGIN.BASE);
       }
     }
-
     getData();
   }, [push, userData]);
-}
+};
+
+export default useValidateToken;

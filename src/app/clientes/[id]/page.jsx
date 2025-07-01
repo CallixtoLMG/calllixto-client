@@ -9,14 +9,11 @@ import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constan
 import { isItemInactive } from "@/common/utils";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useProtectedAction } from "@/hooks/useProtectedAction";
-import { useValidateToken } from "@/hooks/userData";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
-import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
+import { useAllowUpdate, useProtectedAction, useValidateToken, useUnsavedChanges } from "@/hooks";
 
 const Customer = ({ params }) => {
   useValidateToken();
@@ -35,6 +32,7 @@ const Customer = ({ params }) => {
   const activeCustomer = useActiveCustomer();
   const reasonInputRef = useRef(null);
   const formRef = useRef(null);
+
   const {
     showModal: showUnsavedModal,
     handleDiscard,
@@ -54,6 +52,7 @@ const Customer = ({ params }) => {
       formRef.current?.submitForm();
     },
   });
+
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: true,
     onBeforeView,
@@ -99,26 +98,6 @@ const Customer = ({ params }) => {
     setModalAction(null);
     setReason("");
   };
-
-  const handleOpenModalWithAction = useCallback(async (action) => {
-    setModalAction(action);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleActivateClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
-    [handleProtectedAction, handleOpenModalWithAction],
-  );
-
-  const handleInactiveClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
-    [handleProtectedAction, handleOpenModalWithAction],
-  );
-
-  const handleDeleteClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(DELETE)),
-    [handleProtectedAction, handleOpenModalWithAction],
-  );
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editCustomer,
@@ -211,13 +190,18 @@ const Customer = ({ params }) => {
   const requiresConfirmation = modalAction === DELETE;
 
   useEffect(() => {
+    const handleClick = (action) => () => handleProtectedAction(() => {
+      setModalAction(action);
+      setIsModalOpen(true);
+    });
+
     if (customer) {
       const actions = [
         {
           id: 1,
           icon: isItemInactive(customer.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
           color: COLORS.GREY,
-          onClick: isItemInactive(customer.state) ? handleActivateClick : handleInactiveClick,
+          onClick: handleClick(isItemInactive(customer.state) ? ACTIVE : INACTIVE),
           text: isItemInactive(customer.state) ? "Activar" : "Desactivar",
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction || isEditPending,
@@ -227,7 +211,7 @@ const Customer = ({ params }) => {
           id: 2,
           icon: ICONS.TRASH,
           color: COLORS.RED,
-          onClick: handleDeleteClick,
+          onClick: handleClick(DELETE),
           text: "Eliminar",
           tooltip: hasAssociatedBudgets ? "No se puede eliminar este cliente, existen presupuestos asociados." : false,
           basic: true,
@@ -238,7 +222,9 @@ const Customer = ({ params }) => {
 
       setActions(actions);
     }
-  }, [customer, activeAction, isActivePending, isInactivePending, isDeletePending, isEditPending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions, hasAssociatedBudgets]);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [customer, activeAction, isActivePending, isInactivePending, isDeletePending, isEditPending, hasAssociatedBudgets, setActions]);
 
   if (!isLoading && !customer) {
     push(PAGES.NOT_FOUND.BASE);

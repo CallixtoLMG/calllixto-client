@@ -1,7 +1,7 @@
 import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { Loader } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
@@ -29,12 +29,14 @@ const CustomTable = ({
   clearSelection,
   selectAllCurrentPageElements,
   paginate,
+  filters = {},
+  setFilters = () => { },
   onFilter = () => true,
 }) => {
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
-  const [activePage, setActivePage] = useState(1);
+  const [activePage, setActivePage] = useState(filters?.page ?? 1);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupOpenId, setPopupOpenId] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
@@ -59,10 +61,15 @@ const CustomTable = ({
   }, []);
 
   useEffect(() => {
-    if (activePage > pages) {
-      setActivePage(1);
+    if (hydrated && !isLoading) {
+      if (activePage > pages) {
+        setActivePage(1);
+      }
+      if (filters?.pageSize !== pageSize) {
+        setPageSize(filters?.pageSize ?? DEFAULT_PAGE_SIZE);
+      }
     }
-  }, [pages, activePage]);
+  }, [hydrated, isLoading, filters?.pageSize, pageSize, pages, activePage]);
 
   useEffect(() => {
     const tableEl = tableRef.current;
@@ -74,9 +81,11 @@ const CustomTable = ({
       }
     };
 
+
     if (tableEl) {
       tableEl.addEventListener('keydown', conditionalPreventSend);
     }
+
 
     return () => {
       if (tableEl) {
@@ -87,6 +96,7 @@ const CustomTable = ({
 
   const handlePageChange = (e, { activePage }) => {
     clearSelection?.();
+    setFilters({ ...filters, page: activePage });
     setActivePage(activePage);
   };
 
@@ -100,6 +110,7 @@ const CustomTable = ({
 
   const handlePageSizeChange = (e, { value }) => {
     setPageSize(value);
+    setFilters({ ...filters, pageSize: value, page: 1 });
     setActivePage(1);
     clearSelection?.();
   };

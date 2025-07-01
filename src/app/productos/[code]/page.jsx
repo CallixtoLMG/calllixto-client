@@ -13,17 +13,14 @@ import ProductForm from "@/components/products/ProductForm";
 import ProductStock from "@/components/products/ProductStock";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
-import { useAllowUpdate } from "@/hooks/allowUpdate";
-import { useProtectedAction } from "@/hooks/useProtectedAction";
-import { useValidateToken } from "@/hooks/userData";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Tab } from "semantic-ui-react";
-import { useUnsavedChanges } from "../../../hooks/unsavedChanges";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -43,6 +40,7 @@ const Product = ({ params }) => {
   const inactiveProduct = useInactiveProduct();
   const recoverProduct = useRecoverProduct();
   const formRef = useRef(null);
+
   const {
     showModal: showUnsavedModal,
     handleDiscard,
@@ -62,6 +60,7 @@ const Product = ({ params }) => {
       formRef.current?.submitForm();
     },
   });
+
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
     onBeforeView,
@@ -133,40 +132,6 @@ const Product = ({ params }) => {
     setModalAction(null);
     setReason("");
   };
-
-  const handleOpenModalWithAction = useCallback((action) => {
-    setModalAction(action);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleActiveClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(ACTIVE)),
-    [handleOpenModalWithAction, handleProtectedAction]
-  );
-
-  const handleRecoverClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction("recover")),
-    [handleOpenModalWithAction, handleProtectedAction]
-  );
-
-  const handleInactiveClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(INACTIVE)),
-    [handleOpenModalWithAction, handleProtectedAction]
-  );
-  const handleStockChangeClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction(isProductOOS(product?.state) ? "inStock" : "outOfStock")),
-    [handleOpenModalWithAction, product?.state, handleProtectedAction]
-  );
-
-  const handleSoftDeleteClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction("softDelete")),
-    [handleOpenModalWithAction, handleProtectedAction]
-  );
-
-  const handleHardDeleteClick = useCallback(
-    () => handleProtectedAction(() => handleOpenModalWithAction("hardDelete")),
-    [handleOpenModalWithAction, handleProtectedAction]
-  );
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
     mutationFn: editProduct,
@@ -307,12 +272,16 @@ const Product = ({ params }) => {
     handleModalClose();
   };
 
-
   const { header, confirmText = "", icon = ICONS.QUESTION, color } = modalConfig[modalAction] || {};
   const requiresConfirmation = modalAction === "softDelete" || modalAction === "hardDelete";
 
   useEffect(() => {
     if (product) {
+      const handleClick = (action) => () => handleProtectedAction(() => {
+        setModalAction(action);
+        setIsModalOpen(true);
+      });
+
       const actions = [
         {
           id: 1,
@@ -329,7 +298,7 @@ const Product = ({ params }) => {
           id: 2,
           icon: isProductOOS(product?.state) ? ICONS.BOX : ICONS.BAN,
           color: COLORS.ORANGE,
-          onClick: handleStockChangeClick,
+          onClick: handleClick(isProductOOS(product?.state) ? "inStock" : "outOfStock"),
           text: isProductOOS(product?.state) ? "En stock" : PRODUCT_STATES.OOS.singularTitle,
           width: "fit-content",
           loading: activeAction === "outOfStock",
@@ -341,7 +310,7 @@ const Product = ({ params }) => {
           id: 3,
           icon: isProductInactive(product?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
           color: COLORS.GREY,
-          onClick: isProductInactive(product?.state) ? handleActiveClick : handleInactiveClick,
+          onClick: handleClick(isProductInactive(product?.state) ? ACTIVE : INACTIVE),
           text: isProductInactive(product?.state) ? "Activar" : "Desactivar",
           width: "fit-content",
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
@@ -351,7 +320,7 @@ const Product = ({ params }) => {
           id: 4,
           icon: ICONS.TRASH,
           color: COLORS.RED,
-          onClick: handleSoftDeleteClick,
+          onClick: handleClick('softDelete'),
           text: "Eliminar",
           basic: true,
           loading: activeAction === "softDelete",
@@ -363,7 +332,7 @@ const Product = ({ params }) => {
           id: 5,
           icon: ICONS.UNDO,
           color: COLORS.GREEN,
-          onClick: handleRecoverClick,
+          onClick: handleClick('recover'),
           text: "Recuperar",
           width: "fit-content",
           loading: activeAction === "recover",
@@ -373,7 +342,7 @@ const Product = ({ params }) => {
           id: 6,
           icon: ICONS.TRASH,
           color: COLORS.RED,
-          onClick: handleHardDeleteClick,
+          onClick: handleClick('hardDelete'),
           text: "Eliminar",
           basic: true,
           loading: activeAction === "hardDelete",
@@ -384,7 +353,7 @@ const Product = ({ params }) => {
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product, activeAction, isEditPending, handleRecoverClick, handleActiveClick, handleInactiveClick, handleStockChangeClick, handleSoftDeleteClick, handleHardDeleteClick, setActions]);
+  }, [product, activeAction, isEditPending, setActions]);
 
   if (!isLoading && !product) {
     push(PAGES.NOT_FOUND.BASE);

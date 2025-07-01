@@ -1,12 +1,10 @@
-import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
 import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
-import { useArrayTags } from "@/hooks/arrayTags";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { forwardRef, useEffect, useImperativeHandle } from "react";
+import { useArrayTags, useKeyboardShortcuts } from "@/hooks";
+import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
 
@@ -26,15 +24,10 @@ const CustomerForm = forwardRef(({
     resetForm: () => reset(getInitialValues(customer))
   }));
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
-  const { data: customersSettings, isFetching: isCustomerSettingsFetching, refetch: refetchCustomersSettings } = useGetSetting(ENTITIES.CUSTOMERS);
   const { tagsOptions, optionsMapper } = useArrayTags(
     ENTITIES.CUSTOMERS,
-    customer?.tags || [] 
+    customer?.tags || []
   );
-
-  useEffect(() => {
-    refetchCustomersSettings();
-  }, [refetchCustomersSettings]);
 
   const handleCreate = (data) => {
     const { previousVersions, ...filteredData } = data;
@@ -101,7 +94,6 @@ const CustomerForm = forwardRef(({
             search={isUpdating && !view}
             selection
             optionsMapper={optionsMapper}
-            loading={isCustomerSettingsFetching}
             options={Object.values(tagsOptions)}
             renderLabel={(item) => ({
               color: item.value.color,

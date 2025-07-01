@@ -6,12 +6,12 @@ import { ModalAction } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
 import { COLORS, ICONS, RULES as VALIDATE_RULES } from "@/common/constants";
 import { createFilter, preventSend } from "@/common/utils";
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMemo, useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { EMPTY_STOCK_FILTERS, STOCK_TABLE_HEADERS, STOCK_TYPE_OPTIONS } from "../products.constants";
+import { EMPTY_STOCK_FILTERS, PRODUCTS_FILTERS_KEY, STOCK_TABLE_HEADERS, STOCK_TYPE_OPTIONS } from "../products.constants";
 import { Header } from "./styles";
 
 const product = {
@@ -68,11 +68,12 @@ const ProductStock = () => {
   const {
     onRestoreFilters,
     onSubmit,
-    appliedFilters,
+    filters,
+    setFilters,
     methods: filterMethods,
-  } = useFilters(EMPTY_STOCK_FILTERS);
+  } = useFilters({ defaultFilters: EMPTY_STOCK_FILTERS, key: PRODUCTS_FILTERS_KEY });
 
-  const onFilter = createFilter(appliedFilters, ['invoiceNumber', 'comments']);
+  const onFilter = createFilter(filters, ['invoiceNumber', 'comments']);
   const [showModal, setShowModal] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
   const { control } = methods;
@@ -86,14 +87,14 @@ const ProductStock = () => {
 
   const filteredStockList = useMemo(() => {
     return stockList.filter((item) => {
-      const matchesType = appliedFilters.type === "all"
-        || (appliedFilters.type === "in" && item.quantity > 0)
-        || (appliedFilters.type === "out" && item.quantity < 0);
-      const matchesInvoice = item.invoiceNumber?.toLowerCase().includes(appliedFilters.invoiceNumber?.toLowerCase() || "");
-      const matchesComments = item.comments?.toLowerCase().includes(appliedFilters.comments?.toLowerCase() || "");
+      const matchesType = filters.type === "all"
+        || (filters.type === "in" && item.quantity > 0)
+        || (filters.type === "out" && item.quantity < 0);
+      const matchesInvoice = item.invoiceNumber?.toLowerCase().includes(filters.invoiceNumber?.toLowerCase() || "");
+      const matchesComments = item.comments?.toLowerCase().includes(filters.comments?.toLowerCase() || "");
       return matchesType && matchesInvoice && matchesComments;
     });
-  }, [appliedFilters, stockList]);
+  }, [filters, stockList]);
 
   const actions = RULES.canRemove[role] ? [
     {
@@ -194,7 +195,7 @@ const ProductStock = () => {
   return (
     <FlexColumn $rowGap="15px">
       <FormProvider {...filterMethods}>
-        <Form onSubmit={onSubmit(() => { })}>
+        <Form onSubmit={onSubmit}>
           <FlexColumn $rowGap="15px">
             <Flex $justifyContent="space-between">
               <Header center>Movimientos de stock</Header>
@@ -215,7 +216,15 @@ const ProductStock = () => {
               </Flex>
             </Flex>
             <Filters entity="STOCK" onRefetch={() => { }} onRestoreFilters={onRestoreFilters} update={false}>
-              <DropdownControlled width="200px" name="type" options={STOCK_TYPE_OPTIONS} defaultValue={EMPTY_STOCK_FILTERS.type} afterChange={() => onSubmit(() => { })()} />
+              <DropdownControlled
+                width="200px"
+                name="type"
+                options={STOCK_TYPE_OPTIONS}
+                defaultValue={EMPTY_STOCK_FILTERS.type}
+                afterChange={() => {
+                  onSubmit();
+                }}
+              />
               <TextControlled name="invoiceNumber" placeholder="Detalle" width="200px" />
               <TextControlled name="comments" placeholder="Comentarios" width="300px" />
             </Filters>
@@ -225,7 +234,16 @@ const ProductStock = () => {
 
       <FormProvider {...methods}>
         <Form onKeyDown={preventSend}>
-          <Table paginate headers={STOCK_TABLE_HEADERS} elements={elementsWithActions} actions={(el) => el._actions} $deleteButtonInside onFilter={onFilter} />
+          <Table
+            paginate
+            headers={STOCK_TABLE_HEADERS}
+            elements={elementsWithActions}
+            actions={(element) => element._actions}
+            $deleteButtonInside
+            onFilter={onFilter}
+            filters={filters}
+            setFilters={setFilters}
+          />
         </Form>
       </FormProvider>
 

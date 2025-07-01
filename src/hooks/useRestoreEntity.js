@@ -1,7 +1,7 @@
 import { removeStorageEntity } from '@/api/common';
 import { useQueryClient } from '@tanstack/react-query';
 
-export function useRestoreEntity({ entity, key }) {
+const useRestoreEntity = ({ entity, key }) => {
   const queryClient = useQueryClient();
 
   const restoreEntity = async () => {
@@ -11,3 +11,5 @@ export function useRestoreEntity({ entity, key }) {
 
   return restoreEntity;
 }
+
+export default useRestoreEntity;

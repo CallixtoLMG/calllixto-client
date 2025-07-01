@@ -2,11 +2,11 @@ import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from '@/common/components/table';
 import { ALL, COLORS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter } from '@/common/utils';
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGETS_COLUMNS, EMPTY_FILTERS } from "../budgets.constants";
+import { BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGETS_COLUMNS, BUDGETS_FILTERS_KEY, EMPTY_FILTERS } from "../budgets.constants";
 
 const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const { push } = useRouter();
@@ -14,11 +14,12 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const {
     onRestoreFilters,
     onSubmit,
-    appliedFilters,
+    filters,
+    setFilters,
     methods
-  } = useFilters(EMPTY_FILTERS);
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BUDGETS_FILTERS_KEY});
 
-  const onFilter = createFilter(appliedFilters, ['id', 'customer', 'seller'], {
+  const onFilter = createFilter(filters, ['id', 'customer', 'seller'], {
     customer: budget => budget.customer?.name || '',
     allState: ALL,
   });
@@ -36,7 +37,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit(() => { })}>
+        <Form onSubmit={onSubmit}>
           <Filters
             entity={ENTITIES.BUDGETS}
             onRefetch={onRefetch}
@@ -47,9 +48,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
               name="state"
               options={BUDGET_STATES_OPTIONS}
               defaultValue={SELECT_ALL_OPTION.state}
-              afterChange={() => {
-                onSubmit(() => { })();
-              }}
+              afterChange={onSubmit}
             />
             <TextControlled
               width="120px"
@@ -75,9 +74,11 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
         elements={budgets}
         page={PAGES.BUDGETS}
         actions={actions}
-        color={BUDGET_STATES[appliedFilters.state]?.color}
+        color={BUDGET_STATES[filters.state]?.color}
         onFilter={onFilter}
         paginate
+        filters={filters}
+        setFilters={setFilters}
       />
     </>
   );

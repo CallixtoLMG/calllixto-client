@@ -9,7 +9,7 @@ import { Filters, Table } from "@/common/components/table";
 import { COLORS, ENTITIES, ICONS, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { OnlyPrint } from "@/components/layout";
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useRef, useState } from "react";
@@ -17,7 +17,7 @@ import { FormProvider } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form } from "semantic-ui-react";
-import { EMPTY_FILTERS, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "../products.constants";
+import { EMPTY_FILTERS, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS, PRODUCTS_FILTERS_KEY } from "../products.constants";
 
 const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
   const { role } = useUserContext();
@@ -33,11 +33,12 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
   const {
     onRestoreFilters,
     onSubmit,
-    appliedFilters,
+    filters,
+    setFilters,
     methods
-  } = useFilters(EMPTY_FILTERS);
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: PRODUCTS_FILTERS_KEY });
 
-  const onFilter = createFilter(appliedFilters, ['code', 'name']);
+  const onFilter = createFilter(filters, ['code', 'name']);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -143,7 +144,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
     <>
       <FlexColumn $rowGap="15px">
         <FormProvider {...methods}>
-          <Form onSubmit={onSubmit(() => { })}>
+          <Form onSubmit={onSubmit}>
             <Filters
               entity={ENTITIES.PRODUCTS}
               onRefetch={onRefetch}
@@ -156,7 +157,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
                 options={PRODUCT_STATES_OPTIONS}
                 defaultValue={EMPTY_FILTERS.state}
                 afterChange={() => {
-                  onSubmit(() => { })();
+                  onSubmit();
                   setSelectedProducts({});
                 }}
               />
@@ -178,8 +179,10 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
           clearSelection={() => setSelectedProducts({})}
           selectAllCurrentPageElements={selectAllCurrentPageElements}
           onFilter={onFilter}
-          color={PRODUCT_STATES[appliedFilters.state]?.color}
+          color={PRODUCT_STATES[filters.state]?.color}
           paginate
+          filters={filters}
+          setFilters={setFilters}
         />
         <ModalAction
           showModal={showModal}
