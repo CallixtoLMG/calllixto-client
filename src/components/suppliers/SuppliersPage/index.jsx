@@ -5,7 +5,7 @@ import { createFilter } from "@/common/utils";
 import { useFilters } from "@/hooks";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { EMPTY_FILTERS, SUPPLIER_STATES_OPTIONS, SUPPLIERS_COLUMNS, SUPPLIERS_FILTERS_KEY } from "../suppliers.constants";
+import { EMPTY_FILTERS, SUPPLIERS_COLUMNS, SUPPLIERS_FILTERS_KEY, SUPPLIER_STATES_OPTIONS } from "../suppliers.constants";
 
 const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
   const {
@@ -13,7 +13,9 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
     onSubmit,
     filters,
     setFilters,
-    methods
+    methods,
+    appliedCount,
+    hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: SUPPLIERS_FILTERS_KEY });
 
   const onFilter = createFilter(filters, ['id', 'name']);
@@ -26,6 +28,8 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
             entity={ENTITIES.SUPPLIERS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
+            appliedCount={appliedCount}
+            hydrated={hydrated}
           >
             <DropdownControlled
               width="200px"
