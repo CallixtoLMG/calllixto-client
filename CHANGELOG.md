@@ -3,6 +3,12 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2025-07-02
+
+### Added
+
+- Added ability to sort tables in both ascending and descending order.
+
 ## [1.0.2] - 2025-06-03
 
 ### Added
