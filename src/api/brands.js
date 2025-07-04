@@ -6,13 +6,13 @@ import { useQuery } from '@tanstack/react-query';
 import { getInstance } from "./axios";
 import { listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from './common';
 
-export function useListBrands({ sort = 'name', order = true } = {}) {
+export function useListBrands() {
   const query = useQuery({
     queryKey: [LIST_BRANDS_QUERY_KEY],
     queryFn: () => listItems({
       entity: ENTITIES.BRANDS,
       url: PATHS.BRANDS,
-      params: getDefaultListParams(ATTRIBUTES, sort, order)
+      params: getDefaultListParams(ATTRIBUTES)
     }),
     staleTime: IN_MS.ONE_DAY,
   });
@@ -24,7 +24,6 @@ export function useGetBrand(id) {
   const getBrand = async (id) => {
     try {
       const { data } = await getInstance().get(`${PATHS.BRANDS}/${id}`);
-
       return data?.brand ?? null;
     } catch (error) {
       throw error;

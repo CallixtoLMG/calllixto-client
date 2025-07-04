@@ -227,18 +227,8 @@ export const LABELS = {
   UNKNOWN: "Desconocido",
 };
 
-export const EVENT_KEYS = {
-  UPDATE: 'U',
-  CREATE: "C",
-  DELETE: "D",
-  UPDATE_ALL: "A",
-  DELETE_SUPPLIER_PRODUCTS: "S"
-}
-
-export const DEFAULT_LAST_EVENT_ID = "A0000";
-
 export const ID = "id";
-export const LAST_EVENT_ID = "lastEventId";
+export const LAST_UPDATED_AT = "lastUpdatedAt";
 export const CODE = "code";
 
 export const PASSWORD_REQUIREMENTS = [

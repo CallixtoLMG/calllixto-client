@@ -1,7 +1,6 @@
-import { ALL, DEFAULT_LAST_EVENT_ID, DELETE, ENTITIES, EVENT_KEYS, ID, LAST_EVENT_ID, USERNAME } from "@/common/constants";
+import { ALL, DELETE, ID, LAST_UPDATED_AT, USERNAME } from "@/common/constants";
 import { now } from "@/common/utils/dates";
 import { config } from "@/config";
-import { EVENTS, PATHS } from "@/fetchUrls";
 import { useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import { addStorageItem, bulkAddStorageItems, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
@@ -12,7 +11,6 @@ async function entityList({ entity, url, params }) {
     let LastEvaluatedKey;
 
     do {
-
       const queryParams = {
         ...params,
         ...(LastEvaluatedKey && { LastEvaluatedKey: JSON.stringify(LastEvaluatedKey) }),
@@ -36,110 +34,35 @@ async function entityList({ entity, url, params }) {
   }
 };
 
-async function handleEvents({ entity, values, key = ID }) {
-  let lastEventId = await getStorageItem({ entity: LAST_EVENT_ID, id: entity });
-
-  if (!lastEventId) {
-    lastEventId = { lastEventId: DEFAULT_LAST_EVENT_ID };
-    await updateOrCreateStorageItem({ entity: LAST_EVENT_ID, id: entity, value: lastEventId });
-  }
-
-  const { data: eventsData } = await getInstance().get(`${EVENTS}/${entity}`, {
-    params: { lastEventId: lastEventId.lastEventId },
-  });
-
-  if (eventsData.statusOk) {
-    const newEvents = eventsData.events;
-
-    lastEventId = newEvents[newEvents.length - 1]?.id;
-    if (lastEventId) {
-      await updateOrCreateStorageItem({ entity: LAST_EVENT_ID, id: entity, value: { lastEventId } });
-    }
-
-    if (newEvents.some((event) => event.action === EVENT_KEYS.UPDATE_ALL)) {
-      return [];
-    }
-
-    for (const event of newEvents) {
-      if (event.action === EVENT_KEYS.CREATE) {
-        event.value.forEach((item) => {
-          const exists = values.find((existingItem) => existingItem[key] === item[key]);
-          if (!exists) {
-            values = [item, ...values];
-          }
-        });
-      }
-
-      if (event.action === EVENT_KEYS.UPDATE) {
-        event.value.forEach((item) => {
-          values = values.map((existingItem) =>
-            existingItem[key] === item[key] ? { ...existingItem, ...item } : existingItem
-          );
-        });
-      }
-
-      if (event.action === EVENT_KEYS.DELETE) {
-        const idsToDelete = event.value.map((item) => item[key]);
-        values = values.filter(existingItem => !idsToDelete.includes(existingItem[key]));
-      }
-
-      if (event.action === EVENT_KEYS.DELETE_SUPPLIER_PRODUCTS) {
-        const supplierIdToDelete = event.value.supplierId;
-
-        await removeStorageItemsByCustomFilter({
-          entity: ENTITIES.PRODUCTS,
-          filter: (product) => product.code.slice(0, 2) !== supplierIdToDelete
-        });
-
-        values = await getAllStorageItems(entity);
-      }
-    }
-  };
-
-  return values;
-};
-
 export async function listItems({ entity, url, params, key = ID }) {
+  params = { ...params, sort: 'updatedAt' };
+  let updateLastUpdatedAt = false;
+  let lastUpdatedAt = (await getStorageItem({ entity: LAST_UPDATED_AT, id: entity }))?.lastUpdatedAt;
   let values = await getAllStorageItems(entity);
 
   if (values?.length) {
-    values = await handleEvents({ entity, values, key });
+    const outdatedValues = await entityList({ entity, url, params: { ...params, startDate: '2024-01-01' } });
+    if (outdatedValues.length > 1) {
+      updateLastUpdatedAt = true;
+      for (const value of outdatedValues) {
+        await updateOrCreateStorageItem({ entity, id: value[key], key, value });
+      }
+    }
   } else {
     values = await entityList({ entity, url, params });
-
     await bulkAddStorageItems({ entity, values });
-
-    const { data } = await getInstance().get(`${PATHS.EVENTS}/${entity}`, { params: { order: false, pageSize: 1 } });
-    const lastEventId = data?.events?.[0]?.id;
-
-    if (lastEventId) {
-      await updateOrCreateStorageItem({ entity: LAST_EVENT_ID, id: entity, value: { lastEventId } });
+    if (!!values.length) {
+      updateLastUpdatedAt = true;
     }
+  }
+
+  if (updateLastUpdatedAt) {
+    const { updatedAt, createdAt } = values[0];
+    await updateOrCreateStorageItem({ entity: LAST_UPDATED_AT, id: entity, value: { lastUpdatedAt: updatedAt ?? createdAt } });
   }
 
   return { [entity]: values };
 };
-
-export async function getItemById({ id, url, entity, singular }) {
-  const getEntity = async () => {
-    try {
-      const { data } = await getInstance().get(`${url}/${id}`);
-      if (data.statusOk) {
-        await updateOrCreateStorageItem({ entity, id, value: data[singular] });
-        return data[singular];
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const value = await getStorageItem({ entity, id });
-  if (value) {
-    return value;
-  }
-
-  return getEntity();
-}
 
 export function useCreateItem() {
   const queryClient = useQueryClient();
@@ -154,7 +77,6 @@ export function useCreateItem() {
 
     if (data.statusOk) {
       await addStorageItem({ entity, value: data[responseEntity] });
-
       invalidateQueries.forEach((query) => {
         queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
       });
@@ -190,6 +112,7 @@ export function useInactiveItem() {
   return inactiveItem;
 };
 
+// to remove
 export function useInactiveItemByParam() {
   const queryClient = useQueryClient();
 
@@ -197,7 +120,8 @@ export function useInactiveItemByParam() {
     const { data } = await getInstance().post(url, value, { params });
 
     if (data.statusOk) {
-      await updateStorageItem({ entity, value: data[responseEntity], key });
+      await updateOrCreateStorageItem({ entity, id: data[responseEntity][key], key, value: data[responseEntity] });
+
       invalidateQueries.forEach((query) => {
         queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
       });
@@ -209,6 +133,7 @@ export function useInactiveItemByParam() {
   return inactiveItem;
 };
 
+// to remove
 export function useActiveItemByParam() {
   const queryClient = useQueryClient();
 
@@ -216,7 +141,8 @@ export function useActiveItemByParam() {
     const { data } = await getInstance().post(url, value, { params });
 
     if (data.statusOk) {
-      await updateStorageItem({ entity, value: data[responseEntity], key });
+      await updateOrCreateStorageItem({ entity, id: data[responseEntity][key], key, value: data[responseEntity] });
+
       invalidateQueries.forEach((query) => {
         queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
       });
@@ -241,6 +167,7 @@ export function useActiveItem() {
 
     if (data.statusOk) {
       await updateOrCreateStorageItem({ entity, id: data[responseEntity][key], key, value: data[responseEntity] });
+
       invalidateQueries.forEach((query) => {
         queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
       });
@@ -263,8 +190,7 @@ export function useRecoverItem() {
     const { data } = await getInstance().post(url, body);
 
     if (data.statusOk) {
-
-      await updateStorageItem({ entity, value: data[responseEntity], key });
+      await updateOrCreateStorageItem({ entity, id: data[responseEntity][key], key, value: data[responseEntity] });
 
       invalidateQueries.forEach((query) => {
         queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
@@ -289,7 +215,7 @@ export function useEditItem() {
 
     if (data.statusOk) {
       if (data[responseEntity]) {
-        await updateStorageItem({ entity, key, value: data[responseEntity] });
+        await updateOrCreateStorageItem({ entity, id: data[responseEntity][key], key, value: data[responseEntity] });
       }
 
       invalidateQueries.forEach((query) => {
@@ -319,12 +245,11 @@ export function useEditItemByParam() {
 
     if (data.statusOk) {
       if (data[responseEntity]) {
-
         if (!data[responseEntity].username) {
           console.error("❌ Error: El usuario editado no tiene ID:", data[responseEntity]);
           return;
         }
-        await updateStorageItem({ entity, key: "username", value: data[responseEntity] });
+        await updateOrCreateStorageItem({ entity, id: data[responseEntity][key], key, value: data[responseEntity] });
       }
 
       invalidateQueries.forEach((query) => {

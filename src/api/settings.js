@@ -18,17 +18,21 @@ export function useListSettings() {
 };
 
 export function useGetSetting(entity) {
+  const getSetting = async () => {
+    try {
+      const { data } = await getInstance().get(`${PATHS.SETTINGS}`);
+      return data?.settings[entity] ?? null;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const query = useQuery({
     queryKey: [GET_SETTING_QUERY_KEY, entity],
-    queryFn: () =>
-    getItemById({
-      key: "entity",
-      id: entity,
-      url: `${PATHS.SETTINGS}`,
-      entity: ENTITIES.SETTINGS,
-    }),
+    queryFn: getSetting,
+    retry: false,
     staleTime: IN_MS.ONE_HOUR,
-    enabled: !!entity,
+    enabled: !!getSetting,
   });
 
   return query;

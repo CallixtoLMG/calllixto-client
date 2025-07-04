@@ -9,7 +9,6 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
-  EVENTS: 'events',
   USERS: 'users',
   USER: 'user',
   SETTINGS: "settings",

@@ -6,13 +6,13 @@ import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
 import { listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
-export function useListCustomers({ sort = 'name', order = true } = {}) {
+export function useListCustomers() {
   const query = useQuery({
-    queryKey: [LIST_CUSTOMERS_QUERY_KEY, sort, order],
+    queryKey: [LIST_CUSTOMERS_QUERY_KEY],
     queryFn: () => listItems({
       entity: ENTITIES.CUSTOMERS,
       url: PATHS.CUSTOMERS,
-      params: getDefaultListParams(ATTRIBUTES, sort, order)
+      params: getDefaultListParams(ATTRIBUTES)
     }),
     retry: false,
     staleTime: 0,

@@ -1,5 +1,5 @@
 import Dexie from 'dexie';
-import { ID, LAST_EVENT_ID } from '@/common/constants';
+import { ID, LAST_UPDATED_AT } from '@/common/constants';
 
 export const db = new Dexie('Callixto');
 
@@ -9,7 +9,7 @@ db.version(1).stores({
   suppliers: 'id',
   products: 'code',
   budgets: 'id',
-  [LAST_EVENT_ID]: 'id',
+  [LAST_UPDATED_AT]: 'id',
 });
 
 export async function addStorageItem({ entity, value }) {

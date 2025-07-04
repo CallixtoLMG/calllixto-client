@@ -140,13 +140,10 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
 
 export const normalizeText = (text) => text?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() ?? "";
 
-export const getDefaultListParams = (attributes, sort, order) => {
+export const getDefaultListParams = (attributes) => {
   const params = {
-    attributes: encodeUri(Object.values(attributes)),
+    attributes: encodeUri(Object.values({ ...attributes, updatedAt: 'updatedAt', createdAt: 'createdAt' })),
   };
-
-  if (sort) params.sort = sort;
-  if (typeof order !== 'undefined') params.order = order;
 
   return params;
 };

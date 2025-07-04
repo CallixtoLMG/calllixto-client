@@ -14,8 +14,7 @@ import { Button, Dropdown, Icon, Popup } from 'semantic-ui-react';
 import { IconedButton } from '../buttons';
 import { FiltersContainer, HeaderSegment, MainContainer } from './styles';
 
-const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
-
+const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated }) => {
   const ENTITY_MAPPING = {
     [ENTITIES.CUSTOMERS]: { queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
     [ENTITIES.PRODUCTS]: { queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
