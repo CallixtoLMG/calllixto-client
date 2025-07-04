@@ -48,12 +48,20 @@ export const PAGES = {
     NAME: 'Ventas',
     SHORTKEYS: 'Control+5'
   },
+    EXPENSES: {
+    BASE: "/gastos",
+    CREATE: "/gastos/crear",
+    UPDATE: (id) => `/gastos/${id}?update=true`,
+    SHOW: (id) => `/gastos/${id}`,
+    NAME: 'Gastos',
+    SHORTKEYS: 'Control+6'
+  },
   USERS: {
     BASE: "/usuarios",
     CREATE: "/usuarios/crear",
     SHOW: (id) => `/usuarios/${id}`,
     NAME: 'Usuarios',
-    SHORTKEYS: 'Control+6'
+    SHORTKEYS: 'Control+7'
   },
   LOGIN: {
     BASE: "/login"
@@ -61,7 +69,7 @@ export const PAGES = {
   SETTINGS: {
     BASE: "/configuracion",
     NAME: 'Configuración',
-    SHORTKEYS: 'Control+7'
+    SHORTKEYS: 'Control+8'
   },
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"
