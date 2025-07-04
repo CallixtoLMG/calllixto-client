@@ -2,7 +2,7 @@ import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
 import { TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { useKeyboardShortcuts } from "@/hooks";
 import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_BRAND } from "../brands.constants";
@@ -67,7 +67,7 @@ const BrandForm = forwardRef(({
             disabled={view && !isUpdating}
           />
         </FieldsContainer>
-        <TextAreaControlled name="comments" label="Comentarios" disabled={view && !isUpdating} />
+        <TextAreaControlled name="comments" label="Comentarios" readOnly={view && !isUpdating} />
         {(isUpdating || !view) && (
           <SubmitAndRestore
             isUpdating={isUpdating}

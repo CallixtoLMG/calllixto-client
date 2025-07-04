@@ -37,3 +37,17 @@ export const getPastDate = (amount, unit = "years") => {
 
   return date;
 };
+
+export const getSortedPaymentsByDate = (paymentMethods = []) => {
+  return [...paymentMethods].sort(
+    (a, b) => dayjs(a.date || 0).valueOf() - dayjs(b.date || 0).valueOf()
+  );
+};
+
+export const isDateAfter = (date1, date2) => {
+  return dayjs(date1).isAfter(dayjs(date2));
+}
+
+export const isDateBefore = (date1, date2) => {
+  return dayjs(date1).isBefore(dayjs(date2));
+}

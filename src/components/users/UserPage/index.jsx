@@ -2,25 +2,26 @@ import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
-import { useFilters } from "@/hooks/useFilters";
+import { useFilters } from "@/hooks";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { EMPTY_FILTERS, USER_COLUMNS, USER_STATE_OPTIONS } from "../users.constants";
+import { EMPTY_FILTERS, USER_COLUMNS, USER_STATE_OPTIONS, USERS_FILTERS_KEY } from "../users.constants";
 
 const UsersPage = ({ users = [], isLoading, onRefetch }) => {
   const {
     onRestoreFilters,
     onSubmit,
-    appliedFilters,
+    filters,
+    setFilters,
     methods
-  } = useFilters(EMPTY_FILTERS);
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: USERS_FILTERS_KEY });
 
-  const onFilter = createFilter(appliedFilters, ['username', 'firstName', 'lastName']);
+  const onFilter = createFilter(filters, ['username', 'firstName', 'lastName']);
 
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit(() => { })}>
+        <Form onSubmit={onSubmit}>
           <Filters
             entity={ENTITIES.USERS}
             onRefetch={onRefetch}
@@ -31,9 +32,7 @@ const UsersPage = ({ users = [], isLoading, onRefetch }) => {
               name="state"
               options={USER_STATE_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
-              afterChange={() => {
-                onSubmit(() => { })();
-              }}
+              afterChange={onSubmit}
             />
             <TextControlled name="username" placeholder="Usuario" width="180px" />
             <TextControlled name="firstName" placeholder="Nombre" width="180px" />
@@ -48,6 +47,8 @@ const UsersPage = ({ users = [], isLoading, onRefetch }) => {
         page={PAGES.USERS}
         onFilter={onFilter}
         paginate
+        filters={filters}
+        setFilters={setFilters}
         mainKey="username"
       />
     </>

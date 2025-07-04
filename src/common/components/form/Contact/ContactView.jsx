@@ -9,6 +9,7 @@ export const ContactView = ({ phoneNumbers = [], addresses = [], emails = [] }) 
         <Table
           headers={PHONE_TABLE_HEADERS}
           elements={phoneNumbers}
+          mainKey="number"
         />
       </FormField>
       <FormField flex="1">
@@ -16,6 +17,7 @@ export const ContactView = ({ phoneNumbers = [], addresses = [], emails = [] }) 
           $wrap
           headers={ADDRESS_TABLE_HEADERS}
           elements={addresses}
+          mainKey="address"
         />
       </FormField>
       <FormField flex="1">
@@ -23,6 +25,7 @@ export const ContactView = ({ phoneNumbers = [], addresses = [], emails = [] }) 
           $wrap
           headers={EMAIL_TABLE_HEADERS}
           elements={emails}
+          mainKey="email"
         />
       </FormField>
     </FieldsContainer>

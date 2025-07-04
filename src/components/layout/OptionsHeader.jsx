@@ -1,6 +1,6 @@
 import ModalAction from '@/common/components/modals/ModalAction';
 import { COLORS, ICONS } from '@/common/constants';
-import { useRestoreEntity } from '@/hooks/common';
+import { useRestoreEntity } from '@/hooks';
 import { useState } from 'react';
 import { Icon } from 'semantic-ui-react';
 import { Dropdown } from '../../common/components/custom';

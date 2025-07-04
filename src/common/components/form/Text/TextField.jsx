@@ -40,6 +40,7 @@ const StyledLabel = styled(Label)`
 `;
 
 export const TextField = forwardRef(({
+  name,
   flex,
   width,
   label,
@@ -112,6 +113,7 @@ export const TextField = forwardRef(({
           placeholder={placeholder ?? label}
           {...(iconLabel && { labelPosition: 'left' })}
           value={value}
+          name={name}
           onChange={onChange}
           readOnly={readOnly}
           maxLength={maxLength}

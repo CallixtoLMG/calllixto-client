@@ -1,5 +1,7 @@
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
 import { COLORS, ICONS, RULES } from "@/common/constants";
+import { handleEnterKeyDown } from "@/common/utils";
+import { getSortedPaymentsByDate } from "@/common/utils/dates";
 import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
 import { useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
@@ -27,12 +29,12 @@ const calculateTotals = (payments, total) => {
 };
 
 const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, padding, deleteButtonInside }) => {
-    const methods = useFormContext();
-    const { control } = methods;
-    const { fields: paymentsMade, append: appendPayment, remove: removePayment } = useFieldArray({
-      control,
-      name: "paymentsMade"
-    });
+  const methods = useFormContext();
+  const { control } = methods;
+  const { fields: paymentsMade, append: appendPayment, remove: removePayment } = useFieldArray({
+    control,
+    name: "paymentsMade"
+  });
 
   const { totalPending, totalAssigned } = useMemo(() => calculateTotals(paymentsMade, total), [total, paymentsMade]);
   const isTotalCovered = useMemo(() => totalPending <= 0, [totalPending]);
@@ -95,6 +97,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
                 error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
               />
               <PriceField
+                key={`price-${payment.method}-${payment.date.getTime()}`} 
                 placeholder="Monto"
                 width="150px"
                 label="Monto"
@@ -111,6 +114,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
                       ? "El monto no puede superar el total pendiente."
                       : undefined
                 }
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
               />
               <TextField
                 flex="1"
@@ -120,6 +124,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
                 onChange={e => {
                   setPayment({ ...payment, comments: e.target.value });
                 }}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
               />
               <FormField $width="fit-content">
                 <FlexColumn $rowGap="5px">
@@ -131,7 +136,9 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
                     labelPosition="left"
                     color={COLORS.BLUE}
                     type="button"
-                    onClick={() => setPayment({ ...payment, amount: parseFloat(totalPending) })}
+                    onClick={() => {
+                      setPayment({ ...payment, amount: parseFloat(totalPending) });
+                    }}
                     disabled={isTotalCovered}
                     width="fit-content"
                   />
@@ -153,7 +160,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
           <Flex width="100%">
             <Table
               headers={PAYMENT_TABLE_HEADERS}
-              elements={paymentsMade}
+              elements={getSortedPaymentsByDate(paymentsMade)}
               actions={update && [
                 {
                   id: 1,

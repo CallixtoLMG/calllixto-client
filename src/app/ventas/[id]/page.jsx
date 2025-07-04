@@ -17,7 +17,7 @@ import ModalPDF from "@/components/budgets/ModalPDF";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -40,7 +40,6 @@ const Budget = ({ params }) => {
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
   const [isModalPDFOpen, setIsModalPDFOpen] = useState(false);
-
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
@@ -95,8 +94,10 @@ const Budget = ({ params }) => {
         budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
       ].filter(Boolean));
       setCustomerData(budget.customer);
-      setSelectedContact(budget.pickUpInStore ? PICK_UP_IN_STORE :{
-        address: budget.customer?.addresses?.[0]?.address,
+      setSelectedContact({
+        address: budget.pickUpInStore
+          ? PICK_UP_IN_STORE
+          : budget.customer?.addresses?.[0]?.address,
         phone: getFormatedPhone(budget.customer?.phoneNumbers?.[0])
       });
     }

@@ -12,7 +12,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { chunk } from "lodash";
 import { useMemo } from "react";
 import { getInstance } from "./axios";
-import { getItemById, listItems, removeStorageItemsByCustomFilter, useActiveItem, useBatchDeleteItems, useCreateItem, useDeleteItem, useEditItem, useInactiveItem, useRecoverItem } from "./common";
+import { listItems, removeStorageItemsByCustomFilter, useActiveItem, useBatchDeleteItems, useCreateItem, useDeleteItem, useEditItem, useInactiveItem, useRecoverItem } from "./common";
 
 
 export function useListProducts() {
@@ -45,13 +45,23 @@ export function useHasProductsByBrandId(brandId) {
   return { hasAssociatedProducts, isLoadingProducts };
 }
 
-
 export function useGetProduct(id) {
+  const getProduct = async (id) => {
+    try {
+      const { data } = await getInstance().get(`${PATHS.PRODUCTS}/${id}`);
+
+      return data?.product ?? null;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const query = useQuery({
     queryKey: [GET_PRODUCT_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PATHS.PRODUCTS, entity: ENTITIES.PRODUCTS, singular: ENTITIES.PRODUCT }),
+    queryFn: () => getProduct(id),
     retry: false,
     staleTime: IN_MS.ONE_DAY,
+    enabled: !!id,
   });
 
   return query;
@@ -116,7 +126,7 @@ export const useEditProduct = () => {
 
   const editProduct = async (product) => {
     const { previousVersions, ...cleanProduct } = product;
-    
+
     const response = await editItem({
       entity: ENTITIES.PRODUCTS,
       url: `${PATHS.PRODUCTS}/${product.code}`,

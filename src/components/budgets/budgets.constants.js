@@ -8,6 +8,7 @@ import { getLabelColor, getPopupContent, getTotalSum, isBudgetCancelled, isBudge
 
 export const LIST_BUDGETS_QUERY_KEY = 'listAllBudgets';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
+export const BUDGETS_FILTERS_KEY = 'budgetsFilters';
 
 export const ATTRIBUTES = {
   ID: "id",

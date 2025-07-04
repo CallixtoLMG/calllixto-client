@@ -4,7 +4,7 @@ import PDFfile from "@/components/budgets/PDFfile";
 import { Loader } from "@/components/layout";
 import { PAGES } from "@/common/constants";
 import { useRouter } from "next/navigation";
-import { useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks";
 import { useUserContext } from "@/User";
 import { getFormatedPhone } from "@/common/utils";
 import { BUDGET_PDF_FORMAT } from "@/components/budgets/budgets.constants";

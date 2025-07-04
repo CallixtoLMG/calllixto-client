@@ -1,14 +1,7 @@
 import { FormField, Input } from "@/common/components/custom";
-import { useEffect, useRef, useState } from "react";
+import { getNumberFormated } from "@/common/utils";
+import { useRef, useState } from "react";
 import { Icon } from "semantic-ui-react";
-
-const formatNumberWithThousands = (value) => {
-  const [integer, decimal] = value.split('.');
-  const formattedInteger = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  return decimal !== undefined ? `${formattedInteger}.${decimal}` : formattedInteger;
-};
-
-const getThousandSeparatorCount = (value) => (value.match(/,/g) || []).length;
 
 export const PriceField = ({
   error,
@@ -18,44 +11,22 @@ export const PriceField = ({
   onChange,
   disabled = false,
   placeholder,
+  onKeyDown,
   justifyItems
 }) => {
-  const inputRef = useRef(null);
-  const [internalValue, setInternalValue] = useState(value.toString());
+  const isUserTyping = useRef(false);
+  const [formattedValue, setFormattedValue] = useState(getNumberFormated(value ?? 0)[0]);
 
-  useEffect(() => {
-    setInternalValue(formatNumberWithThousands(value.toString()));
-  }, [value]);
+  const handleChange = (event) => {
+    const [asString, asNumber] = getNumberFormated(event.target.value);
+    isUserTyping.current = true;
+    setFormattedValue(asString);
+    onChange(asNumber);
+  };
 
-  const handleChange = (e) => {
-    const inputElement = e.target;
-    const cursorPosition = inputElement.selectionStart;
-
-    let inputValue = e.target.value;
-
-    inputValue = inputValue.replace(/[^0-9.]/g, '');
-
-    const normalizedValue = inputValue.split('.').reduce((acc, part, index) => {
-      return index === 0 ? part : `${acc}.${part}`;
-    });
-
-    const [integerPart, decimalPart = ''] = normalizedValue.split('.');
-    const trimmedValue = decimalPart.length > 2
-      ? `${integerPart}.${decimalPart.slice(0, 2)}`
-      : normalizedValue;
-
-    const separatorCountBefore = getThousandSeparatorCount(internalValue);
-    const formattedValue = formatNumberWithThousands(trimmedValue);
-    const separatorCountAfter = getThousandSeparatorCount(formattedValue);
-
-    const cursorAdjustment = separatorCountAfter - separatorCountBefore;
-
-    setInternalValue(formattedValue);
-    onChange(parseFloat(trimmedValue) || 0);
-
-    window.requestAnimationFrame(() => {
-      inputElement.setSelectionRange(cursorPosition + cursorAdjustment, cursorPosition + cursorAdjustment);
-    });
+  const [expectedFormatted] = getNumberFormated(value ?? 0);
+  if (!isUserTyping.current && formattedValue !== expectedFormatted) {
+    setFormattedValue(expectedFormatted);
   };
 
   return (
@@ -67,13 +38,14 @@ export const PriceField = ({
       error={error}
     >
       <Input
-        ref={inputRef}
-        value={internalValue}
+        value={formattedValue}
         onChange={handleChange}
+        onBlur={() => { isUserTyping.current = false; }}
         disabled={disabled}
         iconPosition="left"
         placeholder={placeholder}
         justifyItems={justifyItems}
+        onKeyDown={onKeyDown}
       >
         <Icon name="dollar" />
         <input />

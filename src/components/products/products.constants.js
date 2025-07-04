@@ -7,6 +7,7 @@ import { getBrandCode, getProductCode, getSupplierCode } from "./products.utils"
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
+export const PRODUCTS_FILTERS_KEY = "productsFilters";
 
 export const ATTRIBUTES = {
   CODE: "code",
@@ -20,6 +21,8 @@ export const ATTRIBUTES = {
   PREVIOUS_VERSIONS: "previousVersions",
   STATE: "state",
   COST: "cost",
+  TAGS: "tags",
+  INACTIVE_REASON: "inactiveReason",
 };
 
 export const PRODUCT_COLUMNS = [
@@ -172,3 +175,23 @@ export const MEASSURE_UNITS = {
     text: 'Kilogramos',
   },
 };
+
+export const FIELD_LABELS = {
+  name: "Nombre",
+  comments: "Comentario",
+  state: "Estado",
+  fractionConfig: "Medida",
+  tags: "Etiquetas",
+  editablePrice: "Precio editable",
+  price: "Precio",
+  cost: "Costo",
+};
+
+export const PRODUCT_LABELS = {
+  NO_MEASURE: "Sin medida",
+  NO_TAGS: "Sin etiquetas",
+  NO_NAME: "Sin nombre",
+  NO_COMMENT: "Sin comentario",
+};
+
+export const getLabel = (key) => FIELD_LABELS[key] ?? key;

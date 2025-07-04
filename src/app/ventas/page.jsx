@@ -8,8 +8,7 @@ import { BUDGET_STATE_TRANSLATIONS } from "@/components/budgets/budgets.constant
 import { getTotalSum } from "@/components/budgets/budgets.utils";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { getTotal } from "@/components/products/products.utils";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
-import { useValidateToken } from "@/hooks/userData";
+import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 

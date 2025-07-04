@@ -206,6 +206,7 @@ export const ICONS = {
   MAIL_SQUARE: "mail square",
   PERCENT: 'percent',
   SETTINGS: "settings",
+  BULLHORN: "bullhorn"
 };
 
 export const ALL = "all";
@@ -219,6 +220,12 @@ export const INACTIVE = "inactive";
 export const RECOVER = "recover";
 
 export const USERNAME = "username";
+
+export const LABELS = {
+  ACTIVE: "Activado",
+  INACTIVE: "Desactivado",
+  UNKNOWN: "Desconocido",
+};
 
 export const EVENT_KEYS = {
   UPDATE: 'U',

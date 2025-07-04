@@ -3,7 +3,7 @@ import { useCreateCustomer } from "@/api/customers";
 import { PAGES } from "@/common/constants";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useValidateToken } from "@/hooks/userData";
+import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";

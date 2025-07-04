@@ -3,7 +3,8 @@ import { getDefaultListParams } from '@/common/utils';
 import { ATTRIBUTES, GET_SUPPLIER_QUERY_KEY, LIST_SUPPLIERS_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
-import { getItemById, listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
+import { getInstance } from "./axios";
+import { listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
 
 
 export function useListSuppliers({ sort = ID, order = true } = {}) {
@@ -21,11 +22,22 @@ export function useListSuppliers({ sort = ID, order = true } = {}) {
 };
 
 export function useGetSupplier(id) {
+  const getSupplier = async (id) => {
+    try {
+      const { data } = await getInstance().get(`${PATHS.SUPPLIERS}/${id}`);
+
+      return data?.supplier ?? null;
+    } catch (error) {
+      throw error;
+    }
+  };
+
   const query = useQuery({
     queryKey: [GET_SUPPLIER_QUERY_KEY, id],
-    queryFn: () => getItemById({ id, url: PATHS.SUPPLIERS, entity: ENTITIES.SUPPLIERS, singular: ENTITIES.SUPPLIER }),
+    queryFn: () => getSupplier(id),
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
+    enabled: !!id,
   });
 
   return query;

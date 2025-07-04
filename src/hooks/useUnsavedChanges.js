@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
+const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
   const [showModal, setShowModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -65,19 +65,19 @@ export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
 
   const handleDiscard = useCallback(async () => {
     await onDiscard?.();
-    isDirtyRef.current = false; 
+    isDirtyRef.current = false;
     closeModal();
   }, [onDiscard, closeModal]);
 
   const handleSave = useCallback(async () => {
     setIsSaving(true);
-  
+
     try {
       const result = await new Promise((resolve, reject) => {
         submitPromiseRef.current = { resolve, reject };
         onSave?.();
       });
-  
+
       isDirtyRef.current = false;
       closeModal();
       return result;
@@ -120,3 +120,5 @@ export const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
     resolveSave,
   };
 };
+
+export default useUnsavedChanges;

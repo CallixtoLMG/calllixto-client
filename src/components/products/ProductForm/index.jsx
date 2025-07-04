@@ -6,8 +6,7 @@ import { Text } from "@/common/components/search/styles";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
-import { useArrayTags } from "@/hooks/arrayTags";
-import { useKeyboardShortcuts } from "@/hooks/keyboardShortcuts";
+import { useArrayTags, useKeyboardShortcuts } from "@/hooks";
 import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
@@ -304,7 +303,7 @@ const ProductForm = forwardRef(({
         <TextAreaControlled
           name="comments"
           label="Comentarios"
-          disabled={!isUpdating && view}
+          readOnly={!isUpdating && view}
         />
         {(isUpdating || !view) && (
           <SubmitAndRestore
