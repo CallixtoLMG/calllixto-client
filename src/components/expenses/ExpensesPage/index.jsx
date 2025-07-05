@@ -1,110 +1,55 @@
-import { Dropdown, Flex, Input } from "@/components/common/custom";
-import { Filters, Table } from "@/components/common/table";
-import { EXPENSE_STATES, PAGES } from "@/constants";
-import { useFilters } from "@/hooks/useFilters";
-import { createFilter } from "@/utils";
-import { Controller, FormProvider } from "react-hook-form";
-import { Form, Label } from "semantic-ui-react";
-import { EXPENSE_COLUMNS } from "../expenses.common";
-
-const EMPTY_FILTERS = { id: '', name: '', category: ""};
-const STATE_OPTIONS = [
-  ...Object.entries(EXPENSE_STATES).map(([key, value]) => ({
-    key,
-    text: (
-      <Flex alignItems="center" justifyContent="space-between">
-        {value.title}&nbsp;<Label color={value.color} circular empty />
-      </Flex>
-    ),
-    value: key
-  }))
-];
+import { DropdownControlled, TextControlled } from '@/common/components/form';
+import { Filters, Table } from '@/common/components/table';
+import { ENTITIES, PAGES } from "@/common/constants";
+import { createFilter } from '@/common/utils';
+import { useFilters } from "@/hooks";
+import { FormProvider } from "react-hook-form";
+import { Form } from "semantic-ui-react";
+import { EMPTY_FILTERS, EXPENSES_FILTERS_KEY, EXPENSES_STATE_OPTIONS, HEADERS } from '../expenses.constants';
 
 const ExpensesPage = ({ expenses = [], isLoading, onRefetch }) => {
-  console.log("expenses", expenses)
+  console.log(expenses)
   const {
     onRestoreFilters,
     onSubmit,
-    appliedFilters,
+    filters,
+    setFilters,
     methods
-  } = useFilters(EMPTY_FILTERS);
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: EXPENSES_FILTERS_KEY });
 
-  const onFilter = createFilter(appliedFilters, []);
-  console.log("onFilter", onFilter)
+  const onFilter = createFilter(filters, ["id", "category", "name"]);
 
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit(() => { })}>
+        <Form onSubmit={onSubmit}>
           <Filters
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
+            entity={ENTITIES.EXPENSES}
           >
-            <Controller
+            <DropdownControlled
+              width="200px"
               name="state"
-              render={({ field: { onChange, ...rest } }) => (
-                <Dropdown
-                  {...rest}
-                  $maxWidth
-                  top="10px"
-                  height="35px"
-                  minHeight="35px"
-                  selection
-                  options={STATE_OPTIONS}
-                  defaultValue={EMPTY_FILTERS.state}
-                  onChange={(e, { value }) => {
-                    onChange(value);
-                    onSubmit(() => { })();
-                  }}
-                />
-              )}
+              options={EXPENSES_STATE_OPTIONS}
+              value={EMPTY_FILTERS.state}
+              afterChange={onSubmit}
             />
-            <Controller
-              name="id"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Id"
-                />
-              )}
-            />
-            <Controller
-              name="name"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Nombre"
-                />
-              )}
-            />
-            <Controller
-              name="category"
-              render={({ field }) => (
-                <Input
-                  {...field}
-                  $marginBottom
-                  $maxWidth
-                  height="35px"
-                  placeholder="Categoria"
-                />
-              )}
-            />
+            <TextControlled name="id" placeholder="Id" width="130px" />
+            <TextControlled name="category" placeholder="Categoria" width="200px" />
+            <TextControlled name="name" placeholder="Nombre" width="300px" />
           </Filters>
         </Form>
       </FormProvider>
       <Table
         isLoading={isLoading}
-        headers={EXPENSE_COLUMNS}
-        elements={expenses}
+        headers={HEADERS}
         page={PAGES.EXPENSES}
+        elements={expenses}
         onFilter={onFilter}
         paginate
+        filters={filters}
+        setFilters={setFilters}
       />
     </>
   );
