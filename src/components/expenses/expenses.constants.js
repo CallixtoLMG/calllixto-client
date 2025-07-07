@@ -55,7 +55,7 @@ export const HEADERS = [
   }
 ];
 
-export const EMPTY_FILTERS = { state: EXPENSE_STATES.ACTIVE.id, id: '', name: '', category: "" };
+export const EMPTY_FILTERS = { id: '', name: '', category: "" };
 
 export const EXPENSES_STATE_OPTIONS = Object.values(EXPENSE_STATES)
   .map(({ id, title, color }) => ({

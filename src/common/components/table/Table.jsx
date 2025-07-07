@@ -33,6 +33,8 @@ const CustomTable = ({
   setFilters = () => { },
   onFilter = () => true,
 }) => {
+  console.log("elements", elements)
+
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
@@ -43,7 +45,7 @@ const CustomTable = ({
   const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
   const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
   const tableRef = useRef(null);
-
+  console.log("filteredElements", filteredElements)
   const currentPageElements = useMemo(() => {
     if (!paginate) {
       return filteredElements;

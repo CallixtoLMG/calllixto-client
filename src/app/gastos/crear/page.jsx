@@ -11,10 +11,11 @@ import { toast } from "react-hot-toast";
 
 const CreateExpense = () => {
   useValidateToken();
+  const { push } = useRouter();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
-  const { push } = useRouter();
   const createExpense = useCreateExpense();
+
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps

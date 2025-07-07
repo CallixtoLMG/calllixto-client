@@ -17,7 +17,7 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CUSTOMERS_FILTERS_KEY });
 
   const onFilter = createFilter(filters, ['name']);
-
+console.log(customers)
   return (
     <>
       <FormProvider {...methods}>

@@ -1,19 +1,19 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useActiveExpense, useDeleteExpense, useEditExpense, useGetExpense, useInactiveExpense } from "@/api/expenses";
-import { Input } from "@/common/components/custom";
-import { ModalAction } from "@/common/components/modals";
+import { Flex, Input, Message, MessageHeader } from "@/common/components/custom";
+import { ModalAction, UnsavedChangesModal } from "@/common/components/modals";
 import { COLORS, ICONS, PAGES } from "@/common/constants";
+import { isItemInactive } from "@/common/utils";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useAllowUpdate, useValidateToken } from "@/hooks";
-
-import { isItemInactive } from "@/common/utils";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
+import { Tab } from "semantic-ui-react";
 
 const Expense = ({ params }) => {
   useValidateToken();
@@ -22,7 +22,6 @@ const Expense = ({ params }) => {
   const { data: expense, isLoading, refetch } = useGetExpense(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const { isUpdating, toggleButton } = useAllowUpdate({ canUpdate: RULES.canUpdate[role] });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -31,6 +30,35 @@ const Expense = ({ params }) => {
   const deleteExpense = useDeleteExpense();
   const activeExpense = useActiveExpense();
   const inactiveExpense = useInactiveExpense();
+  const formRef = useRef(null);
+
+
+  const {
+    showModal: showUnsavedModal,
+    handleDiscard,
+    handleSave,
+    resolveSave,
+    handleCancel,
+    isSaving,
+    onBeforeView,
+    closeModal,
+  } = useUnsavedChanges({
+    formRef,
+    onDiscard: async () => {
+      formRef.current?.resetForm();
+      setIsUpdating(false);
+    },
+    onSave: () => {
+      formRef.current?.submitForm();
+    },
+  });
+
+  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
+    canUpdate: RULES.canUpdate[role],
+    onBeforeView,
+  });
+  const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
+
 
   useEffect(() => {
     resetActions();
@@ -199,22 +227,51 @@ const Expense = ({ params }) => {
     push(PAGES.NOT_FOUND.BASE);
   }
 
+  const panes = [
+    {
+      menuItem: "Gastos",
+      render: () => (
+        <Tab.Pane>
+          <Flex $marginBottom="15px">
+            {!isItemInactive(expense?.state) && toggleButton}
+          </Flex>
+          {isItemInactive(expense?.state) && (
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{expense.inactiveReason}</p>
+            </Message>
+          )}
+          <ExpenseForm
+            ref={formRef}
+            expense={expense}
+            onSubmit={mutateEdit}
+            isLoading={isEditPending}
+            isUpdating={isUpdating && !isItemInactive(expense?.state)}
+            view
+            isDeletePending={isDeletePending}
+          />
+        </Tab.Pane>
+      ),
+    },
+    {
+      menuItem: "Algo de gastos",
+      render: () => (
+        <Tab.Pane>
+          <></>
+        </Tab.Pane>
+      ),
+    },
+  ];
+
   return (
     <Loader active={isLoading}>
-      {!isItemInactive(expense?.state) && toggleButton}
-      {isItemInactive(expense?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{expense.inactiveReason}</p>
-        </Message>
-      )}
-      <ExpenseForm
-        expense={expense}
-        onSubmit={mutateEdit}
-        isLoading={isEditPending}
-        isUpdating={isUpdating && !isItemInactive(expense?.state)}
-        view
-        isDeletePending={isDeletePending}
+      <Tab panes={panes} />
+      <UnsavedChangesModal
+        open={showUnsavedModal}
+        onDiscard={handleDiscard}
+        onSave={handleSave}
+        isSaving={isSaving}
+        onCancel={handleCancel}
       />
       <ModalAction
         title={header}

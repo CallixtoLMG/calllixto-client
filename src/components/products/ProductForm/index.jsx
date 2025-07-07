@@ -6,7 +6,8 @@ import { Text } from "@/common/components/search/styles";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
-import { useArrayTags, useKeyboardShortcuts } from "@/hooks";
+import { useKeyboardShortcuts } from "@/hooks";
+import useSettingArrayField from "@/hooks/useSettingArrayField";
 import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
@@ -36,10 +37,11 @@ const ProductForm = forwardRef(({
     defaultValues: getInitialValues(product)
   });
   const { data: productsSettings, isFetching: isProductSettingsFetching, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
-  const { tagsOptions, optionsMapper } = useArrayTags(
-    ENTITIES.PRODUCTS,
-    product?.tags || []
-  );
+  const { options: tagsOptions, optionsMapper } = useSettingArrayField(ENTITIES.PRODUCTS, "tags", product?.tags || []);
+  // const { tagsOptions, optionsMapper } = useArrayTags(
+  //   ENTITIES.PRODUCTS,
+  //   product?.tags || []
+  // );
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
