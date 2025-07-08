@@ -2,7 +2,7 @@ import { ALL, DEFAULT_KEY, LAST_UPDATED_AT } from "@/common/constants";
 import { now } from "@/common/utils/dates";
 import { useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
-import { addStorageItem, bulkAddStorageItems, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
+import { addStorageItem, bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
 
 function useInvalidateQueries() {
   const queryClient = useQueryClient();
@@ -56,6 +56,7 @@ export async function listItems({ entity, url, params = {}, key = DEFAULT_KEY })
       }
     }
   } else {
+    await clearStorageTable(entity);
     values = await entityList({ entity, url, params });
     await bulkAddStorageItems({ entity, values });
     if (!!values.length) {

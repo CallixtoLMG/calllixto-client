@@ -36,7 +36,6 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
   };
 
   const handleConfirmHardUpdate = async () => {
-
     setIsLoading(true);
 
     if (!entity || !queryKey || typeof restoreEntity !== "function") {
