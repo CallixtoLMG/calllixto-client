@@ -45,17 +45,18 @@ const CustomTable = ({
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const tableRef = useRef(null);
 
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: null });
+  const [sortConfig, setSortConfig] = useState(filters?.sorting ?? { key: mainKey, direction: ASC });
 
   const handleSort = (columnKey) => {
+    let newSorting = { key: columnKey, direction: ASC };
     if (sortConfig.key === columnKey) {
-      setSortConfig({
+      newSorting = {
         key: columnKey,
         direction: sortConfig.direction === ASC ? DESC : ASC
-      });
-    } else {
-      setSortConfig({ key: columnKey, direction: ASC });
+      };
     }
+    setSortConfig(newSorting);
+    setFilters({ ...filters, sorting: newSorting });
   };
 
   const filteredElements = useMemo(() => {
