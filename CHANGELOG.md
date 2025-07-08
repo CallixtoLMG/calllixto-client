@@ -3,7 +3,12 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.4] - 2025-06-26
+## 2025-07-02
+
+### Added
+
+- Added ability to sort tables in both ascending and descending order.
+## 2025-06-26
 
 ### Changed
 - Added display of the inactivation reason (inactiveReason) when the product status changes to Inactive.
@@ -11,7 +16,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Fixed
 - Fixxed version history logs, now displaying the user (updatedBy) who made each product update, enhancing traceability in the product change timeline.
 
-## [1.0.3] - 2025-06-19
+## 2025-06-19
 
 ### Changed
 - Improved product search logic in ProductSearch component:
@@ -19,7 +24,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Updated getNumberFormated function for consistent price formatting: ensures correct display of thousand separators.
 - Utilizes toLocaleString("es-AR") for consistent regional formatting.
 
-## [1.0.2] - 2025-06-03
+## 2025-06-03
 
 ### Added
 
@@ -33,7 +38,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Updated product detail view layout: now displayed in tab format with separate tabs for "Producto" and "Historial de cambios" (`ProductChanges`).
 
-## [1.0.1] - 2025-05-28
+## 2025-05-28
 
 ### Added
 
@@ -56,7 +61,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Resolved an issue where the amount input field (PriceField) did not reset when adding a payment via Enter key. This was fixed by dynamically updating the component’s key prop to force re-mount and clear its internal state.
 
 
-## [1.0.0] - 2025-05-21
+## 2025-05-21
 
 ### Added
 - Display of payment dates, sorted in ascending order (oldest first) in PDFfile.

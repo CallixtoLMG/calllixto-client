@@ -60,7 +60,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
     }
   ] : [];
 
-  const { mutate, isPending } = useMutation({
+  const { mutate: mutateDelete, isPending } = useMutation({
     mutationFn: async () => {
       let response;
       if (selectedProduct.state === PRODUCT_STATES.DELETED.id) {
@@ -191,7 +191,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
           showModal={showModal}
           setShowModal={setShowModal}
           title={`¿Está seguro que desea eliminar ${selectedProduct?.state === PRODUCT_STATES.DELETED.id ? "PERMANENTEMENTE" : ""} el producto "${selectedProduct?.name}"?`}
-          onConfirm={mutate}
+          onConfirm={mutateDelete}
           isLoading={isPending}
         />
       </Flex>
