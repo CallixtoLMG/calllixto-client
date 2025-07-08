@@ -49,21 +49,12 @@ const Budget = ({ params }) => {
   const confirmBudget = useConfirmBudget();
   const cancelBudget = useCancelBudget();
 
-  const products = useMemo(() => productsData?.products?.map(product => ({
-    ...product,
-    key: product.code,
-    value: product.name,
-    text: product.name,
-  })),
-    [productsData]);
-
   const customers = useMemo(() => customersData?.customers?.map(customer => ({
     ...customer,
     key: customer.name,
     value: customer.name,
     text: customer.name,
-  }))
-    , [customersData]);
+  })), [customersData]);
 
   useEffect(() => {
     resetActions();
@@ -297,7 +288,7 @@ const Budget = ({ params }) => {
       {isBudgetDraft(budget?.state) ? (
         <BudgetForm
           onSubmit={mutateEdit}
-          products={products}
+          products={productsData?.products ?? []}
           customers={customers}
           user={userData}
           budget={budget}

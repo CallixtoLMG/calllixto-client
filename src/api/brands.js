@@ -1,10 +1,10 @@
 import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { ATTRIBUTES, GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
+import { LIST_ATTRIBUTES, GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { getInstance } from "./axios";
-import { listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from './common';
+import { listItems, usePostUpdateItem, useCreateItem, useDeleteItem, useEditItem } from './common';
 
 export function useListBrands() {
   const query = useQuery({
@@ -12,7 +12,7 @@ export function useListBrands() {
     queryFn: () => listItems({
       entity: ENTITIES.BRANDS,
       url: PATHS.BRANDS,
-      params: getDefaultListParams(ATTRIBUTES)
+      params: getDefaultListParams(LIST_ATTRIBUTES)
     }),
     staleTime: IN_MS.ONE_DAY,
   });
@@ -37,22 +37,21 @@ export function useGetBrand(id) {
     staleTime: IN_MS.ONE_HOUR,
     enabled: !!id,
   });
+
   return query;
 };
 
 export const useCreateBrand = () => {
   const createItem = useCreateItem();
 
-  const createBrand = async (brand) => {
-    const response = await createItem({
+  const createBrand = (brand) => {
+    return createItem({
       entity: ENTITIES.BRANDS,
       url: PATHS.BRANDS,
       value: brand,
       responseEntity: ENTITIES.BRAND,
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY]],
     });
-
-    return response;
   };
 
   return createBrand;
@@ -61,16 +60,13 @@ export const useCreateBrand = () => {
 export const useDeleteBrand = () => {
   const deleteItem = useDeleteItem();
 
-  const deleteBrand = async (id) => {
-    const response = await deleteItem({
+  const deleteBrand = (id) => {
+    return deleteItem({
       entity: ENTITIES.BRANDS,
       id,
       url: PATHS.BRANDS,
-      key: "id",
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY]]
     });
-
-    return response;
   };
 
   return deleteBrand;
@@ -79,62 +75,46 @@ export const useDeleteBrand = () => {
 export const useEditBrand = () => {
   const editItem = useEditItem();
 
-  const editBrand = async (brand) => {
-    const response = await editItem({
+  const editBrand = (brand) => {
+    return editItem({
       entity: ENTITIES.BRANDS,
       url: `${PATHS.BRANDS}/${brand.id}`,
       value: brand,
-      key: "id",
       responseEntity: ENTITIES.BRAND,
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, brand.id]]
     });
-
-    return response;
   };
 
   return editBrand;
 };
 
-
 export const useInactiveBrand = () => {
-  const inactiveItem = useInactiveItem();
+  const inactiveItem = usePostUpdateItem();
 
-  const inactiveBrand = async (brand, reason) => {
-    const updatedBrand = {
-      id: brand.id,
-      inactiveReason: reason
-    }
-
-    const response = await inactiveItem({
+  const inactiveBrand = ({ id }, inactiveReason) => {
+    return inactiveItem({
       entity: ENTITIES.BRANDS,
-      url: `${PATHS.BRANDS}/${brand.id}/${INACTIVE}`,
-      value: updatedBrand,
+      url: `${PATHS.BRANDS}/${id}/${INACTIVE}`,
+      value: { id, inactiveReason},
       responseEntity: ENTITIES.BRAND,
-      invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, brand.id]]
+      invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, id]]
     });
-
-    return response;
   };
 
   return inactiveBrand;
 };
+
 export const useActiveBrand = () => {
-  const activeItem = useActiveItem();
+  const activeItem = usePostUpdateItem();
 
-  const activeBrand = async (brand) => {
-    const updatedBrand = {
-      id: brand.id,
-    }
-
-    const response = await activeItem({
+  const activeBrand = async ({ id }) => {
+    return activeItem({
       entity: ENTITIES.BRANDS,
-      url: `${PATHS.BRANDS}/${brand.id}/${ACTIVE}`,
-      value: updatedBrand,
+      url: `${PATHS.BRANDS}/${id}/${ACTIVE}`,
+      value: { id },
       responseEntity: ENTITIES.BRAND,
-      invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, brand.id]]
+      invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, id]]
     });
-
-    return response;
   };
 
   return activeBrand;

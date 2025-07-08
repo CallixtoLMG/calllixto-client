@@ -1,11 +1,11 @@
-import { ACTIVE, ENTITIES, INACTIVE, IN_MS, USERNAME } from "@/common/constants";
+import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { now } from "@/common/utils/dates";
-import { ATTRIBUTES, GET_USER_QUERY_KEY, LIST_USERS_QUERY_KEY } from "@/components/users/users.constants";
+import { LIST_ATTRIBUTES, GET_USER_QUERY_KEY, LIST_USERS_QUERY_KEY, MAIN_KEY } from "@/components/users/users.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { getInstance } from "./axios";
-import { listItems, useActiveItemByParam, useCreateItem, useDeleteItemByParam, useEditItemByParam, useInactiveItemByParam } from './common';
+import { listItems, useCreateItem, useEditItem, useDeleteItem } from './common';
 
 export function useListUsers() {
   const query = useQuery({
@@ -13,8 +13,8 @@ export function useListUsers() {
     queryFn: () => listItems({
       entity: ENTITIES.USERS,
       url: PATHS.USERS,
-      key: USERNAME,
-      params: getDefaultListParams(ATTRIBUTES)
+      key: MAIN_KEY,
+      params: getDefaultListParams(LIST_ATTRIBUTES)
     }),
     staleTime: IN_MS.ONE_DAY,
   });
@@ -28,7 +28,7 @@ export function useGetUser(username) {
       const { data } = await getInstance().get(PATHS.USER, {
         params: { username },
       });
-      
+
       return data?.user ?? null;
     } catch (error) {
       throw error;
@@ -49,23 +49,21 @@ export function useGetUser(username) {
 export const useCreateUser = () => {
   const createItem = useCreateItem();
 
-  const createUser = async (user) => {
-    const response = await createItem({
+  const createUser = (user) => {
+    return createItem({
       entity: ENTITIES.USERS,
       url: PATHS.USER,
       value: user,
       responseEntity: ENTITIES.USER,
       invalidateQueries: [[LIST_USERS_QUERY_KEY]],
     });
-
-    return response;
   };
 
   return createUser;
 };
 
 export const useEditUser = () => {
-  const editItemByParam = useEditItemByParam();
+  const editItemByParam = useEditItem();
 
   const editUser = async (user) => {
     const { previousVersions, ...cleanUser } = user;
@@ -73,7 +71,7 @@ export const useEditUser = () => {
       entity: ENTITIES.USERS,
       url: PATHS.USER,
       value: cleanUser,
-      username: user.username,
+      params: { username: user.username},
       responseEntity: ENTITIES.USER,
       invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, user.username]]
     });
@@ -85,7 +83,7 @@ export const useEditUser = () => {
 };
 
 export const useDeleteUser = () => {
-  const deleteItemByParam = useDeleteItemByParam();
+  const deleteItemByParam = useDeleteItem();
 
   const deleteUser = async (username) => {
     return await deleteItemByParam({
@@ -100,7 +98,7 @@ export const useDeleteUser = () => {
 };
 
 export const useInactiveUser = () => {
-  const inactiveItem = useInactiveItemByParam();
+  const inactiveItem = usePostUpdateItem();
 
   const inactiveUser = async (username, reason) => {
     const response = await inactiveItem({
@@ -111,7 +109,7 @@ export const useInactiveUser = () => {
         inactiveReason: reason,
         updatedAt: now(),
       },
-      key: USERNAME,
+      key: MAIN_KEY,
       responseEntity: ENTITIES.USER,
       invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, username]]
     });
@@ -123,7 +121,7 @@ export const useInactiveUser = () => {
 };
 
 export const useActiveUser = () => {
-  const activeItem = useActiveItemByParam();
+  const activeItem = usePostUpdateItem();
 
   const activeUser = async (username) => {
     const response = await activeItem({
@@ -131,7 +129,7 @@ export const useActiveUser = () => {
       url: `${PATHS.USER}/${ACTIVE}`,
       params: { username },
       value: { updatedAt: now() },
-      key: USERNAME,
+      key: MAIN_KEY,
       responseEntity: ENTITIES.USER,
       invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, username]]
     });

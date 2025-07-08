@@ -1,10 +1,10 @@
 import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { ATTRIBUTES, GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
+import { LIST_ATTRIBUTES, GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
-import { listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
+import { listItems, usePostUpdateItem, useCreateItem, useDeleteItem, useEditItem } from "./common";
 
 export function useListCustomers() {
   const query = useQuery({
@@ -12,10 +12,9 @@ export function useListCustomers() {
     queryFn: () => listItems({
       entity: ENTITIES.CUSTOMERS,
       url: PATHS.CUSTOMERS,
-      params: getDefaultListParams(ATTRIBUTES)
+      params: getDefaultListParams(LIST_ATTRIBUTES)
     }),
     retry: false,
-    staleTime: 0,
   });
 
   return query;
@@ -90,18 +89,15 @@ export const useEditCustomer = () => {
 };
 
 export const useInactiveCustomer = () => {
-  const inactiveItem = useInactiveItem();
+  const inactiveItem = usePostUpdateItem();
 
-  const inactiveCustomer = (customer, reason) => {
+  const inactiveCustomer = ({ id }, inactiveReason) => {
     return inactiveItem({
       entity: ENTITIES.CUSTOMERS,
-      url: `${PATHS.CUSTOMERS}/${customer.id}/${INACTIVE}`,
-      value: {
-        id: customer.id,
-        inactiveReason: reason
-      },
+      url: `${PATHS.CUSTOMERS}/${id}/${INACTIVE}`,
+      value: { id, inactiveReason },
       responseEntity: ENTITIES.CUSTOMER,
-      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, id]]
     });
   };
 
@@ -109,17 +105,15 @@ export const useInactiveCustomer = () => {
 };
 
 export const useActiveCustomer = () => {
-  const activeItem = useActiveItem();
+  const activeItem = usePostUpdateItem();
 
-  const activeCustomer = (customer) => {
+  const activeCustomer = ({ id }) => {
     return activeItem({
       entity: ENTITIES.CUSTOMERS,
-      url: `${PATHS.CUSTOMERS}/${customer.id}/${ACTIVE}`,
-      value: {
-        id: customer.id,
-      },
+      url: `${PATHS.CUSTOMERS}/${id}/${ACTIVE}`,
+      value: { id },
       responseEntity: ENTITIES.CUSTOMER,
-      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, id]]
     });
   };
 

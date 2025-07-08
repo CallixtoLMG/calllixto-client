@@ -1,19 +1,19 @@
-import { ACTIVE, ENTITIES, ID, INACTIVE, IN_MS } from "@/common/constants";
+import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { ATTRIBUTES, GET_SUPPLIER_QUERY_KEY, LIST_SUPPLIERS_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
+import { LIST_ATTRIBUTES, GET_SUPPLIER_QUERY_KEY, LIST_SUPPLIERS_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
-import { listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
+import { listItems, usePostUpdateItem, useCreateItem, useDeleteItem, useEditItem } from "./common";
 
 
-export function useListSuppliers({ sort = ID, order = true } = {}) {
+export function useListSuppliers() {
   const query = useQuery({
     queryKey: [LIST_SUPPLIERS_QUERY_KEY],
     queryFn: () => listItems({
       entity: ENTITIES.SUPPLIERS,
       url: PATHS.SUPPLIERS,
-      params: getDefaultListParams(ATTRIBUTES, sort, order)
+      params: getDefaultListParams(LIST_ATTRIBUTES)
     }),
     staleTime: 0,
   });
@@ -46,16 +46,14 @@ export function useGetSupplier(id) {
 export const useCreateSupplier = () => {
   const createItem = useCreateItem();
 
-  const createSupplier = async (supplier) => {
-    const response = await createItem({
+  const createSupplier = (supplier) => {
+    return createItem({
       entity: ENTITIES.SUPPLIERS,
       url: PATHS.SUPPLIERS,
       value: supplier,
       responseEntity: ENTITIES.SUPPLIER,
       invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY]],
     });
-
-    return response;
   };
 
   return createSupplier;
@@ -101,47 +99,36 @@ export const useEditSupplier = () => {
 };
 
 export const useInactiveSupplier = () => {
-  const inactiveItem = useInactiveItem();
+  const inactiveItem = usePostUpdateItem();
 
   const inactiveSupplier = async (supplier, reason) => {
     const updatedSupplier = {
       id: supplier.id,
       inactiveReason: reason
     }
-
-    const response = await inactiveItem({
+    return inactiveItem({
       entity: ENTITIES.SUPPLIERS,
       url: `${PATHS.SUPPLIERS}/${supplier.id}/${INACTIVE}`,
       value: updatedSupplier,
-      key: "id",
       responseEntity: ENTITIES.SUPPLIER,
       invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, supplier.id]]
     });
-
-    return response;
   };
 
   return inactiveSupplier;
 };
 
 export const useActiveSupplier = () => {
-  const activeItem = useActiveItem();
+  const activeItem = usePostUpdateItem();
 
-  const activeSupplier = async (supplier) => {
-    const updatedSupplier = {
-      id: supplier.id,
-    }
-
-    const response = await activeItem({
+  const activeSupplier = async ({ id }) => {
+    return activeItem({
       entity: ENTITIES.SUPPLIERS,
-      url: `${PATHS.SUPPLIERS}/${supplier.id}/${ACTIVE}`,
-      value: updatedSupplier,
-      key: "id",
+      url: `${PATHS.SUPPLIERS}/${id}/${ACTIVE}`,
+      value: { id },
       responseEntity: ENTITIES.SUPPLIER,
-      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, supplier.id]]
+      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, id]]
     });
-
-    return response;
   };
 
   return activeSupplier;

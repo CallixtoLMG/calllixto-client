@@ -5,8 +5,7 @@ import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "..
 export const LIST_CUSTOMERS_QUERY_KEY = 'listCustomers';
 export const GET_CUSTOMER_QUERY_KEY = 'getCustomer';
 export const CUSTOMERS_FILTERS_KEY = 'customersFilters';
-
-export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHONES: 'phoneNumbers', EMAILS: 'emails', COMMENT: 'comments', KEY: 'key', TEXT: 'text', VALUE: 'value', STATE: "state", INACTIVE_REASON: "inactiveReason", TAGS: "tags" };
+export const LIST_ATTRIBUTES = ['id', 'name', 'addresses', 'phoneNumbers', 'comments', "state", "tags"];
 
 export const HEADERS = [
   {

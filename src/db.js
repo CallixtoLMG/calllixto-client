@@ -1,5 +1,5 @@
 import Dexie from 'dexie';
-import { ID, LAST_UPDATED_AT } from '@/common/constants';
+import { DEFAULT_KEY, LAST_UPDATED_AT } from '@/common/constants';
 
 export const db = new Dexie('Callixto');
 
@@ -28,7 +28,7 @@ export function getAllStorageItems(entity) {
   return db[entity].toArray();
 };
 
-export async function updateOrCreateStorageItem({ entity, id, key = ID, value }) {
+export async function updateOrCreateStorageItem({ entity, id, key = DEFAULT_KEY, value }) {
   const existingItem = await getStorageItem({ entity, id });
   if (!existingItem) {
     await addStorageItem({ entity, value: { [key]: id, ...value } });

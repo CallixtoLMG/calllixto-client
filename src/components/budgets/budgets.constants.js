@@ -4,34 +4,26 @@ import { getFormatedDate } from "@/common/utils/dates";
 import { Label, Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { CommentTooltip } from "../../common/components/tooltips";
-import { getLabelColor, getPopupContent, getTotalSum, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
+import { getLabelColor, getPopupContent, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
 
 export const LIST_BUDGETS_QUERY_KEY = 'listAllBudgets';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 export const BUDGETS_FILTERS_KEY = 'budgetsFilters';
-
-export const ATTRIBUTES = {
-  ID: "id",
-  CUSTOMER: "customer",
-  CREATED_AT: "createdAt",
-  UPDATED_AT: "updatedAt",
-  CONFIRMED: "confirmed",
-  SELLER: "seller",
-  PRODUCTS: "products",
-  DISCOUNT: "globalDiscount",
-  STATE: "state",
-  ADDITIONAL_CHARGE: "additionalCharge",
-  PAYMENT_METHODS: "paymentMethods",
-  PAYMENTS_MADE: "paymentsMade",
-  EXPIRATION_OFF_SET_DAYS: "expirationOffsetDays",
-  PICKUP_IN_STORE: "pickUpInStore",
-  TOTAL: "total",
-  CONFIRMED_AT: "confirmedAt",
-  CONFIRMED_BY: "confirmedBy",
-  CANCELLED_AT: "cancelledAt",
-  CANCELLED_BY: "cancelledBy",
-  COMMENTS: "comments"
-};
+export const LIST_ATTRIBUTES = [
+  "id",
+  "customer",
+  "state",
+  "products",
+  "globalDiscount",
+  "additionalCharge",
+  "seller",
+  "total",
+  "confirmedAt",
+  "confirmedBy",
+  "cancelledAt",
+  "cancelledBy",
+  "comments"
+];
 
 export const BUDGET_STATES = {
   CONFIRMED: {
@@ -122,8 +114,8 @@ export const BUDGETS_COLUMNS = [
     id: 4,
     title: "Total",
     width: 2,
-    value: (budget) => (
-      <PriceLabel value={getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)} />
+    value: ({ total }) => (
+      <PriceLabel value={total} />
     )
   },
   {
