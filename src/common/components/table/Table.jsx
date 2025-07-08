@@ -1,4 +1,4 @@
-import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS } from "@/common/constants";
+import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS, SORTING } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { Loader } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
@@ -10,9 +10,7 @@ import { CenteredFlex } from "../custom";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
-
-const ASC = 'ascending';
-const DESC = 'descending';
+const{ ASC, DESC } = SORTING;
 
 const CustomTable = ({
   isLoading,

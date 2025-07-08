@@ -1,5 +1,5 @@
 import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
-import { DATE_FORMATS, ICONS, SELECT_ALL_OPTION } from "@/common/constants";
+import { DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
 import { getFormatedDate } from "@/common/utils/dates";
 import { Label, Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
@@ -204,7 +204,7 @@ export const BUDGET_PDF_FORMAT = {
 
 export const PICK_UP_IN_STORE = "Retira en tienda";
 
-export const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: SELECT_ALL_OPTION.value };
+export const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: SELECT_ALL_OPTION.value, sorting: { key: 'id', direction: SORTING.DESC } };
 export const BUDGET_STATES_OPTIONS = [
   SELECT_ALL_OPTION,
   ...Object.values(BUDGET_STATES).map(({ id, title, color }) => (
