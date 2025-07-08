@@ -6,7 +6,7 @@ import { useFilters } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGETS_COLUMNS, BUDGETS_FILTERS_KEY, EMPTY_FILTERS } from "../budgets.constants";
+import { BUDGETS_COLUMNS, BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, EMPTY_FILTERS } from "../budgets.constants";
 
 const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const { push } = useRouter();
@@ -16,7 +16,9 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
     onSubmit,
     filters,
     setFilters,
-    methods
+    methods,
+    appliedCount,
+    hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BUDGETS_FILTERS_KEY});
 
   const onFilter = createFilter(filters, ['id', 'customer', 'seller'], {
@@ -42,6 +44,8 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
             entity={ENTITIES.BUDGETS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
+            appliedCount={appliedCount}
+            hydrated={hydrated}
           >
             <DropdownControlled
               width="200px"

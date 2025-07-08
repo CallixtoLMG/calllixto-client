@@ -13,11 +13,13 @@ export const HEADERS = [
     title: 'Nombre',
     align: 'left',
     width: 9,
+    key: "name",
+    sortable: true,
     value: (customer) => {
       const { tags, name, comments } = customer;
       return (
         <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper  maxWidth="45vw" popupContent={name}>
+          <OverflowWrapper maxWidth="45vw" popupContent={name}>
             {name}
           </OverflowWrapper>
           <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
@@ -26,11 +28,14 @@ export const HEADERS = [
           </Flex>
         </Flex>
       );
-    }
+    },
+    sortValue: (customer) => customer.name ?? ""
   },
   {
     id: 2,
     title: "Direccion",
+    key: "addresses",
+    sortable: true,
     width: 5,
     align: "left",
     value: (customer) => {
@@ -41,7 +46,8 @@ export const HEADERS = [
           {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
         </Flex>
       );
-    }
+    },
+    sortValue: (customer) => customer.addresses?.[0]?.address ?? ""
   },
   {
     id: 3,

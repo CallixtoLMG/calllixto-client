@@ -15,6 +15,8 @@ export const USER_COLUMNS = [
   {
     id: 1,
     title: "Usuario",
+    key: "username",
+    sortable: true,
     width: 1,
     align: "left",
     value: (user) =>
@@ -25,23 +27,30 @@ export const USER_COLUMNS = [
           </OverflowWrapper >
         </>
         {user.comments && <CommentTooltip comment={user.comments} />}
-      </Flex>
+      </Flex>,
+    sortValue: (user) => user.username?.toLowerCase() ?? ""
+
   },
   {
     id: 2,
-    title: "Nombre y Apellido",
+    title: "Apellido y nombre",
+    key: "lastname",
+    sortable: true,
     align: "left",
     width: 3,
     value: (user) => (
       <>
-        < OverflowWrapper maxWidth="30vw" popupContent={`${user.firstName} ${user.lastName}`} >
-          {user.firstName} {user.lastName}
+        < OverflowWrapper maxWidth="30vw" popupContent={`${user.lastName} ${user.firstName}`} >
+          {user.lastName} {user.firstName}
         </OverflowWrapper >
       </>
-    )
+    ),
+    sortValue: (user) => user.firstName?.toLowerCase() ?? ""
   }, {
     id: 3,
     title: "Direccion",
+    key: "address",
+    sortable: true,
     width: 1,
     align: "left",
     value: (user) => (
@@ -50,7 +59,8 @@ export const USER_COLUMNS = [
           {user.address}
         </OverflowWrapper >
       </>
-    )
+    ),
+    sortValue: (user) => user.address?.toLowerCase() ?? ""
   },
   {
     id: 4,

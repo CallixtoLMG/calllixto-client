@@ -5,7 +5,7 @@ import { createFilter } from "@/common/utils";
 import { useFilters } from "@/hooks";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { BRAND_COLUMNS, BRAND_STATES_OPTIONS, BRANDS_FILTERS_KEY, EMPTY_FILTERS } from "../brands.constants";
+import { BRANDS_FILTERS_KEY, BRAND_COLUMNS, BRAND_STATES_OPTIONS, EMPTY_FILTERS } from "../brands.constants";
 
 const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
   const {
@@ -13,7 +13,9 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
     onSubmit,
     filters,
     setFilters,
-    methods
+    methods,
+    appliedCount,
+    hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BRANDS_FILTERS_KEY });
 
   const onFilter = createFilter(filters, ['name', 'id']);
@@ -26,6 +28,8 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
             entity={ENTITIES.BRANDS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
+            appliedCount={appliedCount}
+            hydrated={hydrated}
           >
             <DropdownControlled
               width="200px"

@@ -1,4 +1,4 @@
-import { Button as CustomButton, DropdownItem, Flex } from '@/common/components/custom';
+import { Button as CustomButton, DropdownItem, Flex, Label } from '@/common/components/custom';
 import ModalAction from '@/common/components/modals/ModalAction';
 import { COLORS, ENTITIES, ICONS, PAGES } from "@/common/constants";
 import { LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
@@ -71,6 +71,16 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
           {children}
         </FiltersContainer>
         <Flex $columnGap="10px" $alignSelf="center">
+          {hydrated && appliedCount > 0 && (
+            <Popup
+              content="Filtros activos"
+              position="top center"
+              size="tiny"
+              trigger={
+                <Label $alignSelf="center" width="fit-content" circular color={COLORS.BLUE}>{appliedCount}</Label>
+              }
+            />
+          )}
           <IconedButton
             text="Buscar"
             icon={ICONS.SEARCH}
