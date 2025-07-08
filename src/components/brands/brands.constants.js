@@ -15,7 +15,7 @@ export const BRAND_COLUMNS = [
     sortable: true,
     width: 1,
     value: (brand) => brand.id,
-    sortValue: (brand) => brand.id?.trim().toLowerCase() ?? ""
+    sortValue: (brand) => brand.id ?? ""
 
   },
   {
@@ -31,7 +31,7 @@ export const BRAND_COLUMNS = [
         </OverflowWrapper>
         {brand.comments && <CommentTooltip comment={brand.comments} />}
       </Flex>,
-    sortValue: (brand) => brand.name?.trim().toLowerCase() ?? ""
+    sortValue: (brand) => brand.name ?? ""
   }
 ];
 

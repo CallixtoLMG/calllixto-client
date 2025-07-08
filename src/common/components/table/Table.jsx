@@ -11,6 +11,9 @@ import Actions from "./Actions";
 import Pagination from "./Pagination";
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
 
+const ASC = 'ascending';
+const DESC = 'descending';
+
 const CustomTable = ({
   isLoading,
   headers = [],
@@ -48,10 +51,10 @@ const CustomTable = ({
     if (sortConfig.key === columnKey) {
       setSortConfig({
         key: columnKey,
-        direction: sortConfig.direction === 'ascending' ? 'descending' : 'ascending'
+        direction: sortConfig.direction === ASC ? DESC : ASC
       });
     } else {
-      setSortConfig({ key: columnKey, direction: 'ascending' });
+      setSortConfig({ key: columnKey, direction: ASC });
     }
   };
 
@@ -62,8 +65,7 @@ const CustomTable = ({
       const header = headers.find(h => h.key === sortConfig.key);
 
       if (header) {
-        result = [...result].sort((a, b) => {
-          const header = headers.find(h => h.key === sortConfig.key);
+        result = result.sort((a, b) => {
           const aVal = header?.sortValue ? header.sortValue(a) : a[sortConfig.key];
           const bVal = header?.sortValue ? header.sortValue(b) : b[sortConfig.key];
 
@@ -71,12 +73,12 @@ const CustomTable = ({
             const cleanA = aVal.trim().toLowerCase();
             const cleanB = bVal.trim().toLowerCase();
 
-            return sortConfig.direction === 'ascending'
-              ? cleanA.localeCompare(cleanB, 'es', { sensitivity: 'base' })
-              : cleanB.localeCompare(cleanA, 'es', { sensitivity: 'base' });
+            return sortConfig.direction === ASC
+              ? cleanA.trim().toLowerCase().localeCompare(cleanB, 'es', { sensitivity: 'base' })
+              : cleanB.trim().toLowerCase().localeCompare(cleanA, 'es', { sensitivity: 'base' });
           }
 
-          return sortConfig.direction === 'ascending'
+          return sortConfig.direction === ASC
             ? aVal - bVal
             : bVal - aVal;
         });

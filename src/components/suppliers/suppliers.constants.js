@@ -16,7 +16,7 @@ export const SUPPLIERS_COLUMNS = [
     sortable: true,
     width: 1,
     value: (supplier) => supplier?.id,
-    sortValue: (supplier) => supplier.id?.trim().toLowerCase() ?? ""
+    sortValue: (supplier) => supplier.id ?? ""
   },
   {
     id: 2,
@@ -31,7 +31,7 @@ export const SUPPLIERS_COLUMNS = [
         </OverflowWrapper>
         {supplier.comments && <CommentTooltip tooltip="true" comment={supplier.comments} />}
       </Flex>,
-    sortValue: (supplier) => supplier.name?.trim().toLowerCase() ?? ""
+    sortValue: (supplier) => supplier.name ?? ""
   },
   {
     id: 3,
@@ -48,7 +48,7 @@ export const SUPPLIERS_COLUMNS = [
         </Flex>
       );
     },
-    sortValue: (customer) => customer.addresses?.[0]?.address?.trim().toLowerCase() ?? ""
+    sortValue: (customer) => customer.addresses?.[0]?.address ?? ""
   },
   {
     id: 4,

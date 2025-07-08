@@ -30,7 +30,7 @@ export const HEADERS = [
         </Flex>
       );
     },
-    sortValue: (customer) => customer.name?.trim().toLowerCase() ?? ""
+    sortValue: (customer) => customer.name ?? ""
   },
   {
     id: 2,
@@ -48,7 +48,7 @@ export const HEADERS = [
         </Flex>
       );
     },
-    sortValue: (customer) => customer.addresses?.[0]?.address?.trim().toLowerCase() ?? ""
+    sortValue: (customer) => customer.addresses?.[0]?.address ?? ""
   },
   {
     id: 3,

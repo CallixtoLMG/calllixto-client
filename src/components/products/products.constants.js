@@ -71,7 +71,7 @@ export const PRODUCT_COLUMNS = [
         </Flex>
       );
     },
-    sortValue: (product) => product.name?.trim().toLowerCase() ?? ""
+    sortValue: (product) => product.name ?? ""
 
   },
   {

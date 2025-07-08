@@ -99,7 +99,7 @@ export const BUDGETS_COLUMNS = [
         )}
       </Box>
     ),
-    sortValue: (budget) => budget.id?.trim().toLowerCase() ?? ""
+    sortValue: (budget) => budget.id ?? ""
   },
   {
     id: 2,
@@ -116,7 +116,7 @@ export const BUDGETS_COLUMNS = [
         {budget.comments && <CommentTooltip comment={budget.comments} />}
       </Flex>
     ),
-    sortValue: (budget) => budget.customer.name?.trim().toLowerCase() ?? ""
+    sortValue: (budget) => budget.customer.name ?? ""
   },
   {
     id: 3,
@@ -125,7 +125,7 @@ export const BUDGETS_COLUMNS = [
     sortable: true,
     width: 3,
     value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME),
-    sortValue: (budget) => budget.createdAt?.trim().toLowerCase() ?? ""
+    sortValue: (budget) => budget.createdAt ?? ""
 
   },
   {
@@ -151,7 +151,7 @@ export const BUDGETS_COLUMNS = [
         {budget.seller}
       </OverflowWrapper>
     ),
-    sortValue: (budget) => budget.seller?.trim().toLowerCase() ?? ""
+    sortValue: (budget) => budget.seller ?? ""
   },
 ];
 
