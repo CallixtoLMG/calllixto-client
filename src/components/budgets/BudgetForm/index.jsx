@@ -8,7 +8,7 @@ import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
-import { getDateWithOffset, now } from "@/common/utils/dates";
+import { getDateWithOffset } from "@/common/utils/dates";
 import { BUDGET_STATES, PAYMENT_METHODS, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
@@ -352,7 +352,7 @@ const BudgetForm = ({
       id: 1,
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      onClick: (element, index) => { removeProduct(index)},
+      onClick: (element, index) => { removeProduct(index) },
       tooltip: 'Eliminar',
       width: "100%"
     },
@@ -618,7 +618,7 @@ const BudgetForm = ({
                 readOnly
                 value={
                   watchExpirationOffsetDays
-                    ? getDateWithOffset(now(), watchExpirationOffsetDays, "days")
+                    ? getDateWithOffset({ offset: watchExpirationOffsetDays })
                     : ""
                 }
                 placeholder="dd/mm/aaaa"

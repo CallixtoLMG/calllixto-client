@@ -1,5 +1,5 @@
 import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
-import { getDefaultListParams } from '@/common/utils';
+import { getDefaultAttributes, getDefaultListParams } from '@/common/utils';
 import { LIST_ATTRIBUTES, GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
@@ -51,6 +51,7 @@ export const useCreateCustomer = () => {
       value: customer,
       responseEntity: ENTITIES.CUSTOMER,
       invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY]],
+      attributes: LIST_ATTRIBUTES
     });
   };
 
@@ -64,7 +65,7 @@ export const useDeleteCustomer = () => {
     return deleteItem({
       entity: ENTITIES.CUSTOMERS,
       id,
-      url: PATHS.CUSTOMERS,
+      url: `${PATHS.CUSTOMERS}/${id}`,
       invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY]]
     });
   };
@@ -81,7 +82,8 @@ export const useEditCustomer = () => {
       url: `${PATHS.CUSTOMERS}/${customer.id}`,
       value: customer,
       responseEntity: ENTITIES.CUSTOMER,
-      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]],
+      attributes: LIST_ATTRIBUTES
     });
   };
 
@@ -97,7 +99,8 @@ export const useInactiveCustomer = () => {
       url: `${PATHS.CUSTOMERS}/${id}/${INACTIVE}`,
       value: { id, inactiveReason },
       responseEntity: ENTITIES.CUSTOMER,
-      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, id]]
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, id]],
+      attributes: LIST_ATTRIBUTES
     });
   };
 
@@ -113,7 +116,8 @@ export const useActiveCustomer = () => {
       url: `${PATHS.CUSTOMERS}/${id}/${ACTIVE}`,
       value: { id },
       responseEntity: ENTITIES.CUSTOMER,
-      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, id]]
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, id]],
+      attributes: LIST_ATTRIBUTES
     });
   };
 

@@ -1,8 +1,10 @@
-import { ALL, DEFAULT_KEY, LAST_UPDATED_AT } from "@/common/constants";
-import { now } from "@/common/utils/dates";
+import { ALL, DATE_FORMATS, DEFAULT_KEY, LAST_UPDATED_AT } from "@/common/constants";
+import { getDateWithOffset, now } from "@/common/utils/dates";
 import { useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
-import { addStorageItem, bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
+import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
+import { getDefaultAttributes } from "@/common/utils";
+import { pick } from 'lodash';
 
 function useInvalidateQueries() {
   const queryClient = useQueryClient();
@@ -40,33 +42,35 @@ async function entityList({ entity, url, params }) {
   }
 };
 
-export async function listItems({ entity, url, params = {}, key = DEFAULT_KEY }) {
+export async function listItems({ entity, url, params = {} }) {
   params = { ...params, sort: 'updatedAt' };
   let updateLastUpdatedAt = false;
   let lastUpdatedAt = (await getStorageItem({ entity: LAST_UPDATED_AT, id: entity }))?.lastUpdatedAt;
-  let values = await getAllStorageItems(entity);
 
-  if (!!values?.length && lastUpdatedAt) {
-    const outdatedValues = await entityList({ entity, url, params: { ...params, startDate: lastUpdatedAt } });
-    if (outdatedValues.length > 1) {
+  if (lastUpdatedAt) {
+
+    const startDate = getDateWithOffset({ date: lastUpdatedAt, offset: 1, unit: 'seconds', format: DATE_FORMATS.ISO });
+    const outdatedValues = await entityList({ entity, url, params: { ...params, startDate } });
+    if (!!outdatedValues.length) {
       updateLastUpdatedAt = true;
-      // try to use some bulkPut eventually
       for (const value of outdatedValues) {
-        await updateOrCreateStorageItem({ entity, id: value[key], key, value });
+        await updateOrCreateStorageItem({ entity, value });
       }
     }
   } else {
     await clearStorageTable(entity);
-    values = await entityList({ entity, url, params });
-    await bulkAddStorageItems({ entity, values });
-    if (!!values.length) {
+    const data = await entityList({ entity, url, params });
+    if (!!data.length) {
+      await bulkAddStorageItems({ entity, values: data });
       updateLastUpdatedAt = true;
     }
   }
 
+  const values = await getAllStorageItems({ entity, order: 'descending' });
+
   if (updateLastUpdatedAt) {
     const { updatedAt, createdAt } = values[0];
-    await updateOrCreateStorageItem({ entity: LAST_UPDATED_AT, id: entity, value: { lastUpdatedAt: updatedAt ?? createdAt } });
+    await updateOrCreateStorageItem({ entity: LAST_UPDATED_AT, value: { id: entity, lastUpdatedAt: updatedAt ?? createdAt } });
   }
 
   return { [entity]: values };
@@ -75,16 +79,20 @@ export async function listItems({ entity, url, params = {}, key = DEFAULT_KEY })
 export function useCreateItem() {
   const invalidate = useInvalidateQueries();
 
-  const createItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [] }) => {
+  const createItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], attributes }) => {
     const body = {
       ...value,
       createdAt: now(),
+      updatedAt: now(),
     };
 
     const { data } = await getInstance().post(url, body);
 
     if (data.statusOk) {
-      await addStorageItem({ entity, value: data[responseEntity] });
+      await updateOrCreateStorageItem({
+        entity,
+        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
+      });
       invalidate(invalidateQueries);
     }
 
@@ -97,7 +105,7 @@ export function useCreateItem() {
 export function usePostUpdateItem() {
   const invalidate = useInvalidateQueries();
 
-  const postItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], key = DEFAULT_KEY, params = {} }) => {
+  const postItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes }) => {
     const body = {
       ...value,
       updatedAt: now(),
@@ -106,7 +114,10 @@ export function usePostUpdateItem() {
     const { data } = await getInstance().post(url, body, { params });
 
     if (data.statusOk) {
-      await updateOrCreateStorageItem({ entity, id: data[responseEntity][key], key, value: data[responseEntity] });
+      await updateOrCreateStorageItem({
+        entity,
+        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
+      });
       invalidate(invalidateQueries);
     }
 
@@ -119,7 +130,7 @@ export function usePostUpdateItem() {
 export function useEditItem() {
   const invalidate = useInvalidateQueries();
 
-  const editItem = async ({ entity, value = {}, url, responseEntity, key = DEFAULT_KEY, invalidateQueries = [], params = {} }) => {
+  const editItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes }) => {
     const updatedItem = {
       ...value,
       updatedAt: now(),
@@ -128,7 +139,10 @@ export function useEditItem() {
     const { data } = await getInstance().put(url, updatedItem, { params });
 
     if (data.statusOk && data[responseEntity]) {
-      await updateOrCreateStorageItem({ entity, id: data[responseEntity][key], key, value: data[responseEntity] });
+      await updateOrCreateStorageItem({
+        entity,
+        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
+      });
       invalidate(invalidateQueries);
     } else {
       console.error("Error en la respuesta:", data.message);
