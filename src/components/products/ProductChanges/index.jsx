@@ -76,11 +76,13 @@ const renderTags = ({ oldValue, newValue }) => {
   );
 };
 
-const renderInactiveReason = ({ newValue }) => (
-  <Span key={ATTRIBUTES.INACTIVE_REASON} color={COLORS.RED}>
-    Motivo de inactivación: {newValue}
-  </Span>
-);
+const renderInactiveReason = ({ newValue }) => {
+  return (
+    <Span key={ATTRIBUTES.INACTIVE_REASON} color={COLORS.RED}>
+      Motivo de inactivación: {newValue}
+    </Span>
+  );
+};
 
 const renderFunctions = {
   [ATTRIBUTES.NAME]: renderName,
@@ -91,22 +93,31 @@ const renderFunctions = {
   [ATTRIBUTES.COST]: renderCost,
   [ATTRIBUTES.FRACTION_CONFIG]: renderFractionConfig,
   [ATTRIBUTES.TAGS]: renderTags,
-  // [ATTRIBUTES.INACTIVE_REASON]: renderInactiveReason, TODO
 };
 
 const ProductChanges = ({ product }) => {
   const { createdAt, createdBy, previousVersions = [] } = product ?? {};
 
-  const fullHistory = [...previousVersions, { ...product }];
+  const latestVersion = { ...product };
+  delete latestVersion.previousVersions;
+
+  const fullHistory = [...previousVersions, {
+    ...latestVersion,
+    updatedAt: product.updatedAt,
+    updatedBy: product.updatedBy,
+  }];
   const reconstructedVersions = fullHistory
     .slice()
     .reverse()
     .reduce((acc, curr, index) => {
-      const nextVersion = { ...acc[index - 1] };
-      delete nextVersion.updatedBy;
-      delete nextVersion.updatedAt;
-      const complete = { ...nextVersion, ...curr };
-      return [...acc, complete];
+      const prevVersion = acc[index - 1] || {};
+      const merged = {
+        ...prevVersion,
+        ...curr,
+        updatedAt: curr.updatedAt || prevVersion.updatedAt,
+        updatedBy: curr.updatedBy || prevVersion.updatedBy,
+      };
+      return [...acc, merged];
     }, [])
     .reverse();
 
@@ -139,12 +150,19 @@ const ProductChanges = ({ product }) => {
           }
         });
 
+        const becameInactive = prevVersion?.state !== "INACTIVE" && version?.state === "INACTIVE";
+        const hasReason = !!version?.inactiveReason;
+
+        if (becameInactive && hasReason) {
+          changes.push(renderInactiveReason({ newValue: version.inactiveReason }));
+        }
+
         if (!changes.length) return null;
 
         const date = version.updatedAt
           ? getFormatedDate(version.updatedAt, DATE_FORMATS.DATE_WITH_TIME)
           : `Sin fecha`;
-        const updatedBy = prevVersion?.updatedBy;
+        const updatedBy = version.updatedBy;
 
         return (
           <FlexColumn key={index}>

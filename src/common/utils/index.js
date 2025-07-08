@@ -11,7 +11,10 @@ export const getFormatedPrice = (number) => {
 };
 
 export const getFormatedNumber = (number) => {
-  return Number(number).toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+  return Number(number).toLocaleString("es-AR", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  });
 };
 
 export const getFormatedPhone = (phone) => {
