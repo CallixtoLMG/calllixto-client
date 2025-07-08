@@ -5,7 +5,7 @@ import { createFilter } from '@/common/utils';
 import { useFilters } from "@/hooks";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { CUSTOMER_STATES_OPTIONS, CUSTOMERS_FILTERS_KEY, EMPTY_FILTERS, HEADERS } from "../customers.constants";
+import { CUSTOMERS_FILTERS_KEY, CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS } from "../customers.constants";
 
 const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
   const {
@@ -14,6 +14,8 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
     filters,
     setFilters,
     methods,
+    appliedCount,
+    hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CUSTOMERS_FILTERS_KEY });
 
   const onFilter = createFilter(filters, ['name']);
@@ -21,11 +23,13 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
   return (
     <>
       <FormProvider {...methods}>
-        <Form onSubmit={onSubmit}>
+        <Form onSubmit={onSubmit} key={JSON.stringify(filters)}>
           <Filters
             entity={ENTITIES.CUSTOMERS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
+            appliedCount={appliedCount}
+            hydrated={hydrated}
           >
             <DropdownControlled
               width="200px"
