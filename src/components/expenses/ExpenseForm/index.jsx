@@ -1,140 +1,124 @@
 import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form, FormField, Input } from "@/common/components/custom";
-import { DropdownControlled, NumberControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
+import { FieldsContainer, Form } from "@/common/components/custom";
+import { DropdownControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
-import { getDateWithOffset, now } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks";
 import useSettingArrayField from "@/hooks/useSettingArrayField";
 import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-
-const EMPTY_EXPENSE = { name: '', comments: '', category: '', tags: '', amount: '', expiration: '' };
-
-const CATEGORY_OPTIONS = [
-  { key: "office", text: "Oficina", value: "office" },
-  { key: "travel", text: "Viajes", value: "travel" },
-  { key: "misc", text: "Varios", value: "misc" },
-];
+import { DatePickerControlled } from "../../../common/components/form/DatePicker";
+import { EMPTY_EXPENSE } from "../expenses.constants";
 
 const ExpenseForm = forwardRef(({
   expense, onSubmit, isLoading, isUpdating, view },
   ref) => {
-  console.log(expense)
   const getInitialValues = (expense) => ({
     ...EMPTY_EXPENSE,
+    tags: [],
+    categories: [],
     ...expense,
   });
   const methods = useForm({
     defaultValues: getInitialValues(expense)
   });
-  const { data: expensesSettings, isFetching: isExpensesSettingsFetching, refetch: refetchExprensesSettings } = useGetSetting(ENTITIES.EXPENSES);
-  console.log(expensesSettings)
-  const { options: tagsOptions, optionsMapper } = useSettingArrayField(ENTITIES.EXPENSES, "tags", expense?.tags || []);
-  const { options: categoryOptions } = useSettingArrayField(ENTITIES.EXPENSES, "categories", []);
-
-  const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
+  const { isFetching: isExpensesSettingsFetching, refetch: refetchExprensesSettings } = useGetSetting(ENTITIES.EXPENSES);
+  const { options: tagsOptions, optionsMapper: tagsMapper } = useSettingArrayField(ENTITIES.EXPENSES, "tags", expense?.tags || []);
+  const { options: categoryOptions, optionsMapper: categoriesMapper } = useSettingArrayField(ENTITIES.EXPENSES, "categories", expense?.categories || []);
+  const { handleSubmit, reset, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
-    submitForm: () => handleSubmit(handleCreate)(),
+    submitForm: () => handleSubmit(handleForm)(),
     resetForm: () => reset(getInitialValues(expense))
   }));
-  const [watchExpiration] = watch([
-    "expiration"
-  ]);
-
-  const handleReset = useCallback((expense) => {
-    reset({ ...EMPTY_EXPENSE, ...expense });
-  }, [reset]);
-
-  const handleCreate = (data) => {
-    onSubmit(data);
-  };
 
   useEffect(() => {
     refetchExprensesSettings();
   }, [refetchExprensesSettings]);
 
-  useKeyboardShortcuts(() => handleSubmit(handleCreate)(), SHORTKEYS.ENTER);
-  useKeyboardShortcuts(() => handleReset(isUpdating ? { ...EMPTY_EXPENSE, ...expense } : EMPTY_EXPENSE), SHORTKEYS.DELETE);
+  const handleReset = useCallback((expense) => {
+    reset({ ...EMPTY_EXPENSE, ...expense });
+  }, [reset]);
+
+  const handleForm = async (data) => {
+    await onSubmit(data);
+    reset(getInitialValues({ ...expense, ...data }));
+  };
+
+  const validateShortcuts = {
+    canConfirm: () => !isLoading && isDirty,
+    canReset: () => isDirty,
+  };
+
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: handleSubmit(handleForm),
+      condition: validateShortcuts.canConfirm,
+    },
+    {
+      key: SHORTKEYS.DELETE,
+      action: () => reset(getInitialValues(expense)),
+      condition: validateShortcuts.canReset,
+    }
+  ]);
 
   return (
     <FormProvider {...methods}>
-      <Form onSubmit={handleSubmit(handleCreate)} onKeyDown={preventSend}>
+      <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
         <FieldsContainer $rowGap="5px">
           {view &&
             <TextField
-              width="250px"
+              width="200px"
               label="Código"
               value={expense?.id}
               disabled
             />
           }
           <TextControlled
-            width="40%"
-            name="name"
-            label="Nombre"
+            width="30%"
+            name="detail"
+            label="Detalle"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
           />
-        </FieldsContainer>
-        <FieldsContainer $rowGap="5px">
           <PriceControlled
-            width="20%"
+            width="15%"
             name="amount"
             label="Monto"
             disabled={!isUpdating && view}
           />
+          <DatePickerControlled
+            disabled={!isUpdating && view}
+            name="expirationDate"
+            label="Fecha de vencimiento"
+            width="fit-content"
+            showMonthDropdown
+            showYearDropdown
+            scrollableYearDropdown
+            yearDropdownItemNumber={80}
+          />
+        </FieldsContainer>
+        <FieldsContainer $rowGap="5px">
           <DropdownControlled
             disabled={!isUpdating && view}
             width={(!isUpdating && view) ? "fit-content" : "40%"}
             name="categories"
             label="Categorias"
             placeholder="Selecciona categorias"
-            height="fit-content"
             multiple
             clearable={isUpdating && !view}
             icon={(!isUpdating && view) ? null : undefined}
             search={isUpdating && !view}
             selection
-            optionsMapper={optionsMapper}
+            optionsMapper={categoriesMapper}
             loading={isExpensesSettingsFetching}
             options={Object.values(categoryOptions)}
             renderLabel={(item) => ({
               color: item.value.color,
               content: item.value.name,
             })}
-          />
-          {/* < DropdownControlled
-            width="30%"
-            name="category"
-            label="Categoría"
-            icon={(!isUpdating && view) ? null : undefined}
-            defaultValue={expense?.category || "misc"}
-            rules={RULES.REQUIRED}
-            options={CATEGORY_OPTIONS}
-            disabled={!isUpdating && view}
-          /> */}
-          <NumberControlled
-            width="200px"
-            name="expiration"
-            rules={RULES.REQUIRED}
-            maxLength={3}
-            label="Dias para el vencimiento"
-            placeholder="Cantidad en días"
-          />
-          <FormField
-            $width="200px"
-            label="Fecha de vencimiento"
-            control={Input}
-            readOnly
-            value={
-              watchExpiration
-                ? getDateWithOffset(now(), watchExpiration, "days")
-                : ""
-            }
-            placeholder="dd/mm/aaaa"
           />
         </FieldsContainer>
         <FieldsContainer $rowGap="5px">
@@ -150,7 +134,7 @@ const ExpenseForm = forwardRef(({
             icon={(!isUpdating && view) ? null : undefined}
             search={isUpdating && !view}
             selection
-            optionsMapper={optionsMapper}
+            optionsMapper={tagsMapper}
             loading={isExpensesSettingsFetching}
             options={Object.values(tagsOptions)}
             renderLabel={(item) => ({

@@ -4,6 +4,7 @@ import { COLORS, ENTITIES, ICONS, PAGES } from "@/common/constants";
 import { LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
+import { LIST_EXPENSES_QUERY_KEY } from '@/components/expenses/expenses.constants';
 import { LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
 import { LIST_SUPPLIERS_QUERY_KEY } from '@/components/suppliers/suppliers.constants';
 import { LIST_USERS_QUERY_KEY } from '@/components/users/users.constants';
@@ -23,6 +24,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity }) => {
     [ENTITIES.BRANDS]: { queryKey: LIST_BRANDS_QUERY_KEY, text: PAGES.BRANDS.NAME },
     [ENTITIES.SUPPLIERS]: { queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
     [ENTITIES.USERS]: { queryKey: LIST_USERS_QUERY_KEY, text: PAGES.USERS.NAME },
+    [ENTITIES.EXPENSES]: { queryKey: LIST_EXPENSES_QUERY_KEY, text: PAGES.EXPENSES.NAME },
   };
 
   const { formState: { isDirty } } = useFormContext();

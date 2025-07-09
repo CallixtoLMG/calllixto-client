@@ -1,6 +1,6 @@
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
-import { INACTIVE, REGEX } from "../constants";
+import { CANCELLED, INACTIVE, REGEX } from "../constants";
 
 export const getFormatedPrice = (number) => {
   const safeNumber = Number(number) ?? 0;
@@ -102,6 +102,10 @@ export const isItemInactive = (state) => {
   return state === toUpperCase(INACTIVE);
 };
 
+export const isItemCancelled = (state) => {
+  return state === toUpperCase(CANCELLED);
+};
+
 export const renderContent = (content) => {
   return typeof content === 'string' ? content : (
     isValidElement(content) ? content : null
@@ -110,15 +114,28 @@ export const renderContent = (content) => {
 
 export const createFilter = (filters, keysToFilter, exceptions = {}) => {
   return (item) => {
-    for (const key of keysToFilter) {
+    for (const keyConfig of keysToFilter) {
+      const key = typeof keyConfig === "string" ? keyConfig : keyConfig.field;
+      const nestedKey = typeof keyConfig === "object" ? keyConfig.nestedField : null;
+
       if (filters[key]) {
         const filterWords = normalizeText(filters[key]).split(/\s+/);
 
-        const itemValue = typeof item[key] === "string"
-          ? normalizeText(item[key])
-          : typeof exceptions[key] === "function"
-            ? normalizeText(exceptions[key](item))
-            : "";
+        let itemValue = "";
+
+        if (nestedKey && Array.isArray(item[key])) {
+
+          itemValue = normalizeText(
+            item[key]
+              .map(obj => obj?.[nestedKey])
+              .filter(Boolean)
+              .join(" ")
+          );
+        } else if (typeof item[key] === "string") {
+          itemValue = normalizeText(item[key]);
+        } else if (typeof exceptions[key] === "function") {
+          itemValue = normalizeText(exceptions[key](item));
+        }
 
         const allWordsMatch = filterWords.every(word => itemValue.includes(word));
         if (!allWordsMatch) {
@@ -134,6 +151,7 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
     return true;
   };
 };
+
 
 export const normalizeText = (text) => text?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() ?? "";
 

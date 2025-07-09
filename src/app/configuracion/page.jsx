@@ -27,7 +27,7 @@ const ENTITY_MAPPER = {
 export const SUPPORTED_SETTINGS = {
   PRODUCT: ["tags", "blacklist"],
   CUSTOMER: ["tags"],
-  EXPENSE: ["tags", "category"],
+  EXPENSE: ["tags", "categories"],
 };
 
 const Settings = () => {
@@ -87,7 +87,9 @@ const Settings = () => {
   }, [setActions, setLabels]);
 
   const { mutate: mutateEdit, isPending } = useMutation({
+    
     mutationFn: (data) => editSetting({
+   
       entity: `${activeEntity?.entity}S`,
       value: pick(data, SUPPORTED_SETTINGS[activeEntity?.entity]),
     }),

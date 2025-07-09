@@ -225,6 +225,8 @@ export const DELETE = "delete";
 
 export const INACTIVE = "inactive";
 
+export const CANCELLED = "cancelled";
+
 export const RECOVER = "recover";
 
 export const USERNAME = "username";

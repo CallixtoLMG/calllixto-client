@@ -3,7 +3,7 @@ import { FieldsContainer, Form } from "@/common/components/custom";
 import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
-import { useArrayTags, useKeyboardShortcuts } from "@/hooks";
+import { useKeyboardShortcuts, useSettingArrayField } from "@/hooks";
 import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
@@ -24,8 +24,9 @@ const CustomerForm = forwardRef(({
     resetForm: () => reset(getInitialValues(customer))
   }));
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
-  const { tagsOptions, optionsMapper } = useArrayTags(
+  const { options: tagsOptions, optionsMapper } = useSettingArrayField(
     ENTITIES.CUSTOMERS,
+    "tags",
     customer?.tags || []
   );
 

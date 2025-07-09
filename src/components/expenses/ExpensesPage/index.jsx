@@ -1,14 +1,14 @@
-import { TextControlled } from '@/common/components/form';
+import { DropdownControlled, TextControlled } from '@/common/components/form';
 import { Filters, Table } from '@/common/components/table';
 import { ENTITIES, PAGES } from "@/common/constants";
 import { createFilter } from '@/common/utils';
 import { useFilters } from "@/hooks";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { EMPTY_FILTERS, EXPENSES_FILTERS_KEY, HEADERS } from '../expenses.constants';
+import { EMPTY_FILTERS, EXPENSES_FILTERS_KEY, EXPENSES_STATE_OPTIONS, HEADERS } from '../expenses.constants';
 
 const ExpensesPage = ({ expenses = [], isLoading, onRefetch }) => {
-  console.log(expenses)
+
   const {
     onRestoreFilters,
     onSubmit,
@@ -17,7 +17,11 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch }) => {
     methods
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: EXPENSES_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ["id", "category", "name"]);
+  const onFilter = createFilter(filters, [
+    "id",
+    "name",
+    { field: "categories", nestedField: "name" }
+  ]);
 
   return (
     <>
@@ -28,16 +32,16 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch }) => {
             onRestoreFilters={onRestoreFilters}
             entity={ENTITIES.EXPENSES}
           >
-            {/* <DropdownControlled
+            <DropdownControlled
               width="200px"
               name="state"
               options={EXPENSES_STATE_OPTIONS}
               value={EMPTY_FILTERS.state}
               afterChange={onSubmit}
-            /> */}
-            <TextControlled name="id" placeholder="Id" width="130px" />
-            <TextControlled name="category" placeholder="Categoria" width="200px" />
-            <TextControlled name="name" placeholder="Nombre" width="300px" />
+            />
+            <TextControlled name="id" placeholder="Id" width="100px" />
+            <TextControlled name="name" placeholder="Nombre" width="250px" />
+            <TextControlled name="categories" placeholder="Categoria" width="150px" />
           </Filters>
         </Form>
       </FormProvider>

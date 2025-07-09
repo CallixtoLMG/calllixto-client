@@ -91,7 +91,6 @@ const renderFunctions = {
   [ATTRIBUTES.COST]: renderCost,
   [ATTRIBUTES.FRACTION_CONFIG]: renderFractionConfig,
   [ATTRIBUTES.TAGS]: renderTags,
-  // [ATTRIBUTES.INACTIVE_REASON]: renderInactiveReason, TODO
 };
 
 const ProductChanges = ({ product }) => {

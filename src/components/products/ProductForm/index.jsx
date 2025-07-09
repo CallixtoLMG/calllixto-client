@@ -36,12 +36,8 @@ const ProductForm = forwardRef(({
   const methods = useForm({
     defaultValues: getInitialValues(product)
   });
-  const { data: productsSettings, isFetching: isProductSettingsFetching, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
+  const { isFetching: isProductSettingsFetching, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
   const { options: tagsOptions, optionsMapper } = useSettingArrayField(ENTITIES.PRODUCTS, "tags", product?.tags || []);
-  // const { tagsOptions, optionsMapper } = useArrayTags(
-  //   ENTITIES.PRODUCTS,
-  //   product?.tags || []
-  // );
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
@@ -287,7 +283,6 @@ const ProductForm = forwardRef(({
             name="tags"
             label="Etiquetas"
             placeholder="Selecciona etiquetas"
-            height="fit-content"
             multiple
             clearable={isUpdating && !view}
             icon={(!isUpdating && view) ? null : undefined}

@@ -2,7 +2,9 @@
 import { useUserContext } from "@/User";
 import { useListExpenses } from "@/api/expenses";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { downloadExcel } from "@/common/utils";
 import ExpensesPage from "@/components/expenses/ExpensesPage";
+import { EXPENSE_STATES } from "@/components/expenses/expenses.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
@@ -27,12 +29,14 @@ const Expenses = () => {
 
   const handleDownloadExcel = useCallback(() => {
     if (!expenses) return;
-    const headers = ['ID', 'Nombre', 'Estado', 'Comentarios'];
+    const headers = ['ID', 'Nombre', 'Categorias', 'Monto', 'Estado', 'Comentarios'];
     const mappedExpenses = expenses.map(expense => {
       const expenseState = EXPENSE_STATES[expense.state]?.singularTitle || expense.state;
       return [
         expense.id,
         expense.name,
+        expense.categories?.map(cat => cat.name).join(', ') ?? '',
+        expense.amount,
         expenseState,
         expense.comments,
       ];

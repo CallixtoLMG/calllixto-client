@@ -1,17 +1,18 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useActiveExpense, useDeleteExpense, useEditExpense, useGetExpense, useInactiveExpense } from "@/api/expenses";
-import { Flex, Input, Message, MessageHeader } from "@/common/components/custom";
+import { Flex, Message, MessageHeader } from "@/common/components/custom";
+import { TextField } from "@/common/components/form";
 import { ModalAction, UnsavedChangesModal } from "@/common/components/modals";
-import { COLORS, ICONS, PAGES } from "@/common/constants";
-import { isItemInactive } from "@/common/utils";
+import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { isItemCancelled, isItemInactive } from "@/common/utils";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
@@ -30,8 +31,8 @@ const Expense = ({ params }) => {
   const deleteExpense = useDeleteExpense();
   const activeExpense = useActiveExpense();
   const inactiveExpense = useInactiveExpense();
+  const reasonInputRef = useRef(null);
   const formRef = useRef(null);
-
 
   const {
     showModal: showUnsavedModal,
@@ -58,7 +59,6 @@ const Expense = ({ params }) => {
     onBeforeView,
   });
   const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
-
 
   useEffect(() => {
     resetActions();
@@ -92,23 +92,13 @@ const Expense = ({ params }) => {
     setReason("");
   };
 
-  const handleOpenModalWithAction = useCallback((action) => {
-    setModalAction(action);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleActivateClick = useCallback(() => handleOpenModalWithAction("active"), [handleOpenModalWithAction]);
-  const handleInactiveClick = useCallback(() => handleOpenModalWithAction("inactive"), [handleOpenModalWithAction]);
-  const handleDeleteClick = useCallback(() => handleOpenModalWithAction("delete"), [handleOpenModalWithAction]);
-
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: async (expense) => {
-      const data = await editExpense(expense);
-      return data;
-    },
+    mutationFn: editExpense,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Gasto actualizado!");
+        setIsUpdating(false);
+        resolveSave();
       } else {
         toast.error(response.error.message);
       }
@@ -116,14 +106,12 @@ const Expense = ({ params }) => {
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
+      closeModal();
     },
   });
 
   const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: async ({ expense }) => {
-      const response = await activeExpense(expense);
-      return response;
-    },
+    mutationFn: ({ expense }) => activeExpense(expense),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Gasto activado!");
@@ -138,10 +126,7 @@ const Expense = ({ params }) => {
   });
 
   const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: async ({ expense, reason }) => {
-      const response = await inactiveExpense(expense, reason);
-      return response;
-    },
+    mutationFn: ({ expense, reason }) => inactiveExpense(expense, reason),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Gasto desactivado!");
@@ -156,9 +141,7 @@ const Expense = ({ params }) => {
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: () => {
-      return deleteExpense(params.id);
-    },
+    mutationFn: () => deleteExpense(params.id),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Gasto eliminado permanentemente!");
@@ -174,17 +157,22 @@ const Expense = ({ params }) => {
   });
 
   const handleActionConfirm = async () => {
+    if (modalAction === INACTIVE && !reason) {
+      toast.error("Debe proporcionar una razón para desactivar al gasto.");
+      return;
+    }
+
     setActiveAction(modalAction);
 
-    if (modalAction === "delete") {
+    if (modalAction === DELETE) {
       mutateDelete();
-    } else if (modalAction === "inactive") {
-      if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar el gasto.");
-        return;
-      }
+    }
+
+    if (modalAction === INACTIVE) {
       mutateInactive({ expense, reason });
-    } else if (modalAction === "active") {
+    }
+
+    if (modalAction === ACTIVE) {
       mutateActive({ expense });
     }
 
@@ -192,18 +180,23 @@ const Expense = ({ params }) => {
   };
 
   const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
-  const requiresConfirmation = modalAction === "delete";
+  const requiresConfirmation = modalAction === DELETE;
 
   useEffect(() => {
+    const handleClick = (action) => () => handleProtectedAction(() => {
+      setModalAction(action);
+      setIsModalOpen(true);
+    });
+
     if (expense) {
       const actions = RULES.canRemove[role] ? [
         {
           id: 1,
           icon: isItemInactive(expense?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
           color: COLORS.GREY,
-          text: isItemInactive(expense?.state) ? "Activar" : "Desactivar",
-          onClick: isItemInactive(expense?.state) ? handleActivateClick : handleInactiveClick,
-          loading: (activeAction === "active" || activeAction === "inactive"),
+          onClick: handleClick(isItemInactive(expense?.state) ? ACTIVE : INACTIVE),
+          text: isItemInactive(expense.state) ? "Activar" : "Desactivar",
+          loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction,
           width: "fit-content",
         },
@@ -211,17 +204,17 @@ const Expense = ({ params }) => {
           id: 2,
           icon: ICONS.TRASH,
           color: COLORS.RED,
+          onClick: handleClick(DELETE),
           text: "Eliminar",
           basic: true,
-          onClick: handleDeleteClick,
-          loading: activeAction === "delete",
+          loading: activeAction === DELETE,
           disabled: !!activeAction,
         },
       ] : [];
 
       setActions(actions);
     }
-  }, [role, expense, activeAction, isActivePending, isInactivePending, isDeletePending, handleActivateClick, handleInactiveClick, handleDeleteClick, setActions]);
+  }, [role, expense, activeAction, isActivePending, isInactivePending, isDeletePending, setActions]);
 
   if (!isLoading && !expense) {
     push(PAGES.NOT_FOUND.BASE);
@@ -229,16 +222,16 @@ const Expense = ({ params }) => {
 
   const panes = [
     {
-      menuItem: "Gastos",
+      menuItem: "Gasto",
       render: () => (
         <Tab.Pane>
           <Flex $marginBottom="15px">
-            {!isItemInactive(expense?.state) && toggleButton}
+            {!isItemCancelled(expense?.state) && toggleButton}
           </Flex>
-          {isItemInactive(expense?.state) && (
+          {isItemCancelled(expense?.state) && (
             <Message negative>
-              <MessageHeader>Motivo de inactivación</MessageHeader>
-              <p>{expense.inactiveReason}</p>
+              <MessageHeader>Motivo de cancelación</MessageHeader>
+              <p>{expense.cancelReason}</p>
             </Message>
           )}
           <ExpenseForm
@@ -246,7 +239,7 @@ const Expense = ({ params }) => {
             expense={expense}
             onSubmit={mutateEdit}
             isLoading={isEditPending}
-            isUpdating={isUpdating && !isItemInactive(expense?.state)}
+            isUpdating={isUpdating && !isItemCancelled(expense?.state)}
             view
             isDeletePending={isDeletePending}
           />
@@ -254,7 +247,7 @@ const Expense = ({ params }) => {
       ),
     },
     {
-      menuItem: "Algo de gastos",
+      menuItem: "Pagos",
       render: () => (
         <Tab.Pane>
           <></>
@@ -282,12 +275,13 @@ const Expense = ({ params }) => {
         setShowModal={handleModalClose}
         isLoading={isDeletePending || isInactivePending || isActivePending}
         noConfirmation={!requiresConfirmation}
-        disableButtons={!reason && modalAction === "inactive"}
+        disableButtons={!reason && modalAction === INACTIVE}
+        reasonInputRef={reasonInputRef}
         bodyContent={
-          modalAction === "inactive" && (
-            <Input
-              type="text"
-              placeholder="Indique la razón de desactivación"
+          modalAction === INACTIVE && (
+            <TextField
+              ref={reasonInputRef}
+              placeholder="Motivo"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

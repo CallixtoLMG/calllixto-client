@@ -6,7 +6,7 @@ import { useFilters } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGETS_COLUMNS, BUDGETS_FILTERS_KEY, EMPTY_FILTERS } from "../budgets.constants";
+import { BUDGETS_COLUMNS, BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, EMPTY_FILTERS } from "../budgets.constants";
 
 const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
   const { push } = useRouter();

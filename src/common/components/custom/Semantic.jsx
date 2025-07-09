@@ -83,12 +83,12 @@ export const Dropdown = styled(SDropdown)`
   box-shadow: ${({ $boxShadow }) => $boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
   width: ${({ width }) => `${width}!important`};
 
-  .divider.text{
-    height: 15px;
-  }
-
   .text{
     text-align: ${({ $textAlign }) => `${$textAlign}!important`};
+  }
+
+  .divider.text{
+    padding-bottom: 2px;
   }
 
   .menu > .item,

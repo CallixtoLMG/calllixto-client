@@ -3,6 +3,20 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2025-07-08
+
+### Added
+- Introduced the Expenses entity with full CRUD support, mirroring the structure and behavior of existing entities.
+
+- Added expenses configuration in Settings to manage categories and tags.
+
+### Changed
+- Refactored createFilter to support filtering within nested structures (e.g., searching by category names in tables).
+
+- Replaced useArrayTags with more generic and reusable useSettingArrayField hook, to handle both tags and categories which share the same data structure.
+
+- Minor CSS update on Dropdown component to prevent visual clipping of descenders (e.g., characters like j, g, y, q).
+
 ## [1.0.2] - 2025-06-03
 
 ### Added
