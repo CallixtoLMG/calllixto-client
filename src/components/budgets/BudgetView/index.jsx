@@ -1,14 +1,14 @@
 import { useUpdatePayments } from "@/api/budgets";
+import EntityPayments from "@/common/components/modules/EntityPayments";
 import { now } from "@/common/utils/dates";
 import BudgetDetails from "@/components/budgets/BudgetView/Modules/BudgetDetails";
-import BudgetPayments from "@/components/budgets/BudgetView/Modules/BudgetPayments";
 import { useAllowUpdate, useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
-import { isBudgetExpired, isBudgetPending } from "../budgets.utils";
+import { isBudgetCancelled, isBudgetExpired, isBudgetPending } from "../budgets.utils";
 
 const BudgetView = ({
   budget,
@@ -125,22 +125,27 @@ const BudgetView = ({
           key: "payments",
           label: "Pagos",
           component: (
-            <BudgetPayments
-              budget={budget}
-              total={total}
-              methods={methods}
-              formRef={formRef}
-              isUpdating={isUpdating}
-              toggleButton={toggleButton}
-              mutateUpdatePayment={mutateUpdatePayment}
-              isLoadingUpdatePayment={isLoadingUpdatePayment}
-              isDirty={isDirty}
-              showUnsavedModal={showUnsavedModal}
-              handleDiscard={handleDiscard}
-              handleSave={handleSave}
-              handleCancel={handleCancel}
-              isSaving={isSaving}
-            />
+            <>
+              <EntityPayments
+                entity={budget}
+                total={total}
+                entityState={budget.state}
+                methods={methods}
+                formRef={formRef}
+                isCancelled={isBudgetCancelled}
+                isUpdating={isUpdating}
+                toggleButton={toggleButton}
+                onSubmit={mutateUpdatePayment}
+                isLoading={isLoadingUpdatePayment}
+                isDirty={isDirty}
+                resetValue={{ paymentsMade: budget.paymentsMade }}
+                showUnsavedModal={showUnsavedModal}
+                handleDiscard={handleDiscard}
+                handleSave={handleSave}
+                handleCancel={handleCancel}
+                isSaving={isSaving}
+              />
+            </>
           ),
         },
       ]

@@ -1,11 +1,13 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useActiveExpense, useDeleteExpense, useEditExpense, useGetExpense, useInactiveExpense } from "@/api/expenses";
+import { useCancelExpense, useEditExpense, useGetExpense, useUpdatePayments } from "@/api/expenses";
 import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { ModalAction, UnsavedChangesModal } from "@/common/components/modals";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
-import { isItemCancelled, isItemInactive } from "@/common/utils";
+import EntityPayments from "@/common/components/modules/EntityPayments";
+import { ACTIVE, CANCELLED, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { isItemCancelled } from "@/common/utils";
+import { now } from "@/common/utils/dates";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
@@ -13,6 +15,7 @@ import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
@@ -28,11 +31,80 @@ const Expense = ({ params }) => {
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
   const editExpense = useEditExpense();
-  const deleteExpense = useDeleteExpense();
-  const activeExpense = useActiveExpense();
-  const inactiveExpense = useInactiveExpense();
   const reasonInputRef = useRef(null);
   const formRef = useRef(null);
+  const cancelExpense = useCancelExpense();
+
+  const mockData = {
+    "id": "A0002",
+    "name": "DRUGS",
+    "categories": [],
+    "createdAt": "2025-07-07T23:34:26.297Z",
+    "createdBy": "Milton Barraza",
+    "updatedAt": "2025-07-08T14:12:22.342Z",
+    "updatedBy": "Milton Barraza",
+    "amount": 3003,
+    "total": 3003,
+    "paymentsMade": [
+      {
+        "date": "2025-07-08T15:00:00.000Z",
+        "amount": 1000,
+        "comments": "Primer pago",
+        "method": "Transferencia Bancaria"
+      },
+      {
+        "date": "2025-07-09T10:30:00.000Z",
+        "amount": 2003,
+        "comments": "Pago final",
+        "method": "Efectivo"
+      }
+    ],
+    "comments": "",
+    "expirationDate": "2025-06-30T03:00:00.000Z",
+    "state": "ACTIVE",
+    "tags": [],
+    "previousVersions": [
+      {
+        "name": "Drugsss",
+        "amount": 300,
+        "comments": "Comentario",
+        "categories": [
+          {
+            "name": "Levi",
+            "color": "grey",
+            "description": "asdasd"
+          },
+          {
+            "name": "Prueba 2",
+            "color": "olive",
+            "description": "ASD"
+          }
+        ],
+        "tags": [
+          {
+            "name": "cacasc",
+            "color": "brown",
+            "description": "ascasc"
+          },
+          {
+            "name": "cvgcvxcv",
+            "color": "yellow",
+            "description": ""
+          }
+        ],
+        "expirationDate": "2025-07-17T03:00:00.000Z"
+      }
+    ]
+  }
+
+  const methods = useForm({
+    defaultValues: {
+      paymentsMade: mockData?.paymentsMade || [],
+    },
+    mode: "onChange",
+  });
+
+  const { isDirty } = methods.formState;
 
   const {
     showModal: showUnsavedModal,
@@ -59,6 +131,7 @@ const Expense = ({ params }) => {
     onBeforeView,
   });
   const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
+  const updatePayment = useUpdatePayments();
 
   useEffect(() => {
     resetActions();
@@ -71,19 +144,11 @@ const Expense = ({ params }) => {
   }, [setLabels, expense, refetch]);
 
   const modalConfig = useMemo(() => ({
-    delete: {
-      header: `¿Está seguro que desea eliminar el gasto "${expense?.name}"?`,
-      confirmText: "eliminar",
-      icon: ICONS.TRASH,
-    },
-    active: {
-      header: `¿Está seguro que desea activar el gasto ${expense?.id}?`,
-      icon: ICONS.PLAY_CIRCLE
-    },
-    inactive: {
-      header: `¿Está seguro que desea desactivar el gasto ${expense?.id}?`,
-      icon: ICONS.PAUSE_CIRCLE
-    },
+    cancel: {
+      header: `¿Está seguro que desea cancelar el gasto "${expense?.name}"?`,
+      confirmText: "cancelar",
+      icon: ICONS.BAN,
+    }
   }), [expense]);
 
   const handleModalClose = () => {
@@ -110,70 +175,65 @@ const Expense = ({ params }) => {
     },
   });
 
-  const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: ({ expense }) => activeExpense(expense),
+  const { mutate: mutateCancel, isPending: isCancelPending } = useMutation({
+    mutationFn: (cancelReason) => {
+      const cancelData = {
+        cancelledBy: `${userData.name}`,
+        cancelledAt: now(),
+        cancelledMsg: cancelReason
+      };
+      return cancelExpense({ cancelData, id: expense?.id });
+    },
     onSuccess: (response) => {
       if (response.statusOk) {
-        toast.success("Gasto activado!");
+        toast.success('Gasto anulado!');
+        setIsModalCancelOpen(false);
       } else {
         toast.error(response.error.message);
       }
     },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
+    onError: (error) => {
+      toast.error(`Error al anular: ${error.message}`);
+    }
   });
 
-  const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: ({ expense, reason }) => inactiveExpense(expense, reason),
+  const { mutate: mutateUpdatePayment, isPending: isLoadingUpdatePayment } = useMutation({
+    mutationFn: async () => {
+      const formData = methods.getValues();
+      const updatedExpense = {
+        ...expense,
+        paymentsMade: formData.paymentsMade,
+        updatedAt: now(),
+      };
+      const data = await updatePayment({ budget: updatedExpense, id: budget.id });
+      return data;
+    },
     onSuccess: (response) => {
       if (response.statusOk) {
-        toast.success("Gasto desactivado!");
+        toast.success("Pagos actualizados!");
+        const formData = methods.getValues();
+        methods.reset(formData);
+        setIsUpdating(false);
+        resolveSave();
       } else {
         toast.error(response.error.message);
       }
     },
     onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
-  });
-
-  const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: () => deleteExpense(params.id),
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success("Gasto eliminado permanentemente!");
-        push(PAGES.EXPENSES.BASE);
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
+      closeModal();
     },
   });
 
   const handleActionConfirm = async () => {
-    if (modalAction === INACTIVE && !reason) {
-      toast.error("Debe proporcionar una razón para desactivar al gasto.");
+    if (modalAction === CANCELLED && !reason) {
+      toast.error("Debe proporcionar una razón para cancelar al gasto.");
       return;
     }
 
     setActiveAction(modalAction);
 
-    if (modalAction === DELETE) {
-      mutateDelete();
-    }
-
-    if (modalAction === INACTIVE) {
-      mutateInactive({ expense, reason });
-    }
-
-    if (modalAction === ACTIVE) {
-      mutateActive({ expense });
+    if (modalAction === CANCELLED) {
+      mutateCancel();
     }
 
     handleModalClose();
@@ -192,29 +252,20 @@ const Expense = ({ params }) => {
       const actions = RULES.canRemove[role] ? [
         {
           id: 1,
-          icon: isItemInactive(expense?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
-          color: COLORS.GREY,
-          onClick: handleClick(isItemInactive(expense?.state) ? ACTIVE : INACTIVE),
-          text: isItemInactive(expense.state) ? "Activar" : "Desactivar",
-          loading: (activeAction === ACTIVE || activeAction === INACTIVE),
+          icon: ICONS.BAN,
+          color: COLORS.RED,
+          basic: true,
+          onClick: handleClick(isItemCancelled(expense?.state) ? ACTIVE : INACTIVE),
+          text: "Anular",
+          loading: (activeAction === CANCELLED),
           disabled: !!activeAction,
           width: "fit-content",
-        },
-        {
-          id: 2,
-          icon: ICONS.TRASH,
-          color: COLORS.RED,
-          onClick: handleClick(DELETE),
-          text: "Eliminar",
-          basic: true,
-          loading: activeAction === DELETE,
-          disabled: !!activeAction,
-        },
+        }
       ] : [];
 
       setActions(actions);
     }
-  }, [role, expense, activeAction, isActivePending, isInactivePending, isDeletePending, setActions]);
+  }, [role, expense, activeAction, isCancelPending, setActions]);
 
   if (!isLoading && !expense) {
     push(PAGES.NOT_FOUND.BASE);
@@ -236,12 +287,12 @@ const Expense = ({ params }) => {
           )}
           <ExpenseForm
             ref={formRef}
-            expense={expense}
+            expense={mockData}
             onSubmit={mutateEdit}
             isLoading={isEditPending}
             isUpdating={isUpdating && !isItemCancelled(expense?.state)}
             view
-            isDeletePending={isDeletePending}
+          // isCancelPending={isCancelPending}
           />
         </Tab.Pane>
       ),
@@ -250,7 +301,24 @@ const Expense = ({ params }) => {
       menuItem: "Pagos",
       render: () => (
         <Tab.Pane>
-          <></>
+          <EntityPayments
+            total={mockData.total}
+            entityState={expense.state}
+            methods={methods}
+            formRef={formRef}
+            isCancelled={isItemCancelled}
+            isUpdating={isUpdating}
+            toggleButton={toggleButton}
+            onSubmit={mutateUpdatePayment}
+            isLoading={isLoadingUpdatePayment}
+            isDirty={isDirty}
+            resetValue={{ paymentsMade: mockData.paymentsMade }}
+            showUnsavedModal={showUnsavedModal}
+            handleDiscard={handleDiscard}
+            handleSave={handleSave}
+            handleCancel={handleCancel}
+            isSaving={isSaving}
+          />
         </Tab.Pane>
       ),
     },
@@ -273,7 +341,7 @@ const Expense = ({ params }) => {
         confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
-        isLoading={isDeletePending || isInactivePending || isActivePending}
+        isLoading={isCancelPending}
         noConfirmation={!requiresConfirmation}
         disableButtons={!reason && modalAction === INACTIVE}
         reasonInputRef={reasonInputRef}

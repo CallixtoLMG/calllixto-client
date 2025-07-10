@@ -1,10 +1,10 @@
-import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
+import { ENTITIES, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { PATHS } from "@/fetchUrls";
+import { CANCEL, PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { ATTRIBUTES, GET_EXPENSE_QUERY_KEY, LIST_EXPENSES_QUERY_KEY } from "../components/expenses/expenses.constants";
 import { getInstance } from "./axios";
-import { listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from './common';
+import { listItems, useCreateItem, useEditItem } from './common';
 
 export function useListExpenses({ sort = 'name', order = true } = {}) {
   const query = useQuery({
@@ -14,7 +14,7 @@ export function useListExpenses({ sort = 'name', order = true } = {}) {
       url: PATHS.EXPENSES,
       params: getDefaultListParams(ATTRIBUTES, sort, order)
     }),
-     retry: false,
+    retry: false,
     staleTime: IN_MS.ONE_DAY,
   });
 
@@ -57,23 +57,6 @@ export const useCreateExpense = () => {
   return createExpense;
 };
 
-export const useDeleteExpense = () => {
-  const deleteItem = useDeleteItem();
-
-  const deleteExpense = async (id) => {
-    const response = await deleteItem({
-      entity: ENTITIES.EXPENSES,
-      id,
-      url: PATHS.EXPENSES,
-      invalidateQueries: [[LIST_EXPENSES_QUERY_KEY]]
-    });
-
-    return response;
-  };
-
-  return deleteExpense;
-};
-
 export const useEditExpense = () => {
   const editItem = useEditItem();
 
@@ -89,40 +72,41 @@ export const useEditExpense = () => {
   return editExpense;
 };
 
-export const useInactiveExpense = () => {
-  const inactiveItem = useInactiveItem();
+export const useUpdatePayments = () => {
+  const editItem = useEditItem();
 
-  const inactiveExpense = async (expense, reason) => {
-    return inactiveItem({
+  const updatePayments = async ({ expense, id }) => {
+    const { paymentsMade, updatedAt } = expense;
+
+    const response = await editItem({
       entity: ENTITIES.EXPENSES,
-      url: `${PATHS.EXPENSES}/${expense.id}/${INACTIVE}`,
-      value: {
-        id: expense.id,
-        inactiveReason: reason
-      },
+      url: `${PATHS.EXPENSES}/${id}/${PAYMENTS}`,
+      value: { paymentsMade, updatedAt },
       responseEntity: ENTITIES.EXPENSE,
       invalidateQueries: [[LIST_EXPENSES_QUERY_KEY], [GET_EXPENSE_QUERY_KEY, expense.id]]
     });
+
+    return response;
   };
 
-  return inactiveExpense;
+  return updatePayments;
 };
 
-export const useActiveExpense = () => {
-  const activeItem = useActiveItem();
+export const useCancelExpense = () => {
+  const editItem = useEditItem();
 
-  const activeCustomer = (expense) => {
-    return activeItem({
+  const cancelExpense = async ({ cancelData, id }) => {
+
+    const response = await editItem({
       entity: ENTITIES.EXPENSES,
-      url: `${PATHS.EXPENSES}/${expense.id}/${ACTIVE}`,
-      value: {
-        id: expense.id,
-      },
-      responseEntity: ENTITIES.EXPENSE,
-      invalidateQueries: [[LIST_EXPENSES_QUERY_KEY], [GET_EXPENSE_QUERY_KEY, expense.id]]
+      url: `${PATHS.EXPENSES}/${id}/${CANCEL}`,
+      value: cancelData,
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [[LIST_EXPENSES_QUERY_KEY], [GET_EXPENSE_QUERY_KEY, id]]
     });
+
+    return response;
   };
 
-  return activeCustomer;
+  return cancelExpense;
 };
-

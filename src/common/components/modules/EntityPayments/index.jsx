@@ -4,52 +4,53 @@ import Payments from "@/common/components/form/Payments";
 import { UnsavedChangesModal } from "@/common/components/modals";
 import { SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
-import { isBudgetCancelled } from "@/components/budgets/budgets.utils";
 import { useKeyboardShortcuts } from "@/hooks";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 
-const BudgetPayments = ({
-  budget,
+const EntityPayments = ({
   total,
-  methods,
+  entityState,
+  isCancelled = () => false,
   isUpdating,
   toggleButton,
-  mutateUpdatePayment,
-  isLoadingUpdatePayment,
+  methods,
+  onSubmit,
+  isLoading,
   isDirty,
+  resetValue,
   showUnsavedModal,
   handleDiscard,
   handleSave,
   handleCancel,
   isSaving,
+  submitText = "Guardar"
 }) => {
-
   const validateShortcuts = {
-    canConfirm: () => !isLoadingUpdatePayment && isDirty,
+    canConfirm: () => !isLoading && isDirty,
     canReset: () => isDirty,
   };
 
   useKeyboardShortcuts([
     {
       key: SHORTKEYS.ENTER,
-      action: () => methods.handleSubmit(() => mutateUpdatePayment())(),
+      action: () => methods.handleSubmit(onSubmit)(),
       condition: validateShortcuts.canConfirm,
     },
     {
       key: SHORTKEYS.DELETE,
-      action: () => methods.reset({ paymentsMade: budget.paymentsMade }),
+      action: () => methods.reset(resetValue),
       condition: validateShortcuts.canReset,
     },
   ]);
 
   return (
     <>
-      {!isBudgetCancelled(budget.state) && (
+      {!isCancelled(entityState) && (
         <Flex $justifyContent="space-between">{toggleButton}</Flex>
       )}
       <FormProvider {...methods}>
-        <Form onSubmit={methods.handleSubmit(() => mutateUpdatePayment())} onKeyDown={preventSend}>
+        <Form onSubmit={methods.handleSubmit(onSubmit)} onKeyDown={preventSend}>
           <Payments
             deleteButtonInside
             padding="14px 0"
@@ -61,13 +62,11 @@ const BudgetPayments = ({
           {isUpdating && (
             <SubmitAndRestore
               isUpdating={isUpdating}
-              isLoading={isLoadingUpdatePayment}
+              isLoading={isLoading}
               isDirty={isDirty}
-              onReset={() =>
-                methods.reset({ paymentsMade: budget.paymentsMade })
-              }
+              onReset={() => methods.reset(resetValue)}
               disabled={!isDirty}
-              text="Guardar"
+              text={submitText}
               submit
             />
           )}
@@ -84,4 +83,4 @@ const BudgetPayments = ({
   );
 };
 
-export default BudgetPayments;
+export default EntityPayments;
