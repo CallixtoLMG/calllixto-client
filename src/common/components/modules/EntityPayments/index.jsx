@@ -24,7 +24,8 @@ const EntityPayments = ({
   handleSave,
   handleCancel,
   isSaving,
-  submitText = "Guardar"
+  submitText = "Guardar",
+  dueDate
 }) => {
   const validateShortcuts = {
     canConfirm: () => !isLoading && isDirty,
@@ -58,6 +59,7 @@ const EntityPayments = ({
             noBoxShadow
             update={isUpdating}
             total={total}
+            dueDate={dueDate}
           />
           {isUpdating && (
             <SubmitAndRestore

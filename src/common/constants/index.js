@@ -48,9 +48,10 @@ export const PAGES = {
     NAME: 'Ventas',
     SHORTKEYS: 'Control+5'
   },
-    EXPENSES: {
+  EXPENSES: {
     BASE: "/gastos",
     CREATE: "/gastos/crear",
+    CLONE: (id) => `/ventas/crear?clonar=${id}`,
     UPDATE: (id) => `/gastos/${id}?update=true`,
     SHOW: (id) => `/gastos/${id}`,
     NAME: 'Gastos',
@@ -227,6 +228,8 @@ export const INACTIVE = "inactive";
 
 export const CANCELLED = "cancelled";
 
+export const CANCEL_ACTION = "cancel";
+
 export const RECOVER = "recover";
 
 export const USERNAME = "username";
@@ -260,3 +263,21 @@ export const PASSWORD_REQUIREMENTS = [
 ];
 
 export const SELECT_ALL_OPTION = { key: ALL, value: ALL, text: 'Todos' };
+
+// export const PAYMENT_TABLE_HEADERS = [
+//   {
+//     id: 'date',
+//     title: 'Fecha de Pago',
+//     value: (element) =>
+//       element.date
+//         ? getFormatedDate(element.date)
+//         : "-",
+//     width: 2
+//   },
+//   { id: 'method', width: 4, title: 'Método', value: (element) => element.method },
+//   { id: 'amount', width: 3, title: 'Monto', value: (element) => <PriceLabel value={element.amount} /> },
+//   {
+//     id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) =>
+//       <OverflowWrapper maxWidth="30vw" popupContent={element.comments}> {element.comments} </OverflowWrapper>
+//   },
+// ];

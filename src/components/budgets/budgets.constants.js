@@ -150,24 +150,6 @@ export const PAYMENT_METHODS = [
   { key: 'multi', text: 'Varios', value: 'Varios' }
 ];
 
-export const PAYMENT_TABLE_HEADERS = [
-  {
-    id: 'date',
-    title: 'Fecha de Pago',
-    value: (element) =>
-      element.date
-        ? getFormatedDate(element.date)
-        : "-",
-    width: 2
-  },
-  { id: 'method', width: 4, title: 'Método', value: (element) => element.method },
-  { id: 'amount', width: 3, title: 'Monto', value: (element) => <PriceLabel value={element.amount} /> },
-  {
-    id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) =>
-      <OverflowWrapper maxWidth="30vw" popupContent={element.comments}> {element.comments} </OverflowWrapper>
-  },
-];
-
 export const BUDGET_PDF_FORMAT = {
   DISPATCH: {
     icon: ICONS.TRUCK,

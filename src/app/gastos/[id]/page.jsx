@@ -2,10 +2,10 @@
 import { useUserContext } from "@/User";
 import { useCancelExpense, useEditExpense, useGetExpense, useUpdatePayments } from "@/api/expenses";
 import { Flex, Message, MessageHeader } from "@/common/components/custom";
-import { TextField } from "@/common/components/form";
-import { ModalAction, UnsavedChangesModal } from "@/common/components/modals";
+import { UnsavedChangesModal } from "@/common/components/modals";
+import ModalCancel from "@/common/components/modals/ModalCancel";
 import EntityPayments from "@/common/components/modules/EntityPayments";
-import { ACTIVE, CANCELLED, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { CANCELLED, COLORS, ICONS, PAGES } from "@/common/constants";
 import { isItemCancelled } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
@@ -14,24 +14,22 @@ import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
 const Expense = ({ params }) => {
   useValidateToken();
-  const { role } = useUserContext();
+  const { role, userData } = useUserContext();
   const { push } = useRouter();
   const { data: expense, isLoading, refetch } = useGetExpense(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
-  const [reason, setReason] = useState("");
   const editExpense = useEditExpense();
-  const reasonInputRef = useRef(null);
+  const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
+
   const formRef = useRef(null);
   const cancelExpense = useCancelExpense();
 
@@ -143,18 +141,9 @@ const Expense = ({ params }) => {
     refetch();
   }, [setLabels, expense, refetch]);
 
-  const modalConfig = useMemo(() => ({
-    cancel: {
-      header: `¿Está seguro que desea cancelar el gasto "${expense?.name}"?`,
-      confirmText: "cancelar",
-      icon: ICONS.BAN,
-    }
-  }), [expense]);
-
   const handleModalClose = () => {
     setIsModalOpen(false);
     setModalAction(null);
-    setReason("");
   };
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
@@ -187,7 +176,7 @@ const Expense = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Gasto anulado!');
-        setIsModalCancelOpen(false);
+        setIsModalOpen(false);
       } else {
         toast.error(response.error.message);
       }
@@ -205,7 +194,7 @@ const Expense = ({ params }) => {
         paymentsMade: formData.paymentsMade,
         updatedAt: now(),
       };
-      const data = await updatePayment({ budget: updatedExpense, id: budget.id });
+      const data = await updatePayment({ expense: updatedExpense, id: expense.id });
       return data;
     },
     onSuccess: (response) => {
@@ -224,23 +213,9 @@ const Expense = ({ params }) => {
     },
   });
 
-  const handleActionConfirm = async () => {
-    if (modalAction === CANCELLED && !reason) {
-      toast.error("Debe proporcionar una razón para cancelar al gasto.");
-      return;
-    }
-
-    setActiveAction(modalAction);
-
-    if (modalAction === CANCELLED) {
-      mutateCancel();
-    }
-
-    handleModalClose();
+  const handleModalCancelClose = () => {
+    setIsModalCancelOpen(false);
   };
-
-  const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
-  const requiresConfirmation = modalAction === DELETE;
 
   useEffect(() => {
     const handleClick = (action) => () => handleProtectedAction(() => {
@@ -252,15 +227,22 @@ const Expense = ({ params }) => {
       const actions = RULES.canRemove[role] ? [
         {
           id: 1,
+          icon: ICONS.COPY,
+          color: COLORS.GREEN,
+          onClick: () => { push(PAGES.EXPENSES.CLONE(expense.id)) },
+          text: 'Clonar'
+        },
+        {
+          id: 2,
           icon: ICONS.BAN,
           color: COLORS.RED,
           basic: true,
-          onClick: handleClick(isItemCancelled(expense?.state) ? ACTIVE : INACTIVE),
+          onClick: () => handleClick(setIsModalCancelOpen(true)),
           text: "Anular",
           loading: (activeAction === CANCELLED),
           disabled: !!activeAction,
           width: "fit-content",
-        }
+        },
       ] : [];
 
       setActions(actions);
@@ -318,6 +300,7 @@ const Expense = ({ params }) => {
             handleSave={handleSave}
             handleCancel={handleCancel}
             isSaving={isSaving}
+            dueDate={expense.expirationDate}
           />
         </Tab.Pane>
       ),
@@ -334,27 +317,13 @@ const Expense = ({ params }) => {
         isSaving={isSaving}
         onCancel={handleCancel}
       />
-      <ModalAction
-        title={header}
-        onConfirm={handleActionConfirm}
-        confirmationWord={requiresConfirmation ? confirmText : ""}
-        confirmButtonIcon={icon}
-        showModal={isModalOpen}
-        setShowModal={handleModalClose}
+      <ModalCancel
+        isModalOpen={isModalCancelOpen}
+        onClose={handleModalCancelClose}
+        onConfirm={mutateCancel}
         isLoading={isCancelPending}
-        noConfirmation={!requiresConfirmation}
-        disableButtons={!reason && modalAction === INACTIVE}
-        reasonInputRef={reasonInputRef}
-        bodyContent={
-          modalAction === INACTIVE && (
-            <TextField
-              ref={reasonInputRef}
-              placeholder="Motivo"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-            />
-          )
-        }
+        id={expense?.id}
+        header={`Desea anular el gasto ${expense?.name}?`}
       />
     </Loader>
   );

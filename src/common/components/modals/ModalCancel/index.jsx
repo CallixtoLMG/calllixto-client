@@ -6,13 +6,13 @@ import { useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
 import { Message, ModalContent } from "./styles";
 
-const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id }) => {
+const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id, header }) => {
   const [cancelReason, setCancelReason] = useState("");
   return (
     <Transition visible={isModalOpen} animation='scale' duration={500}>
-      <Modal open={isModalOpen} onClose={() => onClose(false)}>
+      <Modal closeIcon open={isModalOpen} onClose={() => onClose(false)}>
         <Modal.Header>
-          Desea anular la venta?
+          {header}
         </Modal.Header>
         <ModalContent>
           <Message>

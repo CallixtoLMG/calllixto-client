@@ -1,12 +1,12 @@
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
 import { COLORS, ICONS, RULES } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
-import { getSortedPaymentsByDate } from "@/common/utils/dates";
-import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
+import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
+import { PAYMENT_METHODS } from "@/components/budgets/budgets.constants";
 import { useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Header } from "semantic-ui-react";
-import { Button, FieldsContainer, Flex, FlexColumn, FormField, Segment } from "../custom";
+import { Header, Popup } from "semantic-ui-react";
+import { Button, FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "../custom";
 import { Table, TotalList } from "../table";
 import { DatePicker } from "./DatePicker";
 
@@ -28,7 +28,61 @@ const calculateTotals = (payments, total) => {
   return { totalAssigned, totalPending };
 };
 
-const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, padding, deleteButtonInside }) => {
+const getPaymentTableHeaders = () => [
+  {
+    id: 'date',
+    title: 'Fecha de Pago',
+    width: 2,
+    value: (element) => (
+      <Flex $columnGap="10px">
+        {getFormatedDate(element.date)}
+        {element.isOverdue && (
+          <Popup
+            content="Pago posterior a la fecha de vencimiento"
+            position="top center"
+            size="mini"
+            trigger={<Icon name={ICONS.EXCLAMATION_CIRCLE} color={COLORS.RED} size="small" />}
+          />
+        )}
+      </Flex>
+    ),
+  },
+  {
+    id: 'method',
+    width: 4,
+    title: 'Método',
+    value: (element) => element.method
+  },
+  {
+    id: 'amount',
+    width: 3,
+    title: 'Monto',
+    value: (element) => <PriceLabel value={element.amount} />
+  },
+  {
+    id: 'comments',
+    width: 9,
+    align: "left",
+    title: 'Comentarios',
+    value: (element) => (
+      <OverflowWrapper maxWidth="30vw" popupContent={element.comments}>
+        {element.comments}
+      </OverflowWrapper>
+    )
+  }
+];
+
+const Payments = ({
+  total,
+  maxHeight,
+  children,
+  update,
+  noBoxShadow,
+  noBorder,
+  padding,
+  deleteButtonInside,
+  dueDate
+}) => {
   const methods = useFormContext();
   const { control } = methods;
   const { fields: paymentsMade, append: appendPayment, remove: removePayment } = useFieldArray({
@@ -62,6 +116,14 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
     setExceedAmountError(false);
   };
 
+  const elements = useMemo(() => {
+    if (!dueDate) return getSortedPaymentsByDate(paymentsMade);
+    return getSortedPaymentsByDate(paymentsMade).map((payment) => ({
+      ...payment,
+      isOverdue: new Date(payment.date) > new Date(dueDate)
+    }));
+  }, [paymentsMade, dueDate]);
+
   const TOTAL_LIST_ITEMS = [
     { id: 1, title: "Pagado", amount: <PriceLabel value={totalAssigned} /> },
     { id: 2, title: "Pendiente", amount: <PriceLabel value={totalPending} /> },
@@ -70,7 +132,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
 
   return (
     <Flex width="100%" $maxHeight={maxHeight ? "55vh" : ""} className="ui form">
-      <Segment noBorder={noBorder} noBoxShadow={noBoxShadow} padding={padding ? padding : "25px 60px 25px 35px"}>
+      <Segment $noBorder={noBorder} $noBoxShadow={noBoxShadow} padding={padding ? padding : "25px 60px 25px 35px"}>
         <Header>
           Detalle de Pagos
         </Header>
@@ -97,7 +159,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
                 error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
               />
               <PriceField
-                key={`price-${payment.method}-${payment.date.getTime()}`} 
+                key={`price-${payment.method}-${payment.date.getTime()}`}
                 placeholder="Monto"
                 width="150px"
                 label="Monto"
@@ -159,8 +221,8 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
           )}
           <Flex width="100%">
             <Table
-              headers={PAYMENT_TABLE_HEADERS}
-              elements={getSortedPaymentsByDate(paymentsMade)}
+              headers={getPaymentTableHeaders()}
+              elements={elements}
               actions={update && [
                 {
                   id: 1,
