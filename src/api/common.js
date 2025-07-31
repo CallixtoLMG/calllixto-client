@@ -1,5 +1,5 @@
-import { ALL, DATE_FORMATS, DEFAULT_KEY, LAST_UPDATED_AT } from "@/common/constants";
-import { getDateWithOffset, now } from "@/common/utils/dates";
+import { ALL, DATE_FORMATS, LAST_UPDATED_AT } from "@/common/constants";
+import { getDateWithOffset } from "@/common/utils/dates";
 import { useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
@@ -48,13 +48,16 @@ export async function listItems({ entity, url, params = {} }) {
   let lastUpdatedAt = (await getStorageItem({ entity: LAST_UPDATED_AT, id: entity }))?.lastUpdatedAt;
 
   if (lastUpdatedAt) {
-
     const startDate = getDateWithOffset({ date: lastUpdatedAt, offset: 1, unit: 'seconds', format: DATE_FORMATS.ISO });
     const outdatedValues = await entityList({ entity, url, params: { ...params, startDate } });
     if (!!outdatedValues.length) {
       updateLastUpdatedAt = true;
       for (const value of outdatedValues) {
-        await updateOrCreateStorageItem({ entity, value });
+        if (value.state === 'HARD_DELETED') {
+          await removeStorageItem({ entity, id: value.id });
+        } else {
+          await updateOrCreateStorageItem({ entity, value });
+        }
       }
     }
   } else {
@@ -66,7 +69,7 @@ export async function listItems({ entity, url, params = {} }) {
     }
   }
 
-  const values = await getAllStorageItems({ entity, order: 'descending' });
+  const values = await getAllStorageItems({ entity, order: 'descending', sort: 'updatedAt' });
 
   if (updateLastUpdatedAt) {
     const { updatedAt, createdAt } = values[0];
@@ -80,13 +83,7 @@ export function useCreateItem() {
   const invalidate = useInvalidateQueries();
 
   const createItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], attributes }) => {
-    const body = {
-      ...value,
-      createdAt: now(),
-      updatedAt: now(),
-    };
-
-    const { data } = await getInstance().post(url, body);
+    const { data } = await getInstance().post(url, value);
 
     if (data.statusOk) {
       await updateOrCreateStorageItem({
@@ -106,12 +103,7 @@ export function usePostUpdateItem() {
   const invalidate = useInvalidateQueries();
 
   const postItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes }) => {
-    const body = {
-      ...value,
-      updatedAt: now(),
-    };
-
-    const { data } = await getInstance().post(url, body, { params });
+    const { data } = await getInstance().post(url, value, { params });
 
     if (data.statusOk) {
       await updateOrCreateStorageItem({
@@ -131,12 +123,7 @@ export function useEditItem() {
   const invalidate = useInvalidateQueries();
 
   const editItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes }) => {
-    const updatedItem = {
-      ...value,
-      updatedAt: now(),
-    };
-
-    const { data } = await getInstance().put(url, updatedItem, { params });
+    const { data } = await getInstance().put(url, value, { params });
 
     if (data.statusOk && data[responseEntity]) {
       await updateOrCreateStorageItem({

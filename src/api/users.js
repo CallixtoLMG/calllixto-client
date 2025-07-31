@@ -107,7 +107,6 @@ export const useInactiveUser = () => {
       params: { username },
       value: {
         inactiveReason: reason,
-        updatedAt: now(),
       },
       key: MAIN_KEY,
       responseEntity: ENTITIES.USER,
@@ -128,7 +127,7 @@ export const useActiveUser = () => {
       entity: ENTITIES.USERS,
       url: `${PATHS.USER}/${ACTIVE}`,
       params: { username },
-      value: { updatedAt: now() },
+      value: {},
       key: MAIN_KEY,
       responseEntity: ENTITIES.USER,
       invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, username]]

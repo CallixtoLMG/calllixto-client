@@ -174,7 +174,6 @@ export const useCreateBatch = () => {
   const createBatch = async (products) => {
     const parsedProducts = products.map((product) => ({
       ...product,
-      createdAt: now(),
       state: ACTIVE,
     }));
 
