@@ -1,14 +1,16 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Flex } from "@/common/components/custom";
 import Payments from "@/common/components/form/Payments";
-import { UnsavedChangesModal } from "@/common/components/modals";
-import { SHORTKEYS } from "@/common/constants";
+import { DATE_FORMATS, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
+import { getFormatedDate } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks";
+import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
+import { TextField } from "../../form";
 
-const EntityPayments = ({
+const EntityPayments = forwardRef(({
   total,
   entityState,
   isCancelled = () => false,
@@ -17,16 +19,23 @@ const EntityPayments = ({
   methods,
   onSubmit,
   isLoading,
+  submitText = "Guardar",
   isDirty,
   resetValue,
-  showUnsavedModal,
-  handleDiscard,
-  handleSave,
-  handleCancel,
-  isSaving,
-  submitText = "Guardar",
-  dueDate
-}) => {
+  dueDate,
+}, ref) => {
+  const {
+    handleSubmit,
+    reset,
+  } = methods;
+
+  useImperativeHandle(ref, () => ({
+    isDirty: () => isDirty,
+    submitForm: () => handleSubmit(onSubmit)(),
+    resetForm: () => reset(resetValue),
+    getValues: () => methods.getValues(),
+  }));
+
   const validateShortcuts = {
     canConfirm: () => !isLoading && isDirty,
     canReset: () => isDirty,
@@ -35,12 +44,12 @@ const EntityPayments = ({
   useKeyboardShortcuts([
     {
       key: SHORTKEYS.ENTER,
-      action: () => methods.handleSubmit(onSubmit)(),
+      action: () => handleSubmit(onSubmit)(),
       condition: validateShortcuts.canConfirm,
     },
     {
       key: SHORTKEYS.DELETE,
-      action: () => methods.reset(resetValue),
+      action: () => reset(resetValue),
       condition: validateShortcuts.canReset,
     },
   ]);
@@ -48,10 +57,18 @@ const EntityPayments = ({
   return (
     <>
       {!isCancelled(entityState) && (
-        <Flex $justifyContent="space-between">{toggleButton}</Flex>
+        <Flex $justifyContent="space-between">
+          {toggleButton}
+          <TextField
+            width="20%"
+            value={getFormatedDate(dueDate, DATE_FORMATS.ONLY_DATE)}
+            label="Fecha de Vencimiento"
+            disabled
+          />
+        </Flex>
       )}
       <FormProvider {...methods}>
-        <Form onSubmit={methods.handleSubmit(onSubmit)} onKeyDown={preventSend}>
+        <Form onSubmit={handleSubmit(onSubmit)} onKeyDown={preventSend}>
           <Payments
             deleteButtonInside
             padding="14px 0"
@@ -66,7 +83,7 @@ const EntityPayments = ({
               isUpdating={isUpdating}
               isLoading={isLoading}
               isDirty={isDirty}
-              onReset={() => methods.reset(resetValue)}
+              onReset={() => reset({ paymentsMade: resetValue?.paymentsMade || [] })}
               disabled={!isDirty}
               text={submitText}
               submit
@@ -74,15 +91,10 @@ const EntityPayments = ({
           )}
         </Form>
       </FormProvider>
-      <UnsavedChangesModal
-        open={showUnsavedModal}
-        onDiscard={handleDiscard}
-        onSave={handleSave}
-        onCancel={handleCancel}
-        isSaving={isSaving}
-      />
     </>
   );
-};
+});
+
+EntityPayments.displayName = "EntityPayments";
 
 export default EntityPayments;

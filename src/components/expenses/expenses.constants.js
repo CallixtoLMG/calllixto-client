@@ -6,8 +6,18 @@ import { Label } from "semantic-ui-react";
 export const LIST_EXPENSES_QUERY_KEY = 'listExpenses';
 export const GET_EXPENSE_QUERY_KEY = 'getExpense';
 export const EXPENSES_FILTERS_KEY = 'expensesFilters';
+// remover cuando gawain tenga los valores
+const getTotalPayments = (expense) => {
+  if (!expense?.paymentsMade?.length) return 0;
+  return expense.paymentsMade.reduce((acc, payment) => acc + (payment.amount || 0), 0);
+};
 
-export const ATTRIBUTES = { ID: "id", NAME: "name", CATEGORIES: "categories", PAYMENT_DETAILS: "paymentDetails", TAGS: "tags", AMOUNT: "amount", EXPIRATION: "expiration", COMMENT: "comments", STATE: "state" };
+const getRemainingAmount = (expense) => {
+  const totalPaid = getTotalPayments(expense);
+  return (expense.amount || 0) - totalPaid;
+};
+
+export const ATTRIBUTES = { ID: "id", NAME: "name", CATEGORIES: "categories", TAGS: "tags", AMOUNT: "amount", EXPIRATION_DATE: "expirationDate", COMMENTS: "comments", STATE: "state", TOTAL: "total", PAYMENTS_MADE: "paymentsMade" };
 
 export const HEADERS = [
   {
@@ -42,7 +52,7 @@ export const HEADERS = [
     value: (expense) => {
       return (
         <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
-          {expense.categories && <TagsTooltip maxWidthOverflow="8vw" tooltip="true" tags={expense.categories} />}
+          {expense.categories && <TagsTooltip categorie maxWidthOverflow="8vw" tooltip="true" tags={expense.categories} />}
         </Flex>
       );
     }
@@ -52,53 +62,47 @@ export const HEADERS = [
     title: "Monto",
     align: "left",
     value: (expense) => <PriceLabel value={expense.amount} />,
+  },
+  {
+    id: 5,
+    title: "Pagado",
+    align: "left",
+    value: (expense) => <PriceLabel value={getTotalPayments(expense)} />,
+  },
+  {
+    id: 6,
+    title: "Pendiente",
+    align: "left",
+    value: (expense) => <PriceLabel value={getRemainingAmount(expense)} />,
   }
 ];
 
 export const EXPENSE_STATES = {
-  ACTIVE: {
-    id: 'ACTIVE',
-    title: 'Activos',
-    singularTitle: 'Activo',
+  PAID: {
+    id: 'PAID',
+    title: 'Pagados',
+    singularTitle: 'Pagado',
     color: 'green',
     icon: 'check',
   },
-  INACTIVE: {
-    id: 'INACTIVE',
-    title: 'Inactivos',
-    singularTitle: 'Inactivo',
-    color: 'grey',
+  PENDING: {
+    id: 'PENDING',
+    title: 'Pendientes',
+    singularTitle: 'Pendiente',
+    color: 'orange',
     icon: 'hourglass half',
   },
+  CANCELLED: {
+    id: 'CANCELLED',
+    title: 'Anulados',
+    singularTitle: 'Anulado',
+    color: 'red',
+    icon: 'ban',
+  }
 };
 
-// export const EXPENSE_STATES = {
-//   PAID: {
-//     id: 'PAID',
-//     title: 'Pagados',
-//     singularTitle: 'Pagado',
-//     color: 'green',
-//     icon: 'check',
-//   },
-//   PENDING: {
-//     id: 'PENDING',
-//     title: 'Pendientes',
-//     singularTitle: 'Pendiente',
-//     color: 'orange',
-//     icon: 'hourglass half',
-//   },
-//   CANCELLED: {
-//     id: 'CANCELLED',
-//     title: 'Anulados',
-//     singularTitle: 'Anulado',
-//     color: 'red',
-//     icon: 'ban',
-//   }
-// };
-
-export const EMPTY_EXPENSE = { name: '', comments: '', amount: '', expirationDate: '' };
-// export const EMPTY_FILTERS = { id: '', name: '', categories: "", state: EXPENSE_STATES.PAID.id };
-export const EMPTY_FILTERS = { id: '', name: '', categories: "", state: EXPENSE_STATES.ACTIVE.id };
+export const EMPTY_EXPENSE = { name: '', comments: '', amount: '', expirationDate: '', paymentsMade: [] };
+export const EMPTY_FILTERS = { id: '', name: '', categories: "", state: EXPENSE_STATES.PAID.id };
 
 export const EXPENSES_STATE_OPTIONS = Object.values(EXPENSE_STATES)
   .map(({ id, title, color }) => ({

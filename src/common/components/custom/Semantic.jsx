@@ -25,8 +25,8 @@ export const Segment = styled(SSegment)`
   overflow: auto;
   align-content: center;
   opacity: ${({ show }) => show ? "0" : "1"} !important;
-  border: ${({ noBorder }) => noBorder && "none"} !important;
-  box-shadow: ${({ noBoxShadow  }) => noBoxShadow && "none"} !important;
+  border: ${({ $noBorder }) => $noBorder && "blue"} !important;
+  box-shadow: ${({ $noBoxShadow  }) => $noBoxShadow && "none"} !important;
 `;
 
 export const Input = styled(SInput)`

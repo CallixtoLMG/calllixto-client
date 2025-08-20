@@ -1,6 +1,6 @@
 import { ENTITIES, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { CANCEL, PATHS } from "@/fetchUrls";
+import { CANCEL, PATHS, PAYMENTS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { ATTRIBUTES, GET_EXPENSE_QUERY_KEY, LIST_EXPENSES_QUERY_KEY } from "../components/expenses/expenses.constants";
 import { getInstance } from "./axios";

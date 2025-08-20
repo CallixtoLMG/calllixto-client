@@ -5,7 +5,7 @@ import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
 import ModalCancel from "@/common/components/modals/ModalCancel";
 import EntityPayments from "@/common/components/modules/EntityPayments";
-import { CANCELLED, COLORS, ICONS, PAGES } from "@/common/constants";
+import { COLORS, ICONS, PAGES } from "@/common/constants";
 import { isItemCancelled } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
@@ -26,109 +26,10 @@ const Expense = ({ params }) => {
   const { data: expense, isLoading, refetch } = useGetExpense(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const [activeAction, setActiveAction] = useState(null);
-  const editExpense = useEditExpense();
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
-
-  const formRef = useRef(null);
+  const [activeIndex, setActiveIndex] = useState(0);
   const cancelExpense = useCancelExpense();
-
-  const mockData = {
-    "id": "A0002",
-    "name": "DRUGS",
-    "categories": [],
-    "createdAt": "2025-07-07T23:34:26.297Z",
-    "createdBy": "Milton Barraza",
-    "updatedAt": "2025-07-08T14:12:22.342Z",
-    "updatedBy": "Milton Barraza",
-    "amount": 3003,
-    "total": 3003,
-    "paymentsMade": [
-      {
-        "date": "2025-07-08T15:00:00.000Z",
-        "amount": 1000,
-        "comments": "Primer pago",
-        "method": "Transferencia Bancaria"
-      },
-      {
-        "date": "2025-07-09T10:30:00.000Z",
-        "amount": 2003,
-        "comments": "Pago final",
-        "method": "Efectivo"
-      }
-    ],
-    "comments": "",
-    "expirationDate": "2025-06-30T03:00:00.000Z",
-    "state": "ACTIVE",
-    "tags": [],
-    "previousVersions": [
-      {
-        "name": "Drugsss",
-        "amount": 300,
-        "comments": "Comentario",
-        "categories": [
-          {
-            "name": "Levi",
-            "color": "grey",
-            "description": "asdasd"
-          },
-          {
-            "name": "Prueba 2",
-            "color": "olive",
-            "description": "ASD"
-          }
-        ],
-        "tags": [
-          {
-            "name": "cacasc",
-            "color": "brown",
-            "description": "ascasc"
-          },
-          {
-            "name": "cvgcvxcv",
-            "color": "yellow",
-            "description": ""
-          }
-        ],
-        "expirationDate": "2025-07-17T03:00:00.000Z"
-      }
-    ]
-  }
-
-  const methods = useForm({
-    defaultValues: {
-      paymentsMade: mockData?.paymentsMade || [],
-    },
-    mode: "onChange",
-  });
-
-  const { isDirty } = methods.formState;
-
-  const {
-    showModal: showUnsavedModal,
-    handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
-    onBeforeView,
-    closeModal,
-  } = useUnsavedChanges({
-    formRef,
-    onDiscard: async () => {
-      formRef.current?.resetForm();
-      setIsUpdating(false);
-    },
-    onSave: () => {
-      formRef.current?.submitForm();
-    },
-  });
-
-  const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
-    canUpdate: RULES.canUpdate[role],
-    onBeforeView,
-  });
-  const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
+  const editExpense = useEditExpense();
   const updatePayment = useUpdatePayments();
 
   useEffect(() => {
@@ -141,9 +42,72 @@ const Expense = ({ params }) => {
     refetch();
   }, [setLabels, expense, refetch]);
 
+  const { handleProtectedAction } = useProtectedAction({
+    onBeforeView: async () => {
+      const expenseOk = await expenseUnsaved.onBeforeView?.();
+      const paymentsOk = await paymentsUnsaved.onBeforeView?.();
+      return expenseOk && paymentsOk;
+    },
+  });
+
+  useEffect(() => {
+
+    const actionsList = RULES.canRemove[role] ? [
+      {
+        id: 1,
+        icon: ICONS.COPY,
+        color: COLORS.GREEN,
+        onClick: () => { push(PAGES.EXPENSES.CLONE(expense.id)) },
+        text: 'Clonar',
+      },
+    ] : [];
+    if (!isItemCancelled(expense?.state)) {
+      actionsList.push({
+        id: 2,
+        icon: ICONS.BAN,
+        color: COLORS.RED,
+        basic: true,
+        onClick: () => handleProtectedAction(() => setIsModalCancelOpen(true)),
+        text: "Anular",
+        width: "fit-content",
+      });
+    }
+    setActions(actionsList);
+  }, [role, expense, push]);
+
+  const expenseFormRef = useRef();
+
+  const expenseUnsaved = useUnsavedChanges({
+    formRef: expenseFormRef,
+    onSave: () => expenseFormRef.current.submitForm(),
+    onDiscard: () => expenseFormRef.current.resetForm(),
+  });
+
+  const expenseAllow = useAllowUpdate({ canUpdate: RULES.canUpdate[role], onBeforeView: expenseUnsaved.onBeforeView });
+
+  const paymentsFormRef = useRef();
+  const paymentMethods = useForm({
+    defaultValues: { paymentsMade: expense?.paymentsMade || [] },
+    mode: "onChange",
+  });
+
+  const { formState: { isDirty: isPaymentsDirty } } = paymentMethods;
+
+  useEffect(() => {
+    if (expense?.paymentsMade && !isPaymentsDirty) {
+      paymentMethods.reset({ paymentsMade: expense.paymentsMade });
+    }
+  }, [expense?.paymentsMade, isPaymentsDirty, paymentMethods]);
+
+  const paymentsUnsaved = useUnsavedChanges({
+    formRef: paymentsFormRef,
+    onSave: () => paymentsFormRef.current.submitForm(),
+    onDiscard: () => paymentsFormRef.current.resetForm(),
+  });
+  const paymentsAllow = useAllowUpdate({ canUpdate: RULES.canUpdate[role], onBeforeView: paymentsUnsaved.onBeforeView })
+
   const handleModalClose = () => {
-    setIsModalOpen(false);
-    setModalAction(null);
+    setIsModalCancelOpen(false);
   };
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
@@ -151,16 +115,15 @@ const Expense = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Gasto actualizado!");
-        setIsUpdating(false);
-        resolveSave();
+        expenseAllow.setIsUpdating(false);
+        expenseUnsaved.resolveSave();
       } else {
         toast.error(response.error.message);
       }
     },
     onSettled: () => {
-      setActiveAction(null);
       handleModalClose();
-      closeModal();
+      expenseUnsaved.closeModal();
     },
   });
 
@@ -176,7 +139,7 @@ const Expense = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success('Gasto anulado!');
-        setIsModalOpen(false);
+        setIsModalCancelOpen(false);
       } else {
         toast.error(response.error.message);
       }
@@ -188,7 +151,7 @@ const Expense = ({ params }) => {
 
   const { mutate: mutateUpdatePayment, isPending: isLoadingUpdatePayment } = useMutation({
     mutationFn: async () => {
-      const formData = methods.getValues();
+      const formData = paymentsFormRef.current.getValues();
       const updatedExpense = {
         ...expense,
         paymentsMade: formData.paymentsMade,
@@ -200,58 +163,20 @@ const Expense = ({ params }) => {
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pagos actualizados!");
-        const formData = methods.getValues();
-        methods.reset(formData);
-        setIsUpdating(false);
-        resolveSave();
+        paymentsFormRef.current.resetForm();
+        paymentsAllow.setIsUpdating(false);
+        paymentsUnsaved.resolveSave();
+        refetch();
       } else {
         toast.error(response.error.message);
       }
     },
-    onSettled: () => {
-      closeModal();
-    },
+    onSettled: () => paymentsUnsaved.closeModal(),
   });
 
   const handleModalCancelClose = () => {
     setIsModalCancelOpen(false);
   };
-
-  useEffect(() => {
-    const handleClick = (action) => () => handleProtectedAction(() => {
-      setModalAction(action);
-      setIsModalOpen(true);
-    });
-
-    if (expense) {
-      const actions = RULES.canRemove[role] ? [
-        {
-          id: 1,
-          icon: ICONS.COPY,
-          color: COLORS.GREEN,
-          onClick: () => { push(PAGES.EXPENSES.CLONE(expense.id)) },
-          text: 'Clonar'
-        },
-        {
-          id: 2,
-          icon: ICONS.BAN,
-          color: COLORS.RED,
-          basic: true,
-          onClick: () => handleClick(setIsModalCancelOpen(true)),
-          text: "Anular",
-          loading: (activeAction === CANCELLED),
-          disabled: !!activeAction,
-          width: "fit-content",
-        },
-      ] : [];
-
-      setActions(actions);
-    }
-  }, [role, expense, activeAction, isCancelPending, setActions]);
-
-  if (!isLoading && !expense) {
-    push(PAGES.NOT_FOUND.BASE);
-  }
 
   const panes = [
     {
@@ -259,22 +184,28 @@ const Expense = ({ params }) => {
       render: () => (
         <Tab.Pane>
           <Flex $marginBottom="15px">
-            {!isItemCancelled(expense?.state) && toggleButton}
+            {!isItemCancelled(expense?.state) && expenseAllow.toggleButton}
           </Flex>
           {isItemCancelled(expense?.state) && (
             <Message negative>
               <MessageHeader>Motivo de cancelación</MessageHeader>
-              <p>{expense.cancelReason}</p>
+              <p>{expense.cancelledMsg}</p>
             </Message>
           )}
           <ExpenseForm
-            ref={formRef}
-            expense={mockData}
+            ref={expenseFormRef}
+            expense={expense}
             onSubmit={mutateEdit}
             isLoading={isEditPending}
-            isUpdating={isUpdating && !isItemCancelled(expense?.state)}
+            isUpdating={expenseAllow.isUpdating && !isItemCancelled(expense?.state)}
             view
-          // isCancelPending={isCancelPending}
+          />
+          <UnsavedChangesModal
+            open={expenseUnsaved.showModal}
+            onSave={expenseUnsaved.handleSave}
+            onDiscard={expenseUnsaved.handleDiscard}
+            isSaving={expenseUnsaved.isSaving}
+            onCancel={expenseUnsaved.handleCancel}
           />
         </Tab.Pane>
       ),
@@ -284,38 +215,43 @@ const Expense = ({ params }) => {
       render: () => (
         <Tab.Pane>
           <EntityPayments
-            total={mockData.total}
+            ref={paymentsFormRef}
+            total={expense.amount}
             entityState={expense.state}
-            methods={methods}
-            formRef={formRef}
             isCancelled={isItemCancelled}
-            isUpdating={isUpdating}
-            toggleButton={toggleButton}
+            isUpdating={paymentsAllow.isUpdating}
+            toggleButton={paymentsAllow.toggleButton}
+            methods={paymentMethods}
             onSubmit={mutateUpdatePayment}
             isLoading={isLoadingUpdatePayment}
-            isDirty={isDirty}
-            resetValue={{ paymentsMade: mockData.paymentsMade }}
-            showUnsavedModal={showUnsavedModal}
-            handleDiscard={handleDiscard}
-            handleSave={handleSave}
-            handleCancel={handleCancel}
-            isSaving={isSaving}
+            isDirty={isPaymentsDirty}
+            resetValue={{ paymentsMade: expense.paymentsMade }}
             dueDate={expense.expirationDate}
+          />
+          <UnsavedChangesModal
+            open={paymentsUnsaved.showModal}
+            onSave={paymentsUnsaved.handleSave}
+            onDiscard={paymentsUnsaved.handleDiscard}
+            isSaving={paymentsUnsaved.isSaving}
+            onCancel={paymentsUnsaved.handleCancel}
           />
         </Tab.Pane>
       ),
     },
   ];
 
+  const handleTabChange = async (_, { activeIndex }) => {
+    if (await expenseUnsaved.onBeforeView() && await paymentsUnsaved.onBeforeView()) {
+      setActiveIndex(activeIndex);
+    }
+  };
+
   return (
     <Loader active={isLoading}>
-      <Tab panes={panes} />
-      <UnsavedChangesModal
-        open={showUnsavedModal}
-        onDiscard={handleDiscard}
-        onSave={handleSave}
-        isSaving={isSaving}
-        onCancel={handleCancel}
+      <Tab
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={handleTabChange}
       />
       <ModalCancel
         isModalOpen={isModalCancelOpen}

@@ -6,13 +6,19 @@ import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { useKeyboardShortcuts } from "@/hooks";
 import useSettingArrayField from "@/hooks/useSettingArrayField";
-import { forwardRef, useCallback, useEffect, useImperativeHandle } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { DatePickerControlled } from "../../../common/components/form/DatePicker";
 import { EMPTY_EXPENSE } from "../expenses.constants";
 
 const ExpenseForm = forwardRef(({
-  expense, onSubmit, isLoading, isUpdating, view },
+  expense,
+  onSubmit,
+  isLoading,
+  isUpdating,
+  view,
+  isCloning = false,
+},
   ref) => {
   const getInitialValues = (expense) => ({
     ...EMPTY_EXPENSE,
@@ -20,8 +26,23 @@ const ExpenseForm = forwardRef(({
     categories: [],
     ...expense,
   });
+
+  const clonedInitialValues = useMemo(() => {
+    if (!isCloning || !expense) return EMPTY_EXPENSE;
+  
+    const { id, createdAt, createdBy, updatedAt, updatedBy, state, paymentsMade, ...rest } = expense;
+  
+    return {
+      ...EMPTY_EXPENSE,
+      ...rest,
+      paymentsMade: [],
+      categories: rest.categories || [],
+      tags: rest.tags || [],
+    };
+  }, [expense, isCloning]);
+
   const methods = useForm({
-    defaultValues: getInitialValues(expense)
+    defaultValues: isCloning ? clonedInitialValues : getInitialValues(expense),
   });
   const { isFetching: isExpensesSettingsFetching, refetch: refetchExprensesSettings } = useGetSetting(ENTITIES.EXPENSES);
   const { options: tagsOptions, optionsMapper: tagsMapper } = useSettingArrayField(ENTITIES.EXPENSES, "tags", expense?.tags || []);
@@ -30,16 +51,21 @@ const ExpenseForm = forwardRef(({
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleForm)(),
-    resetForm: () => reset(getInitialValues(expense))
+    resetForm: () => reset(getInitialValues(expense)),
   }));
 
   useEffect(() => {
+    reset(getInitialValues(expense));
     refetchExprensesSettings();
-  }, [refetchExprensesSettings]);
+  }, [expense, refetchExprensesSettings]);
 
-  const handleReset = useCallback((expense) => {
-    reset({ ...EMPTY_EXPENSE, ...expense });
-  }, [reset]);
+  const handleReset = useCallback(() => {
+    if (isCloning) {
+      reset(clonedInitialValues);
+    } else {
+      reset({ ...EMPTY_EXPENSE, ...expense });
+    }
+  }, [reset, isCloning, clonedInitialValues, expense]);
 
   const handleForm = async (data) => {
     await onSubmit(data);
@@ -78,7 +104,7 @@ const ExpenseForm = forwardRef(({
           }
           <TextControlled
             width="30%"
-            name="detail"
+            name="name"
             label="Detalle"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
@@ -153,6 +179,7 @@ const ExpenseForm = forwardRef(({
             isDirty={isDirty}
             onReset={() => handleReset(isUpdating ? { ...EMPTY_EXPENSE, ...expense } : EMPTY_EXPENSE)}
             submit
+            cloningExpense
           />
         )}
       </Form>

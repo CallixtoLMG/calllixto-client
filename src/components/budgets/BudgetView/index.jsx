@@ -1,4 +1,5 @@
 import { useUpdatePayments } from "@/api/budgets";
+import { UnsavedChangesModal } from "@/common/components/modals";
 import EntityPayments from "@/common/components/modules/EntityPayments";
 import { now } from "@/common/utils/dates";
 import BudgetDetails from "@/components/budgets/BudgetView/Modules/BudgetDetails";
@@ -127,23 +128,24 @@ const BudgetView = ({
           component: (
             <>
               <EntityPayments
-                entity={budget}
+                ref={formRef}
                 total={total}
                 entityState={budget.state}
-                methods={methods}
-                formRef={formRef}
                 isCancelled={isBudgetCancelled}
                 isUpdating={isUpdating}
                 toggleButton={toggleButton}
+                methods={methods}
                 onSubmit={mutateUpdatePayment}
                 isLoading={isLoadingUpdatePayment}
                 isDirty={isDirty}
                 resetValue={{ paymentsMade: budget.paymentsMade }}
-                showUnsavedModal={showUnsavedModal}
-                handleDiscard={handleDiscard}
-                handleSave={handleSave}
-                handleCancel={handleCancel}
+              />
+              <UnsavedChangesModal
+                open={showUnsavedModal}
+                onSave={handleSave}
+                onDiscard={handleDiscard}
                 isSaving={isSaving}
+                onCancel={handleCancel}
               />
             </>
           ),
