@@ -6,18 +6,8 @@ import { Label } from "semantic-ui-react";
 export const LIST_EXPENSES_QUERY_KEY = 'listExpenses';
 export const GET_EXPENSE_QUERY_KEY = 'getExpense';
 export const EXPENSES_FILTERS_KEY = 'expensesFilters';
-// remover cuando gawain tenga los valores
-const getTotalPayments = (expense) => {
-  if (!expense?.paymentsMade?.length) return 0;
-  return expense.paymentsMade.reduce((acc, payment) => acc + (payment.amount || 0), 0);
-};
 
-const getRemainingAmount = (expense) => {
-  const totalPaid = getTotalPayments(expense);
-  return (expense.amount || 0) - totalPaid;
-};
-
-export const ATTRIBUTES = { ID: "id", NAME: "name", CATEGORIES: "categories", TAGS: "tags", AMOUNT: "amount", EXPIRATION_DATE: "expirationDate", COMMENTS: "comments", STATE: "state", TOTAL: "total", PAYMENTS_MADE: "paymentsMade" };
+export const ATTRIBUTES = { ID: "id", NAME: "name", CATEGORIES: "categories", TAGS: "tags", AMOUNT: "amount", EXPIRATION_DATE: "expirationDate", COMMENTS: "comments", STATE: "state", TOTAL: "total", PAYMENTS_MADE: "paymentsMade", PAID_AMOUNT: "paidAmount", PENDING_AMOUNT: "pendingAmount" };
 
 export const HEADERS = [
   {
@@ -61,19 +51,19 @@ export const HEADERS = [
     id: 4,
     title: "Monto",
     align: "left",
-    value: (expense) => <PriceLabel value={expense.amount} />,
+    value: (expense) => <PriceLabel value={expense.amount ?? 0} />,
   },
   {
     id: 5,
     title: "Pagado",
     align: "left",
-    value: (expense) => <PriceLabel value={getTotalPayments(expense)} />,
+    value: (expense) => <PriceLabel value={expense.paidAmount ?? 0} />,
   },
   {
     id: 6,
     title: "Pendiente",
     align: "left",
-    value: (expense) => <PriceLabel value={getRemainingAmount(expense)} />,
+    value: (expense) => <PriceLabel value={expense?.pendingAmount ?? 0} />,
   }
 ];
 
