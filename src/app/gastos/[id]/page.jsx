@@ -73,7 +73,7 @@ const Expense = ({ params }) => {
       });
     }
     setActions(actionsList);
-  }, [role, expense, push]);
+  }, [role, expense, push, handleProtectedAction, setActions]);
 
   const expenseFormRef = useRef();
 

@@ -20,7 +20,7 @@ const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
     }, 300);
   
     return () => clearInterval(interval);
-  }, []);
+  }, [formRef]);
 
   useEffect(() => {
     const handleBeforeUnload = (e) => {

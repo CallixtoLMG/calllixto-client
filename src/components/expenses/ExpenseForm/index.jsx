@@ -57,7 +57,7 @@ const ExpenseForm = forwardRef(({
   useEffect(() => {
     reset(getInitialValues(expense));
     refetchExprensesSettings();
-  }, [expense, refetchExprensesSettings]);
+  }, [expense, refetchExprensesSettings, reset]);
 
   const handleReset = useCallback(() => {
     if (isCloning) {
