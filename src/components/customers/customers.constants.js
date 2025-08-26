@@ -11,9 +11,18 @@ export const ATTRIBUTES = { ID: 'id', NAME: 'name', ADDRESSES: 'addresses', PHON
 export const HEADERS = [
   {
     id: 1,
+    title: "Id",
+    key: "id",
+    sortable: true,
+    width: 1,
+    value: (customer) => customer.id,
+    sortValue: (customer) => customer.id ?? ""
+  },
+  {
+    id: 2,
     title: 'Nombre',
     align: 'left',
-    width: 9,
+    width: 8,
     key: "name",
     sortable: true,
     value: (customer) => {
@@ -33,7 +42,7 @@ export const HEADERS = [
     sortValue: (customer) => customer.name ?? ""
   },
   {
-    id: 2,
+    id: 3,
     title: "Direccion",
     key: "addresses",
     sortable: true,
@@ -51,7 +60,7 @@ export const HEADERS = [
     sortValue: (customer) => customer.addresses?.[0]?.address ?? ""
   },
   {
-    id: 3,
+    id: 4,
     title: "Teléfono",
     width: 3,
     value: (customer) => {
