@@ -75,7 +75,7 @@ const BudgetForm = ({
       paymentsMade: [],
       pickUpInStore: false,
     };
-  }, [budget, isCloning, user]);
+  }, [budget, isCloning, user, paymentMethods]);
 
   const methods = useForm({
     defaultValues: isCloning && budget
@@ -96,11 +96,11 @@ const BudgetForm = ({
   useEffect(() => {
     const current = methods.getValues("paymentMethods");
     const all = paymentMethods.map(m => m.value);
-  
+
     if (!current?.length) {
       methods.setValue("paymentMethods", all, { shouldDirty: false });
     }
-  }, [paymentMethods]);
+  }, [paymentMethods, methods]);
 
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
@@ -362,7 +362,7 @@ const BudgetForm = ({
       id: 1,
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      onClick: (element, index) => { removeProduct(index)},
+      onClick: (element, index) => { removeProduct(index) },
       tooltip: 'Eliminar',
       width: "100%"
     },
