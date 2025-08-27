@@ -50,7 +50,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
 
   useEffect(() => {
     refetch();
-  }, [refetch]);
+  }, []);
 
   const handleAddPayment = async () => {
     setShowErrors(true);
