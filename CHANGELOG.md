@@ -3,6 +3,15 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2025-08-25
+### Added
+
+- Added a new "General" tab to the Settings section for configuring global parameters.
+
+- Added support for custom payment method management for clients, including the ability to add personalized payment methods through the UI.
+
+- Created a reusable utility function `mapToDropdownOptions` to map arrays of strings into dropdown-compatible objects ({ key, text, value }).
+
 ## 2025-07-02
 
 ### Added
