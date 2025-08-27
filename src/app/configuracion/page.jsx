@@ -7,7 +7,7 @@ import { ENTITIES, PAGES, SHORTKEYS } from "@/common/constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
 import { LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
-import { useValidateToken, useKeyboardShortcuts, useUnsavedChanges, useRestoreEntity } from "@/hooks";
+import { useKeyboardShortcuts, useRestoreEntity, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -27,6 +27,7 @@ const ENTITY_MAPPER = {
 export const SUPPORTED_SETTINGS = {
   PRODUCT: ["tags", "blacklist"],
   CUSTOMER: ["tags"],
+  GENERAL: ["paymentMethods"],
 };
 
 const Settings = () => {
@@ -124,15 +125,15 @@ const Settings = () => {
     if (!data?.settings) return [];
 
     const mappedEntities = data.settings
-      .filter((entity) => SUPPORTED_SETTINGS[entity.entity]?.some((setting) => !!entity[setting]))
-      .map((entity) => ({
-        ...entity,
-        label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
-      }));
+    .filter((entity) => SUPPORTED_SETTINGS[entity.entity]?.some((setting) => !!entity[setting]))
+    .map((entity) => ({
+      ...entity,
+      label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
+    }));
 
-    return mappedEntities;
-  }, [data]);
-
+  return mappedEntities;
+}, [data]);
+ 
   useEffect(() => {
     if (!activeEntity && settings.length) {
       handleEntityChange(settings[0]);
