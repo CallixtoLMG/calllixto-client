@@ -1,9 +1,10 @@
+import { useGetSetting } from "@/api/settings";
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
-import { COLORS, ICONS, RULES } from "@/common/constants";
-import { handleEnterKeyDown } from "@/common/utils";
+import { COLORS, ENTITIES, ICONS, RULES } from "@/common/constants";
+import { handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { getSortedPaymentsByDate } from "@/common/utils/dates";
-import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
-import { useMemo, useState } from "react";
+import { PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
+import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header } from "semantic-ui-react";
 import { Button, FieldsContainer, Flex, FlexColumn, FormField, Segment } from "../custom";
@@ -41,6 +42,15 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
   const [payment, setPayment] = useState(EMPTY_PAYMENT());
   const [showErrors, setShowErrors] = useState(false);
   const [exceedAmountError, setExceedAmountError] = useState(false);
+  const { data: paymentMethods, refetch} = useGetSetting(ENTITIES.GENERAL);
+
+  const paymentMethodOptions = useMemo(() => {
+    return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
+  }, [paymentMethods]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const handleAddPayment = async () => {
     setShowErrors(true);
@@ -90,7 +100,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
               <DropdownField
                 width="fit-content"
                 label="Método de Pago"
-                options={PAYMENT_METHODS.filter((method) => method.key !== 'dolares')}
+                options={paymentMethodOptions.filter((method) => method.key !== 'dolares')}
                 value={payment.method}
                 onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                 disabled={isTotalCovered}

@@ -174,3 +174,10 @@ export const getNumberFormated = (value) => {
 
   return [asString, asNumber];
 };
+
+export const mapToDropdownOptions = (items = []) =>
+  items.map((item) => ({
+    key: item.toLowerCase().replace(/\s+/g, "_"),
+    text: item,
+    value: item,
+  }));
