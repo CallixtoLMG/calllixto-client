@@ -27,6 +27,7 @@ const ENTITY_MAPPER = {
 export const SUPPORTED_SETTINGS = {
   PRODUCT: ["tags", "blacklist"],
   CUSTOMER: ["tags"],
+  GENERAL: ["paymentMethods"],
   EXPENSE: ["tags", "categories"],
 };
 
@@ -127,15 +128,15 @@ const Settings = () => {
     if (!data?.settings) return [];
 
     const mappedEntities = data.settings
-      .filter((entity) => SUPPORTED_SETTINGS[entity.entity]?.some((setting) => !!entity[setting]))
-      .map((entity) => ({
-        ...entity,
-        label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
-      }));
+    .filter((entity) => SUPPORTED_SETTINGS[entity.entity]?.some((setting) => !!entity[setting]))
+    .map((entity) => ({
+      ...entity,
+      label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
+    }));
 
-    return mappedEntities;
-  }, [data]);
-
+  return mappedEntities;
+}, [data]);
+ 
   useEffect(() => {
     if (!activeEntity && settings.length) {
       handleEntityChange(settings[0]);

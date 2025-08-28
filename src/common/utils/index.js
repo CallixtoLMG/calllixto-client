@@ -11,7 +11,10 @@ export const getFormatedPrice = (number) => {
 };
 
 export const getFormatedNumber = (number) => {
-  return Number(number).toLocaleString(undefined, { maximumFractionDigits: 2, minimumFractionDigits: 2 });
+  return Number(number).toLocaleString("es-AR", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  });
 };
 
 export const getFormatedPhone = (phone) => {
@@ -189,3 +192,10 @@ export const getNumberFormated = (value) => {
 
   return [asString, asNumber];
 };
+
+export const mapToDropdownOptions = (items = []) =>
+  items.map((item) => ({
+    key: item.toLowerCase().replace(/\s+/g, "_"),
+    text: item,
+    value: item,
+  }));

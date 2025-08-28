@@ -12,7 +12,7 @@ import {
 import { isDateBefore } from '@/common/utils/dates';
 
 const ModalUpdates = () => {
-  const activeVersion = '2025-06-09';
+  const activeVersion = '2025-07-08';
   const latestNews = window?.localStorage?.getItem('latestNews');
   const [open, setOpen] = useState(!latestNews || isDateBefore(latestNews, activeVersion));
 
@@ -35,29 +35,12 @@ const ModalUpdates = () => {
       />
       <Transition visible={open} animation="scale" duration={500}>
         <Modal open={open} onClose={() => setOpen(false)}>
-          <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas Novedades - 10 - 06 - 2025" />
+          <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas Novedades - 08 - 07 - 2025" />
           <StyledModalContent>
             <StyledListHeader><Icon name={ICONS.ADD} color="blue" />Nuevo</StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
-                Nueva pestaña para la visualización del historial de cambios de un producto.
-              </ListItem>
-              <ListItem>
-                Guardado de filtros aplicados en las tablas principales durante la navegación.
-              </ListItem>
-              <ListItem>
-                Visualización de fechas de pago ordenadas cronológicamente en los PDF.
-              </ListItem>
-              <ListItem>
-                Atajos de teclado en pestaña &quot;pagos&quot; de una venta confirmada:
-                <ListItem as="ol" value="-">
-                  <ListItem as='li' value='-'>
-                    Control + Enter: envía el formulario si corresponde.
-                  </ListItem>
-                  <ListItem as='li' value='-'>
-                    Control + Delete: restaura el formulario a los valores originales.
-                  </ListItem>
-                </ListItem>
+                Posibilidad de ordenar las tablas principales de forma ascendente o descendente haciendo click en el nombre de la columna.
               </ListItem>
             </List>
           </StyledModalContent>

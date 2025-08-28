@@ -1,4 +1,5 @@
 export const ENTITIES = {
+  GENERAL:'general',
   CUSTOMERS: 'customers',
   CUSTOMER: 'customer',
   SUPPLIERS: 'suppliers',

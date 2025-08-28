@@ -3,7 +3,9 @@ import { useUserContext } from "@/User";
 import { useCreateBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
-import { PAGES } from "@/common/constants";
+import { useGetSetting } from "@/api/settings";
+import { ENTITIES, PAGES } from "@/common/constants";
+import { mapToDropdownOptions } from "@/common/utils";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
@@ -23,8 +25,9 @@ const CreateBudget = () => {
   const createBudget = useCreateBudget();
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
-  const { data: productsData, isLoading: loadingProducts, refetch, isRefetching } = useListProducts();
+  const { data: productsData, isLoading: loadingProducts, refetch: refetchproductsData , isRefetching } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
+  const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
   const products = useMemo(() => productsData?.products.filter((product) => ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state)), [productsData]);
   const customers = useMemo(() => customersData?.customers, [customersData]);
@@ -36,8 +39,9 @@ const CreateBudget = () => {
 
   useEffect(() => {
     setLabels([PAGES.BUDGETS.NAME, 'Crear']);
-    refetch();
-  }, [setLabels, refetch]);
+    refetchproductsData();
+    refetchPaymentMethods();
+  }, [setLabels, refetchproductsData, refetchPaymentMethods]);
 
   const mappedProducts = useMemo(() => products?.map(product => ({
     ...product,
@@ -71,6 +75,10 @@ const CreateBudget = () => {
     }
   }, [budget]);
 
+  const paymentMethodOptions = useMemo(() => {
+    return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
+  }, [paymentMethods]);
+
   return (
     <Loader active={loadingProducts || loadingCustomers || loadingBudget || isRefetching}>
       <BudgetForm
@@ -81,7 +89,8 @@ const CreateBudget = () => {
         budget={clonedBudget}
         isCloning={!!clonedBudget}
         isLoading={isPending}
-        refetchProducts={refetch}
+        refetchProducts={refetchproductsData}
+        paymentMethods={paymentMethodOptions}
       />
     </Loader>
   )

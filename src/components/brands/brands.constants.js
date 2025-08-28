@@ -11,12 +11,17 @@ export const BRAND_COLUMNS = [
   {
     id: 1,
     title: "Id",
+    key: "id",
+    sortable: true,
     width: 1,
-    value: (brand) => brand.id
+    value: (brand) => brand.id,
+    sortValue: (brand) => brand.id ?? ""
   },
   {
     id: 2,
     title: "Nombre",
+    key: "name",
+    sortable: true,
     align: "left",
     value: (brand) =>
       <Flex $justifyContent="space-between">
@@ -24,7 +29,8 @@ export const BRAND_COLUMNS = [
           {brand.name}
         </OverflowWrapper>
         {brand.comments && <CommentTooltip comment={brand.comments} />}
-      </Flex>
+      </Flex>,
+    sortValue: (brand) => brand.name ?? ""
   }
 ];
 

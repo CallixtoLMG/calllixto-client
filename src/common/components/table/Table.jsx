@@ -1,4 +1,4 @@
-import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS } from "@/common/constants";
+import { COLORS, DEFAULT_PAGE_SIZE, ICONS, SHORTKEYS, SORTING } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { Loader } from "@/components/layout";
 import { useKeyboardShortcuts } from "@/hooks";
@@ -10,6 +10,7 @@ import { CenteredFlex } from "../custom";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
+const { ASC, DESC } = SORTING;
 
 const CustomTable = ({
   isLoading,
@@ -41,9 +42,54 @@ const CustomTable = ({
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [popupOpenId, setPopupOpenId] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
-  const filteredElements = useMemo(() => elements.filter(onFilter), [elements, onFilter]);
-  const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
   const tableRef = useRef(null);
+  const [sortConfig, setSortConfig] = useState(filters?.sorting ?? { key: mainKey, direction: ASC });
+
+  const handleSort = (columnKey) => {
+    let newSorting = { key: columnKey, direction: ASC };
+    if (sortConfig.key === columnKey) {
+      newSorting = {
+        key: columnKey,
+        direction: sortConfig.direction === ASC ? DESC : ASC
+      };
+    }
+    setSortConfig(newSorting);
+    setFilters({ ...filters, sorting: newSorting });
+  };
+
+  const filteredElements = useMemo(() => {
+    let result = elements.filter(onFilter);
+
+    if (sortConfig.key) {
+      const header = headers.find(h => h.key === sortConfig.key);
+
+      if (header) {
+        result = result.sort((a, b) => {
+          const aVal = header?.sortValue ? header.sortValue(a) : a[sortConfig.key];
+          const bVal = header?.sortValue ? header.sortValue(b) : b[sortConfig.key];
+
+          if (typeof aVal === 'string' && typeof bVal === 'string') {
+            const cleanA = aVal.trim().toLowerCase();
+            const cleanB = bVal.trim().toLowerCase();
+
+            return sortConfig.direction === ASC
+              ? cleanA.trim().toLowerCase().localeCompare(cleanB, 'es', { sensitivity: 'base' })
+              : cleanB.trim().toLowerCase().localeCompare(cleanA, 'es', { sensitivity: 'base' });
+          }
+
+          return sortConfig.direction === ASC
+            ? aVal - bVal
+            : bVal - aVal;
+        });
+
+      }
+    }
+
+    return result;
+  }, [elements, headers, onFilter, sortConfig]);
+
+
+  const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
   const currentPageElements = useMemo(() => {
     if (!paginate) {
       return filteredElements;
@@ -140,7 +186,7 @@ const CustomTable = ({
         />
       )}
       <Loader active={isLoading} $greyColor>
-        <Table celled compact striped={!basic} color={color} definition={isSelectable}>
+        <Table sortable celled compact striped={!basic} color={color} definition={isSelectable}>
           <TableHeader fullWidth>
             <TableRow>
               {isSelectable && (
@@ -155,7 +201,15 @@ const CustomTable = ({
                 </HeaderCell>
               )}
               {headers.map((header) => (
-                <HeaderCell key={`header_${header.id}`} $basic={basic}>{header.title}</HeaderCell>
+                <HeaderCell
+                  key={`header_${header.id}`}
+                  $basic={basic}
+                  sorted={sortConfig.key === header.key ? sortConfig.direction : null}
+                  onClick={() => header.sortable && handleSort(header.key)}
+                  style={{ cursor: header.sortable ? 'pointer' : 'default' }}
+                >
+                  {header.title}
+                </HeaderCell>
               ))}
               {!!Object.keys(selection).length && (
                 <ActionsContainer $header $open={isPopupOpen}>
@@ -186,8 +240,9 @@ const CustomTable = ({
               ) : (
                 currentPageElements.map((element, index) => {
                   if (page) {
+                    const rowKey = typeof mainKey === "function" ? mainKey(element, index) : element[mainKey];
                     return (
-                      <TableRow key={element[mainKey]}>
+                      <TableRow key={rowKey || index}>
                         {isSelectable && (
                           <Cell $basic={basic}>
                             <CenteredFlex>
@@ -238,8 +293,9 @@ const CustomTable = ({
                       </TableRow>
                     );
                   }
+                  const rowKey = typeof mainKey === "function" ? mainKey(element, index) : element[mainKey];
                   return (
-                    <TableRow key={element[mainKey]}>
+                    <TableRow key={rowKey || index}>
                       {headers.map(header => (
                         <Cell
                           key={`cell_${header.id}`}
@@ -271,7 +327,6 @@ const CustomTable = ({
                                     width={action.width}
                                   />
                                 ))}
-
                               />
                             ) : (
                               <Actions actions={actions} element={element} index={index} />

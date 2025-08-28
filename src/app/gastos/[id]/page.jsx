@@ -76,7 +76,7 @@ const Expense = ({ params }) => {
     }
   
     setActions(actionsList);
-  }, [role, expense?.id, expense?.state, setActions]);
+  }, [role, expense?.id, expense?.state, setActions, handleProtectedAction, push]);
   
   const expenseFormRef = useRef();
 

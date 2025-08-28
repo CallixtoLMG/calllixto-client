@@ -1,9 +1,9 @@
+import { useGetSetting } from "@/api/settings";
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
-import { COLORS, ICONS, RULES } from "@/common/constants";
-import { handleEnterKeyDown } from "@/common/utils";
+import { COLORS, ENTITIES, ICONS, RULES } from "@/common/constants";
+import { handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
-import { PAYMENT_METHODS } from "@/components/budgets/budgets.constants";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header, Popup } from "semantic-ui-react";
 import { Button, FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "../custom";
@@ -95,6 +95,15 @@ const Payments = ({
   const [payment, setPayment] = useState(EMPTY_PAYMENT());
   const [showErrors, setShowErrors] = useState(false);
   const [exceedAmountError, setExceedAmountError] = useState(false);
+  const { data: paymentMethods, refetch } = useGetSetting(ENTITIES.GENERAL);
+
+  const paymentMethodOptions = useMemo(() => {
+    return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
+  }, [paymentMethods]);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const handleAddPayment = async () => {
     setShowErrors(true);
@@ -152,7 +161,7 @@ const Payments = ({
               <DropdownField
                 width="fit-content"
                 label="Método de Pago"
-                options={PAYMENT_METHODS.filter((method) => method.key !== 'dolares')}
+                options={paymentMethodOptions.filter((method) => method.key !== 'dolares')}
                 value={payment.method}
                 onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                 disabled={isTotalCovered}
