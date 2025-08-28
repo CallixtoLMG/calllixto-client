@@ -17,7 +17,7 @@ import { FormProvider } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Form } from "semantic-ui-react";
-import { EMPTY_FILTERS, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS, PRODUCTS_FILTERS_KEY } from "../products.constants";
+import { EMPTY_FILTERS, PRODUCTS_FILTERS_KEY, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "../products.constants";
 
 const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
   const { role } = useUserContext();
@@ -35,7 +35,9 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
     onSubmit,
     filters,
     setFilters,
-    methods
+    methods,
+    appliedCount,
+    hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: PRODUCTS_FILTERS_KEY });
 
   const onFilter = createFilter(filters, ['code', 'name']);
@@ -58,7 +60,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
     }
   ] : [];
 
-  const { mutate, isPending } = useMutation({
+  const { mutate: mutateDelete, isPending } = useMutation({
     mutationFn: async () => {
       let response;
       if (selectedProduct.state === PRODUCT_STATES.DELETED.id) {
@@ -149,6 +151,8 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
               onRefetch={onRefetch}
               clearSelection={() => setSelectedProducts({})}
               onRestoreFilters={onRestoreFilters}
+              appliedCount={appliedCount}
+              hydrated={hydrated}
             >
               <DropdownControlled
                 width="200px"
@@ -187,7 +191,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
           showModal={showModal}
           setShowModal={setShowModal}
           title={`¿Está seguro que desea eliminar ${selectedProduct?.state === PRODUCT_STATES.DELETED.id ? "PERMANENTEMENTE" : ""} el producto "${selectedProduct?.name}"?`}
-          onConfirm={mutate}
+          onConfirm={mutateDelete}
           isLoading={isPending}
         />
       </Flex>

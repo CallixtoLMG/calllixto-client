@@ -19,7 +19,7 @@ export function useListCustomers({ sort = 'name', order = true } = {}) {
   });
 
   return query;
-}
+};
 
 export function useGetCustomer(id) {
   const getCustomer = async (id) => {

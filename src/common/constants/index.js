@@ -48,12 +48,21 @@ export const PAGES = {
     NAME: 'Ventas',
     SHORTKEYS: 'Control+5'
   },
+  EXPENSES: {
+    BASE: "/gastos",
+    CREATE: "/gastos/crear",
+    CLONE: (id) => `/gastos/crear?clonar=${id}`,
+    UPDATE: (id) => `/gastos/${id}?update=true`,
+    SHOW: (id) => `/gastos/${id}`,
+    NAME: 'Gastos',
+    SHORTKEYS: 'Control+6'
+  },
   USERS: {
     BASE: "/usuarios",
     CREATE: "/usuarios/crear",
     SHOW: (id) => `/usuarios/${id}`,
     NAME: 'Usuarios',
-    SHORTKEYS: 'Control+6'
+    SHORTKEYS: 'Control+7'
   },
   LOGIN: {
     BASE: "/login"
@@ -61,7 +70,7 @@ export const PAGES = {
   SETTINGS: {
     BASE: "/configuracion",
     NAME: 'Configuración',
-    SHORTKEYS: 'Control+7'
+    SHORTKEYS: 'Control+8'
   },
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"
@@ -206,7 +215,8 @@ export const ICONS = {
   MAIL_SQUARE: "mail square",
   PERCENT: 'percent',
   SETTINGS: "settings",
-  BULLHORN: "bullhorn"
+  BULLHORN: "bullhorn",
+  BOXES: "boxes"
 };
 
 export const ALL = "all";
@@ -216,6 +226,10 @@ export const ACTIVE = "active";
 export const DELETE = "delete";
 
 export const INACTIVE = "inactive";
+
+export const CANCELLED = "cancelled";
+
+export const CANCEL_ACTION = "cancel";
 
 export const RECOVER = "recover";
 
@@ -250,3 +264,10 @@ export const PASSWORD_REQUIREMENTS = [
 ];
 
 export const SELECT_ALL_OPTION = { key: ALL, value: ALL, text: 'Todos' };
+
+export const SORTING = {
+  ASC:'ascending',
+  DESC: 'descending'
+}
+
+

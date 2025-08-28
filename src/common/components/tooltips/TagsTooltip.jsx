@@ -2,7 +2,7 @@ import { COLORS, ICONS } from "@/common/constants";
 import { Popup } from "semantic-ui-react";
 import { Flex, Icon, Label, OverflowWrapper } from "../custom";
 
-export const TagsTooltip = ({ tags, tooltip, maxWidthOverflow, lineClamp }) => {
+export const TagsTooltip = ({ tags, tooltip, maxWidthOverflow, lineClamp, icon = ICONS.TAGS }) => {
   const validTags = (tags || []).filter(tag => tag && tag.name);
   if (!tags || tags.length === 0) return null;
 
@@ -25,7 +25,7 @@ export const TagsTooltip = ({ tags, tooltip, maxWidthOverflow, lineClamp }) => {
         <Popup
           size="mini"
           hoverable
-          trigger={<Icon tooltip={tooltip} margin="0" name={ICONS.TAGS} color={COLORS.BLUE} />}
+          trigger={<Icon tooltip={tooltip} margin="0" name={icon} color={COLORS.BLUE} />}
           content={
             <Flex $columnGap="5px" >
               {validTags.slice(1).map((tag) => (

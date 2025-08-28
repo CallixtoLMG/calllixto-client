@@ -5,12 +5,12 @@ import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
 import { DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu } from "@/common/components/custom";
+import ModalCancel from "@/common/components/modals/ModalCancel";
 import { COLORS, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import BudgetView from "@/components/budgets/BudgetView";
-import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import ModalPDF from "@/components/budgets/ModalPDF";
@@ -348,6 +348,7 @@ const Budget = ({ params }) => {
         onConfirm={mutateCancel}
         isLoading={isPendingCancel}
         id={budget?.id}
+        header={`Desea anular el presupuesto ${budget?.id}?`}
       />
     </Loader>
   );

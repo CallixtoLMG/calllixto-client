@@ -9,11 +9,11 @@ import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constan
 import { isItemInactive } from "@/common/utils";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
-import { useAllowUpdate, useProtectedAction, useValidateToken, useUnsavedChanges } from "@/hooks";
 
 const Customer = ({ params }) => {
   useValidateToken();
@@ -68,7 +68,6 @@ const Customer = ({ params }) => {
     setLabels([PAGES.CUSTOMERS.NAME, customer?.name]);
     refetch();
   }, [customer, setLabels, refetch]);
-
 
   const hasAssociatedBudgets = useMemo(() => {
     return budgetData?.budgets?.some(budget => budget.customer?.id === customer?.id);

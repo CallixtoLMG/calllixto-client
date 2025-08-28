@@ -6,7 +6,8 @@ import { Text } from "@/common/components/search/styles";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
-import { useArrayTags, useKeyboardShortcuts } from "@/hooks";
+import { useKeyboardShortcuts } from "@/hooks";
+import useSettingArrayField from "@/hooks/useSettingArrayField";
 import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
@@ -35,11 +36,8 @@ const ProductForm = forwardRef(({
   const methods = useForm({
     defaultValues: getInitialValues(product)
   });
-  const { data: productsSettings, isFetching: isProductSettingsFetching, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
-  const { tagsOptions, optionsMapper } = useArrayTags(
-    ENTITIES.PRODUCTS,
-    product?.tags || []
-  );
+  const { isFetching: isProductSettingsFetching, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
+  const { options: tagsOptions, optionsMapper } = useSettingArrayField(ENTITIES.PRODUCTS, "tags", product?.tags || []);
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
@@ -285,7 +283,6 @@ const ProductForm = forwardRef(({
             name="tags"
             label="Etiquetas"
             placeholder="Selecciona etiquetas"
-            height="fit-content"
             multiple
             clearable={isUpdating && !view}
             icon={(!isUpdating && view) ? null : undefined}

@@ -9,7 +9,7 @@ import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/
 import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
 import { getDateWithOffset, now } from "@/common/utils/dates";
-import { BUDGET_STATES, PAYMENT_METHODS, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
+import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
 import { ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
@@ -32,7 +32,7 @@ const EMPTY_BUDGET = (user) => ({
   comments: '',
   globalDiscount: 0,
   additionalCharge: 0,
-  paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
+  paymentMethods: [],
   expirationOffsetDays: '',
   paymentsMade: [],
   pickUpInStore: false,
@@ -47,6 +47,7 @@ const BudgetForm = ({
   isLoading,
   isCloning,
   draft,
+  paymentMethods,
 }) => {
   const clonedInitialValues = useMemo(() => {
     if (!isCloning || !budget) return EMPTY_BUDGET(user);
@@ -64,7 +65,7 @@ const BudgetForm = ({
         })
       })),
       seller: user?.name,
-      paymentMethods: PAYMENT_METHODS.map(({ value }) => value),
+      paymentMethods: paymentMethods.map(({ value }) => value),
       state: BUDGET_STATES.PENDING.id,
       customer: { name: '', addresses: [], phoneNumbers: [] },
       comments: '',
@@ -74,7 +75,7 @@ const BudgetForm = ({
       paymentsMade: [],
       pickUpInStore: false,
     };
-  }, [budget, isCloning, user]);
+  }, [budget, isCloning, user, paymentMethods]);
 
   const methods = useForm({
     defaultValues: isCloning && budget
@@ -91,6 +92,15 @@ const BudgetForm = ({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
   });
+
+  useEffect(() => {
+    const current = methods.getValues("paymentMethods");
+    const all = paymentMethods.map(m => m.value);
+
+    if (!current?.length) {
+      methods.setValue("paymentMethods", all, { shouldDirty: false });
+    }
+  }, [paymentMethods, methods]);
 
   const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
@@ -352,7 +362,7 @@ const BudgetForm = ({
       id: 1,
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      onClick: (element, index) => { removeProduct(index)},
+      onClick: (element, index) => { removeProduct(index) },
       tooltip: 'Eliminar',
       width: "100%"
     },
@@ -756,26 +766,26 @@ const BudgetForm = ({
             <Controller
               name="paymentMethods"
               render={({ field: { onChange, value } }) => (
-                <FormField flex="1" label="Métodos de pago" control={Input}>
+                <FormField flex="1" label="Métodos de pago" control={Input} height="auto">
                   <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                     <Button
                       $paddingLeft="18px"
                       width="fit-content"
                       type="button"
-                      basic={value.length !== PAYMENT_METHODS.length}
+                      basic={value.length !== paymentMethods.length}
                       color={COLORS.BLUE}
                       onClick={() => {
-                        if (value.length === PAYMENT_METHODS.length) {
+                        if (value.length === paymentMethods.length) {
                           onChange([]);
                         } else {
-                          onChange(PAYMENT_METHODS.map(method => method.value));
+                          onChange(paymentMethods.map(method => method.value));
                         }
                       }}
                     >
                       Todos
                     </Button>
                     <VerticalDivider />
-                    {PAYMENT_METHODS.map(({ key, text, value: methodValue }) => (
+                    {paymentMethods.map(({ key, text, value: methodValue }) => (
                       <Button
                         $paddingLeft="18px"
                         width="fit-content"

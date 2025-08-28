@@ -122,8 +122,8 @@ const Categories = () => {
                 label="Nombre"
                 placeholder="Nombre de la categoria"
                 value={categoryToAdd.name}
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
                 onChange={handleNameChange}
+                onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
                 error={errors?.name}
               />
               <DropdownField

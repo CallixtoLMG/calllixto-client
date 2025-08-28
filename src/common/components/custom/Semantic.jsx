@@ -25,8 +25,8 @@ export const Segment = styled(SSegment)`
   overflow: auto;
   align-content: center;
   opacity: ${({ show }) => show ? "0" : "1"} !important;
-  border: ${({ noBorder }) => noBorder && "none"} !important;
-  box-shadow: ${({ noBoxShadow  }) => noBoxShadow && "none"} !important;
+  border: ${({ $noBorder }) => $noBorder && "blue"} !important;
+  box-shadow: ${({ $noBoxShadow }) => $noBoxShadow && "none"} !important;
 `;
 
 export const Input = styled(SInput)`
@@ -66,6 +66,7 @@ export const Label = styled(SLabel)`
   margin: ${({ margin }) => margin ? margin : '0'} !important;
   padding: ${({ padding }) => padding} !important;
   align-content: center;
+  align-self: ${({ $alignSelf }) => $alignSelf} !important;
   opacity: ${({ show }) => show ? "0" : "1"} !important;
   font-weight: ${({ fontWeight }) => fontWeight} !important;
   box-shadow: ${({ fontWeight }) => fontWeight && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
@@ -83,12 +84,12 @@ export const Dropdown = styled(SDropdown)`
   box-shadow: ${({ $boxShadow }) => $boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
   width: ${({ width }) => `${width}!important`};
 
-  .divider.text{
-    height: 15px;
-  }
-
   .text{
     text-align: ${({ $textAlign }) => `${$textAlign}!important`};
+  }
+
+  .divider.text{
+    padding-bottom: 2px;
   }
 
   .menu > .item,

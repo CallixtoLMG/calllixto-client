@@ -26,7 +26,7 @@ export const FieldsContainer = styled(Flex)`
 
 export const ButtonsContainer = styled(Flex)`
   flex-direction: row;
-  margin-top: ${({ marginTop }) => (marginTop ? marginTop : '0')};
+  margin-top: ${({ $marginTop }) => ($marginTop ? $marginTop : '0')};
   justify-content: flex-end;
   column-gap: 10px;
   padding: 0!important;

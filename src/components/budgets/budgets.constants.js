@@ -1,5 +1,5 @@
 import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
-import { DATE_FORMATS, ICONS, SELECT_ALL_OPTION } from "@/common/constants";
+import { DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
 import { getFormatedDate } from "@/common/utils/dates";
 import { Label, Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
@@ -75,6 +75,8 @@ export const BUDGETS_COLUMNS = [
   {
     id: 1,
     title: "Id",
+    key: "id",
+    sortable: true,
     width: 1,
     align: "left",
     value: (budget) => (
@@ -96,11 +98,14 @@ export const BUDGETS_COLUMNS = [
           </Label>
         )}
       </Box>
-    )
+    ),
+    sortValue: (budget) => budget.id ?? ""
   },
   {
     id: 2,
     title: "Cliente",
+    key: "customer",
+    sortable: true,
     align: "left",
     width: 6,
     value: (budget) => (
@@ -110,32 +115,43 @@ export const BUDGETS_COLUMNS = [
         </OverflowWrapper>
         {budget.comments && <CommentTooltip comment={budget.comments} />}
       </Flex>
-    )
+    ),
+    sortValue: (budget) => budget.customer.name ?? ""
   },
   {
     id: 3,
     title: "Fecha",
+    key: "date",
+    sortable: true,
     width: 3,
-    value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)
+    value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME),
+    sortValue: (budget) => budget.createdAt ?? ""
+
   },
   {
     id: 4,
     title: "Total",
+    key: "total",
+    sortable: true,
     width: 2,
     value: (budget) => (
       <PriceLabel value={getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge)} />
-    )
+    ),
+    sortValue: (budget) => getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge) ?? ""
   },
   {
     id: 5,
     title: "Vendedor",
     align: "left",
+    key: "seller",
+    sortable: true,
     width: 4,
     value: (budget) => (
       <OverflowWrapper maxWidth="25vw" popupContent={budget.seller}>
         {budget.seller}
       </OverflowWrapper>
-    )
+    ),
+    sortValue: (budget) => budget.seller ?? ""
   },
 ];
 
@@ -148,24 +164,6 @@ export const PAYMENT_METHODS = [
   { key: 'dolares', text: 'Dólares', value: 'Dólares' },
   { key: 'others', text: 'Otros', value: 'Otros' },
   { key: 'multi', text: 'Varios', value: 'Varios' }
-];
-
-export const PAYMENT_TABLE_HEADERS = [
-  {
-    id: 'date',
-    title: 'Fecha de Pago',
-    value: (element) =>
-      element.date
-        ? getFormatedDate(element.date)
-        : "-",
-    width: 2
-  },
-  { id: 'method', width: 4, title: 'Método', value: (element) => element.method },
-  { id: 'amount', width: 3, title: 'Monto', value: (element) => <PriceLabel value={element.amount} /> },
-  {
-    id: 'comments', width: 9, align: "left", title: 'Comentarios', value: (element) =>
-      <OverflowWrapper maxWidth="30vw" popupContent={element.comments}> {element.comments} </OverflowWrapper>
-  },
 ];
 
 export const BUDGET_PDF_FORMAT = {
@@ -188,7 +186,7 @@ export const BUDGET_PDF_FORMAT = {
 
 export const PICK_UP_IN_STORE = "Retira en tienda";
 
-export const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: SELECT_ALL_OPTION.value };
+export const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: SELECT_ALL_OPTION.value, sorting: { key: 'id', direction: SORTING.DESC } };
 export const BUDGET_STATES_OPTIONS = [
   SELECT_ALL_OPTION,
   ...Object.values(BUDGET_STATES).map(({ id, title, color }) => (

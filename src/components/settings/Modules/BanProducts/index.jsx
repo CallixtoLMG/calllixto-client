@@ -97,6 +97,7 @@ const Blacklist = () => {
       color: COLORS.RED,
       onClick: handleRemoveCode,
       tooltip: "Eliminar",
+      getKey: (code, index) => `delete_${code}_${index}`, 
     },
   ], [handleRemoveCode]);
 

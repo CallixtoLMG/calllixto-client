@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import useFilterParams from "./useFilterParams";
 
@@ -8,8 +8,10 @@ const useFilters = ({ defaultFilters, key }) => {
     defaultParams: defaultFilters,
   });
 
+  const [hydrated, setHydrated] = useState(false);
+
   const methods = useForm({
-    defaultValues: filters,
+    defaultValues: defaultFilters,
   });
   const { handleSubmit, reset } = methods;
 
@@ -19,22 +21,33 @@ const useFilters = ({ defaultFilters, key }) => {
   };
 
   const onSubmit = handleSubmit(data => {
-    const mergedData = { ...filters, ...data };
+    const mergedData = { ...defaultFilters, ...filters, ...data };
     reset(mergedData);
     setFilters(mergedData);
   });
 
   useEffect(() => {
-    onSubmit(filters);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    reset(filters);
+    setHydrated(true);
+  }, [filters, reset]);
+
+  const appliedCount = useMemo(() => {
+    return Object.keys(defaultFilters).reduce((acc, key) => {
+      if (filters[key] !== defaultFilters[key]) {
+        acc += 1;
+      }
+      return acc;
+    }, 0);
+  }, [filters, defaultFilters]);
 
   return {
     onRestoreFilters,
     onSubmit,
     filters,
     setFilters,
-    methods
+    methods,
+    appliedCount,
+    hydrated
   };
 };
 

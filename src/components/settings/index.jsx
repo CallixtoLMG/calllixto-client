@@ -7,6 +7,7 @@ import BrandsModule from "./Entities/Brands";
 import BudgetsModule from "./Entities/Budgets";
 import CustomersModule from "./Entities/Customers";
 import ExpensesModule from "./Entities/Expenses";
+import GeneralModule from "./Entities/General";
 import ProductsModule from "./Entities/Products";
 import SuppliersModule from "./Entities/Suppliers";
 
@@ -18,6 +19,7 @@ const SettingsTabs = ({ onEntityChange, settings = [], onRefresh, isLoading, onB
     menuItem: entity.label,
     render: () => (
       <Tab.Pane>
+        {entity.entity === 'GENERAL' && <GeneralModule />}
         {entity.entity === 'CUSTOMER' && <CustomersModule />}
         {entity.entity === 'SUPPLIER' && <SuppliersModule />}
         {entity.entity === 'BRAND' && <BrandsModule />}
