@@ -176,7 +176,7 @@ const ExpenseForm = forwardRef(({
           <SubmitAndRestore
             isUpdating={isUpdating}
             isLoading={isLoading}
-            isDirty={isDirty}
+            isDirty={isCloning ? true : isDirty}
             onReset={() => handleReset(isUpdating ? { ...EMPTY_EXPENSE, ...expense } : EMPTY_EXPENSE)}
             submit
             cloningExpense

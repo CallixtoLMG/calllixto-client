@@ -25,7 +25,7 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id, header })
           </Message>
         </ModalContent>
         <Modal.Actions>
-          <ButtonsContainer width="100%" marginTop="10px">
+          <ButtonsContainer width="100%" $marginTop="10px">
             <IconedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} />
             <IconedButton
               text="Anular"

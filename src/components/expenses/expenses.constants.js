@@ -1,6 +1,7 @@
 import { Flex, OverflowWrapper } from "@/common/components/custom";
 import { PriceLabel } from "@/common/components/form";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
+import { ICONS } from "@/common/constants";
 import { Label } from "semantic-ui-react";
 
 export const LIST_EXPENSES_QUERY_KEY = 'listExpenses';
@@ -42,7 +43,7 @@ export const HEADERS = [
     value: (expense) => {
       return (
         <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
-          {expense.categories && <TagsTooltip categorie maxWidthOverflow="8vw" tooltip="true" tags={expense.categories} />}
+          {expense.categories && <TagsTooltip icon={ICONS.BOXES} maxWidthOverflow="8vw" tooltip="true" tags={expense.categories} />}
         </Flex>
       );
     }

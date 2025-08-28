@@ -51,16 +51,18 @@ const Expense = ({ params }) => {
   });
 
   useEffect(() => {
-
-    const actionsList = RULES.canRemove[role] ? [
-      {
+    const actionsList = [];
+  
+    if (RULES.canRemove[role]) {
+      actionsList.push({
         id: 1,
         icon: ICONS.COPY,
         color: COLORS.GREEN,
-        onClick: () => { push(PAGES.EXPENSES.CLONE(expense.id)) },
+        onClick: () => push(PAGES.EXPENSES.CLONE(expense.id)),
         text: 'Clonar',
-      },
-    ] : [];
+      });
+    }
+  
     if (!isItemCancelled(expense?.state)) {
       actionsList.push({
         id: 2,
@@ -72,9 +74,10 @@ const Expense = ({ params }) => {
         width: "fit-content",
       });
     }
+  
     setActions(actionsList);
-  }, [role, expense, push, handleProtectedAction, setActions]);
-
+  }, [role, expense?.id, expense?.state, setActions]);
+  
   const expenseFormRef = useRef();
 
   const expenseUnsaved = useUnsavedChanges({
