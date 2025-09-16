@@ -7,11 +7,11 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 export const now = () => {
-  return dayjs().tz(dayjs.tz.guess()).toISOString();
+  return dayjs().utc().format(DATE_FORMATS.ISO);
 };
 
-export const getDateWithOffset = (date, offset, unit) => {
-  return dayjs(date).add(offset, unit).format(DATE_FORMATS.ONLY_DATE);
+export const getDateWithOffset = ({ date, offset, unit = 'days', format = DATE_FORMATS.ONLY_DATE }) => {
+  return dayjs(date).utc().add(offset, unit).format(format);
 };
 
 export const getFormatedDate = (date, format = DATE_FORMATS.ONLY_DATE) => {

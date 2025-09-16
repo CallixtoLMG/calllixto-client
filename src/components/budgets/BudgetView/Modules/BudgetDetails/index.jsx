@@ -169,8 +169,8 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
               <FormField
                 label="Fecha de vencimiento"
                 control={Input}
-                value={getDateWithOffset(budget?.createdAt, budget?.expirationOffsetDays, 'days')}
-                disabled
+                value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })}
+            disabled
               />
             )}
           </FieldsContainer>

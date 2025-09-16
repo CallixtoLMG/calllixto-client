@@ -158,16 +158,11 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
 
 export const normalizeText = (text) => text?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() ?? "";
 
-export const getDefaultListParams = (attributes, sort, order) => {
-  const params = {
-    attributes: encodeUri(Object.values(attributes)),
-  };
-
-  if (sort) params.sort = sort;
-  if (typeof order !== 'undefined') params.order = order;
-
-  return params;
+export const getDefaultListParams = (attributes = []) => {
+  return { attributes: encodeUri(getDefaultAttributes(attributes)) };
 };
+
+export const getDefaultAttributes = (attributes = []) => [...attributes, 'updatedAt', 'createdAt' ];
 
 export const toUpperCase = (text = "") => {
   if (typeof text !== "string") return "";

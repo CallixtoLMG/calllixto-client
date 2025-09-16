@@ -1,10 +1,17 @@
-import { ALL, DEFAULT_LAST_EVENT_ID, DELETE, ENTITIES, EVENT_KEYS, ID, USERNAME } from "@/common/constants";
-import { now } from "@/common/utils/dates";
-import { config } from "@/config";
-import { EVENTS, PATHS } from "@/fetchUrls";
+import { ALL, DATE_FORMATS, LAST_UPDATED_AT } from "@/common/constants";
+import { getDateWithOffset } from "@/common/utils/dates";
 import { useQueryClient } from "@tanstack/react-query";
 import { getInstance } from './axios';
-import localforage from "./local-forage";
+import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
+import { getDefaultAttributes } from "@/common/utils";
+import { pick } from 'lodash';
+
+function useInvalidateQueries() {
+  const queryClient = useQueryClient();
+  return (queries) => {
+    queries.forEach((queryKey) => { queryClient.invalidateQueries({ queryKey, refetchType: ALL }); });
+  };
+}
 
 async function entityList({ entity, url, params }) {
   try {
@@ -12,7 +19,6 @@ async function entityList({ entity, url, params }) {
     let LastEvaluatedKey;
 
     do {
-
       const queryParams = {
         ...params,
         ...(LastEvaluatedKey && { LastEvaluatedKey: JSON.stringify(LastEvaluatedKey) }),
@@ -36,156 +42,55 @@ async function entityList({ entity, url, params }) {
   }
 };
 
-async function handleEvents({ entity, values, key = ID }) {
-  let lastEventId = await localforage.getItem(`${config.APP_ENV}-${entity}-lastEventId`);
+export async function listItems({ entity, url, params = {} }) {
+  params = { ...params, sort: 'updatedAt' };
+  let updateLastUpdatedAt = false;
+  let lastUpdatedAt = (await getStorageItem({ entity: LAST_UPDATED_AT, id: entity }))?.lastUpdatedAt;
 
-
-  if (!lastEventId) {
-    lastEventId = DEFAULT_LAST_EVENT_ID;
-    await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
-  }
-
-  const { data: eventsData } = await getInstance().get(`${EVENTS}/${entity}`, {
-    params: { lastEventId },
-  });
-
-  if (eventsData.statusOk) {
-    const newEvents = eventsData.events;
-
-    lastEventId = newEvents[newEvents.length - 1]?.id;
-    if (lastEventId) {
-      await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
-    }
-
-    if (newEvents.some((event) => event.action === EVENT_KEYS.UPDATE_ALL)) {
-      return [];
-    }
-
-    for (const event of newEvents) {
-      if (event.action === EVENT_KEYS.CREATE) {
-        event.value.forEach((item) => {
-          const exists = values.find((existingItem) => existingItem[key] === item[key]);
-          if (!exists) {
-            values = [item, ...values];
-          }
-        });
-      }
-
-      if (event.action === EVENT_KEYS.UPDATE) {
-        event.value.forEach((item) => {
-          values = values.map((existingItem) =>
-            existingItem[key] === item[key] ? { ...existingItem, ...item } : existingItem
-          );
-        });
-      }
-
-      if (event.action === EVENT_KEYS.DELETE) {
-        const idsToDelete = event.value.map((item) => item[key]);
-        values = values.filter(existingItem => !idsToDelete.includes(existingItem[key]));
-      }
-
-      if (event.action === EVENT_KEYS.DELETE_SUPPLIER_PRODUCTS) {
-        const supplierIdToDelete = event.value.supplierId;
-
-        await removeStorageItemsByCustomFilter({
-          entity: ENTITIES.PRODUCTS,
-          filter: (product) => product.code.slice(0, 2) !== supplierIdToDelete
-        });
-
-        values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
+  if (lastUpdatedAt) {
+    const startDate = getDateWithOffset({ date: lastUpdatedAt, offset: 1, unit: 'seconds', format: DATE_FORMATS.ISO });
+    const outdatedValues = await entityList({ entity, url, params: { ...params, startDate } });
+    if (!!outdatedValues.length) {
+      updateLastUpdatedAt = true;
+      for (const value of outdatedValues) {
+        if (value.state === 'HARD_DELETED') {
+          await removeStorageItem({ entity, id: value.id });
+        } else {
+          await updateOrCreateStorageItem({ entity, value });
+        }
       }
     }
-  };
-
-  return values;
-};
-
-export async function listItems({ entity, url, params, key = ID }) {
-  let values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-
-  if (values?.length) {
-    values = await handleEvents({ entity, values, key });
-  }
-
-  if (!values || values.length === 0) {
-    values = await entityList({ entity, url, params });
-
-    await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
-
-    const { data } = await getInstance().get(`${PATHS.EVENTS}/${entity}`, { params: { order: false, pageSize: 1 } });
-    const lastEventId = data?.events?.[0]?.id;
-
-    if (lastEventId) {
-      await localforage.setItem(`${config.APP_ENV}-${entity}-lastEventId`, lastEventId);
+  } else {
+    await clearStorageTable(entity);
+    const data = await entityList({ entity, url, params });
+    if (!!data.length) {
+      await bulkAddStorageItems({ entity, values: data });
+      updateLastUpdatedAt = true;
     }
   }
 
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, values);
+  const values = await getAllStorageItems({ entity, order: 'descending', sort: 'updatedAt' });
+
+  if (updateLastUpdatedAt) {
+    const { updatedAt, createdAt } = values[0];
+    await updateOrCreateStorageItem({ entity: LAST_UPDATED_AT, value: { id: entity, lastUpdatedAt: updatedAt ?? createdAt } });
+  }
 
   return { [entity]: values };
 };
 
-export async function getItemById({ id, url, entity, key = ID, params }) {
-  await listItems({ entity, url, params, key });
-  const getEntity = async (id) => {
-    try {
-      const { data } = await getInstance().get(`${url}/${id}`);
-      if (data.statusOk) {
-        return data[entity];
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  let value = (await localforage.getItem(`${config.APP_ENV}-${entity}`))?.find((item) => item[key] === id);
-  if (value) {
-    return value;
-  }
-  return getEntity(id);
-};
-
-export async function getItemByParam({ params, url, entitySingular, entityPlural, key }) {
-
-  await listItems({ entity: entityPlural, url, params, key });
-
-  const getEntity = async () => {
-    try {
-      const { data } = await getInstance().get(url, { params });
-      if (data.statusOk) {
-        return data[entitySingular];
-      }
-    } catch (error) {
-      throw error;
-    }
-  };
-
-  const cachedData = await localforage.getItem(`${config.APP_ENV}-${entityPlural}`);
-
-  const value = cachedData?.find((item) =>
-    Object.entries(params).every(([key, val]) => item[key] === val)
-  );
-
-  return value || getEntity();
-}
-
 export function useCreateItem() {
-  const queryClient = useQueryClient();
+  const invalidate = useInvalidateQueries();
 
-  const createItem = async ({ entity, value, url, responseEntity, invalidateQueries = [] }) => {
-    const body = {
-      ...value,
-      createdAt: now(),
-    };
-
-    const { data } = await getInstance().post(url, body);
+  const createItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], attributes }) => {
+    const { data } = await getInstance().post(url, value);
 
     if (data.statusOk) {
-      await addStorageItem({ entity, value: data[responseEntity] });
-
-      invalidateQueries.forEach((query) => {
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      await updateOrCreateStorageItem({
+        entity,
+        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
       });
+      invalidate(invalidateQueries);
     }
 
     return data;
@@ -194,137 +99,38 @@ export function useCreateItem() {
   return createItem;
 };
 
-export function useInactiveItem() {
-  const queryClient = useQueryClient();
+export function usePostUpdateItem() {
+  const invalidate = useInvalidateQueries();
 
-  const inactiveItem = async ({ entity, value, url, responseEntity, invalidateQueries = [], key = ID }) => {
-    const body = {
-      ...value,
-      updatedAt: now(),
-    };
-
-    const { data } = await getInstance().post(url, body);
-
-    if (data.statusOk) {
-      await updateStorageItem({ entity, value: data[responseEntity], key });
-      invalidateQueries.forEach((query) => {
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
-      });
-    }
-
-    return data;
-  };
-
-  return inactiveItem;
-};
-
-export function useInactiveItemByParam() {
-  const queryClient = useQueryClient();
-
-  const inactiveItem = async ({ entity, value, url, params = {}, responseEntity, invalidateQueries = [], key }) => {
+  const postItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes }) => {
     const { data } = await getInstance().post(url, value, { params });
 
     if (data.statusOk) {
-      await updateStorageItem({ entity, value: data[responseEntity], key });
-      invalidateQueries.forEach((query) => {
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+      await updateOrCreateStorageItem({
+        entity,
+        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
       });
+      invalidate(invalidateQueries);
     }
 
     return data;
   };
 
-  return inactiveItem;
-};
-
-export function useActiveItemByParam() {
-  const queryClient = useQueryClient();
-
-  const activeItem = async ({ entity, value, url, params = {}, responseEntity, invalidateQueries = [], key }) => {
-    const { data } = await getInstance().post(url, value, { params });
-
-    if (data.statusOk) {
-      await updateStorageItem({ entity, value: data[responseEntity], key });
-      invalidateQueries.forEach((query) => {
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
-      });
-    }
-
-    return data;
-  };
-
-  return activeItem;
-};
-
-export function useActiveItem() {
-  const queryClient = useQueryClient();
-
-  const activeItem = async ({ entity, value, url, responseEntity, invalidateQueries = [], key }) => {
-    const body = {
-      ...value,
-      updatedAt: now(),
-    };
-
-    const { data } = await getInstance().post(url, body);
-
-    if (data.statusOk) {
-
-      await updateStorageItem({ entity, value: data[responseEntity], key });
-
-      invalidateQueries.forEach((query) => {
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
-      });
-    }
-
-    return data;
-  };
-
-  return activeItem;
-};
-
-export function useRecoverItem() {
-  const queryClient = useQueryClient();
-
-  const recoverItem = async ({ entity, url, responseEntity, invalidateQueries = [], key }) => {
-    const body = {
-      updatedAt: now(),
-    };
-
-    const { data } = await getInstance().post(url, body);
-
-    if (data.statusOk) {
-
-      await updateStorageItem({ entity, value: data[responseEntity], key });
-
-      invalidateQueries.forEach((query) => {
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
-      });
-    }
-
-    return data;
-  };
-
-  return recoverItem;
+  return postItem;
 };
 
 export function useEditItem() {
-  const queryClient = useQueryClient();
+  const invalidate = useInvalidateQueries();
 
-  const editItem = async ({ entity, value, url, responseEntity, key = ID, invalidateQueries = [] }) => {
-    const updatedItem = {
-      ...value,
-      updatedAt: now(),
-    };
-    const { data } = await getInstance().put(url, updatedItem);
+  const editItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes }) => {
+    const { data } = await getInstance().put(url, value, { params });
 
-    if (data.statusOk) {
-      if (data[responseEntity]) {
-        await updateStorageItem({ entity, key, value: data[responseEntity] });
-      }
-
-      invalidateQueries.forEach((query) => {
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
+    if (data.statusOk && data[responseEntity]) {
+      await updateOrCreateStorageItem({
+        entity,
+        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
       });
+      invalidate(invalidateQueries);
     } else {
       console.error("Error en la respuesta:", data.message);
     }
@@ -335,155 +141,28 @@ export function useEditItem() {
   return editItem;
 };
 
-export function useEditItemByParam() {
-  const queryClient = useQueryClient();
-
-  const editItemByParam = async ({ entity, url, value, username, responseEntity, invalidateQueries = [] }) => {
-
-    const updatedItem = {
-      ...value,
-      updatedAt: now(),
-    };
-
-    const { data } = await getInstance().put(url, updatedItem, { params: { username } });
-
-    if (data.statusOk) {
-      if (data[responseEntity]) {
-
-        if (!data[responseEntity].username) {
-          console.error("❌ Error: El usuario editado no tiene ID:", data[responseEntity]);
-          return;
-        }
-        await updateStorageItem({ entity, key: "username", value: data[responseEntity] });
-      }
-
-      invalidateQueries.forEach((query) => {
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
-      });
-    } else {
-      console.error("⚠️ Error en la respuesta:", data.message);
-    }
-
-    return data;
-  };
-
-  return editItemByParam;
-};
-
 export function useDeleteItem() {
-  const queryClient = useQueryClient();
+  const invalidate = useInvalidateQueries();
 
-  const deleteItem = async ({ entity, id, url, key = ID, invalidateQueries = [] }) => {
-    const { data } = await getInstance().delete(`${url}/${id}`);
+  const deleteItem = async ({ entity, id, url, invalidateQueries = [], params = {} }) => {
+    const { data } = await getInstance().delete(url, { params });
 
     if (data.statusOk) {
-      await removeStorageItem({ entity, id, key });
+      await removeStorageItem({ entity, id });
+      invalidate(invalidateQueries);
     }
-    invalidateQueries.forEach((query) => { queryClient.invalidateQueries({ queryKey: query, refetchType: ALL }); })
+
     return data;
   };
   return deleteItem;
 };
 
-export function useDeleteItemByParam() {
-  const queryClient = useQueryClient();
-
-  const deleteItemByParam = async ({ entity, url, params = {}, invalidateQueries = [] }) => {
-    try {
-      const { data } = await getInstance().delete(url, { params });
-
-      if (data.statusOk) {
-        await removeStorageItem({ entity, id: params.username, key: USERNAME });
-      }
-
-      invalidateQueries.forEach((query) => {
-        queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
-      });
-
-      return data;
-    } catch (error) {
-      console.error("❌ Error en la petición DELETE:", error);
-      throw error;
-    }
-  };
-
-  return deleteItemByParam;
-};
-
-export function useBatchDeleteItems() {
-  const queryClient = useQueryClient();
-
-  const batchDeleteItems = async ({ entity, ids = [], url, key = ID, invalidateQueries = [] }) => {
-    if (!Array.isArray(ids) || ids.length === 0) {
-      console.warn("No hay IDs válidos para eliminar.");
-      return { statusOk: true, deletedCount: 0 };
-    }
-
-    const successfulDeletes = [];
-    let deletedCount = 0;
-
-    for (const code of ids) {
-      try {
-        const { data } = await getInstance().delete(`${url}/${code}`);
-        if (data.statusOk) {
-          deletedCount += 1;
-
-          if (data.product?.state === DELETE) {
-            successfulDeletes.push(code);
-          }
-        } else {
-          console.warn(`No se pudo eliminar el ID ${code}:`, data.error);
-        }
-      } catch (error) {
-        console.error(`Error al eliminar el elemento con ID ${code}:`, error);
-      }
-    }
-
-    if (successfulDeletes.length > 0) {
-      await removeStorageItemsByCustomFilter({
-        entity,
-        filter: (item) => !successfulDeletes.includes(item[key]),
-      });
-    }
-
-    invalidateQueries.forEach((query) => {
-      queryClient.invalidateQueries({ queryKey: query, refetchType: ALL });
-    });
-
-    return { statusOk: true, deletedCount };
-  };
-
-  return batchDeleteItems;
-};
-
-export async function addStorageItem({ entity, value }) {
-  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, [value, ...values]);
-};
-
-export async function updateStorageItem({ entity, value, key = ID }) {
-  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  const updatedArray = values.map(item => {
-    return item[key] === value[key] ? { ...item, ...value } : item;
-  })
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, updatedArray);
-};
-
-export async function removeStorageItem({ entity, id, key = ID }) {
-  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, values.filter((item) => item[key] !== id));
-};
-
 export async function removeStorageItemsByCustomFilter({ entity, filter }) {
-  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  if (!values) {
-    console.warn("No se encontraron valores en el storage para la entidad:", entity);
-    return;
-  }
-  const filteredValues = values.filter(filter);
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, filteredValues);
-};
-
-export function removeStorageEntity(entity) {
-  return localforage.removeItem(`${config.APP_ENV}-${entity}`);
+  // const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
+  // if (!values) {
+  //   console.warn("No se encontraron valores en el storage para la entidad:", entity);
+  //   return;
+  // }
+  // const filteredValues = values.filter(filter);
+  // await localforage.setItem(`${config.APP_ENV}-${entity}`, filteredValues);
 };

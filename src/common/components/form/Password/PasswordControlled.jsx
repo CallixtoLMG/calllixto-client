@@ -4,6 +4,7 @@ import { forwardRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { PasswordRequirements } from "../PasswordRequirements";
 import PasswordField from "./PasswordField";
+import { Box } from "../../custom";
 
 export const PasswordControlled = forwardRef(({
   name,
@@ -13,12 +14,11 @@ export const PasswordControlled = forwardRef(({
 }, ref) => {
   const { formState: { errors } } = useFormContext();
   return (
-    <>
-      <Controller
+    <Controller
         name={name}
         rules={rules}
         render={({ field: { value, ...rest } }) => (
-          <>
+          <Box>
             <PasswordField
               {...rest}
               ref={ref}
@@ -35,10 +35,9 @@ export const PasswordControlled = forwardRef(({
                 password={value}
               />
             )}
-          </>
+          </Box>
         )}
       />
-    </>
   );
 });
 

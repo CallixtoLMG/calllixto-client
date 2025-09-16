@@ -10,7 +10,6 @@ export const PATHS = {
   EXPENSES: ENTITIES.EXPENSES,
   USERS: ENTITIES.USERS,
   USER: ENTITIES.USER,
-  EVENTS: ENTITIES.EVENTS,
   SETTINGS: ENTITIES.SETTINGS,
   USER_PROFILE: "userProfile",
   RESTORE_PASSWORD: `${ENTITIES.USERS}/restore`,
@@ -24,7 +23,6 @@ export const CLIENT = "clients";
 export const VALIDATE = "validate";
 export const EDIT_BATCH = "transact";
 export const URL = process.env.NEXT_PUBLIC_URL;
-export const EVENTS = "events"
 export const PAYMENTS = "payments"
 export const CONFIRM = "confirm"
 export const CANCEL = "cancel"

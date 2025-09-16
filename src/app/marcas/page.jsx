@@ -21,15 +21,14 @@ const Brands = () => {
 
   useEffect(() => {
     setLabels([PAGES.BRANDS.NAME]);
-    refetch();
-  }, [setLabels, refetch]);
+  }, [setLabels]);
 
   const brands = useMemo(() => data?.brands, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
   const handleDownloadExcel = useCallback(() => {
     if (!brands) return;
-    const headers = ['ID', 'Nombre', 'Estado', 'Comentarios'];
+    const headers = ['Id', 'Nombre', 'Estado', 'Comentarios'];
     const mappedBrands = brands.map(brand => {
       const brandState = BRAND_STATES[brand.state]?.singularTitle || brand.state;
       return [

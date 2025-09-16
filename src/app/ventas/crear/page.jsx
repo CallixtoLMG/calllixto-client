@@ -29,7 +29,9 @@ const CreateBudget = () => {
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
-  const products = useMemo(() => productsData?.products.filter((product) => ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state)), [productsData]);
+  const products = useMemo(() => {
+    return productsData?.products.filter((product) => ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state));
+  }, [productsData]);
   const customers = useMemo(() => customersData?.customers, [customersData]);
 
   useEffect(() => {
@@ -42,13 +44,6 @@ const CreateBudget = () => {
     refetchproductsData();
     refetchPaymentMethods();
   }, [setLabels, refetchproductsData, refetchPaymentMethods]);
-
-  const mappedProducts = useMemo(() => products?.map(product => ({
-    ...product,
-    key: product.code,
-    value: product.name,
-    text: product.name,
-  })), [products]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createBudget,
@@ -83,7 +78,7 @@ const CreateBudget = () => {
     <Loader active={loadingProducts || loadingCustomers || loadingBudget || isRefetching}>
       <BudgetForm
         onSubmit={mutate}
-        products={mappedProducts}
+        products={products}
         customers={customers}
         user={userData}
         budget={clonedBudget}
