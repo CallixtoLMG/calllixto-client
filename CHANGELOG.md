@@ -3,22 +3,52 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2025-08-25
+
+### Added
+
+- Added a new "General" tab to the Settings section for configuring global parameters.
+
+- Added support for custom payment method management for clients, including the ability to add personalized payment methods through the UI.
+
+- Created a reusable utility function `mapToDropdownOptions` to map arrays of strings into dropdown-compatible objects ({ key, text, value }).
+
+## 2025-07-08
+
+### Added
+
+- Introduced the Expenses entity with full CRUD support, mirroring the structure and behavior of existing entities.
+
+- Added expenses configuration in Settings to manage categories and tags.
+
+### Changed
+
+- Refactored createFilter to support filtering within nested structures (e.g., searching by category names in tables).
+
+- Replaced useArrayTags with more generic and reusable useSettingArrayField hook, to handle both tags and categories which share the same data structure.
+
+- Minor CSS update on Dropdown component to prevent visual clipping of descenders (e.g., characters like j, g, y, q).
+
 ## 2025-07-02
 
 ### Added
 
 - Added ability to sort tables in both ascending and descending order.
+
 ## 2025-06-26
 
 ### Changed
+
 - Added display of the inactivation reason (inactiveReason) when the product status changes to Inactive.
 
 ### Fixed
+
 - Fixxed version history logs, now displaying the user (updatedBy) who made each product update, enhancing traceability in the product change timeline.
 
 ## 2025-06-19
 
 ### Changed
+
 - Improved product search logic in ProductSearch component:
 - Prioritizes exact matches on product name or code before falling back to word-by-word partial matches.
 - Updated getNumberFormated function for consistent price formatting: ensures correct display of thousand separators.
@@ -64,7 +94,9 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ## 2025-05-21
 
 ### Added
+
 - Display of payment dates, sorted in ascending order (oldest first) in PDFfile.
 
 ### Changed
+
 - Alignment of comments and payment dates in PDFfile.

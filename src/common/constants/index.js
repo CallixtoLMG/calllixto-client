@@ -49,12 +49,21 @@ export const PAGES = {
     NAME: 'Ventas',
     SHORTKEYS: 'Control+5'
   },
+  EXPENSES: {
+    BASE: "/gastos",
+    CREATE: "/gastos/crear",
+    CLONE: (id) => `/gastos/crear?clonar=${id}`,
+    UPDATE: (id) => `/gastos/${id}?update=true`,
+    SHOW: (id) => `/gastos/${id}`,
+    NAME: 'Gastos',
+    SHORTKEYS: 'Control+6'
+  },
   USERS: {
     BASE: "/usuarios",
     CREATE: "/usuarios/crear",
     SHOW: (id) => `/usuarios/${id}`,
     NAME: 'Usuarios',
-    SHORTKEYS: 'Control+6'
+    SHORTKEYS: 'Control+7'
   },
   LOGIN: {
     BASE: "/login"
@@ -62,7 +71,7 @@ export const PAGES = {
   SETTINGS: {
     BASE: "/configuracion",
     NAME: 'Configuración',
-    SHORTKEYS: 'Control+7'
+    SHORTKEYS: 'Control+8'
   },
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"
@@ -133,10 +142,95 @@ export const SHORTKEYS = {
 
 export const DEFAULT_KEY = "id";
 export const LAST_UPDATED_AT = "lastUpdatedAt";
+export const COLORS = {
+  RED: 'red',
+  GREEN: 'green',
+  BLUE: 'blue',
+  ORANGE: 'orange',
+  GREY: 'grey',
+  BROWN: 'brown',
+  TEAL: 'teal',
+  YELLOW: "yellow"
+};
+
+export const SEMANTIC_COLORS = [
+  { key: "yellow", text: "Amarillo", value: "yellow" },
+  { key: "blue", text: "Azul", value: "blue" },
+  { key: "brown", text: "Marrón", value: "brown" },
+  { key: "grey", text: "Gris", value: "grey" },
+  { key: "black", text: "Negro", value: "black" },
+  { key: "olive", text: "Oliva", value: "olive" },
+  { key: "orange", text: "Naranja", value: "orange" },
+  { key: "pink", text: "Rosa", value: "pink" },
+  { key: "purple", text: "Púrpura", value: "purple" },
+  { key: "red", text: "Rojo", value: "red" },
+  { key: "green", text: "Verde", value: "green" },
+  { key: "teal", text: "Turquesa", value: "teal" },
+  { key: "violet", text: "Violeta", value: "violet" },
+];
+
+export const ICONS = {
+  X: 'x',
+  TRASH: 'trash',
+  CHECK: 'check',
+  TRUCK: 'truck',
+  HOURGLASS_HALF: "hourglass half",
+  ADD: "add",
+  UNDO: "undo",
+  BAN: "ban",
+  FILE_EXCEL: "file excel",
+  FILE_EXCEL_OUTLINE: "file excel outline",
+  SEND: "send",
+  DOWNLOAD: "download",
+  COPY: "copy",
+  DOLLAR: "dollar",
+  PLAY_CIRCLE: "play circle",
+  PAUSE_CIRCLE: "pause circle",
+  BOX: "box",
+  QUESTION: "question",
+  BARCODE: "barcode",
+  LIST_UL: "list ul",
+  INFO_CIRCLE: "info circle",
+  WAREHOUSE: "warehouse",
+  ARROW_LEFT: "arrow left",
+  CANCEL: "cancel",
+  DELETE: "delete",
+  EDIT: "edit",
+  TIMES: "times",
+  KEYBOARD: "keyboard",
+  REMOVE: "remove",
+  SEARCH: "search",
+  CHEVRON_RIGHT: "chevron right",
+  USER: "user",
+  LOCK: "lock",
+  PENCIL: "pencil",
+  CUT: "cut",
+  EDIT: "edit",
+  EYE: "eye",
+  EYE_SLASH: "eye slash",
+  COG: "cog",
+  EXCLAMATION_CIRCLE: "exclamation circle",
+  TAGS: "tags",
+  ADDRESS_CARD: "address card",
+  ARCHIVE: "archive",
+  OPTIONS: "options",
+  REFRESH: "refresh",
+  MAIL_SQUARE: "mail square",
+  PERCENT: 'percent',
+  SETTINGS: "settings",
+  BULLHORN: "bullhorn",
+  BOXES: "boxes"
+};
+
 export const ALL = "all";
 export const ACTIVE = "active";
 export const DELETE = "delete";
 export const INACTIVE = "inactive";
+
+export const CANCELLED = "cancelled";
+
+export const CANCEL_ACTION = "cancel";
+
 export const RECOVER = "recover";
 
 export const LABELS = {
@@ -159,4 +253,5 @@ export const SORTING = {
   ASC:'ascending',
   DESC: 'descending'
 }
+
 

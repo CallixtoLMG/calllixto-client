@@ -1,6 +1,8 @@
 const useProtectedAction = ({ formRef, onBeforeView }) => {
   const handleProtectedAction = (actionFn) => {
-    if (formRef.current?.isDirty()) {
+    const isDirty = formRef?.current?.isDirty?.();
+
+    if (isDirty) {
       onBeforeView(actionFn);
     } else {
       actionFn();

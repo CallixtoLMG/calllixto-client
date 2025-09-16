@@ -8,7 +8,7 @@ import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constan
 import { isItemInactive } from "@/common/utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UserForm from "@/components/users/UserForm";
-import { useAllowUpdate, useProtectedAction, useValidateToken, useUnsavedChanges } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -268,7 +268,7 @@ const User = ({ params }) => {
           modalAction === INACTIVE && (
             <Input
               type="text"
-              placeholder="Indique el razón de desactivación"
+              placeholder="Motivo"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

@@ -1,4 +1,5 @@
 export const ENTITIES = {
+  GENERAL:'general',
   CUSTOMERS: 'customers',
   CUSTOMER: 'customer',
   SUPPLIERS: 'suppliers',
@@ -9,6 +10,9 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
+  EVENTS: 'events',
+  EXPENSES: "expenses",
+  EXPENSE: "expense",
   USERS: 'users',
   USER: 'user',
   SETTINGS: "settings",

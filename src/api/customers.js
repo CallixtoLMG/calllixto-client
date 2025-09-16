@@ -18,7 +18,7 @@ export function useListCustomers() {
   });
 
   return query;
-}
+};
 
 export function useGetCustomer(id) {
   const getCustomer = async (id) => {

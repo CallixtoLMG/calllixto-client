@@ -15,7 +15,6 @@ export const BRAND_COLUMNS = [
     width: 1,
     value: (brand) => brand.id,
     sortValue: (brand) => brand.id ?? ""
-
   },
   {
     id: 2,

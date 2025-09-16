@@ -19,17 +19,16 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CUSTOMERS_FILTERS_KEY });
 
   const onFilter = createFilter(filters, ['name']);
-
   return (
     <>
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit} key={JSON.stringify(filters)}>
           <Filters
-            entity={ENTITIES.CUSTOMERS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
             hydrated={hydrated}
+            entity={ENTITIES.CUSTOMERS}
           >
             <DropdownControlled
               width="200px"
