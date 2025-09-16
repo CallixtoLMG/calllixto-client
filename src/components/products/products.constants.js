@@ -25,6 +25,18 @@ export const LIST_ATTRIBUTES = [
   "inactiveReason",
 ];
 
+export const ATTRIBUTES = {
+  NAME: "name",
+  COMMENTS: "comments",
+  STATE: "state",
+  EDITABLE_PRICE: "editablePrice",
+  PRICE: "price",
+  COST: "cost",
+  FRACTION_CONFIG: "fractionConfig",
+  TAGS: "tags",
+  INACTIVE_REASON: "inactiveReason",
+}
+
 export const PRODUCT_COLUMNS = [
   {
     id: 1,
