@@ -44,6 +44,7 @@ const Header = () => {
     [PAGES.EXPENSES.SHORTKEYS]: () => push(PAGES.EXPENSES.BASE),
     [PAGES.USERS.SHORTKEYS]: () => push(PAGES.USERS.BASE),
     [PAGES.SETTINGS.SHORTKEYS]: () => push(PAGES.SETTINGS.BASE),
+    [PAGES.CASH_BALANCES.SHORTKEYS]: () => push(PAGES.CASH_BALANCES.BASE),
   };
 
   useKeyboardShortcuts(shortcutMapping);

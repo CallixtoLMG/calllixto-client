@@ -16,4 +16,7 @@ export const ENTITIES = {
   USERS: 'users',
   USER: 'user',
   SETTINGS: "settings",
+  CASH_BALANCES: "cash-balances",
+  CASH_BALANCE: "cash-balance",
+  CASHBALANCES:"cashBalances"
 };

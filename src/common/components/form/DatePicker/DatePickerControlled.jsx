@@ -27,9 +27,9 @@ export const DatePickerControlled = ({
   locale = "es",
   icon,
   afterChange,
+  required
 }) => {
   const { formState: { errors } } = useFormContext();
-
   return (
     <Controller
       name={name}
@@ -40,6 +40,7 @@ export const DatePickerControlled = ({
           height={height}
           $width={width}
           label={label}
+          required={required}
           icon={icon}
           control={ReactDatePicker}
           error={!!errors?.[name] && {

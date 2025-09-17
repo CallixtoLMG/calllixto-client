@@ -16,6 +16,7 @@ export const DropdownControlled = ({
   multiple,
   loading,
   optionsMapper,
+  required,
   icon
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -40,17 +41,23 @@ export const DropdownControlled = ({
             label={label}
             placeholder={placeholder ?? label}
             search={search}
+            required={required}
             selection
             control={Dropdown}
             multiple={multiple}
             renderLabel={(item) => {
-              if (typeof item === "string")
-                return item
+              if (typeof item === "string") return item;
 
-              return {
-                color: optionsMapper[item.value]?.color,
-                content: optionsMapper[item.value]?.name,
-              };
+              const mappedItem = optionsMapper?.[item.value];
+
+              return mappedItem
+                ? {
+                  color: mappedItem.color,
+                  content: mappedItem.name,
+                }
+                : {
+                  content: item.text || item.value,
+                };
             }}
             noResultsMessage="No se encontraron resultados"
             clearable={clearable}

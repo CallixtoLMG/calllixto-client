@@ -64,13 +64,21 @@ export const PAGES = {
     NAME: 'Usuarios',
     SHORTKEYS: 'Control+7'
   },
+  CASH_BALANCES: {
+    BASE: "/cajas",
+    CREATE: "/cajas/crear",
+    UPDATE: (id) => `/cajas/${id}?update=true`,
+    SHOW: (id) => `/cajas/${id}`,
+    NAME: 'Cajas',
+    SHORTKEYS: 'Control+8'
+  },
   LOGIN: {
     BASE: "/login"
   },
   SETTINGS: {
     BASE: "/configuracion",
     NAME: 'Configuración',
-    SHORTKEYS: 'Control+8'
+    SHORTKEYS: 'Control+9'
   },
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"
@@ -110,6 +118,15 @@ export const RULES = {
   REQUIRED_PRODUCT: (value) => ({
     required: value !== false ? 'Campo requerido.' : 'Es necesario elegir un producto',
   }),
+  REQUIRED_POSITIVE_NUMBER: {
+    required: "El monto es obligatorio",
+    validate: (value) => {
+      if (value === null || value === undefined || value === '') return "Debe ingresar un monto";
+      if (isNaN(value)) return "El valor debe ser un número";
+      if (Number(value) < 0) return "Debe ser un valor mayor o igual a cero";
+      return true;
+    }
+  },
   REQUIRED_TWO_DIGIT: {
     required: 'Campo requerido.',
     pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
@@ -266,7 +283,7 @@ export const PASSWORD_REQUIREMENTS = [
 export const SELECT_ALL_OPTION = { key: ALL, value: ALL, text: 'Todos' };
 
 export const SORTING = {
-  ASC:'ascending',
+  ASC: 'ascending',
   DESC: 'descending'
 }
 

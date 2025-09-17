@@ -3,6 +3,7 @@ import ModalAction from '@/common/components/modals/ModalAction';
 import { COLORS, ENTITIES, ICONS, PAGES } from "@/common/constants";
 import { LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
+import { LIST_CASH_BALANCES_QUERY_KEY } from '@/components/cashBalances/cashBalances.constants';
 import { LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
 import { LIST_EXPENSES_QUERY_KEY } from '@/components/expenses/expenses.constants';
 import { LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
@@ -25,6 +26,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
     [ENTITIES.SUPPLIERS]: { queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
     [ENTITIES.USERS]: { queryKey: LIST_USERS_QUERY_KEY, text: PAGES.USERS.NAME },
     [ENTITIES.EXPENSES]: { queryKey: LIST_EXPENSES_QUERY_KEY, text: PAGES.EXPENSES.NAME },
+    [ENTITIES.CASH_BALANCES]: { queryKey: LIST_CASH_BALANCES_QUERY_KEY, text: PAGES.CASH_BALANCES.NAME },
   };
 
   const { formState: { isDirty } } = useFormContext();

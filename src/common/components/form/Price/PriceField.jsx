@@ -12,7 +12,9 @@ export const PriceField = ({
   disabled = false,
   placeholder,
   onKeyDown,
-  justifyItems
+  justifyItems,
+  required,
+  readOnly
 }) => {
   const isUserTyping = useRef(false);
   const [formattedValue, setFormattedValue] = useState(getNumberFormated(value ?? 0)[0]);
@@ -36,6 +38,7 @@ export const PriceField = ({
       $width={width}
       control={Input}
       error={error}
+      required={required}
     >
       <Input
         value={formattedValue}
@@ -46,6 +49,7 @@ export const PriceField = ({
         placeholder={placeholder}
         justifyItems={justifyItems}
         onKeyDown={onKeyDown}
+        readOnly={readOnly}
       >
         <Icon name="dollar" />
         <input />
