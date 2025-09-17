@@ -42,10 +42,7 @@ const ModalConfirmation = ({
   const handleConfirm = (data) => {
     const { paymentsMade, pickUpInStore } = data;
     const payload = {
-      paymentsMade: paymentsMade?.map((payment) => ({
-        ...payment,
-        createdAt: now()
-      })),
+      paymentsMade,
       total: parsedTotal,
       pickUpInStore
     };

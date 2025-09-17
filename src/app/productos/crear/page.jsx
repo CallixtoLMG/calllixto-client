@@ -9,7 +9,7 @@ import ProductForm from "@/components/products/ProductForm";
 import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateProduct = () => {
@@ -34,20 +34,6 @@ const CreateProduct = () => {
     setLabels(['Productos', 'Crear']);
   }, [setLabels]);
 
-  const mappedBrands = useMemo(() => brands?.brands?.map(brand => ({
-    ...brand,
-    key: brand.id,
-    value: brand.name,
-    text: brand.name,
-  })), [brands]);
-
-  const mappedSuppliers = useMemo(() => suppliers?.suppliers?.map(supplier => ({
-    ...supplier,
-    key: supplier.id,
-    value: supplier.name,
-    text: supplier.name,
-  })), [suppliers]);
-
   const { mutate, isPending } = useMutation({
     mutationFn: createProduct,
     onSuccess: async (response) => {
@@ -66,8 +52,8 @@ const CreateProduct = () => {
   return (
     <Loader active={isLoadingBrands || isLoadingSuppliers || isBrandsRefetching || isSupplierRefetching}>
       <ProductForm
-        brands={mappedBrands}
-        suppliers={mappedSuppliers}
+        brands={brands?.brands ?? []}
+        suppliers={suppliers?.suppliers ?? []}
         onSubmit={mutate}
         isLoading={isPending}
         blacklist={blacklist?.blacklist}

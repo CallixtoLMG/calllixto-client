@@ -116,7 +116,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
           </Flex>
           <Flex>
             <Field label="Teléfonos" value={client?.phoneNumbers?.map(getFormatedPhone).join(' | ')} />
-            <Field label="Válido hasta" value={getDateWithOffset(budget?.createdAt, budget?.expirationOffsetDays, 'days')} />
+            <Field label="Válido hasta" value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })} />
           </Flex>
         </SectionContainer>
         <Divider />

@@ -1,6 +1,6 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from '@/common/components/table';
-import { ALL, COLORS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter } from '@/common/utils';
 import { useFilters } from "@/hooks";
 import { useRouter } from "next/navigation";
@@ -23,7 +23,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
 
   const onFilter = createFilter(filters, ['id', 'customer', 'seller'], {
     customer: budget => budget.customer?.name || '',
-    allState: ALL,
+    allState: SELECT_ALL_OPTION.value,
   });
 
   const actions = [

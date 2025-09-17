@@ -8,22 +8,34 @@ export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
 export const PRODUCTS_FILTERS_KEY = "productsFilters";
+export const MAIN_KEY = 'code';
+
+export const LIST_ATTRIBUTES = [
+  "code",
+  "state",
+  "name",
+  "brandName",
+  "supplierName",
+  "cost",
+  "price",
+  "comments",
+  "tags",
+  "editablePrice",
+  "fractionConfig",
+  "inactiveReason",
+];
 
 export const ATTRIBUTES = {
-  CODE: "code",
   NAME: "name",
-  PRICE: "price",
   COMMENTS: "comments",
-  BRAND_NAME: "brandName",
-  SUPPLIER_NAME: "supplierName",
-  EDITABLE_PRICE: "editablePrice",
-  FRACTION_CONFIG: "fractionConfig",
-  PREVIOUS_VERSIONS: "previousVersions",
   STATE: "state",
+  EDITABLE_PRICE: "editablePrice",
+  PRICE: "price",
   COST: "cost",
+  FRACTION_CONFIG: "fractionConfig",
   TAGS: "tags",
   INACTIVE_REASON: "inactiveReason",
-};
+}
 
 export const PRODUCT_COLUMNS = [
   {

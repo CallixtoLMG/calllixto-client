@@ -8,11 +8,11 @@ import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
-import { getDateWithOffset, now } from "@/common/utils/dates";
+import { getDateWithOffset } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
-import { ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
+import { LIST_ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
 import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks";
 import { pick } from "lodash";
@@ -316,7 +316,7 @@ const BudgetForm = ({
     await onSubmit({
       ...data,
       customer: { id: customer.id, name: customer.name },
-      products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment", "tags"])),
+      products: data.products.map((product) => pick(product, [LIST_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags"])),
       total: Number(total.toFixed(2)),
       state
     });
@@ -628,7 +628,7 @@ const BudgetForm = ({
                 readOnly
                 value={
                   watchExpirationOffsetDays
-                    ? getDateWithOffset(now(), watchExpirationOffsetDays, "days")
+                    ? getDateWithOffset({ offset: watchExpirationOffsetDays })
                     : ""
                 }
                 placeholder="dd/mm/aaaa"
@@ -718,7 +718,12 @@ const BudgetForm = ({
                 control={ProductSearch}
                 ref={productSearchRef}
                 tooltip
-                products={products}
+                products={products?.map(product => ({
+                  ...product,
+                  key: product.code,
+                  value: product.name,
+                  text: product.name,
+                }))}
                 onProductSelect={(selectedProduct) => {
                   appendProduct({
                     ...selectedProduct,

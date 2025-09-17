@@ -28,7 +28,7 @@ const Suppliers = () => {
 
   const handleDownloadExcel = useCallback(() => {
     if (!suppliers) return;
-    const headers = ["ID", 'Nombre', 'Estado', 'Dirección', 'Teléfono'];
+    const headers = ["Id", 'Nombre', 'Estado', 'Dirección', 'Teléfono'];
     const mappedSuppliers = suppliers.map(supplier => {
       const supplierState = SUPPLIER_STATES[supplier.state]?.singularTitle || supplier.state;
       return [

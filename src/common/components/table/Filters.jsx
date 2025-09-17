@@ -17,7 +17,6 @@ import { IconedButton } from '../buttons';
 import { FiltersContainer, HeaderSegment, MainContainer } from './styles';
 
 const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, hydrated }) => {
-
   const ENTITY_MAPPING = {
     [ENTITIES.CUSTOMERS]: { queryKey: LIST_CUSTOMERS_QUERY_KEY, text: PAGES.CUSTOMERS.NAME },
     [ENTITIES.PRODUCTS]: { queryKey: LIST_PRODUCTS_QUERY_KEY, text: PAGES.PRODUCTS.NAME },
@@ -41,7 +40,6 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
   };
 
   const handleConfirmHardUpdate = async () => {
-
     setIsLoading(true);
 
     if (!entity || !queryKey || typeof restoreEntity !== "function") {

@@ -66,7 +66,6 @@ const BudgetView = ({
       const updatedBudget = {
         ...budget,
         paymentsMade: formData.paymentsMade,
-        updatedAt: now(),
       };
       const data = await updatePayment({ budget: updatedBudget, id: budget.id });
       return data;

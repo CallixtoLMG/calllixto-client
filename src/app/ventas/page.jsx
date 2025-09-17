@@ -5,7 +5,6 @@ import { downloadExcel, getFormatedPercentage, handleUndefined } from "@/common/
 import { getFormatedDate } from "@/common/utils/dates";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { BUDGET_STATE_TRANSLATIONS } from "@/components/budgets/budgets.constants";
-import { getTotalSum } from "@/components/budgets/budgets.utils";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { getTotal } from "@/components/products/products.utils";
 import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
@@ -37,7 +36,7 @@ const Budgets = () => {
         handleUndefined(translatedState),
         handleUndefined(budget.customer.name),
         handleUndefined(getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)),
-        getTotalSum(budget.products, budget.globalDiscount, budget.additionalCharge),
+        handleUndefined(budget.total),
         getFormatedPercentage(budget.globalDiscount),
         getFormatedPercentage(budget.additionalCharge),
         handleUndefined(budget.seller)

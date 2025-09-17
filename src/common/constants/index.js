@@ -3,6 +3,7 @@ import { encodeUri } from "@/common/utils";
 export * from './dates';
 export * from './entities';
 export * from './time';
+export * from './semantic';
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
 
@@ -156,6 +157,8 @@ export const SHORTKEYS = {
   DELETE: "Control+Delete",
 };
 
+export const DEFAULT_KEY = "id";
+export const LAST_UPDATED_AT = "lastUpdatedAt";
 export const COLORS = {
   RED: 'red',
   GREEN: 'green',
@@ -237,11 +240,8 @@ export const ICONS = {
 };
 
 export const ALL = "all";
-
 export const ACTIVE = "active";
-
 export const DELETE = "delete";
-
 export const INACTIVE = "inactive";
 
 export const CANCELLED = "cancelled";
@@ -250,27 +250,11 @@ export const CANCEL_ACTION = "cancel";
 
 export const RECOVER = "recover";
 
-export const USERNAME = "username";
-
 export const LABELS = {
   ACTIVE: "Activado",
   INACTIVE: "Desactivado",
   UNKNOWN: "Desconocido",
 };
-
-export const EVENT_KEYS = {
-  UPDATE: 'U',
-  CREATE: "C",
-  DELETE: "D",
-  UPDATE_ALL: "A",
-  DELETE_SUPPLIER_PRODUCTS: "S"
-}
-
-export const DEFAULT_LAST_EVENT_ID = "A0000";
-
-export const ID = "id";
-
-export const CODE = "code";
 
 export const PASSWORD_REQUIREMENTS = [
   { label: "Al menos 8 caracteres.", test: /.{8,}/ },
