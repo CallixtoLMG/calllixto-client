@@ -86,6 +86,7 @@ export const Dropdown = styled(SDropdown)`
 
   .text{
     text-align: ${({ $textAlign }) => `${$textAlign}!important`};
+    max-width: ${({ textMaxWidth }) => `${textMaxWidth}!important`};
   }
 
   .divider.text{
@@ -103,7 +104,7 @@ export const Dropdown = styled(SDropdown)`
   i{
     margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
   }
-
+  
   ${({ multiple }) => multiple && `
     &&&&&& div.item {
       padding: 0.35rem 0.4rem!important;
@@ -204,7 +205,10 @@ export const MessageHeader = styled(SMessageHeader)`
 `;
 
 export const Message = styled(SMessage)`
-  width: 100%;
+  align-content: ${({ alignContent }) => `${alignContent}!important`} ;
+  padding: ${({ padding }) => `${padding}!important`} ;
+  height: ${({ height }) => `${height}!important`} ;
+  width: ${({ width }) => `${width}!important`} ;
   margin: ${({ margin }) => `${margin}!important`} ;
 `;
 

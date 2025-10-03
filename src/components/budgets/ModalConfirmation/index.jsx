@@ -2,9 +2,8 @@ import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import Payments from "@/common/components/form/Payments";
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
-import { now } from "@/common/utils/dates";
 import { useMemo, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Form, Modal, Transition } from "semantic-ui-react";
@@ -53,7 +52,7 @@ const ModalConfirmation = ({
     <FormProvider {...methods}>
       <Form ref={formRef} onSubmit={methods.handleSubmit(handleConfirm)}>
         <Transition visible={isModalOpen} animation='scale' duration={500}>
-          <Modal size="large" closeIcon open={isModalOpen} onClose={() => onClose(false)}>
+          <Modal size={SIZES.LARGE} closeIcon open={isModalOpen} onClose={() => onClose(false)}>
             <Modal.Header>
               <Flex $alignItems="center" $justifyContent="space-between">
                 Desea confirmar el presupuesto?

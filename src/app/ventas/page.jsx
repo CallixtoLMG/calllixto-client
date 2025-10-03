@@ -47,7 +47,7 @@ const Budgets = () => {
         if (product.fractionConfig?.active) {
           productName = `${product.name} x ${product.fractionConfig.value} ${product.fractionConfig.unit}`;
         }
-        return `Código: ${handleUndefined(product.code)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${product.price ?? 0}, Descuento: % ${product.discount ?? 0}, Total: ${getTotal(product)};`;
+        return `Id: ${handleUndefined(product.id)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${product.price ?? 0}, Descuento: % ${product.discount ?? 0}, Total: ${getTotal(product)};`;
       });
 
       while (productData.length < maxProductCount) {

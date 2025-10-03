@@ -17,10 +17,10 @@ export const DropdownControlled = ({
   loading,
   optionsMapper,
   required,
-  icon
+  icon,
+  textMaxWidth
 }) => {
   const { formState: { errors } } = useFormContext();
-
 
   return (
     <Controller
@@ -37,6 +37,7 @@ export const DropdownControlled = ({
             icon={icon}
             height={height}
             $width={width}
+            textMaxWidth={textMaxWidth}
             loading={loading}
             label={label}
             placeholder={placeholder ?? label}

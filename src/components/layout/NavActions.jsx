@@ -1,4 +1,5 @@
 import { Box, Flex } from '@/common/components/custom';
+import { SIZES } from '@/common/constants';
 import { createContext, useContext, useState } from 'react';
 import { Popup } from 'semantic-ui-react';
 import { IconedButton } from '../../common/components/buttons';
@@ -37,7 +38,7 @@ const NavActions = () => {
                   content={tooltip}
                   position="bottom center"
                   on="hover"
-                  size='tiny'
+                  size={SIZES.TINY}
                   trigger={
                     <Box>
                       <IconedButton

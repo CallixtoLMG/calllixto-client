@@ -2,10 +2,11 @@ import { useGetSetting } from "@/api/settings";
 import { Label } from "@/common/components/custom";
 
 const useSettingArrayField = (entity, fieldName = "tags", externalItems = []) => {
-  const { data: settings, isFetching } = useGetSetting(entity);
 
+  const { data, isFetching } = useGetSetting(entity);
   const uniqueItems = {};
-  const entityItems = settings?.[fieldName] ?? [];
+  const entityItems = data?.[fieldName] ?? [];
+
   const combinedItems = [...entityItems, ...externalItems];
 
   combinedItems.forEach((item) => {

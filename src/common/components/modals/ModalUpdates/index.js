@@ -1,5 +1,6 @@
 'use client';
-import { COLORS, ICONS } from '@/common/constants';
+import { COLORS, ICONS, SIZES } from '@/common/constants';
+import { isDateBefore } from '@/common/utils/dates';
 import { useState } from 'react';
 import { List, ListItem, Modal, Popup, Transition } from 'semantic-ui-react';
 import { IconedButton } from '../../buttons';
@@ -9,7 +10,6 @@ import {
   StyledModalContent,
   StyledModalHeader
 } from "../ModalShortcuts/styles";
-import { isDateBefore } from '@/common/utils/dates';
 
 const ModalUpdates = () => {
   const activeVersion = '2025-07-08';
@@ -24,14 +24,14 @@ const ModalUpdates = () => {
           <Icon
             margin="0"
             pointer="true"
-            size="large"
+            size={SIZES.LARGE}
             name={ICONS.BULLHORN}
             color={COLORS.BLUE}
             onClick={() => setOpen(true)}
           />
         }
         position="bottom right"
-        size="tiny"
+        size={SIZES.TINY}
       />
       <Transition visible={open} animation="scale" duration={500}>
         <Modal open={open} onClose={() => setOpen(false)}>

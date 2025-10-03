@@ -29,11 +29,12 @@ export const DatePickerControlled = ({
   afterChange,
   required
 }) => {
-  const { formState: { errors } } = useFormContext();
+  const { control, formState: { errors } } = useFormContext();
   return (
     <Controller
       name={name}
       rules={rules}
+      control={control} 
       render={({ field: { onChange, value } }) => (
         <FormField
           flex={flex}

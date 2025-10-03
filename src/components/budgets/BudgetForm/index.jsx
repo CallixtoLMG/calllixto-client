@@ -6,14 +6,14 @@ import ProductSearch from "@/common/components/search/search";
 import { Text } from "@/common/components/search/styles";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
 import { getDateWithOffset } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
 import { LIST_ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
-import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
+import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks";
 import { pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -125,7 +125,7 @@ const BudgetForm = ({
 
   const getRestoredProducts = useCallback((sourceProducts) => {
     return sourceProducts.map(product => {
-      const latestProduct = products.find(p => p.code === product.code);
+      const latestProduct = products.find(p => p.id === product.id);
       const updatedState = latestProduct?.state ?? product.state;
 
       return {
@@ -136,7 +136,7 @@ const BudgetForm = ({
     }).filter(product =>
       product.state !== PRODUCT_STATES.INACTIVE.id &&
       product.state !== PRODUCT_STATES.DELETED.id &&
-      products.some(p => p.code === product.code)
+      products.some(p => p.id === product.id)
     );
   }, [products]);
 
@@ -212,14 +212,14 @@ const BudgetForm = ({
       setIsTableLoading(true);
       let budgetProducts = [...budget.products];
 
-      const existingProductCodes = new Set(products.map(p => p.code));
-      const removedProducts = budgetProducts.filter(p => !existingProductCodes.has(p.code));
-      const validProducts = budgetProducts.filter(p => existingProductCodes.has(p.code));
+      const existingProductIds = new Set(products.map(p => p.id));
+      const removedProducts = budgetProducts.filter(p => !existingProductIds.has(p.id));
+      const validProducts = budgetProducts.filter(p => existingProductIds.has(p.id));
 
       setValue("products", validProducts);
 
       const outdatedProducts = products.filter(product => {
-        const budgetProduct = validProducts.find(bp => bp.code === product.code);
+        const budgetProduct = validProducts.find(bp => bp.id === product.id);
 
         if (budgetProduct) {
           const priceChanged = budgetProduct.price !== product.price;
@@ -254,7 +254,7 @@ const BudgetForm = ({
 
   const handleConfirmUpdate = () => {
     const updatedProducts = temporaryProducts.map(product => {
-      const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
+      const outdatedProduct = outdatedProducts.find(op => op.id === product.id);
 
       if (outdatedProduct) {
         return {
@@ -274,7 +274,7 @@ const BudgetForm = ({
     });
 
     const restoredProducts = getRestoredProducts(updatedProducts).filter(
-      product => !removedProducts.find(rp => rp.code === product.code)
+      product => !removedProducts.find(rp => rp.id === product.id)
     );
 
     const restoredForm = {
@@ -316,7 +316,9 @@ const BudgetForm = ({
     await onSubmit({
       ...data,
       customer: { id: customer.id, name: customer.name },
-      products: data.products.map((product) => pick(product, [LIST_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags"])),
+      products: data.products.map((product) =>
+        pick(product, [...LIST_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags"])
+      ),
       total: Number(total.toFixed(2)),
       state
     });
@@ -385,26 +387,26 @@ const BudgetForm = ({
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => [
     {
       id: 1,
-      title: "Código",
+      title: "Id",
       value: (product) => (
         <>
           <Popup
-            size="tiny"
-            trigger={<span>{getSupplierCode(product.code)}</span>}
+            size={SIZES.TINY}
+            trigger={<span>{getSupplierId(product.id)}</span>}
             position="top center"
             on="hover"
             content={product.supplierName}
           />
           {'-'}
           <Popup
-            size="tiny"
-            trigger={<span>{getBrandCode(product.code)}</span>}
+            size={SIZES.TINY}
+            trigger={<span>{getBrandId(product.id)}</span>}
             position="top center"
             on="hover"
             content={product.brandName}
           />
           {'-'}
-          <span>{getProductCode(product.code)}</span>
+          <span>{getProductId(product.id)}</span>
         </>
       ),
       width: 1,
@@ -436,7 +438,7 @@ const BudgetForm = ({
             {product.name}
           </OverflowWrapper>
           <Flex $alignItems="center" $marginLeft="5px" $columnGap="5px">
-            {isProductOOS(product.state) && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
+            {isProductOOS(product.state) && <Label color={COLORS.ORANGE} size={SIZES.TINY}>Sin Stock</Label>}
             {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
             {product.comments && <CommentTooltip tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
@@ -571,7 +573,7 @@ const BudgetForm = ({
         <Form onSubmit={handleSubmit(handleConfirm)}>
           <FieldsContainer $justifyContent="space-between">
             <FormField $width="300px">
-              <ButtonGroup size="small">
+              <ButtonGroup size={SIZES.SMALL}>
                 <IconedButton
                   text="Confirmado"
                   icon={ICONS.CHECK}
@@ -720,7 +722,7 @@ const BudgetForm = ({
                 tooltip
                 products={products?.map(product => ({
                   ...product,
-                  key: product.code,
+                  key: product.id,
                   value: product.name,
                   text: product.name,
                 }))}

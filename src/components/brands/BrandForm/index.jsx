@@ -51,8 +51,8 @@ const BrandForm = forwardRef(({
           <TextControlled
             width="150px"
             name="id"
-            label="Código"
-            placeholder="Código (A1)"
+            label="Id"
+            placeholder="Id (A1)"
             rules={RULES.REQUIRED_TWO_DIGIT}
             onChange={value => value.toUpperCase()}
             disabled={view}

@@ -13,6 +13,7 @@ import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import toast from "react-hot-toast";
 
 const CashBalances = () => {
   useValidateToken();
@@ -48,7 +49,7 @@ const CashBalances = () => {
         cashBalance.closeDate,
         cashBalance.paymentMethods,
         cashBalance.initialAmount,
-        cashBalance.actualAmount,
+        cashBalance.currentAmount,
         cashBalance.billsDetails,
         cashBalance.comments,
       ];
@@ -85,8 +86,8 @@ const CashBalances = () => {
     mutationFn: createCashBalance,
     onSuccess: async (response) => {
       if (response.statusOk) {
-        push(PAGES.CASH_BALANCES.SHOW(response.cashBalance.id))
         toast.success('Caja abierta!');
+        push(PAGES.CASH_BALANCES.SHOW(response.cashBalance.id))
       } else {
         toast.error(response.error.message);
       }
@@ -101,8 +102,14 @@ const CashBalances = () => {
   }, []);
 
   const handleConfirm = useCallback((data) => {
+    const payload = {
+      ...data,
+      paymentMethods: data.allPaymentMethods
+        ? null
+        : data.paymentMethods.map((paymentMethod) => paymentMethod.value),
+    };
     setIsModalOpen(false);
-    mutate(data);
+    mutate(payload);
   }, [mutate]);
 
   useKeyboardShortcuts(() => push(PAGES.CASH_BALANCES.CREATE), SHORTKEYS.ENTER);
@@ -112,6 +119,7 @@ const CashBalances = () => {
         onRefetch={refetch}
         isLoading={isPending}
         cashBalances={isPending ? [] : cashBalances}
+        paymentOptions={paymentMethodOptions}
       />
       <ModalOpenTill
         open={isModalOpen}

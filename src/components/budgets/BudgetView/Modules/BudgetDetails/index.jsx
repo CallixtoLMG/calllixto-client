@@ -2,11 +2,11 @@ import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, O
 import { DropdownField, PriceLabel } from "@/common/components/form";
 import { Table, Total } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
 import { getDateWithOffset } from "@/common/utils/dates";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
+import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useEffect, useMemo, useState } from "react";
 import { Popup } from "semantic-ui-react";
 import { PICK_UP_IN_STORE } from "../../../budgets.constants";
@@ -39,26 +39,26 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
       {
-        title: "Código",
+        title: "Id",
         value: (product) => (
           <>
             <Popup
-              size="tiny"
-              trigger={<span>{getSupplierCode(product.code)}</span>}
+              size={SIZES.TINY}
+              trigger={<span>{getSupplierId(product.id)}</span>}
               position="top center"
               on="hover"
               content={product.supplierName}
             />
             -
             <Popup
-              size="tiny"
-              trigger={<span>{getBrandCode(product.code)}</span>}
+              size={SIZES.TINY}
+              trigger={<span>{getBrandId(product.id)}</span>}
               position="top center"
               on="hover"
               content={product.brandName}
             />
             -
-            <span>{getProductCode(product.code)}</span>
+            <span>{getProductId(product.id)}</span>
           </>
         ),
         id: 1,
@@ -82,7 +82,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
               </OverflowWrapper>
               <Flex $columnGap="5px" $marginLeft="7px">
                 {isProductOOS(product.state) && (
-                  <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
+                  <Label color={COLORS.ORANGE} size={SIZES.TINY}>{PRODUCT_STATES.OOS.singularTitle}</Label>
                 )}
                 {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
                 {product.comments && <CommentTooltip lineHeight="normal" comment={product.comments} />}
@@ -186,6 +186,8 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           />
           <DropdownField
             flex="3"
+            selection
+            width="200px"
             label="Dirección"
             control={Dropdown}
             value={selectedContact?.address || (budget?.pickUpInStore ? PICK_UP_IN_STORE : '')}
@@ -207,6 +209,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           />
           <DropdownField
             flex="2"
+            selection
             label="Teléfono"
             control={Dropdown}
             value={selectedContact?.phone ?? ''}

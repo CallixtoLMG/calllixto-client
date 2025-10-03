@@ -1,6 +1,6 @@
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer } from "@/common/components/custom";
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { useEffect, useMemo, useRef } from "react";
@@ -28,7 +28,7 @@ const ModalUpdates = ({
 
   const messageItems = useMemo(() => (
     outdatedProducts.map(p => {
-      const oldProduct = budget.products.find(op => op.code === p.code);
+      const oldProduct = budget.products.find(op => op.id === p.id);
       const priceChanged = oldProduct.price !== p.price;
       const stateChanged = oldProduct.state !== p.state;
       const editablePriceBecameTrue = !oldProduct.editablePrice && p.editablePrice;
@@ -37,8 +37,8 @@ const ModalUpdates = ({
       const fractionConfigBecameInactive = oldProduct.fractionConfig?.active && !p.fractionConfig?.active;
 
       return (
-        <MessageItem key={p.code}>
-          {`${p.code} | ${p.name} | `}
+        <MessageItem key={p.id}>
+          {`${p.id} | ${p.name} | `}
           {priceChanged && (
             <>
               <span style={{ color: COLORS.RED }}>{getFormatedPrice(oldProduct.price)}</span>
@@ -87,7 +87,7 @@ const ModalUpdates = ({
 
   return (
     <Transition visible={shouldShowModal} animation='scale' duration={500}>
-      <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={onCancel} size="large">
+      <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={onCancel} size={SIZES.LARGE}>
         <Modal.Header>¿Le gustaría actualizar el presupuesto debido a las recientes modificaciones en algunos productos?</Modal.Header>
         <Modal.Content>
           {!!outdatedProducts.length && (
@@ -103,7 +103,7 @@ const ModalUpdates = ({
               <MessageHeader>Productos no disponibles</MessageHeader>
               <Message.List>
                 {removedProducts.map(p => (
-                  <MessageItem key={p.code}>{`${p.code} | ${p.name} | ${getFormatedPrice(p.price)}.`}</MessageItem>
+                  <MessageItem key={p.id}>{`${p.id} | ${p.name} | ${getFormatedPrice(p.price)}.`}</MessageItem>
                 ))}
               </Message.List>
             </Message>

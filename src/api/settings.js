@@ -2,6 +2,7 @@ import { ENTITIES, IN_MS } from "@/common/constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY } from "../components/settings/settings.constants";
+import { getInstance } from "./axios";
 import { listItems, useEditItem } from "./common";
 
 export function useListSettings() {
@@ -21,7 +22,7 @@ export function useGetSetting(entity) {
   const getSetting = async () => {
     try {
       const { data } = await getInstance().get(PATHS.SETTINGS);
-      return data?.settings[entity] ?? null;
+      return data?.settings.find(setting => setting.entity.toLowerCase() === entity);
     } catch (error) {
       throw error;
     }
@@ -33,6 +34,7 @@ export function useGetSetting(entity) {
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
     enabled: !!getSetting,
+    placeholderData: {},
   });
 
   return query;

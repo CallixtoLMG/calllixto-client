@@ -1,15 +1,15 @@
 import { PRODUCT_STATES } from "./products.constants";
 
-export const getSupplierCode = (code) => {
-  return code?.slice(0, 2);
+export const getSupplierId = (id) => {
+  return id?.slice(0, 2);
 };
 
-export const getBrandCode = (code) => {
-  return code?.slice(2, 4);
+export const getBrandId = (id) => {
+  return id?.slice(2, 4);
 };
 
-export const getProductCode = (code) => {
-  return code?.slice(4);
+export const getProductId = (id) => {
+  return id?.slice(4);
 };
 
 export const getFormatedMargin = (price, cost) => {
@@ -21,24 +21,24 @@ export const getFormatedMargin = (price, cost) => {
   const margin = ((safePrice / safeCost) - 1) * 100;
   const roundedMargin = Math.round(margin * 100) / 100;
 
-  return `% ${roundedMargin}`; 
+  return `% ${roundedMargin}`;
 };
 
 export const getMargin = (price, cost) => {
   const safePrice = Number(price) || 0;
   const safeCost = Number(cost) || 0;
 
-  if (safeCost === 0) return 0; 
+  if (safeCost === 0) return 0;
   const margin = ((safePrice / safeCost) - 1) * 100;
   return Math.round(margin * 100) / 100;
 };
 
-export const formatProductCode = (code) => {
-  const supplierCode = getSupplierCode(code);
-  const brandCode = getBrandCode(code);
-  const productCode = getProductCode(code);
+export const formatProductId = (id) => {
+  const supplierId = getSupplierId(id);
+  const brandId = getBrandId(id);
+  const productId = getProductId(id);
 
-  return `${supplierCode}-${brandCode}-${productCode}`;
+  return `${supplierId}-${brandId}-${productId}`;
 };
 
 export const isProductOOS = (status) => {

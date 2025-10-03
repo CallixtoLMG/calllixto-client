@@ -1,42 +1,75 @@
-import { ButtonsContainer, FieldsContainer, Flex, FlexColumn, Form, FormField } from "@/common/components/custom";
+import { Box, ButtonsContainer, FieldsContainer, Flex, FlexColumn, Form } from "@/common/components/custom";
 import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePickerControlled";
-import { COLORS, ICONS, RULES } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, RULES, SIZES } from "@/common/constants";
+import { datePickerNow } from "@/common/utils/dates";
+import { AddBillPopup } from "@/components/cashBalances/AddBillPopup";
+import { BILLS_DETAILS_TABLE_HEADERS, EMPTY_BILL } from "@/components/cashBalances/cashBalances.constants";
+import { useSettingArrayField } from "@/hooks";
+import { useRef, useState } from "react";
 import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import { Modal, Transition } from "semantic-ui-react";
+import { Modal, Popup, Transition } from "semantic-ui-react";
 import { IconedButton } from "../../buttons";
-import { DropdownControlled, NumberControlled, PriceControlled, TextAreaControlled } from "../../form";
+import { DropdownControlled, IconedButtonControlled, PriceControlled, PriceLabel, TextAreaControlled } from "../../form";
+import { Table } from "../../table";
 import { Header } from "./styles";
-
-const mockPaymentMethods = [
-  { "key": "mercado_pago", "text": "Mercado Pago", "value": "Mercado Pago" },
-  { "key": "efectivo", "text": "Efectivo", "value": "Efectivo" },
-  { "key": "mercado_pagos", "text": "Mercado Pagos", "value": "Mercado Pagos" }
-]
 
 const ModalOpenTill = ({ open, onClose, onSubmit, paymentOptions, isLoading }) => {
   const methods = useForm({
     defaultValues: {
-      startDate: null,
+      startDate: datePickerNow(),
       closeDate: null,
       paymentMethods: [],
       initialAmount: 0,
-      billsDetails: []
+      billsDetails: [],
+      tempQuantity: '',
+      setAllPaymentMethods: false,
     }
   });
-
-  const { control, handleSubmit, watch, setValue } = methods;
+  const { control, handleSubmit, watch, setValue, getValues, trigger, clearErrors, reset } = methods;
   const { fields: billDetailsFields, append: appendBillDetails, remove: removeBillDetails } = useFieldArray({
     control,
     name: "billsDetails"
   });
-
+  const [billToAdd, setBillToAdd] = useState(EMPTY_BILL);
+  const [openBillPopup, setOpenBillPopup] = useState(false);
+  const [billError, setBillError] = useState();
+  const billButtonRef = useRef(null);
   const selectedMethods = watch("paymentMethods") || [];
-  const showBillsTable = selectedMethods.includes("Efectivo");
+  const watchAllMethods = methods.watch("allPaymentMethods");
+  const showBillsTable = watchAllMethods || selectedMethods.some(m => m?.name === "Efectivo");
+  const billsTotal = billDetailsFields.reduce(
+    (sum, b) => sum + (Number(b.denomination) * Number(b.quantity)),
+    0
+  );
+
+  const { options: tagsOptions, optionsMapper } = useSettingArrayField(
+    ENTITIES.GENERAL,
+    "paymentMethods",
+    paymentOptions ?? []
+  );
+
+  const handleCloseModal = () => {
+    reset();
+    onClose();
+  };
+
+  const resetStartDate = () => {
+    reset({ startDate: datePickerNow() });
+  };
+
+  const handleClosePopup = () => {
+    setBillToAdd(EMPTY_BILL);
+    setOpenBillPopup(false);
+    setBillError(undefined);
+    setValue("tempQuantity", "");
+    billButtonRef.current?.focus();
+    clearErrors("tempQuantity");
+  };
 
   return (
     <FormProvider {...methods}>
-      <Transition visible={open} animation="scale" duration={500}>
-        <Modal open={open} onClose={onClose} size="small">
+      <Transition visible={open} onStart={resetStartDate} animation="scale" duration={500}>
+        <Modal open={open} onClose={handleCloseModal} size={SIZES.SMALL}>
           <Header icon="inbox" content="Abrir caja" />
           <Modal.Content>
             <Form>
@@ -66,8 +99,8 @@ const ModalOpenTill = ({ open, onClose, onSubmit, paymentOptions, isLoading }) =
                   />
                 </FieldsContainer>
               </Flex>
-              <FieldsContainer>
-                <FormField>
+              <FieldsContainer $alignItems="end" $rowGap="10px">
+                {!watchAllMethods &&
                   <DropdownControlled
                     height="fit-content"
                     rules={RULES.REQUIRED}
@@ -77,72 +110,103 @@ const ModalOpenTill = ({ open, onClose, onSubmit, paymentOptions, isLoading }) =
                     width="fit-content"
                     multiple
                     selection
-                    // options={paymentOptions}
-                    options={mockPaymentMethods}
-
+                    options={tagsOptions}
                     value={watch("paymentMethods")}
+                    optionsMapper={optionsMapper}
                     onChange={(e, { value }) => setValue("paymentMethods", value)}
+                    renderLabel={(item) => ({
+                      color: item.value.color ?? "grey",
+                      content: item.value.name
+                    })}
                     required
                   />
-                </FormField>
+                }
+                <IconedButtonControlled
+                  width="fit-content"
+                  name="allPaymentMethods"
+                  label="Todos los métodos"
+                  icon={ICONS.PENCIL}
+                  color={COLORS.BLUE}
+                />
               </FieldsContainer>
-
+              <FieldsContainer>
+                <PriceControlled
+                  width="200px"
+                  label="Monto inicial"
+                  name="initialAmount"
+                  rules={RULES.REQUIRED_POSITIVE_NUMBER}
+                  required
+                  value={0}
+                />
+              </FieldsContainer>
               {showBillsTable && (
                 <FieldsContainer>
                   <FlexColumn $rowGap="10px">
                     <Header margin="0">Desglose de Billetes</Header>
-                    <IconedButton
+                    <Flex $columnGap="10px">
+                      <Popup
+                        trigger={
+                          <Box
+                            width="fit-content"
+                            tabIndex={0}
+                            role="button"
+                            ref={billButtonRef}
+                            onClick={() => setOpenBillPopup(true)}
+                          >
+                            <IconedButton
+                              text="Agregar billete"
+                              icon={ICONS.ADD}
+                              color={COLORS.GREEN}
+                            />
 
-                      text="Agregar billete"
-                      icon={ICONS.ADD}
-                      color={COLORS.GREEN}
-                      onClick={() => appendBillDetails({ denomination: '', quantity: '' })}
-                    />
-                    {billDetailsFields.map((field, index) => (
-                      <Flex key={field.id} $columnGap="10px" $alignItems="center">
-                        <PriceControlled
-                          name={`bills.${index}.denomination`}
-                          label="Denominación"
-                          width="200px"
-                          rules={{
-                            required: "Denominación requerida",
-                            validate: v => v && Number(v) > 0 ? true : "Debe ser número y mayor a cero"
-                          }}
-                        />
-                        <NumberControlled
-                          name={`bills.${index}.quantity`}
-                          label="Cantidad"
-                          width="200px"
-                          rules={{
-                            required: "Cantidad requerida",
-                            validate: v => v && Number(v) > 0 ? true : "Debe ser número y mayor a cero"
-                          }}
-                        />
+                          </Box>
+                        }
+                        open={openBillPopup}
+                        on='click'
+                        onClose={handleClosePopup}
+                        closeOnDocumentClick
+                        position='top left'
+                      >
+                        <Flex $columnGap="10px" $alignItems="center">
+                          <AddBillPopup
+                            billToAdd={billToAdd}
+                            setBillToAdd={setBillToAdd}
+                            billError={billError}
+                            setBillError={setBillError}
+                            billDetailsFields={billDetailsFields}
+                            appendBillDetails={appendBillDetails}
+                            setValue={setValue}
+                            getValues={getValues}
+                            onClose={handleClosePopup}
+                            buttonRef={billButtonRef}
+                            trigger={trigger}
+                          />
+                        </Flex>
+                      </Popup>
+                      {billsTotal > 0 && (
                         <IconedButton
-                          height="38px"
-                          alignSelf="end"
-                          icon={ICONS.TRASH}
-                          color={COLORS.RED}
-                          onClick={() => removeBillDetails(index)}
+                          text="Actualizar monto inicial"
+                          icon={ICONS.CHECK}
+                          color={COLORS.BLUE}
+                          onClick={() => setValue("initialAmount", billsTotal)}
                         />
+                      )}
+                    </Flex>
+                    <Flex width="40vw" $columnGap="60px">
+                      <Table
+                        headers={BILLS_DETAILS_TABLE_HEADERS}
+                        actions={[
+                          { id: 1, icon: ICONS.TRASH, color: COLORS.RED, onClick: (billDetail, index) => removeBillDetails(index), tooltip: 'Eliminar' }
+                        ]}
+                        elements={billDetailsFields}
+                      />
+                      <Flex $alignSelf="end" $marginBottom="11px">
+                        Total <PriceLabel value={billsTotal} />
                       </Flex>
-                    ))}
-
+                    </Flex>
                   </FlexColumn>
                 </FieldsContainer>
               )}
-              <FieldsContainer>
-                <FormField>
-                  <PriceControlled
-                    width="200px"
-                    label="Monto inicial"
-                    name="initialAmount"
-                    rules={RULES.REQUIRED_POSITIVE_NUMBER}
-                    required
-                    value={0}
-                  />
-                </FormField>
-              </FieldsContainer>
               <FieldsContainer>
                 <TextAreaControlled name="comments" label="Comentarios" />
               </FieldsContainer>
@@ -154,7 +218,7 @@ const ModalOpenTill = ({ open, onClose, onSubmit, paymentOptions, isLoading }) =
                 text="Cancelar"
                 icon={ICONS.CANCEL}
                 color={COLORS.RED}
-                onClick={onClose}
+                onClick={handleCloseModal}
               />
               <IconedButton
                 text="Confirmar"
@@ -162,7 +226,10 @@ const ModalOpenTill = ({ open, onClose, onSubmit, paymentOptions, isLoading }) =
                 color={COLORS.GREEN}
                 loading={isLoading}
                 disabled={isLoading}
-                onClick={handleSubmit(onSubmit)}
+                onClick={handleSubmit((data) => {
+                  const { tempQuantity, ...cleanData } = data;
+                  onSubmit(cleanData);
+                })}
               />
             </ButtonsContainer>
           </Modal.Actions>

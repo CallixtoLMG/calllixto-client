@@ -64,20 +64,24 @@ const Expense = ({ params }) => {
     }
   
     if (!isItemCancelled(expense?.state)) {
+      const handleBan = () => handleProtectedAction(() => setIsModalCancelOpen(true));
+
       actionsList.push({
         id: 2,
         icon: ICONS.BAN,
         color: COLORS.RED,
         basic: true,
-        onClick: () => handleProtectedAction(() => setIsModalCancelOpen(true)),
+        onClick: handleBan,
         text: "Anular",
         width: "fit-content",
       });
     }
   
     setActions(actionsList);
-  }, [role, expense?.id, expense?.state, setActions, handleProtectedAction, push]);
-  
+  }, [
+    role, expense?.id, expense?.state, setActions, push,
+  ]);
+
   const expenseFormRef = useRef();
 
   const expenseUnsaved = useUnsavedChanges({

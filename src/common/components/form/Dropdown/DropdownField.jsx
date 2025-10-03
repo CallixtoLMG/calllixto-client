@@ -14,13 +14,15 @@ export const DropdownField = ({
   clearable,
   multiple,
   search,
-  selection
+  selection,
+  height = "38px"
 }) => {
 
   return (
     <FormField
       flex={flex}
       $width={width}
+      height={height}
       required={required}
       label={label}
       placeholder={placeholder ?? label}

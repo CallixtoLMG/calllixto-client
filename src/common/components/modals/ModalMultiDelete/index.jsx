@@ -34,7 +34,7 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
           <Table
             headers={headers}
             elements={elements}
-            mainKey="code"
+            mainKey="id"
           />
         </ModalContent>
         <Modal.Actions>

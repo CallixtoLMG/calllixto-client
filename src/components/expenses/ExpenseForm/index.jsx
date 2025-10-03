@@ -45,8 +45,8 @@ const ExpenseForm = forwardRef(({
     defaultValues: isCloning ? clonedInitialValues : getInitialValues(expense),
   });
   const { isFetching: isExpensesSettingsFetching, refetch: refetchExprensesSettings } = useGetSetting(ENTITIES.EXPENSES);
-  const { options: tagsOptions, optionsMapper: tagsMapper } = useSettingArrayField(ENTITIES.EXPENSES, "tags", expense?.tags || []);
-  const { options: categoryOptions, optionsMapper: categoriesMapper } = useSettingArrayField(ENTITIES.EXPENSES, "categories", expense?.categories || []);
+  const { options: tagsOptions, optionsMapper: tagsMapper } = useSettingArrayField(ENTITIES.EXPENSE, "tags", expense?.tags || []);
+  const { options: categoryOptions, optionsMapper: categoriesMapper } = useSettingArrayField(ENTITIES.EXPENSE, "categories", expense?.categories || []);
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
@@ -97,7 +97,7 @@ const ExpenseForm = forwardRef(({
           {view &&
             <TextField
               width="200px"
-              label="Código"
+              label="Id"
               value={expense?.id}
               disabled
             />

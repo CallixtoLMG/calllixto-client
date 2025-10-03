@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, DELETE, ICONS } from "@/common/constants";
+import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -30,63 +30,63 @@ const Blacklist = () => {
   }, [setValue]);
 
   const handleAddBlacklist = () => {
-    const codes = inputValue
+    const ids = inputValue
       .split(",")
-      .map(code => code.trim().toUpperCase())
+      .map(id => id.trim().toUpperCase())
       .filter(Boolean);
 
-    const uniqueCodes = [...new Set(codes)];
-    const validCodes = [];
-    const errorCodes = [];
+    const uniqueIds = [...new Set(ids)];
+    const validIds = [];
+    const errorIds = [];
     const detailedErrors = {};
 
-    uniqueCodes.forEach(code => {
-      if (code.includes(" ")) {
-        errorCodes.push(code);
-        detailedErrors[code] = `El código [${code}] contiene espacios en blanco, no permitidos!`;
+    uniqueIds.forEach(id => {
+      if (id.includes(" ")) {
+        errorIds.push(id);
+        detailedErrors[id] = `El id [${id}] contiene espacios en blanco, no permitidos!`;
         return;
       }
-      if (code.length < 5) {
-        errorCodes.push(code);
-        detailedErrors[code] = `El código [${code}] debe tener más de 5 caracteres!`;
+      if (id.length < 5) {
+        errorIds.push(id);
+        detailedErrors[id] = `El id [${id}] debe tener más de 5 caracteres!`;
         return;
       }
-      if (blacklist.includes(code)) {
-        errorCodes.push(code);
-        detailedErrors[code] = `El código [${code}] ya existe en la lista!`;
+      if (blacklist.includes(id)) {
+        errorIds.push(id);
+        detailedErrors[id] = `El id [${id}] ya existe en la lista!`;
         return;
       }
-      validCodes.push(code);
+      validIds.push(id);
     });
 
-    if (validCodes.length > 0) {
-      updateBlacklist([...blacklist, ...validCodes]);
+    if (validIds.length > 0) {
+      updateBlacklist([...blacklist, ...validIds]);
     }
 
-    if (errorCodes.length > 0) {
-      if (errorCodes.length === 1) {
-        setError(detailedErrors[errorCodes[0]]);
+    if (errorIds.length > 0) {
+      if (errorIds.length === 1) {
+        setError(detailedErrors[errorIds[0]]);
       } else {
-        setError("Revisa los códigos marcados con error.");
+        setError("Revisa los ids marcados con error.");
       }
-      setInputValue(errorCodes.join(", "));
+      setInputValue(errorIds.join(", "));
     } else {
       setError(null);
       setInputValue(EMPTY_INPUT);
     }
   };
 
-  const handleRemoveCode = useCallback((codeToRemove) => {
-    const updatedBlacklist = (watch("blacklist") || []).filter(code => code !== codeToRemove);
+  const handleRemoveId = useCallback((idToRemove) => {
+    const updatedBlacklist = (watch("blacklist") || []).filter(id => id !== idToRemove);
     updateBlacklist(updatedBlacklist);
   }, [watch, updateBlacklist]);
 
   const headers = useMemo(() => [
     {
-      id: "code",
+      id: "id",
       title: "Productos Bloqueados",
       align: "left",
-      value: (code) => code,
+      value: (id) => id,
     },
   ], []);
 
@@ -95,11 +95,11 @@ const Blacklist = () => {
       id: DELETE,
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      onClick: handleRemoveCode,
+      onClick: handleRemoveId,
       tooltip: "Eliminar",
-      getKey: (code, index) => `delete_${code}_${index}`, 
+      getKey: (id, index) => `delete_${id}_${index}`,
     },
-  ], [handleRemoveCode]);
+  ], [handleRemoveId]);
 
   return (
     <Box $marginBottom="5px">
@@ -113,8 +113,8 @@ const Blacklist = () => {
             <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
               <TextField
                 width="50%"
-                label="Código(s)"
-                placeholder="Ingresar código(s)"
+                label="Id(s)"
+                placeholder="Ingresar id(s)"
                 value={inputValue}
                 onChange={(e) => {
                   setInputValue(e.target.value);
@@ -127,13 +127,13 @@ const Blacklist = () => {
                 popupPosition="top right"
                 popupContent={
                   <div>
-                    <p>* Para añadir un código nuevo a la lista, anótelo y luego pulse &quot;enter&quot;.</p>
-                    <p>* Puede agregar múltiples códigos separados por coma, por ejemplo: PCMU123,PCMU124.</p>
+                    <p>* Para añadir un id nuevo a la lista, anótelo y luego pulse &quot;enter&quot;.</p>
+                    <p>* Puede agregar múltiples ids separados por coma, por ejemplo: PCMU123,PCMU124.</p>
                   </div>
                 }
               />
               <Button
-                size="small"
+                size={SIZES.SMALL}
                 icon={ICONS.ADD}
                 content="Agregar"
                 labelPosition="left"

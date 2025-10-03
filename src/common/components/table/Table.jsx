@@ -258,7 +258,11 @@ const CustomTable = ({
                             key={`cell_${header.id}_${element[mainKey]}`}
                             align={header.align}
                             width={header.width}
-                            onClick={() => push(page.SHOW(element[mainKey]))}
+                            onClick={() => {
+                              if (typeof page?.SHOW === "function") {
+                                push(page.SHOW(element[mainKey], element));
+                              }
+                            }}
                           >
                             {header.value(element, index)}
                           </LinkCell>

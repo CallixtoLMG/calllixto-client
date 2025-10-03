@@ -38,7 +38,7 @@ const CreateProduct = () => {
     mutationFn: createProduct,
     onSuccess: async (response) => {
       if (response.statusOk) {
-        push(PAGES.PRODUCTS.SHOW(response.product.code))
+        push(PAGES.PRODUCTS.SHOW(response.product.id))
         toast.success('Producto creado!');
       } else {
         toast.error(response.error.message);

@@ -10,6 +10,10 @@ export const now = () => {
   return dayjs().utc().format(DATE_FORMATS.ISO);
 };
 
+export const datePickerNow = () => {
+  return dayjs().toDate(); 
+}
+
 export const getDateWithOffset = ({ date, offset, unit = 'days', format = DATE_FORMATS.ONLY_DATE }) => {
   return dayjs(date).utc().add(offset, unit).format(format);
 };

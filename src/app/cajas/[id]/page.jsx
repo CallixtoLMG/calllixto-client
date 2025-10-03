@@ -1,12 +1,14 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useEditCashBalance, useGetCashBalance } from "@/api/cashBalances";
-import { TextField } from "@/common/components/form";
+import { useCloseCashBalance, useDeleteCashBalance, useEditCashBalance, useGetCashBalance } from "@/api/cashBalances";
+import { Flex } from "@/common/components/custom";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { COLORS, DELETE, ICONS, PAGES } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import CashBalanceForm from "@/components/cashBalances/CashBalanceForm";
+import CashBalanceMovements from "@/components/cashBalances/CashBalanceMovements";
+import { CASH_BALANCE_STATES, CLOSED } from "@/components/cashBalances/cashBalances.constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
@@ -26,8 +28,9 @@ const CashBalance = ({ params }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
-  const [reason, setReason] = useState("");
   const editCashBalance = useEditCashBalance();
+  const closeCashBalance = useCloseCashBalance();
+  const deleteCashBalance = useDeleteCashBalance();
   const formRef = useRef(null);
 
   const {
@@ -55,9 +58,6 @@ const CashBalance = ({ params }) => {
     onBeforeView,
   });
 
-  // const deleteBrand = useDeleteBrand();
-  // const activeBrand = useActiveBrand();
-  // const inactiveBrand = useInactiveBrand();
   const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
 
   useEffect(() => {
@@ -66,15 +66,24 @@ const CashBalance = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.CASH_BALANCES.NAME, cashBalance?.name]);
+    setLabels([
+      PAGES.CASH_BALANCES.NAME,
+      cashBalance?.id
+        ? { id: cashBalance.id, title: CASH_BALANCE_STATES[cashBalance.state]?.singularTitle, color: CASH_BALANCE_STATES[cashBalance.state]?.color }
+        : null
+    ].filter(Boolean));
     refetch();
   }, [setLabels, cashBalance, refetch]);
 
   const modalConfig = useMemo(() => ({
     delete: {
-      header: `¿Está seguro que desea eliminar la marca "${cashBalance?.name}"?`,
+      header: `¿Está seguro que desea eliminar la caja "${cashBalance?.id}"?`,
       confirmText: "eliminar",
       icon: ICONS.TRASH,
+    },
+    closed: {
+      header: `¿Está seguro que desea cerrar  la caja "${cashBalance?.id}"?`,
+      icon: ICONS.CLOSE
     },
 
   }), [cashBalance]);
@@ -82,7 +91,6 @@ const CashBalance = ({ params }) => {
   const handleModalClose = () => {
     setIsModalOpen(false);
     setModalAction(null);
-    setReason("");
   };
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
@@ -103,36 +111,36 @@ const CashBalance = ({ params }) => {
     },
   });
 
-  // const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-  //   mutationFn: ({ brand }) => activeBrand(brand),
-  //   onSuccess: (response) => {
-  //     if (response.statusOk) {
-  //       toast.success("Marca activada!");
-  //     } else {
-  //       toast.error(response.error.message);
-  //     }
-  //   },
-  //   onSettled: () => {
-  //     setActiveAction(null);
-  //     handleModalClose();
-  //   },
-  // });
+  const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
+    mutationFn: () => deleteCashBalance(params.id),
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Caja eliminada permanentemente!");
+        push(PAGES.CASH_BALANCES.BASE);
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
+  });
 
-  // const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-  //   mutationFn: () => deleteBrand(params.id),
-  //   onSuccess: (response) => {
-  //     if (response.statusOk) {
-  //       toast.success("Marca eliminada permanentemente!");
-  //       push(PAGES.BRANDS.BASE);
-  //     } else {
-  //       toast.error(response.error.message);
-  //     }
-  //   },
-  //   onSettled: () => {
-  //     setActiveAction(null);
-  //     handleModalClose();
-  //   },
-  // });
+  const { mutate: mutateClose, isPending: isClosePending } = useMutation({
+    mutationFn: ({ cashBalance }) => closeCashBalance(cashBalance),
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Caja cerrada!");
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
+  });
 
   const handleActionConfirm = async () => {
     setActiveAction(modalAction);
@@ -141,17 +149,9 @@ const CashBalance = ({ params }) => {
       mutateDelete();
     }
 
-    // if (modalAction === INACTIVE) {
-    //   if (!reason) {
-    //     toast.error("Debe proporcionar una razón para desactivar la marca.");
-    //     return;
-    //   }
-    //   mutateInactive({ brand, reason });
-    // }
-
-    // if (modalAction === ACTIVE) {
-    //   mutateActive({ brand });
-    // }
+    if (modalAction === CLOSED) {
+      mutateClose({ cashBalance });
+    }
 
     handleModalClose();
   };
@@ -167,8 +167,21 @@ const CashBalance = ({ params }) => {
       });
 
       const actions = RULES.canRemove[role] ? [
-        {
+        cashBalance.state !== CLOSED && {
           id: 1,
+          icon: ICONS.CLOSE,
+          color: COLORS.ORANGE,
+          text: "Cerrar caja",
+          width: "fit-content",
+          basic: true,
+          onClick: handleClick(CLOSED),
+          disabled: cashBalance.state === CASH_BALANCE_STATES.CLOSED.id,
+          tooltip: cashBalance.state === CASH_BALANCE_STATES.CLOSED.id
+          ? 'La caja ya se encuentra cerrada.'
+          : false,
+        },
+        {
+          id: 2,
           icon: ICONS.TRASH,
           color: COLORS.RED,
           text: "Eliminar",
@@ -181,7 +194,7 @@ const CashBalance = ({ params }) => {
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, activeAction, setActions]);
+  }, [role, activeAction, setActions, cashBalance]);
 
   if (!isLoading && !cashBalance) {
     push(PAGES.NOT_FOUND.BASE);
@@ -192,6 +205,9 @@ const CashBalance = ({ params }) => {
       menuItem: "Caja",
       render: () => (
         <Tab.Pane>
+          <Flex $justifyContent="space-between" $marginBottom="15px">
+            {toggleButton}
+          </Flex>
           <CashBalanceForm
             ref={formRef}
             cashBalance={cashBalance}
@@ -207,7 +223,7 @@ const CashBalance = ({ params }) => {
       menuItem: "Movimientos",
       render: () => (
         <Tab.Pane>
-          {/* <ProductChanges product={product} /> */}
+          <CashBalanceMovements cashBalance={cashBalance} />
         </Tab.Pane>
       ),
     },
@@ -230,18 +246,8 @@ const CashBalance = ({ params }) => {
         confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
-        // isLoading={isInactivePending || isActivePending}
+        isLoading={isClosePending || isDeletePending}
         noConfirmation={!requiresConfirmation}
-        disableButtons={!reason && modalAction === INACTIVE}
-        bodyContent={
-          modalAction === INACTIVE && (
-            <TextField
-              placeholder="Motivo"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-            />
-          )
-        }
       />
     </Loader>
   );

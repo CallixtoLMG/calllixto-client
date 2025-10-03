@@ -1,14 +1,18 @@
-import Dexie from 'dexie';
 import { LAST_UPDATED_AT } from '@/common/constants';
+import Dexie from 'dexie';
 
 export const db = new Dexie('Callixto');
 
 db.version(1).stores({
   customers: 'id, updatedAt',
-  brands: 'id',
-  suppliers: 'id',
-  products: 'code',
-  budgets: 'id',
+  brands: 'id, updatedAt',
+  suppliers: 'id, updatedAt',
+  products: 'id, updatedAt',
+  budgets: 'id, updatedAt',
+  expenses: 'id, updatedAt',
+  users: 'id, updatedAt',
+  cashBalances: 'id, updatedAt',
+  settings: 'entity, updatedAt',
   [LAST_UPDATED_AT]: 'id',
 });
 
@@ -22,7 +26,6 @@ export function getStorageItem({ entity, id }) {
 
 export function getAllStorageItems({ entity, sort, order }) {
   let query = db[entity];
-
   if (sort) {
     query = query.orderBy(sort);
   }

@@ -1,4 +1,5 @@
 import { IconedButton } from "@/common/components/buttons";
+import { SIZES } from "@/common/constants";
 import { Controller } from "react-hook-form";
 import { ButtonGroup } from "semantic-ui-react";
 import { FormField } from "../../custom";
@@ -9,7 +10,7 @@ export const GroupedButtonsControlled = ({ name, width, buttons, color }) => {
       name={name}
       render={({ field: { onChange, value: formValue, ...rest } }) => (
         <FormField $width={width}>
-          <ButtonGroup size="small">
+          <ButtonGroup size={SIZES.SMALL}>
             {buttons?.map(({ text, icon, value }) => (
               <IconedButton
                 {...rest}

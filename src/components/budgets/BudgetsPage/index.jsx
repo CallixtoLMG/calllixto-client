@@ -19,7 +19,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
     methods,
     appliedCount,
     hydrated
-  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BUDGETS_FILTERS_KEY});
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BUDGETS_FILTERS_KEY });
 
   const onFilter = createFilter(filters, ['id', 'customer', 'seller'], {
     customer: budget => budget.customer?.name || '',
@@ -48,6 +48,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
             hydrated={hydrated}
           >
             <DropdownControlled
+              filter
               width="200px"
               name="state"
               options={BUDGET_STATES_OPTIONS}

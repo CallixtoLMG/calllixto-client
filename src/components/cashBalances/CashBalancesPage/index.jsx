@@ -2,12 +2,18 @@ import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
-import { useFilters } from "@/hooks";
+import { useFilters, useSettingArrayField } from "@/hooks";
 import { useMemo } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
-import { CASH_BALANCES_FILTERS_KEY, CASH_BALANCE_STATES_OPTIONS, EMPTY_FILTERS, getCashBalanceColumns } from "../cashBalances.constants";
-const CashBalance = ({ cashBalances = [], isLoading, onRefetch }) => {
+import {
+  CASH_BALANCES_FILTERS_KEY,
+  CASH_BALANCE_STATES_OPTIONS,
+  EMPTY_FILTERS,
+  getCashBalanceColumns
+} from "../cashBalances.constants";
+
+const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOptions }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -18,8 +24,31 @@ const CashBalance = ({ cashBalances = [], isLoading, onRefetch }) => {
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CASH_BALANCES_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['id']);
-  const cashBalanceColumns = useMemo(() => getCashBalanceColumns(filters.state), [filters.state]);
+  const normalizedCashBalances = useMemo(() => {
+    return cashBalances.map(cashBalance => ({
+      ...cashBalance,
+      paymentMethodsText: cashBalance.paymentMethods?.join(", ") ?? ""
+    }));
+  }, [cashBalances]);
+
+  const adjustedFilters = {
+    ...filters,
+    paymentMethodsText: filters.paymentMethods 
+  };
+
+  const onFilter = createFilter(adjustedFilters, ["id", "paymentMethodsText"]);
+
+  const cashBalanceColumns = useMemo(
+    () => getCashBalanceColumns(filters.state),
+    [filters.state]
+  );
+
+  const { options: tagsOptions } = useSettingArrayField(
+    ENTITIES.GENERAL,
+    "paymentMethods",
+    paymentOptions ?? []
+  );
+
   return (
     <>
       <FormProvider {...methods}>
@@ -39,13 +68,22 @@ const CashBalance = ({ cashBalances = [], isLoading, onRefetch }) => {
               afterChange={onSubmit}
             />
             <TextControlled name="id" placeholder="Id" width="80px" />
+            <DropdownControlled
+              width="200px"
+              name="paymentMethods"
+              placeholder="Método de pago"
+              options={tagsOptions}
+              defaultValue={EMPTY_FILTERS.paymentMethods}
+              afterChange={onSubmit}
+              textMaxWidth="fit-content"
+            />
           </Filters>
         </Form>
       </FormProvider>
       <Table
         isLoading={isLoading}
         headers={cashBalanceColumns}
-        elements={cashBalances}
+        elements={normalizedCashBalances}
         page={PAGES.CASH_BALANCES}
         onFilter={onFilter}
         paginate
@@ -56,4 +94,4 @@ const CashBalance = ({ cashBalances = [], isLoading, onRefetch }) => {
   );
 };
 
-export default CashBalance;
+export default CashBalancesPage;

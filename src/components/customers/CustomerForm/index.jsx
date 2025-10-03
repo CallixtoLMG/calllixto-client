@@ -25,7 +25,7 @@ const CustomerForm = forwardRef(({
   }));
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
   const { options: tagsOptions, optionsMapper } = useSettingArrayField(
-    ENTITIES.CUSTOMERS,
+    ENTITIES.CUSTOMER,
     "tags",
     customer?.tags || []
   );

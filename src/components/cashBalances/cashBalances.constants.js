@@ -1,14 +1,15 @@
-import { Flex, Label, OverflowWrapper } from '@/common/components/custom';
+import { Box, Flex, Icon, Label, OverflowWrapper } from '@/common/components/custom';
 import { PriceLabel } from '@/common/components/form';
 import { CommentTooltip } from "@/common/components/tooltips";
-import { DATE_FORMATS } from '@/common/constants';
+import { COLORS, DATE_FORMATS, ICONS, SIZES } from '@/common/constants';
 import { getFormatedDate } from '@/common/utils/dates';
 
 export const GET_CASH_BALANCE_QUERY_KEY = 'getCashBalance';
 export const LIST_CASH_BALANCES_QUERY_KEY = 'listCashBalances';
 export const CASH_BALANCES_FILTERS_KEY = 'cashBalancesFilters';
-
-export const ATTRIBUTES = { ID: "id", START_DATE: "startDate", CLOSE_DATE: "closeDate", PAYMENT_METHODS: "paymentMethods", COMMENTS: "comments", INITIAL_AMOUNT: "initialAmount", ACTUAL_AMOUNT: "actualAmount", BILLS_DETAILS: "billsDetails", STATE: "state" };
+export const CASH_BALANCE_MOVEMENTS_FILTERS_KEY = "cashBalanceMovementsFilters";
+export const CLOSED = "closed"
+export const LIST_ATTRIBUTES = ["id", "startDate", "closeDate", "paymentMethods", "comments", "initialAmount", "currentAmount", "billsDetails", "state"];
 
 export const CASH_BALANCE_STATES = {
   OPEN: {
@@ -18,8 +19,8 @@ export const CASH_BALANCE_STATES = {
     color: 'green',
     icon: 'check',
   },
-  CLOSE: {
-    id: 'CLOSE',
+  CLOSED: {
+    id: 'CLOSED',
     title: 'Cerradas',
     singularTitle: 'Cerrada',
     color: 'grey',
@@ -61,67 +62,53 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       key: "initialAmount",
       sortable: true,
       align: "left",
+      width: 2,
       value: (cashBalance) => <PriceLabel value={cashBalance.initialAmount} />,
       sortValue: (cashBalance) => cashBalance.initialAmount ?? ""
     },
     {
       id: 4,
       title: "Monto Actual",
-      key: "actualAmount",
+      key: "currentAmount",
       sortable: true,
       align: "left",
-      value: (cashBalance) => <PriceLabel value={cashBalance.actualAmount ?? ""} />,
-      sortValue: (cashBalance) => cashBalance.actualAmount ?? ""
+      width: 2,
+      value: (cashBalance) => <PriceLabel value={cashBalance.currentAmount ?? ""} />,
+      sortValue: (cashBalance) => cashBalance.currentAmount ?? ""
     },
     {
       id: 5,
       title: "Métodos de pago",
-      key: "method",
-      sortable: true,
       align: "left",
-      value: (cashBalance) =>
-        <Flex $justifyContent="space-between">
-          <OverflowWrapper maxWidth="15vw" popupContent={cashBalance.method}>
-            {cashBalance.method}
-          </OverflowWrapper>
-        </Flex>,
-      sortValue: (cashBalance) => cashBalance.method ?? ""
+      value: (cashBalance) => (
+        <Flex $wrap $columnGap="6px" $rowGap="4px">
+          {(cashBalance.paymentMethods?.length > 0)
+            ? cashBalance.paymentMethods.map((method, index) => (
+              <Label width="fit-content" key={index} size={SIZES.TINY}>
+                {method}
+              </Label>
+            ))
+            :
+            <Label width="fit-content" size={SIZES.TINY}>
+              Todos los métodos
+            </Label>
+          }
+        </Flex>
+      ),
     },
-    // {
-    //   id: 6,
-    //   title: "Detalle de Billetes",
-    //   key: "billsDetails",
-    //   sortable: true,
-    //   align: "left",
-    //   value: (cashBalance) =>
-    //     <Flex $justifyContent="space-between">
-    //       <OverflowWrapper
-    //         maxWidth="30vw"
-    //         popupContent={Object.entries(cashBalance.billsDetails || {})
-    //           .map(([denomination, quantity]) => `${denomination} x ${quantity}`)
-    //           .join(" / ")}>
-    //         {Object.entries(cashBalance.billsDetails || {})
-    //           .map(([denomination, quantity]) => `${denomination} x ${quantity}`)
-    //           .join(" / ")
-    //         }
-    //       </OverflowWrapper>
-    //     </Flex>,
-    //   sortValue: (cashBalance) => Object.entries(cashBalance.billsDetails || {})
-    //     .map(([denomination, quantity]) => `${denomination}x${quantity}`)
-    //     .join(" ") ?? ""
-    // },
   ];
 
-  if (state === CASH_BALANCE_STATES.CLOSE.id) {
+  if (state === CASH_BALANCE_STATES.CLOSED.id) {
     columns.splice(2, 0, {
-      id: 2.5,
+      id: 6,
+      width: 2,
       title: "Fecha cierre",
       key: "closeDate",
       sortable: true,
       align: "left",
       value: (cashBalance) => (
         <Flex $justifyContent="space-between">
-          {cashBalance.closeDate}
+          {getFormatedDate(cashBalance.closeDate, DATE_FORMATS.ONLY_DATE)}
         </Flex>
       ),
       sortValue: (cashBalance) => cashBalance.closeDate ?? ""
@@ -132,7 +119,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
 };
 
 export const EMPTY_CASH_BALANCE = { method: '', startDate: '', closeDate: '', id: '', comments: '' };
-export const EMPTY_FILTERS = { id: '', state: CASH_BALANCE_STATES.OPEN.id };
+export const EMPTY_FILTERS = { id: '', state: CASH_BALANCE_STATES.OPEN.id, paymentMethods: '' };
 
 export const CASH_BALANCE_STATES_OPTIONS = Object.values(CASH_BALANCE_STATES)
   .map(({ id, title, color }) => ({
@@ -144,3 +131,155 @@ export const CASH_BALANCE_STATES_OPTIONS = Object.values(CASH_BALANCE_STATES)
     ),
     value: id
   }));
+
+export const BILLS_DETAILS_TABLE_HEADERS = [
+  {
+    id: 1,
+    title: "Denominación",
+    width: 4,
+    key: "denomination",
+    sortable: true,
+    value: (billDetail) => <PriceLabel value={billDetail.denomination} />,
+    sortValue: (billDetail) => billDetail.denomination ?? ""
+  }, {
+    id: 2,
+    width: 5,
+    title: 'Cantidad',
+    key: "quantity",
+    align: "right",
+    value: (billDetail) => billDetail.quantity,
+    sortValue: (billDetail) => billDetail.quantity ?? ""
+  },
+  {
+    id: 3,
+    title: "Subtotal",
+    width: 8,
+    key: "subtotal",
+    align: "right",
+    value: (billDetail) => {
+      const total = Number(billDetail.denomination) * Number(billDetail.quantity);
+      return <PriceLabel value={total} />;
+    },
+    sortValue: (billDetail) => {
+      const subtotal = Number(billDetail.denomination) * Number(billDetail.quantity);
+      return subtotal || 0;
+    }
+  }
+];
+
+export const ARS_BILL_DENOMINATIONS = [
+  { key: 10, value: 10, text: "$10" },
+  { key: 20, value: 20, text: "$20" },
+  { key: 50, value: 50, text: "$50" },
+  { key: 100, value: 100, text: "$100" },
+  { key: 200, value: 200, text: "$200" },
+  { key: 500, value: 500, text: "$500" },
+  { key: 1000, value: 1000, text: "$1.000" },
+  { key: 2000, value: 2000, text: "$2.000" },
+  { key: 10000, value: 10000, text: "$10.000" },
+  { key: 20000, value: 20000, text: "$20.000" },
+];
+
+export const EMPTY_BILL = { denomination: '', quantity: '' };
+
+export const CASH_FILTERS_KEY = "cashBalanceMovementsFilters";
+
+export const EMPTY_CASH_BALANCE_MOVEMENTS_FILTERS = {
+  type: "all",
+  movementId: "",
+};
+
+export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
+  {
+    id: 1,
+    title: 'Fecha',
+    key: 'date',
+    width: 3,
+    sortable: true,
+    sortValue: (element) => element.date ?? "",
+    value: (element) => (
+      <Flex whiteSpace="nowrap" $alignItems="center">
+        <Label ribbon width="fit-content" color={element.quantity < 0 ? COLORS.RED : COLORS.GREEN}>
+          <Icon inverted name={element.quantity < 0 ? ICONS.ARROW_UP : ICONS.ARROW_DOWN} />
+        </Label>
+        <Box width="100%">
+          {element.date ? getFormatedDate(element.date) : "-"}
+        </Box>
+      </Flex>
+    )
+  },
+  {
+    id: 2,
+    title: 'Monto',
+    key: 'quantity',
+    sortable: true,
+    sortValue: (element) => element.amount ?? "",
+    width: 2,
+    value: (element) => <PriceLabel value={element.amount} />
+  },
+  {
+    id: 3,
+    title: 'Método de Pago',
+    key: 'method',
+    sortable: true,
+    sortValue: (element) => element.method ?? "",
+    width: 3,
+    value: (element) => element.method || "-"
+  },
+  {
+    id: 4,
+    title: 'Id',
+    key: 'id',
+    sortable: true,
+    sortValue: (element) => element.movementId ?? "",
+    width: 2,
+    value: (element) => {
+      const prefix = element.source === "expense" ? "Gasto" : "Venta";
+      return `${prefix} - ${element.movementId}`;
+    }
+  },
+  {
+    id: 5,
+    title: 'Comentarios',
+    width: 6,
+    align: "left",
+    value: (element) => (
+      <OverflowWrapper maxWidth="30vw" popupContent={element.comments}>
+        {element.comments}
+      </OverflowWrapper>
+    )
+  }
+];
+
+export const CASH_BALANCE_MOVEMENTS_TYPE_OPTIONS = [
+  {
+    key: "all",
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        Todos&nbsp;
+      </Flex>
+    ),
+    value: "all",
+  },
+  {
+    key: "in",
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        Ingresos&nbsp;
+        <Icon name={ICONS.ARROW_DOWN} color={COLORS.GREEN} />
+      </Flex>
+    ),
+    value: "in",
+  },
+  {
+    key: "out",
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        Egresos&nbsp;
+        <Icon name={ICONS.ARROW_UP} color={COLORS.RED} />
+      </Flex>
+    ),
+    value: "out",
+  },
+];
+

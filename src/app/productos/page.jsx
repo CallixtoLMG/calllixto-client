@@ -32,11 +32,11 @@ const Products = () => {
 
   const handleDownloadExcel = useCallback(() => {
     if (!products) return;
-    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Costo', 'Precio', 'Margen', 'Estado', 'Comentarios'];
+    const headers = ['Id', 'Nombre', 'Marca', 'Proveedor', 'Costo', 'Precio', 'Margen', 'Estado', 'Comentarios'];
     const mappedPRoducts = products.map(product => {
       const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
       return [
-        product.code,
+        product.id,
         product.name,
         product.brandName,
         product.supplierName,
