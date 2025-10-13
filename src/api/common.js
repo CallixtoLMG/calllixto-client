@@ -1,7 +1,7 @@
 import { ALL, DATE_FORMATS, LAST_UPDATED_AT } from "@/common/constants";
 import { getDefaultAttributes } from "@/common/utils";
 import { getDateWithOffset } from "@/common/utils/dates";
-import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
+import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, removeStorageItemsByFilter, updateOrCreateStorageItem } from "@/db";
 import { useQueryClient } from "@tanstack/react-query";
 import { pick } from 'lodash';
 import { getInstance } from './axios';
@@ -156,11 +156,5 @@ export function useDeleteItem() {
 };
 
 export async function removeStorageItemsByCustomFilter({ entity, filter }) {
-  const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  if (!values) {
-    console.warn("No se encontraron valores en el storage para la entidad:", entity);
-    return;
-  }
-  const filteredValues = values.filter(filter);
-  await localforage.setItem(`${config.APP_ENV}-${entity}`, filteredValues);
+  await removeStorageItemsByFilter({ entity, filter });
 };

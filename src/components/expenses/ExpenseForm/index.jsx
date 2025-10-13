@@ -29,9 +29,9 @@ const ExpenseForm = forwardRef(({
 
   const clonedInitialValues = useMemo(() => {
     if (!isCloning || !expense) return EMPTY_EXPENSE;
-  
+
     const { id, createdAt, createdBy, updatedAt, updatedBy, state, paymentsMade, ...rest } = expense;
-  
+
     return {
       ...EMPTY_EXPENSE,
       ...rest,
@@ -44,7 +44,7 @@ const ExpenseForm = forwardRef(({
   const methods = useForm({
     defaultValues: isCloning ? clonedInitialValues : getInitialValues(expense),
   });
-  const { isFetching: isExpensesSettingsFetching, refetch: refetchExprensesSettings } = useGetSetting(ENTITIES.EXPENSES);
+  const { isFetching: isExpensesSettingsFetching, refetch: refetchExprensesSettings } = useGetSetting(ENTITIES.EXPENSE);
   const { options: tagsOptions, optionsMapper: tagsMapper } = useSettingArrayField(ENTITIES.EXPENSE, "tags", expense?.tags || []);
   const { options: categoryOptions, optionsMapper: categoriesMapper } = useSettingArrayField(ENTITIES.EXPENSE, "categories", expense?.categories || []);
   const { handleSubmit, reset, formState: { isDirty } } = methods;

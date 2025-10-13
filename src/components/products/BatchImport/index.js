@@ -31,7 +31,7 @@ const BatchImport = ({ isCreating }) => {
   const [unprocessedProductsCount, setUnprocessedProductsCount] = useState(0);
   const [importedProductsCount, setImportedProductsCount] = useState(0);
   const watchProducts = watch("importProducts", []);
-  const { refetch: refetchBlacklist } = useGetSetting(ENTITIES.PRODUCTS);
+  const { refetch: refetchBlacklist } = useGetSetting(ENTITIES.PRODUCT);
   const inputRef = useRef();
   const formRef = useRef(null);
   const [existingIds, setExistingIds] = useState({});

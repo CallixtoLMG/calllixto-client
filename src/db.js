@@ -48,3 +48,14 @@ export async function removeStorageItem({ entity, id }) {
 export async function clearStorageTable(entity) {
   await db[entity].clear();
 };
+
+export async function removeStorageItemsByFilter({ entity, filter }) {
+  const allItems = await db[entity].toArray();
+  const idsToDelete = allItems
+    .filter(filter)
+    .map(item => item.id);
+
+  if (idsToDelete.length) {
+    await db[entity].bulkDelete(idsToDelete);
+  }
+};

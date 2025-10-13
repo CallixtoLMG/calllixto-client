@@ -2,7 +2,7 @@ import { Flex, FlexColumn, Message } from "@/common/components/custom";
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { COLORS, DATE_FORMATS, ENTITIES, PAGES } from "@/common/constants";
-import { createFilter, preventSend } from "@/common/utils";
+import { createFilter, getFormatedNumber, preventSend } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { useFilters } from "@/hooks";
 import { useMemo } from "react";
@@ -68,14 +68,16 @@ const CashBalanceMovements = ({ cashBalance }) => {
             <Flex $justifyContent="space-between">
               <Header center>Movimientos de Caja</Header>
               <Flex $columnGap="15px">
-                <Message width="fit-content" alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.GREY}>
-                  Fecha de cierre: {getFormatedDate(cashBalance?.closeDate, DATE_FORMATS.ONLY_DATE)}
-                </Message>
+                {cashBalance.closeDate &&
+                  <Message width="fit-content" alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.GREY}>
+                    Fecha de cierre: {getFormatedDate(cashBalance?.closeDate, DATE_FORMATS.ONLY_DATE)}
+                  </Message>
+                }
                 <Message width="fit-content" alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.BLUE}>
-                  Monto inicial: {cashBalance.initialAmount}
+                  Monto inicial: {getFormatedNumber(cashBalance.initialAmount)}
                 </Message>
                 <Message width="fit-content" alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.GREEN}>
-                  Monto actual: {cashBalance.currentAmount}
+                  Monto actual: {getFormatedNumber(cashBalance.currentAmount)}
                 </Message>
               </Flex>
             </Flex>

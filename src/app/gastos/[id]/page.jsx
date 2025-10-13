@@ -52,7 +52,7 @@ const Expense = ({ params }) => {
 
   useEffect(() => {
     const actionsList = [];
-  
+
     if (RULES.canRemove[role]) {
       actionsList.push({
         id: 1,
@@ -62,7 +62,7 @@ const Expense = ({ params }) => {
         text: 'Clonar',
       });
     }
-  
+
     if (!isItemCancelled(expense?.state)) {
       const handleBan = () => handleProtectedAction(() => setIsModalCancelOpen(true));
 
@@ -76,11 +76,9 @@ const Expense = ({ params }) => {
         width: "fit-content",
       });
     }
-  
+
     setActions(actionsList);
-  }, [
-    role, expense?.id, expense?.state, setActions, push,
-  ]);
+  }, [role, expense?.id, expense?.state, setActions, push, handleProtectedAction]);
 
   const expenseFormRef = useRef();
 
