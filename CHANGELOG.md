@@ -3,6 +3,42 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2025-10-30
+
+### Added
+
+- Implemented full CRUD functionality for the CashBalances entity.
+
+- Created ModalOpenTill modal component for adding new cash balances, with support for dynamic bill entry.
+
+### Changed
+
+- Introduced an activeIndex parameter for the Expenses and Budgets views to prioritize the Payments tab when redirected from the CashBalances entity.
+
+- Added a skipStorageUpdate flag to the database utility layer to prevent saving specific entities (e.g., Payments) when needed.
+
+- Replaced usage of the seller property with createdBy across the entire project for consistency and clarity.
+
+- Refactored the Payments module to treat it as a standalone entity, ensuring proper modular behavior and integration with other entities.
+
+## 2025-10-03
+
+### Added
+
+- Added the cashBalance entity with full integration: includes a dedicated modal (ModalOpenTill) and dynamic entry popup (AddBillPopup).
+
+- Introduced SIZES constant in common/constants to avoid hardcoded Semantic UI size strings across components.
+
+- Created utility function datePickerNow to get the current date for use in date pickers (returns raw Date object without formatting).
+
+- Created or updated mapToDropdownOptions utility function to dynamically adapt constant arrays for use in dropdowns (returns { key, text, value }[] format).
+
+### Changed
+
+- Modified code field in Products to now use id instead, ensuring consistency with other entities like Budgets, Expenses, and CashBalances.
+
+- Updated Table component to accept two parameters in the actions prop function when necessary, increasing flexibility in table row customization.
+
 ## 2025-08-25
 
 ### Added
@@ -50,7 +86,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Changed
 
 - Improved product search logic in ProductSearch component:
-- Prioritizes exact matches on product name or code before falling back to word-by-word partial matches.
+- Prioritizes exact matches on product name or id before falling back to word-by-word partial matches.
 - Updated getNumberFormated function for consistent price formatting: ensures correct display of thousand separators.
 - Utilizes toLocaleString("es-AR") for consistent regional formatting.
 

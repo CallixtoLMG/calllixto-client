@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, DELETE, ICONS } from "@/common/constants";
+import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -92,7 +92,7 @@ const PaymentMethods = () => {
                 error={error}
               />
               <Button
-                size="small"
+                size={SIZES.SMALL}
                 icon={ICONS.ADD}
                 content="Agregar"
                 labelPosition="left"

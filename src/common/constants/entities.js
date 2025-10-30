@@ -1,5 +1,5 @@
 export const ENTITIES = {
-  GENERAL:'general',
+  GENERAL: 'general',
   CUSTOMERS: 'customers',
   CUSTOMER: 'customer',
   SUPPLIERS: 'suppliers',
@@ -16,4 +16,10 @@ export const ENTITIES = {
   USERS: 'users',
   USER: 'user',
   SETTINGS: "settings",
+  CASH_BALANCES: "cash-balances",
+  CASH_BALANCE: "cash-balance",
+  CASHBALANCES: "cashBalances",
+  CASHBALANCE: "cashBalance",
+  PAYMENTS: "payments",
+  PAYMENT: "payment"
 };

@@ -4,6 +4,7 @@ import { FieldsContainer, Form } from "@/common/components/custom";
 import { DropdownControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
+import { now } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks";
 import useSettingArrayField from "@/hooks/useSettingArrayField";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo } from "react";
@@ -24,14 +25,15 @@ const ExpenseForm = forwardRef(({
     ...EMPTY_EXPENSE,
     tags: [],
     categories: [],
+    expirationDate: expense?.expirationDate ? expense?.expirationDate : now(),
     ...expense,
   });
 
   const clonedInitialValues = useMemo(() => {
     if (!isCloning || !expense) return EMPTY_EXPENSE;
-  
+
     const { id, createdAt, createdBy, updatedAt, updatedBy, state, paymentsMade, ...rest } = expense;
-  
+
     return {
       ...EMPTY_EXPENSE,
       ...rest,
@@ -44,9 +46,9 @@ const ExpenseForm = forwardRef(({
   const methods = useForm({
     defaultValues: isCloning ? clonedInitialValues : getInitialValues(expense),
   });
-  const { isFetching: isExpensesSettingsFetching, refetch: refetchExprensesSettings } = useGetSetting(ENTITIES.EXPENSES);
-  const { options: tagsOptions, optionsMapper: tagsMapper } = useSettingArrayField(ENTITIES.EXPENSES, "tags", expense?.tags || []);
-  const { options: categoryOptions, optionsMapper: categoriesMapper } = useSettingArrayField(ENTITIES.EXPENSES, "categories", expense?.categories || []);
+  const { isFetching: isExpensesSettingsFetching, refetch: refetchExprensesSettings } = useGetSetting(ENTITIES.EXPENSE);
+  const { options: tagsOptions, optionsMapper: tagsMapper } = useSettingArrayField(ENTITIES.EXPENSE, "tags", expense?.tags || []);
+  const { options: categoryOptions, optionsMapper: categoriesMapper } = useSettingArrayField(ENTITIES.EXPENSE, "categories", expense?.categories || []);
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
@@ -97,7 +99,7 @@ const ExpenseForm = forwardRef(({
           {view &&
             <TextField
               width="200px"
-              label="Código"
+              label="Id"
               value={expense?.id}
               disabled
             />
@@ -124,6 +126,7 @@ const ExpenseForm = forwardRef(({
             showYearDropdown
             scrollableYearDropdown
             yearDropdownItemNumber={80}
+            rules={RULES.REQUIRED}
           />
         </FieldsContainer>
         <FieldsContainer $rowGap="5px">

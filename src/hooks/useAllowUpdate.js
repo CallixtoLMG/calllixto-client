@@ -1,6 +1,6 @@
 import { IconedButton } from "@/common/components/buttons";
 import { Box } from "@/common/components/custom";
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { useState } from "react";
 import { ButtonGroup } from "semantic-ui-react";
 
@@ -17,7 +17,7 @@ const useAllowUpdate = ({ canUpdate, onBeforeView }) => {
     <>
       {canUpdate && (
         <Box>
-          <ButtonGroup size="small">
+          <ButtonGroup size={SIZES.SMALL}>
             <IconedButton
               text="Actualizar"
               icon={ICONS.EDIT}

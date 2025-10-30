@@ -1,10 +1,10 @@
 import { ALL, DATE_FORMATS, LAST_UPDATED_AT } from "@/common/constants";
-import { getDateWithOffset } from "@/common/utils/dates";
-import { useQueryClient } from "@tanstack/react-query";
-import { getInstance } from './axios';
-import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, updateOrCreateStorageItem } from "@/db";
 import { getDefaultAttributes } from "@/common/utils";
+import { getDateWithOffset } from "@/common/utils/dates";
+import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, removeStorageItemsByFilter, updateOrCreateStorageItem } from "@/db";
+import { useQueryClient } from "@tanstack/react-query";
 import { pick } from 'lodash';
+import { getInstance } from './axios';
 
 function useInvalidateQueries() {
   const queryClient = useQueryClient();
@@ -43,13 +43,12 @@ async function entityList({ entity, url, params }) {
 };
 
 export async function listItems({ entity, url, params = {} }) {
-  params = { ...params, sort: 'updatedAt' };
   let updateLastUpdatedAt = false;
   let lastUpdatedAt = (await getStorageItem({ entity: LAST_UPDATED_AT, id: entity }))?.lastUpdatedAt;
 
   if (lastUpdatedAt) {
     const startDate = getDateWithOffset({ date: lastUpdatedAt, offset: 1, unit: 'seconds', format: DATE_FORMATS.ISO });
-    const outdatedValues = await entityList({ entity, url, params: { ...params, startDate } });
+    const outdatedValues = await entityList({ entity, url, params: { ...params, sort: 'updatedAt', startDate } });
     if (!!outdatedValues.length) {
       updateLastUpdatedAt = true;
       for (const value of outdatedValues) {
@@ -82,17 +81,18 @@ export async function listItems({ entity, url, params = {} }) {
 export function useCreateItem() {
   const invalidate = useInvalidateQueries();
 
-  const createItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], attributes }) => {
+  const createItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], attributes, skipStorageUpdate }) => {
     const { data } = await getInstance().post(url, value);
 
     if (data.statusOk) {
-      await updateOrCreateStorageItem({
-        entity,
-        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
-      });
+      if (!skipStorageUpdate) {
+        await updateOrCreateStorageItem({
+          entity,
+          value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity],
+        });
+      }
       invalidate(invalidateQueries);
     }
-
     return data;
   };
 
@@ -122,14 +122,18 @@ export function usePostUpdateItem() {
 export function useEditItem() {
   const invalidate = useInvalidateQueries();
 
-  const editItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes }) => {
+  const editItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes, skipStorageUpdate = false, }) => {
     const { data } = await getInstance().put(url, value, { params });
 
     if (data.statusOk && data[responseEntity]) {
-      await updateOrCreateStorageItem({
-        entity,
-        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
-      });
+      if (!skipStorageUpdate) {
+        await updateOrCreateStorageItem({
+          entity,
+          value: attributes
+            ? pick(data[responseEntity], getDefaultAttributes(attributes))
+            : data[responseEntity],
+        });
+      }
       invalidate(invalidateQueries);
     } else {
       console.error("Error en la respuesta:", data.message);
@@ -139,30 +143,25 @@ export function useEditItem() {
   };
 
   return editItem;
-};
+}
 
 export function useDeleteItem() {
   const invalidate = useInvalidateQueries();
 
-  const deleteItem = async ({ entity, id, url, invalidateQueries = [], params = {} }) => {
+  const deleteItem = async ({ entity, id, url, invalidateQueries = [], params = {}, skipStorageUpdate }) => {
     const { data } = await getInstance().delete(url, { params });
 
     if (data.statusOk) {
-      await removeStorageItem({ entity, id });
+      if (!skipStorageUpdate) {
+        await removeStorageItem({ entity, id });
+      }
       invalidate(invalidateQueries);
     }
-
     return data;
   };
   return deleteItem;
 };
 
 export async function removeStorageItemsByCustomFilter({ entity, filter }) {
-  // const values = await localforage.getItem(`${config.APP_ENV}-${entity}`);
-  // if (!values) {
-  //   console.warn("No se encontraron valores en el storage para la entidad:", entity);
-  //   return;
-  // }
-  // const filteredValues = values.filter(filter);
-  // await localforage.setItem(`${config.APP_ENV}-${entity}`, filteredValues);
+  await removeStorageItemsByFilter({ entity, filter });
 };

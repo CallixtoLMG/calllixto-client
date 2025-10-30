@@ -1,7 +1,6 @@
 import { ACTIVE, ALL, ENTITIES, INACTIVE, IN_MS, RECOVER } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { now } from "@/common/utils/dates";
-import { LIST_ATTRIBUTES, GET_PRODUCT_QUERY_KEY, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, MAIN_KEY } from "@/components/products/products.constants";
+import { GET_PRODUCT_QUERY_KEY, LIST_ATTRIBUTES, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, MAIN_KEY } from "@/components/products/products.constants";
 import {
   BATCH,
   EDIT_BATCH,
@@ -12,13 +11,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { chunk } from "lodash";
 import { useMemo } from "react";
 import { getInstance } from "./axios";
-import { listItems, removeStorageItemsByCustomFilter, usePostUpdateItem, useCreateItem, useDeleteItem, useEditItem } from "./common";
+import { listItems, removeStorageItemsByCustomFilter, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
 
 export function useListProducts() {
   const query = useQuery({
     queryKey: [LIST_PRODUCTS_QUERY_KEY],
     queryFn: () => listItems({
-      key: MAIN_KEY,
       entity: ENTITIES.PRODUCTS,
       url: PATHS.PRODUCTS,
       params: getDefaultListParams(LIST_ATTRIBUTES)
@@ -34,7 +32,7 @@ export function useHasProductsByBrandId(brandId) {
 
   const hasAssociatedProducts = useMemo(() => {
     if (!products?.products || !brandId) return false;
-    return products.products.some(({ code }) => code?.substring(2, 4) === String(brandId));
+    return products.products.some(({ id }) => id?.substring(2, 4) === String(brandId));
   }, [products, brandId]);
 
   return { hasAssociatedProducts, isLoadingProducts };
@@ -80,10 +78,10 @@ export const useCreateProduct = () => {
 export const useDeleteProduct = () => {
   const deleteItem = useDeleteItem();
 
-  const deleteProduct = (code) => {
+  const deleteProduct = (id) => {
     return deleteItem({
       entity: ENTITIES.PRODUCTS,
-      id: code,
+      id: id,
       url: PATHS.PRODUCTS,
       invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]]
     });
@@ -92,32 +90,31 @@ export const useDeleteProduct = () => {
   return deleteProduct;
 };
 
-// terminar de ver y probar
 export const useBatchDeleteProducts = () => {
   const queryClient = useQueryClient();
 
-  const batchDeleteProducts = async (codes) => {
-    if (!Array.isArray(codes) || codes.length === 0) {
-      console.warn("No hay códigos válidos para eliminar.");
+  const batchDeleteProducts = async (ids) => {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      console.warn("No hay ids válidos para eliminar.");
       return { statusOk: true, deletedCount: 0 };
     }
 
     const successfulDeletes = [];
     let deletedCount = 0;
 
-    for (const code of codes) {
+    for (const id of ids) {
       try {
-        const { data } = await getInstance().delete(`${PATHS.PRODUCTS}/${code}`);
+        const { data } = await getInstance().delete(`${PATHS.PRODUCTS}/${id}`);
         if (data.statusOk) {
           deletedCount++;
           if (data.product?.state === DELETE) {
-            successfulDeletes.push(code);
+            successfulDeletes.push(id);
           }
         } else {
-          console.warn(`No se pudo eliminar el ID ${code}:`, data.error);
+          console.warn(`No se pudo eliminar el ID ${id}:`, data.error);
         }
       } catch (error) {
-        console.error(`Error al eliminar el elemento con ID ${code}:`, error);
+        console.error(`Error al eliminar el elemento con ID ${id}:`, error);
       }
     }
 
@@ -142,11 +139,11 @@ export const useEditProduct = () => {
   const editProduct = async ({ previousVersions, ...rest }) => {
     return editItem({
       entity: ENTITIES.PRODUCTS,
-      url: `${PATHS.PRODUCTS}/${rest.code}`,
+      url: `${PATHS.PRODUCTS}/${rest.id}`,
       value: rest,
       key: MAIN_KEY,
       responseEntity: ENTITIES.PRODUCT,
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, rest.code]]
+      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, rest.id]]
     });
   };
 
@@ -156,7 +153,7 @@ export const useEditProduct = () => {
 export function useProductsBySupplierId(supplierId) {
   const listBySupplierId = async () => {
     const { products } = await listItems({ entity: ENTITIES.PRODUCTS, url: PATHS.PRODUCTS, key: MAIN_KEY });
-    return products.filter((product) => product.code.startsWith(supplierId));
+    return products.filter((product) => product.id.startsWith(supplierId));
   }
 
   const query = useQuery({
@@ -253,7 +250,7 @@ export const useDeleteBySupplierId = () => {
 
     if (data.statusOk) {
       await removeStorageItemsByCustomFilter({
-        entity: ENTITIES.PRODUCTS, filter: ((product) => !product.code.startsWith(supplierId))
+        entity: ENTITIES.PRODUCTS, filter: ((product) => !product.id.startsWith(supplierId))
       });
 
       queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId], refetchType: ALL });
@@ -270,14 +267,14 @@ export const useDeleteBySupplierId = () => {
 export const useInactiveProduct = () => {
   const inactiveItem = usePostUpdateItem();
 
-  const inactiveProduct = ({ code }, inactiveReason) => {
+  const inactiveProduct = ({ id }, inactiveReason) => {
     return inactiveItem({
       entity: ENTITIES.PRODUCTS,
-      url: `${PATHS.PRODUCTS}/${code}/${INACTIVE}`,
-      value: { code, inactiveReason },
+      url: `${PATHS.PRODUCTS}/${id}/${INACTIVE}`,
+      value: { id, inactiveReason },
       key: MAIN_KEY,
       responseEntity: ENTITIES.PRODUCT,
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, code]]
+      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, id]]
     });
   };
 
@@ -287,14 +284,14 @@ export const useInactiveProduct = () => {
 export const useActiveProduct = () => {
   const activeItem = usePostUpdateItem();
 
-  const activeProduct = ({ code }) => {
+  const activeProduct = ({ id }) => {
     return activeItem({
       entity: ENTITIES.PRODUCTS,
-      url: `${PATHS.PRODUCTS}/${code}/${ACTIVE}`,
-      value: { code },
+      url: `${PATHS.PRODUCTS}/${id}/${ACTIVE}`,
+      value: { id },
       key: MAIN_KEY,
       responseEntity: ENTITIES.PRODUCT,
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, code]]
+      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, id]]
     });
   };
 
@@ -304,13 +301,13 @@ export const useActiveProduct = () => {
 export const useRecoverProduct = () => {
   const recoverItem = usePostUpdateItem();
 
-  const recoverProduct = ({ code }) => {
+  const recoverProduct = ({ id }) => {
     return recoverItem({
       entity: ENTITIES.PRODUCTS,
-      url: `${PATHS.PRODUCTS}/${code}/${RECOVER}`,
+      url: `${PATHS.PRODUCTS}/${id}/${RECOVER}`,
       key: MAIN_KEY,
       responseEntity: ENTITIES.PRODUCT,
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, code]]
+      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, id]]
     });
   };
 

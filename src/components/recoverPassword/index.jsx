@@ -2,7 +2,7 @@
 import { confirmReset, recoverPassword } from "@/api/login";
 import { Form } from "@/common/components/custom";
 import { PasswordControlled, TextControlled } from "@/common/components/form";
-import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES } from "@/common/constants";
+import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES, SIZES } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -76,7 +76,7 @@ const RecoverPasswordForm = () => {
               height={100}
               priority
             />
-          <Text>{isCodeSent ? "Cambiar Contraseña" : "Recuperar Contraseña"}</Text>
+            <Text>{isCodeSent ? "Cambiar Contraseña" : "Recuperar Contraseña"}</Text>
           </div>
         </ModHeader>
         <FormProvider {...methods}>
@@ -84,7 +84,7 @@ const RecoverPasswordForm = () => {
             onSubmit={handleSubmit((data) => {
               isCodeSent ? onConfirmReset(data) : onRecoverPassword(data);
             })}
-            size="large"
+            size={SIZES.LARGE}
           >
             {!isCodeSent ? (
               <TextControlled
@@ -140,7 +140,7 @@ const RecoverPasswordForm = () => {
             <ModButton
               loading={isCodeSent ? isConfirmResetPending : isRecoverPasswordPending}
               fluid="true"
-              size="large"
+              size={SIZES.LARGE}
               disabled={isCodeSent ? isConfirmResetPending : isRecoverPasswordPending}
             >
               {isCodeSent ? "Cambiar Contraseña" : "Enviar"}

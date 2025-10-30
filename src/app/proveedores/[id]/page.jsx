@@ -28,7 +28,7 @@ import {
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
-import { useProtectedAction, useValidateToken, useUnsavedChanges, useAllowUpdate } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -274,7 +274,7 @@ const Supplier = ({ params }) => {
     const handleDownloadExcel = () => {
       if (!products) return;
       const headers = [
-        'Código',
+        'Id',
         'Nombre',
         'Marca',
         'Proveedor',
@@ -288,7 +288,7 @@ const Supplier = ({ params }) => {
       const mappedProducts = products.map((product) => {
         const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
         return [
-          product.code,
+          product.id,
           product.name,
           product.brandName,
           product.supplierName,
@@ -317,7 +317,7 @@ const Supplier = ({ params }) => {
         id: 1,
         icon: ICONS.BARCODE,
         color: COLORS.BLUE,
-        text: "Códigos",
+        text: "Ids",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
         disabled: !!activeAction || isEditPending || !hasAssociatedProducts,

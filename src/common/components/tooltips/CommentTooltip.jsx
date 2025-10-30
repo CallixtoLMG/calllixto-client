@@ -8,7 +8,7 @@ export const CommentTooltip = ({ comment, tooltip, lineHeight }) => {
       size="mini"
       content={comment}
       position="top center"
-      trigger={<Icon margin="0px" tooltip={tooltip} lineHeight={lineHeight} name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />}
+      trigger={<Icon margin="0px" tooltip={tooltip} $lineHeight={lineHeight} name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />}
     />
   );
 };

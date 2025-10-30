@@ -81,6 +81,7 @@ const UserForm = forwardRef(({
             popupContent="Introduce el email del usuario."
           />
           <DropdownControlled
+            height="38px"
             width="25%"
             name="role"
             label="Rol"

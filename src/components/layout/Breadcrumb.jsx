@@ -1,5 +1,5 @@
 import { OverflowWrapper } from '@/common/components/custom';
-import { ICONS } from '@/common/constants';
+import { ICONS, SIZES } from '@/common/constants';
 import { createContext, useContext, useState } from 'react';
 import { BreadcrumbDivider, BreadcrumbSection, Breadcrumb as SBreadcrumb, Label as SLabel } from 'semantic-ui-react';
 import styled from "styled-components";
@@ -61,7 +61,7 @@ const useBreadcrumContext = () => {
 const Breadcrumb = () => {
   const { labels } = useBreadcrumContext();
   return (
-    <SSBreadcrumb size='huge'>
+    <SSBreadcrumb size={SIZES.HUGE}>
       {labels.map((label, index) => (
         <BreadcrumbSection key={`label_${index}`}>
           {index !== 0 && label && <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />}

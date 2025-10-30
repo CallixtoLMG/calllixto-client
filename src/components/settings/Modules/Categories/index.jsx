@@ -143,7 +143,7 @@ const Categories = () => {
                 error={errors?.description}
               />
               <Button
-                size="small"
+                size={SIZE.SMALL}
                 icon={ICONS.ADD}
                 content="Agregar"
                 labelPosition="left"

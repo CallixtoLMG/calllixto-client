@@ -2,19 +2,18 @@ import { ENTITIES, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { CANCEL, PATHS, PAYMENTS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
-import { ATTRIBUTES, GET_EXPENSE_QUERY_KEY, LIST_EXPENSES_QUERY_KEY } from "../components/expenses/expenses.constants";
+import { GET_EXPENSE_QUERY_KEY, LIST_ATTRIBUTES, LIST_EXPENSES_QUERY_KEY } from "../components/expenses/expenses.constants";
 import { getInstance } from "./axios";
 import { listItems, useCreateItem, useEditItem } from './common';
 
-export function useListExpenses({ sort = 'name', order = true } = {}) {
+export function useListExpenses() {
   const query = useQuery({
     queryKey: [LIST_EXPENSES_QUERY_KEY],
     queryFn: () => listItems({
       entity: ENTITIES.EXPENSES,
       url: PATHS.EXPENSES,
-      params: getDefaultListParams(ATTRIBUTES, sort, order)
+      params: getDefaultListParams(LIST_ATTRIBUTES)
     }),
-    retry: false,
     staleTime: IN_MS.ONE_DAY,
   });
 

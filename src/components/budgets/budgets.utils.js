@@ -33,7 +33,7 @@ export const getBudgetState = (budget) => {
     return {
       label: "Confirmado por",
       color: COLORS.GREEN,
-      person: budget?.confirmedBy || budget?.seller,
+      person: budget?.confirmedBy || budget?.createdBy,
       date: getFormatedDate(budget?.confirmedAt, DATE_FORMATS.DATE_WITH_TIME),
       dateLabel: "Fecha de confirmación"
     };
@@ -42,7 +42,7 @@ export const getBudgetState = (budget) => {
     return {
       label: "Anulado por",
       color: COLORS.RED,
-      person: budget?.cancelledBy || budget?.seller,
+      person: budget?.cancelledBy || budget?.createdBy,
       date: getFormatedDate(budget?.cancelledAt, DATE_FORMATS.DATE_WITH_TIME),
       dateLabel: "Fecha de anulación"
     };

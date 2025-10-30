@@ -78,7 +78,7 @@ export const TextArea = styled(STextarea)`
 `;
 
 export const Dropdown = styled(SDropdown)`
-  height: ${({ height = '35px' }) => `${height}!important`} ;
+  height: ${({ height = '38px' }) => `${height}!important`} ;
   padding: ${({ padding }) => `${padding}!important`} ;
   background-color: ${({ bgColor }) => `${bgColor}!important`};
   box-shadow: ${({ $boxShadow }) => $boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
@@ -86,6 +86,7 @@ export const Dropdown = styled(SDropdown)`
 
   .text{
     text-align: ${({ $textAlign }) => `${$textAlign}!important`};
+    max-width: ${({ textMaxWidth }) => `${textMaxWidth}!important`};
   }
 
   .divider.text{
@@ -103,7 +104,7 @@ export const Dropdown = styled(SDropdown)`
   i{
     margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
   }
-
+  
   ${({ multiple }) => multiple && `
     &&&&&& div.item {
       padding: 0.35rem 0.4rem!important;
@@ -189,7 +190,7 @@ export const Icon = styled(SIcon)`
   cursor: ${({ pointer }) => pointer && "pointer"} !important;
   justify-items: ${({ justifyItems }) => `${justifyItems}!important;`};
   pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
-  line-height: ${({ lineHeight }) => `${lineHeight}!important;`};
+  line-height: ${({ $lineHeight }) => `${$lineHeight}!important;`};
 `;
 
 export const Modal = styled(SModal)`
@@ -204,7 +205,10 @@ export const MessageHeader = styled(SMessageHeader)`
 `;
 
 export const Message = styled(SMessage)`
-  width: 100%;
+  align-content: ${({ alignContent }) => `${alignContent}!important`} ;
+  padding: ${({ padding }) => `${padding}!important`} ;
+  height: ${({ height }) => `${height}!important`} ;
+  width: ${({ width }) => `${width}!important`} ;
   margin: ${({ margin }) => `${margin}!important`} ;
 `;
 

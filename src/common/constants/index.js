@@ -2,8 +2,8 @@ import { encodeUri } from "@/common/utils";
 
 export * from './dates';
 export * from './entities';
-export * from './time';
 export * from './semantic';
+export * from './time';
 
 export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
 
@@ -12,7 +12,7 @@ export const PAGES = {
   CUSTOMERS: {
     BASE: "/clientes",
     CREATE: "/clientes/crear",
-    UPDATE: (code) => `/clientes/${code}?update=true`,
+    UPDATE: (id) => `/clientes/${id}?update=true`,
     SHOW: (id) => `/clientes/${id}`,
     NAME: 'Clientes',
     SHORTKEYS: 'Control+1'
@@ -36,8 +36,8 @@ export const PAGES = {
   PRODUCTS: {
     BASE: "/productos",
     CREATE: "/productos/crear",
-    UPDATE: (code) => `/productos/${code}?update=true`,
-    SHOW: (code) => `/productos/${code}`,
+    UPDATE: (id) => `/productos/${id}?update=true`,
+    SHOW: (id) => `/productos/${id}`,
     NAME: 'Productos',
     SHORTKEYS: 'Control+4'
   },
@@ -65,13 +65,21 @@ export const PAGES = {
     NAME: 'Usuarios',
     SHORTKEYS: 'Control+7'
   },
+  CASH_BALANCES: {
+    BASE: "/cajas",
+    CREATE: "/cajas/crear",
+    UPDATE: (id) => `/cajas/${id}?update=true`,
+    SHOW: (id) => `/cajas/${id}`,
+    NAME: 'Cajas',
+    SHORTKEYS: 'Control+8'
+  },
   LOGIN: {
     BASE: "/login"
   },
   SETTINGS: {
     BASE: "/configuracion",
     NAME: 'Configuración',
-    SHORTKEYS: 'Control+8'
+    SHORTKEYS: 'Control+9'
   },
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"
@@ -100,8 +108,8 @@ export const EXTERNAL_APIS = {
 
 export const REGEX = {
   EMAIL: /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,10}))$/,
-  TWO_DIGIT_CODE: /^[A-Z0-9]{2}$/,
-  MAX26_DIGIT_CODE: /^[A-Za-z0-9\-\_]{1,26}$/,
+  TWO_DIGIT_ID: /^[A-Z0-9]{2}$/,
+  MAX26_DIGIT_ID: /^[A-Za-z0-9\-\_]{1,26}$/,
 };
 
 export const RULES = {
@@ -111,20 +119,29 @@ export const RULES = {
   REQUIRED_PRODUCT: (value) => ({
     required: value !== false ? 'Campo requerido.' : 'Es necesario elegir un producto',
   }),
+  REQUIRED_POSITIVE_NUMBER: {
+    required: "El monto es obligatorio",
+    validate: (value) => {
+      if (value === null || value === undefined || value === '') return "Debe ingresar un monto";
+      if (isNaN(value)) return "El valor debe ser un número";
+      if (Number(value) < 0) return "Debe ser un valor mayor o igual a cero";
+      return true;
+    }
+  },
   REQUIRED_TWO_DIGIT: {
     required: 'Campo requerido.',
-    pattern: { value: REGEX.TWO_DIGIT_CODE, message: 'El código debe ser de 2 cifras alfanumérico' }
+    pattern: { value: REGEX.TWO_DIGIT_ID, message: 'El id debe ser de 2 cifras alfanumérico' }
   },
   REQUIRED_BRAND_AND_SUPPLIER: (brand, supplier) => ({
     validate: (value) => {
       if (!brand?.id || !supplier?.id) {
-        return 'Debe seleccionar un proveedor y una marca antes de ingresar un código';
+        return 'Debe seleccionar un proveedor y una marca antes de ingresar un id';
       }
       if (!value) {
-        return 'El código es requerido';
+        return 'El id es requerido';
       }
-      if (!REGEX.MAX26_DIGIT_CODE.test(value)) {
-        return 'El código no puede tener más de 26 caracteres alfanuméricos, incluyendo "-" y "_"';
+      if (!REGEX.MAX26_DIGIT_ID.test(value)) {
+        return 'El id no puede tener más de 26 caracteres alfanuméricos, incluyendo "-" y "_"';
       }
       return true;
     }
@@ -151,6 +168,14 @@ export const COLORS = {
   BROWN: 'brown',
   TEAL: 'teal',
   YELLOW: "yellow"
+};
+
+export const SIZES = {
+  MINI: 'mini',
+  TINY: 'tiny',
+  SMALL: 'small',
+  LARGE: 'large',
+  HUGE: 'huge',
 };
 
 export const SEMANTIC_COLORS = [
@@ -219,7 +244,10 @@ export const ICONS = {
   PERCENT: 'percent',
   SETTINGS: "settings",
   BULLHORN: "bullhorn",
-  BOXES: "boxes"
+  BOXES: "boxes",
+  CLOSE: "close",
+  ARROW_UP: "arrow up",
+  ARROW_DOWN: "arrow down",
 };
 
 export const ALL = "all";
@@ -250,7 +278,7 @@ export const PASSWORD_REQUIREMENTS = [
 export const SELECT_ALL_OPTION = { key: ALL, value: ALL, text: 'Todos' };
 
 export const SORTING = {
-  ASC:'ascending',
+  ASC: 'ascending',
   DESC: 'descending'
 }
 

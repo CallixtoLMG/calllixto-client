@@ -1,7 +1,7 @@
-import { COLORS } from "@/common/constants";
+import { COLORS, SIZES } from "@/common/constants";
 import { getFormatedPrice, normalizeText } from "@/common/utils";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { formatProductCode } from "@/components/products/products.utils";
+import { formatProductId } from "@/components/products/products.utils";
 import debounce from 'lodash/debounce';
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
 import { Box, Flex, FlexColumn, Label, OverflowWrapper } from "../custom";
@@ -33,11 +33,11 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
 
       products?.forEach(product => {
         const name = normalizeText(product?.name);
-        const code = normalizeText(product?.code);
+        const id = normalizeText(product?.id);
 
-        const exactMatch = name.includes(normalizedQuery) || code.includes(normalizedQuery);
+        const exactMatch = name.includes(normalizedQuery) || id.includes(normalizedQuery);
         const partialMatch = queryWords.every(word =>
-          name.includes(word) || code.includes(word)
+          name.includes(word) || id.includes(word)
         );
 
         if (exactMatch) {
@@ -82,9 +82,9 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
       onSearchChange={handleSearchChange}
       value={selectedProduct ? '' : searchQuery}
       noResultsMessage="No se encontró producto"
-      placeholder="Nombre, código"
+      placeholder="Nombre, id"
       results={filteredProducts?.slice(0, MAX_RESULTS).map((product) => ({
-        key: product.code,
+        key: product.id,
         title: (
           <OverflowWrapper popupContent={product.name}>
             {product.name}
@@ -93,13 +93,13 @@ const ProductSearch = forwardRef(({ products, onProductSelect }, ref) => {
         description: (
           <FlexColumn $marginTop="5px" $rowGap="5px">
             <FlexColumn>
-              <Text>Código: {formatProductCode(product.code)}</Text>
+              <Text>Id: {formatProductId(product.id)}</Text>
               <Text>Precio: {getFormatedPrice(product?.price)}</Text>
             </FlexColumn>
             <Flex width="100%" $justifyContent="space-between" height="20px" $marginTop="auto" $columnGap="5px" $alignItems="center">
               <Flex $columnGap="7px">
                 {product.state === PRODUCT_STATES.OOS.id && (
-                  <Label width="fit-content" size="tiny" color={COLORS.ORANGE}>Sin Stock</Label>
+                  <Label width="fit-content" size={SIZES.TINY} color={COLORS.ORANGE}>Sin Stock</Label>
                 )}
                 {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
               </Flex>

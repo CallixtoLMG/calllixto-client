@@ -12,7 +12,7 @@ import ProductChanges from "@/components/products/ProductChanges";
 import ProductForm from "@/components/products/ProductForm";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
-import { useAllowUpdate, useProtectedAction, useValidateToken, useUnsavedChanges } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -25,7 +25,7 @@ const Product = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { data: product, isLoading, refetch } = useGetProduct(params.code);
+  const { data: product, isLoading, refetch } = useGetProduct(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -74,8 +74,8 @@ const Product = ({ params }) => {
   useEffect(() => {
     setLabels([
       PAGES.PRODUCTS.NAME,
-      product?.code
-        ? { id: product.code, title: PRODUCT_STATES[product.state]?.singularTitle, color: PRODUCT_STATES[product.state]?.color }
+      product?.id
+        ? { id: product.id, title: PRODUCT_STATES[product.state]?.singularTitle, color: PRODUCT_STATES[product.state]?.color }
         : null
     ].filter(Boolean));
     refetch();
@@ -201,7 +201,7 @@ const Product = ({ params }) => {
   });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: () => deleteProduct(product.code),
+    mutationFn: () => deleteProduct(product.id),
     onSuccess: (response) => {
       if (response.statusOk) {
         if (product.state === PRODUCT_STATES.DELETED.id) {
@@ -233,7 +233,7 @@ const Product = ({ params }) => {
       if (product.state === PRODUCT_STATES.DELETED.id) {
         mutateDelete();
       } else {
-        mutateEdit({ code: product.code, state: PRODUCT_STATES.DELETED.id });
+        mutateEdit({ id: product.id, state: PRODUCT_STATES.DELETED.id });
       }
     }
 
@@ -250,11 +250,11 @@ const Product = ({ params }) => {
     }
 
     if (modalAction === "outOfStock") {
-      mutateEdit({ code: product.code, state: PRODUCT_STATES.OOS.id });
+      mutateEdit({ id: product.id, state: PRODUCT_STATES.OOS.id });
     }
 
     if (modalAction === "inStock") {
-      mutateEdit({ code: product.code, state: PRODUCT_STATES.ACTIVE.id });
+      mutateEdit({ id: product.id, state: PRODUCT_STATES.ACTIVE.id });
     }
 
     if (modalAction === RECOVER) {
@@ -280,7 +280,7 @@ const Product = ({ params }) => {
           icon: ICONS.BARCODE,
           color: COLORS.BLUE,
           onClick: () => setTimeout(handlePrint),
-          text: "Código",
+          text: "Código de barra",
           loading: activeAction === "print",
           disabled: !!activeAction || isEditPending,
         },

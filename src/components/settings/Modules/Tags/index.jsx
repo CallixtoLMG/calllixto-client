@@ -1,7 +1,7 @@
 import { Box, Button, Flex, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, DELETE, ICONS, SEMANTIC_COLORS } from "@/common/constants";
+import { COLORS, DELETE, ICONS, SEMANTIC_COLORS, SIZES } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
@@ -141,7 +141,7 @@ const Tags = () => {
                 error={errors?.description}
               />
               <Button
-                size="small"
+                size={SIZES.SMALL}
                 icon={ICONS.ADD}
                 content="Agregar"
                 labelPosition="left"

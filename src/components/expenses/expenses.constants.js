@@ -8,7 +8,7 @@ export const LIST_EXPENSES_QUERY_KEY = 'listExpenses';
 export const GET_EXPENSE_QUERY_KEY = 'getExpense';
 export const EXPENSES_FILTERS_KEY = 'expensesFilters';
 
-export const ATTRIBUTES = { ID: "id", NAME: "name", CATEGORIES: "categories", TAGS: "tags", AMOUNT: "amount", EXPIRATION_DATE: "expirationDate", COMMENTS: "comments", STATE: "state", TOTAL: "total", PAYMENTS_MADE: "paymentsMade", PAID_AMOUNT: "paidAmount", PENDING_AMOUNT: "pendingAmount" };
+export const LIST_ATTRIBUTES = ["id", "name", "categories", "tags", "amount", "expirationDate", "comments", "state", "total", "paymentsMade", "paidAmount", "pendingAmount"];
 
 export const HEADERS = [
   {

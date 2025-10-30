@@ -31,10 +31,10 @@ const BatchImport = ({ isCreating }) => {
   const [unprocessedProductsCount, setUnprocessedProductsCount] = useState(0);
   const [importedProductsCount, setImportedProductsCount] = useState(0);
   const watchProducts = watch("importProducts", []);
-  const { refetch: refetchBlacklist } = useGetSetting(ENTITIES.PRODUCTS);
+  const { refetch: refetchBlacklist } = useGetSetting(ENTITIES.PRODUCT);
   const inputRef = useRef();
   const formRef = useRef(null);
-  const [existingCodes, setExistingCodes] = useState({});
+  const [existingIds, setExistingIds] = useState({});
   const totalProducts = importedProductsCount + downloadProducts.length;
   const createBatch = useCreateBatch();
   const editBatch = useEditBatch();
@@ -47,12 +47,12 @@ const BatchImport = ({ isCreating }) => {
   };
 
   useEffect(() => {
-    const codes = products?.reduce((acc, product) => {
-      acc[product.code?.toUpperCase()] = product;
+    const ids = products?.reduce((acc, product) => {
+      acc[product.id?.toUpperCase()] = product;
       return acc;
     }, {});
 
-    setExistingCodes(codes);
+    setExistingIds(ids);
   }, [products]);
 
   const importSettings = useMemo(() => {
@@ -63,13 +63,13 @@ const BatchImport = ({ isCreating }) => {
       label: isCreating ? "Nuevos productos" : "Productos para actualizar",
       confirmation: isCreating ? "con errores o ya" : "no",
       onSubmit: handleBatchAction,
-      processData: (formattedProduct, existingCodes, downloadProducts, importProducts, productCounts) => {
-        const productCode = formattedProduct.code.toUpperCase();
-        if (productCounts[productCode] > 1) {
+      processData: (formattedProduct, existingIds, downloadProducts, importProducts, productCounts) => {
+        const productId = formattedProduct.id.toUpperCase();
+        if (productCounts[productId] > 1) {
           downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra duplicado" });
-        } else if (existingCodes[productCode] && !isCreating) {
+        } else if (existingIds[productId] && !isCreating) {
           importProducts.push(formattedProduct);
-        } else if (!existingCodes[productCode] && isCreating) {
+        } else if (!existingIds[productId] && isCreating) {
           importProducts.push(formattedProduct);
         } else {
           const msg = isCreating ? "Este producto ya existe" : "Este producto no existe";
@@ -131,7 +131,7 @@ const BatchImport = ({ isCreating }) => {
     const headersRow = XLSX.utils.sheet_to_json(sheet, { header: 1 })[0];
 
     const columnMapping = {
-      codigo: "code",
+      id: "id",
       nombre: "name",
       marca: "brand",
       proveedor: "supplier",
@@ -173,38 +173,38 @@ const BatchImport = ({ isCreating }) => {
     const downloadProducts = [];
     const productCounts = {};
 
-    const updatedExistingCodes = updatedProducts?.reduce((acc, product) => {
-      acc[product.code?.toUpperCase()] = product;
+    const updatedExistingIds = updatedProducts?.reduce((acc, product) => {
+      acc[product.id?.toUpperCase()] = product;
       return acc;
     }, {});
 
     parsedData.forEach(product => {
-      const code = product.code ? String(product.code).toUpperCase() : "Sin código";
-      productCounts[code] = (productCounts[code] || 0) + 1;
+      const id = product.id ? String(product.id).toUpperCase() : "Sin id";
+      productCounts[id] = (productCounts[id] || 0) + 1;
     });
 
     parsedData.forEach(product => {
-      const code = product.code ? String(product.code).toUpperCase() : "Sin código";
-      const hasAtLeastOneValue = product.code || product.name || product.cost || product.price;
+      const id = product.id ? String(product.id).toUpperCase() : "Sin id";
+      const hasAtLeastOneValue = product.id || product.name || product.cost || product.price;
 
       if (hasAtLeastOneValue) {
         const formattedProduct = {
-          code,
+          id,
           name: product.name,
           cost: isNaN(parseFloat(product.cost)) ? 0 : parseFloat(product.cost),
           price: isNaN(parseFloat(product.price)) ? 0 : parseFloat(product.price),
           comments: product.comments
         };
 
-        if (code === "Sin código") {
-          downloadProducts.push({ ...formattedProduct, msg: "Este producto no tiene código" });
-        } else if (blacklist.some(item => item === code)) {
+        if (id === "Sin id") {
+          downloadProducts.push({ ...formattedProduct, msg: "Este producto no tiene id" });
+        } else if (blacklist.some(item => item === id)) {
           downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra en la lista de productos bloqueados" });
-        } else if (productCounts[code] > 1) {
+        } else if (productCounts[id] > 1) {
           downloadProducts.push({ ...formattedProduct, msg: "Este producto se encuentra duplicado" });
-        } else if (updatedExistingCodes && updatedExistingCodes[code] && !isCreating) {
+        } else if (updatedExistingIds && updatedExistingIds[id] && !isCreating) {
           importProducts.push(formattedProduct);
-        } else if (updatedExistingCodes && !updatedExistingCodes[code] && isCreating) {
+        } else if (updatedExistingIds && !updatedExistingIds[id] && isCreating) {
           importProducts.push(formattedProduct);
         } else {
           const msg = isCreating ? "Este producto ya existe" : "Este producto no existe";
@@ -224,9 +224,9 @@ const BatchImport = ({ isCreating }) => {
 
   const handleDownloadConfirmation = () => {
     const data = [
-      ['Código', 'Nombre', 'Costo', 'Precio', 'Comentarios', 'Error'],
+      ['Id', 'Nombre', 'Costo', 'Precio', 'Comentarios', 'Error'],
       ...downloadProducts.map((product) => [
-        product.code,
+        product.id,
         product.name,
         product.cost,
         product.price,
@@ -247,9 +247,9 @@ const BatchImport = ({ isCreating }) => {
         msg: product?.msg || "Este producto tiene errores"
       }));
       const formattedData = [
-        ["Código", "Nombre", "Costo", "Precio", "Comentarios", "Mensaje de error"],
+        ["Id", "Nombre", "Costo", "Precio", "Comentarios", "Mensaje de error"],
         ...data.map(product => [
-          product.code,
+          product.id,
           product.name,
           product.cost,
           product.price,
@@ -270,11 +270,11 @@ const BatchImport = ({ isCreating }) => {
       } else {
         const processedProducts = e.importProducts
           .map(product => {
-            const existingProduct = existingCodes[product.code.toUpperCase()];
-            let productWithChanges = { code: product.code };
+            const existingProduct = existingIds[product.id.toUpperCase()];
+            let productWithChanges = { id: product.id };
             let previousVersion = {};
             Object.keys(product).forEach(key => {
-              if (key !== 'code' && product[key] !== undefined && product[key] !== '' && product[key] !== existingProduct[key]) {
+              if (key !== 'id' && product[key] !== undefined && product[key] !== '' && product[key] !== existingProduct[key]) {
                 productWithChanges[key] = product[key];
                 previousVersion[key] = existingProduct[key];
               }
@@ -336,8 +336,8 @@ const BatchImport = ({ isCreating }) => {
 
   const PRODUCTS_COLUMNS = [
     {
-      title: "Código",
-      value: (product) => product.code,
+      title: "Id",
+      value: (product) => product.id,
       id: 1,
       width: 2
     },
@@ -448,7 +448,7 @@ const BatchImport = ({ isCreating }) => {
                         <Table
                           $deleteButtonInside
                           $tableHeight="50vh"
-                          mainKey="code"
+                          mainKey="id"
                           headers={PRODUCTS_COLUMNS}
                           elements={watchProducts}
                           actions={actions}

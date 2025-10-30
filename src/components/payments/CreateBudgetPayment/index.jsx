@@ -1,14 +1,14 @@
 import { useGetSetting } from "@/api/settings";
+import { Button, FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "@/common/components/custom";
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
-import { COLORS, ENTITIES, ICONS, RULES } from "@/common/constants";
+import { DatePicker } from "@/common/components/form/DatePicker";
+import { Table, TotalList } from "@/common/components/table";
+import { COLORS, ENTITIES, ICONS, RULES, SIZES } from "@/common/constants";
 import { handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header, Popup } from "semantic-ui-react";
-import { Button, FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "../custom";
-import { Table, TotalList } from "../table";
-import { DatePicker } from "./DatePicker";
 
 const EMPTY_PAYMENT = () => ({
   method: '',
@@ -40,8 +40,8 @@ const getPaymentTableHeaders = () => [
           <Popup
             content="Pago posterior a la fecha de vencimiento"
             position="top center"
-            size="mini"
-            trigger={<Icon name={ICONS.EXCLAMATION_CIRCLE} color={COLORS.RED} size="small" />}
+            size={SIZES.MINI}
+            trigger={<Icon name={ICONS.EXCLAMATION_CIRCLE} color={COLORS.RED} size={SIZES.SMALL} />}
           />
         )}
       </Flex>
@@ -72,7 +72,7 @@ const getPaymentTableHeaders = () => [
   }
 ];
 
-const Payments = ({
+const CreateBudgetPayments = ({
   total,
   maxHeight,
   children,
@@ -147,7 +147,7 @@ const Payments = ({
         </Header>
         <FlexColumn $rowGap="15px">
           {update && (
-            <FieldsContainer>
+            <FieldsContainer $rowGap="15px">
               <FormField
                 selected={payment.date}
                 onChange={(date) => setPayment({ ...payment, date })}
@@ -161,6 +161,7 @@ const Payments = ({
               <DropdownField
                 width="fit-content"
                 label="Método de Pago"
+                selection
                 options={paymentMethodOptions.filter((method) => method.key !== 'dolares')}
                 value={payment.method}
                 onChange={(e, { value }) => setPayment({ ...payment, method: value })}
@@ -201,7 +202,7 @@ const Payments = ({
                 <FlexColumn $rowGap="5px">
                   <Button
                     padding="3px 18px 3px 40px"
-                    size="small"
+                    size={SIZES.SMALL}
                     content="Completar"
                     icon={ICONS.CHECK}
                     labelPosition="left"
@@ -214,7 +215,7 @@ const Payments = ({
                     width="fit-content"
                   />
                   <Button
-                    size="small"
+                    size={SIZES.SMALL}
                     icon={ICONS.ADD}
                     content="Agregar"
                     labelPosition="left"
@@ -252,4 +253,4 @@ const Payments = ({
   );
 };
 
-export default Payments;
+export default CreateBudgetPayments;

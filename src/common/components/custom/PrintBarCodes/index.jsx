@@ -1,14 +1,14 @@
 import JsBarcode from "jsbarcode";
 import { forwardRef, useEffect } from "react";
-import { BarCodeContainer, BarCodeSubContainer, Barcode, ProductCode, ProductName } from "./styles";
+import { BarCodeContainer, BarCodeSubContainer, Barcode, ProductId, ProductName } from "./styles";
 
 const PrintBarCodes = forwardRef(({ products }, ref) => {
   useEffect(() => {
     const generateBarcodes = () => {
       products?.forEach(product => {
-        const barcodeElement = document.getElementById(`barcode-${product?.code}`);
+        const barcodeElement = document.getElementById(`barcode-${product?.id}`);
         if (barcodeElement) {
-          JsBarcode(barcodeElement, product?.code, {
+          JsBarcode(barcodeElement, product?.id, {
             format: "CODE128",
             lineColor: "#000",
             width: 2,
@@ -26,10 +26,10 @@ const PrintBarCodes = forwardRef(({ products }, ref) => {
   return (
     <BarCodeContainer ref={ref}>
       {products?.map(product => (
-        <BarCodeSubContainer $singleProduct={products?.length === 1} key={product?.code}>
+        <BarCodeSubContainer $singleProduct={products?.length === 1} key={product?.id}>
           <ProductName>{product?.name}</ProductName>
-          <Barcode id={`barcode-${product?.code}`}></Barcode>
-          <ProductCode>{product?.code}</ProductCode>
+          <Barcode id={`barcode-${product?.id}`}></Barcode>
+          <ProductId>{product?.id}</ProductId>
         </BarCodeSubContainer>
       ))}
     </BarCodeContainer>

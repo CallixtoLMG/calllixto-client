@@ -1,5 +1,5 @@
 import { Segment } from "@/common/components/custom";
-import { PAGES } from "@/common/constants";
+import { PAGES, SIZES } from "@/common/constants";
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { List } from 'semantic-ui-react';
@@ -20,7 +20,7 @@ const Footer = () => {
                 height={40}
               />
             </div>
-            <List link size='small'>
+            <List link size={SIZES.SMALL}>
               <List.Item as='a' href='#'>
                 © Copyright 2023 - Todos los derechos reservados por la empresa CallixtoGLM
               </List.Item>

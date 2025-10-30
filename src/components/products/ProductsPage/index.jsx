@@ -40,7 +40,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: PRODUCTS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['code', 'name']);
+  const onFilter = createFilter(filters, ['id', 'name']);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -64,7 +64,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
     mutationFn: async () => {
       let response;
       if (selectedProduct.state === PRODUCT_STATES.DELETED.id) {
-        response = await deleteProduct(selectedProduct?.code);
+        response = await deleteProduct(selectedProduct?.id);
       } else {
         response = await editProduct({ ...selectedProduct, state: PRODUCT_STATES.DELETED.id });
       }
@@ -81,28 +81,28 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
   });
 
   const onSelectionChange = useCallback(selected => {
-    const isSelected = !!selectedProducts[selected.code];
+    const isSelected = !!selectedProducts[selected.id];
     if (isSelected) {
       const newProducts = { ...selectedProducts };
-      delete newProducts[selected.code];
+      delete newProducts[selected.id];
       setSelectedProducts(newProducts);
     } else {
-      setSelectedProducts(prev => ({ ...prev, [selected.code]: selected }));
+      setSelectedProducts(prev => ({ ...prev, [selected.id]: selected }));
     }
   }, [selectedProducts]);
 
   const selectAllCurrentPageElements = (currentPageElements) => {
     const newSelectedProducts = {};
     currentPageElements.forEach(product => {
-      newSelectedProducts[product.code] = product;
+      newSelectedProducts[product.id] = product;
     });
     setSelectedProducts(newSelectedProducts);
   };
 
   const { mutate: deleteSelectedProducts, isPending: deleteIsPending } = useMutation({
     mutationFn: async () => {
-      const codes = Object.keys(selectedProducts);
-      const response = await batchDeleteProducts(codes);
+      const ids = Object.keys(selectedProducts);
+      const response = await batchDeleteProducts(ids);
       return response.deletedCount;
     },
     onSuccess: (deletedCount) => {
@@ -164,16 +164,15 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
                   setSelectedProducts({});
                 }}
               />
-              <TextControlled name="code" placeholder="Código" width="200px" />
+              <TextControlled name="id" placeholder="Id" width="200px" />
               <TextControlled name="name" placeholder="Nombre" width="350px" />
             </Filters>
           </Form>
         </FormProvider>
         <Table
           isLoading={isLoading || deleteIsPending}
-          mainKey="code"
           headers={PRODUCT_COLUMNS}
-          elements={products.map(p => ({ ...p, key: p.code }))}
+          elements={products.map(p => ({ ...p, key: p.id }))}
           page={PAGES.PRODUCTS}
           actions={actions}
           selection={selectedProducts}

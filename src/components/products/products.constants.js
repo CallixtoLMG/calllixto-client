@@ -1,17 +1,18 @@
 import { Flex, Label, OverflowWrapper } from "@/common/components/custom";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
+import { SIZES } from "@/common/constants";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
-import { getBrandCode, getProductCode, getSupplierCode } from "./products.utils";
+import { getBrandId, getProductId, getSupplierId } from "./products.utils";
 
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
 export const GET_PRODUCT_QUERY_KEY = "getProduct";
 export const PRODUCTS_FILTERS_KEY = "productsFilters";
-export const MAIN_KEY = 'code';
+export const MAIN_KEY = 'id';
 
 export const LIST_ATTRIBUTES = [
-  "code",
+  "id",
   "state",
   "name",
   "brandName",
@@ -40,28 +41,28 @@ export const ATTRIBUTES = {
 export const PRODUCT_COLUMNS = [
   {
     id: 1,
-    title: "Código",
-    key: "code",
+    title: "Id",
+    key: "id",
     sortable: true,
     align: "left",
     width: 2,
     value: (product) =>
       <>
         <Popup
-          size="tiny"
+          size={SIZES.TINY}
           content={product.supplierName}
           position="top center"
-          trigger={<span>{getSupplierCode(product.code)}</span>}
+          trigger={<span>{getSupplierId(product.id)}</span>}
         />&nbsp;
         <Popup
-          size="tiny"
+          size={SIZES.TINY}
           content={product.brandName}
           position="top center"
-          trigger={<span>{getBrandCode(product.code)}</span>}
+          trigger={<span>{getBrandId(product.id)}</span>}
         />&nbsp;
-        <span>{getProductCode(product.code)}</span>
+        <span>{getProductId(product.id)}</span>
       </>,
-    sortValue: (product) => product.code?.toLowerCase() ?? ""
+    sortValue: (product) => product.id?.toLowerCase() ?? ""
   },
   {
     id: 2,
@@ -100,7 +101,7 @@ export const PRODUCT_COLUMNS = [
 export const IMPORT_PRODUCTS_COLUMNS = [
   {
     id: 1,
-    title: "Código",
+    title: "Id",
     width: 2,
   },
   {
@@ -123,18 +124,18 @@ export const IMPORT_PRODUCTS_COLUMNS = [
 export const BAN_PRODUCTS_COLUMNS = [
   {
     id: 1,
-    title: "Código",
+    title: "Id",
     value: (product) =>
-      product.code
+      product.id
   },
 ];
 
 export const BAN_FILTERS = [
-  { value: 'code', placeholder: 'Código' },
+  { value: 'id', placeholder: 'Id' },
 ];
 
 export const EXAMPLE_TEMPLATE_DATA = [
-  ['Codigo', 'Nombre', 'Costo', 'Precio', 'Comentarios'],
+  ['Id', 'Nombre', 'Costo', 'Precio', 'Comentarios'],
   ['AABB001', "Producto 1", 100, 200, 'Comentarios...'],
   ['AABB002', "Producto 2", 200, 300, 'Comentarios...'],
   ['AABB003', "Producto 3", 300, 400, 'Comentarios...'],
@@ -171,8 +172,8 @@ export const PRODUCT_STATES = {
   },
 };
 
-export const EMPTY_PRODUCT = { name: '', cost: 0, price: 0, code: '', comments: '', supplierId: '', brandId: '' };
-export const EMPTY_FILTERS = { code: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
+export const EMPTY_PRODUCT = { name: '', cost: 0, price: 0, id: '', comments: '', supplierId: '', brandId: '' };
+export const EMPTY_FILTERS = { id: '', name: '', state: PRODUCT_STATES.ACTIVE.id };
 
 export const PRODUCT_STATES_OPTIONS = Object.values(PRODUCT_STATES)
   .map(({ id, title, color }) => ({

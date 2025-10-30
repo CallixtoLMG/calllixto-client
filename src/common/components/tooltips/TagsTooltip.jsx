@@ -1,4 +1,4 @@
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { Popup } from "semantic-ui-react";
 import { Flex, Icon, Label, OverflowWrapper } from "../custom";
 
@@ -11,7 +11,7 @@ export const TagsTooltip = ({ tags, tooltip, maxWidthOverflow, lineClamp, icon =
       <Popup
         size="mini"
         trigger={
-          <Label width="fit-content" size="tiny" color={validTags[0]?.color}>
+          <Label width="fit-content" size={SIZES.TINY} color={validTags[0]?.color}>
             <OverflowWrapper position="bottom center" maxWidth={maxWidthOverflow} $lineClamp={lineClamp} popupContent={validTags[0]?.name}>
               {validTags[0]?.name}
             </OverflowWrapper>

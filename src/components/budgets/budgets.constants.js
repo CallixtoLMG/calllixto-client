@@ -16,7 +16,7 @@ export const LIST_ATTRIBUTES = [
   "products",
   "globalDiscount",
   "additionalCharge",
-  "seller",
+  "createdBy",
   "total",
   "confirmedAt",
   "confirmedBy",
@@ -127,7 +127,7 @@ export const BUDGETS_COLUMNS = [
     sortable: true,
     width: 2,
     value: ({ total }) => (
-      <PriceLabel value={total} />
+      <PriceLabel value={total ?? 0} />
     ),
     sortValue: ({ total }) => total ?? 0
   },
@@ -135,15 +135,15 @@ export const BUDGETS_COLUMNS = [
     id: 5,
     title: "Vendedor",
     align: "left",
-    key: "seller",
+    key: "createdBy",
     sortable: true,
     width: 4,
     value: (budget) => (
-      <OverflowWrapper maxWidth="25vw" popupContent={budget.seller}>
-        {budget.seller}
+      <OverflowWrapper maxWidth="25vw" popupContent={budget.createdBy}>
+        {budget.createdBy}
       </OverflowWrapper>
     ),
-    sortValue: (budget) => budget.seller ?? ""
+    sortValue: (budget) => budget.createdBy ?? ""
   },
 ];
 
@@ -178,7 +178,7 @@ export const BUDGET_PDF_FORMAT = {
 
 export const PICK_UP_IN_STORE = "Retira en tienda";
 
-export const EMPTY_FILTERS = { id: '', customer: '', seller: '', state: SELECT_ALL_OPTION.value, sorting: { key: 'id', direction: SORTING.DESC } };
+export const EMPTY_FILTERS = { id: '', customer: '', createdBy: '', state: SELECT_ALL_OPTION.value, sorting: { key: 'id', direction: SORTING.DESC } };
 export const BUDGET_STATES_OPTIONS = [
   SELECT_ALL_OPTION,
   ...Object.values(BUDGET_STATES).map(({ id, title, color }) => (

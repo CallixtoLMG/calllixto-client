@@ -1,5 +1,5 @@
 import ModalAction from '@/common/components/modals/ModalAction';
-import { COLORS, ICONS } from '@/common/constants';
+import { COLORS, ICONS, SIZES } from '@/common/constants';
 import { useRestoreEntity } from '@/hooks';
 import { useState } from 'react';
 import { Icon } from 'semantic-ui-react';
@@ -42,7 +42,7 @@ const OptionsDropdown = ({ entity, queryKey, text }) => {
         padding="2em 0.5em"
         iconMargin="0"
         item
-        icon={<Icon size='large' name={ICONS.OPTIONS} color={COLORS.ORANGE} />}
+        icon={<Icon size={SIZES.LARGE} name={ICONS.OPTIONS} color={COLORS.ORANGE} />}
         direction="bottom"
       >
         <Dropdown.Menu>

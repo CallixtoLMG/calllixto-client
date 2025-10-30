@@ -17,11 +17,10 @@ const CreateProduct = () => {
   const { push } = useRouter();
   const { data: brands, isLoading: isLoadingBrands, refetch: refetchBrands, isRefetching: isBrandsRefetching } = useListBrands();
   const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers, isRefetching: isSupplierRefetching } = useListSuppliers();
-  const { data: blacklist, refetch: refetchBlacklist } = useGetSetting(ENTITIES.PRODUCTS);
+  const { data: blacklist, refetch: refetchBlacklist } = useGetSetting(ENTITIES.PRODUCT);
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createProduct = useCreateProduct();
-
   useEffect(() => {
     resetActions();
     refetchBrands();
@@ -38,7 +37,7 @@ const CreateProduct = () => {
     mutationFn: createProduct,
     onSuccess: async (response) => {
       if (response.statusOk) {
-        push(PAGES.PRODUCTS.SHOW(response.product.code))
+        push(PAGES.PRODUCTS.SHOW(response.product.id))
         toast.success('Producto creado!');
       } else {
         toast.error(response.error.message);

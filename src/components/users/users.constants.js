@@ -9,7 +9,7 @@ export const GET_USER_QUERY_KEY = 'getUser';
 export const LIST_USERS_QUERY_KEY = 'listUsers';
 export const USERS_FILTERS_KEY = 'usersFilters';
 export const MAIN_KEY = 'username';
-export const LIST_ATTRIBUTES = ["firstName", "lastName", 'address', 'phoneNumber', 'username', "birthDate", "comments", "state", "role"];
+export const LIST_ATTRIBUTES = ["id", "firstName", "lastName", 'address', 'phoneNumber', 'username', "birthDate", "comments", "state", "role"];
 
 export const USER_COLUMNS = [
   {

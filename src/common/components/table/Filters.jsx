@@ -1,8 +1,9 @@
 import { Button as CustomButton, DropdownItem, Flex, Label } from '@/common/components/custom';
 import ModalAction from '@/common/components/modals/ModalAction';
-import { COLORS, ENTITIES, ICONS, PAGES } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, PAGES, SIZES } from "@/common/constants";
 import { LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
+import { LIST_CASH_BALANCES_QUERY_KEY } from '@/components/cashBalances/cashBalances.constants';
 import { LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
 import { LIST_EXPENSES_QUERY_KEY } from '@/components/expenses/expenses.constants';
 import { LIST_PRODUCTS_QUERY_KEY } from "@/components/products/products.constants";
@@ -24,6 +25,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
     [ENTITIES.SUPPLIERS]: { queryKey: LIST_SUPPLIERS_QUERY_KEY, text: PAGES.SUPPLIERS.NAME },
     [ENTITIES.USERS]: { queryKey: LIST_USERS_QUERY_KEY, text: PAGES.USERS.NAME },
     [ENTITIES.EXPENSES]: { queryKey: LIST_EXPENSES_QUERY_KEY, text: PAGES.EXPENSES.NAME },
+    [ENTITIES.CASH_BALANCES]: { queryKey: LIST_CASH_BALANCES_QUERY_KEY, text: PAGES.CASH_BALANCES.NAME },
   };
 
   const { formState: { isDirty } } = useFormContext();
@@ -63,7 +65,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
           <Popup
             content="Restaurar filtros"
             position="top center"
-            size="tiny"
+            size={SIZES.TINY}
             trigger={(
               <Button circular icon type="button" onClick={onRestoreFilters}>
                 <Icon name={ICONS.UNDO} />
@@ -77,7 +79,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
             <Popup
               content="Filtros activos"
               position="top center"
-              size="tiny"
+              size={SIZES.TINY}
               trigger={
                 <Label $alignSelf="center" width="fit-content" circular color={COLORS.BLUE}>{appliedCount}</Label>
               }
@@ -90,16 +92,18 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
             color={isDirty ? COLORS.BLUE : undefined}
             width="130px"
           />
-          <Dropdown width="130px" pointing as={CustomButton} text='Actualizar' icon={ICONS.REFRESH} floating labeled button className='icon'>
-            <Dropdown.Menu>
-              <DropdownItem onClick={onRefetch}>
-                <Icon color={COLORS.BLUE} name={ICONS.DOWNLOAD} />Actualización rápida
-              </DropdownItem>
-              <DropdownItem onClick={handleHardUpdate}>
-                <Icon color={COLORS.RED} name={ICONS.DOWNLOAD} />Actualización completa
-              </DropdownItem>
-            </Dropdown.Menu>
-          </Dropdown>
+          {onRefetch &&
+            <Dropdown width="130px" pointing as={CustomButton} text='Actualizar' icon={ICONS.REFRESH} floating labeled button className='icon'>
+              <Dropdown.Menu>
+                <DropdownItem onClick={onRefetch}>
+                  <Icon color={COLORS.BLUE} name={ICONS.DOWNLOAD} />Actualización rápida
+                </DropdownItem>
+                <DropdownItem onClick={handleHardUpdate}>
+                  <Icon color={COLORS.RED} name={ICONS.DOWNLOAD} />Actualización completa
+                </DropdownItem>
+              </Dropdown.Menu>
+            </Dropdown>
+          }
         </Flex>
       </HeaderSegment>
       <ModalAction

@@ -1,4 +1,3 @@
-import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Flex, Form, Label, OverflowWrapper } from "@/common/components/custom";
 import { DropdownControlled, IconedButtonControlled, PercentField, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
@@ -8,11 +7,11 @@ import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import useSettingArrayField from "@/hooks/useSettingArrayField";
-import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
+import { forwardRef, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
-import { calculateMargin, calculatePriceFromMargin, getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
+import { calculateMargin, calculatePriceFromMargin, getBrandId, getMargin, getProductId, getSupplierId, isProductDeleted } from "../products.utils";
 
 const ProductForm = forwardRef(({
   product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending, blacklist },
@@ -36,8 +35,7 @@ const ProductForm = forwardRef(({
   const methods = useForm({
     defaultValues: getInitialValues(product)
   });
-  const { isFetching: isProductSettingsFetching, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
-  const { options: tagsOptions, optionsMapper } = useSettingArrayField(ENTITIES.PRODUCTS, "tags", product?.tags || []);
+  const { options: tagsOptions, optionsMapper } = useSettingArrayField(ENTITIES.PRODUCT, "tags", product?.tags || []);
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
@@ -52,10 +50,6 @@ const ProductForm = forwardRef(({
     'price',
   ]);
 
-  useEffect(() => {
-    refetchProductSettings();
-  }, [refetchProductSettings]);
-
   const handleForm = async (data) => {
     const filteredData = { ...data };
 
@@ -68,7 +62,7 @@ const ProductForm = forwardRef(({
     }
 
     if (!isUpdating) {
-      filteredData.code = `${data.supplier?.id ?? ''}${data.brand?.id ?? ''}${data.code.toUpperCase()}`;
+      filteredData.id = `${data.supplier?.id ?? ''}${data.brand?.id ?? ''}${data.id.toUpperCase()}`;
       delete filteredData.supplier;
       delete filteredData.brand;
     }
@@ -155,9 +149,9 @@ const ProductForm = forwardRef(({
               <TextField width="25%" label="Marca" value={product?.brandName} disabled />
               <TextField
                 width="250px"
-                label="Código"
-                value={getProductCode(product?.code)}
-                iconLabel={`${getSupplierCode(product?.code)} ${getBrandCode(product?.code)}`}
+                label="Id"
+                value={getProductId(product?.id)}
+                iconLabel={`${getSupplierId(product?.id)} ${getBrandId(product?.id)}`}
                 disabled
               />
             </>
@@ -197,13 +191,13 @@ const ProductForm = forwardRef(({
               />
               <TextControlled
                 width="250px"
-                name="code"
-                label="Código"
+                name="id"
+                label="Id"
                 rules={{
                   required: "Este campo es obligatorio.",
                   validate: (value) => {
                     if (blacklist?.includes(value.trim().toUpperCase())) {
-                      return "Este código se encuentra dentro de la lista de productos bloqueados.";
+                      return "Este id se encuentra dentro de la lista de productos bloqueados.";
                     }
                     return true;
                   },
@@ -289,7 +283,6 @@ const ProductForm = forwardRef(({
             search={isUpdating && !view}
             selection
             optionsMapper={optionsMapper}
-            loading={isProductSettingsFetching}
             options={Object.values(tagsOptions)}
             renderLabel={(item) => ({
               color: item.value.color,

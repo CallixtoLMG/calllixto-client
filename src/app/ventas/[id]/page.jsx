@@ -2,11 +2,12 @@
 import { useUserContext } from "@/User";
 import { useCancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
+import { useGetPayment } from "@/api/payments";
 import { useListProducts } from "@/api/products";
 import { IconedButton } from "@/common/components/buttons";
 import { DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu } from "@/common/components/custom";
 import ModalCancel from "@/common/components/modals/ModalCancel";
-import { COLORS, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
+import { COLORS, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import BudgetForm from "@/components/budgets/BudgetForm";
@@ -35,6 +36,7 @@ const Budget = ({ params }) => {
   const { data: budget, isLoading } = useGetBudget(params.id);
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
+  const { data: payment, refetch: refetchPayment } = useGetPayment(ENTITIES.BUDGET, params.id);
   const [customerData, setCustomerData] = useState();
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
@@ -305,6 +307,8 @@ const Budget = ({ params }) => {
           total={total}
           selectedContact={selectedContact}
           setSelectedContact={setSelectedContact}
+          payment={payment}
+          refetchPayment={refetchPayment}
         />
       )}
       <ModalPDF
