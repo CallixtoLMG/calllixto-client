@@ -86,15 +86,12 @@ const CashBalances = () => {
     mutationFn: createCashBalance,
     onSuccess: async (response) => {
       if (response.statusOk) {
-        toast.success('Caja abierta!');
+        toast.success('Caja creada correctamente!');
         push(PAGES.CASH_BALANCES.SHOW(response.cashBalance.id))
       } else {
         toast.error(response.error.message);
       }
     },
-    onError: (error) => {
-      toast.error(error.message);
-    }
   });
 
   const handleOpenModal = useCallback(() => {

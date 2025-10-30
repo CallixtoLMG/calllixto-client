@@ -3,13 +3,14 @@ import { PriceLabel } from '@/common/components/form';
 import { CommentTooltip } from "@/common/components/tooltips";
 import { COLORS, DATE_FORMATS, ICONS, SIZES } from '@/common/constants';
 import { getFormatedDate } from '@/common/utils/dates';
+import { Popup } from 'semantic-ui-react';
 
 export const GET_CASH_BALANCE_QUERY_KEY = 'getCashBalance';
 export const LIST_CASH_BALANCES_QUERY_KEY = 'listCashBalances';
 export const CASH_BALANCES_FILTERS_KEY = 'cashBalancesFilters';
 export const CASH_BALANCE_MOVEMENTS_FILTERS_KEY = "cashBalanceMovementsFilters";
 export const CLOSED = "closed"
-export const LIST_ATTRIBUTES = ["id", "startDate", "closeDate", "paymentMethods", "comments", "initialAmount", "currentAmount", "billsDetails", "state"];
+export const LIST_ATTRIBUTES = ["id", "startDate", "closeDate", "paymentMethods", "comments", "initialAmount", "currentAmount", "billsDetails", "state", "createdBy"];
 
 export const CASH_BALANCE_STATES = {
   OPEN: {
@@ -36,7 +37,21 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       key: "id",
       sortable: true,
       width: 1,
-      value: (cashBalance) => cashBalance.id,
+      value: (cashBalance) => (
+        <Box width="60px">
+          <Popup
+            trigger={<Box width="60px">{cashBalance.id}</Box>}
+            content={
+              <>
+                <Box>{`Abierta por ${cashBalance?.createdBy || "Sin vendedor"}`}</Box>
+                <Box>{`Fecha: ${getFormatedDate(cashBalance?.createdAt, DATE_FORMATS.DATE_WITH_TIME)}`}</Box>
+              </>
+            }
+            position="right center"
+            size="mini"
+          />
+        </Box>
+      ),
       sortValue: (cashBalance) => cashBalance.id ?? ""
     },
     {
@@ -45,10 +60,10 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       key: "startDate",
       sortable: true,
       align: "left",
-      width: 2,
+      width: 3,
       value: (cashBalance) => (
         <Flex $justifyContent="space-between">
-          {getFormatedDate(cashBalance.startDate, DATE_FORMATS.ONLY_DATE)}
+          {getFormatedDate(cashBalance.startDate, DATE_FORMATS.DATE_WITH_TIME)}
           <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
             {cashBalance.comments && <CommentTooltip comment={cashBalance.comments} />}
           </Flex>
@@ -108,7 +123,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       align: "left",
       value: (cashBalance) => (
         <Flex $justifyContent="space-between">
-          {getFormatedDate(cashBalance.closeDate, DATE_FORMATS.ONLY_DATE)}
+          {getFormatedDate(cashBalance.closeDate, DATE_FORMATS.DATE_WITH_TIME)}
         </Flex>
       ),
       sortValue: (cashBalance) => cashBalance.closeDate ?? ""
@@ -203,7 +218,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
           <Icon inverted name={element.quantity < 0 ? ICONS.ARROW_UP : ICONS.ARROW_DOWN} />
         </Label>
         <Box width="100%">
-          {element.date ? getFormatedDate(element.date) : "-"}
+          {element.date ? getFormatedDate(element.date, DATE_FORMATS.DATE_WITH_TIME) : "-"}
         </Box>
       </Flex>
     )
@@ -235,7 +250,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
     width: 2,
     value: (element) => {
       const prefix = element.source === "expense" ? "Gasto" : "Venta";
-      return `${prefix} - ${element.movementId}`;
+      return `${prefix} - ${element.entityId}`;
     }
   },
   {

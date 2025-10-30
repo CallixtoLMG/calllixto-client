@@ -117,7 +117,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
       },
       {
         title: "Total",
-        value: (product) => <PriceLabel value={getTotal(product)} />,
+        value: (product) => <PriceLabel value={product.total ? getTotal(product) : 0} />,
         id: 6,
         width: 3
       },
@@ -141,7 +141,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
               $width="300px"
               label="Vendedor"
               control={Input}
-              value={budget?.seller}
+              value={budget?.createdBy}
               readOnly
               disabled
             />
@@ -170,7 +170,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 label="Fecha de vencimiento"
                 control={Input}
                 value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })}
-            disabled
+                disabled
               />
             )}
           </FieldsContainer>

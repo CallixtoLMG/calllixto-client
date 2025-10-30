@@ -1,7 +1,6 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
 import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
 import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import Payments from "@/common/components/form/Payments";
 import ProductSearch from "@/common/components/search/search";
 import { Text } from "@/common/components/search/styles";
 import { Table, Total } from "@/common/components/table";
@@ -12,6 +11,7 @@ import { getDateWithOffset } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
+import CreateBudgetPayments from "@/components/payments/CreateBudgetPayment";
 import { LIST_ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
 import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks";
@@ -26,7 +26,7 @@ import ModalComment from "./ModalComment";
 import { Container, VerticalDivider } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
-  seller: user?.name,
+  createdBy: user?.name,
   customer: { name: '', addresses: [], phoneNumbers: [] },
   products: [],
   comments: '',
@@ -64,7 +64,7 @@ const BudgetForm = ({
           }
         })
       })),
-      seller: user?.name,
+      createdBy: user?.name,
       paymentMethods: paymentMethods.map(({ value }) => value),
       state: BUDGET_STATES.PENDING.id,
       customer: { name: '', addresses: [], phoneNumbers: [] },
@@ -83,7 +83,7 @@ const BudgetForm = ({
       : budget && draft
         ? {
           ...budget,
-          seller: user?.name,
+          createdBy: user?.name,
           paymentsMade: budget.paymentsMade || [],
         }
         : {
@@ -341,9 +341,9 @@ const BudgetForm = ({
         products: restoredProducts
       };
     } else if (draft) {
-      baseBudget = { ...EMPTY_BUDGET(user), ...budget, seller: user?.name };
+      baseBudget = { ...EMPTY_BUDGET(user), ...budget, createdBy: user?.name };
     } else {
-      baseBudget = { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
+      baseBudget = { ...EMPTY_BUDGET(user), state: watchState, createdBy: user?.name };
     }
 
     reset(baseBudget);
@@ -608,7 +608,7 @@ const BudgetForm = ({
           </FieldsContainer>
           <FieldsContainer $justifyContent="space-between">
             <TextControlled
-              name="seller"
+              name="createdBy"
               label="Vendedor"
               rules={RULES.REQUIRED}
               width="300px"
@@ -763,7 +763,7 @@ const BudgetForm = ({
           </Loader>
           {isBudgetConfirmed(watchState) && (
             <FieldsContainer width="100%" $rowGap="15px">
-              <Payments
+              <CreateBudgetPayments
                 total={total}
                 update
               />

@@ -1,7 +1,7 @@
 import { Box, ButtonsContainer, FieldsContainer, Flex, FlexColumn, Form } from "@/common/components/custom";
 import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePickerControlled";
 import { COLORS, ENTITIES, ICONS, RULES, SIZES } from "@/common/constants";
-import { datePickerNow } from "@/common/utils/dates";
+import { datePickerNow, now } from "@/common/utils/dates";
 import { AddBillPopup } from "@/components/cashBalances/AddBillPopup";
 import { BILLS_DETAILS_TABLE_HEADERS, EMPTY_BILL } from "@/components/cashBalances/cashBalances.constants";
 import { useSettingArrayField } from "@/hooks";
@@ -96,6 +96,12 @@ const ModalOpenTill = ({ open, onClose, onSubmit, paymentOptions, isLoading }) =
                     showTimeSelect
                     scrollableYearDropdown
                     dateFormat="dd-MM-yyyy HH:mm"
+                    rules={{
+                      validate: (value) => {
+                        if (!value) return true;
+                        return value <= now() || "La fecha de cierre no puede ser mayor a la actual.";
+                      }
+                    }}
                   />
                 </FieldsContainer>
               </Flex>

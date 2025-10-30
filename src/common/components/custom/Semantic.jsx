@@ -190,7 +190,7 @@ export const Icon = styled(SIcon)`
   cursor: ${({ pointer }) => pointer && "pointer"} !important;
   justify-items: ${({ justifyItems }) => `${justifyItems}!important;`};
   pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
-  line-height: ${({ lineHeight }) => `${lineHeight}!important;`};
+  line-height: ${({ $lineHeight }) => `${$lineHeight}!important;`};
 `;
 
 export const Modal = styled(SModal)`

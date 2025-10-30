@@ -111,7 +111,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         <Divider />
         <SectionContainer $alignItems="left" $flexDirection="column" $minHeight="50px">
           <Flex>
-            <Field label="Vendedor/a" value={budget?.seller} />
+            <Field label="Vendedor/a" value={budget?.createdBy} />
             <Field label="Fecha" value={getFormatedDate()} />
           </Flex>
           <Flex>

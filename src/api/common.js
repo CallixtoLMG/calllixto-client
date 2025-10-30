@@ -81,14 +81,16 @@ export async function listItems({ entity, url, params = {} }) {
 export function useCreateItem() {
   const invalidate = useInvalidateQueries();
 
-  const createItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], attributes }) => {
+  const createItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], attributes, skipStorageUpdate }) => {
     const { data } = await getInstance().post(url, value);
 
     if (data.statusOk) {
-      await updateOrCreateStorageItem({
-        entity,
-        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
-      });
+      if (!skipStorageUpdate) {
+        await updateOrCreateStorageItem({
+          entity,
+          value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity],
+        });
+      }
       invalidate(invalidateQueries);
     }
     return data;
@@ -120,14 +122,18 @@ export function usePostUpdateItem() {
 export function useEditItem() {
   const invalidate = useInvalidateQueries();
 
-  const editItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes }) => {
+  const editItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes, skipStorageUpdate = false, }) => {
     const { data } = await getInstance().put(url, value, { params });
 
     if (data.statusOk && data[responseEntity]) {
-      await updateOrCreateStorageItem({
-        entity,
-        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
-      });
+      if (!skipStorageUpdate) {
+        await updateOrCreateStorageItem({
+          entity,
+          value: attributes
+            ? pick(data[responseEntity], getDefaultAttributes(attributes))
+            : data[responseEntity],
+        });
+      }
       invalidate(invalidateQueries);
     } else {
       console.error("Error en la respuesta:", data.message);
@@ -137,19 +143,20 @@ export function useEditItem() {
   };
 
   return editItem;
-};
+}
 
 export function useDeleteItem() {
   const invalidate = useInvalidateQueries();
 
-  const deleteItem = async ({ entity, id, url, invalidateQueries = [], params = {} }) => {
+  const deleteItem = async ({ entity, id, url, invalidateQueries = [], params = {}, skipStorageUpdate }) => {
     const { data } = await getInstance().delete(url, { params });
 
     if (data.statusOk) {
-      await removeStorageItem({ entity, id });
+      if (!skipStorageUpdate) {
+        await removeStorageItem({ entity, id });
+      }
       invalidate(invalidateQueries);
     }
-
     return data;
   };
   return deleteItem;

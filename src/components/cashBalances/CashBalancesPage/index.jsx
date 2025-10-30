@@ -33,7 +33,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
 
   const adjustedFilters = {
     ...filters,
-    paymentMethodsText: filters.paymentMethods 
+    paymentMethodsText: filters.paymentMethods
   };
 
   const onFilter = createFilter(adjustedFilters, ["id", "paymentMethodsText"]);

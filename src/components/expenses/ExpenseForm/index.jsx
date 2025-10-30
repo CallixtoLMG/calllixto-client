@@ -4,6 +4,7 @@ import { FieldsContainer, Form } from "@/common/components/custom";
 import { DropdownControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
+import { now } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks";
 import useSettingArrayField from "@/hooks/useSettingArrayField";
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useMemo } from "react";
@@ -24,6 +25,7 @@ const ExpenseForm = forwardRef(({
     ...EMPTY_EXPENSE,
     tags: [],
     categories: [],
+    expirationDate: expense?.expirationDate ? expense?.expirationDate : now(),
     ...expense,
   });
 
@@ -124,6 +126,7 @@ const ExpenseForm = forwardRef(({
             showYearDropdown
             scrollableYearDropdown
             yearDropdownItemNumber={80}
+            rules={RULES.REQUIRED}
           />
         </FieldsContainer>
         <FieldsContainer $rowGap="5px">

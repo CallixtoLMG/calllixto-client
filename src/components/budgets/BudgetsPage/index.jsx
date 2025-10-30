@@ -21,7 +21,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BUDGETS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['id', 'customer', 'seller'], {
+  const onFilter = createFilter(filters, ['id', 'customer', 'createdBy'], {
     customer: budget => budget.customer?.name || '',
     allState: SELECT_ALL_OPTION.value,
   });
@@ -67,7 +67,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
             />
             <TextControlled
               flex="1"
-              name="seller"
+              name="createdBy"
               placeholder="Vendedor"
             />
           </Filters>

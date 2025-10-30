@@ -93,7 +93,7 @@ export const Total = ({
   items.push({
     id: 'total',
     title: <Title >TOTAL</Title>,
-    amount: <Title ><PriceLabel value={total} /></Title>
+    amount: <Title ><PriceLabel value={total || 0} /></Title>
   });
 
   return (

@@ -39,7 +39,7 @@ const Budgets = () => {
         handleUndefined(budget.total),
         getFormatedPercentage(budget.globalDiscount),
         getFormatedPercentage(budget.additionalCharge),
-        handleUndefined(budget.seller)
+        handleUndefined(budget.createdBy)
       ];
 
       const productData = budget.products.map(product => {

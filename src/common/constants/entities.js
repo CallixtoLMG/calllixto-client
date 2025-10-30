@@ -19,5 +19,7 @@ export const ENTITIES = {
   CASH_BALANCES: "cash-balances",
   CASH_BALANCE: "cash-balance",
   CASHBALANCES: "cashBalances",
-  CASHBALANCE: "cashBalance"
+  CASHBALANCE: "cashBalance",
+  PAYMENTS: "payments",
+  PAYMENT: "payment"
 };

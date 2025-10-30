@@ -25,7 +25,8 @@ const CashBalanceMovements = ({ cashBalance }) => {
       movementId: e.id,
       source: "expense"
     }));
-    return { movements: [...budgets, ...expenses] };
+    const result = { movements: [...budgets, ...expenses] };
+    return result;
   }, [cashBalance]);
 
   const methods = useForm({ defaultValues });
@@ -42,19 +43,23 @@ const CashBalanceMovements = ({ cashBalance }) => {
   const { fields: movementList } = useFieldArray({ control, name: "movements" });
 
   const filteredList = useMemo(() => {
-    return movementList
+    const result = movementList
       .filter(item => {
         const isIn = item.quantity > 0;
         const isOut = item.quantity < 0;
-        const matchType = filters.type === "all" || (filters.type === "in" && isIn) || (filters.type === "out" && isOut);
+        const matchType = filters.type === "all"
+          || (filters.type === "in" && isIn)
+          || (filters.type === "out" && isOut);
         const matchId = item.movementId?.toLowerCase().includes(filters.movementId?.toLowerCase() || "");
-        const matchComments = item.comments?.toLowerCase().includes(filters.comments?.toLowerCase() || "");
+        const matchComments = (item.comments || "").toLowerCase().includes((filters.comments || "").toLowerCase());
         return matchType && matchId && matchComments;
       })
       .map(item => ({
         ...item,
-        id: item.movementId
+        id: `${item.source}_${item.entityId}_${item.movementId}`,
       }));
+
+    return result;
   }, [filters, movementList]);
 
   const getPageFor = (movement) =>
@@ -101,7 +106,7 @@ const CashBalanceMovements = ({ cashBalance }) => {
           <Table
             paginate
             page={{
-              SHOW: (id, element) => getPageFor(element).SHOW(id)
+              SHOW: (_, element) => `${getPageFor(element).SHOW(element.entityId)}?tab=pagos`
             }}
             headers={CASH_BALANCE_MOVEMENTS_TABLE_HEADERS}
             elements={filteredList}

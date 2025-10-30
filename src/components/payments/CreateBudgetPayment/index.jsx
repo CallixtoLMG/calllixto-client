@@ -1,14 +1,14 @@
 import { useGetSetting } from "@/api/settings";
+import { Button, FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "@/common/components/custom";
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
+import { DatePicker } from "@/common/components/form/DatePicker";
+import { Table, TotalList } from "@/common/components/table";
 import { COLORS, ENTITIES, ICONS, RULES, SIZES } from "@/common/constants";
 import { handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header, Popup } from "semantic-ui-react";
-import { Button, FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "../custom";
-import { Table, TotalList } from "../table";
-import { DatePicker } from "./DatePicker";
 
 const EMPTY_PAYMENT = () => ({
   method: '',
@@ -72,7 +72,7 @@ const getPaymentTableHeaders = () => [
   }
 ];
 
-const Payments = ({
+const CreateBudgetPayments = ({
   total,
   maxHeight,
   children,
@@ -253,4 +253,4 @@ const Payments = ({
   );
 };
 
-export default Payments;
+export default CreateBudgetPayments;
