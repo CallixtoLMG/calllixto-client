@@ -152,7 +152,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
       }
       {client?.id === 'maderera-las-tapias' && (
         <Box width="100%">
-          Controle su mercadería. No se aceptan reclamos, devoluciones o cambios una vez firmado el conforme. La mercadería se descarga el pie del camión, sin excepción.
+          Por favor controle su pedido. No se aceptan reclamos, devoluciones o cambios una vez firmado el remito de entrega. La mercadería se descarga al pie del camión, sin excepción.
         </Box>
       )}
       <FlexColumn $rowGap="15px">

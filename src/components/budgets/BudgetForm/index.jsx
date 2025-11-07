@@ -47,7 +47,7 @@ const BudgetForm = ({
   isLoading,
   isCloning,
   draft,
-  paymentMethods,
+  paymentMethods = [],
 }) => {
   const clonedInitialValues = useMemo(() => {
     if (!isCloning || !budget) return EMPTY_BUDGET(user);
