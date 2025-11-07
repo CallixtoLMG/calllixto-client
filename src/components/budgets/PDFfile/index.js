@@ -151,11 +151,9 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         )
       }
       {client?.id === 'maderera-las-tapias' && (
-        <Flex width="100%" $justifyContent="end">
-          <Box width="40%">
-            Controle su mercadería. No se aceptan reclamos, devoluciones o cambios una vez firmado el conforme. La mercadería se descarga el pie del camión, sin excepción.
-          </Box>
-        </Flex>
+        <Box width="100%">
+          Controle su mercadería. No se aceptan reclamos, devoluciones o cambios una vez firmado el conforme. La mercadería se descarga el pie del camión, sin excepción.
+        </Box>
       )}
       <FlexColumn $rowGap="15px">
         {!dispatchPdf &&
