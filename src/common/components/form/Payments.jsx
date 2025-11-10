@@ -3,7 +3,7 @@ import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/compo
 import { COLORS, ENTITIES, ICONS, RULES } from "@/common/constants";
 import { handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { getSortedPaymentsByDate } from "@/common/utils/dates";
-import { PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
+import { PAYMENT_METHODS, PAYMENT_TABLE_HEADERS } from "@/components/budgets/budgets.constants";
 import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Header } from "semantic-ui-react";
@@ -100,7 +100,7 @@ const Payments = ({ total, maxHeight, children, update, noBoxShadow, noBorder, p
               <DropdownField
                 width="fit-content"
                 label="Método de Pago"
-                options={paymentMethodOptions.filter((method) => method.key !== 'dolares')}
+                options={PAYMENT_METHODS.filter((method) => method.key !== 'dolares')}
                 value={payment.method}
                 onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                 disabled={isTotalCovered}
