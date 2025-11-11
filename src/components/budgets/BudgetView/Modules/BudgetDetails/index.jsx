@@ -14,7 +14,7 @@ import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../../../b
 import { Container, Message, MessageHeader } from "./../../styles";
 
 const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
-
+  
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
@@ -117,7 +117,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
       },
       {
         title: "Total",
-        value: (product) => <PriceLabel value={product.total ? getTotal(product) : 0} />,
+        value: (product) => <PriceLabel value={product.price ? getTotal(product) : 0} />,
         id: 6,
         width: 3
       },

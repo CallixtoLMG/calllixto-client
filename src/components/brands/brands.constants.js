@@ -4,7 +4,7 @@ import { CommentTooltip } from "@/common/components/tooltips";
 export const GET_BRAND_QUERY_KEY = 'getBrand';
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 export const BRANDS_FILTERS_KEY = 'brandsFilters';
-export const LIST_ATTRIBUTES = ['id', 'name', 'comments',  'state', 'deactivationReason'];
+export const LIST_ATTRIBUTES = ['id', 'name', 'comments',  'state', 'inactiveReason'];
 
 export const BRAND_COLUMNS = [
   {

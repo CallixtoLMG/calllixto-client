@@ -1,3 +1,4 @@
+'use client';
 import { useUserContext } from "@/User";
 import { Flex, Icon, Label } from "@/common/components/custom";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
@@ -14,17 +15,18 @@ const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const [selectedClientId, setSelectedClientId] = useState(null);
+  const [selectedClientId, setSelectedClientId] = useState(DEFAULT_SELECTED_CLIENT);
 
   useEffect(() => {
-    const storedData = JSON.parse(sessionStorage.getItem("userData"));
-    setSelectedClientId(storedData?.selectedClientId || DEFAULT_SELECTED_CLIENT);
-  }, []);
+    if (typeof window !== "undefined") {
+      const client = localStorage.getItem("selectedClientId") ?? DEFAULT_SELECTED_CLIENT;
+      setSelectedClientId(client);
+    }
+  }, []); 
 
   const handleClientChange = (client) => {
-    const storedData = JSON.parse(sessionStorage.getItem("userData"));
-    sessionStorage.setItem("userData", JSON.stringify({ ...storedData, selectedClientId: client }));
-    setSelectedClientId(client);
+    localStorage.setItem("selectedClientId", client);
+    setSelectedClientId(client); 
     location.reload();
   };
 
@@ -90,14 +92,14 @@ const Header = () => {
                 </Flex>
                 <Flex>
                   <RigthHeaderDiv>
-                    <Flex $columnGap ="10px">
+                    <Flex $columnGap="10px">
                       <ModalUpdates />
                       <KeyboardShortcuts />
                     </Flex>
                   </RigthHeaderDiv>
                   {isCallixtoUser(role) && (
                     <RigthHeaderDiv>
-                      <Label height="36px">{userData.selectedClientId || DEFAULT_SELECTED_CLIENT}</Label>
+                      <Label height="36px">{selectedClientId}</Label>
                     </RigthHeaderDiv>
                   )}
                   <RigthHeaderDiv>

@@ -1,7 +1,7 @@
 import { Box, Button, Flex, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, DELETE, ICONS, SEMANTIC_COLORS } from "@/common/constants";
+import { COLORS, DELETE, ICONS, SEMANTIC_COLORS, SIZES } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
@@ -72,7 +72,7 @@ const Categories = () => {
     const newErrors = {};
 
     if (!categoryToAdd.name.trim()) {
-         newErrors.name = "El nombre es obligatorio.";
+      newErrors.name = "El nombre es obligatorio.";
     }
 
     if (categoryToAdd.name.length > 50) {
@@ -127,6 +127,7 @@ const Categories = () => {
                 error={errors?.name}
               />
               <DropdownField
+                selection
                 flex={1}
                 label="Color"
                 options={SEMANTIC_COLORS}
@@ -143,7 +144,7 @@ const Categories = () => {
                 error={errors?.description}
               />
               <Button
-                size={SIZE.SMALL}
+                size={SIZES.SMALL}
                 icon={ICONS.ADD}
                 content="Agregar"
                 labelPosition="left"

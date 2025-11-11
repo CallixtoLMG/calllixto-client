@@ -3,7 +3,7 @@ import { useListBrands } from "@/api/brands";
 import { useCreateProduct } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
 import { useListSuppliers } from "@/api/suppliers";
-import { ENTITIES, PAGES } from "@/common/constants";
+import { ENTITIES, HARD_DELETED, PAGES } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
 import { useValidateToken } from "@/hooks";
@@ -21,6 +21,9 @@ const CreateProduct = () => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createProduct = useCreateProduct();
+  const filterBrands = brands?.brands?.filter((brand) => brand.state !== HARD_DELETED) ?? [];
+  const filterSuppliers = suppliers?.suppliers?.filter((supplier) => supplier.state !== HARD_DELETED) ?? [];
+
   useEffect(() => {
     resetActions();
     refetchBrands();
@@ -51,8 +54,8 @@ const CreateProduct = () => {
   return (
     <Loader active={isLoadingBrands || isLoadingSuppliers || isBrandsRefetching || isSupplierRefetching}>
       <ProductForm
-        brands={brands?.brands ?? []}
-        suppliers={suppliers?.suppliers ?? []}
+        brands={filterBrands ?? []}
+        suppliers={filterSuppliers ?? []}
         onSubmit={mutate}
         isLoading={isPending}
         blacklist={blacklist?.blacklist}

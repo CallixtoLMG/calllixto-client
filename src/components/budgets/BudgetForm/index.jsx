@@ -5,7 +5,7 @@ import ProductSearch from "@/common/components/search/search";
 import { Text } from "@/common/components/search/styles";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
+import { COLORS, HARD_DELETED, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
 import { getDateWithOffset } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
@@ -21,7 +21,7 @@ import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-for
 import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import { CUSTOMER_STATES } from "../../customers/customers.constants";
-import ModalUpdates from "../ModalUpdates";
+import ModalProductUpdates from "../ModalProductUpdates";
 import ModalComment from "./ModalComment";
 import { Container, VerticalDivider } from "./styles";
 
@@ -95,7 +95,7 @@ const BudgetForm = ({
 
   useEffect(() => {
     const current = methods.getValues("paymentMethods");
-    const all = paymentMethods.map(m => m.value);
+    const all = paymentMethods?.map(m => m.value);
 
     if (!current?.length) {
       methods.setValue("paymentMethods", all, { shouldDirty: false });
@@ -136,6 +136,7 @@ const BudgetForm = ({
     }).filter(product =>
       product.state !== PRODUCT_STATES.INACTIVE.id &&
       product.state !== PRODUCT_STATES.DELETED.id &&
+      product.state !== HARD_DELETED &&
       products.some(p => p.id === product.id)
     );
   }, [products]);
@@ -150,7 +151,7 @@ const BudgetForm = ({
 
   const customerOptions = useMemo(() => {
     return customers
-      .filter(({ state }) => state !== CUSTOMER_STATES.INACTIVE.id)
+      .filter(({ state }) => state === CUSTOMER_STATES.ACTIVE.id)
       .map(({ id, name, state, tags, comments, phoneNumbers, addresses }) => ({
         key: id,
         value: { phoneNumbers, addresses, id, state, name },
@@ -259,6 +260,7 @@ const BudgetForm = ({
       if (outdatedProduct) {
         return {
           ...product,
+          name: outdatedProduct.name, 
           price: outdatedProduct.price,
           editablePrice: outdatedProduct.editablePrice,
           fractionConfig: {
@@ -561,7 +563,7 @@ const BudgetForm = ({
   return (
     <>
       <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={setIsModalCommentOpen} product={selectedProduct} />
-      <ModalUpdates
+      <ModalProductUpdates
         shouldShowModal={shouldShowModal}
         outdatedProducts={outdatedProducts}
         removedProducts={removedProducts}
@@ -779,20 +781,20 @@ const BudgetForm = ({
                       $paddingLeft="18px"
                       width="fit-content"
                       type="button"
-                      basic={value.length !== paymentMethods.length}
+                      basic={value.length !== paymentMethods?.length}
                       color={COLORS.BLUE}
                       onClick={() => {
-                        if (value.length === paymentMethods.length) {
+                        if (value.length === paymentMethods?.length) {
                           onChange([]);
                         } else {
-                          onChange(paymentMethods.map(method => method.value));
+                          onChange(paymentMethods?.map(method => method.value));
                         }
                       }}
                     >
                       Todos
                     </Button>
                     <VerticalDivider />
-                    {paymentMethods.map(({ key, text, value: methodValue }) => (
+                    {paymentMethods?.map(({ key, text, value: methodValue }) => (
                       <Button
                         $paddingLeft="18px"
                         width="fit-content"

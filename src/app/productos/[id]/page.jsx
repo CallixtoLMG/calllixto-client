@@ -88,33 +88,47 @@ const Product = ({ params }) => {
 
   const modalConfig = useMemo(() => ({
     softDelete: {
-      header: `¿Está seguro que desea eliminar el producto "${product?.name}"?`,
+      header: (
+        <>¿Está seguro que desea eliminar el producto <i>{product?.name} ({product?.id}) </i> ?</>
+      ),
       confirmText: "eliminar",
       icon: ICONS.TRASH
     },
     hardDelete: {
-      header: `¿Está seguro que desea eliminar PERMANENTEMENTE el producto "${product?.name}"?`,
+      header: (
+        <>¿Está seguro que desea eliminar PERMANENTEMENTE el producto <i>{product?.name} ({product?.id}) </i> ?</>
+      ),
       confirmText: "eliminar",
       icon: ICONS.TRASH,
     },
     recover: {
-      header: `¿Está seguro que desea recuperar el producto "${product?.name}"?`,
+      header: (
+        <>¿Está seguro que desea recuperar el producto <i>{product?.name} ({product?.id}) </i> ?</>
+      ),
       icon: ICONS.UNDO
     },
     active: {
-      header: `¿Está seguro que desea activar el producto "${product?.name}"?`,
+      header: (
+        <>¿Está seguro que desea activar el producto <i>{product?.name} ({product?.id}) </i> ?</>
+      ),
       icon: ICONS.PLAY_CIRCLE
     },
     inactive: {
-      header: `¿Está seguro que desea desactivar el producto "${product?.name}"?`,
+      header: (
+        <>¿Está seguro que desea desactivar el producto <i>{product?.name} ({product?.id}) </i> ?</>
+      ),
       icon: ICONS.PAUSE_CIRCLE
     },
     outOfStock: {
-      header: `¿Está seguro que desea cambiar el estado a sin stock el producto "${product?.name}"?`,
+      header: (
+        <>¿Está seguro que desea cambiar el estado a sin stock el producto <i>{product?.name} ({product?.id}) </i> ?</>
+      ),
       icon: ICONS.BAN
     },
     inStock: {
-      header: `¿Está seguro que desea cambiar el estado a en stock el producto "${product?.name}"?`,
+      header: (
+        <>¿Está seguro que desea cambiar el estado a en stock el producto <i>{product?.name} ({product?.id}) </i> ?</>
+      ),
       icon: ICONS.BOX
     }
   }), [product]);

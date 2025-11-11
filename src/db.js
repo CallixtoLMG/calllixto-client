@@ -1,20 +1,26 @@
 import { LAST_UPDATED_AT } from '@/common/constants';
+import { config } from "@/config";
 import Dexie from 'dexie';
 
-export const db = new Dexie('Callixto');
+let db;
 
-db.version(1).stores({
-  customers: 'id, updatedAt',
-  brands: 'id, updatedAt',
-  suppliers: 'id, updatedAt',
-  products: 'id, updatedAt',
-  budgets: 'id, updatedAt',
-  expenses: 'id, updatedAt',
-  users: 'id, updatedAt',
-  cashBalances: 'id, updatedAt',
-  settings: 'entity, updatedAt',
-  [LAST_UPDATED_AT]: 'id',
-});
+if (typeof window !== "undefined") {
+  db = new Dexie(`${config.APP_ENV}-Callixto-${localStorage.getItem("selectedClientId")}`);
+  db.version(1).stores({
+    customers: 'id, updatedAt',
+    brands: 'id, updatedAt',
+    suppliers: 'id, updatedAt',
+    products: 'id, updatedAt',
+    budgets: 'id, updatedAt',
+    expenses: 'id, updatedAt',
+    users: 'id, updatedAt',
+    cashBalances: 'id, updatedAt',
+    settings: 'entity, updatedAt',
+    [LAST_UPDATED_AT]: 'id',
+  });
+}
+
+export { db };
 
 export async function bulkAddStorageItems({ entity, values }) {
   await db[entity].bulkAdd(values);
@@ -49,13 +55,14 @@ export async function clearStorageTable(entity) {
   await db[entity].clear();
 };
 
-export async function removeStorageItemsByFilter({ entity, filter }) {
-  const allItems = await db[entity].toArray();
-  const idsToDelete = allItems
-    .filter(filter)
-    .map(item => item.id);
-
-  if (idsToDelete.length) {
-    await db[entity].bulkDelete(idsToDelete);
+export async function removeStorageItemById({ entity, id }) {
+  if (!entity || id === undefined || id === null || id === "") {
+    return;
+  }
+  try {
+    const result = await db[entity].delete(id);
+    return result;
+  } catch (error) {
+    throw error;
   }
 };

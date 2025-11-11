@@ -1,10 +1,10 @@
 import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { LIST_ATTRIBUTES, GET_BRAND_QUERY_KEY, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
+import { GET_BRAND_QUERY_KEY, LIST_ATTRIBUTES, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { getInstance } from "./axios";
-import { listItems, usePostUpdateItem, useCreateItem, useDeleteItem, useEditItem } from './common';
+import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
 
 export function useListBrands() {
   const query = useQuery({
@@ -64,7 +64,7 @@ export const useDeleteBrand = () => {
     return deleteItem({
       entity: ENTITIES.BRANDS,
       id,
-      url: PATHS.BRANDS,
+      url: `${PATHS.BRANDS}/${id}`,
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY]]
     });
   };
@@ -95,7 +95,7 @@ export const useInactiveBrand = () => {
     return inactiveItem({
       entity: ENTITIES.BRANDS,
       url: `${PATHS.BRANDS}/${id}/${INACTIVE}`,
-      value: { id, inactiveReason},
+      value: { id, inactiveReason },
       responseEntity: ENTITIES.BRAND,
       invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, id]]
     });

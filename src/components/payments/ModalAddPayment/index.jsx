@@ -1,6 +1,6 @@
 import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
-import { Box, Button, ButtonsContainer, FieldsContainer, Flex, FlexColumn, Form, FormField } from "@/common/components/custom";
+import { Button, ButtonsContainer, FieldsContainer, Flex, Form, FormField } from "@/common/components/custom";
 import { DropdownField, PriceField, TextAreaField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { COLORS, ENTITIES, ICONS, RULES, SIZES } from "@/common/constants";
@@ -81,9 +81,9 @@ export const ModalAddPayment = ({
       <Modal open={open} onClose={handleClose} size="large">
         <Modal.Header>Agregar Pago</Modal.Header>
         <Modal.Content>
-          <FlexColumn $rowGap="15px">
-            <FieldsContainer >
-              <Box fontSize="14px" margin="0" as={Form} >
+          <Flex $rowGap="14px" as={Form}>
+            <FieldsContainer  >
+              <Flex $columnGap="14px" rowGap="14px" fontSize="14px" margin="0" flexDirection={"row"} >
                 <FormField
                   selected={payment.date}
                   onChange={(date) => setPayment({ ...payment, date })}
@@ -94,8 +94,6 @@ export const ModalAddPayment = ({
                   $width="150px"
                   control={DatePicker}
                 />
-              </Box>
-              <Flex as={Form}>
                 <DropdownField
                   width="fit-content"
                   label="Método de Pago"
@@ -106,8 +104,6 @@ export const ModalAddPayment = ({
                   disabled={isTotalCovered}
                   error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
                 />
-              </Flex>
-              <Flex as={Form}>
                 <PriceField
                   placeholder="Monto"
                   width="150px"
@@ -151,7 +147,7 @@ export const ModalAddPayment = ({
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
               />
             </FieldsContainer>
-          </FlexColumn>
+          </Flex>
         </Modal.Content >
         <Modal.Actions>
           <ButtonsContainer>

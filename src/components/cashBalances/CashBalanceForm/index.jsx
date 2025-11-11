@@ -68,14 +68,14 @@ const CashBalanceForm = forwardRef(({
             width="200px"
             label="Fecha de inicio"
             disabled
-            value={getFormatedDate(cashBalance?.startDate, DATE_FORMATS.ONLY_DATE)}
+            value={getFormatedDate(cashBalance?.startDate, DATE_FORMATS.DATE_WITH_TIME)}
           />
           {cashBalance?.closeDate &&
             <TextField
               width="200px"
               label="Fecha de cierre"
               disabled
-              value={getFormatedDate(cashBalance?.closeDate, DATE_FORMATS.ONLY_DATE)}
+              value={getFormatedDate(cashBalance?.closeDate, DATE_FORMATS.DATE_WITH_TIME)}
             />
           }
         </FieldsContainer>

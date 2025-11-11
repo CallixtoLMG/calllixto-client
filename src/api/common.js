@@ -1,12 +1,12 @@
 import { ALL, DATE_FORMATS, LAST_UPDATED_AT } from "@/common/constants";
 import { getDefaultAttributes } from "@/common/utils";
 import { getDateWithOffset } from "@/common/utils/dates";
-import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, removeStorageItemsByFilter, updateOrCreateStorageItem } from "@/db";
+import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, removeStorageItemById, updateOrCreateStorageItem } from "@/db";
 import { useQueryClient } from "@tanstack/react-query";
 import { pick } from 'lodash';
 import { getInstance } from './axios';
 
-function useInvalidateQueries() {
+export function useInvalidateQueries() {
   const queryClient = useQueryClient();
   return (queries) => {
     queries.forEach((queryKey) => { queryClient.invalidateQueries({ queryKey, refetchType: ALL }); });
@@ -162,6 +162,52 @@ export function useDeleteItem() {
   return deleteItem;
 };
 
-export async function removeStorageItemsByCustomFilter({ entity, filter }) {
-  await removeStorageItemsByFilter({ entity, filter });
+export function useBatchDeleteItem() {
+  const invalidate = useInvalidateQueries();
+
+  const batchDeleteItem = async ({
+    entity,
+    url,
+    ids,
+    deleteCondition = () => true, 
+    invalidateQueries = [],
+  }) => {
+    if (!Array.isArray(ids) || ids.length === 0) {
+      console.warn("[BatchDelete] No hay IDs válidos para eliminar.");
+      return { statusOk: true, deletedCount: 0 };
+    }
+
+    const successfulDeletes = [];
+    let deletedCount = 0;
+
+    for (const id of ids) {
+      try {
+        const { data } = await getInstance().delete(`${url}/${id}`);
+        if (data.statusOk) {
+          deletedCount++;
+          if (deleteCondition(data)) {
+            successfulDeletes.push(id);
+          }
+        } else {
+          console.warn(`[BatchDelete] No se pudo eliminar el ID ${id}:`, data.error);
+        }
+      } catch (error) {
+        console.error(`[BatchDelete] Error al eliminar ID ${id}:`, error);
+      }
+    }
+
+    if (successfulDeletes.length > 0) {
+      await Promise.all(
+        successfulDeletes.map((id) =>
+          removeStorageItemById({ entity, id })
+        )
+      );
+    }
+
+    invalidate(invalidateQueries);
+
+    return { statusOk: true, deletedCount };
+  };
+
+  return batchDeleteItem;
 };
