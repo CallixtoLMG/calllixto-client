@@ -21,6 +21,7 @@ export const NumberControlled = ({
   defaultValue = 0,
   allowsDecimal = false,
   padding,
+  required,
   onKeyDown,
   ...inputProps
 }) => {
@@ -40,6 +41,7 @@ export const NumberControlled = ({
             flex={flex}
             $width={width}
             label={label}
+            required={required}
             control={Input}
             error={fieldError && {
               content: fieldError.message,

@@ -1,8 +1,7 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
-import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import ProductSearch from "@/common/components/search/search";
-import { Text } from "@/common/components/search/styles";
+import { Button, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
+import { GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
+import SearchControlled from "@/common/components/form/Search/SearchControlled";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
@@ -12,7 +11,7 @@ import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.co
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
 import CreateBudgetPayments from "@/components/payments/CreateBudgetPayment";
-import { LIST_ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
+import { LIST_ATTRIBUTES, PRODUCT_STATES, getProductSearchDescription, getProductSearchTitle } from "@/components/products/products.constants";
 import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks";
 import { pick } from "lodash";
@@ -20,7 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
-import { CUSTOMER_STATES } from "../../customers/customers.constants";
+import { CUSTOMER_STATES, getCustomerSearchDescription, getCustomerSearchTitle } from "../../customers/customers.constants";
 import ModalUpdates from "../ModalUpdates";
 import ModalComment from "./ModalComment";
 import { Container, VerticalDivider } from "./styles";
@@ -149,51 +148,12 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers
-      .filter(({ state }) => state !== CUSTOMER_STATES.INACTIVE.id)
-      .map(({ id, name, state, tags, comments, phoneNumbers, addresses }) => ({
-        key: id,
-        value: { phoneNumbers, addresses, id, state, name },
-        text: name,
-        content: (
-          <FlexColumn $marginTop="5px" $rowGap="5px">
-            <FlexColumn>
-              <OverflowWrapper popupContent={name}>
-                <Text>{name}</Text>
-              </OverflowWrapper>
-            </FlexColumn>
-            <Flex $justifyContent="space-between" $alignItems="center" $columnGap="5px">
-              <Box style={{ width: "30px", textAlign: "center" }}>
-                {comments ? (
-                  <CommentTooltip comment={comments} />
-                ) : (
-                  <Box visibility="hidden">ℹ️</Box>
-                )}
-              </Box>
-              <Box>
-                {tags ? (
-                  <TagsTooltip maxWidthOverflow="5vw" tags={tags} />
-                ) : (
-                  <Box visibility="hidden">🔖</Box>
-                )}
-              </Box>
-            </Flex>
-          </FlexColumn>
-        ),
-      }));
+    return customers?.filter(({ state }) => state !== CUSTOMER_STATES.INACTIVE.id);
   }, [customers]);
 
   const normalizedCustomer = useMemo(() => {
-    if (!watchCustomer ?? !watchCustomer?.id) return null;
-
-    return customerOptions.find(option => option.key === watchCustomer.id)?.value || {
-      id: watchCustomer.id,
-      name: watchCustomer.name,
-      state: watchCustomer.state,
-      addresses: watchCustomer.addresses,
-      phoneNumbers: watchCustomer.phoneNumbers
-    };
-  }, [watchCustomer, customerOptions]);
+    return customers.find(customer => customer.id === watchCustomer?.id) || watchCustomer;
+  }, [customers, watchCustomer]);
 
   useEffect(() => {
     if (
@@ -622,6 +582,7 @@ const BudgetForm = ({
                 maxLength={3}
                 label="Dias para el vencimiento"
                 placeholder="Cantidad en días"
+                required
               />
               <FormField
                 $width="200px"
@@ -638,55 +599,59 @@ const BudgetForm = ({
             </FieldsContainer>
           </FieldsContainer>
           <FieldsContainer>
-            <DropdownControlled
+            <SearchControlled
               name="customer"
-              border
+              width="300px"
+              label="Cliente"
+              required
+              clearable
+              placeholder="Seleccione un cliente"
               rules={{
                 validate: {
-                  required: value => {
-                    return !!value?.id || 'Campo requerido.';
-                  },
-                  activeCustomer: value => {
-                    return value?.state === CUSTOMER_STATES.ACTIVE.id || 'No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.';
-                  },
-                  requiredAddress: value => {
-                    return (
-                      isBudgetConfirmed(watchState) &&
+                  required: (value) => !!value?.id || "Campo requerido.",
+                  activeCustomer: (value) =>
+                    value?.state === CUSTOMER_STATES.ACTIVE.id ||
+                    "No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.",
+                  requiredAddress: (value) =>
+                    isBudgetConfirmed(watchState) &&
                       (!value?.addresses.length && !watchPickUp)
-                    )
-                      ? 'Dirección requerida.'
-                      : true;
-                  },
-                  requiredPhone: value => {
-                    return (
-                      isBudgetConfirmed(watchState) &&
-                      !value?.phoneNumbers.length
-                    )
-                      ? 'Teléfono requerido.'
-                      : true;
-                  },
+                      ? "Dirección requerida."
+                      : true,
+                  requiredPhone: (value) =>
+                    isBudgetConfirmed(watchState) && !value?.phoneNumbers.length
+                      ? "Teléfono requerido."
+                      : true,
                 }
               }}
-              pickErrors={["required", "activeCustomer"]}
-              label="Cliente"
-              placeholder="Seleccione un cliente"
-              width="300px"
-              options={customerOptions}
-              value={normalizedCustomer ?? "No se seleccionó ningún cliente"}
-              search
+              elements={customerOptions}
+              extractSearchFields={(customer) => [customer.name, customer.id, customer.cuit]}
+              getResultProps={(customer) => ({
+                key: customer.id,
+                title: getCustomerSearchTitle(customer),
+                description: getCustomerSearchDescription(customer),
+                value: customer,
+              })}
+              persistSelection={true}
+              onAfterChange={(selectedCustomer) => {
+                setValue("customer", selectedCustomer);
+              }}
             />
             <TextField
               flex="2"
               label="Dirección"
               placeholder="Dirección"
               disabled
-              error={!watchCustomer?.addresses?.length && (errors.customer?.type === "requiredAddress") && errors.customer?.message}
+              error={
+                !watchCustomer?.addresses?.length &&
+                errors.customer?.type === "requiredAddress" &&
+                errors.customer?.message
+              }
               value={
                 watchPickUp
                   ? PICK_UP_IN_STORE
                   : watchCustomer?.addresses?.length > 0
-                    ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
-                    : 'Cliente sin dirección'
+                    ? `${watchCustomer.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
+                    : "Cliente sin dirección"
               }
               extraContent={() => {
                 const { additionalAddresses } = getAddressesForDisplay(watchCustomer?.addresses || []);
@@ -697,52 +662,53 @@ const BudgetForm = ({
               flex="2"
               label="Teléfono"
               placeholder="Teléfono"
-              error={!watchCustomer?.phoneNumbers?.length && (errors.customer?.type === "requiredPhone") && errors.customer?.message}
               disabled
+              error={
+                !watchCustomer?.phoneNumbers?.length &&
+                errors.customer?.type === "requiredPhone" &&
+                errors.customer?.message
+              }
               value={
                 watchCustomer?.phoneNumbers?.length > 0
-                  ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
-                  : 'Cliente sin teléfono'
+                  ? `${watchCustomer.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
+                  : "Cliente sin teléfono"
               }
               extraContent={() => {
-                const { additionalPhones } = getPhonesForDisplay(watchCustomer?.phoneNumbers);
+                const { additionalPhones } = getPhonesForDisplay(watchCustomer?.phoneNumbers || []);
                 return additionalPhones ? <PhonesTooltip input phones={additionalPhones} /> : null;
               }}
             />
           </FieldsContainer>
-          <Controller name="products"
-            rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
-            render={() => (
-              <FormField
-                $width="300px"
-                label="Productos"
-                error={errors.products?.root?.message}
-                control={ProductSearch}
-                ref={productSearchRef}
-                tooltip
-                products={products?.map(product => ({
-                  ...product,
-                  key: product.id,
-                  value: product.name,
-                  text: product.name,
-                }))}
-                onProductSelect={(selectedProduct) => {
-                  appendProduct({
-                    ...selectedProduct,
-                    quantity: selectedProduct.state === PRODUCT_STATES.OOS.id ? 0 : 1,
-                    discount: 0,
-                    key: uuid(),
-                    ...(selectedProduct.fractionConfig?.active && {
-                      fractionConfig: {
-                        ...selectedProduct.fractionConfig,
-                        value: 1,
-                        price: selectedProduct.price,
-                      }
-                    })
-                  });
-                }}
-              />
-            )}
+          <SearchControlled
+            name="product"
+            label="Producto"
+            width="300px"
+            required
+            placeholder="Seleccione un producto"
+            rules={{ required: 'Seleccione un producto.' }}
+            elements={products}
+            extractSearchFields={(product) => [product.name, product.id]}
+            getResultProps={(product) => ({
+              key: product.id,
+              title: getProductSearchTitle(product),
+              description: getProductSearchDescription(product),
+              value: product,
+            })}
+            onAfterChange={(selectedProduct) => {
+              appendProduct({
+                ...selectedProduct,
+                quantity: selectedProduct.state === PRODUCT_STATES.OOS.id ? 0 : 1,
+                discount: 0,
+                key: uuid(),
+                ...(selectedProduct.fractionConfig?.active && {
+                  fractionConfig: {
+                    ...selectedProduct.fractionConfig,
+                    value: 1,
+                    price: selectedProduct.price,
+                  }
+                })
+              });
+            }}
           />
           <Loader active={isTableLoading}>
             <Table

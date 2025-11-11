@@ -1,4 +1,4 @@
-import { Flex, Label, OverflowWrapper } from "@/common/components/custom";
+import { Box, Flex, FlexColumn, Label, OverflowWrapper } from "@/common/components/custom";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "../../common/components/tooltips";
 
@@ -104,3 +104,31 @@ export const CUSTOMER_STATES_OPTIONS = Object.values(CUSTOMER_STATES)
     ),
     value: id
   }));
+
+export const getCustomerSearchTitle = (customer) => (
+  <OverflowWrapper $lineClamp={3} popupContent={customer.name} maxWidth="100%">
+    {customer.name}
+  </OverflowWrapper>
+);
+
+export const getCustomerSearchDescription = (customer) => (
+  <FlexColumn $marginTop="5px" $rowGap="5px">
+    <Flex $justifyContent="space-between" $alignItems="center" $columnGap="5px">
+      <Box>
+        {customer.tags ? (
+          <TagsTooltip maxWidthOverflow="5vw" tags={customer.tags} />
+        ) : (
+          <Box visibility="hidden">🔖</Box>
+        )}
+      </Box>
+      <Box style={{ width: "30px", textAlign: "center" }}>
+        {customer.comments ? (
+          <CommentTooltip comment={customer.comments} />
+        ) : (
+          <Box visibility="hidden">ℹ️</Box>
+        )}
+      </Box>
+    </Flex>
+  </FlexColumn>
+);
+

@@ -1,15 +1,14 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Flex, Form, Label, OverflowWrapper } from "@/common/components/custom";
+import { FieldsContainer, Form } from "@/common/components/custom";
 import { DropdownControlled, IconedButtonControlled, PercentField, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import { Text } from "@/common/components/search/styles";
+import SearchControlled from "@/common/components/form/Search/SearchControlled";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
-import { BRAND_STATES } from "@/components/brands/brands.constants";
-import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
+import { BRAND_STATES, getBrandSearchDescription, getBrandSearchTitle } from "@/components/brands/brands.constants";
+import { SUPPLIER_STATES, getSupplierSearchDescription, getSupplierSearchTitle } from "@/components/suppliers/suppliers.constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import useSettingArrayField from "@/hooks/useSettingArrayField";
 import { forwardRef, useImperativeHandle, useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { Popup } from "semantic-ui-react";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
 import { calculateMargin, calculatePriceFromMargin, getBrandId, getMargin, getProductId, getSupplierId, isProductDeleted } from "../products.utils";
 
@@ -90,53 +89,11 @@ const ProductForm = forwardRef(({
   ]);
 
   const supplierOptions = useMemo(() => {
-    return suppliers?.map(({ id, name, state, deactivationReason }) => ({
-      key: id,
-      value: { id, state },
-      text: name,
-      content: (
-        <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper maxWidth="80%" popupContent={name}>
-            <Text>{name}</Text>
-          </OverflowWrapper>
-          <Flex>
-            {state === SUPPLIER_STATES.INACTIVE.id && (
-              <Popup
-                trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
-                content={deactivationReason ?? 'Motivo no especificado'}
-                position="top center"
-                size="mini"
-              />
-            )}
-          </Flex>
-        </Flex>
-      ),
-    }));
+    return suppliers?.filter(({ state }) => state !== "HARD_DELETED");
   }, [suppliers]);
 
   const brandOptions = useMemo(() => {
-    return brands?.map(({ id, name, state, deactivationReason }) => ({
-      key: id,
-      value: { id, state },
-      text: name,
-      content: (
-        <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper maxWidth="80%" popupContent={name}>
-            <Text>{name}</Text>
-          </OverflowWrapper>
-          <Flex>
-            {state === BRAND_STATES.INACTIVE.id && (
-              <Popup
-                trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
-                content={deactivationReason ?? 'Motivo no especificado'}
-                position="top center"
-                size="mini"
-              />
-            )}
-          </Flex>
-        </Flex>
-      ),
-    }));
+    return brands?.filter(({ state }) => state !== "HARD_DELETED");
   }, [brands]);
 
   return (
@@ -157,37 +114,51 @@ const ProductForm = forwardRef(({
             </>
           ) : (
             <>
-              <DropdownControlled
+              <SearchControlled
+                clearable
                 width="25%"
+                disabled={isUpdating || isLoading}
                 name="supplier"
                 label="Proveedor"
+                persistSelection
                 rules={{
                   validate: {
-                    required: value => {
-                      return !!value?.id || 'Campo requerido.';
-                    },
-                    activeSupplier: value => {
-                      return value?.state === SUPPLIER_STATES.ACTIVE.id || 'No es posible usar un proveedor inactivo.';
-                    },
-                  }
+                    required: (value) => !!value?.id || 'Campo requerido.',
+                    activeSupplier: (value) =>
+                      value?.state === SUPPLIER_STATES.ACTIVE.id || 'No es posible usar un proveedor inactivo.',
+                  },
                 }}
-                options={supplierOptions}
+                elements={supplierOptions}
+                extractSearchFields={(supplier) => [supplier.name, supplier.id, supplier.cuit]}
+                getResultProps={(supplier) => ({
+                  key: supplier.id,
+                  title: getSupplierSearchTitle(supplier),
+                  description: getSupplierSearchDescription(supplier),
+                  value: supplier,
+                })}
               />
-              <DropdownControlled
+              <SearchControlled
+                clearable
+                disabled={isUpdating || isLoading}
                 width="25%"
                 name="brand"
                 label="Marca"
+                persistSelection
                 rules={{
                   validate: {
-                    required: value => {
-                      return !!value?.id || 'Campo requerido.';
-                    },
-                    activeBrand: value => {
-                      return value?.state === BRAND_STATES.ACTIVE.id || 'No es posible usar una marca inactiva.';
-                    },
-                  }
+                    required: (value) => !!value?.id || 'Campo requerido.',
+                    activeBrand: (value) =>
+                      value?.state === BRAND_STATES.ACTIVE.id || 'No es posible usar una marca inactiva.',
+                  },
                 }}
-                options={brandOptions}
+                elements={brandOptions}
+                extractSearchFields={(brand) => [brand.name, brand.id]}
+                getResultProps={(brand) => ({
+                  key: brand.id,
+                  title: getBrandSearchTitle(brand),
+                  description: getBrandSearchDescription(brand),
+                  value: brand,
+                })}
               />
               <TextControlled
                 width="250px"

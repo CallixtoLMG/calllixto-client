@@ -3,6 +3,32 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2025-11-11
+
+### Added
+
+- Created SearchControlled component with full integration to react-hook-form using Controller, enabling declarative field rules and error display.
+
+- Implemented SearchField component with debounced search, multi-field matching, and customizable result rendering.
+
+- Introduced persistSelection flag to optionally retain the selected item’s display value in the input after selection.
+
+- Added clearable support to allow manual deselection of the selected value, with appropriate onSelect(null) callback.
+
+- Implemented support for onAfterChange callback to execute logic after selecting an item (e.g., update dependent fields).
+
+- Integrated getDisplayValue prop to customize how the selected value is shown in the input field.
+
+- Added OverflowWrapper utility component to handle truncated titles in search results, showing full content via Popup.
+
+### Changed
+
+- Replaced DropdownControlled components with SearchControlled in BudgetForm and ProductForm.
+
+### Removed
+
+- ProductSearch component.
+
 ## 2025-10-30
 
 ### Added
@@ -98,7 +124,6 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - Added `FIELD_LABELS`, `getLabel`, `PRODUCT_LABELS` to `products.constants`.
 - Added const `LABELS` to `common/constants`.
 - Stored filters applied on main tables.
-
 
 ### Changed
 
