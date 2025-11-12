@@ -57,6 +57,7 @@ const BudgetPayments = ({
             noBoxShadow
             update={isUpdating}
             total={total}
+            isCancelled={isBudgetCancelled}
           />
           {isUpdating && (
             <SubmitAndRestore

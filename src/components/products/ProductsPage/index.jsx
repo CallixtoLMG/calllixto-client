@@ -203,7 +203,11 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
         onConfirm={deleteSelectedProducts}
         elements={Object.values(selectedProducts)}
         icon={ICONS.TRASH}
-        title="Estás seguro de que desea eliminar estos productos?"
+        title={`¿Estás seguro de que desea eliminar${Object.values(selectedProducts).some(
+          p => p.state === PRODUCT_STATES.DELETED.id) ?
+          " PERMANENTEMENTE" :
+          ""} estos productos?`
+        }
         isLoading={deleteIsPending}
         headers={PRODUCT_COLUMNS}
       />

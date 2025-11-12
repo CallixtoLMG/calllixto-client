@@ -160,14 +160,18 @@ const CashBalance = ({ params }) => {
   const requiresConfirmation = modalAction === DELETE;
 
   useEffect(() => {
-    if (cashBalance) {
-      const handleClick = (action) => () => handleProtectedAction(() => {
-        setModalAction(action);
-        setIsModalOpen(true);
-      });
+    if (!cashBalance) return;
 
-      const actions = RULES.canRemove[role] ? [
-        cashBalance.state !== CLOSED && {
+    const handleClick = (action) => () => handleProtectedAction(() => {
+      setModalAction(action);
+      setIsModalOpen(true);
+    });
+
+    let actions = [];
+
+    if (RULES.canRemove[role]) {
+      if (cashBalance.state !== CASH_BALANCE_STATES.CLOSED.id) {
+        actions.push({
           id: 1,
           icon: ICONS.CLOSE,
           color: COLORS.ORANGE,
@@ -175,26 +179,26 @@ const CashBalance = ({ params }) => {
           width: "fit-content",
           basic: true,
           onClick: handleClick(CLOSED),
-          disabled: cashBalance.state === CASH_BALANCE_STATES.CLOSED.id,
-          tooltip: cashBalance.state === CASH_BALANCE_STATES.CLOSED.id
-          ? 'La caja ya se encuentra cerrada.'
-          : false,
-        },
-        {
-          id: 2,
-          icon: ICONS.TRASH,
-          color: COLORS.RED,
-          text: "Eliminar",
-          basic: true,
-          onClick: handleClick(DELETE),
-          loading: activeAction === DELETE,
-          disabled: !!activeAction,
-        },
-      ] : [];
-      setActions(actions);
+        });
+      }
+
+      actions.push({
+        id: 2,
+        icon: ICONS.TRASH,
+        color: COLORS.RED,
+        text: "Eliminar",
+        basic: true,
+        onClick: handleClick(DELETE),
+        loading: activeAction === DELETE,
+        disabled: !!activeAction,
+      });
     }
+
+    setActions(actions);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, activeAction, setActions, cashBalance]);
+
 
   if (!isLoading && !cashBalance) {
     push(PAGES.NOT_FOUND.BASE);

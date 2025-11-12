@@ -4,11 +4,12 @@ import { useCancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "
 import { useListCustomers } from "@/api/customers";
 import { useGetPayment } from "@/api/payments";
 import { useListProducts } from "@/api/products";
+import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
 import { DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu } from "@/common/components/custom";
 import ModalCancel from "@/common/components/modals/ModalCancel";
 import { COLORS, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
-import { getFormatedPhone } from "@/common/utils";
+import { getFormatedPhone, mapToDropdownOptions } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import BudgetView from "@/components/budgets/BudgetView";
@@ -37,6 +38,7 @@ const Budget = ({ params }) => {
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: payment, refetch: refetchPayment } = useGetPayment(ENTITIES.BUDGET, params.id);
+  const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const [customerData, setCustomerData] = useState();
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
@@ -57,6 +59,10 @@ const Budget = ({ params }) => {
     value: customer.name,
     text: customer.name,
   })), [customersData]);
+
+  const paymentMethodOptions = useMemo(() => {
+    return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
+  }, [paymentMethods]);
 
   useEffect(() => {
     resetActions();
@@ -298,6 +304,7 @@ const Budget = ({ params }) => {
           draft
           selectedContact={selectedContact}
           setSelectedContact={setSelectedContact}
+          paymentMethods={paymentMethodOptions}
         />
       ) : (
         <BudgetView

@@ -5,7 +5,7 @@ export * from './entities';
 export * from './semantic';
 export * from './time';
 
-export const DEFAULT_SELECTED_CLIENT = "maderera-las-tapias";
+export const DEFAULT_SELECTED_CLIENT = "callixto";
 
 export const PAGES = {
   BASE: "/",
@@ -253,6 +253,7 @@ export const ICONS = {
 export const ALL = "all";
 export const ACTIVE = "active";
 export const DELETE = "delete";
+export const HARD_DELETED= "HARD_DELETED";
 export const INACTIVE = "inactive";
 
 export const CANCELLED = "cancelled";

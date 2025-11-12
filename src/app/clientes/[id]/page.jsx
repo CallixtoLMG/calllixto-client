@@ -75,16 +75,22 @@ const Customer = ({ params }) => {
 
   const modalConfig = useMemo(() => ({
     delete: {
-      header: `¿Está seguro que desea eliminar el cliente ${customer?.id}?`,
+      header: (
+        <>¿Está seguro que desea eliminar el cliente <i>{customer?.name} ({customer?.id}) </i> ?</>
+      ),
       confirmText: "eliminar",
       icon: ICONS.TRASH
     },
     active: {
-      header: `¿Está seguro que desea activar el cliente ${customer?.id}?`,
+      header: (
+        <>¿Está seguro que desea activar el cliente <i>{customer?.name} ({customer?.id}) </i> ?</>
+      ),
       icon: ICONS.PLAY_CIRCLE
     },
     inactive: {
-      header: `¿Está seguro que desea desactivar el cliente ${customer?.id}?`,
+      header: (
+        <>¿Está seguro que desea desactivar el cliente <i>{customer?.name} ({customer?.id}) </i> ?</>
+      ),
       icon: ICONS.PAUSE_CIRCLE
     },
   }), [customer]);

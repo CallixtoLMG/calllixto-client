@@ -20,7 +20,7 @@ import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-for
 import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import { CUSTOMER_STATES, getCustomerSearchDescription, getCustomerSearchTitle } from "../../customers/customers.constants";
-import ModalUpdates from "../ModalUpdates";
+import ModalProductUpdates from "../ModalProductUpdates";
 import ModalComment from "./ModalComment";
 import { Container, VerticalDivider } from "./styles";
 
@@ -94,7 +94,7 @@ const BudgetForm = ({
 
   useEffect(() => {
     const current = methods.getValues("paymentMethods");
-    const all = paymentMethods.map(m => m.value);
+    const all = paymentMethods?.map(m => m.value);
 
     if (!current?.length) {
       methods.setValue("paymentMethods", all, { shouldDirty: false });
@@ -148,7 +148,7 @@ const BudgetForm = ({
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
 
   const customerOptions = useMemo(() => {
-    return customers?.filter(({ state }) => state !== CUSTOMER_STATES.INACTIVE.id);
+    return customers?.filter(({ state }) => state === CUSTOMER_STATES.ACTIVE.id);
   }, [customers]);
 
   const normalizedCustomer = useMemo(() => {
@@ -219,6 +219,7 @@ const BudgetForm = ({
       if (outdatedProduct) {
         return {
           ...product,
+          name: outdatedProduct.name, 
           price: outdatedProduct.price,
           editablePrice: outdatedProduct.editablePrice,
           fractionConfig: {
@@ -521,7 +522,7 @@ const BudgetForm = ({
   return (
     <>
       <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={setIsModalCommentOpen} product={selectedProduct} />
-      <ModalUpdates
+      <ModalProductUpdates
         shouldShowModal={shouldShowModal}
         outdatedProducts={outdatedProducts}
         removedProducts={removedProducts}
@@ -745,20 +746,20 @@ const BudgetForm = ({
                       $paddingLeft="18px"
                       width="fit-content"
                       type="button"
-                      basic={value.length !== paymentMethods.length}
+                      basic={value.length !== paymentMethods?.length}
                       color={COLORS.BLUE}
                       onClick={() => {
-                        if (value.length === paymentMethods.length) {
+                        if (value.length === paymentMethods?.length) {
                           onChange([]);
                         } else {
-                          onChange(paymentMethods.map(method => method.value));
+                          onChange(paymentMethods?.map(method => method.value));
                         }
                       }}
                     >
                       Todos
                     </Button>
                     <VerticalDivider />
-                    {paymentMethods.map(({ key, text, value: methodValue }) => (
+                    {paymentMethods?.map(({ key, text, value: methodValue }) => (
                       <Button
                         $paddingLeft="18px"
                         width="fit-content"

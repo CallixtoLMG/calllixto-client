@@ -21,6 +21,7 @@ const CreateProduct = () => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createProduct = useCreateProduct();
+
   useEffect(() => {
     resetActions();
     refetchBrands();

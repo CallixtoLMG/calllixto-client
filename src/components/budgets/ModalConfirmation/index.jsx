@@ -3,7 +3,7 @@ import { ButtonsContainer, FieldsContainer, Flex, FlexColumn } from "@/common/co
 import { TextField } from "@/common/components/form";
 import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
-import Payments from "@/components/payments";
+import CreateBudgetPayments from "@/components/payments/CreateBudgetPayment";
 import { useMemo, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Form, Modal, Transition } from "semantic-ui-react";
@@ -83,7 +83,7 @@ const ModalConfirmation = ({
                     value={`${customer?.phoneNumbers?.[0]?.ref ? `${customer?.phoneNumbers?.[0]?.ref}:` : "(Sin referencia)"} ${getFormatedPhone(customer?.phoneNumbers?.[0])}`}
                   />
                 </FieldsContainer>
-                <Payments
+                <CreateBudgetPayments
                   total={parsedTotal}
                   maxHeight
                   update

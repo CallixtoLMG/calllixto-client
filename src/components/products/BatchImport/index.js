@@ -147,11 +147,11 @@ const BatchImport = ({ isCreating }) => {
     headersRow.forEach(header => {
       const normalizedHeader = normalizeText(header);
       const mappedColumn = columnMapping[normalizedHeader];
-    
+
       if (mappedColumn && seenMappedColumns.has(mappedColumn)) {
         return;
       }
-    
+
       if (mappedColumn) {
         transformedHeaders.push(mappedColumn);
         seenMappedColumns.add(mappedColumn);
@@ -479,6 +479,13 @@ const BatchImport = ({ isCreating }) => {
                 <ButtonsContainer>
                   {isLoading || isPending && <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>}
                   <IconedButton
+                    text="Cancelar"
+                    icon={ICONS.X}
+                    disabled={isLoading || isPending}
+                    onClick={() => setOpen(false)}
+                    color={COLORS.RED}
+                  />
+                  <IconedButton
                     text="Aceptar"
                     icon={ICONS.CHECK}
                     disabled={importSettings.isButtonDisabled(isPending)}
@@ -486,13 +493,6 @@ const BatchImport = ({ isCreating }) => {
                     submit
                     color={COLORS.GREEN}
                     onClick={handleConfirmClick}
-                  />
-                  <IconedButton
-                    text="Cancelar"
-                    icon={ICONS.X}
-                    disabled={isLoading || isPending}
-                    onClick={() => setOpen(false)}
-                    color={COLORS.RED}
                   />
                 </ButtonsContainer>
               </Modal.Actions>
@@ -509,6 +509,14 @@ const BatchImport = ({ isCreating }) => {
           </Modal.Content>
           <Modal.Actions>
             <IconedButton
+              text="Cancelar"
+              icon={ICONS.X}
+              color={COLORS.RED}
+              onClick={() => {
+                setShowUnprocessedModal(false);
+              }}
+            />
+            <IconedButton
               text="Confirmar"
               icon={ICONS.CHECK}
               color={COLORS.GREEN}
@@ -516,14 +524,6 @@ const BatchImport = ({ isCreating }) => {
                 handleUnprocessedDownload();
               }}
               onKeyDown={handleUnprocessedDownload}
-            />
-            <IconedButton
-              text="Cancelar"
-              icon={ICONS.X}
-              color={COLORS.RED}
-              onClick={() => {
-                setShowUnprocessedModal(false);
-              }}
             />
           </Modal.Actions>
         </Modal>

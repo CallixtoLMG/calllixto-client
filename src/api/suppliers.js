@@ -1,10 +1,10 @@
 import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { LIST_ATTRIBUTES, GET_SUPPLIER_QUERY_KEY, LIST_SUPPLIERS_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
+import { GET_SUPPLIER_QUERY_KEY, LIST_ATTRIBUTES, LIST_SUPPLIERS_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
-import { listItems, usePostUpdateItem, useCreateItem, useDeleteItem, useEditItem } from "./common";
+import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
 
 
 export function useListSuppliers() {
@@ -66,8 +66,7 @@ export const useDeleteSupplier = () => {
     const response = await deleteItem({
       entity: ENTITIES.SUPPLIERS,
       id,
-      url: PATHS.SUPPLIERS,
-      key: "id",
+      url: `${PATHS.SUPPLIERS}/${id}`,
       invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY]]
     });
 
