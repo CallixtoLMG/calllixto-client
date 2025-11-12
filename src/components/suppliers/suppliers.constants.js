@@ -5,7 +5,7 @@ import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 export const SUPPLIERS_FILTERS_KEY = 'suppliersFilters';
-export const LIST_ATTRIBUTES = [ "id", "name", "addresses", "phoneNumbers", "comments", "state", 'deactivationReason'];
+export const LIST_ATTRIBUTES = [ "id", "name", "addresses", "phoneNumbers", "comments", "state", "inactiveReason"];
 
 export const SUPPLIERS_COLUMNS = [
   {

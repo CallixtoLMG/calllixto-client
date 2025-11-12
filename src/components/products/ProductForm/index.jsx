@@ -90,7 +90,7 @@ const ProductForm = forwardRef(({
   ]);
 
   const supplierOptions = useMemo(() => {
-    return suppliers?.map(({ id, name, state, deactivationReason }) => ({
+    return suppliers?.map(({ id, name, state, inactiveReason }) => ({
       key: id,
       value: { id, state },
       text: name,
@@ -103,7 +103,7 @@ const ProductForm = forwardRef(({
             {state === SUPPLIER_STATES.INACTIVE.id && (
               <Popup
                 trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
-                content={deactivationReason ?? 'Motivo no especificado'}
+                content={inactiveReason ?? 'Motivo no especificado'}
                 position="top center"
                 size="mini"
               />
@@ -115,7 +115,7 @@ const ProductForm = forwardRef(({
   }, [suppliers]);
 
   const brandOptions = useMemo(() => {
-    return brands?.map(({ id, name, state, deactivationReason }) => ({
+    return brands?.map(({ id, name, state, inactiveReason }) => ({
       key: id,
       value: { id, state },
       text: name,
@@ -128,7 +128,7 @@ const ProductForm = forwardRef(({
             {state === BRAND_STATES.INACTIVE.id && (
               <Popup
                 trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
-                content={deactivationReason ?? 'Motivo no especificado'}
+                content={inactiveReason ?? 'Motivo no especificado'}
                 position="top center"
                 size="mini"
               />

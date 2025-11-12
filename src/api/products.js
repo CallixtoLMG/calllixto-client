@@ -1,4 +1,4 @@
-import { ACTIVE, ALL, ENTITIES, INACTIVE, IN_MS, RECOVER } from "@/common/constants";
+import { ACTIVE, ALL, DELETE, ENTITIES, HARD_DELETED, INACTIVE, IN_MS, RECOVER } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { GET_PRODUCT_QUERY_KEY, LIST_ATTRIBUTES, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, MAIN_KEY } from "@/components/products/products.constants";
 import {
@@ -10,8 +10,9 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { chunk } from "lodash";
 import { useMemo } from "react";
+import { db } from "../db";
 import { getInstance } from "./axios";
-import { listItems, removeStorageItemsByCustomFilter, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
+import { listItems, useBatchDeleteItem, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
 
 export function useListProducts() {
   const query = useQuery({
@@ -82,7 +83,7 @@ export const useDeleteProduct = () => {
     return deleteItem({
       entity: ENTITIES.PRODUCTS,
       id: id,
-      url: PATHS.PRODUCTS,
+      url: `${PATHS.PRODUCTS}/${id}`,
       invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]]
     });
   };
@@ -91,46 +92,22 @@ export const useDeleteProduct = () => {
 };
 
 export const useBatchDeleteProducts = () => {
-  const queryClient = useQueryClient();
+  const batchDeleteItem = useBatchDeleteItem();
 
-  const batchDeleteProducts = async (ids) => {
-    if (!Array.isArray(ids) || ids.length === 0) {
-      console.warn("No hay ids válidos para eliminar.");
-      return { statusOk: true, deletedCount: 0 };
-    }
-
-    const successfulDeletes = [];
-    let deletedCount = 0;
-
-    for (const id of ids) {
-      try {
-        const { data } = await getInstance().delete(`${PATHS.PRODUCTS}/${id}`);
-        if (data.statusOk) {
-          deletedCount++;
-          if (data.product?.state === DELETE) {
-            successfulDeletes.push(id);
-          }
-        } else {
-          console.warn(`No se pudo eliminar el ID ${id}:`, data.error);
-        }
-      } catch (error) {
-        console.error(`Error al eliminar el elemento con ID ${id}:`, error);
-      }
-    }
-
-    if (successfulDeletes.length > 0) {
-      await removeStorageItemsByCustomFilter({
-        entity: ENTITIES.PRODUCTS,
-        filter: (item) => !successfulDeletes.includes(item[key]),
-      });
-    }
-
-    queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: ALL });
-
-    return { statusOk: true, deletedCount };
+  const deleteProducts = (ids) => {
+    return batchDeleteItem({
+      entity: ENTITIES.PRODUCTS,
+      url: PATHS.PRODUCTS,
+      ids,
+      deleteCondition: (data) => {
+        const state = data.product?.state;
+        return state === DELETE || state === HARD_DELETED;
+      },
+      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY]],
+    });
   };
 
-  return batchDeleteProducts;
+  return deleteProducts;
 };
 
 export const useEditProduct = () => {
@@ -163,7 +140,7 @@ export function useProductsBySupplierId(supplierId) {
   });
 
   return query;
-}
+};
 
 export const useCreateBatch = () => {
   const queryClient = useQueryClient();
@@ -245,13 +222,16 @@ export const useEditBatch = () => {
 export const useDeleteBySupplierId = () => {
   const queryClient = useQueryClient();
 
-  const deleteBatchProducts = async (supplierId) => {
+  const deleteProductsBySupplierId = async (supplierId) => {
+
     const { data } = await getInstance().delete(`${PATHS.PRODUCTS}/${SUPPLIER}/${supplierId}`);
 
     if (data.statusOk) {
-      await removeStorageItemsByCustomFilter({
-        entity: ENTITIES.PRODUCTS, filter: ((product) => !product.id.startsWith(supplierId))
-      });
+
+      await db[ENTITIES.PRODUCTS]
+        .where("id")
+        .startsWith(supplierId)
+        .delete();
 
       queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, supplierId], refetchType: ALL });
       queryClient.invalidateQueries({ queryKey: [LIST_PRODUCTS_QUERY_KEY], refetchType: ALL });
@@ -261,7 +241,7 @@ export const useDeleteBySupplierId = () => {
     return data;
   };
 
-  return deleteBatchProducts;
+  return deleteProductsBySupplierId;
 };
 
 export const useInactiveProduct = () => {

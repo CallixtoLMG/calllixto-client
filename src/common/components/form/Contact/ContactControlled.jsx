@@ -90,6 +90,7 @@ export const ContactControlled = () => {
     appendPhone(phoneToAdd);
     setPhoneToAdd(EMPTY_PHONE);
     setError();
+    setOpenPhone(false)
   };
 
   const handleAddAddress = () => {
@@ -107,6 +108,7 @@ export const ContactControlled = () => {
     appendAddress(addressToAdd);
     setAddressToAdd(EMPTY_ADDRESS);
     setError();
+    setOpenAddress(false)
   };
 
   const handleAddEmail = () => {
@@ -124,6 +126,7 @@ export const ContactControlled = () => {
     appendEmail(emailToAdd);
     setEmailToAdd(EMPTY_EMAIL);
     setError();
+    setOpenEmail(false)
   };
 
   return (
@@ -217,6 +220,8 @@ export const ContactControlled = () => {
                 color={COLORS.GREEN}
                 onClick={handleAddPhone}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPhone)}
+                alignSelf="end"
+                height="38px"
               />
             </FieldsContainer>
           </Form>
@@ -298,6 +303,8 @@ export const ContactControlled = () => {
                 color={COLORS.GREEN}
                 onClick={handleAddAddress}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddAddress)}
+                alignSelf="end"
+                height="38px"
               />
             </FieldsContainer>
           </Form>
@@ -380,7 +387,8 @@ export const ContactControlled = () => {
                 color={COLORS.GREEN}
                 onClick={handleAddEmail}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddEmail)}
-
+                alignSelf="end"
+                height="38px"
               />
             </FieldsContainer>
           </Form>

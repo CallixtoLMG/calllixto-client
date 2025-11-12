@@ -1,11 +1,10 @@
 import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { now } from "@/common/utils/dates";
-import { LIST_ATTRIBUTES, GET_USER_QUERY_KEY, LIST_USERS_QUERY_KEY, MAIN_KEY } from "@/components/users/users.constants";
+import { GET_USER_QUERY_KEY, LIST_ATTRIBUTES, LIST_USERS_QUERY_KEY, MAIN_KEY } from "@/components/users/users.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { getInstance } from "./axios";
-import { listItems, useCreateItem, useEditItem, useDeleteItem } from './common';
+import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from './common';
 
 export function useListUsers() {
   const query = useQuery({

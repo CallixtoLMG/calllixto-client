@@ -72,7 +72,7 @@ export const USER_COLUMNS = [
     id: 5,
     title: "Nacimiento",
     width: 1,
-    value: (user) => getFormatedDate(user.birthDate, DATE_FORMATS.ONLY_DATE)
+    value: (user) => {getFormatedDate(user.birthDate, DATE_FORMATS.ONLY_DATE) ?? ""}
   }
 ];
 

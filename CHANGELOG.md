@@ -3,6 +3,22 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2025-11-11
+
+### Added
+
+- Enabled support for multiple local databases (DB) based on user and environment to ensure data isolation.
+
+- Created useBatchDeleteItem function in api/common.js, now utilized in api/products.js for batch deletion logic.
+
+### Changed
+
+- Aligned the header formatting in all modal action components for consistent visual presentation.
+
+- Filtered out items with the HARD_DELETED state across multiple entity lists to prevent unintended display or operations.
+
+- Applied minor fixes and refinements to the ContactControlled component.
+
 ## 2025-10-30
 
 ### Added
@@ -125,7 +141,6 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Payment amount field (`PriceField`) now correctly resets after adding a new payment without relying on `useEffect`.
 - Resolved an issue where the amount input field (PriceField) did not reset when adding a payment via Enter key. This was fixed by dynamically updating the component’s key prop to force re-mount and clear its internal state.
-
 
 ## 2025-05-21
 

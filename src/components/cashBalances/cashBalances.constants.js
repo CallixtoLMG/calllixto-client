@@ -60,7 +60,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       key: "startDate",
       sortable: true,
       align: "left",
-      width: 3,
+      width: 2,
       value: (cashBalance) => (
         <Flex $justifyContent="space-between">
           {getFormatedDate(cashBalance.startDate, DATE_FORMATS.DATE_WITH_TIME)}

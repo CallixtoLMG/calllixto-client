@@ -4,8 +4,9 @@ import { Flex } from "./Flex";
 
 export const Form = styled(SForm)`
   display: flex !important;
-  flex-direction: column !important;
-  row-gap: 15px !important;
+  flex-direction: ${({ flexDirection = "column" }) => flexDirection} !important;
+  row-gap: ${({ rowGap = "15px" }) => rowGap} !important;
+  column-gap: ${({ columnGap }) => columnGap} !important;
   .field > label {
     margin: ${({ margin }) => margin} !important;
     font-size: ${({ fontSize }) => fontSize} !important;

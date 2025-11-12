@@ -10,7 +10,7 @@ import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constan
 import { isItemInactive } from "@/common/utils";
 import BrandForm from "@/components/brands/BrandForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useValidateToken, useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -74,16 +74,22 @@ const Brand = ({ params }) => {
 
   const modalConfig = useMemo(() => ({
     delete: {
-      header: `¿Está seguro que desea eliminar la marca "${brand?.name}"?`,
+      header: (
+        <>¿Está seguro que desea eliminar la marca <i>{brand?.name} ({brand?.id}) </i> ?</>
+      ),
       confirmText: "eliminar",
       icon: ICONS.TRASH,
     },
     active: {
-      header: `¿Está seguro que desea activar el cliente ${brand?.id}?`,
+      header: (
+        <>¿Está seguro que desea activar la marca <i>{brand?.name} ({brand?.id}) </i> ?</>
+      ),
       icon: ICONS.PLAY_CIRCLE
     },
     inactive: {
-      header: `¿Está seguro que desea desactivar el cliente ${brand?.id}?`,
+      header: (
+        <>¿Está seguro que desea desactivar la marca <i>{brand?.name} ({brand?.id}) </i> ?</>
+      ),
       icon: ICONS.PAUSE_CIRCLE
     },
   }), [brand]);

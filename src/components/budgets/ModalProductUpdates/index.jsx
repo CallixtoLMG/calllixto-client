@@ -1,13 +1,12 @@
 import { IconedButton } from "@/common/components/buttons";
-import { ButtonsContainer } from "@/common/components/custom";
+import { ButtonsContainer, Icon, Message } from "@/common/components/custom";
 import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { useEffect, useMemo, useRef } from "react";
-import { Message, Modal, Transition } from "semantic-ui-react";
-import { MessageHeader, MessageItem } from "./styles";
-
-const ModalUpdates = ({
+import { Modal, Transition } from "semantic-ui-react";
+import { MessageHeader, MessageItem, ModalContent } from "./styles";
+const ModalProductUpdates = ({
   shouldShowModal,
   outdatedProducts,
   removedProducts,
@@ -31,6 +30,7 @@ const ModalUpdates = ({
       const oldProduct = budget.products.find(op => op.id === p.id);
       const priceChanged = oldProduct.price !== p.price;
       const stateChanged = oldProduct.state !== p.state;
+      const nameChanged = oldProduct.name !== p.name;
       const editablePriceBecameTrue = !oldProduct.editablePrice && p.editablePrice;
       const editablePriceBecameFalse = oldProduct.editablePrice && !p.editablePrice;
       const fractionConfigBecameActive = !oldProduct.fractionConfig?.active && p.fractionConfig?.active;
@@ -39,6 +39,15 @@ const ModalUpdates = ({
       return (
         <MessageItem key={p.id}>
           {`${p.id} | ${p.name} | `}
+          {nameChanged && (
+            <>
+              {' Nombre: '}
+              <span style={{ color: COLORS.RED }}>{oldProduct.name}</span>
+              {' -> '}
+              <span style={{ color: COLORS.GREEN }}>{p.name}</span>
+              {' | '}
+            </>
+          )}
           {priceChanged && (
             <>
               <span style={{ color: COLORS.RED }}>{getFormatedPrice(oldProduct.price)}</span>
@@ -89,7 +98,8 @@ const ModalUpdates = ({
     <Transition visible={shouldShowModal} animation='scale' duration={500}>
       <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={onCancel} size={SIZES.LARGE}>
         <Modal.Header>¿Le gustaría actualizar el presupuesto debido a las recientes modificaciones en algunos productos?</Modal.Header>
-        <Modal.Content>
+        <Message margin="10px 21px 0 21px" size="mini" >Confirmar esta acción solo actualizará el <strong>PRECIO</strong> de los productos, de lo contrario mantendrán el precio anterior.<Icon name={ICONS.INFO_CIRCLE}/></Message>
+        <ModalContent>
           {!!outdatedProducts.length && (
             <Message>
               <MessageHeader>Productos con cambios</MessageHeader>
@@ -108,7 +118,7 @@ const ModalUpdates = ({
               </Message.List>
             </Message>
           )}
-        </Modal.Content>
+        </ModalContent>
         <Modal.Actions>
           <ButtonsContainer>
             <IconedButton
@@ -131,4 +141,4 @@ const ModalUpdates = ({
   );
 };
 
-export default ModalUpdates;
+export default ModalProductUpdates;

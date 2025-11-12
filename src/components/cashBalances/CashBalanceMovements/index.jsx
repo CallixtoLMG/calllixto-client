@@ -75,7 +75,7 @@ const CashBalanceMovements = ({ cashBalance }) => {
               <Flex $columnGap="15px">
                 {cashBalance.closeDate &&
                   <Message width="fit-content" alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.GREY}>
-                    Fecha de cierre: {getFormatedDate(cashBalance?.closeDate, DATE_FORMATS.ONLY_DATE)}
+                    Fecha de cierre: {getFormatedDate(cashBalance?.closeDate, DATE_FORMATS.DATE_WITH_TIME)}
                   </Message>
                 }
                 <Message width="fit-content" alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.BLUE}>

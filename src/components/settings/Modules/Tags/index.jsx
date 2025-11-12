@@ -69,33 +69,33 @@ const Tags = () => {
   const handleAddTag = () => {
     const isDuplicate = tags.some((tag) => tag.name.trim().toLowerCase() === tagToAdd.name.trim().toLowerCase());
     const newErrors = {};
-  
+
     if (!tagToAdd.name.trim()) {
       newErrors.name = "El nombre es obligatorio.";
     }
-  
+
     if (tagToAdd.name.length > 50) {
       newErrors.name = "El nombre no debe superar los 50 caracteres.";
     }
-  
+
     if (tagToAdd.description.length > 250) {
       newErrors.description = "La descripción no debe superar los 250 caracteres.";
     }
-  
+
     if (isDuplicate) {
       newErrors.name = "Ya existe una etiqueta con este nombre.";
     }
-  
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-  
+
     append(tagToAdd);
     setTagToAdd(EMPTY_TAG);
     setErrors({});
   };
-  
+
   const handleNameChange = (e) => {
     const name = e.target.value;
     setTagToAdd({ ...tagToAdd, name });
@@ -125,6 +125,7 @@ const Tags = () => {
                 error={errors?.name}
               />
               <DropdownField
+                selection
                 flex={1}
                 label="Color"
                 options={SEMANTIC_COLORS}
