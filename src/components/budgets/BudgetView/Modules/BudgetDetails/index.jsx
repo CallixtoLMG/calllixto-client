@@ -117,7 +117,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
       },
       {
         title: "Total",
-        value: (product) => <PriceLabel value={product.price ? getTotal(product) : 0} />,
+        value: (product) => <PriceLabel value={getTotal(product) ?? 0} />,
         id: 6,
         width: 3
       },

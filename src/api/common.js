@@ -1,4 +1,4 @@
-import { ALL, DATE_FORMATS, LAST_UPDATED_AT } from "@/common/constants";
+import { ALL, DATE_FORMATS, HARD_DELETED, LAST_UPDATED_AT } from "@/common/constants";
 import { getDefaultAttributes } from "@/common/utils";
 import { getDateWithOffset } from "@/common/utils/dates";
 import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, removeStorageItemById, updateOrCreateStorageItem } from "@/db";
@@ -52,7 +52,7 @@ export async function listItems({ entity, url, params = {} }) {
     if (!!outdatedValues.length) {
       updateLastUpdatedAt = true;
       for (const value of outdatedValues) {
-        if (value.state === 'HARD_DELETED') {
+        if (value.state === HARD_DELETED) {
           await removeStorageItem({ entity, id: value.id });
         } else {
           await updateOrCreateStorageItem({ entity, value });

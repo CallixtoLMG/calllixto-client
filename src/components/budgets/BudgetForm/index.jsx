@@ -5,7 +5,7 @@ import ProductSearch from "@/common/components/search/search";
 import { Text } from "@/common/components/search/styles";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, HARD_DELETED, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
+import { COLORS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
 import { getDateWithOffset } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
@@ -136,7 +136,6 @@ const BudgetForm = ({
     }).filter(product =>
       product.state !== PRODUCT_STATES.INACTIVE.id &&
       product.state !== PRODUCT_STATES.DELETED.id &&
-      product.state !== HARD_DELETED &&
       products.some(p => p.id === product.id)
     );
   }, [products]);

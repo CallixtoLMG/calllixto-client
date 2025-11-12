@@ -59,10 +59,4 @@ export async function removeStorageItemById({ entity, id }) {
   if (!entity || id === undefined || id === null || id === "") {
     return;
   }
-  try {
-    const result = await db[entity].delete(id);
-    return result;
-  } catch (error) {
-    throw error;
-  }
 };

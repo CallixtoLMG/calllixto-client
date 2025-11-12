@@ -103,7 +103,7 @@ const Supplier = ({ params }) => {
   const modalConfig = {
     deleteSupplier: {
       header: (
-        <>¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor <i>"{supplier?.name}" ({supplier?.id}) </i> ?</>
+        <>¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
       ),
       confirmText: "eliminar",
       icon: ICONS.TRASH,
@@ -113,20 +113,20 @@ const Supplier = ({ params }) => {
     },
     deleteBatch: {
       header: (
-        <>¿Está seguro que desea eliminar los {products?.length || ""} productos del proveedor <i>"{supplier?.name}" ({supplier?.id}) </i> ?</>
+        <>¿Está seguro que desea eliminar los {products?.length || ""} productos del proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
       ),
       confirmText: "eliminar",
       icon: ICONS.TRASH,
     },
     active: {
       header: (
-        <>¿Está seguro que desea activar el proveedor <i>"{supplier?.name}" ({supplier?.id}) </i> ?</>
+        <>¿Está seguro que desea activar el proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
       ),
       icon: ICONS.PLAY_CIRCLE,
     },
     inactive: {
       header: (
-        <>¿Está seguro que desea desactivar el proveedor <i>"{supplier?.name}" ({supplier?.id}) </i> ?</>
+        <>¿Está seguro que desea desactivar el proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
       ),
       icon: ICONS.PAUSE_CIRCLE,
     },

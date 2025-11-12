@@ -75,20 +75,20 @@ const Brand = ({ params }) => {
   const modalConfig = useMemo(() => ({
     delete: {
       header: (
-        <>¿Está seguro que desea eliminar la marca <i>"{brand?.name}" ({brand?.id}) </i> ?</>
+        <>¿Está seguro que desea eliminar la marca <i>{brand?.name} ({brand?.id}) </i> ?</>
       ),
       confirmText: "eliminar",
       icon: ICONS.TRASH,
     },
     active: {
       header: (
-        <>¿Está seguro que desea activar la marca <i>"{brand?.name}" ({brand?.id}) </i> ?</>
+        <>¿Está seguro que desea activar la marca <i>{brand?.name} ({brand?.id}) </i> ?</>
       ),
       icon: ICONS.PLAY_CIRCLE
     },
     inactive: {
       header: (
-        <>¿Está seguro que desea desactivar la marca <i>"{brand?.name}" ({brand?.id}) </i> ?</>
+        <>¿Está seguro que desea desactivar la marca <i>{brand?.name} ({brand?.id}) </i> ?</>
       ),
       icon: ICONS.PAUSE_CIRCLE
     },
