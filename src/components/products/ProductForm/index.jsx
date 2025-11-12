@@ -7,7 +7,7 @@ import { BRAND_STATES, getBrandSearchDescription, getBrandSearchTitle } from "@/
 import { SUPPLIER_STATES, getSupplierSearchDescription, getSupplierSearchTitle } from "@/components/suppliers/suppliers.constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import useSettingArrayField from "@/hooks/useSettingArrayField";
-import { forwardRef, useImperativeHandle, useMemo } from "react";
+import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
 import { calculateMargin, calculatePriceFromMargin, getBrandId, getMargin, getProductId, getSupplierId, isProductDeleted } from "../products.utils";
@@ -88,14 +88,6 @@ const ProductForm = forwardRef(({
     }
   ]);
 
-  const supplierOptions = useMemo(() => {
-    return suppliers?.filter(({ state }) => state !== "HARD_DELETED");
-  }, [suppliers]);
-
-  const brandOptions = useMemo(() => {
-    return brands?.filter(({ state }) => state !== "HARD_DELETED");
-  }, [brands]);
-
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleForm)}>
@@ -128,7 +120,7 @@ const ProductForm = forwardRef(({
                       value?.state === SUPPLIER_STATES.ACTIVE.id || 'No es posible usar un proveedor inactivo.',
                   },
                 }}
-                elements={supplierOptions}
+                elements={suppliers}
                 extractSearchFields={(supplier) => [supplier.name, supplier.id, supplier.cuit]}
                 getResultProps={(supplier) => ({
                   key: supplier.id,
@@ -151,7 +143,7 @@ const ProductForm = forwardRef(({
                       value?.state === BRAND_STATES.ACTIVE.id || 'No es posible usar una marca inactiva.',
                   },
                 }}
-                elements={brandOptions}
+                elements={brands}
                 extractSearchFields={(brand) => [brand.name, brand.id]}
                 getResultProps={(brand) => ({
                   key: brand.id,
