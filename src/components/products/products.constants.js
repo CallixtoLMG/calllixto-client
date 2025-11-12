@@ -1,9 +1,11 @@
-import { Flex, Label, OverflowWrapper } from "@/common/components/custom";
+import { Box, Flex, FlexColumn, Label, OverflowWrapper } from "@/common/components/custom";
+import { Text } from "@/common/components/form/Search/styles";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { SIZES } from "@/common/constants";
+import { getFormatedPrice } from "@/common/utils";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
-import { getBrandId, getProductId, getSupplierId } from "./products.utils";
+import { formatProductId, getBrandId, getProductId, getSupplierId } from "./products.utils";
 
 export const LIST_PRODUCTS_QUERY_KEY = "listProducts";
 export const LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY = "listProductsBySupplier";
@@ -218,3 +220,44 @@ export const PRODUCT_LABELS = {
 };
 
 export const getLabel = (key) => FIELD_LABELS[key] ?? key;
+
+export const getProductSearchTitle = (product) => (
+  <OverflowWrapper $lineClamp={3} popupContent={product.name} maxWidth="100%">
+    {product.name}
+  </OverflowWrapper>
+);
+
+export const getProductSearchDescription = (product) => (
+  <FlexColumn $marginTop="5px" $rowGap="5px">
+    <FlexColumn>
+      <Text>Id: {formatProductId(product.id)}</Text>
+      <Text>Precio: {getFormatedPrice(product?.price)}</Text>
+    </FlexColumn>
+    <Flex
+      width="100%"
+      $justifyContent="space-between"
+      height="20px"
+      $marginTop="auto"
+      $columnGap="5px"
+      $alignItems="center"
+    >
+      <Flex $columnGap="7px">
+        {product.state === PRODUCT_STATES.OOS.id && (
+          <Label width="fit-content" size={SIZES.TINY} color={COLORS.ORANGE}>
+            Sin Stock
+          </Label>
+        )}
+        {product.tags && (
+          <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />
+        )}
+      </Flex>
+      <Box width="fit-content">
+        {product.comments ? (
+          <CommentTooltip comment={product.comments} />
+        ) : (
+          <Box visibility="hidden" />
+        )}
+      </Box>
+    </Flex>
+  </FlexColumn>
+);

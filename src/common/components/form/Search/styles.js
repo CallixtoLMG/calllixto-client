@@ -1,12 +1,5 @@
-import { Flex } from '@/common/components/custom';
-import { Label as SLabel, Search as SSearch } from "semantic-ui-react";
+import { Search as SSearch } from "semantic-ui-react";
 import styled from "styled-components";
-
-const Container = styled(Flex)`
-  flex-direction: ${({ flexDir }) => flexDir};
-  margin-top: ${({ marginTop }) => marginTop} !important;
-  place-content: space-between;
-`;
 
 const Search = styled(SSearch)`
   div.results.transition.visible {
@@ -35,12 +28,7 @@ const Text = styled.p`
    display: inline;
 `;
 
-const Label = styled(SLabel)`
-  width: fit-content!important;
-  margin-top:2px!important;
-`;
-
 export {
-  Container, Label, Search, Text
+  Search, Text
 };
 
