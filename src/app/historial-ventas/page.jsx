@@ -5,7 +5,7 @@ import { downloadExcel, getFormatedPercentage, handleUndefined } from "@/common/
 import { getFormatedDate } from "@/common/utils/dates";
 import BudgetsHistoryFilter from "@/components/budgets/BudgetsHistoryFilters";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
-import { BUDGET_STATE_TRANSLATIONS } from "@/components/budgets/budgets.constants";
+import { BUDGET_STATE_TRANSLATIONS, BUDGETS_HISTORY_FILTERS_KEY } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { getTotal } from "@/components/products/products.utils";
 import { useValidateToken } from "@/hooks";
@@ -96,7 +96,13 @@ const BudgetsHistory = () => {
   return (
     <>
       <BudgetsHistoryFilter onSearch={handleSearch} isLoading={loading} />
-      {dateRange.startDate && dateRange.endDate && <BudgetsPage isLoading={loading} budgets={loading ? [] : budgets} />}
+      {dateRange.startDate && dateRange.endDate && (
+        <BudgetsPage
+          isLoading={loading}
+          budgets={loading ? [] : budgets}
+          filterKey={BUDGETS_HISTORY_FILTERS_KEY}
+         />
+      )}
     </>
   );
 };
