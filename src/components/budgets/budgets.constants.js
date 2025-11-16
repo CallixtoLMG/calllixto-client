@@ -1,12 +1,14 @@
 import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
 import { DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
 import { getFormatedDate } from "@/common/utils/dates";
+import dayjs from "dayjs";
 import { Label, Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { CommentTooltip } from "../../common/components/tooltips";
 import { getLabelColor, getPopupContent, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
 
 export const LIST_BUDGETS_QUERY_KEY = 'listAllBudgets';
+export const LIST_BUDGETS_HISTORY_QUERY_KEY = 'getBudgetsHistory';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 export const BUDGETS_FILTERS_KEY = 'budgetsFilters';
 export const LIST_ATTRIBUTES = [
@@ -200,3 +202,23 @@ export const BUDGET_STATE_TRANSLATIONS = {
   CANCELLED: BUDGET_STATES.CANCELLED,
   DRAFT: BUDGET_STATES.DRAFT
 };
+
+export const BUDGETS_HISTORY_DATE_RANGE = [
+  {
+    label: "Sin filtro de fecha",
+    value: null,
+    getRange: () => ({ startDate: null, endDate: null })
+  },
+  ...[1, 2, 3, 4, 5, 6].map((months) => ({
+    label: `Últimos ${months} ${months === 1 ? "mes" : "meses"}`,
+    value: months,
+    getRange: () => {
+      const now = dayjs().endOf("day");
+      const start = now.subtract(months, "month").startOf("day");
+      return {
+        startDate: start.toDate(),
+        endDate: now.toDate()
+      };
+    }
+  }))
+];

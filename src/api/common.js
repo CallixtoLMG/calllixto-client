@@ -1,10 +1,12 @@
 import { ALL, DATE_FORMATS, HARD_DELETED, LAST_UPDATED_AT } from "@/common/constants";
 import { getDefaultAttributes } from "@/common/utils";
-import { getDateWithOffset } from "@/common/utils/dates";
+import { getDateWithOffset, getDayDifference, now } from "@/common/utils/dates";
 import { bulkAddStorageItems, clearStorageTable, getAllStorageItems, getStorageItem, removeStorageItem, removeStorageItemById, updateOrCreateStorageItem } from "@/db";
 import { useQueryClient } from "@tanstack/react-query";
 import { pick } from 'lodash';
 import { getInstance } from './axios';
+
+const activeVersion = '2025-07-28';
 
 export function useInvalidateQueries() {
   const queryClient = useQueryClient();
@@ -13,7 +15,7 @@ export function useInvalidateQueries() {
   };
 }
 
-async function entityList({ entity, url, params }) {
+export async function entityList({ entity, url, params }) {
   try {
     let values = [];
     let LastEvaluatedKey;
@@ -45,8 +47,9 @@ async function entityList({ entity, url, params }) {
 export async function listItems({ entity, url, params = {} }) {
   let updateLastUpdatedAt = false;
   let lastUpdatedAt = (await getStorageItem({ entity: LAST_UPDATED_AT, id: entity }))?.lastUpdatedAt;
+  let lastHardReset = (await getStorageItem({ entity: LAST_UPDATED_AT, id: "hardReset" }))?.lastUpdatedAt;
 
-  if (lastUpdatedAt) {
+  if (lastUpdatedAt && getDayDifference(now(), lastUpdatedAt) < 7 && lastHardReset === activeVersion) {
     const startDate = getDateWithOffset({ date: lastUpdatedAt, offset: 1, unit: 'seconds', format: DATE_FORMATS.ISO });
     const outdatedValues = await entityList({ entity, url, params: { ...params, sort: 'updatedAt', startDate } });
     if (!!outdatedValues.length) {
@@ -65,6 +68,13 @@ export async function listItems({ entity, url, params = {} }) {
     if (!!data.length) {
       await bulkAddStorageItems({ entity, values: data });
       updateLastUpdatedAt = true;
+    }
+
+    if (lastHardReset !== activeVersion) {
+      await updateOrCreateStorageItem({
+        entity: LAST_UPDATED_AT,
+        value: { id: "hardReset", lastUpdatedAt: activeVersion }
+      });
     }
   }
 
@@ -169,7 +179,7 @@ export function useBatchDeleteItem() {
     entity,
     url,
     ids,
-    deleteCondition = () => true, 
+    deleteCondition = () => true,
     invalidateQueries = [],
   }) => {
     if (!Array.isArray(ids) || ids.length === 0) {

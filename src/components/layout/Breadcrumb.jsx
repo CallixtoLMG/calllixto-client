@@ -1,13 +1,14 @@
-import { OverflowWrapper } from '@/common/components/custom';
+import { Flex, OverflowWrapper } from '@/common/components/custom';
 import { ICONS, SIZES } from '@/common/constants';
 import { createContext, useContext, useState } from 'react';
-import { BreadcrumbDivider, BreadcrumbSection, Breadcrumb as SBreadcrumb, Label as SLabel } from 'semantic-ui-react';
+import { BreadcrumbDivider, BreadcrumbSection, Popup, Breadcrumb as SBreadcrumb, Label as SLabel } from 'semantic-ui-react';
 import styled from "styled-components";
 
 const Label = styled(SLabel)`
   position: relative;
-  top: -3px;
+  top: 5px;
   max-height: fit-content;
+  margin-left: 10px!important;
 `;
 
 const Span = styled.span`
@@ -64,22 +65,36 @@ const Breadcrumb = () => {
     <SSBreadcrumb size={SIZES.HUGE}>
       {labels.map((label, index) => (
         <BreadcrumbSection key={`label_${index}`}>
-          {index !== 0 && label && <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />}
+          {index !== 0 && !label.popup && <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />}
           {typeof label === 'string' ? (
             <OverflowWrapper $verticalAlign="baseline" popupContent={label} maxWidth="25vw">
               {label}
             </OverflowWrapper>
           ) : (
-            label?.id && label?.title && (
+            label?.title && (
               <OverflowWrapper $verticalAlign="bottom" maxWidth="25vw" popupContent={label.title}>
-                <Span>
-                  {label.id}
-                </Span>
-                <Label pointing="left" color={label.color}>
-                  {label.title}
-                </Label>
+                <Flex>
+                  <Span>
+                    {label.id && <span>{label.id}</span>}
+                  </Span>
+                  {label.id ? (
+                    <Label pointing="left" color={label.color}>
+                      {label.title}
+                    </Label>
+                  ) : (
+                    <Popup
+                      content={label.popup || ""}
+                      position='bottom center'
+                      size='mini'
+                      trigger={
+                        <Label pointing="left" color={label.color}>
+                          {label.title}
+                        </Label>
+                      }
+                    />
+                  )}
+                </Flex>
               </OverflowWrapper>
-
             )
           )}
         </BreadcrumbSection>

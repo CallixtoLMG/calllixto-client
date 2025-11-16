@@ -50,8 +50,15 @@ export const getSortedPaymentsByDate = (paymentMethods = []) => {
 
 export const isDateAfter = (date1, date2) => {
   return dayjs(date1).isAfter(dayjs(date2));
-}
+};
 
 export const isDateBefore = (date1, date2) => {
   return dayjs(date1).isBefore(dayjs(date2));
-}
+};
+
+export function getDayDifference(date1, date2) {
+  const d1 = dayjs(date1);
+  const d2 = dayjs(date2);
+  return d1.diff(d2, 'day'); 
+};
+

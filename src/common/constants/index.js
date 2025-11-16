@@ -73,6 +73,9 @@ export const PAGES = {
     NAME: 'Cajas',
     SHORTKEYS: 'Control+8'
   },
+  BUDGETS_HISTORY: {
+    BASE: "/historial-ventas",
+  },
   LOGIN: {
     BASE: "/login"
   },
@@ -253,7 +256,7 @@ export const ICONS = {
 export const ALL = "all";
 export const ACTIVE = "active";
 export const DELETE = "delete";
-export const HARD_DELETED= "HARD_DELETED";
+export const HARD_DELETED = "HARD_DELETED";
 export const INACTIVE = "inactive";
 
 export const CANCELLED = "cancelled";

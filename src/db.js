@@ -12,6 +12,7 @@ if (typeof window !== "undefined") {
     suppliers: 'id, updatedAt',
     products: 'id, updatedAt',
     budgets: 'id, updatedAt',
+    budgetsHistory: 'id, updatedAt',
     expenses: 'id, updatedAt',
     users: 'id, updatedAt',
     cashBalances: 'id, updatedAt',

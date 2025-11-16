@@ -10,6 +10,7 @@ export const ENTITIES = {
   PRODUCT: 'product',
   BUDGETS: 'budgets',
   BUDGET: 'budget',
+  BUDGETS_HISTORY: 'budgets-history',
   EVENTS: 'events',
   EXPENSES: "expenses",
   EXPENSE: "expense",

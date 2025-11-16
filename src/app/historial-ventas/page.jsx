@@ -1,33 +1,49 @@
 "use client";
-import { useListBudgets } from "@/api/budgets";
-import { Icon } from "@/common/components/custom";
-import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { useListBudgetsHistory } from "@/api/budgets";
+import { DATE_FORMATS, ICONS, PAGES } from "@/common/constants";
 import { downloadExcel, getFormatedPercentage, handleUndefined } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
+import BudgetsHistoryFilter from "@/components/budgets/BudgetsHistoryFilters";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { BUDGET_STATE_TRANSLATIONS } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { getTotal } from "@/components/products/products.utils";
-import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
-import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo } from "react";
+import { useValidateToken } from "@/hooks";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-const Budgets = () => {
+const BudgetsHistory = () => {
   useValidateToken();
-  const { data, isLoading, isRefetching, refetch } = useListBudgets();
+  const [dateRange, setDateRange] = useState({ startDate: null, endDate: null });
+
+  const { data, isLoading, refetch, isRefetching } = useListBudgetsHistory(
+    {
+      sort: "createdAt",
+      startDate: dateRange.startDate,
+      endDate: dateRange.endDate,
+    },
+    { enabled: false }
+  );
+
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
-  const { push } = useRouter();
 
   useEffect(() => {
-    setLabels([PAGES.BUDGETS.NAME, {
-      popup: <> Para ventas mas antiguas, <br></br> haga click en <Icon name={ICONS.SEARCH} />Historial</>, title: "Ultimos 6 meses", color: COLORS.BLUE
-    }]);
-    refetch()
-  }, [setLabels, refetch]);
+    setLabels([PAGES.BUDGETS_HISTORY.NAME]);
+  }, [setLabels]);
 
-  const budgets = useMemo(() => data?.budgets, [data]);
-  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
+  useEffect(() => {
+    if (dateRange.startDate || dateRange.endDate) {
+      refetch();
+    }
+  }, [dateRange, refetch]);
+
+  const handleSearch = (newRange) => {
+    setDateRange(newRange);
+  };
+
+  const budgets = useMemo(() => data, [data]);
+  const loading = isLoading || isRefetching;
+
   const handleDownloadExcel = useCallback(() => {
     if (!budgets) return;
     let maxProductCount = 1;
@@ -60,45 +76,30 @@ const Budgets = () => {
       return [...budgetRow, ...productData];
     });
 
-    const productsHeaders = Array.from(Array(maxProductCount).keys()).map((index) => `Producto ${index + 1}`);
+    const productsHeaders = Array.from({ length: maxProductCount }, (_, i) => `Producto ${i + 1}`);
     const headers = ['ID', 'Estado', 'Cliente', 'Fecha', "Total", "Descuento", "Cargo adicional", "Vendedor", ...productsHeaders];
     downloadExcel([headers, ...mappedBudgets], "Lista de Ventas");
   }, [budgets]);
 
   useEffect(() => {
-    const actions = [
+    setActions([
       {
         id: 1,
-        icon: ICONS.ADD,
-        color: COLORS.GREEN,
-        onClick: () => { push(PAGES.BUDGETS.CREATE) },
-        text: 'Crear'
-      },
-      {
-        id: 2,
-        icon: ICONS.SEARCH,
-        color: COLORS.BLUE,
-        onClick: () => { push(PAGES.BUDGETS_HISTORY.BASE) },
-        text: 'Historial'
-      },
-      {
-        id: 3,
         icon: ICONS.FILE_EXCEL,
         width: "fit-content",
         onClick: handleDownloadExcel,
         text: 'Presupuestos',
-        disabled: loading
+        disabled: loading || !budgets
       },
-    ];
-    setActions(actions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [push, setActions, loading]);
-
-  useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
+    ]);
+  }, [handleDownloadExcel, loading, setActions]);
 
   return (
-    <BudgetsPage onRefetch={refetch} isLoading={loading} budgets={loading ? [] : budgets} />
-  )
+    <>
+      <BudgetsHistoryFilter onSearch={handleSearch} isLoading={loading} />
+      {dateRange.startDate && dateRange.endDate && <BudgetsPage isLoading={loading} budgets={loading ? [] : budgets} />}
+    </>
+  );
 };
 
-export default Budgets;
+export default BudgetsHistory;
