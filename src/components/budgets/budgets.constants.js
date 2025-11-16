@@ -209,7 +209,7 @@ export const BUDGETS_HISTORY_DATE_RANGE = [
     value: 'today',
     getRange: () => ({
       startDate: getStartOfUnit(now(), 'day'),
-      endDate: getEndOfUnit(now(), 'day')
+      endDate: now()
     })
   },
   {
@@ -217,7 +217,7 @@ export const BUDGETS_HISTORY_DATE_RANGE = [
     value: 'this_month',
     getRange: () => ({
       startDate: getStartOfUnit(now(), 'month'),
-      endDate: getEndOfUnit(now(), 'month'),
+      endDate: now(),
     })
   },
   {
