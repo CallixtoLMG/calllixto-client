@@ -1,11 +1,10 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
-import { Icon } from "@/common/components/custom";
 import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, getFormatedPercentage, handleUndefined } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
-import { BUDGET_STATE_TRANSLATIONS } from "@/components/budgets/budgets.constants";
+import { BUDGET_STATE_TRANSLATIONS, BUDGETS_VIEW_MONTHS } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { getTotal } from "@/components/products/products.utils";
 import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
@@ -21,7 +20,7 @@ const Budgets = () => {
 
   useEffect(() => {
     setLabels([PAGES.BUDGETS.NAME, {
-      popup: <> Para ventas mas antiguas, <br></br> haga click en <Icon name={ICONS.SEARCH} />Historial</>, title: "Ultimos 6 meses", color: COLORS.BLUE
+      popup: <> Para ver el historial completo de Ventas haga click en <b>Historial</b>.</>, title: `Últimos ${BUDGETS_VIEW_MONTHS} meses`, color: COLORS.BLUE
     }]);
     refetch()
   }, [setLabels, refetch]);

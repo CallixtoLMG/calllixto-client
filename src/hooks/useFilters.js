@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import useFilterParams from "./useFilterParams";
+import { omit } from "lodash";
 
 const useFilters = ({ defaultFilters, key }) => {
   const { filters, setFilters } = useFilterParams({
@@ -32,7 +33,7 @@ const useFilters = ({ defaultFilters, key }) => {
   }, [filters, reset]);
 
   const appliedCount = useMemo(() => {
-    return Object.keys(defaultFilters).reduce((acc, key) => {
+    return Object.keys(omit(defaultFilters, ['sorting'])).reduce((acc, key) => {
       if (filters[key] !== defaultFilters[key]) {
         acc += 1;
       }

@@ -17,11 +17,9 @@ const BudgetsHistory = () => {
 
   const { data, isLoading, refetch, isRefetching } = useListBudgetsHistory(
     {
-      sort: "createdAt",
       startDate: dateRange.startDate,
       endDate: dateRange.endDate,
-    },
-    { enabled: false }
+    }
   );
 
   const { setLabels } = useBreadcrumContext();
@@ -92,6 +90,7 @@ const BudgetsHistory = () => {
         disabled: loading || !budgets
       },
     ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleDownloadExcel, loading, setActions]);
 
   return (

@@ -1,7 +1,7 @@
 import { DATE_FORMATS, ENTITIES, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { getDateWithOffset } from "@/common/utils/dates";
-import { GET_BUDGET_QUERY_KEY, LIST_ATTRIBUTES, LIST_BUDGETS_HISTORY_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
+import { BUDGETS_VIEW_MONTHS, GET_BUDGET_QUERY_KEY, LIST_ATTRIBUTES, LIST_BUDGETS_HISTORY_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { CANCEL, CONFIRM, PATHS, PAYMENTS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from './axios';
@@ -13,7 +13,7 @@ export function useListBudgets() {
     queryFn: () => listItems({
       entity: ENTITIES.BUDGETS,
       url: PATHS.BUDGETS,
-      params: { ...getDefaultListParams(LIST_ATTRIBUTES), sort: "createdAt", startDate: getDateWithOffset({ offset: -3, unit: "month", format: DATE_FORMATS.ISO }) }
+      params: { ...getDefaultListParams(LIST_ATTRIBUTES), sort: "createdAt", startDate: getDateWithOffset({ offset: -BUDGETS_VIEW_MONTHS, unit: "month", format: DATE_FORMATS.ISO }) }
     }),
     staleTime: IN_MS.ONE_DAY,
   });
@@ -21,26 +21,20 @@ export function useListBudgets() {
   return query;
 };
 
-export function useListBudgetsHistory(
-  { sort = 'createdAt', startDate, endDate },
-  queryOptions = {}
-) {
-
+export function useListBudgetsHistory({ startDate, endDate }) {
   return useQuery({
-    queryKey: [LIST_BUDGETS_HISTORY_QUERY_KEY, sort, startDate, endDate],
+    queryKey: [LIST_BUDGETS_HISTORY_QUERY_KEY, JSON.stringify({ startDate, endDate })],
     queryFn: () => entityList({
       entity: ENTITIES.BUDGETS,
       url: PATHS.BUDGETS,
       params: {
-        sort,
-        ...(startDate && { startDate }),
-        ...(endDate && { endDate })
+        sort: 'createdAt',
+        startDate,
+        endDate
       }
     }),
-    retry: false,
-    staleTime: IN_MS.FIVE_MINUTES,
-    enabled: false,
-    ...queryOptions,
+    staleTime: IN_MS.ONE_DAY,
+    enabled: !!startDate && !!endDate,
   });
 }
 

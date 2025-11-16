@@ -2,8 +2,8 @@ import { IconedButton } from "@/common/components/buttons";
 import { Flex, Form } from "@/common/components/custom";
 import { DropdownControlled } from "@/common/components/form";
 import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePickerControlled";
-import { COLORS, DATE_FORMATS, ICONS } from "@/common/constants";
-import { getFormatedDate } from "@/common/utils/dates";
+import { COLORS, ICONS } from "@/common/constants";
+import { getDateUTC } from "@/common/utils/dates";
 import { FormProvider, useForm } from "react-hook-form";
 import { BUDGETS_HISTORY_DATE_RANGE } from "../budgets.constants";
 
@@ -48,12 +48,13 @@ const BudgetsHistoryFilter = ({ onSearch, isLoading }) => {
   const handleSearch = () => {
     const { startDate, endDate } = getValues();
 
-    const formattedStart = startDate ? getFormatedDate(startDate, DATE_FORMATS.ISO) : null;
-    const formattedEnd = endDate ? getFormatedDate(endDate, DATE_FORMATS.ISO) : null;
+    if (!startDate && !endDate) {
+      return;
+    }
 
     onSearch({
-      startDate: formattedStart,
-      endDate: formattedEnd,
+      startDate: getDateUTC(startDate),
+      endDate:  getDateUTC(endDate) ,
     });
   };
 
@@ -64,7 +65,7 @@ const BudgetsHistoryFilter = ({ onSearch, isLoading }) => {
           <DropdownControlled
             width="fit-content"
             name="presetDays"
-            label="Elegir un rango rápido"
+            label="Rangos predefinidos"
             placeholder="Último mes, 3 meses, etc."
             options={BUDGETS_HISTORY_DATE_RANGE.map(({ label, value }) => ({ text: label, value }))}
             afterChange={handlePresetChange}
