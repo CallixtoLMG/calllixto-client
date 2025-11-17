@@ -23,10 +23,10 @@ const Customers = () => {
   const customers = useMemo(() => data?.customers, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const handleDownloadExcel = useCallback(() => {
-    if (!customers) return;
+  const handleDownloadExcel = useCallback((elements) => {
+    if (!elements?.length) return;
     const headers = ['Nombre', 'Estado', 'Dirección', 'Teléfono'];
-    const mappedCustomers = customers.map(customer => {
+    const mappedCustomers = elements.map(customer => {
       const customerState = CUSTOMER_STATES[customer.state]?.singularTitle || customer.state;
       return [
         customer.name,
@@ -36,7 +36,7 @@ const Customers = () => {
       ];
     });
     downloadExcel([headers, ...mappedCustomers], "Lista de Clientes");
-  }, [customers]);
+  }, []);
 
   useEffect(() => {
     const actions = [
@@ -46,23 +46,15 @@ const Customers = () => {
         color: COLORS.GREEN,
         onClick: () => { push(PAGES.CUSTOMERS.CREATE) },
         text: 'Crear',
-      },
-      {
-        id: 3,
-        icon: ICONS.FILE_EXCEL,
-        onClick: handleDownloadExcel,
-        text: 'Clientes',
-        disabled: loading
-      },
+      }
     ];
     setActions(actions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <CustomersPage onRefetch={refetch} isLoading={loading} customers={loading ? [] : customers} />
+    <CustomersPage onRefetch={refetch} isLoading={loading} customers={loading ? [] : customers} onDownloadExcel={handleDownloadExcel} />
   );
 };
 

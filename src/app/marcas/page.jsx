@@ -26,10 +26,10 @@ const Brands = () => {
   const brands = useMemo(() => data?.brands, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const handleDownloadExcel = useCallback(() => {
-    if (!brands) return;
+  const handleDownloadExcel = useCallback((elements) => {
+    if (!elements.length) return;
     const headers = ['Id', 'Nombre', 'Estado', 'Comentarios'];
-    const mappedBrands = brands.map(brand => {
+    const mappedBrands = elements.map(brand => {
       const brandState = BRAND_STATES[brand.state]?.singularTitle || brand.state;
       return [
         brand.id,
@@ -39,7 +39,7 @@ const Brands = () => {
       ];
     });
     downloadExcel([headers, ...mappedBrands], "Lista de Marcas");
-  }, [brands]);
+  }, []);
 
   useEffect(() => {
     const actions = [];
@@ -54,16 +54,7 @@ const Brands = () => {
       })
     }
 
-    actions.push({
-      id: 3,
-      icon: ICONS.FILE_EXCEL,
-      onClick: handleDownloadExcel,
-      text: 'Marcas',
-      disabled: loading
-    });
-
     setActions(actions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEYS.ENTER);
@@ -73,6 +64,7 @@ const Brands = () => {
       onRefetch={refetch}
       isLoading={loading}
       brands={loading ? [] : brands}
+      onDownloadExcel={handleDownloadExcel}
     />
   );
 };

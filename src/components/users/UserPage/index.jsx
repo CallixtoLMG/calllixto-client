@@ -7,7 +7,7 @@ import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import { EMPTY_FILTERS, USERS_FILTERS_KEY, USER_COLUMNS, USER_STATE_OPTIONS } from "../users.constants";
 
-const UsersPage = ({ users = [], isLoading, onRefetch }) => {
+const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -54,6 +54,7 @@ const UsersPage = ({ users = [], isLoading, onRefetch }) => {
         filters={filters}
         setFilters={setFilters}
         mainKey="username"
+        onDownloadExcel={onDownloadExcel}
       />
     </>
   )

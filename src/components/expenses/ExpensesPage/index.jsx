@@ -7,7 +7,7 @@ import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import { EMPTY_FILTERS, EXPENSES_FILTERS_KEY, EXPENSES_STATE_OPTIONS, HEADERS } from '../expenses.constants';
 
-const ExpensesPage = ({ expenses = [], isLoading, onRefetch }) => {
+const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel }) => {
 
   const {
     onRestoreFilters,
@@ -54,6 +54,7 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch }) => {
         paginate
         filters={filters}
         setFilters={setFilters}
+        onDownloadExcel={onDownloadExcel}
       />
     </>
   );
