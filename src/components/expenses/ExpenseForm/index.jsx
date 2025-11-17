@@ -110,12 +110,14 @@ const ExpenseForm = forwardRef(({
             label="Detalle"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            placeholder="Netflix"
           />
           <PriceControlled
             width="15%"
             name="amount"
             label="Monto"
             disabled={!isUpdating && view}
+            placeholder="18000"
           />
           <DatePickerControlled
             disabled={!isUpdating && view}
@@ -127,6 +129,7 @@ const ExpenseForm = forwardRef(({
             scrollableYearDropdown
             yearDropdownItemNumber={80}
             rules={RULES.REQUIRED}
+            placeholder="16-11-2025"
           />
         </FieldsContainer>
         <FieldsContainer $rowGap="5px">
@@ -173,7 +176,7 @@ const ExpenseForm = forwardRef(({
           />
         </FieldsContainer>
         <FieldsContainer>
-          <TextAreaControlled name="comments" label="Comentarios" readOnly={!isUpdating && view} />
+          <TextAreaControlled name="comments" label="Comentarios" placeholder="Quiero ver el Juego del Calamar temporada 2" readOnly={!isUpdating && view} />
         </FieldsContainer>
         {(isUpdating || !view) && (
           <SubmitAndRestore

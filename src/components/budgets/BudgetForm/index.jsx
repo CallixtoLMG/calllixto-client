@@ -587,7 +587,7 @@ const BudgetForm = ({
                 }}
                 maxLength={3}
                 label="Dias para el vencimiento"
-                placeholder="Cantidad en días"
+                placeholder="3"
                 required
               />
               <FormField
@@ -610,8 +610,8 @@ const BudgetForm = ({
               width="300px"
               label="Cliente"
               required
-              clearable
-              placeholder="Seleccione un cliente"
+              clearable={!!watchCustomer?.name}
+              placeholder="Martín Bueno"
               rules={{
                 validate: {
                   required: (value) => !!value?.id || "Campo requerido.",
@@ -687,7 +687,7 @@ const BudgetForm = ({
             label="Producto"
             width="300px"
             required
-            placeholder="Seleccione un producto"
+            placeholder="Televisor 100”"
             rules={{
               validate: () => {
                 return !!watchProducts.length || "Al menos un producto es requerido.";
@@ -789,7 +789,7 @@ const BudgetForm = ({
               )}
             />
           </FieldsContainer>
-          <TextAreaControlled name="comments" label="Comentarios" />
+          <TextAreaControlled name="comments" label="Comentarios" placeholder="Pago con billetes de 100" />
           <SubmitAndRestore
             draft={draft}
             isLoading={isLoading && !isBudgetDraft(watchState)}

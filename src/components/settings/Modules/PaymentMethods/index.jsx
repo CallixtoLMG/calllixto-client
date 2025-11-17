@@ -82,7 +82,7 @@ const PaymentMethods = () => {
               <TextField
                 width="50%"
                 label="Método"
-                placeholder="Ingresar método"
+                placeholder="Tarjeta de credito"
                 value={inputValue}
                 onChange={(e) => {
                   setInputValue(e.target.value);
