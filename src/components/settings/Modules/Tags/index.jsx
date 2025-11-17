@@ -123,6 +123,7 @@ const Tags = () => {
                 onChange={handleNameChange}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
                 error={errors?.name}
+                required
               />
               <DropdownField
                 selection

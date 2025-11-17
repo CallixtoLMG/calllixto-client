@@ -625,7 +625,8 @@ const BudgetForm = ({
                 }
               }}
               elements={customerOptions}
-              extractSearchFields={(customer) => [customer.name, customer.id, customer.cuit]}
+              value={watchCustomer}
+              extractSearchFields={(customer) => [customer.name, customer.id]}
               getResultProps={(customer) => ({
                 key: customer.id,
                 title: getCustomerSearchTitle(customer),

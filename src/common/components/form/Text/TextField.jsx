@@ -51,6 +51,7 @@ export const TextField = forwardRef(({
   onChange,
   onKeyDown,
   maxLength,
+  required,
   error,
   showPopup = false,
   popupContent,
@@ -93,6 +94,7 @@ export const TextField = forwardRef(({
       control={Input}
       error={error}
       disabled={disabled}
+      required={required}
     >
       {disabled ? (
         <Input

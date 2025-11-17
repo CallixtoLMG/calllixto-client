@@ -57,6 +57,7 @@ const SupplierForm = forwardRef(({
             onChange={value => value.toUpperCase()}
             disabled={view}
             maxLength={2}
+            required
           />
           <TextControlled
             width="40%"
@@ -65,6 +66,7 @@ const SupplierForm = forwardRef(({
             placeholder="Nombre"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
         </FieldsContainer>
         {(!view || isUpdating) ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}

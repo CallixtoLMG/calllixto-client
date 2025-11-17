@@ -76,6 +76,7 @@ const CustomerForm = forwardRef(({
             placeholder="Nombre"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
         </FieldsContainer>
         {isUpdating || !view

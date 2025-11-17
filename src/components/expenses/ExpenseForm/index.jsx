@@ -110,6 +110,7 @@ const ExpenseForm = forwardRef(({
             label="Detalle"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
           <PriceControlled
             width="15%"
@@ -127,6 +128,7 @@ const ExpenseForm = forwardRef(({
             scrollableYearDropdown
             yearDropdownItemNumber={80}
             rules={RULES.REQUIRED}
+            required
           />
         </FieldsContainer>
         <FieldsContainer $rowGap="5px">
