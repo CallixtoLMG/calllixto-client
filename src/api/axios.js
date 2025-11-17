@@ -15,7 +15,6 @@ const getClientId = () => {
 
   try {
     const userData = JSON.parse(userDataString);
-
     if (isCallixtoUser(userData.clientId)) {
       return localStorage.getItem("selectedClientId") ?? DEFAULT_SELECTED_CLIENT
     }

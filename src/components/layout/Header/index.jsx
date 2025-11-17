@@ -20,13 +20,14 @@ const Header = () => {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const client = localStorage.getItem("selectedClientId") ?? DEFAULT_SELECTED_CLIENT;
+      localStorage.setItem("selectedClientId", client);
       setSelectedClientId(client);
     }
-  }, []); 
+  }, []);
 
   const handleClientChange = (client) => {
     localStorage.setItem("selectedClientId", client);
-    setSelectedClientId(client); 
+    setSelectedClientId(client);
     location.reload();
   };
 
