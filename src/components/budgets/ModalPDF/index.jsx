@@ -8,6 +8,13 @@ import { useReactToPrint } from "react-to-print";
 import { Modal, Segment, Transition } from "semantic-ui-react";
 import PDFfile from "../PDFfile";
 import { BUDGET_PDF_FORMAT } from "../budgets.constants";
+import styled from "styled-components";
+
+const StyledModal = styled(Modal)`
+  width: 80vw !important;
+  height: 90vh !important;
+  overflow: auto;
+`;
 
 const ModalPDF = ({
   budget,
@@ -68,7 +75,7 @@ const ModalPDF = ({
   return (
     <>
       <Transition visible={isModalOpen} animation='scale' duration={500}>
-        <Modal closeIcon open={isModalOpen} onClose={() => onClose(false)}>
+        <StyledModal closeIcon open={isModalOpen} onClose={() => onClose(false)} width="90vw" height="90vh">
           <Modal.Header>Opciones de Impresión</Modal.Header>
           <Modal.Content>
             <FlexColumn $rowGap="15px">
@@ -158,7 +165,7 @@ const ModalPDF = ({
               />
             </ButtonsContainer>
           </Modal.Actions>
-        </Modal>
+        </StyledModal>
       </Transition>
       <OnlyPrint marginTop="20px">
         <PDFfile
