@@ -27,10 +27,10 @@ const Expenses = () => {
   const expenses = useMemo(() => data?.expenses, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const handleDownloadExcel = useCallback(() => {
-    if (!expenses) return;
+  const handleDownloadExcel = useCallback((elements) => {
+    if (!elements.length) return;
     const headers = ['ID', 'Nombre', 'Categorias', 'Monto', 'Estado', 'Comentarios'];
-    const mappedExpenses = expenses.map(expense => {
+    const mappedExpenses = elements.map(expense => {
       const expenseState = EXPENSE_STATES[expense.state]?.singularTitle || expense.state;
       return [
         expense.id,
@@ -42,7 +42,7 @@ const Expenses = () => {
       ];
     });
     downloadExcel([headers, ...mappedExpenses], "Lista de Gastos");
-  }, [expenses]);
+  }, []);
 
   useEffect(() => {
     const actions = RULES.canCreate[role] ? [
@@ -54,16 +54,7 @@ const Expenses = () => {
         text: 'Crear'
       }
     ] : [];
-    actions.push({
-      id: 3,
-      icon: ICONS.FILE_EXCEL,
-      color: COLORS.SOFT_GREY,
-      onClick: handleDownloadExcel,
-      text: 'Gastos',
-      disabled: loading
-    });
     setActions(actions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.EXPENSES.CREATE), SHORTKEYS.ENTER);
@@ -74,6 +65,7 @@ const Expenses = () => {
       isLoading={loading}
       expenses={loading ? [] : expenses}
       role={role}
+      onDownloadExcel={handleDownloadExcel}
     />
   );
 };

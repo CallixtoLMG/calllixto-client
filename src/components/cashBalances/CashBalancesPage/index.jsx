@@ -13,7 +13,7 @@ import {
   getCashBalanceColumns
 } from "../cashBalances.constants";
 
-const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOptions }) => {
+const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOptions, onDownloadExcel }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -89,6 +89,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
         paginate
         filters={filters}
         setFilters={setFilters}
+        onDownloadExcel={onDownloadExcel}
       />
     </>
   );

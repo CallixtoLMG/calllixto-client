@@ -37,10 +37,10 @@ const CashBalances = () => {
     return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
   }, [paymentMethods]);
 
-  const handleDownloadExcel = useCallback(() => {
-    if (!cashBalances) return;
+  const handleDownloadExcel = useCallback((elements) => {
+    if (!elements.length) return;
     const headers = ['ID', 'Estado', 'Fecha de inicio', 'Fecha de cierre', 'Métodos de pago', 'Monto inicial', 'Monto actual', 'Detalle de Billetes', 'Comentarios',];
-    const mappedCashBalances = cashBalances.map(cashBalance => {
+    const mappedCashBalances = elements.map(cashBalance => {
       const cashBalanceState = CASH_BALANCE_STATES[cashBalance.state]?.singularTitle || cashBalance.state;
       return [
         cashBalance.id,
@@ -55,31 +55,20 @@ const CashBalances = () => {
       ];
     });
     downloadExcel([headers, ...mappedCashBalances], "Lista de Cajas");
-  }, [cashBalances]);
+  }, []);
 
   useEffect(() => {
     const actions = [];
-
     if (RULES.canCreate[role]) {
       actions.push({
         id: 1,
         icon: ICONS.ADD,
         color: COLORS.GREEN,
-        onClick: handleOpenModal,
+        onClick: () => setIsModalOpen(true),
         text: 'Abrir',
       });
     }
-
-    actions.push({
-      id: 2,
-      icon: ICONS.FILE_EXCEL,
-      onClick: handleDownloadExcel,
-      text: 'Cajas',
-      disabled: loading
-    });
-
     setActions(actions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
 
   const { mutate, isPending } = useMutation({
@@ -94,9 +83,6 @@ const CashBalances = () => {
     },
   });
 
-  const handleOpenModal = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
 
   const handleConfirm = useCallback((data) => {
     const payload = {
@@ -117,6 +103,7 @@ const CashBalances = () => {
         isLoading={isPending}
         cashBalances={isPending ? [] : cashBalances}
         paymentOptions={paymentMethodOptions}
+        onDownloadExcel={handleDownloadExcel}
       />
       <ModalOpenTill
         open={isModalOpen}

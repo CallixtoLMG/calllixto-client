@@ -7,7 +7,7 @@ import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import { BRANDS_FILTERS_KEY, BRAND_COLUMNS, BRAND_STATES_OPTIONS, EMPTY_FILTERS } from "../brands.constants";
 
-const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
+const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -52,6 +52,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch }) => {
         paginate
         filters={filters}
         setFilters={setFilters}
+        onDownloadExcel={onDownloadExcel}
       />
     </>
   );

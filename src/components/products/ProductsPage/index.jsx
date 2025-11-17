@@ -19,7 +19,7 @@ import { useReactToPrint } from "react-to-print";
 import { Form } from "semantic-ui-react";
 import { EMPTY_FILTERS, PRODUCTS_FILTERS_KEY, PRODUCT_COLUMNS, PRODUCT_STATES, PRODUCT_STATES_OPTIONS } from "../products.constants";
 
-const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
+const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) => {
   const { role } = useUserContext();
   const printRef = useRef();
   const deleteProduct = useDeleteProduct();
@@ -185,6 +185,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch }) => {
           paginate
           filters={filters}
           setFilters={setFilters}
+          onDownloadExcel={onDownloadExcel}
         />
         <ModalAction
           showModal={showModal}

@@ -158,6 +158,7 @@ const CreateBudgetPayments = ({
                 $width="150px"
                 required
                 error={showErrors && !payment.date ? RULES.REQUIRED.required : undefined}
+                placeholder="16-11-2025"
                 control={DatePicker}>
               </FormField>
               <DropdownField
@@ -173,7 +174,7 @@ const CreateBudgetPayments = ({
               />
               <PriceField
                 key={`price-${payment.method}-${payment.date?.getTime()}`}
-                placeholder="Monto"
+                placeholder="10000"
                 required
                 width="150px"
                 label="Monto"
@@ -195,6 +196,7 @@ const CreateBudgetPayments = ({
               <TextField
                 flex="1"
                 label="Comentarios"
+                placeholder="Primer pago"
                 disabled={isTotalCovered}
                 value={payment.comments}
                 onChange={e => {

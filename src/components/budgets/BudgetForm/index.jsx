@@ -101,7 +101,7 @@ const BudgetForm = ({
     }
   }, [paymentMethods, methods]);
 
-  const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
+  const { control, trigger, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
     control,
     name: "products"
@@ -145,7 +145,7 @@ const BudgetForm = ({
 
     const updatedtotal = getSubtotal(updatedSubtotalAfterDiscount, watchAdditionalCharge);
     setTotal(updatedtotal);
-  }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
+  }, [subtotal, watchGlobalDiscount, watchAdditionalCharge, trigger]);
 
   const customerOptions = useMemo(() => {
     return customers?.filter(({ state }) => state === CUSTOMER_STATES.ACTIVE.id);
@@ -219,7 +219,7 @@ const BudgetForm = ({
       if (outdatedProduct) {
         return {
           ...product,
-          name: outdatedProduct.name, 
+          name: outdatedProduct.name,
           price: outdatedProduct.price,
           editablePrice: outdatedProduct.editablePrice,
           fractionConfig: {
@@ -270,7 +270,8 @@ const BudgetForm = ({
 
   useEffect(() => {
     calculateTotal();
-  }, [watchProducts, calculateTotal]);
+    if (isDirty) trigger('product');
+  }, [watchProducts, calculateTotal, trigger, isDirty]);
 
   const handleCreate = async (data, state) => {
     const { customer } = data;
@@ -579,10 +580,14 @@ const BudgetForm = ({
               <NumberControlled
                 width="200px"
                 name="expirationOffsetDays"
-                rules={RULES.REQUIRED}
+                rules={{
+                  validate: {
+                    positive: (value) => value > 0 || 'Campo requerido.'
+                  },
+                }}
                 maxLength={3}
                 label="Dias para el vencimiento"
-                placeholder="Cantidad en días"
+                placeholder="3"
                 required
               />
               <FormField
@@ -605,8 +610,8 @@ const BudgetForm = ({
               width="300px"
               label="Cliente"
               required
-              clearable
-              placeholder="Seleccione un cliente"
+              clearable={!!watchCustomer?.name}
+              placeholder="Martín Bueno"
               rules={{
                 validate: {
                   required: (value) => !!value?.id || "Campo requerido.",
@@ -634,9 +639,6 @@ const BudgetForm = ({
                 value: customer,
               })}
               persistSelection={true}
-              onAfterChange={(selectedCustomer) => {
-                setValue("customer", selectedCustomer);
-              }}
             />
             <TextField
               flex="2"
@@ -686,8 +688,12 @@ const BudgetForm = ({
             label="Producto"
             width="300px"
             required
-            placeholder="Seleccione un producto"
-            rules={{ required: 'Seleccione un producto.' }}
+            placeholder="Televisor 100”"
+            rules={{
+              validate: () => {
+                return !!watchProducts.length || "Al menos un producto es requerido.";
+              },
+            }}
             elements={products}
             extractSearchFields={(product) => [product.name, product.id]}
             getResultProps={(product) => ({
@@ -784,7 +790,7 @@ const BudgetForm = ({
               )}
             />
           </FieldsContainer>
-          <TextAreaControlled name="comments" label="Comentarios" />
+          <TextAreaControlled name="comments" label="Comentarios" placeholder="Pago con billetes de 100" />
           <SubmitAndRestore
             draft={draft}
             isLoading={isLoading && !isBudgetDraft(watchState)}

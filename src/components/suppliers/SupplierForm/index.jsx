@@ -52,7 +52,7 @@ const SupplierForm = forwardRef(({
             width="150px"
             name="id"
             label="Id"
-            placeholder="Id (A1)"
+            placeholder="A1"
             rules={RULES.REQUIRED_TWO_DIGIT}
             onChange={value => value.toUpperCase()}
             disabled={view}
@@ -63,14 +63,14 @@ const SupplierForm = forwardRef(({
             width="40%"
             name="name"
             label="Nombre"
-            placeholder="Nombre"
+            placeholder="Suministro Estrella"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
             required
           />
         </FieldsContainer>
         {(!view || isUpdating) ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
-        <TextAreaControlled name="comments" label="Comentarios" readOnly={!isUpdating && view} />
+        <TextAreaControlled name="comments" label="Comentarios" placeholder="Siempre demora en los pedidos" readOnly={!isUpdating && view} />
         {(isUpdating || !view) && (
           <SubmitAndRestore
             isUpdating={isUpdating}

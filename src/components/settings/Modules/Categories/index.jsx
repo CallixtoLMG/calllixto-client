@@ -120,7 +120,7 @@ const Categories = () => {
               <TextField
                 width={4}
                 label="Nombre"
-                placeholder="Nombre de la categoria"
+                placeholder="Personal"
                 value={categoryToAdd.name}
                 onChange={handleNameChange}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
@@ -138,7 +138,7 @@ const Categories = () => {
               <TextField
                 flex={2}
                 label="Descripción"
-                placeholder="Descripción"
+                placeholder="Mis cosas"
                 value={categoryToAdd.description}
                 onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}

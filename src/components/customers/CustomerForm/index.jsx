@@ -73,7 +73,7 @@ const CustomerForm = forwardRef(({
             width="40%"
             name="name"
             label="Nombre"
-            placeholder="Nombre"
+            placeholder="Martín Bueno"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
             required
@@ -103,7 +103,7 @@ const CustomerForm = forwardRef(({
             })}
           />
         </FieldsContainer>
-        <TextAreaControlled name="comments" label="Comentarios" readOnly={!isUpdating && view} />
+        <TextAreaControlled name="comments" label="Comentarios" placeholder="No era tan bueno" readOnly={!isUpdating && view} />
         {(isUpdating || !view) && (
           <SubmitAndRestore
             isUpdating={isUpdating}

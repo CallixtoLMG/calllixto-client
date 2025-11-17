@@ -108,11 +108,12 @@ const ProductForm = forwardRef(({
           ) : (
             <>
               <SearchControlled
-                clearable
+                clearable={!!watchSupplier?.id}
                 width="25%"
                 disabled={isUpdating || isLoading}
                 name="supplier"
                 label="Proveedor"
+                placeholder="Suministro Estrella"
                 persistSelection
                 required
                 rules={{
@@ -132,11 +133,12 @@ const ProductForm = forwardRef(({
                 })}
               />
               <SearchControlled
-                clearable
+                clearable={!!watchBrand?.id}
                 disabled={isUpdating || isLoading}
                 width="25%"
                 name="brand"
                 label="Marca"
+                placeholder="CallixtoGLM"
                 persistSelection
                 required
                 rules={{
@@ -160,6 +162,7 @@ const ProductForm = forwardRef(({
                 name="id"
                 label="Id"
                 required
+                placeholder="A0001"
                 rules={{
                   required: "Este campo es obligatorio.",
                   validate: (value) => {
@@ -181,6 +184,7 @@ const ProductForm = forwardRef(({
             width="40%"
             name="name"
             label="Nombre"
+            placeholder="Televisor 100”"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
             required
@@ -261,6 +265,7 @@ const ProductForm = forwardRef(({
         <TextAreaControlled
           name="comments"
           label="Comentarios"
+          placeholder="Realmente son muchas pulgadas"
           readOnly={!isUpdating && view}
         />
         {(isUpdating || !view) && (

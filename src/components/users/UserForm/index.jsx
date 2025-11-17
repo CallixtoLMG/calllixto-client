@@ -67,7 +67,7 @@ const UserForm = forwardRef(({
             width="25%"
             name="username"
             label="Usuario"
-            placeholder="nombre@empresa.com"
+            placeholder="martinb@hotmail.com"
             rules={{
               required: "Este campo es obligatorio.",
               validate: {
@@ -98,7 +98,7 @@ const UserForm = forwardRef(({
             width="25%"
             name="firstName"
             label="Nombre"
-            placeholder="Nombre"
+            placeholder="Martín"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
             required
@@ -107,7 +107,7 @@ const UserForm = forwardRef(({
             width="25%"
             name="lastName"
             label="Apellido"
-            placeholder="Apellido"
+            placeholder="Bueno"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
             required
@@ -116,6 +116,7 @@ const UserForm = forwardRef(({
             disabled={!isUpdating && view}
             name="birthDate"
             label="Fecha de nacimiento"
+            placeholder="16-11-2025"
             width="180px"
             defaultValue={getPastDate(18, "years")}
             maxDate={new Date()}
@@ -140,7 +141,7 @@ const UserForm = forwardRef(({
             width="51%"
             name="address"
             label="Dirección"
-            placeholder="Dirección"
+            placeholder="Mitre 525 9c"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
             required
@@ -149,7 +150,7 @@ const UserForm = forwardRef(({
             width="130px"
             name="phoneNumber.areaCode"
             label="Código de Área"
-            placeholder="Ej: 351"
+            placeholder="385"
             maxLength="4"
             rules={{
               required: "El código de área es requerido.",
@@ -167,7 +168,7 @@ const UserForm = forwardRef(({
             width="150px"
             name="phoneNumber.number"
             label="Número de Teléfono"
-            placeholder="Ej: 12345678"
+            placeholder="5228706"
             rules={{
               required: "El número de teléfono es requerido.",
               validate: (value) => {
@@ -183,7 +184,7 @@ const UserForm = forwardRef(({
           />
         </FieldsContainer>
         <FieldsContainer>
-          <TextAreaControlled name="comments" label="Comentarios" readOnly={!isUpdating && view} />
+          <TextAreaControlled name="comments" label="Comentarios" placeholder="Martin Bueno no era un cliente?" readOnly={!isUpdating && view} />
         </FieldsContainer>
         {(isUpdating || !view) && (
           <SubmitAndRestore

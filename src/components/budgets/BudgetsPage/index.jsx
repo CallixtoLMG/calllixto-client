@@ -1,15 +1,55 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from '@/common/components/table';
-import { COLORS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
-import { createFilter } from '@/common/utils';
+import { COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
+import { createFilter, downloadExcel, getFormatedPercentage, handleUndefined } from '@/common/utils';
 import { useFilters } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { BUDGETS_COLUMNS, BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, EMPTY_FILTERS } from "../budgets.constants";
+import { BUDGETS_COLUMNS, BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE_TRANSLATIONS, EMPTY_FILTERS } from "../budgets.constants";
+import { useCallback } from "react";
+import { getFormatedDate } from "@/common/utils/dates";
+import { getTotal } from "@/components/products/products.utils";
 
 const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRefetch }) => {
   const { push } = useRouter();
+
+  const handleDownloadExcel = useCallback((elements) => {
+    if (!elements.length) return;
+    let maxProductCount = 1;
+    const mappedBudgets = elements.map(budget => {
+      const translatedState = BUDGET_STATE_TRANSLATIONS[budget.state].singularTitle || "";
+      maxProductCount = Math.max(maxProductCount, budget.products?.length);
+      const budgetRow = [
+        handleUndefined(budget.id),
+        handleUndefined(translatedState),
+        handleUndefined(budget.customer.name),
+        handleUndefined(getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)),
+        handleUndefined(budget.total),
+        getFormatedPercentage(budget.globalDiscount),
+        getFormatedPercentage(budget.additionalCharge),
+        handleUndefined(budget.createdBy)
+      ];
+
+      const productData = budget.products.map(product => {
+        let productName = handleUndefined(product.name);
+        if (product.fractionConfig?.active) {
+          productName = `${product.name} x ${product.fractionConfig.value} ${product.fractionConfig.unit}`;
+        }
+        return `Id: ${handleUndefined(product.id)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${product.price ?? 0}, Descuento: % ${product.discount ?? 0}, Total: ${getTotal(product)};`;
+      });
+
+      while (productData.length < maxProductCount) {
+        productData.push('');
+      }
+
+      return [...budgetRow, ...productData];
+    });
+
+    const productsHeaders = Array.from({ length: maxProductCount }, (_, i) => `Producto ${i + 1}`);
+    const headers = ['ID', 'Estado', 'Cliente', 'Fecha', "Total", "Descuento", "Cargo adicional", "Vendedor", ...productsHeaders];
+    downloadExcel([headers, ...mappedBudgets], "Lista de Ventas");
+  }, []);
 
   const {
     onRestoreFilters,
@@ -84,6 +124,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
         paginate
         filters={filters}
         setFilters={setFilters}
+        onDownloadExcel={handleDownloadExcel}
       />
     </>
   );
