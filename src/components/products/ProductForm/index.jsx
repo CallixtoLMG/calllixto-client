@@ -94,14 +94,15 @@ const ProductForm = forwardRef(({
         <FieldsContainer $rowGap="5px">
           {view ? (
             <>
-              <TextField width="25%" label="Proveedor" value={product?.supplierName} disabled />
-              <TextField width="25%" label="Marca" value={product?.brandName} disabled />
+              <TextField width="25%" label="Proveedor" value={product?.supplierName} disabled required />
+              <TextField width="25%" label="Marca" value={product?.brandName} disabled required />
               <TextField
                 width="250px"
                 label="Id"
                 value={getProductId(product?.id)}
                 iconLabel={`${getSupplierId(product?.id)} ${getBrandId(product?.id)}`}
                 disabled
+                required
               />
             </>
           ) : (
@@ -114,6 +115,7 @@ const ProductForm = forwardRef(({
                 label="Proveedor"
                 placeholder="Suministro Estrella"
                 persistSelection
+                required
                 rules={{
                   validate: {
                     required: (value) => !!value?.id || 'Campo requerido.',
@@ -122,7 +124,7 @@ const ProductForm = forwardRef(({
                   },
                 }}
                 elements={suppliers}
-                extractSearchFields={(supplier) => [supplier.name, supplier.id, supplier.cuit]}
+                extractSearchFields={(supplier) => [supplier.name, supplier.id]}
                 getResultProps={(supplier) => ({
                   key: supplier.id,
                   title: getSupplierSearchTitle(supplier),
@@ -138,6 +140,7 @@ const ProductForm = forwardRef(({
                 label="Marca"
                 placeholder="CallixtoGLM"
                 persistSelection
+                required
                 rules={{
                   validate: {
                     required: (value) => !!value?.id || 'Campo requerido.',
@@ -158,6 +161,7 @@ const ProductForm = forwardRef(({
                 width="250px"
                 name="id"
                 label="Id"
+                required
                 placeholder="A0001"
                 rules={{
                   required: "Este campo es obligatorio.",
@@ -183,6 +187,7 @@ const ProductForm = forwardRef(({
             placeholder="Televisor 100”"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
         </FieldsContainer>
         <FieldsContainer $alignItems="end">

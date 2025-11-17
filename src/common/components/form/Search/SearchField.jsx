@@ -10,6 +10,7 @@ const SearchField = forwardRef(
     {
       elements = [],
       onSelect,
+      selectedValue,
       clearable,
       placeholder = 'Buscar...',
       noResultsMessage = 'No se encontraron resultados.',
@@ -35,8 +36,15 @@ const SearchField = forwardRef(
   ) => {
     const [query, setQuery] = useState('');
     const [filtered, setFiltered] = useState(elements);
-    const [selected, setSelected] = useState(null);
+    const [selected, setSelected] = useState(selectedValue ?? null);
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+      if (persistSelection && selectedValue?.id !== selected?.id) {
+        setSelected(selectedValue);
+        setQuery('');
+      }
+    }, [selectedValue, persistSelection]);
 
     useImperativeHandle(ref, () => ({
       clear: () => {

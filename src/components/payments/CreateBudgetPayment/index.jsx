@@ -156,6 +156,8 @@ const CreateBudgetPayments = ({
                 maxDate={new Date()}
                 label="Fecha"
                 $width="150px"
+                required
+                error={showErrors && !payment.date ? RULES.REQUIRED.required : undefined}
                 placeholder="16-11-2025"
                 control={DatePicker}>
               </FormField>
@@ -168,10 +170,12 @@ const CreateBudgetPayments = ({
                 onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                 disabled={isTotalCovered}
                 error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
+                required
               />
               <PriceField
                 key={`price-${payment.method}-${payment.date?.getTime()}`}
                 placeholder="10000"
+                required
                 width="150px"
                 label="Monto"
                 value={payment.amount}

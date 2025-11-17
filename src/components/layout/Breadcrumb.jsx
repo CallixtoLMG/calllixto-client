@@ -65,7 +65,7 @@ const Breadcrumb = () => {
     <SSBreadcrumb size={SIZES.HUGE}>
       {labels.map((label, index) => (
         <BreadcrumbSection key={`label_${index}`}>
-          {index !== 0 && !label.popup && <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />}
+          {index !== 0 && !label?.popup && <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />}
           {typeof label === 'string' ? (
             <OverflowWrapper $verticalAlign="baseline" popupContent={label} maxWidth="25vw">
               {label}

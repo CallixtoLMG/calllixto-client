@@ -38,7 +38,8 @@ const SearchControlled = ({
             pointing: 'above',
           }}
           elements={elements}
-          value={value}
+          value={value}            
+          selectedValue={value}     
           onSelect={(val) => {
             onChange(val);
             onAfterChange?.(val);

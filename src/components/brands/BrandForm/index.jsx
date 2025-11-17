@@ -57,6 +57,7 @@ const BrandForm = forwardRef(({
             onChange={value => value.toUpperCase()}
             disabled={view}
             maxLength={2}
+            required
           />
           <TextControlled
             width="40%"
@@ -65,6 +66,7 @@ const BrandForm = forwardRef(({
             placeholder="CallixtoGLM"
             rules={RULES.REQUIRED}
             disabled={view && !isUpdating}
+            required
           />
         </FieldsContainer>
         <TextAreaControlled name="comments" label="Comentarios" placeholder="Una marca macanuda" readOnly={view && !isUpdating} />

@@ -125,6 +125,7 @@ const Categories = () => {
                 onChange={handleNameChange}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
                 error={errors?.name}
+                required
               />
               <DropdownField
                 selection

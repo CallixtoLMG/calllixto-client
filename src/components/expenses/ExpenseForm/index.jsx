@@ -110,6 +110,7 @@ const ExpenseForm = forwardRef(({
             label="Detalle"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
             placeholder="Netflix"
           />
           <PriceControlled
@@ -129,6 +130,7 @@ const ExpenseForm = forwardRef(({
             scrollableYearDropdown
             yearDropdownItemNumber={80}
             rules={RULES.REQUIRED}
+            required
             placeholder="16-11-2025"
           />
         </FieldsContainer>

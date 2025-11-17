@@ -79,6 +79,7 @@ const UserForm = forwardRef(({
             popupPosition="bottom left"
             showPopup={!view}
             popupContent="Introduce el email del usuario."
+            required
           />
           <DropdownControlled
             height="38px"
@@ -100,6 +101,7 @@ const UserForm = forwardRef(({
             placeholder="Martín"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
           <TextControlled
             width="25%"
@@ -108,6 +110,7 @@ const UserForm = forwardRef(({
             placeholder="Bueno"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
           <DatePickerControlled
             disabled={!isUpdating && view}
@@ -130,6 +133,7 @@ const UserForm = forwardRef(({
                 return value <= minBirthDate || "El usuario debe tener al menos 18 años.";
               }
             }}
+            required
           />
         </FieldsContainer>
         <FieldsContainer>
@@ -140,6 +144,7 @@ const UserForm = forwardRef(({
             placeholder="Mitre 525 9c"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
           <NumberControlled
             width="130px"
@@ -157,6 +162,7 @@ const UserForm = forwardRef(({
             onChange={() => isSubmitted && trigger("phoneNumber.number")}
             disabled={!isUpdating && view}
             normalMode
+            required
           />
           <NumberControlled
             width="150px"
@@ -174,6 +180,7 @@ const UserForm = forwardRef(({
             disabled={!isUpdating && view}
             maxLength="7"
             normalMode
+            required
           />
         </FieldsContainer>
         <FieldsContainer>

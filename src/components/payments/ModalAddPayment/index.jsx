@@ -104,9 +104,11 @@ export const ModalAddPayment = ({
                   onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                   disabled={isTotalCovered}
                   error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
+                  required
                 />
                 <PriceField
                   placeholder="10000"
+                  required
                   width="150px"
                   label="Monto"
                   value={payment.amount}
