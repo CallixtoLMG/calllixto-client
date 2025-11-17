@@ -27,10 +27,10 @@ const Users = () => {
   const users = useMemo(() => data?.users, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const handleDownloadExcel = useCallback(() => {
-    if (!users) return;
+  const handleDownloadExcel = useCallback((elements) => {
+    if (!elements.length) return;
     const headers = ['Usuario', 'Nombre', 'Apellido', 'Rol', 'Dirección', 'Telefono', 'Estado', 'Nacimiento', 'Comentarios'];
-    const mappedUsers = users.map(user => {
+    const mappedUsers = elements.map(user => {
       const usersState = USER_STATES[user.state]?.singularTitle || user.state;
       const roleText = USERS_ROLE_OPTIONS.find(option => option.value === user.role)?.text || user.role;
       return [
@@ -46,7 +46,7 @@ const Users = () => {
       ];
     });
     downloadExcel([headers, ...mappedUsers], "Lista de Usuarios");
-  }, [users]);
+  }, []);
 
   useEffect(() => {
     const actions = RULES.canCreate[role] ? [
@@ -58,15 +58,7 @@ const Users = () => {
         text: 'Crear'
       }
     ] : [];
-    actions.push({
-      id: 3,
-      icon: ICONS.FILE_EXCEL,
-      onClick: handleDownloadExcel,
-      text: 'Usuarios',
-      disabled: loading
-    });
     setActions(actions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.USERS.CREATE), SHORTKEYS.ENTER);
@@ -77,6 +69,7 @@ const Users = () => {
       isLoading={loading}
       users={loading ? [] : users}
       role={role}
+      onDownloadExcel={handleDownloadExcel}
     />
   );
 };

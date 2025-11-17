@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
 import { IconedButton, PopupActions } from "../buttons";
-import { CenteredFlex } from "../custom";
+import { CenteredFlex, Flex } from "../custom";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
@@ -33,6 +33,7 @@ const CustomTable = ({
   filters = {},
   setFilters = () => { },
   onFilter = () => true,
+  onDownloadExcel
 }) => {
 
   const { push } = useRouter();
@@ -345,6 +346,15 @@ const CustomTable = ({
             </Table.Body>
           )}
         </Table>
+        {onDownloadExcel && (
+           <Flex width="100%" $justifyContent="flex-end" >
+           <IconedButton
+             text="Descargar Excel"
+             icon={ICONS.FILE_EXCEL}
+             onClick={() => onDownloadExcel(filteredElements)}
+           />
+         </Flex>
+        )}
       </Loader>
     </Container>
   );

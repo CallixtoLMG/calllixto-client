@@ -193,6 +193,6 @@ export const mapToDropdownOptions = (items = []) =>
     key: item.toLowerCase().replace(/\s+/g, "_"),
     text: item,
     value: item,
-    name: item, 
-    color: "grey" 
+    name: item,
+    color: "grey"
   }));

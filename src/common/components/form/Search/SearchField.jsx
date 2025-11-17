@@ -1,7 +1,7 @@
 import { ICONS } from '@/common/constants';
 import { normalizeText } from '@/common/utils';
 import debounce from 'lodash/debounce';
-import { forwardRef, useCallback, useEffect, useImperativeHandle, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { FormField } from '../../custom';
 import { Search } from './styles';
 
@@ -46,9 +46,11 @@ const SearchField = forwardRef(
       },
     }));
 
-    const debouncedSearch = useCallback(
-      debounce((q) => {
-        const normalizedQuery = normalizeText(q);
+    useEffect(() => {
+      setLoading(true);
+
+      const debouncedSearch = debounce(() => {
+        const normalizedQuery = normalizeText(query);
         const queryWords = normalizedQuery.split(' ').filter(Boolean);
 
         const exact = [];
@@ -67,15 +69,13 @@ const SearchField = forwardRef(
 
         setFiltered([...exact, ...partial]);
         setLoading(false);
-      }, 300),
-      [elements, extractSearchFields]
-    );
+      }, 300);
 
-    useEffect(() => {
-      setLoading(true);
-      debouncedSearch(query);
+      debouncedSearch();
+
       return () => debouncedSearch.cancel();
-    }, [query, debouncedSearch]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [elements, query]);
 
     const handleChange = (_, { value }) => {
       setQuery(value);
@@ -103,7 +103,7 @@ const SearchField = forwardRef(
       <FormField
         $width={width}
         icon={
-          clearable ? {
+          clearable && selected ? {
             name: ICONS.CLOSE,
             link: true,
             onClick: handleClear,

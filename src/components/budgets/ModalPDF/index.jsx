@@ -5,7 +5,7 @@ import { COLORS, ICONS } from "@/common/constants";
 import { OnlyPrint } from "@/components/layout";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import { Modal, Transition } from "semantic-ui-react";
+import { Modal, Segment, Transition } from "semantic-ui-react";
 import PDFfile from "../PDFfile";
 import { BUDGET_PDF_FORMAT } from "../budgets.constants";
 
@@ -68,11 +68,11 @@ const ModalPDF = ({
   return (
     <>
       <Transition visible={isModalOpen} animation='scale' duration={500}>
-        <Modal size="mini" closeIcon open={isModalOpen} onClose={() => onClose(false)}>
+        <Modal closeIcon open={isModalOpen} onClose={() => onClose(false)}>
           <Modal.Header>Opciones de Impresión</Modal.Header>
           <Modal.Content>
             <FlexColumn $rowGap="15px">
-              <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
+              <Flex $columnGap="15px" wrap="wrap" $rowGap="5px">
                 {Object.values(BUDGET_PDF_FORMAT).map(({ key, title, icon }) => (
                   <IconedButton
                     key={key}
@@ -87,41 +87,56 @@ const ModalPDF = ({
                     }}
                   />
                 ))}
+                <IconedButton
+                  text="Mostrar Precios"
+                  icon={ICONS.EYE}
+                  color={COLORS.BLUE}
+                  onClick={() => setShowPrices(prev => !prev)}
+                  basic={!showPrices}
+                />
+                <Input
+                  type="text"
+                  height="35px"
+                  width="150px"
+                  onChange={handleDollarChange}
+                  actionPosition='left'
+                  placeholder="Precio"
+                  value={formattedDolarRate}
+                  disabled={!showDolarExangeRate}
+                  action={
+                    <IconedButton
+                      text="Cotizar en USD"
+                      icon={ICONS.DOLLAR}
+                      color={COLORS.GREEN}
+                      basic={!showDolarExangeRate}
+                      onClick={() => {
+                        setShowDolarExangeRate(prev => !prev);
+                        if (!showDolarExangeRate) {
+                          setFormattedDolarRate(formatValue(dolarRate));
+                        } else {
+                          setFormattedDolarRate('');
+                          setDolarRate(0);
+                        }
+                      }}
+                    />
+                  }
+                />
               </Flex>
-              <Input
-                type="text"
-                height="35px"
-                width="150px"
-                onChange={handleDollarChange}
-                actionPosition='left'
-                placeholder="Precio"
-                value={formattedDolarRate}
-                disabled={!showDolarExangeRate}
-                action={
-                  <IconedButton
-                    text="Cotizar en USD"
-                    icon={ICONS.DOLLAR}
-                    color={COLORS.GREEN}
-                    basic={!showDolarExangeRate}
-                    onClick={() => {
-                      setShowDolarExangeRate(prev => !prev);
-                      if (!showDolarExangeRate) {
-                        setFormattedDolarRate(formatValue(dolarRate));
-                      } else {
-                        setFormattedDolarRate('');
-                        setDolarRate(0);
-                      }
-                    }}
-                  />
-                }
+              <Segment>
+              <PDFfile
+                ref={printRef}
+                budget={budget}
+                client={client}
+                id={client?.id}
+                printPdfMode={printPdfMode}
+                subtotal={subtotal}
+                subtotalAfterDiscount={subtotalAfterDiscount}
+                total={total}
+                selectedContact={selectedContact}
+                dolarExchangeRate={showDolarExangeRate && dolarRate}
+                showPrices={showPrices}
               />
-              <IconedButton
-                text="Mostrar Precios"
-                icon={ICONS.EYE}
-                color={COLORS.BLUE}
-                onClick={() => setShowPrices(prev => !prev)}
-                basic={!showPrices}
-              />
+              </Segment>
             </FlexColumn>
           </Modal.Content>
           <Modal.Actions>
