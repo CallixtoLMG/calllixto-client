@@ -31,7 +31,20 @@ const CashBalances = () => {
   }, [setLabels, refetch]);
 
   const cashBalances = useMemo(() => data?.cashBalances, [data]);
-  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: createCashBalance,
+    onSuccess: async (response) => {
+      if (response.statusOk) {
+        toast.success('Caja creada correctamente!');
+        push(PAGES.CASH_BALANCES.SHOW(response.cashBalance.id))
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+  });
+
+  const loading = useMemo(() => isLoading || isRefetching || isPending, [isLoading, isRefetching, isPending]);
 
   const paymentMethodOptions = useMemo(() => {
     return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
@@ -71,19 +84,6 @@ const CashBalances = () => {
     setActions(actions);
   }, [push, role, setActions, loading]);
 
-  const { mutate, isPending } = useMutation({
-    mutationFn: createCashBalance,
-    onSuccess: async (response) => {
-      if (response.statusOk) {
-        toast.success('Caja creada correctamente!');
-        push(PAGES.CASH_BALANCES.SHOW(response.cashBalance.id))
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-  });
-
-
   const handleConfirm = useCallback((data) => {
     const payload = {
       ...data,
@@ -100,14 +100,14 @@ const CashBalances = () => {
     <>
       <CashBalancesPage
         onRefetch={refetch}
-        isLoading={isPending}
+        isLoading={loading}
         cashBalances={isPending ? [] : cashBalances}
         paymentOptions={paymentMethodOptions}
         onDownloadExcel={handleDownloadExcel}
       />
       <ModalOpenTill
         open={isModalOpen}
-        isLoading={isPending}
+        isLoading={loading}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleConfirm}
         paymentOptions={paymentMethodOptions}

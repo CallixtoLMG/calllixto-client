@@ -88,9 +88,7 @@ const Settings = () => {
   }, [setActions, setLabels]);
 
   const { mutate: mutateEdit, isPending } = useMutation({
-    
     mutationFn: (data) => editSetting({
-   
       entity: `${activeEntity?.entity}S`,
       value: pick(data, SUPPORTED_SETTINGS[activeEntity?.entity]),
     }),
@@ -136,7 +134,6 @@ const Settings = () => {
 
   return mappedEntities;
 }, [data]);
- 
   useEffect(() => {
     if (!activeEntity && settings.length) {
       handleEntityChange(settings[0]);

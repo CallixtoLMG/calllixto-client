@@ -54,7 +54,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit}>
           <Filters
-            entity={ENTITIES.CASH_BALANCES}
+            entity={ENTITIES.CASHBALANCES}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
