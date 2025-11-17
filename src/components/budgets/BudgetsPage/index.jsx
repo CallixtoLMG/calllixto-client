@@ -8,7 +8,7 @@ import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
 import { BUDGETS_COLUMNS, BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, EMPTY_FILTERS } from "../budgets.constants";
 
-const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
+const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRefetch }) => {
   const { push } = useRouter();
 
   const {
@@ -19,7 +19,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
     methods,
     appliedCount,
     hydrated
-  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BUDGETS_FILTERS_KEY });
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: filterKey });
 
   const onFilter = createFilter(filters, ['id', 'customer', 'createdBy'], {
     customer: budget => budget.customer?.name || '',

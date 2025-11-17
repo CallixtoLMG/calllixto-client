@@ -1,14 +1,16 @@
 import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
 import { DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
-import { getFormatedDate } from "@/common/utils/dates";
+import { getDateWithOffset, getEndOfUnit, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
 import { Label, Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { CommentTooltip } from "../../common/components/tooltips";
 import { getLabelColor, getPopupContent, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
 
 export const LIST_BUDGETS_QUERY_KEY = 'listAllBudgets';
+export const LIST_BUDGETS_HISTORY_QUERY_KEY = 'getBudgetsHistory';
 export const GET_BUDGET_QUERY_KEY = 'getBudget';
 export const BUDGETS_FILTERS_KEY = 'budgetsFilters';
+export const BUDGETS_HISTORY_FILTERS_KEY = 'budgetsHistoryFilters';
 export const LIST_ATTRIBUTES = [
   "id",
   "customer",
@@ -24,6 +26,7 @@ export const LIST_ATTRIBUTES = [
   "cancelledBy",
   "comments"
 ];
+export const BUDGETS_VIEW_MONTHS = 3;
 
 export const BUDGET_STATES = {
   CONFIRMED: {
@@ -200,3 +203,54 @@ export const BUDGET_STATE_TRANSLATIONS = {
   CANCELLED: BUDGET_STATES.CANCELLED,
   DRAFT: BUDGET_STATES.DRAFT
 };
+
+export const BUDGETS_HISTORY_DATE_RANGE = [
+  {
+    label: 'Hoy',
+    value: 'today',
+    getRange: () => ({
+      startDate: getStartOfUnit(now(), 'day'),
+      endDate: now()
+    })
+  },
+  {
+    label: 'Este mes',
+    value: 'this_month',
+    getRange: () => ({
+      startDate: getStartOfUnit(now(), 'month'),
+      endDate: now(),
+    })
+  },
+  {
+    label: 'Mes pasado',
+    value: 'last_month',
+    getRange: () => ({
+      startDate: getStartOfUnit(getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO}), 'month'),
+      endDate: getEndOfUnit(getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO}), 'month')
+    })
+  },
+  {
+    label: 'Último mes',
+    value: 'last_30_days',
+    getRange: () => ({
+      startDate: getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO}),
+      endDate: now()
+    })
+  },
+  {
+    label: 'Últimos 3 meses',
+    value: 'last_3_months',
+    getRange: () => ({
+      startDate: getDateWithOffset({ offset: -3, unit: 'month', format: DATE_FORMATS.ISO}),
+      endDate: now()
+    })
+  },
+  {
+    label: 'Últimos 6 meses',
+    value: 'last_6_months',
+    getRange: () => ({
+      startDate: getDateWithOffset({ offset: -6, unit: 'month', format: DATE_FORMATS.ISO}),
+      endDate: now()
+    })
+  }
+];

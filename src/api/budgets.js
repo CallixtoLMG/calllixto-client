@@ -1,10 +1,11 @@
-import { ENTITIES, IN_MS } from "@/common/constants";
+import { DATE_FORMATS, ENTITIES, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { LIST_ATTRIBUTES, GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
+import { getDateWithOffset } from "@/common/utils/dates";
+import { BUDGETS_VIEW_MONTHS, GET_BUDGET_QUERY_KEY, LIST_ATTRIBUTES, LIST_BUDGETS_HISTORY_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { CANCEL, CONFIRM, PATHS, PAYMENTS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from './axios';
-import { listItems, useCreateItem, useEditItem } from "./common";
+import { entityList, listItems, useCreateItem, useEditItem } from "./common";
 
 export function useListBudgets() {
   const query = useQuery({
@@ -12,12 +13,29 @@ export function useListBudgets() {
     queryFn: () => listItems({
       entity: ENTITIES.BUDGETS,
       url: PATHS.BUDGETS,
-      params: getDefaultListParams(LIST_ATTRIBUTES)
+      params: { ...getDefaultListParams(LIST_ATTRIBUTES), sort: "createdAt", startDate: getDateWithOffset({ offset: -BUDGETS_VIEW_MONTHS, unit: "month", format: DATE_FORMATS.ISO }) }
     }),
     staleTime: IN_MS.ONE_DAY,
   });
 
   return query;
+};
+
+export function useListBudgetsHistory({ startDate, endDate }) {
+  return useQuery({
+    queryKey: [LIST_BUDGETS_HISTORY_QUERY_KEY, JSON.stringify({ startDate, endDate })],
+    queryFn: () => entityList({
+      entity: ENTITIES.BUDGETS,
+      url: PATHS.BUDGETS,
+      params: {
+        sort: 'createdAt',
+        startDate,
+        endDate
+      }
+    }),
+    staleTime: IN_MS.ONE_DAY,
+    enabled: !!startDate && !!endDate,
+  });
 }
 
 export function useGetBudget(id) {
