@@ -92,6 +92,7 @@ export const ModalAddPayment = ({
                   maxDate={new Date()}
                   label="Fecha"
                   $width="150px"
+                  placeholder="16-11-2025"
                   control={DatePicker}
                 />
                 <DropdownField
@@ -105,7 +106,7 @@ export const ModalAddPayment = ({
                   error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
                 />
                 <PriceField
-                  placeholder="Monto"
+                  placeholder="10000"
                   width="150px"
                   label="Monto"
                   value={payment.amount}
@@ -143,6 +144,7 @@ export const ModalAddPayment = ({
               <TextAreaField
                 label="Comentarios"
                 value={payment.comments}
+                placeholder="Primer pago"
                 onChange={e => setPayment({ ...payment, comments: e.target.value })}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
               />

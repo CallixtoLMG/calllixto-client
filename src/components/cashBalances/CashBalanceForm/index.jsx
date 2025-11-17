@@ -118,7 +118,7 @@ const CashBalanceForm = forwardRef(({
             disabled
           />
         </FieldsContainer>
-        <TextAreaControlled name="comments" label="Comentarios" disabled={!isUpdating} />
+        <TextAreaControlled name="comments" label="Comentarios" placeholder="Solo billetes de 500" disabled={!isUpdating} />
         {(isUpdating || !view) && (
           <SubmitAndRestore
             isUpdating={isUpdating}

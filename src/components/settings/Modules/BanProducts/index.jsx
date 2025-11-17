@@ -114,7 +114,7 @@ const Blacklist = () => {
               <TextField
                 width="50%"
                 label="Id(s)"
-                placeholder="Ingresar id(s)"
+                placeholder="A0001, A0002"
                 value={inputValue}
                 onChange={(e) => {
                   setInputValue(e.target.value);

@@ -214,7 +214,7 @@ const ModalOpenTill = ({ open, onClose, onSubmit, paymentOptions, isLoading }) =
                 </FieldsContainer>
               )}
               <FieldsContainer>
-                <TextAreaControlled name="comments" label="Comentarios" />
+                <TextAreaControlled name="comments" label="Comentarios" placeholder="Solo billetes de 500" />
               </FieldsContainer>
             </Form>
           </Modal.Content>
