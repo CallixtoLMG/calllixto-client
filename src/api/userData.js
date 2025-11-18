@@ -15,6 +15,7 @@ export async function getUserData() {
   }
 
   if (data?.isAuthorized) {
+    setSelectedClientData(data);
     return data;
   }
 
@@ -30,6 +31,7 @@ export async function getUserData() {
 
     if (response.data) {
       sessionStorage.setItem("userData", JSON.stringify(response.data));
+      setSelectedClientData(data);
       return response.data;
     }
   } catch (e) {
@@ -37,3 +39,11 @@ export async function getUserData() {
     return null;
   }
 };
+
+function setSelectedClientData(data) {
+  if (data?.clientId === 'callixto') {
+    const selectedClientId = localStorage.getItem('selectedClientId');
+    const selectedClient = data?.callixtoClients?.items.find(client => client.id === selectedClientId);
+    data.selectedClient = selectedClient ?? null;
+  }
+}

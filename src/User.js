@@ -19,11 +19,6 @@ const UserProvider = ({ children }) => {
     getData();
   }, []);
 
-  const updateSessionData = useCallback((data) => {
-    sessionStorage.setItem("userData", JSON.stringify(data));
-    setUserData(data);
-  }, []);
-
   useEffect(() => {
     if (userData?.roles?.length) {
       setRole(userData.roles[0]);
@@ -31,7 +26,7 @@ const UserProvider = ({ children }) => {
   }, [userData]);
 
   return (
-    <UserContext.Provider value={{ userData, setUserData, role, updateSessionData }}>
+    <UserContext.Provider value={{ userData, setUserData, role }}>
       {children}
     </UserContext.Provider>
   );

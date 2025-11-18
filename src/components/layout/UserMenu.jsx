@@ -37,17 +37,17 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
   };
 
   const clientOptions = useMemo(() => {
-    const clients = userData.callixtoClients || [];
+    const clients = userData.callixtoClients.items || [];
     const filteredClients = searchTerm
-      ? clients.filter(client => client.toLowerCase().includes(searchTerm.toLowerCase()))
+      ? clients.filter(client => client.name.toLowerCase().includes(searchTerm.toLowerCase()))
       : clients;
-  
+
     return filteredClients.map(client => ({
-      key: client,
-      value: client,
-      text: client,
+      key: client.id,
+      value: client.id,
+      text: client.name,
     }));
-  }, [searchTerm, userData.callixtoClients]);
+  }, [searchTerm, userData]);
 
   return (
     <Popup
@@ -91,7 +91,7 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
                   minCharacters={2}
                   noResultsMessage="No se han encontrado resultados."
                   options={clientOptions}
-                  value={selectedClient || null} 
+                  value={selectedClient || null}
                   onSearchChange={(e, { searchQuery }) => setSearchTerm(searchQuery)}
                   onChange={(e, { value }) => {
                     onClientChange(value);

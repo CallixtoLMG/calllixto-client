@@ -322,7 +322,7 @@ const Budget = ({ params }) => {
         isModalOpen={isModalPDFOpen}
         onClose={setIsModalPDFOpen}
         budget={budget}
-        client={userData?.client}
+        client={userData?.selectedClient ?? userData?.client}
         total={total}
         subtotal={subtotal}
         selectedContact={selectedContact}
