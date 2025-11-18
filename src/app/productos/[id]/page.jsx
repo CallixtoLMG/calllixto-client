@@ -402,7 +402,7 @@ const Product = ({ params }) => {
   ];
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || !product}>
       <Tab panes={panes} />
       <UnsavedChangesModal
         open={showUnsavedModal}

@@ -230,7 +230,7 @@ const User = ({ params }) => {
   }
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || !user}>
       {!isItemInactive(user?.state) && toggleButton}
       {isItemInactive(user?.state) && (
         <Message negative>

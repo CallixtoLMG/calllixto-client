@@ -2,7 +2,6 @@
 import { useUserContext } from "@/User";
 import { useCancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
-import { useGetPayment } from "@/api/payments";
 import { useListProducts } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
@@ -37,7 +36,6 @@ const Budget = ({ params }) => {
   const { data: budget, isLoading } = useGetBudget(params.id);
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
-  const { data: payment, refetch: refetchPayment } = useGetPayment(ENTITIES.BUDGET, params.id);
   const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const [customerData, setCustomerData] = useState();
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
@@ -279,7 +277,7 @@ const Budget = ({ params }) => {
   });
 
   return (
-    <Loader active={isLoading || loadingProducts || loadingCustomers}>
+    <Loader active={isLoading || loadingProducts || loadingCustomers || !budget}>
       {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) && (
         <Flex
           $margin={(isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state)) ? "0" : undefined}
@@ -314,8 +312,6 @@ const Budget = ({ params }) => {
           total={total}
           selectedContact={selectedContact}
           setSelectedContact={setSelectedContact}
-          payment={payment}
-          refetchPayment={refetchPayment}
         />
       )}
       <ModalPDF

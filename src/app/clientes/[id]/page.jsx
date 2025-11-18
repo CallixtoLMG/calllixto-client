@@ -233,7 +233,7 @@ const Customer = ({ params }) => {
   }
 
   return (
-    <Loader active={isLoading || isLoadingBudgets}>
+    <Loader active={isLoading || isLoadingBudgets || !customer}>
       {!isItemInactive(customer?.state) && toggleButton}
       {isItemInactive(customer?.state) && (
         <Message negative>

@@ -418,7 +418,7 @@ const Supplier = ({ params }) => {
   }
 
   return (
-    <Loader active={isLoading || loadingProducts}>
+    <Loader active={isLoading || loadingProducts || !supplier}>
       {!isItemInactive(supplier?.state) && toggleButton}
       {isItemInactive(supplier?.state) && (
         <Message negative>

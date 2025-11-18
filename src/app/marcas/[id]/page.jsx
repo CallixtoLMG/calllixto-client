@@ -229,7 +229,7 @@ const Brand = ({ params }) => {
   }
 
   return (
-    <Loader active={isLoading || isLoadingProducts}>
+    <Loader active={isLoading || isLoadingProducts || !brand}>
       {!isItemInactive(brand?.state) && toggleButton}
       {isItemInactive(brand?.state) && (
         <Message negative>
