@@ -1,8 +1,8 @@
-import Tags from "../../Modules/Tags"
+import CreateBudget from './CreateBudget';
 
 const BudgetsModule = (() => {
   return (
-    <Tags />
+    <CreateBudget />
   )
 })
 

@@ -1,4 +1,4 @@
-import PaymentMethod from "../../Modules/PaymentMethods"
+import PaymentMethod from "../../Common/PaymentMethods"
 
 const GeneralModule = (() => {
 

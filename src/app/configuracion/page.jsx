@@ -26,10 +26,11 @@ const ENTITY_MAPPER = {
 };
 
 export const SUPPORTED_SETTINGS = {
-  PRODUCT: ["tags", "blacklist"],
-  CUSTOMER: ["tags"],
-  GENERAL: ["paymentMethods"],
-  EXPENSE: ["tags", "categories"],
+  PRODUCT: ['tags', 'blacklist'],
+  CUSTOMER: ['tags'],
+  GENERAL: ['paymentMethods'],
+  EXPENSE: ['tags', 'categories'],
+  BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
 };
 
 const Settings = () => {

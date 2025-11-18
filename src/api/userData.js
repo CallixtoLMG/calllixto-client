@@ -43,7 +43,7 @@ export async function getUserData() {
 function setSelectedClientData(data) {
   if (data?.clientId === 'callixto') {
     const selectedClientId = localStorage.getItem('selectedClientId');
-    const selectedClient = data?.callixtoClients?.items.find(client => client.id === selectedClientId);
+    const selectedClient = data?.callixtoClients?.items?.find(client => client.id === selectedClientId);
     data.selectedClient = selectedClient ?? null;
   }
 }

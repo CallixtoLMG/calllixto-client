@@ -1,6 +1,6 @@
 import { Divider, FlexColumn } from "@/common/components/custom";
-import BanProduct from "@/components/settings/Modules/BanProducts";
-import Tags from "../../Modules/Tags";
+import BanProduct from "@/components/settings/Entities/Products/BanProducts";
+import Tags from "../../Common/Tags";
 
 const ProductsModule = (() => {
 
