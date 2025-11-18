@@ -2,9 +2,9 @@ import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, O
 import { DropdownField, PriceLabel } from "@/common/components/form";
 import { Table, Total } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, ICONS, SIZES } from "@/common/constants";
+import { COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
-import { getDateWithOffset } from "@/common/utils/dates";
+import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useEffect, useMemo, useState } from "react";
@@ -14,7 +14,6 @@ import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../../../b
 import { Container, Message, MessageHeader } from "./../../styles";
 
 const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
-  
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
@@ -145,6 +144,18 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
               readOnly
               disabled
             />
+            {budget?.createdAt && (
+              <FormField
+                $width="180px"
+                label="Fecha de creación"
+                control={Input}
+                value={getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)}
+                readOnly
+                disabled
+              />
+            )}
+          </FieldsContainer>
+          <FieldsContainer>
             {budgetState && (
               <FormField
                 $width="300px"
@@ -155,10 +166,9 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 disabled
               />
             )}
-          </FieldsContainer>
-          <FieldsContainer>
             {budgetState && (
               <FormField
+                $width="200px"
                 label={budgetState.dateLabel}
                 control={Input}
                 value={budgetState.date}
@@ -167,6 +177,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
             )}
             {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) && (
               <FormField
+                $width="200px"
                 label="Fecha de vencimiento"
                 control={Input}
                 value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })}
