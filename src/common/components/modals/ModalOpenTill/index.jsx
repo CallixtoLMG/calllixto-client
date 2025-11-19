@@ -147,7 +147,7 @@ const ModalOpenTill = ({ open, onClose, onSubmit, paymentOptions, isLoading }) =
                 <IconedButtonControlled
                   width="fit-content"
                   name="allPaymentMethods"
-                  label="Todos los métodos"
+                  text="Todos los métodos"
                   icon={ICONS.PENCIL}
                   color={COLORS.BLUE}
                 />

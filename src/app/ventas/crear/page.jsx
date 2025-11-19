@@ -28,6 +28,7 @@ const CreateBudget = () => {
   const { data: productsData, isLoading: loadingProducts, refetch: refetchproductsData , isRefetching } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
+  const { data: budgetSettings, isLoading: isLoadingBudgetSettings, isRefetching: isRefetchingSettings } = useGetSetting(ENTITIES.BUDGET);
   const { data: budget, isLoading: loadingBudget } = useGetBudget(cloneId);
   const products = useMemo(() => {
     return productsData?.products.filter((product) => ![PRODUCT_STATES.DELETED.id, PRODUCT_STATES.INACTIVE.id].some(state => state === product.state));
@@ -75,7 +76,7 @@ const CreateBudget = () => {
   }, [paymentMethods]);
 
   return (
-    <Loader active={loadingProducts || loadingCustomers || loadingBudget || isRefetching}>
+    <Loader active={loadingProducts || loadingCustomers || loadingBudget || isRefetching || isLoadingBudgetSettings || isRefetchingSettings}>
       <BudgetForm
         onSubmit={mutate}
         products={products}
@@ -86,6 +87,7 @@ const CreateBudget = () => {
         isLoading={isPending}
         refetchProducts={refetchproductsData}
         paymentMethods={paymentMethodOptions}
+        settings={budgetSettings}
       />
     </Loader>
   )

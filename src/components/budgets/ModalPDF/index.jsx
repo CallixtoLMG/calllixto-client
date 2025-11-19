@@ -24,16 +24,17 @@ const ModalPDF = ({
   total,
   subtotal,
   subtotalAfterDiscount,
-  selectedContact
+  selectedContact,
+  defaults = {}
 }) => {
   const printRef = useRef();
-  const [printPdfMode, setPrintPdfMode] = useState(BUDGET_PDF_FORMAT.CLIENT.key);
+  const [printPdfMode, setPrintPdfMode] = useState(defaults?.printPdfMode ?? BUDGET_PDF_FORMAT.CLIENT.key);
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
   const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
   const [dolarRate, setDolarRate] = useState(dolar);
   const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
-  const [showPrices, setShowPrices] = useState(true);
+  const [showPrices, setShowPrices] = useState(defaults?.showPrices ?? true);
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {

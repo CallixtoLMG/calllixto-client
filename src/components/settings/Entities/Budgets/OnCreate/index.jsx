@@ -1,24 +1,23 @@
 import { Box, FlexColumn } from "@/common/components/custom";
-import { GroupedButtonsControlled } from "@/common/components/form";
+import { GroupedButtonsControlled, NumberControlled, TextControlled } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion, Icon } from "semantic-ui-react";
 
-const CreateBudget = () => {
+const OnCreate = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
 
-  const { formState: { isDirty }, watch } = useFormContext();
+  const { watch } = useFormContext();
   const [defaultsCreate] = watch(['defaultsCreate']);
 
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
         <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon name="dropdown" />
-          Al Crear una Venta
+          <Icon name="dropdown" /> Al Crear una Venta
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
           <FlexColumn $rowGap="20px">
@@ -40,6 +39,13 @@ const CreateBudget = () => {
                 { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
               ]}
             />
+            <TextControlled name="defaultsCreate.customer" placeholder="A0001" width="200px" label="Cliente por Defecto" />
+            <NumberControlled
+              name="defaultsCreate.expirationOffsetDays"
+              label="Días para el Vencimiento por Defecto"
+              width="300px"
+              placeholder="15"
+            />
           </FlexColumn>
         </Accordion.Content>
       </Accordion>
@@ -47,4 +53,4 @@ const CreateBudget = () => {
   );
 };
 
-export default CreateBudget;
+export default OnCreate;

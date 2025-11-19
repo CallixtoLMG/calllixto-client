@@ -3,12 +3,12 @@ import { useEditSetting, useListSettings } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
-import { ENTITIES, PAGES, SHORTKEYS } from "@/common/constants";
+import { ALL, ENTITIES, PAGES, SHORTKEYS } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
-import { LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
+import { GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
 import { useKeyboardShortcuts, useRestoreEntity, useUnsavedChanges, useValidateToken } from "@/hooks";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { pick } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -40,6 +40,7 @@ const Settings = () => {
   const { setActions } = useNavActionsContext();
   const { data, isLoading: isLoadingSettings } = useListSettings();
   const editSetting = useEditSetting();
+  const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm();
   const formRef = useRef(null);
@@ -98,6 +99,7 @@ const Settings = () => {
     onSuccess: () => {
       toast.success("Cambios guardados correctamente.");
       methods.reset(methods.getValues());
+      queryClient.invalidateQueries({ queryKey: [[GET_SETTING_QUERY_KEY]], refetchType: ALL })
       resolveSave();
     },
     onError: (error) => {
