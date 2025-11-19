@@ -3,8 +3,9 @@ import { forwardRef } from "react";
 import { Controller } from "react-hook-form";
 import { IconedButton } from "../../buttons";
 
-  export const IconedButtonControlled = forwardRef(({
+export const IconedButtonControlled = forwardRef(({
   width,
+  height = "38px",
   name,
   icon,
   label,
@@ -19,7 +20,7 @@ import { IconedButton } from "../../buttons";
         <FormField
           {...rest}
           $width={width}
-          $height="38px"
+          height={height}
           label={label}
           text={text}
           icon={icon}

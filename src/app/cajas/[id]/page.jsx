@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useCloseCashBalance, useDeleteCashBalance, useEditCashBalance, useGetCashBalance } from "@/api/cashBalances";
 import { IconedButton } from "@/common/components/buttons";
-import { FieldsContainer, Form } from "@/common/components/custom";
+import { FieldsContainer, Flex, Form } from "@/common/components/custom";
 import { PriceField } from "@/common/components/form";
 import { DatePickerControlled } from "@/common/components/form/DatePicker";
 import ModalAction from "@/common/components/modals/ModalAction";
@@ -13,6 +13,7 @@ import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import CashBalanceForm from "@/components/cashBalances/CashBalanceForm";
 import CashBalanceMovements from "@/components/cashBalances/CashBalanceMovements";
 import { CASH_BALANCE_STATES, CLOSED } from "@/components/cashBalances/cashBalances.constants";
+import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
@@ -22,7 +23,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
-import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
 
 const CashBalance = ({ params }) => {
   useValidateToken();
@@ -219,7 +219,9 @@ const CashBalance = ({ params }) => {
       menuItem: "Caja",
       render: () => (
         <Tab.Pane>
-          {cashBalance.state !== 'CLOSED' && toggleButton}
+          <Flex $marginBottom="15px">
+            {cashBalance.state !== CASH_BALANCE_STATES.CLOSED.id && toggleButton}
+          </Flex>
           <CashBalanceForm
             ref={formRef}
             cashBalance={cashBalance}
