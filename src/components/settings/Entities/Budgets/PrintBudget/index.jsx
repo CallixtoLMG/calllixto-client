@@ -13,8 +13,6 @@ const PrintBudget = () => {
   const { watch } = useFormContext();
   const [defaultsPDF] = watch(['defaultsPDF']);
 
-  console.log({ defaultsPDF });
-
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
