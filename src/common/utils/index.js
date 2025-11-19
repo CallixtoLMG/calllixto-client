@@ -190,9 +190,11 @@ export const getNumberFormated = (value) => {
 
 export const mapToDropdownOptions = (items = []) =>
   items.map((item) => ({
-    key: item.toLowerCase().replace(/\s+/g, "_"),
+    key: item?.toLowerCase().replace(/\s+/g, "_"),
     text: item,
     value: item,
     name: item,
     color: "grey"
   }));
+
+export const getLabelColor = (entity, states) => states?.[entity?.state]?.color;

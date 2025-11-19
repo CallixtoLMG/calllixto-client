@@ -3,6 +3,32 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2025-11-19
+
+### Added
+
+- CashBalances: Added support to display and submit cash closing date (defaulted to "now") and bills breakdown (closing) in the close modal.
+
+- CashBalances: When the selected payment methods include "Cash", the bills breakdown (opening) table is now shown and editable on the cash balance detail view.
+
+- CashBalances: Added bills breakdown (closing) table in the detail view for closed cash balances with that data.
+
+- CashBalances: Included a "Now" button for quick selection of the current date/time in both opening and closing date pickers.
+
+### Changed
+
+- CashBalances: The state filter dropdown now behaves as a single-select (not multi-select) to avoid confusion.
+
+- Expenses: Added "All states" option to the state filter dropdown.
+
+- CashBalances: Prevented the selection of future dates in both start and close date fields.
+
+- CashBalances: Fixed layout of the bills breakdown (opening) section in the Excel export.
+
+- CashBalances: The Add Bill** popup is now wrapped in a proper `<Form>` component for consistent visual layout with the rest of the page.
+
+- Breadcrumbs: Fixed issue where the arrow icon (">") would render prematurely before the full path label was loaded.
+
 ## 2025-11-11
 
 ### Added
@@ -51,7 +77,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Implemented full CRUD functionality for the CashBalances entity.
 
-- Created ModalOpenTill modal component for adding new cash balances, with support for dynamic bill entry.
+- Created ModalOpenCashBalance modal component for adding new cash balances, with support for dynamic bill entry.
 
 ### Changed
 
@@ -67,7 +93,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Added the cashBalance entity with full integration: includes a dedicated modal (ModalOpenTill) and dynamic entry popup (AddBillPopup).
+- Added the cashBalance entity with full integration: includes a dedicated modal (ModalOpenCashBalance) and dynamic entry popup (AddBillPopup).
 
 - Introduced SIZES constant in common/constants to avoid hardcoded Semantic UI size strings across components.
 

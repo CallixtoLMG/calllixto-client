@@ -95,13 +95,13 @@ export const useEditCashBalance = () => {
 export const useCloseCashBalance = () => {
   const closeItem = usePostUpdateItem();
 
-  const closeCashBalance = async (cashBalance) => {
+  const closeCashBalance = async (id, value) => {
     const response = await closeItem({
       entity: ENTITIES.CASHBALANCES,
-      url: `${PATHS.CASH_BALANCES}/${cashBalance.id}`,
-      value: cashBalance,
+      url: `${PATHS.CASH_BALANCES}/${id}`,
+      value,
       responseEntity: ENTITIES.CASHBALANCE,
-      invalidateQueries: [[LIST_CASH_BALANCES_QUERY_KEY], [GET_CASH_BALANCE_QUERY_KEY, cashBalance.id]]
+      invalidateQueries: [[LIST_CASH_BALANCES_QUERY_KEY], [GET_CASH_BALANCE_QUERY_KEY]]
     });
 
     return response;

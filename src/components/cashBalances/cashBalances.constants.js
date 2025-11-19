@@ -10,7 +10,7 @@ export const LIST_CASH_BALANCES_QUERY_KEY = 'listCashBalances';
 export const CASH_BALANCES_FILTERS_KEY = 'cashBalancesFilters';
 export const CASH_BALANCE_MOVEMENTS_FILTERS_KEY = "cashBalanceMovementsFilters";
 export const CLOSED = "closed"
-export const LIST_ATTRIBUTES = ["id", "startDate", "closeDate", "paymentMethods", "comments", "initialAmount", "currentAmount", "billsDetails", "state", "createdBy"];
+export const LIST_ATTRIBUTES = ["id", "startDate", "closeDate", "paymentMethods", "comments", "initialAmount", "currentAmount", "billsDetails", "billsDetailsOnClose", "state", "createdBy"];
 
 export const CASH_BALANCE_STATES = {
   OPEN: {
@@ -137,6 +137,17 @@ export const EMPTY_CASH_BALANCE = { method: '', startDate: '', closeDate: '', id
 export const EMPTY_FILTERS = { id: '', state: CASH_BALANCE_STATES.OPEN.id, paymentMethods: '' };
 
 export const CASH_BALANCE_STATES_OPTIONS = Object.values(CASH_BALANCE_STATES)
+  .map(({ id, title, color }) => ({
+    key: id,
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+      </Flex>
+    ),
+    value: id
+  }));
+
+export const CASH_BALANCE_PAYMENT_METHODS_OPTIONS = Object.values(CASH_BALANCE_STATES)
   .map(({ id, title, color }) => ({
     key: id,
     text: (

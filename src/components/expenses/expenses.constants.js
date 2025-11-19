@@ -1,7 +1,8 @@
-import { Flex, OverflowWrapper } from "@/common/components/custom";
+import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
 import { PriceLabel } from "@/common/components/form";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { ICONS } from "@/common/constants";
+import { ICONS, SELECT_ALL_OPTION } from "@/common/constants";
+import { getLabelColor } from "@/common/utils";
 import { Label } from "semantic-ui-react";
 
 export const LIST_EXPENSES_QUERY_KEY = 'listExpenses';
@@ -14,8 +15,14 @@ export const HEADERS = [
   {
     id: 1,
     title: "Id",
-    width: 2,
-    value: (expense) => expense.id
+    width: 1,
+    value: (expense) => (
+      <Box width="60px">
+        <Label ribbon color={getLabelColor(expense, EXPENSE_STATES)}>
+          {expense.id}
+        </Label>
+      </Box>
+    )
   },
   {
     id: 2,
@@ -93,15 +100,18 @@ export const EXPENSE_STATES = {
 };
 
 export const EMPTY_EXPENSE = { name: '', comments: '', amount: '', expirationDate: '', paymentsMade: [] };
-export const EMPTY_FILTERS = { id: '', name: '', categories: "", state: EXPENSE_STATES.PAID.id };
+export const EMPTY_FILTERS = { id: '', name: '', categories: "", state: SELECT_ALL_OPTION.value, };
 
-export const EXPENSES_STATE_OPTIONS = Object.values(EXPENSE_STATES)
-  .map(({ id, title, color }) => ({
-    key: id,
-    text: (
-      <Flex $alignItems="center" $justifyContent="space-between">
-        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
-      </Flex>
-    ),
-    value: id
-  }));
+export const EXPENSES_STATE_OPTIONS = [
+  SELECT_ALL_OPTION,
+  ...Object.values(EXPENSE_STATES).map(({ id, title, color }) => (
+    {
+      key: id,
+      text: (
+        <Flex $alignItems="center" $justifyContent="space-between">
+          {title}&nbsp;<Label color={color} circular empty />
+        </Flex>
+      ),
+      value: id
+    }))
+];

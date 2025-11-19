@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useCreateCashBalance, useListCashBalances } from "@/api/cashBalances";
 import { useGetSetting } from "@/api/settings";
-import { ModalOpenTill } from "@/common/components/modals";
+import { ModalOpenCashBalance } from "@/common/components/modals";
 import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, mapToDropdownOptions } from "@/common/utils";
 import CashBalancesPage from "@/components/cashBalances/CashBalancesPage";
@@ -44,17 +44,24 @@ const CashBalances = () => {
     },
   });
 
-  const loading = useMemo(() => isLoading || isRefetching || isPending, [isLoading, isRefetching, isPending]);
-
   const paymentMethodOptions = useMemo(() => {
     return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
   }, [paymentMethods]);
 
   const handleDownloadExcel = useCallback((elements) => {
     if (!elements.length) return;
-    const headers = ['ID', 'Estado', 'Fecha de inicio', 'Fecha de cierre', 'Métodos de pago', 'Monto inicial', 'Monto actual', 'Detalle de Billetes', 'Comentarios',];
+    const headers = ['ID', 'Estado', 'Fecha de inicio', 'Fecha de cierre', 'Métodos de pago', 'Monto inicial', 'Monto actual', 'Desgloce de Billetes (Inicio)', 'Desgloce de Billetes (Cierre)', 'Comentarios'];
     const mappedCashBalances = elements.map(cashBalance => {
       const cashBalanceState = CASH_BALANCE_STATES[cashBalance.state]?.singularTitle || cashBalance.state;
+
+      const formattedBillsOnOpen = (cashBalance?.billsDetails || [])
+        .map(bill => `$${bill.denomination} x ${bill.quantity}`)
+        .join(', ');
+
+      const formattedBillsOnClose = (cashBalance?.billsDetailsOnClose || [])
+        .map(bill => `$${bill.denomination} x ${bill.quantity}`)
+        .join(', ');
+
       return [
         cashBalance.id,
         cashBalanceState,
@@ -63,7 +70,8 @@ const CashBalances = () => {
         cashBalance.paymentMethods,
         cashBalance.initialAmount,
         cashBalance.currentAmount,
-        cashBalance.billsDetails,
+        formattedBillsOnOpen,
+        formattedBillsOnClose,
         cashBalance.comments,
       ];
     });
@@ -82,7 +90,7 @@ const CashBalances = () => {
       });
     }
     setActions(actions);
-  }, [push, role, setActions, loading]);
+  }, [push, role, setActions]);
 
   const handleConfirm = useCallback((data) => {
     const payload = {
@@ -91,7 +99,6 @@ const CashBalances = () => {
         ? null
         : data.paymentMethods.map((paymentMethod) => paymentMethod.value),
     };
-    setIsModalOpen(false);
     mutate(payload);
   }, [mutate]);
 
@@ -100,14 +107,14 @@ const CashBalances = () => {
     <>
       <CashBalancesPage
         onRefetch={refetch}
-        isLoading={loading}
+        isLoading={isLoading || isRefetching}
         cashBalances={isPending ? [] : cashBalances}
         paymentOptions={paymentMethodOptions}
         onDownloadExcel={handleDownloadExcel}
       />
-      <ModalOpenTill
+      <ModalOpenCashBalance
         open={isModalOpen}
-        isLoading={loading}
+        isLoading={isPending}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleConfirm}
         paymentOptions={paymentMethodOptions}

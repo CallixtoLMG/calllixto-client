@@ -1,84 +1,97 @@
 import { IconedButton } from "@/common/components/buttons";
-import { DropdownField, NumberControlled } from "@/common/components/form";
+import { Flex, Form } from "@/common/components/custom";
+import { DropdownField, NumberField } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
-import { ARS_BILL_DENOMINATIONS } from "@/components/cashBalances/cashBalances.constants";
+import { ARS_BILL_DENOMINATIONS, EMPTY_BILL } from "@/components/cashBalances/cashBalances.constants";
+import { useEffect, useState } from "react";
 
 export const AddBillPopup = ({
-  billToAdd,
-  setBillToAdd,
-  billError,
-  setBillError,
   billDetailsFields,
   appendBillDetails,
-  setValue,
-  getValues,
   onClose,
 }) => {
+  const [billToAdd, setBillToAdd] = useState(EMPTY_BILL);
+  const [billErrors, setBillErrors] = useState({});
+  const [isDirty, setIsDirty] = useState(false);
 
-    const handleAdd = () => {
-    const d = parseInt(`${billToAdd.denomination}`, 10);
-    const q = parseInt(getValues("tempQuantity") || "0", 10);
-    const errors = {};
+  useEffect(() => {
+    const checkErrors = () => {
+      const errors = {};
+      const denomination = Number(billToAdd.denomination);
+      const quantity = Number(billToAdd.quantity);
 
-    if (isNaN(d) || d <= 0) errors.denomination = "Seleccione una denominación";
+      if (!denomination) errors.denomination = "Seleccione una denominación";
+      if (!quantity) errors.quantity = "Ingrese una cantidad";
+      if (billDetailsFields.some(bill => Number(bill.denomination) === denomination)) errors.denomination = "Ya existe esta denominación";
 
-    const exists = billDetailsFields.some(
-      (b) => parseInt(`${b.denomination}`, 10) === d
-    );
-    if (exists) errors.denomination = "Ya existe esta denominación";
+      setBillErrors(errors);
+    };
 
-    if (Object.keys(errors).length > 0) {
-      setBillError(errors);
+    checkErrors(billToAdd);
+  }, [billToAdd]);
+
+  const handleAdd = () => {
+    setIsDirty(true);
+    const denomination = Number(billToAdd.denomination);
+    const quantity = Number(billToAdd.quantity);
+
+    if (!!Object.keys(billErrors).length) {
       return;
     }
 
-    appendBillDetails({ denomination: d, quantity: q });
-    setValue("tempQuantity", "");
-    setBillToAdd({ denomination: "", quantity: "" });
-    setBillError(undefined);
+    appendBillDetails({ denomination, quantity });
+
+    setBillToAdd(EMPTY_BILL);
+    setBillErrors({});
+    setIsDirty(false);
     onClose();
   };
 
   return (
     <>
-      <DropdownField
-        height="58px"
-        label="Denominación"
-        width="200px"
-        selection
-        options={ARS_BILL_DENOMINATIONS}
-        value={billToAdd.denomination}
-        onChange={(e, { value }) => {
-          setBillToAdd({ ...billToAdd, denomination: value });
-          if (!isNaN(parseInt(`${value}`, 10)) && parseInt(`${value}`, 10) > 0) {
-            setBillError((prev) => ({ ...prev, denomination: undefined }));
+      <Flex $columnGap="14px" as={Form} flexDirection="row">
+        <DropdownField
+          dropdownHeight="38px"
+          height="auto"
+          label="Denominación"
+          width="200px"
+          selection
+          options={ARS_BILL_DENOMINATIONS}
+          value={billToAdd.denomination}
+          onChange={(e, { value }) => {
+            setBillToAdd({ ...billToAdd, denomination: value });
+          }}
+          error={
+            billErrors?.denomination && isDirty && {
+              content: billErrors.denomination,
+              pointing: "above"
+            }
           }
-        }}
-        error={
-          billError?.denomination && {
-            content: billError.denomination,
+          placeholder="Seleccionar"
+        />
+        <NumberField
+          label="Cantidad"
+          width="200px"
+          value={billToAdd.quantity}
+          onChange={(value) => {
+            setBillToAdd({ ...billToAdd, quantity: value });
+          }}
+          error={billErrors?.quantity && isDirty &&  {
+            content: billErrors.quantity,
             pointing: "above"
-          }
-        }
-        placeholder="Seleccionar"
-      />
-      <NumberControlled
-        name="tempQuantity"
-        label="Cantidad"
-        width="200px"
-        onKeyDown={(e) => handleEnterKeyDown(e, handleAdd)}
-
-      />
-      <IconedButton
-        text="Agregar"
-        alignSelf="end"
-        height="38px"
-        icon={ICONS.CHECK}
-        color={COLORS.GREEN}
-        onClick={handleAdd}
-        onKeyDown={(e) => handleEnterKeyDown(e, handleAdd)}
-      />
+          }}
+        />
+        <IconedButton
+          text="Agregar"
+          alignSelf="end"
+          height="38px"
+          icon={ICONS.CHECK}
+          color={COLORS.GREEN}
+          onClick={handleAdd}
+          onKeyDown={(e) => handleEnterKeyDown(e, handleAdd)}
+        />
+      </Flex>
     </>
   );
 };
