@@ -1,7 +1,15 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form } from "@/common/components/custom";
-import { DropdownControlled, IconedButtonControlled, PercentField, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import SearchControlled from "@/common/components/form/Search/SearchControlled";
+import {
+  DropdownControlled,
+  IconedButtonControlled,
+  PercentField,
+  PriceControlled,
+  TextAreaControlled,
+  TextControlled,
+  TextField,
+  SearchControlled
+} from "@/common/components/form";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { BRAND_STATES, getBrandSearchDescription, getBrandSearchTitle } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES, getSupplierSearchDescription, getSupplierSearchTitle } from "@/components/suppliers/suppliers.constants";
@@ -36,11 +44,13 @@ const ProductForm = forwardRef(({
   });
   const { options: tagsOptions, optionsMapper } = useSettingArrayField(ENTITIES.PRODUCT, "tags", product?.tags || []);
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
+
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleForm)(),
     resetForm: () => reset(getInitialValues(product))
   }));
+
   const [watchFractionable, watchSupplier, watchBrand, watchCost, watchPrice] = watch([
     'fractionConfig.active',
     'supplier',
@@ -124,7 +134,7 @@ const ProductForm = forwardRef(({
                   },
                 }}
                 elements={suppliers}
-                extractSearchFields={(supplier) => [supplier.name, supplier.id]}
+                searchFields={['name', 'id']}
                 getResultProps={(supplier) => ({
                   key: supplier.id,
                   title: getSupplierSearchTitle(supplier),
@@ -149,7 +159,7 @@ const ProductForm = forwardRef(({
                   },
                 }}
                 elements={brands}
-                extractSearchFields={(brand) => [brand.name, brand.id]}
+                searchFields={['name', 'id']}
                 getResultProps={(brand) => ({
                   key: brand.id,
                   title: getBrandSearchTitle(brand),

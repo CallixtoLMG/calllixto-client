@@ -1,5 +1,5 @@
 import { Box, FlexColumn } from "@/common/components/custom";
-import { GroupedButtonsControlled } from "@/common/components/form";
+import { GroupedButtonsControlled, NumberControlled, TextControlled } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { useState } from "react";
@@ -10,7 +10,7 @@ const CreateBudget = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
 
-  const { formState: { isDirty }, watch } = useFormContext();
+  const { watch } = useFormContext();
   const [defaultsCreate] = watch(['defaultsCreate']);
 
   return (
@@ -39,6 +39,13 @@ const CreateBudget = () => {
                 { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
                 { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
               ]}
+            />
+            <TextControlled name="defaultsCreate.customer" placeholder="A0001" width="200px" label="Cliente por Defecto" />
+            <NumberControlled
+              name="defaultsCreate.expirationOffsetDays"
+              label="Días para el Vencimiento por Defecto"
+              width="300px"
+              placeholder="15"
             />
           </FlexColumn>
         </Accordion.Content>

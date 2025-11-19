@@ -1,7 +1,16 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
 import { Button, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
-import { GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import SearchControlled from "@/common/components/form/Search/SearchControlled";
+import {
+  GroupedButtonsControlled,
+  NumberControlled,
+  PercentControlled,
+  PriceControlled,
+  PriceLabel,
+  TextAreaControlled,
+  TextControlled,
+  TextField,
+  SearchControlled
+} from "@/common/components/form";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, DATE_FORMATS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
@@ -40,6 +49,7 @@ const EMPTY_BUDGET = (user) => ({
 const BudgetForm = ({
   onSubmit,
   products,
+  settings = {},
   customers = [],
   budget,
   user,
@@ -87,6 +97,8 @@ const BudgetForm = ({
         }
         : {
           ...EMPTY_BUDGET(user),
+          ...settings.defaultsCreate,
+          ...(settings?.defaultsCreate?.customer && { customer: customers.find(c => c.id === settings.defaultsCreate.customer) ?? null }),
         },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -116,7 +128,7 @@ const BudgetForm = ({
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [shouldShowModal, setShouldShowModal] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(settings?.defaultsCreate?.state === BUDGET_STATES.CONFIRMED.id);
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
@@ -150,22 +162,6 @@ const BudgetForm = ({
   const customerOptions = useMemo(() => {
     return customers?.filter(({ state }) => state === CUSTOMER_STATES.ACTIVE.id);
   }, [customers]);
-
-  const normalizedCustomer = useMemo(() => {
-    return customers.find(customer => customer.id === watchCustomer?.id) || watchCustomer;
-  }, [customers, watchCustomer]);
-
-  useEffect(() => {
-    if (
-      normalizedCustomer &&
-      normalizedCustomer?.id &&
-      (
-        JSON.stringify(normalizedCustomer) !== JSON.stringify(watchCustomer)
-      )
-    ) {
-      setValue("customer", normalizedCustomer, { shouldValidate: true });
-    }
-  }, [normalizedCustomer, setValue, watch, watchCustomer]);
 
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
@@ -642,8 +638,7 @@ const BudgetForm = ({
                 }
               }}
               elements={customerOptions}
-              value={watchCustomer}
-              extractSearchFields={(customer) => [customer.name, customer.id]}
+              searchFields={['name', 'id']}
               getResultProps={(customer) => ({
                 key: customer.id,
                 title: getCustomerSearchTitle(customer),
@@ -707,7 +702,7 @@ const BudgetForm = ({
               },
             }}
             elements={products}
-            extractSearchFields={(product) => [product.name, product.id]}
+            searchFields={['name', 'id']}
             getResultProps={(product) => ({
               key: product.id,
               title: getProductSearchTitle(product),
