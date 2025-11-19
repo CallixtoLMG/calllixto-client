@@ -1,4 +1,7 @@
 import { encodeUri } from "@/common/utils";
+import { ENTITIES } from "./entities";
+import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
+import { Icon, List, ListItem } from "semantic-ui-react";
 
 export * from './dates';
 export * from './entities';
@@ -287,4 +290,21 @@ export const SORTING = {
   DESC: 'descending'
 }
 
-
+export const INFO = {
+  HELP: {
+    SECTIONS: {
+      [ENTITIES.CASH_BALANCE]: (
+        <>
+          <StyledModalContent>
+            <StyledListHeader><Icon name={ICONS.ADD} color={COLORS.BLUE} />TO DO</StyledListHeader>
+            <List relaxed bulleted as="ol">
+              <ListItem>
+                TO DO.
+              </ListItem>
+            </List>
+          </StyledModalContent>
+        </>
+      )
+    }
+  }
+}
