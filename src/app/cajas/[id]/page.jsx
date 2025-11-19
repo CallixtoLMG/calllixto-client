@@ -1,26 +1,28 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useCloseCashBalance, useDeleteCashBalance, useEditCashBalance, useGetCashBalance } from "@/api/cashBalances";
-import { Flex, Form } from "@/common/components/custom";
+import { IconedButton } from "@/common/components/buttons";
+import { FieldsContainer, Form } from "@/common/components/custom";
+import { PriceField } from "@/common/components/form";
 import { DatePickerControlled } from "@/common/components/form/DatePicker";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { COLORS, DELETE, ICONS, PAGES } from "@/common/constants";
-import { isItemInactive } from "@/common/utils";
-import { datePickerNow } from "@/common/utils/dates";
+import { datePickerNow, getDateUTC } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import CashBalanceForm from "@/components/cashBalances/CashBalanceForm";
 import CashBalanceMovements from "@/components/cashBalances/CashBalanceMovements";
-import { CASH_BALANCE_STATES, CLOSED, EMPTY_BILL } from "@/components/cashBalances/cashBalances.constants";
+import { CASH_BALANCE_STATES, CLOSED } from "@/components/cashBalances/cashBalances.constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
+import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
 
 const CashBalance = ({ params }) => {
   useValidateToken();
@@ -36,21 +38,8 @@ const CashBalance = ({ params }) => {
   const closeCashBalance = useCloseCashBalance();
   const deleteCashBalance = useDeleteCashBalance();
   const formRef = useRef(null);
-  const form = useForm();
-  const { control, setValue, getValues, trigger } = form;
-
-  const {
-    fields: billDetailsFields,
-    append: appendBillDetails,
-    remove: removeBillDetails
-  } = useFieldArray({
-    control,
-    name: "billDetailsOnClose"
-  });
-  const [billToAdd, setBillToAdd] = useState(EMPTY_BILL);
-  const [billError, setBillError] = useState(undefined);
-  const [openBillPopup, setOpenBillPopup] = useState(false);
-  const billButtonRef = useRef(null);
+  const form = useForm({ defaultValues: { billsDetailsOnClose: [], closeDate: datePickerNow() } });
+  const billsDetails = form.watch("billsDetailsOnClose");
 
   const {
     showModal: showUnsavedModal,
@@ -147,7 +136,7 @@ const CashBalance = ({ params }) => {
   });
 
   const { mutate: mutateClose, isPending: isClosePending } = useMutation({
-    mutationFn: ({ cashBalance }) => closeCashBalance(cashBalance),
+    mutationFn: (data) => closeCashBalance(params.id, data),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Caja cerrada!");
@@ -169,18 +158,8 @@ const CashBalance = ({ params }) => {
     }
 
     if (modalAction === CLOSED) {
-      const { billDetailsOnClose, ...rest } = data;
-
-      mutateClose({
-        cashBalance: {
-          ...cashBalance,
-          ...rest,
-          billsDetailsOnClose: billDetailsOnClose,
-        },
-      });
+      mutateClose({ billsDetailsOnClose: data.billsDetailsOnClose, closeDate: getDateUTC(data.closeDate) });
     }
-
-    handleModalClose();
   };
 
   const { header, confirmText = "", icon = ICONS.QUESTION } = modalConfig[modalAction] || {};
@@ -236,29 +215,13 @@ const CashBalance = ({ params }) => {
       menuItem: "Caja",
       render: () => (
         <Tab.Pane>
-          <Flex $justifyContent="space-between" $marginBottom="15px">
-            {toggleButton}
-          </Flex>
+          {cashBalance.state !== 'CLOSED' && toggleButton}
           <CashBalanceForm
             ref={formRef}
             cashBalance={cashBalance}
             onSubmit={mutateEdit}
             isLoading={isEditPending}
-            isUpdating={isUpdating && !isItemInactive(cashBalance?.state)}
-            view
-            billDetailsFields={billDetailsFields}
-            appendBillDetails={appendBillDetails}
-            removeBillDetails={removeBillDetails}
-            billToAdd={billToAdd}
-            setBillToAdd={setBillToAdd}
-            billError={billError}
-            setBillError={setBillError}
-            billButtonRef={billButtonRef}
-            openBillPopup={openBillPopup}
-            setOpenBillPopup={setOpenBillPopup}
-            getValues={getValues}
-            setValue={setValue}
-            trigger={trigger}
+            isUpdating={isUpdating}
           />
         </Tab.Pane>
       ),
@@ -292,47 +255,51 @@ const CashBalance = ({ params }) => {
         setShowModal={handleModalClose}
         isLoading={isClosePending || isDeletePending}
         noConfirmation={!requiresConfirmation}
-        bodyContent={
+        onStart={() => {
+          form.reset({ billsDetailsOnClose: [], closeDate: datePickerNow() });
+        }}
+        bodyContent={modalAction === CLOSED && (
           <FormProvider {...form}>
             <Form>
-              <DatePickerControlled
-                name="closeDate"
-                label="Fecha de cierre"
-                width="fit-content"
-                showMonthDropdown
-                showYearDropdown
-                showTimeSelect
-                scrollableYearDropdown
-                defaultValue={datePickerNow()}
-                dateFormat="dd-MM-yyyy HH:mm"
-                rules={{
-                  validate: (value) => {
-                    if (!value) return true;
-                    return value <= now() || "La fecha de cierre no puede ser mayor a la actual.";
-                  }
-                }}
-              />
-              {cashBalance?.billsDetails && (
-                <BillDetails
-                  billDetailsFields={billDetailsFields}
-                  appendBillDetails={appendBillDetails}
-                  removeBillDetails={removeBillDetails}
-                  billToAdd={billToAdd}
-                  setBillToAdd={setBillToAdd}
-                  billError={billError}
-                  setBillError={setBillError}
-                  billButtonRef={billButtonRef}
-                  openBillPopup={openBillPopup}
-                  setOpenBillPopup={setOpenBillPopup}
-                  getValues={getValues}
-                  setValue={setValue}
-                  trigger={trigger}
-                  close
+              <FieldsContainer>
+                <DatePickerControlled
+                  name="closeDate"
+                  label="Fecha de cierre"
+                  width="fit-content"
+                  showMonthDropdown
+                  showYearDropdown
+                  showTimeSelect
+                  scrollableYearDropdown
+                  defaultValue={datePickerNow()}
+                  dateFormat="dd-MM-yyyy HH:mm"
+                  rules={{
+                    validate: (value) => {
+                      if (!value) return true;
+                      return value <= datePickerNow() || "La fecha de cierre no puede ser mayor a la actual.";
+                    }
+                  }}
                 />
+                <IconedButton
+                  icon={ICONS.CLOCK}
+                  text="Ahora"
+                  color={COLORS.BLUE}
+                  onClick={() => form.setValue("closeDate", datePickerNow())}
+                  alignSelf="end"
+                  height="38px"
+                />
+              </FieldsContainer>
+              <PriceField
+                width="180px"
+                label="Total billetes"
+                value={getBillsTotal(billsDetails)}
+                disabled
+              />
+              {cashBalance?.paymentMethods?.some(method => method === "Efectivo") && (
+                <BillDetails name="billsDetailsOnClose" />
               )}
             </Form>
           </FormProvider>
-        }
+        )}
       />
     </Loader>
   );

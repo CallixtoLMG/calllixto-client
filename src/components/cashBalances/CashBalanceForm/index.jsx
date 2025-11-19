@@ -1,57 +1,40 @@
-import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, FlexColumn, Form } from "@/common/components/custom";
+import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
+import { FieldsContainer, Flex, FlexColumn, Form } from "@/common/components/custom";
 import { DropdownControlled, PriceControlled, PriceField, TextAreaControlled, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { DATE_FORMATS, ENTITIES, SHORTKEYS, SIZES } from "@/common/constants";
+import { COLORS, DATE_FORMATS, ENTITIES, ICONS, SHORTKEYS, SIZES } from "@/common/constants";
 import { mapToDropdownOptions } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import { useKeyboardShortcuts, useSettingArrayField } from "@/hooks";
 import { forwardRef, useImperativeHandle, useMemo } from "react";
-import { FormProvider, useFieldArray, useForm } from "react-hook-form";
-import { BILLS_DETAILS_TABLE_HEADERS, CASH_BALANCE_STATES, CLOSED, EMPTY_CASH_BALANCE } from "../cashBalances.constants";
+import { FormProvider, useForm } from "react-hook-form";
+import { BILLS_DETAILS_TABLE_HEADERS, CASH_BALANCE_STATES, EMPTY_CASH_BALANCE } from "../cashBalances.constants";
 import { Header } from "./styles";
+import { getBillsTotal } from "../cashBalances.utils";
+
+const getInitialValues = (cashBalance) => ({ ...EMPTY_CASH_BALANCE, ...cashBalance });
 
 const CashBalanceForm = forwardRef(({
   cashBalance,
   onSubmit,
   isUpdating,
   isLoading,
-  view,
-
-  billToAdd,
-  setBillToAdd,
-  billError,
-  setBillError,
-  billButtonRef,
-  openBillPopup,
-  setOpenBillPopup,
-  getValues,
-  setValue,
-  trigger
 }, ref) => {
-  const getInitialValues = (cashBalance) => ({ ...EMPTY_CASH_BALANCE, ...cashBalance });
   const methods = useForm({
-    defaultValues: getInitialValues(cashBalance),
-    billDetails: cashBalance?.billsDetails ?? [],
+    defaultValues: getInitialValues(cashBalance)
   });
-
-  const { control } = methods;
-
-  const {
-    fields: billDetailsFields,
-    append: appendBillDetails,
-    remove: removeBillDetails
-  } = useFieldArray({
-    control,
-    name: "billDetails",
-  });
+  const { watch, setValue } = methods;
+  const [initialAmount, billsDetails, billsDetailsOnClose] = watch(['initialAmount', 'billsDetails', 'billsDetailsOnClose']);
 
   const paymentMethodOptions = useMemo(() => {
     return mapToDropdownOptions(cashBalance?.paymentMethods || []);
   }, [cashBalance]);
 
   const { options: tagsOptions, optionsMapper } = useSettingArrayField(ENTITIES.GENERAL, "paymentMethods", paymentMethodOptions || []);
+
+  const billsTotal = useMemo(() => getBillsTotal(billsDetails), [billsDetails]);
+  const showBillsTable = useMemo(() => cashBalance?.paymentMethods?.some(method => method === "Efectivo"), [cashBalance]);
 
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
@@ -108,13 +91,12 @@ const CashBalanceForm = forwardRef(({
             />
           }
         </FieldsContainer>
-        <FieldsContainer width="50%">
+        <FieldsContainer width="fit-content">
           <DropdownControlled
             name="paymentMethods"
             label="Métodos de pago"
             disabled
             multiple
-            icon={(!isUpdating && view) ? null : undefined}
             optionsMapper={optionsMapper}
             options={Object.values(tagsOptions)}
             renderLabel={(item) => ({
@@ -123,72 +105,77 @@ const CashBalanceForm = forwardRef(({
             })}
           />
         </FieldsContainer>
-        {cashBalance.billsDetails && (
-          <FieldsContainer width="50%">
-            {cashBalance.state === CASH_BALANCE_STATES.OPEN.id && isUpdating ? (
-              <>
-                {billDetailsFields.length === 0 && cashBalance.billsDetails?.length > 0 &&
-                  cashBalance.billsDetails.forEach(bill => appendBillDetails(bill))
-                }
-                <BillDetails
-                  billDetailsFields={billDetailsFields}
-                  appendBillDetails={appendBillDetails}
-                  removeBillDetails={removeBillDetails}
-                  billToAdd={billToAdd}
-                  setBillToAdd={setBillToAdd}
-                  billError={billError}
-                  setBillError={setBillError}
-                  billButtonRef={billButtonRef}
-                  openBillPopup={openBillPopup}
-                  setOpenBillPopup={setOpenBillPopup}
-                  getValues={getValues}
-                  setValue={setValue}
-                  trigger={trigger}
-                />
-              </>
-            ) : (
-              <FlexColumn $rowGap="10px">
-                <Header
-                  margin="0"
-                  content={`Desglose de Billetes ${cashBalance.billsDetailsOnClose ? "(Inicio)" : ""}`}
-                />
-                <Table
-                  headers={BILLS_DETAILS_TABLE_HEADERS}
-                  elements={cashBalance.billsDetails}
-                  mainKey="billsDetails"
-                  disabled
-                />
-              </FlexColumn>
-            )}
-          </FieldsContainer>
-        )}
-        {cashBalance.billsDetailsOnClose &&
-          <FieldsContainer width="50%">
-            <Header size={SIZES.TINY} content="Detalle billetes(Cierre)"></Header>
-            <Table
-              headers={BILLS_DETAILS_TABLE_HEADERS}
-              elements={cashBalance.billsDetailsOnClose}
-              mainKey="billsDetails"
-              disabled={!isUpdating || cashBalance.state === CLOSED}
-            />
-          </FieldsContainer>}
-        <FieldsContainer>
+        <FieldsContainer $alignItems="flex-end">
           <PriceControlled
-            width="20%"
+            width="180px"
             name="initialAmount"
             label="Monto inicial"
             disabled={!isUpdating}
           />
+          {showBillsTable && (
+            <>
+              <PriceField
+                width="180px"
+                label="Total billetes"
+                value={billsTotal}
+                disabled
+              />
+              {billsDetailsOnClose && (
+                <PriceField
+                  width="180px"
+                  label="Total billetes (cierre)"
+                  value={getBillsTotal(billsDetailsOnClose)}
+                  disabled
+                />
+              )}
+              {isUpdating && (
+                <IconedButton
+                  text="Actualizar Monto Inicial"
+                  icon={ICONS.DOLLAR}
+                  color={COLORS.BLUE}
+                  onClick={() => setValue("initialAmount", billsTotal)}
+                  disabled={billsTotal === initialAmount}
+                />
+              )}
+            </>
+          )}
           <PriceField
-            width="20%"
+            width="180px"
             name="currentAmount"
             label="Monto actual"
             value={cashBalance.currentAmount ?? 0}
             disabled
           />
         </FieldsContainer>
+        {showBillsTable && (
+          <FieldsContainer width="80%">
+            {cashBalance.state === CASH_BALANCE_STATES.OPEN.id && isUpdating ? (
+              <BillDetails name="billsDetails" />
+            ) : (
+              <Flex $columnGap="30px">
+                <FlexColumn $rowGap="10px">
+                  <Header content="Desglose de billetes" />
+                  <Table
+                    headers={BILLS_DETAILS_TABLE_HEADERS}
+                    elements={billsDetails}
+                  />
+                </FlexColumn>
+                {billsDetailsOnClose && (
+                  <FlexColumn $rowGap="10px">
+                    <Header content="Detalle de billetes (cierre)"></Header>
+                    <Table
+                      headers={BILLS_DETAILS_TABLE_HEADERS}
+                      elements={billsDetailsOnClose}
+                    />
+                  </FlexColumn>
+                )}
+              </Flex>
+            )}
+          </FieldsContainer>
+        )}
+
         <TextAreaControlled name="comments" label="Comentarios" placeholder="Solo billetes de 500" disabled={!isUpdating} />
-        {(isUpdating || !view) && (
+        {isUpdating && (
           <SubmitAndRestore
             isUpdating={isUpdating}
             isLoading={isLoading}
