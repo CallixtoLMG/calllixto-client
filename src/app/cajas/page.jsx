@@ -91,7 +91,7 @@ const CashBalances = () => {
     }
     setActions(actions);
     setInfo(INFO.HELP.SECTIONS[ENTITIES.CASH_BALANCE]);
-  }, [push, role, setActions]);
+  }, [push, role, setActions, setInfo]);
 
   const handleConfirm = useCallback((data) => {
     const payload = {
