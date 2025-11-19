@@ -88,7 +88,8 @@ const Expense = ({ params }) => {
     }
 
     setActions(actionsList);
-  }, [role, expense?.id, expense?.state, setActions, push,]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [role, expense?.id, expense?.state, setActions, push]);
 
   const expenseFormRef = useRef();
 

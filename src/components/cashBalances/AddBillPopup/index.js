@@ -29,7 +29,7 @@ export const AddBillPopup = ({
     };
 
     checkErrors(billToAdd);
-  }, [billToAdd]);
+  }, [billDetailsFields, billToAdd]);
 
   const handleAdd = () => {
     setIsDirty(true);

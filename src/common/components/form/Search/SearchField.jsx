@@ -68,6 +68,7 @@ const SearchField = forwardRef(
       debouncedSearch();
 
       return () => debouncedSearch.cancel();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [elements, query]);
 
     const handleChange = (_, { value }) => {
