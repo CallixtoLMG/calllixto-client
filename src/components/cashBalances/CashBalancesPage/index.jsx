@@ -72,7 +72,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
               width="200px"
               name="paymentMethods"
               placeholder="Método de pago"
-              options={tagsOptions}
+              options={paymentOptions}
               defaultValue={EMPTY_FILTERS.paymentMethods}
               afterChange={onSubmit}
               textMaxWidth="fit-content"

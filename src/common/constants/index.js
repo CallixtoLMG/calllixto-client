@@ -251,6 +251,7 @@ export const ICONS = {
   CLOSE: "close",
   ARROW_UP: "arrow up",
   ARROW_DOWN: "arrow down",
+  CLOCK: "clock",
 };
 
 export const ALL = "all";

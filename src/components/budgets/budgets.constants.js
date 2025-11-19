@@ -1,10 +1,11 @@
 import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
 import { DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
+import { getLabelColor } from "@/common/utils";
 import { getDateWithOffset, getEndOfUnit, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
 import { Label, Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { CommentTooltip } from "../../common/components/tooltips";
-import { getLabelColor, getPopupContent, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
+import { getPopupContent, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
 
 export const LIST_BUDGETS_QUERY_KEY = 'listAllBudgets';
 export const LIST_BUDGETS_HISTORY_QUERY_KEY = 'getBudgetsHistory';
@@ -79,7 +80,7 @@ export const BUDGETS_COLUMNS = [
         {isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state) ? (
           <Popup
             trigger={
-              <Label ribbon color={getLabelColor(budget)}>
+              <Label ribbon color={getLabelColor(budget, BUDGET_STATES)}>
                 {budget.id}
               </Label>
             }
@@ -88,7 +89,7 @@ export const BUDGETS_COLUMNS = [
             size="mini"
           />
         ) : (
-          <Label ribbon color={getLabelColor(budget)}>
+          <Label ribbon color={getLabelColor(budget, BUDGET_STATES)}>
             {budget.id}
           </Label>
         )}

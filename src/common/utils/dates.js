@@ -12,7 +12,7 @@ export const now = () => {
 
 export const datePickerNow = () => {
   return dayjs().toDate();
-}
+};
 
 export const getDateWithOffset = ({ date, offset, unit = 'days', format = DATE_FORMATS.ONLY_DATE }) => {
   return dayjs(date).utc().add(offset, unit).format(format);

@@ -1,22 +1,50 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form } from "@/common/components/custom";
+import { FieldsContainer, FlexColumn, Form } from "@/common/components/custom";
 import { DropdownControlled, PriceControlled, PriceField, TextAreaControlled, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { DATE_FORMATS, ENTITIES, SHORTKEYS, SIZES } from "@/common/constants";
 import { mapToDropdownOptions } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
+import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import { useKeyboardShortcuts, useSettingArrayField } from "@/hooks";
 import { forwardRef, useImperativeHandle, useMemo } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import { Header } from "semantic-ui-react";
-import { BILLS_DETAILS_TABLE_HEADERS, EMPTY_CASH_BALANCE } from "../cashBalances.constants";
+import { FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { BILLS_DETAILS_TABLE_HEADERS, CASH_BALANCE_STATES, CLOSED, EMPTY_CASH_BALANCE } from "../cashBalances.constants";
+import { Header } from "./styles";
 
 const CashBalanceForm = forwardRef(({
-  cashBalance, onSubmit, isUpdating, isLoading, view,
+  cashBalance,
+  onSubmit,
+  isUpdating,
+  isLoading,
+  view,
+
+  billToAdd,
+  setBillToAdd,
+  billError,
+  setBillError,
+  billButtonRef,
+  openBillPopup,
+  setOpenBillPopup,
+  getValues,
+  setValue,
+  trigger
 }, ref) => {
   const getInitialValues = (cashBalance) => ({ ...EMPTY_CASH_BALANCE, ...cashBalance });
   const methods = useForm({
-    defaultValues: getInitialValues(cashBalance)
+    defaultValues: getInitialValues(cashBalance),
+    billDetails: cashBalance?.billsDetails ?? [],
+  });
+
+  const { control } = methods;
+
+  const {
+    fields: billDetailsFields,
+    append: appendBillDetails,
+    remove: removeBillDetails
+  } = useFieldArray({
+    control,
+    name: "billDetails",
   });
 
   const paymentMethodOptions = useMemo(() => {
@@ -24,6 +52,7 @@ const CashBalanceForm = forwardRef(({
   }, [cashBalance]);
 
   const { options: tagsOptions, optionsMapper } = useSettingArrayField(ENTITIES.GENERAL, "paymentMethods", paymentMethodOptions || []);
+
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
@@ -94,13 +123,53 @@ const CashBalanceForm = forwardRef(({
             })}
           />
         </FieldsContainer>
-        {!!cashBalance.billsDetails?.length &&
+        {cashBalance.billsDetails && (
           <FieldsContainer width="50%">
-            <Header size={SIZES.TINY} content="Detalle billetes"></Header>
+            {cashBalance.state === CASH_BALANCE_STATES.OPEN.id && isUpdating ? (
+              <>
+                {billDetailsFields.length === 0 && cashBalance.billsDetails?.length > 0 &&
+                  cashBalance.billsDetails.forEach(bill => appendBillDetails(bill))
+                }
+                <BillDetails
+                  billDetailsFields={billDetailsFields}
+                  appendBillDetails={appendBillDetails}
+                  removeBillDetails={removeBillDetails}
+                  billToAdd={billToAdd}
+                  setBillToAdd={setBillToAdd}
+                  billError={billError}
+                  setBillError={setBillError}
+                  billButtonRef={billButtonRef}
+                  openBillPopup={openBillPopup}
+                  setOpenBillPopup={setOpenBillPopup}
+                  getValues={getValues}
+                  setValue={setValue}
+                  trigger={trigger}
+                />
+              </>
+            ) : (
+              <FlexColumn $rowGap="10px">
+                <Header
+                  margin="0"
+                  content={`Desglose de Billetes ${cashBalance.billsDetailsOnClose ? "(Inicio)" : ""}`}
+                />
+                <Table
+                  headers={BILLS_DETAILS_TABLE_HEADERS}
+                  elements={cashBalance.billsDetails}
+                  mainKey="billsDetails"
+                  disabled
+                />
+              </FlexColumn>
+            )}
+          </FieldsContainer>
+        )}
+        {cashBalance.billsDetailsOnClose &&
+          <FieldsContainer width="50%">
+            <Header size={SIZES.TINY} content="Detalle billetes(Cierre)"></Header>
             <Table
               headers={BILLS_DETAILS_TABLE_HEADERS}
-              elements={cashBalance.billsDetails}
+              elements={cashBalance.billsDetailsOnClose}
               mainKey="billsDetails"
+              disabled={!isUpdating || cashBalance.state === CLOSED}
             />
           </FieldsContainer>}
         <FieldsContainer>

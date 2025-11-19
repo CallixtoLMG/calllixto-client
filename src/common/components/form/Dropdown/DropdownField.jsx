@@ -15,7 +15,8 @@ export const DropdownField = ({
   multiple,
   search,
   selection,
-  height = "38px"
+  height = "38px",
+  dropdownHeight
 }) => {
 
   return (
@@ -34,6 +35,7 @@ export const DropdownField = ({
       options={options}
       clearable={clearable}
       value={value}
+      dropdownHeight={dropdownHeight}
       onChange={onChange}
       disabled={disabled}
       control={Dropdown}

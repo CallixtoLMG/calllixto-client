@@ -1,20 +1,24 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useCloseCashBalance, useDeleteCashBalance, useEditCashBalance, useGetCashBalance } from "@/api/cashBalances";
-import { Flex } from "@/common/components/custom";
+import { Flex, Form } from "@/common/components/custom";
+import { DatePickerControlled } from "@/common/components/form/DatePicker";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { COLORS, DELETE, ICONS, PAGES } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
+import { datePickerNow } from "@/common/utils/dates";
+import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import CashBalanceForm from "@/components/cashBalances/CashBalanceForm";
 import CashBalanceMovements from "@/components/cashBalances/CashBalanceMovements";
-import { CASH_BALANCE_STATES, CLOSED } from "@/components/cashBalances/cashBalances.constants";
+import { CASH_BALANCE_STATES, CLOSED, EMPTY_BILL } from "@/components/cashBalances/cashBalances.constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
@@ -32,6 +36,21 @@ const CashBalance = ({ params }) => {
   const closeCashBalance = useCloseCashBalance();
   const deleteCashBalance = useDeleteCashBalance();
   const formRef = useRef(null);
+  const form = useForm();
+  const { control, setValue, getValues, trigger } = form;
+
+  const {
+    fields: billDetailsFields,
+    append: appendBillDetails,
+    remove: removeBillDetails
+  } = useFieldArray({
+    control,
+    name: "billDetailsOnClose"
+  });
+  const [billToAdd, setBillToAdd] = useState(EMPTY_BILL);
+  const [billError, setBillError] = useState(undefined);
+  const [openBillPopup, setOpenBillPopup] = useState(false);
+  const billButtonRef = useRef(null);
 
   const {
     showModal: showUnsavedModal,
@@ -142,7 +161,7 @@ const CashBalance = ({ params }) => {
     },
   });
 
-  const handleActionConfirm = async () => {
+  const handleActionConfirm = async (data) => {
     setActiveAction(modalAction);
 
     if (modalAction === DELETE) {
@@ -150,7 +169,15 @@ const CashBalance = ({ params }) => {
     }
 
     if (modalAction === CLOSED) {
-      mutateClose({ cashBalance });
+      const { billDetailsOnClose, ...rest } = data;
+
+      mutateClose({
+        cashBalance: {
+          ...cashBalance,
+          ...rest,
+          billsDetailsOnClose: billDetailsOnClose,
+        },
+      });
     }
 
     handleModalClose();
@@ -219,6 +246,19 @@ const CashBalance = ({ params }) => {
             isLoading={isEditPending}
             isUpdating={isUpdating && !isItemInactive(cashBalance?.state)}
             view
+            billDetailsFields={billDetailsFields}
+            appendBillDetails={appendBillDetails}
+            removeBillDetails={removeBillDetails}
+            billToAdd={billToAdd}
+            setBillToAdd={setBillToAdd}
+            billError={billError}
+            setBillError={setBillError}
+            billButtonRef={billButtonRef}
+            openBillPopup={openBillPopup}
+            setOpenBillPopup={setOpenBillPopup}
+            getValues={getValues}
+            setValue={setValue}
+            trigger={trigger}
           />
         </Tab.Pane>
       ),
@@ -245,13 +285,54 @@ const CashBalance = ({ params }) => {
       />
       <ModalAction
         title={header}
-        onConfirm={handleActionConfirm}
+        onConfirm={form.handleSubmit(handleActionConfirm)}
         confirmationWord={requiresConfirmation ? confirmText : ""}
         confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
         isLoading={isClosePending || isDeletePending}
         noConfirmation={!requiresConfirmation}
+        bodyContent={
+          <FormProvider {...form}>
+            <Form>
+              <DatePickerControlled
+                name="closeDate"
+                label="Fecha de cierre"
+                width="fit-content"
+                showMonthDropdown
+                showYearDropdown
+                showTimeSelect
+                scrollableYearDropdown
+                defaultValue={datePickerNow()}
+                dateFormat="dd-MM-yyyy HH:mm"
+                rules={{
+                  validate: (value) => {
+                    if (!value) return true;
+                    return value <= now() || "La fecha de cierre no puede ser mayor a la actual.";
+                  }
+                }}
+              />
+              {cashBalance?.billsDetails && (
+                <BillDetails
+                  billDetailsFields={billDetailsFields}
+                  appendBillDetails={appendBillDetails}
+                  removeBillDetails={removeBillDetails}
+                  billToAdd={billToAdd}
+                  setBillToAdd={setBillToAdd}
+                  billError={billError}
+                  setBillError={setBillError}
+                  billButtonRef={billButtonRef}
+                  openBillPopup={openBillPopup}
+                  setOpenBillPopup={setOpenBillPopup}
+                  getValues={getValues}
+                  setValue={setValue}
+                  trigger={trigger}
+                  close
+                />
+              )}
+            </Form>
+          </FormProvider>
+        }
       />
     </Loader>
   );
