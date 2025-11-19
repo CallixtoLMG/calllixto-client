@@ -65,7 +65,6 @@ const Breadcrumb = () => {
             {index !== 0 && (
               <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />
             )}
-
             <OverflowWrapper $verticalAlign="baseline" popupContent={name} maxWidth="25vw">
               <Flex>
                 <Span>{name}</Span>
