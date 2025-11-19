@@ -64,7 +64,7 @@ const User = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.USERS.NAME, user && `${user?.firstName} ${user?.lastName}`]);
+    setLabels([{ name: PAGES.USERS.NAME }, { name: user && `${user?.firstName} ${user?.lastName}`}]);
     refetch();
   }, [setLabels, user, refetch]);
 

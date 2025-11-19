@@ -87,7 +87,7 @@ const Settings = () => {
 
   useEffect(() => {
     setActions([]);
-    setLabels([PAGES.SETTINGS.NAME]);
+    setLabels([{ name: PAGES.SETTINGS.NAME }]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setActions, setLabels]);
 
@@ -123,7 +123,7 @@ const Settings = () => {
     if (!canView) return;
 
     setActiveEntity(entity);
-    setLabels([PAGES.SETTINGS.NAME, entity.label]);
+    setLabels([{ name: PAGES.SETTINGS.NAME }, { name: entity.label }]);
     reset(entity);
   }, [onBeforeView, reset, setLabels]);
 

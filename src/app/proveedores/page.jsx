@@ -20,7 +20,7 @@ const Suppliers = () => {
   const { push } = useRouter();
 
   useEffect(() => {
-    setLabels([PAGES.SUPPLIERS.NAME]);
+    setLabels([{ name: PAGES.SUPPLIERS.NAME }]);
   }, [setLabels]);
 
   const suppliers = useMemo(() => data?.suppliers, [data]);

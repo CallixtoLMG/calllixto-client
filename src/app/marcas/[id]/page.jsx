@@ -68,7 +68,7 @@ const Brand = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.BRANDS.NAME, brand?.name]);
+    setLabels([{ name: PAGES.BRANDS.NAME }, { name: brand?.name }]);
     refetch();
   }, [setLabels, brand, refetch]);
 

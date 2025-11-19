@@ -65,7 +65,7 @@ const Customer = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.CUSTOMERS.NAME, customer?.name]);
+    setLabels([{ name: PAGES.CUSTOMERS.NAME }, { name: customer?.name }]);
     refetch();
   }, [customer, setLabels, refetch]);
 

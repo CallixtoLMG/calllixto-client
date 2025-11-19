@@ -20,7 +20,7 @@ const Users = () => {
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   useEffect(() => {
-    setLabels([PAGES.USERS.NAME]);
+    setLabels([{ name: PAGES.USERS.NAME }]);
     refetch();
   }, [setLabels, refetch]);
 

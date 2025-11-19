@@ -17,7 +17,7 @@ const Customers = () => {
   const { push } = useRouter();
 
   useEffect(() => {
-    setLabels([PAGES.CUSTOMERS.NAME]);
+    setLabels([{ name: PAGES.CUSTOMERS.NAME }]);
   }, [setLabels]);
 
   const customers = useMemo(() => data?.customers, [data]);

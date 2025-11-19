@@ -88,8 +88,8 @@ const Budget = ({ params }) => {
       const stateTitle = BUDGET_STATES[budget.state]?.singularTitle || BUDGET_STATES.INACTIVE.singularTitle;
       const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([
-        PAGES.BUDGETS.NAME,
-        budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
+        { name: PAGES.BUDGETS.NAME },
+        { name: budget?.id, label: { title: stateTitle, color: stateColor } }
       ].filter(Boolean));
       setCustomerData(budget.customer);
       setSelectedContact({

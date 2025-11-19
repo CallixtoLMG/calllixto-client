@@ -88,7 +88,7 @@ const Supplier = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.SUPPLIERS.NAME, supplier?.name]);
+    setLabels([{ name: PAGES.SUPPLIERS.NAME }, { name: supplier?.name }]);
     refetchSupplier();
     refetchProducts();
   }, [setLabels, supplier, refetchProducts, refetchSupplier]);

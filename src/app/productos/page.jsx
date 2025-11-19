@@ -24,7 +24,7 @@ const Products = () => {
   const { push } = useRouter();
 
   useEffect(() => {
-    setLabels(['Productos']);
+    setLabels([{ name: 'Productos' }]);
   }, [setLabels]);
 
   const products = useMemo(() => data?.products, [data]);

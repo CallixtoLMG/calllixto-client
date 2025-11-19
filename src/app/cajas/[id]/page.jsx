@@ -75,11 +75,15 @@ const CashBalance = ({ params }) => {
 
   useEffect(() => {
     setLabels([
-      PAGES.CASH_BALANCES.NAME,
-      cashBalance?.id
-        ? { id: cashBalance.id, title: CASH_BALANCE_STATES[cashBalance.state]?.singularTitle, color: CASH_BALANCE_STATES[cashBalance.state]?.color }
-        : null
-    ].filter(Boolean));
+      { name: PAGES.CASH_BALANCES.NAME },
+      {
+        name: cashBalance?.id,
+        label: {
+          title: CASH_BALANCE_STATES[cashBalance?.state]?.singularTitle,
+          color: CASH_BALANCE_STATES[cashBalance?.state]?.color
+        }
+      }
+    ]);
     refetch();
   }, [setLabels, cashBalance, refetch]);
 

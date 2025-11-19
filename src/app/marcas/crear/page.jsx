@@ -22,7 +22,7 @@ const CreateBrand = () => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.BRANDS.NAME, 'Crear']);
+    setLabels([{ name: PAGES.BRANDS.NAME }, { name: 'Crear' }]);
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({

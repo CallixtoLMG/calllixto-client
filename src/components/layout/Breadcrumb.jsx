@@ -30,10 +30,6 @@ const SSBreadcrumb = styled(SBreadcrumb)`
     align-content: center;
   }
 
-  div.section {
-    text-wrap-mode: nowrap!important;
-  }
-
   i {
     position: relative;
     top: -10px;
@@ -63,47 +59,31 @@ const Breadcrumb = () => {
   const { labels } = useBreadcrumContext();
   return (
     <SSBreadcrumb size={SIZES.HUGE}>
-      {labels.map((label, index) => {
-        const isStringLabel = typeof label === 'string' && label.trim() !== '';
-        const isObjectLabel = typeof label === 'object' && label?.title;
-
-        if (!isStringLabel && !isObjectLabel) return null;
-
-        const currentHasPopup = typeof label === 'object' && !!label.popup;
-
+      {labels.filter(label => label.name).map(({ name, label }, index) => {
         return (
           <BreadcrumbSection key={`label_${index}`}>
-            {index !== 0 && !currentHasPopup && (
+            {index !== 0 && (
               <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />
             )}
 
-            {isStringLabel ? (
-              <OverflowWrapper $verticalAlign="baseline" popupContent={label} maxWidth="25vw">
-                {label}
-              </OverflowWrapper>
-            ) : (
-              <OverflowWrapper $verticalAlign="bottom" maxWidth="25vw" popupContent={label.title}>
-                <Flex>
-                  <Span>{label.id && <span>{label.id}</span>}</Span>
-                  {label.id ? (
-                    <Label pointing="left" color={label.color}>
-                      {label.title}
-                    </Label>
-                  ) : (
-                    <Popup
-                      content={label.popup || ''}
-                      position="bottom center"
-                      size="mini"
-                      trigger={
-                        <Label pointing="left" color={label.color}>
-                          {label.title}
-                        </Label>
-                      }
-                    />
-                  )}
-                </Flex>
-              </OverflowWrapper>
-            )}
+            <OverflowWrapper $verticalAlign="baseline" popupContent={name} maxWidth="25vw">
+              <Flex>
+                <Span>{name}</Span>
+                {label && (
+                  <Popup
+                    content={label.popup}
+                    disabled={!label.popup}
+                    position="bottom center"
+                    size="mini"
+                    trigger={
+                      <Label pointing="left" color={label.color}>
+                        {label.title}
+                      </Label>
+                    }
+                  />
+                )}
+              </Flex>
+            </OverflowWrapper>
           </BreadcrumbSection>
         );
       })}

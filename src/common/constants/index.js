@@ -77,6 +77,7 @@ export const PAGES = {
     SHORTKEYS: 'Control+7'
   },
   BUDGETS_HISTORY: {
+    NAME: 'Historial de Ventas',
     BASE: "/historial-ventas",
   },
   LOGIN: {

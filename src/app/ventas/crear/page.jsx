@@ -25,7 +25,7 @@ const CreateBudget = () => {
   const createBudget = useCreateBudget();
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
-  const { data: productsData, isLoading: loadingProducts, refetch: refetchproductsData , isRefetching } = useListProducts();
+  const { data: productsData, isLoading: loadingProducts, refetch: refetchproductsData, isRefetching } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const { data: budgetSettings, isLoading: isLoadingBudgetSettings, isRefetching: isRefetchingSettings } = useGetSetting(ENTITIES.BUDGET);
@@ -41,7 +41,7 @@ const CreateBudget = () => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.BUDGETS.NAME, 'Crear']);
+    setLabels([{ name: PAGES.BUDGETS.NAME }, { name: 'Crear' }]);
     refetchproductsData();
     refetchPaymentMethods();
   }, [setLabels, refetchproductsData, refetchPaymentMethods]);

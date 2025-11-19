@@ -48,7 +48,7 @@ const Expense = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.EXPENSES.NAME, expense?.name]);
+    setLabels([{ name: PAGES.EXPENSES.NAME }, { name: expense?.name }]);
     refetch();
   }, [setLabels, expense, refetch]);
 

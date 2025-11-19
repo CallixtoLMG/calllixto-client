@@ -20,7 +20,7 @@ const Expenses = () => {
   const { push } = useRouter();
 
   useEffect(() => {
-    setLabels([PAGES.EXPENSES.NAME]);
+    setLabels([{ name: PAGES.EXPENSES.NAME }]);
     refetch();
   }, [setLabels, refetch]);
 

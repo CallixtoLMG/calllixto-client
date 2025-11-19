@@ -73,11 +73,14 @@ const Product = ({ params }) => {
 
   useEffect(() => {
     setLabels([
-      PAGES.PRODUCTS.NAME,
-      product?.id
-        ? { id: product.id, title: PRODUCT_STATES[product.state]?.singularTitle, color: PRODUCT_STATES[product.state]?.color }
-        : null
-    ].filter(Boolean));
+      { name: PAGES.PRODUCTS.NAME },
+      {
+        name: product?.id,
+        label: {
+          title: PRODUCT_STATES[product?.state]?.singularTitle, color: PRODUCT_STATES[product?.state]?.color
+        }
+      }
+    ]);
     refetch();
   }, [setLabels, product, refetch]);
 

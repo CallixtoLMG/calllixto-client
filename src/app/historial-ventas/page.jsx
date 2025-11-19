@@ -23,7 +23,7 @@ const BudgetsHistory = () => {
   const { setActions } = useNavActionsContext();
 
   useEffect(() => {
-    setLabels([PAGES.BUDGETS_HISTORY.NAME]);
+    setLabels([{ name: PAGES.BUDGETS_HISTORY.NAME }]);
   }, [setLabels]);
 
   useEffect(() => {

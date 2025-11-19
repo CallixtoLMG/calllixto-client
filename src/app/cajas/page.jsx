@@ -26,7 +26,7 @@ const CashBalances = () => {
   const { data: paymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const createCashBalance = useCreateCashBalance();
   useEffect(() => {
-    setLabels([PAGES.CASH_BALANCES.NAME]);
+    setLabels([{ name: PAGES.CASH_BALANCES.NAME }]);
     refetch();
   }, [setLabels, refetch]);
 

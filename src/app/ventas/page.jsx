@@ -16,8 +16,12 @@ const Budgets = () => {
   const { push } = useRouter();
 
   useEffect(() => {
-    setLabels([PAGES.BUDGETS.NAME, {
-      popup: <> Para ver el historial completo de Ventas haga click en <b>Historial</b>.</>, title: `Últimos ${BUDGETS_VIEW_MONTHS} meses`, color: COLORS.BLUE
+    setLabels([{
+      name: PAGES.BUDGETS.NAME, label: {
+        title: `Últimos ${BUDGETS_VIEW_MONTHS} meses`,
+        color: COLORS.BLUE,
+        popup: <>Para ver el historial completo de Ventas haga click en <b>Historial</b></>
+      }
     }]);
     refetch()
   }, [setLabels, refetch]);
