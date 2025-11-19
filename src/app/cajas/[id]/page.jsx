@@ -274,7 +274,7 @@ const CashBalance = ({ params }) => {
   ];
 
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || !cashBalance}>
       <Tab panes={panes} />
       <UnsavedChangesModal
         open={showUnsavedModal}

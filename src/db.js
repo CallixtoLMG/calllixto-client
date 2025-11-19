@@ -1,4 +1,4 @@
-import { LAST_UPDATED_AT } from '@/common/constants';
+import { ENTITIES, LAST_UPDATED_AT } from '@/common/constants';
 import { config } from "@/config";
 import Dexie from 'dexie';
 
@@ -7,16 +7,15 @@ let db;
 if (typeof window !== "undefined") {
   db = new Dexie(`${config.APP_ENV}-Callixto-${localStorage.getItem("selectedClientId")}`);
   db.version(1).stores({
-    customers: 'id, updatedAt',
-    brands: 'id, updatedAt',
-    suppliers: 'id, updatedAt',
-    products: 'id, updatedAt',
-    budgets: 'id, updatedAt',
-    budgetsHistory: 'id, updatedAt',
-    expenses: 'id, updatedAt',
-    users: 'id, updatedAt',
-    cashBalances: 'id, updatedAt',
-    settings: 'entity, updatedAt',
+    [ENTITIES.CUSTOMERS]: 'id, updatedAt',
+    [ENTITIES.BRANDS]: 'id, updatedAt',
+    [ENTITIES.SUPPLIERS]: 'id, updatedAt',
+    [ENTITIES.PRODUCTS]: 'id, updatedAt',
+    [ENTITIES.BUDGETS]: 'id, updatedAt',
+    [ENTITIES.EXPENSES]: 'id, updatedAt',
+    [ENTITIES.USERS]: 'id, updatedAt',
+    [ENTITIES.CASHBALANCES]: 'id, updatedAt',
+    [ENTITIES.SETTINGS]: 'entity, updatedAt',
     [LAST_UPDATED_AT]: 'id',
   });
 }

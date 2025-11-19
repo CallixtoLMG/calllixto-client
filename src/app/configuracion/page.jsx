@@ -4,12 +4,13 @@ import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
 import { ENTITIES, PAGES, SHORTKEYS } from "@/common/constants";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
 import { LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
 import { useKeyboardShortcuts, useRestoreEntity, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { pick } from "lodash";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -25,17 +26,19 @@ const ENTITY_MAPPER = {
 };
 
 export const SUPPORTED_SETTINGS = {
-  PRODUCT: ["tags", "blacklist"],
-  CUSTOMER: ["tags"],
-  GENERAL: ["paymentMethods"],
-  EXPENSE: ["tags", "categories"],
+  PRODUCT: ['tags', 'blacklist'],
+  CUSTOMER: ['tags'],
+  GENERAL: ['paymentMethods'],
+  EXPENSE: ['tags', 'categories'],
+  BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
 };
 
 const Settings = () => {
   useValidateToken();
+  const { push } = useRouter();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
-  const { data } = useListSettings();
+  const { data, isLoading: isLoadingSettings } = useListSettings();
   const editSetting = useEditSetting();
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm();
@@ -88,9 +91,7 @@ const Settings = () => {
   }, [setActions, setLabels]);
 
   const { mutate: mutateEdit, isPending } = useMutation({
-    
     mutationFn: (data) => editSetting({
-   
       entity: `${activeEntity?.entity}S`,
       value: pick(data, SUPPORTED_SETTINGS[activeEntity?.entity]),
     }),
@@ -136,7 +137,6 @@ const Settings = () => {
 
   return mappedEntities;
 }, [data]);
- 
   useEffect(() => {
     if (!activeEntity && settings.length) {
       handleEntityChange(settings[0]);
@@ -161,32 +161,38 @@ const Settings = () => {
     }
   ]);
 
+  if (!isLoadingSettings && !data) {
+    push(PAGES.NOT_FOUND.BASE);
+  }
+
   return (
-    <FormProvider {...methods}>
-      <Form ref={formRef} onSubmit={handleSubmit(mutateEdit)}>
-        <SettingsTabs
-          onEntityChange={handleEntityChange}
-          settings={settings}
-          onRefresh={handleSettingsRefresh}
-          isLoading={isLoading}
-          onBeforeView={onBeforeView}
-        />
-        <SubmitAndRestore
-          isLoading={isPending}
-          onReset={() => reset(data[activeEntity])}
-          isDirty={isDirty}
-          text="Actualizar"
-          submit
-        />
-        <UnsavedChangesModal
-          open={showModal}
-          onDiscard={handleDiscard}
-          onSave={handleSave}
-          isSaving={isSaving}
-          onCancel={handleCancel}
-        />
-      </Form>
-    </FormProvider>
+    <Loader active={isLoadingSettings}>
+      <FormProvider {...methods}>
+        <Form ref={formRef} onSubmit={handleSubmit(mutateEdit)}>
+          <SettingsTabs
+            onEntityChange={handleEntityChange}
+            settings={settings}
+            onRefresh={handleSettingsRefresh}
+            isLoading={isLoading}
+            onBeforeView={onBeforeView}
+          />
+          <SubmitAndRestore
+            isLoading={isPending}
+            onReset={() => reset(data[activeEntity])}
+            isDirty={isDirty}
+            text="Actualizar"
+            submit
+          />
+          <UnsavedChangesModal
+            open={showModal}
+            onDiscard={handleDiscard}
+            onSave={handleSave}
+            isSaving={isSaving}
+            onCancel={handleCancel}
+          />
+        </Form>
+      </FormProvider>
+    </Loader>
   );
 };
 

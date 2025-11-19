@@ -59,13 +59,10 @@ export const useCreatePayment = () => {
   return createPayment;
 };
 
-export function useGetPayment(entity, entityId) {
-
+export function useGetPayment(entity, entityId, enabled) {
   const getPayment = async (entityId) => {
-
     try {
       const { data } = await getInstance().get(`${PATHS.PAYMENTS}/${entity}/${entityId}`);
-
       return data?.payments ?? null;
     } catch (error) {
       throw error;
@@ -77,7 +74,7 @@ export function useGetPayment(entity, entityId) {
     queryFn: () => getPayment(entityId),
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
-    enabled: !!entityId,
+    enabled: enabled && !!entityId,
   });
 
   return query;

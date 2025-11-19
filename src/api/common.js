@@ -66,7 +66,7 @@ export async function listItems({ entity, url, params = {} }) {
     await clearStorageTable(entity);
     const data = await entityList({ entity, url, params });
     if (!!data.length) {
-      await bulkAddStorageItems({ entity, values: data });
+      await bulkAddStorageItems({ entity, values: data.filter(element => element.state !== HARD_DELETED) });
       updateLastUpdatedAt = true;
     }
 

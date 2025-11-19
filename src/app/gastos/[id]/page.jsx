@@ -32,6 +32,7 @@ const Expense = ({ params }) => {
   const tabParam = searchParams.get("tab");
   const initialTabIndex = tabParam === "pagos" ? 1 : 0;
   const [activeIndex, setActiveIndex] = useState(initialTabIndex);
+  const { data: payment, refetch: refetchPayment, isLoading: isLoadingPayments, isRefetching } = useGetPayment(ENTITIES.EXPENSE, params.id, activeIndex === 1);
   const cancelExpense = useCancelExpense();
   const editExpense = useEditExpense();
   const editPayment = useEditPayment();
@@ -40,8 +41,6 @@ const Expense = ({ params }) => {
   const [isModalPaymentOpen, setIsModalPaymentOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const router = useRouter();
-
-  const { data: payment, refetch: refetchPayment } = useGetPayment(ENTITIES.EXPENSE, params.id);
 
   useEffect(() => {
     resetActions();
@@ -256,33 +255,35 @@ const Expense = ({ params }) => {
       menuItem: "Pagos",
       render: () => (
         <Tab.Pane>
-          <EntityPayments
-            ref={paymentsFormRef}
-            total={expense.amount}
-            entityState={expense.state}
-            isCancelled={isItemCancelled}
-            isUpdating={paymentsAllow.isUpdating}
-            isModalPaymentOpen={isModalPaymentOpen}
-            setIsModalPaymentOpen={setIsModalPaymentOpen}
-            showDeleteModal={showDeleteModal}
-            setShowDeleteModal={setShowDeleteModal}
-            toggleButton={paymentsAllow.toggleButton}
-            methods={paymentMethods}
-            isLoading={isDeletePending || isCreatePending || isEditPaymentPending}
-            isDirty={isPaymentsDirty}
-            resetValue={{ paymentsMade: expense.paymentsMade }}
-            dueDate={expense.expirationDate}
-            payment={payment}
-            onAdd={(payment) => mutateCreatePayment({ payment, entity: ENTITIES.EXPENSE, entityId: expense.id })}
-            onEdit={(payment) => mutateEditPayment({ payment, entity: ENTITIES.EXPENSE, entityId: expense.id })}
-            onDelete={(payment) => {
-              mutateDeletePayment({
-                paymentId: payment.paymentId || payment.id,
-                entity: ENTITIES.EXPENSE,
-                entityId: expense.id
-              });
-            }}
-          />
+          <Loader active={isLoadingPayments || isRefetching}>
+            <EntityPayments
+              ref={paymentsFormRef}
+              total={expense.amount}
+              entityState={expense.state}
+              isCancelled={isItemCancelled}
+              isUpdating={paymentsAllow.isUpdating}
+              isModalPaymentOpen={isModalPaymentOpen}
+              setIsModalPaymentOpen={setIsModalPaymentOpen}
+              showDeleteModal={showDeleteModal}
+              setShowDeleteModal={setShowDeleteModal}
+              toggleButton={paymentsAllow.toggleButton}
+              methods={paymentMethods}
+              isLoading={isDeletePending || isCreatePending || isEditPaymentPending}
+              isDirty={isPaymentsDirty}
+              resetValue={{ paymentsMade: expense.paymentsMade }}
+              dueDate={expense.expirationDate}
+              payment={payment}
+              onAdd={(payment) => mutateCreatePayment({ payment, entity: ENTITIES.EXPENSE, entityId: expense.id })}
+              onEdit={(payment) => mutateEditPayment({ payment, entity: ENTITIES.EXPENSE, entityId: expense.id })}
+              onDelete={(payment) => {
+                mutateDeletePayment({
+                  paymentId: payment.paymentId || payment.id,
+                  entity: ENTITIES.EXPENSE,
+                  entityId: expense.id
+                });
+              }}
+            />
+          </Loader>
         </Tab.Pane>
       ),
     },
@@ -296,8 +297,12 @@ const Expense = ({ params }) => {
     }
   };
 
+  if (!isLoading && !expense) {
+    push(PAGES.NOT_FOUND.BASE);
+  }
+
   return (
-    <Loader active={isLoading}>
+    <Loader active={isLoading || !expense}>
       <Tab
         panes={panes}
         activeIndex={activeIndex}

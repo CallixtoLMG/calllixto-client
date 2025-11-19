@@ -4,9 +4,9 @@ import { GroupedButtonsControlled, NumberControlled, PercentControlled, PriceCon
 import SearchControlled from "@/common/components/form/Search/SearchControlled";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
+import { COLORS, DATE_FORMATS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
-import { getDateWithOffset } from "@/common/utils/dates";
+import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
@@ -569,13 +569,25 @@ const BudgetForm = ({
             />
           </FieldsContainer>
           <FieldsContainer $justifyContent="space-between">
-            <TextControlled
-              name="createdBy"
-              label="Vendedor"
-              rules={RULES.REQUIRED}
-              width="300px"
-              disabled
-            />
+            <FieldsContainer>
+              <TextControlled
+                name="createdBy"
+                label="Vendedor"
+                rules={RULES.REQUIRED}
+                width="300px"
+                disabled
+              />
+              {budget?.createdAt && (
+                <FormField
+                  $width="180px"
+                  label="Fecha de creación"
+                  control={Input}
+                  value={getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)}
+                  readOnly
+                  disabled
+                />
+              )}
+            </FieldsContainer>
             <FieldsContainer>
               <NumberControlled
                 width="200px"

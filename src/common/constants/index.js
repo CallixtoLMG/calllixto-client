@@ -58,13 +58,6 @@ export const PAGES = {
     NAME: 'Gastos',
     SHORTKEYS: 'Control+6'
   },
-  USERS: {
-    BASE: "/usuarios",
-    CREATE: "/usuarios/crear",
-    SHOW: (id) => `/usuarios/${id}`,
-    NAME: 'Usuarios',
-    SHORTKEYS: 'Control+7'
-  },
   CASH_BALANCES: {
     BASE: "/cajas",
     CREATE: "/cajas/crear",
@@ -72,6 +65,13 @@ export const PAGES = {
     SHOW: (id) => `/cajas/${id}`,
     NAME: 'Cajas',
     SHORTKEYS: 'Control+8'
+  },
+  USERS: {
+    BASE: "/usuarios",
+    CREATE: "/usuarios/crear",
+    SHOW: (id) => `/usuarios/${id}`,
+    NAME: 'Usuarios',
+    SHORTKEYS: 'Control+7'
   },
   BUDGETS_HISTORY: {
     BASE: "/historial-ventas",

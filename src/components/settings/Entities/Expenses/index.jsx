@@ -1,7 +1,7 @@
 import { FlexColumn } from "@/common/components/custom";
 import { Divider } from "@/common/components/custom/Semantic";
-import Categories from "../../Modules/Categories";
-import Tags from "../../Modules/Tags";
+import Categories from "../../Common/Categories";
+import Tags from "../../Common/Tags";
 
 const ExpensesModule = (() => {
 

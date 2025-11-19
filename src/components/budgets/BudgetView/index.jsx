@@ -1,4 +1,4 @@
-import { useCreatePayment, useDeletePayment, useEditPayment } from "@/api/payments";
+import { useCreatePayment, useDeletePayment, useEditPayment, useGetPayment } from "@/api/payments";
 import EntityPayments from "@/common/components/modules/EntityPayments";
 import { ENTITIES } from "@/common/constants";
 import BudgetDetails from "@/components/budgets/BudgetView/Modules/BudgetDetails";
@@ -10,6 +10,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 import { isBudgetCancelled, isBudgetExpired, isBudgetPending } from "../budgets.utils";
+import { Loader } from "@/components/layout";
 
 const BudgetView = ({
   budget,
@@ -17,14 +18,13 @@ const BudgetView = ({
   subtotalAfterDiscount,
   total,
   selectedContact,
-  setSelectedContact,
-  payment,
-  refetchPayment
+  setSelectedContact
 }) => {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
   const initialTabIndex = tabParam === "pagos" ? 1 : 0;
   const [activeIndex, setActiveIndex] = useState(initialTabIndex);
+  const { data: payment, refetch: refetchPayment, isLoading, isRefetching } = useGetPayment(ENTITIES.BUDGET, budget.id, activeIndex === 1);
   const router = useRouter();
   const editPayment = useEditPayment();
   const createPayment = useCreatePayment();
@@ -126,7 +126,7 @@ const BudgetView = ({
           key: "payments",
           label: "Pagos",
           component: (
-            <>
+            <Loader active={isLoading || isRefetching}>
               <EntityPayments
                 refetchPayment={refetchPayment}
                 payment={payment}
@@ -149,7 +149,7 @@ const BudgetView = ({
                   });
                 }}
               />
-            </>
+            </Loader>
           ),
         },
       ]
