@@ -37,6 +37,7 @@ const Budget = ({ params }) => {
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
+  const { data: budgetSettings, isLoading: isLoadingBudgetSettings, isRefetching: isRefetchingSettings } = useGetSetting(ENTITIES.BUDGET);
   const [customerData, setCustomerData] = useState();
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
@@ -277,7 +278,7 @@ const Budget = ({ params }) => {
   });
 
   return (
-    <Loader active={isLoading || loadingProducts || loadingCustomers || !budget}>
+    <Loader active={isLoading || loadingProducts || loadingCustomers || !budget || isLoadingBudgetSettings || isRefetchingSettings}>
       {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) && (
         <Flex
           $margin={(isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state)) ? "0" : undefined}
@@ -323,6 +324,7 @@ const Budget = ({ params }) => {
         subtotal={subtotal}
         selectedContact={selectedContact}
         subtotalAfterDiscount={subtotalAfterDiscount}
+        defaults={budgetSettings?.defaultsPDF}
       />
       <ModalCustomer
         isModalOpen={isModalCustomerOpen}

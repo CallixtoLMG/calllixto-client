@@ -230,7 +230,7 @@ const ProductForm = forwardRef(({
           <IconedButtonControlled
             width="fit-content"
             name="editablePrice"
-            label="Precio Editable"
+            text="Precio Editable"
             icon={ICONS.PENCIL}
             color={COLORS.BLUE}
             disabled={!isUpdating && view}
@@ -238,7 +238,7 @@ const ProductForm = forwardRef(({
           <IconedButtonControlled
             width="fit-content"
             name="fractionConfig.active"
-            label="Producto Fraccionable"
+            text="Producto Fraccionable"
             icon={ICONS.CUT}
             disabled={!isUpdating && view}
             color={COLORS.BLUE}
