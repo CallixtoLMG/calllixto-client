@@ -25,7 +25,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - CashBalances: Fixed layout of the bills breakdown (opening) section in the Excel export.
 
-- CashBalances: The Add Bill** popup is now wrapped in a proper `<Form>` component for consistent visual layout with the rest of the page.
+- CashBalances: The Add Bill popup is now wrapped in a proper `<Form>` component for consistent visual layout with the rest of the page.
 
 - Breadcrumbs: Fixed issue where the arrow icon (">") would render prematurely before the full path label was loaded.
 
