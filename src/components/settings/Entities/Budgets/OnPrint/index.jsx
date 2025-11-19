@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion, Icon } from "semantic-ui-react";
 
-const PrintBudget = () => {
+const OnPrint = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
 
@@ -17,8 +17,7 @@ const PrintBudget = () => {
     <Box $marginBottom="5px">
       <Accordion fluid>
         <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon name="dropdown" />
-          Al Imprimir una Venta
+          <Icon name="dropdown" /> Al Imprimir una Venta
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
           <FlexColumn $rowGap="20px">
@@ -34,7 +33,8 @@ const PrintBudget = () => {
               name="defaultsPDF.printPdfMode"
               label="Modo de Impresión por Defecto"
               options={Object.values(BUDGET_PDF_FORMAT).map(option => ({ value: option.key, key: option.key, text: <Flex>{option.title}</Flex>}))}
-              defaultValue={BUDGET_PDF_FORMAT.CLIENT}
+              defaultValue={BUDGET_PDF_FORMAT.CLIENT.key}
+              width="200px"
             />
           </FlexColumn>
         </Accordion.Content>
@@ -43,4 +43,4 @@ const PrintBudget = () => {
   );
 };
 
-export default PrintBudget;
+export default OnPrint;

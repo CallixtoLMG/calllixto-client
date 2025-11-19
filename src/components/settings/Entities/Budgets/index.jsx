@@ -1,13 +1,16 @@
 import { Divider, FlexColumn } from '@/common/components/custom';
-import CreateBudget from './CreateBudget';
-import PrintBudget from './PrintBudget';
+import OnCreate from './OnCreate';
+import OnPrint from './OnPrint';
+import General from './General';
 
 const BudgetsModule = (() => {
   return (
     <FlexColumn>
-      <CreateBudget />
+      {/* <General />
+      <Divider /> */}
+      <OnCreate />
       <Divider />
-      <PrintBudget />
+      <OnPrint />
     </FlexColumn>
   )
 })

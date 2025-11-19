@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion, Icon } from "semantic-ui-react";
 
-const CreateBudget = () => {
+const OnCreate = () => {
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
 
@@ -17,8 +17,7 @@ const CreateBudget = () => {
     <Box $marginBottom="5px">
       <Accordion fluid>
         <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon name="dropdown" />
-          Al Crear una Venta
+          <Icon name="dropdown" /> Al Crear una Venta
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
           <FlexColumn $rowGap="20px">
@@ -54,4 +53,4 @@ const CreateBudget = () => {
   );
 };
 
-export default CreateBudget;
+export default OnCreate;
