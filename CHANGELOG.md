@@ -77,7 +77,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Implemented full CRUD functionality for the CashBalances entity.
 
-- Created ModalOpenTill modal component for adding new cash balances, with support for dynamic bill entry.
+- Created ModalOpenCashBalance modal component for adding new cash balances, with support for dynamic bill entry.
 
 ### Changed
 
@@ -93,7 +93,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- Added the cashBalance entity with full integration: includes a dedicated modal (ModalOpenTill) and dynamic entry popup (AddBillPopup).
+- Added the cashBalance entity with full integration: includes a dedicated modal (ModalOpenCashBalance) and dynamic entry popup (AddBillPopup).
 
 - Introduced SIZES constant in common/constants to avoid hardcoded Semantic UI size strings across components.
 

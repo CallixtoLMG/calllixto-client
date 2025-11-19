@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useCreateCashBalance, useListCashBalances } from "@/api/cashBalances";
 import { useGetSetting } from "@/api/settings";
-import { ModalOpenTill } from "@/common/components/modals";
+import { ModalOpenCashBalance } from "@/common/components/modals";
 import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, mapToDropdownOptions } from "@/common/utils";
 import CashBalancesPage from "@/components/cashBalances/CashBalancesPage";
@@ -43,8 +43,6 @@ const CashBalances = () => {
       }
     },
   });
-
-  const loading = useMemo(() => isLoading || isRefetching || isPending, [isLoading, isRefetching, isPending]);
 
   const paymentMethodOptions = useMemo(() => {
     return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
@@ -92,7 +90,7 @@ const CashBalances = () => {
       });
     }
     setActions(actions);
-  }, [push, role, setActions, loading]);
+  }, [push, role, setActions]);
 
   const handleConfirm = useCallback((data) => {
     const payload = {
@@ -101,7 +99,6 @@ const CashBalances = () => {
         ? null
         : data.paymentMethods.map((paymentMethod) => paymentMethod.value),
     };
-    setIsModalOpen(false);
     mutate(payload);
   }, [mutate]);
 
@@ -110,14 +107,14 @@ const CashBalances = () => {
     <>
       <CashBalancesPage
         onRefetch={refetch}
-        isLoading={loading}
+        isLoading={isLoading || isRefetching}
         cashBalances={isPending ? [] : cashBalances}
         paymentOptions={paymentMethodOptions}
         onDownloadExcel={handleDownloadExcel}
       />
-      <ModalOpenTill
+      <ModalOpenCashBalance
         open={isModalOpen}
-        isLoading={loading}
+        isLoading={isPending}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleConfirm}
         paymentOptions={paymentMethodOptions}

@@ -8,6 +8,7 @@ import { IconedButton } from "../../buttons";
   name,
   icon,
   label,
+  text,
   disabled,
   color,
 }, ref) => {
@@ -15,19 +16,20 @@ import { IconedButton } from "../../buttons";
     <Controller
       name={name}
       render={({ field: { value, onChange, ...rest } }) => (
-        <FormField $width={width}>
-          <IconedButton
-            {...rest}
-            height="38px"
-            text={label}
-            icon={icon}
-            onClick={() => onChange(!value)}
-            basic={!value}
-            disabled={disabled}
-            color={color}
-            ref={ref}
-          />
-        </FormField>
+        <FormField
+          {...rest}
+          $width={width}
+          $height="38px"
+          label={label}
+          text={text}
+          icon={icon}
+          control={IconedButton}
+          onClick={() => onChange(!value)}
+          basic={!value}
+          disabled={disabled}
+          color={color}
+          ref={ref}
+        />
       )}
     />
   );

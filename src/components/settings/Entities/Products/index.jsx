@@ -5,7 +5,7 @@ import Tags from "../../Common/Tags";
 const ProductsModule = (() => {
 
   return (
-    <FlexColumn >
+    <FlexColumn>
       <Tags />
       <Divider />
       <BanProduct />

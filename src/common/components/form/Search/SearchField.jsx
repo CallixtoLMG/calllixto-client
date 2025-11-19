@@ -1,22 +1,22 @@
 import { ICONS } from '@/common/constants';
 import { normalizeText } from '@/common/utils';
-import debounce from 'lodash/debounce';
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
+import { debounce, get } from 'lodash';
+import { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormField } from '../../custom';
 import { Search } from './styles';
 
 const SearchField = forwardRef(
   (
     {
+      value,
       elements = [],
       onSelect,
-      selectedValue,
       clearable,
       placeholder = 'Buscar...',
       noResultsMessage = 'No se encontraron resultados.',
       minCharacters = 2,
       maxResults = 16,
-      extractSearchFields = (element) => [element?.name, element?.id],
+      searchFields = ['name', 'id'],
       getResultProps = (element) => ({
         key: element.id,
         title: element.name,
@@ -24,7 +24,6 @@ const SearchField = forwardRef(
         value: element,
       }),
       getDisplayValue = (element) => element?.name ?? '',
-      persistSelection = false,
       label,
       width,
       required,
@@ -36,23 +35,13 @@ const SearchField = forwardRef(
   ) => {
     const [query, setQuery] = useState('');
     const [filtered, setFiltered] = useState(elements);
-    const [selected, setSelected] = useState(selectedValue ?? null);
+    const [selected, setSelected] = useState(value ?? null);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-      if (persistSelection && selectedValue?.id !== selected?.id) {
-        setSelected(selectedValue);
-        setQuery('');
-      }
-    }, [selectedValue, persistSelection]);
-
-    useImperativeHandle(ref, () => ({
-      clear: () => {
-        setQuery('');
-        setSelected(null);
-        setFiltered(elements);
-      },
-    }));
+    const fields = useMemo(() => searchFields.map(normalizeText), [searchFields]);
+    const matchesOnSomeField = useCallback((element, word) => {
+      return fields.some(field => normalizeText(get(element, field)).includes(word))
+    }, [fields]);
 
     useEffect(() => {
       setLoading(true);
@@ -64,12 +53,9 @@ const SearchField = forwardRef(
         const exact = [];
         const partial = [];
 
-        elements?.forEach((element) => {
-          const fields = extractSearchFields(element).map(normalizeText);
-          const fieldString = fields.join(' ');
-
-          const isExact = fields.some((f) => f.includes(normalizedQuery));
-          const isPartial = queryWords.every((word) => fieldString.includes(word));
+        elements.forEach((element) => {
+          const isExact = matchesOnSomeField(element, normalizedQuery);
+          const isPartial = queryWords.every(word => matchesOnSomeField(element, word));
 
           if (isExact) exact.push(element);
           else if (isPartial) partial.push(element);
@@ -82,7 +68,6 @@ const SearchField = forwardRef(
       debouncedSearch();
 
       return () => debouncedSearch.cancel();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [elements, query]);
 
     const handleChange = (_, { value }) => {
@@ -92,13 +77,8 @@ const SearchField = forwardRef(
 
     const handleSelect = (_, { result }) => {
       onSelect(result.value);
-      if (persistSelection) {
-        setSelected(result.value);
-        setQuery('');
-      } else {
-        setQuery('');
-        setSelected(null);
-      }
+      setSelected(result.value);
+      setQuery('');
     };
 
     const handleClear = () => {
@@ -126,11 +106,7 @@ const SearchField = forwardRef(
         control={Search}
         loading={loading}
         results={filtered.slice(0, maxResults).map(getResultProps)}
-        value={
-          persistSelection
-            ? (selected ? getDisplayValue(selected) : query)
-            : query
-        }
+        value={selected ? getDisplayValue(selected) : query}
         onSearchChange={handleChange}
         onResultSelect={handleSelect}
         disabled={disabled}

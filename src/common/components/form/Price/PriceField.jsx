@@ -7,7 +7,7 @@ export const PriceField = ({
   error,
   label,
   width,
-  value = '',
+  value = 0,
   onChange,
   disabled = false,
   placeholder,
