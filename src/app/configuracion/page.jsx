@@ -9,7 +9,7 @@ import SettingsTabs from "@/components/settings";
 import { GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
 import { useKeyboardShortcuts, useRestoreEntity, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { pick } from "lodash";
+import { pick, sortBy } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -173,7 +173,7 @@ const Settings = () => {
         <Form ref={formRef} onSubmit={handleSubmit(mutateEdit)}>
           <SettingsTabs
             onEntityChange={handleEntityChange}
-            settings={settings}
+            settings={sortBy(settings, 'entity')}
             onRefresh={handleSettingsRefresh}
             isLoading={isLoading}
             onBeforeView={onBeforeView}
