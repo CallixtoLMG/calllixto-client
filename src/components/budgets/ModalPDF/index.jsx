@@ -12,7 +12,7 @@ import styled from "styled-components";
 
 const StyledModal = styled(Modal)`
   width: 80vw !important;
-  height: 90vh !important;
+  max-height: 90vh !important;
   overflow: auto;
 `;
 

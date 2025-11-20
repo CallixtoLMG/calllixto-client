@@ -10,6 +10,12 @@ const Icon = styled(SIcon)`
   cursor: pointer;
 `;
 
+const StyledModal = styled(Modal)`
+  width: 80vw !important;
+  max-height: 90vh !important;
+  overflow: auto;
+`;
+
 const NavActionsContext = createContext();
 
 const NavActionsProvider = ({ children }) => {
@@ -97,7 +103,7 @@ const NavActions = () => {
         )}
       </Flex>
       <Transition visible={open} animation="scale" duration={500}>
-        <Modal open={open} onClose={() => setOpen(false)}>
+        <StyledModal open={open} onClose={() => setOpen(false)}>
           <StyledModalHeader icon={ICONS.INFO_CIRCLE} content="¿Cómo funciona esta sección?" />
           {info}
           <Modal.Actions>
@@ -108,7 +114,7 @@ const NavActions = () => {
               onClick={() => { setOpen(false); }}
             />
           </Modal.Actions>
-        </Modal>
+        </StyledModal>
       </Transition>
     </>
   );

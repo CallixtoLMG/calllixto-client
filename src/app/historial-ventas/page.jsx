@@ -1,6 +1,5 @@
 "use client";
 import { useListBudgetsHistory } from "@/api/budgets";
-import { PAGES } from "@/common/constants";
 import BudgetsHistoryFilter from "@/components/budgets/BudgetsHistoryFilters";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { BUDGETS_HISTORY_FILTERS_KEY } from "@/components/budgets/budgets.constants";
@@ -23,7 +22,7 @@ const BudgetsHistory = () => {
   const { setActions } = useNavActionsContext();
 
   useEffect(() => {
-    setLabels([{ name: PAGES.BUDGETS_HISTORY.NAME }]);
+    setLabels([{ name: "Historial de ventas" }]);
   }, [setLabels]);
 
   useEffect(() => {

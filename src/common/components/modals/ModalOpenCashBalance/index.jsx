@@ -3,14 +3,14 @@ import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePi
 import { COLORS, ENTITIES, ICONS, RULES } from "@/common/constants";
 import { datePickerNow } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
+import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
 import { useSettingArrayField } from "@/hooks";
+import { useMemo } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 import { IconedButton } from "../../buttons";
 import { DropdownControlled, IconedButtonControlled, PriceControlled, PriceField, TextAreaControlled } from "../../form";
 import { Header } from "./styles";
-import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
-import { useMemo } from "react";
 
 const EMPTPY_CASH_BALANCE = {
   closeDate: null,
@@ -121,6 +121,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                   text="Todos los métodos"
                   icon={ICONS.PENCIL}
                   color={COLORS.BLUE}
+                  height="38px"
                 />
               </FieldsContainer>
               <FieldsContainer $alignItems="flex-end">

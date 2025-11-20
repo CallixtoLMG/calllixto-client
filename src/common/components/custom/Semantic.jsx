@@ -46,7 +46,7 @@ export const FormField = styled(Form.Field)`
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
-  height: ${({ height }) => height} !important;
+  height: ${({ $height }) => $height} !important;
 
   .disabled {
     opacity: 1!important;
