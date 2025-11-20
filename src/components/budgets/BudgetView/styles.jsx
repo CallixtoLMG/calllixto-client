@@ -30,4 +30,3 @@ const MessageList = styled(SMessageList)`
 `;
 
 export { Container, Icon, Message, MessageHeader, MessageItem, MessageList };
-

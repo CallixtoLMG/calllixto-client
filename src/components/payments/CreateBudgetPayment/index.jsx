@@ -165,7 +165,7 @@ const CreateBudgetPayments = ({
                 width="fit-content"
                 label="Método de Pago"
                 selection
-                options={paymentMethodOptions.filter((method) => method.key !== 'dolares')}
+                options={paymentMethodOptions}
                 value={payment.method}
                 onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                 disabled={isTotalCovered}
