@@ -255,6 +255,8 @@ export const ICONS = {
   ARROW_UP: "arrow up",
   ARROW_DOWN: "arrow down",
   CLOCK: "clock",
+  MONEY: "money",
+  CALCULATOR: "calculator",
 };
 
 export const ALL = "all";
@@ -296,7 +298,7 @@ export const INFO = {
       [ENTITIES.CASH_BALANCE]: (
         <>
           <StyledModalContent>
-            <StyledListHeader><Icon name={ICONS.ADD} color={COLORS.BLUE} />Sección Caja</StyledListHeader>
+            <StyledListHeader><Icon name={ICONS.CALCULATOR} color={COLORS.BLUE} /><strong>Caja</strong></StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
                 En la pantalla principal se muestran todas las cajas, abiertas o cerradas, según el filtro aplicado. También se pueden utilizar otros filtros como ID o método de pago.
@@ -305,19 +307,19 @@ export const INFO = {
                 Debajo de la tabla se encuentra el botón <b>Descargar Excel</b>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles, para evitar información innecesaria.
               </ListItem>
               <ListItem>
-                Para crear una caja, presioná el botón verde <b>Abrir</b>. Podrás establecer la fecha de inicio y cierre, los métodos de pago (pueden ser múltiples), y el monto inicial. Si se selecciona <b>efectivo</b> como método de pago, se habilita la opción de desglosar billetes, eligiendo denominación y cantidad con el botón <b>Agregar billetes</b>.
+                Para crear una caja, presioná el botón verde <b>Abrir</b>. Podrás establecer la fecha de inicio y cierre, los métodos de pago (pueden ser múltiples), y el monto inicial. Si se selecciona <b>Efectivo</b> como método de pago, se habilita la opción de desglosar billetes, eligiendo denominación y cantidad.
               </ListItem>
               <ListItem>
                 Una vez creada la caja, serás redirigido a su vista individual. En la pestaña <b>Caja</b> se muestran los datos generales, y si está habilitada la edición, algunos de ellos pueden modificarse.
               </ListItem>
               <ListItem>
-                En la pestaña <b>Movimientos</b> se listan todos los <b>gastos</b> y <b>ventas</b> realizadas mientras la caja estuvo abierta. Al hacer clic sobre un ítem, serás redirigido al detalle correspondiente.
+                En la pestaña <b>Movimientos</b> se listan todos los <b>gastos</b> y <b>ventas</b> realizados mientras la caja estuvo abierta. Al hacer clic sobre un ítem, serás redirigido al detalle correspondiente.
               </ListItem>
               <ListItem>
                 Si no se estableció una fecha de cierre al crearla, se puede cerrar la caja manualmente desde el botón <b>Cerrar Caja</b>.
               </ListItem>
               <ListItem>
-                Las cajas pueden eliminarse con el botón de <b>Eliminar</b> (solo visible para administradores).
+                Las cajas pueden eliminarse con el botón de <b>Eliminar</b> (solo disponible para administradores).
               </ListItem>
             </List>
           </StyledModalContent>
