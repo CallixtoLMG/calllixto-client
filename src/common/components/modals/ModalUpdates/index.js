@@ -12,7 +12,7 @@ import {
 } from "../ModalShortcuts/styles";
 
 const ModalUpdates = () => {
-  const activeVersion = '2025-07-08';
+  const activeVersion = '2025-11-25';
   const latestNews = window?.localStorage?.getItem('latestNews');
   const [open, setOpen] = useState(!latestNews || isDateBefore(latestNews, activeVersion));
 
@@ -48,7 +48,7 @@ const ModalUpdates = () => {
                 La sección <strong>Gastos</strong> permite registrar consumos y egresos, generando un historial detallado.
               </ListItem>
               <ListItem>
-                La sección <strong>Caja</strong> permite abrir y cerrar cajas configurando fechas y métodos de pago. Mientras estén abiertas, se vinculan automáticamente las ventas y gastos realizados.
+                La sección <strong>Caja</strong> permite abrir y cerrar cajas configurando fechas y métodos de pago. Mientras estén abiertas, se vinculan automáticamente los pagos asociados a ventas y gastos.
               </ListItem>
               <ListItem>
                 Se mejoró el rendimiento general y se realizaron ajustes visuales en diferentes partes del sistema para optimizar la experiencia de uso.
