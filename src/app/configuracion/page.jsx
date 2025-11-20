@@ -9,7 +9,7 @@ import SettingsTabs from "@/components/settings";
 import { GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
 import { useKeyboardShortcuts, useRestoreEntity, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { pick, sortBy } from "lodash";
+import { pick } from "lodash";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -137,8 +137,9 @@ const Settings = () => {
       label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
     }));
 
-  return mappedEntities;
-}, [data]);
+    return mappedEntities;
+  }, [data]);
+
   useEffect(() => {
     if (!activeEntity && settings.length) {
       handleEntityChange(settings[0]);
@@ -173,7 +174,7 @@ const Settings = () => {
         <Form ref={formRef} onSubmit={handleSubmit(mutateEdit)}>
           <SettingsTabs
             onEntityChange={handleEntityChange}
-            settings={sortBy(settings, 'entity')}
+            settings={settings}
             onRefresh={handleSettingsRefresh}
             isLoading={isLoading}
             onBeforeView={onBeforeView}
