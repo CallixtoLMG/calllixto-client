@@ -1,5 +1,4 @@
 "use client";
-import { useListBudgets } from "@/api/budgets";
 import { useActiveCustomer, useDeleteCustomer, useEditCustomer, useGetCustomer, useInactiveCustomer } from "@/api/customers";
 import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
@@ -19,7 +18,6 @@ const Customer = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
   const { data: customer, isLoading, refetch } = useGetCustomer(params.id);
-  const { data: budgetData, isLoading: isLoadingBudgets } = useListBudgets();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -68,10 +66,6 @@ const Customer = ({ params }) => {
     setLabels([{ name: PAGES.CUSTOMERS.NAME }, { name: customer?.name }]);
     refetch();
   }, [customer, setLabels, refetch]);
-
-  const hasAssociatedBudgets = useMemo(() => {
-    return budgetData?.budgets?.some(budget => budget.customer?.id === customer?.id);
-  }, [budgetData, customer]);
 
   const modalConfig = useMemo(() => ({
     delete: {
@@ -215,10 +209,10 @@ const Customer = ({ params }) => {
           color: COLORS.RED,
           onClick: handleClick(DELETE),
           text: "Eliminar",
-          tooltip: hasAssociatedBudgets ? "No se puede eliminar este cliente, existen presupuestos asociados." : false,
+          tooltip: customer.hasBudgets ? "No se puede eliminar este cliente, existen presupuestos asociados." : false,
           basic: true,
           loading: activeAction === DELETE,
-          disabled: hasAssociatedBudgets || !!activeAction || isEditPending,
+          disabled: customer.hasBudgets || !!activeAction || isEditPending,
         },
       ];
 
@@ -226,14 +220,14 @@ const Customer = ({ params }) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customer, activeAction, isActivePending, isInactivePending, isDeletePending, isEditPending, hasAssociatedBudgets, setActions]);
+  }, [customer, activeAction, isActivePending, isInactivePending, isDeletePending, isEditPending, setActions]);
 
   if (!isLoading && !customer) {
     push(PAGES.NOT_FOUND.BASE);
   }
 
   return (
-    <Loader active={isLoading || isLoadingBudgets || !customer}>
+    <Loader active={isLoading || !customer}>
       {!isItemInactive(customer?.state) && toggleButton}
       {isItemInactive(customer?.state) && (
         <Message negative>

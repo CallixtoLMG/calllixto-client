@@ -137,8 +137,9 @@ const Settings = () => {
       label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
     }));
 
-  return mappedEntities;
-}, [data]);
+    return mappedEntities;
+  }, [data]);
+
   useEffect(() => {
     if (!activeEntity && settings.length) {
       handleEntityChange(settings[0]);
