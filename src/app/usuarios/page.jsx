@@ -17,7 +17,7 @@ const Users = () => {
   const { data, isLoading, isRefetching, refetch } = useListUsers();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
+  const { setActions, setInfo } = useNavActionsContext();
   const { push } = useRouter();
   useEffect(() => {
     setLabels([{ name: PAGES.USERS.NAME }]);
@@ -59,7 +59,8 @@ const Users = () => {
       }
     ] : [];
     setActions(actions);
-  }, [push, role, setActions, loading]);
+    setInfo(null)
+  }, [push, role, setActions, loading, setInfo]);
 
   useKeyboardShortcuts(() => push(PAGES.USERS.CREATE), SHORTKEYS.ENTER);
 

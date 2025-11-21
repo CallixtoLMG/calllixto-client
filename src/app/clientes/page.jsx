@@ -13,7 +13,7 @@ const Customers = () => {
   useValidateToken();
   const { data, isLoading, isRefetching, refetch } = useListCustomers();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
+  const { setActions, setInfo } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -49,7 +49,8 @@ const Customers = () => {
       }
     ];
     setActions(actions);
-  }, [push, setActions, loading]);
+    setInfo(null);
+  }, [push, setActions, loading, setInfo]);
 
   useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);
 

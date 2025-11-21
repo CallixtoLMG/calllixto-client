@@ -3,6 +3,7 @@ import { COLORS, ICONS, SIZES } from '@/common/constants';
 import { isDateBefore } from '@/common/utils/dates';
 import { useState } from 'react';
 import { List, ListItem, Modal, Popup, Transition } from 'semantic-ui-react';
+import styled from 'styled-components';
 import { IconedButton } from '../../buttons';
 import { Icon } from '../../custom';
 import {
@@ -10,7 +11,6 @@ import {
   StyledModalContent,
   StyledModalHeader
 } from "../ModalShortcuts/styles";
-import styled from 'styled-components';
 
 const StyledModal = styled(Modal)`
   width: 80vw !important;
@@ -56,6 +56,12 @@ const ModalUpdates = () => {
               </ListItem>
               <ListItem>
                 La sección <strong>Caja</strong> permite abrir y cerrar cajas configurando fechas y métodos de pago. Mientras estén abiertas, se vinculan automáticamente los pagos asociados a ventas y gastos.
+              </ListItem>
+              <ListItem>
+                La sección <strong>Ventas</strong> ahora solo muestra los últimos 3 meses de registro. En caso de necesitar registros anteriores, se agregó el botón <strong>Historial</strong>, el cual permite ir a la sección <strong>Historial de ventas</strong>.
+              </ListItem>
+              <ListItem>
+                La sección <strong>Historial de ventas</strong> permite buscar de manera precisa, entre fechas, registros de ventas pasadas. Luego de seleccionar rangos predefinidos o elegir fechas de manera manual, presione el botón <strong>Pedir datos</strong>. Posteriormente, puede filtrar los datos recibidos al igual que en el resto de las tablas.
               </ListItem>
               <ListItem>
                 Ahora es posible previsualizar un presupuesto antes de imprimirlo en cualquiera de sus formatos.

@@ -142,6 +142,7 @@ const Payments = ({
                 paymentData={paymentToEdit}
                 totalPending={totalPending}
                 isLoading={isLoading}
+                totalListItem={TOTAL_LIST_ITEMS}
                 onAdd={async (newPayment) => {
                   if (paymentToEdit) {
                     await onEdit({ ...paymentToEdit, ...newPayment });

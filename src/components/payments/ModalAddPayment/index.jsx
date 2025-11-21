@@ -3,6 +3,7 @@ import { IconedButton } from "@/common/components/buttons";
 import { Button, ButtonsContainer, FieldsContainer, Flex, Form, FormField } from "@/common/components/custom";
 import { DropdownField, PriceField, TextAreaField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
+import { TotalList } from "@/common/components/table";
 import { COLORS, ENTITIES, ICONS, RULES, SIZES } from "@/common/constants";
 import { handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { useEffect, useMemo, useState } from "react";
@@ -21,7 +22,8 @@ export const ModalAddPayment = ({
   onAdd,
   totalPending,
   paymentData,
-  isLoading
+  isLoading,
+  totalListItem
 }) => {
   const [payment, setPayment] = useState(EMPTY_PAYMENT());
   const [showErrors, setShowErrors] = useState(false);
@@ -78,7 +80,7 @@ export const ModalAddPayment = ({
 
   return (
     <Transition visible={open} animation='scale' duration={500}>
-      <Modal open={open} onClose={handleClose} size="large">
+      <Modal open={open} onClose={handleClose} size={SIZES.SMALL}>
         <Modal.Header>Agregar Pago</Modal.Header>
         <Modal.Content>
           <Flex $rowGap="14px" as={Form}>
@@ -151,6 +153,7 @@ export const ModalAddPayment = ({
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
               />
             </FieldsContainer>
+            <TotalList readOnly items={totalListItem} />
           </Flex>
         </Modal.Content >
         <Modal.Actions>

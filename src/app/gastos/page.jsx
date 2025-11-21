@@ -16,7 +16,7 @@ const Expenses = () => {
   const { data, isLoading, isRefetching, refetch } = useListExpenses();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
+  const { setActions, setInfo } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -55,7 +55,8 @@ const Expenses = () => {
       }
     ] : [];
     setActions(actions);
-  }, [push, role, setActions, loading]);
+    setInfo(null);
+  }, [push, role, setActions, loading, setInfo]);
 
   useKeyboardShortcuts(() => push(PAGES.EXPENSES.CREATE), SHORTKEYS.ENTER);
 
