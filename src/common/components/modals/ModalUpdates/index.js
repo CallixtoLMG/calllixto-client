@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { List, ListItem, Modal, Popup, Transition } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { IconedButton } from '../../buttons';
-import { Icon } from '../../custom';
+import { Accent, Icon } from '../../custom';
 import {
   StyledListHeader,
   StyledModalContent,
@@ -49,22 +49,22 @@ const ModalUpdates = () => {
             </StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
-                Se incorporaron dos nuevas secciones: <strong>Gastos</strong> y <strong>Caja</strong>. Estas funcionalidades están disponibles en modo de prueba durante 30 días. Pasado ese período se deshabilitarán automáticamente y deberán contactar con el administrador para su contratación.
+                Se incorporaron dos nuevas secciones: <Accent>Gastos</Accent> y <Accent>Caja</Accent>. Estas funcionalidades están disponibles en modo de prueba durante 30 días. Pasado ese período se deshabilitarán automáticamente y deberán contactar con el administrador para su contratación.
               </ListItem>
               <ListItem>
-                La sección <strong>Gastos</strong> permite registrar consumos y egresos, generando un historial detallado.
+                La sección <Accent>Gastos</Accent> permite registrar consumos y egresos, generando un historial detallado.
               </ListItem>
               <ListItem>
-                La sección <strong>Caja</strong> permite abrir y cerrar cajas configurando fechas y métodos de pago. Mientras estén abiertas, se vinculan automáticamente los pagos asociados a ventas y gastos.
+                La sección <Accent>Caja</Accent> permite abrir y cerrar cajas configurando fechas y métodos de pago. Mientras estén abiertas, se vinculan automáticamente los pagos asociados a ventas y gastos.
               </ListItem>
               <ListItem>
-                Se incorporó la sección <strong>Historial de ventas</strong>, que permite buscar información sobre ventas anteriores a los últimos 3 meses.
+                Se incorporó la sección <Accent>Historial de ventas</Accent>, que permite buscar información sobre ventas anteriores a los últimos 3 meses.
               </ListItem>
               <ListItem>
                 Ahora es posible previsualizar un presupuesto antes de imprimirlo en cualquiera de sus formatos.
               </ListItem>
               <ListItem>
-                En <strong>Configuración</strong> se agregó la pestaña <strong>Ventas</strong>, para definir valores predeterminados al crear o imprimir una venta.
+                En <Accent>Configuración</Accent> se agregó la pestaña <Accent>Ventas</Accent>, para definir valores predeterminados al crear o imprimir una venta.
               </ListItem>
             </List>
             <StyledListHeader>
@@ -72,10 +72,10 @@ const ModalUpdates = () => {
             </StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
-                El botón de <strong>Descargar Excel</strong> se encuentra ahora debajo de cada tabla y el archivo solo incluirá los elementos filtrados.
+                El botón de <Accent>Descargar Excel</Accent> se encuentra ahora debajo de cada tabla y el archivo solo incluirá los elementos filtrados.
               </ListItem>
               <ListItem>
-                La sección <strong>Ventas</strong> ahora solo muestra registros de los últimos 3 meses (esto se realizó para mejorar el rendimiento en esa página, que al tener tantos elementos generaba muchas demoras). En caso de necesitar registros anteriores, se agregó la sección <strong>Historial de Ventas</strong>.
+                La sección <Accent>Ventas</Accent> ahora solo muestra registros de los últimos 3 meses (esto se realizó para mejorar el rendimiento en esa página, que al tener tantos elementos generaba muchas demoras). En caso de necesitar registros anteriores, se agregó la sección <Accent>Historial de Ventas</Accent>.
               </ListItem>
               <ListItem>
                 Se actualizaron los buscadores de clientes, productos, proveedores y marcas para mostrar coincidencias a medida que se escribe y facilitar la selección.

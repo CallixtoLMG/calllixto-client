@@ -2,6 +2,7 @@ import { encodeUri } from "@/common/utils";
 import { Icon, List, ListItem } from "semantic-ui-react";
 import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
 import { ENTITIES } from "./entities";
+import { Accent } from "../components/custom";
 
 export * from './dates';
 export * from './entities';
@@ -304,22 +305,22 @@ export const INFO = {
                 En la pantalla principal se muestran todas las cajas, abiertas o cerradas, según el filtro aplicado. También se pueden utilizar otros filtros como ID o método de pago.
               </ListItem>
               <ListItem>
-                Debajo de la tabla se encuentra el botón <b>Descargar Excel</b>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles, para evitar información innecesaria.
+                Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles, para evitar información innecesaria.
               </ListItem>
               <ListItem>
-                Para crear una caja, presioná el botón verde <b>Abrir</b>. Podrás establecer la fecha de inicio y cierre, los métodos de pago (pueden ser múltiples), y el monto inicial. Si se selecciona <b>Efectivo</b> como método de pago, se habilita la opción de desglosar billetes, eligiendo denominación y cantidad.
+                Para crear una caja, presioná el botón verde <Accent>Abrir</Accent>. Podrás establecer la fecha de inicio y cierre, los métodos de pago (pueden ser múltiples), y el monto inicial. Si se selecciona <Accent>Efectivo</Accent> como método de pago, se habilita la opción de desglosar billetes, eligiendo denominación y cantidad.
               </ListItem>
               <ListItem>
-                Una vez creada la caja, serás redirigido a su vista individual. En la pestaña <b>Caja</b> se muestran los datos generales, y si está habilitada la edición, algunos de ellos pueden modificarse.
+                Una vez creada la caja, serás redirigido a su vista individual. En la pestaña <Accent>Caja</Accent> se muestran los datos generales, y si está habilitada la edición, algunos de ellos pueden modificarse.
               </ListItem>
               <ListItem>
-                En la pestaña <b>Movimientos</b> se listan todos los <b>gastos</b> y <b>ventas</b> realizados mientras la caja estuvo abierta. Al hacer clic sobre un ítem, serás redirigido al detalle correspondiente.
+                En la pestaña <Accent>Movimientos</Accent> se listan todos los <Accent>Gastos</Accent> y <Accent>Ventas</Accent> realizados mientras la caja estuvo abierta. Al hacer clic sobre un ítem, serás redirigido al detalle correspondiente.
               </ListItem>
               <ListItem>
-                Si no se estableció una fecha de cierre al crearla, se puede cerrar la caja manualmente desde el botón <b>Cerrar Caja</b>.
+                Si no se estableció una fecha de cierre al crearla, se puede cerrar la caja manualmente desde el botón <Accent>Cerrar Caja</Accent>.
               </ListItem>
               <ListItem>
-                Las cajas pueden eliminarse con el botón de <b>Eliminar</b> (solo disponible para administradores).
+                Las cajas pueden eliminarse con el botón de <Accent>Eliminar</Accent> (solo disponible para administradores).
               </ListItem>
             </List>
           </StyledModalContent>

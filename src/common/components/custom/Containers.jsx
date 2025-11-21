@@ -43,3 +43,11 @@ export const PhoneContainer = styled(Flex)`
   width: 100%;
   column-gap: 15px;
 `;
+
+export const Accent = styled.span`
+  background-color: #8c9eb5;
+  color: white;
+  padding: 2px 4px;
+  font-size: 85%;
+  border-radius: 3px;
+`;
