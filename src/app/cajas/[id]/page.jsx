@@ -40,6 +40,7 @@ const CashBalance = ({ params }) => {
   const formRef = useRef(null);
   const form = useForm({ defaultValues: { billsDetailsOnClose: [], closeDate: datePickerNow() } });
   const billsDetails = form.watch("billsDetailsOnClose");
+  const showBillsTable = useMemo(() => cashBalance?.paymentMethods?.some(method => method === "Efectivo"), [cashBalance]);
 
   const {
     showModal: showUnsavedModal,
@@ -294,14 +295,30 @@ const CashBalance = ({ params }) => {
                   height="38px"
                 />
               </FieldsContainer>
-              <PriceField
-                width="180px"
-                label="Total billetes"
-                value={getBillsTotal(billsDetails)}
-                disabled
-              />
-              {cashBalance?.paymentMethods?.some(method => method === "Efectivo") && (
-                <BillDetails name="billsDetailsOnClose" />
+              <FieldsContainer>
+                <PriceField
+                  width="180px"
+                  label="Monto inicial"
+                  value={cashBalance.initialAmount ?? 0}
+                  disabled
+                />
+                <PriceField
+                  width="180px"
+                  label="Monto actual"
+                  value={cashBalance.currentAmount ?? 0}
+                  disabled
+                />
+              </FieldsContainer>
+              {showBillsTable && (
+                <>
+                  <PriceField
+                    width="180px"
+                    label="Total billetes (cierre)"
+                    value={getBillsTotal(billsDetails)}
+                    disabled
+                  />
+                  <BillDetails name="billsDetailsOnClose" />
+                </>
               )}
             </Form>
           </FormProvider>

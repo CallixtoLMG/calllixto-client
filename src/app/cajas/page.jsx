@@ -37,11 +37,14 @@ const CashBalances = () => {
     onSuccess: async (response) => {
       if (response.statusOk) {
         toast.success('Caja creada correctamente!');
-        push(PAGES.CASH_BALANCES.SHOW(response.cashBalance.id))
+        push(PAGES.CASH_BALANCES.SHOW(response.cashBalance.id));
       } else {
         toast.error(response.error.message);
       }
     },
+    onSettled: () => {
+      setIsModalOpen(false);
+    }
   });
 
   const paymentMethodOptions = useMemo(() => {

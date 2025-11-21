@@ -286,7 +286,7 @@ const Supplier = ({ params }) => {
         'Nombre',
         'Marca',
         'Proveedor',
-        'Cost ',
+        'Costo',
         'Precio',
         'Margen',
         'Estado',

@@ -58,10 +58,7 @@ const ModalUpdates = () => {
                 La sección <strong>Caja</strong> permite abrir y cerrar cajas configurando fechas y métodos de pago. Mientras estén abiertas, se vinculan automáticamente los pagos asociados a ventas y gastos.
               </ListItem>
               <ListItem>
-                La sección <strong>Ventas</strong> ahora solo muestra los últimos 3 meses de registro. En caso de necesitar registros anteriores, se agregó el botón <strong>Historial</strong>, el cual permite ir a la sección <strong>Historial de ventas</strong>.
-              </ListItem>
-              <ListItem>
-                La sección <strong>Historial de ventas</strong> permite buscar de manera precisa, entre fechas, registros de ventas pasadas. Luego de seleccionar rangos predefinidos o elegir fechas de manera manual, presione el botón <strong>Pedir datos</strong>. Posteriormente, puede filtrar los datos recibidos al igual que en el resto de las tablas.
+                Se incorporó la sección <strong>Historial de ventas</strong>, que permite buscar información sobre ventas anteriores a los últimos 3 meses.
               </ListItem>
               <ListItem>
                 Ahora es posible previsualizar un presupuesto antes de imprimirlo en cualquiera de sus formatos.
@@ -76,6 +73,9 @@ const ModalUpdates = () => {
             <List relaxed bulleted as="ol">
               <ListItem>
                 El botón de <strong>Descargar Excel</strong> se encuentra ahora debajo de cada tabla y el archivo solo incluirá los elementos filtrados.
+              </ListItem>
+              <ListItem>
+                La sección <strong>Ventas</strong> ahora solo muestra registros de los últimos 3 meses (esto se realizó para mejorar el rendimiento en esa página, que al tener tantos elementos generaba muchas demoras). En caso de necesitar registros anteriores, se agregó la sección <strong>Historial de Ventas</strong>.
               </ListItem>
               <ListItem>
                 Se actualizaron los buscadores de clientes, productos, proveedores y marcas para mostrar coincidencias a medida que se escribe y facilitar la selección.
