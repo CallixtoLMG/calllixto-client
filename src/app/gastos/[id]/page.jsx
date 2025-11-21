@@ -26,7 +26,7 @@ const Expense = ({ params }) => {
   const { push } = useRouter();
   const { data: expense, isLoading, refetch } = useGetExpense(params.id);
   const { setLabels } = useBreadcrumContext();
-  const { resetActions, setActions } = useNavActionsContext();
+  const { resetActions, setActions, setInfo } = useNavActionsContext();
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
@@ -88,6 +88,7 @@ const Expense = ({ params }) => {
     }
 
     setActions(actionsList);
+    setInfo(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, expense?.id, expense?.state, setActions, push]);
 

@@ -31,7 +31,7 @@ const Budget = ({ params }) => {
   const { role } = useUserContext();
   const { userData } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { resetActions, setActions } = useNavActionsContext();
+  const { resetActions, setActions, setInfo } = useNavActionsContext();
   const { push } = useRouter();
   const { data: budget, isLoading } = useGetBudget(params.id);
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
@@ -194,6 +194,7 @@ const Budget = ({ params }) => {
         },
       ].filter(Boolean);
       setActions(actions);
+      setInfo(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [budget, push, role, setActions]);

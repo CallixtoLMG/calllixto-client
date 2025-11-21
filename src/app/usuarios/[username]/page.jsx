@@ -21,7 +21,7 @@ const User = ({ params }) => {
   const { push } = useRouter();
   const { data: user, isLoading, refetch } = useGetUser(decodeURIComponent(params.username));
   const { setLabels } = useBreadcrumContext();
-  const { resetActions, setActions } = useNavActionsContext();
+  const { resetActions, setActions, setInfo } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -221,6 +221,7 @@ const User = ({ params }) => {
       }
 
       setActions(actions);
+      setInfo(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, user, activeAction, isActivePending, isInactivePending, isDeletePending, setActions]);

@@ -19,7 +19,7 @@ const BudgetsHistory = () => {
   );
 
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
+  const { setActions, setInfo } = useNavActionsContext();
 
   useEffect(() => {
     setLabels([{ name: "Historial de ventas" }]);
@@ -40,7 +40,8 @@ const BudgetsHistory = () => {
 
   useEffect(() => {
     setActions([]);
-  }, [loading, setActions]);
+    setInfo(null);
+  }, [loading, setActions, setInfo]);
 
   return (
     <>

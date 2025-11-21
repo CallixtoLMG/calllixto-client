@@ -37,7 +37,7 @@ const Settings = () => {
   useValidateToken();
   const { push } = useRouter();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
+  const { setActions, setInfo } = useNavActionsContext();
   const { data, isLoading: isLoadingSettings } = useListSettings();
   const editSetting = useEditSetting();
   const queryClient = useQueryClient();
@@ -87,6 +87,7 @@ const Settings = () => {
 
   useEffect(() => {
     setActions([]);
+    setInfo(null);
     setLabels([{ name: PAGES.SETTINGS.NAME }]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setActions, setLabels]);
