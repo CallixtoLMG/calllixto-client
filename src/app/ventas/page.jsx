@@ -12,7 +12,7 @@ const Budgets = () => {
   useValidateToken();
   const { data, isLoading, isRefetching, refetch } = useListBudgets();
   const { setLabels } = useBreadcrumContext();
-  const { setActions } = useNavActionsContext();
+  const { setActions, setInfo } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -47,8 +47,9 @@ const Budgets = () => {
       },
     ];
     setActions(actions);
+    setInfo(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [push, setActions, loading]);
+  }, [push, setActions, loading, setInfo]);
 
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 
