@@ -18,7 +18,7 @@ const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel }) => {
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: USERS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['username', 'firstName', 'lastName']);
+  const onFilter = createFilter(filters, ['username', 'firstName', 'lastName', 'state']);
 
   return (
     <>

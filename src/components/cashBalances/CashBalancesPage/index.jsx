@@ -36,7 +36,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
     paymentMethodsText: filters.paymentMethods
   };
 
-  const onFilter = createFilter(adjustedFilters, ["id", "paymentMethodsText"]);
+  const onFilter = createFilter(adjustedFilters, ["id", "paymentMethodsText", 'state']);
 
   const cashBalanceColumns = useMemo(
     () => getCashBalanceColumns(filters.state),

@@ -36,7 +36,7 @@ const CashBalanceMovements = ({ cashBalance }) => {
     key: CASH_BALANCE_MOVEMENTS_FILTERS_KEY
   });
 
-  const onFilter = createFilter(filters, ['movementId']);
+  const onFilter = createFilter(filters, ['movementId', 'state'], ['state']);
 
   const { control } = methods;
 

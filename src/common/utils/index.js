@@ -1,6 +1,6 @@
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
-import { CANCELLED, INACTIVE, REGEX } from "../constants";
+import { ALL, CANCELLED, INACTIVE, REGEX } from "../constants";
 
 export const getFormatedPrice = (number) => {
   const safeNumber = Number(number) ?? 0;
@@ -115,13 +115,17 @@ export const renderContent = (content) => {
   );
 };
 
-export const createFilter = (filters, keysToFilter, exceptions = {}) => {
+export const createFilter = (filters, keysToFilter, skipAll = []) => {
   return (item) => {
     for (const keyConfig of keysToFilter) {
       const key = typeof keyConfig === "string" ? keyConfig : keyConfig.field;
       const nestedKey = typeof keyConfig === "object" ? keyConfig.nestedField : null;
 
       if (filters[key]) {
+        if (skipAll.includes(key) && filters[key] === ALL) {
+          return true;
+        }
+
         const filterWords = normalizeText(filters[key]).split(/\s+/);
 
         let itemValue = "";
@@ -136,8 +140,6 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
           );
         } else if (typeof item[key] === "string") {
           itemValue = normalizeText(item[key]);
-        } else if (typeof exceptions[key] === "function") {
-          itemValue = normalizeText(exceptions[key](item));
         }
 
         const allWordsMatch = filterWords.every(word => itemValue.includes(word));
@@ -145,10 +147,6 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
           return false;
         }
       }
-    }
-
-    if (filters.state && filters.state !== item.state && filters.state !== exceptions.allState) {
-      return false;
     }
 
     return true;
