@@ -21,7 +21,12 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel }) 
 
   const { data, isLoading: isLoadingSettings } = useGetSetting(ENTITIES.EXPENSE);
 
-  const onFilter = createFilter(filters, ['id', 'name', { field: "categories", nestedField: "name" }, 'state'], ['state', 'categories']);
+  const onFilter = createFilter(filters, {
+    id: {},
+    name: {},
+    categories: { skipAll: true, arrayKey: 'name', fullMatch: true },
+    state: { skipAll: true, fullMatch: true }
+  });
 
   const categoryOptions = useMemo(() => {
     return [SELECT_ALL_OPTION, ...(data?.categories?.map(({ name, color }) => ({

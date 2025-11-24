@@ -1,7 +1,7 @@
 import { Box, Flex, Icon, Label, OverflowWrapper } from '@/common/components/custom';
 import { PriceLabel } from '@/common/components/form';
 import { CommentTooltip } from "@/common/components/tooltips";
-import { COLORS, DATE_FORMATS, ICONS, SIZES } from '@/common/constants';
+import { COLORS, DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SIZES } from '@/common/constants';
 import { getFormatedDate } from '@/common/utils/dates';
 import { Popup } from 'semantic-ui-react';
 
@@ -134,7 +134,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
 };
 
 export const EMPTY_CASH_BALANCE = { method: '', startDate: '', closeDate: '', id: '', comments: '' };
-export const EMPTY_FILTERS = { id: '', state: CASH_BALANCE_STATES.OPEN.id, paymentMethods: '' };
+export const EMPTY_FILTERS = { id: '', state: CASH_BALANCE_STATES.OPEN.id, paymentMethods: SELECT_ALL_OPTION.value };
 
 export const CASH_BALANCE_STATES_OPTIONS = Object.values(CASH_BALANCE_STATES)
   .map(({ id, title, color }) => ({

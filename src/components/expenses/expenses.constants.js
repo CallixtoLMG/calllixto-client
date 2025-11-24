@@ -100,7 +100,7 @@ export const EXPENSE_STATES = {
 };
 
 export const EMPTY_EXPENSE = { name: '', comments: '', amount: '', expirationDate: '', paymentsMade: [] };
-export const EMPTY_FILTERS = { id: '', name: '', categories: "", state: SELECT_ALL_OPTION.value, };
+export const EMPTY_FILTERS = { id: '', name: '', categories: "", state: SELECT_ALL_OPTION.value, categories: SELECT_ALL_OPTION.value };
 
 export const EXPENSES_STATE_OPTIONS = [
   SELECT_ALL_OPTION,

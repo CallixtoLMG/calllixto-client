@@ -61,7 +61,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: filterKey });
 
-  const onFilter = createFilter(filters, ['id', 'customer', 'createdBy', 'state'], ['state']);
+  const onFilter = createFilter(filters, { id: {}, customer: { field: 'name' }, createdBy: {}, state: { skipAll: true } });
 
   const actions = [
     {

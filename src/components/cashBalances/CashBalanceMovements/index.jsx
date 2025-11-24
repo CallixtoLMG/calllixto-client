@@ -36,7 +36,7 @@ const CashBalanceMovements = ({ cashBalance }) => {
     key: CASH_BALANCE_MOVEMENTS_FILTERS_KEY
   });
 
-  const onFilter = createFilter(filters, ['movementId', 'state'], ['state']);
+  const onFilter = createFilter(filters, { entityId: {}, state: { skipAll: true } });
 
   const { control } = methods;
 
@@ -96,7 +96,7 @@ const CashBalanceMovements = ({ cashBalance }) => {
                 defaultValue="all"
                 afterChange={onSubmit}
               />
-              <TextControlled name="movementId" placeholder="Id" width="150px" />
+              <TextControlled name="entityId" placeholder="Id" width="150px" />
             </Filters>
           </FlexColumn>
         </Form>

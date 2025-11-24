@@ -18,7 +18,7 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch, onDownloadExcel }
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: SUPPLIERS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['id', 'name', 'state']);
+  const onFilter = createFilter(filters, { id: {}, name: {}, state: { fullMatch: true } });
 
   return (
     <>

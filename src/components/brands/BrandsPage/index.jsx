@@ -18,7 +18,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel }) => {
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BRANDS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['name', 'id', 'state']);
+  const onFilter = createFilter(filters, { name: {}, id: {}, state: {} });
 
   return (
     <>

@@ -1,6 +1,6 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { ENTITIES, PAGES } from "@/common/constants";
+import { ENTITIES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { useFilters, useSettingArrayField } from "@/hooks";
 import { useMemo } from "react";
@@ -31,22 +31,11 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
     }));
   }, [cashBalances]);
 
-  const adjustedFilters = {
-    ...filters,
-    paymentMethodsText: filters.paymentMethods
-  };
-
-  const onFilter = createFilter(adjustedFilters, ["id", "paymentMethodsText", 'state']);
+  const onFilter = createFilter(filters, { id: {}, paymentMethods: { isArray: true,  skipAll: true }, state: { fullMatch: true } });
 
   const cashBalanceColumns = useMemo(
     () => getCashBalanceColumns(filters.state),
     [filters.state]
-  );
-
-  const { options: tagsOptions } = useSettingArrayField(
-    ENTITIES.GENERAL,
-    "paymentMethods",
-    paymentOptions ?? []
   );
 
   return (
@@ -64,7 +53,6 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
               width="200px"
               name="state"
               options={CASH_BALANCE_STATES_OPTIONS}
-              defaultValue={EMPTY_FILTERS.state}
               afterChange={onSubmit}
             />
             <TextControlled name="id" placeholder="Id" width="80px" />
@@ -72,8 +60,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
               width="200px"
               name="paymentMethods"
               placeholder="Método de pago"
-              options={paymentOptions}
-              defaultValue={EMPTY_FILTERS.paymentMethods}
+              options={[SELECT_ALL_OPTION, ...paymentOptions]}
               afterChange={onSubmit}
               textMaxWidth="fit-content"
             />

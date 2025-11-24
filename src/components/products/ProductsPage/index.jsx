@@ -40,7 +40,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: PRODUCTS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['id', 'name', 'state']);
+  const onFilter = createFilter(filters, { id: {}, name: {}, state: { skipAll: true, fullMatch: true } });
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,

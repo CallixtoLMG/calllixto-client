@@ -18,7 +18,7 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel }
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CUSTOMERS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['name', 'state']);
+  const onFilter = createFilter(filters, { name: {}, state: { fullMatch: true } });
   return (
     <>
       <FormProvider {...methods}>

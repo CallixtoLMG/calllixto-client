@@ -115,34 +115,55 @@ export const renderContent = (content) => {
   );
 };
 
-export const createFilter = (filters, keysToFilter, skipAll = []) => {
+export const createFilter = (filters, config) => {
   return (item) => {
-    for (const keyConfig of keysToFilter) {
-      const key = typeof keyConfig === "string" ? keyConfig : keyConfig.field;
-      const nestedKey = typeof keyConfig === "object" ? keyConfig.nestedField : null;
-
+    for (const [key, { skipAll, arrayKey, fullMatch, isArray, field }] of Object.entries(config)) {
+      const filter = filters[key];
       if (filters[key]) {
-        if (skipAll.includes(key) && filters[key] === ALL) {
-          return true;
+        if (skipAll && filter === ALL) {
+          continue;
         }
 
-        const filterWords = normalizeText(filters[key]).split(/\s+/);
+        const filterWords = normalizeText(filter).split(/\s+/);
 
-        let itemValue = "";
+        if (arrayKey) {
+          const anyArrayItemMatches = item[key]?.some(arrayItem => {
+            if (fullMatch) {
+              return normalizeText(arrayItem[arrayKey]) === normalizeText(filter);
+            }
+            return filterWords.every(word => normalizeText(arrayItem[arrayKey]).includes(word));
+          });
 
-        if (nestedKey && Array.isArray(item[key])) {
-
-          itemValue = normalizeText(
-            item[key]
-              .map(obj => obj?.[nestedKey])
-              .filter(Boolean)
-              .join(" ")
-          );
-        } else if (typeof item[key] === "string") {
-          itemValue = normalizeText(item[key]);
+          if (!anyArrayItemMatches) {
+            return false;
+          }
+          continue;
         }
 
-        const allWordsMatch = filterWords.every(word => itemValue.includes(word));
+        if (isArray) {
+          const anyArrayItemMatches = item[key]?.some(item => {
+            if (fullMatch) {
+              return normalizeText(item) === normalizeText(filter);
+            }
+            return filterWords.every(word => normalizeText(item).includes(word));
+          });
+
+          if (!anyArrayItemMatches) {
+            return false;
+          }
+          continue;
+        }
+
+        const value = field ? normalizeText(item[key]?.[field]) : normalizeText(item[key]);
+
+        if (fullMatch) {
+          if (value !== normalizeText(filter)) {
+            return false;
+          }
+          continue;
+        }
+
+        const allWordsMatch = filterWords.every(word => value.includes(word));
         if (!allWordsMatch) {
           return false;
         }
@@ -160,7 +181,7 @@ export const getDefaultListParams = (attributes = []) => {
   return { attributes: encodeUri(getDefaultAttributes(attributes)) };
 };
 
-export const getDefaultAttributes = (attributes = []) => [...attributes, 'updatedAt', 'createdAt' ];
+export const getDefaultAttributes = (attributes = []) => [...attributes, 'updatedAt', 'createdAt'];
 
 export const toUpperCase = (text = "") => {
   if (typeof text !== "string") return "";
