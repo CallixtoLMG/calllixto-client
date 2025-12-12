@@ -1,7 +1,7 @@
 import { ButtonsContainer, FieldsContainer, Flex, Form } from "@/common/components/custom";
 import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePickerControlled";
 import { COLORS, ENTITIES, ICONS, RULES } from "@/common/constants";
-import { datePickerNow } from "@/common/utils/dates";
+import { datePickerNow, getPastDate } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
 import { useSettingArrayField } from "@/hooks";
@@ -39,7 +39,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
 
   return (
     <FormProvider {...methods}>
-      <Transition visible={open} onStart={handleOnStart}  animation="scale" duration={500}>
+      <Transition visible={open} onStart={handleOnStart} animation="scale" duration={500}>
         <Modal open={open} onClose={onClose}>
           <Header icon="inbox" content="Abrir caja" />
           <Modal.Content>
@@ -47,7 +47,13 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
               <Flex $columnGap="15px">
                 <FieldsContainer>
                   <DatePickerControlled
-                    rules={RULES.REQUIRED}
+                    rules={{
+                      required: "Campo obligatorio.",
+                      validate: {
+                        minDate: (value) =>
+                          value >= getPastDate(1, "months") || "No puede seleccionar una fecha anterior a un mes.",
+                      },
+                    }}
                     name="startDate"
                     label="Fecha de inicio"
                     width="fit-content"

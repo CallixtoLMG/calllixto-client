@@ -5,7 +5,7 @@ import { BUDGETS_VIEW_MONTHS, GET_BUDGET_QUERY_KEY, LIST_ATTRIBUTES, LIST_BUDGET
 import { CANCEL, CONFIRM, PATHS, PAYMENTS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from './axios';
-import { entityList, listItems, useCreateItem, useEditItem } from "./common";
+import { entityList, listItems, useCreateItem, useEditItem, usePatchItem } from "./common";
 
 export function useListBudgets() {
   const query = useQuery({
@@ -113,6 +113,28 @@ export const useConfirmBudget = () => {
 
   return confirmBudget
 };
+
+export const useConfirmBudgetDiscount = () => {
+  const patchItem = usePatchItem();
+
+  const confirmBudgetDiscount = ({ id, postConfirmDiscount }) => {
+    return patchItem({
+      entity: ENTITIES.BUDGETS,
+      url: `${PATHS.BUDGETS}/${id}/confirmed`,
+      value: {
+        postConfirmDiscount,
+      },
+      responseEntity: ENTITIES.BUDGET,
+      invalidateQueries: [
+        [LIST_BUDGETS_QUERY_KEY],
+        [GET_BUDGET_QUERY_KEY, id]
+      ]
+    });
+  };
+
+  return confirmBudgetDiscount;
+};
+
 
 export const useCancelBudget = () => {
   const editItem = useEditItem();

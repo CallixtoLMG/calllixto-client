@@ -2,12 +2,12 @@ import { IconedButton } from "@/common/components/buttons";
 import { Box, FieldsContainer, Flex, FlexColumn } from "@/common/components/custom";
 import { Table } from "@/common/components/table";
 import { COLORS, ICONS } from "@/common/constants";
+import { useRef, useState } from "react";
+import { useFieldArray } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { AddBillPopup } from "../AddBillPopup";
 import { BILLS_DETAILS_TABLE_HEADERS } from "../cashBalances.constants";
 import { Header } from "./styles";
-import { useFieldArray } from "react-hook-form";
-import { useRef, useState } from "react";
 
 export const BillDetails = ({ name }) => {
   const [openBillPopup, setOpenBillPopup] = useState(false);

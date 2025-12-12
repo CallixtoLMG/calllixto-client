@@ -169,6 +169,7 @@ export const Menu = styled(SMenu)`
     min-height:35px;
     font-size: 13px!important;
     border:none;
+    box-shadow: none;
   }
 `;
 

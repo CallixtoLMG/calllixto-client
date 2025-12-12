@@ -32,7 +32,7 @@ export const Flex = styled(Common)`
 `;
 
 export const FlexColumn = styled(Flex)`
-  flex-direction: column;
+  flex-direction: column!important;
 `;
 
 export const Box = styled(Common)`

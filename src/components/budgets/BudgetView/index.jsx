@@ -1,16 +1,17 @@
+import { useConfirmBudgetDiscount } from "@/api/budgets";
 import { useCreatePayment, useDeletePayment, useEditPayment, useGetPayment } from "@/api/payments";
 import EntityPayments from "@/common/components/modules/EntityPayments";
 import { ENTITIES } from "@/common/constants";
 import BudgetDetails from "@/components/budgets/BudgetView/Modules/BudgetDetails";
+import { Loader } from "@/components/layout";
 import { useAllowUpdate, useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 import { isBudgetCancelled, isBudgetExpired, isBudgetPending } from "../budgets.utils";
-import { Loader } from "@/components/layout";
 
 const BudgetView = ({
   budget,
@@ -18,7 +19,8 @@ const BudgetView = ({
   subtotalAfterDiscount,
   total,
   selectedContact,
-  setSelectedContact
+  setSelectedContact,
+  refetch
 }) => {
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
@@ -29,6 +31,7 @@ const BudgetView = ({
   const editPayment = useEditPayment();
   const createPayment = useCreatePayment();
   const deletePayment = useDeletePayment();
+  const confirmBudgetDiscount = useConfirmBudgetDiscount();
   const methods = useForm({
     defaultValues: {
       paymentsMade: Object.values(payment || {}).map((payment) => ({
@@ -105,19 +108,35 @@ const BudgetView = ({
     }
   });
 
+  const { mutate: mutateConfirmBudgetDiscount, isPending: isConfirmBudgetDiscountPending } = useMutation({
+    mutationFn: ({ budgetId, postConfirmDiscount }) => confirmBudgetDiscount({ id: budgetId, postConfirmDiscount }),
+    onSuccess: (response) => {
+      if (response?.statusOk) {
+        toast.success("Descuento aplicado correctamente!");
+        refetch();
+      } else {
+        toast.error(response?.error?.message || "Error al aplicar descuento!.");
+      }
+    },
+  });
+
   const modules = [
     {
       key: "main",
       label: "Presupuesto",
       component: (
-        <BudgetDetails
-          budget={budget}
-          subtotal={subtotal}
-          subtotalAfterDiscount={subtotalAfterDiscount}
-          total={total}
-          selectedContact={selectedContact}
-          setSelectedContact={setSelectedContact}
-        />
+        <FormProvider {...methods}>
+          <BudgetDetails
+            budget={budget}
+            subtotal={subtotal}
+            subtotalAfterDiscount={subtotalAfterDiscount}
+            total={total}
+            selectedContact={selectedContact}
+            setSelectedContact={setSelectedContact}
+            onConfirmBudgetDiscount={mutateConfirmBudgetDiscount}
+            isLoading={isConfirmBudgetDiscountPending}
+          />
+        </FormProvider>
       ),
     },
     ...(!isBudgetPending(budget?.state) && !isBudgetExpired(budget?.state)
