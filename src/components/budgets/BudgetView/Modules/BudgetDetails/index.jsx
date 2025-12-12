@@ -1,6 +1,7 @@
+import { IconedButton } from "@/common/components/buttons";
 import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
-import { DropdownField, PriceLabel } from "@/common/components/form";
-import { Table, Total } from "@/common/components/table";
+import { DropdownField, PriceControlled, PriceLabel } from "@/common/components/form";
+import { Table, Total, TotalList } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
@@ -8,15 +9,20 @@ import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useEffect, useMemo, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
+import { FlexColumn } from "../../../../../common/components/custom";
 import { PICK_UP_IN_STORE } from "../../../budgets.constants";
 import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../../../budgets.utils";
 import { Container, Message, MessageHeader } from "./../../styles";
 
-const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
+const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact, onConfirmBudgetDiscount, isLoading }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
+  const totalPending = (total - budget.paidAmount).toFixed(2)
+  const { setValue, getValues, trigger } = useFormContext();
+  const amountIsCover = budget.paidAmount >= budget.total
 
   useEffect(() => {
     if (!budget || initializedContact) return;
@@ -34,6 +40,12 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
 
     setInitializedContact(true);
   }, [budget, initializedContact, setSelectedContact]);
+
+  const TOTAL_LIST_ITEMS = [
+    { id: 1, title: "Pagado", amount: <PriceLabel value={budget.paidAmount} /> },
+    { id: 2, title: "Pendiente", amount: <PriceLabel value={totalPending} /> },
+    { id: 3, title: "Total", amount: <PriceLabel value={total} /> },
+  ];
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
@@ -248,14 +260,66 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           headers={BUDGET_FORM_PRODUCT_COLUMNS}
           elements={budget?.products}
         />
-        <Total
-          readOnly
-          subtotal={subtotal}
-          total={total}
-          subtotalAfterDiscount={subtotalAfterDiscount}
-          globalDiscount={budget?.globalDiscount}
-          additionalCharge={budget?.additionalCharge}
-        />
+        {isBudgetConfirmed(budget?.state) ?
+          <>
+            <TotalList items={TOTAL_LIST_ITEMS} />
+            {!amountIsCover &&
+              <FlexColumn $alignSelf="end" $rowGap="15px">
+                <Flex $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
+                  <IconedButton
+                    text="Completar"
+                    icon={ICONS.ADD}
+                    color={COLORS.BLUE}
+                    onClick={() => {
+                      setValue("postConfirmDiscount", totalPending);
+                      trigger("postConfirmDiscount");
+                    }}
+                    alignSelf="start"
+                    height="38px"
+                    disabled={isLoading}
+                  />
+                  <PriceControlled
+                    width="200px"
+                    placeholder="5.000"
+                    name="postConfirmDiscount"
+                    rules={{
+                      validate: (value) =>
+                        value ? value <= totalPending || "No puede superar el monto pendiente" : true,
+                    }}
+                    justifyItems="right"
+                  />
+                </Flex>
+                <Flex $columnGap="15px" $alignSelf="end">
+                  <IconedButton
+                    text="Aplicar descuento"
+                    loading={isLoading}
+                    disabled={isLoading}
+                    icon={ICONS.CHECK}
+                    color={COLORS.GREEN}
+                    height="38px"
+                    onClick={() => {
+                      const value = getValues("postConfirmDiscount");
+                      onConfirmBudgetDiscount({
+                        budgetId: budget.id,
+                        postConfirmDiscount: Number(value),
+                      });
+                    }}
+                  />
+                </Flex>
+              </FlexColumn>
+            }
+
+          </>
+          :
+          <Total
+            readOnly
+            subtotal={subtotal}
+            total={total}
+            subtotalAfterDiscount={subtotalAfterDiscount}
+            globalDiscount={budget?.globalDiscount}
+            additionalCharge={budget?.additionalCharge}
+          />
+        }
         <FormField
           control={Input}
           label="Métodos de pago"

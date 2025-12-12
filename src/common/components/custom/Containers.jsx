@@ -14,7 +14,7 @@ export const Form = styled(SForm)`
 `;
 
 export const ViewContainer = styled(Flex)`
-  flex-direction: column;
+  flex-direction: column!important;
   row-gap: 15px;
 `;
 

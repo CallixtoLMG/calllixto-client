@@ -33,7 +33,7 @@ const Budget = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions, setInfo } = useNavActionsContext();
   const { push } = useRouter();
-  const { data: budget, isLoading } = useGetBudget(params.id);
+  const { data: budget, isLoading, refetch: refetchBudget } = useGetBudget(params.id);
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
@@ -80,11 +80,10 @@ const Budget = ({ params }) => {
       }))
       const calculatedSubtotal = getTotalSum(budget.products);
       const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount);
-      const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget.additionalCharge);
 
       setSubtotal(calculatedSubtotal);
       setSubtotalAfterDiscount(calculatedSubtotalAfterDiscount);
-      setTotal(calculatedFinalTotal);
+      setTotal(budget.total);
       const stateTitle = BUDGET_STATES[budget.state]?.singularTitle || BUDGET_STATES.INACTIVE.singularTitle;
       const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([
@@ -314,6 +313,7 @@ const Budget = ({ params }) => {
           total={total}
           selectedContact={selectedContact}
           setSelectedContact={setSelectedContact}
+          refetch={refetchBudget}
         />
       )}
       <ModalPDF

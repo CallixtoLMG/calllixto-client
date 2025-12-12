@@ -1,5 +1,5 @@
-import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
-import { DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
+import { Box, Flex, Icon, OverflowWrapper } from "@/common/components/custom";
+import { COLORS, DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
 import { getLabelColor } from "@/common/utils";
 import { getDateWithOffset, getEndOfUnit, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
 import { Label, Popup } from "semantic-ui-react";
@@ -25,7 +25,8 @@ export const LIST_ATTRIBUTES = [
   "confirmedBy",
   "cancelledAt",
   "cancelledBy",
-  "comments"
+  "comments",
+  "paidAmount"
 ];
 export const BUDGETS_VIEW_MONTHS = 3;
 
@@ -67,76 +68,123 @@ export const BUDGET_STATES = {
   },
 };
 
-export const BUDGETS_COLUMNS = [
-  {
-    id: 1,
-    title: "Id",
-    key: "id",
-    sortable: true,
-    width: 1,
-    align: "left",
-    value: (budget) => (
-      <Box width="60px">
-        {isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state) ? (
-          <Popup
-            trigger={
-              <Label ribbon color={getLabelColor(budget, BUDGET_STATES)}>
-                {budget.id}
-              </Label>
-            }
-            content={getPopupContent(budget)}
-            position="right center"
-            size="mini"
-          />
-        ) : (
-          <Label ribbon color={getLabelColor(budget, BUDGET_STATES)}>
-            {budget.id}
-          </Label>
-        )}
-      </Box>
-    ),
-    sortValue: (budget) => budget.id ?? ""
-  },
-  {
-    id: 2,
-    title: "Cliente",
-    key: "customer",
-    sortable: true,
-    align: "left",
-    width: 6,
-    value: (budget) => (
-      <Flex $justifyContent="space-between">
-        <OverflowWrapper maxWidth="25vw" popupContent={budget.customer.name}>
-          {budget.customer.name}
-        </OverflowWrapper>
-        {budget.comments && <CommentTooltip comment={budget.comments} />}
-      </Flex>
-    ),
-    sortValue: (budget) => budget.customer.name ?? ""
-  },
-  {
-    id: 3,
-    title: "Fecha",
-    key: "date",
-    sortable: true,
-    width: 3,
-    value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME),
-    sortValue: (budget) => budget.createdAt ?? ""
+export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
+  const isConfirmed = state === BUDGET_STATES.CONFIRMED.id;
 
-  },
-  {
-    id: 4,
-    title: "Total",
-    key: "total",
-    sortable: true,
-    width: 2,
-    value: ({ total }) => (
-      <PriceLabel value={total ?? 0} />
-    ),
-    sortValue: ({ total }) => total ?? 0
-  },
-  {
-    id: 5,
+  const columns = [
+    {
+      id: 1,
+      title: "Id",
+      key: "id",
+      sortable: true,
+      width: 1,
+      align: "left",
+      value: (budget) => {
+        const isPaid = Number(budget?.paidAmount) === Number(budget?.total);
+        return (
+          <Box width="80px">
+            <Flex $alignItems="center">
+              {isBudgetConfirmed(budget?.state) || isBudgetCancelled(budget?.state) ? (
+                <Popup
+                  trigger={
+                    <Label ribbon color={getLabelColor(budget, BUDGET_STATES)}>
+                      {budget.id}
+                    </Label>
+                  }
+                  content={getPopupContent(budget)}
+                  position="right center"
+                  size="mini"
+                />
+              ) : (
+                <Label ribbon color={getLabelColor(budget, BUDGET_STATES)}>
+                  {budget.id}
+                </Label>
+              )}
+              {isPaid && (
+                <Popup
+                  content="Pagado"
+                  position="right center"
+                  size="mini"
+                  trigger={
+                    <Icon
+                      name={ICONS.DOLLAR}
+                      color={COLORS.GREEN}
+                    />
+                  }
+                />
+              )}
+            </Flex>
+          </Box>
+        );
+      },
+      sortValue: (budget) => budget.id ?? ""
+    },
+    {
+      id: 2,
+      title: "Cliente",
+      key: "customer",
+      sortable: true,
+      align: "left",
+      width: 6,
+      value: (budget) => (
+        <Flex $justifyContent="space-between">
+          <OverflowWrapper maxWidth="25vw" popupContent={budget.customer.name}>
+            {budget.customer.name}
+          </OverflowWrapper>
+          {budget.comments && <CommentTooltip comment={budget.comments} />}
+        </Flex>
+      ),
+      sortValue: (budget) => budget.customer.name ?? ""
+    },
+    {
+      id: 3,
+      title: "Fecha",
+      key: "date",
+      sortable: true,
+      width: 3,
+      value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME),
+      sortValue: (budget) => budget.createdAt ?? ""
+    },
+    {
+      id: 4,
+      title: "Total",
+      key: "total",
+      sortable: true,
+      width: 2,
+      value: ({ total }) => <PriceLabel value={total ?? 0} />,
+      sortValue: ({ total }) => total ?? 0
+    },
+  ];
+
+  if (isConfirmed) {
+    columns.push(
+      {
+        id: 5,
+        title: "Pagado",
+        key: "paidAmount",
+        sortable: true,
+        width: 2,
+        value: (budget) => <PriceLabel value={budget.paidAmount ?? 0} />,
+        sortValue: (budget) => budget.paidAmount ?? 0
+      },
+      {
+        id: 6,
+        title: "Pendiente",
+        key: "pendingAmount",
+        sortable: true,
+        width: 2,
+        value: (budget) => {
+          const pending = (budget.total ?? 0) - (budget.paidAmount ?? 0);
+          return <PriceLabel value={Math.max(pending, 0)} />;
+        },
+        sortValue: (budget) =>
+          (budget.total ?? 0) - (budget.paidAmount ?? 0)
+      }
+    );
+  }
+
+  columns.push({
+    id: isConfirmed ? 7 : 5,
     title: "Vendedor",
     align: "left",
     key: "createdBy",
@@ -148,8 +196,10 @@ export const BUDGETS_COLUMNS = [
       </OverflowWrapper>
     ),
     sortValue: (budget) => budget.createdBy ?? ""
-  },
-];
+  });
+
+  return columns;
+};
 
 export const PAYMENT_METHODS = [
   { key: 'efectivo', text: 'Efectivo', value: 'Efectivo' },
@@ -182,7 +232,7 @@ export const BUDGET_PDF_FORMAT = {
 
 export const PICK_UP_IN_STORE = "Retira en tienda";
 
-export const EMPTY_FILTERS = { id: '', customer: '', createdBy: '', state: SELECT_ALL_OPTION.value, sorting: { key: 'id', direction: SORTING.DESC } };
+export const EMPTY_FILTERS = { id: '', customer: '', createdBy: '', paymentStatus: '', state: SELECT_ALL_OPTION.value, sorting: { key: 'id', direction: SORTING.DESC } };
 export const BUDGET_STATES_OPTIONS = [
   SELECT_ALL_OPTION,
   ...Object.values(BUDGET_STATES).map(({ id, title, color }) => (
@@ -196,6 +246,33 @@ export const BUDGET_STATES_OPTIONS = [
       value: id
     }))
 ];
+
+export const PAYMENT_STATES = {
+  PAID: {
+    id: 'PAID',
+    title: 'Pagados',
+    color: 'green',
+    icon: 'dollar sign',
+  },
+  PENDING: {
+    id: 'PENDING',
+    title: 'Pendientes',
+    color: 'orange',
+    icon: 'clock outline',
+  },
+};
+
+export const PAYMENT_STATES_OPTIONS = Object.values(PAYMENT_STATES).map(
+  ({ id, title, color }) => ({
+    key: id,
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+      </Flex>
+    ),
+    value: id,
+  })
+);
 
 export const BUDGET_STATE_TRANSLATIONS = {
   CONFIRMED: BUDGET_STATES.CONFIRMED,
@@ -226,15 +303,15 @@ export const BUDGETS_HISTORY_DATE_RANGE = [
     label: 'Mes pasado',
     value: 'last_month',
     getRange: () => ({
-      startDate: getStartOfUnit(getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO}), 'month'),
-      endDate: getEndOfUnit(getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO}), 'month')
+      startDate: getStartOfUnit(getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO }), 'month'),
+      endDate: getEndOfUnit(getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO }), 'month')
     })
   },
   {
     label: 'Último mes',
     value: 'last_30_days',
     getRange: () => ({
-      startDate: getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO}),
+      startDate: getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO }),
       endDate: now()
     })
   },
@@ -242,7 +319,7 @@ export const BUDGETS_HISTORY_DATE_RANGE = [
     label: 'Últimos 3 meses',
     value: 'last_3_months',
     getRange: () => ({
-      startDate: getDateWithOffset({ offset: -3, unit: 'month', format: DATE_FORMATS.ISO}),
+      startDate: getDateWithOffset({ offset: -3, unit: 'month', format: DATE_FORMATS.ISO }),
       endDate: now()
     })
   },
@@ -250,7 +327,7 @@ export const BUDGETS_HISTORY_DATE_RANGE = [
     label: 'Últimos 6 meses',
     value: 'last_6_months',
     getRange: () => ({
-      startDate: getDateWithOffset({ offset: -6, unit: 'month', format: DATE_FORMATS.ISO}),
+      startDate: getDateWithOffset({ offset: -6, unit: 'month', format: DATE_FORMATS.ISO }),
       endDate: now()
     })
   }
