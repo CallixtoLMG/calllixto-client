@@ -1,7 +1,7 @@
+import { omit } from "lodash";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import useFilterParams from "./useFilterParams";
-import { omit } from "lodash";
 
 const useFilters = ({ defaultFilters, key }) => {
   const { filters, setFilters } = useFilterParams({

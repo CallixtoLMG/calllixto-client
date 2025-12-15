@@ -122,7 +122,11 @@ export const createFilter = (filters, config) => {
       if (filters[key]) {
 
         if (custom) {
-          return custom(item)
+          const isValid = custom(item);
+          if (!isValid) {
+            return false;
+          }
+          continue;
         }
 
         if (skipAll && filter === ALL) {

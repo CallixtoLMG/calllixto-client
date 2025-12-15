@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE_TRANSLATIONS, EMPTY_FILTERS, PAYMENT_STATES_OPTIONS, getBudgetColumns } from "../budgets.constants";
+import { BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE_TRANSLATIONS, EMPTY_FILTERS, PAYMENT_STATES, PAYMENT_STATES_OPTIONS, getBudgetColumns } from "../budgets.constants";
 
 const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRefetch }) => {
   const { push } = useRouter();
@@ -73,11 +73,11 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
         const total = Number(item.total ?? 0);
         const paid = Number(item.paidAmount ?? 0);
 
-        if (filter === "PAID") {
+        if (filter === PAYMENT_STATES.PAID.id) {
           return paid === total;
         }
 
-        if (filter === "PENDING") {
+        if (filter === PAYMENT_STATES.PENDING.id) {
           return paid < total;
         }
 

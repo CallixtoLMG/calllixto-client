@@ -268,7 +268,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 <Flex $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
                   <IconedButton
                     text="Completar"
-                    icon={ICONS.ADD}
+                    icon={ICONS.CHECK}
                     color={COLORS.BLUE}
                     onClick={() => {
                       setValue("postConfirmDiscount", totalPending);
