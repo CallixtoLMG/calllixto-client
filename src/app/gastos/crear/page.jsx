@@ -15,7 +15,7 @@ const CreateExpense = () => {
   const searchParams = useSearchParams();
   const cloneId = searchParams.get("clonar");
   const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
+  const { resetActions, setInfo } = useNavActionsContext();
   const createExpense = useCreateExpense();
   const { data: expenseToClone, isLoading: loadingClone } = useGetExpense(cloneId);
 
@@ -26,6 +26,7 @@ const CreateExpense = () => {
 
   useEffect(() => {
     setLabels([{ name: PAGES.EXPENSES.NAME }, { name: 'Crear' }]);
+    setInfo(null)
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({

@@ -64,7 +64,16 @@ const ModalUpdates = () => {
                 Ahora es posible previsualizar un presupuesto antes de imprimirlo en cualquiera de sus formatos.
               </ListItem>
               <ListItem>
+                En la página de <Accent>Ventas</Accent> se agregó un nuevo filtro. Al visualizar las ventas confirmadas, ahora es posible filtrar por <Accent>Estado de pago</Accent>, ya sea pendiente o pagado.
+              </ListItem>
+              <ListItem>
+                Las ventas confirmadas ahora pueden recibir un descuento posterior a su confirmación, lo que permite descontar un monto numérico del total y evitar quedar con pequeños saldos pendientes.
+              </ListItem>
+              <ListItem>
                 En <Accent>Configuración</Accent> se agregó la pestaña <Accent>Ventas</Accent>, para definir valores predeterminados al crear o imprimir una venta.
+              </ListItem>
+              <ListItem>
+                En la parte superior derecha de todas las páginas principales se agregó el ícono <Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />. Al hacer clic, se despliega una pantalla con información sobre el funcionamiento de la sección.
               </ListItem>
             </List>
             <StyledListHeader>

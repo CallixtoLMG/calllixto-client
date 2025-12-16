@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useListProducts } from "@/api/products";
 import { Button, DropdownItem, Icon } from "@/common/components/custom";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, INFO, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import BatchImport from "@/components/products/BatchImport";
@@ -91,7 +91,7 @@ const Products = () => {
     }
 
     setActions(actions);
-    setInfo(null);
+    setInfo(INFO.HELP.SECTIONS[ENTITIES.PRODUCT]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading, setInfo]);
 

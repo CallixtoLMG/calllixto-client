@@ -1,8 +1,8 @@
 "use client";
 import { useCreateSupplier } from "@/api/suppliers";
+import { PAGES } from "@/common/constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
-import { PAGES } from "@/common/constants";
 import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -15,6 +15,7 @@ const CreateSupplier = () => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createSupplier = useCreateSupplier();
+  const { setInfo } = useNavActionsContext();
 
   useEffect(() => {
     resetActions();
@@ -23,6 +24,7 @@ const CreateSupplier = () => {
 
   useEffect(() => {
     setLabels([{ name: PAGES.SUPPLIERS.NAME }, { name: 'Crear' }]);
+    setInfo(null);
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({

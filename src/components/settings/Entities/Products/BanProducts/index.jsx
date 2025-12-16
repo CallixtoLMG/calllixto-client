@@ -84,7 +84,7 @@ const Blacklist = () => {
   const headers = useMemo(() => [
     {
       id: "id",
-      title: "Productos Bloqueados",
+      title: "Productos bloqueados",
       align: "left",
       value: (id) => id,
     },
@@ -106,7 +106,7 @@ const Blacklist = () => {
       <Accordion fluid>
         <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
           <Icon name="dropdown" />
-          Productos Bloqueados
+          Productos bloqueados
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
           <Box>
@@ -127,7 +127,7 @@ const Blacklist = () => {
                 popupPosition="top right"
                 popupContent={
                   <div>
-                    <p>* Para añadir un id nuevo a la lista, anótelo y luego pulse &quot;enter&quot;.</p>
+                    <p>* Para añadir un id nuevo a la lista, anótelo y luego pulse &quot;enter&quot; o haz click en el boton Agregar.</p>
                     <p>* Puede agregar múltiples ids separados por coma, por ejemplo: PCMU123,PCMU124.</p>
                   </div>
                 }

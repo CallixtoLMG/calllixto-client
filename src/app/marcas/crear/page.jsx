@@ -1,8 +1,8 @@
 "use client";
 import { useCreateBrand } from "@/api/brands";
+import { PAGES } from "@/common/constants";
 import BrandForm from "@/components/brands/BrandForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { PAGES } from "@/common/constants";
 import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -12,7 +12,7 @@ import { toast } from "react-hot-toast";
 const CreateBrand = () => {
   useValidateToken();
   const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
+  const { resetActions, setInfo } = useNavActionsContext();
   const { push } = useRouter();
   const createBrand = useCreateBrand();
 
@@ -23,6 +23,7 @@ const CreateBrand = () => {
 
   useEffect(() => {
     setLabels([{ name: PAGES.BRANDS.NAME }, { name: 'Crear' }]);
+    setInfo(null);
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({

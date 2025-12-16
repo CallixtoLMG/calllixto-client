@@ -12,7 +12,7 @@ import { toast } from "react-hot-toast";
 const CreateUser = () => {
   useValidateToken();
   const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
+  const { resetActions, setInfo } = useNavActionsContext();
   const { push } = useRouter();
   const createUser = useCreateUser();
   useEffect(() => {
@@ -22,6 +22,7 @@ const CreateUser = () => {
 
   useEffect(() => {
     setLabels([{ name: PAGES.USERS.NAME }, { name: 'Crear' }]);
+    setInfo(null)
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({

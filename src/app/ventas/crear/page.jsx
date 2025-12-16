@@ -7,7 +7,6 @@ import { useGetSetting } from "@/api/settings";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { mapToDropdownOptions } from "@/common/utils";
 import BudgetForm from "@/components/budgets/BudgetForm";
-import { PAYMENT_METHODS } from "@/components/budgets/budgets.constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { useValidateToken } from "@/hooks";
@@ -22,7 +21,7 @@ const CreateBudget = () => {
   const { userData } = useUserContext();
   const searchParams = useSearchParams();
   const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
+  const { resetActions, setInfo } = useNavActionsContext();
   const createBudget = useCreateBudget();
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
@@ -45,6 +44,7 @@ const CreateBudget = () => {
     setLabels([{ name: PAGES.BUDGETS.NAME }, { name: 'Crear' }]);
     refetchproductsData();
     refetchPaymentMethods();
+    setInfo(null);
   }, [setLabels, refetchproductsData, refetchPaymentMethods]);
 
   const { mutate, isPending } = useMutation({

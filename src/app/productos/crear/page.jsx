@@ -19,7 +19,7 @@ const CreateProduct = () => {
   const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers, isRefetching: isSupplierRefetching } = useListSuppliers();
   const { data: blacklist, refetch: refetchBlacklist } = useGetSetting(ENTITIES.PRODUCT);
   const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
+  const { resetActions, setInfo } = useNavActionsContext();
   const createProduct = useCreateProduct();
 
   useEffect(() => {
@@ -32,6 +32,7 @@ const CreateProduct = () => {
 
   useEffect(() => {
     setLabels([{ name: 'Productos' }, { name: 'Crear' }]);
+    setInfo(null)
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({

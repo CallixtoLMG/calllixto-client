@@ -1,6 +1,6 @@
 "use client";
 import { useListCustomers } from "@/api/customers";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, INFO, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
@@ -49,7 +49,7 @@ const Customers = () => {
       }
     ];
     setActions(actions);
-    setInfo(null);
+    setInfo(INFO.HELP.SECTIONS[ENTITIES.CUSTOMER]);
   }, [push, setActions, loading, setInfo]);
 
   useKeyboardShortcuts(() => push(PAGES.CUSTOMERS.CREATE), SHORTKEYS.ENTER);

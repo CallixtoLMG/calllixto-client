@@ -1,6 +1,6 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, INFO, PAGES, SHORTKEYS } from "@/common/constants";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { BUDGETS_VIEW_MONTHS } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -47,7 +47,7 @@ const Budgets = () => {
       },
     ];
     setActions(actions);
-    setInfo(null);
+    setInfo(INFO.HELP.SECTIONS[ENTITIES.BUDGET]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, setActions, loading, setInfo]);
 

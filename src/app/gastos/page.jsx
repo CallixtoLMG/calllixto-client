@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListExpenses } from "@/api/expenses";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, INFO, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import ExpensesPage from "@/components/expenses/ExpensesPage";
 import { EXPENSE_STATES } from "@/components/expenses/expenses.constants";
@@ -55,7 +55,7 @@ const Expenses = () => {
       }
     ] : [];
     setActions(actions);
-    setInfo(null);
+    setInfo(INFO.HELP.SECTIONS[ENTITIES.EXPENSE]);
   }, [push, role, setActions, loading, setInfo]);
 
   useKeyboardShortcuts(() => push(PAGES.EXPENSES.CREATE), SHORTKEYS.ENTER);

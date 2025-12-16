@@ -3,7 +3,7 @@ import { useEditSetting, useListSettings } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
-import { ALL, ENTITIES, PAGES, SHORTKEYS } from "@/common/constants";
+import { ALL, ENTITIES, INFO, PAGES, SHORTKEYS } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
 import { GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
@@ -87,7 +87,7 @@ const Settings = () => {
 
   useEffect(() => {
     setActions([]);
-    setInfo(null);
+    setInfo(INFO.HELP.SECTIONS[ENTITIES.SETTINGS]);
     setLabels([{ name: PAGES.SETTINGS.NAME }]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setActions, setLabels]);
