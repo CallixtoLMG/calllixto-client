@@ -27,7 +27,7 @@ const CreateExpense = () => {
   useEffect(() => {
     setLabels([{ name: PAGES.EXPENSES.NAME }, { name: 'Crear' }]);
     setInfo(null)
-  }, [setLabels]);
+  }, [setLabels, setInfo]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createExpense,

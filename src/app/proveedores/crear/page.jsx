@@ -25,7 +25,7 @@ const CreateSupplier = () => {
   useEffect(() => {
     setLabels([{ name: PAGES.SUPPLIERS.NAME }, { name: 'Crear' }]);
     setInfo(null);
-  }, [setLabels]);
+  }, [setLabels, setInfo]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createSupplier,

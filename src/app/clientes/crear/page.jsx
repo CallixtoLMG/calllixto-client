@@ -24,7 +24,7 @@ const CreateCustomer = () => {
   useEffect(() => {
     setLabels([{ name: PAGES.CUSTOMERS.NAME }, { name: 'Crear' }]);
     setInfo(null);
-  }, [setLabels]);
+  }, [setLabels, setInfo]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createCustomer,

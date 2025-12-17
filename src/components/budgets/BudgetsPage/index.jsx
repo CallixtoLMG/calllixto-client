@@ -98,7 +98,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
       methods.setValue("paymentStatus", "");
       onSubmit();
     }
-  }, [filters.state]);
+  }, [filters.state, filters.paymentStatus, methods, onSubmit]);
 
   const actions = [
     {

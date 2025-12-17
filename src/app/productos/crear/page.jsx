@@ -33,7 +33,7 @@ const CreateProduct = () => {
   useEffect(() => {
     setLabels([{ name: 'Productos' }, { name: 'Crear' }]);
     setInfo(null)
-  }, [setLabels]);
+  }, [setLabels, setInfo]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createProduct,

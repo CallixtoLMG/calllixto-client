@@ -45,7 +45,7 @@ const CreateBudget = () => {
     refetchproductsData();
     refetchPaymentMethods();
     setInfo(null);
-  }, [setLabels, refetchproductsData, refetchPaymentMethods]);
+  }, [setLabels, refetchproductsData, refetchPaymentMethods, setInfo]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createBudget,

@@ -618,7 +618,7 @@ export const INFO = {
                 Los productos bloqueados son una lista de IDs que no podrán ser agregados o creados. Para más información, pasa el mouse por encima del icono <Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />.
               </ListItem>
               <ListItem>
-                En el apartado de ventas, encontrarás dos opciones: "Al crear una venta" y "Al imprimir una venta". La primera te permite establecer valores predeterminados para las ventas, como el estado inicial o el método de entrega. La segunda te permite configurar la visualización del PDF al imprimir la venta, incluyendo si deseás mostrar o no los precios, y la posibilidad de agregar un texto en el PDF, a modo de descargo de responsabilidad, el cual solo será visible en el modo de visualización para el cliente.
+                En el apartado de ventas, encontrarás dos opciones: &quot;Al crear una venta&quot; y &quot;Al imprimir una venta&quot;. La primera te permite establecer valores predeterminados para las ventas, como el estado inicial o el método de entrega. La segunda te permite configurar la visualización del PDF al imprimir la venta, incluyendo si deseás mostrar o no los precios, y la posibilidad de agregar un texto en el PDF, a modo de descargo de responsabilidad, el cual solo será visible en el modo de visualización para el cliente.
               </ListItem>
               <ListItem>
                 En General, podés definir métodos de pago que estarán disponibles al elegir el método de pago. Simplemente escribí el nombre y hacé clic en <Accent>Agregar</Accent>. Luego, haz clic en <Accent>Actualizar</Accent> para guardar los cambios.
