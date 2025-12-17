@@ -117,9 +117,18 @@ export const renderContent = (content) => {
 
 export const createFilter = (filters, config) => {
   return (item) => {
-    for (const [key, { skipAll, arrayKey, fullMatch, isArray, field }] of Object.entries(config)) {
+    for (const [key, { skipAll, arrayKey, fullMatch, isArray, field, custom }] of Object.entries(config)) {
       const filter = filters[key];
       if (filters[key]) {
+
+        if (custom) {
+          const isValid = custom(item);
+          if (!isValid) {
+            return false;
+          }
+          continue;
+        }
+
         if (skipAll && filter === ALL) {
           continue;
         }
@@ -173,7 +182,6 @@ export const createFilter = (filters, config) => {
     return true;
   };
 };
-
 
 export const normalizeText = (text) => text?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() ?? "";
 

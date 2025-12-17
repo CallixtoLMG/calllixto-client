@@ -13,7 +13,7 @@ export function useInvalidateQueries() {
   return (queries) => {
     queries.forEach((queryKey) => { queryClient.invalidateQueries({ queryKey, refetchType: ALL }); });
   };
-}
+};
 
 export async function entityList({ entity, url, params }) {
   try {
@@ -153,7 +153,43 @@ export function useEditItem() {
   };
 
   return editItem;
-}
+};
+
+export function usePatchItem() {
+  const invalidate = useInvalidateQueries();
+
+  const patchItem = async ({
+    entity,
+    value = {},
+    url,
+    responseEntity,
+    invalidateQueries = [],
+    params = {},
+    attributes,
+    skipStorageUpdate = false,
+  }) => {
+    const { data } = await getInstance().patch(url, value, { params });
+
+    if (data.statusOk && data[responseEntity]) {
+      if (!skipStorageUpdate) {
+        await updateOrCreateStorageItem({
+          entity,
+          value: attributes
+            ? pick(data[responseEntity], getDefaultAttributes(attributes))
+            : data[responseEntity],
+        });
+      }
+      invalidate(invalidateQueries);
+    } else {
+      console.error("Error en la respuesta PATCH:", data.message);
+    }
+
+    return data;
+  };
+
+  return patchItem;
+};
+
 
 export function useDeleteItem() {
   const invalidate = useInvalidateQueries();

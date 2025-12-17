@@ -2,14 +2,14 @@ import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from '@/common/components/table';
 import { COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter, downloadExcel, getFormatedPercentage, handleUndefined } from '@/common/utils';
-import { useFilters } from "@/hooks";
-import { useRouter } from "next/navigation";
-import { FormProvider } from 'react-hook-form';
-import { Form } from 'semantic-ui-react';
-import { BUDGETS_COLUMNS, BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE_TRANSLATIONS, EMPTY_FILTERS } from "../budgets.constants";
-import { useCallback } from "react";
 import { getFormatedDate } from "@/common/utils/dates";
 import { getTotal } from "@/components/products/products.utils";
+import { useFilters } from "@/hooks";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo } from "react";
+import { FormProvider } from 'react-hook-form';
+import { Form } from 'semantic-ui-react';
+import { BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE_TRANSLATIONS, EMPTY_FILTERS, PAYMENT_STATES, PAYMENT_STATES_OPTIONS, getBudgetColumns } from "../budgets.constants";
 
 const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRefetch }) => {
   const { push } = useRouter();
@@ -61,7 +61,44 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: filterKey });
 
-  const onFilter = createFilter(filters, { id: {}, customer: { field: 'name' }, createdBy: {}, state: { skipAll: true } });
+  const onFilter = createFilter(filters, {
+    id: {},
+    customer: { field: 'name' },
+    paymentStatus: {
+      custom: (item) => {
+        const filter = filters.paymentStatus;
+
+        if (!filter) return true;
+
+        const total = Number(item.total ?? 0);
+        const paid = Number(item.paidAmount ?? 0);
+
+        if (filter === PAYMENT_STATES.PAID.id) {
+          return paid === total;
+        }
+
+        if (filter === PAYMENT_STATES.PENDING.id) {
+          return paid < total;
+        }
+
+        return true;
+      }
+    },
+    createdBy: {},
+    state: { skipAll: true },
+  });
+
+  const cashBudgetColumns = useMemo(
+    () => getBudgetColumns(filters.state),
+    [filters.state]
+  );
+
+  useEffect(() => {
+    if (filters.state !== BUDGET_STATES.CONFIRMED.id && filters.paymentStatus) {
+      methods.setValue("paymentStatus", "");
+      onSubmit();
+    }
+  }, [filters.state]);
 
   const actions = [
     {
@@ -107,12 +144,22 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
               name="createdBy"
               placeholder="Vendedor"
             />
+            {filters.state === BUDGET_STATES.CONFIRMED.id && (
+              <DropdownControlled
+                filter
+                width="200px"
+                name="paymentStatus"
+                placeholder="Estado de pago"
+                options={PAYMENT_STATES_OPTIONS}
+                afterChange={onSubmit}
+              />
+            )}
           </Filters>
         </Form>
       </FormProvider>
       <Table
         isLoading={isLoading}
-        headers={BUDGETS_COLUMNS}
+        headers={cashBudgetColumns}
         elements={budgets}
         page={PAGES.BUDGETS}
         actions={actions}
