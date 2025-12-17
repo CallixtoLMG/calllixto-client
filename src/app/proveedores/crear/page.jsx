@@ -15,7 +15,6 @@ const CreateSupplier = () => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createSupplier = useCreateSupplier();
-  const { setInfo } = useNavActionsContext();
 
   useEffect(() => {
     resetActions();
@@ -24,8 +23,7 @@ const CreateSupplier = () => {
 
   useEffect(() => {
     setLabels([{ name: PAGES.SUPPLIERS.NAME }, { name: 'Crear' }]);
-    setInfo(null);
-  }, [setLabels, setInfo]);
+  }, [setLabels]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createSupplier,

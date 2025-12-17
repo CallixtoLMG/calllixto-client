@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListUsers } from "@/api/users";
-import { COLORS, DATE_FORMATS, ENTITIES, ICONS, INFO, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, DATE_FORMATS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -17,7 +17,7 @@ const Users = () => {
   const { data, isLoading, isRefetching, refetch } = useListUsers();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions, setInfo } = useNavActionsContext();
+  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   useEffect(() => {
     setLabels([{ name: PAGES.USERS.NAME }]);
@@ -59,8 +59,7 @@ const Users = () => {
       }
     ] : [];
     setActions(actions);
-    setInfo(INFO.HELP.SECTIONS[ENTITIES.USER])
-  }, [push, role, setActions, loading, setInfo]);
+  }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.USERS.CREATE), SHORTKEYS.ENTER);
 

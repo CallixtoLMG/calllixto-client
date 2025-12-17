@@ -23,7 +23,7 @@ const Brand = ({ params }) => {
   const { push } = useRouter();
   const { data: brand, isLoading, refetch } = useGetBrand(params.id);
   const { setLabels } = useBreadcrumContext();
-  const { resetActions, setActions, setInfo } = useNavActionsContext();
+  const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -220,7 +220,6 @@ const Brand = ({ params }) => {
         },
       ] : [];
       setActions(actions);
-      setInfo(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, brand, activeAction, isActivePending, isInactivePending, isDeletePending, setActions, hasAssociatedProducts]);

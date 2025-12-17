@@ -295,339 +295,543 @@ export const SELECT_ALL_OPTION = { key: ALL, value: ALL, text: 'Todos' };
 export const SORTING = {
   ASC: 'ascending',
   DESC: 'descending'
-}
+};
+
+export const ENTITY_VIEW = {
+  LIST: 'LIST',
+  CREATE: 'CREATE',
+  DETAIL: 'DETAIL',
+};
 
 export const INFO = {
   HELP: {
     SECTIONS: {
 
-      [ENTITIES.CUSTOMER]: (
-        <>
-          <StyledModalContent>
-            <StyledListHeader><Icon name={ICONS.USERS} color={COLORS.BLUE} /><strong>Clientes</strong></StyledListHeader>
-            <List relaxed bulleted as="ol">
-              <ListItem>
-                En la pantalla principal se muestran todos los clientes, activos o inactivos, según el filtro aplicado. También podés utilizar otros filtros como el nombre.
-              </ListItem>
-              <ListItem>
-                Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles, para evitar información innecesaria.
-              </ListItem>
-              <ListItem>
-                Para crear un cliente, presioná el botón verde <Accent>Crear</Accent>. Podrás establecer un nombre, así como teléfonos, direcciones, correos electrónicos y etiquetas (pueden ser múltiples).
-              </ListItem>
-              <ListItem>
-                Una vez creado el cliente, serás redirigido a su vista individual. Allí se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
-              </ListItem>
-              <ListItem>
-                En la vista individual del cliente se pueden realizar las siguientes acciones:
-                <List list>
-                  <ListItem>
-                    Desactivar el cliente con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
-                  </ListItem>
-                  <ListItem>
-                    Eliminar el cliente con el botón <Accent>Eliminar</Accent> (solo disponible para administradores).
-                  </ListItem>
-                </List>
-              </ListItem>
-            </List>
-          </StyledModalContent>
-        </>
-      ),
+      [ENTITIES.CUSTOMER]: {
+        LIST: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.USERS} color={COLORS.BLUE} /><strong>Clientes</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  En la pantalla principal se muestran todos los clientes, activos o inactivos, según el filtro aplicado.
+                </ListItem>
+                <ListItem>
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos filtrados.
+                </ListItem>
+                <ListItem>
+                  Para crear un cliente, presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        CREATE: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.USERS} color={COLORS.BLUE} /><strong>Crear cliente</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        DETAIL: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.USERS} color={COLORS.BLUE} /><strong>Detalle del cliente</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                < ListItem >
+                  Esta es la vista individual del cliente. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem >
+                < ListItem >
+                  En esta página se pueden realizar las siguientes acciones:
+                  <List list>
+                    <ListItem>
+                      Desactivar el cliente con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
+                    </ListItem>
+                    <ListItem>
+                      Eliminar el cliente con el botón <Accent>Eliminar</Accent> (Solo disponible para administradores. No se puede eliminar un cliente si existen presupuestos asociados).
+                    </ListItem>
+                  </List>
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+      },
 
-      [ENTITIES.SUPPLIER]: (
-        <>
-          <StyledModalContent>
-            <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /><strong>Proveedores</strong></StyledListHeader>
-            <List relaxed bulleted as="ol">
-              <ListItem>
-                En la pantalla principal se muestran todos los proveedores, activos o inactivos, según el filtro aplicado. También se pueden utilizar otros filtros como ID o nombre.
-              </ListItem>
-              <ListItem>
-                Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
-              </ListItem>
-              <ListItem>
-                Para crear un proveedor, presioná el botón verde <Accent>Crear</Accent>. Podrás establecer un ID y nombre, así como teléfonos, direcciones y correos electrónicos (pueden ser múltiples).
-              </ListItem>
-              <ListItem>
-                Una vez creado el proveedor, serás redirigido a su vista individual. Allí se muestran los datos generales y, si está habilitada la edición, algunos de ellos pueden modificarse.
-              </ListItem>
-              <ListItem>
-                En la vista individual del proveedor se pueden realizar las siguientes acciones:
-                <List list>
-                  <ListItem>
-                    Descargar los códigos de barra de los productos del proveedor con el botón <Accent>Ids</Accent>.
-                  </ListItem>
-                  <ListItem>
-                    Desactivar el proveedor con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
-                  </ListItem>
-                  <ListItem>
-                    Descargar todos los productos del proveedor con el botón <Accent>Descargar productos</Accent>.
-                  </ListItem>
-                  <ListItem>
-                    Eliminar todos los productos del proveedor con el botón <Accent>Eliminar productos</Accent>.
-                  </ListItem>
-                  <ListItem>
-                    Eliminar el proveedor con el botón <Accent>Eliminar</Accent> (solo disponible para administradores).
-                  </ListItem>
-                </List>
-              </ListItem>
-            </List>
-          </StyledModalContent>
-        </>
-      ),
+      [ENTITIES.SUPPLIER]: {
+        LIST: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /><strong>Proveedores</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  En la pantalla principal se muestran todos los proveedores, activos o inactivos, según el filtro aplicado.
+                </ListItem>
+                <ListItem>
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
+                </ListItem>
+                <ListItem>
+                  Para crear un proveedor, presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        CREATE: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /><strong>Crear proveedor</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        DETAIL: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /><strong>Detalle del proveedor</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                < ListItem >
+                  Esta es la vista individual del proveedor. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem >
+                < ListItem >
+                  En esta página se pueden se pueden realizar las siguientes acciones:
+                  <List list>
+                    <ListItem>
+                      Descargar los códigos de barra de los productos del proveedor con el botón <Accent>Ids</Accent>.
+                    </ListItem>
+                    <ListItem>
+                      Desactivar el proveedor con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
+                    </ListItem>
+                    <ListItem>
+                      Descargar todos los productos del proveedor con el botón <Accent>Descargar productos</Accent>.
+                    </ListItem>
+                    <ListItem>
+                      Eliminar todos los productos del proveedor con el botón <Accent>Eliminar productos</Accent>.
+                    </ListItem>
+                    <ListItem>
+                      Eliminar el proveedor con el botón <Accent>Eliminar</Accent> (Solo disponible para administradores. No se puede eliminar un proveedor si existen productos asociados).
+                    </ListItem>
+                  </List>
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+      },
 
-      [ENTITIES.BRAND]: (
-        <>
-          <StyledModalContent>
-            <StyledListHeader><Icon name={ICONS.COPYRIGHT} color={COLORS.BLUE} /><strong>Marcas</strong></StyledListHeader>
-            <List relaxed bulleted as="ol">
-              <ListItem>
-                En la pantalla principal se muestran todas las marcas, activas o inactivas, según el filtro aplicado. También se pueden utilizar otros filtros como ID o nombre.
-              </ListItem>
-              <ListItem>
-                Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos visibles.
-              </ListItem>
-              <ListItem>
-                Para crear una marca, presioná el botón verde <Accent>Crear</Accent>. Podrás establecer un ID y un nombre.
-              </ListItem>
-              <ListItem>
-                Una vez creada la marca, serás redirigido a su vista individual. Allí se muestran los datos generales, y si está habilitada la edición, algunos pueden modificarse.
-              </ListItem>
-              <ListItem>
-                En la vista individual de la marca se pueden realizar las siguientes acciones:
-                <List list>
-                  <ListItem>
-                    Desactivar la marca con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
-                  </ListItem>
-                  <ListItem>
-                    Eliminar la marca con el botón <Accent>Eliminar</Accent> (solo disponible para administradores).
-                  </ListItem>
-                </List>
-              </ListItem>
-            </List>
-          </StyledModalContent>
-        </>
-      ),
+      [ENTITIES.BRAND]: {
+        LIST: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.COPYRIGHT} color={COLORS.BLUE} /><strong>Marcas</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  En la pantalla principal se muestran todas las marcas, activas o inactivas, según el filtro aplicado.
+                </ListItem>
+                <ListItem>
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos visibles.
+                </ListItem>
+                <ListItem>
+                  Para crear una marca, presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        CREATE: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.COPYRIGHT} color={COLORS.BLUE} /><strong>Crear marca</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        DETAIL: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.COPYRIGHT} color={COLORS.BLUE} /><strong>Detalle de la marca</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                < ListItem >
+                  Esta es la vista individual de la marca. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem >
+                < ListItem >
+                  En esta página se pueden se pueden realizar las siguientes acciones:
+                  <List list>
+                    <ListItem>
+                      Desactivar la marca con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
+                    </ListItem>
+                    <ListItem>
+                      Eliminar la marca con el botón <Accent>Eliminar</Accent> (solo disponible para administradores. No se puede eliminar una marca si existen productos asociados).
+                    </ListItem>
+                  </List>
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+      },
 
-      [ENTITIES.PRODUCT]: (
-        <>
-          <StyledModalContent>
-            <StyledListHeader><Icon name={ICONS.BOX} color={COLORS.BLUE} /><strong>Productos</strong></StyledListHeader>
-            <List relaxed bulleted as="ol">
-              <ListItem>
-                En la pantalla principal se muestran todos los productos, ya sean activos, inactivos, eliminados o sin stock, según el filtro aplicado. También podés usar otros filtros como ID o nombre.
-              </ListItem>
-              <ListItem>
-                Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos visibles. Si hay filtros activos, solo se descarga lo filtrado.
-              </ListItem>
-              <ListItem>
-                Para crear un producto, presioná el botón verde <Accent>Crear</Accent>. Podrás establecer la marca, proveedor, ID, nombre, costo, precio, margen de ganancia y etiquetas. Además, podés indicar si el producto tendrá precio editable en ventas o si será fraccionable, eligiendo la unidad correspondiente (metros, kilogramos, etc.).
-              </ListItem>
-              <ListItem>
-                Una vez creado el producto, serás redirigido a su vista individual. En la pestaña <Accent>Producto</Accent> se muestran los datos generales, y si está habilitada la edición, algunos pueden modificarse. En la pestaña <Accent>Historial de cambios</Accent> se registran las modificaciones realizadas.
-              </ListItem>
-              <ListItem>
-                En la vista individual del producto se pueden realizar las siguientes acciones:
-                <List list>
-                  <ListItem>
-                    Descargar los códigos de barra del producto con el botón <Accent>Códigos de barra</Accent>.
-                  </ListItem>
-                  <ListItem>
-                    Marcar el producto como sin stock con el botón <Accent>Sin stock</Accent>.
-                  </ListItem>
-                  <ListItem>
-                    Marcar el producto como disponible con el botón <Accent>En stock</Accent>.
-                  </ListItem>
-                  <ListItem>
-                    Desactivar el producto con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
-                  </ListItem>
-                  <ListItem>
-                    Eliminar el producto con el botón <Accent>Eliminar</Accent> (solo disponible para administradores).
-                  </ListItem>
-                </List>
-              </ListItem>
-            </List>
-          </StyledModalContent>
-        </>
-      ),
-      [ENTITIES.BUDGET]: (
-        <>
-          <StyledModalContent>
-            <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /><strong>Ventas</strong></StyledListHeader>
-            <List relaxed bulleted as="ol">
-              <ListItem>
-                En la pantalla principal se muestran todas las ventas: confirmadas, pendientes, borradores, anuladas o expiradas, según el filtro aplicado. También se pueden utilizar filtros como ID, cliente o vendedor.
-              </ListItem>
-              <ListItem>
-                En las ventas confirmadas, pasando el mouse sobre el ID, se podrá visualizar quién y cuándo se confirmó la venta. Si la venta está pagada en su totalidad, aparecerá el icono <Icon name={ICONS.DOLLAR} color={COLORS.GREEN} />.
-              </ListItem>
-              <ListItem>
-                Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
-              </ListItem>
-              <ListItem>
-                En esta pantalla principal se muestran datos de los últimos 3 meses. Si necesitás datos posteriores, podés hacer clic en el botón <Accent>Historial</Accent>.
-              </ListItem>
-              <ListItem>
-                En la pantalla <Accent>Historial de ventas</Accent> podés definir rangos de fechas para obtener los datos necesarios. Podés usar las fechas predeterminadas o establecerlas manualmente. También podés aplicar filtros y descargar los datos como en la página principal.
-              </ListItem>
-              <ListItem>
-                Para crear una venta, presioná el botón verde <Accent>Crear</Accent>. Podrás definir el estado de la venta, confirmada o pendiente, y establecer detalles como el método de entrega, fecha de vencimiento, cliente, productos, descuentos y métodos de pago.
-              </ListItem>
-              <ListItem>
-                En caso de querer crear una venta confirmada, podrás agregar uno o más pagos a la venta.
-              </ListItem>
-              <ListItem>
-                Una vez creada la venta, serás redirigido a su vista individual. En el caso de ventas en estado borrador, será posible modificar algunos datos. En ventas en estado pendiente o confirmadas, solo se podrán modificar aspectos menores. Las ventas confirmadas mostrarán pestañas de <Accent>Presupuestos</Accent> y <Accent>Pagos</Accent>.
-              </ListItem>
-              <ListItem>
-                En la vista individual de la venta, dependiendo de su estado, podrás realizar las siguientes acciones:
-                <List list>
-                  <ListItem>
-                    Ver y descargar el presupuesto en formato PDF con el botón <Accent>PDF</Accent>.
-                  </ListItem>
-                  <ListItem>
-                    Enviar la venta por WhatsApp o correo electrónico con el botón <Accent>Enviar</Accent>. (Se recomienda descargar previamente el presupuesto para adjuntarlo).
-                  </ListItem>
-                  <ListItem>
-                    Clonar la venta actual con el botón <Accent>Clonar</Accent>, lo que te redirigirá a una nueva venta, manteniendo todos los productos del original.
-                  </ListItem>
-                  <ListItem>
-                    Anular la venta con el botón <Accent>Anular</Accent>, e ingresando un motivo.
-                  </ListItem>
-                </List>
-              </ListItem>
-            </List>
-          </StyledModalContent>
-        </>
-      ),
+      [ENTITIES.PRODUCT]: {
+        LIST: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.BOX} color={COLORS.BLUE} /><strong>Productos</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  En la pantalla principal se muestran todos los productos, ya sean activos, inactivos, eliminados o sin stock, según el filtro aplicado.
+                </ListItem>
+                <ListItem>
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos visibles. Si hay filtros activos, solo se descarga lo filtrado.
+                </ListItem>
+                <ListItem>
+                  Para crear un producto, presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        CREATE: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.BOX} color={COLORS.BLUE} /><strong>Crear producto</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        DETAIL: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.BOX} color={COLORS.BLUE} /><strong>Detalle del producto</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                < ListItem >
+                  Esta es la vista individual del producto. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem >
+                <ListItem>
+                  En la pestaña <Accent>Producto</Accent> se muestran los datos generales, y si está habilitada la edición, algunos pueden modificarse.
+                </ListItem>
+                <ListItem>
+                  En la pestaña <Accent>Historial de cambios</Accent> se muestra un listado de cambios realizados al producto.
+                </ListItem>
+                < ListItem >
+                  En esta página se pueden se pueden realizar las siguientes acciones:
+                  <List list>
+                    <ListItem>
+                      Descargar los códigos de barra del producto con el botón <Accent>Códigos de barra</Accent>.
+                    </ListItem>
+                    <ListItem>
+                      Marcar el producto como sin stock con el botón <Accent>Sin stock</Accent>.
+                    </ListItem>
+                    <ListItem>
+                      Marcar el producto como disponible con el botón <Accent>En stock</Accent>.
+                    </ListItem>
+                    <ListItem>
+                      Desactivar el producto con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
+                    </ListItem>
+                    <ListItem>
+                      Eliminar el producto con el botón <Accent>Eliminar</Accent> (solo disponible para administradores).
+                    </ListItem>
+                  </List>
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+      },
 
-      [ENTITIES.EXPENSE]: (
-        <>
-          <StyledModalContent>
-            <StyledListHeader><Icon name={ICONS.MONEY_BILL_ALTERNATE} color={COLORS.BLUE} /><strong>Gastos</strong></StyledListHeader>
-            <List relaxed bulleted as="ol">
-              <ListItem>
-                En la pantalla principal se muestran todos los gastos: pagados, pendientes o anulados, según el filtro aplicado. También se pueden utilizar otros filtros como ID o nombre.
-              </ListItem>
-              <ListItem>
-                Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
-              </ListItem>
-              <ListItem>
-                Para crear un gasto, presioná el botón verde <Accent>Crear</Accent>. Podrás establecer el detalle (nombre), monto, fecha de vencimiento, categorías y etiquetas.
-              </ListItem>
-              <ListItem>
-                Una vez creado el gasto, serás redirigido a su vista individual. En la pestaña <Accent>Gasto</Accent> se muestran los datos generales, y si está habilitada la edición, algunos pueden modificarse. En la pestaña <Accent>Pagos</Accent>, podrás ver el historial de pagos y agregar nuevos.
-              </ListItem>
-              <ListItem>
-                En la vista individual del gasto se pueden realizar las siguientes acciones:
-                <List list>
-                  <ListItem>
-                    Clonar el gasto con el botón <Accent>Clonar</Accent>. Este proceso mantendrá todos los datos del gasto original, excepto los pagos.
-                  </ListItem>
-                  <ListItem>
-                    Anular el gasto con el botón <Accent>Anular</Accent>, e ingresando un motivo.
-                  </ListItem>
-                </List>
-              </ListItem>
-            </List>
-          </StyledModalContent>
-        </>
-      ),
+      [ENTITIES.BUDGET]: {
+        LIST: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /><strong>Ventas</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  En la pantalla principal se muestran todas las ventas: confirmadas, pendientes, borradores, anuladas o expiradas, según el filtro aplicado.
+                </ListItem>
+                <ListItem>
+                  En las ventas confirmadas, pasando el mouse sobre el ID, se podrá visualizar quién y cuándo se confirmó la venta. Si la venta está pagada en su totalidad, aparecerá el icono <Icon name={ICONS.DOLLAR} color={COLORS.GREEN} />.
+                </ListItem>
+                <ListItem>
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
+                </ListItem>
+                <ListItem>
+                  En esta pantalla principal se muestran datos de los últimos 3 meses. Si necesitás datos posteriores, podés hacer clic en el botón <Accent>Historial</Accent>.
+                </ListItem>
+                <ListItem>
+                  En la pantalla <Accent>Historial de ventas</Accent> podés definir rangos de fechas para obtener los datos necesarios. Podés usar las fechas predeterminadas o establecerlas manualmente. También podés aplicar filtros y descargar los datos como en la página principal.
+                </ListItem>
+                <ListItem>
+                  Para crear una venta, presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        CREATE: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /><strong>Crear venta</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
 
-      [ENTITIES.CASH_BALANCE]: (
-        <>
-          <StyledModalContent>
-            <StyledListHeader><Icon name={ICONS.CALCULATOR} color={COLORS.BLUE} /><strong>Caja</strong></StyledListHeader>
-            <List relaxed bulleted as="ol">
-              <ListItem>
-                En la pantalla principal se muestran todas las cajas: abiertas o cerradas, según el filtro aplicado. También se pueden utilizar otros filtros como ID o método de pago.
-              </ListItem>
-              <ListItem>
-                Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
-              </ListItem>
-              <ListItem>
-                Para crear una caja, presioná el botón verde <Accent>Abrir</Accent>. Podrás establecer la fecha de inicio y cierre, los métodos de pago (pueden ser múltiples) y el monto inicial. Si seleccionás <Accent>Efectivo</Accent> como método de pago, se habilita la opción de desglosar billetes.
-              </ListItem>
-              <ListItem>
-                Una vez creada la caja, serás redirigido a su vista individual. En la pestaña <Accent>Caja</Accent> se muestran los datos generales, y si está habilitada la edición, algunos pueden modificarse.
-              </ListItem>
-              <ListItem>
-                En la pestaña <Accent>Movimientos</Accent> se listan todos los <Accent>Gastos</Accent> y <Accent>Ventas</Accent> realizados mientras la caja estuvo abierta. Al hacer clic sobre un ítem, serás redirigido al detalle correspondiente.
-              </ListItem>
-              <ListItem>
-                En la vista individual de la caja se pueden realizar las siguientes acciones:
-                <List list>
-                  <ListItem>
-                    Si no se estableció una fecha de cierre al crearla, podrás cerrar la caja manualmente desde el botón <Accent>Cerrar Caja</Accent>.
-                  </ListItem>
-                  <ListItem>
-                    Eliminar la caja con el botón de <Accent>Eliminar</Accent> (solo disponible para administradores).
-                  </ListItem>
-                </List>
-              </ListItem>
-            </List>
-          </StyledModalContent>
-        </>
-      ),
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        DETAIL: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /><strong>Detalle de la venta</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                < ListItem >
+                  Esta es la vista individual de una venta.
+                </ListItem >
+                <ListItem>
+                  En la pestaña <Accent>Presupuesto</Accent> se muestran los datos generales, y si está habilitada la edición, algunos pueden modificarse.
+                </ListItem>
+                <ListItem>
+                  En la pestaña <Accent>Pagos</Accent> se muestran un listado de los pagos realizados. Tambien se puede agregar, quitar o modificar pagos.
+                </ListItem>
+                <ListItem>
+                  En el caso de ventas en estado borrador, será posible modificar algunos datos. En ventas en estado pendiente o confirmadas, solo se podrán modificar aspectos menores. Las ventas confirmadas mostrarán pestañas de <Accent>Presupuestos</Accent> y <Accent>Pagos</Accent>.
+                </ListItem>
+                <ListItem>
+                  En caso de querer crear una venta confirmada, podrás agregar uno o más pagos a la venta.
+                </ListItem>
+                < ListItem >
+                  En la vista individual de la venta, dependiendo de su estado, podrás realizar las siguientes acciones:
+                  <List list>
+                    <ListItem>
+                      Ver y descargar el presupuesto en formato PDF con el botón <Accent>PDF</Accent>.
+                    </ListItem>
+                    <ListItem>
+                      Enviar la venta por WhatsApp o correo electrónico con el botón <Accent>Enviar</Accent>. (Se recomienda descargar previamente el presupuesto para adjuntarlo).
+                    </ListItem>
+                    <ListItem>
+                      Clonar la venta actual con el botón <Accent>Clonar</Accent>, lo que te redirigirá a una nueva venta, manteniendo todos los productos del original.
+                    </ListItem>
+                    <ListItem>
+                      Anular la venta con el botón <Accent>Anular</Accent>, e ingresando un motivo.
+                    </ListItem>
+                  </List>
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+      },
 
-      [ENTITIES.USER]: (
-        <>
-          <StyledModalContent>
-            <StyledListHeader><Icon name={ICONS.USER} color={COLORS.BLUE} /><strong>Usuarios</strong></StyledListHeader>
-            <List relaxed bulleted as="ol">
-              <ListItem>
-                En la pantalla principal se muestran todos los usuarios: activos o inactivos, según el filtro aplicado. También se pueden utilizar otros filtros como ID o nombre.
-              </ListItem>
-              <ListItem>
-                Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
-              </ListItem>
-              <ListItem>
-                Para crear un usuario, presioná el botón verde <Accent>Crear</Accent>. Podrás establecer el nombre del usuario (que debe ser un correo electrónico), el rol y otros datos personales.
-              </ListItem>
-              <ListItem>
-                Una vez creado el usuario, serás redirigido a su vista individual. Allí se muestran los datos generales, y si está habilitada la edición, algunos pueden modificarse.
-              </ListItem>
-              <ListItem>
-                En la vista individual del usuario se pueden realizar las siguientes acciones:
-                <List list>
-                  <ListItem>
-                    Desactivar el usuario con el botón de <Accent>Desactivar</Accent>, ingresando un motivo.
-                  </ListItem>
-                  <ListItem>
-                    Eliminar el usuario con el botón de <Accent>Eliminar</Accent> (solo disponible para administradores).
-                  </ListItem>
-                </List>
-              </ListItem>
-            </List>
-          </StyledModalContent>
-        </>
-      ),
+      [ENTITIES.EXPENSE]: {
+        LIST: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.MONEY_BILL_ALTERNATE} color={COLORS.BLUE} /><strong>Gastos</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  En la pantalla principal se muestran todos los gastos: pagados, pendientes o anulados, según el filtro aplicado.
+                </ListItem>
+                <ListItem>
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
+                </ListItem>
+                <ListItem>
+                  Para crear un gasto, presioná el botón verde <Accent>Crear</Accent>. Podrás establecer el detalle (nombre), monto, fecha de vencimiento, categorías y etiquetas.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        CREATE: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.MONEY_BILL_ALTERNATE} color={COLORS.BLUE} /><strong>Crear gasto</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
 
-      [ENTITIES.SETTINGS]: (
-        <>
-          <StyledModalContent>
-            <StyledListHeader><Icon name={ICONS.SETTINGS} color={COLORS.BLUE} /><strong>Configuración</strong></StyledListHeader>
-            <List relaxed bulleted as="ol">
-              <ListItem>
-                En la pantalla principal se muestran las distintas pestañas con aspectos configurables. En cada una de ellas encontrarás elementos desplegables donde podrás definir parámetros específicos de cada sección.
-              </ListItem>
-              <ListItem>
-                Las etiquetas y categorías sirven para catalogar elementos. Para crear una etiqueta o categoría, ingresa un nombre, selecciona un color y agrega una descripción opcional. Luego, haz clic en el botón <Accent>Agregar</Accent>. Cuando hayas terminado, debajo de la tabla se encuentra el botón <Accent>Actualizar</Accent> para guardar los cambios.
-              </ListItem>
-              <ListItem>
-                Los productos bloqueados son una lista de IDs que no podrán ser agregados o creados. Para más información, pasa el mouse por encima del icono <Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />.
-              </ListItem>
-              <ListItem>
-                En el apartado de ventas, encontrarás dos opciones: &quot;Al crear una venta&quot; y &quot;Al imprimir una venta&quot;. La primera te permite establecer valores predeterminados para las ventas, como el estado inicial o el método de entrega. La segunda te permite configurar la visualización del PDF al imprimir la venta, incluyendo si deseás mostrar o no los precios, y la posibilidad de agregar un texto en el PDF, a modo de descargo de responsabilidad, el cual solo será visible en el modo de visualización para el cliente.
-              </ListItem>
-              <ListItem>
-                En General, podés definir métodos de pago que estarán disponibles al elegir el método de pago. Simplemente escribí el nombre y hacé clic en <Accent>Agregar</Accent>. Luego, haz clic en <Accent>Actualizar</Accent> para guardar los cambios.
-              </ListItem>
-            </List>
-          </StyledModalContent>
-        </>
-      ),
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        DETAIL: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.MONEY_BILL_ALTERNATE} color={COLORS.BLUE} /><strong>Detalle del gasto</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                < ListItem >
+                  Esta es la vista individual de un gasto. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem >
+                <ListItem>
+                  en esta página se pueden realizar las siguientes acciones:
+                  <List list>
+                    <ListItem>
+                      Clonar el gasto con el botón <Accent>Clonar</Accent>. Este proceso mantendrá todos los datos del gasto original, excepto los pagos.
+                    </ListItem>
+                    <ListItem>
+                      Anular el gasto con el botón <Accent>Anular</Accent>, e ingresando un motivo.
+                    </ListItem>
+                  </List>
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+      },
 
+      [ENTITIES.CASH_BALANCE]: {
+        LIST: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.CALCULATOR} color={COLORS.BLUE} /><strong>Caja</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  En la pantalla principal se muestran todas las cajas: abiertas o cerradas, según el filtro aplicado.
+                </ListItem>
+                <ListItem>
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
+                </ListItem>
+                <ListItem>
+                  Para crear una caja, presioná el botón verde <Accent>Abrir</Accent>.
+                </ListItem>
+                <ListItem>
+                  En la ventana abierta <Accent>Crear caja</Accent>, completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        DETAIL: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.CALCULATOR} color={COLORS.BLUE} /><strong>Detalle de caja</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                < ListItem >
+                  Esta es la vista individual de una caja.
+                </ListItem >
+                < ListItem >
+                  En la pestaña<Accent>Caja</Accent> aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem >
+                < ListItem >
+                  En la pestaña<Accent>Movimientos</Accent> se listan todos los<Accent>Gastos</Accent> y < Accent >Ventas</Accent> realizados mientras la caja estuvo abierta.Al hacer clic sobre un ítem, serás redirigido al detalle correspondiente.
+                </ListItem >
+                <ListItem>
+                  En la vista individual de la caja se pueden realizar las siguientes acciones:
+                  <List list>
+                    <ListItem>
+                      Si no se estableció una fecha de cierre al crearla, podrás cerrar la caja manualmente desde el botón <Accent>Cerrar Caja</Accent>.
+                    </ListItem>
+                    <ListItem>
+                      Eliminar la caja con el botón de <Accent>Eliminar</Accent> (solo disponible para administradores).
+                    </ListItem>
+                  </List>
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+      },
+
+      [ENTITIES.USER]: {
+        LIST: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.USER} color={COLORS.BLUE} /><strong>Usuarios</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  En la pantalla principal se muestran todos los usuarios: activos o inactivos, según el filtro aplicado.
+                </ListItem>
+                <ListItem>
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
+                </ListItem>
+                <ListItem>
+                  Para crear un usuario, presioná el botón verde <Accent>Crear</Accent>. Podrás establecer el nombre del usuario (que debe ser un correo electrónico), el rol y otros datos personales.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        CREATE: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.USER} color={COLORS.BLUE} /><strong>Crear usuario</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                </ListItem>
+
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+        DETAIL: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.USER} color={COLORS.BLUE} /><strong>Detalle del usuario</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                < ListItem >
+                  Esta es la vista individual de un usuario. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem >
+                < ListItem >
+                  En esta página se pueden realizar las siguientes acciones:
+                  <List list>
+                    <ListItem>
+                      Desactivar el usuario con el botón de <Accent>Desactivar</Accent>, ingresando un motivo.
+                    </ListItem>
+                    <ListItem>
+                      Eliminar el usuario con el botón de <Accent>Eliminar</Accent> (solo disponible para administradores).
+                    </ListItem>
+                  </List>
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+      },
+
+      [ENTITIES.SETTINGS]: {
+        LIST: (
+          <>
+            <StyledModalContent>
+              <StyledListHeader><Icon name={ICONS.SETTINGS} color={COLORS.BLUE} /><strong>Configuración</strong></StyledListHeader>
+              <List relaxed bulleted as="ol">
+                <ListItem>
+                  En la pantalla principal se muestran las distintas pestañas con aspectos configurables. En cada una de ellas encontrarás elementos desplegables donde podrás definir parámetros específicos de cada sección.
+                </ListItem>
+                <ListItem>
+                  Las etiquetas y categorías sirven para catalogar elementos. Para crear una etiqueta o categoría, ingresa un nombre, selecciona un color y agrega una descripción opcional. Luego, haz clic en el botón <Accent>Agregar</Accent>. Cuando hayas terminado, debajo de la tabla se encuentra el botón <Accent>Actualizar</Accent> para guardar los cambios.
+                </ListItem>
+                <ListItem>
+                  Los productos bloqueados son una lista de IDs que no podrán ser agregados o creados. Para más información, pasa el mouse por encima del icono <Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />.
+                </ListItem>
+                <ListItem>
+                  En el apartado de ventas, encontrarás dos opciones: &quot;Al crear una venta&quot; y &quot;Al imprimir una venta&quot;. La primera te permite establecer valores predeterminados para las ventas, como el estado inicial o el método de entrega. La segunda te permite configurar la visualización del PDF al imprimir la venta, incluyendo si deseás mostrar o no los precios, y la posibilidad de agregar un texto en el PDF, a modo de descargo de responsabilidad, el cual solo será visible en el modo de visualización para el cliente.
+                </ListItem>
+                <ListItem>
+                  En General, podés definir métodos de pago que estarán disponibles al elegir el método de pago. Simplemente escribí el nombre y hacé clic en <Accent>Agregar</Accent>. Luego, haz clic en <Accent>Actualizar</Accent> para guardar los cambios.
+                </ListItem>
+              </List>
+            </StyledModalContent>
+          </>
+        ),
+      },
     }
   }
 };

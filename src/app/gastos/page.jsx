@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListExpenses } from "@/api/expenses";
-import { COLORS, ENTITIES, ICONS, INFO, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import ExpensesPage from "@/components/expenses/ExpensesPage";
 import { EXPENSE_STATES } from "@/components/expenses/expenses.constants";
@@ -16,7 +16,7 @@ const Expenses = () => {
   const { data, isLoading, isRefetching, refetch } = useListExpenses();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions, setInfo } = useNavActionsContext();
+  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -55,8 +55,7 @@ const Expenses = () => {
       }
     ] : [];
     setActions(actions);
-    setInfo(INFO.HELP.SECTIONS[ENTITIES.EXPENSE]);
-  }, [push, role, setActions, loading, setInfo]);
+  }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.EXPENSES.CREATE), SHORTKEYS.ENTER);
 

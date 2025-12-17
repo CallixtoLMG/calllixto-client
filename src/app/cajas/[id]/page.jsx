@@ -30,7 +30,7 @@ const CashBalance = ({ params }) => {
   const { push } = useRouter();
   const { data: cashBalance, isLoading, refetch } = useGetCashBalance(params.id);
   const { setLabels } = useBreadcrumContext();
-  const { resetActions, setActions, setInfo } = useNavActionsContext();
+  const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -206,7 +206,6 @@ const CashBalance = ({ params }) => {
     }
 
     setActions(actions);
-    setInfo(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, activeAction, setActions, cashBalance]);
 

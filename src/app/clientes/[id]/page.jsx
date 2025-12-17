@@ -19,7 +19,7 @@ const Customer = ({ params }) => {
   const { push } = useRouter();
   const { data: customer, isLoading, refetch } = useGetCustomer(params.id);
   const { setLabels } = useBreadcrumContext();
-  const { resetActions, setActions, setInfo } = useNavActionsContext();
+  const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -217,7 +217,6 @@ const Customer = ({ params }) => {
       ];
 
       setActions(actions);
-      setInfo(null);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

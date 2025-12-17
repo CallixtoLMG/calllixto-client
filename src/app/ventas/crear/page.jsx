@@ -21,7 +21,7 @@ const CreateBudget = () => {
   const { userData } = useUserContext();
   const searchParams = useSearchParams();
   const { setLabels } = useBreadcrumContext();
-  const { resetActions, setInfo } = useNavActionsContext();
+  const { resetActions } = useNavActionsContext();
   const createBudget = useCreateBudget();
   const cloneId = searchParams.get('clonar');
   const { push } = useRouter();
@@ -44,8 +44,7 @@ const CreateBudget = () => {
     setLabels([{ name: PAGES.BUDGETS.NAME }, { name: 'Crear' }]);
     refetchproductsData();
     refetchPaymentMethods();
-    setInfo(null);
-  }, [setLabels, refetchproductsData, refetchPaymentMethods, setInfo]);
+  }, [setLabels, refetchproductsData, refetchPaymentMethods]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createBudget,

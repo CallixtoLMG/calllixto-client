@@ -3,7 +3,7 @@ import { useUserContext } from "@/User";
 import { useCreateCashBalance, useListCashBalances } from "@/api/cashBalances";
 import { useGetSetting } from "@/api/settings";
 import { ModalOpenCashBalance } from "@/common/components/modals";
-import { COLORS, ENTITIES, ICONS, INFO, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, mapToDropdownOptions } from "@/common/utils";
 import CashBalancesPage from "@/components/cashBalances/CashBalancesPage";
 import { CASH_BALANCE_STATES } from "@/components/cashBalances/cashBalances.constants";
@@ -20,7 +20,7 @@ const CashBalances = () => {
   const { data, isLoading, isRefetching, refetch } = useListCashBalances();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions, setInfo } = useNavActionsContext();
+  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: paymentMethods } = useGetSetting(ENTITIES.GENERAL);
@@ -93,8 +93,7 @@ const CashBalances = () => {
       });
     }
     setActions(actions);
-    setInfo(INFO.HELP.SECTIONS[ENTITIES.CASH_BALANCE]);
-  }, [push, role, setActions, setInfo]);
+  }, [push, role, setActions]);
 
   const handleConfirm = useCallback((data) => {
     const payload = {

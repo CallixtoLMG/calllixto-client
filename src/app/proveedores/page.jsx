@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListSuppliers } from "@/api/suppliers";
-import { COLORS, ENTITIES, ICONS, INFO, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
@@ -16,7 +16,7 @@ const Suppliers = () => {
   const { data, isLoading, isRefetching, refetch } = useListSuppliers();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions, setInfo } = useNavActionsContext();
+  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -54,8 +54,7 @@ const Suppliers = () => {
       })
     }
     setActions(actions);
-    setInfo(INFO.HELP.SECTIONS[ENTITIES.SUPPLIER]);
-  }, [push, role, setActions, loading, setInfo]);
+  }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.SUPPLIERS.CREATE), SHORTKEYS.ENTER);
 

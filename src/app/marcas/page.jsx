@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useListBrands } from "@/api/brands";
-import { COLORS, ENTITIES, ICONS, INFO, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { BRAND_STATES } from "@/components/brands/brands.constants";
@@ -16,7 +16,7 @@ const Brands = () => {
   const { data, isLoading, isRefetching, refetch } = useListBrands();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions, setInfo } = useNavActionsContext();
+  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -55,8 +55,7 @@ const Brands = () => {
     }
 
     setActions(actions);
-    setInfo(INFO.HELP.SECTIONS[ENTITIES.BRAND]);
-  }, [push, role, setActions, loading, setInfo]);
+  }, [push, role, setActions, loading, ]);
 
   useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEYS.ENTER);
 
