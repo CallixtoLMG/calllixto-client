@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Accordion, Dropdown, Icon, Menu, Popup } from "semantic-ui-react";
 import styled from "styled-components";
+
 const AccordionMenu = styled(Menu)`
   border-radius: 0!important;
   border: 0!important;
@@ -37,7 +38,7 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
   };
 
   const clientOptions = useMemo(() => {
-    const clients = userData.callixtoClients.items || [];
+    const clients = userData?.callixtoClients?.items || [];
     const filteredClients = searchTerm
       ? clients.filter(client => client.name.toLowerCase().includes(searchTerm.toLowerCase()))
       : clients;
@@ -102,7 +103,6 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
             </AccordionItem>
           </Accordion>
         )}
-
       </Menu>
     </Popup>
   );
