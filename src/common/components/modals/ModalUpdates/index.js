@@ -66,9 +66,9 @@ const ModalUpdates = () => {
               <ListItem>
                 En la página de <Accent>Ventas</Accent> se agregó un nuevo filtro. Al visualizar las ventas confirmadas, ahora es posible filtrar por <Accent>Estado de pago</Accent>, ya sea pendiente o pagado.
               </ListItem>
-              <ListItem>
+              {/* <ListItem>
                 Las ventas confirmadas ahora pueden recibir un descuento posterior a su confirmación, lo que permite descontar un monto numérico del total y evitar quedar con pequeños saldos pendientes.
-              </ListItem>
+              </ListItem> */}
               <ListItem>
                 En <Accent>Configuración</Accent> se agregó la pestaña <Accent>Ventas</Accent>, para definir valores predeterminados al crear o imprimir una venta.
               </ListItem>

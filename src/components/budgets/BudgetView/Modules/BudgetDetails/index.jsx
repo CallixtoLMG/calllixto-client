@@ -20,9 +20,8 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
-  const totalPending = (total - budget.paidAmount).toFixed(2)
+  const totalPending = (total - budget.paidAmount).toFixed(2);
   const { setValue, getValues, trigger } = useFormContext();
-  const amountIsCover = budget.paidAmount >= budget.total
 
   useEffect(() => {
     if (!budget || initializedContact) return;
@@ -263,7 +262,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
         {isBudgetConfirmed(budget?.state) ?
           <>
             <TotalList items={TOTAL_LIST_ITEMS} />
-            <FlexColumn $alignSelf="end" $rowGap="15px">
+            {/* <FlexColumn $alignSelf="end" $rowGap="15px">
               <Flex $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
                 <IconedButton
                   text="Completar"
@@ -283,7 +282,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                   name="postConfirmDiscount"
                   rules={{
                     validate: (value) =>
-                      value ? value <= totalPending || "No puede superar el monto pendiente" : true,
+                      value ? value <= total - budget.paidAmount || "No puede superar el monto pendiente" : true,
                   }}
                   justifyItems="right"
                 />
@@ -305,7 +304,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                   }}
                 />
               </Flex>
-            </FlexColumn>
+            </FlexColumn> */}
           </>
           :
           <Total
