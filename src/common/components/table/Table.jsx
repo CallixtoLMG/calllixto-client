@@ -6,11 +6,11 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Checkbox, Header, Icon } from "semantic-ui-react";
 import { IconedButton, PopupActions } from "../buttons";
-import { CenteredFlex } from "../custom";
+import { CenteredFlex, Flex } from "../custom";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
 import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
-const{ ASC, DESC } = SORTING;
+const { ASC, DESC } = SORTING;
 
 const CustomTable = ({
   isLoading,
@@ -33,7 +33,9 @@ const CustomTable = ({
   filters = {},
   setFilters = () => { },
   onFilter = () => true,
+  onDownloadExcel
 }) => {
+
   const { push } = useRouter();
   const [hydrated, setHydrated] = useState(false);
   const isSelectable = useMemo(() => !!selectionActions.length, [selectionActions]);
@@ -42,7 +44,6 @@ const CustomTable = ({
   const [popupOpenId, setPopupOpenId] = useState(null);
   const [pageSize, setPageSize] = useState(DEFAULT_PAGE_SIZE);
   const tableRef = useRef(null);
-
   const [sortConfig, setSortConfig] = useState(filters?.sorting ?? { key: mainKey, direction: ASC });
 
   const handleSort = (columnKey) => {
@@ -90,7 +91,6 @@ const CustomTable = ({
 
 
   const pages = useMemo(() => (paginate ? Math.ceil(filteredElements.length / pageSize) : 1), [filteredElements, pageSize, paginate]);
-
   const currentPageElements = useMemo(() => {
     if (!paginate) {
       return filteredElements;
@@ -241,8 +241,9 @@ const CustomTable = ({
               ) : (
                 currentPageElements.map((element, index) => {
                   if (page) {
+                    const rowKey = typeof mainKey === "function" ? mainKey(element, index) : element[mainKey];
                     return (
-                      <TableRow key={element[mainKey]}>
+                      <TableRow key={rowKey || index}>
                         {isSelectable && (
                           <Cell $basic={basic}>
                             <CenteredFlex>
@@ -258,7 +259,11 @@ const CustomTable = ({
                             key={`cell_${header.id}_${element[mainKey]}`}
                             align={header.align}
                             width={header.width}
-                            onClick={() => push(page.SHOW(element[mainKey]))}
+                            onClick={() => {
+                              if (typeof page?.SHOW === "function") {
+                                push(page.SHOW(element[mainKey], element));
+                              }
+                            }}
                           >
                             {header.value(element, index)}
                           </LinkCell>
@@ -293,8 +298,9 @@ const CustomTable = ({
                       </TableRow>
                     );
                   }
+                  const rowKey = typeof mainKey === "function" ? mainKey(element, index) : element[mainKey];
                   return (
-                    <TableRow key={element[mainKey]}>
+                    <TableRow key={rowKey || index}>
                       {headers.map(header => (
                         <Cell
                           key={`cell_${header.id}`}
@@ -326,7 +332,6 @@ const CustomTable = ({
                                     width={action.width}
                                   />
                                 ))}
-
                               />
                             ) : (
                               <Actions actions={actions} element={element} index={index} />
@@ -341,6 +346,15 @@ const CustomTable = ({
             </Table.Body>
           )}
         </Table>
+        {onDownloadExcel && (
+           <Flex width="100%" $justifyContent="flex-end" >
+           <IconedButton
+             text="Descargar Excel"
+             icon={ICONS.FILE_EXCEL}
+             onClick={() => onDownloadExcel(filteredElements)}
+           />
+         </Flex>
+        )}
       </Loader>
     </Container>
   );

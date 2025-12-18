@@ -1,11 +1,12 @@
-import { Flex, Label, OverflowWrapper } from '@/common/components/custom';
+import { Box, Flex, Label, OverflowWrapper } from '@/common/components/custom';
 import { CommentTooltip } from "@/common/components/tooltips";
+import { COLORS } from '@/common/constants';
+import { Popup } from 'semantic-ui-react';
 
 export const GET_BRAND_QUERY_KEY = 'getBrand';
 export const LIST_BRANDS_QUERY_KEY = 'listBrands';
 export const BRANDS_FILTERS_KEY = 'brandsFilters';
-
-export const ATTRIBUTES = { ID: "id", NAME: "name", COMMENT: "comments", STATE: "state" };
+export const LIST_ATTRIBUTES = ['id', 'name', 'comments',  'state', 'inactiveReason'];
 
 export const BRAND_COLUMNS = [
   {
@@ -64,3 +65,40 @@ export const BRAND_STATES_OPTIONS = Object.values(BRAND_STATES)
     ),
     value: id
   }));
+
+export const getBrandSearchTitle = (brand) => (
+  <OverflowWrapper $lineClamp={3} popupContent={brand.name} maxWidth="100%">
+    {brand.name}
+  </OverflowWrapper>
+);
+
+export const getBrandSearchDescription = (brand) => (
+  <Flex $marginTop="5px" $rowGap="5px">
+    <Flex
+      width="100%"
+      $justifyContent="space-between"
+      height="20px"
+      $marginTop="auto"
+      $columnGap="5px"
+      $alignItems="center"
+    >
+      <Flex $columnGap="7px">
+        {brand?.state === BRAND_STATES.INACTIVE.id && (
+          <Popup
+            trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
+            content={brand.inactiveReason ?? 'Motivo no especificado'}
+            position="top center"
+            size="mini"
+          />
+        )}
+      </Flex>
+      <Box width="fit-content">
+        {brand.comments ? (
+          <CommentTooltip comment={brand.comments} />
+        ) : (
+          <Box visibility="hidden" />
+        )}
+      </Box>
+    </Flex>
+  </Flex>
+);

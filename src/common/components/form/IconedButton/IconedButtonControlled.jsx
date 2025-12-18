@@ -3,11 +3,13 @@ import { forwardRef } from "react";
 import { Controller } from "react-hook-form";
 import { IconedButton } from "../../buttons";
 
-  export const IconedButtonControlled = forwardRef(({
+export const IconedButtonControlled = forwardRef(({
   width,
+  height = "38px",
   name,
   icon,
   label,
+  text,
   disabled,
   color,
 }, ref) => {
@@ -15,19 +17,20 @@ import { IconedButton } from "../../buttons";
     <Controller
       name={name}
       render={({ field: { value, onChange, ...rest } }) => (
-        <FormField $width={width}>
-          <IconedButton
-            {...rest}
-            height="38px"
-            text={label}
-            icon={icon}
-            onClick={() => onChange(!value)}
-            basic={!value}
-            disabled={disabled}
-            color={color}
-            ref={ref}
-          />
-        </FormField>
+        <FormField
+          {...rest}
+          $width={width}
+          height={height}
+          label={label}
+          text={text}
+          icon={icon}
+          control={IconedButton}
+          onClick={() => onChange(!value)}
+          basic={!value}
+          disabled={disabled}
+          color={color}
+          ref={ref}
+        />
       )}
     />
   );

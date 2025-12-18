@@ -1,15 +1,55 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from '@/common/components/table';
-import { ALL, COLORS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
-import { createFilter } from '@/common/utils';
+import { COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
+import { createFilter, downloadExcel, getFormatedPercentage, handleUndefined } from '@/common/utils';
+import { getFormatedDate } from "@/common/utils/dates";
+import { getTotal } from "@/components/products/products.utils";
 import { useFilters } from "@/hooks";
 import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useMemo } from "react";
 import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
-import { BUDGETS_COLUMNS, BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, EMPTY_FILTERS } from "../budgets.constants";
+import { BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE_TRANSLATIONS, EMPTY_FILTERS, PAYMENT_STATES, PAYMENT_STATES_OPTIONS, getBudgetColumns } from "../budgets.constants";
 
-const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
+const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRefetch }) => {
   const { push } = useRouter();
+
+  const handleDownloadExcel = useCallback((elements) => {
+    if (!elements.length) return;
+    let maxProductCount = 1;
+    const mappedBudgets = elements.map(budget => {
+      const translatedState = BUDGET_STATE_TRANSLATIONS[budget.state].singularTitle || "";
+      maxProductCount = Math.max(maxProductCount, budget.products?.length);
+      const budgetRow = [
+        handleUndefined(budget.id),
+        handleUndefined(translatedState),
+        handleUndefined(budget.customer.name),
+        handleUndefined(getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)),
+        handleUndefined(budget.total),
+        getFormatedPercentage(budget.globalDiscount),
+        getFormatedPercentage(budget.additionalCharge),
+        handleUndefined(budget.createdBy)
+      ];
+
+      const productData = budget.products.map(product => {
+        let productName = handleUndefined(product.name);
+        if (product.fractionConfig?.active) {
+          productName = `${product.name} x ${product.fractionConfig.value} ${product.fractionConfig.unit}`;
+        }
+        return `Id: ${handleUndefined(product.id)}, Cantidad: ${handleUndefined(product.quantity)}, Nombre: ${productName}, Precio: ${product.price ?? 0}, Descuento: % ${product.discount ?? 0}, Total: ${getTotal(product)};`;
+      });
+
+      while (productData.length < maxProductCount) {
+        productData.push('');
+      }
+
+      return [...budgetRow, ...productData];
+    });
+
+    const productsHeaders = Array.from({ length: maxProductCount }, (_, i) => `Producto ${i + 1}`);
+    const headers = ['ID', 'Estado', 'Cliente', 'Fecha', "Total", "Descuento", "Cargo adicional", "Vendedor", ...productsHeaders];
+    downloadExcel([headers, ...mappedBudgets], "Lista de Ventas");
+  }, []);
 
   const {
     onRestoreFilters,
@@ -19,12 +59,46 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
     methods,
     appliedCount,
     hydrated
-  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BUDGETS_FILTERS_KEY});
+  } = useFilters({ defaultFilters: EMPTY_FILTERS, key: filterKey });
 
-  const onFilter = createFilter(filters, ['id', 'customer', 'seller'], {
-    customer: budget => budget.customer?.name || '',
-    allState: ALL,
+  const onFilter = createFilter(filters, {
+    id: {},
+    customer: { field: 'name' },
+    paymentStatus: {
+      custom: (item) => {
+        const filter = filters.paymentStatus;
+
+        if (!filter) return true;
+
+        const total = Number(item.total ?? 0);
+        const paid = Number(item.paidAmount ?? 0);
+
+        if (filter === PAYMENT_STATES.PAID.id) {
+          return paid === total;
+        }
+
+        if (filter === PAYMENT_STATES.PENDING.id) {
+          return paid < total;
+        }
+
+        return true;
+      }
+    },
+    createdBy: {},
+    state: { skipAll: true },
   });
+
+  const cashBudgetColumns = useMemo(
+    () => getBudgetColumns(filters.state),
+    [filters.state]
+  );
+
+  useEffect(() => {
+    if (filters.state !== BUDGET_STATES.CONFIRMED.id && filters.paymentStatus) {
+      methods.setValue("paymentStatus", "");
+      onSubmit();
+    }
+  }, [filters.state, filters.paymentStatus, methods, onSubmit]);
 
   const actions = [
     {
@@ -48,6 +122,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
             hydrated={hydrated}
           >
             <DropdownControlled
+              filter
               width="200px"
               name="state"
               options={BUDGET_STATES_OPTIONS}
@@ -66,15 +141,25 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
             />
             <TextControlled
               flex="1"
-              name="seller"
+              name="createdBy"
               placeholder="Vendedor"
             />
+            {filters.state === BUDGET_STATES.CONFIRMED.id && (
+              <DropdownControlled
+                filter
+                width="200px"
+                name="paymentStatus"
+                placeholder="Estado de pago"
+                options={PAYMENT_STATES_OPTIONS}
+                afterChange={onSubmit}
+              />
+            )}
           </Filters>
         </Form>
       </FormProvider>
       <Table
         isLoading={isLoading}
-        headers={BUDGETS_COLUMNS}
+        headers={cashBudgetColumns}
         elements={budgets}
         page={PAGES.BUDGETS}
         actions={actions}
@@ -83,6 +168,7 @@ const BudgetsPage = ({ budgets, isLoading, onRefetch }) => {
         paginate
         filters={filters}
         setFilters={setFilters}
+        onDownloadExcel={handleDownloadExcel}
       />
     </>
   );

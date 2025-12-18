@@ -1,13 +1,15 @@
-import { OverflowWrapper } from '@/common/components/custom';
-import { ICONS } from '@/common/constants';
-import { createContext, useContext, useState } from 'react';
-import { BreadcrumbDivider, BreadcrumbSection, Breadcrumb as SBreadcrumb, Label as SLabel } from 'semantic-ui-react';
+import { Flex, OverflowWrapper } from '@/common/components/custom';
+import { ENTITIES, ENTITY_VIEW, ICONS, INFO, PAGES, SIZES } from '@/common/constants';
+import { createContext, useContext, useEffect, useState } from 'react';
+import { BreadcrumbDivider, BreadcrumbSection, Popup, Breadcrumb as SBreadcrumb, Label as SLabel } from 'semantic-ui-react';
 import styled from "styled-components";
+import { useNavActionsContext } from '.';
 
 const Label = styled(SLabel)`
   position: relative;
-  top: -3px;
+  top: 5px;
   max-height: fit-content;
+  margin-left: 10px!important;
 `;
 
 const Span = styled.span`
@@ -29,22 +31,68 @@ const SSBreadcrumb = styled(SBreadcrumb)`
     align-content: center;
   }
 
-  div.section {
-    text-wrap-mode: nowrap!important;
-  }
-
   i {
     position: relative;
     top: -10px;
   }
 `;
 
+export const PATHNAME_ENTITY_MAP = {
+  [PAGES.CUSTOMERS.BASE]: ENTITIES.CUSTOMER,
+  [PAGES.SUPPLIERS.BASE]: ENTITIES.SUPPLIER,
+  [PAGES.BRANDS.BASE]: ENTITIES.BRAND,
+  [PAGES.PRODUCTS.BASE]: ENTITIES.PRODUCT,
+  [PAGES.BUDGETS.BASE]: ENTITIES.BUDGET,
+  [PAGES.EXPENSES.BASE]: ENTITIES.EXPENSE,
+  [PAGES.CASH_BALANCES.BASE]: ENTITIES.CASH_BALANCE,
+  [PAGES.USERS.BASE]: ENTITIES.USER,
+  [PAGES.SETTINGS.BASE]: ENTITIES.SETTINGS,
+};
+
+const getEntityFromPathname = (pathname) => {
+  return Object.entries(PATHNAME_ENTITY_MAP).find(([path]) =>
+    pathname.startsWith(path)
+  )?.[1];
+};
+
 const BreadcrumContext = createContext();
 
-const BreadcrumProvider = ({ children }) => {
+const resolveEntityContext = (pathname) => {
+  if (pathname.endsWith('/crear')) {
+    return { view: ENTITY_VIEW.CREATE };
+  }
+
+  const segments = pathname.split('/').filter(Boolean);
+
+  if (segments.length === 2) {
+    return { view: ENTITY_VIEW.DETAIL, id: segments[1] };
+  }
+
+  return { view: ENTITY_VIEW.LIST };
+};
+
+const BreadcrumProvider = ({ children, pathname }) => {
   const [labels, setLabels] = useState([]);
+  const { setInfo } = useNavActionsContext();
+
+  useEffect(() => {
+    if (!pathname) return;
+
+    const entity = getEntityFromPathname(pathname);
+    if (!entity) {
+      setInfo(null);
+      return;
+    }
+
+    const { view } = resolveEntityContext(pathname);
+
+    const help = INFO.HELP.SECTIONS?.[entity]?.[view] ?? null;
+    setInfo(help);
+
+  }, [pathname, setInfo]);;
+
   return (
-    <BreadcrumContext.Provider value={{ labels, setLabels }}>
+    <BreadcrumContext.Provider value={{ labels, setLabels, pathname }}>
       {children}
     </BreadcrumContext.Provider>
   );
@@ -61,29 +109,34 @@ const useBreadcrumContext = () => {
 const Breadcrumb = () => {
   const { labels } = useBreadcrumContext();
   return (
-    <SSBreadcrumb size='huge'>
-      {labels.map((label, index) => (
-        <BreadcrumbSection key={`label_${index}`}>
-          {index !== 0 && label && <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />}
-          {typeof label === 'string' ? (
-            <OverflowWrapper $verticalAlign="baseline" popupContent={label} maxWidth="25vw">
-              {label}
+    <SSBreadcrumb size={SIZES.HUGE}>
+      {labels.filter(label => label.name).map(({ name, label }, index) => {
+        return (
+          <BreadcrumbSection key={`label_${index}`}>
+            {index !== 0 && (
+              <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />
+            )}
+            <OverflowWrapper $verticalAlign="baseline" popupContent={name} maxWidth="25vw">
+              <Flex>
+                <Span>{name}</Span>
+                {label && (
+                  <Popup
+                    content={label.popup}
+                    disabled={!label.popup}
+                    position="bottom center"
+                    size="mini"
+                    trigger={
+                      <Label pointing="left" color={label.color}>
+                        {label.title}
+                      </Label>
+                    }
+                  />
+                )}
+              </Flex>
             </OverflowWrapper>
-          ) : (
-            label?.id && label?.title && (
-              <OverflowWrapper $verticalAlign="bottom" maxWidth="25vw" popupContent={label.title}>
-                <Span>
-                  {label.id}
-                </Span>
-                <Label pointing="left" color={label.color}>
-                  {label.title}
-                </Label>
-              </OverflowWrapper>
-
-            )
-          )}
-        </BreadcrumbSection>
-      ))}
+          </BreadcrumbSection>
+        );
+      })}
     </SSBreadcrumb>
   );
 };

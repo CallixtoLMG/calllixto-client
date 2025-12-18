@@ -7,7 +7,7 @@ import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import { EMPTY_FILTERS, SUPPLIERS_COLUMNS, SUPPLIERS_FILTERS_KEY, SUPPLIER_STATES_OPTIONS } from "../suppliers.constants";
 
-const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
+const SuppliersPage = ({ isLoading, suppliers = [], onRefetch, onDownloadExcel }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -18,7 +18,7 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: SUPPLIERS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['id', 'name']);
+  const onFilter = createFilter(filters, { id: {}, name: {}, state: { fullMatch: true } });
 
   return (
     <>
@@ -52,6 +52,7 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch }) => {
         paginate
         filters={filters}
         setFilters={setFilters}
+        onDownloadExcel={onDownloadExcel}
       />
     </>
   );

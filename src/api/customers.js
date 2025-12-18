@@ -1,25 +1,24 @@
 import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
-import { getDefaultListParams } from '@/common/utils';
-import { ATTRIBUTES, GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
+import { getDefaultAttributes, getDefaultListParams } from '@/common/utils';
+import { LIST_ATTRIBUTES, GET_CUSTOMER_QUERY_KEY, LIST_CUSTOMERS_QUERY_KEY } from "@/components/customers/customers.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
-import { listItems, useActiveItem, useCreateItem, useDeleteItem, useEditItem, useInactiveItem } from "./common";
+import { listItems, usePostUpdateItem, useCreateItem, useDeleteItem, useEditItem } from "./common";
 
-export function useListCustomers({ sort = 'name', order = true } = {}) {
+export function useListCustomers() {
   const query = useQuery({
-    queryKey: [LIST_CUSTOMERS_QUERY_KEY, sort, order],
+    queryKey: [LIST_CUSTOMERS_QUERY_KEY],
     queryFn: () => listItems({
       entity: ENTITIES.CUSTOMERS,
       url: PATHS.CUSTOMERS,
-      params: getDefaultListParams(ATTRIBUTES, sort, order)
+      params: getDefaultListParams(LIST_ATTRIBUTES)
     }),
     retry: false,
-    staleTime: 0,
   });
 
   return query;
-}
+};
 
 export function useGetCustomer(id) {
   const getCustomer = async (id) => {
@@ -52,6 +51,7 @@ export const useCreateCustomer = () => {
       value: customer,
       responseEntity: ENTITIES.CUSTOMER,
       invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY]],
+      attributes: LIST_ATTRIBUTES
     });
   };
 
@@ -65,7 +65,7 @@ export const useDeleteCustomer = () => {
     return deleteItem({
       entity: ENTITIES.CUSTOMERS,
       id,
-      url: PATHS.CUSTOMERS,
+      url: `${PATHS.CUSTOMERS}/${id}`,
       invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY]]
     });
   };
@@ -82,7 +82,8 @@ export const useEditCustomer = () => {
       url: `${PATHS.CUSTOMERS}/${customer.id}`,
       value: customer,
       responseEntity: ENTITIES.CUSTOMER,
-      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]],
+      attributes: LIST_ATTRIBUTES
     });
   };
 
@@ -90,18 +91,16 @@ export const useEditCustomer = () => {
 };
 
 export const useInactiveCustomer = () => {
-  const inactiveItem = useInactiveItem();
+  const inactiveItem = usePostUpdateItem();
 
-  const inactiveCustomer = (customer, reason) => {
+  const inactiveCustomer = ({ id }, inactiveReason) => {
     return inactiveItem({
       entity: ENTITIES.CUSTOMERS,
-      url: `${PATHS.CUSTOMERS}/${customer.id}/${INACTIVE}`,
-      value: {
-        id: customer.id,
-        inactiveReason: reason
-      },
+      url: `${PATHS.CUSTOMERS}/${id}/${INACTIVE}`,
+      value: { id, inactiveReason },
       responseEntity: ENTITIES.CUSTOMER,
-      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, id]],
+      attributes: LIST_ATTRIBUTES
     });
   };
 
@@ -109,17 +108,16 @@ export const useInactiveCustomer = () => {
 };
 
 export const useActiveCustomer = () => {
-  const activeItem = useActiveItem();
+  const activeItem = usePostUpdateItem();
 
-  const activeCustomer = (customer) => {
+  const activeCustomer = ({ id }) => {
     return activeItem({
       entity: ENTITIES.CUSTOMERS,
-      url: `${PATHS.CUSTOMERS}/${customer.id}/${ACTIVE}`,
-      value: {
-        id: customer.id,
-      },
+      url: `${PATHS.CUSTOMERS}/${id}/${ACTIVE}`,
+      value: { id },
       responseEntity: ENTITIES.CUSTOMER,
-      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, customer.id]]
+      invalidateQueries: [[LIST_CUSTOMERS_QUERY_KEY], [GET_CUSTOMER_QUERY_KEY, id]],
+      attributes: LIST_ATTRIBUTES
     });
   };
 

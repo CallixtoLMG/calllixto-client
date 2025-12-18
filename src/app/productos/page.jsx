@@ -24,20 +24,19 @@ const Products = () => {
   const { push } = useRouter();
 
   useEffect(() => {
-    setLabels(['Productos']);
-    refetch();
-  }, [setLabels, refetch]);
+    setLabels([{ name: 'Productos' }]);
+  }, [setLabels]);
 
   const products = useMemo(() => data?.products, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const handleDownloadExcel = useCallback(() => {
-    if (!products) return;
-    const headers = ['Código', 'Nombre', 'Marca', 'Proveedor', 'Costo', 'Precio', 'Margen', 'Estado', 'Comentarios'];
-    const mappedPRoducts = products.map(product => {
+  const handleDownloadExcel = useCallback((elements) => {
+    if (!elements.length) return;
+    const headers = ['Id', 'Nombre', 'Marca', 'Proveedor', 'Costo', 'Precio', 'Margen', 'Estado', 'Comentarios'];
+    const mappedPRoducts = elements.map(product => {
       const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
       return [
-        product.code,
+        product.id,
         product.name,
         product.brandName,
         product.supplierName,
@@ -49,7 +48,7 @@ const Products = () => {
       ];
     });
     downloadExcel([headers, ...mappedPRoducts], "Lista de Productos");
-  }, [products]);
+  }, []);
 
   useEffect(() => {
     const actions = [];
@@ -82,9 +81,6 @@ const Products = () => {
                 <DropdownItem>
                   <BatchImport key="batch-update" />
                 </DropdownItem>
-                <DropdownItem onClick={handleDownloadExcel}>
-                  <Icon name={ICONS.DOWNLOAD} />Productos
-                </DropdownItem>
                 <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA, "Ejemplo de tabla")}>
                   <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla
                 </DropdownItem>
@@ -106,6 +102,7 @@ const Products = () => {
         onRefetch={refetch}
         isLoading={loading}
         products={loading ? [] : products}
+        onDownloadExcel={handleDownloadExcel}
       />
     </>
   );

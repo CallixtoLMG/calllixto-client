@@ -1,5 +1,5 @@
 import { FormField, Icon, Input } from "@/common/components/custom";
-import { ICONS } from "@/common/constants";
+import { ICONS, SIZES } from "@/common/constants";
 import { forwardRef } from "react";
 
 export const PercentField = forwardRef(({
@@ -53,7 +53,7 @@ export const PercentField = forwardRef(({
         ref={ref}
       >
         <input />
-        <Icon name={ICONS.PERCENT} size='small' />
+        <Icon name={ICONS.PERCENT} size={SIZES.SMALL} />
       </Input>
     </FormField>
   );

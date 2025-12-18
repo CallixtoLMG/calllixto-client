@@ -27,19 +27,21 @@ export const DatePickerControlled = ({
   locale = "es",
   icon,
   afterChange,
+  required
 }) => {
-  const { formState: { errors } } = useFormContext();
-
+  const { control, formState: { errors } } = useFormContext();
   return (
     <Controller
       name={name}
       rules={rules}
+      control={control} 
       render={({ field: { onChange, value } }) => (
         <FormField
           flex={flex}
           height={height}
           $width={width}
           label={label}
+          required={required}
           icon={icon}
           control={ReactDatePicker}
           error={!!errors?.[name] && {

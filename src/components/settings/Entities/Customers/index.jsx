@@ -1,4 +1,4 @@
-import Tags from "../../Modules/Tags";
+import Tags from "../../Common/Tags";
 
 const CustomersModule = (() => {
 

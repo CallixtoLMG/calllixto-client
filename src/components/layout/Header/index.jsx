@@ -1,3 +1,4 @@
+'use client';
 import { useUserContext } from "@/User";
 import { Flex, Icon, Label } from "@/common/components/custom";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
@@ -14,16 +15,18 @@ const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const [selectedClientId, setSelectedClientId] = useState(null);
+  const [selectedClientId, setSelectedClientId] = useState(DEFAULT_SELECTED_CLIENT);
 
   useEffect(() => {
-    const storedData = JSON.parse(sessionStorage.getItem("userData"));
-    setSelectedClientId(storedData?.selectedClientId || DEFAULT_SELECTED_CLIENT);
+    if (typeof window !== "undefined") {
+      const client = localStorage.getItem("selectedClientId") ?? DEFAULT_SELECTED_CLIENT;
+      localStorage.setItem("selectedClientId", client);
+      setSelectedClientId(client);
+    }
   }, []);
 
   const handleClientChange = (client) => {
-    const storedData = JSON.parse(sessionStorage.getItem("userData"));
-    sessionStorage.setItem("userData", JSON.stringify({ ...storedData, selectedClientId: client }));
+    localStorage.setItem("selectedClientId", client);
     setSelectedClientId(client);
     location.reload();
   };
@@ -41,8 +44,10 @@ const Header = () => {
     [PAGES.BRANDS.SHORTKEYS]: () => push(PAGES.BRANDS.BASE),
     [PAGES.PRODUCTS.SHORTKEYS]: () => push(PAGES.PRODUCTS.BASE),
     [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
+    [PAGES.EXPENSES.SHORTKEYS]: () => push(PAGES.EXPENSES.BASE),
     [PAGES.USERS.SHORTKEYS]: () => push(PAGES.USERS.BASE),
     [PAGES.SETTINGS.SHORTKEYS]: () => push(PAGES.SETTINGS.BASE),
+    [PAGES.CASH_BALANCES.SHORTKEYS]: () => push(PAGES.CASH_BALANCES.BASE),
   };
 
   useKeyboardShortcuts(shortcutMapping);
@@ -88,14 +93,14 @@ const Header = () => {
                 </Flex>
                 <Flex>
                   <RigthHeaderDiv>
-                    <Flex $columnGap ="10px">
+                    <Flex $columnGap="10px">
                       <ModalUpdates />
                       <KeyboardShortcuts />
                     </Flex>
                   </RigthHeaderDiv>
                   {isCallixtoUser(role) && (
                     <RigthHeaderDiv>
-                      <Label height="36px">{userData.selectedClientId || DEFAULT_SELECTED_CLIENT}</Label>
+                      <Label height="36px">{selectedClientId}</Label>
                     </RigthHeaderDiv>
                   )}
                   <RigthHeaderDiv>

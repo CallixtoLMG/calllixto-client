@@ -1,6 +1,6 @@
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
-import { INACTIVE, REGEX } from "../constants";
+import { ALL, CANCELLED, INACTIVE, REGEX } from "../constants";
 
 export const getFormatedPrice = (number) => {
   const safeNumber = Number(number) ?? 0;
@@ -105,33 +105,78 @@ export const isItemInactive = (state) => {
   return state === toUpperCase(INACTIVE);
 };
 
+export const isItemCancelled = (state) => {
+  return state === toUpperCase(CANCELLED);
+};
+
 export const renderContent = (content) => {
   return typeof content === 'string' ? content : (
     isValidElement(content) ? content : null
   );
 };
 
-export const createFilter = (filters, keysToFilter, exceptions = {}) => {
+export const createFilter = (filters, config) => {
   return (item) => {
-    for (const key of keysToFilter) {
+    for (const [key, { skipAll, arrayKey, fullMatch, isArray, field, custom }] of Object.entries(config)) {
+      const filter = filters[key];
       if (filters[key]) {
-        const filterWords = normalizeText(filters[key]).split(/\s+/);
 
-        const itemValue = typeof item[key] === "string"
-          ? normalizeText(item[key])
-          : typeof exceptions[key] === "function"
-            ? normalizeText(exceptions[key](item))
-            : "";
+        if (custom) {
+          const isValid = custom(item);
+          if (!isValid) {
+            return false;
+          }
+          continue;
+        }
 
-        const allWordsMatch = filterWords.every(word => itemValue.includes(word));
+        if (skipAll && filter === ALL) {
+          continue;
+        }
+
+        const filterWords = normalizeText(filter).split(/\s+/);
+
+        if (arrayKey) {
+          const anyArrayItemMatches = item[key]?.some(arrayItem => {
+            if (fullMatch) {
+              return normalizeText(arrayItem[arrayKey]) === normalizeText(filter);
+            }
+            return filterWords.every(word => normalizeText(arrayItem[arrayKey]).includes(word));
+          });
+
+          if (!anyArrayItemMatches) {
+            return false;
+          }
+          continue;
+        }
+
+        if (isArray) {
+          const anyArrayItemMatches = item[key]?.some(item => {
+            if (fullMatch) {
+              return normalizeText(item) === normalizeText(filter);
+            }
+            return filterWords.every(word => normalizeText(item).includes(word));
+          });
+
+          if (!anyArrayItemMatches) {
+            return false;
+          }
+          continue;
+        }
+
+        const value = field ? normalizeText(item[key]?.[field]) : normalizeText(item[key]);
+
+        if (fullMatch) {
+          if (value !== normalizeText(filter)) {
+            return false;
+          }
+          continue;
+        }
+
+        const allWordsMatch = filterWords.every(word => value.includes(word));
         if (!allWordsMatch) {
           return false;
         }
       }
-    }
-
-    if (filters.state && filters.state !== item.state && filters.state !== exceptions.allState) {
-      return false;
     }
 
     return true;
@@ -140,16 +185,11 @@ export const createFilter = (filters, keysToFilter, exceptions = {}) => {
 
 export const normalizeText = (text) => text?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() ?? "";
 
-export const getDefaultListParams = (attributes, sort, order) => {
-  const params = {
-    attributes: encodeUri(Object.values(attributes)),
-  };
-
-  if (sort) params.sort = sort;
-  if (typeof order !== 'undefined') params.order = order;
-
-  return params;
+export const getDefaultListParams = (attributes = []) => {
+  return { attributes: encodeUri(getDefaultAttributes(attributes)) };
 };
+
+export const getDefaultAttributes = (attributes = []) => [...attributes, 'updatedAt', 'createdAt'];
 
 export const toUpperCase = (text = "") => {
   if (typeof text !== "string") return "";
@@ -177,7 +217,11 @@ export const getNumberFormated = (value) => {
 
 export const mapToDropdownOptions = (items = []) =>
   items.map((item) => ({
-    key: item.toLowerCase().replace(/\s+/g, "_"),
+    key: item?.toLowerCase().replace(/\s+/g, "_"),
     text: item,
     value: item,
+    name: item,
+    color: "grey"
   }));
+
+export const getLabelColor = (entity, states) => states?.[entity?.state]?.color;

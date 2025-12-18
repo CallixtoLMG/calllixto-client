@@ -1,23 +1,27 @@
+import { IconedButton } from "@/common/components/buttons";
 import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
-import { DropdownField, PriceLabel } from "@/common/components/form";
-import { Table, Total } from "@/common/components/table";
+import { DropdownField, PriceControlled, PriceLabel } from "@/common/components/form";
+import { Table, Total, TotalList } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
-import { getDateWithOffset } from "@/common/utils/dates";
+import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
+import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useEffect, useMemo, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
+import { FlexColumn } from "../../../../../common/components/custom";
 import { PICK_UP_IN_STORE } from "../../../budgets.constants";
 import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../../../budgets.utils";
 import { Container, Message, MessageHeader } from "./../../styles";
 
-const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact }) => {
-
+const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selectedContact, setSelectedContact, onConfirmBudgetDiscount, isLoading }) => {
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
+  const totalPending = (total - budget.paidAmount).toFixed(2);
+  const { setValue, getValues, trigger } = useFormContext();
 
   useEffect(() => {
     if (!budget || initializedContact) return;
@@ -36,29 +40,35 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
     setInitializedContact(true);
   }, [budget, initializedContact, setSelectedContact]);
 
+  const TOTAL_LIST_ITEMS = [
+    { id: 1, title: "Pagado", amount: <PriceLabel value={budget.paidAmount} /> },
+    { id: 2, title: "Pendiente", amount: <PriceLabel value={totalPending} /> },
+    { id: 3, title: "Total", amount: <PriceLabel value={total} /> },
+  ];
+
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
       {
-        title: "Código",
+        title: "Id",
         value: (product) => (
           <>
             <Popup
-              size="tiny"
-              trigger={<span>{getSupplierCode(product.code)}</span>}
+              size={SIZES.TINY}
+              trigger={<span>{getSupplierId(product.id)}</span>}
               position="top center"
               on="hover"
               content={product.supplierName}
             />
             -
             <Popup
-              size="tiny"
-              trigger={<span>{getBrandCode(product.code)}</span>}
+              size={SIZES.TINY}
+              trigger={<span>{getBrandId(product.id)}</span>}
               position="top center"
               on="hover"
               content={product.brandName}
             />
             -
-            <span>{getProductCode(product.code)}</span>
+            <span>{getProductId(product.id)}</span>
           </>
         ),
         id: 1,
@@ -82,7 +92,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
               </OverflowWrapper>
               <Flex $columnGap="5px" $marginLeft="7px">
                 {isProductOOS(product.state) && (
-                  <Label color={COLORS.ORANGE} size="tiny">{PRODUCT_STATES.OOS.singularTitle}</Label>
+                  <Label color={COLORS.ORANGE} size={SIZES.TINY}>{PRODUCT_STATES.OOS.singularTitle}</Label>
                 )}
                 {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
                 {product.comments && <CommentTooltip lineHeight="normal" comment={product.comments} />}
@@ -117,7 +127,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
       },
       {
         title: "Total",
-        value: (product) => <PriceLabel value={getTotal(product)} />,
+        value: (product) => <PriceLabel value={getTotal(product) ?? 0} />,
         id: 6,
         width: 3
       },
@@ -141,10 +151,22 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
               $width="300px"
               label="Vendedor"
               control={Input}
-              value={budget?.seller}
+              value={budget?.createdBy}
               readOnly
               disabled
             />
+            {budget?.createdAt && (
+              <FormField
+                $width="180px"
+                label="Fecha de creación"
+                control={Input}
+                value={getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)}
+                readOnly
+                disabled
+              />
+            )}
+          </FieldsContainer>
+          <FieldsContainer>
             {budgetState && (
               <FormField
                 $width="300px"
@@ -155,10 +177,9 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 disabled
               />
             )}
-          </FieldsContainer>
-          <FieldsContainer>
             {budgetState && (
               <FormField
+                $width="200px"
                 label={budgetState.dateLabel}
                 control={Input}
                 value={budgetState.date}
@@ -167,9 +188,10 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
             )}
             {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) && (
               <FormField
+                $width="200px"
                 label="Fecha de vencimiento"
                 control={Input}
-                value={getDateWithOffset(budget?.createdAt, budget?.expirationOffsetDays, 'days')}
+                value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })}
                 disabled
               />
             )}
@@ -186,6 +208,8 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           />
           <DropdownField
             flex="3"
+            selection
+            width="200px"
             label="Dirección"
             control={Dropdown}
             value={selectedContact?.address || (budget?.pickUpInStore ? PICK_UP_IN_STORE : '')}
@@ -207,6 +231,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           />
           <DropdownField
             flex="2"
+            selection
             label="Teléfono"
             control={Dropdown}
             value={selectedContact?.phone ?? ''}
@@ -234,14 +259,63 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           headers={BUDGET_FORM_PRODUCT_COLUMNS}
           elements={budget?.products}
         />
-        <Total
-          readOnly
-          subtotal={subtotal}
-          total={total}
-          subtotalAfterDiscount={subtotalAfterDiscount}
-          globalDiscount={budget?.globalDiscount}
-          additionalCharge={budget?.additionalCharge}
-        />
+        {isBudgetConfirmed(budget?.state) ?
+          <>
+            <TotalList items={TOTAL_LIST_ITEMS} />
+            {/* <FlexColumn $alignSelf="end" $rowGap="15px">
+              <Flex $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
+                <IconedButton
+                  text="Completar"
+                  icon={ICONS.CHECK}
+                  color={COLORS.BLUE}
+                  onClick={() => {
+                    setValue("postConfirmDiscount", totalPending);
+                    trigger("postConfirmDiscount");
+                  }}
+                  alignSelf="start"
+                  height="38px"
+                  disabled={isLoading}
+                />
+                <PriceControlled
+                  width="200px"
+                  placeholder="5.000"
+                  name="postConfirmDiscount"
+                  rules={{
+                    validate: (value) =>
+                      value ? value <= total - budget.paidAmount || "No puede superar el monto pendiente" : true,
+                  }}
+                  justifyItems="right"
+                />
+              </Flex>
+              <Flex $columnGap="15px" $alignSelf="end">
+                <IconedButton
+                  text="Aplicar descuento"
+                  loading={isLoading}
+                  disabled={isLoading}
+                  icon={ICONS.CHECK}
+                  color={COLORS.GREEN}
+                  height="38px"
+                  onClick={() => {
+                    const value = getValues("postConfirmDiscount");
+                    onConfirmBudgetDiscount({
+                      budgetId: budget.id,
+                      postConfirmDiscount: Number(value),
+                    });
+                  }}
+                />
+              </Flex>
+            </FlexColumn> */}
+          </>
+          :
+          <Total
+            readOnly
+            subtotal={subtotal}
+            total={total}
+            subtotalAfterDiscount={subtotalAfterDiscount}
+            globalDiscount={budget?.globalDiscount}
+            additionalCharge={budget?.additionalCharge}
+          />
+        }
         <FormField
           control={Input}
           label="Métodos de pago"

@@ -6,8 +6,6 @@ import { getPrice, getTotal } from "@/components/products/products.utils";
 import { PriceLabel } from "../../common/components/form";
 import { BUDGET_STATES } from "./budgets.constants";
 
-export const getLabelColor = (budget) => BUDGET_STATES[budget?.state]?.color;
-
 export const getPopupContent = (budget) => {
   if (isBudgetConfirmed(budget?.state)) {
     return (
@@ -33,7 +31,7 @@ export const getBudgetState = (budget) => {
     return {
       label: "Confirmado por",
       color: COLORS.GREEN,
-      person: budget?.confirmedBy || budget?.seller,
+      person: budget?.confirmedBy || budget?.createdBy,
       date: getFormatedDate(budget?.confirmedAt, DATE_FORMATS.DATE_WITH_TIME),
       dateLabel: "Fecha de confirmación"
     };
@@ -42,7 +40,7 @@ export const getBudgetState = (budget) => {
     return {
       label: "Anulado por",
       color: COLORS.RED,
-      person: budget?.cancelledBy || budget?.seller,
+      person: budget?.cancelledBy || budget?.createdBy,
       date: getFormatedDate(budget?.cancelledAt, DATE_FORMATS.DATE_WITH_TIME),
       dateLabel: "Fecha de anulación"
     };

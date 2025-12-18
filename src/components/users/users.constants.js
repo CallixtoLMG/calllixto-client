@@ -8,18 +8,8 @@ import { ROLES } from '@/roles';
 export const GET_USER_QUERY_KEY = 'getUser';
 export const LIST_USERS_QUERY_KEY = 'listUsers';
 export const USERS_FILTERS_KEY = 'usersFilters';
-
-export const ATTRIBUTES = {
-  FIRST_NAME: "firstName",
-  LAST_NAME: "lastName",
-  ADDRESS: 'address',
-  PHONE_NUMBER: 'phoneNumber',
-  USERNAME: 'username',
-  BIRTH_DATE: "birthDate",
-  COMMENT: "comments",
-  STATE: "state",
-  ROLE: "role"
-};
+export const MAIN_KEY = 'username';
+export const LIST_ATTRIBUTES = ["id", "firstName", "lastName", 'address', 'phoneNumber', 'username', "birthDate", "comments", "state", "role"];
 
 export const USER_COLUMNS = [
   {
@@ -82,7 +72,7 @@ export const USER_COLUMNS = [
     id: 5,
     title: "Nacimiento",
     width: 1,
-    value: (user) => getFormatedDate(user.birthDate, DATE_FORMATS.ONLY_DATE)
+    value: (user) => user.birthDate ? getFormatedDate(user.birthDate, DATE_FORMATS.ONLY_DATE) : ""
   }
 ];
 

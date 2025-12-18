@@ -1,14 +1,17 @@
-import { useUpdatePayments } from "@/api/budgets";
-import { now } from "@/common/utils/dates";
+import { useConfirmBudgetDiscount } from "@/api/budgets";
+import { useCreatePayment, useDeletePayment, useEditPayment, useGetPayment } from "@/api/payments";
+import EntityPayments from "@/common/components/modules/EntityPayments";
+import { ENTITIES } from "@/common/constants";
 import BudgetDetails from "@/components/budgets/BudgetView/Modules/BudgetDetails";
-import BudgetPayments from "@/components/budgets/BudgetView/Modules/BudgetPayments";
+import { Loader } from "@/components/layout";
 import { useAllowUpdate, useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useRef, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
-import { isBudgetExpired, isBudgetPending } from "../budgets.utils";
+import { isBudgetCancelled, isBudgetExpired, isBudgetPending } from "../budgets.utils";
 
 const BudgetView = ({
   budget,
@@ -17,106 +20,123 @@ const BudgetView = ({
   total,
   selectedContact,
   setSelectedContact,
+  refetch
 }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const updatePayment = useUpdatePayments();
-
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const initialTabIndex = tabParam === "pagos" ? 1 : 0;
+  const [activeIndex, setActiveIndex] = useState(initialTabIndex);
+  const { data: payment, refetch: refetchPayment, isLoading, isRefetching } = useGetPayment(ENTITIES.BUDGET, budget.id, activeIndex === 1);
+  const router = useRouter();
+  const editPayment = useEditPayment();
+  const createPayment = useCreatePayment();
+  const deletePayment = useDeletePayment();
+  const confirmBudgetDiscount = useConfirmBudgetDiscount();
   const methods = useForm({
     defaultValues: {
-      paymentsMade: budget?.paymentsMade || [],
+      paymentsMade: Object.values(payment || {}).map((payment) => ({
+        ...payment,
+        paymentId: payment.id,
+      })),
     },
     mode: "onChange",
   });
+  const [isModalPaymentOpen, setIsModalPaymentOpen] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const formRef = useRef(null);
-  const { isDirty } = methods.formState;
 
   const {
-    showModal: showUnsavedModal,
-    handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
     onBeforeView,
-    closeModal,
   } = useUnsavedChanges({
     formRef,
-    onDiscard: async () => {
-      methods.reset({ paymentsMade: budget?.paymentsMade });
-    },
-    onSave: () => {
-      methods.handleSubmit(() => mutateUpdatePayment())();
-    },
   });
 
-  const {
-    isUpdating,
-    toggleButton,
-    setIsUpdating
-  } = useAllowUpdate({
+  const { } = useAllowUpdate({
     canUpdate: true,
     onBeforeView,
   });
 
-  const { mutate: mutateUpdatePayment, isPending: isLoadingUpdatePayment } = useMutation({
-    mutationFn: async () => {
-      const formData = methods.getValues();
-      const updatedBudget = {
-        ...budget,
-        paymentsMade: formData.paymentsMade,
-        updatedAt: now(),
-      };
-      const data = await updatePayment({ budget: updatedBudget, id: budget.id });
-      return data;
-    },
+  const { mutate: mutateCreatePayment, isPending: isCreatePending } = useMutation({
+    mutationFn: (paymentData) =>
+      createPayment(paymentData.payment, paymentData.entity, paymentData.entityId, { skipStorageUpdate: true })
+    ,
     onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success("Pagos actualizados!");
-        const formData = methods.getValues();
-        methods.reset(formData);
-        setIsUpdating(false);
-        resolveSave();
+      if (response?.statusOk) {
+        toast.success("Pago creado correctamente!");
+        refetchPayment();
       } else {
         toast.error(response.error.message);
       }
     },
     onSettled: () => {
-      closeModal();
-    },
+      setIsModalPaymentOpen(false);
+    }
   });
 
-  useEffect(() => {
-    formRef.current = {
-      isDirty: () => methods.formState.isDirty,
-      submitForm: () => methods.handleSubmit(() => mutateUpdatePayment())(),
-      resetForm: () => methods.reset({ paymentsMade: budget?.paymentsMade }),
-    };
-  }, [methods, mutateUpdatePayment, budget]);
-
-  useEffect(() => {
-    const current = methods.getValues("paymentsMade");
-    if (
-      !methods.formState.isDirty &&
-      JSON.stringify(current) !== JSON.stringify(budget?.paymentsMade)
-    ) {
-      methods.reset({ paymentsMade: budget?.paymentsMade });
+  const { mutate: mutateEditPayment, isPending: isEditPending } = useMutation({
+    mutationFn: ({ payment, entity, entityId },) =>
+      editPayment(payment, entity, entityId, {
+        skipStorageUpdate: true,
+      }),
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Pago actualizado!");
+        refetchPayment();
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+    onSettled: () => {
+      setIsModalPaymentOpen(false);
     }
-  }, [budget?.paymentsMade, methods]);
+  });
+
+  const { mutate: mutateDeletePayment, isPending: isDeletePending } = useMutation({
+    mutationFn: ({ paymentId, entity, entityId }) =>
+      deletePayment({ paymentId, entity, entityId }, { skipStorageUpdate: true }),
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Pago eliminado!");
+        refetchPayment();
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+    onSettled: () => {
+      setShowDeleteModal(false)
+    }
+  });
+
+  const { mutate: mutateConfirmBudgetDiscount, isPending: isConfirmBudgetDiscountPending } = useMutation({
+    mutationFn: ({ budgetId, postConfirmDiscount }) => confirmBudgetDiscount({ id: budgetId, postConfirmDiscount }),
+    onSuccess: (response) => {
+      if (response?.statusOk) {
+        toast.success("Descuento aplicado correctamente!");
+        refetch();
+      } else {
+        toast.error(response?.error?.message || "Error al aplicar descuento!.");
+      }
+    },
+  });
 
   const modules = [
     {
       key: "main",
       label: "Presupuesto",
       component: (
-        <BudgetDetails
-          budget={budget}
-          subtotal={subtotal}
-          subtotalAfterDiscount={subtotalAfterDiscount}
-          total={total}
-          selectedContact={selectedContact}
-          setSelectedContact={setSelectedContact}
-        />
+        <FormProvider {...methods}>
+          <BudgetDetails
+            budget={budget}
+            subtotal={subtotal}
+            subtotalAfterDiscount={subtotalAfterDiscount}
+            total={total}
+            selectedContact={selectedContact}
+            setSelectedContact={setSelectedContact}
+            onConfirmBudgetDiscount={mutateConfirmBudgetDiscount}
+            isLoading={isConfirmBudgetDiscountPending}
+          />
+        </FormProvider>
       ),
     },
     ...(!isBudgetPending(budget?.state) && !isBudgetExpired(budget?.state)
@@ -125,22 +145,30 @@ const BudgetView = ({
           key: "payments",
           label: "Pagos",
           component: (
-            <BudgetPayments
-              budget={budget}
-              total={total}
-              methods={methods}
-              formRef={formRef}
-              isUpdating={isUpdating}
-              toggleButton={toggleButton}
-              mutateUpdatePayment={mutateUpdatePayment}
-              isLoadingUpdatePayment={isLoadingUpdatePayment}
-              isDirty={isDirty}
-              showUnsavedModal={showUnsavedModal}
-              handleDiscard={handleDiscard}
-              handleSave={handleSave}
-              handleCancel={handleCancel}
-              isSaving={isSaving}
-            />
+            <Loader active={isLoading || isRefetching}>
+              <EntityPayments
+                refetchPayment={refetchPayment}
+                payment={payment}
+                isModalPaymentOpen={isModalPaymentOpen}
+                setIsModalPaymentOpen={setIsModalPaymentOpen}
+                showDeleteModal={showDeleteModal}
+                setShowDeleteModal={setShowDeleteModal}
+                total={total}
+                entityState={budget.state}
+                isCancelled={isBudgetCancelled}
+                methods={methods}
+                isLoading={isCreatePending || isDeletePending || isEditPending}
+                onAdd={(payment) => mutateCreatePayment({ payment, entity: ENTITIES.BUDGET, entityId: budget.id })}
+                onEdit={(payment) => mutateEditPayment({ payment, entity: ENTITIES.BUDGET, entityId: budget.id })}
+                onDelete={(payment) => {
+                  mutateDeletePayment({
+                    paymentId: payment.paymentId || payment.id,
+                    entity: ENTITIES.BUDGET,
+                    entityId: budget.id
+                  });
+                }}
+              />
+            </Loader>
           ),
         },
       ]
@@ -152,10 +180,12 @@ const BudgetView = ({
     render: () => <Tab.Pane>{mod.component}</Tab.Pane>,
   }));
 
-  const handleTabChange = async (e, { activeIndex: nextIndex }) => {
+  const handleTabChange = async (_, { activeIndex }) => {
     const canChange = await onBeforeView?.();
     if (canChange) {
-      setActiveIndex(nextIndex);
+      setActiveIndex(activeIndex);
+      const newUrl = window.location.pathname;
+      router.replace(newUrl);
     }
   };
 

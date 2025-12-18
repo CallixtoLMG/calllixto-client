@@ -1,0 +1,38 @@
+import { Controller, useFormContext } from 'react-hook-form';
+import SearchField from './SearchField';
+
+export const SearchControlled = ({
+  name,
+  rules,
+  label,
+  placeholder,
+  onAfterChange,
+  ...rest
+}) => {
+  const {
+    formState: { errors },
+  } = useFormContext();
+
+  return (
+    <Controller
+      name={name}
+      rules={rules}
+      render={({ field: { onChange, value } }) => (
+        <SearchField
+          {...rest}
+          label={label}
+          error={errors?.[name] && {
+            content: errors[name].message,
+            pointing: 'above',
+          }}
+          value={value}
+          onSelect={(val) => {
+            onChange(val);
+            onAfterChange?.(val);
+          }}
+          placeholder={placeholder ?? label}
+        />
+      )}
+    />
+  );
+};

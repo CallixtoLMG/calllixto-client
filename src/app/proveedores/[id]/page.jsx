@@ -28,7 +28,7 @@ import {
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
-import { useProtectedAction, useValidateToken, useUnsavedChanges, useAllowUpdate } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -88,7 +88,7 @@ const Supplier = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.SUPPLIERS.NAME, supplier?.name]);
+    setLabels([{ name: PAGES.SUPPLIERS.NAME }, { name: supplier?.name }]);
     refetchSupplier();
     refetchProducts();
   }, [setLabels, supplier, refetchProducts, refetchSupplier]);
@@ -102,7 +102,9 @@ const Supplier = ({ params }) => {
 
   const modalConfig = {
     deleteSupplier: {
-      header: `¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor "${supplier?.name}"?`,
+      header: (
+        <>¿Está seguro que desea eliminar PERMANENTEMENTE al proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
+      ),
       confirmText: "eliminar",
       icon: ICONS.TRASH,
       tooltip: hasAssociatedProducts
@@ -110,16 +112,22 @@ const Supplier = ({ params }) => {
         : false,
     },
     deleteBatch: {
-      header: `¿Está seguro que desea eliminar los ${products?.length || ""} productos del proveedor "${supplier?.name}"?`,
+      header: (
+        <>¿Está seguro que desea eliminar los {products?.length || ""} productos del proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
+      ),
       confirmText: "eliminar",
       icon: ICONS.TRASH,
     },
     active: {
-      header: `¿Está seguro que desea activar el proveedor "${supplier?.name}"?`,
+      header: (
+        <>¿Está seguro que desea activar el proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
+      ),
       icon: ICONS.PLAY_CIRCLE,
     },
     inactive: {
-      header: `¿Está seguro que desea desactivar el proveedor "${supplier?.name}"?`,
+      header: (
+        <>¿Está seguro que desea desactivar el proveedor <i>{supplier?.name} ({supplier?.id}) </i> ?</>
+      ),
       icon: ICONS.PAUSE_CIRCLE,
     },
   };
@@ -274,11 +282,11 @@ const Supplier = ({ params }) => {
     const handleDownloadExcel = () => {
       if (!products) return;
       const headers = [
-        'Código',
+        'Id',
         'Nombre',
         'Marca',
         'Proveedor',
-        'Cost ',
+        'Costo',
         'Precio',
         'Margen',
         'Estado',
@@ -288,7 +296,7 @@ const Supplier = ({ params }) => {
       const mappedProducts = products.map((product) => {
         const productState = PRODUCT_STATES[product.state]?.singularTitle || product.state;
         return [
-          product.code,
+          product.id,
           product.name,
           product.brandName,
           product.supplierName,
@@ -401,7 +409,6 @@ const Supplier = ({ params }) => {
     }
 
     setActions(actions);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, supplier, products, hasAssociatedProducts, activeAction, isEditPending, loadingProducts, isExcelLoading]);
 
@@ -410,7 +417,7 @@ const Supplier = ({ params }) => {
   }
 
   return (
-    <Loader active={isLoading || loadingProducts}>
+    <Loader active={isLoading || loadingProducts || !supplier}>
       {!isItemInactive(supplier?.state) && toggleButton}
       {isItemInactive(supplier?.state) && (
         <Message negative>

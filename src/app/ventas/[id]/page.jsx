@@ -3,14 +3,15 @@ import { useUserContext } from "@/User";
 import { useCancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
+import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
 import { DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu } from "@/common/components/custom";
-import { COLORS, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
-import { getFormatedPhone } from "@/common/utils";
+import ModalCancel from "@/common/components/modals/ModalCancel";
+import { COLORS, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
+import { getFormatedPhone, mapToDropdownOptions } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import BudgetView from "@/components/budgets/BudgetView";
-import ModalCancel from "@/components/budgets/ModalCancelBudget";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import ModalPDF from "@/components/budgets/ModalPDF";
@@ -32,9 +33,11 @@ const Budget = ({ params }) => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const { push } = useRouter();
-  const { data: budget, isLoading } = useGetBudget(params.id);
+  const { data: budget, isLoading, refetch: refetchBudget } = useGetBudget(params.id);
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
+  const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
+  const { data: budgetSettings, isLoading: isLoadingBudgetSettings, isRefetching: isRefetchingSettings } = useGetSetting(ENTITIES.BUDGET);
   const [customerData, setCustomerData] = useState();
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
   const [isModalConfirmationOpen, setIsModalConfirmationOpen] = useState(false);
@@ -49,21 +52,16 @@ const Budget = ({ params }) => {
   const confirmBudget = useConfirmBudget();
   const cancelBudget = useCancelBudget();
 
-  const products = useMemo(() => productsData?.products?.map(product => ({
-    ...product,
-    key: product.code,
-    value: product.name,
-    text: product.name,
-  })),
-    [productsData]);
-
   const customers = useMemo(() => customersData?.customers?.map(customer => ({
     ...customer,
     key: customer.name,
     value: customer.name,
     text: customer.name,
-  }))
-    , [customersData]);
+  })), [customersData]);
+
+  const paymentMethodOptions = useMemo(() => {
+    return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
+  }, [paymentMethods]);
 
   useEffect(() => {
     resetActions();
@@ -82,16 +80,15 @@ const Budget = ({ params }) => {
       }))
       const calculatedSubtotal = getTotalSum(budget.products);
       const calculatedSubtotalAfterDiscount = getSubtotal(calculatedSubtotal, -budget.globalDiscount);
-      const calculatedFinalTotal = getSubtotal(calculatedSubtotalAfterDiscount, budget.additionalCharge);
 
       setSubtotal(calculatedSubtotal);
       setSubtotalAfterDiscount(calculatedSubtotalAfterDiscount);
-      setTotal(calculatedFinalTotal);
+      setTotal(budget.total);
       const stateTitle = BUDGET_STATES[budget.state]?.singularTitle || BUDGET_STATES.INACTIVE.singularTitle;
       const stateColor = BUDGET_STATES[budget.state]?.color || BUDGET_STATES.INACTIVE.color;
       setLabels([
-        PAGES.BUDGETS.NAME,
-        budget.id ? { id: budget.id, title: stateTitle, color: stateColor } : null
+        { name: PAGES.BUDGETS.NAME },
+        { name: budget?.id, label: { title: stateTitle, color: stateColor } }
       ].filter(Boolean));
       setCustomerData(budget.customer);
       setSelectedContact({
@@ -280,7 +277,7 @@ const Budget = ({ params }) => {
   });
 
   return (
-    <Loader active={isLoading || loadingProducts || loadingCustomers}>
+    <Loader active={isLoading || loadingProducts || loadingCustomers || !budget || isLoadingBudgetSettings || isRefetchingSettings}>
       {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) && (
         <Flex
           $margin={(isBudgetDraft(budget?.state) || isBudgetCancelled(budget?.state)) ? "0" : undefined}
@@ -297,7 +294,7 @@ const Budget = ({ params }) => {
       {isBudgetDraft(budget?.state) ? (
         <BudgetForm
           onSubmit={mutateEdit}
-          products={products}
+          products={productsData?.products ?? []}
           customers={customers}
           user={userData}
           budget={budget}
@@ -305,6 +302,7 @@ const Budget = ({ params }) => {
           draft
           selectedContact={selectedContact}
           setSelectedContact={setSelectedContact}
+          paymentMethods={paymentMethodOptions}
         />
       ) : (
         <BudgetView
@@ -314,17 +312,19 @@ const Budget = ({ params }) => {
           total={total}
           selectedContact={selectedContact}
           setSelectedContact={setSelectedContact}
+          refetch={refetchBudget}
         />
       )}
       <ModalPDF
         isModalOpen={isModalPDFOpen}
         onClose={setIsModalPDFOpen}
         budget={budget}
-        client={userData?.client}
+        client={userData?.selectedClient ?? userData?.client}
         total={total}
         subtotal={subtotal}
         selectedContact={selectedContact}
         subtotalAfterDiscount={subtotalAfterDiscount}
+        defaults={budgetSettings?.defaultsPDF}
       />
       <ModalCustomer
         isModalOpen={isModalCustomerOpen}
@@ -348,6 +348,7 @@ const Budget = ({ params }) => {
         onConfirm={mutateCancel}
         isLoading={isPendingCancel}
         id={budget?.id}
+        header={`Desea anular el presupuesto ${budget?.id}?`}
       />
     </Loader>
   );

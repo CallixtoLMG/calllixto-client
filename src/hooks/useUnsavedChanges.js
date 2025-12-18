@@ -12,9 +12,13 @@ const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      isDirtyRef.current = formRef.current?.isDirty?.() ?? false;
+      if (formRef?.current && typeof formRef.current.isDirty === "function") {
+        isDirtyRef.current = formRef.current.isDirty();
+      } else {
+        isDirtyRef.current = false;
+      }
     }, 300);
-
+  
     return () => clearInterval(interval);
   }, [formRef]);
 

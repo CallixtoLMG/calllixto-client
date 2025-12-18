@@ -90,6 +90,7 @@ export const ContactControlled = () => {
     appendPhone(phoneToAdd);
     setPhoneToAdd(EMPTY_PHONE);
     setError();
+    setOpenPhone(false)
   };
 
   const handleAddAddress = () => {
@@ -107,6 +108,7 @@ export const ContactControlled = () => {
     appendAddress(addressToAdd);
     setAddressToAdd(EMPTY_ADDRESS);
     setError();
+    setOpenAddress(false)
   };
 
   const handleAddEmail = () => {
@@ -124,6 +126,7 @@ export const ContactControlled = () => {
     appendEmail(emailToAdd);
     setEmailToAdd(EMPTY_EMAIL);
     setError();
+    setOpenEmail(false)
   };
 
   return (
@@ -155,7 +158,7 @@ export const ContactControlled = () => {
             setPhoneToAdd(EMPTY_PHONE);
             setError();
             setOpenPhone(false);
-            phoneButtonRef.current?.focus(); 
+            phoneButtonRef.current?.focus();
           }}
           closeOnDocumentClick
           position='top left'
@@ -166,7 +169,7 @@ export const ContactControlled = () => {
                 flex="1"
                 label="Referencia"
                 control={Input}
-                placeholder="Referencia"
+                placeholder="Casa"
                 value={phoneToAdd.ref}
                 onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'ref', e.target.value)}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPhone)}
@@ -183,7 +186,7 @@ export const ContactControlled = () => {
                 } : null}
                 required
                 maxLength="4"
-                placeholder="Área"
+                placeholder="385"
                 value={phoneToAdd.areaCode}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -202,7 +205,7 @@ export const ContactControlled = () => {
                 } : null}
                 required
                 maxLength="7"
-                placeholder="Número"
+                placeholder="5228706"
                 value={phoneToAdd.number}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -217,6 +220,8 @@ export const ContactControlled = () => {
                 color={COLORS.GREEN}
                 onClick={handleAddPhone}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPhone)}
+                alignSelf="end"
+                height="38px"
               />
             </FieldsContainer>
           </Form>
@@ -267,7 +272,7 @@ export const ContactControlled = () => {
                 flex="1"
                 label="Referencia"
                 control={Input}
-                placeholder="Referencia"
+                placeholder="Casa"
                 value={addressToAdd.ref}
                 onChange={(e) => updateFieldToAdd(setAddressToAdd, 'ref', e.target.value)}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddAddress)}
@@ -283,7 +288,7 @@ export const ContactControlled = () => {
                   pointing: 'above',
                 } : null}
                 required
-                placeholder="Dirección"
+                placeholder="Mitre 525 9c"
                 value={addressToAdd.address}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -298,6 +303,8 @@ export const ContactControlled = () => {
                 color={COLORS.GREEN}
                 onClick={handleAddAddress}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddAddress)}
+                alignSelf="end"
+                height="38px"
               />
             </FieldsContainer>
           </Form>
@@ -349,7 +356,7 @@ export const ContactControlled = () => {
                 flex="1"
                 label="Referencia"
                 control={Input}
-                placeholder="Referencia"
+                placeholder="Trabajo"
                 value={emailToAdd.ref}
                 onChange={(e) => updateFieldToAdd(setEmailToAdd, 'ref', e.target.value)}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddEmail)}
@@ -365,7 +372,7 @@ export const ContactControlled = () => {
                   pointing: 'above',
                 } : null}
                 required
-                placeholder="Email"
+                placeholder="Martinb@hotmail.com"
                 value={emailToAdd.email}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -380,7 +387,8 @@ export const ContactControlled = () => {
                 color={COLORS.GREEN}
                 onClick={handleAddEmail}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddEmail)}
-
+                alignSelf="end"
+                height="38px"
               />
             </FieldsContainer>
           </Form>

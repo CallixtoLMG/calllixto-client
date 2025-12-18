@@ -51,23 +51,25 @@ const BrandForm = forwardRef(({
           <TextControlled
             width="150px"
             name="id"
-            label="Código"
-            placeholder="Código (A1)"
+            label="Id"
+            placeholder="CX"
             rules={RULES.REQUIRED_TWO_DIGIT}
             onChange={value => value.toUpperCase()}
             disabled={view}
             maxLength={2}
+            required
           />
           <TextControlled
             width="40%"
             name="name"
             label="Nombre"
-            placeholder="Nombre"
+            placeholder="CallixtoGLM"
             rules={RULES.REQUIRED}
             disabled={view && !isUpdating}
+            required
           />
         </FieldsContainer>
-        <TextAreaControlled name="comments" label="Comentarios" readOnly={view && !isUpdating} />
+        <TextAreaControlled name="comments" label="Comentarios" placeholder="Una marca macanuda" readOnly={view && !isUpdating} />
         {(isUpdating || !view) && (
           <SubmitAndRestore
             isUpdating={isUpdating}

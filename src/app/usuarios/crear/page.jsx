@@ -21,7 +21,7 @@ const CreateUser = () => {
   }, []);
 
   useEffect(() => {
-    setLabels([PAGES.USERS.NAME, 'Crear']);
+    setLabels([{ name: PAGES.USERS.NAME }, { name: 'Crear' }]);
   }, [setLabels]);
 
   const { mutate, isPending } = useMutation({

@@ -1,5 +1,5 @@
 import { FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { forwardRef, useState } from "react";
 import { Popup } from "semantic-ui-react";
 import styled, { css } from "styled-components";
@@ -51,6 +51,7 @@ export const TextField = forwardRef(({
   onChange,
   onKeyDown,
   maxLength,
+  required,
   error,
   showPopup = false,
   popupContent,
@@ -70,7 +71,7 @@ export const TextField = forwardRef(({
       {showPopup && (
         <Popup
           position={popupPosition}
-          size="tiny"
+          size={SIZES.TINY}
           content={popupContent}
           trigger={
             <Icon
@@ -93,6 +94,7 @@ export const TextField = forwardRef(({
       control={Input}
       error={error}
       disabled={disabled}
+      required={required}
     >
       {disabled ? (
         <Input

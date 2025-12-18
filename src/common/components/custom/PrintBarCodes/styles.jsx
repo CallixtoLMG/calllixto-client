@@ -24,7 +24,7 @@ const ProductName = styled.p`
   height: 50px !important;
 `;
 
-const ProductCode = styled.p`
+const ProductId = styled.p`
   margin: 0;
   font-size: 16px;
   flex: 1 0 5% !important;
@@ -38,5 +38,5 @@ const Barcode = styled.img`
   padding: 0 3px !important;
 `;
 
-export { Barcode, BarCodeContainer, BarCodeSubContainer, ProductCode, ProductName };
+export { BarCodeContainer, BarCodeSubContainer, Barcode, ProductId, ProductName };
 

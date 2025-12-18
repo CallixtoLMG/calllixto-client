@@ -1,32 +1,40 @@
 import { IconedButton, SubmitAndRestore } from "@/common/components/buttons";
-import { Box, Button, FieldsContainer, Flex, FlexColumn, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
-import { DropdownControlled, GroupedButtonsControlled, NumberControlled, PercentControlled, PriceControlled, PriceLabel, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import Payments from "@/common/components/form/Payments";
-import ProductSearch from "@/common/components/search/search";
-import { Text } from "@/common/components/search/styles";
+import { Button, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
+import {
+  GroupedButtonsControlled,
+  NumberControlled,
+  PercentControlled,
+  PriceControlled,
+  PriceLabel,
+  TextAreaControlled,
+  TextControlled,
+  TextField,
+  SearchControlled
+} from "@/common/components/form";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
+import { COLORS, DATE_FORMATS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
-import { getDateWithOffset, now } from "@/common/utils/dates";
+import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
-import { ATTRIBUTES, PRODUCT_STATES } from "@/components/products/products.constants";
-import { getBrandCode, getPrice, getProductCode, getSupplierCode, getTotal, isProductOOS } from "@/components/products/products.utils";
+import CreateBudgetPayments from "@/components/payments/CreateBudgetPayment";
+import { LIST_ATTRIBUTES, PRODUCT_STATES, getProductSearchDescription, getProductSearchTitle } from "@/components/products/products.constants";
+import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks";
 import { pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
 import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
-import { CUSTOMER_STATES } from "../../customers/customers.constants";
-import ModalUpdates from "../ModalUpdates";
+import { CUSTOMER_STATES, getCustomerSearchDescription, getCustomerSearchTitle } from "../../customers/customers.constants";
+import ModalProductUpdates from "../ModalProductUpdates";
 import ModalComment from "./ModalComment";
 import { Container, VerticalDivider } from "./styles";
 
 const EMPTY_BUDGET = (user) => ({
-  seller: user?.name,
+  createdBy: user?.name,
   customer: { name: '', addresses: [], phoneNumbers: [] },
   products: [],
   comments: '',
@@ -41,6 +49,7 @@ const EMPTY_BUDGET = (user) => ({
 const BudgetForm = ({
   onSubmit,
   products,
+  settings = {},
   customers = [],
   budget,
   user,
@@ -64,7 +73,7 @@ const BudgetForm = ({
           }
         })
       })),
-      seller: user?.name,
+      createdBy: user?.name,
       paymentMethods: paymentMethods.map(({ value }) => value),
       state: BUDGET_STATES.PENDING.id,
       customer: { name: '', addresses: [], phoneNumbers: [] },
@@ -83,11 +92,13 @@ const BudgetForm = ({
       : budget && draft
         ? {
           ...budget,
-          seller: user?.name,
+          createdBy: user?.name,
           paymentsMade: budget.paymentsMade || [],
         }
         : {
           ...EMPTY_BUDGET(user),
+          ...settings.defaultsCreate,
+          ...(settings?.defaultsCreate?.customer && { customer: customers.find(c => c.id === settings.defaultsCreate.customer) ?? null }),
         },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -95,14 +106,14 @@ const BudgetForm = ({
 
   useEffect(() => {
     const current = methods.getValues("paymentMethods");
-    const all = paymentMethods.map(m => m.value);
+    const all = paymentMethods?.map(m => m.value);
 
     if (!current?.length) {
       methods.setValue("paymentMethods", all, { shouldDirty: false });
     }
   }, [paymentMethods, methods]);
 
-  const { control, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
+  const { control, trigger, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
     control,
     name: "products"
@@ -117,7 +128,7 @@ const BudgetForm = ({
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [shouldShowModal, setShouldShowModal] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState(settings?.defaultsCreate?.state === BUDGET_STATES.CONFIRMED.id);
   const [subtotal, setSubtotal] = useState(0);
   const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
   const [total, setTotal] = useState(0);
@@ -125,7 +136,7 @@ const BudgetForm = ({
 
   const getRestoredProducts = useCallback((sourceProducts) => {
     return sourceProducts.map(product => {
-      const latestProduct = products.find(p => p.code === product.code);
+      const latestProduct = products.find(p => p.id === product.id);
       const updatedState = latestProduct?.state ?? product.state;
 
       return {
@@ -136,7 +147,7 @@ const BudgetForm = ({
     }).filter(product =>
       product.state !== PRODUCT_STATES.INACTIVE.id &&
       product.state !== PRODUCT_STATES.DELETED.id &&
-      products.some(p => p.code === product.code)
+      products.some(p => p.id === product.id)
     );
   }, [products]);
 
@@ -146,80 +157,25 @@ const BudgetForm = ({
 
     const updatedtotal = getSubtotal(updatedSubtotalAfterDiscount, watchAdditionalCharge);
     setTotal(updatedtotal);
-  }, [subtotal, watchGlobalDiscount, watchAdditionalCharge]);
+  }, [subtotal, watchGlobalDiscount, watchAdditionalCharge, trigger]);
 
   const customerOptions = useMemo(() => {
-    return customers
-      .filter(({ state }) => state !== CUSTOMER_STATES.INACTIVE.id)
-      .map(({ id, name, state, tags, comments, phoneNumbers, addresses }) => ({
-        key: id,
-        value: { phoneNumbers, addresses, id, state, name },
-        text: name,
-        content: (
-          <FlexColumn $marginTop="5px" $rowGap="5px">
-            <FlexColumn>
-              <OverflowWrapper popupContent={name}>
-                <Text>{name}</Text>
-              </OverflowWrapper>
-            </FlexColumn>
-            <Flex $justifyContent="space-between" $alignItems="center" $columnGap="5px">
-              <Box style={{ width: "30px", textAlign: "center" }}>
-                {comments ? (
-                  <CommentTooltip comment={comments} />
-                ) : (
-                  <Box visibility="hidden">ℹ️</Box>
-                )}
-              </Box>
-              <Box>
-                {tags ? (
-                  <TagsTooltip maxWidthOverflow="5vw" tags={tags} />
-                ) : (
-                  <Box visibility="hidden">🔖</Box>
-                )}
-              </Box>
-            </Flex>
-          </FlexColumn>
-        ),
-      }));
+    return customers?.filter(({ state }) => state === CUSTOMER_STATES.ACTIVE.id);
   }, [customers]);
-
-  const normalizedCustomer = useMemo(() => {
-    if (!watchCustomer ?? !watchCustomer?.id) return null;
-
-    return customerOptions.find(option => option.key === watchCustomer.id)?.value || {
-      id: watchCustomer.id,
-      name: watchCustomer.name,
-      state: watchCustomer.state,
-      addresses: watchCustomer.addresses,
-      phoneNumbers: watchCustomer.phoneNumbers
-    };
-  }, [watchCustomer, customerOptions]);
-
-  useEffect(() => {
-    if (
-      normalizedCustomer &&
-      normalizedCustomer?.id &&
-      (
-        JSON.stringify(normalizedCustomer) !== JSON.stringify(watchCustomer)
-      )
-    ) {
-      setValue("customer", normalizedCustomer, { shouldValidate: true });
-    }
-  }, [normalizedCustomer, setValue, watch, watchCustomer]);
 
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
       setIsTableLoading(true);
       let budgetProducts = [...budget.products];
 
-      const existingProductCodes = new Set(products.map(p => p.code));
-      const removedProducts = budgetProducts.filter(p => !existingProductCodes.has(p.code));
-      const validProducts = budgetProducts.filter(p => existingProductCodes.has(p.code));
+      const existingProductIds = new Set(products.map(p => p.id));
+      const removedProducts = budgetProducts.filter(p => !existingProductIds.has(p.id));
+      const validProducts = budgetProducts.filter(p => existingProductIds.has(p.id));
 
       setValue("products", validProducts);
 
       const outdatedProducts = products.filter(product => {
-        const budgetProduct = validProducts.find(bp => bp.code === product.code);
+        const budgetProduct = validProducts.find(bp => bp.id === product.id);
 
         if (budgetProduct) {
           const priceChanged = budgetProduct.price !== product.price;
@@ -254,11 +210,12 @@ const BudgetForm = ({
 
   const handleConfirmUpdate = () => {
     const updatedProducts = temporaryProducts.map(product => {
-      const outdatedProduct = outdatedProducts.find(op => op.code === product.code);
+      const outdatedProduct = outdatedProducts.find(op => op.id === product.id);
 
       if (outdatedProduct) {
         return {
           ...product,
+          name: outdatedProduct.name,
           price: outdatedProduct.price,
           editablePrice: outdatedProduct.editablePrice,
           fractionConfig: {
@@ -274,7 +231,7 @@ const BudgetForm = ({
     });
 
     const restoredProducts = getRestoredProducts(updatedProducts).filter(
-      product => !removedProducts.find(rp => rp.code === product.code)
+      product => !removedProducts.find(rp => rp.id === product.id)
     );
 
     const restoredForm = {
@@ -309,14 +266,17 @@ const BudgetForm = ({
 
   useEffect(() => {
     calculateTotal();
-  }, [watchProducts, calculateTotal]);
+    if (isDirty) trigger('product');
+  }, [watchProducts, calculateTotal, trigger, isDirty]);
 
   const handleCreate = async (data, state) => {
     const { customer } = data;
     await onSubmit({
       ...data,
       customer: { id: customer.id, name: customer.name },
-      products: data.products.map((product) => pick(product, [...Object.values(ATTRIBUTES), "quantity", "discount", "dispatchComment", "tags"])),
+      products: data.products.map((product) =>
+        pick(product, [...LIST_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags"])
+      ),
       total: Number(total.toFixed(2)),
       state
     });
@@ -339,9 +299,9 @@ const BudgetForm = ({
         products: restoredProducts
       };
     } else if (draft) {
-      baseBudget = { ...EMPTY_BUDGET(user), ...budget, seller: user?.name };
+      baseBudget = { ...EMPTY_BUDGET(user), ...budget, createdBy: user?.name };
     } else {
-      baseBudget = { ...EMPTY_BUDGET(user), state: watchState, seller: user?.name };
+      baseBudget = { ...EMPTY_BUDGET(user), state: watchState, createdBy: user?.name };
     }
 
     reset(baseBudget);
@@ -385,26 +345,26 @@ const BudgetForm = ({
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => [
     {
       id: 1,
-      title: "Código",
+      title: "Id",
       value: (product) => (
         <>
           <Popup
-            size="tiny"
-            trigger={<span>{getSupplierCode(product.code)}</span>}
+            size={SIZES.TINY}
+            trigger={<span>{getSupplierId(product.id)}</span>}
             position="top center"
             on="hover"
             content={product.supplierName}
           />
           {'-'}
           <Popup
-            size="tiny"
-            trigger={<span>{getBrandCode(product.code)}</span>}
+            size={SIZES.TINY}
+            trigger={<span>{getBrandId(product.id)}</span>}
             position="top center"
             on="hover"
             content={product.brandName}
           />
           {'-'}
-          <span>{getProductCode(product.code)}</span>
+          <span>{getProductId(product.id)}</span>
         </>
       ),
       width: 1,
@@ -436,7 +396,7 @@ const BudgetForm = ({
             {product.name}
           </OverflowWrapper>
           <Flex $alignItems="center" $marginLeft="5px" $columnGap="5px">
-            {isProductOOS(product.state) && <Label color={COLORS.ORANGE} size="tiny">Sin Stock</Label>}
+            {isProductOOS(product.state) && <Label color={COLORS.ORANGE} size={SIZES.TINY}>Sin Stock</Label>}
             {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
             {product.comments && <CommentTooltip tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
@@ -559,7 +519,7 @@ const BudgetForm = ({
   return (
     <>
       <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={setIsModalCommentOpen} product={selectedProduct} />
-      <ModalUpdates
+      <ModalProductUpdates
         shouldShowModal={shouldShowModal}
         outdatedProducts={outdatedProducts}
         removedProducts={removedProducts}
@@ -571,7 +531,7 @@ const BudgetForm = ({
         <Form onSubmit={handleSubmit(handleConfirm)}>
           <FieldsContainer $justifyContent="space-between">
             <FormField $width="300px">
-              <ButtonGroup size="small">
+              <ButtonGroup size={SIZES.SMALL}>
                 <IconedButton
                   text="Confirmado"
                   icon={ICONS.CHECK}
@@ -605,21 +565,38 @@ const BudgetForm = ({
             />
           </FieldsContainer>
           <FieldsContainer $justifyContent="space-between">
-            <TextControlled
-              name="seller"
-              label="Vendedor"
-              rules={RULES.REQUIRED}
-              width="300px"
-              disabled
-            />
+            <FieldsContainer>
+              <TextControlled
+                name="createdBy"
+                label="Vendedor"
+                rules={RULES.REQUIRED}
+                width="300px"
+                disabled
+              />
+              {budget?.createdAt && (
+                <FormField
+                  $width="180px"
+                  label="Fecha de creación"
+                  control={Input}
+                  value={getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)}
+                  readOnly
+                  disabled
+                />
+              )}
+            </FieldsContainer>
             <FieldsContainer>
               <NumberControlled
                 width="200px"
                 name="expirationOffsetDays"
-                rules={RULES.REQUIRED}
+                rules={{
+                  validate: {
+                    positive: (value) => value > 0 || 'Campo requerido.'
+                  },
+                }}
                 maxLength={3}
                 label="Dias para el vencimiento"
-                placeholder="Cantidad en días"
+                placeholder="3"
+                required
               />
               <FormField
                 $width="200px"
@@ -628,7 +605,7 @@ const BudgetForm = ({
                 readOnly
                 value={
                   watchExpirationOffsetDays
-                    ? getDateWithOffset(now(), watchExpirationOffsetDays, "days")
+                    ? getDateWithOffset({ offset: watchExpirationOffsetDays })
                     : ""
                 }
                 placeholder="dd/mm/aaaa"
@@ -636,55 +613,56 @@ const BudgetForm = ({
             </FieldsContainer>
           </FieldsContainer>
           <FieldsContainer>
-            <DropdownControlled
+            <SearchControlled
               name="customer"
-              border
+              width="300px"
+              label="Cliente"
+              required
+              clearable={!!watchCustomer?.name}
+              placeholder="Martín Bueno"
               rules={{
                 validate: {
-                  required: value => {
-                    return !!value?.id || 'Campo requerido.';
-                  },
-                  activeCustomer: value => {
-                    return value?.state === CUSTOMER_STATES.ACTIVE.id || 'No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.';
-                  },
-                  requiredAddress: value => {
-                    return (
-                      isBudgetConfirmed(watchState) &&
+                  required: (value) => !!value?.id || "Campo requerido.",
+                  activeCustomer: (value) =>
+                    value?.state === CUSTOMER_STATES.ACTIVE.id ||
+                    "No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.",
+                  requiredAddress: (value) =>
+                    isBudgetConfirmed(watchState) &&
                       (!value?.addresses.length && !watchPickUp)
-                    )
-                      ? 'Dirección requerida.'
-                      : true;
-                  },
-                  requiredPhone: value => {
-                    return (
-                      isBudgetConfirmed(watchState) &&
-                      !value?.phoneNumbers.length
-                    )
-                      ? 'Teléfono requerido.'
-                      : true;
-                  },
+                      ? "Dirección requerida."
+                      : true,
+                  requiredPhone: (value) =>
+                    isBudgetConfirmed(watchState) && !value?.phoneNumbers.length
+                      ? "Teléfono requerido."
+                      : true,
                 }
               }}
-              pickErrors={["required", "activeCustomer"]}
-              label="Cliente"
-              placeholder="Seleccione un cliente"
-              width="300px"
-              options={customerOptions}
-              value={normalizedCustomer ?? "No se seleccionó ningún cliente"}
-              search
+              elements={customerOptions}
+              searchFields={['name', 'id']}
+              getResultProps={(customer) => ({
+                key: customer.id,
+                title: getCustomerSearchTitle(customer),
+                description: getCustomerSearchDescription(customer),
+                value: customer,
+              })}
+              persistSelection={true}
             />
             <TextField
               flex="2"
               label="Dirección"
               placeholder="Dirección"
               disabled
-              error={!watchCustomer?.addresses?.length && (errors.customer?.type === "requiredAddress") && errors.customer?.message}
+              error={
+                !watchCustomer?.addresses?.length &&
+                errors.customer?.type === "requiredAddress" &&
+                errors.customer?.message
+              }
               value={
                 watchPickUp
                   ? PICK_UP_IN_STORE
                   : watchCustomer?.addresses?.length > 0
-                    ? `${watchCustomer?.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
-                    : 'Cliente sin dirección'
+                    ? `${watchCustomer.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
+                    : "Cliente sin dirección"
               }
               extraContent={() => {
                 const { additionalAddresses } = getAddressesForDisplay(watchCustomer?.addresses || []);
@@ -695,47 +673,57 @@ const BudgetForm = ({
               flex="2"
               label="Teléfono"
               placeholder="Teléfono"
-              error={!watchCustomer?.phoneNumbers?.length && (errors.customer?.type === "requiredPhone") && errors.customer?.message}
               disabled
+              error={
+                !watchCustomer?.phoneNumbers?.length &&
+                errors.customer?.type === "requiredPhone" &&
+                errors.customer?.message
+              }
               value={
                 watchCustomer?.phoneNumbers?.length > 0
-                  ? `${watchCustomer?.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
-                  : 'Cliente sin teléfono'
+                  ? `${watchCustomer.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
+                  : "Cliente sin teléfono"
               }
               extraContent={() => {
-                const { additionalPhones } = getPhonesForDisplay(watchCustomer?.phoneNumbers);
+                const { additionalPhones } = getPhonesForDisplay(watchCustomer?.phoneNumbers || []);
                 return additionalPhones ? <PhonesTooltip input phones={additionalPhones} /> : null;
               }}
             />
           </FieldsContainer>
-          <Controller name="products"
-            rules={{ validate: value => value?.length || 'Al menos 1 producto es requerido.' }}
-            render={() => (
-              <FormField
-                $width="300px"
-                label="Productos"
-                error={errors.products?.root?.message}
-                control={ProductSearch}
-                ref={productSearchRef}
-                tooltip
-                products={products}
-                onProductSelect={(selectedProduct) => {
-                  appendProduct({
-                    ...selectedProduct,
-                    quantity: selectedProduct.state === PRODUCT_STATES.OOS.id ? 0 : 1,
-                    discount: 0,
-                    key: uuid(),
-                    ...(selectedProduct.fractionConfig?.active && {
-                      fractionConfig: {
-                        ...selectedProduct.fractionConfig,
-                        value: 1,
-                        price: selectedProduct.price,
-                      }
-                    })
-                  });
-                }}
-              />
-            )}
+          <SearchControlled
+            name="product"
+            label="Producto"
+            width="300px"
+            required
+            placeholder="Televisor 100”"
+            rules={{
+              validate: () => {
+                return !!watchProducts.length || "Al menos un producto es requerido.";
+              },
+            }}
+            elements={products}
+            searchFields={['name', 'id']}
+            getResultProps={(product) => ({
+              key: product.id,
+              title: getProductSearchTitle(product),
+              description: getProductSearchDescription(product),
+              value: product,
+            })}
+            onAfterChange={(selectedProduct) => {
+              appendProduct({
+                ...selectedProduct,
+                quantity: selectedProduct.state === PRODUCT_STATES.OOS.id ? 0 : 1,
+                discount: 0,
+                key: uuid(),
+                ...(selectedProduct.fractionConfig?.active && {
+                  fractionConfig: {
+                    ...selectedProduct.fractionConfig,
+                    value: 1,
+                    price: selectedProduct.price,
+                  }
+                })
+              });
+            }}
           />
           <Loader active={isTableLoading}>
             <Table
@@ -756,7 +744,7 @@ const BudgetForm = ({
           </Loader>
           {isBudgetConfirmed(watchState) && (
             <FieldsContainer width="100%" $rowGap="15px">
-              <Payments
+              <CreateBudgetPayments
                 total={total}
                 update
               />
@@ -772,20 +760,20 @@ const BudgetForm = ({
                       $paddingLeft="18px"
                       width="fit-content"
                       type="button"
-                      basic={value.length !== paymentMethods.length}
+                      basic={value.length !== paymentMethods?.length}
                       color={COLORS.BLUE}
                       onClick={() => {
-                        if (value.length === paymentMethods.length) {
+                        if (value.length === paymentMethods?.length) {
                           onChange([]);
                         } else {
-                          onChange(paymentMethods.map(method => method.value));
+                          onChange(paymentMethods?.map(method => method.value));
                         }
                       }}
                     >
                       Todos
                     </Button>
                     <VerticalDivider />
-                    {paymentMethods.map(({ key, text, value: methodValue }) => (
+                    {paymentMethods?.map(({ key, text, value: methodValue }) => (
                       <Button
                         $paddingLeft="18px"
                         width="fit-content"
@@ -809,7 +797,7 @@ const BudgetForm = ({
               )}
             />
           </FieldsContainer>
-          <TextAreaControlled name="comments" label="Comentarios" />
+          <TextAreaControlled name="comments" label="Comentarios" placeholder="Pago con billetes de 100" />
           <SubmitAndRestore
             draft={draft}
             isLoading={isLoading && !isBudgetDraft(watchState)}

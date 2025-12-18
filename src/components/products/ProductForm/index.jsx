@@ -1,17 +1,24 @@
-import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Flex, Form, Label, OverflowWrapper } from "@/common/components/custom";
-import { DropdownControlled, IconedButtonControlled, PercentField, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import { Text } from "@/common/components/search/styles";
+import { FieldsContainer, Form } from "@/common/components/custom";
+import {
+  DropdownControlled,
+  IconedButtonControlled,
+  PercentField,
+  PriceControlled,
+  TextAreaControlled,
+  TextControlled,
+  TextField,
+  SearchControlled
+} from "@/common/components/form";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
-import { BRAND_STATES } from "@/components/brands/brands.constants";
-import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
-import { useArrayTags, useKeyboardShortcuts } from "@/hooks";
-import { forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
+import { BRAND_STATES, getBrandSearchDescription, getBrandSearchTitle } from "@/components/brands/brands.constants";
+import { SUPPLIER_STATES, getSupplierSearchDescription, getSupplierSearchTitle } from "@/components/suppliers/suppliers.constants";
+import { useKeyboardShortcuts } from "@/hooks";
+import useSettingArrayField from "@/hooks/useSettingArrayField";
+import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
-import { Popup } from "semantic-ui-react";
 import { EMPTY_PRODUCT, MEASSURE_UNITS } from "../products.constants";
-import { calculateMargin, calculatePriceFromMargin, getBrandCode, getMargin, getProductCode, getSupplierCode, isProductDeleted } from "../products.utils";
+import { calculateMargin, calculatePriceFromMargin, getBrandId, getMargin, getProductId, getSupplierId, isProductDeleted } from "../products.utils";
 
 const ProductForm = forwardRef(({
   product, onSubmit, brands, suppliers, isUpdating, isLoading, view, isDeletePending, blacklist },
@@ -35,17 +42,15 @@ const ProductForm = forwardRef(({
   const methods = useForm({
     defaultValues: getInitialValues(product)
   });
-  const { data: productsSettings, isFetching: isProductSettingsFetching, refetch: refetchProductSettings } = useGetSetting(ENTITIES.PRODUCTS);
-  const { tagsOptions, optionsMapper } = useArrayTags(
-    ENTITIES.PRODUCTS,
-    product?.tags || []
-  );
+  const { options: tagsOptions, optionsMapper } = useSettingArrayField(ENTITIES.PRODUCT, "tags", product?.tags || []);
   const { handleSubmit, reset, watch, formState: { isDirty } } = methods;
+
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleForm)(),
     resetForm: () => reset(getInitialValues(product))
   }));
+
   const [watchFractionable, watchSupplier, watchBrand, watchCost, watchPrice] = watch([
     'fractionConfig.active',
     'supplier',
@@ -53,10 +58,6 @@ const ProductForm = forwardRef(({
     'cost',
     'price',
   ]);
-
-  useEffect(() => {
-    refetchProductSettings();
-  }, [refetchProductSettings]);
 
   const handleForm = async (data) => {
     const filteredData = { ...data };
@@ -70,7 +71,7 @@ const ProductForm = forwardRef(({
     }
 
     if (!isUpdating) {
-      filteredData.code = `${data.supplier?.id ?? ''}${data.brand?.id ?? ''}${data.code.toUpperCase()}`;
+      filteredData.id = `${data.supplier?.id ?? ''}${data.brand?.id ?? ''}${data.id.toUpperCase()}`;
       delete filteredData.supplier;
       delete filteredData.brand;
     }
@@ -97,115 +98,86 @@ const ProductForm = forwardRef(({
     }
   ]);
 
-  const supplierOptions = useMemo(() => {
-    return suppliers?.map(({ id, name, state, deactivationReason }) => ({
-      key: id,
-      value: { id, state },
-      text: name,
-      content: (
-        <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper maxWidth="80%" popupContent={name}>
-            <Text>{name}</Text>
-          </OverflowWrapper>
-          <Flex>
-            {state === SUPPLIER_STATES.INACTIVE.id && (
-              <Popup
-                trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
-                content={deactivationReason ?? 'Motivo no especificado'}
-                position="top center"
-                size="mini"
-              />
-            )}
-          </Flex>
-        </Flex>
-      ),
-    }));
-  }, [suppliers]);
-
-  const brandOptions = useMemo(() => {
-    return brands?.map(({ id, name, state, deactivationReason }) => ({
-      key: id,
-      value: { id, state },
-      text: name,
-      content: (
-        <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper maxWidth="80%" popupContent={name}>
-            <Text>{name}</Text>
-          </OverflowWrapper>
-          <Flex>
-            {state === BRAND_STATES.INACTIVE.id && (
-              <Popup
-                trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
-                content={deactivationReason ?? 'Motivo no especificado'}
-                position="top center"
-                size="mini"
-              />
-            )}
-          </Flex>
-        </Flex>
-      ),
-    }));
-  }, [brands]);
-
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleForm)}>
         <FieldsContainer $rowGap="5px">
           {view ? (
             <>
-              <TextField width="25%" label="Proveedor" value={product?.supplierName} disabled />
-              <TextField width="25%" label="Marca" value={product?.brandName} disabled />
+              <TextField width="25%" label="Proveedor" value={product?.supplierName} disabled required />
+              <TextField width="25%" label="Marca" value={product?.brandName} disabled required />
               <TextField
                 width="250px"
-                label="Código"
-                value={getProductCode(product?.code)}
-                iconLabel={`${getSupplierCode(product?.code)} ${getBrandCode(product?.code)}`}
+                label="Id"
+                value={getProductId(product?.id)}
+                iconLabel={`${getSupplierId(product?.id)} ${getBrandId(product?.id)}`}
                 disabled
+                required
               />
             </>
           ) : (
             <>
-              <DropdownControlled
+              <SearchControlled
+                clearable={!!watchSupplier?.id}
                 width="25%"
+                disabled={isUpdating || isLoading}
                 name="supplier"
                 label="Proveedor"
+                placeholder="Suministro Estrella"
+                persistSelection
+                required
                 rules={{
                   validate: {
-                    required: value => {
-                      return !!value?.id || 'Campo requerido.';
-                    },
-                    activeSupplier: value => {
-                      return value?.state === SUPPLIER_STATES.ACTIVE.id || 'No es posible usar un proveedor inactivo.';
-                    },
-                  }
+                    required: (value) => !!value?.id || 'Campo requerido.',
+                    activeSupplier: (value) =>
+                      value?.state === SUPPLIER_STATES.ACTIVE.id || 'No es posible usar un proveedor inactivo.',
+                  },
                 }}
-                options={supplierOptions}
+                elements={suppliers}
+                searchFields={['name', 'id']}
+                getResultProps={(supplier) => ({
+                  key: supplier.id,
+                  title: getSupplierSearchTitle(supplier),
+                  description: getSupplierSearchDescription(supplier),
+                  value: supplier,
+                })}
               />
-              <DropdownControlled
+              <SearchControlled
+                clearable={!!watchBrand?.id}
+                disabled={isUpdating || isLoading}
                 width="25%"
                 name="brand"
                 label="Marca"
+                placeholder="CallixtoGLM"
+                persistSelection
+                required
                 rules={{
                   validate: {
-                    required: value => {
-                      return !!value?.id || 'Campo requerido.';
-                    },
-                    activeBrand: value => {
-                      return value?.state === BRAND_STATES.ACTIVE.id || 'No es posible usar una marca inactiva.';
-                    },
-                  }
+                    required: (value) => !!value?.id || 'Campo requerido.',
+                    activeBrand: (value) =>
+                      value?.state === BRAND_STATES.ACTIVE.id || 'No es posible usar una marca inactiva.',
+                  },
                 }}
-                options={brandOptions}
+                elements={brands}
+                searchFields={['name', 'id']}
+                getResultProps={(brand) => ({
+                  key: brand.id,
+                  title: getBrandSearchTitle(brand),
+                  description: getBrandSearchDescription(brand),
+                  value: brand,
+                })}
               />
               <TextControlled
                 width="250px"
-                name="code"
-                label="Código"
+                name="id"
+                label="Id"
+                required
+                placeholder="A0001"
                 rules={{
                   required: "Este campo es obligatorio.",
                   validate: (value) => {
                     if (blacklist?.includes(value.trim().toUpperCase())) {
-                      return "Este código se encuentra dentro de la lista de productos bloqueados.";
+                      return "Este id se encuentra dentro de la lista de productos bloqueados.";
                     }
                     return true;
                   },
@@ -222,8 +194,10 @@ const ProductForm = forwardRef(({
             width="40%"
             name="name"
             label="Nombre"
+            placeholder="Televisor 100”"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
         </FieldsContainer>
         <FieldsContainer $alignItems="end">
@@ -256,7 +230,7 @@ const ProductForm = forwardRef(({
           <IconedButtonControlled
             width="fit-content"
             name="editablePrice"
-            label="Precio Editable"
+            text="Precio Editable"
             icon={ICONS.PENCIL}
             color={COLORS.BLUE}
             disabled={!isUpdating && view}
@@ -264,7 +238,7 @@ const ProductForm = forwardRef(({
           <IconedButtonControlled
             width="fit-content"
             name="fractionConfig.active"
-            label="Producto Fraccionable"
+            text="Producto Fraccionable"
             icon={ICONS.CUT}
             disabled={!isUpdating && view}
             color={COLORS.BLUE}
@@ -285,14 +259,12 @@ const ProductForm = forwardRef(({
             name="tags"
             label="Etiquetas"
             placeholder="Selecciona etiquetas"
-            height="fit-content"
             multiple
             clearable={isUpdating && !view}
             icon={(!isUpdating && view) ? null : undefined}
             search={isUpdating && !view}
             selection
             optionsMapper={optionsMapper}
-            loading={isProductSettingsFetching}
             options={Object.values(tagsOptions)}
             renderLabel={(item) => ({
               color: item.value.color,
@@ -303,6 +275,7 @@ const ProductForm = forwardRef(({
         <TextAreaControlled
           name="comments"
           label="Comentarios"
+          placeholder="Realmente son muchas pulgadas"
           readOnly={!isUpdating && view}
         />
         {(isUpdating || !view) && (

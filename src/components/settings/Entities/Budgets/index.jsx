@@ -1,8 +1,17 @@
-import Tags from "../../Modules/Tags"
+import { Divider, FlexColumn } from '@/common/components/custom';
+import OnCreate from './OnCreate';
+import OnPrint from './OnPrint';
+import General from './General';
 
 const BudgetsModule = (() => {
   return (
-    <Tags />
+    <FlexColumn>
+      {/* <General />
+      <Divider /> */}
+      <OnCreate />
+      <Divider />
+      <OnPrint />
+    </FlexColumn>
   )
 })
 

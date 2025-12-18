@@ -68,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <RouteHistoryProvider>
                 <Header />
                 <NavActionsProvider>
-                  <BreadcrumProvider>
+                  <BreadcrumProvider pathname={pathname}>
                     {show && (
                       <NavigationContainer>
                         <BreadcrumbContainer>

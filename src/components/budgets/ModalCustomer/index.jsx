@@ -29,7 +29,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
     if (customer) {
       const address = customer.addresses?.[0] ?? {};
       const phone = customer.phoneNumbers?.[0] ?? {};
-  
+
       reset({
         refA: address.ref ?? '',
         address: address.address ?? '',
@@ -105,6 +105,9 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   rules={RULES.REQUIRED}
                   label="Referencia"
                   ref={addressRefInputRef}
+                  popupContent="Agregá una referencia (casa, depto, oficina, etc.) para identificar el domicilio."
+                  showPopup={true}
+                  iconLabel
                 />
                 <TextControlled
                   width="50%"
@@ -119,6 +122,9 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   name="refP"
                   rules={RULES.REQUIRED}
                   label="Referencia"
+                  popupContent="Agregá una referencia (Cel, fijo, oficina, etc.) para identificar el número de teléfono."
+                  showPopup={true}
+                  iconLabel
                 />
                 <NumberControlled
                   width="130px"

@@ -21,6 +21,8 @@ export const NumberControlled = ({
   defaultValue = 0,
   allowsDecimal = false,
   padding,
+  required,
+  onKeyDown,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -39,6 +41,7 @@ export const NumberControlled = ({
             flex={flex}
             $width={width}
             label={label}
+            required={required}
             control={Input}
             error={fieldError && {
               content: fieldError.message,
@@ -49,6 +52,7 @@ export const NumberControlled = ({
               {...inputProps}
               {...rest}
               icon
+              onKeyDown={onKeyDown}
               padding={padding}
               maxLength={maxLength}
               value={safeValue}

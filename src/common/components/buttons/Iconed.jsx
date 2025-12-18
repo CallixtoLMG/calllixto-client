@@ -1,3 +1,4 @@
+import { SIZES } from '@/common/constants';
 import { forwardRef } from 'react';
 import { Icon } from 'semantic-ui-react';
 import { Button } from '../custom';
@@ -20,7 +21,7 @@ const IconedButton = forwardRef(({
 }, ref) => {
   return (
     <Button
-      size="small"
+      size={SIZES.SMALL}
       icon
       $alignSelf={alignSelf}
       labelPosition="left"

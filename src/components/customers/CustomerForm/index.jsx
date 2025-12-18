@@ -3,7 +3,7 @@ import { FieldsContainer, Form } from "@/common/components/custom";
 import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
-import { useArrayTags, useKeyboardShortcuts } from "@/hooks";
+import { useKeyboardShortcuts, useSettingArrayField } from "@/hooks";
 import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { EMPTY_CUSTOMER } from "../customers.constants";
@@ -24,8 +24,9 @@ const CustomerForm = forwardRef(({
     resetForm: () => reset(getInitialValues(customer))
   }));
   const [phones, addresses, emails] = watch(['phoneNumbers', 'addresses', 'emails']);
-  const { tagsOptions, optionsMapper } = useArrayTags(
-    ENTITIES.CUSTOMERS,
+  const { options: tagsOptions, optionsMapper } = useSettingArrayField(
+    ENTITIES.CUSTOMER,
+    "tags",
     customer?.tags || []
   );
 
@@ -72,9 +73,10 @@ const CustomerForm = forwardRef(({
             width="40%"
             name="name"
             label="Nombre"
-            placeholder="Nombre"
+            placeholder="Martín Bueno"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
         </FieldsContainer>
         {isUpdating || !view
@@ -101,7 +103,7 @@ const CustomerForm = forwardRef(({
             })}
           />
         </FieldsContainer>
-        <TextAreaControlled name="comments" label="Comentarios" readOnly={!isUpdating && view} />
+        <TextAreaControlled name="comments" label="Comentarios" placeholder="No era tan bueno" readOnly={!isUpdating && view} />
         {(isUpdating || !view) && (
           <SubmitAndRestore
             isUpdating={isUpdating}

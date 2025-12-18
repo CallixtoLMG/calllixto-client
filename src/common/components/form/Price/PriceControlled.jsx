@@ -12,6 +12,7 @@ export const PriceControlled = ({
   onAfterChange,
   handlePriceChange,
   justifyItems,
+  required,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -28,9 +29,10 @@ export const PriceControlled = ({
             label={label}
             width={width}
             value={value}
+            required={required}
             onChange={(newValue) => {
-              onChange(newValue);   
-              onAfterChange?.(newValue);    
+              onChange(newValue);
+              onAfterChange?.(newValue);
             }}
             disabled={disabled}
             placeholder={placeholder ?? label}

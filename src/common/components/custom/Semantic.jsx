@@ -25,8 +25,8 @@ export const Segment = styled(SSegment)`
   overflow: auto;
   align-content: center;
   opacity: ${({ show }) => show ? "0" : "1"} !important;
-  border: ${({ noBorder }) => noBorder && "none"} !important;
-  box-shadow: ${({ noBoxShadow }) => noBoxShadow && "none"} !important;
+  border: ${({ $noBorder }) => $noBorder && "blue"} !important;
+  box-shadow: ${({ $noBoxShadow }) => $noBoxShadow && "none"} !important;
 `;
 
 export const Input = styled(SInput)`
@@ -46,7 +46,7 @@ export const FormField = styled(Form.Field)`
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
-  height: ${({ height }) => height} !important;
+  height: ${({ $height }) => $height} !important;
 
   .disabled {
     opacity: 1!important;
@@ -78,18 +78,19 @@ export const TextArea = styled(STextarea)`
 `;
 
 export const Dropdown = styled(SDropdown)`
-  height: ${({ height = '35px' }) => `${height}!important`} ;
+  height: ${({ dropdownHeight = '38px' }) => `${dropdownHeight}!important`} ;
   padding: ${({ padding }) => `${padding}!important`} ;
   background-color: ${({ bgColor }) => `${bgColor}!important`};
   box-shadow: ${({ $boxShadow }) => $boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
   width: ${({ width }) => `${width}!important`};
 
-  .divider.text{
-    height: 15px;
-  }
-
   .text{
     text-align: ${({ $textAlign }) => `${$textAlign}!important`};
+    max-width: ${({ textMaxWidth }) => `${textMaxWidth}!important`};
+  }
+
+  .divider.text{
+    padding-bottom: 2px;
   }
 
   .menu > .item,
@@ -103,7 +104,7 @@ export const Dropdown = styled(SDropdown)`
   i{
     margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
   }
-
+  
   ${({ multiple }) => multiple && `
     &&&&&& div.item {
       padding: 0.35rem 0.4rem!important;
@@ -168,6 +169,7 @@ export const Menu = styled(SMenu)`
     min-height:35px;
     font-size: 13px!important;
     border:none;
+    box-shadow: none;
   }
 `;
 
@@ -189,7 +191,7 @@ export const Icon = styled(SIcon)`
   cursor: ${({ pointer }) => pointer && "pointer"} !important;
   justify-items: ${({ justifyItems }) => `${justifyItems}!important;`};
   pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
-  line-height: ${({ lineHeight }) => `${lineHeight}!important;`};
+  line-height: ${({ $lineHeight }) => `${$lineHeight}!important;`};
 `;
 
 export const Modal = styled(SModal)`
@@ -204,7 +206,10 @@ export const MessageHeader = styled(SMessageHeader)`
 `;
 
 export const Message = styled(SMessage)`
-  width: 100%;
+  align-content: ${({ alignContent }) => `${alignContent}!important`} ;
+  padding: ${({ padding }) => `${padding}!important`} ;
+  height: ${({ height }) => `${height}!important`} ;
+  width: ${({ width }) => `${width}!important`} ;
   margin: ${({ margin }) => `${margin}!important`} ;
 `;
 

@@ -5,9 +5,16 @@ import { COLORS, ICONS } from "@/common/constants";
 import { OnlyPrint } from "@/components/layout";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import { Modal, Transition } from "semantic-ui-react";
+import { Modal, Segment, Transition } from "semantic-ui-react";
+import styled from "styled-components";
 import PDFfile from "../PDFfile";
 import { BUDGET_PDF_FORMAT } from "../budgets.constants";
+
+const StyledModal = styled(Modal)`
+  width: 80vw !important;
+  max-height: 90vh !important;
+  overflow: auto;
+`;
 
 const ModalPDF = ({
   budget,
@@ -17,16 +24,17 @@ const ModalPDF = ({
   total,
   subtotal,
   subtotalAfterDiscount,
-  selectedContact
+  selectedContact,
+  defaults = {}
 }) => {
   const printRef = useRef();
-  const [printPdfMode, setPrintPdfMode] = useState(BUDGET_PDF_FORMAT.CLIENT.key);
+  const [printPdfMode, setPrintPdfMode] = useState(defaults?.printPdfMode ?? BUDGET_PDF_FORMAT.CLIENT.key);
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
   const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
   const [dolarRate, setDolarRate] = useState(dolar);
   const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
-  const [showPrices, setShowPrices] = useState(true);
+  const [showPrices, setShowPrices] = useState(defaults?.showPrices ?? true);
 
   useEffect(() => {
     if (dolar && showDolarExangeRate && !initialDolarRateSet) {
@@ -68,11 +76,11 @@ const ModalPDF = ({
   return (
     <>
       <Transition visible={isModalOpen} animation='scale' duration={500}>
-        <Modal size="mini" closeIcon open={isModalOpen} onClose={() => onClose(false)}>
+        <StyledModal closeIcon open={isModalOpen} onClose={() => onClose(false)} width="90vw" height="90vh">
           <Modal.Header>Opciones de Impresión</Modal.Header>
           <Modal.Content>
             <FlexColumn $rowGap="15px">
-              <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
+              <Flex $columnGap="15px" wrap="wrap" $rowGap="5px">
                 {Object.values(BUDGET_PDF_FORMAT).map(({ key, title, icon }) => (
                   <IconedButton
                     key={key}
@@ -87,41 +95,57 @@ const ModalPDF = ({
                     }}
                   />
                 ))}
+                <IconedButton
+                  text="Mostrar Precios"
+                  icon={ICONS.EYE}
+                  color={COLORS.BLUE}
+                  onClick={() => setShowPrices(prev => !prev)}
+                  basic={!showPrices}
+                />
+                <Input
+                  type="text"
+                  height="35px"
+                  width="150px"
+                  onChange={handleDollarChange}
+                  actionPosition='left'
+                  placeholder="Precio"
+                  value={formattedDolarRate}
+                  disabled={!showDolarExangeRate}
+                  action={
+                    <IconedButton
+                      text="Cotizar en USD"
+                      icon={ICONS.DOLLAR}
+                      color={COLORS.GREEN}
+                      basic={!showDolarExangeRate}
+                      onClick={() => {
+                        setShowDolarExangeRate(prev => !prev);
+                        if (!showDolarExangeRate) {
+                          setFormattedDolarRate(formatValue(dolarRate));
+                        } else {
+                          setFormattedDolarRate('');
+                          setDolarRate(0);
+                        }
+                      }}
+                    />
+                  }
+                />
               </Flex>
-              <Input
-                type="text"
-                height="35px"
-                width="150px"
-                onChange={handleDollarChange}
-                actionPosition='left'
-                placeholder="Precio"
-                value={formattedDolarRate}
-                disabled={!showDolarExangeRate}
-                action={
-                  <IconedButton
-                    text="Cotizar en USD"
-                    icon={ICONS.DOLLAR}
-                    color={COLORS.GREEN}
-                    basic={!showDolarExangeRate}
-                    onClick={() => {
-                      setShowDolarExangeRate(prev => !prev);
-                      if (!showDolarExangeRate) {
-                        setFormattedDolarRate(formatValue(dolarRate));
-                      } else {
-                        setFormattedDolarRate('');
-                        setDolarRate(0);
-                      }
-                    }}
-                  />
-                }
-              />
-              <IconedButton
-                text="Mostrar Precios"
-                icon={ICONS.EYE}
-                color={COLORS.BLUE}
-                onClick={() => setShowPrices(prev => !prev)}
-                basic={!showPrices}
-              />
+              <Segment>
+                <PDFfile
+                  ref={printRef}
+                  budget={budget}
+                  client={client}
+                  id={client?.id}
+                  printPdfMode={printPdfMode}
+                  subtotal={subtotal}
+                  subtotalAfterDiscount={subtotalAfterDiscount}
+                  total={total}
+                  selectedContact={selectedContact}
+                  dolarExchangeRate={showDolarExangeRate && dolarRate}
+                  showPrices={showPrices}
+                  customPDFDisclaimer={defaults.customPDFDisclaimer}
+                />
+              </Segment>
             </FlexColumn>
           </Modal.Content>
           <Modal.Actions>
@@ -143,7 +167,7 @@ const ModalPDF = ({
               />
             </ButtonsContainer>
           </Modal.Actions>
-        </Modal>
+        </StyledModal>
       </Transition>
       <OnlyPrint marginTop="20px">
         <PDFfile

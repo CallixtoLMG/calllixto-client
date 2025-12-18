@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { getUserData } from "@/api/userData";
-import { ICONS, PAGES, RULES } from "@/common/constants";
+import { ICONS, PAGES, RULES, SIZES } from "@/common/constants";
 import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
@@ -55,7 +55,7 @@ const LoginForm = ({ onSubmit }) => {
             </div>
           </ModHeader>
           <FormProvider {...methods}>
-            <Form onSubmit={handleSubmit(login)} size="large">
+            <Form onSubmit={handleSubmit(login)} size={SIZES.LARGE}>
               <TextControlled
                 name="username"
                 rules={{
@@ -74,7 +74,7 @@ const LoginForm = ({ onSubmit }) => {
                 rules={RULES.REQUIRED}
                 placeholder="Contraseña"
               />
-              <ModButton $fluid size="large">
+              <ModButton $fluid size={SIZES.LARGE}>
                 Ingresar
               </ModButton>
               <PasswordLink onClick={() => push(PAGES.RESTORE_PASSWORD.BASE)}>

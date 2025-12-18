@@ -1,12 +1,13 @@
-import { Flex, Label, OverflowWrapper } from "@/common/components/custom";
+import { Box, Flex, Label, OverflowWrapper } from "@/common/components/custom";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "@/common/components/tooltips";
+import { COLORS } from "@/common/constants";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
+import { Popup } from "semantic-ui-react";
 
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 export const SUPPLIERS_FILTERS_KEY = 'suppliersFilters';
-
-export const ATTRIBUTES = { ID: "id", NAME: "name", ADDRESSES: "addresses", PHONES: "phoneNumbers", COMMENT: "comments", STATE: "state" };
+export const LIST_ATTRIBUTES = [ "id", "name", "addresses", "phoneNumbers", "comments", "state", "inactiveReason"];
 
 export const SUPPLIERS_COLUMNS = [
   {
@@ -96,3 +97,41 @@ export const SUPPLIER_STATES_OPTIONS = Object.values(SUPPLIER_STATES)
     ),
     value: id
   }));
+
+export const getSupplierSearchTitle = (supplier) => (
+  <OverflowWrapper $lineClamp={3} popupContent={supplier.name} maxWidth="100%">
+    {supplier.name}
+  </OverflowWrapper>
+);
+
+export const getSupplierSearchDescription = (supplier) => (
+
+  <Flex $marginTop="5px" $rowGap="5px">
+    <Flex
+      width="100%"
+      $justifyContent="space-between"
+      height="20px"
+      $marginTop="auto"
+      $columnGap="5px"
+      $alignItems="center"
+    >
+      <Flex $columnGap="7px">
+        {supplier?.state === SUPPLIER_STATES.INACTIVE.id && (
+          <Popup
+            trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
+            content={supplier.inactiveReason ?? 'Motivo no especificado'}
+            position="top center"
+            size="mini"
+          />
+        )}
+      </Flex>
+      <Box width="fit-content">
+        {supplier.comments ? (
+          <CommentTooltip comment={supplier.comments} />
+        ) : (
+          <Box visibility="hidden" />
+        )}
+      </Box>
+    </Flex>
+  </Flex>
+);

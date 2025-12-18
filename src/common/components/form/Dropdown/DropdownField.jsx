@@ -11,24 +11,31 @@ export const DropdownField = ({
   onChange,
   disabled,
   error,
-  clearable
+  clearable,
+  multiple,
+  search,
+  selection,
+  height = "38px",
+  dropdownHeight
 }) => {
-  
-  return (
 
+  return (
     <FormField
       flex={flex}
       $width={width}
+      height={height}
       required={required}
       label={label}
       placeholder={placeholder ?? label}
-      search
-      selection
+      search={search}
+      multiple={multiple}
+      selection={selection}
       minCharacters={2}
       noResultsMessage="Sin resultados!"
       options={options}
       clearable={clearable}
       value={value}
+      dropdownHeight={dropdownHeight}
       onChange={onChange}
       disabled={disabled}
       control={Dropdown}

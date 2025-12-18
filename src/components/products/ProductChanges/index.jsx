@@ -4,7 +4,7 @@ import { getFormatedPrice } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { ATTRIBUTES, PRODUCT_LABELS, getLabel } from "@/components/products/products.constants";
 import isEqual from "lodash/isEqual";
-import { MessageItem } from "../../budgets/ModalUpdates/styles";
+import { MessageItem } from "../../budgets/ModalProductUpdates/styles";
 import { PRODUCT_STATES } from "../products.constants";
 import { List, Span } from "./styles";
 

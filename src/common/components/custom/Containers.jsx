@@ -4,19 +4,24 @@ import { Flex } from "./Flex";
 
 export const Form = styled(SForm)`
   display: flex !important;
-  flex-direction: column !important;
-  row-gap: 15px !important;
+  flex-direction: ${({ flexDirection = "column" }) => flexDirection} !important;
+  row-gap: ${({ rowGap = "15px" }) => rowGap} !important;
+  column-gap: ${({ columnGap }) => columnGap} !important;
+  .field > label {
+    margin: ${({ margin }) => margin} !important;
+    font-size: ${({ fontSize }) => fontSize} !important;
+  }
 `;
 
 export const ViewContainer = styled(Flex)`
-  flex-direction: column;
+  flex-direction: column!important;
   row-gap: 15px;
 `;
 
 export const FieldsContainer = styled(Flex)`
   justify-content: ${({ $justifyContent }) => $justifyContent};
   flex-wrap: wrap;
-  column-gap: ${({ $columnGap = '15px' }) => $columnGap } !important;
+  column-gap: ${({ $columnGap = '15px' }) => $columnGap} !important;
   row-gap: ${({ $rowGap = 'auto' }) => $rowGap} !important;
   width: ${({ width = 'auto' }) => width} !important;
   min-height: ${({ $minHeight = 'auto' }) => $minHeight} !important;
@@ -26,7 +31,7 @@ export const FieldsContainer = styled(Flex)`
 
 export const ButtonsContainer = styled(Flex)`
   flex-direction: row;
-  margin-top: ${({ marginTop }) => (marginTop ? marginTop : '0')};
+  margin-top: ${({ $marginTop }) => ($marginTop ? $marginTop : '0')};
   justify-content: flex-end;
   column-gap: 10px;
   padding: 0!important;
@@ -37,4 +42,12 @@ export const PhoneContainer = styled(Flex)`
   flex-wrap: ${({ wrap }) => wrap && 'wrap'};
   width: 100%;
   column-gap: 15px;
+`;
+
+export const Accent = styled.span`
+  background-color: #8c9eb5;
+  color: white;
+  padding: 2px 4px;
+  font-size: 85%;
+  border-radius: 3px;
 `;

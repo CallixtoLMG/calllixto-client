@@ -20,16 +20,16 @@ const Suppliers = () => {
   const { push } = useRouter();
 
   useEffect(() => {
-    setLabels([PAGES.SUPPLIERS.NAME]);
+    setLabels([{ name: PAGES.SUPPLIERS.NAME }]);
   }, [setLabels]);
 
   const suppliers = useMemo(() => data?.suppliers, [data]);
   const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
 
-  const handleDownloadExcel = useCallback(() => {
-    if (!suppliers) return;
-    const headers = ["ID", 'Nombre', 'Estado', 'Dirección', 'Teléfono'];
-    const mappedSuppliers = suppliers.map(supplier => {
+  const handleDownloadExcel = useCallback((elements) => {
+    if (!elements.length) return;
+    const headers = ["Id", 'Nombre', 'Estado', 'Dirección', 'Teléfono'];
+    const mappedSuppliers = elements.map(supplier => {
       const supplierState = SUPPLIER_STATES[supplier.state]?.singularTitle || supplier.state;
       return [
         supplier.id,
@@ -40,11 +40,10 @@ const Suppliers = () => {
       ];
     });
     downloadExcel([headers, ...mappedSuppliers], "Lista de Proveedores");
-  }, [suppliers]);
+  }, []);
 
   useEffect(() => {
     const actions = [];
-
     if (RULES.canCreate[role]) {
       actions.push({
         id: 1,
@@ -54,18 +53,7 @@ const Suppliers = () => {
         text: 'Crear'
       })
     }
-
-    actions.push({
-      id: 3,
-      icon: ICONS.FILE_EXCEL,
-      width: "fit-content",
-      onClick: handleDownloadExcel,
-      text: 'Proveedores',
-      disabled: loading
-    });
-
     setActions(actions);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.SUPPLIERS.CREATE), SHORTKEYS.ENTER);
@@ -75,6 +63,7 @@ const Suppliers = () => {
       onRefetch={refetch}
       isLoading={loading}
       suppliers={loading ? [] : suppliers}
+      onDownloadExcel={handleDownloadExcel}
     />
   );
 };

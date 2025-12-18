@@ -3,7 +3,6 @@ import styled from "styled-components";
 import { Flex, FlexColumn, Icon } from "../custom";
 
 const MessageText = styled.p`
-  display: flex;
   font-size: 12px;
   margin: 0!important;
   color: #579294;

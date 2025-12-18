@@ -7,7 +7,7 @@ import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
 import { CUSTOMERS_FILTERS_KEY, CUSTOMER_STATES_OPTIONS, EMPTY_FILTERS, HEADERS } from "../customers.constants";
 
-const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
+const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel }) => {
   const {
     onRestoreFilters,
     onSubmit,
@@ -18,18 +18,17 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: CUSTOMERS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['name']);
-
+  const onFilter = createFilter(filters, { name: {}, state: { fullMatch: true } });
   return (
     <>
       <FormProvider {...methods}>
         <Form onSubmit={onSubmit} key={JSON.stringify(filters)}>
           <Filters
-            entity={ENTITIES.CUSTOMERS}
             onRefetch={onRefetch}
             onRestoreFilters={onRestoreFilters}
             appliedCount={appliedCount}
             hydrated={hydrated}
+            entity={ENTITIES.CUSTOMERS}
           >
             <DropdownControlled
               width="200px"
@@ -51,6 +50,7 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch }) => {
         paginate
         filters={filters}
         setFilters={setFilters}
+        onDownloadExcel={onDownloadExcel}
       />
     </>
   );

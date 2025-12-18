@@ -67,7 +67,7 @@ const UserForm = forwardRef(({
             width="25%"
             name="username"
             label="Usuario"
-            placeholder="nombre@empresa.com"
+            placeholder="martinb@hotmail.com"
             rules={{
               required: "Este campo es obligatorio.",
               validate: {
@@ -75,12 +75,14 @@ const UserForm = forwardRef(({
               },
             }}
             disabled={view}
-            iconLabel
+            iconLabel={!view}
             popupPosition="bottom left"
-            showPopup
+            showPopup={!view}
             popupContent="Introduce el email del usuario."
+            required
           />
           <DropdownControlled
+            height="38px"
             width="25%"
             name="role"
             label="Rol"
@@ -96,22 +98,25 @@ const UserForm = forwardRef(({
             width="25%"
             name="firstName"
             label="Nombre"
-            placeholder="Nombre"
+            placeholder="Martín"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
           <TextControlled
             width="25%"
             name="lastName"
             label="Apellido"
-            placeholder="Apellido"
+            placeholder="Bueno"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
           <DatePickerControlled
             disabled={!isUpdating && view}
             name="birthDate"
             label="Fecha de nacimiento"
+            placeholder="16-11-2025"
             width="180px"
             defaultValue={getPastDate(18, "years")}
             maxDate={new Date()}
@@ -128,6 +133,7 @@ const UserForm = forwardRef(({
                 return value <= minBirthDate || "El usuario debe tener al menos 18 años.";
               }
             }}
+            required
           />
         </FieldsContainer>
         <FieldsContainer>
@@ -135,15 +141,16 @@ const UserForm = forwardRef(({
             width="51%"
             name="address"
             label="Dirección"
-            placeholder="Dirección"
+            placeholder="Mitre 525 9c"
             rules={RULES.REQUIRED}
             disabled={!isUpdating && view}
+            required
           />
           <NumberControlled
             width="130px"
             name="phoneNumber.areaCode"
             label="Código de Área"
-            placeholder="Ej: 351"
+            placeholder="385"
             maxLength="4"
             rules={{
               required: "El código de área es requerido.",
@@ -155,12 +162,13 @@ const UserForm = forwardRef(({
             onChange={() => isSubmitted && trigger("phoneNumber.number")}
             disabled={!isUpdating && view}
             normalMode
+            required
           />
           <NumberControlled
             width="150px"
             name="phoneNumber.number"
             label="Número de Teléfono"
-            placeholder="Ej: 12345678"
+            placeholder="5228706"
             rules={{
               required: "El número de teléfono es requerido.",
               validate: (value) => {
@@ -172,10 +180,11 @@ const UserForm = forwardRef(({
             disabled={!isUpdating && view}
             maxLength="7"
             normalMode
+            required
           />
         </FieldsContainer>
         <FieldsContainer>
-          <TextAreaControlled name="comments" label="Comentarios" readOnly={!isUpdating && view} />
+          <TextAreaControlled name="comments" label="Comentarios" placeholder="Martin Bueno no era un cliente?" readOnly={!isUpdating && view} />
         </FieldsContainer>
         {(isUpdating || !view) && (
           <SubmitAndRestore
