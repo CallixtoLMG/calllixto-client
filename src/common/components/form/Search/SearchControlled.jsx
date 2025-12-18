@@ -7,6 +7,7 @@ export const SearchControlled = ({
   label,
   placeholder,
   onAfterChange,
+  clearAfterSelect,
   ...rest
 }) => {
   const {
@@ -31,6 +32,7 @@ export const SearchControlled = ({
             onAfterChange?.(val);
           }}
           placeholder={placeholder ?? label}
+          clearAfterSelect={clearAfterSelect}
         />
       )}
     />
