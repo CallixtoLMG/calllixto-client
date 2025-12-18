@@ -20,7 +20,7 @@ const Products = () => {
   const { role } = useUserContext();
   const { data, isLoading, isRefetching, refetch } = useListProducts();
   const { setLabels } = useBreadcrumContext();
-  const { setActions, setInfo } = useNavActionsContext();
+  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -91,9 +91,8 @@ const Products = () => {
     }
 
     setActions(actions);
-    setInfo(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [push, role, setActions, loading, setInfo]);
+  }, [push, role, setActions, loading]);
 
   useKeyboardShortcuts(() => push(PAGES.PRODUCTS.CREATE), SHORTKEYS.ENTER);
 

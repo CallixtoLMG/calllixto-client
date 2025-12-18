@@ -263,52 +263,49 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
         {isBudgetConfirmed(budget?.state) ?
           <>
             <TotalList items={TOTAL_LIST_ITEMS} />
-            {!amountIsCover &&
-              <FlexColumn $alignSelf="end" $rowGap="15px">
-                <Flex $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
-                  <IconedButton
-                    text="Completar"
-                    icon={ICONS.CHECK}
-                    color={COLORS.BLUE}
-                    onClick={() => {
-                      setValue("postConfirmDiscount", totalPending);
-                      trigger("postConfirmDiscount");
-                    }}
-                    alignSelf="start"
-                    height="38px"
-                    disabled={isLoading}
-                  />
-                  <PriceControlled
-                    width="200px"
-                    placeholder="5.000"
-                    name="postConfirmDiscount"
-                    rules={{
-                      validate: (value) =>
-                        value ? value <= totalPending || "No puede superar el monto pendiente" : true,
-                    }}
-                    justifyItems="right"
-                  />
-                </Flex>
-                <Flex $columnGap="15px" $alignSelf="end">
-                  <IconedButton
-                    text="Aplicar descuento"
-                    loading={isLoading}
-                    disabled={isLoading}
-                    icon={ICONS.CHECK}
-                    color={COLORS.GREEN}
-                    height="38px"
-                    onClick={() => {
-                      const value = getValues("postConfirmDiscount");
-                      onConfirmBudgetDiscount({
-                        budgetId: budget.id,
-                        postConfirmDiscount: Number(value),
-                      });
-                    }}
-                  />
-                </Flex>
-              </FlexColumn>
-            }
-
+            <FlexColumn $alignSelf="end" $rowGap="15px">
+              <Flex $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
+                <IconedButton
+                  text="Completar"
+                  icon={ICONS.CHECK}
+                  color={COLORS.BLUE}
+                  onClick={() => {
+                    setValue("postConfirmDiscount", totalPending);
+                    trigger("postConfirmDiscount");
+                  }}
+                  alignSelf="start"
+                  height="38px"
+                  disabled={isLoading}
+                />
+                <PriceControlled
+                  width="200px"
+                  placeholder="5.000"
+                  name="postConfirmDiscount"
+                  rules={{
+                    validate: (value) =>
+                      value ? value <= totalPending || "No puede superar el monto pendiente" : true,
+                  }}
+                  justifyItems="right"
+                />
+              </Flex>
+              <Flex $columnGap="15px" $alignSelf="end">
+                <IconedButton
+                  text="Aplicar descuento"
+                  loading={isLoading}
+                  disabled={isLoading}
+                  icon={ICONS.CHECK}
+                  color={COLORS.GREEN}
+                  height="38px"
+                  onClick={() => {
+                    const value = getValues("postConfirmDiscount");
+                    onConfirmBudgetDiscount({
+                      budgetId: budget.id,
+                      postConfirmDiscount: Number(value),
+                    });
+                  }}
+                />
+              </Flex>
+            </FlexColumn>
           </>
           :
           <Total

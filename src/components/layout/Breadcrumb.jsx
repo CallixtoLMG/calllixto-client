@@ -1,8 +1,9 @@
 import { Flex, OverflowWrapper } from '@/common/components/custom';
-import { ICONS, SIZES } from '@/common/constants';
-import { createContext, useContext, useState } from 'react';
+import { ENTITIES, ENTITY_VIEW, ICONS, INFO, PAGES, SIZES } from '@/common/constants';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { BreadcrumbDivider, BreadcrumbSection, Popup, Breadcrumb as SBreadcrumb, Label as SLabel } from 'semantic-ui-react';
 import styled from "styled-components";
+import { useNavActionsContext } from '.';
 
 const Label = styled(SLabel)`
   position: relative;
@@ -36,12 +37,62 @@ const SSBreadcrumb = styled(SBreadcrumb)`
   }
 `;
 
+export const PATHNAME_ENTITY_MAP = {
+  [PAGES.CUSTOMERS.BASE]: ENTITIES.CUSTOMER,
+  [PAGES.SUPPLIERS.BASE]: ENTITIES.SUPPLIER,
+  [PAGES.BRANDS.BASE]: ENTITIES.BRAND,
+  [PAGES.PRODUCTS.BASE]: ENTITIES.PRODUCT,
+  [PAGES.BUDGETS.BASE]: ENTITIES.BUDGET,
+  [PAGES.EXPENSES.BASE]: ENTITIES.EXPENSE,
+  [PAGES.CASH_BALANCES.BASE]: ENTITIES.CASH_BALANCE,
+  [PAGES.USERS.BASE]: ENTITIES.USER,
+  [PAGES.SETTINGS.BASE]: ENTITIES.SETTINGS,
+};
+
+const getEntityFromPathname = (pathname) => {
+  return Object.entries(PATHNAME_ENTITY_MAP).find(([path]) =>
+    pathname.startsWith(path)
+  )?.[1];
+};
+
 const BreadcrumContext = createContext();
 
-const BreadcrumProvider = ({ children }) => {
+const resolveEntityContext = (pathname) => {
+  if (pathname.endsWith('/crear')) {
+    return { view: ENTITY_VIEW.CREATE };
+  }
+
+  const segments = pathname.split('/').filter(Boolean);
+
+  if (segments.length === 2) {
+    return { view: ENTITY_VIEW.DETAIL, id: segments[1] };
+  }
+
+  return { view: ENTITY_VIEW.LIST };
+};
+
+const BreadcrumProvider = ({ children, pathname }) => {
   const [labels, setLabels] = useState([]);
+  const { setInfo } = useNavActionsContext();
+
+  useEffect(() => {
+    if (!pathname) return;
+
+    const entity = getEntityFromPathname(pathname);
+    if (!entity) {
+      setInfo(null);
+      return;
+    }
+
+    const { view } = resolveEntityContext(pathname);
+
+    const help = INFO.HELP.SECTIONS?.[entity]?.[view] ?? null;
+    setInfo(help);
+
+  }, [pathname, setInfo]);;
+
   return (
-    <BreadcrumContext.Provider value={{ labels, setLabels }}>
+    <BreadcrumContext.Provider value={{ labels, setLabels, pathname }}>
       {children}
     </BreadcrumContext.Provider>
   );

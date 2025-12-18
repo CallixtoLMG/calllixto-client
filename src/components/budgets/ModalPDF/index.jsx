@@ -6,9 +6,9 @@ import { OnlyPrint } from "@/components/layout";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Modal, Segment, Transition } from "semantic-ui-react";
+import styled from "styled-components";
 import PDFfile from "../PDFfile";
 import { BUDGET_PDF_FORMAT } from "../budgets.constants";
-import styled from "styled-components";
 
 const StyledModal = styled(Modal)`
   width: 80vw !important;
@@ -131,19 +131,20 @@ const ModalPDF = ({
                 />
               </Flex>
               <Segment>
-              <PDFfile
-                ref={printRef}
-                budget={budget}
-                client={client}
-                id={client?.id}
-                printPdfMode={printPdfMode}
-                subtotal={subtotal}
-                subtotalAfterDiscount={subtotalAfterDiscount}
-                total={total}
-                selectedContact={selectedContact}
-                dolarExchangeRate={showDolarExangeRate && dolarRate}
-                showPrices={showPrices}
-              />
+                <PDFfile
+                  ref={printRef}
+                  budget={budget}
+                  client={client}
+                  id={client?.id}
+                  printPdfMode={printPdfMode}
+                  subtotal={subtotal}
+                  subtotalAfterDiscount={subtotalAfterDiscount}
+                  total={total}
+                  selectedContact={selectedContact}
+                  dolarExchangeRate={showDolarExangeRate && dolarRate}
+                  showPrices={showPrices}
+                  customPDFDisclaimer={defaults.customPDFDisclaimer}
+                />
               </Segment>
             </FlexColumn>
           </Modal.Content>

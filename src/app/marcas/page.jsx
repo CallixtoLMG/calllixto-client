@@ -16,7 +16,7 @@ const Brands = () => {
   const { data, isLoading, isRefetching, refetch } = useListBrands();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();
-  const { setActions, setInfo } = useNavActionsContext();
+  const { setActions } = useNavActionsContext();
   const { push } = useRouter();
 
   useEffect(() => {
@@ -55,8 +55,7 @@ const Brands = () => {
     }
 
     setActions(actions);
-    setInfo(null);
-  }, [push, role, setActions, loading, setInfo]);
+  }, [push, role, setActions, loading, ]);
 
   useKeyboardShortcuts(() => push(PAGES.BRANDS.CREATE), SHORTKEYS.ENTER);
 

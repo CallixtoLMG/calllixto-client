@@ -26,7 +26,8 @@ export const LIST_ATTRIBUTES = [
   "cancelledAt",
   "cancelledBy",
   "comments",
-  "paidAmount"
+  "paidAmount",
+  "customPDFDisclaimer"
 ];
 export const BUDGETS_VIEW_MONTHS = 3;
 

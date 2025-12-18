@@ -24,7 +24,7 @@ const Field = ({ label, value, ...rest }) => (
   </Flex>
 );
 
-const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, total, selectedContact, showPrices }, ref) => {
+const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, total, selectedContact, showPrices, customPDFDisclaimer }, ref) => {
   const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT.key, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH.key, [printPdfMode]);
   const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL.key, [printPdfMode]);
@@ -152,7 +152,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
       }
       {client?.id === 'maderera-las-tapias' && (
         <Box width="100%">
-          Por favor controle su pedido. No se aceptan reclamos, devoluciones o cambios una vez firmado el remito de entrega. La mercadería se descarga al pie del camión, sin excepción.
+          {clientPdf && customPDFDisclaimer}
         </Box>
       )}
       <FlexColumn $rowGap="15px">

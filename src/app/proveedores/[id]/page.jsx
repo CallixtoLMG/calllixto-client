@@ -44,7 +44,7 @@ const Supplier = ({ params }) => {
   const { data: products, isLoading: loadingProducts, refetch: refetchProducts } =
     useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
-  const { resetActions, setActions, setInfo } = useNavActionsContext();
+  const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
@@ -325,7 +325,7 @@ const Supplier = ({ params }) => {
         id: 1,
         icon: ICONS.BARCODE,
         color: COLORS.BLUE,
-        text: "Ids",
+        text: "Códigos",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
         disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
@@ -409,7 +409,6 @@ const Supplier = ({ params }) => {
     }
 
     setActions(actions);
-    setInfo(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [role, supplier, products, hasAssociatedProducts, activeAction, isEditPending, loadingProducts, isExcelLoading]);
 

@@ -12,7 +12,7 @@ import { toast } from "react-hot-toast";
 const CreateCustomer = () => {
   useValidateToken();
   const { setLabels } = useBreadcrumContext();
-  const { resetActions } = useNavActionsContext();
+  const { resetActions, setInfo } = useNavActionsContext();
   const { push } = useRouter();
   const createCustomer = useCreateCustomer();
 
@@ -23,7 +23,8 @@ const CreateCustomer = () => {
 
   useEffect(() => {
     setLabels([{ name: PAGES.CUSTOMERS.NAME }, { name: 'Crear' }]);
-  }, [setLabels]);
+    setInfo(null);
+  }, [setLabels, setInfo]);
 
   const { mutate, isPending } = useMutation({
     mutationFn: createCustomer,
