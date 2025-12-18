@@ -306,21 +306,20 @@ export const ENTITY_VIEW = {
 export const INFO = {
   HELP: {
     SECTIONS: {
-
       [ENTITIES.CUSTOMER]: {
         LIST: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.USERS} color={COLORS.BLUE} /><strong>Clientes</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.USERS} color={COLORS.BLUE} /> <strong>Listado de clientes</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  En la pantalla principal se muestran todos los clientes, activos o inactivos, según el filtro aplicado.
+                  Listado de clientes según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos filtrados.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
-                  Para crear un cliente, presioná el botón verde <Accent>Crear</Accent>.
+                  Para crear un cliente, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -329,10 +328,10 @@ export const INFO = {
         CREATE: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.USERS} color={COLORS.BLUE} /><strong>Crear cliente</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.USERS} color={COLORS.BLUE} /> <strong>Crear cliente</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                  Completá los datos teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios. Luego presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -341,19 +340,19 @@ export const INFO = {
         DETAIL: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.USERS} color={COLORS.BLUE} /><strong>Detalle del cliente</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.USERS} color={COLORS.BLUE} /><strong> Detalles del cliente</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
-                < ListItem >
-                  Esta es la vista individual del cliente. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
-                </ListItem >
-                < ListItem >
-                  En esta página se pueden realizar las siguientes acciones:
+                <ListItem>
+                  Datos generales del cliente seleccionado. Si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem>
+                <ListItem>
+                  Acciones disponibles:
                   <List list>
                     <ListItem>
                       Desactivar el cliente con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
                     </ListItem>
                     <ListItem>
-                      Eliminar el cliente con el botón <Accent>Eliminar</Accent> (Solo disponible para administradores. No se puede eliminar un cliente si existen presupuestos asociados).
+                      Eliminar el cliente con el botón <Accent>Eliminar</Accent> (solo disponible para administradores y clientes sin ventas asociadas).
                     </ListItem>
                   </List>
                 </ListItem>
@@ -362,21 +361,20 @@ export const INFO = {
           </>
         ),
       },
-
       [ENTITIES.SUPPLIER]: {
         LIST: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /><strong>Proveedores</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /> <strong>Listado de proveedores</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  En la pantalla principal se muestran todos los proveedores, activos o inactivos, según el filtro aplicado.
+                Listado de proveedores según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
-                  Para crear un proveedor, presioná el botón verde <Accent>Crear</Accent>.
+                  Para crear un proveedor, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -385,10 +383,10 @@ export const INFO = {
         CREATE: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /><strong>Crear proveedor</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /> <strong>Crear proveedor</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                  Completá los datos teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios. Luego presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -397,16 +395,16 @@ export const INFO = {
         DETAIL: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /><strong>Detalle del proveedor</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /> <strong>Detalles del proveedor</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
-                < ListItem >
-                  Esta es la vista individual del proveedor. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
-                </ListItem >
-                < ListItem >
-                  En esta página se pueden se pueden realizar las siguientes acciones:
+                <ListItem>
+                  Datos generales del proveedor seleccionado. Si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem>
+                <ListItem>
+                  Acciones disponibles:
                   <List list>
                     <ListItem>
-                      Descargar los códigos de barra de los productos del proveedor con el botón <Accent>Ids</Accent>.
+                      Descargar los códigos de barra de todos los productos del proveedor con el botón <Accent>Códigos</Accent>.
                     </ListItem>
                     <ListItem>
                       Desactivar el proveedor con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
@@ -418,7 +416,7 @@ export const INFO = {
                       Eliminar todos los productos del proveedor con el botón <Accent>Eliminar productos</Accent>.
                     </ListItem>
                     <ListItem>
-                      Eliminar el proveedor con el botón <Accent>Eliminar</Accent> (Solo disponible para administradores. No se puede eliminar un proveedor si existen productos asociados).
+                      Eliminar el proveedor con el botón <Accent>Eliminar</Accent> (solo disponible para administradores y proveedores sin productos asociados).
                     </ListItem>
                   </List>
                 </ListItem>
@@ -427,21 +425,20 @@ export const INFO = {
           </>
         ),
       },
-
       [ENTITIES.BRAND]: {
         LIST: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.COPYRIGHT} color={COLORS.BLUE} /><strong>Marcas</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.COPYRIGHT} color={COLORS.BLUE} /> <strong>Listado de marcas</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  En la pantalla principal se muestran todas las marcas, activas o inactivas, según el filtro aplicado.
+                  Listado de marcas según los filtros activos.
                 </ListItem>
                 <ListItem>
                   Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos visibles.
                 </ListItem>
                 <ListItem>
-                  Para crear una marca, presioná el botón verde <Accent>Crear</Accent>.
+                  Para crear una marca, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -450,10 +447,10 @@ export const INFO = {
         CREATE: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.COPYRIGHT} color={COLORS.BLUE} /><strong>Crear marca</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.COPYRIGHT} color={COLORS.BLUE} /> <strong>Crear marca</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                  Completá los datos teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios. Luego presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -462,19 +459,19 @@ export const INFO = {
         DETAIL: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.COPYRIGHT} color={COLORS.BLUE} /><strong>Detalle de la marca</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.COPYRIGHT} color={COLORS.BLUE} /> <strong>Detalles de la marca</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
-                < ListItem >
-                  Esta es la vista individual de la marca. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
-                </ListItem >
-                < ListItem >
-                  En esta página se pueden se pueden realizar las siguientes acciones:
+                <ListItem>
+                  Datos generales de la marca seleccionada. Si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem>
+                <ListItem>
+                  Acciones disponibles:
                   <List list>
                     <ListItem>
                       Desactivar la marca con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
                     </ListItem>
                     <ListItem>
-                      Eliminar la marca con el botón <Accent>Eliminar</Accent> (solo disponible para administradores. No se puede eliminar una marca si existen productos asociados).
+                      Eliminar la marca con el botón <Accent>Eliminar</Accent> (solo disponible para administradores y marcas sin productos asociados).
                     </ListItem>
                   </List>
                 </ListItem>
@@ -483,21 +480,20 @@ export const INFO = {
           </>
         ),
       },
-
       [ENTITIES.PRODUCT]: {
         LIST: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.BOX} color={COLORS.BLUE} /><strong>Productos</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.BOX} color={COLORS.BLUE} /> <strong>Listado de productos</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  En la pantalla principal se muestran todos los productos, ya sean activos, inactivos, eliminados o sin stock, según el filtro aplicado.
+                  Listado de productos según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos visibles. Si hay filtros activos, solo se descarga lo filtrado.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos visibles.
                 </ListItem>
                 <ListItem>
-                  Para crear un producto, presioná el botón verde <Accent>Crear</Accent>.
+                  Para crear un producto, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -506,10 +502,10 @@ export const INFO = {
         CREATE: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.BOX} color={COLORS.BLUE} /><strong>Crear producto</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.BOX} color={COLORS.BLUE} /> <strong>Crear producto</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                  Completá los datos teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios. Luego presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -518,22 +514,19 @@ export const INFO = {
         DETAIL: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.BOX} color={COLORS.BLUE} /><strong>Detalle del producto</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.BOX} color={COLORS.BLUE} /> <strong>Detalles del producto</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
-                < ListItem >
-                  Esta es la vista individual del producto. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
-                </ListItem >
                 <ListItem>
-                  En la pestaña <Accent>Producto</Accent> se muestran los datos generales, y si está habilitada la edición, algunos pueden modificarse.
+                  Datos generales de del producto seleccionada. Si la edición está habilitada, algunos de ellos pueden modificarse.
                 </ListItem>
                 <ListItem>
                   En la pestaña <Accent>Historial de cambios</Accent> se muestra un listado de cambios realizados al producto.
                 </ListItem>
-                < ListItem >
-                  En esta página se pueden se pueden realizar las siguientes acciones:
+                <ListItem>
+                  Acciones disponibles:
                   <List list>
                     <ListItem>
-                      Descargar los códigos de barra del producto con el botón <Accent>Códigos de barra</Accent>.
+                      Descargar el código de barra del producto con el botón <Accent>Código</Accent>.
                     </ListItem>
                     <ListItem>
                       Marcar el producto como sin stock con el botón <Accent>Sin stock</Accent>.
@@ -545,6 +538,9 @@ export const INFO = {
                       Desactivar el producto con el botón <Accent>Desactivar</Accent>, ingresando un motivo.
                     </ListItem>
                     <ListItem>
+                      Reactivar un producto desactivado con el botón <Accent>Activar</Accent>.
+                    </ListItem>
+                    <ListItem>
                       Eliminar el producto con el botón <Accent>Eliminar</Accent> (solo disponible para administradores).
                     </ListItem>
                   </List>
@@ -554,30 +550,26 @@ export const INFO = {
           </>
         ),
       },
-
       [ENTITIES.BUDGET]: {
         LIST: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /><strong>Ventas</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /> <strong>Listado de ventas</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  En la pantalla principal se muestran todas las ventas: confirmadas, pendientes, borradores, anuladas o expiradas, según el filtro aplicado.
+                  Listado de ventas según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  En las ventas confirmadas, pasando el mouse sobre el ID, se podrá visualizar quién y cuándo se confirmó la venta. Si la venta está pagada en su totalidad, aparecerá el icono <Icon name={ICONS.DOLLAR} color={COLORS.GREEN} />.
+                  En esta pantalla solo se muestran ventas de los últimos 3 meses. Si necesitás datos anteriores, podés hacer clic en el botón <Accent>Historial</Accent> y definir rangos de fechas específicos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
+                  En ventas confirmadas, pasando el cursor sobre el <Accent>ID</Accent>, se podrá visualizar quién y cuándo se confirmó la venta. Si la venta está pagada en su totalidad, aparecerá el icono <span><Icon name={ICONS.DOLLAR} color={COLORS.GREEN} /></span>.
                 </ListItem>
                 <ListItem>
-                  En esta pantalla principal se muestran datos de los últimos 3 meses. Si necesitás datos posteriores, podés hacer clic en el botón <Accent>Historial</Accent>.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
-                  En la pantalla <Accent>Historial de ventas</Accent> podés definir rangos de fechas para obtener los datos necesarios. Podés usar las fechas predeterminadas o establecerlas manualmente. También podés aplicar filtros y descargar los datos como en la página principal.
-                </ListItem>
-                <ListItem>
-                  Para crear una venta, presioná el botón verde <Accent>Crear</Accent>.
+                  Para crear una venta, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -586,12 +578,11 @@ export const INFO = {
         CREATE: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /><strong>Crear venta</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /> <strong>Crear venta</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                  Completá los datos teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios. Luego presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
-
               </List>
             </StyledModalContent>
           </>
@@ -599,37 +590,34 @@ export const INFO = {
         DETAIL: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /><strong>Detalle de la venta</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.CLIPBOARD} color={COLORS.BLUE} /><strong> Detalles de la venta</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
-                < ListItem >
-                  Esta es la vista individual de una venta.
-                </ListItem >
                 <ListItem>
-                  En la pestaña <Accent>Presupuesto</Accent> se muestran los datos generales, y si está habilitada la edición, algunos pueden modificarse.
+                  En la pestaña <Accent>Pagos</Accent> se muestran el detalle de los pagos realizados pudiendo agregar, quitar o modificarlos según sea necesario (solo disponible para ventas confirmadas).
                 </ListItem>
                 <ListItem>
-                  En la pestaña <Accent>Pagos</Accent> se muestran un listado de los pagos realizados. Tambien se puede agregar, quitar o modificar pagos.
+                  Ventas en estado <Accent>Borrador</Accent> se podrán modificar de forma completa.
                 </ListItem>
                 <ListItem>
-                  En el caso de ventas en estado borrador, será posible modificar algunos datos. En ventas en estado pendiente o confirmadas, solo se podrán modificar aspectos menores. Las ventas confirmadas mostrarán pestañas de <Accent>Presupuestos</Accent> y <Accent>Pagos</Accent>.
+                  Ventas en estado <Accent>Pendiente</Accent> o <Accent>Confirmado</Accent> solo se podrán modificar aspectos menores.
                 </ListItem>
                 <ListItem>
-                  En caso de querer crear una venta confirmada, podrás agregar uno o más pagos a la venta.
+                  Al crear una venta confirmada, podrás agregar uno o más pagos en ese mismo momento.
                 </ListItem>
-                < ListItem >
-                  En la vista individual de la venta, dependiendo de su estado, podrás realizar las siguientes acciones:
+                <ListItem>
+                  Acciones disponibles:
                   <List list>
                     <ListItem>
                       Ver y descargar el presupuesto en formato PDF con el botón <Accent>PDF</Accent>.
                     </ListItem>
                     <ListItem>
-                      Enviar la venta por WhatsApp o correo electrónico con el botón <Accent>Enviar</Accent>. (Se recomienda descargar previamente el presupuesto para adjuntarlo).
+                      Enviar la venta por WhatsApp o correo electrónico con el botón <Accent>Enviar</Accent> (se recomienda descargar previamente el presupuesto para adjuntarlo).
                     </ListItem>
                     <ListItem>
                       Clonar la venta actual con el botón <Accent>Clonar</Accent>, lo que te redirigirá a una nueva venta, manteniendo todos los productos del original.
                     </ListItem>
                     <ListItem>
-                      Anular la venta con el botón <Accent>Anular</Accent>, e ingresando un motivo.
+                      Anular la venta con el botón <Accent>Anular</Accent>, ingresando un motivo.
                     </ListItem>
                   </List>
                 </ListItem>
@@ -638,21 +626,20 @@ export const INFO = {
           </>
         ),
       },
-
       [ENTITIES.EXPENSE]: {
         LIST: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.MONEY_BILL_ALTERNATE} color={COLORS.BLUE} /><strong>Gastos</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.MONEY_BILL_ALTERNATE} color={COLORS.BLUE} /> <strong>Listado de gastos</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  En la pantalla principal se muestran todos los gastos: pagados, pendientes o anulados, según el filtro aplicado.
+                  Listado de gastos según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
-                  Para crear un gasto, presioná el botón verde <Accent>Crear</Accent>. Podrás establecer el detalle (nombre), monto, fecha de vencimiento, categorías y etiquetas.
+                  Para crear un gasto, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -661,12 +648,11 @@ export const INFO = {
         CREATE: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.MONEY_BILL_ALTERNATE} color={COLORS.BLUE} /><strong>Crear gasto</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.MONEY_BILL_ALTERNATE} color={COLORS.BLUE} /> <strong>Crear gasto</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                  Completá los datos teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios. Luego presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
-
               </List>
             </StyledModalContent>
           </>
@@ -674,19 +660,19 @@ export const INFO = {
         DETAIL: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.MONEY_BILL_ALTERNATE} color={COLORS.BLUE} /><strong>Detalle del gasto</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.MONEY_BILL_ALTERNATE} color={COLORS.BLUE} /> <strong>Detalles del gasto</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
-                < ListItem >
-                  Esta es la vista individual de un gasto. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
-                </ListItem >
                 <ListItem>
-                  en esta página se pueden realizar las siguientes acciones:
+                  Datos generales del gasto seleccionado. Si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem>
+                <ListItem>
+                  Acciones disponibles:
                   <List list>
                     <ListItem>
                       Clonar el gasto con el botón <Accent>Clonar</Accent>. Este proceso mantendrá todos los datos del gasto original, excepto los pagos.
                     </ListItem>
                     <ListItem>
-                      Anular el gasto con el botón <Accent>Anular</Accent>, e ingresando un motivo.
+                      Anular el gasto con el botón <Accent>Anular</Accent>, ingresando un motivo.
                     </ListItem>
                   </List>
                 </ListItem>
@@ -695,24 +681,23 @@ export const INFO = {
           </>
         ),
       },
-
       [ENTITIES.CASH_BALANCE]: {
         LIST: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.CALCULATOR} color={COLORS.BLUE} /><strong>Caja</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.CALCULATOR} color={COLORS.BLUE} /> <strong>Listado de cajas</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  En la pantalla principal se muestran todas las cajas: abiertas o cerradas, según el filtro aplicado.
+                  Listado de cajas según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
-                  Para crear una caja, presioná el botón verde <Accent>Abrir</Accent>.
+                  Para crear una caja, presioná el botón <Accent>Abrir</Accent>.
                 </ListItem>
                 <ListItem>
-                  En la ventana abierta <Accent>Crear caja</Accent>, completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                  En la ventana abierta <Accent>Crear caja</Accent>, completá los datos (teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios). Luego presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -721,19 +706,16 @@ export const INFO = {
         DETAIL: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.CALCULATOR} color={COLORS.BLUE} /><strong>Detalle de caja</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.CALCULATOR} color={COLORS.BLUE} /> <strong>Detalles de caja</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
-                < ListItem >
-                  Esta es la vista individual de una caja.
-                </ListItem >
-                < ListItem >
-                  En la pestaña<Accent>Caja</Accent> aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
-                </ListItem >
-                < ListItem >
-                  En la pestaña<Accent>Movimientos</Accent> se listan todos los<Accent>Gastos</Accent> y < Accent >Ventas</Accent> realizados mientras la caja estuvo abierta.Al hacer clic sobre un ítem, serás redirigido al detalle correspondiente.
-                </ListItem >
                 <ListItem>
-                  En la vista individual de la caja se pueden realizar las siguientes acciones:
+                  En la pestaña<Accent>Caja</Accent> se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem>
+                <ListItem>
+                  En la pestaña<Accent>Movimientos</Accent> se listan todos los<Accent>Gastos</Accent> y < Accent >Ventas</Accent> realizados mientras la caja estuvo abierta. Al hacer clic sobre un ítem, serás redirigido al detalle correspondiente.
+                </ListItem>
+                <ListItem>
+                  Acciones disponibles:
                   <List list>
                     <ListItem>
                       Si no se estableció una fecha de cierre al crearla, podrás cerrar la caja manualmente desde el botón <Accent>Cerrar Caja</Accent>.
@@ -748,21 +730,20 @@ export const INFO = {
           </>
         ),
       },
-
       [ENTITIES.USER]: {
         LIST: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.USER} color={COLORS.BLUE} /><strong>Usuarios</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.USER} color={COLORS.BLUE} /> <strong>Listado de usuarios</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  En la pantalla principal se muestran todos los usuarios: activos o inactivos, según el filtro aplicado.
+                  Listado de usuarios según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos a un archivo. Si hay filtros activos, solo se descargan los elementos visibles.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
-                  Para crear un usuario, presioná el botón verde <Accent>Crear</Accent>. Podrás establecer el nombre del usuario (que debe ser un correo electrónico), el rol y otros datos personales.
+                  Para crear un usuario, presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
               </List>
             </StyledModalContent>
@@ -771,12 +752,11 @@ export const INFO = {
         CREATE: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.USER} color={COLORS.BLUE} /><strong>Crear usuario</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.USER} color={COLORS.BLUE} /> <strong>Crear un usuario</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                  Estás en la pantalla de creación. Completá los datos, teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios y no podrás finalizar la creación si falta alguno. Luego presioná el botón verde <Accent>Crear</Accent>.
+                  Completá los datos teniendo en cuenta que aquellos marcados con un asterisco rojo son obligatorios. Luego presioná el botón <Accent>Crear</Accent>.
                 </ListItem>
-
               </List>
             </StyledModalContent>
           </>
@@ -784,13 +764,13 @@ export const INFO = {
         DETAIL: (
           <>
             <StyledModalContent>
-              <StyledListHeader><Icon name={ICONS.USER} color={COLORS.BLUE} /><strong>Detalle del usuario</strong></StyledListHeader>
+              <StyledListHeader><Icon name={ICONS.USER} color={COLORS.BLUE} /> <strong>Detalles del usuario</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
-                < ListItem >
-                  Esta es la vista individual de un usuario. Aqui se muestran los datos generales y, si la edición está habilitada, algunos de ellos pueden modificarse.
-                </ListItem >
-                < ListItem >
-                  En esta página se pueden realizar las siguientes acciones:
+                <ListItem>
+                  Datos generales de del usuario seleccionada. Si la edición está habilitada, algunos de ellos pueden modificarse.
+                </ListItem>
+                <ListItem>
+                  Acciones disponibles:
                   <List list>
                     <ListItem>
                       Desactivar el usuario con el botón de <Accent>Desactivar</Accent>, ingresando un motivo.
@@ -805,7 +785,6 @@ export const INFO = {
           </>
         ),
       },
-
       [ENTITIES.SETTINGS]: {
         LIST: (
           <>

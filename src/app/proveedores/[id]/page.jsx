@@ -325,7 +325,7 @@ const Supplier = ({ params }) => {
         id: 1,
         icon: ICONS.BARCODE,
         color: COLORS.BLUE,
-        text: "Ids",
+        text: "Códigos",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
         disabled: !!activeAction || isEditPending || !hasAssociatedProducts,

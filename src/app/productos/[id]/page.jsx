@@ -297,7 +297,7 @@ const Product = ({ params }) => {
           icon: ICONS.BARCODE,
           color: COLORS.BLUE,
           onClick: () => setTimeout(handlePrint),
-          text: "Código de barra",
+          text: "Código",
           loading: activeAction === "print",
           disabled: !!activeAction || isEditPending,
         },
