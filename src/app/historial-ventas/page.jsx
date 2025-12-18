@@ -6,10 +6,13 @@ import { BUDGETS_HISTORY_FILTERS_KEY, DATE_RANGE_KEY } from "@/components/budget
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useValidateToken } from "@/hooks";
 import useFilterParams from "@/hooks/useFilterParams";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 const BudgetsHistory = () => {
   useValidateToken();
+
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
 
   const {
     filters: dateRange,
@@ -38,6 +41,11 @@ const BudgetsHistory = () => {
     setLabels([{ name: "Historial de ventas" }]);
   }, [setLabels]);
 
+  useEffect(() => {
+    setActions([]);
+    setInfo(null);
+  }, [isLoading, isRefetching, setActions, setInfo]);
+
   const handleSearch = (newRange) => {
     setDateRange(newRange);
   };
@@ -45,10 +53,7 @@ const BudgetsHistory = () => {
   const budgets = useMemo(() => data ?? [], [data]);
   const loading = isLoading || isRefetching;
 
-  useEffect(() => {
-    setActions([]);
-    setInfo(null);
-  }, [loading, setActions, setInfo]);
+  if (!hydrated) return null;
 
   return (
     <>
