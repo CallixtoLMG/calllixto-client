@@ -6,7 +6,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { pick } from 'lodash';
 import { getInstance } from './axios';
 
-const activeVersion = '2025-07-28';
+const activeVersion = '2025-12-17';
 
 export function useInvalidateQueries() {
   const queryClient = useQueryClient();
