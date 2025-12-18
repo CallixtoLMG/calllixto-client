@@ -57,7 +57,6 @@ const BudgetsHistory = () => {
         isLoading={loading}
         defaultValues={dateRange}
       />
-
       {dateRange.startDate && dateRange.endDate && (
         <BudgetsPage
           isLoading={loading}
