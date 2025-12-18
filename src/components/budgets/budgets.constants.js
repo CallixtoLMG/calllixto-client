@@ -334,4 +334,4 @@ export const BUDGETS_HISTORY_DATE_RANGE = [
   }
 ];
 
-const DATE_RANGE_KEY = "budgets-history-date-range";
+export const DATE_RANGE_KEY = "budgets-history-date-range";
