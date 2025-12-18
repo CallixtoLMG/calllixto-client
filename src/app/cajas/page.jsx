@@ -9,7 +9,6 @@ import CashBalancesPage from "@/components/cashBalances/CashBalancesPage";
 import { CASH_BALANCE_STATES } from "@/components/cashBalances/cashBalances.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
-import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -82,16 +81,13 @@ const CashBalances = () => {
   }, []);
 
   useEffect(() => {
-    const actions = [];
-    if (RULES.canCreate[role]) {
-      actions.push({
-        id: 1,
-        icon: ICONS.ADD,
-        color: COLORS.GREEN,
-        onClick: () => setIsModalOpen(true),
-        text: 'Abrir',
-      });
-    }
+    const actions = [{
+      id: 1,
+      icon: ICONS.ADD,
+      color: COLORS.GREEN,
+      onClick: () => setIsModalOpen(true),
+      text: 'Abrir',
+    }];
     setActions(actions);
   }, [push, role, setActions]);
 
