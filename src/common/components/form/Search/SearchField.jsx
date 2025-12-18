@@ -30,6 +30,7 @@ const SearchField = forwardRef(
       disabled,
       error,
       height,
+      clearAfterSelect,
     },
     ref
   ) => {
@@ -78,8 +79,13 @@ const SearchField = forwardRef(
 
     const handleSelect = (_, { result }) => {
       onSelect(result.value);
-      setSelected(result.value);
-      setQuery('');
+    
+      if (clearAfterSelect) {
+        setSelected(null);
+        setQuery('');
+      } else {
+        setSelected(result.value);
+      }
     };
 
     const handleClear = () => {

@@ -6,10 +6,10 @@ import {
   PercentControlled,
   PriceControlled,
   PriceLabel,
+  SearchControlled,
   TextAreaControlled,
   TextControlled,
-  TextField,
-  SearchControlled
+  TextField
 } from "@/common/components/form";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
@@ -695,6 +695,7 @@ const BudgetForm = ({
             label="Producto"
             width="300px"
             required
+            clearAfterSelect
             placeholder="Televisor 100”"
             rules={{
               validate: () => {
