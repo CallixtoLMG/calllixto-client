@@ -64,14 +64,24 @@ export const HEADERS = [
   {
     id: 5,
     title: "Pagado",
+    key: "paidAmount",
+    sortable: true,
     align: "left",
     value: (expense) => <PriceLabel value={expense.paidAmount ?? 0} />,
+    sortValue: (expense) => expense.paidAmount ?? 0
   },
   {
     id: 6,
     title: "Pendiente",
+    key: "pendingAmount",
+    sortable: true,
     align: "left",
-    value: (expense) => <PriceLabel value={expense?.pendingAmount ?? 0} />,
+    value: (expense) => {
+      const pending = (expense.amount ?? 0) - (expense.paidAmount ?? 0);
+      return <PriceLabel value={Math.max(pending, 0)} />;
+    },
+    sortValue: (expense) =>
+      (expense.amount ?? 0) - (expense.paidAmount ?? 0)
   }
 ];
 
