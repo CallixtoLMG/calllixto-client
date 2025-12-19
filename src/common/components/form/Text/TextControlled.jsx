@@ -13,6 +13,7 @@ export const TextControlled = forwardRef(({
   popupPosition,
   disabled,
   required,
+  onKeyDown,
   onChange = value => value,
   ...inputParams
 }, ref) => {
@@ -28,6 +29,7 @@ export const TextControlled = forwardRef(({
           name={name}
           width={width}
           ref={ref}
+          onKeyDown={onKeyDown}
           required={required}
           disabled={disabled}
           showPopup={showPopup}
