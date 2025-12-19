@@ -45,7 +45,6 @@ export async function entityList({ entity, url, params }) {
 };
 
 export async function listItems({ entity, url, params = {} }) {
-  let updateLastUpdatedAt = false;
   let lastUpdatedAt = (await getStorageItem({ entity: LAST_UPDATED_AT, id: entity }))?.lastUpdatedAt;
   let lastHardReset = (await getStorageItem({ entity: LAST_UPDATED_AT, id: "hardReset" }))?.lastUpdatedAt;
 
