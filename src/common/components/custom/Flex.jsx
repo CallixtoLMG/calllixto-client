@@ -14,7 +14,7 @@ const Common = styled.div`
   padding-bottom: ${({ paddingBottom = '0' }) => paddingBottom};
   padding-top: ${({ paddingTop = '0' }) => paddingTop};
   padding-left: ${({ $paddingLeft = '0' }) => $paddingLeft};
-  padding-right: ${({ paddingRight = '0' }) => paddingRight};
+  padding-right: ${({ $paddingRight = '0' }) => $paddingRight};
 `;
 
 export const Flex = styled(Common)`

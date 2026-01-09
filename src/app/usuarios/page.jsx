@@ -19,6 +19,7 @@ const Users = () => {
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
+  
   useEffect(() => {
     setLabels([{ name: PAGES.USERS.NAME }]);
     refetch();

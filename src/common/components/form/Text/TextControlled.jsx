@@ -21,11 +21,12 @@ export const TextControlled = forwardRef(({
     <Controller
       name={name}
       rules={rules}
-      render={({ field: { onChange: onFormChange, ...rest } }) => (
+      render={({ field: { onChange: onFormChange, value, ...rest } }) => (
         <TextField
           {...rest}
           {...inputParams}
           name={name}
+          value={value ?? ''}
           width={width}
           ref={ref}
           required={required}

@@ -96,7 +96,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       title: "Métodos de pago",
       align: "left",
       value: (cashBalance) => (
-        <Flex $wrap $columnGap="6px" $rowGap="4px">
+        <Flex $wrap $columnGap="5px" $rowGap="5px">
           {(cashBalance.paymentMethods?.length > 0)
             ? cashBalance.paymentMethods.map((method, index) => (
               <Label width="fit-content" key={index} size={SIZES.TINY}>

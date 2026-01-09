@@ -20,7 +20,7 @@ const OnCreate = () => {
           <Icon name="dropdown" /> Al Crear una Venta
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
-          <FlexColumn $rowGap="20px">
+          <FlexColumn $rowGap="15px">
             <GroupedButtonsControlled
               label="Estado por Defecto"
               name="defaultsCreate.state"
@@ -39,7 +39,12 @@ const OnCreate = () => {
                 { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
               ]}
             />
-            <TextControlled name="defaultsCreate.customer" placeholder="A0001" width="200px" label="Cliente por Defecto" />
+            <TextControlled
+              name="defaultsCreate.customer.value"
+              placeholder="A0001"
+              width="200px"
+              label="Cliente por Defecto"
+            />
             <NumberControlled
               name="defaultsCreate.expirationOffsetDays"
               label="Días para el Vencimiento por Defecto"

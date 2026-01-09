@@ -141,7 +141,7 @@ const ChangePasswordForm = () => {
                 }}
                 disabled={!isCodeRequested}
               />
-              <FlexColumn $rowGap="14px">
+              <FlexColumn $rowGap="15px">
                 <Button
                   loading={isOnConfirmResetPending}
                   disabled={isOnConfirmResetPending || isRequestCodePending || !isCodeRequested}

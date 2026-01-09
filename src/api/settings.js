@@ -33,7 +33,7 @@ export function useGetSetting(entity) {
     queryFn: getSetting,
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
-    enabled: !!getSetting,
+    enabled: !!entity,         
     placeholderData: {},
   });
 

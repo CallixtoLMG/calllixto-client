@@ -83,9 +83,9 @@ export const ModalAddPayment = ({
       <Modal open={open} onClose={handleClose} size={SIZES.SMALL}>
         <Modal.Header>Agregar Pago</Modal.Header>
         <Modal.Content>
-          <Flex $rowGap="14px" as={Form}>
+          <Flex $rowGap="15px" as={Form}>
             <FieldsContainer  >
-              <Flex $columnGap="14px" rowGap="14px" fontSize="14px" margin="0" flexDirection={"row"} >
+              <Flex $columnGap="15px" rowGap="15px" fontSize="14px" margin="0" flexDirection={"row"} >
                 <FormField
                   selected={payment.date}
                   onChange={(date) => setPayment({ ...payment, date })}

@@ -109,7 +109,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
       tooltip: 'Clonar'
     }
   ];
-
+  if (!hydrated) return null;
   return (
     <>
       <FormProvider {...methods}>

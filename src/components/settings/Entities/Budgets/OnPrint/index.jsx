@@ -20,7 +20,7 @@ const OnPrint = () => {
           <Icon name="dropdown" /> Al Imprimir una Venta
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
-          <FlexColumn $rowGap="20px">
+          <FlexColumn $rowGap="15px">
             <IconedButtonControlled
               name="defaultsPDF.showPrices"
               label="Mostrar Precios por Defecto"
