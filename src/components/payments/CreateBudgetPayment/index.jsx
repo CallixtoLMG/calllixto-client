@@ -4,7 +4,7 @@ import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/compo
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { Table, TotalList } from "@/common/components/table";
 import { COLORS, ENTITIES, ICONS, RULES, SIZES } from "@/common/constants";
-import { handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
+import { calculateTotals, handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { useEffect, useMemo, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
@@ -16,17 +16,6 @@ const EMPTY_PAYMENT = () => ({
   comments: '',
   date: new Date(),
 });
-
-const calculateTotals = (payments, total) => {
-  const totalAssigned = payments.reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0).toFixed(2);
-  let totalPending = (total - totalAssigned).toFixed(2);
-
-  if (Math.abs(totalPending) < 0.01) {
-    totalPending = (0).toFixed(2);
-  }
-
-  return { totalAssigned, totalPending };
-};
 
 const getPaymentTableHeaders = () => [
   {
@@ -90,7 +79,7 @@ const CreateBudgetPayments = ({
     name: "paymentsMade"
   });
 
-  const { totalPending, totalAssigned } = useMemo(() => calculateTotals(paymentsMade, total), [total, paymentsMade]);
+  const { totalPending, totalPaid } = useMemo(() => calculateTotals(paymentsMade, total), [total, paymentsMade]);
   const isTotalCovered = useMemo(() => totalPending <= 0, [totalPending]);
   const [payment, setPayment] = useState(EMPTY_PAYMENT());
   const [showErrors, setShowErrors] = useState(false);
@@ -134,7 +123,7 @@ const CreateBudgetPayments = ({
   }, [paymentsMade, dueDate]);
 
   const TOTAL_LIST_ITEMS = [
-    { id: 1, title: "Pagado", amount: <PriceLabel value={totalAssigned} /> },
+    { id: 1, title: "Pagado", amount: <PriceLabel value={totalPaid} /> },
     { id: 2, title: "Pendiente", amount: <PriceLabel value={totalPending} /> },
     { id: 3, title: "Total", amount: <PriceLabel value={total} /> },
   ];

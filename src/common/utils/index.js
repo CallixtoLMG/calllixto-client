@@ -225,3 +225,14 @@ export const mapToDropdownOptions = (items = []) =>
   }));
 
 export const getLabelColor = (entity, states) => states?.[entity?.state]?.color;
+
+export const calculateTotals = (payments = [], total) => {
+  const totalPaid = payments?.reduce((sum, payments) => sum + (parseFloat(payments.amount) || 0), 0).toFixed(2);
+  let totalPending = (total - totalPaid).toFixed(2);
+
+  if (Math.abs(totalPending) < 0.01) {
+    totalPending = (0).toFixed(2);
+  }
+
+  return { totalPaid, totalPending };
+};
