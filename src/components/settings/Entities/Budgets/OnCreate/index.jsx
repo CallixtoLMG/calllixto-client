@@ -1,17 +1,23 @@
 import { Box, FlexColumn } from "@/common/components/custom";
-import { GroupedButtonsControlled, NumberControlled, TextControlled } from "@/common/components/form";
+import { GroupedButtonsControlled, NumberControlled, SearchControlled } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion, Icon } from "semantic-ui-react";
+import { getCustomerSearchDescription, getCustomerSearchTitle } from "../../../../customers/customers.constants";
 
-const OnCreate = () => {
+const OnCreate = ({ customerOptions, isLoading }) => {
+
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
 
-  const { watch } = useFormContext();
-  const [defaultsCreate] = watch(['defaultsCreate']);
+  const { watch, setValue } = useFormContext();
+  const [defaultsCreate, defaultsCreateCustomer] = watch(['defaultsCreate', "defaultsCreate.customer"]);
+
+  const selectedCustomer = useMemo(() => {
+    return customerOptions?.find(c => c.id === defaultsCreateCustomer) ?? null;
+  }, [defaultsCreateCustomer, customerOptions]);
 
   return (
     <Box $marginBottom="5px">
@@ -39,11 +45,34 @@ const OnCreate = () => {
                 { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
               ]}
             />
-            <TextControlled name="defaultsCreate.customer" placeholder="A0001" width="200px" label="Cliente por Defecto" />
+            <SearchControlled
+              key={defaultsCreateCustomer?.id ?? 'no-customer'}
+              name="defaultsCreate.customer"
+              width="300px"
+              label="Cliente por Defecto"
+              disabled={isLoading}
+              required
+              clearable={!!defaultsCreateCustomer?.name}
+              value={selectedCustomer}
+              placeholder="A0001"
+              elements={customerOptions}
+              searchFields={['name', 'id']}
+              getResultProps={(customer) => ({
+                key: customer.id,
+                title: getCustomerSearchTitle(customer),
+                description: getCustomerSearchDescription(customer),
+                value: customer,
+              })}
+              persistSelection={true}
+              onAfterChange={(value) => {
+                const customerId = value?.id ?? null;
+                setValue('defaultsCreate.customer', customerId)
+              }}
+            />
             <NumberControlled
               name="defaultsCreate.expirationOffsetDays"
               label="Días para el Vencimiento por Defecto"
-              width="300px"
+              width="fit-content"
               placeholder="15"
             />
           </FlexColumn>
