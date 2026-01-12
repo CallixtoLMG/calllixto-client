@@ -40,11 +40,26 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
     setInitializedContact(true);
   }, [budget, initializedContact, setSelectedContact]);
 
-  const TOTAL_LIST_ITEMS = [
-    { id: 1, title: "Pagado", amount: <PriceLabel value={budget.paidAmount} /> },
-    { id: 2, title: "Pendiente", amount: <PriceLabel value={totalPending} /> },
-    { id: 3, title: "Total", amount: <PriceLabel value={total} /> },
-  ];
+  const TOTAL_LIST_ITEMS = useMemo(() => {
+    const items = [
+      { id: 1, title: "Pagado", amount: <PriceLabel value={budget.paidAmount} /> },
+    ];
+
+    if (budget?.postConfirmDiscount) {
+      items.push({
+        id: 2,
+        title: "Descuento aplicado",
+        amount: <PriceLabel value={budget.postConfirmDiscount} />,
+      });
+    }
+
+    items.push(
+      { id: 3, title: "Pendiente", amount: <PriceLabel value={totalPending} /> },
+      { id: 4, title: "Total", amount: <PriceLabel value={total} /> },
+    );
+
+    return items;
+  }, [budget?.paidAmount, budget?.postConfirmDiscount, totalPending, total]);
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
@@ -262,7 +277,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
         {isBudgetConfirmed(budget?.state) ?
           <>
             <TotalList items={TOTAL_LIST_ITEMS} />
-            {/* <FlexColumn $alignSelf="end" $rowGap="15px">
+            <FlexColumn $alignSelf="end" $rowGap="15px">
               <Flex $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
                 <IconedButton
                   text="Completar"
@@ -277,9 +292,11 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                   disabled={isLoading}
                 />
                 <PriceControlled
+                  key={budget?.postConfirmDiscount ?? 'no-discount'}
                   width="200px"
                   placeholder="5.000"
                   name="postConfirmDiscount"
+                  defaultValue={budget?.postConfirmDiscount ?? ''}
                   rules={{
                     validate: (value) =>
                       value ? value <= total - budget.paidAmount || "No puede superar el monto pendiente" : true,
@@ -304,7 +321,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                   }}
                 />
               </Flex>
-            </FlexColumn> */}
+            </FlexColumn>
           </>
           :
           <Total
