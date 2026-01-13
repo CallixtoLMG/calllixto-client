@@ -52,7 +52,6 @@ export const TextField = forwardRef(({
   maxLength,
   required,
   error,
-  onKeyDown,
   showPopup = false,
   popupContent,
   popupPosition = "top center",
@@ -119,7 +118,6 @@ export const TextField = forwardRef(({
           onChange={onChange}
           readOnly={readOnly}
           maxLength={maxLength}
-          onKeyDown={onKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           $iconLabel={iconLabel}
