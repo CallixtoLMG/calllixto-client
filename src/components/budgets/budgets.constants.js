@@ -342,7 +342,7 @@ export const buildCustomHistoryRanges = (historyDateRanges = []) => {
     .filter(r => r.unit && r.value)
     .map((range) => {
       const valueNum = Number(range.value);
-      const cfg = UNIT_CONFIG[range.unit];
+      const config = UNIT_CONFIG[range.unit];
 
       const offset =
         range.unit === 'week'
@@ -357,7 +357,7 @@ export const buildCustomHistoryRanges = (historyDateRanges = []) => {
       const raw = getDateWithOffset({
         offset,
         unit,
-        format: DATE_FORMATS.ONLY_DATE, // DD-MM-YYYY
+        format: DATE_FORMATS.ONLY_DATE, 
       });
 
       const parsedDate = parse(
@@ -369,8 +369,8 @@ export const buildCustomHistoryRanges = (historyDateRanges = []) => {
       return {
         label:
           valueNum === 1
-            ? `${cfg.article.singular} ${cfg.singular}`
-            : `${cfg.article.plural} ${valueNum} ${cfg.plural}`,
+            ? `${config.article.singular} ${config.singular}`
+            : `${config.article.plural} ${valueNum} ${config.plural}`,
         value: range.key,
         getRange: () => ({
           startDate: parsedDate,
