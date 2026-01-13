@@ -52,6 +52,7 @@ export const TextField = forwardRef(({
   maxLength,
   required,
   error,
+  onKeyDown,
   showPopup = false,
   popupContent,
   popupPosition = "top center",
