@@ -49,7 +49,6 @@ export const TextField = forwardRef(({
   value,
   disabled,
   onChange,
-  onKeyDown,
   maxLength,
   required,
   error,
@@ -102,7 +101,6 @@ export const TextField = forwardRef(({
           disabled
           labelPosition={iconLabel ? 'left' : undefined}
           textAlign={textAlign}
-          onKeyDown={onKeyDown}
         >
           {iconLabel && showIconLabel()}
           <TruncateInput>

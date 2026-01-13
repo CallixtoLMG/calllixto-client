@@ -2,7 +2,6 @@ import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, Form } from "@/common/components/custom";
 import { TextControlled, TextField } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
-import { handleEnterKeyDown } from "@/common/utils";
 import { useEffect, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
@@ -36,7 +35,15 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         <Modal.Content>
           <Flex $flexDirection="column" $rowGap="15px">
             <FormProvider {...methods}>
-              <Form onSubmit={handleSubmit(onAddComment)}>
+              <Form
+                onSubmit={handleSubmit(onAddComment)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmit(onAddComment)();
+                  }
+                }}
+              >
                 <FieldsContainer>
                   <TextField flex="1" label="Id" placeholder={product?.id} readOnly />
                   <TextField flex="1" label="Nombre" placeholder={product?.name} readOnly />
@@ -48,7 +55,6 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
                     name="dispatchComment"
                     placeholder="Comentario"
                     ref={commentInputRef}
-                    onKeyDown={(e) => handleEnterKeyDown(e, handleSubmit(onAddComment))}
                   />
                 </FieldsContainer>
               </Form>
