@@ -284,7 +284,10 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                   icon={ICONS.CHECK}
                   color={COLORS.BLUE}
                   onClick={() => {
-                    setValue("postConfirmDiscount", totalPending);
+                    setValue(
+                      "postConfirmDiscount",
+                      Number(budget.postConfirmDiscount ?? 0) + Number(totalPending)
+                    );
                     trigger("postConfirmDiscount");
                   }}
                   alignSelf="start"
@@ -299,7 +302,10 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                   defaultValue={budget?.postConfirmDiscount ?? ''}
                   rules={{
                     validate: (value) =>
-                      value ? value <= total - budget.paidAmount || "No puede superar el monto pendiente" : true,
+                      !value ||
+                      Number(value) <=
+                      Number(totalPending) + Number(budget.postConfirmDiscount ?? 0) ||
+                      "No puede superar el monto pendiente más el descuento aplicado"
                   }}
                   justifyItems="right"
                 />
