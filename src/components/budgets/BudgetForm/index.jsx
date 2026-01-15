@@ -98,7 +98,7 @@ const BudgetForm = ({
         : {
           ...EMPTY_BUDGET(user),
           ...settings.defaultsCreate,
-          ...(settings?.defaultsCreate?.customer && { customer: customers.find(c => c.id === settings.defaultsCreate.customer) ?? null }),
+          ...(settings?.defaultsCreate?.customer && { customer: customers.find(c => c.id === settings.defaultsCreate.customer.key) ?? null }),
         },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -158,10 +158,6 @@ const BudgetForm = ({
     const updatedtotal = getSubtotal(updatedSubtotalAfterDiscount, watchAdditionalCharge);
     setTotal(updatedtotal);
   }, [subtotal, watchGlobalDiscount, watchAdditionalCharge, trigger]);
-
-  const customerOptions = useMemo(() => {
-    return customers?.filter(({ state }) => state === CUSTOMER_STATES.ACTIVE.id);
-  }, [customers]);
 
   useEffect(() => {
     if (isCloning && !hasShownModal.current) {
@@ -637,7 +633,7 @@ const BudgetForm = ({
                       : true,
                 }
               }}
-              elements={customerOptions}
+              elements={customers}
               searchFields={['name', 'id']}
               getResultProps={(customer) => ({
                 key: customer.id,

@@ -5,7 +5,6 @@ import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.co
 import { useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion, Icon } from "semantic-ui-react";
-import { getCustomerSearchDescription, getCustomerSearchTitle } from "../../../../customers/customers.constants";
 
 const OnCreate = ({ customerOptions, isLoading }) => {
 
@@ -46,28 +45,23 @@ const OnCreate = ({ customerOptions, isLoading }) => {
               ]}
             />
             <SearchControlled
-              key={defaultsCreateCustomer?.id ?? 'no-customer'}
               name="defaultsCreate.customer"
               width="300px"
               label="Cliente por Defecto"
               disabled={isLoading}
               required
-              clearable={!!defaultsCreateCustomer?.name}
-              value={selectedCustomer}
+              clearable={!!defaultsCreateCustomer}
               placeholder="A0001"
               elements={customerOptions}
-              searchFields={['name', 'id']}
-              getResultProps={(customer) => ({
-                key: customer.id,
-                title: getCustomerSearchTitle(customer),
-                description: getCustomerSearchDescription(customer),
-                value: customer,
+              searchFields={['text', 'value']}
+              getResultProps={(option) => ({
+                key: option.key,
+                title: option.text,
+                description: option.value,
+                value: option,
               })}
               persistSelection={true}
-              onAfterChange={(value) => {
-                const customerId = value?.id ?? null;
-                setValue('defaultsCreate.customer', customerId)
-              }}
+              getDisplayValue={(option) => option?.text ?? ''}
             />
             <NumberControlled
               name="defaultsCreate.expirationOffsetDays"

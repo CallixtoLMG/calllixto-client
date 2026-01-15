@@ -18,6 +18,7 @@ import ModalCustomer from "@/components/budgets/ModalCustomer";
 import ModalPDF from "@/components/budgets/ModalPDF";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
+import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
@@ -56,10 +57,10 @@ const Budget = ({ params }) => {
 
   const customers = useMemo(() => customersData?.customers?.map(customer => ({
     ...customer,
-    key: customer.name,
-    value: customer.name,
+    key: customer.id,
+    value: customer.id,
     text: customer.name,
-  })), [customersData]);
+  }))?.filter(({ state }) => state === CUSTOMER_STATES.ACTIVE.id), [customersData]);
 
   const paymentMethodOptions = useMemo(() => {
     return mapToDropdownOptions(paymentMethods?.paymentMethods || []);

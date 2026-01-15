@@ -6,15 +6,16 @@ import OnCreate from './OnCreate';
 import OnPrint from './OnPrint';
 
 const BudgetsModule = (() => {
-  
+
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
 
-  const customers = useMemo(() => customersData?.customers, [customersData]);
+  const customerOptions = useMemo(() => customersData?.customers?.map(customer => ({
+    state: customer.state,
+    key: customer.id,
+    value: customer.id,
+    text: customer.name,
+  }))?.filter(({ state }) => state === CUSTOMER_STATES.ACTIVE.id), [customersData]);
 
-  const customerOptions = useMemo(() => {
-    return customers?.filter(({ state }) => state === CUSTOMER_STATES.ACTIVE.id);
-  }, [customers]);
-  
   return (
     <FlexColumn>
       {/* <General />
