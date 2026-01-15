@@ -7,8 +7,8 @@ import { getDateUTC } from "@/common/utils/dates";
 import { FormProvider, useForm } from "react-hook-form";
 import { BUDGETS_HISTORY_DATE_RANGE } from "../budgets.constants";
 
-const BudgetsHistoryFilter = ({ onSearch, isLoading }) => {
-  const form = useForm();
+const BudgetsHistoryFilter = ({ onSearch, isLoading, defaultValues }) => {
+  const form = useForm({ defaultValues });
   const { setValue, getValues, resetField } = form;
 
   const handlePresetChange = (months) => {

@@ -8,7 +8,7 @@ import { useCreateItem, useDeleteItem, useEditItem } from "./common";
 export const useEditPayment = () => {
   const editItem = useEditItem();
 
-  const editPayment = (payment, entity, entityId, options = {}) => {
+  const editPayment = (payment, entity, entityId) => {
     return editItem({
       entity: ENTITIES.PAYMENTS,
       url: `${PATHS.PAYMENTS}/${entity}/${entityId}/${payment.id}`,
@@ -18,7 +18,7 @@ export const useEditPayment = () => {
         [LIST_PAYMENTS_QUERY_KEY],
         [GET_PAYMENT_QUERY_KEY, payment.id],
       ],
-      ...options,
+      skipStorageUpdate: true,
     });
   };
 
@@ -28,14 +28,13 @@ export const useEditPayment = () => {
 export const useDeletePayment = () => {
   const deleteItem = useDeleteItem();
 
-  const deletePayment = ({ paymentId, entity, entityId }, options = {}) => {
-
+  const deletePayment = (paymentId, entity, entityId) => {
     return deleteItem({
       entity: ENTITIES.PAYMENTS,
       id: paymentId,
       url: `${PATHS.PAYMENTS}/${entity}/${entityId}/${paymentId}`,
       invalidateQueries: [[LIST_PAYMENTS_QUERY_KEY]],
-      ...options
+      skipStorageUpdate: true,
     });
   };
 
@@ -45,21 +44,21 @@ export const useDeletePayment = () => {
 export const useCreatePayment = () => {
   const createItem = useCreateItem();
 
-  const createPayment = (payment, entity, entityId, options = {}) => {
+  const createPayment = (payment, entity, entityId) => {
     return createItem({
       entity: ENTITIES.PAYMENTS,
       url: `${PATHS.PAYMENTS}/${entity}/${entityId}`,
       value: payment,
       responseEntity: ENTITIES.PAYMENT,
       invalidateQueries: [[LIST_PAYMENTS_QUERY_KEY]],
-      ...options
+      skipStorageUpdate: true
     });
   };
 
   return createPayment;
 };
 
-export function useGetPayment(entity, entityId, enabled) {
+export function useGetPayments(entity, entityId) {
   const getPayment = async (entityId) => {
     try {
       const { data } = await getInstance().get(`${PATHS.PAYMENTS}/${entity}/${entityId}`);
@@ -74,7 +73,7 @@ export function useGetPayment(entity, entityId, enabled) {
     queryFn: () => getPayment(entityId),
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
-    enabled: enabled && !!entityId,
+    enabled: !!entityId,
   });
 
   return query;
