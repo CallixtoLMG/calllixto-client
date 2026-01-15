@@ -36,7 +36,7 @@ export function useListBudgetsHistory({ startDate, endDate }) {
     staleTime: IN_MS.ONE_DAY,
     enabled: !!startDate && !!endDate,
   });
-}
+};
 
 export function useGetBudget(id) {
   const getBudget = async (id) => {

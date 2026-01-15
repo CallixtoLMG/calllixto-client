@@ -31,12 +31,12 @@ const SearchField = forwardRef(
       error,
       height,
       clearAfterSelect,
+      onAfterChange,
     },
     ref
   ) => {
     const [query, setQuery] = useState('');
     const [filtered, setFiltered] = useState(elements);
-    const [selected, setSelected] = useState(value ?? null);
     const [loading, setLoading] = useState(false);
 
     const fields = useMemo(() => searchFields.map(normalizeText), [searchFields]);
@@ -74,23 +74,23 @@ const SearchField = forwardRef(
 
     const handleChange = (_, { value }) => {
       setQuery(value);
-      setSelected(null);
+      onSelect(null);
     };
 
     const handleSelect = (_, { result }) => {
-      onSelect(result.value);
-    
+      const selectedOption = result.value;
+
+      onSelect(selectedOption);
+      onAfterChange?.(selectedOption);
+
       if (clearAfterSelect) {
-        setSelected(null);
         setQuery('');
-      } else {
-        setSelected(result.value);
+        onSelect(null);
       }
     };
 
     const handleClear = () => {
       setQuery('');
-      setSelected(null);
       onSelect(null);
     };
 
@@ -98,7 +98,7 @@ const SearchField = forwardRef(
       <FormField
         $width={width}
         icon={
-          clearable && selected ? {
+          clearable && value ? {
             name: ICONS.CLOSE,
             link: true,
             onClick: handleClear,
@@ -113,7 +113,7 @@ const SearchField = forwardRef(
         control={Search}
         loading={loading}
         results={filtered.slice(0, maxResults).map(getResultProps)}
-        value={selected ? getDisplayValue(selected) : query}
+        value={value ? getDisplayValue(value) : query}
         onSearchChange={handleChange}
         onResultSelect={handleSelect}
         disabled={disabled}

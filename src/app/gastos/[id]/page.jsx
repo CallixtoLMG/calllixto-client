@@ -1,14 +1,14 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useCancelExpense, useEditExpense, useGetExpense } from "@/api/expenses";
-import { useCreatePayment, useDeletePayment, useEditPayment, useGetPayment } from "@/api/payments";
+import { useCreatePayment, useDeletePayment, useEditPayment, useGetPayments } from "@/api/payments";
 import { Flex, Message, MessageHeader } from "@/common/components/custom";
+import { TextField } from "@/common/components/form";
 import { UnsavedChangesModal } from "@/common/components/modals";
 import ModalCancel from "@/common/components/modals/ModalCancel";
-import EntityPayments from "@/common/components/modules/EntityPayments";
-import { COLORS, ENTITIES, ICONS, PAGES } from "@/common/constants";
+import { COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES } from "@/common/constants";
 import { isItemCancelled } from "@/common/utils";
-import { now } from "@/common/utils/dates";
+import { getFormatedDate, isDateAfter, now } from "@/common/utils/dates";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
@@ -16,9 +16,9 @@ import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
+import Payments from "@/components/payments";
 
 const Expense = ({ params }) => {
   useValidateToken();
@@ -32,7 +32,7 @@ const Expense = ({ params }) => {
   const tabParam = searchParams.get("tab");
   const initialTabIndex = tabParam === "pagos" ? 1 : 0;
   const [activeIndex, setActiveIndex] = useState(initialTabIndex);
-  const { data: payment, refetch: refetchPayment, isLoading: isLoadingPayments, isRefetching } = useGetPayment(ENTITIES.EXPENSE, params.id, activeIndex === 1);
+  const { data: payments, refetch: refetchPayments, isLoading: isLoadingPayments, isRefetching } = useGetPayments(ENTITIES.EXPENSE, params.id);
   const cancelExpense = useCancelExpense();
   const editExpense = useEditExpense();
   const editPayment = useEditPayment();
@@ -102,25 +102,12 @@ const Expense = ({ params }) => {
   const expenseAllow = useAllowUpdate({ canUpdate: RULES.canUpdate[role], onBeforeView: expenseUnsaved.onBeforeView });
 
   const paymentsFormRef = useRef();
-  const paymentMethods = useForm({
-    defaultValues: { paymentsMade: expense?.paymentsMade || [] },
-    mode: "onChange",
-  });
-
-  const { formState: { isDirty: isPaymentsDirty } } = paymentMethods;
-
-  useEffect(() => {
-    if (expense?.paymentsMade && !isPaymentsDirty) {
-      paymentMethods.reset({ paymentsMade: expense.paymentsMade });
-    }
-  }, [expense?.paymentsMade, isPaymentsDirty, paymentMethods]);
 
   const paymentsUnsaved = useUnsavedChanges({
     formRef: paymentsFormRef,
     onSave: () => paymentsFormRef.current.submitForm(),
     onDiscard: () => paymentsFormRef.current.resetForm(),
   });
-  const paymentsAllow = useAllowUpdate({ canUpdate: RULES.canUpdate[role], onBeforeView: paymentsUnsaved.onBeforeView })
 
   const handleModalClose = () => {
     setIsModalCancelOpen(false);
@@ -166,13 +153,11 @@ const Expense = ({ params }) => {
   });
 
   const { mutate: mutateCreatePayment, isPending: isCreatePending } = useMutation({
-    mutationFn: (paymentData) =>
-      createPayment(paymentData.payment, paymentData.entity, paymentData.entityId, { skipStorageUpdate: true })
-    ,
+    mutationFn: (payment) => createPayment(payment, ENTITIES.EXPENSE, expense.id),
     onSuccess: (response) => {
       if (response?.statusOk) {
         toast.success("Pago creado correctamente!");
-        refetchPayment();
+        refetchPayments();
       } else {
         toast.error(response.error.message);
       }
@@ -183,14 +168,11 @@ const Expense = ({ params }) => {
   });
 
   const { mutate: mutateEditPayment, isPending: isEditPaymentPending } = useMutation({
-    mutationFn: ({ payment, entity, entityId }) =>
-      editPayment(payment, entity, entityId, {
-        skipStorageUpdate: true,
-      }),
+    mutationFn: (payment) => editPayment(payment, ENTITIES.EXPENSE, expense.id),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pago actualizado!");
-        refetchPayment();
+        refetchPayments();
       } else {
         toast.error(response.error.message);
       }
@@ -201,12 +183,11 @@ const Expense = ({ params }) => {
   });
 
   const { mutate: mutateDeletePayment, isPending: isDeletePending } = useMutation({
-    mutationFn: ({ paymentId, entity, entityId }) =>
-      deletePayment({ paymentId, entity, entityId }, { skipStorageUpdate: true }),
+    mutationFn: (paymentId) => deletePayment(paymentId, ENTITIES.EXPENSE,expense.id),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pago eliminado!");
-        refetchPayment();
+        refetchPayments();
       } else {
         toast.error(response.error.message);
       }
@@ -228,12 +209,6 @@ const Expense = ({ params }) => {
           <Flex $marginBottom="15px">
             {!isItemCancelled(expense?.state) && expenseAllow.toggleButton}
           </Flex>
-          {isItemCancelled(expense?.state) && (
-            <Message negative>
-              <MessageHeader>Motivo de cancelación</MessageHeader>
-              <p>{expense.cancelledMsg}</p>
-            </Message>
-          )}
           <ExpenseForm
             ref={expenseFormRef}
             expense={expense}
@@ -257,32 +232,30 @@ const Expense = ({ params }) => {
       render: () => (
         <Tab.Pane>
           <Loader active={isLoadingPayments || isRefetching}>
-            <EntityPayments
-              ref={paymentsFormRef}
-              total={expense.amount}
-              entityState={expense.state}
-              isCancelled={isItemCancelled}
-              isUpdating={paymentsAllow.isUpdating}
+            {!isItemCancelled(expense?.state) && expense.expirationDate && (
+              <Flex $justifyContent="space-between">
+                <TextField
+                  width="20%"
+                  value={getFormatedDate(expense.expirationDate, DATE_FORMATS.ONLY_DATE)}
+                  label="Fecha de Vencimiento"
+                  disabled
+                />
+              </Flex>
+            )}
+            <Payments
+              payments={payments.map(payment => ({ ...payment, isOverdue: isDateAfter(payment.date, expense.expirationDate) })) ?? []}
               isModalPaymentOpen={isModalPaymentOpen}
               setIsModalPaymentOpen={setIsModalPaymentOpen}
               showDeleteModal={showDeleteModal}
               setShowDeleteModal={setShowDeleteModal}
-              toggleButton={paymentsAllow.toggleButton}
-              methods={paymentMethods}
+              total={expense.amount}
               isLoading={isDeletePending || isCreatePending || isEditPaymentPending}
-              isDirty={isPaymentsDirty}
-              resetValue={{ paymentsMade: expense.paymentsMade }}
-              dueDate={expense.expirationDate}
-              payment={payment}
-              onAdd={(payment) => mutateCreatePayment({ payment, entity: ENTITIES.EXPENSE, entityId: expense.id })}
-              onEdit={(payment) => mutateEditPayment({ payment, entity: ENTITIES.EXPENSE, entityId: expense.id })}
+              onAdd={(payment) => mutateCreatePayment(payment)}
+              onEdit={(payment) => mutateEditPayment(payment)}
               onDelete={(payment) => {
-                mutateDeletePayment({
-                  paymentId: payment.paymentId || payment.id,
-                  entity: ENTITIES.EXPENSE,
-                  entityId: expense.id
-                });
+                mutateDeletePayment(payment.id);
               }}
+              allowUpdates={!isItemCancelled(expense?.state)}
             />
           </Loader>
         </Tab.Pane>
@@ -304,6 +277,12 @@ const Expense = ({ params }) => {
 
   return (
     <Loader active={isLoading || !expense}>
+      {isItemCancelled(expense?.state) && (
+        <Message negative>
+          <MessageHeader>Motivo de cancelación</MessageHeader>
+          <p>{expense.cancelledMsg}</p>
+        </Message>
+      )}
       <Tab
         panes={panes}
         activeIndex={activeIndex}

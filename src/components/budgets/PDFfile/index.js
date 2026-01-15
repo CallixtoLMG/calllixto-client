@@ -31,14 +31,11 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
   const filteredColumns = useMemo(() => getProductsColumns(dispatchPdf, budget, showPrices), [budget, dispatchPdf, showPrices]);
   const comments = useMemo(() => budget?.products?.filter(product => product.dispatchComment || product?.dispatch?.comment)
     .map(product => `${product.name} - ${product.dispatchComment || product?.dispatch?.comment}`), [budget?.products]);
-  const roundedFinalTotal = parseFloat(total?.toFixed(2));
 
-  const createTotalListItems = (paymentMethods = [], total) => {
+  const createTotalListItems = () => {
+    const sortedPayments = getSortedPaymentsByDate(budget?.paymentsMade);
+    const totalPending = total - budget?.paidAmount;
 
-    const sortedPayments = getSortedPaymentsByDate(paymentMethods);
-
-    const totalAssigned = sortedPayments.reduce((acc, payment) => acc + payment.amount, 0) || 0;
-    const totalPending = total - totalAssigned;
     const items = sortedPayments.map((payment, index) => {
       const date = payment.date ? getFormatedDate(payment.date) : null;
       const subtitleParts = [];
@@ -57,27 +54,19 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
     items.push({
       id: items.length + 1,
       title: "Total Pagado",
-      amount: <PriceLabel value={totalAssigned} />,
+      amount: <PriceLabel value={budget?.paidAmount} />,
     });
 
-    if (totalPending > 0) {
-      items.push({
-        id: items.length + 2,
-        title: "Total Pendiente",
-        amount: <PriceLabel value={totalPending} />,
-      });
-    }
-
     items.push({
-      id: items.length + (totalPending > 0 ? 3 : 2),
-      title: "Total a Pagar",
-      amount: <PriceLabel value={roundedFinalTotal} />,
+      id: items.length + 2,
+      title: "Pendiente",
+      amount: <PriceLabel value={totalPending} />,
     });
 
     return items;
   };
 
-  const TOTAL_LIST_ITEMS = createTotalListItems(budget?.paymentsMade, roundedFinalTotal);
+  const TOTAL_LIST_ITEMS = createTotalListItems();
   return (
     <FlexColumn ref={ref} $rowGap="15px">
       <Box>
@@ -145,7 +134,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             additionalCharge={budget?.additionalCharge}
             readOnly
             showAllways={false}
-            total={roundedFinalTotal}
+            total={total}
             subtotalAfterDiscount={subtotalAfterDiscount}
           />
         )
@@ -168,7 +157,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
                 <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Cotización en USD a Tasa de Cambio: <b>{getFormatedPrice(dolarExchangeRate)}</b></Title>
                 <Divider />
                 <Title as="h4" $alignSelf="left" width="fit-content" $minHeight="30px">
-                  <PriceLabel value={roundedFinalTotal / parseInt(dolarExchangeRate)} />
+                  <PriceLabel value={total / parseInt(dolarExchangeRate)} />
                 </Title>
               </DataContainer>
             )}
