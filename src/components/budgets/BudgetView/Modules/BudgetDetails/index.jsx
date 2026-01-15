@@ -40,6 +40,12 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
     setInitializedContact(true);
   }, [budget, initializedContact, setSelectedContact]);
 
+  useEffect(() => {
+    if (budget?.postConfirmDiscount != null) {
+      setValue("postConfirmDiscount", budget.postConfirmDiscount);
+    }
+  }, [budget?.postConfirmDiscount, setValue]);
+
   const TOTAL_LIST_ITEMS = useMemo(() => {
     const items = [
       { id: 1, title: "Pagado", amount: <PriceLabel value={budget.paidAmount} /> },
