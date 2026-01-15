@@ -3,14 +3,15 @@ import { useCreatePayment, useDeletePayment, useEditPayment } from "@/api/paymen
 import { ENTITIES } from "@/common/constants";
 import BudgetDetails from "@/components/budgets/BudgetView/BudgetDetails";
 import { Loader } from "@/components/layout";
+import Payments from "@/components/payments";
 import { useAllowUpdate, useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 import { isBudgetCancelled, isBudgetExpired, isBudgetPending } from "../budgets.utils";
-import Payments from "@/components/payments";
 
 const BudgetView = ({
   budget,
@@ -38,13 +39,19 @@ const BudgetView = ({
 
   const formRef = useRef(null);
 
+  const methods = useForm({
+    defaultValues: {
+      postConfirmDiscount: 0,
+    },
+  });
+
   const {
     onBeforeView,
   } = useUnsavedChanges({
     formRef,
   });
 
-  const {} = useAllowUpdate({
+  const { } = useAllowUpdate({
     canUpdate: true,
     onBeforeView,
   });
@@ -168,11 +175,13 @@ const BudgetView = ({
   };
 
   return (
-    <Tab
-      panes={panes}
-      activeIndex={activeIndex}
-      onTabChange={handleTabChange}
-    />
+    <FormProvider {...methods}>
+      <Tab
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={handleTabChange}
+      />
+    </FormProvider>
   );
 };
 

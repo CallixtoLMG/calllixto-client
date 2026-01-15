@@ -1,5 +1,6 @@
-import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
-import { DropdownField, PriceLabel } from "@/common/components/form";
+import { IconedButton } from "@/common/components/buttons";
+import { Dropdown, FieldsContainer, Flex, FlexColumn, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
+import { DropdownField, PriceControlled, PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
@@ -8,6 +9,7 @@ import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useEffect, useMemo, useState } from "react";
+import { useFormContext } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
 import { PICK_UP_IN_STORE } from "../../budgets.constants";
 import { getBudgetState, isBudgetCancelled, isBudgetConfirmed } from "../../budgets.utils";
@@ -18,6 +20,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
   const totalPending = (total - budget.paidAmount).toFixed(2);
+  const { setValue, getValues, trigger } = useFormContext();
 
   useEffect(() => {
     if (!budget || initializedContact) return;
