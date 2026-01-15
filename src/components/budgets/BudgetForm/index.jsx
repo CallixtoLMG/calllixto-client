@@ -98,7 +98,7 @@ const BudgetForm = ({
         : {
           ...EMPTY_BUDGET(user),
           ...settings.defaultsCreate,
-          ...(settings?.defaultsCreate?.customer && { customer: customers.find(c => c.id === settings.defaultsCreate.customer.key) ?? null }),
+          ...(settings?.defaultsCreate?.customer && { customer: customers.find(c => c.id === settings.defaultsCreate.customer.id) ?? null }),
         },
     mode: 'onSubmit',
     reValidateMode: 'onChange',
@@ -614,7 +614,7 @@ const BudgetForm = ({
               width="300px"
               label="Cliente"
               required
-              clearable={!!watchCustomer?.name}
+              clearable
               placeholder="Martín Bueno"
               rules={{
                 validate: {
@@ -709,14 +709,14 @@ const BudgetForm = ({
             onAfterChange={(selectedProduct) => {
               appendProduct({
                 ...selectedProduct,
-                quantity: selectedProduct.state === PRODUCT_STATES.OOS.id ? 0 : 1,
+                quantity: selectedProduct?.state === PRODUCT_STATES.OOS.id ? 0 : 1,
                 discount: 0,
                 key: uuid(),
-                ...(selectedProduct.fractionConfig?.active && {
+                ...(selectedProduct?.fractionConfig?.active && {
                   fractionConfig: {
-                    ...selectedProduct.fractionConfig,
+                    ...selectedProduct?.fractionConfig,
                     value: 1,
-                    price: selectedProduct.price,
+                    price: selectedProduct?.price,
                   }
                 })
               });

@@ -11,6 +11,7 @@ const BudgetsModule = (() => {
 
   const customerOptions = useMemo(() => customersData?.customers?.map(customer => ({
     state: customer.state,
+    id: customer.id,
     key: customer.id,
     value: customer.id,
     text: customer.name,

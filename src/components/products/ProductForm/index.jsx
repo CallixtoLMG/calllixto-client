@@ -5,10 +5,10 @@ import {
   IconedButtonControlled,
   PercentField,
   PriceControlled,
+  SearchControlled,
   TextAreaControlled,
   TextControlled,
-  TextField,
-  SearchControlled
+  TextField
 } from "@/common/components/form";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { BRAND_STATES, getBrandSearchDescription, getBrandSearchTitle } from "@/components/brands/brands.constants";
@@ -118,7 +118,7 @@ const ProductForm = forwardRef(({
           ) : (
             <>
               <SearchControlled
-                clearable={!!watchSupplier?.id}
+                clearable
                 width="25%"
                 disabled={isUpdating || isLoading}
                 name="supplier"
@@ -143,7 +143,7 @@ const ProductForm = forwardRef(({
                 })}
               />
               <SearchControlled
-                clearable={!!watchBrand?.id}
+                clearable
                 disabled={isUpdating || isLoading}
                 width="25%"
                 name="brand"

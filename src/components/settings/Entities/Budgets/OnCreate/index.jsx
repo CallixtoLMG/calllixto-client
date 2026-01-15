@@ -2,7 +2,7 @@ import { Box, FlexColumn } from "@/common/components/custom";
 import { GroupedButtonsControlled, NumberControlled, SearchControlled } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion, Icon } from "semantic-ui-react";
 
@@ -10,13 +10,8 @@ const OnCreate = ({ customerOptions, isLoading }) => {
 
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
-
-  const { watch, setValue } = useFormContext();
+  const { watch } = useFormContext();
   const [defaultsCreate, defaultsCreateCustomer] = watch(['defaultsCreate', "defaultsCreate.customer"]);
-
-  const selectedCustomer = useMemo(() => {
-    return customerOptions?.find(c => c.id === defaultsCreateCustomer) ?? null;
-  }, [defaultsCreateCustomer, customerOptions]);
 
   return (
     <Box $marginBottom="5px">
@@ -50,7 +45,7 @@ const OnCreate = ({ customerOptions, isLoading }) => {
               label="Cliente por Defecto"
               disabled={isLoading}
               required
-              clearable={!!defaultsCreateCustomer}
+              clearable
               placeholder="A0001"
               elements={customerOptions}
               searchFields={['text', 'value']}
