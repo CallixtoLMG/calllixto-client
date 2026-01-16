@@ -1,4 +1,4 @@
-import { DropdownControlled, TextControlled } from "@/common/components/form";
+import { DropdownControlled, SearchControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from '@/common/components/table';
 import { COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter, downloadExcel, getFormatedPercentage, handleUndefined } from '@/common/utils';
@@ -11,7 +11,7 @@ import { FormProvider } from 'react-hook-form';
 import { Form } from 'semantic-ui-react';
 import { BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE_TRANSLATIONS, EMPTY_FILTERS, PAYMENT_STATES, PAYMENT_STATES_OPTIONS, getBudgetColumns } from "../budgets.constants";
 
-const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRefetch }) => {
+const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRefetch, usersOptions }) => {
   const { push } = useRouter();
 
   const handleDownloadExcel = useCallback((elements) => {
@@ -61,6 +61,8 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: filterKey });
 
+  const { setValue } = methods;
+
   const onFilter = createFilter(filters, {
     id: {},
     customer: { field: 'name' },
@@ -94,11 +96,11 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
   );
 
   useEffect(() => {
-    if (filters.state !== BUDGET_STATES.CONFIRMED.id && filters.paymentStatus) {
-      methods.setValue("paymentStatus", "");
-      onSubmit();
+    onRestoreFilters()
+    if (filters.state === BUDGET_STATES.CONFIRMED.id) {
+      methods.setValue('paymentStatus', SELECT_ALL_OPTION.value);
     }
-  }, [filters.state, filters.paymentStatus, methods, onSubmit]);
+  }, [filters.state, setValue]);
 
   const actions = [
     {
@@ -139,10 +141,20 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
               name="customer"
               placeholder="Cliente"
             />
-            <TextControlled
-              flex="1"
+            <SearchControlled
               name="createdBy"
+              width="200px"
               placeholder="Vendedor"
+              elements={usersOptions}
+              searchFields={['text', 'value', 'id']}
+              getResultProps={(option) => ({
+                key: option.key,
+                title: option.text,
+                description: option.id,
+                value: option
+              })}
+              getDisplayValue={(option) => option?.text ?? ''}
+              persistSelection
             />
             {filters.state === BUDGET_STATES.CONFIRMED.id && (
               <DropdownControlled

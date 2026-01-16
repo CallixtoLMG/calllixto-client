@@ -38,7 +38,6 @@ const SearchField = forwardRef(
     const [query, setQuery] = useState('');
     const [filtered, setFiltered] = useState(elements);
     const [loading, setLoading] = useState(false);
-
     const fields = useMemo(() => searchFields.map(normalizeText), [searchFields]);
     const matchesOnSomeField = useCallback((element, word) => {
       return fields.some(field => normalizeText(get(element, field)).includes(word))
@@ -71,6 +70,12 @@ const SearchField = forwardRef(
       return () => debouncedSearch.cancel();
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [elements, query]);
+
+    useEffect(() => {
+      if (!value) {
+        setQuery('');
+      }
+    }, [value]);
 
     const handleChange = (_, { value }) => {
       setQuery(value);
