@@ -1,17 +1,17 @@
 import { Box, FlexColumn } from "@/common/components/custom";
-import { GroupedButtonsControlled, NumberControlled, TextControlled } from "@/common/components/form";
+import { GroupedButtonsControlled, NumberControlled, SearchControlled } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion, Icon } from "semantic-ui-react";
 
-const OnCreate = () => {
+const OnCreate = ({ customerOptions, isLoading }) => {
+
   const [isAccordionOpen, setIsAccordionOpen] = useState(false);
   const toggleAccordion = () => setIsAccordionOpen(!isAccordionOpen);
-
   const { watch } = useFormContext();
-  const [defaultsCreate] = watch(['defaultsCreate']);
+  const [defaultsCreate, defaultsCreateCustomer] = watch(['defaultsCreate', "defaultsCreate.customer"]);
 
   return (
     <Box $marginBottom="5px">
@@ -39,16 +39,29 @@ const OnCreate = () => {
                 { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
               ]}
             />
-            <TextControlled
-              name="defaultsCreate.customer.value"
-              placeholder="A0001"
-              width="200px"
+            <SearchControlled
+              name="defaultsCreate.customer"
+              width="300px"
               label="Cliente por Defecto"
+              disabled={isLoading}
+              required
+              clearable
+              placeholder="A0001"
+              elements={customerOptions}
+              searchFields={['text', 'value']}
+              getResultProps={(option) => ({
+                key: option.key,
+                title: option.text,
+                description: option.value,
+                value: option,
+              })}
+              persistSelection={true}
+              getDisplayValue={(option) => option?.text ?? ''}
             />
             <NumberControlled
               name="defaultsCreate.expirationOffsetDays"
               label="Días para el Vencimiento por Defecto"
-              width="300px"
+              width="fit-content"
               placeholder="15"
             />
           </FlexColumn>

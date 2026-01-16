@@ -2,10 +2,11 @@
 import { useUserContext } from "@/User";
 import { useCancelBudget, useConfirmBudget, useEditBudget, useGetBudget } from "@/api/budgets";
 import { useListCustomers } from "@/api/customers";
+import { useGetPayments } from "@/api/payments";
 import { useListProducts } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
-import { DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu } from "@/common/components/custom";
+import { DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu, Message, MessageHeader } from "@/common/components/custom";
 import ModalCancel from "@/common/components/modals/ModalCancel";
 import { COLORS, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone, mapToDropdownOptions } from "@/common/utils";
@@ -17,6 +18,7 @@ import ModalCustomer from "@/components/budgets/ModalCustomer";
 import ModalPDF from "@/components/budgets/ModalPDF";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
+import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
@@ -34,9 +36,10 @@ const Budget = ({ params }) => {
   const { resetActions, setActions } = useNavActionsContext();
   const { push } = useRouter();
   const { data: budget, isLoading, refetch: refetchBudget } = useGetBudget(params.id);
+  const { data: paymentsMade, isLoading: isLoadingPayments, refetch: refetchPayments } = useGetPayments(ENTITIES.BUDGET, params.id);
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
-  const { data: paymentMethods, refetch: refetchPaymentMethods } = useGetSetting(ENTITIES.GENERAL);
+  const { data: paymentMethods } = useGetSetting(ENTITIES.GENERAL);
   const { data: budgetSettings, isLoading: isLoadingBudgetSettings, isRefetching: isRefetchingSettings } = useGetSetting(ENTITIES.BUDGET);
   const [customerData, setCustomerData] = useState();
   const [isModalCustomerOpen, setIsModalCustomerOpen] = useState(false);
@@ -54,10 +57,10 @@ const Budget = ({ params }) => {
 
   const customers = useMemo(() => customersData?.customers?.map(customer => ({
     ...customer,
-    key: customer.name,
-    value: customer.name,
+    key: customer.id,
+    value: customer.id,
     text: customer.name,
-  })), [customersData]);
+  }))?.filter(({ state }) => state === CUSTOMER_STATES.ACTIVE.id), [customersData]);
 
   const paymentMethodOptions = useMemo(() => {
     return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
@@ -305,20 +308,31 @@ const Budget = ({ params }) => {
           paymentMethods={paymentMethodOptions}
         />
       ) : (
-        <BudgetView
-          budget={{ ...budget, customer: customerData }}
-          subtotal={subtotal}
-          subtotalAfterDiscount={subtotalAfterDiscount}
-          total={total}
-          selectedContact={selectedContact}
-          setSelectedContact={setSelectedContact}
-          refetch={refetchBudget}
-        />
+        <>
+          {isBudgetCancelled(budget?.state) && (
+            <Message negative>
+              <MessageHeader>Motivo de anulación</MessageHeader>
+              <p>{budget?.cancelledMsg}</p>
+            </Message>
+          )}
+          <BudgetView
+            budget={{ ...budget, customer: customerData }}
+            paymentsMade={paymentsMade}
+            subtotal={subtotal}
+            subtotalAfterDiscount={subtotalAfterDiscount}
+            total={total}
+            selectedContact={selectedContact}
+            setSelectedContact={setSelectedContact}
+            refetch={refetchBudget}
+            isLoadingPayments={isLoadingPayments}
+            refetchPayments={refetchPayments}
+          />
+        </>
       )}
       <ModalPDF
         isModalOpen={isModalPDFOpen}
         onClose={setIsModalPDFOpen}
-        budget={budget}
+        budget={{ ...budget, paymentsMade }}
         client={userData?.selectedClient ?? userData?.client}
         total={total}
         subtotal={subtotal}

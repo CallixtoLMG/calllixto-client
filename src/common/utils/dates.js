@@ -46,8 +46,8 @@ export const getPastDate = (amount, unit = "years") => {
   return date;
 };
 
-export const getSortedPaymentsByDate = (paymentMethods = []) => {
-  return [...paymentMethods].sort(
+export const getSortedPaymentsByDate = (paymentsMade = []) => {
+  return [...paymentsMade].sort(
     (a, b) => dayjs(a.date || 0).valueOf() - dayjs(b.date || 0).valueOf()
   );
 };

@@ -7,17 +7,7 @@ import { useMemo, useState } from "react";
 import { Header, Popup } from "semantic-ui-react";
 import { Box, Button, Flex, FlexColumn, Icon, OverflowWrapper, Segment } from "../../common/components/custom";
 import { Table, TotalList } from "../../common/components/table";
-
-const calculateTotals = (payments, total) => {
-  const totalAssigned = payments?.reduce((sum, payment) => sum + (parseFloat(payment.amount) || 0), 0).toFixed(2);
-  let totalPending = (total - totalAssigned).toFixed(2);
-
-  if (Math.abs(totalPending) < 0.01) {
-    totalPending = (0).toFixed(2);
-  }
-
-  return { totalAssigned, totalPending };
-};
+import { calculateTotals } from "@/common/utils";
 
 const getPaymentTableHeaders = () => [
   {
@@ -64,53 +54,38 @@ const getPaymentTableHeaders = () => [
 ];
 
 const Payments = ({
+  payments,
+  isModalPaymentOpen,
+  setIsModalPaymentOpen,
+  showDeleteModal,
+  setShowDeleteModal,
   total,
-  maxHeight,
-  children,
-  update,
-  noBoxShadow,
-  noBorder,
-  padding,
-  deleteButtonInside,
-  dueDate,
+  isLoading,
   onAdd,
   onEdit,
   onDelete,
-  payment,
-  entityState,
-  isCancelled,
-  isLoading,
-  showDeleteModal,
-  setShowDeleteModal,
-  isModalPaymentOpen,
-  setIsModalPaymentOpen,
+  allowUpdates,
 }) => {
-  const { totalPending, totalAssigned } = useMemo(() => calculateTotals(payment, total), [payment, total]);
+  const { totalPending, totalPaid } = useMemo(() => calculateTotals(payments, total), [payments, total]);
   const isTotalCovered = useMemo(() => totalPending <= 0, [totalPending]);
   const [paymentToEdit, setPaymentToEdit] = useState(null);
   const [paymentToDelete, setPaymentToDelete] = useState(null);
-  const elements = useMemo(() => {
-    if (!dueDate) return getSortedPaymentsByDate(payment);
-    return getSortedPaymentsByDate(payment).map((payment) => ({
-      ...payment,
-      isOverdue: new Date(payment.date) > new Date(dueDate)
-    }));
-  }, [payment, dueDate]);
+  const elements = useMemo(() => getSortedPaymentsByDate(payments), [payments]);
 
   const TOTAL_LIST_ITEMS = [
-    { id: 1, title: "Pagado", amount: <PriceLabel value={totalAssigned} /> },
-    { id: 2, title: "Pendiente", amount: <PriceLabel value={totalPending} /> },
+    { id: 1, title: "Pagado", amount: <PriceLabel value={totalPaid ?? 0} /> },
+    { id: 2, title: "Pendiente", amount: <PriceLabel value={totalPending ?? 0} /> },
     { id: 3, title: "Total", amount: <PriceLabel value={total} /> },
   ];
 
   return (
-    <Flex width="100%" $maxHeight={maxHeight ? "55vh" : ""} className="ui form">
-      <Segment $noBorder={noBorder} $noBoxShadow={noBoxShadow} padding={padding ? padding : "25px 60px 25px 35px"}>
+    <Flex width="100%" className="ui form">
+      <Segment $noBorder $noBoxShadow padding="14px 0">
         <Header>
           Detalle de Pagos
         </Header>
         <FlexColumn $rowGap="15px">
-          {!isCancelled(entityState) && (
+          {allowUpdates && (
             <>
               <Popup
                 trigger={
@@ -157,34 +132,35 @@ const Payments = ({
             <Table
               headers={getPaymentTableHeaders()}
               elements={elements}
-              actions={[
-                {
-                  id: 1,
-                  icon: ICONS.TRASH,
-                  color: COLORS.RED,
-                  onClick: (element) => {
-                    setPaymentToDelete(element);
-                    setShowDeleteModal(true);
+              {...allowUpdates && {
+                actions: [
+                  {
+                    id: 1,
+                    icon: ICONS.TRASH,
+                    color: COLORS.RED,
+                    onClick: (element) => {
+                      setPaymentToDelete(element);
+                      setShowDeleteModal(true);
+                    },
+                    tooltip: 'Eliminar',
                   },
-                  tooltip: 'Eliminar',
-                },
-                {
-                  id: 2,
-                  icon: ICONS.EDIT,
-                  color: COLORS.BLUE,
-                  onClick: (element) => {
-                    setPaymentToEdit(element);
-                    setIsModalPaymentOpen(true);
-                  },
-                  tooltip: "Editar",
-                  width: "100%"
-                }
-              ]}
-              $deleteButtonInside={deleteButtonInside}
+                  {
+                    id: 2,
+                    icon: ICONS.EDIT,
+                    color: COLORS.BLUE,
+                    onClick: (element) => {
+                      setPaymentToEdit(element);
+                      setIsModalPaymentOpen(true);
+                    },
+                    tooltip: "Editar",
+                    width: "100%"
+                  }
+                ]
+              }}
+              $deleteButtonInside
             />
           </Flex>
           <TotalList readOnly items={TOTAL_LIST_ITEMS} />
-          {update && children}
         </FlexColumn>
       </Segment>
       <ModalAction
