@@ -183,7 +183,11 @@ export const createFilter = (filters, config) => {
   };
 };
 
-export const normalizeText = (text) => text?.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() ?? "";
+export const normalizeText = (text = "") =>
+  String(text)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
 
 export const getDefaultListParams = (attributes = []) => {
   return { attributes: encodeUri(getDefaultAttributes(attributes)) };

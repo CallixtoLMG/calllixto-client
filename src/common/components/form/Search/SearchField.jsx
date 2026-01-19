@@ -38,7 +38,7 @@ const SearchField = forwardRef(
     const [query, setQuery] = useState('');
     const [filtered, setFiltered] = useState(elements);
     const [loading, setLoading] = useState(false);
-    const fields = useMemo(() => searchFields.map(normalizeText), [searchFields]);
+    const fields = useMemo(() => searchFields, [searchFields]);
     const matchesOnSomeField = useCallback((element, word) => {
       return fields.some(field => normalizeText(get(element, field)).includes(word))
     }, [fields]);
@@ -72,14 +72,19 @@ const SearchField = forwardRef(
     }, [elements, query]);
 
     useEffect(() => {
-      if (!value) {
+      if (value == null) {
         setQuery('');
       }
     }, [value]);
 
-    const handleChange = (_, { value }) => {
-      setQuery(value);
-      onSelect(null);
+    const handleKeyDown = (e) => {
+      if (e.key === 'Backspace' && value != null) {
+        onSelect(null);
+      }
+    };
+
+    const handleChange = (_, { value: inputValue }) => {
+      setQuery(inputValue);
     };
 
     const handleSelect = (_, { result }) => {
@@ -120,6 +125,7 @@ const SearchField = forwardRef(
         results={filtered.slice(0, maxResults).map(getResultProps)}
         value={value ? getDisplayValue(value) : query}
         onSearchChange={handleChange}
+        onKeyDown={handleKeyDown}
         onResultSelect={handleSelect}
         disabled={disabled}
         error={error}

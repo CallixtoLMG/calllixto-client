@@ -40,8 +40,6 @@ const Budgets = () => {
     text: `${user.firstName} ${user.lastName}`,
   }))?.filter(({ state }) => state === USER_STATES.ACTIVE.id), [users]);
   
-  console.log(usersOptions)
-
   useEffect(() => {
     const actions = [
       {

@@ -96,7 +96,6 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
   );
 
   useEffect(() => {
-    onRestoreFilters()
     if (filters.state === BUDGET_STATES.CONFIRMED.id) {
       methods.setValue('paymentStatus', SELECT_ALL_OPTION.value);
     }
@@ -146,14 +145,14 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
               width="200px"
               placeholder="Vendedor"
               elements={usersOptions}
-              searchFields={['text', 'value', 'id']}
+              searchFields={['text', 'value']}
               getResultProps={(option) => ({
                 key: option.key,
                 title: option.text,
                 description: option.id,
-                value: option
+                value: option.text
               })}
-              getDisplayValue={(option) => option?.text ?? ''}
+              getDisplayValue={(value) => value ?? ''}
               persistSelection
             />
             {filters.state === BUDGET_STATES.CONFIRMED.id && (

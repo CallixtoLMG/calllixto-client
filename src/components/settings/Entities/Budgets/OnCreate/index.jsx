@@ -53,10 +53,10 @@ const OnCreate = ({ customerOptions, isLoading }) => {
                 key: option.key,
                 title: option.text,
                 description: option.value,
-                value: option,
+                value: option
               })}
               persistSelection={true}
-              getDisplayValue={(option) => option?.text ?? ''}
+              getDisplayValue={(value) => value.text ?? ''}
             />
             <NumberControlled
               name="defaultsCreate.expirationOffsetDays"
