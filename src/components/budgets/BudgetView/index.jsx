@@ -4,11 +4,9 @@ import { ENTITIES } from "@/common/constants";
 import BudgetDetails from "@/components/budgets/BudgetView/BudgetDetails";
 import { Loader } from "@/components/layout";
 import Payments from "@/components/payments";
-import { useAllowUpdate, useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 import { isBudgetCancelled, isBudgetExpired, isBudgetPending } from "../budgets.utils";
@@ -36,25 +34,6 @@ const BudgetView = ({
   const confirmBudgetDiscount = useConfirmBudgetDiscount();
   const [isModalPaymentOpen, setIsModalPaymentOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const formRef = useRef(null);
-
-  const methods = useForm({
-    defaultValues: {
-      postConfirmDiscount: 0,
-    },
-  });
-
-  const {
-    onBeforeView,
-  } = useUnsavedChanges({
-    formRef,
-  });
-
-  const { } = useAllowUpdate({
-    canUpdate: true,
-    onBeforeView,
-  });
 
   const { mutate: mutateCreatePayment, isPending: isCreatePending } = useMutation({
     mutationFn: (payment) => createPayment(payment, ENTITIES.BUDGET, budget.id),
@@ -166,22 +145,17 @@ const BudgetView = ({
   }));
 
   const handleTabChange = async (_, { activeIndex }) => {
-    const canChange = await onBeforeView?.();
-    if (canChange) {
-      setActiveIndex(activeIndex);
-      const newUrl = window.location.pathname;
-      router.replace(newUrl);
-    }
+    setActiveIndex(activeIndex);
+    const newUrl = window.location.pathname;
+    router.replace(newUrl);
   };
 
   return (
-    <FormProvider {...methods}>
-      <Tab
-        panes={panes}
-        activeIndex={activeIndex}
-        onTabChange={handleTabChange}
-      />
-    </FormProvider>
+    <Tab
+      panes={panes}
+      activeIndex={activeIndex}
+      onTabChange={handleTabChange}
+    />
   );
 };
 
