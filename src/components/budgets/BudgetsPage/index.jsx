@@ -99,7 +99,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
     if (filters.state === BUDGET_STATES.CONFIRMED.id) {
       methods.setValue('paymentStatus', SELECT_ALL_OPTION.value);
     }
-  }, [filters.state, setValue]);
+  }, [filters.state, setValue, methods]);
 
   const actions = [
     {
