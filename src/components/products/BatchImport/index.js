@@ -132,6 +132,7 @@ const BatchImport = ({ isCreating }) => {
 
     const columnMapping = {
       id: "id",
+      codigo: "id",
       nombre: "name",
       marca: "brand",
       proveedor: "supplier",
@@ -419,17 +420,17 @@ const BatchImport = ({ isCreating }) => {
                 <Modal.Actions>
                   <ButtonsContainer>
                     <IconedButton
+                      text="Cancelar"
+                      icon={ICONS.X}
+                      color={COLORS.RED}
+                      onClick={() => setShowConfirmationModal(false)}
+                    />
+                    <IconedButton
                       text="Confirmar"
                       icon={ICONS.CHECK}
                       color={COLORS.GREEN}
                       onClick={handleDownloadConfirmation}
                       onKeyDown={handleDownloadConfirmation}
-                    />
-                    <IconedButton
-                      text="Cancelar"
-                      icon={ICONS.X}
-                      color={COLORS.RED}
-                      onClick={() => setShowConfirmationModal(false)}
                     />
                   </ButtonsContainer>
                 </Modal.Actions>
