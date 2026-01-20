@@ -6,7 +6,7 @@ import { PriceControlled, TextControlled, TextField } from "@/common/components/
 import { Table } from "@/common/components/table";
 import { COLORS, ENTITIES, ICONS } from "@/common/constants";
 import { downloadExcel, normalizeText } from "@/common/utils";
-import { now } from "@/common/utils/dates";
+import { getDateUTC } from "@/common/utils/dates";
 import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -182,10 +182,7 @@ const BatchImport = ({ isCreating }) => {
     parsedData.forEach(product => {
       const id = product.id ? String(product.id).toUpperCase() : "Sin id";
       productCounts[id] = (productCounts[id] || 0) + 1;
-    });
 
-    parsedData.forEach(product => {
-      const id = product.id ? String(product.id).toUpperCase() : "Sin id";
       const hasAtLeastOneValue = product.id || product.name || product.cost || product.price;
 
       if (hasAtLeastOneValue) {
@@ -269,34 +266,40 @@ const BatchImport = ({ isCreating }) => {
         const { data } = await importSettings.onSubmit(e.importProducts);
         return data;
       } else {
-        const processedProducts = e.importProducts
+        const productsToProcess = e.importProducts
           .map(product => {
             const existingProduct = existingIds[product.id.toUpperCase()];
-            let productWithChanges = { id: product.id };
-            let previousVersion = {};
+            const productWithChanges = { id: product.id };
+            const previousVersion = { updatedAt: existingProduct.updatedAt };
+
             Object.keys(product).forEach(key => {
-              if (key !== 'id' && product[key] !== undefined && product[key] !== '' && product[key] !== existingProduct[key]) {
+              if (product[key] !== undefined && product[key] !== '' && product[key] !== existingProduct[key]) {
                 productWithChanges[key] = product[key];
                 previousVersion[key] = existingProduct[key];
               }
             });
-            if (existingProduct.updatedAt) {
-              previousVersion['updatedAt'] = existingProduct.updatedAt;
-            }
-            if (Object.keys(previousVersion).length > 0) {
-              productWithChanges['previousVersion'] = previousVersion;
-              productWithChanges.updatedAt = now();
-            } else {
-              return null;
-            }
-            return productWithChanges;
-          })
-          .filter(product => product !== null);
 
-        if (processedProducts.length > 0) {
-          const { data } = await importSettings.onSubmit(processedProducts);
+            if (!!Object.keys(previousVersion).length) {
+              productWithChanges['previousVersion'] = previousVersion;
+              productWithChanges.updatedAt = getDateUTC();
+
+              if (productWithChanges.updatedBy !== 'Usuario Actual') {
+                productWithChanges.updatedBy = 'Usuario Actual';
+              }
+
+              return productWithChanges;
+            }
+
+            return undefined;
+          })
+          .filter(Boolean);
+
+        if (!!productsToProcess.length) {
+          const { data } = await importSettings.onSubmit(productsToProcess);
           return data;
         };
+
+        return { error: { message: "No hay productos para actualizar." }};
       };
     },
     onSuccess: (response) => {
@@ -308,6 +311,7 @@ const BatchImport = ({ isCreating }) => {
         refetchProducts();
       } else {
         toast.error(response.error.message);
+        handleModalClose();
       }
       if (response.unprocessed?.length) {
         setShowUnprocessedModal(true);
@@ -438,7 +442,6 @@ const BatchImport = ({ isCreating }) => {
             </>
           ) : (
             <Loader active={loadingProducts || isLoading}>
-
               {watchProducts.length <= 50 ? (
                 <>
                   <Modal.Content>

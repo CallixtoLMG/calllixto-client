@@ -101,12 +101,7 @@ const ProductChanges = ({ product }) => {
   const latestVersion = { ...product };
   delete latestVersion.previousVersions;
 
-  const fullHistory = [...previousVersions, {
-    ...latestVersion,
-    updatedAt: product.updatedAt,
-    updatedBy: product.updatedBy,
-  }];
-  const reconstructedVersions = fullHistory
+  const reconstructedVersions = [...previousVersions, latestVersion]
     .slice()
     .reverse()
     .reduce((acc, curr, index) => {
@@ -114,8 +109,6 @@ const ProductChanges = ({ product }) => {
       const merged = {
         ...prevVersion,
         ...curr,
-        updatedAt: curr.updatedAt || prevVersion.updatedAt,
-        updatedBy: curr.updatedBy || prevVersion.updatedBy,
       };
       return [...acc, merged];
     }, [])
@@ -162,6 +155,7 @@ const ProductChanges = ({ product }) => {
         const date = version.updatedAt
           ? getFormatedDate(version.updatedAt, DATE_FORMATS.DATE_WITH_TIME)
           : `Sin fecha`;
+
         const updatedBy = version.updatedBy;
 
         return (
