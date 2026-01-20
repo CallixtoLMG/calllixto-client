@@ -303,6 +303,8 @@ export const ENTITY_VIEW = {
   DETAIL: 'DETAIL',
 };
 
+export const USER_DATA_KEY = "userData";
+
 export const INFO = {
   HELP: {
     SECTIONS: {
@@ -814,3 +816,5 @@ export const INFO = {
     }
   }
 };
+
+

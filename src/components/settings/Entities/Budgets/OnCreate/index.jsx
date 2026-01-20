@@ -20,7 +20,7 @@ const OnCreate = ({ customerOptions, isLoading }) => {
           <Icon name="dropdown" /> Al Crear una Venta
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
-          <FlexColumn $rowGap="20px">
+          <FlexColumn $rowGap="15px">
             <GroupedButtonsControlled
               label="Estado por Defecto"
               name="defaultsCreate.state"

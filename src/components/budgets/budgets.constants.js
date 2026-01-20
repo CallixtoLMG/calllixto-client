@@ -1,7 +1,8 @@
 import { Box, Flex, Icon, OverflowWrapper } from "@/common/components/custom";
 import { COLORS, DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
 import { getLabelColor } from "@/common/utils";
-import { getDateWithOffset, getEndOfUnit, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
+import { getDateWithOffset, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
+import { parse } from "date-fns";
 import { Label, Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { CommentTooltip } from "../../common/components/tooltips";
@@ -285,55 +286,102 @@ export const BUDGET_STATE_TRANSLATIONS = {
   DRAFT: BUDGET_STATES.DRAFT
 };
 
-export const BUDGETS_HISTORY_DATE_RANGE = [
+export const BASE_BUDGETS_HISTORY_RANGES = [
   {
-    label: 'Hoy',
-    value: 'today',
+    label: "Hoy",
+    value: "base_today",
     getRange: () => ({
-      startDate: getStartOfUnit(now(), 'day'),
-      endDate: now()
-    })
-  },
-  {
-    label: 'Este mes',
-    value: 'this_month',
-    getRange: () => ({
-      startDate: getStartOfUnit(now(), 'month'),
+      startDate: getStartOfUnit(now(), "day"),
       endDate: now(),
-    })
+    }),
   },
   {
-    label: 'Mes pasado',
-    value: 'last_month',
+    label: "Esta semana",
+    value: "base_week",
     getRange: () => ({
-      startDate: getStartOfUnit(getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO }), 'month'),
-      endDate: getEndOfUnit(getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO }), 'month')
-    })
+      startDate: getStartOfUnit(now(), "week"),
+      endDate: now(),
+    }),
   },
   {
-    label: 'Último mes',
-    value: 'last_30_days',
+    label: "Este mes",
+    value: "base_month",
     getRange: () => ({
-      startDate: getDateWithOffset({ offset: -1, unit: 'month', format: DATE_FORMATS.ISO }),
-      endDate: now()
-    })
+      startDate: getStartOfUnit(now(), "month"),
+      endDate: now(),
+    }),
   },
   {
-    label: 'Últimos 3 meses',
-    value: 'last_3_months',
+    label: "Este año",
+    value: "base_year",
     getRange: () => ({
-      startDate: getDateWithOffset({ offset: -3, unit: 'month', format: DATE_FORMATS.ISO }),
-      endDate: now()
-    })
+      startDate: getStartOfUnit(now(), "year"),
+      endDate: now(),
+    }),
   },
-  {
-    label: 'Últimos 6 meses',
-    value: 'last_6_months',
-    getRange: () => ({
-      startDate: getDateWithOffset({ offset: -6, unit: 'month', format: DATE_FORMATS.ISO }),
-      endDate: now()
-    })
-  }
 ];
 
+const UNIT_CONFIG = {
+  day: {
+    singular: "día",
+    plural: "días",
+    article: { singular: "Último", plural: "Últimos" },
+  },
+  week: {
+    singular: "semana",
+    plural: "semanas",
+    article: { singular: "Última", plural: "Últimas" },
+  },
+  month: {
+    singular: "mes",
+    plural: "meses",
+    article: { singular: "Último", plural: "Últimos" },
+  },
+};
+
+export const buildCustomHistoryRanges = (historyDateRanges = []) => {
+  return historyDateRanges
+    .filter(r => r.unit && r.value)
+    .map((range) => {
+      const valueNum = Number(range.value);
+      const config = UNIT_CONFIG[range.unit];
+
+      const offset =
+        range.unit === 'week'
+          ? -valueNum * 7
+          : -valueNum;
+
+      const unit =
+        range.unit === 'week'
+          ? 'day'
+          : range.unit;
+
+      const raw = getDateWithOffset({
+        offset,
+        unit,
+        format: DATE_FORMATS.ONLY_DATE, 
+      });
+
+      const parsedDate = parse(
+        raw,
+        "dd-MM-yyyy",
+        new Date()
+      );
+
+      return {
+        label:
+          valueNum === 1
+            ? `${config.article.singular} ${config.singular}`
+            : `${config.article.plural} ${valueNum} ${config.plural}`,
+        value: range.key,
+        getRange: () => ({
+          startDate: parsedDate,
+          endDate: new Date(),
+        }),
+      };
+    });
+};
+
 export const DATE_RANGE_KEY = "budgets-history-date-range";
+
+export const DEFAULT_DATE_RANGE_VALUE = 3;

@@ -1,9 +1,10 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
+import { useGetSetting } from "@/api/settings";
 import { useListUsers } from "@/api/users";
-import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
-import { BUDGETS_VIEW_MONTHS } from "@/components/budgets/budgets.constants";
+import { DEFAULT_DATE_RANGE_VALUE } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { USER_STATES } from "@/components/users/users.constants";
 import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
@@ -17,17 +18,31 @@ const Budgets = () => {
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
+  const { data: budgetsSettings, refetch: refetchSettings, isFetching: isFetchingSettings, } = useGetSetting(ENTITIES.BUDGET);
+  const rangeValue = Number(budgetsSettings?.defaultPageDateRange?.value) || DEFAULT_DATE_RANGE_VALUE;
 
   useEffect(() => {
+    if (isFetchingSettings) {
+      setLabels([]);
+      return;
+    }
     setLabels([{
-      name: PAGES.BUDGETS.NAME, label: {
-        title: `Últimos ${BUDGETS_VIEW_MONTHS} meses`,
+      name: PAGES.BUDGETS.NAME,
+      label: {
+        title: rangeValue === 1
+          ? 'Último mes'
+          : `Últimos ${rangeValue} meses`,
         color: COLORS.BLUE,
         popup: <>Para ver el historial completo de Ventas haga click en <b>Historial</b></>
       }
     }]);
+
+  }, [setLabels, isFetchingSettings]);
+
+  useEffect(() => {
     refetch()
-  }, [setLabels, refetch]);
+    refetchSettings()
+  }, []);
 
   const budgets = useMemo(() => usersBudgets?.budgets, [usersBudgets]);
   const users = useMemo(() => usersData?.users, [usersData]);
