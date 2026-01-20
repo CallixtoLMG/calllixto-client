@@ -6,14 +6,13 @@ import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { DEFAULT_DATE_RANGE_VALUE } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { USER_STATES } from "@/components/users/users.constants";
 import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
   useValidateToken();
-  const { data: usersBudgets, isLoading: isLoadingBudgets, isRefetching, refetch } = useListBudgets();
+  const { data: budgetsData, isLoading: isLoadingBudgets, isRefetching, refetch } = useListBudgets();
   const { data: usersData, isLoading: isLoadingUsers } = useListUsers();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -44,7 +43,7 @@ const Budgets = () => {
     refetchSettings()
   }, [refetch, refetchSettings]);
 
-  const budgets = useMemo(() => usersBudgets?.budgets, [usersBudgets]);
+  const budgets = useMemo(() => budgetsData?.budgets, [budgetsData]);
   const users = useMemo(() => usersData?.users, [usersData]);
   const loading = useMemo(() => isLoadingBudgets || isRefetching || isLoadingUsers, [isLoadingBudgets, isRefetching, isLoadingUsers]);
 
@@ -53,7 +52,7 @@ const Budgets = () => {
     key: user.username,
     value: `${user.firstName} ${user.lastName}`,
     text: `${user.firstName} ${user.lastName}`,
-  }))?.filter(({ state }) => state === USER_STATES.ACTIVE.id), [users]);
+  })), [users]);
 
   useEffect(() => {
     const actions = [
