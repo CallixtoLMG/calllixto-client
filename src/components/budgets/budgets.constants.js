@@ -264,17 +264,19 @@ export const PAYMENT_STATES = {
   },
 };
 
-export const PAYMENT_STATES_OPTIONS = Object.values(PAYMENT_STATES).map(
-  ({ id, title, color }) => ({
-    key: id,
-    text: (
-      <Flex $alignItems="center" $justifyContent="space-between">
-        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
-      </Flex>
-    ),
-    value: id,
-  })
-);
+export const PAYMENT_STATES_OPTIONS = [
+  SELECT_ALL_OPTION,
+  ...Object.values(PAYMENT_STATES).map(({ id, title, color }) => (
+    {
+      key: id,
+      text: (
+        <Flex $alignItems="center" $justifyContent="space-between">
+          {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+        </Flex>
+      ),
+      value: id,
+    }))
+];
 
 export const BUDGET_STATE_TRANSLATIONS = {
   CONFIRMED: BUDGET_STATES.CONFIRMED,

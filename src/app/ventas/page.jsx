@@ -1,26 +1,25 @@
 "use client";
 import { useListBudgets } from "@/api/budgets";
 import { useGetSetting } from "@/api/settings";
+import { useListUsers } from "@/api/users";
 import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { DEFAULT_DATE_RANGE_VALUE } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { USER_STATES } from "@/components/users/users.constants";
 import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
   useValidateToken();
+  const { data: usersBudgets, isLoading: isLoadingBudgets, isRefetching, refetch } = useListBudgets();
+  const { data: usersData, isLoading: isLoadingUsers } = useListUsers();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const { data: budgetsSettings, refetch: refetchSettings, isFetching: isFetchingSettings, } = useGetSetting(ENTITIES.BUDGET);
   const rangeValue = Number(budgetsSettings?.defaultPageDateRange?.value) || DEFAULT_DATE_RANGE_VALUE;
-
-  const { data, isLoading, isRefetching, refetch } = useListBudgets({
-    defaultPageDateRange: rangeValue,
-    enabled: !isFetchingSettings
-  });
 
   useEffect(() => {
     if (isFetchingSettings) {
@@ -45,8 +44,16 @@ const Budgets = () => {
     refetchSettings()
   }, []);
 
-  const budgets = useMemo(() => data?.budgets, [data]);
-  const loading = useMemo(() => isLoading || isRefetching, [isLoading, isRefetching]);
+  const budgets = useMemo(() => usersBudgets?.budgets, [usersBudgets]);
+  const users = useMemo(() => usersData?.users, [usersData]);
+  const loading = useMemo(() => isLoadingBudgets || isRefetching || isLoadingUsers, [isLoadingBudgets, isRefetching, isLoadingUsers]);
+
+  const usersOptions = useMemo(() => users?.map(user => ({
+    ...user,
+    key: user.username,
+    value: `${user.firstName} ${user.lastName}`,
+    text: `${user.firstName} ${user.lastName}`,
+  }))?.filter(({ state }) => state === USER_STATES.ACTIVE.id), [users]);
 
   useEffect(() => {
     const actions = [
@@ -72,7 +79,7 @@ const Budgets = () => {
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <BudgetsPage onRefetch={refetch} isLoading={loading} budgets={loading ? [] : budgets} />
+    <BudgetsPage onRefetch={refetch} isLoading={loading} budgets={loading ? [] : budgets} usersOptions={usersOptions} />
   )
 };
 
