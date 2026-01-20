@@ -117,6 +117,19 @@ const LinkCell = styled(STable.Cell)`
   }
 `;
 
+const LinkOverlay = styled.a`
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  text-decoration: none;
+  color: inherit;
+`;
+
+const LinkContent = styled.div`
+  z-index: 1;
+  pointer-events: none;
+`;
+
 const MainContainer = styled(Flex)`
   column-gap: 10px;
 `;
@@ -131,5 +144,5 @@ const HeaderSegment = styled(SSegment)`
   justify-content: space-between;
 `;
 
-export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, HeaderSegment, InnerActionsContainer, LinkCell, MainContainer, Pagination, PaginationContainer, Segment, Table, TableHeader, TableRow };
+export { ActionsContainer, Cell, Container, FiltersContainer, HeaderCell, HeaderSegment, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, MainContainer, Pagination, PaginationContainer, Segment, Table, TableHeader, TableRow };
 

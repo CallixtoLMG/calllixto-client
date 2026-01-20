@@ -35,9 +35,17 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         <Modal.Content>
           <Flex $flexDirection="column" $rowGap="15px">
             <FormProvider {...methods}>
-              <Form onSubmit={handleSubmit(onAddComment)}>
+              <Form
+                onSubmit={handleSubmit(onAddComment)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSubmit(onAddComment)();
+                  }
+                }}
+              >
                 <FieldsContainer>
-                  <TextField flex="1" label="Id" placeholder={product?.id} readOnly/>
+                  <TextField flex="1" label="Id" placeholder={product?.id} readOnly />
                   <TextField flex="1" label="Nombre" placeholder={product?.name} readOnly />
                   <TextField width="100px" label="Cantidad" placeholder={product?.quantity} readOnly />
                 </FieldsContainer>

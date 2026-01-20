@@ -132,6 +132,7 @@ const BatchImport = ({ isCreating }) => {
 
     const columnMapping = {
       id: "id",
+      codigo: "id",
       nombre: "name",
       marca: "brand",
       proveedor: "supplier",

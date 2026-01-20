@@ -1,16 +1,17 @@
+import { USER_DATA_KEY } from "@/common/constants";
 import { URL, VALIDATE } from "@/fetchUrls";
 import axios from "axios";
 
 export async function getUserData() {
-  let dataString = sessionStorage.getItem("userData");
+  let dataString = localStorage.getItem(USER_DATA_KEY);
   let data = null;
 
   if (dataString) {
     try {
       data = JSON.parse(dataString);
     } catch (e) {
-      console.error("Error parsing userData from sessionStorage:", e);
-      sessionStorage.removeItem("userData");
+      console.error("Error parsing userData from localStorage:", e);
+      localStorage.removeItem(USER_DATA_KEY);
     }
   }
 
@@ -30,8 +31,8 @@ export async function getUserData() {
     });
 
     if (response.data) {
-      sessionStorage.setItem("userData", JSON.stringify(response.data));
-      setSelectedClientData(data);
+      setSelectedClientData(response.data);
+      localStorage.setItem(USER_DATA_KEY, JSON.stringify(response.data));
       return response.data;
     }
   } catch (e) {
@@ -46,4 +47,4 @@ function setSelectedClientData(data) {
     const selectedClient = data?.callixtoClients?.items?.find(client => client.id === selectedClientId);
     data.selectedClient = selectedClient ?? null;
   }
-}
+};
