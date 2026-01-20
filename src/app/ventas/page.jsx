@@ -46,7 +46,7 @@ const Budgets = () => {
 
   const budgets = useMemo(() => usersBudgets?.budgets, [usersBudgets]);
   const users = useMemo(() => usersData?.users, [usersData]);
-  const loading = useMemo(() => isLoadingBudgets || isRefetching, [isLoadingBudgets, isRefetching]);
+  const loading = useMemo(() => isLoadingBudgets || isRefetching || isLoadingUsers, [isLoadingBudgets, isRefetching, isLoadingUsers]);
 
   const usersOptions = useMemo(() => users?.map(user => ({
     ...user,
@@ -54,7 +54,7 @@ const Budgets = () => {
     value: `${user.firstName} ${user.lastName}`,
     text: `${user.firstName} ${user.lastName}`,
   }))?.filter(({ state }) => state === USER_STATES.ACTIVE.id), [users]);
-  
+
   useEffect(() => {
     const actions = [
       {
