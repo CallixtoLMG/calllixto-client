@@ -20,7 +20,7 @@ const OnCreate = ({ customerOptions, isLoading }) => {
           <Icon name="dropdown" /> Al Crear una Venta
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
-          <FlexColumn $rowGap="20px">
+          <FlexColumn $rowGap="15px">
             <GroupedButtonsControlled
               label="Estado por Defecto"
               name="defaultsCreate.state"
@@ -53,10 +53,10 @@ const OnCreate = ({ customerOptions, isLoading }) => {
                 key: option.key,
                 title: option.text,
                 description: option.value,
-                value: option,
+                value: option
               })}
               persistSelection={true}
-              getDisplayValue={(option) => option?.text ?? ''}
+              getDisplayValue={(value) => value.text ?? ''}
             />
             <NumberControlled
               name="defaultsCreate.expirationOffsetDays"

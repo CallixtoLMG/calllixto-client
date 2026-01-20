@@ -1,4 +1,4 @@
-import { DEFAULT_SELECTED_CLIENT } from "@/common/constants";
+import { DEFAULT_SELECTED_CLIENT, USER_DATA_KEY } from "@/common/constants";
 import axios from 'axios';
 import { isCallixtoUser } from "../roles";
 
@@ -10,7 +10,7 @@ const getToken = () => {
 const getClientId = () => {
   if (typeof window === 'undefined') return null;
 
-  const userDataString = sessionStorage.getItem("userData");
+  const userDataString = localStorage.getItem(USER_DATA_KEY);
   if (!userDataString) return null;
 
   try {
@@ -20,7 +20,7 @@ const getClientId = () => {
     }
     return userData.clientId;
   } catch (e) {
-    console.error("Error parsing userData from sessionStorage:", e);
+    console.error("Error parsing userData from localStorage:", e);
     return null;
   };
 };

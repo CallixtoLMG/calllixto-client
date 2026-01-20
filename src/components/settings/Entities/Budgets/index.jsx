@@ -2,6 +2,7 @@ import { useListCustomers } from "@/api/customers";
 import { Divider, FlexColumn } from '@/common/components/custom';
 import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
 import { useMemo } from "react";
+import General from './General';
 import OnCreate from './OnCreate';
 import OnPrint from './OnPrint';
 
@@ -19,8 +20,8 @@ const BudgetsModule = (() => {
 
   return (
     <FlexColumn>
-      {/* <General />
-      <Divider /> */}
+      <General />
+      <Divider />
       <OnCreate customerOptions={customerOptions} isLoading={loadingCustomers} />
       <Divider />
       <OnPrint />
