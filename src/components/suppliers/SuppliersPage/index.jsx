@@ -34,12 +34,13 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch, onDownloadExcel }
             <DropdownControlled
               width="200px"
               name="state"
+              label="Estado"
               options={SUPPLIER_STATES_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
               afterChange={onSubmit}
             />
-            <TextControlled name="id" placeholder="Id" width="80px" />
-            <TextControlled name="name" placeholder="Nombre" width="300px" />
+            <TextControlled name="id" label="Id" placeholder="SE" width="80px" />
+            <TextControlled name="name" label="Nombre" placeholder="Suministro Estrella" width="300px" />
           </Filters>
         </Form>
       </FormProvider>

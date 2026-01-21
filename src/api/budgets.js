@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import { entityList, listItems, useCreateItem, useEditItem, usePatchItem } from "./common";
 
-export function useListBudgets({ defaultPageDateRange, enabled }) {
+export function useListBudgets({ defaultPageDateRange, enabled } = {}) {
   return useQuery({
     queryKey: [
       LIST_BUDGETS_QUERY_KEY,
@@ -30,7 +30,7 @@ export function useListBudgets({ defaultPageDateRange, enabled }) {
     staleTime: IN_MS.ONE_DAY,
     enabled
   });
-}
+};
 
 export function useListBudgetsHistory({ startDate, endDate }) {
   return useQuery({

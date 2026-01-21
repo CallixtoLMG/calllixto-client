@@ -2,7 +2,7 @@ import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
 import { ENTITIES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter } from "@/common/utils";
-import { useFilters, useSettingArrayField } from "@/hooks";
+import { useFilters } from "@/hooks";
 import { useMemo } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
@@ -31,7 +31,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
     }));
   }, [cashBalances]);
 
-  const onFilter = createFilter(filters, { id: {}, paymentMethods: { isArray: true,  skipAll: true }, state: { fullMatch: true } });
+  const onFilter = createFilter(filters, { id: {}, paymentMethods: { isArray: true, skipAll: true }, state: { fullMatch: true } });
 
   const cashBalanceColumns = useMemo(
     () => getCashBalanceColumns(filters.state),
@@ -52,14 +52,16 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
             <DropdownControlled
               width="200px"
               name="state"
+              label="Estado"
               options={CASH_BALANCE_STATES_OPTIONS}
               afterChange={onSubmit}
             />
-            <TextControlled name="id" placeholder="Id" width="80px" />
+            <TextControlled name="id" label="Id" placeholder="A0009" width="80px" />
             <DropdownControlled
               width="200px"
               name="paymentMethods"
-              placeholder="Método de pago"
+              label="Método de pago"
+              placeholder="Efectivo"
               options={[SELECT_ALL_OPTION, ...paymentOptions]}
               afterChange={onSubmit}
               textMaxWidth="fit-content"
