@@ -3,6 +3,30 @@ import Link from "next/link";
 import { Container as SContainer, Menu as SMenu } from "semantic-ui-react";
 import styled from "styled-components";
 
+export const MenuBadge = styled.span`
+  position: absolute;
+  top: 2px;
+  justify-self: anchor-center;
+  padding: 1px 6px;
+  font-size: 8px;
+  border-radius: 15px;
+  font-weight: 600;
+  pointer-events: none;
+  background-color: ${({ $variant }) => {
+    if ($variant === 'new') return '#e3f2fd';
+    if ($variant === 'trial') return '#fff3e0';
+    if ($variant === 'pro') return '#ede7f6';
+    return 'transparent';
+  }};
+
+  color: ${({ $variant }) => {
+    if ($variant === 'new') return '#1976d2';
+    if ($variant === 'trial') return '#ef6c00';
+    if ($variant === 'pro') return '#5e35b1';
+    return 'inherit';
+  }};
+`;
+
 const ModLink = styled(Link)`
   display:flex;
   position: relative;
@@ -12,12 +36,20 @@ const ModLink = styled(Link)`
 `;
 
 const MenuItem = styled(SMenu.Item)`
-  background-color: ${({ $active }) => ($active ? '#f5f5f5' : 'transparent')}!important;
+  position: relative;
+  height: 3.5rem;
+  background-color: ${({ $active }) =>
+    $active ? '#f5f5f5' : 'transparent'}!important;
+
+  padding: 12px 16px;
+
   &:hover {
-    background-color: ${({ $backgroundColor }) => $backgroundColor && "#f5f5f5"}!important;
-  };
+    background-color: ${({ $backgroundColor }) =>
+    $backgroundColor && '#f5f5f5'}!important;
+  }
+
   &::before {
-    display: ${({ $displayNone }) => $displayNone && "none"}!important;
+    display: ${({ $displayNone }) => $displayNone && 'none'}!important;
   }
 `;
 
@@ -55,7 +87,10 @@ const Container = styled(SContainer)`
 
 const Text = styled.p`
   display: inline-block;
+  text-align: center;
   position: relative;
+  padding:0!important;
+  margin: 0!important;
   &:hover {
     &:after{
       transform: scaleX(1);

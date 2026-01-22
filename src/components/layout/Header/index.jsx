@@ -9,7 +9,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, Menu } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
-import { Container, MenuItem, ModLink, RigthHeaderDiv, Text } from "./styles";
+import { Container, MenuBadge, MenuItem, ModLink, RigthHeaderDiv, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -85,8 +85,23 @@ const Header = () => {
                     })
                     .map((page) => (
                       <ModLink key={page.BASE} href={page.BASE}>
-                        <MenuItem $backgroundColor $active={pathname.includes(page.BASE)}>
-                          <Text $active={pathname.includes(page.BASE)}>{page.NAME}</Text>
+                        <MenuItem
+                          $backgroundColor
+                          $active={pathname.includes(page.BASE)}
+                          $hasBadge={Boolean(page.BADGE)}
+                        >
+                          <Text padding="0px" $active={pathname.includes(page.BASE)}>
+                            {page.NAME}
+                          </Text>
+                          {page.BADGE && (
+                            <MenuBadge $variant={page.BADGE}>
+                              {{
+                                new: 'Nuevo',
+                                trial: 'Prueba',
+                                pro: 'Pro',
+                              }[page.BADGE]}
+                            </MenuBadge>
+                          )}
                         </MenuItem>
                       </ModLink>
                     ))}

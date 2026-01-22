@@ -196,6 +196,20 @@ export const toUpperCase = (text = "") => {
   return text.toUpperCase();
 };
 
+export const isNewFeature = (releasedAt, days = 14) => {
+  const releaseDate = releasedAt instanceof Date
+    ? releasedAt
+    : new Date(releasedAt);
+
+  if (Number.isNaN(releaseDate.getTime())) return false;
+
+  const now = new Date();
+  const diffInDays =
+    (now.getTime() - releaseDate.getTime()) / (1000 * 60 * 60 * 24);
+
+  return diffInDays <= days;
+};
+
 export const getNumberFormated = (value) => {
   const strNumber = String(value)
     .replace(/[^0-9.]/g, "")

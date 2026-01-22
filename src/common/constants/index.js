@@ -1,4 +1,4 @@
-import { encodeUri } from "@/common/utils";
+import { encodeUri, isNewFeature } from "@/common/utils";
 import { Icon, List, ListItem } from "semantic-ui-react";
 import { Accent } from "../components/custom";
 import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
@@ -51,7 +51,8 @@ export const PAGES = {
     CLONE: (id) => `/ventas/crear?clonar=${id}`,
     SHOW: (id) => `/ventas/${id}`,
     NAME: 'Ventas',
-    SHORTKEYS: 'Control+5'
+    SHORTKEYS: 'Control+5',
+    BADGE: "trial"
   },
   EXPENSES: {
     BASE: "/gastos",
@@ -60,7 +61,9 @@ export const PAGES = {
     UPDATE: (id) => `/gastos/${id}?update=true`,
     SHOW: (id) => `/gastos/${id}`,
     NAME: 'Gastos',
-    SHORTKEYS: 'Control+6'
+    SHORTKEYS: 'Control+6',
+    BADGE: "pro"
+
   },
   CASH_BALANCES: {
     BASE: "/cajas",
@@ -68,7 +71,8 @@ export const PAGES = {
     UPDATE: (id) => `/cajas/${id}?update=true`,
     SHOW: (id) => `/cajas/${id}`,
     NAME: 'Cajas',
-    SHORTKEYS: 'Control+8'
+    SHORTKEYS: 'Control+8',
+    BADGE: isNewFeature('2026-01-20') ? 'new' : undefined
   },
   USERS: {
     BASE: "/usuarios",
@@ -368,7 +372,7 @@ export const INFO = {
               <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /> <strong>Listado de proveedores</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                Listado de proveedores según los filtros activos.
+                  Listado de proveedores según los filtros activos.
                 </ListItem>
                 <ListItem>
                   Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
