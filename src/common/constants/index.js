@@ -63,7 +63,6 @@ export const PAGES = {
     NAME: 'Gastos',
     SHORTKEYS: 'Control+6',
     BADGE: "pro"
-
   },
   CASH_BALANCES: {
     BASE: "/cajas",
