@@ -186,7 +186,7 @@ export const useEditBatch = () => {
   const queryClient = useQueryClient();
 
   const editBatch = async (products, invalidateQueries = [[LIST_PRODUCTS_QUERY_KEY]]) => {
-    const chunks = chunk(products, 100);
+    const chunks = chunk(products, 90);
     let delay = 0;
     const delayIncrement = 1000;
 
