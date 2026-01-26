@@ -45,7 +45,6 @@ export async function entityList({ entity, url, params }) {
 };
 
 export async function listItems({ entity, url, params = {} }) {
-  let updateLastUpdatedAt = false;
   let lastUpdatedAt = (await getStorageItem({ entity: LAST_UPDATED_AT, id: entity }))?.lastUpdatedAt;
   let lastHardReset = (await getStorageItem({ entity: LAST_UPDATED_AT, id: "hardReset" }))?.lastUpdatedAt;
 
@@ -53,7 +52,6 @@ export async function listItems({ entity, url, params = {} }) {
     const startDate = getDateWithOffset({ date: lastUpdatedAt, offset: 1, unit: 'seconds', format: DATE_FORMATS.ISO });
     const outdatedValues = await entityList({ entity, url, params: { ...params, sort: 'updatedAt', startDate } });
     if (!!outdatedValues.length) {
-      updateLastUpdatedAt = true;
       for (const value of outdatedValues) {
         if (value.state === HARD_DELETED) {
           await removeStorageItem({ entity, id: value.id });
@@ -67,7 +65,6 @@ export async function listItems({ entity, url, params = {} }) {
     const data = await entityList({ entity, url, params });
     if (!!data.length) {
       await bulkAddStorageItems({ entity, values: data.filter(element => element.state !== HARD_DELETED) });
-      updateLastUpdatedAt = true;
     }
 
     if (lastHardReset !== activeVersion) {
@@ -80,10 +77,8 @@ export async function listItems({ entity, url, params = {} }) {
 
   const values = await getAllStorageItems({ entity, order: 'descending', sort: 'updatedAt' });
 
-  if (updateLastUpdatedAt) {
-    const { updatedAt, createdAt } = values[0];
-    await updateOrCreateStorageItem({ entity: LAST_UPDATED_AT, value: { id: entity, lastUpdatedAt: updatedAt ?? createdAt } });
-  }
+  const { updatedAt, createdAt } = values[0];
+  await updateOrCreateStorageItem({ entity: LAST_UPDATED_AT, value: { id: entity, lastUpdatedAt: updatedAt ?? createdAt } });
 
   return { [entity]: values };
 };

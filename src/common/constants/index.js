@@ -330,6 +330,8 @@ export const BADGE_CONFIG = {
   },
 };
 
+export const USER_DATA_KEY = "userData";
+
 export const INFO = {
   HELP: {
     SECTIONS: {
@@ -841,3 +843,5 @@ export const INFO = {
     }
   }
 };
+
+

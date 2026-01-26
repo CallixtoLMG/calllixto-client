@@ -27,9 +27,9 @@ export const SearchControlled = ({
             pointing: 'above',
           }}
           value={value}
+          onAfterChange={onAfterChange}
           onSelect={(val) => {
             onChange(val);
-            onAfterChange?.(val);
           }}
           placeholder={placeholder ?? label}
           clearAfterSelect={clearAfterSelect}
