@@ -1,6 +1,7 @@
 "use client";
 import { useListBudgetsHistory } from "@/api/budgets";
 import { useGetSetting } from "@/api/settings";
+import { useListUsers } from "@/api/users";
 import { ENTITIES } from "@/common/constants";
 import BudgetsHistoryFilter from "@/components/budgets/BudgetsHistoryFilters";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
@@ -12,7 +13,6 @@ import { useEffect, useMemo, useState } from "react";
 
 const BudgetsHistory = () => {
   useValidateToken();
-
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => setHydrated(true), []);
 
@@ -27,15 +27,11 @@ const BudgetsHistory = () => {
     },
   });
 
-  const {
-    data,
-    isLoading,
-    isRefetching,
-  } = useListBudgetsHistory({
+  const { data: budgetsData, isLoading: isLoadingBudgets, isRefetching } = useListBudgetsHistory({
     startDate: dateRange.startDate,
     endDate: dateRange.endDate,
   });
-
+  const { data: usersData, isLoading: isLoadingUsers } = useListUsers();
   const { setLabels } = useBreadcrumContext();
   const { setActions, setInfo } = useNavActionsContext();
   const { data: budgetsSettings } = useGetSetting(ENTITIES.BUDGET);
@@ -50,6 +46,17 @@ const BudgetsHistory = () => {
     [customPresets]
   );
 
+  const budgets = useMemo(() => budgetsData ?? [], [budgetsData]);
+  const users = useMemo(() => usersData?.users, [usersData]);
+  const loading = useMemo(() => isLoadingBudgets || isLoadingUsers || isRefetching, [isLoadingBudgets, isLoadingUsers, isRefetching]);
+
+  const usersOptions = useMemo(() => users?.map(user => ({
+    ...user,
+    key: user.username,
+    value: `${user.firstName} ${user.lastName}`,
+    text: `${user.firstName} ${user.lastName}`,
+  })), [users]);
+
   useEffect(() => {
     setLabels([{ name: "Historial de ventas" }]);
   }, [setLabels]);
@@ -57,14 +64,12 @@ const BudgetsHistory = () => {
   useEffect(() => {
     setActions([]);
     setInfo(null);
-  }, [isLoading, isRefetching, setActions, setInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSearch = (newRange) => {
     setDateRange(newRange);
   };
-
-  const budgets = useMemo(() => data ?? [], [data]);
-  const loading = isLoading || isRefetching;
 
   if (!hydrated) return null;
 
@@ -81,6 +86,7 @@ const BudgetsHistory = () => {
           isLoading={loading}
           budgets={budgets}
           filterKey={BUDGETS_HISTORY_FILTERS_KEY}
+          usersOptions={usersOptions}
         />
       )}
     </>

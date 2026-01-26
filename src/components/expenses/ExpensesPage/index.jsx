@@ -50,15 +50,17 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel }) 
             <DropdownControlled
               width="200px"
               name="state"
+              label="Estado"
               options={EXPENSES_STATE_OPTIONS}
               value={SELECT_ALL_OPTION.state}
               afterChange={onSubmit}
             />
-            <TextControlled name="id" placeholder="Id" width="100px" />
-            <TextControlled name="name" placeholder="Nombre" width="250px" />
+            <TextControlled name="id" label="Id" placeholder="A0004" width="100px" />
+            <TextControlled name="name" label="Nombre" placeholder="Netflix" width="250px" />
             <DropdownControlled
               width="200px"
               name="categories"
+              label="Categorias"
               options={categoryOptions}
               value={SELECT_ALL_OPTION.state}
               afterChange={onSubmit}

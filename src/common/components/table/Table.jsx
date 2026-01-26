@@ -186,7 +186,7 @@ const CustomTable = ({
           onPageSizeChange={handlePageSizeChange}
         />
       )}
-      <Loader active={isLoading} $greyColor>
+      <Loader $marginTop active={isLoading} $greyColor>
         <Table sortable celled compact striped={!basic} color={color} definition={isSelectable}>
           <TableHeader fullWidth>
             <TableRow>
