@@ -278,6 +278,7 @@ export const ACTIVE = "active";
 export const DELETE = "delete";
 export const HARD_DELETED = "HARD_DELETED";
 export const INACTIVE = "inactive";
+export const SET_STATE = 'set-state';
 
 export const CANCELLED = "cancelled";
 
