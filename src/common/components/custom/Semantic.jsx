@@ -219,8 +219,9 @@ export const Button = styled(SButton)`
     text-align: center;
     height: ${({ height = '35px' }) => `${height}!important`} ;
     margin-top: ${({ $marginTop }) => `${$marginTop}!important`} ;
+    margin-bottom: ${({ $marginBottom }) => `${$marginBottom}!important`} ;
     align-self: ${({ $alignSelf }) => `${$alignSelf}!important`} ;
-    font-size: 13.5px !important;
+    font-size:: ${({ $fontSize = "13.5px" }) => `${$fontSize}!important`} ;
     width: ${({ width = '110px' }) => `${width}!important`} ;
     &{
      padding-left: ${({ $paddingLeft = '40px' }) => `${$paddingLeft}!important`} ;

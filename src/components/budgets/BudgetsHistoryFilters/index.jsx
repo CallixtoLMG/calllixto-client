@@ -10,7 +10,7 @@ const BudgetsHistoryFilter = ({
   onSearch,
   isLoading,
   defaultValues,
-  presets, 
+  presets,
 }) => {
   const form = useForm({ defaultValues });
   const { setValue, getValues, resetField } = form;
@@ -24,7 +24,7 @@ const BudgetsHistoryFilter = ({
       resetField("endDate");
       return;
     }
-
+  
     const { startDate, endDate } = option.getRange();
 
     setValue("startDate", startDate);
@@ -37,8 +37,8 @@ const BudgetsHistoryFilter = ({
   };
 
   const handleClear = () => {
-    resetField("startDate");
-    resetField("endDate");
+    setValue("startDate", null, { shouldDirty: true });
+    setValue("endDate", null, { shouldDirty: true });
 
     setValue("presetDays", null);
     setTimeout(() => resetField("presetDays"), 0);

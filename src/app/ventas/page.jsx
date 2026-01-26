@@ -37,12 +37,12 @@ const Budgets = () => {
       }
     }]);
 
-  }, [setLabels, isFetchingSettings]);
+  }, [setLabels, isFetchingSettings, rangeValue]);
 
   useEffect(() => {
     refetch()
     refetchSettings()
-  }, []);
+  }, [refetch, refetchSettings]);
 
   const budgets = useMemo(() => usersBudgets?.budgets, [usersBudgets]);
   const users = useMemo(() => usersData?.users, [usersData]);
