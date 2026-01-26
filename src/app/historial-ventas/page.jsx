@@ -7,7 +7,6 @@ import BudgetsHistoryFilter from "@/components/budgets/BudgetsHistoryFilters";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { BASE_BUDGETS_HISTORY_RANGES, BUDGETS_HISTORY_FILTERS_KEY, DATE_RANGE_KEY, buildCustomHistoryRanges } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { USER_STATES } from "@/components/users/users.constants";
 import { useValidateToken } from "@/hooks";
 import useFilterParams from "@/hooks/useFilterParams";
 import { useEffect, useMemo, useState } from "react";
@@ -49,14 +48,14 @@ const BudgetsHistory = () => {
 
   const budgets = useMemo(() => budgetsData ?? [], [budgetsData]);
   const users = useMemo(() => usersData?.users, [usersData]);
-  const loading = useMemo(() => isLoadingBudgets || isLoadingUsers, [isLoadingBudgets, isLoadingUsers]);
+  const loading = useMemo(() => isLoadingBudgets || isLoadingUsers || isRefetching, [isLoadingBudgets, isLoadingUsers, isRefetching]);
 
   const usersOptions = useMemo(() => users?.map(user => ({
     ...user,
     key: user.username,
     value: `${user.firstName} ${user.lastName}`,
     text: `${user.firstName} ${user.lastName}`,
-  }))?.filter(({ state }) => state === USER_STATES.ACTIVE.id), [users]);
+  })), [users]);
 
   useEffect(() => {
     setLabels([{ name: "Historial de ventas" }]);
@@ -65,7 +64,8 @@ const BudgetsHistory = () => {
   useEffect(() => {
     setActions([]);
     setInfo(null);
-  }, [isLoadingBudgets, isRefetching, setActions, setInfo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSearch = (newRange) => {
     setDateRange(newRange);
