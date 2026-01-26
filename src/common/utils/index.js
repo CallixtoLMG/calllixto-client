@@ -1,6 +1,8 @@
+import dayjs from "dayjs";
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
 import { ALL, CANCELLED, INACTIVE, REGEX } from "../constants";
+import { isDateAfter } from "./dates";
 
 export const getFormatedPrice = (number) => {
   const safeNumber = Number(number) ?? 0;
@@ -198,6 +200,14 @@ export const getDefaultAttributes = (attributes = []) => [...attributes, 'update
 export const toUpperCase = (text = "") => {
   if (typeof text !== "string") return "";
   return text.toUpperCase();
+};
+
+export const isNewFeature = (releasedAt, days = 14) => {
+  if (!releasedAt) return false;
+
+  const expirationDate = dayjs(releasedAt).add(days, 'day');
+
+  return !isDateAfter(new Date(), expirationDate);
 };
 
 export const getNumberFormated = (value) => {
