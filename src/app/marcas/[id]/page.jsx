@@ -213,7 +213,7 @@ const Brand = ({ params }) => {
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, brand, activeAction, isActivePending, isInactivePending, isDeletePending, setActions, hasAssociatedProducts]);
+  }, [role, brand, activeAction, isMutateStatePending, isDeletePending, setActions, hasAssociatedProducts]);
 
   if (!isLoading && !brand) {
     push(PAGES.NOT_FOUND.BASE);
@@ -251,7 +251,7 @@ const Brand = ({ params }) => {
         confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
-        isLoading={isDeletePending || isInactivePending || isActivePending}
+        isLoading={isDeletePending || isMutateStatePending}
         noConfirmation={!requiresConfirmation}
         disableButtons={!reason && modalAction === INACTIVE}
         bodyContent={
