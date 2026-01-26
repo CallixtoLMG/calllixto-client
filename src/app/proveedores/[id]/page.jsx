@@ -1,30 +1,15 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
-import {
-  useActiveSupplier,
-  useDeleteSupplier,
-  useEditSupplier,
-  useGetSupplier,
-  useInactiveSupplier,
-} from "@/api/suppliers";
-import {
-  Icon,
-  Message,
-  MessageHeader,
-} from "@/common/components/custom";
+import { useDeleteSupplier, useEditSupplier, useGetSupplier, useSetSupplierState } from "@/api/suppliers";
+import { Icon, Message, MessageHeader, } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
 import { downloadExcel, isItemInactive } from "@/common/utils";
-import {
-  Loader,
-  OnlyPrint,
-  useBreadcrumContext,
-  useNavActionsContext,
-} from "@/components/layout";
+import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext, } from "@/components/layout";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
@@ -79,8 +64,7 @@ const Supplier = ({ params }) => {
   const editSupplier = useEditSupplier();
   const deleteSupplier = useDeleteSupplier();
   const deleteBySupplierId = useDeleteBySupplierId();
-  const inactiveSupplier = useInactiveSupplier();
-  const activeSupplier = useActiveSupplier();
+  const setSupplierState = useSetSupplierState();
 
   useEffect(() => {
     resetActions();
@@ -156,39 +140,6 @@ const Supplier = ({ params }) => {
     },
   });
 
-  const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: ({ supplier }) => activeSupplier(supplier),
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success("Proveedor activado!");
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
-  });
-
-  const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: ({ supplier, reason }) => inactiveSupplier(supplier, reason),
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success("Proveedor desactivado!");
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-    onError: (error) => {
-      toast.error(`Error: ${error.message}`);
-    },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
-  });
-
   const { mutate: mutateDeleteBatch, isPending: isDeleteBatchPending } =
     useMutation({
       mutationFn: () => deleteBySupplierId(params.id),
@@ -223,7 +174,31 @@ const Supplier = ({ params }) => {
       },
     });
 
+  const { mutate: mutateState, isPending: isMutateStatePending } = useMutation({
+    mutationFn: setSupplierState,
+    onSuccess: (response, variables) => {
+      if (response.statusOk) {
+        toast.success(
+          variables.state === ACTIVE
+            ? 'Proveedor activado!'
+            : 'Proveedor desactivado!'
+        );
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
+  });
+
   const handleActionConfirm = async () => {
+    if (modalAction === INACTIVE && !reason) {
+      toast.error("Debe proporcionar una razón para desactivar el proveedor.");
+      return;
+    }
+
     setActiveAction(modalAction);
 
     if (modalAction === "deleteBatch") {
@@ -234,18 +209,12 @@ const Supplier = ({ params }) => {
       mutateDelete();
     }
 
-    if (modalAction === INACTIVE) {
-      if (!reason) {
-        toast.error(
-          'Debe proporcionar una razón para desactivar al proveedor.',
-        );
-        return;
-      }
-      mutateInactive({ supplier, reason });
-    }
-
-    if (modalAction === ACTIVE) {
-      mutateActive({ supplier });
+    if (modalAction === ACTIVE || modalAction === INACTIVE) {
+      mutateState({
+        id: supplier.id,
+        state: modalAction === ACTIVE ? ACTIVE : INACTIVE,
+        ...(modalAction === INACTIVE && { inactiveReason: reason }),
+      });
     }
 
     handleModalClose();
@@ -456,8 +425,7 @@ const Supplier = ({ params }) => {
         isLoading={
           isDeleteBatchPending ||
           isDeletePending ||
-          isActivePending ||
-          isInactivePending
+          isMutateStatePending
         }
         noConfirmation={!requiresConfirmation}
         bodyContent={

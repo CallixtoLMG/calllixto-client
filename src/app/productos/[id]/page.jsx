@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useActiveProduct, useDeleteProduct, useEditProduct, useGetProduct, useInactiveProduct, useRecoverProduct } from "@/api/products";
+import { useDeleteProduct, useEditProduct, useGetProduct, useRecoverProduct, useSetProductState } from "@/api/products";
 import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
@@ -35,8 +35,7 @@ const Product = ({ params }) => {
   const printRef = useRef(null);
   const editProduct = useEditProduct();
   const deleteProduct = useDeleteProduct();
-  const activeProduct = useActiveProduct();
-  const inactiveProduct = useInactiveProduct();
+  const setProductState = useSetProductState();
   const recoverProduct = useRecoverProduct();
   const formRef = useRef(null);
 
@@ -163,35 +162,18 @@ const Product = ({ params }) => {
     },
   });
 
-  const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: ({ product }) => activeProduct(product),
-    onSuccess: (response) => {
+  const { mutate: mutateState, isPending: isMutateStatePending } = useMutation({
+    mutationFn: setProductState,
+    onSuccess: (response, variables) => {
       if (response.statusOk) {
-        toast.success("Producto activado!");
+        toast.success(
+          variables.state === ACTIVE
+            ? 'producto activado!'
+            : 'producto desactivado!'
+        );
       } else {
         toast.error(response.error.message);
       }
-    },
-    onError: (error) => {
-      toast.error(`Error al activar el producto: ${error.message || error}`);
-    },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
-  });
-
-  const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: ({ product, reason }) => inactiveProduct(product, reason),
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success("Producto desactivado!");
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-    onError: (error) => {
-      toast.error(`Error al desactivar el producto: ${error.message || error}`);
     },
     onSettled: () => {
       setActiveAction(null);
@@ -241,6 +223,11 @@ const Product = ({ params }) => {
   });
 
   const handleActionConfirm = async () => {
+    if (modalAction === INACTIVE && !reason) {
+      toast.error("Debe proporcionar una razón para desactivar el producto.");
+      return;
+    }
+
     setActiveAction(modalAction);
     if (modalAction === "hardDelete") {
       mutateDelete();
@@ -254,16 +241,12 @@ const Product = ({ params }) => {
       }
     }
 
-    if (modalAction === INACTIVE) {
-      if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar el producto.");
-        return;
-      }
-      mutateInactive({ product, reason });
-    }
-
-    if (modalAction === ACTIVE) {
-      mutateActive({ product });
+    if (modalAction === ACTIVE || modalAction === INACTIVE) {
+      mutateState({
+        id: product.id,
+        state: modalAction === ACTIVE ? ACTIVE : INACTIVE,
+        ...(modalAction === INACTIVE && { inactiveReason: reason }),
+      });
     }
 
     if (modalAction === "outOfStock") {
@@ -426,7 +409,7 @@ const Product = ({ params }) => {
         confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={setIsModalOpen}
-        isLoading={isInactivePending || isActivePending || isDeletePending || isEditPending || isRecoverPending}
+        isLoading={isMutateStatePending || isDeletePending || isEditPending || isRecoverPending}
         noConfirmation={!requiresConfirmation && modalAction !== INACTIVE}
         bodyContent={
           modalAction === INACTIVE ? (

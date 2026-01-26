@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useActiveUser, useDeleteUser, useEditUser, useGetUser, useInactiveUser } from "@/api/users";
+import { useDeleteUser, useEditUser, useGetUser, useSetUserState } from "@/api/users";
 import { Input, Message, MessageHeader } from "@/common/components/custom";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
@@ -28,8 +28,8 @@ const User = ({ params }) => {
   const [reason, setReason] = useState("");
   const editUser = useEditUser();
   const deleteUser = useDeleteUser();
-  const activeUser = useActiveUser();
-  const inactiveUser = useInactiveUser();
+  const setUserState = useSetUserState();
+
   const formRef = useRef(null);
 
   const {
@@ -64,7 +64,7 @@ const User = ({ params }) => {
   }, []);
 
   useEffect(() => {
-    setLabels([{ name: PAGES.USERS.NAME }, { name: user && `${user?.firstName} ${user?.lastName}`}]);
+    setLabels([{ name: PAGES.USERS.NAME }, { name: user && `${user?.firstName} ${user?.lastName}` }]);
     refetch();
   }, [setLabels, user, refetch]);
 
@@ -108,32 +108,15 @@ const User = ({ params }) => {
     },
   });
 
-  const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: async ({ user }) => {
-      const response = await activeUser(user.username);
-      return response;
-    },
-    onSuccess: (response) => {
+  const { mutate: mutateState, isPending: isMutateStatePending } = useMutation({
+    mutationFn: setUserState,
+    onSuccess: (response, variables) => {
       if (response.statusOk) {
-        toast.success("Usuario activado!");
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
-  });
-
-  const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: async ({ user, reason }) => {
-      const response = await inactiveUser(user.username, reason);
-      return response;
-    },
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success("Usuario desactivado!");
+        toast.success(
+          variables.state === ACTIVE
+            ? 'Usuario activado!'
+            : 'Usuario desactivado!'
+        );
       } else {
         toast.error(response.error.message);
       }
@@ -161,23 +144,22 @@ const User = ({ params }) => {
   });
 
   const handleActionConfirm = async () => {
+    if (modalAction === INACTIVE && !reason) {
+      toast.error("Debe proporcionar una razón para desactivar al usuario.");
+      return;
+    }
     setActiveAction(modalAction);
 
     if (modalAction === DELETE) {
       mutateDelete();
     }
 
-    if (modalAction === INACTIVE && !reason) {
-      toast.error("Debe proporcionar una razón para desactivar el usuario.");
-      return;
-    }
-
-    if (modalAction === INACTIVE) {
-      mutateInactive({ user, reason });
-    }
-
-    if (modalAction === ACTIVE) {
-      mutateActive({ user });
+    if (modalAction === ACTIVE || modalAction === INACTIVE) {
+      mutateState({
+        username: user.username,
+        state: modalAction === ACTIVE ? ACTIVE : INACTIVE,
+        ...(modalAction === INACTIVE && { inactiveReason: reason }),
+      });
     }
 
     handleModalClose();
@@ -223,7 +205,7 @@ const User = ({ params }) => {
       setActions(actions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, user, activeAction, isActivePending, isInactivePending, isDeletePending, setActions]);
+  }, [role, user, activeAction, isMutateStatePending, isDeletePending, setActions]);
 
   if (!isLoading && !user) {
     push(PAGES.NOT_FOUND.BASE);
@@ -261,7 +243,7 @@ const User = ({ params }) => {
         confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
-        isLoading={isDeletePending || isInactivePending || isActivePending}
+        isLoading={isDeletePending || isMutateStatePending}
         noConfirmation={!requiresConfirmation}
         disableButtons={!reason && modalAction === INACTIVE}
         bodyContent={

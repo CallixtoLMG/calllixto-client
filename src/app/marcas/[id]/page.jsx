@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useActiveBrand, useDeleteBrand, useEditBrand, useGetBrand, useInactiveBrand } from "@/api/brands";
+import { useDeleteBrand, useEditBrand, useGetBrand, useSetBrandState } from "@/api/brands";
 import { useHasProductsByBrandId } from "@/api/products";
 import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
@@ -57,8 +57,8 @@ const Brand = ({ params }) => {
   });
 
   const deleteBrand = useDeleteBrand();
-  const activeBrand = useActiveBrand();
-  const inactiveBrand = useInactiveBrand();
+  const setBrandState = useSetBrandState();
+
   const { hasAssociatedProducts, isLoadingProducts } = useHasProductsByBrandId(brand?.id);
   const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
 
@@ -118,35 +118,6 @@ const Brand = ({ params }) => {
     },
   });
 
-  const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: ({ brand }) => activeBrand(brand),
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success("Marca activada!");
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
-  });
-
-  const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: ({ brand, reason }) => inactiveBrand(brand, reason),
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success("Marca desactivada!");
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
-  });
 
   const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
     mutationFn: () => deleteBrand(params.id),
@@ -164,23 +135,43 @@ const Brand = ({ params }) => {
     },
   });
 
+  const { mutate: mutateState, isPending: isMutateStatePending } = useMutation({
+    mutationFn: setBrandState,
+    onSuccess: (response, variables) => {
+      if (response.statusOk) {
+        toast.success(
+          variables.state === ACTIVE
+            ? 'Marca activada!'
+            : 'Marca desactivada!'
+        );
+      } else {
+        toast.error(response.error.message);
+      }
+    },
+    onSettled: () => {
+      setActiveAction(null);
+      handleModalClose();
+    },
+  });
+
   const handleActionConfirm = async () => {
+    if (modalAction === INACTIVE && !reason) {
+      toast.error("Debe proporcionar una razón para desactivar la marca.");
+      return;
+    }
+
     setActiveAction(modalAction);
 
     if (modalAction === DELETE) {
       mutateDelete();
     }
 
-    if (modalAction === INACTIVE) {
-      if (!reason) {
-        toast.error("Debe proporcionar una razón para desactivar la marca.");
-        return;
-      }
-      mutateInactive({ brand, reason });
-    }
-
-    if (modalAction === ACTIVE) {
-      mutateActive({ brand });
+    if (modalAction === ACTIVE || modalAction === INACTIVE) {
+      mutateState({
+        id: brand.id,
+        state: modalAction === ACTIVE ? ACTIVE : INACTIVE,
+        ...(modalAction === INACTIVE && { inactiveReason: reason }),
+      });
     }
 
     handleModalClose();

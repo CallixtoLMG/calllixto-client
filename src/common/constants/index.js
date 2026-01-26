@@ -269,6 +269,7 @@ export const ACTIVE = "active";
 export const DELETE = "delete";
 export const HARD_DELETED = "HARD_DELETED";
 export const INACTIVE = "inactive";
+export const SET_STATE = 'set-state';
 
 export const CANCELLED = "cancelled";
 
@@ -368,7 +369,7 @@ export const INFO = {
               <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /> <strong>Listado de proveedores</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                Listado de proveedores según los filtros activos.
+                  Listado de proveedores según los filtros activos.
                 </ListItem>
                 <ListItem>
                   Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.

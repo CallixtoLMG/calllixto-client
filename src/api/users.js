@@ -1,4 +1,4 @@
-import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
+import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { GET_USER_QUERY_KEY, LIST_ATTRIBUTES, LIST_USERS_QUERY_KEY, MAIN_KEY } from "@/components/users/users.constants";
 import { PATHS } from "@/fetchUrls";
@@ -70,7 +70,7 @@ export const useEditUser = () => {
       entity: ENTITIES.USERS,
       url: PATHS.USER,
       value: cleanUser,
-      params: { username: user.username},
+      params: { username: user.username },
       responseEntity: ENTITIES.USER,
       invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, user.username]]
     });
@@ -96,45 +96,28 @@ export const useDeleteUser = () => {
   return deleteUser;
 };
 
-export const useInactiveUser = () => {
-  const inactiveItem = usePostUpdateItem();
+export const useSetUserState = () => {
+  const updateItem = usePostUpdateItem();
 
-  const inactiveUser = async (username, reason) => {
-    const response = await inactiveItem({
+  const setUserState = ({ username, state, inactiveReason }) => {
+    return updateItem({
       entity: ENTITIES.USERS,
-      url: `${PATHS.USER}/${INACTIVE}`,
-      params: { username },
+      url: `${PATHS.USER}/${SET_STATE}`,
+      params: { username }, 
       value: {
-        inactiveReason: reason,
+        state,
+        ...(state === INACTIVE && inactiveReason
+          ? { inactiveReason }
+          : {}),
       },
-      key: MAIN_KEY,
       responseEntity: ENTITIES.USER,
-      invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, username]]
+      invalidateQueries: [
+        [LIST_USERS_QUERY_KEY],
+        [GET_USER_QUERY_KEY, username],
+      ],
+      attributes: LIST_ATTRIBUTES,
     });
-
-    return response;
   };
 
-  return inactiveUser;
+  return setUserState;
 };
-
-export const useActiveUser = () => {
-  const activeItem = usePostUpdateItem();
-
-  const activeUser = async (username) => {
-    const response = await activeItem({
-      entity: ENTITIES.USERS,
-      url: `${PATHS.USER}/${ACTIVE}`,
-      params: { username },
-      value: {},
-      key: MAIN_KEY,
-      responseEntity: ENTITIES.USER,
-      invalidateQueries: [[LIST_USERS_QUERY_KEY], [GET_USER_QUERY_KEY, username]]
-    });
-
-    return response;
-  };
-
-  return activeUser;
-};
-

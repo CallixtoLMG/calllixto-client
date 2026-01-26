@@ -1,5 +1,5 @@
 "use client";
-import { useActiveCustomer, useDeleteCustomer, useEditCustomer, useGetCustomer, useInactiveCustomer } from "@/api/customers";
+import { useDeleteCustomer, useEditCustomer, useGetCustomer, useSetCustomerState } from "@/api/customers";
 import { Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
@@ -26,8 +26,7 @@ const Customer = ({ params }) => {
   const [reason, setReason] = useState("");
   const editCustomer = useEditCustomer();
   const deleteCustomer = useDeleteCustomer();
-  const inactiveCustomer = useInactiveCustomer();
-  const activeCustomer = useActiveCustomer();
+  const setCustomerState = useSetCustomerState();
   const reasonInputRef = useRef(null);
   const formRef = useRef(null);
 
@@ -113,26 +112,15 @@ const Customer = ({ params }) => {
     },
   });
 
-  const { mutate: mutateActive, isPending: isActivePending } = useMutation({
-    mutationFn: ({ customer }) => activeCustomer(customer),
-    onSuccess: (response) => {
+  const { mutate: mutateState, isPending: isMutateStatePending } = useMutation({
+    mutationFn: setCustomerState,
+    onSuccess: (response, variables) => {
       if (response.statusOk) {
-        toast.success("Cliente activado!");
-      } else {
-        toast.error(response.error.message);
-      }
-    },
-    onSettled: () => {
-      setActiveAction(null);
-      handleModalClose();
-    },
-  });
-
-  const { mutate: mutateInactive, isPending: isInactivePending } = useMutation({
-    mutationFn: ({ customer, reason }) => inactiveCustomer(customer, reason),
-    onSuccess: (response) => {
-      if (response.statusOk) {
-        toast.success("Cliente desactivado!");
+        toast.success(
+          variables.state === ACTIVE
+            ? 'Cliente activado!'
+            : 'Cliente desactivado!'
+        );
       } else {
         toast.error(response.error.message);
       }
@@ -171,12 +159,12 @@ const Customer = ({ params }) => {
       mutateDelete();
     }
 
-    if (modalAction === INACTIVE) {
-      mutateInactive({ customer, reason });
-    }
-
-    if (modalAction === ACTIVE) {
-      mutateActive({ customer });
+    if (modalAction === ACTIVE || modalAction === INACTIVE) {
+      mutateState({
+        id: customer.id,
+        state: modalAction === ACTIVE ? ACTIVE : INACTIVE,
+        ...(modalAction === INACTIVE && { inactiveReason: reason }),
+      });
     }
 
     handleModalClose();
@@ -220,7 +208,7 @@ const Customer = ({ params }) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customer, activeAction, isActivePending, isInactivePending, isDeletePending, isEditPending, setActions]);
+  }, [customer, activeAction, isMutateStatePending, isDeletePending, isEditPending, setActions]);
 
   if (!isLoading && !customer) {
     push(PAGES.NOT_FOUND.BASE);
@@ -258,7 +246,7 @@ const Customer = ({ params }) => {
         confirmButtonIcon={icon}
         showModal={isModalOpen}
         setShowModal={handleModalClose}
-        isLoading={isDeletePending || isInactivePending || isActivePending}
+        isLoading={isDeletePending || isMutateStatePending}
         noConfirmation={!requiresConfirmation}
         disableButtons={!reason && modalAction === INACTIVE}
         reasonInputRef={reasonInputRef}

@@ -1,4 +1,4 @@
-import { ACTIVE, ALL, DELETE, ENTITIES, HARD_DELETED, INACTIVE, IN_MS, RECOVER } from "@/common/constants";
+import { ACTIVE, ALL, DELETE, ENTITIES, HARD_DELETED, INACTIVE, IN_MS, RECOVER, SET_STATE } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { GET_PRODUCT_QUERY_KEY, LIST_ATTRIBUTES, LIST_PRODUCTS_BY_SUPPLIER_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, MAIN_KEY } from "@/components/products/products.constants";
 import {
@@ -244,38 +244,30 @@ export const useDeleteBySupplierId = () => {
   return deleteProductsBySupplierId;
 };
 
-export const useInactiveProduct = () => {
-  const inactiveItem = usePostUpdateItem();
+export const useSetProductState = () => {
+  const updateItem = usePostUpdateItem();
 
-  const inactiveProduct = ({ id }, inactiveReason) => {
-    return inactiveItem({
+  const setProductState = ({ id, state, inactiveReason }) => {
+    return updateItem({
       entity: ENTITIES.PRODUCTS,
-      url: `${PATHS.PRODUCTS}/${id}/${INACTIVE}`,
-      value: { id, inactiveReason },
-      key: MAIN_KEY,
+      url: `${PATHS.PRODUCTS}/${id}/${SET_STATE}`,
+      value: {
+        id,
+        state,
+        ...(state === INACTIVE && inactiveReason
+          ? { inactiveReason }
+          : {}),
+      },
       responseEntity: ENTITIES.PRODUCT,
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, id]]
+      invalidateQueries: [
+        [LIST_PRODUCTS_QUERY_KEY],
+        [GET_PRODUCT_QUERY_KEY, id],
+      ],
+      attributes: LIST_ATTRIBUTES,
     });
   };
 
-  return inactiveProduct;
-};
-
-export const useActiveProduct = () => {
-  const activeItem = usePostUpdateItem();
-
-  const activeProduct = ({ id }) => {
-    return activeItem({
-      entity: ENTITIES.PRODUCTS,
-      url: `${PATHS.PRODUCTS}/${id}/${ACTIVE}`,
-      value: { id },
-      key: MAIN_KEY,
-      responseEntity: ENTITIES.PRODUCT,
-      invalidateQueries: [[LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY, id]]
-    });
-  };
-
-  return activeProduct;
+  return setProductState;
 };
 
 export const useRecoverProduct = () => {
