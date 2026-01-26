@@ -19,7 +19,8 @@ export const PAGES = {
     UPDATE: (id) => `/clientes/${id}?update=true`,
     SHOW: (id) => `/clientes/${id}`,
     NAME: 'Clientes',
-    SHORTKEYS: 'Control+1'
+    SHORTKEYS: 'Control+1',
+    BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   SUPPLIERS: {
     BASE: "/proveedores",
@@ -27,7 +28,8 @@ export const PAGES = {
     UPDATE: (id) => `/proveedores/${id}?update=true`,
     SHOW: (id) => `/proveedores/${id}`,
     NAME: 'Proveedores',
-    SHORTKEYS: 'Control+2'
+    SHORTKEYS: 'Control+2',
+    BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   BRANDS: {
     BASE: "/marcas",
@@ -35,7 +37,8 @@ export const PAGES = {
     UPDATE: (id) => `/marcas/${id}?update=true`,
     SHOW: (id) => `/marcas/${id}`,
     NAME: 'Marcas',
-    SHORTKEYS: 'Control+3'
+    SHORTKEYS: 'Control+3',
+    BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   PRODUCTS: {
     BASE: "/productos",
@@ -43,7 +46,8 @@ export const PAGES = {
     UPDATE: (id) => `/productos/${id}?update=true`,
     SHOW: (id) => `/productos/${id}`,
     NAME: 'Productos',
-    SHORTKEYS: 'Control+4'
+    SHORTKEYS: 'Control+4',
+    BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   BUDGETS: {
     BASE: "/ventas",
@@ -52,7 +56,7 @@ export const PAGES = {
     SHOW: (id) => `/ventas/${id}`,
     NAME: 'Ventas',
     SHORTKEYS: 'Control+5',
-    BADGE: "trial"
+    BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   EXPENSES: {
     BASE: "/gastos",
@@ -62,7 +66,7 @@ export const PAGES = {
     SHOW: (id) => `/gastos/${id}`,
     NAME: 'Gastos',
     SHORTKEYS: 'Control+6',
-    BADGE: "pro"
+    BADGE: isNewFeature('2025-01-01') ? 'new' : undefined
   },
   CASH_BALANCES: {
     BASE: "/cajas",
@@ -71,14 +75,15 @@ export const PAGES = {
     SHOW: (id) => `/cajas/${id}`,
     NAME: 'Cajas',
     SHORTKEYS: 'Control+8',
-    BADGE: isNewFeature('2026-01-20') ? 'new' : undefined
+    BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   USERS: {
     BASE: "/usuarios",
     CREATE: "/usuarios/crear",
     SHOW: (id) => `/usuarios/${id}`,
     NAME: 'Usuarios',
-    SHORTKEYS: 'Control+7'
+    SHORTKEYS: 'Control+7',
+    BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   BUDGETS_HISTORY: {
     BASE: "/historial-ventas",
@@ -89,7 +94,8 @@ export const PAGES = {
   SETTINGS: {
     BASE: "/configuracion",
     NAME: 'Configuración',
-    SHORTKEYS: 'Control+9'
+    SHORTKEYS: 'Control+9',
+    BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"
@@ -304,6 +310,24 @@ export const ENTITY_VIEW = {
   LIST: 'LIST',
   CREATE: 'CREATE',
   DETAIL: 'DETAIL',
+};
+
+export const BADGE_CONFIG = {
+  new: {
+    label: 'Nuevo',
+    bgColor: '#e3f2fd',
+    color: '#1976d2',
+  },
+  trial: {
+    label: 'Prueba',
+    bgColor: '#fff3e0',
+    color: '#ef6c00',
+  },
+  pro: {
+    label: 'Pro',
+    bgColor: '#ede7f6',
+    color: '#5e35b1',
+  },
 };
 
 export const INFO = {

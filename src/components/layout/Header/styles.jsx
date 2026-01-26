@@ -12,19 +12,8 @@ export const MenuBadge = styled.span`
   border-radius: 15px;
   font-weight: 600;
   pointer-events: none;
-  background-color: ${({ $variant }) => {
-    if ($variant === 'new') return '#e3f2fd';
-    if ($variant === 'trial') return '#fff3e0';
-    if ($variant === 'pro') return '#ede7f6';
-    return 'transparent';
-  }};
-
-  color: ${({ $variant }) => {
-    if ($variant === 'new') return '#1976d2';
-    if ($variant === 'trial') return '#ef6c00';
-    if ($variant === 'pro') return '#5e35b1';
-    return 'inherit';
-  }};
+  background-color: ${({ bgColor }) => bgColor};
+  color: ${({ color }) => color};
 `;
 
 const ModLink = styled(Link)`
