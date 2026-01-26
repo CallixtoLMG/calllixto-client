@@ -9,7 +9,7 @@ import { IconedButton, PopupActions } from "../buttons";
 import { CenteredFlex, Flex } from "../custom";
 import Actions from "./Actions";
 import Pagination from "./Pagination";
-import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, Table, TableHeader, TableRow } from "./styles";
+import { ActionsContainer, Cell, Container, HeaderCell, InnerActionsContainer, LinkCell, LinkContent, LinkOverlay, Table, TableHeader, TableRow } from "./styles";
 const { ASC, DESC } = SORTING;
 
 const CustomTable = ({
@@ -254,20 +254,34 @@ const CustomTable = ({
                             </CenteredFlex>
                           </Cell>
                         )}
-                        {headers.map(header => (
-                          <LinkCell
-                            key={`cell_${header.id}_${element[mainKey]}`}
-                            align={header.align}
-                            width={header.width}
-                            onClick={() => {
-                              if (typeof page?.SHOW === "function") {
-                                push(page.SHOW(element[mainKey], element));
-                              }
-                            }}
-                          >
-                            {header.value(element, index)}
-                          </LinkCell>
-                        ))}
+                        {headers.map(header => {
+                          const href =
+                            typeof page?.SHOW === "function"
+                              ? page.SHOW(element[mainKey], element)
+                              : undefined;
+
+                          return (
+                            <LinkCell
+                              key={`cell_${header.id}_${element[mainKey]}`}
+                              align={header.align}
+                              width={header.width}
+                            >
+                              {href && (
+                                <LinkOverlay
+                                  href={href}
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    push(href);
+                                  }}
+                                />
+                              )}
+
+                              <LinkContent>
+                                {header.value(element, index)}
+                              </LinkContent>
+                            </LinkCell>
+                          );
+                        })}
                         {!!actions.length && (
                           <ActionsContainer $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
                             <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
@@ -347,13 +361,13 @@ const CustomTable = ({
           )}
         </Table>
         {onDownloadExcel && (
-           <Flex width="100%" $justifyContent="flex-end" >
-           <IconedButton
-             text="Descargar Excel"
-             icon={ICONS.FILE_EXCEL}
-             onClick={() => onDownloadExcel(filteredElements)}
-           />
-         </Flex>
+          <Flex width="100%" $justifyContent="flex-end" >
+            <IconedButton
+              text="Descargar Excel"
+              icon={ICONS.FILE_EXCEL}
+              onClick={() => onDownloadExcel(filteredElements)}
+            />
+          </Flex>
         )}
       </Loader>
     </Container>

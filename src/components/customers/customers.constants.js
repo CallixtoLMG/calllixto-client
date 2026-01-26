@@ -107,7 +107,7 @@ export const CUSTOMER_STATES_OPTIONS = Object.values(CUSTOMER_STATES)
 
 export const getCustomerSearchTitle = (customer) => (
   <OverflowWrapper $lineClamp={3} popupContent={customer.name} maxWidth="100%">
-    {customer.name}
+    {`${customer.name} (${customer.id})`}
   </OverflowWrapper>
 );
 

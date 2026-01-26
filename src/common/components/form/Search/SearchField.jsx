@@ -31,15 +31,14 @@ const SearchField = forwardRef(
       error,
       height,
       clearAfterSelect,
+      onAfterChange,
     },
     ref
   ) => {
     const [query, setQuery] = useState('');
     const [filtered, setFiltered] = useState(elements);
-    const [selected, setSelected] = useState(value ?? null);
     const [loading, setLoading] = useState(false);
-
-    const fields = useMemo(() => searchFields.map(normalizeText), [searchFields]);
+    const fields = useMemo(() => searchFields, [searchFields]);
     const matchesOnSomeField = useCallback((element, word) => {
       return fields.some(field => normalizeText(get(element, field)).includes(word))
     }, [fields]);
@@ -72,25 +71,36 @@ const SearchField = forwardRef(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [elements, query]);
 
-    const handleChange = (_, { value }) => {
-      setQuery(value);
-      setSelected(null);
+    useEffect(() => {
+      if (value == null) {
+        setQuery('');
+      }
+    }, [value]);
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Backspace' && value != null) {
+        onSelect(null);
+      }
+    };
+
+    const handleChange = (_, { value: inputValue }) => {
+      setQuery(inputValue);
     };
 
     const handleSelect = (_, { result }) => {
-      onSelect(result.value);
-    
+      const selectedOption = result.value;
+
+      onSelect(selectedOption);
+      onAfterChange?.(selectedOption);
+
       if (clearAfterSelect) {
-        setSelected(null);
         setQuery('');
-      } else {
-        setSelected(result.value);
+        onSelect(null);
       }
     };
 
     const handleClear = () => {
       setQuery('');
-      setSelected(null);
       onSelect(null);
     };
 
@@ -98,7 +108,7 @@ const SearchField = forwardRef(
       <FormField
         $width={width}
         icon={
-          clearable && selected ? {
+          clearable && value ? {
             name: ICONS.CLOSE,
             link: true,
             onClick: handleClear,
@@ -113,8 +123,9 @@ const SearchField = forwardRef(
         control={Search}
         loading={loading}
         results={filtered.slice(0, maxResults).map(getResultProps)}
-        value={selected ? getDisplayValue(selected) : query}
+        value={value ? getDisplayValue(value) : query}
         onSearchChange={handleChange}
+        onKeyDown={handleKeyDown}
         onResultSelect={handleSelect}
         disabled={disabled}
         error={error}

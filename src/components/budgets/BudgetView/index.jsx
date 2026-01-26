@@ -3,14 +3,13 @@ import { useCreatePayment, useDeletePayment, useEditPayment } from "@/api/paymen
 import { ENTITIES } from "@/common/constants";
 import BudgetDetails from "@/components/budgets/BudgetView/BudgetDetails";
 import { Loader } from "@/components/layout";
-import { useAllowUpdate, useUnsavedChanges } from "@/hooks";
+import Payments from "@/components/payments";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 import { isBudgetCancelled, isBudgetExpired, isBudgetPending } from "../budgets.utils";
-import Payments from "@/components/payments";
 
 const BudgetView = ({
   budget,
@@ -35,19 +34,6 @@ const BudgetView = ({
   const confirmBudgetDiscount = useConfirmBudgetDiscount();
   const [isModalPaymentOpen, setIsModalPaymentOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const formRef = useRef(null);
-
-  const {
-    onBeforeView,
-  } = useUnsavedChanges({
-    formRef,
-  });
-
-  const {} = useAllowUpdate({
-    canUpdate: true,
-    onBeforeView,
-  });
 
   const { mutate: mutateCreatePayment, isPending: isCreatePending } = useMutation({
     mutationFn: (payment) => createPayment(payment, ENTITIES.BUDGET, budget.id),
@@ -159,12 +145,9 @@ const BudgetView = ({
   }));
 
   const handleTabChange = async (_, { activeIndex }) => {
-    const canChange = await onBeforeView?.();
-    if (canChange) {
-      setActiveIndex(activeIndex);
-      const newUrl = window.location.pathname;
-      router.replace(newUrl);
-    }
+    setActiveIndex(activeIndex);
+    const newUrl = window.location.pathname;
+    router.replace(newUrl);
   };
 
   return (
