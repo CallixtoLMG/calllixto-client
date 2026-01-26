@@ -27,9 +27,19 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
     },
   });
 
-  const { setValue, trigger, watch } = methods;
+  const { setValue, trigger, watch, handleSubmit } = methods;
 
   const postConfirmDiscount = watch("postConfirmDiscount")
+
+  const onSubmitDiscount = async ({ postConfirmDiscount }) => {
+    const isValid = await trigger("postConfirmDiscount");
+    if (!isValid) return;
+
+    onConfirmBudgetDiscount({
+      budgetId: budget.id,
+      postConfirmDiscount: Number(postConfirmDiscount),
+    });
+  };
 
   useEffect(() => {
     if (!budget || initializedContact) return;
@@ -159,7 +169,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
 
   return (
     <FormProvider {...methods}>
-      <Form>
+      <Form onSubmit={handleSubmit(onSubmitDiscount)}>
         <ViewContainer>
           <Flex $justifyContent="space-between">
             <FieldsContainer>
@@ -315,19 +325,11 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                   <IconedButton
                     text="Aplicar descuento"
                     loading={isLoading}
+                    submit
                     disabled={isLoading || postConfirmDiscount === budget.postConfirmDiscount}
                     icon={ICONS.CHECK}
                     color={COLORS.GREEN}
                     height="38px"
-                    onClick={async () => {
-                      const isValid = await trigger("postConfirmDiscount");
-                      if (!isValid) return;
-
-                      onConfirmBudgetDiscount({
-                        budgetId: budget.id,
-                        postConfirmDiscount: Number(postConfirmDiscount),
-                      });
-                    }}
                   />
                 </Flex>
               </FlexColumn>
