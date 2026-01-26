@@ -169,7 +169,7 @@ const Brand = ({ params }) => {
     if (modalAction === ACTIVE || modalAction === INACTIVE) {
       mutateState({
         id: brand.id,
-        state: modalAction === ACTIVE ? ACTIVE : INACTIVE,
+        state: modalAction,
         ...(modalAction === INACTIVE && { inactiveReason: reason }),
       });
     }

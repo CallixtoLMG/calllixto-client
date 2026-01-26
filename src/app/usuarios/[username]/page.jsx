@@ -157,7 +157,7 @@ const User = ({ params }) => {
     if (modalAction === ACTIVE || modalAction === INACTIVE) {
       mutateState({
         username: user.username,
-        state: modalAction === ACTIVE ? ACTIVE : INACTIVE,
+        state: modalAction,
         ...(modalAction === INACTIVE && { inactiveReason: reason }),
       });
     }

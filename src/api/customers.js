@@ -100,9 +100,7 @@ export const useSetCustomerState = () => {
       value: {
         id,
         state,
-        ...(state === INACTIVE && inactiveReason
-          ? { inactiveReason }
-          : {}),
+        ...(state === INACTIVE && { inactiveReason }),
       },
       responseEntity: ENTITIES.CUSTOMER,
       invalidateQueries: [

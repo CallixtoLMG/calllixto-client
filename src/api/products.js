@@ -254,9 +254,7 @@ export const useSetProductState = () => {
       value: {
         id,
         state,
-        ...(state === INACTIVE && inactiveReason
-          ? { inactiveReason }
-          : {}),
+        ...(state === INACTIVE && { inactiveReason }),
       },
       responseEntity: ENTITIES.PRODUCT,
       invalidateQueries: [

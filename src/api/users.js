@@ -103,12 +103,10 @@ export const useSetUserState = () => {
     return updateItem({
       entity: ENTITIES.USERS,
       url: `${PATHS.USER}/${SET_STATE}`,
-      params: { username }, 
+      params: { username },
       value: {
         state,
-        ...(state === INACTIVE && inactiveReason
-          ? { inactiveReason }
-          : {}),
+        ...(state === INACTIVE && { inactiveReason }),
       },
       responseEntity: ENTITIES.USER,
       invalidateQueries: [

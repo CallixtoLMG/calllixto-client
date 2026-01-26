@@ -98,9 +98,7 @@ export const useSetBrandState = () => {
       value: {
         id,
         state,
-        ...(state === INACTIVE && inactiveReason
-          ? { inactiveReason }
-          : {}),
+        ...(state === INACTIVE && { inactiveReason }),
       },
       responseEntity: ENTITIES.BRAND,
       invalidateQueries: [

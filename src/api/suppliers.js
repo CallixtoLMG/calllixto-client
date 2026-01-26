@@ -106,9 +106,7 @@ export const useSetSupplierState = () => {
       value: {
         id,
         state,
-        ...(state === INACTIVE && inactiveReason
-          ? { inactiveReason }
-          : {}),
+        ...(state === INACTIVE && { inactiveReason }),
       },
       responseEntity: ENTITIES.SUPPLIER,
       invalidateQueries: [
