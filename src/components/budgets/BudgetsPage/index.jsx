@@ -13,7 +13,6 @@ import { BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE
 
 const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRefetch, usersOptions }) => {
   const { push } = useRouter();
-
   const handleDownloadExcel = useCallback((elements) => {
     if (!elements.length) return;
     let maxProductCount = 1;
@@ -164,7 +163,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
                 filter
                 width="200px"
                 name="paymentStatus"
-                placeholder="Estado de pago"
+                label="Estado de pago"
                 options={PAYMENT_STATES_OPTIONS}
                 afterChange={onSubmit}
               />
