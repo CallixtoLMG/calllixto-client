@@ -12,13 +12,16 @@ import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
   useValidateToken();
-  const { data: budgetsData, isLoading: isLoadingBudgets, isRefetching, refetch } = useListBudgets();
   const { data: usersData, isLoading: isLoadingUsers } = useListUsers();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
   const { push } = useRouter();
   const { data: budgetsSettings, refetch: refetchSettings, isFetching: isFetchingSettings, } = useGetSetting(ENTITIES.BUDGET);
   const rangeValue = Number(budgetsSettings?.defaultPageDateRange?.value) || DEFAULT_DATE_RANGE_VALUE;
+  const { data: budgetsData, isLoading: isLoadingBudgets, isRefetching, refetch } = useListBudgets({
+    defaultPageDateRange: rangeValue,
+    enabled: !!rangeValue,
+  });
 
   useEffect(() => {
     if (isFetchingSettings) {

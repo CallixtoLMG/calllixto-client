@@ -26,8 +26,7 @@ const Supplier = ({ params }) => {
   const { role } = useUserContext();
   const { push } = useRouter();
   const { data: supplier, isLoading, refetch: refetchSupplier } = useGetSupplier(params.id);
-  const { data: products, isLoading: loadingProducts, refetch: refetchProducts } =
-    useProductsBySupplierId(params.id);
+  const { data: products, isLoading: loadingProducts, refetch: refetchProducts } = useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
