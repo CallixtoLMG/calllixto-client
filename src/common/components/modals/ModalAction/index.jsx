@@ -15,6 +15,8 @@ const ModalAction = ({
   placeholder = `Escriba "${confirmationWord}" para confirmar`,
   confirmButtonText = 'Confirmar',
   confirmButtonIcon = 'check',
+  titleIcon = 'check',
+  titleIconColor,
   showModal,
   setShowModal,
   isLoading,
@@ -25,7 +27,7 @@ const ModalAction = ({
   warning,
   reason = '',
   reasonInputRef,
-  onStart = () => {}
+  onStart = () => { }
 }) => {
   const [confirmationText, setConfirmationText] = useState('');
   const [isActionEnabled, setIsActionEnabled] = useState(false);
@@ -75,7 +77,7 @@ const ModalAction = ({
   return (
     <Transition visible={showModal} onStart={onStart} animation='scale' duration={500}>
       <Modal closeIcon open={showModal} onClose={() => setShowModal(false)}>
-        <Header icon={confirmButtonIcon} content={title || ""} />
+        <Header icon={titleIcon} color={titleIconColor} content={title || ""} />
         {bodyContent && (
           <ModalContent>
             <Message negative={warning}>{bodyContent}</Message>

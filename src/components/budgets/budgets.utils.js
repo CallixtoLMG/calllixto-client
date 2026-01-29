@@ -6,7 +6,7 @@ import { getPrice, getTotal } from "@/components/products/products.utils";
 import { PriceLabel } from "../../common/components/form";
 import { BUDGET_STATES } from "./budgets.constants";
 
-export const getPopupContent = (budget) => {
+export const getBudgetListPopupContent = (budget) => {
   if (isBudgetConfirmed(budget?.state)) {
     return (
       <>

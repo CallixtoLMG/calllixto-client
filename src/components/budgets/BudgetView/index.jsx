@@ -5,7 +5,6 @@ import BudgetDetails from "@/components/budgets/BudgetView/BudgetDetails";
 import { Loader } from "@/components/layout";
 import Payments from "@/components/payments";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
@@ -21,13 +20,10 @@ const BudgetView = ({
   refetch,
   paymentsMade,
   isLoadingPayments,
+  activeIndex,
+  onTabChange,
   refetchPayments,
 }) => {
-  const searchParams = useSearchParams();
-  const tabParam = searchParams.get("tab");
-  const initialTabIndex = tabParam === "pagos" ? 1 : 0;
-  const [activeIndex, setActiveIndex] = useState(initialTabIndex);
-  const router = useRouter();
   const editPayment = useEditPayment();
   const createPayment = useCreatePayment();
   const deletePayment = useDeletePayment();
@@ -40,8 +36,6 @@ const BudgetView = ({
     onSuccess: (response) => {
       if (response?.statusOk) {
         toast.success("Pago creado correctamente!");
-        refetchPayments();
-        refetch();
       } else {
         toast.error(response.error.message);
       }
@@ -56,7 +50,6 @@ const BudgetView = ({
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pago actualizado!");
-        refetchPayments();
         refetch();
       } else {
         toast.error(response.error.message);
@@ -72,7 +65,6 @@ const BudgetView = ({
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pago eliminado!");
-        refetchPayments();
         refetch();
       } else {
         toast.error(response.error.message);
@@ -144,17 +136,11 @@ const BudgetView = ({
     render: () => <Tab.Pane>{mod.component}</Tab.Pane>,
   }));
 
-  const handleTabChange = async (_, { activeIndex }) => {
-    setActiveIndex(activeIndex);
-    const newUrl = window.location.pathname;
-    router.replace(newUrl);
-  };
-
   return (
     <Tab
       panes={panes}
       activeIndex={activeIndex}
-      onTabChange={handleTabChange}
+      onTabChange={onTabChange}
     />
   );
 };

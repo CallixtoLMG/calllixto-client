@@ -16,11 +16,11 @@ import BudgetView from "@/components/budgets/BudgetView";
 import ModalConfirmation from "@/components/budgets/ModalConfirmation";
 import ModalCustomer from "@/components/budgets/ModalCustomer";
 import ModalPDF from "@/components/budgets/ModalPDF";
-import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
+import { BUDGET_STATES, PAYMENTS_TAB_INDEX, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
 import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useValidateToken } from "@/hooks";
+import { useLazyTabs, useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -36,7 +36,18 @@ const Budget = ({ params }) => {
   const { resetActions, setActions } = useNavActionsContext();
   const { push } = useRouter();
   const { data: budget, isLoading, refetch: refetchBudget } = useGetBudget(params.id);
-  const { data: paymentsMade, isLoading: isLoadingPayments, refetch: refetchPayments } = useGetPayments(ENTITIES.BUDGET, params.id);
+  const {
+    activeIndex,
+    onTabChange,
+    hasVisited,
+  } = useLazyTabs({
+    initialIndex: 0,
+    lazyIndexes: PAYMENTS_TAB_INDEX !== null ? [PAYMENTS_TAB_INDEX] : [],
+  });
+
+  const { data: paymentsMade, isLoading: isLoadingPayments, refetch: refetchPayments } = useGetPayments(ENTITIES.BUDGET, params.id, {
+    enabled: hasVisited(PAYMENTS_TAB_INDEX),
+  });
   const { data: productsData, isLoading: loadingProducts } = useListProducts();
   const { data: customersData, isLoading: loadingCustomers } = useListCustomers();
   const { data: paymentMethods } = useGetSetting(ENTITIES.GENERAL);
@@ -319,6 +330,8 @@ const Budget = ({ params }) => {
             budget={{ ...budget, customer: customerData }}
             paymentsMade={paymentsMade}
             subtotal={subtotal}
+            activeIndex={activeIndex}
+            onTabChange={onTabChange}
             subtotalAfterDiscount={subtotalAfterDiscount}
             total={total}
             selectedContact={selectedContact}

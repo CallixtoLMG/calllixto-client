@@ -210,6 +210,13 @@ export const isNewFeature = (releasedAt, days = 14) => {
   return !isDateAfter(new Date(), expirationDate);
 };
 
+export const removeNullish = (obj) =>
+  Object.fromEntries(
+    Object.entries(obj).filter(
+      ([_, value]) => value !== null && value !== undefined
+    )
+  );
+
 export const getNumberFormated = (value) => {
   const strNumber = String(value)
     .replace(/[^0-9.]/g, "")
