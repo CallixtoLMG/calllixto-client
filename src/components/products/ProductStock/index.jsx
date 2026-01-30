@@ -99,11 +99,6 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
     setStock(EMPTY_STOCK());
   };
 
-  const getModalTitle = () =>
-    modalMode === "delete"
-      ? `¿Está seguro que desea eliminar el ingreso con detalle ${stock.invoiceNumber} del ${new Date(stock.date).toLocaleDateString()}?`
-      : STOCK_FLOWS_MODAL_CONFIG[modalMode]?.title;
-
   const getModalContent = () => (
     <FieldsContainer className="ui form">
       <FormField
@@ -155,16 +150,32 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
             <Flex $justifyContent="space-between">
               <Header center>Movimientos de stock</Header>
               <Flex $columnGap="15px">
-                <Button labelPosition="left" icon={ICONS.ARROW_DOWN} color={COLORS.GREEN} content="Ingreso" onClick={() => {
-                  setStock(EMPTY_STOCK());
-                  setModalMode(STOCK_MODAL_MODES.ADD);
-                  setShowModal(true);
-                }} />
-                <Button type="button" labelPosition="left" icon={ICONS.ARROW_UP} color={COLORS.RED} content="Egreso" onClick={() => {
-                  setStock(EMPTY_STOCK());
-                  setModalMode(STOCK_MODAL_MODES.OUT);
-                  setShowModal(true);
-                }} />
+                <Button
+                  type="button"
+                  labelPosition="left"
+                  icon={ICONS.ARROW_DOWN}
+                  color={COLORS.GREEN}
+                  content="Ingreso"
+                  disabled={isLoading}
+                  loading={isLoading}
+                  onClick={() => {
+                    setStock(EMPTY_STOCK());
+                    setModalMode(STOCK_MODAL_MODES.ADD);
+                    setShowModal(true);
+                  }} />
+                <Button
+                  type="button"
+                  labelPosition="left"
+                  icon={ICONS.ARROW_UP}
+                  color={COLORS.RED}
+                  content="Egreso"
+                  disabled={isLoading}
+                  loading={isLoading}
+                  onClick={() => {
+                    setStock(EMPTY_STOCK());
+                    setModalMode(STOCK_MODAL_MODES.OUT);
+                    setShowModal(true);
+                  }} />
                 <Message padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
                   <Icon name={ICONS.BOXES} /> Stock Total: {totalStock}
                 </Message>
@@ -181,7 +192,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
                   onSubmit();
                 }}
               />
-              <TextControlled name="invoiceNumber" label="Detalle" placeholder="A0001" width="150px" />
+              <TextControlled name="invoiceNumber" label="N° Factura" placeholder="A0001" width="150px" />
               <TextControlled name="comments" label="Comentarios" placeholder="Uso interno" width="200px" />
             </Filters>
           </FlexColumn>
@@ -196,11 +207,10 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
           onFilter={onFilter}
           filters={filters}
           setFilters={setFilters}
-          isLoading={isLoading}
         />
       </Form>
       <ModalAction
-        title={getModalTitle()}
+        title={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.title}
         isLoading={isLoading}
         titleIcon={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.icon}
         titleIconColor={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.color}
@@ -208,11 +218,10 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         showModal={showModal}
         setShowModal={(open) => {
           if (!open) resetModalState();
-          else setShowModal(true);
         }}
         onConfirm={handleConfirm}
-        noConfirmation={modalMode !== "delete"}
-        bodyContent={modalMode !== "delete" && getModalContent()}
+        noConfirmation
+        bodyContent={getModalContent()}
       />
     </FlexColumn>
   );

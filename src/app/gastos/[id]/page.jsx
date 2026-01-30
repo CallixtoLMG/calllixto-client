@@ -11,6 +11,7 @@ import { isItemCancelled } from "@/common/utils";
 import { getFormatedDate, isDateAfter, now } from "@/common/utils/dates";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import Payments from "@/components/payments";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
@@ -18,7 +19,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
-import Payments from "@/components/payments";
 
 const Expense = ({ params }) => {
   useValidateToken();
@@ -51,14 +51,6 @@ const Expense = ({ params }) => {
     setLabels([{ name: PAGES.EXPENSES.NAME }, { name: expense?.name }]);
     refetch();
   }, [setLabels, expense, refetch]);
-
-  const { handleProtectedAction } = useProtectedAction({
-    onBeforeView: async () => {
-      const expenseOk = await expenseUnsaved.onBeforeView?.();
-      const paymentsOk = await paymentsUnsaved.onBeforeView?.();
-      return expenseOk && paymentsOk;
-    },
-  });
 
   useEffect(() => {
     const actionsList = [];
@@ -95,18 +87,18 @@ const Expense = ({ params }) => {
 
   const expenseUnsaved = useUnsavedChanges({
     formRef: expenseFormRef,
-    onSave: () => expenseFormRef.current.submitForm(),
-    onDiscard: () => expenseFormRef.current.resetForm(),
+    onDiscard: () => expenseFormRef.current?.resetForm(),
   });
 
-  const expenseAllow = useAllowUpdate({ canUpdate: RULES.canUpdate[role], onBeforeView: expenseUnsaved.onBeforeView });
+  const onBeforeView = expenseUnsaved.onBeforeView;
 
-  const paymentsFormRef = useRef();
+  const expenseAllow = useAllowUpdate({
+    canUpdate: RULES.canUpdate[role],
+    onBeforeView,
+  });
 
-  const paymentsUnsaved = useUnsavedChanges({
-    formRef: paymentsFormRef,
-    onSave: () => paymentsFormRef.current.submitForm(),
-    onDiscard: () => paymentsFormRef.current.resetForm(),
+  const { handleProtectedAction } = useProtectedAction({
+    onBeforeView,
   });
 
   const handleModalClose = () => {
@@ -119,14 +111,12 @@ const Expense = ({ params }) => {
       if (response.statusOk) {
         toast.success("Gasto actualizado!");
         expenseAllow.setIsUpdating(false);
-        expenseUnsaved.resolveSave();
       } else {
         toast.error(response.error.message);
       }
     },
     onSettled: () => {
       handleModalClose();
-      expenseUnsaved.closeModal();
     },
   });
 
@@ -183,7 +173,7 @@ const Expense = ({ params }) => {
   });
 
   const { mutate: mutateDeletePayment, isPending: isDeletePending } = useMutation({
-    mutationFn: (paymentId) => deletePayment(paymentId, ENTITIES.EXPENSE,expense.id),
+    mutationFn: (paymentId) => deletePayment(paymentId, ENTITIES.EXPENSE, expense.id),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pago eliminado!");
@@ -216,13 +206,6 @@ const Expense = ({ params }) => {
             isLoading={isEditPending}
             isUpdating={expenseAllow.isUpdating && !isItemCancelled(expense?.state)}
             view
-          />
-          <UnsavedChangesModal
-            open={expenseUnsaved.showModal}
-            onSave={expenseUnsaved.handleSave}
-            onDiscard={expenseUnsaved.handleDiscard}
-            isSaving={expenseUnsaved.isSaving}
-            onCancel={expenseUnsaved.handleCancel}
           />
         </Tab.Pane>
       ),
@@ -263,11 +246,10 @@ const Expense = ({ params }) => {
     },
   ];
 
-  const handleTabChange = async (_, { activeIndex }) => {
-    if (await expenseUnsaved.onBeforeView() && await paymentsUnsaved.onBeforeView()) {
+  const handleTabChange = (_, { activeIndex }) => {
+    if (onBeforeView()) {
       setActiveIndex(activeIndex);
-      const newUrl = window.location.pathname;
-      router.replace(newUrl);
+      router.replace(window.location.pathname);
     }
   };
 
@@ -295,6 +277,11 @@ const Expense = ({ params }) => {
         isLoading={isCancelPending}
         id={expense?.id}
         header={`Desea anular el gasto ${expense?.name}?`}
+      />
+      <UnsavedChangesModal
+        open={expenseUnsaved.showModal}
+        onDiscard={expenseUnsaved.handleDiscard}
+        onContinue={expenseUnsaved.closeModal}
       />
     </Loader>
   );

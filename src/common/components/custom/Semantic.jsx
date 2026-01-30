@@ -211,6 +211,7 @@ export const Message = styled(SMessage)`
   height: ${({ height }) => `${height}!important`} ;
   width: ${({ width }) => `${width}!important`} ;
   margin: ${({ margin }) => `${margin}!important`} ;
+  opacity: ${({ opacity }) => `${opacity && "0.45"}!important`} ;
 `;
 
 export const Button = styled(SButton)`

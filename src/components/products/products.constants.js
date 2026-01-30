@@ -27,6 +27,8 @@ export const LIST_ATTRIBUTES = [
   "editablePrice",
   "fractionConfig",
   "inactiveReason",
+  "stock",
+  "stockControl",
 ];
 
 export const ATTRIBUTES = {
@@ -93,8 +95,11 @@ export const PRODUCT_COLUMNS = [
   {
     id: 4,
     title: "Stock",
+    key: "stock",
+    sortable: true,
     width: 1,
-    value: (product) => (product?.stock || 0)
+    value: (product) => (product?.stock || 0),
+    sortValue: (product) => product.stock ?? ""
   },
   {
     id: 5,
@@ -350,7 +355,7 @@ export const STOCK_TABLE_HEADERS = [
   {
     id: 4,
     width: 3,
-    title: 'Detalle', value: (stockFlows) => stockFlows.invoiceNumber
+    title: 'N° Factura', value: (stockFlows) => stockFlows.invoiceNumber
   },
   {
     id: 5,

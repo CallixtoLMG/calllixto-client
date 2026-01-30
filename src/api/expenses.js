@@ -1,6 +1,6 @@
 import { ENTITIES, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
-import { CANCEL, PATHS, PAYMENTS } from "@/fetchUrls";
+import { CANCEL, PATHS } from "@/fetchUrls";
 import { useQuery } from '@tanstack/react-query';
 import { GET_EXPENSE_QUERY_KEY, LIST_ATTRIBUTES, LIST_EXPENSES_QUERY_KEY } from "../components/expenses/expenses.constants";
 import { getInstance } from "./axios";
@@ -69,26 +69,6 @@ export const useEditExpense = () => {
     });
   };
   return editExpense;
-};
-
-export const useUpdatePayments = () => {
-  const editItem = useEditItem();
-
-  const updatePayments = async ({ expense, id }) => {
-    const { paymentsMade, updatedAt } = expense;
-
-    const response = await editItem({
-      entity: ENTITIES.EXPENSES,
-      url: `${PATHS.EXPENSES}/${id}/${PAYMENTS}`,
-      value: { paymentsMade, updatedAt },
-      responseEntity: ENTITIES.EXPENSE,
-      invalidateQueries: [[LIST_EXPENSES_QUERY_KEY], [GET_EXPENSE_QUERY_KEY, expense.id]]
-    });
-
-    return response;
-  };
-
-  return updatePayments;
 };
 
 export const useCancelExpense = () => {

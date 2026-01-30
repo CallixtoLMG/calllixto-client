@@ -209,9 +209,10 @@ const ProductForm = forwardRef(({
             text="Stock habilitado"
             icon={ICONS.BOXES}
             color={COLORS.BLUE}
+            disabled={!isUpdating && view}
           />
-          {watchStockControl &&
-            <Message height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
+          {watchStockControl && product?.state &&
+            <Message opacity={!isUpdating && view} height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
               <Icon name={ICONS.BOXES} /> Stock Total: {product?.stock ?? 0}
             </Message>
           }

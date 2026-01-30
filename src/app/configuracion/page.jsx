@@ -47,21 +47,14 @@ const Settings = () => {
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   const [activeEntity, setActiveEntity] = useState(null);
   const {
-    showModal,
     handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
     closeModal,
   } = useUnsavedChanges({
     formRef,
     onDiscard: async () => {
       methods.reset(data[activeEntity]);
-    },
-    onSave: () => {
-      methods.handleSubmit(mutateEdit)();
     },
   });
 
@@ -101,7 +94,6 @@ const Settings = () => {
       toast.success("Cambios guardados correctamente.");
       methods.reset(methods.getValues());
       queryClient.invalidateQueries({ queryKey: [[GET_SETTING_QUERY_KEY]], refetchType: ALL })
-      resolveSave();
     },
     onError: (error) => {
       toast.error(`Error al guardar cambios: ${error.message || error}`);
@@ -132,11 +124,11 @@ const Settings = () => {
     if (!data?.settings) return [];
 
     const mappedEntities = data.settings
-    .filter((entity) => SUPPORTED_SETTINGS[entity.entity]?.some((setting) => !!entity[setting]))
-    .map((entity) => ({
-      ...entity,
-      label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
-    }));
+      .filter((entity) => SUPPORTED_SETTINGS[entity.entity]?.some((setting) => !!entity[setting]))
+      .map((entity) => ({
+        ...entity,
+        label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
+      }));
 
     return mappedEntities;
   }, [data]);
@@ -188,11 +180,9 @@ const Settings = () => {
             submit
           />
           <UnsavedChangesModal
-            open={showModal}
+            open={showUnsavedModal}
             onDiscard={handleDiscard}
-            onSave={handleSave}
-            isSaving={isSaving}
-            onCancel={handleCancel}
+            onContinue={handleContinue}
           />
         </Form>
       </FormProvider>

@@ -22,6 +22,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Tab } from "semantic-ui-react";
+import { GET_PRODUCT_QUERY_KEY } from "../../../components/products/products.constants";
 
 const Product = ({ params }) => {
   useValidateToken();
@@ -31,7 +32,7 @@ const Product = ({ params }) => {
 
   const {
     activeIndex,
-    onTabChange,
+    onTabChange: onLazyTabChange,
     hasVisited,
   } = useLazyTabs({
     initialIndex: 0,
@@ -57,10 +58,8 @@ const Product = ({ params }) => {
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
     resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
     closeModal,
   } = useUnsavedChanges({
@@ -69,10 +68,13 @@ const Product = ({ params }) => {
       formRef.current?.resetForm();
       setIsUpdating(false);
     },
-    onSave: () => {
-      formRef.current?.submitForm();
-    },
   });
+
+  const handleTabChange = (_, { activeIndex }) => {
+    if (onBeforeView()) {
+      onLazyTabChange(_, { activeIndex });
+    }
+  };
 
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
@@ -244,6 +246,11 @@ const Product = ({ params }) => {
         toast.success("Movimiento de stock registrado");
         queryClient.invalidateQueries({
           queryKey: [GET_STOCK_FLOW_QUERY_KEY, params.id],
+          exact: true,
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: [GET_PRODUCT_QUERY_KEY, params.id],
           exact: true,
         });
       } else {
@@ -441,14 +448,12 @@ const Product = ({ params }) => {
       <Tab
         panes={panes}
         activeIndex={activeIndex}
-        onTabChange={onTabChange}
+        onTabChange={handleTabChange}
       />
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
-        onSave={handleSave}
-        isSaving={isSaving}
-        onCancel={handleCancel}
+        onContinue={handleContinue}
       />
       {product && (
         <OnlyPrint>
