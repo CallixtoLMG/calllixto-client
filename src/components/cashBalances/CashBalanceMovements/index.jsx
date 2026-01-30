@@ -1,7 +1,7 @@
 import { Flex, FlexColumn, Message } from "@/common/components/custom";
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { COLORS, DATE_FORMATS, ENTITIES, PAGES } from "@/common/constants";
+import { ALL, COLORS, DATE_FORMATS, ENTITIES, IN, OUT, PAGES } from "@/common/constants";
 import { createFilter, getFormatedNumber, preventSend } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { useFilters } from "@/hooks";
@@ -36,31 +36,27 @@ const CashBalanceMovements = ({ cashBalance }) => {
     key: CASH_BALANCE_MOVEMENTS_FILTERS_KEY
   });
 
-  const onFilter = createFilter(filters, { entityId: {}, state: { skipAll: true } });
+  const onFilter = createFilter(filters, {
+    entityId: {},
+    comments: {},
+    type: {
+      skipAll: true,
+      custom: (item) => {
+        const type = filters.type;
+
+        if (type === ALL) return true;
+        if (type === IN) return item.quantity > 0;
+        if (type === OUT) return item.quantity < 0;
+
+        return true;
+      },
+    },
+  });
 
   const { control } = methods;
 
   const { fields: movementList } = useFieldArray({ control, name: "movements" });
 
-  const filteredList = useMemo(() => {
-    const result = movementList
-      .filter(item => {
-        const isIn = item.quantity > 0;
-        const isOut = item.quantity < 0;
-        const matchType = filters.type === "all"
-          || (filters.type === "in" && isIn)
-          || (filters.type === "out" && isOut);
-        const matchId = item.movementId?.toLowerCase().includes(filters.movementId?.toLowerCase() || "");
-        const matchComments = (item.comments || "").toLowerCase().includes((filters.comments || "").toLowerCase());
-        return matchType && matchId && matchComments;
-      })
-      .map(item => ({
-        ...item,
-        id: `${item.source}_${item.entityId}_${item.movementId}`,
-      }));
-
-    return result;
-  }, [filters, movementList]);
 
   const getPageFor = (movement) =>
     movement?.source === ENTITIES.EXPENSE ? PAGES.EXPENSES : PAGES.BUDGETS;
@@ -109,7 +105,10 @@ const CashBalanceMovements = ({ cashBalance }) => {
               SHOW: (_, element) => `${getPageFor(element).SHOW(element.entityId)}?tab=pagos`
             }}
             headers={CASH_BALANCE_MOVEMENTS_TABLE_HEADERS}
-            elements={filteredList}
+            elements={movementList.map(item => ({
+              ...item,
+              id: `${item.source}_${item.entityId}_${item.movementId}`,
+            }))}
             onFilter={onFilter}
             filters={filters}
             setFilters={setFilters}

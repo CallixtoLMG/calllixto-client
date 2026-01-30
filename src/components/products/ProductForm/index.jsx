@@ -62,7 +62,7 @@ const ProductForm = forwardRef(({
   ]);
 
   const handleForm = async (data) => {
-    let filteredData = { ...data };
+    const filteredData = removeNullish({ ...data });
 
     if (data.fractionConfig && !data.fractionConfig.active && product?.fractionConfig?.active === false) {
       delete filteredData.fractionConfig;
@@ -77,8 +77,6 @@ const ProductForm = forwardRef(({
       delete filteredData.supplier;
       delete filteredData.brand;
     }
-
-    filteredData = removeNullish(filteredData);
 
     await onSubmit(filteredData);
     reset(getInitialValues({ ...product, ...filteredData }));
@@ -211,8 +209,8 @@ const ProductForm = forwardRef(({
             color={COLORS.BLUE}
             disabled={!isUpdating && view}
           />
-          {watchStockControl && product?.state &&
-            <Message opacity={!isUpdating && view} height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
+          {watchStockControl && isUpdating &&
+            <Message opacity={view} height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
               <Icon name={ICONS.BOXES} /> Stock Total: {product?.stock ?? 0}
             </Message>
           }

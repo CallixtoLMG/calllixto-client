@@ -1,7 +1,7 @@
 import { Box, Flex, FlexColumn, Icon, Label, OverflowWrapper } from "@/common/components/custom";
 import { Text } from "@/common/components/form/Search/styles";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
+import { ALL, COLORS, DATE_FORMATS, ICONS, IN, OUT, SIZES } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { Popup } from "semantic-ui-react";
@@ -274,7 +274,6 @@ export const getProductSearchDescription = (product) => (
   </FlexColumn>
 );
 
-
 export const EMPTY_STOCK_FILTERS = {
   type: "all",
   invoiceNumber: "",
@@ -283,35 +282,34 @@ export const EMPTY_STOCK_FILTERS = {
 
 export const STOCK_TYPE_OPTIONS = [
   {
-    key: "all",
+    key: ALL,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
         Todos&nbsp;
       </Flex>
     ),
-    value: "all",
+    value: ALL,
   },
   {
-    key: "in",
+    key: IN,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
         Ingresos&nbsp;
         <Icon name={ICONS.ARROW_DOWN} color={COLORS.GREEN} />
       </Flex>
     ),
-    value: "in",
+    value: IN,
   },
   {
-    key: "out",
+    key: OUT,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
         Egresos&nbsp;
         <Icon name={ICONS.ARROW_UP} color={COLORS.RED} />
       </Flex>
     ),
-    value: "out",
+    value: OUT,
   },
-
 ];
 
 export const STOCK_TABLE_HEADERS = [
@@ -323,8 +321,8 @@ export const STOCK_TABLE_HEADERS = [
     sortValue: (stockFlows) => stockFlows.createdAt ?? "",
     value: (stockFlows) => (
       <Flex whiteSpace="nowrap" $alignItems="center" >
-        < Label ribbon width="fit-content" color={stockFlows.isInflow ? COLORS.GREEN : COLORS.RED} >
-          <Icon inverted name={stockFlows.isInflow ? ICONS.ARROW_DOWN : ICONS.ARROW_UP} />
+        < Label ribbon width="fit-content" color={stockFlows.inflow ? COLORS.GREEN : COLORS.RED} >
+          <Icon inverted name={stockFlows.inflow ? ICONS.ARROW_DOWN : ICONS.ARROW_UP} />
         </Label>
         <Box width="100%">
           {stockFlows.date

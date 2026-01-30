@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useDeleteProduct, useEditProduct, useGetProduct, useRecoverProduct, useSetProductState } from "@/api/products";
-import { useCreateStockFlow, useGetStockFlow } from "@/api/stocks";
+import { useCreateStockFlow, useGetStockFlow } from "@/api/stock";
 import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";

@@ -1,7 +1,7 @@
 import { Box, Flex, Icon, Label, OverflowWrapper } from '@/common/components/custom';
 import { PriceLabel } from '@/common/components/form';
 import { CommentTooltip } from "@/common/components/tooltips";
-import { COLORS, DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SIZES } from '@/common/constants';
+import { ALL, COLORS, DATE_FORMATS, ICONS, IN, OUT, SELECT_ALL_OPTION, SIZES } from '@/common/constants';
 import { getFormatedDate } from '@/common/utils/dates';
 import { Popup } from 'semantic-ui-react';
 
@@ -279,33 +279,33 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
 
 export const CASH_BALANCE_MOVEMENTS_TYPE_OPTIONS = [
   {
-    key: "all",
+    key: ALL,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
         Todos&nbsp;
       </Flex>
     ),
-    value: "all",
+    value: ALL,
   },
   {
-    key: "in",
+    key: IN,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
         Ingresos&nbsp;
         <Icon name={ICONS.ARROW_DOWN} color={COLORS.GREEN} />
       </Flex>
     ),
-    value: "in",
+    value: IN,
   },
   {
-    key: "out",
+    key: OUT,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
         Egresos&nbsp;
         <Icon name={ICONS.ARROW_UP} color={COLORS.RED} />
       </Flex>
     ),
-    value: "out",
+    value: OUT,
   },
 ];
 

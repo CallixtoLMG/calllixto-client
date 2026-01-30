@@ -3,10 +3,10 @@ import { DropdownControlled, NumberField, TextControlled, TextField } from "@/co
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { ModalAction } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
-import { COLORS, ICONS, RULES as VALIDATE_RULES } from "@/common/constants";
-import { createFilter, preventSend } from "@/common/utils";
+import { ALL, COLORS, ICONS, IN, OUT, RULES as VALIDATE_RULES } from "@/common/constants";
+import { createFilter } from "@/common/utils";
 import { useFilters } from "@/hooks";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { FormProvider } from "react-hook-form";
 import { Form } from "semantic-ui-react";
 import { EMPTY_STOCK, EMPTY_STOCK_FILTERS, PRODUCTS_FILTERS_KEY, STOCK_FLOWS_MODAL_CONFIG, STOCK_MODAL_MODES, STOCK_TABLE_HEADERS, STOCK_TYPE_OPTIONS } from "../products.constants";
@@ -22,47 +22,26 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
     methods: filterMethods,
   } = useFilters({ defaultFilters: EMPTY_STOCK_FILTERS, key: PRODUCTS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, ['invoiceNumber', 'comments']);
+  const onFilter = createFilter(filters, {
+    invoiceNumber: {},
+    comments: {},
+    type: {
+      skipAll: true,
+      custom: (item) => {
+        const type = filters.type;
+
+        if (type === ALL) return true;
+        if (type === IN) return item.inflow === true;
+        if (type === OUT) return item.inflow === false;
+
+        return true;
+      },
+    },
+  });
   const [showModal, setShowModal] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
   const [modalMode, setModalMode] = useState();
   const [stock, setStock] = useState(EMPTY_STOCK());
-
-  const totalStock = useMemo(() => {
-    return (stockFlows ?? []).reduce((acc, flow) => {
-      const qty = Math.abs(Number(flow.quantity) || 0);
-      return flow.inflow ? acc + qty : acc - qty;
-    }, 0);
-  }, [stockFlows]);
-
-  const filteredStockList = useMemo(() => {
-    return (stockFlows ?? []).filter((flow) => {
-      const isInflow = flow.inflow === true;
-
-      const matchesType =
-        filters.type === "all" ||
-        (filters.type === "in" && isInflow) ||
-        (filters.type === "out" && !isInflow);
-
-      const matchesInvoice =
-        !filters.invoiceNumber ||
-        flow.invoiceNumber?.toLowerCase().includes(filters.invoiceNumber.toLowerCase());
-
-      const matchesComments =
-        !filters.comments ||
-        flow.comments?.toLowerCase().includes(filters.comments.toLowerCase());
-
-      return matchesType && matchesInvoice && matchesComments;
-    });
-  }, [stockFlows, filters]);
-
-  const tableElements = useMemo(() => {
-    return filteredStockList.map((flow) => ({
-      ...flow,
-      quantity: Math.abs(Number(flow.quantity) || 0),
-      isInflow: flow.inflow === true,
-    }));
-  }, [filteredStockList]);
 
   const isValidStockInput = () => {
     const hasDate = stock.date instanceof Date && !isNaN(stock.date);
@@ -144,43 +123,41 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
 
   return (
     <FlexColumn $rowGap="15px">
-      <FormProvider {...filterMethods}>
-        <Form onSubmit={onSubmit}>
-          <FlexColumn $rowGap="15px">
-            <Flex $justifyContent="space-between">
-              <Header center>Movimientos de stock</Header>
-              <Flex $columnGap="15px">
-                <Button
-                  type="button"
-                  labelPosition="left"
-                  icon={ICONS.ARROW_DOWN}
-                  color={COLORS.GREEN}
-                  content="Ingreso"
-                  disabled={isLoading}
-                  loading={isLoading}
-                  onClick={() => {
-                    setStock(EMPTY_STOCK());
-                    setModalMode(STOCK_MODAL_MODES.ADD);
-                    setShowModal(true);
-                  }} />
-                <Button
-                  type="button"
-                  labelPosition="left"
-                  icon={ICONS.ARROW_UP}
-                  color={COLORS.RED}
-                  content="Egreso"
-                  disabled={isLoading}
-                  loading={isLoading}
-                  onClick={() => {
-                    setStock(EMPTY_STOCK());
-                    setModalMode(STOCK_MODAL_MODES.OUT);
-                    setShowModal(true);
-                  }} />
-                <Message padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
-                  <Icon name={ICONS.BOXES} /> Stock Total: {totalStock}
-                </Message>
-              </Flex>
-            </Flex>
+      <FlexColumn $rowGap="15px">
+        <Flex $justifyContent="space-between">
+          <Header center>Movimientos de stock</Header>
+          <Flex $columnGap="15px">
+            <Button
+              labelPosition="left"
+              icon={ICONS.ARROW_DOWN}
+              color={COLORS.GREEN}
+              content="Ingreso"
+              disabled={isLoading}
+              loading={isLoading}
+              onClick={() => {
+                setStock(EMPTY_STOCK());
+                setModalMode(STOCK_MODAL_MODES.ADD);
+                setShowModal(true);
+              }} />
+            <Button
+              labelPosition="left"
+              icon={ICONS.ARROW_UP}
+              color={COLORS.RED}
+              content="Egreso"
+              disabled={isLoading}
+              loading={isLoading}
+              onClick={() => {
+                setStock(EMPTY_STOCK());
+                setModalMode(STOCK_MODAL_MODES.OUT);
+                setShowModal(true);
+              }} />
+            <Message padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
+              <Icon name={ICONS.BOXES} /> Stock Total: {product?.stock ?? 0}
+            </Message>
+          </Flex>
+        </Flex>
+        <FormProvider {...filterMethods}>
+          <Form onSubmit={onSubmit}>
             <Filters entity="STOCK" onRestoreFilters={onRestoreFilters}>
               <DropdownControlled
                 width="fit-content"
@@ -195,20 +172,18 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
               <TextControlled name="invoiceNumber" label="N° Factura" placeholder="A0001" width="150px" />
               <TextControlled name="comments" label="Comentarios" placeholder="Uso interno" width="200px" />
             </Filters>
-          </FlexColumn>
-        </Form>
-      </FormProvider>
-      <Form onKeyDown={preventSend}>
-        <Table
-          paginate
-          headers={STOCK_TABLE_HEADERS}
-          elements={tableElements}
-          $deleteButtonInside
-          onFilter={onFilter}
-          filters={filters}
-          setFilters={setFilters}
-        />
-      </Form>
+          </Form>
+        </FormProvider>
+      </FlexColumn>
+      <Table
+        paginate
+        headers={STOCK_TABLE_HEADERS}
+        elements={stockFlows}
+        $deleteButtonInside
+        onFilter={onFilter}
+        filters={filters}
+        setFilters={setFilters}
+      />
       <ModalAction
         title={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.title}
         isLoading={isLoading}
