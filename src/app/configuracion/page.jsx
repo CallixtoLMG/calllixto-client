@@ -47,6 +47,7 @@ const Settings = () => {
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   const [activeEntity, setActiveEntity] = useState(null);
   const {
+    showModal: showUnsavedModal,
     handleDiscard,
     handleContinue,
     onBeforeView,
