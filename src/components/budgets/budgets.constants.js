@@ -6,7 +6,7 @@ import { parse } from "date-fns";
 import { Label, Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { CommentTooltip } from "../../common/components/tooltips";
-import { getPopupContent, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
+import { getBudgetListPopupContent, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
 
 export const LIST_BUDGETS_QUERY_KEY = 'listAllBudgets';
 export const LIST_BUDGETS_HISTORY_QUERY_KEY = 'getBudgetsHistory';
@@ -93,7 +93,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
                       {budget.id}
                     </Label>
                   }
-                  content={getPopupContent(budget)}
+                  content={getBudgetListPopupContent(budget)}
                   position="right center"
                   size="mini"
                 />
@@ -385,3 +385,5 @@ export const buildCustomHistoryRanges = (historyDateRanges = []) => {
 export const DATE_RANGE_KEY = "budgets-history-date-range";
 
 export const DEFAULT_DATE_RANGE_VALUE = 3;
+
+export const PAYMENTS_TAB_INDEX = 1;

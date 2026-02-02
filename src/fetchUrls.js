@@ -17,6 +17,8 @@ export const PATHS = {
   CHANGE_PASSWORD: "changePassword",
   CASH_BALANCES: ENTITIES.CASH_BALANCES,
   BUDGETS_HISTORY: ENTITIES.BUDGETS_HISTORY,
+  STOCK_FLOWS: ENTITIES.STOCK_FLOWS,
+  STOCK_FLOW: ENTITIES.STOCK_FLOW,
 };
 
 export const BATCH = "batch";
@@ -26,6 +28,6 @@ export const CLIENT = "clients";
 export const VALIDATE = "validate";
 export const EDIT_BATCH = "transact";
 export const URL = process.env.NEXT_PUBLIC_URL;
-export const PAYMENTS = "payments"
-export const CONFIRM = "confirm"
-export const CANCEL = "cancel"
+export const PAYMENTS = "payments";
+export const CONFIRM = "confirm";
+export const CANCEL = "cancel";

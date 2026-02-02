@@ -274,6 +274,8 @@ export const ICONS = {
 };
 
 export const ALL = "all";
+export const IN = "in";
+export const OUT = "out";
 export const ACTIVE = "active";
 export const DELETE = "delete";
 export const HARD_DELETED = "HARD_DELETED";

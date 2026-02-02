@@ -33,10 +33,7 @@ const Customer = ({ params }) => {
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
     closeModal,
   } = useUnsavedChanges({
@@ -44,9 +41,6 @@ const Customer = ({ params }) => {
     onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
-    },
-    onSave: () => {
-      formRef.current?.submitForm();
     },
   });
 
@@ -100,7 +94,6 @@ const Customer = ({ params }) => {
       if (response.statusOk) {
         toast.success("Cliente actualizado!");
         setIsUpdating(false);
-        resolveSave();
       } else {
         toast.error(response.error.message);
       }
@@ -235,9 +228,7 @@ const Customer = ({ params }) => {
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
-        onSave={handleSave}
-        onCancel={handleCancel}
-        isSaving={isSaving}
+        onContinue={handleContinue}
       />
       <ModalAction
         title={header}

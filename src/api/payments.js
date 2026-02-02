@@ -1,5 +1,5 @@
 import { ENTITIES, IN_MS } from "@/common/constants";
-import { GET_PAYMENT_QUERY_KEY, LIST_PAYMENTS_QUERY_KEY } from "@/components/payments/payments.constants";
+import { GET_PAYMENT_QUERY_KEY } from "@/components/payments/payments.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
@@ -15,8 +15,7 @@ export const useEditPayment = () => {
       value: payment,
       responseEntity: ENTITIES.PAYMENT,
       invalidateQueries: [
-        [LIST_PAYMENTS_QUERY_KEY],
-        [GET_PAYMENT_QUERY_KEY, payment.id],
+        [GET_PAYMENT_QUERY_KEY, entityId]
       ],
       skipStorageUpdate: true,
     });
@@ -33,7 +32,9 @@ export const useDeletePayment = () => {
       entity: ENTITIES.PAYMENTS,
       id: paymentId,
       url: `${PATHS.PAYMENTS}/${entity}/${entityId}/${paymentId}`,
-      invalidateQueries: [[LIST_PAYMENTS_QUERY_KEY]],
+      invalidateQueries: [
+        [GET_PAYMENT_QUERY_KEY, entityId], 
+      ],
       skipStorageUpdate: true,
     });
   };
@@ -50,7 +51,7 @@ export const useCreatePayment = () => {
       url: `${PATHS.PAYMENTS}/${entity}/${entityId}`,
       value: payment,
       responseEntity: ENTITIES.PAYMENT,
-      invalidateQueries: [[LIST_PAYMENTS_QUERY_KEY]],
+      invalidateQueries: [[GET_PAYMENT_QUERY_KEY, entityId]],
       skipStorageUpdate: true
     });
   };
@@ -58,7 +59,7 @@ export const useCreatePayment = () => {
   return createPayment;
 };
 
-export function useGetPayments(entity, entityId) {
+export function useGetPayments(entity, entityId, { enabled = true } = {}) {
   const getPayment = async (entityId) => {
     try {
       const { data } = await getInstance().get(`${PATHS.PAYMENTS}/${entity}/${entityId}`);
@@ -73,7 +74,7 @@ export function useGetPayments(entity, entityId) {
     queryFn: () => getPayment(entityId),
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
-    enabled: !!entityId,
+    enabled: !!entityId && enabled,
   });
 
   return query;

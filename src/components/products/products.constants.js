@@ -1,8 +1,9 @@
-import { Box, Flex, FlexColumn, Label, OverflowWrapper } from "@/common/components/custom";
+import { Box, Flex, FlexColumn, Icon, Label, OverflowWrapper } from "@/common/components/custom";
 import { Text } from "@/common/components/form/Search/styles";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { SIZES } from "@/common/constants";
+import { ALL, COLORS, DATE_FORMATS, ICONS, IN, OUT, SIZES } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
+import { getFormatedDate } from "@/common/utils/dates";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
 import { formatProductId, getBrandId, getProductId, getSupplierId } from "./products.utils";
@@ -26,6 +27,8 @@ export const LIST_ATTRIBUTES = [
   "editablePrice",
   "fractionConfig",
   "inactiveReason",
+  "stock",
+  "stockControl",
 ];
 
 export const ATTRIBUTES = {
@@ -90,7 +93,16 @@ export const PRODUCT_COLUMNS = [
 
   },
   {
-    id: 3,
+    id: 4,
+    title: "Stock",
+    key: "stock",
+    sortable: true,
+    width: 1,
+    value: (product) => (product?.stock || 0),
+    sortValue: (product) => product.stock ?? ""
+  },
+  {
+    id: 5,
     title: "Precio",
     width: 2,
     key: "price",
@@ -261,3 +273,150 @@ export const getProductSearchDescription = (product) => (
     </Flex>
   </FlexColumn>
 );
+
+export const EMPTY_STOCK_FILTERS = {
+  type: "all",
+  invoiceNumber: "",
+  comments: "",
+};
+
+export const STOCK_TYPE_OPTIONS = [
+  {
+    key: ALL,
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        Todos&nbsp;
+      </Flex>
+    ),
+    value: ALL,
+  },
+  {
+    key: IN,
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        Ingresos&nbsp;
+        <Icon name={ICONS.ARROW_DOWN} color={COLORS.GREEN} />
+      </Flex>
+    ),
+    value: IN,
+  },
+  {
+    key: OUT,
+    text: (
+      <Flex $alignItems="center" $justifyContent="space-between">
+        Egresos&nbsp;
+        <Icon name={ICONS.ARROW_UP} color={COLORS.RED} />
+      </Flex>
+    ),
+    value: OUT,
+  },
+];
+
+export const STOCK_TABLE_HEADERS = [
+  {
+    id: 1,
+    title: 'Fecha de Pago',
+    key: "date",
+    sortable: true,
+    sortValue: (stockFlows) => stockFlows.createdAt ?? "",
+    value: (stockFlows) => (
+      <Flex whiteSpace="nowrap" $alignItems="center" >
+        < Label ribbon width="fit-content" color={stockFlows.inflow ? COLORS.GREEN : COLORS.RED} >
+          <Icon inverted name={stockFlows.inflow ? ICONS.ARROW_DOWN : ICONS.ARROW_UP} />
+        </Label>
+        <Box width="100%">
+          {stockFlows.date
+            ? getFormatedDate(stockFlows.createdAt, DATE_FORMATS.DATE_WITH_TIME)
+            : "-"}
+        </Box>
+      </Flex>
+    ),
+    width: 2,
+  },
+
+  {
+    id: 2,
+    key: "quantity",
+    sortable: true,
+    sortValue: (stockFlows) => stockFlows.quantity ?? "",
+    width: 2,
+    title: 'Cantidad', value: (stockFlows) => stockFlows.quantity
+  },
+  {
+    id: 3,
+    key: "createdBy",
+    sortable: true,
+    sortValue: (stockFlows) => stockFlows.createdBy ?? "",
+    width: 2,
+    title: 'Creado por', value: (stockFlows) => stockFlows.createdBy
+  },
+  {
+    id: 4,
+    width: 3,
+    title: 'N° Factura', value: (stockFlows) => stockFlows.invoiceNumber
+  },
+  {
+    id: 5,
+    width: 9,
+    align: "left",
+    title: 'Comentarios', value: (stockFlows) => <OverflowWrapper maxWidth="30vw" popupContent={stockFlows.comments}> {stockFlows.comments} </OverflowWrapper>
+  },
+];
+
+export const LIST_PAYMENTS_QUERY_KEY = 'listPayments';
+export const GET_PAYMENT_QUERY_KEY = 'getPayments';
+export const PAYMENTS_FILTERS_KEY = 'paymentsFilters';
+
+export const LIST_STOCK_FLOWS_QUERY_KEY = 'listStockFlows';
+export const GET_STOCK_FLOW_QUERY_KEY = 'getStockFlows';
+export const STOCK_FLOWS_FILTERS_KEY = 'expensesStockFlows';
+
+export const EMPTY_STOCK = () => ({
+  amount: '',
+  comments: '',
+  date: new Date(),
+  invoiceNumber: '',
+});
+
+export const STOCK_FLOWS_MODAL_CONFIG = {
+  add: {
+    title: "Ingreso de stock",
+    icon: ICONS.ARROW_DOWN,
+    color: COLORS.GREEN,
+    confirmText: "Agregar",
+  },
+  out: {
+    title: "Egreso de stock",
+    icon: ICONS.ARROW_UP,
+    color: COLORS.RED,
+    confirmText: "Agregar",
+  },
+  edit: {
+    title: "Editar ingreso",
+    icon: ICONS.EDIT,
+    color: COLORS.BLUE,
+    confirmText: "Actualizar",
+  },
+  delete: {
+    icon: ICONS.TRASH,
+    color: COLORS.RED,
+    confirmText: "Eliminar",
+  },
+};
+
+export const getStockFlowsListPopupContent = (stockFlows) => {
+  return (
+    <>
+      <div>{`Creado por ${stockFlows?.createdBy || "Sin datos"}`}</div>
+      <div>{`Fecha: ${getFormatedDate(stockFlows?.createdAt, DATE_FORMATS.DATE_WITH_TIME)}`}</div>
+    </>
+  );
+};
+
+export const STOCK_TAB_INDEX = 2;
+
+export const STOCK_MODAL_MODES = {
+  ADD: "add",
+  OUT: "out",
+  DELETE: "delete",
+};

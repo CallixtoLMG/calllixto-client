@@ -39,20 +39,13 @@ const Supplier = ({ params }) => {
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
-    closeModal,
   } = useUnsavedChanges({
     formRef,
     onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
-    },
-    onSave: () => {
-      formRef.current?.submitForm();
     },
   });
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
@@ -410,9 +403,7 @@ const Supplier = ({ params }) => {
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
-        onSave={handleSave}
-        isSaving={isSaving}
-        onCancel={handleCancel}
+        onContinue={handleContinue}
       />
       <ModalAction
         title={header}

@@ -1,6 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useDeleteProduct, useEditProduct, useGetProduct, useRecoverProduct, useSetProductState } from "@/api/products";
+import { useCreateStockFlow, useGetStockFlow } from "@/api/stock";
 import { Flex, Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
@@ -10,22 +11,37 @@ import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, RECOVER } from "@/common/consta
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductChanges from "@/components/products/ProductChanges";
 import ProductForm from "@/components/products/ProductForm";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
+import ProductStock from "@/components/products/ProductStock";
+import { GET_STOCK_FLOW_QUERY_KEY, PRODUCT_STATES, STOCK_TAB_INDEX } from "@/components/products/products.constants";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
-import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useAllowUpdate, useLazyTabs, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Tab } from "semantic-ui-react";
+import { GET_PRODUCT_QUERY_KEY } from "../../../components/products/products.constants";
 
 const Product = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { data: product, isLoading, refetch } = useGetProduct(params.id);
+  const { data: product, isLoading: isLoadingProduct, refetch: isRefetchingProduct } = useGetProduct(params.id);
+
+  const {
+    activeIndex,
+    onTabChange: onLazyTabChange,
+    hasVisited,
+  } = useLazyTabs({
+    initialIndex: 0,
+    lazyIndexes: STOCK_TAB_INDEX !== null ? [STOCK_TAB_INDEX] : [],
+  });
+  const queryClient = useQueryClient();
+  const { data: stockFlows, isLoading: isLoadingsStockFlows, refetch: isRefetchingStockFlows } = useGetStockFlow(params.id, {
+    enabled: hasVisited(STOCK_TAB_INDEX),
+  });
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,15 +53,13 @@ const Product = ({ params }) => {
   const deleteProduct = useDeleteProduct();
   const setProductState = useSetProductState();
   const recoverProduct = useRecoverProduct();
+  const createStockFlow = useCreateStockFlow();
   const formRef = useRef(null);
-
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
     resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
     closeModal,
   } = useUnsavedChanges({
@@ -54,10 +68,13 @@ const Product = ({ params }) => {
       formRef.current?.resetForm();
       setIsUpdating(false);
     },
-    onSave: () => {
-      formRef.current?.submitForm();
-    },
   });
+
+  const handleTabChange = (_, { activeIndex }) => {
+    if (onBeforeView()) {
+      onLazyTabChange(_, { activeIndex });
+    }
+  };
 
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
@@ -80,8 +97,8 @@ const Product = ({ params }) => {
         }
       }
     ]);
-    refetch();
-  }, [setLabels, product, refetch]);
+    isRefetchingProduct();
+  }, [setLabels, product, isRefetchingProduct, isRefetchingStockFlows]);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -222,6 +239,29 @@ const Product = ({ params }) => {
     },
   });
 
+  const { mutate: mutateCreateStockFlow, isPending: isPendingCreateStockFlow } = useMutation({
+    mutationFn: createStockFlow,
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Movimiento de stock registrado");
+        queryClient.invalidateQueries({
+          queryKey: [GET_STOCK_FLOW_QUERY_KEY, params.id],
+          exact: true,
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: [GET_PRODUCT_QUERY_KEY, params.id],
+          exact: true,
+        });
+      } else {
+        toast.error(response.error?.message || "Error al registrar el movimiento");
+      }
+    },
+    onError: (error) => {
+      toast.error(`Error al crear movimiento de stock: ${error.message || error}`);
+    },
+  });
+
   const handleActionConfirm = async () => {
     if (modalAction === INACTIVE && !reason) {
       toast.error("Debe proporcionar una razón para desactivar el producto.");
@@ -347,7 +387,7 @@ const Product = ({ params }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, activeAction, isEditPending, setActions]);
 
-  if (!isLoading && !product) {
+  if (!isLoadingProduct && !product) {
     push(PAGES.NOT_FOUND.BASE);
   }
 
@@ -387,15 +427,33 @@ const Product = ({ params }) => {
     },
   ];
 
+  if (product?.stockControl) {
+    panes.push({
+      menuItem: "Control de stock",
+      render: () => (
+        <Tab.Pane>
+          <ProductStock
+            product={product}
+            stockFlows={stockFlows}
+            onCreateStockFlow={mutateCreateStockFlow}
+            isLoading={isPendingCreateStockFlow || isLoadingsStockFlows}
+          />
+        </Tab.Pane>
+      ),
+    });
+  }
+
   return (
-    <Loader active={isLoading || !product}>
-      <Tab panes={panes} />
+    <Loader active={isLoadingProduct || !product}>
+      <Tab
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={handleTabChange}
+      />
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
-        onSave={handleSave}
-        isSaving={isSaving}
-        onCancel={handleCancel}
+        onContinue={handleContinue}
       />
       {product && (
         <OnlyPrint>

@@ -14,7 +14,7 @@ import {
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, DATE_FORMATS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
-import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay } from "@/common/utils";
+import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay, removeNullish } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
@@ -267,15 +267,22 @@ const BudgetForm = ({
 
   const handleCreate = async (data, state) => {
     const { customer } = data;
-    await onSubmit({
+
+    const payload = removeNullish({
       ...data,
-      customer: { id: customer.id, name: customer.name },
+      customer: customer
+        ? { id: customer.id, name: customer.name }
+        : undefined,
       products: data.products.map((product) =>
-        pick(product, [...LIST_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags"])
+        removeNullish(
+          pick(product, [...LIST_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags",])
+        )
       ),
       total: Number(total.toFixed(2)),
-      state
+      state,
     });
+
+    await onSubmit(payload);
   };
 
   const currentState = useMemo(() => {

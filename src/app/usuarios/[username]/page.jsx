@@ -35,20 +35,13 @@ const User = ({ params }) => {
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
-    closeModal,
   } = useUnsavedChanges({
     formRef,
     onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
-    },
-    onSave: () => {
-      formRef.current?.submitForm();
     },
   });
 
@@ -229,13 +222,11 @@ const User = ({ params }) => {
         view
         isDeletePending={isDeletePending}
       />
-      <UnsavedChangesModal
-        open={showUnsavedModal}
-        onSave={handleSave}
-        onDiscard={handleDiscard}
-        isSaving={isSaving}
-        onCancel={handleCancel}
-      />
+<UnsavedChangesModal
+  open={showUnsavedModal}
+  onDiscard={handleDiscard}
+  onContinue={handleContinue}
+/>
       <ModalAction
         title={header}
         onConfirm={handleActionConfirm}

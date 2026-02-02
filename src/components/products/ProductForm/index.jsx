@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form } from "@/common/components/custom";
+import { FieldsContainer, Form, Icon, Message } from "@/common/components/custom";
 import {
   DropdownControlled,
   IconedButtonControlled,
@@ -11,6 +11,7 @@ import {
   TextField
 } from "@/common/components/form";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
+import { removeNullish } from "@/common/utils";
 import { BRAND_STATES, getBrandSearchDescription, getBrandSearchTitle } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES, getSupplierSearchDescription, getSupplierSearchTitle } from "@/components/suppliers/suppliers.constants";
 import { useKeyboardShortcuts } from "@/hooks";
@@ -51,16 +52,17 @@ const ProductForm = forwardRef(({
     resetForm: () => reset(getInitialValues(product))
   }));
 
-  const [watchFractionable, watchSupplier, watchBrand, watchCost, watchPrice] = watch([
+  const [watchFractionable, watchSupplier, watchBrand, watchCost, watchPrice, watchStockControl] = watch([
     'fractionConfig.active',
     'supplier',
     'brand',
     'cost',
     'price',
+    'stockControl',
   ]);
 
   const handleForm = async (data) => {
-    const filteredData = { ...data };
+    const filteredData = removeNullish({ ...data });
 
     if (data.fractionConfig && !data.fractionConfig.active && product?.fractionConfig?.active === false) {
       delete filteredData.fractionConfig;
@@ -199,6 +201,19 @@ const ProductForm = forwardRef(({
             disabled={!isUpdating && view}
             required
           />
+          <IconedButtonControlled
+            width="fit-content"
+            name="stockControl"
+            text="Stock habilitado"
+            icon={ICONS.BOXES}
+            color={COLORS.BLUE}
+            disabled={!isUpdating && view}
+          />
+          {watchStockControl && isUpdating &&
+            <Message opacity={view} height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
+              <Icon name={ICONS.BOXES} /> Stock Total: {product?.stock ?? 0}
+            </Message>
+          }
         </FieldsContainer>
         <FieldsContainer $alignItems="end">
           <PriceControlled
