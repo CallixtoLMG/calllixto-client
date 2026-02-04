@@ -58,7 +58,6 @@ const Product = ({ params }) => {
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    resolveSave,
     handleContinue,
     onBeforeView,
     closeModal,
@@ -164,7 +163,6 @@ const Product = ({ params }) => {
       if (response.statusOk) {
         toast.success("Producto actualizado!");
         setIsUpdating(false);
-        resolveSave();
       } else {
         toast.error(response.error.message);
       }

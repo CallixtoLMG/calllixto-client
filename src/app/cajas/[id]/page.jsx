@@ -105,7 +105,6 @@ const CashBalance = ({ params }) => {
       if (response.statusOk) {
         toast.success("Caja actualizada!");
         setIsUpdating(false);
-        resolveSave();
       } else {
         toast.error(response.error.message);
       }

@@ -5,7 +5,7 @@ import { Button, DropdownItem, Icon } from "@/common/components/custom";
 import { COLORS, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
 import { downloadExcel } from "@/common/utils";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import BatchImport from "@/components/products/BatchImport";
+import { BatchImportProducts } from "@/components/products/BatchImportProducts";
 import ProductsPage from "@/components/products/ProductsPage";
 import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
@@ -76,10 +76,10 @@ const Products = () => {
             >
               <Dropdown.Menu>
                 <DropdownItem>
-                  <BatchImport key="batch-create" isCreating />
+                  <BatchImportProducts key="batch-create" isCreating />
                 </DropdownItem>
                 <DropdownItem>
-                  <BatchImport key="batch-update" />
+                  <BatchImportProducts key="batch-update" />
                 </DropdownItem>
                 <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA, "Ejemplo de tabla")}>
                   <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla

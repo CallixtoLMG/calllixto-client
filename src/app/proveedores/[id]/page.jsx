@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
 import { useDeleteSupplier, useEditSupplier, useGetSupplier, useSetSupplierState } from "@/api/suppliers";
-import { Icon, Message, MessageHeader, } from "@/common/components/custom";
+import { Button, DropdownItem, Icon, Message, MessageHeader, } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
@@ -10,7 +10,8 @@ import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges"
 import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
 import { downloadExcel, isItemInactive } from "@/common/utils";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext, } from "@/components/layout";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
+import { BatchImportStock } from "@/components/products/BatchImportStock";
+import { DISCOUNT_STOCK, PRODUCT_STATES, UPLOAD_STOCK } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
@@ -20,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
+import { Dropdown } from "semantic-ui-react";
 
 const Supplier = ({ params }) => {
   useValidateToken();
@@ -120,7 +122,6 @@ const Supplier = ({ params }) => {
       if (response.statusOk) {
         toast.success('Proveedor actualizado!');
         setIsUpdating(false);
-        resolveSave();
       } else {
         toast.error(response.error.message);
       }
@@ -308,37 +309,66 @@ const Supplier = ({ params }) => {
       },
       {
         id: 3,
-        icon: ICONS.FILE_EXCEL,
-        text: "Descargar productos",
-        onClick: () => {
-          if (products?.length) {
-            setIsExcelLoading(true);
-            handleDownloadExcel();
-            setIsExcelLoading(false);
-          } else {
-            toast("No hay productos de este proveedor para descargar.", {
-              icon: (
-                <Icon
-                  margin="0"
-                  toast
-                  name={ICONS.INFO_CIRCLE}
-                  color={COLORS.BLUE}
+        button: (
+          <Dropdown
+            pointing
+            as={Button}
+            text="Stock/Excel"
+            icon={ICONS.FILE_EXCEL}
+            width="fit-content"
+            floating
+            labeled
+            button
+            className="icon"
+            disabled={
+              isExcelLoading ||
+              !!activeAction ||
+              loadingProducts ||
+              isEditPending ||
+              !hasAssociatedProducts
+            }
+          >
+            <Dropdown.Menu>
+              <DropdownItem
+                onClick={() => {
+                  if (products?.length) {
+                    setIsExcelLoading(true);
+                    handleDownloadExcel();
+                    setIsExcelLoading(false);
+                  } else {
+                    toast("No hay productos de este proveedor para descargar.", {
+                      icon: (
+                        <Icon
+                          margin="0"
+                          toast
+                          name={ICONS.INFO_CIRCLE}
+                          color={COLORS.BLUE}
+                        />
+                      ),
+                    });
+                  }
+                }}
+              >
+                <Icon name={ICONS.DOWNLOAD} color="blue" />
+                Descargar productos
+              </DropdownItem>
+              <DropdownItem  >
+                <BatchImportStock
+                  mode={UPLOAD_STOCK}
+                  supplierId={supplier?.id}
+                  products={products}
                 />
-              ),
-            });
-          }
-        },
-        loading: isExcelLoading,
-        disabled:
-          isExcelLoading ||
-          !!activeAction ||
-          loadingProducts ||
-          isEditPending ||
-          !hasAssociatedProducts,
-        tooltip: !hasAssociatedProducts
-          ? 'No existen productos de este proveedor.'
-          : false,
-        width: "fit-content",
+              </DropdownItem>
+              <DropdownItem  >
+                <BatchImportStock
+                  mode={DISCOUNT_STOCK}
+                  supplierId={supplier?.id}
+                  products={products}
+                />
+              </DropdownItem>
+            </Dropdown.Menu>
+          </Dropdown>
+        ),
       },
       {
         id: 4,
@@ -410,7 +440,11 @@ const Supplier = ({ params }) => {
         onConfirm={handleActionConfirm}
         confirmationWord={requiresConfirmation ? confirmText : ""}
         confirmButtonIcon={icon}
-        showModal={isModalOpen}
+        showModal={
+          isModalOpen &&
+          modalAction !== UPLOAD_STOCK &&
+          modalAction !== DISCOUNT_STOCK
+        }
         setShowModal={handleModalClose}
         isLoading={
           isDeleteBatchPending ||
