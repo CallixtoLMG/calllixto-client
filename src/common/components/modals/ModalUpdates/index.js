@@ -19,7 +19,7 @@ const StyledModal = styled(Modal)`
 `;
 
 const ModalUpdates = () => {
-  const activeVersion = '2025-12-17';
+  const activeVersion = '2026-02-06';
   const latestNews = window?.localStorage?.getItem('latestNews');
   const [open, setOpen] = useState(!latestNews || isDateBefore(latestNews, activeVersion));
 
