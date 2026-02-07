@@ -359,7 +359,7 @@ export const buildCustomHistoryRanges = (historyDateRanges = []) => {
       const raw = getDateWithOffset({
         offset,
         unit,
-        format: DATE_FORMATS.ONLY_DATE, 
+        format: DATE_FORMATS.ONLY_DATE,
       });
 
       const parsedDate = parse(
@@ -373,7 +373,7 @@ export const buildCustomHistoryRanges = (historyDateRanges = []) => {
           valueNum === 1
             ? `${config.article.singular} ${config.singular}`
             : `${config.article.plural} ${valueNum} ${config.plural}`,
-        value: range.key,
+        value: `custom_${range.unit}_${valueNum}`,
         getRange: () => ({
           startDate: parsedDate,
           endDate: new Date(),

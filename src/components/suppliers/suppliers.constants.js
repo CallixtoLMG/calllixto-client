@@ -7,7 +7,7 @@ import { Popup } from "semantic-ui-react";
 export const GET_SUPPLIER_QUERY_KEY = 'getSupplier';
 export const LIST_SUPPLIERS_QUERY_KEY = 'listSuppliers';
 export const SUPPLIERS_FILTERS_KEY = 'suppliersFilters';
-export const LIST_ATTRIBUTES = [ "id", "name", "addresses", "phoneNumbers", "comments", "state", "inactiveReason"];
+export const LIST_ATTRIBUTES = ["id", "name", "addresses", "phoneNumbers", "comments", "state", "inactiveReason"];
 
 export const SUPPLIERS_COLUMNS = [
   {
@@ -105,7 +105,6 @@ export const getSupplierSearchTitle = (supplier) => (
 );
 
 export const getSupplierSearchDescription = (supplier) => (
-
   <Flex $marginTop="5px" $rowGap="5px">
     <Flex
       width="100%"

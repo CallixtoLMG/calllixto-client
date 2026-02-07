@@ -157,6 +157,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
               <DropdownControlled
                 width="200px"
                 name="state"
+                label="Estado"
                 options={PRODUCT_STATES_OPTIONS}
                 defaultValue={EMPTY_FILTERS.state}
                 afterChange={() => {
@@ -164,8 +165,8 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
                   setSelectedProducts({});
                 }}
               />
-              <TextControlled name="id" placeholder="Id" width="200px" />
-              <TextControlled name="name" placeholder="Nombre" width="350px" />
+              <TextControlled name="id" label="Id" placeholder="SECG001" width="200px" />
+              <TextControlled name="name" label="Nombre" placeholder="Caramelito" width="350px" />
             </Filters>
           </Form>
         </FormProvider>

@@ -13,7 +13,6 @@ import { BUDGETS_FILTERS_KEY, BUDGET_STATES, BUDGET_STATES_OPTIONS, BUDGET_STATE
 
 const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRefetch, usersOptions }) => {
   const { push } = useRouter();
-
   const handleDownloadExcel = useCallback((elements) => {
     if (!elements.length) return;
     let maxProductCount = 1;
@@ -126,6 +125,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
               filter
               width="200px"
               name="state"
+              label="Estado"
               options={BUDGET_STATES_OPTIONS}
               defaultValue={SELECT_ALL_OPTION.state}
               afterChange={onSubmit}
@@ -133,17 +133,20 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
             <TextControlled
               width="120px"
               name="id"
-              placeholder="Id"
+              label="Id"
+              placeholder="MI525"
             />
             <TextControlled
               flex="1"
               name="customer"
-              placeholder="Cliente"
+              label="Cliente"
+              placeholder="Martín Bueno"
             />
             <SearchControlled
               name="createdBy"
+              label="Vendedor"
               width="200px"
-              placeholder="Vendedor"
+              placeholder="Leandro Gómez"
               elements={usersOptions}
               searchFields={['text', 'value']}
               getResultProps={(option) => ({
@@ -160,7 +163,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
                 filter
                 width="200px"
                 name="paymentStatus"
-                placeholder="Estado de pago"
+                label="Estado de pago"
                 options={PAYMENT_STATES_OPTIONS}
                 afterChange={onSubmit}
               />

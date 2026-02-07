@@ -34,13 +34,14 @@ const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel }) => {
             <DropdownControlled
               width="200px"
               name="state"
+              label="Estado"
               options={USER_STATE_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
               afterChange={onSubmit}
             />
-            <TextControlled name="username" placeholder="Usuario" width="180px" />
-            <TextControlled name="firstName" placeholder="Nombre" width="180px" />
-            <TextControlled name="lastName" placeholder="Apellido" width="180px" />
+            <TextControlled name="username" label="Usuario" placeholder="Martinb@hotmail.com" width="180px" />
+            <TextControlled name="firstName" label="Nombre" placeholder="Martín" width="180px" />
+            <TextControlled name="lastName" label="Apellido" placeholder="Bueno" width="180px" />
           </Filters>
         </Form>
       </FormProvider>

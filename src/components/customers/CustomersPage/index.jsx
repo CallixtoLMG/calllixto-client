@@ -33,11 +33,12 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel }
             <DropdownControlled
               width="200px"
               name="state"
+              label="Estado"
               options={CUSTOMER_STATES_OPTIONS}
               value={EMPTY_FILTERS.state}
               afterChange={onSubmit}
             />
-            <TextControlled name="name" placeholder="Nombre" width="300px" />
+            <TextControlled name="name" label="Nombre" placeholder="Martín Bueno" width="300px" />
           </Filters>
         </Form>
       </FormProvider >

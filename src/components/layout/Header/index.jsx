@@ -2,14 +2,14 @@
 import { useUserContext } from "@/User";
 import { Flex, Icon, Label } from "@/common/components/custom";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
-import { DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/common/constants";
+import { BADGE_CONFIG, DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button, Menu } from "semantic-ui-react";
 import UserMenu from "../UserMenu";
-import { Container, MenuItem, ModLink, RigthHeaderDiv, Text } from "./styles";
+import { Container, MenuBadge, MenuItem, ModLink, RigthHeaderDiv, Text } from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
@@ -85,8 +85,22 @@ const Header = () => {
                     })
                     .map((page) => (
                       <ModLink key={page.BASE} href={page.BASE}>
-                        <MenuItem $backgroundColor $active={pathname.includes(page.BASE)}>
-                          <Text $active={pathname.includes(page.BASE)}>{page.NAME}</Text>
+                        <MenuItem
+                          $backgroundColor
+                          $active={pathname.includes(page.BASE)}
+                          $hasBadge={Boolean(page.BADGE)}
+                        >
+                          <Text padding="0px" $active={pathname.includes(page.BASE)}>
+                            {page.NAME}
+                          </Text>
+                          {page.BADGE && BADGE_CONFIG[page.BADGE] && (
+                            <MenuBadge
+                              bgColor={BADGE_CONFIG[page.BADGE].bgColor}
+                              color={BADGE_CONFIG[page.BADGE].color}
+                            >
+                              {BADGE_CONFIG[page.BADGE].label}
+                            </MenuBadge>
+                          )}
                         </MenuItem>
                       </ModLink>
                     ))}

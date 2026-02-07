@@ -12,7 +12,7 @@ import { LIST_USERS_QUERY_KEY } from '@/components/users/users.constants';
 import { useRestoreEntity } from '@/hooks';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Button, Dropdown, Icon, Popup } from 'semantic-ui-react';
+import { Dropdown, Icon, Popup } from 'semantic-ui-react';
 import { IconedButton } from '../buttons';
 import { FiltersContainer, HeaderSegment, MainContainer } from './styles';
 
@@ -67,14 +67,14 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
             position="top center"
             size={SIZES.TINY}
             trigger={(
-              <Button circular icon type="button" onClick={onRestoreFilters}>
+              <CustomButton $marginBottom="2px" $alignSelf="flex-end" width="fit-content" $fontSize="14px" $paddingLeft="11px" padding="11px" circular icon type="button" onClick={onRestoreFilters}>
                 <Icon name={ICONS.UNDO} />
-              </Button>
+              </CustomButton>
             )}
           />
           {children}
         </FiltersContainer>
-        <Flex $columnGap="10px" $alignSelf="center">
+        <Flex $columnGap="10px" $marginBottom="2px" $alignSelf="flex-end">
           {hydrated && appliedCount > 0 && (
             <Popup
               content="Filtros activos"

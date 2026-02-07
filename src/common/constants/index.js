@@ -1,4 +1,4 @@
-import { encodeUri } from "@/common/utils";
+import { encodeUri, isNewFeature } from "@/common/utils";
 import { Icon, List, ListItem } from "semantic-ui-react";
 import { Accent } from "../components/custom";
 import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
@@ -19,7 +19,8 @@ export const PAGES = {
     UPDATE: (id) => `/clientes/${id}?update=true`,
     SHOW: (id) => `/clientes/${id}`,
     NAME: 'Clientes',
-    SHORTKEYS: 'Control+1'
+    SHORTKEYS: 'Control+1',
+    BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   SUPPLIERS: {
     BASE: "/proveedores",
@@ -27,7 +28,8 @@ export const PAGES = {
     UPDATE: (id) => `/proveedores/${id}?update=true`,
     SHOW: (id) => `/proveedores/${id}`,
     NAME: 'Proveedores',
-    SHORTKEYS: 'Control+2'
+    SHORTKEYS: 'Control+2',
+    BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   BRANDS: {
     BASE: "/marcas",
@@ -35,7 +37,8 @@ export const PAGES = {
     UPDATE: (id) => `/marcas/${id}?update=true`,
     SHOW: (id) => `/marcas/${id}`,
     NAME: 'Marcas',
-    SHORTKEYS: 'Control+3'
+    SHORTKEYS: 'Control+3',
+    BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   PRODUCTS: {
     BASE: "/productos",
@@ -43,7 +46,8 @@ export const PAGES = {
     UPDATE: (id) => `/productos/${id}?update=true`,
     SHOW: (id) => `/productos/${id}`,
     NAME: 'Productos',
-    SHORTKEYS: 'Control+4'
+    SHORTKEYS: 'Control+4',
+    BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   BUDGETS: {
     BASE: "/ventas",
@@ -51,7 +55,8 @@ export const PAGES = {
     CLONE: (id) => `/ventas/crear?clonar=${id}`,
     SHOW: (id) => `/ventas/${id}`,
     NAME: 'Ventas',
-    SHORTKEYS: 'Control+5'
+    SHORTKEYS: 'Control+5',
+    BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   EXPENSES: {
     BASE: "/gastos",
@@ -60,7 +65,8 @@ export const PAGES = {
     UPDATE: (id) => `/gastos/${id}?update=true`,
     SHOW: (id) => `/gastos/${id}`,
     NAME: 'Gastos',
-    SHORTKEYS: 'Control+6'
+    SHORTKEYS: 'Control+6',
+    BADGE: isNewFeature('2025-01-01') ? 'new' : undefined
   },
   CASH_BALANCES: {
     BASE: "/cajas",
@@ -68,14 +74,16 @@ export const PAGES = {
     UPDATE: (id) => `/cajas/${id}?update=true`,
     SHOW: (id) => `/cajas/${id}`,
     NAME: 'Cajas',
-    SHORTKEYS: 'Control+8'
+    SHORTKEYS: 'Control+8',
+    BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   USERS: {
     BASE: "/usuarios",
     CREATE: "/usuarios/crear",
     SHOW: (id) => `/usuarios/${id}`,
     NAME: 'Usuarios',
-    SHORTKEYS: 'Control+7'
+    SHORTKEYS: 'Control+7',
+    BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   BUDGETS_HISTORY: {
     BASE: "/historial-ventas",
@@ -86,7 +94,8 @@ export const PAGES = {
   SETTINGS: {
     BASE: "/configuracion",
     NAME: 'Configuración',
-    SHORTKEYS: 'Control+9'
+    SHORTKEYS: 'Control+9',
+    BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   CHANGE_PASSWORD: {
     BASE: "/cambiar-contrasena"
@@ -269,6 +278,7 @@ export const ACTIVE = "active";
 export const DELETE = "delete";
 export const HARD_DELETED = "HARD_DELETED";
 export const INACTIVE = "inactive";
+export const SET_STATE = 'set-state';
 
 export const CANCELLED = "cancelled";
 
@@ -301,6 +311,24 @@ export const ENTITY_VIEW = {
   LIST: 'LIST',
   CREATE: 'CREATE',
   DETAIL: 'DETAIL',
+};
+
+export const BADGE_CONFIG = {
+  new: {
+    label: 'Nuevo',
+    bgColor: '#e3f2fd',
+    color: '#1976d2',
+  },
+  trial: {
+    label: 'Prueba',
+    bgColor: '#fff3e0',
+    color: '#ef6c00',
+  },
+  pro: {
+    label: 'Pro',
+    bgColor: '#ede7f6',
+    color: '#5e35b1',
+  },
 };
 
 export const USER_DATA_KEY = "userData";
@@ -370,7 +398,7 @@ export const INFO = {
               <StyledListHeader><Icon name={ICONS.TRUCK} color={COLORS.BLUE} /> <strong>Listado de proveedores</strong></StyledListHeader>
               <List relaxed bulleted as="ol">
                 <ListItem>
-                Listado de proveedores según los filtros activos.
+                  Listado de proveedores según los filtros activos.
                 </ListItem>
                 <ListItem>
                   Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.

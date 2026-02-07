@@ -1,4 +1,4 @@
-import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
+import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { GET_BRAND_QUERY_KEY, LIST_ATTRIBUTES, LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { PATHS } from "@/fetchUrls";
@@ -88,35 +88,27 @@ export const useEditBrand = () => {
   return editBrand;
 };
 
-export const useInactiveBrand = () => {
-  const inactiveItem = usePostUpdateItem();
+export const useSetBrandState = () => {
+  const updateItem = usePostUpdateItem();
 
-  const inactiveBrand = ({ id }, inactiveReason) => {
-    return inactiveItem({
+  const setBrandState = ({ id, state, inactiveReason }) => {
+    return updateItem({
       entity: ENTITIES.BRANDS,
-      url: `${PATHS.BRANDS}/${id}/${INACTIVE}`,
-      value: { id, inactiveReason },
+      url: `${PATHS.BRANDS}/${id}/${SET_STATE}`,
+      value: {
+        id,
+        state,
+        ...(state === INACTIVE && { inactiveReason }),
+      },
       responseEntity: ENTITIES.BRAND,
-      invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, id]]
+      invalidateQueries: [
+        [LIST_BRANDS_QUERY_KEY],
+        [GET_BRAND_QUERY_KEY, id],
+      ],
+      attributes: LIST_ATTRIBUTES,
     });
   };
 
-  return inactiveBrand;
-};
-
-export const useActiveBrand = () => {
-  const activeItem = usePostUpdateItem();
-
-  const activeBrand = async ({ id }) => {
-    return activeItem({
-      entity: ENTITIES.BRANDS,
-      url: `${PATHS.BRANDS}/${id}/${ACTIVE}`,
-      value: { id },
-      responseEntity: ENTITIES.BRAND,
-      invalidateQueries: [[LIST_BRANDS_QUERY_KEY], [GET_BRAND_QUERY_KEY, id]]
-    });
-  };
-
-  return activeBrand;
+  return setBrandState;
 };
 

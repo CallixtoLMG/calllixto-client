@@ -1,11 +1,10 @@
-import { ACTIVE, ENTITIES, INACTIVE, IN_MS } from "@/common/constants";
+import { ENTITIES, INACTIVE, IN_MS, SET_STATE } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { GET_SUPPLIER_QUERY_KEY, LIST_ATTRIBUTES, LIST_SUPPLIERS_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
 import { PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
 import { listItems, useCreateItem, useDeleteItem, useEditItem, usePostUpdateItem } from "./common";
-
 
 export function useListSuppliers() {
   const query = useQuery({
@@ -97,40 +96,28 @@ export const useEditSupplier = () => {
   return editSupplier;
 };
 
-export const useInactiveSupplier = () => {
-  const inactiveItem = usePostUpdateItem();
+export const useSetSupplierState = () => {
+  const updateItem = usePostUpdateItem();
 
-  const inactiveSupplier = async (supplier, reason) => {
-    const updatedSupplier = {
-      id: supplier.id,
-      inactiveReason: reason
-    }
-    return inactiveItem({
+  const setSupplierState = ({ id, state, inactiveReason }) => {
+    return updateItem({
       entity: ENTITIES.SUPPLIERS,
-      url: `${PATHS.SUPPLIERS}/${supplier.id}/${INACTIVE}`,
-      value: updatedSupplier,
+      url: `${PATHS.SUPPLIERS}/${id}/${SET_STATE}`,
+      value: {
+        id,
+        state,
+        ...(state === INACTIVE && { inactiveReason }),
+      },
       responseEntity: ENTITIES.SUPPLIER,
-      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, supplier.id]]
+      invalidateQueries: [
+        [LIST_SUPPLIERS_QUERY_KEY],
+        [GET_SUPPLIER_QUERY_KEY, id],
+      ],
+      attributes: LIST_ATTRIBUTES,
     });
   };
 
-  return inactiveSupplier;
-};
-
-export const useActiveSupplier = () => {
-  const activeItem = usePostUpdateItem();
-
-  const activeSupplier = async ({ id }) => {
-    return activeItem({
-      entity: ENTITIES.SUPPLIERS,
-      url: `${PATHS.SUPPLIERS}/${id}/${ACTIVE}`,
-      value: { id },
-      responseEntity: ENTITIES.SUPPLIER,
-      invalidateQueries: [[LIST_SUPPLIERS_QUERY_KEY], [GET_SUPPLIER_QUERY_KEY, id]]
-    });
-  };
-
-  return activeSupplier;
+  return setSupplierState;
 };
 
 

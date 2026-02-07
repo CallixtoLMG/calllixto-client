@@ -18,7 +18,7 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel }) => {
     hydrated
   } = useFilters({ defaultFilters: EMPTY_FILTERS, key: BRANDS_FILTERS_KEY });
 
-  const onFilter = createFilter(filters, { name: {}, id: {}, state: {} });
+  const onFilter = createFilter(filters, { name: {}, id: {}, state: { fullMatch: true } });
 
   return (
     <>
@@ -34,12 +34,13 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel }) => {
             <DropdownControlled
               width="200px"
               name="state"
+              label="Estado"
               options={BRAND_STATES_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
               afterChange={onSubmit}
             />
-            <TextControlled name="id" placeholder="Id" width="80px" />
-            <TextControlled name="name" placeholder="Nombre" width="300px" />
+            <TextControlled name="id" label="Id" placeholder="CG" width="80px" />
+            <TextControlled name="name" label="Nombre" placeholder="CallixtoGLM" width="300px" />
           </Filters>
         </Form>
       </FormProvider>
