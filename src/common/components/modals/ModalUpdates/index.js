@@ -19,7 +19,7 @@ const StyledModal = styled(Modal)`
 `;
 
 const ModalUpdates = () => {
-  const activeVersion = '2025-12-17';
+  const activeVersion = '2026-02-06';
   const latestNews = window?.localStorage?.getItem('latestNews');
   const [open, setOpen] = useState(!latestNews || isDateBefore(latestNews, activeVersion));
 
@@ -49,48 +49,25 @@ const ModalUpdates = () => {
             </StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
-                Se incorporaron dos nuevas secciones: <Accent>Gastos</Accent> y <Accent>Caja</Accent>. Estas funcionalidades están disponibles en modo de prueba durante 30 días. Pasado ese período se deshabilitarán automáticamente y deberán contactar con el administrador para su contratación.
+                Las ventas confirmadas ahora pueden recibir un descuento posterior a su confirmación, permitiendo descontar un monto numérico del total y evitar que queden pequeños saldos pendientes.
               </ListItem>
               <ListItem>
-                La sección <Accent>Gastos</Accent> permite registrar consumos y egresos, generando un historial detallado.
-              </ListItem>
-              <ListItem>
-                La sección <Accent>Caja</Accent> permite abrir y cerrar cajas configurando fechas y métodos de pago. Mientras estén abiertas, se vinculan automáticamente los pagos asociados a ventas y gastos.
-              </ListItem>
-              <ListItem>
-                Se incorporó la sección <Accent>Historial de ventas</Accent>, que permite buscar información sobre ventas anteriores a los últimos 3 meses.
-              </ListItem>
-              <ListItem>
-                Ahora es posible previsualizar un presupuesto antes de imprimirlo en cualquiera de sus formatos.
-              </ListItem>
-              <ListItem>
-                En la página de <Accent>Ventas</Accent> se agregó un nuevo filtro. Al visualizar las ventas confirmadas, ahora es posible filtrar por <Accent>Estado de pago</Accent>, ya sea pendiente o pagado.
-              </ListItem>
-              {/* <ListItem>
-                Las ventas confirmadas ahora pueden recibir un descuento posterior a su confirmación, lo que permite descontar un monto numérico del total y evitar quedar con pequeños saldos pendientes.
-              </ListItem> */}
-              <ListItem>
-                En <Accent>Configuración</Accent> se agregó la pestaña <Accent>Ventas</Accent>, para definir valores predeterminados al crear o imprimir una venta.
-              </ListItem>
-              <ListItem>
-                En la parte superior derecha de todas las páginas principales se agregó el ícono <Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />. Al hacer clic, se despliega una pantalla con información sobre el funcionamiento de la sección.
+                En <Accent>Configuración</Accent> / <Accent>Ventas</Accent> / <Accent>General</Accent> se agregó la opción de definir un valor predeterminado para el rango de tiempo con el cual se solicitan los presupuestos.
               </ListItem>
             </List>
             <StyledListHeader>
-              <Icon name={ICONS.PENCIL} color={COLORS.BLUE} />Actualizaciones
+              <Icon name={ICONS.PENCIL} color={COLORS.BLUE} />
+              Actualizaciones
             </StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
-                El botón de <Accent>Descargar Excel</Accent> se encuentra ahora debajo de cada tabla y el archivo solo incluirá los elementos filtrados.
+                Se restableció la posibilidad de confirmar comentarios en los productos al crear una venta utilizando la tecla <Accent>Enter</Accent>.
               </ListItem>
               <ListItem>
-                La sección <Accent>Ventas</Accent> ahora solo muestra registros de los últimos 3 meses (esto se realizó para mejorar el rendimiento en esa página, que al tener tantos elementos generaba muchas demoras). En caso de necesitar registros anteriores, se agregó la sección <Accent>Historial de Ventas</Accent>.
+                Se mejoró el filtro de la sección <Accent>Ventas</Accent>, incorporando la posibilidad de filtrar ventas confirmadas según su estado de pago: <Accent>pagadas</Accent> o <Accent>pendientes</Accent>.
               </ListItem>
               <ListItem>
-                Se actualizaron los buscadores de clientes, productos, proveedores y marcas para mostrar coincidencias a medida que se escribe y facilitar la selección.
-              </ListItem>
-              <ListItem>
-                Se mejoró el rendimiento general y se realizaron ajustes visuales en diferentes partes del sistema para optimizar la experiencia del usuario.
+                Se optimizaron las tablas en todas las secciones para permitir abrir un elemento en una pestaña nueva directamente mediante el clic con el botón central del mouse (rueda).
               </ListItem>
             </List>
           </StyledModalContent>
