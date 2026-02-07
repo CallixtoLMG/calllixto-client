@@ -30,7 +30,6 @@ export const DropdownControlled = ({
         const normalizedValue = Array.isArray(value)
           ? value.map(v => (typeof v === "object" ? v?.name : v))
           : value;
-
         return (
           <FormField
             {...rest}
