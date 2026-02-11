@@ -47,6 +47,7 @@ export const FormField = styled(Form.Field)`
   margin: ${({ margin = "0" }) => margin} !important;
   flex-direction: column;
   height: ${({ $height }) => $height} !important;
+  row-gap: ${({ $rowGap }) => $rowGap} !important;
 
   .disabled {
     opacity: 1!important;
