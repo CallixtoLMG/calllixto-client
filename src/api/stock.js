@@ -40,10 +40,10 @@ export const useCreateStockFlow = () => {
   };
 };
 
-export const useAddStock = () => {
+export const useAddSupplierStock = () => {
   const updateItem = usePostUpdateItem();
 
-  const addStock = ({ supplierId, inflow, flows, }) => {
+  const addSupplierStock = ({ supplierId, inflow, flows, }) => {
     return updateItem({
       entity: ENTITIES.PRODUCTS,
       url: `/${PATHS.STOCK_FLOWS}/${supplierId}/${ADD}`,
@@ -57,24 +57,5 @@ export const useAddStock = () => {
     });
   };
 
-  return addStock;
+  return addSupplierStock;
 };
-
-// ESTA NO LA TENGO ARMADA, ES UN ESQUELETO NOMAS
-// export const useConsumeStock = () => {
-//   const updateItem = usePostUpdateItem();
-
-//   const consumeStock = ({ budgetId, flows, invalidateQueries = [], }) => {
-//     return updateItem({
-//       entity: ENTITIES.PRODUCTS,
-//       url: `/${PATHS.STOCK_FLOWS}/${budgetId}/${CONSUME}`,
-//       value: { flows },
-//       responseEntity: null,
-//       skipStorageUpdate: true,
-//       invalidateQueries,
-//     });
-//   };
-
-//   return consumeStock;
-// };
-

@@ -31,8 +31,7 @@ const Supplier = ({ params }) => {
   const { data: products, isLoading: loadingProducts, refetch: refetchProducts } = useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalAction, setModalAction] = useState(null);
+  const [confirmationAction, setConfirmationAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
   const [isExcelLoading, setIsExcelLoading] = useState(false);
   const [reason, setReason] = useState("");
@@ -111,8 +110,7 @@ const Supplier = ({ params }) => {
   };
 
   const handleModalClose = () => {
-    setIsModalOpen(false);
-    setModalAction(null);
+    setConfirmationAction(null);
     setReason("");
   };
 
@@ -187,39 +185,38 @@ const Supplier = ({ params }) => {
   });
 
   const handleActionConfirm = async () => {
-    if (modalAction === INACTIVE && !reason) {
+    if (confirmationAction === INACTIVE && !reason) {
       toast.error("Debe proporcionar una razón para desactivar el proveedor.");
       return;
     }
 
-    setActiveAction(modalAction);
+    setActiveAction(confirmationAction);
 
-    if (modalAction === "deleteBatch") {
+    if (confirmationAction === "deleteBatch") {
       mutateDeleteBatch();
     }
 
-    if (modalAction === "deleteSupplier") {
+    if (confirmationAction === "deleteSupplier") {
       mutateDelete();
     }
 
-    if (modalAction === ACTIVE || modalAction === INACTIVE) {
+    if (confirmationAction === ACTIVE || confirmationAction === INACTIVE) {
       mutateState({
         id: supplier.id,
-        state: modalAction,
-        ...(modalAction === INACTIVE && { inactiveReason: reason }),
+        state: confirmationAction,
+        ...(confirmationAction === INACTIVE && { inactiveReason: reason }),
       });
     }
 
     handleModalClose();
   };
 
-  const {
-    header,
-    confirmText = '',
-    icon = ICONS.QUESTION,
-  } = modalConfig[modalAction] || {};
+  const { header, confirmText = '', icon = ICONS.QUESTION } =
+    modalConfig[confirmationAction] || {};
+
   const requiresConfirmation =
-    modalAction === "deleteSupplier" || modalAction === "deleteBatch";
+    confirmationAction === "deleteSupplier" ||
+    confirmationAction === "deleteBatch";
 
   useEffect(() => {
     const handleBarCodePrint = () => {
@@ -278,10 +275,10 @@ const Supplier = ({ params }) => {
     let actions = [];
 
     if (RULES.canRemove[role]) {
-      const handleClick = (action) => () => handleProtectedAction(() => {
-        setModalAction(action);
-        setIsModalOpen(true);
-      });
+      const handleClick = (action) => () =>
+        handleProtectedAction(() => {
+          setConfirmationAction(action);
+        });
 
       actions = [{
         id: 1,
@@ -440,11 +437,7 @@ const Supplier = ({ params }) => {
         onConfirm={handleActionConfirm}
         confirmationWord={requiresConfirmation ? confirmText : ""}
         confirmButtonIcon={icon}
-        showModal={
-          isModalOpen &&
-          modalAction !== UPLOAD_STOCK &&
-          modalAction !== DISCOUNT_STOCK
-        }
+        showModal={!!confirmationAction}
         setShowModal={handleModalClose}
         isLoading={
           isDeleteBatchPending ||
@@ -453,7 +446,7 @@ const Supplier = ({ params }) => {
         }
         noConfirmation={!requiresConfirmation}
         bodyContent={
-          modalAction === INACTIVE && (
+          confirmationAction === INACTIVE && (
             <TextField
               placeholder="Motivo"
               value={reason}

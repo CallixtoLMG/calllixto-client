@@ -39,12 +39,6 @@ export const BatchImportProducts = ({ isCreating }) => {
   const editBatch = useEditBatch();
   const handleBatchAction = isCreating ? createBatch : editBatch;
 
-  // const handleConfirmClick = () => {
-  //   if (formRef.current) {
-  //     formRef.current.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-  //   }
-  // }; PREGUNTAR POR EL DISPATCH o si servia puntalmente par algo esto?
-
   useEffect(() => {
     const ids = products?.reduce((acc, product) => {
       acc[product.id?.toUpperCase()] = product;

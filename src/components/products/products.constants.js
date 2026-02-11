@@ -353,7 +353,7 @@ export const STOCK_TABLE_HEADERS = [
   {
     id: 4,
     width: 3,
-    title: 'N° Factura', value: (stockFlows) => stockFlows.invoiceNumber
+    title: 'Factura', value: (stockFlows) => stockFlows.invoiceNumber
   },
   {
     id: 5,
@@ -421,7 +421,7 @@ export const BATCH_IMPORT_STOCK_HEADERS = {
   id: "productId",
   fecha: "date",
   cantidad: "quantity",
-  "nº factura": "invoiceNumber",
+  factura: "invoiceNumber",
   comentarios: "comments",
 };
 

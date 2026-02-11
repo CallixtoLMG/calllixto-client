@@ -107,7 +107,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
 
       <TextField
         width="150px"
-        label="N° Factura"
+        label="Factura"
         value={stock.invoiceNumber}
         onChange={(e) => setStock({ ...stock, invoiceNumber: e.target.value })}
         placeholder="Ej: 000A12"
@@ -133,7 +133,6 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
               color={COLORS.GREEN}
               content="Ingreso"
               disabled={isLoading}
-              loading={isLoading}
               onClick={() => {
                 setStock(EMPTY_STOCK());
                 setModalMode(STOCK_MODAL_MODES.ADD);
@@ -145,7 +144,6 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
               color={COLORS.RED}
               content="Egreso"
               disabled={isLoading}
-              loading={isLoading}
               onClick={() => {
                 setStock(EMPTY_STOCK());
                 setModalMode(STOCK_MODAL_MODES.OUT);

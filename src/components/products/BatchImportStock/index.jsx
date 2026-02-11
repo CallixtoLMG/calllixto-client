@@ -1,6 +1,6 @@
 "use client";
 
-import { useAddStock } from "@/api/stock";
+import { useAddSupplierStock } from "@/api/stock";
 import { Button } from "@/common/components/custom";
 import { TextControlled } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
@@ -35,7 +35,7 @@ export const BatchImportStock = ({
   const [downloadRows, setDownloadRows] = useState([]);
   const [showConfirmDownload, setShowConfirmDownload] = useState(false);
   const flows = watch("flows", []);
-  const addStock = useAddStock();
+  const addSupplierStock = useAddSupplierStock();
 
   const productIndex = useMemo(() => {
     return products.reduce((acc, p) => {
@@ -83,26 +83,18 @@ export const BatchImportStock = ({
 
   const parseExcelDate = (value) => {
     if (!value) return null;
-
+  
     if (typeof value === "number") {
-      const excelEpoch = new Date(Date.UTC(1900, 0, 1));
-      return new Date(excelEpoch.getTime() + (value - 1) * 86400000);
+      return dayjs("1899-12-30")
+        .add(value, "day")
+        .toDate();
     }
-
-    if (typeof value === "string") {
-      const parts = value.split("/");
-      if (parts.length === 3) {
-        const [day, month, year] = parts;
-        return new Date(year, month - 1, day);
-      }
-
-      const parsed = new Date(value);
-      if (!isNaN(parsed.getTime())) {
-        return parsed;
-      }
-    }
-
-    return null;
+  
+    const strict = dayjs(value, "DD/MM/YYYY", true);
+    if (strict.isValid()) return strict.toDate();
+  
+    const parsed = dayjs(value);
+    return parsed.isValid() ? parsed.toDate() : null;
   };
 
   const parseExcel = (data) => {
@@ -116,7 +108,7 @@ export const BatchImportStock = ({
       id: "productId",
       fecha: "date",
       cantidad: "quantity",
-      "nº factura": "invoiceNumber",
+      factura: "invoiceNumber",
       comentarios: "comments",
     };
 
@@ -137,7 +129,7 @@ export const BatchImportStock = ({
 
     parsed.forEach((row) => {
 
-      const productId = String(row.productId || "").toUpperCase();
+      const productId = String(row.productId ?? "").toUpperCase();
 
       if (!productId || !productIndex[productId]) {
         invalid.push({ ...row, msg: "Producto inexistente" });
@@ -176,7 +168,7 @@ export const BatchImportStock = ({
 
   const handleDownloadInvalid = () => {
     const data = [
-      ["Id", "Fecha", "Cantidad", "Nº factura", "Comentarios", "Error"],
+      ["Id", "Fecha", "Cantidad", "Factura", "Comentarios", "Error"],
       ...downloadRows.map((row) => [
         row.productId,
         dayjs(row.date).format("DD/MM/YYYY"),
@@ -199,7 +191,7 @@ export const BatchImportStock = ({
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ flows }) => {
 
-      return addStock({
+      return addSupplierStock({
         supplierId,
         inflow: mode === UPLOAD_STOCK,
         flows,
@@ -227,15 +219,11 @@ export const BatchImportStock = ({
   });
 
   const onSubmitForm = handleSubmit((data) => {
-
-    const flows = data.flows.map((flow) => ({
-      productId: flow.productId,
-      quantity: flow.quantity,
+    const flows = data.flows.map(flow => ({
+      ...flow,
       date: getDateUTC(flow.date),
-      invoiceNumber: flow.invoiceNumber,
-      comments: flow.comments,
     }));
-
+  
     mutate({ flows });
   });
 
@@ -283,11 +271,11 @@ export const BatchImportStock = ({
       width: 2,
     },
     {
-      title: "Nº factura",
+      title: "Factura",
       value: (_, index) => (
         <TextControlled
           name={`flows[${index}].invoiceNumber`}
-          placeholder="Factura"
+          placeholder="000A12"
         />
       ),
       id: 4,
