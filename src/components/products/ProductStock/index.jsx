@@ -109,7 +109,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
 
       <TextField
         width="150px"
-        label="Detalle"
+        label="Factura"
         value={stock.invoiceNumber}
         onChange={(e) => setStock({ ...stock, invoiceNumber: e.target.value })}
         placeholder="Ej: 000A12"

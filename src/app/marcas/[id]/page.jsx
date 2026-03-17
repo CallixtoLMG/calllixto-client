@@ -99,7 +99,6 @@ const Brand = ({ params }) => {
       if (response.statusOk) {
         toast.success("Marca actualizada!");
         setIsUpdating(false);
-        resolveSave();
       } else {
         toast.error(response.error.message);
       }

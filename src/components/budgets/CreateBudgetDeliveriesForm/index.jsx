@@ -12,7 +12,13 @@ import { getDeliveryStats } from "../budgets.constants";
 const CreateBudgetDeliveriesForm = () => {
   const { control, setValue } = useFormContext();
 
-  const products = useWatch({ control, name: "products", }) ?? [];
+  const watchedProducts = useWatch({ control, name: "products" });
+
+  const products = useMemo(
+    () => watchedProducts ?? [],
+    [watchedProducts]
+  );
+
   const deliveryNote = useWatch({ control, name: "deliveryNote", });
   const canCompleteAll = useMemo(() => {
     return products.some((product) => {

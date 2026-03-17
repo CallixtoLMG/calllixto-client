@@ -89,7 +89,6 @@ const User = ({ params }) => {
       if (response.statusOk) {
         toast.success("Usuario actualizado!");
         setIsUpdating(false);
-        resolveSave();
       } else {
         toast.error(response.error.message);
       }

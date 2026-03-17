@@ -273,7 +273,9 @@ export const ICONS = {
   COPYRIGHT: "copyright",
   CLIPBOARD: "clipboard",
   MONEY_BILL_ALTERNATE: "money bill alternate",
-  DROPDOWN: "dropdown"
+  DROPDOWN: "dropdown",
+  MINUS_SQUARE: "minus square",
+  PLUS_SQUARE: "plus square",
 };
 
 export const ALL = "all";

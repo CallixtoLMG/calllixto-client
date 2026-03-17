@@ -1,7 +1,8 @@
 import { ENTITIES, IN_MS } from "@/common/constants";
 import { GET_BUDGET_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
-import { GET_STOCK_FLOW_QUERY_KEY, LIST_STOCK_FLOWS_QUERY_KEY } from "@/components/products/products.constants";
-import { CONSUME, PATHS } from "@/fetchUrls";
+import { GET_PRODUCT_QUERY_KEY, GET_STOCK_FLOW_QUERY_KEY, LIST_PRODUCTS_QUERY_KEY, LIST_STOCK_FLOWS_QUERY_KEY } from "@/components/products/products.constants";
+import { GET_SUPPLIER_QUERY_KEY } from "@/components/suppliers/suppliers.constants";
+import { ADD, CONSUME, PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from "./axios";
 import { useCreateItem, usePostUpdateItem } from "./common";
@@ -17,6 +18,7 @@ export function useGetStockFlow(productId, { enabled = true } = {}) {
     queryFn: getStockFlow,
     retry: false,
     staleTime: IN_MS.ONE_HOUR,
+    enabled: !!productId && enabled,
     enabled: !!productId && enabled,
   });
 
@@ -38,6 +40,26 @@ export const useCreateStockFlow = () => {
       ],
     });
   };
+};
+
+export const useAddSupplierStock = () => {
+  const updateItem = usePostUpdateItem();
+
+  const addSupplierStock = ({ supplierId, inflow, flows, }) => {
+    return updateItem({
+      entity: ENTITIES.PRODUCTS,
+      url: `/${PATHS.STOCK_FLOWS}/${supplierId}/${ADD}`,
+      value: { inflow, flows, },
+      responseEntity: null,
+      skipStorageUpdate: true,
+      invalidateQueries: [
+        [LIST_PRODUCTS_QUERY_KEY], [GET_PRODUCT_QUERY_KEY]
+        [GET_SUPPLIER_QUERY_KEY, supplierId],
+      ],
+    });
+  };
+
+  return addSupplierStock;
 };
 
 export const useConsumeStock = () => {

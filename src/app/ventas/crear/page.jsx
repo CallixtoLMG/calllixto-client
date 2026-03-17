@@ -78,7 +78,7 @@ const CreateBudget = () => {
       user: userData,
       paymentMethods: paymentMethodOptions,
     });
-  }, [isCloning, budget?.id]);
+  }, [isCloning, budget, paymentMethodOptions, userData]);
 
   const draftDefaults = useMemo(() => {
     if (!isDraft || !budget) return null;
@@ -88,7 +88,7 @@ const CreateBudget = () => {
       createdBy: userData?.name,
       paymentsMade: budget.paymentsMade || [],
     };
-  }, [isDraft, budget?.id]);
+  }, [isDraft, budget, userData?.name]);
 
   const emptyDefaults = useMemo(() => {
     if (isCloning || isDraft) return null;
@@ -99,7 +99,7 @@ const CreateBudget = () => {
       ...budgetSettings?.defaultsCreate,
       paymentMethods: paymentMethodOptions.map(m => m.value),
     };
-  }, [userData?.id, budgetSettings?.defaultsCreate?.id, paymentMethodOptions]);
+  }, [paymentMethodOptions, budgetSettings?.defaultsCreate, isCloning, isDraft, userData]);
 
   const defaultValues = clonedDefaults || draftDefaults || emptyDefaults;
 
@@ -169,7 +169,7 @@ const CreateBudget = () => {
             inflow: false,
             flows,
           });
-  
+
           if (!consumeResponse?.statusOk || consumeResponse?.error) {
             consumeError = true;
           }
@@ -184,7 +184,7 @@ const CreateBudget = () => {
       } else {
         toast.success("Presupuesto creado");
       }
-  
+
       if (
         data.state === BUDGET_STATES.CONFIRMED.id ||
         data.state === BUDGET_STATES.PENDING.id
@@ -193,7 +193,7 @@ const CreateBudget = () => {
       } else {
         push(`${PAGES.BUDGETS.SHOW(budgetId)}/borrador`);
       }
-  
+
     } catch (error) {
       toast.error(error?.message || "Error inesperado");
     }

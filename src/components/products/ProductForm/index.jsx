@@ -209,7 +209,7 @@ const ProductForm = forwardRef(({
             color={COLORS.BLUE}
             disabled={!isUpdating && view}
           />
-          {watchStockControl && isUpdating &&
+          {watchStockControl && !isUpdating &&
             <Message opacity={view} height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
               <Icon name={ICONS.BOXES} /> Stock Total: {product?.stock ?? 0}
             </Message>

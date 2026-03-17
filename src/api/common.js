@@ -136,7 +136,7 @@ export function usePostUpdateItem() {
   };
 
   return postItem;
-};
+}
 
 export function useEditItem() {
   const invalidate = useInvalidateQueries();

@@ -165,7 +165,7 @@ const BudgetView = ({
     if (!budget) return;
 
     methods.reset(mapBudgetToDeliveryForm(budget));
-  }, [budget]);
+  }, [budget, methods]);
 
   const panes = modules.map((mod) => ({
     menuItem: mod.label,

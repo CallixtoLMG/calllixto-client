@@ -356,21 +356,17 @@ export const STOCK_TABLE_HEADERS = [
     title: 'Factura', value: (stockFlows) => stockFlows.invoiceNumber
   },
   {
-    id: 4,
+    id: 5,
     width: 3,
     title: 'Remito', value: (stockFlows) => stockFlows.deliveryNote
   },
   {
-    id: 5,
+    id: 6,
     width: 9,
     align: "left",
     title: 'Comentarios', value: (stockFlows) => <OverflowWrapper maxWidth="30vw" popupContent={stockFlows.comments}> {stockFlows.comments} </OverflowWrapper>
   },
 ];
-
-export const LIST_PAYMENTS_QUERY_KEY = 'listPayments';
-export const GET_PAYMENT_QUERY_KEY = 'getPayments';
-export const PAYMENTS_FILTERS_KEY = 'paymentsFilters';
 
 export const LIST_STOCK_FLOWS_QUERY_KEY = 'listStockFlows';
 export const GET_STOCK_FLOW_QUERY_KEY = 'getStockFlows';
@@ -425,3 +421,14 @@ export const STOCK_MODAL_MODES = {
   OUT: "out",
   DELETE: "delete",
 };
+
+export const BATCH_IMPORT_STOCK_HEADERS = {
+  id: "productId",
+  fecha: "date",
+  cantidad: "quantity",
+  factura: "invoiceNumber",
+  comentarios: "comments",
+};
+
+export const UPLOAD_STOCK = "uploadStock";
+export const DISCOUNT_STOCK = "discountStock";

@@ -24,7 +24,12 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
   const [deliveryNote, setDeliveryNote] = useState("");
   const [mode, setMode] = useState(null);
 
-  const products = useWatch({ control, name: "products", }) ?? [];
+  const watchedProducts = useWatch({ control, name: "products" });
+
+  const products = useMemo(
+    () => watchedProducts ?? [],
+    [watchedProducts]
+  );
 
   const operableProducts = useMemo(() => {
     if (!products?.length) return [];
