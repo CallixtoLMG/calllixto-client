@@ -19,7 +19,11 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
-  const totalPending = (total - budget.paidAmount).toFixed(2);
+  const totalPending = (
+    (total ?? 0) -
+    (budget?.paidAmount ?? 0) -
+    (budget?.postConfirmDiscount ?? 0)
+  ).toFixed(2);
 
   const methods = useForm({
     defaultValues: {
@@ -172,7 +176,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
       <Form onSubmit={handleSubmit(onSubmitDiscount)}>
         <ViewContainer>
           <Flex $justifyContent="space-between">
-            <FieldsContainer>
+            <FieldsContainer $rowGap="14px">
               <FormField
                 $width="300px"
                 label="Vendedor"

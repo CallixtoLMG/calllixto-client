@@ -31,3 +31,4 @@ export const URL = process.env.NEXT_PUBLIC_URL;
 export const PAYMENTS = "payments";
 export const CONFIRM = "confirm";
 export const CANCEL = "cancel";
+export const CONSUME = "consume";

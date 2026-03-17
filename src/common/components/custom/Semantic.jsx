@@ -182,6 +182,7 @@ export const DropdownMenu = styled(SDropdown.Menu)`
 
 export const Icon = styled(SIcon)`
   align-self: center!important;
+  align-content: ${({ $alignContent }) => `${$alignContent}!important;`} ;
   margin-right: ${({ $marginRight }) => $marginRight && `11px!important`} ;
   top: ${({ dollar, tooltip }) => (dollar ? `-3px` : tooltip ? `-1px` : 'initial')} !important;
   position: ${({ dollar, tooltip }) => (dollar || tooltip) && `relative!important`} ;
@@ -192,6 +193,7 @@ export const Icon = styled(SIcon)`
   justify-items: ${({ justifyItems }) => `${justifyItems}!important;`};
   pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
   line-height: ${({ $lineHeight }) => `${$lineHeight}!important;`};
+  height: ${({ $height }) => `${$height}!important;`};
 `;
 
 export const Modal = styled(SModal)`

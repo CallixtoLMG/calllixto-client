@@ -7,7 +7,7 @@ const OverflowText = styled.div`
   width: fit-content;
   max-width: ${({ $maxWidth }) => $maxWidth};
   height: ${({ $height }) => $height}!important;
-  align-self: end;
+  align-self: ${({ $alignSelf = "end" }) => $alignSelf}!important;
   
   ${({ $lineClamp }) =>
     $lineClamp > 1
@@ -32,7 +32,8 @@ export const OverflowWrapper = ({
   maxWidth = "100%",
   $lineClamp = 1,
   height,
-  $verticalAlign
+  $verticalAlign,
+  $alignSelf
 }) => {
   const textRef = useRef(null);
   const [isTruncated, setIsTruncated] = useState(false);
@@ -78,6 +79,7 @@ export const OverflowWrapper = ({
           $lineClamp={$lineClamp}
           $height={height}
           $verticalAlign={$verticalAlign}
+          $alignSelf={$alignSelf}
         >
           {children}
         </OverflowText>

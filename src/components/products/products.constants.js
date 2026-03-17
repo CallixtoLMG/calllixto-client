@@ -353,7 +353,12 @@ export const STOCK_TABLE_HEADERS = [
   {
     id: 4,
     width: 3,
-    title: 'N° Factura', value: (stockFlows) => stockFlows.invoiceNumber
+    title: 'Factura', value: (stockFlows) => stockFlows.invoiceNumber
+  },
+  {
+    id: 4,
+    width: 3,
+    title: 'Remito', value: (stockFlows) => stockFlows.deliveryNote
   },
   {
     id: 5,

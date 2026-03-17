@@ -20,6 +20,8 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
     filters,
     setFilters,
     methods: filterMethods,
+    hydrated,
+    appliedCount
   } = useFilters({ defaultFilters: EMPTY_STOCK_FILTERS, key: PRODUCTS_FILTERS_KEY });
 
   const onFilter = createFilter(filters, {
@@ -133,7 +135,6 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
               color={COLORS.GREEN}
               content="Ingreso"
               disabled={isLoading}
-              loading={isLoading}
               onClick={() => {
                 setStock(EMPTY_STOCK());
                 setModalMode(STOCK_MODAL_MODES.ADD);
@@ -145,7 +146,6 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
               color={COLORS.RED}
               content="Egreso"
               disabled={isLoading}
-              loading={isLoading}
               onClick={() => {
                 setStock(EMPTY_STOCK());
                 setModalMode(STOCK_MODAL_MODES.OUT);
@@ -158,7 +158,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         </Flex>
         <FormProvider {...filterMethods}>
           <Form onSubmit={onSubmit}>
-            <Filters entity="STOCK" onRestoreFilters={onRestoreFilters}>
+            <Filters appliedCount={appliedCount} hydrated={hydrated} entity="STOCK" onRestoreFilters={onRestoreFilters}>
               <DropdownControlled
                 width="fit-content"
                 name="type"
@@ -169,7 +169,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
                   onSubmit();
                 }}
               />
-              <TextControlled name="invoiceNumber" label="N° Factura" placeholder="A0001" width="150px" />
+              <TextControlled name="invoiceNumber" label="Factura" placeholder="A0001" width="150px" />
               <TextControlled name="comments" label="Comentarios" placeholder="Uso interno" width="200px" />
             </Filters>
           </Form>

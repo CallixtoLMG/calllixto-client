@@ -20,7 +20,7 @@ const CustomTable = ({
   actions = [],
   mainKey = 'id',
   $tableHeight,
-  $deleteButtonInside,
+  $actionButtonInside,
   color,
   selection = {},
   onSelectionChange,
@@ -256,9 +256,11 @@ const CustomTable = ({
                         )}
                         {headers.map(header => {
                           const href =
-                            typeof page?.SHOW === "function"
-                              ? page.SHOW(element[mainKey], element)
-                              : undefined;
+                            header.href
+                              ? header.href(element)
+                              : typeof page?.SHOW === "function"
+                                ? page.SHOW(element[mainKey], element)
+                                : undefined;
 
                           return (
                             <LinkCell
@@ -283,8 +285,8 @@ const CustomTable = ({
                           );
                         })}
                         {!!actions.length && (
-                          <ActionsContainer $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
-                            <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
+                          <ActionsContainer $actionButtonInside={$actionButtonInside} $open={isPopupOpen}>
+                            <InnerActionsContainer $actionButtonInside={$actionButtonInside}>
                               {actions.length > 1 ? (
                                 <PopupActions
                                   open={popupOpenId === element[mainKey]}
@@ -327,8 +329,8 @@ const CustomTable = ({
                         </Cell>
                       ))}
                       {!!actions.length && (
-                        <ActionsContainer $stillShow $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
-                          <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
+                        <ActionsContainer $stillShow $actionButtonInside={$actionButtonInside} $open={isPopupOpen}>
+                          <InnerActionsContainer $actionButtonInside={$actionButtonInside}>
                             {actions.length > 1 ? (
                               <PopupActions
                                 open={popupOpenId === element[mainKey]}

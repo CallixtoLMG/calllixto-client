@@ -1,13 +1,14 @@
 import { PriceLabel } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
+import { calculateTotals } from "@/common/utils";
 import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { ModalAddPayment } from "@/components/payments/ModalAddPayment";
 import { useMemo, useState } from "react";
-import { Header, Popup } from "semantic-ui-react";
-import { Box, Button, Flex, FlexColumn, Icon, OverflowWrapper, Segment } from "../../common/components/custom";
+import { Popup } from "semantic-ui-react";
+import { Box, Button, Flex, FlexColumn, Icon, OverflowWrapper } from "../../common/components/custom";
 import { Table, TotalList } from "../../common/components/table";
-import { calculateTotals } from "@/common/utils";
+import { Header } from "../products/ProductStock/styles";
 
 const getPaymentTableHeaders = () => [
   {
@@ -79,12 +80,12 @@ const Payments = ({
   ];
 
   return (
-    <Flex width="100%" className="ui form">
-      <Segment $noBorder $noBoxShadow padding="14px 0">
+    <FlexColumn width="100%" $rowGap="15px" className="ui form">
+      <Flex $columnGap="15px" $justifyContent="space-between">
         <Header>
           Detalle de Pagos
         </Header>
-        <FlexColumn $rowGap="15px">
+        <Flex $columnGap="15px">
           {allowUpdates && (
             <>
               <Popup
@@ -128,41 +129,39 @@ const Payments = ({
               />
             </>
           )}
-          <Flex width="100%">
-            <Table
-              headers={getPaymentTableHeaders()}
-              elements={elements}
-              {...allowUpdates && {
-                actions: [
-                  {
-                    id: 1,
-                    icon: ICONS.TRASH,
-                    color: COLORS.RED,
-                    onClick: (element) => {
-                      setPaymentToDelete(element);
-                      setShowDeleteModal(true);
-                    },
-                    tooltip: 'Eliminar',
-                  },
-                  {
-                    id: 2,
-                    icon: ICONS.EDIT,
-                    color: COLORS.BLUE,
-                    onClick: (element) => {
-                      setPaymentToEdit(element);
-                      setIsModalPaymentOpen(true);
-                    },
-                    tooltip: "Editar",
-                    width: "100%"
-                  }
-                ]
-              }}
-              $deleteButtonInside
-            />
-          </Flex>
-          <TotalList readOnly items={TOTAL_LIST_ITEMS} />
-        </FlexColumn>
-      </Segment>
+        </Flex>
+      </Flex>
+      <Table
+        headers={getPaymentTableHeaders()}
+        elements={elements}
+        {...allowUpdates && {
+          actions: [
+            {
+              id: 1,
+              icon: ICONS.TRASH,
+              color: COLORS.RED,
+              onClick: (element) => {
+                setPaymentToDelete(element);
+                setShowDeleteModal(true);
+              },
+              tooltip: 'Eliminar',
+            },
+            {
+              id: 2,
+              icon: ICONS.EDIT,
+              color: COLORS.BLUE,
+              onClick: (element) => {
+                setPaymentToEdit(element);
+                setIsModalPaymentOpen(true);
+              },
+              tooltip: "Editar",
+              width: "100%"
+            }
+          ]
+        }}
+        $deleteButtonInside
+      />
+      <TotalList readOnly items={TOTAL_LIST_ITEMS} />
       <ModalAction
         title="¿Estás seguro de que querés eliminar este pago?"
         onConfirm={async () => {
@@ -175,7 +174,7 @@ const Payments = ({
         confirmButtonIcon={ICONS.TRASH}
         isLoading={isLoading}
       />
-    </Flex>
+    </FlexColumn >
   );
 };
 

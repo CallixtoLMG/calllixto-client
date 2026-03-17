@@ -1,13 +1,19 @@
 import { useConfirmBudgetDiscount } from "@/api/budgets";
 import { useCreatePayment, useDeletePayment, useEditPayment } from "@/api/payments";
+import { useListStockFlowsByBudget } from "@/api/stock";
 import { ENTITIES } from "@/common/constants";
+import BudgetDeliveries from "@/components/budgets/BudgetDeliveries";
+import DeliveriesHistory from "@/components/budgets/BudgetDeliveries/DeliveriesHistory";
 import BudgetDetails from "@/components/budgets/BudgetView/BudgetDetails";
 import { Loader } from "@/components/layout";
 import Payments from "@/components/payments";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
+import { FlexColumn } from "../../../common/components/custom";
+import { mapBudgetToDeliveryForm, mapStockFlowsToHistory } from "../budgets.constants";
 import { isBudgetCancelled, isBudgetExpired, isBudgetPending } from "../budgets.utils";
 
 const BudgetView = ({
@@ -22,7 +28,6 @@ const BudgetView = ({
   isLoadingPayments,
   activeIndex,
   onTabChange,
-  refetchPayments,
 }) => {
   const editPayment = useEditPayment();
   const createPayment = useCreatePayment();
@@ -30,6 +35,17 @@ const BudgetView = ({
   const confirmBudgetDiscount = useConfirmBudgetDiscount();
   const [isModalPaymentOpen, setIsModalPaymentOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { data: stockFlowsByBudget, isLoading: isLoadingStockFlowsByBudget } = useListStockFlowsByBudget({ budgetId: budget.id });
+
+  const stockFlowsByBudgetHistory = useMemo(
+    () => mapStockFlowsToHistory(stockFlowsByBudget ?? []),
+    [stockFlowsByBudget]
+  );
+
+  const methods = useForm({
+    defaultValues: undefined,
+    shouldUnregister: false,
+  });
 
   const { mutate: mutateCreatePayment, isPending: isCreatePending } = useMutation({
     mutationFn: (payment) => createPayment(payment, ENTITIES.BUDGET, budget.id),
@@ -127,9 +143,29 @@ const BudgetView = ({
             </Loader>
           ),
         },
+        {
+          key: "deliveries",
+          label: "Entregas",
+          component: (
+            <FlexColumn $rowGap="15px">
+              <Loader active={isLoadingStockFlowsByBudget}>
+                <BudgetDeliveries onSuccess={refetch} budgetId={budget.id} state={budget.state} />
+                {!!stockFlowsByBudgetHistory.length &&
+                  <DeliveriesHistory history={stockFlowsByBudgetHistory} />
+                }
+              </Loader>
+            </FlexColumn>
+          ),
+        },
       ]
       : []),
   ];
+
+  useEffect(() => {
+    if (!budget) return;
+
+    methods.reset(mapBudgetToDeliveryForm(budget));
+  }, [budget]);
 
   const panes = modules.map((mod) => ({
     menuItem: mod.label,
@@ -137,11 +173,13 @@ const BudgetView = ({
   }));
 
   return (
-    <Tab
-      panes={panes}
-      activeIndex={activeIndex}
-      onTabChange={onTabChange}
-    />
+    <FormProvider {...methods}>
+      <Tab
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={onTabChange}
+      />
+    </FormProvider>
   );
 };
 
