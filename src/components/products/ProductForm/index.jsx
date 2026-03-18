@@ -234,9 +234,7 @@ const ProductForm = forwardRef(({
             value={calculateMargin(watchPrice, watchCost)}
             disabled={!isUpdating && view}
             onChange={(newMargin) => {
-              if (!newMargin || !watchCost) {
-                return;
-              }
+              if (newMargin === '' || !watchCost) return;
               const newPrice = calculatePriceFromMargin(watchCost, newMargin);
               methods.setValue('price', newPrice);
             }}

@@ -306,6 +306,9 @@ const Supplier = ({ params }) => {
       },
       {
         id: 3,
+        tooltip: !hasAssociatedProducts
+        ? 'No existen productos de este proveedor.'
+        : false,
         button: (
           <Dropdown
             pointing

@@ -1,10 +1,10 @@
 import { Box, Flex, Icon as SIcon } from '@/common/components/custom';
+import { StyledModalHeader } from '@/common/components/modals/ModalShortcuts/styles';
 import { COLORS, ICONS, SIZES } from '@/common/constants';
 import { createContext, useContext, useState } from 'react';
 import { Modal, Popup, Transition } from 'semantic-ui-react';
-import { IconedButton } from '../../common/components/buttons';
 import styled from 'styled-components';
-import { StyledModalHeader } from '@/common/components/modals/ModalShortcuts/styles';
+import { IconedButton } from '../../common/components/buttons';
 
 const Icon = styled(SIcon)`
   cursor: pointer;
@@ -46,42 +46,32 @@ const NavActions = () => {
     <>
       <Flex $columnGap="10px" $alignItems="center">
         {actions.map(({ id, icon, color, onClick, text, button, disabled, width, basic, loading, tooltip }) => {
+
+          const content = button ? button : (
+            <IconedButton
+              text={text}
+              icon={icon}
+              color={color}
+              basic={basic}
+              onClick={onClick}
+              width={width || "110px"}
+              disabled={disabled}
+              loading={loading}
+            />
+          );
+
           return (
             <Box key={`action_${id}`}>
-              {button ? button : (
-                tooltip ? (
-                  <Popup
-                    content={tooltip}
-                    position="bottom center"
-                    on="hover"
-                    size={SIZES.TINY}
-                    trigger={
-                      <Box>
-                        <IconedButton
-                          text={text}
-                          icon={icon}
-                          color={color}
-                          basic={basic}
-                          onClick={onClick}
-                          width={width || "110px"}
-                          disabled={disabled}
-                          loading={loading}
-                        />
-                      </Box>
-                    }
-                  />
-                ) : (
-                  <IconedButton
-                    text={text}
-                    icon={icon}
-                    color={color}
-                    basic={basic}
-                    onClick={onClick}
-                    width={width || "110px"}
-                    disabled={disabled}
-                    loading={loading}
-                  />
-                )
+              {tooltip ? (
+                <Popup
+                  content={tooltip}
+                  position="bottom center"
+                  on="hover"
+                  size={SIZES.TINY}
+                  trigger={<Box>{content}</Box>}
+                />
+              ) : (
+                content
               )}
             </Box>
           );
@@ -122,4 +112,3 @@ const NavActions = () => {
 
 
 export { NavActions, NavActionsProvider, useNavActionsContext };
-

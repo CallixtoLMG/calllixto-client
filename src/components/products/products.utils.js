@@ -64,8 +64,14 @@ export const getTotal = (product) => {
 };
 
 export const calculateMargin = (price, cost) => {
-  if (!cost) return 0;
-  const margin = ((price / cost - 1) * 100);
+  if (!cost || !price) return 0;
+
+  const numericPrice = Number(price);
+  const numericCost = Number(cost);
+
+  if (!numericPrice || !numericCost) return 0;
+
+  const margin = ((numericPrice / numericCost - 1) * 100);
   return parseFloat(margin.toFixed(2));
 };
 
