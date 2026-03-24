@@ -80,7 +80,7 @@ export const useCancelExpense = () => {
       entity: ENTITIES.EXPENSES,
       url: `${PATHS.EXPENSES}/${id}/${CANCEL}`,
       value: cancelData,
-      responseEntity: ENTITIES.BUDGET,
+      responseEntity: ENTITIES.EXPENSE,
       invalidateQueries: [[LIST_EXPENSES_QUERY_KEY], [GET_EXPENSE_QUERY_KEY, id]]
     });
 

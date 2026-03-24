@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useCancelExpense, useEditExpense, useGetExpense } from "@/api/expenses";
 import { useCreatePayment, useDeletePayment, useEditPayment, useGetPayments } from "@/api/payments";
-import { Flex, Message, MessageHeader } from "@/common/components/custom";
+import { FieldsContainer, Flex, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { UnsavedChangesModal } from "@/common/components/modals";
 import ModalCancel from "@/common/components/modals/ModalCancel";
@@ -216,14 +216,17 @@ const Expense = ({ params }) => {
         <Tab.Pane>
           <Loader active={isLoadingPayments || isRefetching}>
             {!isItemCancelled(expense?.state) && expense.expirationDate && (
-              <Flex $justifyContent="space-between">
-                <TextField
-                  width="20%"
-                  value={getFormatedDate(expense.expirationDate, DATE_FORMATS.ONLY_DATE)}
-                  label="Fecha de Vencimiento"
-                  disabled
-                />
-              </Flex>
+              <FieldsContainer>
+                <FormField flex="1">
+                  <TextField
+                    value={getFormatedDate(expense.expirationDate, DATE_FORMATS.ONLY_DATE)}
+                    label="Fecha de vencimiento"
+                    disabled
+                  />
+                </FormField>
+                <FormField flex="1" />
+                <FormField flex="1" />
+              </FieldsContainer>
             )}
             <Payments
               payments={payments.map(payment => ({ ...payment, isOverdue: isDateAfter(payment.date, expense.expirationDate) })) ?? []}
@@ -260,10 +263,15 @@ const Expense = ({ params }) => {
   return (
     <Loader active={isLoading || !expense}>
       {isItemCancelled(expense?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de cancelación</MessageHeader>
-          <p>{expense.cancelledMsg}</p>
-        </Message>
+        <FieldsContainer>
+          <FormField flex="1">
+            <Message negative>
+              <MessageHeader>Motivo de cancelación</MessageHeader>
+              <p>{expense.cancelledMsg}</p>
+            </Message>
+          </FormField>
+          <FormField flex="1" />
+        </FieldsContainer>
       )}
       <Tab
         panes={panes}

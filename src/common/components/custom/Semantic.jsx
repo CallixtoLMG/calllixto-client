@@ -37,6 +37,7 @@ export const Input = styled(SInput)`
     border-left: ${({ $iconLabel }) => ($iconLabel) && "none"} !important;
     justify-items: ${({ justifyItems }) => justifyItems} !important;
     padding: ${({ padding }) => padding} !important;
+    opacity: ${({ disabled }) => disabled && "0.45"} !important;
   }
 `;
 
@@ -45,9 +46,14 @@ export const FormField = styled(Form.Field)`
   display: flex;
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: ${({ margin = "0" }) => margin} !important;
-  flex-direction: column;
+  flex-direction: ${({ flexDirection = "column" }) => flexDirection} !important;
   height: ${({ $height }) => $height} !important;
   row-gap: ${({ $rowGap }) => $rowGap} !important;
+  column-gap: ${({ $columnGap = '15px' }) => $columnGap} !important;
+  align-items: ${({ $alignItems }) => $alignItems} !important;
+  justify-content: ${({ $justifyContent }) => $justifyContent} !important;
+  min-width: ${({ $minWidth }) => $minWidth}!important;
+  max-width: ${({ $maxWidth }) => $maxWidth}!important;
 
   .disabled {
     opacity: 1!important;
@@ -84,7 +90,10 @@ export const Dropdown = styled(SDropdown)`
   background-color: ${({ bgColor }) => `${bgColor}!important`};
   box-shadow: ${({ $boxShadow }) => $boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
   width: ${({ width }) => `${width}!important`};
-
+  &&& {
+    opacity: ${({ disabled }) => disabled && "0.45"} !important;
+  }
+  
   .text{
     text-align: ${({ $textAlign }) => `${$textAlign}!important`};
     max-width: ${({ textMaxWidth }) => `${textMaxWidth}!important`};
@@ -105,14 +114,24 @@ export const Dropdown = styled(SDropdown)`
   i{
     margin-right: ${({ iconMargin }) => `${iconMargin}!important`}
   }
+
+  .disabled.selection-dropdown {
+    color: red!important;
+    opacity: .45!important;
+  }
   
   ${({ multiple }) => multiple && `
+    min-height: fit-content!important;
     &&&&&& div.item {
+      min-height: fit-content!important;
       padding: 0.35rem 0.4rem!important;
       font-size: 12px!important;
       div{
         width: fit-content!important;
       }
+    }
+    div.divider.default.text{
+      margin: 6px 0 5px 9px;
     }
     a.ui.label {
       font-size: 12px!important;
@@ -210,7 +229,9 @@ export const Message = styled(SMessage)`
   align-content: ${({ alignContent }) => `${alignContent}!important`} ;
   padding: ${({ padding }) => `${padding}!important`} ;
   height: ${({ height }) => `${height}!important`} ;
+  height: ${({ height }) => `${height}!important`} ;
   width: ${({ width }) => `${width}!important`} ;
+  min-width: ${({ minWidth }) => `${minWidth}!important`} ;
   margin: ${({ margin }) => `${margin}!important`} ;
   opacity: ${({ opacity }) => `${opacity && "0.45"}!important`} ;
 `;
@@ -223,7 +244,7 @@ export const Button = styled(SButton)`
     margin-top: ${({ $marginTop }) => `${$marginTop}!important`} ;
     margin-bottom: ${({ $marginBottom }) => `${$marginBottom}!important`} ;
     align-self: ${({ $alignSelf }) => `${$alignSelf}!important`} ;
-    font-size:: ${({ $fontSize = "13.5px" }) => `${$fontSize}!important`} ;
+    font-size: ${({ $fontSize = "13.5px" }) => `${$fontSize}!important`} ;
     width: ${({ width = '110px' }) => `${width}!important`} ;
     &{
      padding-left: ${({ $paddingLeft = '40px' }) => `${$paddingLeft}!important`} ;

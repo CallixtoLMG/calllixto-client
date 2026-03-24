@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useDeleteBrand, useEditBrand, useGetBrand, useSetBrandState } from "@/api/brands";
 import { useHasProductsByBrandId } from "@/api/products";
-import { Message, MessageHeader } from "@/common/components/custom";
+import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
@@ -215,10 +215,16 @@ const Brand = ({ params }) => {
     <Loader active={isLoading || isLoadingProducts || !brand}>
       {!isItemInactive(brand?.state) && toggleButton}
       {isItemInactive(brand?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{brand.inactiveReason}</p>
-        </Message>
+        <FieldsContainer>
+          <FormField flex="1">
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{brand.inactiveReason}</p>
+            </Message>
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
+        </FieldsContainer>
       )}
       <BrandForm
         ref={formRef}

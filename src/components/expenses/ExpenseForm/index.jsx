@@ -1,6 +1,6 @@
 import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form } from "@/common/components/custom";
+import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { DropdownControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
 import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
@@ -97,101 +97,107 @@ const ExpenseForm = forwardRef(({
       <Form onSubmit={handleSubmit(handleForm)} onKeyDown={preventSend}>
         <FieldsContainer $rowGap="5px">
           {view &&
-            <TextField
-              width="200px"
-              label="Id"
-              value={expense?.id}
-              disabled
-            />
+            <FormField flex="1">
+              <TextField
+                label="Id"
+                value={expense?.id}
+                disabled
+              />
+            </FormField>
           }
-          <TextControlled
-            width="30%"
-            name="name"
-            label="Detalle"
-            rules={RULES.REQUIRED}
-            disabled={!isUpdating && view}
-            required
-            placeholder="Netflix"
-          />
-          <PriceControlled
-            width="15%"
-            name="amount"
-            label="Monto"
-            disabled={!isUpdating && view}
-            placeholder="18000"
-          />
-          <DatePickerControlled
-            disabled={!isUpdating && view}
-            name="expirationDate"
-            label="Fecha de vencimiento"
-            width="fit-content"
-            showMonthDropdown
-            showYearDropdown
-            scrollableYearDropdown
-            yearDropdownItemNumber={80}
-            rules={RULES.REQUIRED}
-            required
-            placeholder="16-11-2025"
-          />
+          <FormField flex="1">
+            <TextControlled
+              name="name"
+              label="Detalle"
+              rules={RULES.REQUIRED}
+              disabled={!isUpdating && view}
+              required={isUpdating || !view}
+              placeholder="Netflix"
+            />
+          </FormField>
+          <FormField flex="1">
+            <PriceControlled
+              name="amount"
+              label="Monto"
+              disabled={!isUpdating && view}
+              placeholder="18000"
+            />
+          </FormField>
+          <FormField  flex="1">
+            <DatePickerControlled
+              disabled={!isUpdating && view}
+              name="expirationDate"
+              label="Fecha de vencimiento"
+              showMonthDropdown
+              showYearDropdown
+              scrollableYearDropdown
+              yearDropdownItemNumber={80}
+              rules={RULES.REQUIRED}
+              required={isUpdating || !view}
+              placeholder="16-11-2025"
+            />
+          </FormField>
         </FieldsContainer>
         <FieldsContainer $rowGap="5px">
-          <DropdownControlled
-            disabled={!isUpdating && view}
-            width={(!isUpdating && view) ? "fit-content" : "40%"}
-            name="categories"
-            label="Categorias"
-            placeholder="Selecciona categorias"
-            multiple
-            clearable={isUpdating && !view}
-            icon={(!isUpdating && view) ? null : undefined}
-            search={isUpdating && !view}
-            selection
-            optionsMapper={categoriesMapper}
-            loading={isExpensesSettingsFetching}
-            options={Object.values(categoryOptions)}
-            renderLabel={(item) => ({
-              color: item.value.color,
-              content: item.value.name,
-            })}
-          />
-        </FieldsContainer>
-        <FieldsContainer $rowGap="5px">
-          <DropdownControlled
-            disabled={!isUpdating && view}
-            width={(!isUpdating && view) ? "fit-content" : "40%"}
-            name="tags"
-            label="Etiquetas"
-            placeholder="Selecciona etiquetas"
-            height="fit-content"
-            multiple
-            clearable={isUpdating && !view}
-            icon={(!isUpdating && view) ? null : undefined}
-            search={isUpdating && !view}
-            selection
-            optionsMapper={tagsMapper}
-            loading={isExpensesSettingsFetching}
-            options={Object.values(tagsOptions)}
-            renderLabel={(item) => ({
-              color: item.value.color,
-              content: item.value.name,
-            })}
-          />
+          <FormField flex="1">
+            <DropdownControlled
+              disabled={!isUpdating && view}
+              name="categories"
+              label="Categorias"
+              placeholder="Selecciona categorias"
+              multiple
+              clearable={isUpdating && !view}
+              icon={(!isUpdating && view) ? null : undefined}
+              search={isUpdating && !view}
+              selection
+              optionsMapper={categoriesMapper}
+              loading={isExpensesSettingsFetching}
+              options={Object.values(categoryOptions)}
+              renderLabel={(item) => ({
+                color: item.value.color,
+                content: item.value.name,
+              })}
+            />
+          </FormField>
+          <FormField flex="1">
+            <DropdownControlled
+              disabled={!isUpdating && view}
+              name="tags"
+              label="Etiquetas"
+              placeholder="Selecciona etiquetas"
+              height="fit-content"
+              multiple
+              clearable={isUpdating && !view}
+              icon={(!isUpdating && view) ? null : undefined}
+              search={isUpdating && !view}
+              selection
+              optionsMapper={tagsMapper}
+              loading={isExpensesSettingsFetching}
+              options={Object.values(tagsOptions)}
+              renderLabel={(item) => ({
+                color: item.value.color,
+                content: item.value.name,
+              })}
+            />
+          </FormField>
         </FieldsContainer>
         <FieldsContainer>
           <TextAreaControlled name="comments" label="Comentarios" placeholder="Quiero ver el Juego del Calamar temporada 2" readOnly={!isUpdating && view} />
         </FieldsContainer>
-        {(isUpdating || !view) && (
-          <SubmitAndRestore
-            isUpdating={isUpdating}
-            isLoading={isLoading}
-            isDirty={isCloning ? true : isDirty}
-            onReset={() => handleReset(isUpdating ? { ...EMPTY_EXPENSE, ...expense } : EMPTY_EXPENSE)}
-            submit
-            cloningExpense
-          />
-        )}
-      </Form>
-    </FormProvider>
+        {
+          (isUpdating || !view) && (
+            <SubmitAndRestore
+              isUpdating={isUpdating}
+              isLoading={isLoading}
+              isDirty={isCloning ? true : isDirty}
+              onReset={() => handleReset(isUpdating ? { ...EMPTY_EXPENSE, ...expense } : EMPTY_EXPENSE)}
+              submit
+              cloningExpense
+            />
+          )
+        }
+      </Form >
+    </FormProvider >
   );
 });
 

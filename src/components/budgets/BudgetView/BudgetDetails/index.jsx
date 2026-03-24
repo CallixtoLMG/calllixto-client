@@ -171,114 +171,120 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(onSubmitDiscount)}>
         <ViewContainer>
-          <Flex $justifyContent="space-between">
-            <FieldsContainer>
+          <FieldsContainer >
+            <FormField
+              flex="1"
+              label="Vendedor"
+              control={Input}
+              value={budget?.createdBy}
+              readOnly
+              disabled
+            />
+            {budget?.createdAt && (
               <FormField
-                $width="300px"
-                label="Vendedor"
+                flex="1"
+                label="Fecha de creación"
                 control={Input}
-                value={budget?.createdBy}
+                value={getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)}
                 readOnly
                 disabled
               />
-              {budget?.createdAt && (
+            )}
+            <FormField flex="1" />
+          </FieldsContainer>
+          <FieldsContainer  >
+            {budgetState && (
+              <FormField
+                flex="1"
+                label={budgetState.label}
+                control={Input}
+                value={budgetState.person}
+                readOnly
+                disabled
+              />
+            )}
+            {budgetState && (
+              <FormField
+                flex="1"
+                label={budgetState.dateLabel}
+                control={Input}
+                value={budgetState.date}
+                disabled
+              />
+            )}
+            {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) ? (
+              <>
                 <FormField
-                  $width="180px"
-                  label="Fecha de creación"
-                  control={Input}
-                  value={getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)}
-                  readOnly
-                  disabled
-                />
-              )}
-            </FieldsContainer>
-            <FieldsContainer>
-              {budgetState && (
-                <FormField
-                  $width="300px"
-                  label={budgetState.label}
-                  control={Input}
-                  value={budgetState.person}
-                  readOnly
-                  disabled
-                />
-              )}
-              {budgetState && (
-                <FormField
-                  $width="200px"
-                  label={budgetState.dateLabel}
-                  control={Input}
-                  value={budgetState.date}
-                  disabled
-                />
-              )}
-              {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) && (
-                <FormField
-                  $width="200px"
+                  flex="1"
                   label="Fecha de vencimiento"
                   control={Input}
                   value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })}
                   disabled
                 />
-              )}
-            </FieldsContainer>
-          </Flex>
+                <FormField flex="1" />
+                <FormField flex="1" />
+              </>
+            ) : <FormField flex="1" />
+            }
+
+          </FieldsContainer>
           <FieldsContainer>
             <FormField
-              $width="300px"
+              flex="1"
               label="Cliente"
               control={Input}
               value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
               readOnly
               disabled
             />
-            <DropdownField
-              flex="3"
-              selection
-              width="200px"
-              label="Dirección"
-              control={Dropdown}
-              value={selectedContact?.address || (budget?.pickUpInStore ? PICK_UP_IN_STORE : '')}
-              options={[
-                { key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE },
-                ...(budget?.customer?.addresses?.map((address) => ({
-                  key: address.address,
-                  text: address.ref ? `${address.ref}: ${address.address}` : address.address,
-                  value: address.address,
-                })) || [])
-              ]}
-              onChange={(e, { value }) =>
-                setSelectedContact((prev) => ({
-                  ...prev,
-                  address: value,
-                }))
-              }
-              disabled={!budget?.customer?.addresses?.length && !budget?.pickUpInStore}
-            />
-            <DropdownField
-              flex="2"
-              selection
-              label="Teléfono"
-              control={Dropdown}
-              value={selectedContact?.phone ?? ''}
-              options={budget?.customer?.phoneNumbers.map((phone) => {
-                const formattedPhone = getFormatedPhone(phone);
-                const label = phone.ref ? `${phone.ref}: ${formattedPhone}` : formattedPhone;
+            <FormField flex="1">
+              <DropdownField
+                selection
+                label="Dirección"
+                control={Dropdown}
+                value={selectedContact?.address || (budget?.pickUpInStore ? PICK_UP_IN_STORE : '')}
+                options={[
+                  { key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE },
+                  ...(budget?.customer?.addresses?.map((address) => ({
+                    key: address.address,
+                    text: address.ref ? `${address.ref}: ${address.address}` : address.address,
+                    value: address.address,
+                  })) || [])
+                ]}
+                onChange={(e, { value }) =>
+                  setSelectedContact((prev) => ({
+                    ...prev,
+                    address: value,
+                  }))
+                }
+                disabled={!budget?.customer?.addresses?.length && !budget?.pickUpInStore}
+              />
+            </FormField>
+            <FormField flex="1">
+              <DropdownField
+                selection
+                label="Teléfono"
+                control={Dropdown}
+                value={selectedContact?.phone ?? ''}
+                options={budget?.customer?.phoneNumbers.map((phone) => {
+                  const formattedPhone = getFormatedPhone(phone);
+                  const label = phone.ref ? `${phone.ref}: ${formattedPhone}` : formattedPhone;
 
-                return {
-                  key: formattedPhone,
-                  text: label,
-                  value: formattedPhone,
-                };
-              })}
-              onChange={(e, { value }) => {
-                setSelectedContact((prev) => ({
-                  ...prev,
-                  phone: value,
-                }));
-              }}
-              disabled={!budget?.customer?.phoneNumbers?.length}
-            />
+                  return {
+                    key: formattedPhone,
+                    text: label,
+                    value: formattedPhone,
+                  };
+                })}
+                onChange={(e, { value }) => {
+                  setSelectedContact((prev) => ({
+                    ...prev,
+                    phone: value,
+                  }));
+                }}
+                disabled={!budget?.customer?.phoneNumbers?.length}
+              />
+            </FormField>
           </FieldsContainer>
           <Table
             mainKey="key"
@@ -307,7 +313,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                   />
                   <PriceControlled
                     key={budget?.postConfirmDiscount ?? 'no-discount'}
-                    width="200px"
+                    width="250px"
                     placeholder="5.000"
                     name="postConfirmDiscount"
                     defaultValue={budget?.postConfirmDiscount ?? ''}
@@ -362,7 +368,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           />
         </ViewContainer>
       </Form>
-    </FormProvider>
+    </FormProvider >
   );
 };
 

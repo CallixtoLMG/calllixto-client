@@ -73,7 +73,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
     },
     {
       id: 3,
-      title: "Monto Inicial",
+      title: "Monto inicial",
       key: "initialAmount",
       sortable: true,
       align: "left",
@@ -83,7 +83,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
     },
     {
       id: 4,
-      title: "Monto Actual",
+      title: "Monto actual",
       key: "currentAmount",
       sortable: true,
       align: "left",
@@ -162,14 +162,12 @@ export const BILLS_DETAILS_TABLE_HEADERS = [
   {
     id: 1,
     title: "Denominación",
-    width: 4,
     key: "denomination",
     sortable: true,
     value: (billDetail) => <PriceLabel value={billDetail.denomination} />,
     sortValue: (billDetail) => billDetail.denomination ?? ""
   }, {
     id: 2,
-    width: 5,
     title: 'Cantidad',
     key: "quantity",
     align: "right",
@@ -179,7 +177,6 @@ export const BILLS_DETAILS_TABLE_HEADERS = [
   {
     id: 3,
     title: "Subtotal",
-    width: 8,
     key: "subtotal",
     align: "right",
     value: (billDetail) => {
@@ -245,7 +242,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
   },
   {
     id: 3,
-    title: 'Método de Pago',
+    title: 'Método de pago',
     key: 'method',
     sortable: true,
     sortValue: (element) => element.method ?? "",

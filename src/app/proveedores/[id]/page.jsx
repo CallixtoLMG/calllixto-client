@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
 import { useDeleteSupplier, useEditSupplier, useGetSupplier, useSetSupplierState } from "@/api/suppliers";
-import { Button, DropdownItem, Icon, Message, MessageHeader, } from "@/common/components/custom";
+import { Button, DropdownItem, FieldsContainer, FormField, Icon, Message, MessageHeader, } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
@@ -408,10 +408,16 @@ const Supplier = ({ params }) => {
     <Loader active={isLoading || loadingProducts || !supplier}>
       {!isItemInactive(supplier?.state) && toggleButton}
       {isItemInactive(supplier?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{supplier.inactiveReason}</p>
-        </Message>
+        <FieldsContainer>
+          <FormField flex="1">
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{supplier.inactiveReason}</p>
+            </Message>
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
+        </FieldsContainer>
       )}
       <SupplierForm
         ref={formRef}

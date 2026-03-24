@@ -205,10 +205,10 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
 
 export const PAYMENT_METHODS = [
   { key: 'efectivo', text: 'Efectivo', value: 'Efectivo' },
-  { key: 'transferencia', text: 'Transferencia Bancaria', value: 'Transferencia Bancaria' },
-  { key: 'debito', text: 'Tarjeta de Débito', value: 'Tarjeta de Débito' },
-  { key: 'credito', text: 'Tarjeta de Crédito', value: 'Tarjeta de Crédito' },
-  { key: 'mercado_pago', text: 'Mercado Pago', value: 'Mercado Pago' },
+  { key: 'transferencia', text: 'Transferencia bancaria', value: 'Transferencia bancaria' },
+  { key: 'debito', text: 'Tarjeta de débito', value: 'Tarjeta de débito' },
+  { key: 'credito', text: 'Tarjeta de crédito', value: 'Tarjeta de crédito' },
+  { key: 'mercado_pago', text: 'Mercado pago', value: 'Mercado pago' },
   { key: 'dolares', text: 'Dólares', value: 'Dólares' },
   { key: 'others', text: 'Otros', value: 'Otros' },
   { key: 'multi', text: 'Varios', value: 'Varios' }
