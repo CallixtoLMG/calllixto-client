@@ -41,6 +41,7 @@ export const PriceField = ({
       required={required}
     >
       <Input
+        width="inherit"
         value={formattedValue}
         onChange={handleChange}
         onBlur={() => { isUserTyping.current = false; }}
@@ -52,7 +53,7 @@ export const PriceField = ({
         readOnly={readOnly}
       >
         <Icon name="dollar" />
-        <input />
+        <input style={{ width: "100%" }} />
       </Input>
     </FormField>
   );

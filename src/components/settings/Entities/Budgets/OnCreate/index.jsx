@@ -17,12 +17,12 @@ const OnCreate = ({ customerOptions, isLoading }) => {
     <Box $marginBottom="5px">
       <Accordion fluid>
         <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon name="dropdown" /> Al Crear una Venta
+          <Icon name="dropdown" /> Al crear una venta
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
           <FlexColumn $rowGap="15px">
             <GroupedButtonsControlled
-              label="Estado por Defecto"
+              label="Estado por defecto"
               name="defaultsCreate.state"
               color={defaultsCreate?.state === BUDGET_STATES.CONFIRMED.id ? COLORS.GREEN : COLORS.ORANGE}
               buttons={[
@@ -31,18 +31,18 @@ const OnCreate = ({ customerOptions, isLoading }) => {
               ]}
             />
             <GroupedButtonsControlled
-              label="Entrega por Defecto"
+              label="Entrega por defecto"
               color={COLORS.BLUE}
               name="defaultsCreate.pickUpInStore"
               buttons={[
                 { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
-                { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
+                { text: 'Enviar a dirección', icon: ICONS.TRUCK, value: false },
               ]}
             />
             <SearchControlled
               name="defaultsCreate.customer"
               width="300px"
-              label="Cliente por Defecto"
+              label="Cliente por defecto"
               disabled={isLoading}
               required
               clearable
@@ -60,7 +60,7 @@ const OnCreate = ({ customerOptions, isLoading }) => {
             />
             <NumberControlled
               name="defaultsCreate.expirationOffsetDays"
-              label="Días para el Vencimiento por Defecto"
+              label="Días para el vencimiento por defecto"
               width="fit-content"
               placeholder="15"
             />

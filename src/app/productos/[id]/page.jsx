@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useDeleteProduct, useEditProduct, useGetProduct, useRecoverProduct, useSetProductState } from "@/api/products";
 import { useCreateStockFlow, useGetStockFlow } from "@/api/stock";
-import { Flex, Message, MessageHeader } from "@/common/components/custom";
+import { FieldsContainer, Flex, FormField, Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
@@ -398,10 +398,16 @@ const Product = ({ params }) => {
             {!isProductDeleted(product?.state) && !isProductInactive(product?.state) && toggleButton}
           </Flex>
           {isProductInactive(product?.state) && (
-            <Message negative>
-              <MessageHeader>Motivo de inactivación</MessageHeader>
-              <p>{product.inactiveReason}</p>
-            </Message>
+            <FieldsContainer $marginBottom="15px">
+              <FormField flex="1">
+                <Message negative>
+                  <MessageHeader>Motivo de inactivación</MessageHeader>
+                  <p>{product.inactiveReason}</p>
+                </Message>
+              </FormField>
+              <FormField flex="1" />
+              <FormField flex="1" />
+            </FieldsContainer>
           )}
           <ProductForm
             ref={formRef}

@@ -47,7 +47,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
 
     const productsHeaders = Array.from({ length: maxProductCount }, (_, i) => `Producto ${i + 1}`);
     const headers = ['ID', 'Estado', 'Cliente', 'Fecha', "Total", "Descuento", "Cargo adicional", "Vendedor", ...productsHeaders];
-    downloadExcel([headers, ...mappedBudgets], "Lista de Ventas");
+    downloadExcel([headers, ...mappedBudgets], "Lista de ventas");
   }, []);
 
   const {

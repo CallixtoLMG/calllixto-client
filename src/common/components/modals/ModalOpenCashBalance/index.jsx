@@ -1,4 +1,4 @@
-import { ButtonsContainer, FieldsContainer, Flex, Form } from "@/common/components/custom";
+import { ButtonsContainer, FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePickerControlled";
 import { COLORS, ENTITIES, ICONS, RULES } from "@/common/constants";
 import { datePickerNow, getPastDate } from "@/common/utils/dates";
@@ -44,9 +44,10 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
           <Header icon="inbox" content="Abrir caja" />
           <Modal.Content>
             <Form>
-              <Flex $columnGap="15px">
-                <FieldsContainer>
+              <FieldsContainer $columnGap="15px">
+                <FormField flexDirection="row" flex="1">
                   <DatePickerControlled
+                    flex="1"
                     rules={{
                       required: "Campo obligatorio.",
                       validate: {
@@ -56,7 +57,6 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                     }}
                     name="startDate"
                     label="Fecha de inicio"
-                    width="fit-content"
                     showMonthDropdown
                     showYearDropdown
                     showTimeSelect
@@ -72,7 +72,10 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                     alignSelf="end"
                     height="38px"
                   />
+                </FormField>
+                <FormField flexDirection="row" flex="1">
                   <DatePickerControlled
+                    flex="1"
                     name="closeDate"
                     label="Fecha de cierre"
                     width="fit-content"
@@ -97,63 +100,73 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                     alignSelf="end"
                     height="38px"
                   />
-                </FieldsContainer>
-              </Flex>
+                </FormField>
+              </FieldsContainer>
               <FieldsContainer $alignItems="end" $rowGap="10px">
                 {!watchAllMethods &&
-                  <DropdownControlled
-                    height="fit-content"
-                    rules={RULES.REQUIRED}
-                    name="paymentMethods"
-                    label="Método de Pago"
-                    placeholder="Seleccionar métodos"
-                    width="fit-content"
-                    multiple
-                    selection
-                    options={paymentsOptions}
-                    value={watch("paymentMethods")}
-                    optionsMapper={optionsMapper}
-                    onChange={(e, { value }) => setValue("paymentMethods", value)}
-                    renderLabel={(item) => ({
-                      color: item.value.color ?? "grey",
-                      content: item.value.name
-                    })}
-                    required
-                  />
+                  <FormField flex="1">
+                    <DropdownControlled
+                      rules={RULES.REQUIRED}
+                      name="paymentMethods"
+                      label="Método de pago"
+                      placeholder="Seleccionar métodos"
+                      multiple
+                      selection
+                      options={paymentsOptions}
+                      value={watch("paymentMethods")}
+                      optionsMapper={optionsMapper}
+                      onChange={(e, { value }) => setValue("paymentMethods", value)}
+                      renderLabel={(item) => ({
+                        color: item.value.color ?? "grey",
+                        content: item.value.name
+                      })}
+                      required
+                    />
+                  </FormField>
                 }
-                <IconedButtonControlled
-                  width="fit-content"
-                  name="allPaymentMethods"
-                  text="Todos los métodos"
-                  icon={ICONS.PENCIL}
-                  color={COLORS.BLUE}
-                  height="38px"
-                />
+                <FormField flex="1">
+                  <IconedButtonControlled
+                    width="fit-content"
+                    name="allPaymentMethods"
+                    text="Todos los métodos"
+                    icon={ICONS.PENCIL}
+                    color={COLORS.BLUE}
+                    height="38px"
+                  />
+                </FormField>
               </FieldsContainer>
               <FieldsContainer $alignItems="flex-end">
-                <PriceControlled
-                  width="200px"
-                  label="Monto inicial"
-                  name="initialAmount"
-                  required
-                />
+                <FormField flex="1">
+                  <PriceControlled
+                    width="100%"
+                    label="Monto inicial"
+                    name="initialAmount"
+                    required
+                  />
+                </FormField>
                 {showBillsTable && (
                   <>
-                    <PriceField
-                      width="200px"
-                      label="Total billetes"
-                      value={billsTotal}
-                      disabled
-                    />
-                    <IconedButton
-                      text="Actualizar Monto Inicial"
-                      icon={ICONS.DOLLAR}
-                      color={COLORS.BLUE}
-                      onClick={() => setValue("initialAmount", billsTotal)}
-                      disabled={billsTotal === initialAmount}
-                    />
+                    <FormField flex="1">
+                      <PriceField
+                        width="100%"
+                        label="Total billetes"
+                        value={billsTotal}
+                        disabled
+                      />
+                    </FormField>
+                    <FormField flex="1">
+                      <IconedButton
+                        height="38px"
+                        text="Actualizar monto inicial"
+                        icon={ICONS.DOLLAR}
+                        color={COLORS.BLUE}
+                        onClick={() => setValue("initialAmount", billsTotal)}
+                        disabled={billsTotal === initialAmount}
+                      />
+                    </FormField>
                   </>
                 )}
+                <FormField flex="1" />
               </FieldsContainer>
               {showBillsTable && (
                 <BillDetails name="billsDetails" />

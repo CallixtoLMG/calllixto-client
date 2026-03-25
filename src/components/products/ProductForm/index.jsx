@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form, Icon, Message } from "@/common/components/custom";
+import { FieldsContainer, Form, FormField, Icon, Message } from "@/common/components/custom";
 import {
   DropdownControlled,
   IconedButtonControlled,
@@ -103,189 +103,223 @@ const ProductForm = forwardRef(({
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleForm)}>
-        <FieldsContainer $rowGap="5px">
+        <FieldsContainer $rowGap="5px" >
           {view ? (
             <>
-              <TextField width="25%" label="Proveedor" value={product?.supplierName} disabled required />
-              <TextField width="25%" label="Marca" value={product?.brandName} disabled required />
-              <TextField
-                width="250px"
-                label="Id"
-                value={getProductId(product?.id)}
-                iconLabel={`${getSupplierId(product?.id)} ${getBrandId(product?.id)}`}
-                disabled
-                required
-              />
+              <FormField flex="1">
+                <TextField label="Proveedor" value={product?.supplierName} disabled />
+              </FormField>
+              <FormField flex="1">
+                <TextField label="Marca" value={product?.brandName} disabled />
+              </FormField>
+              <FormField flex="1">
+                <TextField
+                  width="50%"
+                  label="Id"
+                  value={getProductId(product?.id)}
+                  iconLabel={`${getSupplierId(product?.id)} ${getBrandId(product?.id)}`}
+                  disabled
+                />
+              </FormField>
             </>
           ) : (
             <>
-              <SearchControlled
-                clearable
-                width="25%"
-                disabled={isUpdating || isLoading}
-                name="supplier"
-                label="Proveedor"
-                placeholder="Suministro Estrella"
-                persistSelection
-                required
-                rules={{
-                  validate: {
-                    required: (value) => !!value?.id || 'Campo requerido.',
-                    activeSupplier: (value) =>
-                      value?.state === SUPPLIER_STATES.ACTIVE.id || 'No es posible usar un proveedor inactivo.',
-                  },
-                }}
-                elements={suppliers}
-                searchFields={['name', 'id']}
-                getResultProps={(supplier) => ({
-                  key: supplier.id,
-                  title: getSupplierSearchTitle(supplier),
-                  description: getSupplierSearchDescription(supplier),
-                  value: supplier,
-                })}
-              />
-              <SearchControlled
-                clearable
-                disabled={isUpdating || isLoading}
-                width="25%"
-                name="brand"
-                label="Marca"
-                placeholder="CallixtoGLM"
-                persistSelection
-                required
-                rules={{
-                  validate: {
-                    required: (value) => !!value?.id || 'Campo requerido.',
-                    activeBrand: (value) =>
-                      value?.state === BRAND_STATES.ACTIVE.id || 'No es posible usar una marca inactiva.',
-                  },
-                }}
-                elements={brands}
-                searchFields={['name', 'id']}
-                getResultProps={(brand) => ({
-                  key: brand.id,
-                  title: getBrandSearchTitle(brand),
-                  description: getBrandSearchDescription(brand),
-                  value: brand,
-                })}
-              />
-              <TextControlled
-                width="250px"
-                name="id"
-                label="Id"
-                required
-                placeholder="A0001"
-                rules={{
-                  required: "Este campo es obligatorio.",
-                  validate: (value) => {
-                    if (blacklist?.includes(value.trim().toUpperCase())) {
-                      return "Este id se encuentra dentro de la lista de productos bloqueados.";
-                    }
-                    return true;
-                  },
-                }}
-                onChange={value => value.toUpperCase()}
-                disabled={isProductDeleted(product?.state)}
-                iconLabel={`${watchSupplier?.id ?? ''} ${watchBrand?.id ?? ''}`}
-              />
+              <FormField flex="1">
+                <SearchControlled
+                  clearable
+                  disabled={isUpdating || isLoading}
+                  name="supplier"
+                  label="Proveedor"
+                  placeholder="Suministro Estrella"
+                  persistSelection
+                  required
+                  rules={{
+                    validate: {
+                      required: (value) => !!value?.id || 'Campo requerido.',
+                      activeSupplier: (value) =>
+                        value?.state === SUPPLIER_STATES.ACTIVE.id || 'No es posible usar un proveedor inactivo.',
+                    },
+                  }}
+                  elements={suppliers}
+                  searchFields={['name', 'id']}
+                  getResultProps={(supplier) => ({
+                    key: supplier.id,
+                    title: getSupplierSearchTitle(supplier),
+                    description: getSupplierSearchDescription(supplier),
+                    value: supplier,
+                  })}
+                />
+              </FormField>
+              <FormField flex="1">
+                <SearchControlled
+                  clearable
+                  disabled={isUpdating || isLoading}
+                  name="brand"
+                  label="Marca"
+                  placeholder="CallixtoGLM"
+                  persistSelection
+                  required
+                  rules={{
+                    validate: {
+                      required: (value) => !!value?.id || 'Campo requerido.',
+                      activeBrand: (value) =>
+                        value?.state === BRAND_STATES.ACTIVE.id || 'No es posible usar una marca inactiva.',
+                    },
+                  }}
+                  elements={brands}
+                  searchFields={['name', 'id']}
+                  getResultProps={(brand) => ({
+                    key: brand.id,
+                    title: getBrandSearchTitle(brand),
+                    description: getBrandSearchDescription(brand),
+                    value: brand,
+                  })}
+                />
+              </FormField>
+              <FormField flex="1">
+                <TextControlled
+                  width="50%"
+                  name="id"
+                  label="Id"
+                  required
+                  placeholder="A0001"
+                  rules={{
+                    required: "Este campo es obligatorio.",
+                    validate: (value) => {
+                      if (blacklist?.includes(value.trim().toUpperCase())) {
+                        return "Este id se encuentra dentro de la lista de productos bloqueados.";
+                      }
+                      return true;
+                    },
+                  }}
+                  onChange={value => value.toUpperCase()}
+                  disabled={isProductDeleted(product?.state)}
+                  iconLabel={`${watchSupplier?.id ?? ''} ${watchBrand?.id ?? ''}`}
+                />
+              </FormField>
             </>
           )}
         </FieldsContainer>
         <FieldsContainer $rowGap="5px" $alignItems="flex-end">
-          <TextControlled
-            width="40%"
-            name="name"
-            label="Nombre"
-            placeholder="Televisor 100”"
-            rules={RULES.REQUIRED}
-            disabled={!isUpdating && view}
-            required
-          />
-          <IconedButtonControlled
-            width="fit-content"
-            name="stockControl"
-            text="Stock habilitado"
-            icon={ICONS.BOXES}
-            color={COLORS.BLUE}
-            disabled={!isUpdating && view}
-          />
-          {watchStockControl && !isUpdating &&
-            <Message opacity={view} height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
-              <Icon name={ICONS.BOXES} /> Stock Total: {product?.stock ?? 0}
-            </Message>
-          }
+          <FormField flex="1">
+            <TextControlled
+              name="name"
+              label="Nombre"
+              placeholder="Televisor 100”"
+              rules={RULES.REQUIRED}
+              disabled={!isUpdating && view}
+              required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flexDirection="row" flex="1">
+            <FormField $maxWidth="fit-content" flex="1" >
+              <IconedButtonControlled
+                name="stockControl"
+                text="Stock habilitado"
+                icon={ICONS.BOXES}
+                color={COLORS.BLUE}
+                disabled={!isUpdating && view}
+              />
+            </FormField>
+            {watchStockControl &&
+              <FormField flex="1">
+                <Message minWidth="max-content" opacity={view} height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
+                  <Icon name={ICONS.BOXES} /> Stock: {product?.stock ?? 0}
+                </Message>
+              </FormField>
+            }
+          </FormField>
+          <FormField flex="1" />
         </FieldsContainer>
         <FieldsContainer $alignItems="end">
-          <PriceControlled
-            width="200px"
-            name="cost"
-            label="Costo"
-            disabled={!isUpdating && view}
-          />
-          <PriceControlled
-            width="200px"
-            name="price"
-            label="Precio"
-            disabled={!isUpdating && view}
-          />
-          <PercentField
-            width="150px"
-            label="Margen"
-            value={calculateMargin(watchPrice, watchCost)}
-            disabled={!isUpdating && view}
-            onChange={(newMargin) => {
-              if (!newMargin || !watchCost) {
-                return;
-              }
-              const newPrice = calculatePriceFromMargin(watchCost, newMargin);
-              methods.setValue('price', newPrice);
-            }}
-            maxValue={1000000}
-          />
-          <IconedButtonControlled
-            width="fit-content"
-            name="editablePrice"
-            text="Precio Editable"
-            icon={ICONS.PENCIL}
-            color={COLORS.BLUE}
-            disabled={!isUpdating && view}
-          />
-          <IconedButtonControlled
-            width="fit-content"
-            name="fractionConfig.active"
-            text="Producto Fraccionable"
-            icon={ICONS.CUT}
-            disabled={!isUpdating && view}
-            color={COLORS.BLUE}
-          />
-          <DropdownControlled
-            width="200px"
-            name="fractionConfig.unit"
-            label="Unidad de Medida"
-            options={Object.values(MEASSURE_UNITS)}
-            defaultValue={Object.values(MEASSURE_UNITS)[0].value}
-            disabled={(!isUpdating && view) || !watchFractionable}
-          />
+          <FormField flex="1">
+            <PriceControlled
+              name="cost"
+              label="Costo"
+              disabled={!isUpdating && view}
+            />
+          </FormField>
+          <FormField flex="1">
+            <PriceControlled
+              name="price"
+              label="Precio"
+              disabled={!isUpdating && view}
+            />
+          </FormField>
+          <FormField $alignItems="end" flexDirection="row" flex="1">
+            <FormField flex="1">
+              <PercentField
+                width="50%"
+                label="Margen"
+                value={calculateMargin(watchPrice, watchCost)}
+                disabled={!isUpdating && view}
+                onChange={(newMargin) => {
+                  if (!newMargin || !watchCost) {
+                    return;
+                  }
+                  const newPrice = calculatePriceFromMargin(watchCost, newMargin);
+                  methods.setValue('price', newPrice);
+                }}
+                maxValue={1000000}
+              />
+            </FormField>
+          </FormField>
         </FieldsContainer>
         <FieldsContainer>
-          <DropdownControlled
-            disabled={!isUpdating && view}
-            width={(!isUpdating && view) ? "fit-content" : "40%"}
-            name="tags"
-            label="Etiquetas"
-            placeholder="Selecciona etiquetas"
-            multiple
-            clearable={isUpdating && !view}
-            icon={(!isUpdating && view) ? null : undefined}
-            search={isUpdating && !view}
-            selection
-            optionsMapper={optionsMapper}
-            options={Object.values(tagsOptions)}
-            renderLabel={(item) => ({
-              color: item.value.color,
-              content: item.value.name,
-            })}
-          />
+          <FormField flex="1" >
+            <DropdownControlled
+              name="fractionConfig.unit"
+              label="Unidad de medida"
+              options={Object.values(MEASSURE_UNITS)}
+              defaultValue={Object.values(MEASSURE_UNITS)[0].value}
+              disabled={(!isUpdating && view || !watchFractionable)}
+            />
+          </FormField>
+          <FormField flexDirection="row" flex="1">
+            <FormField $maxWidth="max-content" $alignItems="end" flexDirection="row" flex="1">
+              <IconedButtonControlled
+                name="fractionConfig.active"
+                text="Producto fraccionable"
+                icon={ICONS.CUT}
+                disabled={!isUpdating && view}
+                color={COLORS.BLUE}
+              />
+            </FormField>
+            <FormField $maxWidth="max-content" $alignItems="end" flexDirection="row" flex="1">
+              <IconedButtonControlled
+                name="editablePrice"
+                text="Precio editable"
+                icon={ICONS.PENCIL}
+                color={COLORS.BLUE}
+                disabled={!isUpdating && view}
+              />
+            </FormField>
+          </FormField>
+          <FormField flex="1" />
+        </FieldsContainer>
+        <FieldsContainer>
+          <FormField flex="1">
+            <DropdownControlled
+              disabled={!isUpdating && view}
+              name="tags"
+              label="Etiquetas"
+              placeholder="Selecciona etiquetas"
+              multiple
+              clearable={isUpdating && !view}
+              icon={(!isUpdating && view) ? null : undefined}
+              search={isUpdating && !view}
+              selection
+              optionsMapper={optionsMapper}
+              options={Object.values(tagsOptions)}
+              renderLabel={(item) => ({
+                color: item.value.color,
+                content: item.value.name,
+              })}
+            />
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
+
         </FieldsContainer>
         <TextAreaControlled
           name="comments"
@@ -304,7 +338,7 @@ const ProductForm = forwardRef(({
           />
         )}
       </Form>
-    </FormProvider>
+    </FormProvider >
   );
 });
 

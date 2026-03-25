@@ -130,7 +130,7 @@ export const ContactControlled = () => {
   };
 
   return (
-    <FieldsContainer $columnGap="50px">
+    <FieldsContainer $columnGap="15px">
       <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={

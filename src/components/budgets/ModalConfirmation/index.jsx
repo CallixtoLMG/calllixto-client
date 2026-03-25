@@ -62,7 +62,7 @@ const ModalConfirmation = ({
                   name="pickUpInStore"
                   buttons={[
                     { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
-                    { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
+                    { text: 'Enviar a dirección', icon: ICONS.TRUCK, value: false },
                   ]}
                 />
               </Flex>
@@ -71,13 +71,13 @@ const ModalConfirmation = ({
               <FlexColumn $rowGap="15px">
                 <FieldsContainer>
                   <TextField
-                    flex="2"
+                    flex="7"
                     label="Dirección"
                     disabled
                     value={!watchPickUpInStore ? `${customer?.addresses?.[0]?.ref ? `${customer?.addresses?.[0]?.ref}:` : "(Sin referencia)"} ${customer?.addresses?.[0]?.address}` : PICK_UP_IN_STORE}
                   />
                   <TextField
-                    flex="1"
+                    flex="4"
                     label="Teléfono"
                     disabled
                     value={`${customer?.phoneNumbers?.[0]?.ref ? `${customer?.phoneNumbers?.[0]?.ref}:` : "(Sin referencia)"} ${getFormatedPhone(customer?.phoneNumbers?.[0])}`}

@@ -18,7 +18,7 @@ export const DropdownControlled = ({
   optionsMapper,
   required,
   icon,
-  textMaxWidth
+  textMaxWidth,
 }) => {
   const { formState: { errors } } = useFormContext();
 

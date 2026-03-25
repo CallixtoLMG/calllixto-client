@@ -4,12 +4,12 @@ import { Controller } from "react-hook-form";
 import { ButtonGroup } from "semantic-ui-react";
 import { FormField } from "../../custom";
 
-export const GroupedButtonsControlled = ({ name, label, width, buttons, color }) => {
+export const GroupedButtonsControlled = ({ name, label, width, buttons, color, $alignItems }) => {
   return (
     <Controller
       name={name}
       render={({ field: { onChange, value: formValue, ...rest } }) => (
-        <FormField $width={width} label={label} control={ButtonGroup}>
+        <FormField $alignItems={$alignItems} $width={width} label={label} control={ButtonGroup}>
           <ButtonGroup size={SIZES.SMALL}>
             {buttons?.map(({ text, icon, value }) => (
               <IconedButton

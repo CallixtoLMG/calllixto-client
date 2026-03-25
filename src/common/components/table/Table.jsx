@@ -363,7 +363,7 @@ const CustomTable = ({
         {onDownloadExcel && (
           <Flex width="100%" $justifyContent="flex-end" >
             <IconedButton
-              text="Descargar Excel"
+              text="Descargar excel"
               icon={ICONS.FILE_EXCEL}
               onClick={() => onDownloadExcel(filteredElements)}
             />

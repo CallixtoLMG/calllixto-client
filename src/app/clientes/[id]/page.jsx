@@ -1,6 +1,6 @@
 "use client";
 import { useDeleteCustomer, useEditCustomer, useGetCustomer, useSetCustomerState } from "@/api/customers";
-import { Message, MessageHeader } from "@/common/components/custom";
+import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
@@ -211,10 +211,16 @@ const Customer = ({ params }) => {
     <Loader active={isLoading || !customer}>
       {!isItemInactive(customer?.state) && toggleButton}
       {isItemInactive(customer?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{customer.inactiveReason}</p>
-        </Message>
+        <FieldsContainer>
+          <FormField flex="1">
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{customer.inactiveReason}</p>
+            </Message>
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
+        </FieldsContainer>
       )}
       <CustomerForm
         ref={formRef}

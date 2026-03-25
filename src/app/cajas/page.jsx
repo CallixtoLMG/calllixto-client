@@ -52,7 +52,7 @@ const CashBalances = () => {
 
   const handleDownloadExcel = useCallback((elements) => {
     if (!elements.length) return;
-    const headers = ['ID', 'Estado', 'Fecha de inicio', 'Fecha de cierre', 'Métodos de pago', 'Monto inicial', 'Monto actual', 'Desgloce de Billetes (Inicio)', 'Desgloce de Billetes (Cierre)', 'Comentarios'];
+    const headers = ['ID', 'Estado', 'Fecha de inicio', 'Fecha de cierre', 'Métodos de pago', 'Monto inicial', 'Monto actual', 'Desgloce de billetes (Inicio)', 'Desgloce de billetes (Cierre)', 'Comentarios'];
     const mappedCashBalances = elements.map(cashBalance => {
       const cashBalanceState = CASH_BALANCE_STATES[cashBalance.state]?.singularTitle || cashBalance.state;
 
@@ -77,7 +77,7 @@ const CashBalances = () => {
         cashBalance.comments,
       ];
     });
-    downloadExcel([headers, ...mappedCashBalances], "Lista de Cajas");
+    downloadExcel([headers, ...mappedCashBalances], "Lista de cajas");
   }, []);
 
   useEffect(() => {

@@ -65,6 +65,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
               options={[SELECT_ALL_OPTION, ...paymentOptions]}
               afterChange={onSubmit}
               textMaxWidth="fit-content"
+              height="35px"
             />
           </Filters>
         </Form>

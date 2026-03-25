@@ -31,12 +31,9 @@ const CreateUser = () => {
         push(PAGES.USERS.SHOW(response.user.username))
         toast.success('Usuario creado!');
       } else {
-        toast.error(response.error.message);
+        toast.error(response.error.name === "UsernameExistsException" ? "El usuario ya existe" : response.message);
       }
     },
-    onError: (error) => {
-      toast.error(error.message);
-    }
   });
 
   return (

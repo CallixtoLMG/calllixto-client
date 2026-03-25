@@ -1,6 +1,6 @@
 import { useEditCustomer } from "@/api/customers";
 import { IconedButton } from "@/common/components/buttons";
-import { ButtonsContainer, FieldsContainer, Form } from "@/common/components/custom";
+import { ButtonsContainer, FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { NumberControlled, TextControlled, TextField } from "@/common/components/form";
 import { COLORS, ICONS, RULES } from "@/common/constants";
 import { useEffect, useRef, useState } from "react";
@@ -97,9 +97,12 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   value={customer?.name}
                   disabled
                 />
+                <FormField flex="1" />
+                <FormField flex="1" />
               </FieldsContainer>
               <FieldsContainer>
                 <TextControlled
+                  flex="1"
                   width="30%"
                   name="refA"
                   rules={RULES.REQUIRED}
@@ -110,15 +113,17 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   iconLabel
                 />
                 <TextControlled
+                  flex="1"
                   width="50%"
                   name="address"
                   rules={RULES.REQUIRED}
                   label="Dirección"
                 />
+                <FormField flex="1" />
               </FieldsContainer>
               <FieldsContainer>
                 <TextControlled
-                  width="30%"
+                  flex="1"
                   name="refP"
                   rules={RULES.REQUIRED}
                   label="Referencia"
@@ -127,7 +132,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   iconLabel
                 />
                 <NumberControlled
-                  width="130px"
+                  flex="1"
                   label="Código de área"
                   placeholder="Ej: 351"
                   name="areaCode"
@@ -143,7 +148,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
                   normalMode
                 />
                 <NumberControlled
-                  width="150px"
+                  flex="1"
                   label="Número de teléfono"
                   name="number"
                   placeholder="Ej: 12345678"
@@ -163,7 +168,7 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
           </FormProvider>
         </Modal.Content>
         <Modal.Actions>
-          <ButtonsContainer width="100%">
+          <ButtonsContainer >
             <IconedButton
               text="Cancelar"
               icon={ICONS.CANCEL}

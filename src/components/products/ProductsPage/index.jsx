@@ -119,7 +119,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
     const actions = [
       <IconedButton
         key={2}
-        text="Descargar Códigos"
+        text="Descargar códigos"
         icon={ICONS.BARCODE}
         onClick={handlePrint}
       />
@@ -129,7 +129,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
       actions.unshift(
         <IconedButton
           key={1}
-          text="Eliminar Productos"
+          text="Eliminar productos"
           icon={ICONS.TRASH}
           color={COLORS.RED}
           onClick={() => setShowConfirmDeleteModal(true)}

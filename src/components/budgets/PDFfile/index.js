@@ -17,10 +17,10 @@ import {
   Title
 } from "./styles";
 
-const Field = ({ label, value, ...rest }) => (
-  <Flex $columnGap="5px" $minWidth="300px" {...rest}>
-    <Title as="h4" width="100px" $textAlign="right" $slim>{label} |</Title>
-    <Title as="h4">{value?.toUpperCase() || '-'}</Title>
+const Field = ({ label, value, width = "80px", $justifyContent, ...rest }) => (
+  <Flex $columnGap="5px" $minWidth="300px" $justifyContent={$justifyContent} {...rest}>
+    <Title as="h4" width={width} $textAlign="left" $slim>{label} </Title>
+    <Title as="h4">| {value?.toUpperCase() || '-'}</Title>
   </Flex>
 );
 
@@ -72,11 +72,11 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
       <Box>
         <Flex $alignItems="center" $marginBottom="15px" $justifyContent="space-between">
           <FlexColumn width="150px">
-            <Title as="h3" $cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
+            <Title as="h3" $textAlign="left" $alignSelf="left" $cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
             {clientPdf && (
               <>
-                <Title as="h4">{client?.name?.toUpperCase() || "Maderera Las Tapias"}</Title>
-                <Title as="h4">CUIT: {client?.cuil?.toUpperCase() || "CUIT"}</Title>
+                <Title $textAlign="left" as="h4">{client?.name?.toUpperCase() || "Maderera Las Tapias"}</Title>
+                <Title $textAlign="left" $alignSelf="left" as="h4">CUIT: {client?.cuil?.toUpperCase() || "CUIT"}</Title>
                 <Title as="h4">{client?.taxCondition || "Condición IVA"}</Title>
               </>
             )}
@@ -99,23 +99,23 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         </Flex>
         <Divider />
         <SectionContainer $alignItems="left" $flexDirection="column" $minHeight="50px">
-          <Flex>
+          <Flex $justifyContent="space-between">
             <Field label="Vendedor/a" value={budget?.createdBy} />
-            <Field label="Fecha" value={getFormatedDate()} />
+            <Field $justifyContent="flex-end" label="Fecha" value={getFormatedDate()} />
           </Flex>
-          <Flex>
+          <Flex $justifyContent="space-between">
             <Field label="Teléfonos" value={client?.phoneNumbers?.map(getFormatedPhone).join(' | ')} />
-            <Field label="Válido hasta" value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })} />
+            <Field $justifyContent="flex-end" label="Válido hasta" value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })} />
           </Flex>
         </SectionContainer>
         <Divider />
         <SectionContainer $alignItems="left" $flexDirection="column" $minHeight="50px">
           <Flex >
-            <Field width="100%" label="Cliente" value={(get(budget, "customer.name", ""))} />
+            <Field label="Cliente" value={(get(budget, "customer.name", ""))} />
           </Flex>
-          <Flex>
-            <Field flex="1" width="fit-content" label="Dirección" value={selectedContact?.address} />
-            <Field width="fit-content" label="Teléfono" value={selectedContact?.phone} />
+          <Flex $justifyContent="space-between">
+            <Field flex="1" label="Dirección" value={selectedContact?.address} />
+            <Field width="fit-content" $justifyContent="flex-end" label="Teléfono" value={selectedContact?.phone} />
           </Flex>
         </SectionContainer>
         <Divider />
@@ -148,13 +148,13 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
         {!dispatchPdf &&
           <>
             <DataContainer width="100%">
-              <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Detalles de Pago</Title>
+              <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Detalles de pago</Title>
               <Divider />
               <TotalList readOnly items={TOTAL_LIST_ITEMS} />
             </DataContainer>
             {!!dolarExchangeRate && (
               <DataContainer width="100%">
-                <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Cotización en USD a Tasa de Cambio: <b>{getFormatedPrice(dolarExchangeRate)}</b></Title>
+                <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Cotización en USD a tasa de cambio: <b>{getFormatedPrice(dolarExchangeRate)}</b></Title>
                 <Divider />
                 <Title as="h4" $alignSelf="left" width="fit-content" $minHeight="30px">
                   <PriceLabel value={total / parseInt(dolarExchangeRate)} />
@@ -162,7 +162,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
               </DataContainer>
             )}
             <DataContainer width="100%">
-              <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Formas de Pago</Title>
+              <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Formas de pago</Title>
               <Divider />
               <Title as="h4" $alignSelf="left" $textAlignLast="left" $minHeight="30px">
                 {budget?.paymentMethods?.join(" | ")}

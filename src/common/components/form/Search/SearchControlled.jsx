@@ -8,6 +8,7 @@ export const SearchControlled = ({
   placeholder,
   onAfterChange,
   clearAfterSelect,
+  externalError,
   ...rest
 }) => {
   const {
@@ -22,10 +23,13 @@ export const SearchControlled = ({
         <SearchField
           {...rest}
           label={label}
-          error={errors?.[name] && {
-            content: errors[name].message,
-            pointing: 'above',
-          }}
+          error={
+            externalError ||
+            (errors?.[name] && {
+              content: errors[name].message,
+              pointing: 'above',
+            })
+          }
           value={value}
           onAfterChange={onAfterChange}
           onSelect={(val) => {

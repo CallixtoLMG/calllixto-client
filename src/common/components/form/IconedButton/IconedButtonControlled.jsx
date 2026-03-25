@@ -12,6 +12,7 @@ export const IconedButtonControlled = forwardRef(({
   text,
   disabled,
   color,
+  $maxWidth
 }, ref) => {
   return (
     <Controller
@@ -19,6 +20,7 @@ export const IconedButtonControlled = forwardRef(({
       render={({ field: { value, onChange, ...rest } }) => (
         <FormField
           {...rest}
+          $maxWidth={$maxWidth}
           $width={width}
           height={height}
           label={label}
