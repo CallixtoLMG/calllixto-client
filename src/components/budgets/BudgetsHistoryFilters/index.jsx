@@ -91,17 +91,20 @@ const BudgetsHistoryFilter = ({
                 disabled={isLoading}
                 isLoading={isLoading}
                 height="38px"
-                text="Pedir datos"
+                text="Pedir datos de ventas"
                 icon={ICONS.SEARCH}
                 color={COLORS.BLUE}
                 onClick={handleSearch}
+                iconOnly
               />
               <IconedButton
                 height="38px"
-                text="Limpiar"
+                text="Limpiar selección"
                 icon={ICONS.UNDO}
+                color={COLORS.ORANGE}
                 onClick={handleClear}
                 disabled={isLoading}
+                iconOnly
               />
             </Flex>
           </Flex>

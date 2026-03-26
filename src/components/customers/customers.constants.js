@@ -21,7 +21,7 @@ export const HEADERS = [
     id: 2,
     title: 'Nombre',
     align: 'left',
-    width: 8,
+    width: 5,
     key: "name",
     sortable: true,
     value: (customer) => {
@@ -45,14 +45,14 @@ export const HEADERS = [
     title: "Direccion",
     key: "addresses",
     sortable: true,
-    width: 5,
+    width: 4,
     align: "left",
     value: (customer) => {
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(customer.addresses || []);
       return (
         <Flex $justifyContent="space-between">
           {primaryAddress}
-          {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
+          {additionalAddresses && <AddressesTooltip lowTooltip addresses={additionalAddresses} />}
         </Flex>
       );
     },
@@ -61,13 +61,14 @@ export const HEADERS = [
   {
     id: 4,
     title: "Teléfono",
-    width: 3,
+    width: 1,
+    whiteSpace:"nowrap",
     value: (customer) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(customer.phoneNumbers);
       return (
-        <Flex $justifyContent="space-between">
+        <Flex $width="fit-content" $justifyContent="space-between">
           {primaryPhone}
-          {additionalPhones && <PhonesTooltip phones={additionalPhones} />}
+          {additionalPhones && <PhonesTooltip lowTooltip phones={additionalPhones} />}
         </Flex>
       );
     }

@@ -273,6 +273,8 @@ export const ICONS = {
   MONEY_BILL_ALTERNATE: "money bill alternate",
   MINUS_SQUARE: "minus square",
   PLUS_SQUARE: "plus square",
+  REDO: "redo",
+  MINUS: "minus",
 };
 
 export const ALL = "all";

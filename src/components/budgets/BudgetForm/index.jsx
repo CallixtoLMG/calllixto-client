@@ -560,7 +560,7 @@ const BudgetForm = ({
             <GroupedButtonsControlled
               $alignItems="self-end"
               name="pickUpInStore"
-              width="350px"
+              width="fit-content"
               color={COLORS.BLUE}
               buttons={[
                 { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
@@ -785,7 +785,7 @@ const BudgetForm = ({
                 <FormField flex="1" label="Métodos de pago" control={Input} height="auto">
                   <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                     <Button
-                      $paddingLeft="18px"
+                      padding="0 18px"
                       width="fit-content"
                       type="button"
                       basic={value.length !== paymentMethods?.length}
@@ -803,7 +803,7 @@ const BudgetForm = ({
                     <VerticalDivider />
                     {paymentMethods?.map(({ key, text, value: methodValue }) => (
                       <Button
-                        $paddingLeft="18px"
+                        padding="0 18px"
                         width="fit-content"
                         key={key}
                         basic={!value.includes(methodValue)}

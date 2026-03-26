@@ -1,6 +1,6 @@
 import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
-import { Button, ButtonsContainer, FieldsContainer, Flex, Form, FormField } from "@/common/components/custom";
+import { ButtonsContainer, FieldsContainer, Flex, Form, FormField } from "@/common/components/custom";
 import { DropdownField, PriceField, TextAreaField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { TotalList } from "@/common/components/table";
@@ -129,19 +129,23 @@ export const ModalAddPayment = ({
                   onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
                 />
               </FormField>
-              <Button
-                padding="3px 18px 3px 40px"
-                size={SIZES.SMALL}
-                content="Completar"
-                icon={ICONS.CHECK}
-                labelPosition="left"
-                color={COLORS.BLUE}
-                type="button"
-                onClick={() => setPayment({ ...payment, amount: parseFloat(totalPending) })}
-                disabled={isTotalCovered || isLoading}
-                width="fit-content"
-                $alignSelf="end"
+              <IconedButton
                 height="38px"
+                size={SIZES.SMALL}
+                text={payment.amount ? "Limpiar monto" : "Completar monto"}
+                icon={payment.amount ? ICONS.MINUS : ICONS.ADD}
+                labelPosition="left"
+                color={payment.amount ? COLORS.ORANGE : COLORS.BLUE}
+                type="button"
+                onClick={() => {
+                  setPayment({
+                    ...payment,
+                    amount: payment.amount ? '' : parseFloat(totalPending)
+                  });
+                  setExceedAmountError(false);
+                }}
+                disabled={isTotalCovered}
+                iconOnly
               />
             </FieldsContainer>
             <FieldsContainer as={Form}>

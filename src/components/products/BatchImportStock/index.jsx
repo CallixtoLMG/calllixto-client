@@ -308,6 +308,7 @@ export const BatchImportStock = ({
         as={BatchImportIcon}
         onClick={handleOpenFile}
         type="button"
+        $iconOnly
       >
         <Icon
           name={importSettings.icon}

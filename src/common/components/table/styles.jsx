@@ -110,6 +110,7 @@ const LinkCell = styled(STable.Cell)`
   padding: 2px 7px!important;
   cursor: pointer;
   position: relative;
+  white-space: ${({ whiteSpace }) => `${whiteSpace}!important`};
 
   &:hover ${ActionsContainer} {
     opacity: 0.8;

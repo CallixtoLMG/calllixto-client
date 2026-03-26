@@ -48,17 +48,32 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel }) 
             entity={ENTITIES.EXPENSES}
           >
             <DropdownControlled
-              width="200px"
+              minWidth="150px"
+              width="min-content"
               name="state"
               label="Estado"
               options={EXPENSES_STATE_OPTIONS}
               value={SELECT_ALL_OPTION.state}
               afterChange={onSubmit}
             />
-            <TextControlled name="id" label="Id" placeholder="A0004" width="100px" />
-            <TextControlled name="name" label="Nombre" placeholder="Netflix" width="250px" />
+            <TextControlled
+              name="id"
+              label="Id"
+              placeholder="A0004"
+              width="8vw"
+              minWidth="100px"
+            />
+            <TextControlled
+              name="name"
+              label="Nombre"
+              placeholder="Netflix"
+              width="20vw"
+              minWidth="200px"
+            />
             <DropdownControlled
-              width="200px"
+              minWidth="150px"
+              width="min-content"
+              maxWidth="300px"
               name="categories"
               label="Categorias"
               options={categoryOptions}

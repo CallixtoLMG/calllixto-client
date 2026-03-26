@@ -182,7 +182,7 @@ const Customer = ({ params }) => {
           text: isItemInactive(customer.state) ? "Activar" : "Desactivar",
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction || isEditPending,
-          width: "fit-content",
+          iconOnly: true
         },
         {
           id: 2,
@@ -194,6 +194,8 @@ const Customer = ({ params }) => {
           basic: true,
           loading: activeAction === DELETE,
           disabled: customer.hasBudgets || !!activeAction || isEditPending,
+          iconOnly: true,
+          popupPosition:"bottom left"
         },
       ];
 

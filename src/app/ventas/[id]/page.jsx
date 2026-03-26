@@ -152,7 +152,8 @@ const Budget = ({ params }) => {
           icon: ICONS.DOWNLOAD,
           color: COLORS.BLUE,
           onClick: () => setIsModalPDFOpen(true),
-          text: 'PDF'
+          text: 'Imprimir venta',
+          iconOnly:true,
         },
         hasValidSendOptions && {
           id: 2,
@@ -166,16 +167,17 @@ const Budget = ({ params }) => {
                 labeled
                 button
                 className='icon blue'
-                $paddingLeft="45px">
-                <Dropdown.Menu>
+                $paddingLeft="45px"
+                >
+                <Dropdown.Menu direction="left" >
                   {sendButtons.map(({ text, iconName, subOptions }) => (
                     <Flex key={iconName}>
                       {subOptions.length > 0 && (
-                        <DropdownOption text={text} pointing="left" className="link item">
-                          <DropdownMenu icon={iconName}>
+                        <DropdownOption reverse direction="left" text={text} pointing="left" className="link item">
+                          <DropdownMenu margin="0 10px 0 0" icon={iconName}>
                             {subOptions.map(({ key, href, text, iconName, color }) => (
                               <Flex key={key}>
-                                <DropdownItem key={key} as='a' href={href} target="_blank">
+                                <DropdownItem  key={key} as='a' href={href} target="_blank">
                                   <Icon name={iconName} color={color} /> {text}
                                 </DropdownItem>
                               </Flex>
@@ -195,15 +197,17 @@ const Budget = ({ params }) => {
           icon: ICONS.COPY,
           color: COLORS.GREEN,
           onClick: () => { push(PAGES.BUDGETS.CLONE(budget.id)) },
-          text: 'Clonar'
+          text: 'Clonar venta',
+          iconOnly:true,
         },
         budget.state === BUDGET_STATES.CONFIRMED.id && {
           id: 4,
           icon: ICONS.BAN,
           color: COLORS.RED,
           onClick: () => setIsModalCancelOpen(true),
-          text: 'Anular',
-          basic: true
+          text: 'Anular venta',
+          basic: true,
+          iconOnly:true,
         },
       ].filter(Boolean);
       setActions(actions);
@@ -302,6 +306,7 @@ const Budget = ({ params }) => {
             icon={ICONS.CHECK}
             color={COLORS.GREEN}
             onClick={handleConfirm}
+            width="fit-content"
           />
         </Flex>
       )}

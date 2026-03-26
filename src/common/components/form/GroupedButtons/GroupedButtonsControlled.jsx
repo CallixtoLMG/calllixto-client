@@ -5,6 +5,7 @@ import { ButtonGroup } from "semantic-ui-react";
 import { FormField } from "../../custom";
 
 export const GroupedButtonsControlled = ({ name, label, width, buttons, color, $alignItems }) => {
+  const buttonWidth = width;
   return (
     <Controller
       name={name}
@@ -15,6 +16,7 @@ export const GroupedButtonsControlled = ({ name, label, width, buttons, color, $
               <IconedButton
                 {...rest}
                 key={value}
+                width={buttonWidth}
                 color={color}
                 text={text}
                 icon={icon}

@@ -1,5 +1,6 @@
 import { useGetSetting } from "@/api/settings";
-import { Button, FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "@/common/components/custom";
+import { IconedButton } from "@/common/components/buttons";
+import { FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "@/common/components/custom";
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { Table, TotalList } from "@/common/components/table";
@@ -151,7 +152,7 @@ const CreateBudgetPayments = ({
                   placeholder="16-11-2025"
                   control={DatePicker}>
                 </FormField>
-                <FormField  flex="1">
+                <FormField flex="1">
                   <DropdownField
                     label="Método de pago"
                     selection
@@ -163,31 +164,52 @@ const CreateBudgetPayments = ({
                     required
                   />
                 </FormField>
-                <FormField  flex="1">
-                  <PriceField
-                    key={`price-${payment.method}-${payment.date?.getTime()}`}
-                    placeholder="10000"
-                    required
-                    label="Monto"
-                    value={payment.amount}
-                    onChange={(value) => {
-                      setPayment({ ...payment, amount: value ?? 0 });
-                      setExceedAmountError(false);
-                    }}
-                    disabled={isTotalCovered}
-                    error={
-                      showErrors && !payment.amount
-                        ? RULES.REQUIRED.required
-                        : exceedAmountError
-                          ? "El monto no puede superar el total pendiente."
-                          : undefined
-                    }
-                    onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
-                  />
+                <FormField flexDirection="row" $alignItems="end" flex="1">
+                  <FormField flex="1">
+                    <PriceField
+                      key={`price-${payment.method}-${payment.date?.getTime()}`}
+                      placeholder="10000"
+                      required
+                      label="Monto"
+                      value={payment.amount}
+                      onChange={(value) => {
+                        setPayment({ ...payment, amount: value ?? 0 });
+                        setExceedAmountError(false);
+                      }}
+                      disabled={isTotalCovered}
+                      error={
+                        showErrors && !payment.amount
+                          ? RULES.REQUIRED.required
+                          : exceedAmountError
+                            ? "El monto no puede superar el total pendiente."
+                            : undefined
+                      }
+                      onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
+                    />
+                  </FormField>
+                  <FormField $maxWidth="max-content" flex="1">
+                    <IconedButton
+                      height="38px"
+                      size={SIZES.SMALL}
+                      text={payment.amount ? "Limpiar monto" : "Completar monto"}
+                      icon={payment.amount ? ICONS.MINUS : ICONS.ADD}
+                      labelPosition="left"
+                      color={payment.amount ? COLORS.ORANGE : COLORS.BLUE}
+                      type="button"
+                      onClick={() => {
+                        setPayment({
+                          ...payment,
+                          amount: payment.amount ? '' : parseFloat(totalPending)
+                        });
+                        setExceedAmountError(false);
+                      }}
+                      disabled={isTotalCovered}
+                      iconOnly
+                    />
+                  </FormField>
                 </FormField>
               </FieldsContainer>
               <FieldsContainer $rowGap="15px">
-
                 <TextField
                   flex="1"
                   label="Comentarios"
@@ -199,34 +221,20 @@ const CreateBudgetPayments = ({
                   }}
                   onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
                 />
-                <FormField $width="fit-content">
-                  <FlexColumn $rowGap="5px">
-                    <Button
-                      padding="3px 18px 3px 40px"
-                      size={SIZES.SMALL}
-                      content="Completar"
-                      icon={ICONS.CHECK}
-                      labelPosition="left"
-                      color={COLORS.BLUE}
-                      type="button"
-                      onClick={() => {
-                        setPayment({ ...payment, amount: parseFloat(totalPending) });
-                      }}
-                      disabled={isTotalCovered}
-                      width="fit-content"
-                    />
-                    <Button
-                      size={SIZES.SMALL}
-                      icon={ICONS.ADD}
-                      content="Agregar"
-                      labelPosition="left"
-                      color={COLORS.GREEN}
-                      type="button"
-                      onClick={handleAddPayment}
-                      disabled={isTotalCovered}
-                      width="100%"
-                    />
-                  </FlexColumn>
+                <FormField $alignSelf="self-end" $width="fit-content">
+                  <IconedButton
+                    $alignSelf="end"
+                    size={SIZES.SMALL}
+                    icon={ICONS.ADD}
+                    text="Agregar detalle de pago"
+                    labelPosition="left"
+                    color={COLORS.GREEN}
+                    height="38px"
+                    type="button"
+                    onClick={handleAddPayment}
+                    disabled={isTotalCovered}
+                    iconOnly
+                  />
                 </FormField>
               </FieldsContainer>
             </>

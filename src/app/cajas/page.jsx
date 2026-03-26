@@ -47,7 +47,7 @@ const CashBalances = () => {
   });
 
   const paymentMethodOptions = useMemo(() => {
-    return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
+    return mapToDropdownOptions(paymentMethods?.paymentMethods || [], COLORS.BLUE);
   }, [paymentMethods]);
 
   const handleDownloadExcel = useCallback((elements) => {

@@ -17,16 +17,16 @@ export const USER_COLUMNS = [
     title: "Usuario",
     key: "username",
     sortable: true,
-    width: 1,
+    width: 2,
     align: "left",
     value: (user) =>
       <Flex $justifyContent="space-between">
         <>
-          < OverflowWrapper position="top left" maxWidth="15vw" popupContent={user.username} >
+          < OverflowWrapper position="top left" maxWidth="23vw" popupContent={user.username} >
             {user.username}
           </OverflowWrapper >
         </>
-        {user.comments && <CommentTooltip comment={user.comments} />}
+        {user.comments && <CommentTooltip lowTooltip comment={user.comments} />}
       </Flex>,
     sortValue: (user) => user.username?.toLowerCase() ?? ""
 
@@ -66,6 +66,7 @@ export const USER_COLUMNS = [
     id: 4,
     title: "Teléfono",
     width: 1,
+    whiteSpace:"nowrap",
     value: (user) => getFormatedPhone(user.phoneNumber)
   },
   {

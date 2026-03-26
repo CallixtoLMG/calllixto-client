@@ -1,4 +1,5 @@
-import { Button, FieldsContainer, Flex, FlexColumn, FormField, Icon, Message } from "@/common/components/custom";
+import { IconedButton } from "@/common/components/buttons";
+import { FieldsContainer, Flex, FlexColumn, FormField, Icon, Message } from "@/common/components/custom";
 import { DropdownControlled, NumberField, TextControlled, TextField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { ModalAction } from "@/common/components/modals";
@@ -133,28 +134,32 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         <Flex $justifyContent="space-between">
           <Header center>Movimientos de stock</Header>
           <Flex $columnGap="15px">
-            <Button
+            <IconedButton
               labelPosition="left"
               icon={ICONS.ARROW_DOWN}
               color={COLORS.GREEN}
-              content="Ingreso"
+              text="Ingreso de stock"
               disabled={isLoading}
               onClick={() => {
                 setStock(EMPTY_STOCK());
                 setModalMode(STOCK_MODAL_MODES.ADD);
                 setShowModal(true);
-              }} />
-            <Button
+              }}
+              iconOnly
+              />
+            <IconedButton
               labelPosition="left"
               icon={ICONS.ARROW_UP}
               color={COLORS.RED}
-              content="Egreso"
+              text="Egreso de stock"
               disabled={isLoading}
               onClick={() => {
                 setStock(EMPTY_STOCK());
                 setModalMode(STOCK_MODAL_MODES.OUT);
                 setShowModal(true);
-              }} />
+              }} 
+              iconOnly
+              />
             <Message padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
               <Icon name={ICONS.BOXES} /> Stock: {product?.stock ?? 0}
             </Message>

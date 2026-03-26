@@ -61,11 +61,12 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       sortable: true,
       align: "left",
       width: 2,
+      whiteSpace:"nowrap",
       value: (cashBalance) => (
-        <Flex $justifyContent="space-between">
+        <Flex $columnGap="7px" $justifyContent="space-between">
           {getFormatedDate(cashBalance.startDate, DATE_FORMATS.DATE_WITH_TIME)}
-          <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
-            {cashBalance.comments && <CommentTooltip comment={cashBalance.comments} />}
+          <Flex $alignItems="center" $justifyContent="flex-end">
+            {cashBalance.comments && <CommentTooltip lowTooltip comment={cashBalance.comments} />}
           </Flex>
         </Flex>
       ),
@@ -118,6 +119,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       id: 6,
       width: 2,
       title: "Fecha cierre",
+      whiteSpace:"nowrap",
       key: "closeDate",
       sortable: true,
       align: "left",
@@ -218,6 +220,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
     title: 'Fecha',
     key: 'date',
     width: 3,
+    whiteSpace:"nowrap",
     sortable: true,
     sortValue: (element) => element.date ?? "",
     value: (element) => (
