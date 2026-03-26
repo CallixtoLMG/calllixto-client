@@ -382,6 +382,7 @@ export const BatchImportProducts = ({ isCreating }) => {
       <Button
         height="fit-content"
         width="fit-content"
+        $iconOnly
         $paddingLeft="0"
         as={BatchImportIcon}
         onClick={handleClick}

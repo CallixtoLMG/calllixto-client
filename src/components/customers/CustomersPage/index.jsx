@@ -31,14 +31,21 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel }
             entity={ENTITIES.CUSTOMERS}
           >
             <DropdownControlled
-              width="200px"
+              minWidth="150px"
+              width="min-content"
               name="state"
               label="Estado"
               options={CUSTOMER_STATES_OPTIONS}
               value={EMPTY_FILTERS.state}
               afterChange={onSubmit}
             />
-            <TextControlled name="name" label="Nombre" placeholder="Martín Bueno" width="300px" />
+            <TextControlled
+              name="name"
+              label="Nombre"
+              placeholder="Martín Bueno"
+              width="20vw"
+              minWidth="200px"
+            />
           </Filters>
         </Form>
       </FormProvider >

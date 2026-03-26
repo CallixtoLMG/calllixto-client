@@ -52,13 +52,14 @@ const ProductForm = forwardRef(({
     resetForm: () => reset(getInitialValues(product))
   }));
 
-  const [watchFractionable, watchSupplier, watchBrand, watchCost, watchPrice, watchStockControl] = watch([
+  const [watchFractionable, watchSupplier, watchBrand, watchCost, watchPrice, watchStockControl, WatchEditablePrice] = watch([
     'fractionConfig.active',
     'supplier',
     'brand',
     'cost',
     'price',
     'stockControl',
+    'editablePrice',
   ]);
 
   const handleForm = async (data) => {
@@ -215,10 +216,11 @@ const ProductForm = forwardRef(({
             <FormField $maxWidth="fit-content" flex="1" >
               <IconedButtonControlled
                 name="stockControl"
-                text="Stock habilitado"
+                text={watchStockControl ? "Deshabilitar control de stock" : "Habilitar control de stock"}
                 icon={ICONS.BOXES}
                 color={COLORS.BLUE}
                 disabled={!isUpdating && view}
+                iconOnly
               />
             </FormField>
             {watchStockControl &&
@@ -239,17 +241,29 @@ const ProductForm = forwardRef(({
               disabled={!isUpdating && view}
             />
           </FormField>
-          <FormField flex="1">
-            <PriceControlled
-              name="price"
-              label="Precio"
-              disabled={!isUpdating && view}
-            />
+          <FormField flexDirection="row" flex="1">
+            <FormField flex="1">
+              <PriceControlled
+                name="price"
+                label="Precio"
+                disabled={!isUpdating && view}
+              />
+            </FormField>
+            <FormField $maxWidth="max-content" $alignItems="end" flexDirection="row" flex="1">
+              <IconedButtonControlled
+                name="editablePrice"
+                text={WatchEditablePrice ? "Deshabilitar precio editable" : "Habilitar precio editable"}
+                icon={ICONS.PENCIL}
+                color={COLORS.BLUE}
+                disabled={!isUpdating && view}
+                iconOnly
+              />
+            </FormField>
           </FormField>
           <FormField $alignItems="end" flexDirection="row" flex="1">
             <FormField flex="1">
               <PercentField
-                width="50%"
+                width="55%"
                 label="Margen"
                 value={calculateMargin(watchPrice, watchCost)}
                 disabled={!isUpdating && view}
@@ -266,38 +280,27 @@ const ProductForm = forwardRef(({
           </FormField>
         </FieldsContainer>
         <FieldsContainer>
-          <FormField flex="1" >
-            <DropdownControlled
-              name="fractionConfig.unit"
-              label="Unidad de medida"
-              options={Object.values(MEASSURE_UNITS)}
-              defaultValue={Object.values(MEASSURE_UNITS)[0].value}
-              disabled={(!isUpdating && view || !watchFractionable)}
-            />
-          </FormField>
           <FormField flexDirection="row" flex="1">
+            <FormField flex="1" >
+              <DropdownControlled
+                name="fractionConfig.unit"
+                label="Unidad de medida"
+                options={Object.values(MEASSURE_UNITS)}
+                defaultValue={Object.values(MEASSURE_UNITS)[0].value}
+                disabled={(!isUpdating && view || !watchFractionable)}
+              />
+            </FormField>
             <FormField $maxWidth="max-content" $alignItems="end" flexDirection="row" flex="1">
               <IconedButtonControlled
                 name="fractionConfig.active"
-                text="Producto fraccionable"
+                text={watchFractionable ? "Deshabilitar producto fraccionable" : "Habilitar producto fraccionable"}
                 icon={ICONS.CUT}
                 disabled={!isUpdating && view}
                 color={COLORS.BLUE}
-              />
-            </FormField>
-            <FormField $maxWidth="max-content" $alignItems="end" flexDirection="row" flex="1">
-              <IconedButtonControlled
-                name="editablePrice"
-                text="Precio editable"
-                icon={ICONS.PENCIL}
-                color={COLORS.BLUE}
-                disabled={!isUpdating && view}
+                iconOnly
               />
             </FormField>
           </FormField>
-          <FormField flex="1" />
-        </FieldsContainer>
-        <FieldsContainer>
           <FormField flex="1">
             <DropdownControlled
               disabled={!isUpdating && view}
@@ -318,8 +321,6 @@ const ProductForm = forwardRef(({
             />
           </FormField>
           <FormField flex="1" />
-          <FormField flex="1" />
-
         </FieldsContainer>
         <TextAreaControlled
           name="comments"

@@ -295,25 +295,10 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
             <>
               <TotalList items={TOTAL_LIST_ITEMS} />
               <FlexColumn $alignSelf="end" $rowGap="15px">
-                <Flex $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
-                  <IconedButton
-                    text="Completar"
-                    icon={ICONS.CHECK}
-                    color={COLORS.BLUE}
-                    onClick={() => {
-                      setValue(
-                        "postConfirmDiscount",
-                        Number(budget.postConfirmDiscount ?? 0) + Number(totalPending)
-                      );
-                      trigger("postConfirmDiscount");
-                    }}
-                    alignSelf="start"
-                    height="38px"
-                    disabled={isLoading}
-                  />
+                <Flex width="250px" $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
                   <PriceControlled
                     key={budget?.postConfirmDiscount ?? 'no-discount'}
-                    width="250px"
+                    width="fit-content"
                     placeholder="5.000"
                     name="postConfirmDiscount"
                     defaultValue={budget?.postConfirmDiscount ?? ''}
@@ -326,6 +311,25 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                     }}
                     justifyItems="right"
                   />
+                  <IconedButton
+                    text={postConfirmDiscount ? "Limpiar monto" : "Completar monto"}
+                    icon={postConfirmDiscount ? ICONS.MINUS : ICONS.ADD}
+                    color={postConfirmDiscount ? COLORS.ORANGE : COLORS.BLUE}
+                    onClick={() => {
+                      setValue(
+                        "postConfirmDiscount",
+                        postConfirmDiscount
+                          ? ""
+                          : Number(budget.postConfirmDiscount ?? 0) + Number(totalPending),
+                        { shouldDirty: true, shouldTouch: true }
+                      );
+                      trigger("postConfirmDiscount");
+                    }}
+                    alignSelf="start"
+                    height="38px"
+                    disabled={isLoading}
+                    iconOnly
+                  />
                 </Flex>
                 <Flex $columnGap="15px" $alignSelf="end">
                   <IconedButton
@@ -336,6 +340,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                     icon={ICONS.CHECK}
                     color={COLORS.GREEN}
                     height="38px"
+                    width="fit-content"
                   />
                 </Flex>
               </FlexColumn>

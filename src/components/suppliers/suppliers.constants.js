@@ -24,6 +24,7 @@ export const SUPPLIERS_COLUMNS = [
     title: "Nombre",
     align: "left",
     key: "name",
+    width: 5,
     sortable: true,
     value: (supplier) =>
       <Flex $justifyContent="space-between">
@@ -39,7 +40,7 @@ export const SUPPLIERS_COLUMNS = [
     title: "Dirección",
     key: "addresses",
     sortable: true,
-    width: 4,
+    width: 5,
     value: (supplier) => {
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(supplier.addresses || []);
       return (
@@ -54,7 +55,8 @@ export const SUPPLIERS_COLUMNS = [
   {
     id: 4,
     title: "Teléfono",
-    width: 2,
+    width: 1,
+    whiteSpace:"nowrap",
     value: (supplier) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(supplier.phoneNumbers);
       return (

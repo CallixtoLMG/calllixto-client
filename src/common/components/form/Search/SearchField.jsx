@@ -26,6 +26,8 @@ const SearchField = forwardRef(
       getDisplayValue = (element) => element?.name ?? '',
       label,
       width,
+      minWidth,
+      maxWidth,
       required,
       disabled,
       error,
@@ -107,6 +109,8 @@ const SearchField = forwardRef(
     return (
       <FormField
         $width={width}
+        $minWidth={minWidth}
+        $maxWidth={maxWidth}
         icon={
           clearable && value ? {
             name: ICONS.CLOSE,

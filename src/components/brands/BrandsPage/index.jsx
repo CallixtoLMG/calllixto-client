@@ -32,15 +32,28 @@ const BrandsPage = ({ brands = [], isLoading, onRefetch, onDownloadExcel }) => {
             hydrated={hydrated}
           >
             <DropdownControlled
-              width="200px"
+              minWidth="150px"
+              width="min-content"
               name="state"
               label="Estado"
               options={BRAND_STATES_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
               afterChange={onSubmit}
             />
-            <TextControlled name="id" label="Id" placeholder="CG" width="80px" />
-            <TextControlled name="name" label="Nombre" placeholder="CallixtoGLM" width="300px" />
+            <TextControlled
+              name="id"
+              label="Id"
+              placeholder="CG"
+              width="8vw"
+              minWidth="80px"
+            />
+            <TextControlled
+              name="name"
+              label="Nombre"
+              placeholder="CallixtoGLM"
+              width="20vw"
+              minWidth="200px"
+            />
           </Filters>
         </Form>
       </FormProvider>

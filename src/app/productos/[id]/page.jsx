@@ -318,9 +318,10 @@ const Product = ({ params }) => {
           icon: ICONS.BARCODE,
           color: COLORS.BLUE,
           onClick: () => setTimeout(handlePrint),
-          text: "Código",
+          text: "Imprimir código de barras",
           loading: activeAction === "print",
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         },
       ];
       if (!isProductDeleted(product?.state) && !isProductInactive(product?.state)) {
@@ -329,10 +330,10 @@ const Product = ({ params }) => {
           icon: isProductOOS(product?.state) ? ICONS.BOX : ICONS.BAN,
           color: COLORS.ORANGE,
           onClick: handleClick(isProductOOS(product?.state) ? "inStock" : "outOfStock"),
-          text: isProductOOS(product?.state) ? "En stock" : PRODUCT_STATES.OOS.singularTitle,
-          width: "fit-content",
+          text: isProductOOS(product?.state) ? "Cambiar estado a en stock" : "Cambiar estado a sin stock",
           loading: activeAction === "outOfStock",
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         });
       }
       if (!isProductDeleted(product?.state)) {
@@ -342,9 +343,9 @@ const Product = ({ params }) => {
           color: COLORS.GREY,
           onClick: handleClick(isProductInactive(product?.state) ? ACTIVE : INACTIVE),
           text: isProductInactive(product?.state) ? "Activar" : "Desactivar",
-          width: "fit-content",
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         });
         actions.push({
           id: 4,
@@ -355,6 +356,7 @@ const Product = ({ params }) => {
           basic: true,
           loading: activeAction === "softDelete",
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         });
       }
       if (isProductDeleted(product?.state)) {
@@ -364,9 +366,9 @@ const Product = ({ params }) => {
           color: COLORS.GREEN,
           onClick: handleClick('recover'),
           text: "Recuperar",
-          width: "fit-content",
           loading: activeAction === "recover",
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         });
         actions.push({
           id: 6,
@@ -377,6 +379,7 @@ const Product = ({ params }) => {
           basic: true,
           loading: activeAction === "hardDelete",
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         });
       }
 

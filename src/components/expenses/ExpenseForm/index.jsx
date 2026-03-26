@@ -123,7 +123,10 @@ const ExpenseForm = forwardRef(({
               placeholder="18000"
             />
           </FormField>
-          <FormField  flex="1">
+
+        </FieldsContainer>
+        <FieldsContainer $rowGap="5px">
+          <FormField flex="1">
             <DatePickerControlled
               disabled={!isUpdating && view}
               name="expirationDate"
@@ -137,8 +140,6 @@ const ExpenseForm = forwardRef(({
               placeholder="16-11-2025"
             />
           </FormField>
-        </FieldsContainer>
-        <FieldsContainer $rowGap="5px">
           <FormField flex="1">
             <DropdownControlled
               disabled={!isUpdating && view}

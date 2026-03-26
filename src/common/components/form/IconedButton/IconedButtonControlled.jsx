@@ -12,7 +12,8 @@ export const IconedButtonControlled = forwardRef(({
   text,
   disabled,
   color,
-  $maxWidth
+  $maxWidth,
+  iconOnly,
 }, ref) => {
   return (
     <Controller
@@ -26,6 +27,7 @@ export const IconedButtonControlled = forwardRef(({
           label={label}
           text={text}
           icon={icon}
+          iconOnly={iconOnly}
           control={IconedButton}
           onClick={() => onChange(!value)}
           basic={!value}

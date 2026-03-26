@@ -32,9 +32,10 @@ export const BillDetails = ({ name }) => {
             onClick={() => setOpenBillPopup(true)}
           >
             <IconedButton
-              text="Agregar billete"
+              text="Agregar billetes"
               icon={ICONS.ADD}
               color={COLORS.GREEN}
+              iconOnly
             />
           </Box>
         }

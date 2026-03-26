@@ -43,6 +43,8 @@ export const TextField = forwardRef(({
   name,
   flex,
   width,
+  minWidth,
+  maxWidth,
   label,
   placeholder,
   iconLabel,
@@ -84,11 +86,12 @@ export const TextField = forwardRef(({
       {typeof iconLabel === "string" || typeof iconLabel === "object" ? iconLabel : null}
     </StyledLabel>
   );
-
   return (
     <FormField
       flex={flex}
       $width={width}
+      $minWidth={minWidth}
+      $maxWidth={maxWidth}
       label={label}
       control={Input}
       error={error}
@@ -124,7 +127,7 @@ export const TextField = forwardRef(({
           ref={ref}
         >
           {iconLabel && showIconLabel()}
-          <input ref={ref}/>
+          <input ref={ref} />
         </Input>
       )}
     </FormField>

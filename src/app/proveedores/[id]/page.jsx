@@ -284,13 +284,14 @@ const Supplier = ({ params }) => {
         id: 1,
         icon: ICONS.BARCODE,
         color: COLORS.BLUE,
-        text: "Códigos",
+        text: "Imprimir códigos de barra",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
         disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
         tooltip: !hasAssociatedProducts
           ? 'No existen productos de este proveedor.'
           : false,
+        iconOnly: true
       },
       {
         id: 2,
@@ -302,10 +303,11 @@ const Supplier = ({ params }) => {
         onClick: handleClick(isItemInactive(supplier?.state) ? ACTIVE : INACTIVE),
         loading: activeAction === ACTIVE || activeAction === INACTIVE,
         disabled: !!activeAction || isEditPending,
-        width: "fit-content",
+        iconOnly: true
       },
       {
         id: 3,
+        iconOnly: true,
         button: (
           <Dropdown
             pointing
@@ -371,28 +373,29 @@ const Supplier = ({ params }) => {
         id: 4,
         icon: ICONS.LIST_UL,
         color: COLORS.RED,
-        text: "Eliminar productos",
+        text: "Eliminar todos los productos del proveedor",
         onClick: handleClick('deleteBatch'),
         loading: activeAction === "deleteBatch",
         disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
         tooltip: !hasAssociatedProducts
           ? 'No existen productos de este proveedor.'
           : false,
-        width: "fit-content",
+        iconOnly: true
       },
       {
         id: 5,
         icon: ICONS.TRASH,
         color: COLORS.RED,
-        text: "Eliminar",
+        text: "Eliminar proveedor",
         onClick: handleClick('deleteSupplier'),
         loading: activeAction === "deleteSupplier",
         disabled: hasAssociatedProducts || !!activeAction || isEditPending,
         tooltip: hasAssociatedProducts
           ? 'No se puede eliminar este proveedor, existen productos asociados.'
           : false,
-        width: "fit-content",
+        iconOnly: true,
         basic: true,
+        popupPosition: "bottom right"
       }];
     }
 

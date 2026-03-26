@@ -1,9 +1,9 @@
-import { Box, Icon } from "@/common/components/custom";
+import { Flex, Icon } from "@/common/components/custom";
 import { COLORS, ICONS } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { List, ListItem, Popup } from "semantic-ui-react";
 
-export const PhonesTooltip = ({ phones, input }) => {
+export const PhonesTooltip = ({ phones, input, lowTooltip }) => {
   return (
     <Popup
       size="mini"
@@ -20,9 +20,9 @@ export const PhonesTooltip = ({ phones, input }) => {
       trigger={
         input
           ? <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />
-          : <Box $marginLeft="5px" $marginRight="5px">
-            <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />
-          </Box>
+          : <Flex $marginLeft="5px" $marginRight="5px">
+            <Icon lowTooltip={lowTooltip} name={ICONS.LIST_UL} color={COLORS.BLUE} />
+          </Flex>
       }
     />
   );

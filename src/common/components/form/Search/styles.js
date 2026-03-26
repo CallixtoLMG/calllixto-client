@@ -2,6 +2,10 @@ import { Search as SSearch } from "semantic-ui-react";
 import styled from "styled-components";
 
 const Search = styled(SSearch)`
+  width: ${({ $width }) => $width};
+  min-width: ${({ $minWidth }) => $minWidth}!important;
+  max-width: ${({ $maxWidth }) => $maxWidth}!important;
+
   div.results.transition.visible {
     width: 80vw !important;
     display: grid!important;
@@ -18,9 +22,14 @@ const Search = styled(SSearch)`
       border-radius: 0.28571429rem!important;
     };
   };
-div.content{
+
+  div.content{
     width: 100%!important;
-  }
+  };
+  
+  &&& input{
+    padding-right :9.5px!important;
+  };
 `;
 
 const Text = styled.p`

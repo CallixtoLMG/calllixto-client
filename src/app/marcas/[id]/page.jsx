@@ -188,7 +188,7 @@ const Brand = ({ params }) => {
           onClick: handleClick(isItemInactive(brand?.state) ? ACTIVE : INACTIVE),
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction,
-          width: "fit-content",
+          iconOnly:true
         },
         {
           id: 2,
@@ -200,6 +200,7 @@ const Brand = ({ params }) => {
           loading: activeAction === DELETE,
           disabled: hasAssociatedProducts || !!activeAction,
           tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
+          iconOnly:true
         },
       ] : [];
       setActions(actions);

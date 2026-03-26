@@ -6,6 +6,8 @@ import { TextField } from "./TextField";
 export const TextControlled = forwardRef(({
   name,
   width,
+  minWidth,
+  maxWidth,
   rules,
   iconLabel,
   showPopup = false,
@@ -17,6 +19,7 @@ export const TextControlled = forwardRef(({
   ...inputParams
 }, ref) => {
   const { formState: { errors } } = useFormContext();
+
   return (
     <Controller
       name={name}
@@ -28,6 +31,8 @@ export const TextControlled = forwardRef(({
           name={name}
           value={value ?? ''}
           width={width}
+          minWidth={minWidth}
+          maxWidth={maxWidth}
           ref={ref}
           required={required}
           disabled={disabled}

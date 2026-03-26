@@ -54,6 +54,7 @@ export const FormField = styled(Form.Field)`
   justify-content: ${({ $justifyContent }) => $justifyContent} !important;
   min-width: ${({ $minWidth }) => $minWidth}!important;
   max-width: ${({ $maxWidth }) => $maxWidth}!important;
+  align-self: ${({ $alignSelf }) => $alignSelf} !important;
 
   .disabled {
     opacity: 1!important;
@@ -77,6 +78,8 @@ export const Label = styled(SLabel)`
   opacity: ${({ show }) => show ? "0" : "1"} !important;
   font-weight: ${({ fontWeight }) => fontWeight} !important;
   box-shadow: ${({ fontWeight }) => fontWeight && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
+  pointer-events: ${({ pointerEvents }) => pointerEvents} !important;
+  z-index: ${({ zIndex }) => zIndex} !important;
 `;
 
 export const TextArea = styled(STextarea)`
@@ -90,8 +93,10 @@ export const Dropdown = styled(SDropdown)`
   background-color: ${({ bgColor }) => `${bgColor}!important`};
   box-shadow: ${({ $boxShadow }) => $boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
   width: ${({ width }) => `${width}!important`};
+
   &&& {
     opacity: ${({ disabled }) => disabled && "0.45"} !important;
+    min-width: ${({ minWidth }) => `${minWidth}!important`};
   }
   
   .text{
@@ -145,6 +150,7 @@ export const Dropdown = styled(SDropdown)`
 `;
 
 export const DropdownOption = styled(SDropdown)`
+  flex-flow: ${({ reverse }) => `${reverse && "row-reverse"}!important`} ;
 &&&&{
   padding-left: ${({ $paddingLeft }) => $paddingLeft}!important;
 }
@@ -171,7 +177,7 @@ export const DropdownItem = styled(SDropdown.Item)`
   font-weight: 400;
   width: 100%;
   &&&&&&{
-    padding: 10px 10px!important;
+    padding: 12px 10px!important;
   }
   &:hover {
     background-color: #f5f5f5!important;
@@ -195,16 +201,17 @@ export const Menu = styled(SMenu)`
 
 export const DropdownMenu = styled(SDropdown.Menu)`
   left: 110%!important;
-  &&&&{
+  &&&&&&&{
     top: 2px!important;
+    margin-right: 5px!important;
   }
 `;
 
 export const Icon = styled(SIcon)`
   align-self: center!important;
   margin-right: ${({ $marginRight }) => $marginRight && `11px!important`} ;
-  top: ${({ dollar, tooltip }) => (dollar ? `-3px` : tooltip ? `-1px` : 'initial')} !important;
-  position: ${({ dollar, tooltip }) => (dollar || tooltip) && `relative!important`} ;
+  top: ${({ lowTooltip, tooltip }) => (lowTooltip ? `-3px` : tooltip ? `-1px` : 'initial')} !important;
+  position: ${({ lowTooltip, tooltip }) => (lowTooltip || tooltip) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
   padding: ${({ padding }) => `${padding}!important;`};
@@ -212,6 +219,7 @@ export const Icon = styled(SIcon)`
   justify-items: ${({ justifyItems }) => `${justifyItems}!important;`};
   pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
   line-height: ${({ $lineHeight }) => `${$lineHeight}!important;`};
+  z-index:2!important;
 `;
 
 export const Modal = styled(SModal)`
@@ -238,21 +246,62 @@ export const Message = styled(SMessage)`
 
 export const Button = styled(SButton)`
   font-weight: 500 !important;
+
   &&&& {
     text-align: center;
-    height: ${({ height = '35px' }) => `${height}!important`} ;
-    margin-top: ${({ $marginTop }) => `${$marginTop}!important`} ;
-    margin-bottom: ${({ $marginBottom }) => `${$marginBottom}!important`} ;
-    align-self: ${({ $alignSelf }) => `${$alignSelf}!important`} ;
-    font-size: ${({ $fontSize = "13.5px" }) => `${$fontSize}!important`} ;
-    width: ${({ width = '110px' }) => `${width}!important`} ;
-    &{
-     padding-left: ${({ $paddingLeft = '40px' }) => `${$paddingLeft}!important`} ;
-    }
-    padding: ${({ padding }) => padding ? padding : "0 18px 0 40px"}!important ;
+    height: ${({ height = '35px' }) => `${height}!important`};
+    margin-top: ${({ $marginTop }) => `${$marginTop}!important`};
+    margin-bottom: ${({ $marginBottom }) => `${$marginBottom}!important`};
+    align-self: ${({ $alignSelf }) => `${$alignSelf}!important`};
+    font-size: ${({ $fontSize = '13.5px' }) => `${$fontSize}!important`};
+    width: ${({ width = '110px' }) => `${width}!important`};
     margin-right: 0;
-    position: ${({ position }) => `${position}!important`} ;
-  };
+    position: ${({ position }) => `${position}!important`};
+
+    padding: ${({ $iconOnly, padding }) =>
+    $iconOnly
+      ? `${padding || '0'}!important`
+      : `${padding || '0 18px 0 40px'}!important`};
+
+    ${({ $iconOnly, width = '35px', height = '35px' }) =>
+    $iconOnly &&
+    `
+        min-width: ${width}!important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      `}
+  }
+`;
+
+export const IconButton = styled(SButton)`
+  font-weight: 500 !important;
+
+  &&&& {
+    text-align: center;
+    height: ${({ height = '35px' }) => `${height}!important`};
+    margin-top: ${({ $marginTop }) => `${$marginTop}!important`};
+    margin-bottom: ${({ $marginBottom }) => `${$marginBottom}!important`};
+    align-self: ${({ $alignSelf }) => `${$alignSelf}!important`};
+    font-size: ${({ $fontSize = '13.5px' }) => `${$fontSize}!important`};
+    width: ${({ width = '110px' }) => `${width}!important`};
+    margin-right: 0;
+    position: ${({ position }) => `${position}!important`};
+
+    padding: ${({ $iconOnly, padding }) =>
+    $iconOnly
+      ? `${padding || '0'}!important`
+      : `${padding || '0 18px 0 40px'}!important`};
+
+    ${({ $iconOnly, width = '35px', height = '35px' }) =>
+    $iconOnly &&
+    `
+        min-width: ${width}!important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+      `}
+  }
 `;
 
 export const Divider = styled(SDivider)`

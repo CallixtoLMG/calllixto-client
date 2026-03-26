@@ -265,6 +265,7 @@ const CustomTable = ({
                               key={`cell_${header.id}_${element[mainKey]}`}
                               align={header.align}
                               width={header.width}
+                              whiteSpace={header.whiteSpace}
                             >
                               {href && (
                                 <LinkOverlay
@@ -366,6 +367,7 @@ const CustomTable = ({
               text="Descargar excel"
               icon={ICONS.FILE_EXCEL}
               onClick={() => onDownloadExcel(filteredElements)}
+              width="fit-content"
             />
           </Flex>
         )}
