@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
 import { useDeleteSupplier, useEditSupplier, useGetSupplier, useSetSupplierState } from "@/api/suppliers";
-import { Button, DropdownItem, Icon, Message, MessageHeader, } from "@/common/components/custom";
+import { Button, DropdownItem, FieldsContainer, FormField, Icon, Message, MessageHeader, } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
@@ -14,6 +14,7 @@ import { BatchImportStock } from "@/components/products/BatchImportStock";
 import { DISCOUNT_STOCK, PRODUCT_STATES, UPLOAD_STOCK } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
+import { EXAMPLE_TEMPLATE_DATA_STOCK } from "@/components/suppliers/suppliers.constants";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
@@ -284,13 +285,14 @@ const Supplier = ({ params }) => {
         id: 1,
         icon: ICONS.BARCODE,
         color: COLORS.BLUE,
-        text: "Códigos",
+        text: "Imprimir códigos de barra",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
         disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
         tooltip: !hasAssociatedProducts
           ? 'No existen productos de este proveedor.'
           : false,
+        iconOnly: true
       },
       {
         id: 2,
@@ -302,10 +304,11 @@ const Supplier = ({ params }) => {
         onClick: handleClick(isItemInactive(supplier?.state) ? ACTIVE : INACTIVE),
         loading: activeAction === ACTIVE || activeAction === INACTIVE,
         disabled: !!activeAction || isEditPending,
-        width: "fit-content",
+        iconOnly: true
       },
       {
         id: 3,
+        iconOnly: true,
         button: (
           <Dropdown
             pointing
@@ -363,6 +366,9 @@ const Supplier = ({ params }) => {
                   products={products}
                 />
               </DropdownItem>
+              <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA_STOCK, "Ejemplo de tabla stock")}>
+                <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla stock
+              </DropdownItem>
             </Dropdown.Menu>
           </Dropdown>
         ),
@@ -371,28 +377,29 @@ const Supplier = ({ params }) => {
         id: 4,
         icon: ICONS.LIST_UL,
         color: COLORS.RED,
-        text: "Eliminar productos",
+        text: "Eliminar todos los productos del proveedor",
         onClick: handleClick('deleteBatch'),
         loading: activeAction === "deleteBatch",
         disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
         tooltip: !hasAssociatedProducts
           ? 'No existen productos de este proveedor.'
           : false,
-        width: "fit-content",
+        iconOnly: true
       },
       {
         id: 5,
         icon: ICONS.TRASH,
         color: COLORS.RED,
-        text: "Eliminar",
+        text: "Eliminar proveedor",
         onClick: handleClick('deleteSupplier'),
         loading: activeAction === "deleteSupplier",
         disabled: hasAssociatedProducts || !!activeAction || isEditPending,
         tooltip: hasAssociatedProducts
           ? 'No se puede eliminar este proveedor, existen productos asociados.'
           : false,
-        width: "fit-content",
+        iconOnly: true,
         basic: true,
+        popupPosition: "bottom right"
       }];
     }
 
@@ -408,10 +415,16 @@ const Supplier = ({ params }) => {
     <Loader active={isLoading || loadingProducts || !supplier}>
       {!isItemInactive(supplier?.state) && toggleButton}
       {isItemInactive(supplier?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{supplier.inactiveReason}</p>
-        </Message>
+        <FieldsContainer>
+          <FormField flex="1">
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{supplier.inactiveReason}</p>
+            </Message>
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
+        </FieldsContainer>
       )}
       <SupplierForm
         ref={formRef}

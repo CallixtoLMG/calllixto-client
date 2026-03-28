@@ -137,7 +137,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
           <OverflowWrapper maxWidth="25vw" popupContent={budget.customer.name}>
             {budget.customer.name}
           </OverflowWrapper>
-          {budget.comments && <CommentTooltip comment={budget.comments} />}
+          {budget.comments && <CommentTooltip lowTooltip comment={budget.comments} />}
         </Flex>
       ),
       sortValue: (budget) => budget.customer.name ?? ""
@@ -147,7 +147,8 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
       title: "Fecha",
       key: "date",
       sortable: true,
-      width: 3,
+      whiteSpace: "nowrap",
+      width: 1,
       href: (budget) => budget.href,
       value: (budget) => getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME),
       sortValue: (budget) => budget.createdAt ?? ""
@@ -214,10 +215,10 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
 
 export const PAYMENT_METHODS = [
   { key: 'efectivo', text: 'Efectivo', value: 'Efectivo' },
-  { key: 'transferencia', text: 'Transferencia Bancaria', value: 'Transferencia Bancaria' },
-  { key: 'debito', text: 'Tarjeta de Débito', value: 'Tarjeta de Débito' },
-  { key: 'credito', text: 'Tarjeta de Crédito', value: 'Tarjeta de Crédito' },
-  { key: 'mercado_pago', text: 'Mercado Pago', value: 'Mercado Pago' },
+  { key: 'transferencia', text: 'Transferencia bancaria', value: 'Transferencia bancaria' },
+  { key: 'debito', text: 'Tarjeta de débito', value: 'Tarjeta de débito' },
+  { key: 'credito', text: 'Tarjeta de crédito', value: 'Tarjeta de crédito' },
+  { key: 'mercado_pago', text: 'Mercado pago', value: 'Mercado pago' },
   { key: 'dolares', text: 'Dólares', value: 'Dólares' },
   { key: 'others', text: 'Otros', value: 'Otros' },
   { key: 'multi', text: 'Varios', value: 'Varios' }

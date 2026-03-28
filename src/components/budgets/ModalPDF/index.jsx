@@ -96,11 +96,12 @@ const ModalPDF = ({
                   />
                 ))}
                 <IconedButton
-                  text="Mostrar Precios"
+                  text="Mostrar precios"
                   icon={ICONS.EYE}
                   color={COLORS.BLUE}
                   onClick={() => setShowPrices(prev => !prev)}
                   basic={!showPrices}
+                  width="fit-content"
                 />
                 <Input
                   type="text"
@@ -117,6 +118,7 @@ const ModalPDF = ({
                       icon={ICONS.DOLLAR}
                       color={COLORS.GREEN}
                       basic={!showDolarExangeRate}
+                      width="fit-content"
                       onClick={() => {
                         setShowDolarExangeRate(prev => !prev);
                         if (!showDolarExangeRate) {

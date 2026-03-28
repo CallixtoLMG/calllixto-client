@@ -4,7 +4,7 @@ import { ADDRESS_TABLE_HEADERS, EMAIL_TABLE_HEADERS, PHONE_TABLE_HEADERS } from 
 
 export const ContactView = ({ phoneNumbers = [], addresses = [], emails = [] }) => {
   return (
-    <FieldsContainer $columnGap="50px">
+    <FieldsContainer $columnGap="15px">
       <FormField flex="1">
         <Table
           headers={PHONE_TABLE_HEADERS}

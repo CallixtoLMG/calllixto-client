@@ -8,7 +8,8 @@ const OverflowText = styled.div`
   max-width: ${({ $maxWidth }) => $maxWidth};
   height: ${({ $height }) => $height}!important;
   align-self: ${({ $alignSelf = "end" }) => $alignSelf}!important;
-  
+  pointer-events: auto;
+    
   ${({ $lineClamp }) =>
     $lineClamp > 1
       ? css`

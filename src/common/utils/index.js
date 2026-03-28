@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
-import { ALL, CANCELLED, INACTIVE, REGEX } from "../constants";
+import { ALL, CANCELLED, COLORS, INACTIVE, REGEX } from "../constants";
 import { isDateAfter } from "./dates";
 
 export const getFormatedPrice = (number) => {
@@ -236,13 +236,13 @@ export const getNumberFormated = (value) => {
   return [asString, asNumber];
 };
 
-export const mapToDropdownOptions = (items = []) =>
+export const mapToDropdownOptions = (items = [], color) =>
   items.map((item) => ({
     key: item?.toLowerCase().replace(/\s+/g, "_"),
     text: item,
     value: item,
     name: item,
-    color: "grey"
+    color: color || COLORS.GREY
   }));
 
 export const getLabelColor = (entity, states) => states?.[entity?.state]?.color;

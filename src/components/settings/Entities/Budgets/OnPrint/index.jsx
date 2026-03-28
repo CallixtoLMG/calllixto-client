@@ -17,21 +17,21 @@ const OnPrint = () => {
     <Box $marginBottom="5px">
       <Accordion fluid>
         <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon name="dropdown" /> Al Imprimir una Venta
+          <Icon name="dropdown" /> Al imprimir una venta
         </Accordion.Title>
         <Accordion.Content active={isAccordionOpen}>
           <FlexColumn $rowGap="15px">
             <IconedButtonControlled
               name="defaultsPDF.showPrices"
-              label="Mostrar Precios por Defecto"
-              text="Mostrar Precios"
+              label="Mostrar precios por defecto"
+              text="Mostrar precios"
               icon={ICONS.EYE}
               color={COLORS.BLUE}
               basic={!defaultsPDF?.showPrices}
             />
             <DropdownControlled
               name="defaultsPDF.printPdfMode"
-              label="Modo de Impresión por Defecto"
+              label="Modo de impresión por defecto"
               options={Object.values(BUDGET_PDF_FORMAT).map(option => ({ value: option.key, key: option.key, text: <Flex>{option.title}</Flex> }))}
               defaultValue={BUDGET_PDF_FORMAT.CLIENT.key}
               width="200px"

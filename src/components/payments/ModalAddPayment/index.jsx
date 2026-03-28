@@ -1,6 +1,6 @@
 import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
-import { Button, ButtonsContainer, FieldsContainer, Flex, Form, FormField } from "@/common/components/custom";
+import { ButtonsContainer, FieldsContainer, Flex, Form, FormField } from "@/common/components/custom";
 import { DropdownField, PriceField, TextAreaField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { TotalList } from "@/common/components/table";
@@ -80,26 +80,25 @@ export const ModalAddPayment = ({
 
   return (
     <Transition visible={open} animation='scale' duration={500}>
-      <Modal open={open} onClose={handleClose} size={SIZES.SMALL}>
-        <Modal.Header>Agregar Pago</Modal.Header>
+      <Modal open={open} onClose={handleClose} >
+        <Modal.Header>Agregar pago</Modal.Header>
         <Modal.Content>
-          <Flex $rowGap="15px" as={Form}>
-            <FieldsContainer  >
-              <Flex $columnGap="15px" rowGap="15px" fontSize="14px" margin="0" flexDirection={"row"} >
-                <FormField
-                  selected={payment.date}
-                  onChange={(date) => setPayment({ ...payment, date })}
-                  dateFormat="dd-MM-yyyy"
-                  disabled={isTotalCovered}
-                  maxDate={new Date()}
-                  label="Fecha"
-                  $width="150px"
-                  placeholder="16-11-2025"
-                  control={DatePicker}
-                />
+          <Flex as={Form}>
+            <FieldsContainer $justifyContent="space-between" $rowGap="15px" $columnGap="15px"  >
+              <FormField
+                flex="1"
+                selected={payment.date}
+                onChange={(date) => setPayment({ ...payment, date })}
+                dateFormat="dd-MM-yyyy"
+                disabled={isTotalCovered}
+                maxDate={new Date()}
+                label="Fecha"
+                placeholder="16-11-2025"
+                control={DatePicker}
+              />
+              <FormField flex="1">
                 <DropdownField
-                  width="fit-content"
-                  label="Método de Pago"
+                  label="Método de pago"
                   selection
                   options={paymentMethodOptions.filter((method) => method.key !== 'dolares')}
                   value={payment.method}
@@ -108,10 +107,11 @@ export const ModalAddPayment = ({
                   error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
                   required
                 />
+              </FormField>
+              <FormField flex="1">
                 <PriceField
                   placeholder="10000"
                   required
-                  width="150px"
                   label="Monto"
                   value={payment.amount}
                   onChange={(value) => {
@@ -128,20 +128,24 @@ export const ModalAddPayment = ({
                   }
                   onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
                 />
-              </Flex>
-              <Button
-                padding="3px 18px 3px 40px"
-                size={SIZES.SMALL}
-                content="Completar"
-                icon={ICONS.CHECK}
-                labelPosition="left"
-                color={COLORS.BLUE}
-                type="button"
-                onClick={() => setPayment({ ...payment, amount: parseFloat(totalPending) })}
-                disabled={isTotalCovered || isLoading}
-                width="fit-content"
-                $alignSelf="end"
+              </FormField>
+              <IconedButton
                 height="38px"
+                size={SIZES.SMALL}
+                text={payment.amount ? "Limpiar monto" : "Completar monto"}
+                icon={payment.amount ? ICONS.MINUS : ICONS.ADD}
+                labelPosition="left"
+                color={payment.amount ? COLORS.ORANGE : COLORS.BLUE}
+                type="button"
+                onClick={() => {
+                  setPayment({
+                    ...payment,
+                    amount: payment.amount ? '' : parseFloat(totalPending)
+                  });
+                  setExceedAmountError(false);
+                }}
+                disabled={isTotalCovered}
+                iconOnly
               />
             </FieldsContainer>
             <FieldsContainer as={Form}>

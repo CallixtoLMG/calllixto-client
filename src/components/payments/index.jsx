@@ -83,7 +83,7 @@ const Payments = ({
     <FlexColumn width="100%" $rowGap="15px" className="ui form">
       <Flex $columnGap="15px" $justifyContent="space-between">
         <Header>
-          Detalle de Pagos
+          Detalle de pagos
         </Header>
         <Flex $columnGap="15px">
           {allowUpdates && (
@@ -109,7 +109,7 @@ const Payments = ({
                 }
                 disabled={!isTotalCovered}
                 content="El pago esta completo"
-                position='right center'
+                position='top center'
                 size={SIZES.TINY}
               />
               <ModalAddPayment
@@ -159,7 +159,7 @@ const Payments = ({
             }
           ]
         }}
-        $deleteButtonInside
+        $actionButtonInside
       />
       <TotalList readOnly items={TOTAL_LIST_ITEMS} />
       <ModalAction

@@ -67,7 +67,7 @@ const CashBalanceMovements = ({ cashBalance }) => {
         <Form onSubmit={onSubmit}>
           <FlexColumn $rowGap="15px">
             <Flex $justifyContent="space-between">
-              <Header center>Movimientos de Caja</Header>
+              <Header center>Movimientos de caja</Header>
               <Flex $columnGap="15px">
                 {cashBalance.closeDate &&
                   <Message width="fit-content" alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.GREY}>

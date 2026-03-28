@@ -31,7 +31,7 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         open={isModalOpen}
         onClose={() => onClose(false)}
       >
-        <Modal.Header>Comentarios del producto</Modal.Header>
+        <Modal.Header>Comentario del producto</Modal.Header>
         <Modal.Content>
           <Flex $flexDirection="column" $rowGap="15px">
             <FormProvider {...methods}>

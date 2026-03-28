@@ -1,7 +1,7 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useDeleteUser, useEditUser, useGetUser, useSetUserState } from "@/api/users";
-import { Input, Message, MessageHeader } from "@/common/components/custom";
+import { FieldsContainer, FormField, Input, Message, MessageHeader } from "@/common/components/custom";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
@@ -207,10 +207,15 @@ const User = ({ params }) => {
     <Loader active={isLoading || !user}>
       {!isItemInactive(user?.state) && toggleButton}
       {isItemInactive(user?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{user.inactiveReason}</p>
-        </Message>
+        <FieldsContainer>
+          <FormField flex="1">
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{user.inactiveReason}</p>
+            </Message>
+          </FormField>
+          <FormField flex="1" />
+        </FieldsContainer>
       )}
       <UserForm
         ref={formRef}
@@ -221,11 +226,11 @@ const User = ({ params }) => {
         view
         isDeletePending={isDeletePending}
       />
-<UnsavedChangesModal
-  open={showUnsavedModal}
-  onDiscard={handleDiscard}
-  onContinue={handleContinue}
-/>
+      <UnsavedChangesModal
+        open={showUnsavedModal}
+        onDiscard={handleDiscard}
+        onContinue={handleContinue}
+      />
       <ModalAction
         title={header}
         onConfirm={handleActionConfirm}

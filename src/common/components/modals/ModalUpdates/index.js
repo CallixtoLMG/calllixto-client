@@ -26,7 +26,7 @@ const ModalUpdates = () => {
   return (
     <>
       <Popup
-        content="Últimas Novedades"
+        content="Últimas novedades"
         trigger={
           <Icon
             margin="0"
@@ -42,7 +42,7 @@ const ModalUpdates = () => {
       />
       <Transition visible={open} animation="scale" duration={500}>
         <StyledModal open={open} onClose={() => setOpen(false)}>
-          <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas Novedades - 21 - 11 - 2025" />
+          <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas novedades - 21 - 11 - 2025" />
           <StyledModalContent>
             <StyledListHeader>
               <Icon name={ICONS.ADD} color={COLORS.BLUE} />Nuevo
@@ -78,10 +78,10 @@ const ModalUpdates = () => {
             </StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
-                El botón de <Accent>Descargar Excel</Accent> se encuentra ahora debajo de cada tabla y el archivo solo incluirá los elementos filtrados.
+                El botón de <Accent>Descargar excel</Accent> se encuentra ahora debajo de cada tabla y el archivo solo incluirá los elementos filtrados.
               </ListItem>
               <ListItem>
-                La sección <Accent>Ventas</Accent> ahora solo muestra registros de los últimos 3 meses (esto se realizó para mejorar el rendimiento en esa página, que al tener tantos elementos generaba muchas demoras). En caso de necesitar registros anteriores, se agregó la sección <Accent>Historial de Ventas</Accent>.
+                La sección <Accent>Ventas</Accent> ahora solo muestra registros de los últimos 3 meses (esto se realizó para mejorar el rendimiento en esa página, que al tener tantos elementos generaba muchas demoras). En caso de necesitar registros anteriores, se agregó la sección <Accent>Historial de ventas</Accent>.
               </ListItem>
               <ListItem>
                 Se actualizaron los buscadores de clientes, productos, proveedores y marcas para mostrar coincidencias a medida que se escribe y facilitar la selección.

@@ -1,4 +1,5 @@
-import { Button, FieldsContainer, Flex, FlexColumn, FormField, Icon, Message } from "@/common/components/custom";
+import { IconedButton } from "@/common/components/buttons";
+import { FieldsContainer, Flex, FlexColumn, FormField, Icon, Message } from "@/common/components/custom";
 import { DropdownControlled, NumberField, TextControlled, TextField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { ModalAction } from "@/common/components/modals";
@@ -81,46 +82,52 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
   };
 
   const getModalContent = () => (
-    <FieldsContainer className="ui form">
-      <FormField
-        selected={stock.date}
-        onChange={(date) => setStock({ ...stock, date })}
-        dateFormat="dd-MM-yyyy"
-        maxDate={new Date()}
-        label="Fecha"
-        $width="150px"
-        control={DatePicker}
-        error={showErrors && !(stock.date instanceof Date && !isNaN(stock.date)) ? VALIDATE_RULES.REQUIRED.required : undefined}
-      />
-      <NumberField
-        width="150px"
-        label="Cantidad"
-        value={stock.amount}
-        placeholder="Ej: 50"
-        onChange={(value) =>
-          setStock({ ...stock, amount: value })
-        }
-        error={
-          showErrors && (!stock.amount || Number(stock.amount) <= 0)
-            ? "Debe ingresar una cantidad mayor a 0."
-            : undefined
-        }
-      />
-
-      <TextField
-        width="150px"
-        label="Factura"
-        value={stock.invoiceNumber}
-        onChange={(e) => setStock({ ...stock, invoiceNumber: e.target.value })}
-        placeholder="Ej: 000A12"
-      />
-      <TextField
-        flex="1"
-        label="Comentarios"
-        value={stock.comments}
-        onChange={(e) => setStock({ ...stock, comments: e.target.value })}
-      />
-    </FieldsContainer>
+    <FlexColumn $rowGap="15px" >
+      <FieldsContainer className="ui form">
+        <FormField flex="1">
+          <FormField
+            selected={stock.date}
+            onChange={(date) => setStock({ ...stock, date })}
+            dateFormat="dd-MM-yyyy"
+            maxDate={new Date()}
+            label="Fecha"
+            control={DatePicker}
+            error={showErrors && !(stock.date instanceof Date && !isNaN(stock.date)) ? VALIDATE_RULES.REQUIRED.required : undefined}
+          />
+        </FormField>
+        <FormField flex="1">
+          <NumberField
+            label="Cantidad"
+            value={stock.amount}
+            placeholder="Ej: 50"
+            onChange={(value) =>
+              setStock({ ...stock, amount: value })
+            }
+            error={
+              showErrors && (!stock.amount || Number(stock.amount) <= 0)
+                ? "Debe ingresar una cantidad mayor a 0."
+                : undefined
+            }
+          />
+        </FormField>
+        <FormField flex="1">
+          <TextField
+            label="Factura"
+            value={stock.invoiceNumber}
+            onChange={(e) => setStock({ ...stock, invoiceNumber: e.target.value })}
+            placeholder="Ej: 000A12"
+          />
+        </FormField>
+      </FieldsContainer>
+      <FieldsContainer className="ui form">
+        <TextField
+          flex="1"
+          label="Comentarios"
+          value={stock.comments}
+          onChange={(e) => setStock({ ...stock, comments: e.target.value })}
+        />
+      </FieldsContainer>
+    </FlexColumn>
   );
 
   return (
@@ -129,30 +136,34 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         <Flex $justifyContent="space-between">
           <Header center>Movimientos de stock</Header>
           <Flex $columnGap="15px">
-            <Button
+            <IconedButton
               labelPosition="left"
               icon={ICONS.ARROW_DOWN}
               color={COLORS.GREEN}
-              content="Ingreso"
+              text="Ingreso de stock"
               disabled={isLoading}
               onClick={() => {
                 setStock(EMPTY_STOCK());
                 setModalMode(STOCK_MODAL_MODES.ADD);
                 setShowModal(true);
-              }} />
-            <Button
+              }}
+              iconOnly
+              />
+            <IconedButton
               labelPosition="left"
               icon={ICONS.ARROW_UP}
               color={COLORS.RED}
-              content="Egreso"
+              text="Egreso de stock"
               disabled={isLoading}
               onClick={() => {
                 setStock(EMPTY_STOCK());
                 setModalMode(STOCK_MODAL_MODES.OUT);
                 setShowModal(true);
-              }} />
+              }} 
+              iconOnly
+              />
             <Message padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
-              <Icon name={ICONS.BOXES} /> Stock Total: {product?.stock ?? 0}
+              <Icon name={ICONS.BOXES} /> Stock: {product?.stock ?? 0}
             </Message>
           </Flex>
         </Flex>
@@ -179,7 +190,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         paginate
         headers={STOCK_TABLE_HEADERS}
         elements={stockFlows}
-        $deleteButtonInside
+        $actionButtonInside
         onFilter={onFilter}
         filters={filters}
         setFilters={setFilters}
@@ -188,7 +199,6 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         title={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.title}
         isLoading={isLoading}
         titleIcon={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.icon}
-        titleIconColor={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.color}
         confirmButtonText={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.confirmText}
         showModal={showModal}
         setShowModal={(open) => {

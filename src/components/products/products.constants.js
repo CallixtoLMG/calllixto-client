@@ -315,7 +315,7 @@ export const STOCK_TYPE_OPTIONS = [
 export const STOCK_TABLE_HEADERS = [
   {
     id: 1,
-    title: 'Fecha de Pago',
+    title: 'Fecha de pago',
     key: "date",
     sortable: true,
     sortValue: (stockFlows) => stockFlows.createdAt ?? "",
@@ -383,24 +383,20 @@ export const STOCK_FLOWS_MODAL_CONFIG = {
   add: {
     title: "Ingreso de stock",
     icon: ICONS.ARROW_DOWN,
-    color: COLORS.GREEN,
     confirmText: "Agregar",
   },
   out: {
     title: "Egreso de stock",
     icon: ICONS.ARROW_UP,
-    color: COLORS.RED,
     confirmText: "Agregar",
   },
   edit: {
     title: "Editar ingreso",
     icon: ICONS.EDIT,
-    color: COLORS.BLUE,
     confirmText: "Actualizar",
   },
   delete: {
     icon: ICONS.TRASH,
-    color: COLORS.RED,
     confirmText: "Eliminar",
   },
 };

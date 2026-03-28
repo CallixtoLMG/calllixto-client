@@ -1,5 +1,6 @@
 import { useGetSetting } from "@/api/settings";
-import { Button, FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "@/common/components/custom";
+import { IconedButton } from "@/common/components/buttons";
+import { FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Segment } from "@/common/components/custom";
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { Table, TotalList } from "@/common/components/table";
@@ -20,7 +21,7 @@ const EMPTY_PAYMENT = () => ({
 const getPaymentTableHeaders = () => [
   {
     id: 'date',
-    title: 'Fecha de Pago',
+    title: 'Fecha de pago',
     width: 2,
     value: (element) => (
       <Flex $columnGap="10px">
@@ -132,101 +133,118 @@ const CreateBudgetPayments = ({
     <Flex width="100%" $maxHeight={maxHeight ? "55vh" : ""} className="ui form">
       <Segment $noBorder={noBorder} $noBoxShadow={noBoxShadow} padding={padding ? padding : "25px 60px 25px 35px"}>
         <Header>
-          Detalle de Pagos
+          Detalle de pagos
         </Header>
         <FlexColumn $rowGap="15px">
           {update && (
-            <FieldsContainer $rowGap="15px">
-              <FormField
-                selected={payment.date}
-                onChange={(date) => setPayment({ ...payment, date })}
-                dateFormat="dd-MM-yyyy"
-                disabled={isTotalCovered}
-                maxDate={new Date()}
-                label="Fecha"
-                $width="150px"
-                required
-                error={showErrors && !payment.date ? RULES.REQUIRED.required : undefined}
-                placeholder="16-11-2025"
-                control={DatePicker}>
-              </FormField>
-              <DropdownField
-                width="fit-content"
-                label="Método de Pago"
-                selection
-                options={paymentMethodOptions}
-                value={payment.method}
-                onChange={(e, { value }) => setPayment({ ...payment, method: value })}
-                disabled={isTotalCovered}
-                error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
-                required
-              />
-              <PriceField
-                key={`price-${payment.method}-${payment.date?.getTime()}`}
-                placeholder="10000"
-                required
-                width="150px"
-                label="Monto"
-                value={payment.amount}
-                onChange={(value) => {
-                  setPayment({ ...payment, amount: value ?? 0 });
-                  setExceedAmountError(false);
-                }}
-                disabled={isTotalCovered}
-                error={
-                  showErrors && !payment.amount
-                    ? RULES.REQUIRED.required
-                    : exceedAmountError
-                      ? "El monto no puede superar el total pendiente."
-                      : undefined
-                }
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
-              />
-              <TextField
-                flex="1"
-                label="Comentarios"
-                placeholder="Primer pago"
-                disabled={isTotalCovered}
-                value={payment.comments}
-                onChange={e => {
-                  setPayment({ ...payment, comments: e.target.value });
-                }}
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
-              />
-              <FormField $width="fit-content">
-                <FlexColumn $rowGap="5px">
-                  <Button
-                    padding="3px 18px 3px 40px"
-                    size={SIZES.SMALL}
-                    content="Completar"
-                    icon={ICONS.CHECK}
-                    labelPosition="left"
-                    color={COLORS.BLUE}
-                    type="button"
-                    onClick={() => {
-                      setPayment({ ...payment, amount: parseFloat(totalPending) });
-                    }}
+            <>
+              <FieldsContainer $rowGap="15px">
+                <FormField
+                  flex="1"
+                  selected={payment.date}
+                  onChange={(date) => setPayment({ ...payment, date })}
+                  dateFormat="dd-MM-yyyy"
+                  disabled={isTotalCovered}
+                  maxDate={new Date()}
+                  label="Fecha"
+                  required
+                  error={showErrors && !payment.date ? RULES.REQUIRED.required : undefined}
+                  placeholder="16-11-2025"
+                  control={DatePicker}
+                  fontSize="14px"
+                >
+                </FormField>
+                <FormField flex="1">
+                  <DropdownField
+                    label="Método de pago"
+                    selection
+                    options={paymentMethodOptions}
+                    value={payment.method}
+                    onChange={(e, { value }) => setPayment({ ...payment, method: value })}
                     disabled={isTotalCovered}
-                    width="fit-content"
+                    error={showErrors && !payment.method ? RULES.REQUIRED.required : undefined}
+                    required
                   />
-                  <Button
+                </FormField>
+                <FormField flexDirection="row" $alignItems="end" flex="1">
+                  <FormField flex="1">
+                    <PriceField
+                      key={`price-${payment.method}-${payment.date?.getTime()}`}
+                      placeholder="10000"
+                      required
+                      label="Monto"
+                      value={payment.amount}
+                      onChange={(value) => {
+                        setPayment({ ...payment, amount: value ?? 0 });
+                        setExceedAmountError(false);
+                      }}
+                      disabled={isTotalCovered}
+                      error={
+                        showErrors && !payment.amount
+                          ? RULES.REQUIRED.required
+                          : exceedAmountError
+                            ? "El monto no puede superar el total pendiente."
+                            : undefined
+                      }
+                      onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
+                    />
+                  </FormField>
+                  <FormField $maxWidth="max-content" flex="1">
+                    <IconedButton
+                      height="38px"
+                      size={SIZES.SMALL}
+                      text={payment.amount ? "Limpiar monto" : "Completar monto"}
+                      icon={payment.amount ? ICONS.MINUS : ICONS.ADD}
+                      labelPosition="left"
+                      color={payment.amount ? COLORS.ORANGE : COLORS.BLUE}
+                      type="button"
+                      onClick={() => {
+                        setPayment({
+                          ...payment,
+                          amount: payment.amount ? '' : parseFloat(totalPending)
+                        });
+                        setExceedAmountError(false);
+                      }}
+                      disabled={isTotalCovered}
+                      iconOnly
+                    />
+                  </FormField>
+                </FormField>
+              </FieldsContainer>
+              <FieldsContainer $rowGap="15px">
+                <TextField
+                  flex="1"
+                  label="Comentarios"
+                  placeholder="Primer pago"
+                  disabled={isTotalCovered}
+                  value={payment.comments}
+                  onChange={e => {
+                    setPayment({ ...payment, comments: e.target.value });
+                  }}
+                  onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
+                />
+                <FormField $alignSelf="self-end" $width="fit-content">
+                  <IconedButton
+                    $alignSelf="end"
                     size={SIZES.SMALL}
                     icon={ICONS.ADD}
-                    content="Agregar"
+                    text="Agregar detalle de pago"
                     labelPosition="left"
                     color={COLORS.GREEN}
+                    height="38px"
                     type="button"
                     onClick={handleAddPayment}
                     disabled={isTotalCovered}
-                    width="100%"
+                    iconOnly
                   />
-                </FlexColumn>
-              </FormField>
-            </FieldsContainer>
+                </FormField>
+              </FieldsContainer>
+            </>
           )}
           <Flex width="100%">
             <Table
               headers={getPaymentTableHeaders()}
+              $actionButtonInside
               elements={elements}
               actions={update && [
                 {
@@ -237,14 +255,13 @@ const CreateBudgetPayments = ({
                   tooltip: 'Eliminar',
                 },
               ]}
-              $deleteButtonInside={deleteButtonInside}
             />
           </Flex>
           <TotalList readOnly items={TOTAL_LIST_ITEMS} />
           {update && children}
         </FlexColumn>
       </Segment>
-    </Flex>
+    </Flex >
   );
 };
 

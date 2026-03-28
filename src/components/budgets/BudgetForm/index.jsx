@@ -52,6 +52,7 @@ const BudgetForm = ({
     setValue,
     handleSubmit,
     reset,
+    trigger,
     formState: { isDirty, errors },
   } = useFormContext();
 
@@ -78,6 +79,9 @@ const BudgetForm = ({
     if (!isCloning) return;
     if (!Array.isArray(budget?.products)) return;
     if (!Array.isArray(products)) return;
+    if (!initialClonedProductsRef.current) {
+      initialClonedProductsRef.current = budget.products;
+    }
     if (hasShownModal.current) return;
 
     const budgetProducts = budget.products;
@@ -106,7 +110,7 @@ const BudgetForm = ({
       setShouldShowModal(true);
       hasShownModal.current = true;
     }
-  }, [isCloning, budget?.products, products]);
+  }, [isCloning, budget?.products, products, hasShownModal]);
 
   const handleConfirmUpdate = () => {
     const currentProducts = watchProducts;
@@ -162,6 +166,10 @@ const BudgetForm = ({
     setIsTableLoading(false);
   };
 
+  useEffect(() => {
+    trigger("productsValidation");
+  }, [watchProducts, trigger]);
+
   const handleCreate = async (data, state) => {
     const { customer } = data;
 
@@ -215,17 +223,22 @@ const BudgetForm = ({
     },
     {
       id: 2,
-      icon: ICONS.ADD,
+      icon: ICONS.STICKY_NOTE,
       color: COLORS.GREEN,
       onClick: (element, index) => handleOpenCommentModal(element, index),
-      tooltip: 'Comentarios'
+      tooltip: 'Comentario',
+      width: "100%"
     },
   ];
 
-  const onAddComment = async ({ index, dispatchComment }) => {
+  const onAddComment = ({ index, dispatchComment }) => {
     const product = watchProducts[index];
-    product.dispatchComment = dispatchComment;
-    updateProduct(index, product);
+
+    updateProduct(index, {
+      ...product,
+      dispatchComment,
+    });
+
     setIsModalCommentOpen(false);
   };
 
@@ -447,38 +460,43 @@ const BudgetForm = ({
             </ButtonGroup>
           </FormField>
           <GroupedButtonsControlled
+            $alignItems="self-end"
             name="pickUpInStore"
-            width="350px"
+            width="fit-content"
             color={COLORS.BLUE}
             buttons={[
               { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
-              { text: 'Enviar a Dirección', icon: ICONS.TRUCK, value: false },
+              { text: 'Enviar a dirección', icon: ICONS.TRUCK, value: false },
             ]}
           />
         </FieldsContainer>
-        <FieldsContainer $justifyContent="space-between">
-          <FieldsContainer>
+        <FieldsContainer>
+          <FormField flex="1">
             <TextControlled
               name="createdBy"
               label="Vendedor"
               rules={RULES.REQUIRED}
-              width="300px"
               disabled
             />
-            {budget?.createdAt && (
+          </FormField>
+          {budget?.createdAt ? (
+            <FormField flex="1">
               <FormField
-                $width="180px"
+                flex="1"
                 label="Fecha de creación"
                 control={Input}
                 value={getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)}
                 readOnly
                 disabled
               />
-            )}
-          </FieldsContainer>
-          <FieldsContainer>
+            </FormField>
+          ) : <FormField flex="1" />}
+          <FormField flex="1" />
+        </FieldsContainer>
+        <FieldsContainer>
+          <FormField $justifyContent="end" flexDirection="row" flex="1">
             <NumberControlled
-              width="200px"
+              flex="1"
               name="expirationOffsetDays"
               rules={{
                 validate: {
@@ -490,136 +508,163 @@ const BudgetForm = ({
               placeholder="3"
               required
             />
-            <FormField
-              $width="200px"
-              label="Fecha de vencimiento"
-              control={Input}
-              readOnly
-              value={
-                watchExpirationOffsetDays
-                  ? getDateWithOffset({ offset: watchExpirationOffsetDays })
-                  : ""
-              }
-              placeholder="dd/mm/aaaa"
-            />
-          </FieldsContainer>
+          </FormField>
+          <FormField
+            flex="1"
+            label="Fecha de vencimiento"
+            control={Input}
+            readOnly
+            value={
+              watchExpirationOffsetDays
+                ? getDateWithOffset({ offset: watchExpirationOffsetDays })
+                : ""
+            }
+            placeholder="dd/mm/aaaa"
+          />
+          <FormField flex="1" />
         </FieldsContainer>
         <FieldsContainer>
-          <SearchControlled
-            name="customer"
-            width="300px"
-            label="Cliente"
-            required
-            clearable
-            placeholder="Martín Bueno"
-            rules={{
-              validate: {
-                required: (value) => !!value?.id || "Campo requerido.",
-                activeCustomer: (value) =>
-                  value?.state === CUSTOMER_STATES.ACTIVE.id ||
-                  "No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.",
-                requiredAddress: (value) =>
-                  isBudgetConfirmed(watchState) &&
-                    (!value?.addresses.length && !watchPickUp)
-                    ? "Dirección requerida."
-                    : true,
-                requiredPhone: (value) =>
-                  isBudgetConfirmed(watchState) && !value?.phoneNumbers.length
-                    ? "Teléfono requerido."
-                    : true,
-              }
-            }}
-            elements={customers}
-            searchFields={['name', 'id']}
-            getResultProps={(customer) => ({
-              key: customer.id,
-              title: getCustomerSearchTitle(customer),
-              description: getCustomerSearchDescription(customer),
-              value: customer,
-            })}
-            persistSelection={true}
-          />
-          <TextField
-            flex="2"
-            label="Dirección"
-            placeholder="Dirección"
-            disabled
-            error={
-              !watchCustomer?.addresses?.length &&
-              errors.customer?.type === "requiredAddress" &&
-              errors.customer?.message
-            }
-            value={
-              watchPickUp
-                ? PICK_UP_IN_STORE
-                : watchCustomer?.addresses?.length > 0
-                  ? `${watchCustomer.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
-                  : "Cliente sin dirección"
-            }
-            extraContent={() => {
-              const { additionalAddresses } = getAddressesForDisplay(watchCustomer?.addresses || []);
-              return additionalAddresses ? <AddressesTooltip input addresses={additionalAddresses} /> : null;
-            }}
-          />
-          <TextField
-            flex="2"
-            label="Teléfono"
-            placeholder="Teléfono"
-            disabled
-            error={
-              !watchCustomer?.phoneNumbers?.length &&
-              errors.customer?.type === "requiredPhone" &&
-              errors.customer?.message
-            }
-            value={
-              watchCustomer?.phoneNumbers?.length > 0
-                ? `${watchCustomer.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
-                : "Cliente sin teléfono"
-            }
-            extraContent={() => {
-              const { additionalPhones } = getPhonesForDisplay(watchCustomer?.phoneNumbers || []);
-              return additionalPhones ? <PhonesTooltip input phones={additionalPhones} /> : null;
-            }}
-          />
-        </FieldsContainer>
-        <SearchControlled
-          name="product"
-          label="Producto"
-          width="300px"
-          required
-          clearAfterSelect
-          placeholder="Televisor 100”"
-          rules={{
-            validate: () => {
-              return !!watchProducts.length || "Al menos un producto es requerido.";
-            },
-          }}
-          elements={products}
-          searchFields={['name', 'id']}
-          getResultProps={(product) => ({
-            key: product.id,
-            title: getProductSearchTitle(product),
-            description: getProductSearchDescription(product),
-            value: product,
-          })}
-          onAfterChange={(selectedProduct) => {
-            appendProduct({
-              ...selectedProduct,
-              quantity: selectedProduct?.state === PRODUCT_STATES.OOS.id ? 0 : 1,
-              discount: 0,
-              rowId: uuid(),
-              delivered: 0,
-              key: uuid(),
-              ...(selectedProduct?.fractionConfig?.active && {
-                fractionConfig: {
-                  ...selectedProduct?.fractionConfig,
-                  value: 1,
-                  price: selectedProduct?.price,
+          <FormField flex="1">
+            <SearchControlled
+              ref={productSearchRef}
+              name="customer"
+              label="Cliente"
+              required
+              clearable
+              placeholder="Martín Bueno"
+              rules={{
+                validate: {
+                  required: (value) => !!value?.id || "Campo requerido.",
+                  activeCustomer: (value) =>
+                    value?.state === CUSTOMER_STATES.ACTIVE.id ||
+                    "No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.",
+                  requiredAddress: (value) =>
+                    isBudgetConfirmed(watchState) &&
+                      (!value?.addresses.length && !watchPickUp)
+                      ? "Dirección requerida."
+                      : true,
+                  requiredPhone: (value) =>
+                    isBudgetConfirmed(watchState) && !value?.phoneNumbers.length
+                      ? "Teléfono requerido."
+                      : true,
                 }
-              })
-            });
-          }}
-        />
+              }}
+              elements={customers}
+              searchFields={['name', 'id']}
+              getResultProps={(customer) => ({
+                key: customer.id,
+                title: getCustomerSearchTitle(customer),
+                description: getCustomerSearchDescription(customer),
+                value: customer,
+              })}
+              persistSelection={true}
+            />
+          </FormField>
+          <FormField flex="1">
+            <TextField
+              flex="2"
+              label="Dirección"
+              placeholder="Dirección"
+              disabled
+              error={
+                !watchCustomer?.addresses?.length &&
+                errors.customer?.type === "requiredAddress" &&
+                errors.customer?.message
+              }
+              value={
+                watchPickUp
+                  ? PICK_UP_IN_STORE
+                  : watchCustomer?.addresses?.length > 0
+                    ? `${watchCustomer.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
+                    : "Cliente sin dirección"
+              }
+              extraContent={() => {
+                const { additionalAddresses } = getAddressesForDisplay(watchCustomer?.addresses || []);
+                return additionalAddresses ? <AddressesTooltip input addresses={additionalAddresses} /> : null;
+              }}
+            />
+          </FormField>
+          <FormField flex="1">
+            <TextField
+              flex="2"
+              label="Teléfono"
+              placeholder="Teléfono"
+              disabled
+              error={
+                !watchCustomer?.phoneNumbers?.length &&
+                errors.customer?.type === "requiredPhone" &&
+                errors.customer?.message
+              }
+              value={
+                watchCustomer?.phoneNumbers?.length > 0
+                  ? `${watchCustomer.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
+                  : "Cliente sin teléfono"
+              }
+              extraContent={() => {
+                const { additionalPhones } = getPhonesForDisplay(watchCustomer?.phoneNumbers || []);
+                return additionalPhones ? <PhonesTooltip input phones={additionalPhones} /> : null;
+              }}
+            />
+          </FormField>
+        </FieldsContainer>
+        <FieldsContainer>
+          <Controller
+            name="productsValidation"
+            control={control}
+            rules={{
+              validate: () =>
+                watchProducts?.length > 0 || "Al menos un producto es requerido.",
+            }}
+            render={() => null}
+          />
+          <FormField flex="1">
+            <SearchControlled
+              name="product"
+              label="Producto"
+              required
+              clearAfterSelect
+              placeholder="Televisor 100”"
+              externalError={
+                errors.productsValidation && {
+                  content: errors.productsValidation.message,
+                  pointing: 'above',
+                }
+              }
+              // rules={{
+              //   validate: () => {
+              //     return !!watchProducts.length || "Al menos un producto es requerido.";
+              //   },
+              // }}
+              elements={products}
+              searchFields={['name', 'id']}
+              getResultProps={(product) => ({
+                key: product.id,
+                title: getProductSearchTitle(product),
+                description: getProductSearchDescription(product),
+                value: product,
+              })}
+              onAfterChange={(selectedProduct) => {
+                appendProduct({
+                  ...selectedProduct,
+                  quantity: selectedProduct?.state === PRODUCT_STATES.OOS.id ? 0 : 1,
+                  discount: 0,
+                  rowId: uuid(),
+                  delivered: 0,
+                  key: uuid(),
+                  ...(selectedProduct?.fractionConfig?.active && {
+                    fractionConfig: {
+                      ...selectedProduct?.fractionConfig,
+                      value: 1,
+                      price: selectedProduct?.price,
+                    }
+                  })
+                });
+              }}
+            />
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
+        </FieldsContainer>
         <Loader active={isTableLoading}>
           <Table
             mainKey="rowId"
@@ -648,7 +693,7 @@ const BudgetForm = ({
               <FormField flex="1" label="Métodos de pago" control={Input} height="auto">
                 <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                   <Button
-                    $paddingLeft="18px"
+                    padding="0 18px"
                     width="fit-content"
                     type="button"
                     basic={value?.length !== paymentMethods?.length}
@@ -666,7 +711,7 @@ const BudgetForm = ({
                   <VerticalDivider />
                   {paymentMethods?.map(({ key, text, value: methodValue }) => (
                     <Button
-                      $paddingLeft="18px"
+                      padding="0 18px"
                       width="fit-content"
                       key={key}
                       basic={!value?.includes(methodValue)}
@@ -717,6 +762,7 @@ const BudgetForm = ({
           }
         />
       </Form>
+      {/* </FormProvider > */}
     </>
   );
 };

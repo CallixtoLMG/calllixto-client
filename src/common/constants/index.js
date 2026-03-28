@@ -276,6 +276,9 @@ export const ICONS = {
   DROPDOWN: "dropdown",
   MINUS_SQUARE: "minus square",
   PLUS_SQUARE: "plus square",
+  REDO: "redo",
+  MINUS: "minus",
+  STICKY_NOTE:"sticky note"
 };
 
 export const ALL = "all";
@@ -353,7 +356,7 @@ export const INFO = {
                   Listado de clientes según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
                   Para crear un cliente, presioná el botón <Accent>Crear</Accent>.
@@ -408,7 +411,7 @@ export const INFO = {
                   Listado de proveedores según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
                   Para crear un proveedor, presioná el botón <Accent>Crear</Accent>.
@@ -472,7 +475,7 @@ export const INFO = {
                   Listado de marcas según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos visibles.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los datos visibles.
                 </ListItem>
                 <ListItem>
                   Para crear una marca, presioná el botón <Accent>Crear</Accent>.
@@ -527,7 +530,7 @@ export const INFO = {
                   Listado de productos según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los datos visibles.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los datos visibles.
                 </ListItem>
                 <ListItem>
                   Para crear un producto, presioná el botón <Accent>Crear</Accent>.
@@ -603,7 +606,7 @@ export const INFO = {
                   En ventas confirmadas, pasando el cursor sobre el <Accent>ID</Accent>, se podrá visualizar quién y cuándo se confirmó la venta. Si la venta está pagada en su totalidad, aparecerá el icono <span><Icon name={ICONS.DOLLAR} color={COLORS.GREEN} /></span>.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
                   Para crear una venta, presioná el botón <Accent>Crear</Accent>.
@@ -673,7 +676,7 @@ export const INFO = {
                   Listado de gastos según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
                   Para crear un gasto, presioná el botón <Accent>Crear</Accent>.
@@ -728,7 +731,7 @@ export const INFO = {
                   Listado de cajas según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
                   Para crear una caja, presioná el botón <Accent>Abrir</Accent>.
@@ -755,7 +758,7 @@ export const INFO = {
                   Acciones disponibles:
                   <List list>
                     <ListItem>
-                      Si no se estableció una fecha de cierre al crearla, podrás cerrar la caja manualmente desde el botón <Accent>Cerrar Caja</Accent>.
+                      Si no se estableció una fecha de cierre al crearla, podrás cerrar la caja manualmente desde el botón <Accent>Cerrar caja</Accent>.
                     </ListItem>
                     <ListItem>
                       Eliminar la caja con el botón de <Accent>Eliminar</Accent> (solo disponible para administradores).
@@ -777,7 +780,7 @@ export const INFO = {
                   Listado de usuarios según los filtros activos.
                 </ListItem>
                 <ListItem>
-                  Debajo de la tabla se encuentra el botón <Accent>Descargar Excel</Accent>, que permite exportar los elementos filtrados a un archivo.
+                  Debajo de la tabla se encuentra el botón <Accent>Descargar excel</Accent>, que permite exportar los elementos filtrados a un archivo.
                 </ListItem>
                 <ListItem>
                   Para crear un usuario, presioná el botón <Accent>Crear</Accent>.

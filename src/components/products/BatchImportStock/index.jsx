@@ -83,18 +83,28 @@ export const BatchImportStock = ({
 
   const parseExcelDate = (value) => {
     if (!value) return null;
-  
+
     if (typeof value === "number") {
       return dayjs("1899-12-30")
         .add(value, "day")
         .toDate();
     }
-  
-    const strict = dayjs(value, "DD/MM/YYYY", true);
-    if (strict.isValid()) return strict.toDate();
-  
-    const parsed = dayjs(value);
-    return parsed.isValid() ? parsed.toDate() : null;
+
+    const strict = dayjs(value, ["D/M/YYYY", "DD/MM/YYYY"], true);
+
+    if (!strict.isValid()) return null;
+
+    const [day, month, year] = value.split("/").map(Number);
+
+    if (
+      day < 1 || day > 31 ||
+      month < 1 || month > 12 ||
+      year < 1000 || year > 9999
+    ) {
+      return null;
+    }
+
+    return strict.toDate();
   };
 
   const parseExcel = (data) => {
@@ -142,10 +152,15 @@ export const BatchImportStock = ({
         return;
       }
 
-      const parsedDate = parseExcelDate(row.date);
+      const originalDate = row.date;
+      const parsedDate = parseExcelDate(originalDate);
 
       if (!parsedDate) {
-        invalid.push({ ...row, msg: "Fecha inválida" });
+        invalid.push({
+          ...row,
+          originalDate, 
+          msg: "Fecha inválida",
+        });
         return;
       }
 
@@ -171,7 +186,7 @@ export const BatchImportStock = ({
       ["Id", "Fecha", "Cantidad", "Factura", "Comentarios", "Error"],
       ...downloadRows.map((row) => [
         row.productId,
-        dayjs(row.date).format("DD/MM/YYYY"),
+        row.originalDate ?? row.date,
         row.quantity,
         row.invoiceNumber,
         row.comments,
@@ -223,7 +238,7 @@ export const BatchImportStock = ({
       ...flow,
       date: getDateUTC(flow.date),
     }));
-  
+
     mutate({ flows });
   });
 
@@ -232,7 +247,7 @@ export const BatchImportStock = ({
       id: 1,
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      tooltip: "Eliminar",
+      tooltip: "Eliminar fila",
       onClick: (_, index) => {
         const updated = [...flows];
         updated.splice(index, 1);
@@ -308,6 +323,7 @@ export const BatchImportStock = ({
         as={BatchImportIcon}
         onClick={handleOpenFile}
         type="button"
+        $iconOnly
       >
         <Icon
           name={importSettings.icon}

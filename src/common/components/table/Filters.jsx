@@ -90,7 +90,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
             icon={ICONS.SEARCH}
             submit
             color={isDirty ? COLORS.BLUE : undefined}
-            width="130px"
+            iconOnly
           />
           {onRefetch &&
             <Dropdown width="130px" pointing as={CustomButton} text='Actualizar' icon={ICONS.REFRESH} floating labeled button className='icon'>
@@ -109,7 +109,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
       <ModalAction
         title={`¿Quieres realizar una actualización completa de ${text} ?  `}
         onConfirm={handleConfirmHardUpdate}
-        confirmButtonText="Sí, Actualizar"
+        confirmButtonText="Actualizar"
         confirmButtonIcon={ICONS.REFRESH}
         showModal={showModal}
         setShowModal={setShowModal}

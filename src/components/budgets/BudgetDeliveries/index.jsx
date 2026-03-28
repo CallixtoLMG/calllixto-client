@@ -1,14 +1,14 @@
 import { useConsumeStock } from "@/api/stock";
-import { Button, FieldsContainer, Flex } from "@/common/components/custom";
+import { IconedButton } from "@/common/components/buttons";
+import { FieldsContainer, Flex } from "@/common/components/custom";
 import { NumberField, TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { Table } from "@/common/components/table";
 import { COLORS, ICONS } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
-import { Popup } from "semantic-ui-react";
 import { FlexColumn } from "../../../common/components/custom";
 import { Header } from "../../products/ProductStock/styles";
 import { ADJUST_DELIVERY, DELIVERY, buildBudgetDeliveriesColumns, getDeliveryStats, hasInvalidStockQuantities } from "../budgets.constants";
@@ -105,20 +105,29 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
   const handleFillAll = () => {
     const values = {};
 
-    operableProducts.forEach(product => {
-      const { delivered, pending } = getDeliveryStats(product);
-
-      values[product.rowId] =
-        mode === DELIVERY ? pending : delivered;
+    operableProducts.forEach((product) => {
+      values[product.rowId] = getRowTargetQuantity(product);
     });
 
     setQuantityByRow(values);
   };
 
-  const handleResetModal = () => {
-    setQuantityByRow({});
-    setCommentsByRow({});
-    setDeliveryNote("");
+  const handleClearAll = () => {
+    const values = {};
+
+    operableProducts.forEach((product) => {
+      values[product.rowId] = 0;
+    });
+
+    setQuantityByRow(values);
+  };
+
+  const handleToggleAll = () => {
+    if (areAllRowsCompleted) {
+      handleClearAll();
+    } else {
+      handleFillAll();
+    }
   };
 
   const resetModalState = () => {
@@ -142,6 +151,42 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
     [, setValue]
   );
 
+  const getRowTargetQuantity = useCallback((product) => {
+    const { delivered, pending } = getDeliveryStats(product);
+
+    return mode === DELIVERY ? pending : delivered;
+  }, [mode]);
+
+  const handleFillRow = (product) => {
+    setQuantityByRow((prev) => ({
+      ...prev,
+      [product.rowId]: getRowTargetQuantity(product),
+    }));
+  };
+
+  const handleClearRow = (product) => {
+    setQuantityByRow((prev) => ({
+      ...prev,
+      [product.rowId]: 0,
+    }));
+  };
+
+  const areAllRowsCompleted = useMemo(() => {
+    if (!operableProducts.length) return false;
+  
+    return operableProducts.every((product) => {
+      const current = Number(quantityByRow[product.rowId] ?? 0);
+      const target = Number(getRowTargetQuantity(product) ?? 0);
+      return current === target;
+    });
+  }, [operableProducts, quantityByRow, getRowTargetQuantity]);
+
+  const hasAnyRowValue = useMemo(() => {
+    return operableProducts.some(
+      (product) => Number(quantityByRow[product.rowId] ?? 0) > 0
+    );
+  }, [operableProducts, quantityByRow]);
+
   const modalColumns = useMemo(() => [
     {
       id: 1,
@@ -153,7 +198,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
       id: 2,
       title: "Cantidad total",
       value: (product) => product.quantity,
-      width: 4,
+      width: 1,
     },
     {
       id: 3,
@@ -162,7 +207,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
         const { delivered, pending } = getDeliveryStats(product);
         return mode === DELIVERY ? pending : delivered;
       },
-      width: 4,
+      width: 1,
     },
     {
       id: 4,
@@ -206,7 +251,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
       value: (product) => (
         <TextField
           width="100%"
-          placeholder="Aclaración (opcional)"
+          placeholder="Aclaración"
           value={commentsByRow[product.rowId] ?? ""}
           onChange={(e) =>
             setCommentsByRow(prev => ({
@@ -216,7 +261,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
           }
         />
       ),
-      width: 4,
+      width: 5,
     },
   ], [mode, quantityByRow, commentsByRow]);
 
@@ -233,25 +278,44 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
   const actions = [
     {
       id: "fill-row",
-      icon: ICONS.ADD,
-      color: COLORS.BLUE,
-      tooltip: mode === DELIVERY
-        ? "Completar entrega"
-        : "Completar descuento",
-      onClick: (product) => {
-        const delivered = Number(product.delivered ?? 0);
-        const pending = (product.quantity ?? 0) - delivered;
+      icon: (product) => {
+        const current = Number(quantityByRow[product.rowId] ?? 0);
+        const target = Number(getRowTargetQuantity(product) ?? 0);
 
-        setQuantityByRow(prev => ({
-          ...prev,
-          [product.rowId]:
-            mode === DELIVERY
-              ? pending
-              : delivered,
-        }));
+        return current === target ? ICONS.MINUS : ICONS.ADD;
+      },
+      color: (product) => {
+        const current = Number(quantityByRow[product.rowId] ?? 0);
+        const target = Number(getRowTargetQuantity(product) ?? 0);
+
+        return current === target ? COLORS.ORANGE : COLORS.BLUE;
+      },
+      tooltip: (product) => {
+        const current = Number(quantityByRow[product.rowId] ?? 0);
+        const target = Number(getRowTargetQuantity(product) ?? 0);
+
+        if (current === target) {
+          return mode === DELIVERY
+            ? "Limpiar entrega"
+            : "Limpiar descuento";
+        }
+
+        return mode === DELIVERY
+          ? "Completar entrega"
+          : "Completar descuento";
+      },
+      onClick: (product) => {
+        const current = Number(quantityByRow[product.rowId] ?? 0);
+        const target = Number(getRowTargetQuantity(product) ?? 0);
+
+        if (current === target) {
+          handleClearRow(product);
+        } else {
+          handleFillRow(product);
+        }
       },
     },
-  ]
+  ];
 
   return (
     <>
@@ -259,35 +323,35 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
         <Flex $columnGap="15px" $justifyContent="space-between">
           <Header>Productos</Header>
           <Flex $columnGap="15px">
-            <Button
+            <IconedButton
               labelPosition="left"
               icon={ICONS.ARROW_UP}
               color={COLORS.GREEN}
-              content="Entregar"
+              text={!canDeliver ? "Se han entregado todos los productos" : "Entregar productos"}
               disabled={!canDeliver || isBudgetCancelled(state)}
               onClick={() => {
                 setMode(DELIVERY);
                 setShowModal(true);
               }}
+              iconOnly
             />
-            <Popup
-              trigger={
-                <Button
-                  labelPosition="left"
-                  icon={ICONS.ARROW_DOWN}
-                  color={COLORS.ORANGE}
-                  width="fit-content"
-                  content="Descontar entregas"
-                  disabled={!canReturn}
-                  onClick={() => {
-                    setMode(ADJUST_DELIVERY);
-                    setShowModal(true);
-                  }}
-                />
+            <IconedButton
+              labelPosition="left"
+              icon={ICONS.ARROW_DOWN}
+              color={COLORS.ORANGE}
+              disabled={!canReturn}
+              onClick={() => {
+                setMode(ADJUST_DELIVERY);
+                setShowModal(true);
+              }}
+              iconOnly
+              popupPosition="top left"
+              popupContent={
+                <>
+                  <strong><div>Descontar entregas</div></strong>
+                  <div>Permite reducir unidades entregadas cuando se registró una entrega por error.</div>
+                </>
               }
-              content="Permite reducir unidades entregadas cuando se registró una entrega por error."
-              position="top center"
-              size="mini"
             />
           </Flex>
         </Flex>
@@ -321,34 +385,33 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
                 setDeliveryNote(e.target.value)
               }
             />
-
             <Flex $columnGap="14px" $alignSelf="self-end" >
-              <Button
-                width="fit-content"
-                labelPosition="left"
-                icon={ICONS.CHECK}
-                color={COLORS.BLUE}
-                content={mode === DELIVERY ? "Completar todo" : "Completar descuento"}
-                onClick={handleFillAll}
-              />
-              <Button
-                width="fit-content"
-                labelPosition="left"
-                color={COLORS.BROWN}
-                icon={ICONS.UNDO}
-                content="Restaurar"
-                onClick={handleResetModal}
+              <IconedButton
+                icon={areAllRowsCompleted ? ICONS.UNDO : ICONS.ADD}
+                color={areAllRowsCompleted ? COLORS.ORANGE : COLORS.BLUE}
+                text={
+                  areAllRowsCompleted
+                    ? (mode === DELIVERY ? "Limpiar todo" : "Limpiar descuento")
+                    : (mode === DELIVERY ? "Completar todas las entregas" : "Completar descuento")
+                }
+                onClick={handleToggleAll}
+                disabled={!operableProducts.length}
+                iconOnly
+                popupPosition="top left"
               />
             </Flex>
-            <FlexColumn width="100%" $marginRight="30px">
+            <FlexColumn width="100%" >
               <Table
                 mainKey="rowId"
                 headers={modalColumns}
                 elements={operableProducts}
                 actions={actions}
+                $actionButtonInside
               />
               <Flex $alignSelf="self-end">
-                <small>Las cantidades ingresadas se restarán de las unidades entregadas actualmente.</small>
+                {mode === ADJUST_DELIVERY &&
+                  <small>Las cantidades ingresadas se restarán de las unidades entregadas actualmente.</small>
+                }
               </Flex>
             </FlexColumn>
           </FieldsContainer>

@@ -61,11 +61,12 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       sortable: true,
       align: "left",
       width: 2,
+      whiteSpace:"nowrap",
       value: (cashBalance) => (
-        <Flex $justifyContent="space-between">
+        <Flex $columnGap="7px" $justifyContent="space-between">
           {getFormatedDate(cashBalance.startDate, DATE_FORMATS.DATE_WITH_TIME)}
-          <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
-            {cashBalance.comments && <CommentTooltip comment={cashBalance.comments} />}
+          <Flex $alignItems="center" $justifyContent="flex-end">
+            {cashBalance.comments && <CommentTooltip lowTooltip comment={cashBalance.comments} />}
           </Flex>
         </Flex>
       ),
@@ -73,7 +74,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
     },
     {
       id: 3,
-      title: "Monto Inicial",
+      title: "Monto inicial",
       key: "initialAmount",
       sortable: true,
       align: "left",
@@ -83,7 +84,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
     },
     {
       id: 4,
-      title: "Monto Actual",
+      title: "Monto actual",
       key: "currentAmount",
       sortable: true,
       align: "left",
@@ -118,6 +119,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       id: 6,
       width: 2,
       title: "Fecha cierre",
+      whiteSpace:"nowrap",
       key: "closeDate",
       sortable: true,
       align: "left",
@@ -162,14 +164,12 @@ export const BILLS_DETAILS_TABLE_HEADERS = [
   {
     id: 1,
     title: "Denominación",
-    width: 4,
     key: "denomination",
     sortable: true,
     value: (billDetail) => <PriceLabel value={billDetail.denomination} />,
     sortValue: (billDetail) => billDetail.denomination ?? ""
   }, {
     id: 2,
-    width: 5,
     title: 'Cantidad',
     key: "quantity",
     align: "right",
@@ -179,7 +179,6 @@ export const BILLS_DETAILS_TABLE_HEADERS = [
   {
     id: 3,
     title: "Subtotal",
-    width: 8,
     key: "subtotal",
     align: "right",
     value: (billDetail) => {
@@ -221,6 +220,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
     title: 'Fecha',
     key: 'date',
     width: 3,
+    whiteSpace:"nowrap",
     sortable: true,
     sortValue: (element) => element.date ?? "",
     value: (element) => (
@@ -245,7 +245,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
   },
   {
     id: 3,
-    title: 'Método de Pago',
+    title: 'Método de pago',
     key: 'method',
     sortable: true,
     sortValue: (element) => element.method ?? "",

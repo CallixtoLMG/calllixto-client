@@ -1,4 +1,5 @@
 import { FormField, Input } from "@/common/components/custom";
+import { ICONS } from "@/common/constants";
 import { getNumberFormated } from "@/common/utils";
 import { useRef, useState } from "react";
 import { Icon } from "semantic-ui-react";
@@ -41,6 +42,7 @@ export const PriceField = ({
       required={required}
     >
       <Input
+        width="inherit"
         value={formattedValue}
         onChange={handleChange}
         onBlur={() => { isUserTyping.current = false; }}
@@ -51,8 +53,8 @@ export const PriceField = ({
         onKeyDown={onKeyDown}
         readOnly={readOnly}
       >
-        <Icon name="dollar" />
-        <input />
+        <Icon name={ICONS.DOLLAR} />
+        <input style={{ width: "100%" }} />
       </Input>
     </FormField>
   );

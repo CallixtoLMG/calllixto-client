@@ -47,7 +47,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
 
     const productsHeaders = Array.from({ length: maxProductCount }, (_, i) => `Producto ${i + 1}`);
     const headers = ['ID', 'Estado', 'Cliente', 'Fecha', "Total", "Descuento", "Cargo adicional", "Vendedor", ...productsHeaders];
-    downloadExcel([headers, ...mappedBudgets], "Lista de Ventas");
+    downloadExcel([headers, ...mappedBudgets], "Lista de ventas");
   }, []);
 
   const {
@@ -123,7 +123,8 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
           >
             <DropdownControlled
               filter
-              width="200px"
+              minWidth="150px"
+              width="min-content"
               name="state"
               label="Estado"
               options={BUDGET_STATES_OPTIONS}
@@ -131,21 +132,24 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
               afterChange={onSubmit}
             />
             <TextControlled
-              width="120px"
+              width="8vw"
+              minWidth="100px"
               name="id"
               label="Id"
               placeholder="MI525"
             />
             <TextControlled
-              flex="1"
+              width="13vw"
+              minWidth="120px"
               name="customer"
               label="Cliente"
               placeholder="Martín Bueno"
             />
             <SearchControlled
+              width="13vw"
+              minWidth="120px"
               name="createdBy"
               label="Vendedor"
-              width="200px"
               placeholder="Leandro Gómez"
               elements={usersOptions}
               searchFields={['text', 'value']}
@@ -160,8 +164,9 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
             />
             {filters.state === BUDGET_STATES.CONFIRMED.id && (
               <DropdownControlled
+                minWidth="min-content"
+                width="130px"
                 filter
-                width="200px"
                 name="paymentStatus"
                 label="Estado de pago"
                 options={PAYMENT_STATES_OPTIONS}
@@ -170,7 +175,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
             )}
           </Filters>
         </Form>
-      </FormProvider>
+      </FormProvider >
       <Table
         isLoading={isLoading}
         headers={budgetColumns}

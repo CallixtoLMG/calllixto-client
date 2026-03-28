@@ -20,11 +20,15 @@ const CreateBudgetDeliveriesForm = () => {
   );
 
   const deliveryNote = useWatch({ control, name: "deliveryNote", });
-  const canCompleteAll = useMemo(() => {
+  const hasPendingDeliveries = useMemo(() => {
     return products.some((product) => {
       const { pending } = getDeliveryStats(product);
       return pending > 0;
     });
+  }, [products]);
+
+  const hasAnyDelivered = useMemo(() => {
+    return products.some((product) => Number(product.delivered ?? 0) > 0);
   }, [products]);
 
   const columns = useMemo(() => [
@@ -143,15 +147,29 @@ const CreateBudgetDeliveriesForm = () => {
 
   const handleCompleteAll = () => {
     products.forEach((product, index) => {
-      setValue(
-        `products.${index}.delivered`,
-        Number(product.quantity ?? 0),
-        {
-          shouldDirty: true,
-          shouldValidate: true,
-        }
-      );
+      setValue(`products.${index}.delivered`, Number(product.quantity ?? 0), {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
     });
+  };
+
+  const handleClearAll = () => {
+    products.forEach((product, index) => {
+      setValue(`products.${index}.delivered`, 0, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    });
+  };
+
+  const handleToggleAllDeliveries = () => {
+    if (hasPendingDeliveries) {
+      handleCompleteAll();
+      return;
+    }
+
+    handleClearAll();
   };
 
   const handleCompleteRow = (product, index) => {
@@ -165,17 +183,44 @@ const CreateBudgetDeliveriesForm = () => {
     );
   };
 
+  const handleClearRow = (index) => {
+    setValue(
+      `products.${index}.delivered`,
+      0,
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      }
+    );
+  };
+
   const actions = [
     {
       id: 1,
-      icon: ICONS.ADD,
-      color: COLORS.BLUE,
-      onClick: (product, index) => {
-        handleCompleteRow(product, index);
+      icon: (product) => {
+        const { pending } = getDeliveryStats(product);
+        return pending > 0 ? ICONS.ADD : ICONS.MINUS;
       },
-      tooltip: 'Completar entrega',
+      color: (product) => {
+        const { pending } = getDeliveryStats(product);
+        return pending > 0 ? COLORS.BLUE : COLORS.ORANGE;
+      },
+      onClick: (product, index) => {
+        const { pending } = getDeliveryStats(product);
+
+        if (pending > 0) {
+          handleCompleteRow(product, index);
+        } else {
+          handleClearRow(index);
+        }
+      },
+      tooltip: (product) => {
+        const { pending } = getDeliveryStats(product);
+        return pending > 0
+          ? "Completar entrega de producto"
+          : "Limpiar entrega de producto";
+      },
       width: "100%",
-      disabled: !canCompleteAll
     },
   ];
 
@@ -196,13 +241,14 @@ const CreateBudgetDeliveriesForm = () => {
             }
           />
           <IconedButton
-            text="Completar entrega"
-            icon={ICONS.ADD}
-            color={COLORS.BLUE}
-            onClick={handleCompleteAll}
+            text={hasPendingDeliveries ? "Completar todas las entregas de la venta" : "Limpiar todas las entregas"}
+            icon={hasPendingDeliveries ? ICONS.ADD : ICONS.MINUS}
+            color={hasPendingDeliveries ? COLORS.BLUE : COLORS.ORANGE}
+            onClick={handleToggleAllDeliveries}
             alignSelf="end"
-            disabled={!canCompleteAll}
+            disabled={!hasPendingDeliveries && !hasAnyDelivered}
             height="38px"
+            iconOnly
           />
         </Flex>
       </Flex>

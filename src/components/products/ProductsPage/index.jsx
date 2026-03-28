@@ -119,7 +119,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
     const actions = [
       <IconedButton
         key={2}
-        text="Descargar Códigos"
+        text="Descargar códigos"
         icon={ICONS.BARCODE}
         onClick={handlePrint}
       />
@@ -129,7 +129,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
       actions.unshift(
         <IconedButton
           key={1}
-          text="Eliminar Productos"
+          text="Eliminar productos"
           icon={ICONS.TRASH}
           color={COLORS.RED}
           onClick={() => setShowConfirmDeleteModal(true)}
@@ -155,7 +155,8 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
               hydrated={hydrated}
             >
               <DropdownControlled
-                width="200px"
+                minWidth="150px"
+                width="min-content"
                 name="state"
                 label="Estado"
                 options={PRODUCT_STATES_OPTIONS}
@@ -165,8 +166,20 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
                   setSelectedProducts({});
                 }}
               />
-              <TextControlled name="id" label="Id" placeholder="SECG001" width="200px" />
-              <TextControlled name="name" label="Nombre" placeholder="Caramelito" width="350px" />
+              <TextControlled
+                name="id"
+                label="Id"
+                placeholder="SECG001"
+                width="12vw"
+                minWidth="100px"
+              />
+              <TextControlled
+                name="name"
+                label="Nombre"
+                placeholder="Caramelito"
+                width="20vw"
+                minWidth="200px"
+              />
             </Filters>
           </Form>
         </FormProvider>

@@ -7,11 +7,11 @@ export const TagsTooltip = ({ tags, tooltip, maxWidthOverflow, lineClamp, icon =
   if (!tags || tags.length === 0) return null;
 
   return (
-    <Flex $columnGap="7px" $alignItems="center">
+    <Flex zIndex="500" $columnGap="7px" $alignItems="center">
       <Popup
         size="mini"
         trigger={
-          <Label width="fit-content" size={SIZES.TINY} color={validTags[0]?.color}>
+          <Label pointerEvents="auto" zIndex="2" width="fit-content" size={SIZES.TINY} color={validTags[0]?.color}>
             <OverflowWrapper position="bottom center" maxWidth={maxWidthOverflow} $lineClamp={lineClamp} popupContent={validTags[0]?.name}>
               {validTags[0]?.name}
             </OverflowWrapper>
