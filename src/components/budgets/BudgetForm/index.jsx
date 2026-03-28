@@ -17,15 +17,14 @@ import { COLORS, DATE_FORMATS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/c
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay, removeNullish } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
-import { getSubtotal, getTotalSum, isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
+import { isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
-import CreateBudgetPayments from "@/components/payments/CreateBudgetPayment";
 import { LIST_ATTRIBUTES, PRODUCT_STATES, getProductSearchDescription, getProductSearchTitle } from "@/components/products/products.constants";
 import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks";
 import { pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Controller, FormProvider, useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import { CUSTOMER_STATES, getCustomerSearchDescription, getCustomerSearchTitle } from "../../customers/customers.constants";
@@ -33,87 +32,30 @@ import ModalProductUpdates from "../ModalProductUpdates";
 import ModalComment from "./ModalComment";
 import { Container, VerticalDivider } from "./styles";
 
-const EMPTY_BUDGET = (user) => ({
-  createdBy: user?.name,
-  customer: { name: '', addresses: [], phoneNumbers: [] },
-  products: [],
-  comments: '',
-  globalDiscount: 0,
-  additionalCharge: 0,
-  paymentMethods: [],
-  expirationOffsetDays: '',
-  paymentsMade: [],
-  pickUpInStore: false,
-});
-
 const BudgetForm = ({
   onSubmit,
   products,
-  settings = {},
   customers = [],
   budget,
-  user,
   isLoading,
   isCloning,
   draft,
   paymentMethods = [],
+  total,
+  subtotal,
+  subtotalAfterDiscount,
 }) => {
-  const clonedInitialValues = useMemo(() => {
-    if (!isCloning || !budget) return EMPTY_BUDGET(user);
 
-    return {
-      products: budget.products.map((product) => ({
-        ...product,
-        quantity: product.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
-        ...(product.fractionConfig?.active && {
-          fractionConfig: {
-            ...product.fractionConfig,
-            value: product.fractionConfig.value || 1,
-            price: product.price,
-          }
-        })
-      })),
-      createdBy: user?.name,
-      paymentMethods: paymentMethods.map(({ value }) => value),
-      state: BUDGET_STATES.PENDING.id,
-      customer: { name: '', addresses: [], phoneNumbers: [] },
-      comments: '',
-      globalDiscount: 0,
-      additionalCharge: 0,
-      expirationOffsetDays: '',
-      paymentsMade: [],
-      pickUpInStore: false,
-    };
-  }, [budget, isCloning, user, paymentMethods]);
+  const {
+    control,
+    watch,
+    setValue,
+    handleSubmit,
+    reset,
+    trigger,
+    formState: { isDirty, errors },
+  } = useFormContext();
 
-  const methods = useForm({
-    defaultValues: isCloning && budget
-      ? clonedInitialValues
-      : budget && draft
-        ? {
-          ...budget,
-          createdBy: user?.name,
-          paymentsMade: budget.paymentsMade || [],
-        }
-        : {
-          ...EMPTY_BUDGET(user),
-          ...settings.defaultsCreate,
-          ...(settings?.defaultsCreate?.customer && { customer: customers.find(c => c.id === settings.defaultsCreate.customer.id) ?? null }),
-        },
-    mode: 'onSubmit',
-    reValidateMode: 'onChange',
-  });
-
-  useEffect(() => {
-    const current = methods.getValues("paymentMethods");
-    const all = paymentMethods?.map(m => m.value);
-
-    if (!current?.length) {
-      methods.setValue("paymentMethods", all, { shouldDirty: false });
-    }
-  }, [paymentMethods, methods]);
-
-  const { control, trigger, handleSubmit, setValue, watch, reset, formState: { isDirty, errors } } = methods;
   const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
     control,
     name: "products"
@@ -121,149 +63,112 @@ const BudgetForm = ({
   const [watchGlobalDiscount, watchAdditionalCharge, watchCustomer, watchState, watchPickUp, watchProducts] = watch(['globalDiscount', 'additionalCharge', 'customer', 'state', 'pickUpInStore', 'products']);
   const hasShownModal = useRef(false);
   const productSearchRef = useRef(null);
+  const initialClonedProductsRef = useRef(null);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
-  const [temporaryProducts, setTemporaryProducts] = useState([]);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [shouldShowModal, setShouldShowModal] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(settings?.defaultsCreate?.state === BUDGET_STATES.CONFIRMED.id);
-  const [subtotal, setSubtotal] = useState(0);
-  const [subtotalAfterDiscount, setSubtotalAfterDiscount] = useState(0);
-  const [total, setTotal] = useState(0);
   const watchExpirationOffsetDays = watch("expirationOffsetDays");
+  const isConfirmed = watchState === BUDGET_STATES.CONFIRMED.id;
+  const canSubmit = budget?.state === BUDGET_STATES.DRAFT.id || isDirty;
 
-  const getRestoredProducts = useCallback((sourceProducts) => {
-    return sourceProducts.map(product => {
-      const latestProduct = products.find(p => p.id === product.id);
-      const updatedState = latestProduct?.state ?? product.state;
+  useEffect(() => {
+
+    if (!isCloning) return;
+    if (!Array.isArray(budget?.products)) return;
+    if (!Array.isArray(products)) return;
+    if (!initialClonedProductsRef.current) {
+      initialClonedProductsRef.current = budget.products;
+    }
+    if (hasShownModal.current) return;
+
+    const budgetProducts = budget.products;
+
+    const existingIds = new Set(products.map(product => product.id));
+
+    const removed = budgetProducts.filter(
+      budgetProduct => !existingIds.has(budgetProduct.id)
+    );
+
+    const outdated = products.filter(product => {
+      const original = budgetProducts.find(budgetProducts => budgetProducts.id === product.id);
+      if (!original) return false;
+
+      return (
+        original.price !== product.price ||
+        original.state !== product.state ||
+        original.editablePrice !== product.editablePrice ||
+        original.fractionConfig?.active !== product.fractionConfig?.active
+      );
+    });
+
+    if (outdated.length || removed.length) {
+      setOutdatedProducts(outdated);
+      setRemovedProducts(removed);
+      setShouldShowModal(true);
+      hasShownModal.current = true;
+    }
+  }, [isCloning, budget?.products, products, hasShownModal]);
+
+  const handleConfirmUpdate = () => {
+    const currentProducts = watchProducts;
+
+    const updatedProducts = currentProducts.map(product => {
+      const outdated = outdatedProducts.find(op => op.id === product.id);
+
+      const base = outdated ?? product;
 
       return {
         ...product,
-        state: updatedState,
-        quantity: updatedState === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
+        name: base.name,
+        price: Number(base.price ?? product.price ?? 0),
+        quantity: Number(product.quantity ?? 1),
+        discount: Number(product.discount ?? 0),
+        editablePrice: base.editablePrice ?? product.editablePrice ?? false,
+        fractionConfig: base.fractionConfig
+          ? {
+            ...base.fractionConfig,
+            value: Number(base.fractionConfig.value ?? 1),
+            price: Number(base.fractionConfig.price ?? base.price ?? 0),
+          }
+          : product.fractionConfig,
+        state: base.state,
       };
-    }).filter(product =>
-      product.state !== PRODUCT_STATES.INACTIVE.id &&
-      product.state !== PRODUCT_STATES.DELETED.id &&
-      products.some(p => p.id === product.id)
-    );
-  }, [products]);
-
-  useEffect(() => {
-    const updatedSubtotalAfterDiscount = getSubtotal(subtotal, -watchGlobalDiscount);
-    setSubtotalAfterDiscount(updatedSubtotalAfterDiscount);
-
-    const updatedtotal = getSubtotal(updatedSubtotalAfterDiscount, watchAdditionalCharge);
-    setTotal(updatedtotal);
-  }, [subtotal, watchGlobalDiscount, watchAdditionalCharge, trigger]);
-
-  useEffect(() => {
-    if (isCloning && !hasShownModal.current) {
-      setIsTableLoading(true);
-      let budgetProducts = [...budget.products];
-
-      const existingProductIds = new Set(products.map(p => p.id));
-      const removedProducts = budgetProducts.filter(p => !existingProductIds.has(p.id));
-      const validProducts = budgetProducts.filter(p => existingProductIds.has(p.id));
-
-      setValue("products", validProducts);
-
-      const outdatedProducts = products.filter(product => {
-        const budgetProduct = validProducts.find(bp => bp.id === product.id);
-
-        if (budgetProduct) {
-          const priceChanged = budgetProduct.price !== product.price;
-          const stateChanged = budgetProduct.state !== product.state;
-          const editableChanged = budgetProduct.editablePrice !== product.editablePrice;
-
-          const fractionConfigChanged =
-            (budgetProduct.fractionConfig?.active !== product.fractionConfig?.active) ||
-            (
-              budgetProduct.fractionConfig?.active &&
-              product.fractionConfig?.active &&
-              (budgetProduct.fractionConfig.value !== product.fractionConfig.value && product.fractionConfig.value !== undefined)
-            );
-
-          return priceChanged || editableChanged || fractionConfigChanged || stateChanged;
-        }
-
-        return false;
-      });
-
-      if (outdatedProducts.length || removedProducts.length) {
-        setTemporaryProducts(validProducts);
-        setOutdatedProducts(outdatedProducts);
-        setRemovedProducts(removedProducts);
-        setShouldShowModal(true);
-        hasShownModal.current = true;
-      } else {
-        setIsTableLoading(false);
-      }
-    }
-  }, [budget, isCloning, products, setValue]);
-
-  const handleConfirmUpdate = () => {
-    const updatedProducts = temporaryProducts.map(product => {
-      const outdatedProduct = outdatedProducts.find(op => op.id === product.id);
-
-      if (outdatedProduct) {
-        return {
-          ...product,
-          name: outdatedProduct.name,
-          price: outdatedProduct.price,
-          editablePrice: outdatedProduct.editablePrice,
-          fractionConfig: {
-            ...product.fractionConfig,
-            ...outdatedProduct.fractionConfig,
-          },
-          state: outdatedProduct.state,
-          quantity: outdatedProduct.state === PRODUCT_STATES.OOS.id ? 0 : product.quantity,
-        };
-      }
-
-      return product;
     });
 
-    const restoredProducts = getRestoredProducts(updatedProducts).filter(
-      product => !removedProducts.find(rp => rp.id === product.id)
+    const finalProducts = updatedProducts.filter(
+      p => !removedProducts.some(r => r.id === p.id)
     );
 
-    const restoredForm = {
-      ...clonedInitialValues,
-      products: restoredProducts,
-    };
+    setValue("products", finalProducts, {
+      shouldDirty: true,
+      shouldTouch: true,
+    });
 
-    reset(restoredForm);
-    setValue("expirationOffsetDays", '', { shouldDirty: false });
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
+
 
   const handleCancelUpdate = () => {
-    const restoredProducts = getRestoredProducts(budget.products);
+    if (!initialClonedProductsRef.current) return;
 
-    const baseBudget = {
-      ...clonedInitialValues,
-      products: restoredProducts
-    };
+    setValue("products", initialClonedProductsRef.current, {
+      shouldDirty: false,
+      shouldTouch: false,
+    });
 
-    reset(baseBudget);
-    setValue("expirationOffsetDays", '', { shouldDirty: false });
+    setValue("expirationOffsetDays", "", { shouldDirty: false });
+
     setShouldShowModal(false);
     setIsTableLoading(false);
   };
 
-  const calculateTotal = useCallback(() => {
-    const totalSum = getTotalSum(watchProducts);
-    setSubtotal(totalSum);
-  }, [watchProducts]);
-
   useEffect(() => {
-    calculateTotal();
-    if (isDirty) trigger('productsValidation');
-  }, [watchProducts, calculateTotal, isDirty, trigger]);
+    trigger("productsValidation");
+  }, [watchProducts, trigger]);
 
   const handleCreate = async (data, state) => {
     const { customer } = data;
@@ -275,7 +180,7 @@ const BudgetForm = ({
         : undefined,
       products: data.products.map((product) =>
         removeNullish(
-          pick(product, [...LIST_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags",])
+          pick(product, ["rowId", ...LIST_ATTRIBUTES, "quantity", "discount", "dispatchComment", "tags",])
         )
       ),
       total: Number(total.toFixed(2)),
@@ -293,27 +198,14 @@ const BudgetForm = ({
   }, [watchState]);
 
   const handleReset = useCallback(() => {
-    let baseBudget;
+    reset();
 
-    if (isCloning) {
-      const restoredProducts = getRestoredProducts(clonedInitialValues.products);
-      baseBudget = {
-        ...clonedInitialValues,
-        products: restoredProducts
-      };
-    } else if (draft) {
-      baseBudget = { ...EMPTY_BUDGET(user), ...budget, createdBy: user?.name };
-    } else {
-      baseBudget = { ...EMPTY_BUDGET(user), state: watchState, createdBy: user?.name };
-    }
-
-    reset(baseBudget);
-    setValue("expirationOffsetDays", '', { shouldDirty: false });
+    setValue("expirationOffsetDays", "", { shouldDirty: false });
 
     if (productSearchRef.current) {
       productSearchRef.current.clear();
     }
-  }, [reset, setValue, user, draft, budget, watchState, isCloning, clonedInitialValues, getRestoredProducts]);
+  }, [reset, setValue]);
 
   const handleOpenCommentModal = useCallback((product, index) => {
     setSelectedProduct(() => ({ ...product, index }));
@@ -331,17 +223,22 @@ const BudgetForm = ({
     },
     {
       id: 2,
-      icon: ICONS.ADD,
+      icon: ICONS.STICKY_NOTE,
       color: COLORS.GREEN,
       onClick: (element, index) => handleOpenCommentModal(element, index),
-      tooltip: 'Comentarios'
+      tooltip: 'Comentario',
+      width: "100%"
     },
   ];
 
-  const onAddComment = async ({ index, dispatchComment }) => {
+  const onAddComment = ({ index, dispatchComment }) => {
     const product = watchProducts[index];
-    product.dispatchComment = dispatchComment;
-    updateProduct(index, product);
+
+    updateProduct(index, {
+      ...product,
+      dispatchComment,
+    });
+
     setIsModalCommentOpen(false);
   };
 
@@ -381,9 +278,6 @@ const BudgetForm = ({
           padding="9px 14px"
           width="80px"
           name={`products[${index}].quantity`}
-          onChange={() => {
-            calculateTotal();
-          }}
           disabled={isProductOOS(product.state)}
           allowsDecimal
         />
@@ -426,7 +320,6 @@ const BudgetForm = ({
               onChange={(value) => {
                 const safeValue = value ?? 1;
                 setValue(`products[${index}].fractionConfig.price`, safeValue * product.price);
-                calculateTotal();
               }}
               allowsDecimal
               defaultValue={1}
@@ -445,7 +338,12 @@ const BudgetForm = ({
             <PriceControlled
               width="100%"
               name={`products[${index}].price`}
-              onAfterChange={calculateTotal}
+              onAfterChange={(v) => {
+                setValue(`products.${index}.price`, Number(v ?? 0), {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                });
+              }}
               justifyItems="right"
             />
           )
@@ -462,8 +360,13 @@ const BudgetForm = ({
             width="90px"
             name={`products[${index}].discount`}
             defaultValue={product.discount ?? 0}
-            handleChange={calculateTotal}
             disabled={isProductOOS(product.state)}
+            handleChange={(v) => {
+              setValue(`products.${index}.discount`, Number(v ?? 0), {
+                shouldDirty: true,
+                shouldTouch: true,
+              });
+            }}
             justifyItems="left"
           />
         </Flex>
@@ -476,7 +379,7 @@ const BudgetForm = ({
       value: (product) => <PriceLabel value={getTotal(product)} />,
       width: 3
     },
-  ], [calculateTotal, setValue]);
+  ], [setValue]);
 
   const handleDraft = async (data) => {
     setValue("state", BUDGET_STATES.DRAFT.id);
@@ -530,54 +433,54 @@ const BudgetForm = ({
         onCancel={handleCancelUpdate}
         onConfirm={handleConfirmUpdate}
       />
-      <FormProvider {...methods}>
-        <Form onSubmit={handleSubmit(handleConfirm)}>
-          <FieldsContainer $justifyContent="space-between">
-            <FormField $width="300px">
-              <ButtonGroup size={SIZES.SMALL}>
-                <IconedButton
-                  text="Confirmado"
-                  icon={ICONS.CHECK}
-                  basic={!isConfirmed}
-                  color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
-                  onClick={() => {
-                    setIsConfirmed(true);
-                    setValue('state', BUDGET_STATES.CONFIRMED.id);
-                  }}
-                />
-                <IconedButton
-                  text="Pendiente"
-                  icon={ICONS.HOURGLASS_HALF}
-                  basic={isConfirmed}
-                  color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
-                  onClick={() => {
-                    setIsConfirmed(false);
-                    setValue('state', BUDGET_STATES.PENDING.id);
-                  }}
-                />
-              </ButtonGroup>
-            </FormField>
-            <GroupedButtonsControlled
-              $alignItems="self-end"
-              name="pickUpInStore"
-              width="fit-content"
-              color={COLORS.BLUE}
-              buttons={[
-                { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
-                { text: 'Enviar a dirección', icon: ICONS.TRUCK, value: false },
-              ]}
-            />
-          </FieldsContainer>
-          <FieldsContainer>
-            <FormField flex="1">
-              <TextControlled
-                name="createdBy"
-                label="Vendedor"
-                rules={RULES.REQUIRED}
-                disabled
+      <Form onSubmit={handleSubmit(handleConfirm)}>
+        <FieldsContainer $justifyContent="space-between">
+          <FormField $width="300px">
+            <ButtonGroup size={SIZES.SMALL}>
+              <IconedButton
+                text="Confirmado"
+                icon={ICONS.CHECK}
+                basic={!isConfirmed}
+                color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
+                onClick={() => setValue("state", BUDGET_STATES.CONFIRMED.id, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                })}
               />
-            </FormField>
-            {budget?.createdAt ? (
+              <IconedButton
+                text="Pendiente"
+                icon={ICONS.HOURGLASS_HALF}
+                basic={isConfirmed}
+                color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
+                onClick={() => setValue("state", BUDGET_STATES.PENDING.id, {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                })}
+              />
+            </ButtonGroup>
+          </FormField>
+          <GroupedButtonsControlled
+            $alignItems="self-end"
+            name="pickUpInStore"
+            width="fit-content"
+            color={COLORS.BLUE}
+            buttons={[
+              { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
+              { text: 'Enviar a dirección', icon: ICONS.TRUCK, value: false },
+            ]}
+          />
+        </FieldsContainer>
+        <FieldsContainer>
+          <FormField flex="1">
+            <TextControlled
+              name="createdBy"
+              label="Vendedor"
+              rules={RULES.REQUIRED}
+              disabled
+            />
+          </FormField>
+          {budget?.createdAt ? (
+            <FormField flex="1">
               <FormField
                 flex="1"
                 label="Fecha de creación"
@@ -586,275 +489,280 @@ const BudgetForm = ({
                 readOnly
                 disabled
               />
-            ) : <FormField flex="1" />}
-            <FormField flex="1" />
-          </FieldsContainer>
-          <FieldsContainer>
-            <FormField $justifyContent="end" flexDirection="row" flex="1">
-              <NumberControlled
-                flex="1"
-                name="expirationOffsetDays"
-                rules={{
-                  validate: {
-                    positive: (value) => value > 0 || 'Campo requerido.'
-                  },
-                }}
-                maxLength={3}
-                label="Dias para el vencimiento"
-                placeholder="3"
-                required
-              />
             </FormField>
-            <FormField
+          ) : <FormField flex="1" />}
+          <FormField flex="1" />
+        </FieldsContainer>
+        <FieldsContainer>
+          <FormField $justifyContent="end" flexDirection="row" flex="1">
+            <NumberControlled
               flex="1"
-              label="Fecha de vencimiento"
-              control={Input}
-              readOnly
-              value={
-                watchExpirationOffsetDays
-                  ? getDateWithOffset({ offset: watchExpirationOffsetDays })
-                  : ""
-              }
-              placeholder="dd/mm/aaaa"
-            />
-            <FormField flex="1" />
-          </FieldsContainer>
-          <FieldsContainer>
-            <FormField flex="1">
-              <SearchControlled
-                name="customer"
-                label="Cliente"
-                required
-                clearable
-                placeholder="Martín Bueno"
-                rules={{
-                  validate: {
-                    required: (value) => !!value?.id || "Campo requerido.",
-                    activeCustomer: (value) =>
-                      value?.state === CUSTOMER_STATES.ACTIVE.id ||
-                      "No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.",
-                    requiredAddress: (value) =>
-                      isBudgetConfirmed(watchState) &&
-                        (!value?.addresses.length && !watchPickUp)
-                        ? "Dirección requerida."
-                        : true,
-                    requiredPhone: (value) =>
-                      isBudgetConfirmed(watchState) && !value?.phoneNumbers.length
-                        ? "Teléfono requerido."
-                        : true,
-                  }
-                }}
-                elements={customers}
-                searchFields={['name', 'id']}
-                getResultProps={(customer) => ({
-                  key: customer.id,
-                  title: getCustomerSearchTitle(customer),
-                  description: getCustomerSearchDescription(customer),
-                  value: customer,
-                })}
-                persistSelection={true}
-              />
-            </FormField>
-            <FormField flex="1">
-              <TextField
-                flex="2"
-                label="Dirección"
-                placeholder="Dirección"
-                disabled
-                error={
-                  !watchCustomer?.addresses?.length &&
-                  errors.customer?.type === "requiredAddress" &&
-                  errors.customer?.message
-                }
-                value={
-                  watchPickUp
-                    ? PICK_UP_IN_STORE
-                    : watchCustomer?.addresses?.length > 0
-                      ? `${watchCustomer.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
-                      : "Cliente sin dirección"
-                }
-                extraContent={() => {
-                  const { additionalAddresses } = getAddressesForDisplay(watchCustomer?.addresses || []);
-                  return additionalAddresses ? <AddressesTooltip input addresses={additionalAddresses} /> : null;
-                }}
-              />
-            </FormField>
-            <FormField flex="1">
-              <TextField
-                flex="2"
-                label="Teléfono"
-                placeholder="Teléfono"
-                disabled
-                error={
-                  !watchCustomer?.phoneNumbers?.length &&
-                  errors.customer?.type === "requiredPhone" &&
-                  errors.customer?.message
-                }
-                value={
-                  watchCustomer?.phoneNumbers?.length > 0
-                    ? `${watchCustomer.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
-                    : "Cliente sin teléfono"
-                }
-                extraContent={() => {
-                  const { additionalPhones } = getPhonesForDisplay(watchCustomer?.phoneNumbers || []);
-                  return additionalPhones ? <PhonesTooltip input phones={additionalPhones} /> : null;
-                }}
-              />
-            </FormField>
-          </FieldsContainer>
-          <FieldsContainer>
-            <Controller
-              name="productsValidation"
-              control={control}
+              name="expirationOffsetDays"
               rules={{
-                validate: () =>
-                  watchProducts.length > 0 || "Al menos un producto es requerido.",
+                validate: {
+                  positive: (value) => value > 0 || 'Campo requerido.'
+                },
               }}
-              render={() => null}
+              maxLength={3}
+              label="Dias para el vencimiento"
+              placeholder="3"
+              required
             />
-            <FormField flex="1">
-              <SearchControlled
-                name="product"
-                label="Producto"
-                required
-                clearAfterSelect
-                placeholder="Televisor 100”"
-                externalError={
-                  errors.productsValidation && {
-                    content: errors.productsValidation.message,
-                    pointing: 'above',
-                  }
+          </FormField>
+          <FormField
+            flex="1"
+            label="Fecha de vencimiento"
+            control={Input}
+            readOnly
+            value={
+              watchExpirationOffsetDays
+                ? getDateWithOffset({ offset: watchExpirationOffsetDays })
+                : ""
+            }
+            placeholder="dd/mm/aaaa"
+          />
+          <FormField flex="1" />
+        </FieldsContainer>
+        <FieldsContainer>
+          <FormField flex="1">
+            <SearchControlled
+              ref={productSearchRef}
+              name="customer"
+              label="Cliente"
+              required
+              clearable
+              placeholder="Martín Bueno"
+              rules={{
+                validate: {
+                  required: (value) => !!value?.id || "Campo requerido.",
+                  activeCustomer: (value) =>
+                    value?.state === CUSTOMER_STATES.ACTIVE.id ||
+                    "No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.",
+                  requiredAddress: (value) =>
+                    isBudgetConfirmed(watchState) &&
+                      (!value?.addresses.length && !watchPickUp)
+                      ? "Dirección requerida."
+                      : true,
+                  requiredPhone: (value) =>
+                    isBudgetConfirmed(watchState) && !value?.phoneNumbers.length
+                      ? "Teléfono requerido."
+                      : true,
                 }
-                elements={products}
-                searchFields={['name', 'id']}
-                getResultProps={(product) => ({
-                  key: product.id,
-                  title: getProductSearchTitle(product),
-                  description: getProductSearchDescription(product),
-                  value: product,
-                })}
-                onAfterChange={(selectedProduct) => {
-                  appendProduct({
-                    ...selectedProduct,
-                    quantity: selectedProduct?.state === PRODUCT_STATES.OOS.id ? 0 : 1,
-                    discount: 0,
-                    key: uuid(),
-                    ...(selectedProduct?.fractionConfig?.active && {
-                      fractionConfig: {
-                        ...selectedProduct?.fractionConfig,
-                        value: 1,
-                        price: selectedProduct?.price,
+              }}
+              elements={customers}
+              searchFields={['name', 'id']}
+              getResultProps={(customer) => ({
+                key: customer.id,
+                title: getCustomerSearchTitle(customer),
+                description: getCustomerSearchDescription(customer),
+                value: customer,
+              })}
+              persistSelection={true}
+            />
+          </FormField>
+          <FormField flex="1">
+            <TextField
+              flex="2"
+              label="Dirección"
+              placeholder="Dirección"
+              disabled
+              error={
+                !watchCustomer?.addresses?.length &&
+                errors.customer?.type === "requiredAddress" &&
+                errors.customer?.message
+              }
+              value={
+                watchPickUp
+                  ? PICK_UP_IN_STORE
+                  : watchCustomer?.addresses?.length > 0
+                    ? `${watchCustomer.addresses?.[0]?.ref ? `${watchCustomer.addresses[0].ref}: ` : ''}${watchCustomer.addresses[0].address}`
+                    : "Cliente sin dirección"
+              }
+              extraContent={() => {
+                const { additionalAddresses } = getAddressesForDisplay(watchCustomer?.addresses || []);
+                return additionalAddresses ? <AddressesTooltip input addresses={additionalAddresses} /> : null;
+              }}
+            />
+          </FormField>
+          <FormField flex="1">
+            <TextField
+              flex="2"
+              label="Teléfono"
+              placeholder="Teléfono"
+              disabled
+              error={
+                !watchCustomer?.phoneNumbers?.length &&
+                errors.customer?.type === "requiredPhone" &&
+                errors.customer?.message
+              }
+              value={
+                watchCustomer?.phoneNumbers?.length > 0
+                  ? `${watchCustomer.phoneNumbers?.[0]?.ref ? `${watchCustomer.phoneNumbers[0].ref}: ` : ''}${getFormatedPhone(watchCustomer.phoneNumbers[0])}`
+                  : "Cliente sin teléfono"
+              }
+              extraContent={() => {
+                const { additionalPhones } = getPhonesForDisplay(watchCustomer?.phoneNumbers || []);
+                return additionalPhones ? <PhonesTooltip input phones={additionalPhones} /> : null;
+              }}
+            />
+          </FormField>
+        </FieldsContainer>
+        <FieldsContainer>
+          <Controller
+            name="productsValidation"
+            control={control}
+            rules={{
+              validate: () =>
+                watchProducts?.length > 0 || "Al menos un producto es requerido.",
+            }}
+            render={() => null}
+          />
+          <FormField flex="1">
+            <SearchControlled
+              name="product"
+              label="Producto"
+              required
+              clearAfterSelect
+              placeholder="Televisor 100”"
+              externalError={
+                errors.productsValidation && {
+                  content: errors.productsValidation.message,
+                  pointing: 'above',
+                }
+              }
+              // rules={{
+              //   validate: () => {
+              //     return !!watchProducts.length || "Al menos un producto es requerido.";
+              //   },
+              // }}
+              elements={products}
+              searchFields={['name', 'id']}
+              getResultProps={(product) => ({
+                key: product.id,
+                title: getProductSearchTitle(product),
+                description: getProductSearchDescription(product),
+                value: product,
+              })}
+              onAfterChange={(selectedProduct) => {
+                appendProduct({
+                  ...selectedProduct,
+                  quantity: selectedProduct?.state === PRODUCT_STATES.OOS.id ? 0 : 1,
+                  discount: 0,
+                  rowId: uuid(),
+                  delivered: 0,
+                  key: uuid(),
+                  ...(selectedProduct?.fractionConfig?.active && {
+                    fractionConfig: {
+                      ...selectedProduct?.fractionConfig,
+                      value: 1,
+                      price: selectedProduct?.price,
+                    }
+                  })
+                });
+              }}
+            />
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
+        </FieldsContainer>
+        <Loader active={isTableLoading}>
+          <Table
+            mainKey="rowId"
+            headers={BUDGET_FORM_PRODUCT_COLUMNS}
+            elements={watchProducts}
+            actions={actions}
+          />
+          <Total
+            subtotal={subtotal}
+            globalDiscount={watchGlobalDiscount}
+            subtotalAfterDiscount={subtotalAfterDiscount}
+            onGlobalDiscountChange={(v) =>
+              setValue("globalDiscount", v, { shouldDirty: true })
+            }
+            additionalCharge={watchAdditionalCharge}
+            onAdditionalChargeChange={(v) =>
+              setValue("additionalCharge", v, { shouldDirty: true })
+            }
+            total={total}
+          />
+        </Loader>
+        <FieldsContainer width="100%" $rowGap="15px">
+          <Controller
+            name="paymentMethods"
+            render={({ field: { onChange, value } }) => (
+              <FormField flex="1" label="Métodos de pago" control={Input} height="auto">
+                <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
+                  <Button
+                    padding="0 18px"
+                    width="fit-content"
+                    type="button"
+                    basic={value?.length !== paymentMethods?.length}
+                    color={COLORS.BLUE}
+                    onClick={() => {
+                      if (value?.length === paymentMethods?.length) {
+                        onChange([]);
+                      } else {
+                        onChange(paymentMethods?.map(method => method.value));
                       }
-                    })
-                  });
-                }}
-              />
-            </FormField>
-            <FormField flex="1" />
-            <FormField flex="1" />
-          </FieldsContainer>
-          <Loader active={isTableLoading}>
-            <Table
-              mainKey="key"
-              headers={BUDGET_FORM_PRODUCT_COLUMNS}
-              elements={watchProducts}
-              actions={actions}
-            />
-            <Total
-              subtotal={subtotal}
-              globalDiscount={watchGlobalDiscount}
-              subtotalAfterDiscount={subtotalAfterDiscount}
-              onGlobalDiscountChange={(value) => setValue('globalDiscount', value, { shouldDirty: true })}
-              additionalCharge={watchAdditionalCharge}
-              onAdditionalChargeChange={(value) => setValue('additionalCharge', value, { shouldDirty: true })}
-              total={total}
-            />
-          </Loader>
-          {isBudgetConfirmed(watchState) && (
-            <FieldsContainer width="100%" $rowGap="15px">
-              <CreateBudgetPayments
-                total={total}
-                update
-              />
-            </FieldsContainer>
-          )}
-          <FieldsContainer width="100%" $rowGap="15px">
-            <Controller
-              name="paymentMethods"
-              render={({ field: { onChange, value } }) => (
-                <FormField flex="1" label="Métodos de pago" control={Input} height="auto">
-                  <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
+                    }}
+                  >
+                    Todos
+                  </Button>
+                  <VerticalDivider />
+                  {paymentMethods?.map(({ key, text, value: methodValue }) => (
                     <Button
                       padding="0 18px"
                       width="fit-content"
-                      type="button"
-                      basic={value.length !== paymentMethods?.length}
+                      key={key}
+                      basic={!value?.includes(methodValue)}
                       color={COLORS.BLUE}
+                      type="button"
                       onClick={() => {
-                        if (value.length === paymentMethods?.length) {
-                          onChange([]);
+                        if (value.includes(methodValue)) {
+                          onChange(value.filter(payment => payment !== methodValue));
                         } else {
-                          onChange(paymentMethods?.map(method => method.value));
+                          onChange([...value, methodValue]);
                         }
                       }}
                     >
-                      Todos
+                      {text}
                     </Button>
-                    <VerticalDivider />
-                    {paymentMethods?.map(({ key, text, value: methodValue }) => (
-                      <Button
-                        padding="0 18px"
-                        width="fit-content"
-                        key={key}
-                        basic={!value.includes(methodValue)}
-                        color={COLORS.BLUE}
-                        type="button"
-                        onClick={() => {
-                          if (value.includes(methodValue)) {
-                            onChange(value.filter(payment => payment !== methodValue));
-                          } else {
-                            onChange([...value, methodValue]);
-                          }
-                        }}
-                      >
-                        {text}
-                      </Button>
-                    ))}
-                  </Flex>
-                </FormField>
-              )}
-            />
-          </FieldsContainer>
-          <TextAreaControlled name="comments" label="Comentarios" placeholder="Pago con billetes de 100" />
-          <SubmitAndRestore
-            draft={draft}
-            isLoading={isLoading && !isBudgetDraft(watchState)}
-            disabled={isLoading}
-            isDirty={isDirty}
-            isUpdating={draft || isCloning}
-            onReset={handleTryReset}
-            color={currentState.color}
-            onSubmit={handleSubmit(handleConfirm)}
-            icon={currentState.icon}
-            text={currentState.singularTitle}
-            submit
-            extraButton={
-              <IconedButton
-                icon={BUDGET_STATES.DRAFT.icon}
-                labelPosition="left"
-                disabled={isLoading || !isDirty}
-                loading={isLoading && isBudgetDraft(watchState)}
-                type="button"
-                onClick={handleSubmit(handleDraft)}
-                color={BUDGET_STATES.DRAFT.color}
-                width="fit-content"
-                text={BUDGET_STATES.DRAFT.singularTitle}
-              >
-              </IconedButton>
-            }
+                  ))}
+                </Flex>
+              </FormField>
+            )}
           />
-        </Form>
-      </FormProvider >
+        </FieldsContainer>
+        <TextAreaControlled name="comments" label="Comentarios" placeholder="Pago con billetes de 100" />
+        <SubmitAndRestore
+          canSubmitWithoutChanges={canSubmit}
+          isLoading={isLoading && !isBudgetDraft(watchState)}
+          disabled={isLoading}
+          isDirty={isDirty}
+          isUpdating={draft || isCloning}
+          onReset={handleTryReset}
+          color={currentState.color}
+          onSubmit={handleSubmit(handleConfirm)}
+          icon={currentState.icon}
+          text={currentState.singularTitle}
+          submit
+          extraButton={
+            <IconedButton
+              icon={BUDGET_STATES.DRAFT.icon}
+              labelPosition="left"
+              disabled={isLoading || !isDirty}
+              loading={isLoading && isBudgetDraft(watchState)}
+              type="button"
+              onClick={handleSubmit(handleDraft)}
+              color={BUDGET_STATES.DRAFT.color}
+              width="fit-content"
+              text={BUDGET_STATES.DRAFT.singularTitle}
+            >
+            </IconedButton>
+          }
+        />
+      </Form>
+      {/* </FormProvider > */}
     </>
   );
 };

@@ -27,6 +27,7 @@ const ModalAction = ({
   warning,
   reason = '',
   reasonInputRef,
+  size,
   onStart = () => { }
 }) => {
   const [confirmationText, setConfirmationText] = useState('');
@@ -76,7 +77,7 @@ const ModalAction = ({
 
   return (
     <Transition visible={showModal} onStart={onStart} animation='scale' duration={500}>
-      <Modal closeIcon open={showModal} onClose={() => setShowModal(false)}>
+      <Modal size={size} closeIcon open={showModal} onClose={() => setShowModal(false)}>
         <Header icon={titleIcon} color={titleIconColor} content={title || ""} />
         {bodyContent && (
           <ModalContent>

@@ -107,14 +107,25 @@ export function useCreateItem() {
 export function usePostUpdateItem() {
   const invalidate = useInvalidateQueries();
 
-  const postItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes, skipStorageUpdate }) => {
+  const postItem = async ({
+    entity,
+    value = {},
+    url,
+    responseEntity,
+    invalidateQueries = [],
+    params = {},
+    attributes,
+    skipStorageUpdate = false, 
+  }) => {
     const { data } = await getInstance().post(url, value, { params });
 
-    if (data.statusOk) {
-      if (!skipStorageUpdate) {
+    if (data?.statusOk) {
+      if (!skipStorageUpdate && responseEntity) {
         await updateOrCreateStorageItem({
           entity,
-          value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity],
+          value: attributes
+            ? pick(data[responseEntity], getDefaultAttributes(attributes))
+            : data[responseEntity],
         });
       }
 

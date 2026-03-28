@@ -63,6 +63,7 @@ export const FormField = styled(Form.Field)`
     }
   }
   label {
+    font-size: 14px !important;
     opacity: 1 !important;
     font-weight: bold;
   }
@@ -209,6 +210,7 @@ export const DropdownMenu = styled(SDropdown.Menu)`
 
 export const Icon = styled(SIcon)`
   align-self: center!important;
+  align-content: ${({ $alignContent }) => `${$alignContent}!important;`} ;
   margin-right: ${({ $marginRight }) => $marginRight && `11px!important`} ;
   top: ${({ lowTooltip, tooltip }) => (lowTooltip ? `-3px` : tooltip ? `-1px` : 'initial')} !important;
   position: ${({ lowTooltip, tooltip }) => (lowTooltip || tooltip) && `relative!important`} ;
@@ -219,6 +221,7 @@ export const Icon = styled(SIcon)`
   justify-items: ${({ justifyItems }) => `${justifyItems}!important;`};
   pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
   line-height: ${({ $lineHeight }) => `${$lineHeight}!important;`};
+  height: ${({ $height }) => `${$height}!important;`};
   z-index:2!important;
 `;
 

@@ -20,7 +20,7 @@ const CustomTable = ({
   actions = [],
   mainKey = 'id',
   $tableHeight,
-  $deleteButtonInside,
+  $actionButtonInside,
   color,
   selection = {},
   onSelectionChange,
@@ -169,6 +169,10 @@ const CustomTable = ({
     }
   };
 
+  const resolveActionProp = (prop, element, index) => {
+    return typeof prop === "function" ? prop(element, index) : prop;
+  };
+
   useKeyboardShortcuts({
     [SHORTKEYS.RIGHT_ARROW]: () => handleShortcutPageChange(activePage + 1),
     [SHORTKEYS.LEFT_ARROW]: () => handleShortcutPageChange(activePage - 1),
@@ -256,9 +260,11 @@ const CustomTable = ({
                         )}
                         {headers.map(header => {
                           const href =
-                            typeof page?.SHOW === "function"
-                              ? page.SHOW(element[mainKey], element)
-                              : undefined;
+                            header.href
+                              ? header.href(element)
+                              : typeof page?.SHOW === "function"
+                                ? page.SHOW(element[mainKey], element)
+                                : undefined;
 
                           return (
                             <LinkCell
@@ -284,8 +290,8 @@ const CustomTable = ({
                           );
                         })}
                         {!!actions.length && (
-                          <ActionsContainer $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
-                            <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
+                          <ActionsContainer $actionButtonInside={$actionButtonInside} $open={isPopupOpen}>
+                            <InnerActionsContainer $actionButtonInside={$actionButtonInside}>
                               {actions.length > 1 ? (
                                 <PopupActions
                                   open={popupOpenId === element[mainKey]}
@@ -293,16 +299,31 @@ const CustomTable = ({
                                   onClose={() => setPopupOpenId(null)}
                                   position="left center"
                                   trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
-                                  buttons={actions.map((action, idx) => (
-                                    <IconedButton
-                                      key={`${action.icon}_${idx}`}
-                                      icon={action.icon}
-                                      color={action.color}
-                                      onClick={() => action.onClick(element, index)}
-                                      text={action.tooltip}
-                                      width={action.width}
-                                    />
-                                  ))}
+                                  buttons={actions.map((action, idx) => {
+                                    const resolvedIcon = resolveActionProp(action.icon, element, index);
+                                    const resolvedColor = resolveActionProp(action.color, element, index);
+                                    const resolvedTooltip = resolveActionProp(action.tooltip, element, index);
+                                    const resolvedWidth = resolveActionProp(action.width, element, index);
+                                    const resolvedDisabled = resolveActionProp(action.disabled, element, index);
+                                    const resolvedLoading = resolveActionProp(action.loading, element, index);
+                                    const resolvedBasic = resolveActionProp(action.basic, element, index);
+                                    const resolvedText = resolveActionProp(action.text, element, index);
+
+                                    return (
+                                      <IconedButton
+                                        key={`${String(resolvedIcon)}_${idx}`}
+                                        icon={resolvedIcon}
+                                        color={resolvedColor}
+                                        onClick={() => action.onClick(element, index)}
+                                        text={resolvedText || resolvedTooltip}
+                                        width={resolvedWidth}
+                                        disabled={resolvedDisabled}
+                                        loading={resolvedLoading}
+                                        basic={resolvedBasic}
+                                        iconOnly={action.iconOnly}
+                                      />
+                                    );
+                                  })}
                                 />
                               ) : (
                                 <Actions actions={actions} element={element} />
@@ -328,8 +349,8 @@ const CustomTable = ({
                         </Cell>
                       ))}
                       {!!actions.length && (
-                        <ActionsContainer $stillShow $deleteButtonInside={$deleteButtonInside} $open={isPopupOpen}>
-                          <InnerActionsContainer $deleteButtonInside={$deleteButtonInside}>
+                        <ActionsContainer $stillShow $actionButtonInside={$actionButtonInside} $open={isPopupOpen}>
+                          <InnerActionsContainer $actionButtonInside={$actionButtonInside}>
                             {actions.length > 1 ? (
                               <PopupActions
                                 open={popupOpenId === element[mainKey]}
@@ -337,16 +358,31 @@ const CustomTable = ({
                                 onClose={() => setPopupOpenId(null)}
                                 position="left center"
                                 trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
-                                buttons={actions.map((action, idx) => (
-                                  <IconedButton
-                                    key={`${action.icon}_${idx}`}
-                                    icon={action.icon}
-                                    color={action.color}
-                                    onClick={() => action.onClick(element, index)}
-                                    text={action.tooltip}
-                                    width={action.width}
-                                  />
-                                ))}
+                                buttons={actions.map((action, idx) => {
+                                  const resolvedIcon = resolveActionProp(action.icon, element, index);
+                                  const resolvedColor = resolveActionProp(action.color, element, index);
+                                  const resolvedTooltip = resolveActionProp(action.tooltip, element, index);
+                                  const resolvedWidth = resolveActionProp(action.width, element, index);
+                                  const resolvedDisabled = resolveActionProp(action.disabled, element, index);
+                                  const resolvedLoading = resolveActionProp(action.loading, element, index);
+                                  const resolvedBasic = resolveActionProp(action.basic, element, index);
+                                  const resolvedText = resolveActionProp(action.text, element, index);
+                                
+                                  return (
+                                    <IconedButton
+                                      key={`${String(resolvedIcon)}_${idx}`}
+                                      icon={resolvedIcon}
+                                      color={resolvedColor}
+                                      onClick={() => action.onClick(element, index)}
+                                      text={resolvedText || resolvedTooltip}
+                                      width={resolvedWidth}
+                                      disabled={resolvedDisabled}
+                                      loading={resolvedLoading}
+                                      basic={resolvedBasic}
+                                      iconOnly={action.iconOnly}
+                                    />
+                                  );
+                                })}
                               />
                             ) : (
                               <Actions actions={actions} element={element} index={index} />

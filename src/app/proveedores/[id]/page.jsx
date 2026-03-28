@@ -14,6 +14,7 @@ import { BatchImportStock } from "@/components/products/BatchImportStock";
 import { DISCOUNT_STOCK, PRODUCT_STATES, UPLOAD_STOCK } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
+import { EXAMPLE_TEMPLATE_DATA_STOCK } from "@/components/suppliers/suppliers.constants";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
@@ -364,6 +365,9 @@ const Supplier = ({ params }) => {
                   supplierId={supplier?.id}
                   products={products}
                 />
+              </DropdownItem>
+              <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA_STOCK, "Ejemplo de tabla stock")}>
+                <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla stock
               </DropdownItem>
             </Dropdown.Menu>
           </Dropdown>

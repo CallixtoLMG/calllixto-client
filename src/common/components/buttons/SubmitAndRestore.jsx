@@ -1,7 +1,9 @@
 import { RestoreButton, SubmitButton } from "@/common/components/buttons";
 import { ButtonsContainer } from '@/common/components/custom';
 
-export const SubmitAndRestore = ({ draft, submit, isUpdating, isLoading, isDirty, onReset, extraButton, disabled, onSubmit = () => { }, color, icon, text }) => {
+export const SubmitAndRestore = ({ canSubmitWithoutChanges, submit, isUpdating, isLoading, isDirty, onReset, extraButton, disabled, onSubmit = () => { }, color, icon, text }) => {
+
+  const submitIsDirty = canSubmitWithoutChanges ? true : isDirty;
 
   return (
     <ButtonsContainer>
@@ -12,13 +14,12 @@ export const SubmitAndRestore = ({ draft, submit, isUpdating, isLoading, isDirty
         onClick={onReset}
         disabled={disabled}
       />
-      {extraButton && extraButton}
+      {extraButton}
       <SubmitButton
         isUpdating={isUpdating}
         isLoading={isLoading}
-        isDirty={draft ? true : isDirty}
+        isDirty={submitIsDirty}
         onClick={onSubmit}
-        disabled={disabled}
         color={color}
         icon={icon}
         text={text}

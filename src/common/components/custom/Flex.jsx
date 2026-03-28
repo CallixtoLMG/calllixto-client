@@ -27,8 +27,10 @@ export const Flex = styled(Common)`
   align-self: ${({ $alignSelf }) => $alignSelf};
   text-align: ${({ textAlign }) => textAlign};
   flex-wrap: ${({ wrap }) => wrap};
+  text-wrap-mode: ${({ textWrapMode }) => textWrapMode};
   flex-direction: ${({ $flexDirection = "row" }) => $flexDirection};
   overflow-y: ${({ overflowY }) => overflowY};
+  cursor ${({ cursor }) => cursor};
 `;
 
 export const FlexColumn = styled(Flex)`

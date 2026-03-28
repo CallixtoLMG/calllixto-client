@@ -36,17 +36,19 @@ export const ModalBatchImport = ({
                     <Icon name={importSettings.icon} color={importSettings.color} />
                     <Header> {importSettings.title}</Header>
                   </Flex>
-                  <TextField
-                    width={6}
-                    label="Archivo seleccionado"
-                    value={selectedFile}
-                    disabled
-                  />
+                  <FormField>
+                    <TextField
+                      width="50%"
+                      label="Archivo seleccionado"
+                      value={selectedFile}
+                      disabled
+                    />
+                  </FormField>
                   <Label>
                     <Icon name={importSettings.icon} color={importSettings.color} />{`${importSettings.label}: ${importedProductsCount}`}
                   </Label>
                   <Table
-                    $deleteButtonInside
+                    $actionButtonInside
                     $tableHeight="50vh"
                     mainKey="id"
                     headers={columns}

@@ -151,7 +151,7 @@ const Blacklist = () => {
               paginate={false}
               actions={actions}
               $tableHeight="40vh"
-              $deleteButtonInside
+              $actionButtonInside
             />
           </Box>
         </Accordion.Content>

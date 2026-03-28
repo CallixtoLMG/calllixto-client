@@ -21,6 +21,8 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
     filters,
     setFilters,
     methods: filterMethods,
+    hydrated,
+    appliedCount
   } = useFilters({ defaultFilters: EMPTY_STOCK_FILTERS, key: PRODUCTS_FILTERS_KEY });
 
   const onFilter = createFilter(filters, {
@@ -167,7 +169,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         </Flex>
         <FormProvider {...filterMethods}>
           <Form onSubmit={onSubmit}>
-            <Filters entity="STOCK" onRestoreFilters={onRestoreFilters}>
+            <Filters appliedCount={appliedCount} hydrated={hydrated} entity="STOCK" onRestoreFilters={onRestoreFilters}>
               <DropdownControlled
                 width="fit-content"
                 name="type"
@@ -178,7 +180,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
                   onSubmit();
                 }}
               />
-              <TextControlled name="invoiceNumber" label="N° Factura" placeholder="A0001" width="150px" />
+              <TextControlled name="invoiceNumber" label="Factura" placeholder="A0001" width="150px" />
               <TextControlled name="comments" label="Comentarios" placeholder="Uso interno" width="200px" />
             </Filters>
           </Form>
@@ -188,7 +190,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         paginate
         headers={STOCK_TABLE_HEADERS}
         elements={stockFlows}
-        $deleteButtonInside
+        $actionButtonInside
         onFilter={onFilter}
         filters={filters}
         setFilters={setFilters}

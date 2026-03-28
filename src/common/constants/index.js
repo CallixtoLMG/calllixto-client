@@ -54,6 +54,7 @@ export const PAGES = {
     CREATE: "/ventas/crear",
     CLONE: (id) => `/ventas/crear?clonar=${id}`,
     SHOW: (id) => `/ventas/${id}`,
+    DRAFT: (id) => `/ventas/${id}/borrador`,
     NAME: 'Ventas',
     SHORTKEYS: 'Control+5',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
@@ -234,6 +235,7 @@ export const ICONS = {
   INFO_CIRCLE: "info circle",
   WAREHOUSE: "warehouse",
   ARROW_LEFT: "arrow left",
+  ARROW_RIGHT: "arrow right",
   CANCEL: "cancel",
   DELETE: "delete",
   EDIT: "edit",
@@ -271,10 +273,12 @@ export const ICONS = {
   COPYRIGHT: "copyright",
   CLIPBOARD: "clipboard",
   MONEY_BILL_ALTERNATE: "money bill alternate",
+  DROPDOWN: "dropdown",
   MINUS_SQUARE: "minus square",
   PLUS_SQUARE: "plus square",
   REDO: "redo",
   MINUS: "minus",
+  STICKY_NOTE:"sticky note"
 };
 
 export const ALL = "all";

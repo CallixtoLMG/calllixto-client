@@ -89,7 +89,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
     state: { skipAll: true },
   });
 
-  const cashBudgetColumns = useMemo(
+  const budgetColumns = useMemo(
     () => getBudgetColumns(filters.state),
     [filters.state]
   );
@@ -178,7 +178,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
       </FormProvider >
       <Table
         isLoading={isLoading}
-        headers={cashBudgetColumns}
+        headers={budgetColumns}
         elements={budgets}
         page={PAGES.BUDGETS}
         actions={actions}

@@ -52,7 +52,7 @@ const ModalConfirmation = ({
     <FormProvider {...methods}>
       <Form ref={formRef} onSubmit={methods.handleSubmit(handleConfirm)}>
         <Transition visible={isModalOpen} animation='scale' duration={500}>
-          <Modal size={SIZES.LARGE} closeIcon open={isModalOpen} onClose={() => onClose(false)}>
+          <Modal size={SIZES.LARGE} open={isModalOpen} onClose={() => onClose(false)}>
             <Modal.Header>
               <Flex $alignItems="center" $justifyContent="space-between">
                 Desea confirmar el presupuesto?

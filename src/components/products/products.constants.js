@@ -357,6 +357,11 @@ export const STOCK_TABLE_HEADERS = [
   },
   {
     id: 5,
+    width: 3,
+    title: 'Remito', value: (stockFlows) => stockFlows.deliveryNote
+  },
+  {
+    id: 6,
     width: 9,
     align: "left",
     title: 'Comentarios', value: (stockFlows) => <OverflowWrapper maxWidth="30vw" popupContent={stockFlows.comments}> {stockFlows.comments} </OverflowWrapper>

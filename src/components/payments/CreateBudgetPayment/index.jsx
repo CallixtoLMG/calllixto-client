@@ -150,7 +150,9 @@ const CreateBudgetPayments = ({
                   required
                   error={showErrors && !payment.date ? RULES.REQUIRED.required : undefined}
                   placeholder="16-11-2025"
-                  control={DatePicker}>
+                  control={DatePicker}
+                  fontSize="14px"
+                >
                 </FormField>
                 <FormField flex="1">
                   <DropdownField
@@ -242,6 +244,7 @@ const CreateBudgetPayments = ({
           <Flex width="100%">
             <Table
               headers={getPaymentTableHeaders()}
+              $actionButtonInside
               elements={elements}
               actions={update && [
                 {
@@ -252,7 +255,6 @@ const CreateBudgetPayments = ({
                   tooltip: 'Eliminar',
                 },
               ]}
-              $deleteButtonInside={deleteButtonInside}
             />
           </Flex>
           <TotalList readOnly items={TOTAL_LIST_ITEMS} />

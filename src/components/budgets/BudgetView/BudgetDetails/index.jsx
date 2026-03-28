@@ -19,7 +19,11 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
-  const totalPending = (total - budget.paidAmount).toFixed(2);
+  const totalPending = (
+    (total ?? 0) -
+    (budget?.paidAmount ?? 0) -
+    (budget?.postConfirmDiscount ?? 0)
+  ).toFixed(2);
 
   const methods = useForm({
     defaultValues: {
@@ -32,9 +36,6 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
   const postConfirmDiscount = watch("postConfirmDiscount")
 
   const onSubmitDiscount = async ({ postConfirmDiscount }) => {
-    const isValid = await trigger("postConfirmDiscount");
-    if (!isValid) return;
-
     onConfirmBudgetDiscount({
       budgetId: budget.id,
       postConfirmDiscount: Number(postConfirmDiscount),
@@ -77,7 +78,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
     );
 
     return items;
-  }, [budget?.paidAmount, budget?.postConfirmDiscount, totalPending, total]);
+  }, [budget, totalPending, total]);
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
@@ -171,7 +172,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(onSubmitDiscount)}>
         <ViewContainer>
-          <FieldsContainer >
+          <FieldsContainer $rowGap="14px">
             <FormField
               flex="1"
               label="Vendedor"
@@ -190,9 +191,8 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 disabled
               />
             )}
-            <FormField flex="1" />
           </FieldsContainer>
-          <FieldsContainer  >
+          <FieldsContainer>
             {budgetState && (
               <FormField
                 flex="1"
@@ -224,9 +224,9 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 <FormField flex="1" />
                 <FormField flex="1" />
               </>
-            ) : <FormField flex="1" />
+            )
+              : <FormField flex="1" />
             }
-
           </FieldsContainer>
           <FieldsContainer>
             <FormField
@@ -266,7 +266,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 label="Teléfono"
                 control={Dropdown}
                 value={selectedContact?.phone ?? ''}
-                options={budget?.customer?.phoneNumbers.map((phone) => {
+                options={(budget?.customer?.phoneNumbers ?? []).map((phone) => {
                   const formattedPhone = getFormatedPhone(phone);
                   const label = phone.ref ? `${phone.ref}: ${formattedPhone}` : formattedPhone;
 
@@ -298,7 +298,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 <Flex width="250px" $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
                   <PriceControlled
                     key={budget?.postConfirmDiscount ?? 'no-discount'}
-                    width="fit-content"
+                    width="160px"
                     placeholder="5.000"
                     name="postConfirmDiscount"
                     defaultValue={budget?.postConfirmDiscount ?? ''}
@@ -330,8 +330,6 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                     disabled={isLoading}
                     iconOnly
                   />
-                </Flex>
-                <Flex $columnGap="15px" $alignSelf="end">
                   <IconedButton
                     text="Aplicar descuento"
                     loading={isLoading}
@@ -340,8 +338,10 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                     icon={ICONS.CHECK}
                     color={COLORS.GREEN}
                     height="38px"
-                    width="fit-content"
+                    iconOnly
                   />
+                </Flex>
+                <Flex $columnGap="15px" $alignSelf="end">
                 </Flex>
               </FlexColumn>
             </>
@@ -355,18 +355,18 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
               additionalCharge={budget?.additionalCharge}
             />
           }
-          <FormField
-            control={Input}
-            label="Métodos de pago"
-            $width="100%"
-            value={formattedPaymentMethods}
-            readOnly
-            disabled
-          />
+          <FormField>
+            <FormField
+              control={Input}
+              label="Métodos de pago"
+              value={formattedPaymentMethods}
+              readOnly
+              disabled
+            />
+          </FormField>
           <FormField
             control={TextArea}
             label="Comentarios"
-            $width="100%"
             placeholder="Comentarios"
             value={budget?.comments}
             readOnly
