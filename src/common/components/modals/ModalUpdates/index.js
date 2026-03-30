@@ -19,7 +19,7 @@ const StyledModal = styled(Modal)`
 `;
 
 const ModalUpdates = () => {
-  const activeVersion = '2025-12-17';
+  const activeVersion = '2026-03-30';
   const latestNews = window?.localStorage?.getItem('latestNews');
   const [open, setOpen] = useState(!latestNews || isDateBefore(latestNews, activeVersion));
 
@@ -42,38 +42,23 @@ const ModalUpdates = () => {
       />
       <Transition visible={open} animation="scale" duration={500}>
         <StyledModal open={open} onClose={() => setOpen(false)}>
-          <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas novedades - 21 - 11 - 2025" />
+          <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas novedades - 30 - 03 - 2026" />
           <StyledModalContent>
             <StyledListHeader>
               <Icon name={ICONS.ADD} color={COLORS.BLUE} />Nuevo
             </StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
-                Se incorporaron dos nuevas secciones: <Accent>Gastos</Accent> y <Accent>Caja</Accent>. Estas funcionalidades están disponibles en modo de prueba durante 30 días. Pasado ese período se deshabilitarán automáticamente y deberán contactar con el administrador para su contratación.
+                Se incorporó el <Accent>Control de stock</Accent> en productos. Desde la página de cada producto podés registrar entradas y salidas de stock de forma manual, y consultar el historial de movimientos.
               </ListItem>
               <ListItem>
-                La sección <Accent>Gastos</Accent> permite registrar consumos y egresos, generando un historial detallado.
+                Se incorporó la <Accent>Importación masiva de stock</Accent>. Desde la página de un proveedor podés cargar stock para múltiples productos a la vez importando un archivo Excel.
               </ListItem>
               <ListItem>
-                La sección <Accent>Caja</Accent> permite abrir y cerrar cajas configurando fechas y métodos de pago. Mientras estén abiertas, se vinculan automáticamente los pagos asociados a ventas y gastos.
-              </ListItem>
-              <ListItem>
-                Se incorporó la sección <Accent>Historial de ventas</Accent>, que permite buscar información sobre ventas anteriores a los últimos 3 meses.
-              </ListItem>
-              <ListItem>
-                Ahora es posible previsualizar un presupuesto antes de imprimirlo en cualquiera de sus formatos.
-              </ListItem>
-              <ListItem>
-                En la página de <Accent>Ventas</Accent> se agregó un nuevo filtro. Al visualizar las ventas confirmadas, ahora es posible filtrar por <Accent>Estado de pago</Accent>, ya sea pendiente o pagado.
-              </ListItem>
-              <ListItem>
-                En <Accent>Configuración</Accent> se agregó la pestaña <Accent>Ventas</Accent>, para definir valores predeterminados al crear o imprimir una venta.
-              </ListItem>
-              <ListItem>
-                En la parte superior derecha de todas las páginas principales se agregó el ícono <Icon name={ICONS.INFO_CIRCLE} color={COLORS.BLUE} />. Al hacer clic, se despliega una pantalla con información sobre el funcionamiento de la sección.
+                El stock se descuenta automáticamente al <Accent>confirmar o registrar una entrega</Accent> en un presupuesto, siempre que el producto tenga el control de stock habilitado.
               </ListItem>
             </List>
-            <StyledListHeader>
+            {/* <StyledListHeader>
               <Icon name={ICONS.PENCIL} color={COLORS.BLUE} />Actualizaciones
             </StyledListHeader>
             <List relaxed bulleted as="ol">
@@ -87,9 +72,12 @@ const ModalUpdates = () => {
                 Se actualizaron los buscadores de clientes, productos, proveedores y marcas para mostrar coincidencias a medida que se escribe y facilitar la selección.
               </ListItem>
               <ListItem>
+                Los <Accent>proveedores</Accent> ahora tienen un campo de ID de dos caracteres que los identifica en las importaciones de stock.
+              </ListItem>
+              <ListItem>
                 Se mejoró el rendimiento general y se realizaron ajustes visuales en diferentes partes del sistema para optimizar la experiencia del usuario.
               </ListItem>
-            </List>
+            </List> */}
           </StyledModalContent>
           <Modal.Actions>
             <IconedButton
