@@ -57,6 +57,7 @@ const SettingsTabs = ({ onEntityChange, settings = [], onRefresh, isLoading, onB
         alignSelf="end"
         disabled={isLoading}
         loading={isLoading}
+        width="fit-content"
       />
       <Tab
         panes={panes}

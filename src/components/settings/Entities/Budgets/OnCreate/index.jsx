@@ -24,6 +24,7 @@ const OnCreate = ({ customerOptions, isLoading }) => {
             <GroupedButtonsControlled
               label="Estado por defecto"
               name="defaultsCreate.state"
+              width="fit-content"
               color={defaultsCreate?.state === BUDGET_STATES.CONFIRMED.id ? COLORS.GREEN : COLORS.ORANGE}
               buttons={[
                 { text: 'Confirmado', icon: ICONS.CHECK, value: BUDGET_STATES.CONFIRMED.id },
@@ -32,6 +33,7 @@ const OnCreate = ({ customerOptions, isLoading }) => {
             />
             <GroupedButtonsControlled
               label="Entrega por defecto"
+              width="fit-content"
               color={COLORS.BLUE}
               name="defaultsCreate.pickUpInStore"
               buttons={[

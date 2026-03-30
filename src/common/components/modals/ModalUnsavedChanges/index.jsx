@@ -16,6 +16,7 @@ const UnsavedChangesModal = ({ open, onDiscard, onContinue }) => (
             text="Continuar editando"
             icon={ICONS.EDIT}
             color={COLORS.BLUE}
+            width="fit-content"
             basic
             onClick={onContinue}
           />
@@ -23,6 +24,7 @@ const UnsavedChangesModal = ({ open, onDiscard, onContinue }) => (
             text="Descartar cambios"
             icon={ICONS.TIMES}
             color={COLORS.RED}
+            width="fit-content"
             onClick={onDiscard}
           />
         </ButtonsContainer>

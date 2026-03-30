@@ -142,7 +142,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                   </FormField>
                   <FormField flexDirection="row" flex="1">
                     <IconedButton
-                      text={watchAllMethods ? "Deseleccionar todos los metodos de pago" : "Seleccionar todos los métodos de pago"}
+                      text={watchAllMethods ? "Deseleccionar todos los métodos de pago" : "Seleccionar todos los métodos de pago"}
                       icon={watchAllMethods ? ICONS.MINUS : ICONS.ADD}
                       color={watchAllMethods ? COLORS.ORANGE : COLORS.BLUE}
                       height="38px"
@@ -224,6 +224,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                 text="Confirmar"
                 icon={ICONS.CHECK}
                 color={COLORS.GREEN}
+                width="fit-content"
                 loading={isLoading}
                 disabled={isLoading}
                 onClick={handleSubmit(onSubmit)}

@@ -111,6 +111,7 @@ const ModalAction = ({
                 loading={isLoading}
                 color={COLORS.GREEN}
                 submit
+                width="fit-content"
               />
             </ButtonsContainer>
           </Form>
