@@ -61,7 +61,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       sortable: true,
       align: "left",
       width: 2,
-      whiteSpace:"nowrap",
+      whiteSpace: "nowrap",
       value: (cashBalance) => (
         <Flex $columnGap="7px" $justifyContent="space-between">
           {getFormatedDate(cashBalance.startDate, DATE_FORMATS.DATE_WITH_TIME)}
@@ -96,21 +96,54 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       id: 5,
       title: "Métodos de pago",
       align: "left",
-      value: (cashBalance) => (
-        <Flex $wrap $columnGap="5px" $rowGap="5px">
-          {(cashBalance.paymentMethods?.length > 0)
-            ? cashBalance.paymentMethods.map((method, index) => (
-              <Label width="fit-content" key={index} size={SIZES.TINY}>
-                {method}
-              </Label>
-            ))
-            :
-            <Label width="fit-content" size={SIZES.TINY}>
+      value: (cashBalance) => {
+        const methods = cashBalance.paymentMethods ?? [];
+
+        if (!methods.length) {
+          return (
+            <Label color={COLORS.BLUE} width="fit-content" size={SIZES.TINY}>
               Todos los métodos
             </Label>
-          }
-        </Flex>
-      ),
+          );
+        }
+
+        const visible = methods.slice(0, 2);
+        const hidden = methods.slice(2);
+
+        return (
+          <Flex $wrap $columnGap="5px" $rowGap="5px" $alignItems="center">
+            {visible.map((method, index) => (
+              <Label color={COLORS.BLUE} width="fit-content" key={index} size={SIZES.TINY}>
+                {method}
+              </Label>
+            ))}
+
+            {hidden.length > 0 && (
+              <Popup
+                size="mini"
+                hoverable
+                trigger={
+                  <Icon
+                    name={ICONS.TAGS}
+                    color={COLORS.BLUE}
+                    lowTooltip
+                  />
+                }
+                content={
+                  <Flex $columnGap="5px" $wrap>
+                    {hidden.map((method, index) => (
+                      <Label color={COLORS.BLUE} width="fit-content" key={index} size="mini">
+                        {method}
+                      </Label>
+                    ))}
+                  </Flex>
+                }
+                position="top left"
+              />
+            )}
+          </Flex>
+        );
+      }
     },
   ];
 
@@ -119,7 +152,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       id: 6,
       width: 2,
       title: "Fecha cierre",
-      whiteSpace:"nowrap",
+      whiteSpace: "nowrap",
       key: "closeDate",
       sortable: true,
       align: "left",
@@ -220,7 +253,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
     title: 'Fecha',
     key: 'date',
     width: 3,
-    whiteSpace:"nowrap",
+    whiteSpace: "nowrap",
     sortable: true,
     sortValue: (element) => element.date ?? "",
     value: (element) => (

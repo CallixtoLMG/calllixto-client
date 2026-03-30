@@ -277,11 +277,12 @@ const CashBalance = ({ params }) => {
                 />
                 <IconedButton
                   icon={ICONS.CLOCK}
-                  text="Ahora"
+                  text="Establecer fecha actual"
                   color={COLORS.BLUE}
                   onClick={() => form.setValue("closeDate", datePickerNow())}
                   alignSelf="end"
                   height="38px"
+                  iconOnly
                 />
               </FieldsContainer>
               <FieldsContainer>

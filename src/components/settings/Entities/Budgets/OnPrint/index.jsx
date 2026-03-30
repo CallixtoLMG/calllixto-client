@@ -39,7 +39,7 @@ const OnPrint = () => {
             <TextAreaControlled
               name="defaultsPDF.customPDFDisclaimer"
               label="Descargo de responsabilidad"
-              placeholder="Por favor controle su pedido. No se aceptan reclamos, devoluciones o cambios una vez firmado el remito de entrega. La mercadería se descarga al pie del camión, sin excepción."
+              placeholder="Ej: Por favor controle su pedido. No se aceptan reclamos, devoluciones o cambios una vez firmado el remito de entrega. La mercadería se descarga al pie del camión, sin excepción."
             />
           </FlexColumn>
         </Accordion.Content>

@@ -75,7 +75,7 @@ export const PAGES = {
     UPDATE: (id) => `/cajas/${id}?update=true`,
     SHOW: (id) => `/cajas/${id}`,
     NAME: 'Cajas',
-    SHORTKEYS: 'Control+8',
+    SHORTKEYS: 'Control+7',
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   USERS: {
@@ -83,7 +83,7 @@ export const PAGES = {
     CREATE: "/usuarios/crear",
     SHOW: (id) => `/usuarios/${id}`,
     NAME: 'Usuarios',
-    SHORTKEYS: 'Control+7',
+    SHORTKEYS: 'Control+8',
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   BUDGETS_HISTORY: {
