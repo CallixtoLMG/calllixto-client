@@ -150,7 +150,7 @@ const Budget = ({ params }) => {
         !isBudgetDraft(budget.state) &&
         {
           id: 1,
-          icon: ICONS.DOWNLOAD,
+          icon: ICONS.FILE_PDF,
           color: COLORS.BLUE,
           onClick: () => setIsModalPDFOpen(true),
           text: 'Imprimir venta',

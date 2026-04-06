@@ -278,7 +278,8 @@ export const ICONS = {
   PLUS_SQUARE: "plus square",
   REDO: "redo",
   MINUS: "minus",
-  STICKY_NOTE:"sticky note"
+  STICKY_NOTE:"sticky note",
+  FILE_PDF:"file pdf"
 };
 
 export const ALL = "all";

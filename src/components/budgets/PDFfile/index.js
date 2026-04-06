@@ -53,7 +53,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
 
     items.push({
       id: items.length + 1,
-      title: "Total Pagado",
+      title: "Total pagado",
       amount: <PriceLabel value={budget?.paidAmount} />,
     });
 

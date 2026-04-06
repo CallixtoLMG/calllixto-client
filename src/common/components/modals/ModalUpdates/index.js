@@ -52,32 +52,26 @@ const ModalUpdates = () => {
                 Se incorporó el <Accent>Control de stock</Accent> en productos. Desde la página de cada producto podés registrar entradas y salidas de stock de forma manual, y consultar el historial de movimientos.
               </ListItem>
               <ListItem>
-                Se incorporó la <Accent>Importación masiva de stock</Accent>. Desde la página de un proveedor podés cargar stock para múltiples productos a la vez importando un archivo Excel.
+                Se incorporó la <Accent>Importación en bache de stock</Accent>. Desde la página de un proveedor podés cargar stock para múltiples productos a la vez importando un archivo Excel.
               </ListItem>
               <ListItem>
                 El stock se descuenta automáticamente al <Accent>confirmar o registrar una entrega</Accent> en un presupuesto, siempre que el producto tenga el control de stock habilitado.
               </ListItem>
             </List>
-            {/* <StyledListHeader>
+            <StyledListHeader>
               <Icon name={ICONS.PENCIL} color={COLORS.BLUE} />Actualizaciones
             </StyledListHeader>
             <List relaxed bulleted as="ol">
               <ListItem>
-                El botón de <Accent>Descargar excel</Accent> se encuentra ahora debajo de cada tabla y el archivo solo incluirá los elementos filtrados.
+                Se realizaron <Accent>mejoras visuales en diferentes partes del sistema</Accent> con el objetivo de optimizar la experiencia general de uso y lograr una interfaz más clara y ordenada.
               </ListItem>
               <ListItem>
-                La sección <Accent>Ventas</Accent> ahora solo muestra registros de los últimos 3 meses (esto se realizó para mejorar el rendimiento en esa página, que al tener tantos elementos generaba muchas demoras). En caso de necesitar registros anteriores, se agregó la sección <Accent>Historial de ventas</Accent>.
+                Se ajustó la estética de distintos <Accent>botones y acciones</Accent> para optimizar el espacio disponible en pantalla. Mantienen la misma funcionalidad de siempre y, al pasar el mouse por encima, se muestra un mensaje indicativo para facilitar su identificación.
               </ListItem>
               <ListItem>
-                Se actualizaron los buscadores de clientes, productos, proveedores y marcas para mostrar coincidencias a medida que se escribe y facilitar la selección.
+                Se reorganizaron distintos <Accent>formularios y espacios</Accent> para mantener mayor coherencia en los márgenes, alineaciones y estructura general, logrando una presentación más uniforme en todo el sistema.
               </ListItem>
-              <ListItem>
-                Los <Accent>proveedores</Accent> ahora tienen un campo de ID de dos caracteres que los identifica en las importaciones de stock.
-              </ListItem>
-              <ListItem>
-                Se mejoró el rendimiento general y se realizaron ajustes visuales en diferentes partes del sistema para optimizar la experiencia del usuario.
-              </ListItem>
-            </List> */}
+            </List>
           </StyledModalContent>
           <Modal.Actions>
             <IconedButton

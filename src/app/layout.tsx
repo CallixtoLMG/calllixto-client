@@ -26,7 +26,7 @@ const NavigationContainer = styled.div`
   background-color: #fff;
   width: 100%;
   border-bottom: 1px solid #ddd;
-  z-index: 2;
+  z-index: 3;
 `;
 
 const BreadcrumbContainer = styled.div`

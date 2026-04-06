@@ -77,7 +77,7 @@ const ModalPDF = ({
     <>
       <Transition visible={isModalOpen} animation='scale' duration={500}>
         <StyledModal closeIcon open={isModalOpen} onClose={() => onClose(false)} width="90vw" height="90vh">
-          <Modal.Header>Opciones de Impresión</Modal.Header>
+          <Modal.Header>Opciones de impresión</Modal.Header>
           <Modal.Content>
             <FlexColumn $rowGap="15px">
               <Flex $columnGap="15px" wrap="wrap" $rowGap="5px">

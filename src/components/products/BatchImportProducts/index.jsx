@@ -9,7 +9,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Icon } from "semantic-ui-react";
+import { Checkbox, Icon } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { ConfirmDownloadModal } from "../ConfirmDownloadModal";
 import { ModalBatchImport } from "../ModalBatchImport";
@@ -47,6 +47,10 @@ export const BatchImportProducts = ({ isCreating }) => {
 
     setExistingIds(ids);
   }, [products]);
+
+  const parseStockControl = (value) => {
+    return normalizeText(value) === "si";
+  };
 
   const importSettings = useMemo(() => {
     return {
@@ -129,6 +133,7 @@ export const BatchImportProducts = ({ isCreating }) => {
       proveedor: "supplier",
       costo: "cost",
       precio: "price",
+      stock: "stockControl",
       estado: "state",
       comentarios: "comments",
     };
@@ -185,6 +190,7 @@ export const BatchImportProducts = ({ isCreating }) => {
           name: product.name,
           cost: isNaN(parseFloat(product.cost)) ? 0 : parseFloat(product.cost),
           price: isNaN(parseFloat(product.price)) ? 0 : parseFloat(product.price),
+          stockControl: normalizeText(product.stockControl) ?? "",
           comments: product.comments
         };
 
@@ -205,7 +211,7 @@ export const BatchImportProducts = ({ isCreating }) => {
       }
     });
 
-    setValue('importProducts', importProducts);
+    setValue("importProducts", importProducts);
     setImportedProductsCount(importProducts.length);
 
     if (downloadProducts.length) {
@@ -216,12 +222,13 @@ export const BatchImportProducts = ({ isCreating }) => {
 
   const handleDownloadConfirmation = () => {
     const data = [
-      ['Id', 'Nombre', 'Costo', 'Precio', 'Comentarios', 'Error'],
+      ["Id", "Nombre", "Costo", "Precio", "Controlar stock", "Comentarios", "Error"],
       ...downloadProducts.map((product) => [
         product.id,
         product.name,
         product.cost,
         product.price,
+        product.stockControl,
         product.comments,
         product.msg || "",
       ]),
@@ -239,12 +246,13 @@ export const BatchImportProducts = ({ isCreating }) => {
         msg: product?.msg || "Este producto tiene errores"
       }));
       const formattedData = [
-        ["Id", "Nombre", "Costo", "Precio", "Comentarios", "Mensaje de error"],
+        ["Id", "Nombre", "Costo", "Precio", "Controlar stock", "Comentarios", "Mensaje de error"],
         ...data.map(product => [
           product.id,
           product.name,
           product.cost,
           product.price,
+          product.stockControl,
           product.comments,
           product.msg
         ])
@@ -257,29 +265,52 @@ export const BatchImportProducts = ({ isCreating }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (e) => {
       if (isCreating) {
-        const { data } = await importSettings.onSubmit(e.importProducts);
+
+        const processedProducts = e.importProducts.map(product => ({
+          ...product,
+          stockControl: parseStockControl(product.stockControl),
+        }));
+
+        const { data } = await importSettings.onSubmit(processedProducts);
         return data;
+
       } else {
+
         const processedProducts = e.importProducts
           .map(product => {
             const existingProduct = existingIds[product.id.toUpperCase()];
+
+            const parsedProduct = {
+              ...product,
+              stockControl: parseStockControl(product.stockControl),
+            };
+
             let productWithChanges = { id: product.id };
             let previousVersion = {};
-            Object.keys(product).forEach(key => {
-              if (key !== 'id' && product[key] !== undefined && product[key] !== '' && product[key] !== existingProduct[key]) {
-                productWithChanges[key] = product[key];
+
+            Object.keys(parsedProduct).forEach(key => {
+              if (
+                key !== 'id' &&
+                parsedProduct[key] !== undefined &&
+                parsedProduct[key] !== '' &&
+                parsedProduct[key] !== existingProduct[key]
+              ) {
+                productWithChanges[key] = parsedProduct[key];
                 previousVersion[key] = existingProduct[key];
               }
             });
+
             if (existingProduct.updatedAt) {
               previousVersion['updatedAt'] = existingProduct.updatedAt;
             }
+
             if (Object.keys(previousVersion).length > 0) {
               productWithChanges['previousVersion'] = previousVersion;
               productWithChanges.updatedAt = now();
             } else {
               return null;
             }
+
             return productWithChanges;
           })
           .filter(product => product !== null);
@@ -287,19 +318,21 @@ export const BatchImportProducts = ({ isCreating }) => {
         if (processedProducts.length > 0) {
           const { data } = await importSettings.onSubmit(processedProducts);
           return data;
-        };
-      };
+        }
+      }
     },
+
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success(
           `Los productos se han ${isCreating ? "creado" : "actualizado"} con éxito!`
-        )
+        );
         handleModalClose();
         refetchProducts();
       } else {
         toast.error(response.error.message);
       }
+
       if (response.unprocessed?.length) {
         setShowUnprocessedModal(true);
         setUnprocessedResponse({ response });
@@ -358,6 +391,30 @@ export const BatchImportProducts = ({ isCreating }) => {
           placeholder="Precio"
         />
       ), id: 4, width: 2
+    },
+    {
+      title: "Controlar stock",
+      value: (product, index) => {
+        const currentValue = product.stockControl;
+
+        const isChecked = normalizeText(currentValue) === "si";
+
+        return (
+          <Checkbox
+            toggle
+            checked={isChecked}
+            onChange={(_, data) => {
+              setValue(
+                `importProducts[${index}].stockControl`,
+                data.checked ? "si" : "no",
+                { shouldDirty: true, shouldValidate: true }
+              );
+            }}
+          />
+        );
+      },
+      id: 6,
+      width: 2
     },
     {
       title: "Comentarios", value: (product, index) => (
