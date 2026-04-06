@@ -315,7 +315,7 @@ export const STOCK_TYPE_OPTIONS = [
 export const STOCK_TABLE_HEADERS = [
   {
     id: 1,
-    title: 'Fecha de pago',
+    title: 'Fecha',
     key: "date",
     sortable: true,
     sortValue: (stockFlows) => stockFlows.createdAt ?? "",
@@ -332,6 +332,7 @@ export const STOCK_TABLE_HEADERS = [
       </Flex>
     ),
     width: 2,
+    whiteSpace: "nowrap",
   },
 
   {
@@ -344,6 +345,16 @@ export const STOCK_TABLE_HEADERS = [
   },
   {
     id: 3,
+    key: "budgetId",
+    sortable: true,
+    sortValue: (stockFlows) => stockFlows.budgetId ?? "",
+    width: 2,
+    title: 'Id venta',
+    value: (stockFlows) => stockFlows.budgetId,
+    href: (stockFlows) => stockFlows.budgetId ? `/budgets/${stockFlows.budgetId}` : undefined,
+  },
+  {
+    id: 4,
     key: "createdBy",
     sortable: true,
     sortValue: (stockFlows) => stockFlows.createdBy ?? "",
@@ -351,20 +362,20 @@ export const STOCK_TABLE_HEADERS = [
     title: 'Creado por', value: (stockFlows) => stockFlows.createdBy
   },
   {
-    id: 4,
+    id: 5,
     width: 3,
     title: 'Factura', value: (stockFlows) => stockFlows.invoiceNumber
   },
   {
-    id: 5,
+    id: 6,
     width: 3,
     title: 'Remito', value: (stockFlows) => stockFlows.deliveryNote
   },
   {
-    id: 6,
+    id: 7,
     width: 9,
     align: "left",
-    title: 'Comentarios', value: (stockFlows) => <OverflowWrapper maxWidth="30vw" popupContent={stockFlows.comments}> {stockFlows.comments} </OverflowWrapper>
+    title: 'Comentarios', value: (stockFlows) => <OverflowWrapper maxWidth="15vw" popupContent={stockFlows.comments}> {stockFlows.comments} </OverflowWrapper>
   },
 ];
 
@@ -383,11 +394,13 @@ export const STOCK_FLOWS_MODAL_CONFIG = {
   add: {
     title: "Ingreso de stock",
     icon: ICONS.ARROW_DOWN,
+    titleIconColor: COLORS.GREEN,
     confirmText: "Agregar",
   },
   out: {
     title: "Egreso de stock",
     icon: ICONS.ARROW_UP,
+    titleIconColor: COLORS.RED,
     confirmText: "Agregar",
   },
   edit: {

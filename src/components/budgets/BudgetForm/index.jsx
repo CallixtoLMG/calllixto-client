@@ -53,6 +53,7 @@ const BudgetForm = ({
     handleSubmit,
     reset,
     trigger,
+    clearErrors,
     formState: { isDirty, errors },
   } = useFormContext();
 
@@ -166,10 +167,6 @@ const BudgetForm = ({
     setIsTableLoading(false);
   };
 
-  useEffect(() => {
-    trigger("productsValidation");
-  }, [watchProducts, trigger]);
-
   const handleCreate = async (data, state) => {
     const { customer } = data;
 
@@ -217,7 +214,13 @@ const BudgetForm = ({
       id: 1,
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      onClick: (element, index) => { removeProduct(index) },
+      onClick: (element, index) => {
+        removeProduct(index);
+    
+        queueMicrotask(() => {
+          trigger("productsValidation");
+        });
+      },
       tooltip: 'Eliminar',
       width: "100%"
     },
@@ -630,11 +633,6 @@ const BudgetForm = ({
                   pointing: 'above',
                 }
               }
-              // rules={{
-              //   validate: () => {
-              //     return !!watchProducts.length || "Al menos un producto es requerido.";
-              //   },
-              // }}
               elements={products}
               searchFields={['name', 'id']}
               getResultProps={(product) => ({
@@ -659,6 +657,7 @@ const BudgetForm = ({
                     }
                   })
                 });
+                clearErrors("productsValidation");
               }}
             />
           </FormField>
@@ -762,7 +761,6 @@ const BudgetForm = ({
           }
         />
       </Form>
-      {/* </FormProvider > */}
     </>
   );
 };

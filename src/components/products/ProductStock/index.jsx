@@ -4,7 +4,7 @@ import { DropdownControlled, NumberField, TextControlled, TextField } from "@/co
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { ModalAction } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
-import { ALL, COLORS, ICONS, IN, OUT, RULES as VALIDATE_RULES } from "@/common/constants";
+import { ALL, COLORS, ICONS, IN, OUT, PAGES, RULES as VALIDATE_RULES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { useFilters } from "@/hooks";
 import { useState } from "react";
@@ -191,14 +191,17 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         headers={STOCK_TABLE_HEADERS}
         elements={stockFlows}
         $actionButtonInside
+        page={PAGES.BUDGETS}
         onFilter={onFilter}
         filters={filters}
         setFilters={setFilters}
+        mainKey="budgetId"
       />
       <ModalAction
         title={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.title}
         isLoading={isLoading}
         titleIcon={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.icon}
+        titleIconColor={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.titleIconColor}
         confirmButtonText={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.confirmText}
         showModal={showModal}
         setShowModal={(open) => {

@@ -260,11 +260,16 @@ const CustomTable = ({
                         )}
                         {headers.map(header => {
                           const href =
-                            header.href
+                            typeof header.href === "function"
                               ? header.href(element)
-                              : typeof page?.SHOW === "function"
-                                ? page.SHOW(element[mainKey], element)
-                                : undefined;
+                              : header.href
+                                ? header.href
+                                : (
+                                  typeof page?.SHOW === "function" &&
+                                    element[mainKey]
+                                    ? page.SHOW(element[mainKey], element)
+                                    : undefined
+                                );
 
                           return (
                             <LinkCell
@@ -367,7 +372,6 @@ const CustomTable = ({
                                   const resolvedLoading = resolveActionProp(action.loading, element, index);
                                   const resolvedBasic = resolveActionProp(action.basic, element, index);
                                   const resolvedText = resolveActionProp(action.text, element, index);
-                                
                                   return (
                                     <IconedButton
                                       key={`${String(resolvedIcon)}_${idx}`}

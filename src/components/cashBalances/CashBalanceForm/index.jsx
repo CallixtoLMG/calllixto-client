@@ -95,21 +95,37 @@ const CashBalanceForm = forwardRef(({
           </FormField>
         </FieldsContainer>
         <FieldsContainer >
-          <FormField flex="1">
-            <DropdownControlled
-              name="paymentMethods"
-              label="Métodos de pago"
-              multiple
-              disabled
-              optionsMapper={optionsMapper}
-              options={Object.values(tagsOptions)}
-              renderLabel={(item) => ({
-                color: item.value.color ?? "grey",
-                content: item.value.name
-              })}
-            />
-          </FormField>
-          <FormField flex="1" />
+          {cashBalance?.allPaymentMethods ? (
+            <>
+              <FormField flex="1">
+                <TextField
+                  label="Métodos de pago"
+                  value="Todos los métodos de pago"
+                  disabled
+                />
+              </FormField>
+              <FormField flex="1" />
+              <FormField flex="1" />
+            </>
+          ) : (
+            <>
+              <FormField flex="1">
+                <DropdownControlled
+                  name="paymentMethods"
+                  label="Métodos de pago"
+                  multiple
+                  disabled
+                  optionsMapper={optionsMapper}
+                  options={Object.values(tagsOptions)}
+                  renderLabel={(item) => ({
+                    color: item.value.color ?? "grey",
+                    content: item.value.name
+                  })}
+                />
+              </FormField>
+              <FormField flex="1" />
+            </>
+          )}
         </FieldsContainer>
         <FieldsContainer $alignItems="flex-end">
           <FormField flex="1">
@@ -120,7 +136,7 @@ const CashBalanceForm = forwardRef(({
               disabled={!isUpdating}
             />
           </FormField>
-          {showBillsTable && (
+          {showBillsTable ? (
             <>
               <FormField flex="1">
                 <PriceField
@@ -153,7 +169,12 @@ const CashBalanceForm = forwardRef(({
                 )}
               </FormField>
             </>
-          )}
+          ) :
+            <>
+              <FormField disabled flex="1" />
+              <FormField disabled flex="1" />
+            </>
+          }
         </FieldsContainer>
         <FieldsContainer >
           <FormField flex="1">
@@ -167,7 +188,7 @@ const CashBalanceForm = forwardRef(({
           <FormField disabled flex="1" />
           <FormField disabled flex="1" />
         </FieldsContainer>
-        {showBillsTable && (
+        {showBillsTable ?? (
           <>
             {cashBalance.state === CASH_BALANCE_STATES.OPEN.id && isUpdating ? (
               <BillDetails name="billsDetails" />
@@ -193,7 +214,12 @@ const CashBalanceForm = forwardRef(({
             )}
           </>
         )}
-        <TextAreaControlled name="comments" label="Comentarios" placeholder="Solo billetes de 500" disabled={!isUpdating} />
+        <TextAreaControlled
+          name="comments"
+          label="Comentarios"
+          placeholder="Solo billetes de 500"
+          disabled={!isUpdating}
+        />
         {isUpdating && (
           <SubmitAndRestore
             isUpdating={isUpdating}
