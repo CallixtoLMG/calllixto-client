@@ -12,7 +12,7 @@ export const HeaderBar = styled.header`
   align-items: center;
   justify-content: space-between;
   padding: 0 50px;
-  z-index: 1200;
+  z-index: 800;
 `;
 
 export const HeaderLeft = styled.div`
@@ -92,6 +92,6 @@ export const Overlay = styled.div`
   position: fixed;
   inset: 0;
   background: rgba(15, 23, 42, 0.28);
-  z-index: 1190;
+  z-index: 790;
 `;
 

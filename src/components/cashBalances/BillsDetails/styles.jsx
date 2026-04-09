@@ -3,4 +3,5 @@ import styled from 'styled-components';
 
 export const Header = styled(SHeader)`
   margin: 0!important;
+  align-content: center;
 `;

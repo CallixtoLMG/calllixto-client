@@ -10,7 +10,7 @@ export const SidebarContainer = styled.aside`
   background: #ffffff;
   border-right: 1px solid #e5e7eb;
   box-shadow: 8px 0 30px rgba(0, 0, 0, 0.08);
-  z-index: 1300;
+  z-index: 900;
   transform: translateX(-100%);
   transition: transform 0.25s ease;
   display: flex;

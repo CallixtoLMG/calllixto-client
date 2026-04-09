@@ -1,6 +1,6 @@
 import { ButtonsContainer, FieldsContainer, Form, FormField, Input } from "@/common/components/custom";
 import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePickerControlled";
-import { COLORS, ENTITIES, ICONS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, SIZES } from "@/common/constants";
 import { datePickerNow, getPastDate } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
@@ -10,7 +10,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
 import { IconedButton } from "../../buttons";
 import { DropdownControlled, PriceControlled, PriceField, TextAreaControlled } from "../../form";
-import { Header } from "./styles";
+import { Header, ModalContent } from "./styles";
 
 const EMPTPY_CASH_BALANCE = {
   closeDate: null,
@@ -39,9 +39,9 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
   return (
     <FormProvider {...methods}>
       <Transition visible={open} onStart={handleOnStart} animation="scale" duration={500}>
-        <Modal open={open} onClose={onClose}>
+        <Modal size={SIZES.LARGE} open={open} onClose={onClose}>
           <Header icon="inbox" content="Abrir caja" />
-          <Modal.Content>
+          <ModalContent            >
             <Form>
               <FieldsContainer $columnGap="15px">
                 <FormField flexDirection="row" flex="1">
@@ -211,7 +211,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                 <TextAreaControlled name="comments" label="Comentarios" placeholder="Solo billetes de 500" />
               </FieldsContainer>
             </Form>
-          </Modal.Content>
+          </ModalContent>
           <Modal.Actions>
             <ButtonsContainer width="100%">
               <IconedButton
