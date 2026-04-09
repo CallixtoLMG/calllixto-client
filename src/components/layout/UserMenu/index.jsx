@@ -34,11 +34,13 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
   const [view, setView] = useState("main"); 
   const [searchTerm, setSearchTerm] = useState("");
 
-  const clients = userData?.callixtoClients?.items || [];
+  const clientItems = userData?.callixtoClients?.items;
+
+  const clients = useMemo(() => clientItems ?? [], [clientItems]);
 
   const filteredClients = useMemo(() => {
     if (!searchTerm.trim()) return clients;
-
+  
     return clients.filter((client) =>
       client.name.toLowerCase().includes(searchTerm.toLowerCase())
     );

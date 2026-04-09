@@ -145,7 +145,7 @@ const Settings = () => {
       setActiveTabIndex(0);
       handleEntityChange(settings[0]);
     }
-  }, [settings, tabParam, handleEntityChange]);
+  }, [settings, tabParam, handleEntityChange, entityFromUrl]);
 
   const validateShortcuts = {
     canConfirm: () => !isPending && isDirty,
