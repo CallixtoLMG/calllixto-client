@@ -1,5 +1,5 @@
 import { IconedButton } from "@/common/components/buttons";
-import { Box, FlexColumn } from "@/common/components/custom";
+import { Box, Flex, FlexColumn } from "@/common/components/custom";
 import { Table } from "@/common/components/table";
 import { COLORS, ICONS } from "@/common/constants";
 import { useRef, useState } from "react";
@@ -21,36 +21,38 @@ export const BillDetails = ({ name }) => {
 
   return (
     <FlexColumn $rowGap="10px">
-      <Header margin="0">Desglose de Billetes</Header>
-      <Popup
-        trigger={
-          <Box
-            width="fit-content"
-            tabIndex={0}
-            role="button"
-            ref={billButtonRef}
-            onClick={() => setOpenBillPopup(true)}
-          >
-            <IconedButton
-              text="Agregar billetes"
-              icon={ICONS.ADD}
-              color={COLORS.GREEN}
-              iconOnly
-            />
-          </Box>
-        }
-        open={openBillPopup}
-        on="click"
-        onClose={handleClosePopup}
-        closeOnDocumentClick
-        position="top left"
-      >
-        <AddBillPopup
-          billDetailsFields={billDetailsFields}
-          appendBillDetails={appendBillDetails}
+      <Flex $columnGap="15px">
+        <Header margin="0">Desglose de billetes</Header>
+        <Popup
+          trigger={
+            <Box
+              width="fit-content"
+              tabIndex={0}
+              role="button"
+              ref={billButtonRef}
+              onClick={() => setOpenBillPopup(true)}
+            >
+              <IconedButton
+                text="Agregar billetes"
+                icon={ICONS.ADD}
+                color={COLORS.GREEN}
+                iconOnly
+              />
+            </Box>
+          }
+          open={openBillPopup}
+          on="click"
           onClose={handleClosePopup}
-        />
-      </Popup>
+          closeOnDocumentClick
+          position="top left"
+        >
+          <AddBillPopup
+            billDetailsFields={billDetailsFields}
+            appendBillDetails={appendBillDetails}
+            onClose={handleClosePopup}
+          />
+        </Popup>
+      </Flex>
       <Table
         headers={BILLS_DETAILS_TABLE_HEADERS}
         actions={[

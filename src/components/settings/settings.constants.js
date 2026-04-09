@@ -43,3 +43,21 @@ export const BUDGET_RANGE_DATE_MONTH_OPTIONS = Array.from({ length: 12 }, (_, i)
     text: value === 1 ? "1 mes" : `${value} meses`,
   };
 });
+
+export const ENTITY_MAPPER = {
+  PRODUCT: { name: "Productos" },
+  CUSTOMER: { name: "Clientes" },
+  BRAND: { name: "Marcas" },
+  BUDGET: { name: "Ventas" },
+  SUPPLIER: { name: "Proveedores" },
+  EXPENSE: { name: "Gastos" },
+  GENERAL: { name: "General" },
+};
+
+export const SUPPORTED_SETTINGS = {
+  PRODUCT: ['tags', 'blacklist'],
+  CUSTOMER: ['tags'],
+  GENERAL: ['paymentMethods'],
+  EXPENSE: ['tags', 'categories'],
+  BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
+};

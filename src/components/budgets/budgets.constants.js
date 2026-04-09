@@ -195,12 +195,12 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
   }
 
   columns.push({
-    id: isConfirmed ? 7 : 5,
+    id: 7,
     title: "Vendedor",
     align: "left",
     key: "createdBy",
     sortable: true,
-    width: 4,
+    width: isConfirmed ? 4 : 6,
     href: (budget) => budget.href,
     value: (budget) => (
       <OverflowWrapper maxWidth="25vw" popupContent={budget.createdBy}>

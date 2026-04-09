@@ -1,4 +1,5 @@
 import { encodeUri, isNewFeature } from "@/common/utils";
+import { RULES as ROLES, isCallixtoUser } from "@/roles";
 import { Icon, List, ListItem } from "semantic-ui-react";
 import { Accent } from "../components/custom";
 import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
@@ -19,6 +20,7 @@ export const PAGES = {
     UPDATE: (id) => `/clientes/${id}?update=true`,
     SHOW: (id) => `/clientes/${id}`,
     NAME: 'Clientes',
+    SINGULAR_NAME: "Cliente",
     SHORTKEYS: 'Control+1',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
@@ -28,6 +30,7 @@ export const PAGES = {
     UPDATE: (id) => `/proveedores/${id}?update=true`,
     SHOW: (id) => `/proveedores/${id}`,
     NAME: 'Proveedores',
+    SINGULAR_NAME: "Proveedor",
     SHORTKEYS: 'Control+2',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
@@ -37,6 +40,7 @@ export const PAGES = {
     UPDATE: (id) => `/marcas/${id}?update=true`,
     SHOW: (id) => `/marcas/${id}`,
     NAME: 'Marcas',
+    SINGULAR_NAME: "Marca",
     SHORTKEYS: 'Control+3',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
@@ -46,6 +50,7 @@ export const PAGES = {
     UPDATE: (id) => `/productos/${id}?update=true`,
     SHOW: (id) => `/productos/${id}`,
     NAME: 'Productos',
+    SINGULAR_NAME: "Producto",
     SHORTKEYS: 'Control+4',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
@@ -56,6 +61,7 @@ export const PAGES = {
     SHOW: (id) => `/ventas/${id}`,
     DRAFT: (id) => `/ventas/${id}/borrador`,
     NAME: 'Ventas',
+    SINGULAR_NAME: "Venta",
     SHORTKEYS: 'Control+5',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
@@ -66,6 +72,7 @@ export const PAGES = {
     UPDATE: (id) => `/gastos/${id}?update=true`,
     SHOW: (id) => `/gastos/${id}`,
     NAME: 'Gastos',
+    SINGULAR_NAME: "Gasto",
     SHORTKEYS: 'Control+6',
     BADGE: isNewFeature('2025-01-01') ? 'new' : undefined
   },
@@ -75,6 +82,7 @@ export const PAGES = {
     UPDATE: (id) => `/cajas/${id}?update=true`,
     SHOW: (id) => `/cajas/${id}`,
     NAME: 'Cajas',
+    SINGULAR_NAME: "Caja",
     SHORTKEYS: 'Control+7',
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
@@ -83,6 +91,7 @@ export const PAGES = {
     CREATE: "/usuarios/crear",
     SHOW: (id) => `/usuarios/${id}`,
     NAME: 'Usuarios',
+    SINGULAR_NAME: "Usuario",
     SHORTKEYS: 'Control+8',
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
@@ -107,6 +116,155 @@ export const PAGES = {
   NOT_FOUND: {
     BASE: "/ups"
   },
+};
+
+const buildEntityChildren = (page, extra = []) => {
+  const singularName = page.SINGULAR_NAME ?? page.NAME;
+
+  const children = [
+    {
+      id: `${page.BASE}-list`,
+      label: `Lista de ${page.NAME.toLowerCase()}`,
+      href: page.BASE,
+    },
+  ];
+
+  if (page.CREATE) {
+    children.push({
+      id: `${page.BASE}-create`,
+      label: `Crear ${singularName.toLowerCase()}`,
+      href: page.CREATE,
+    });
+  }
+
+  return [...children, ...extra];
+};
+
+const SETTINGS_NAV_ITEMS = [
+  {
+    id: "settings-general",
+    label: "General",
+    href: "/configuracion?tab=general",
+  },
+  {
+    id: "settings-products",
+    label: "Productos",
+    href: "/configuracion?tab=productos",
+  },
+  {
+    id: "settings-customers",
+    label: "Clientes",
+    href: "/configuracion?tab=clientes",
+  },
+  {
+    id: "settings-suppliers",
+    label: "Proveedores",
+    href: "/configuracion?tab=proveedores",
+  },
+  {
+    id: "settings-budgets",
+    label: "Ventas",
+    href: "/configuracion?tab=ventas",
+  },
+  {
+    id: "settings-expenses",
+    label: "Gastos",
+    href: "/configuracion?tab=gastos",
+  },
+];
+
+export const getNavigationItems = (role) => {
+  const items = [
+    {
+      id: "customers",
+      label: PAGES.CUSTOMERS.NAME,
+      icon: ICONS.USERS,
+      children: buildEntityChildren(PAGES.CUSTOMERS),
+      badge: PAGES.CUSTOMERS.BADGE,
+    },
+    {
+      id: "suppliers",
+      label: PAGES.SUPPLIERS.NAME,
+      icon: ICONS.TRUCK,
+      children: buildEntityChildren(PAGES.SUPPLIERS),
+      badge: PAGES.SUPPLIERS.BADGE,
+    },
+    {
+      id: "brands",
+      label: PAGES.BRANDS.NAME,
+      icon: ICONS.TAG,
+      children: buildEntityChildren(PAGES.BRANDS),
+      badge: PAGES.BRANDS.BADGE,
+    },
+    {
+      id: "products",
+      label: PAGES.PRODUCTS.NAME,
+      icon: ICONS.BOX,
+      children: buildEntityChildren(PAGES.PRODUCTS),
+      badge: PAGES.PRODUCTS.BADGE,
+    },
+    {
+      id: "sales",
+      label: "Ventas",
+      icon: ICONS.SHOPPING_CART,
+      children: buildEntityChildren(PAGES.BUDGETS, [
+        {
+          id: "budgets-history",
+          label: "Historial de ventas",
+          href: PAGES.BUDGETS_HISTORY.BASE,
+        },
+      ]),
+      badge: PAGES.BUDGETS.BADGE,
+    },
+    {
+      id: "expenses",
+      label: PAGES.EXPENSES.NAME,
+      icon: ICONS.MONEY_BILL,
+      children: buildEntityChildren(PAGES.EXPENSES),
+      badge: PAGES.EXPENSES.BADGE,
+    },
+    {
+      id: "cash-balances",
+      label: PAGES.CASH_BALANCES.NAME,
+      icon: ICONS.CASH_REGISTER,
+      href: PAGES.CASH_BALANCES.BASE,
+      badge: PAGES.CASH_BALANCES.BADGE,
+    },
+    isCallixtoUser(role) && {
+      id: "users",
+      label: PAGES.USERS.NAME,
+      icon: ICONS.USER,
+      children: buildEntityChildren(PAGES.USERS),
+      badge: PAGES.USERS.BADGE,
+    },
+    ROLES.canUpdate[role] && {
+      id: "settings",
+      label: PAGES.SETTINGS.NAME,
+      icon: ICONS.COG,
+      children: SETTINGS_NAV_ITEMS,
+      badge: PAGES.SETTINGS.BADGE,
+    },
+  ];
+
+  return items.filter(Boolean);
+};
+
+export const SETTINGS_TAB_MAP = {
+  general: "GENERAL",
+  productos: "PRODUCT",
+  clientes: "CUSTOMER",
+  proveedores: "SUPPLIER",
+  ventas: "BUDGET",
+  gastos: "EXPENSE",
+};
+
+export const SETTINGS_TAB_REVERSE_MAP = {
+  GENERAL: "general",
+  PRODUCT: "productos",
+  CUSTOMER: "clientes",
+  SUPPLIER: "proveedores",
+  BUDGET: "ventas",
+  EXPENSE: "gastos",
 };
 
 export const PAGE_SIZE_OPTIONS = [
@@ -172,6 +330,7 @@ export const SHORTKEYS = {
   RIGHT_ARROW: "Control+ArrowRight",
   LEFT_ARROW: "Control+ArrowLeft",
   DELETE: "Control+Delete",
+  ESCAPE: "Escape",
 };
 
 export const DEFAULT_KEY = "id";
@@ -254,7 +413,7 @@ export const ICONS = {
   EYE_SLASH: "eye slash",
   COG: "cog",
   EXCLAMATION_CIRCLE: "exclamation circle",
-  TAGS: "tags",
+  SS: "tags",
   ADDRESS_CARD: "address card",
   ARCHIVE: "archive",
   OPTIONS: "options",
@@ -278,8 +437,12 @@ export const ICONS = {
   PLUS_SQUARE: "plus square",
   REDO: "redo",
   MINUS: "minus",
-  STICKY_NOTE:"sticky note",
-  FILE_PDF:"file pdf"
+  STICKY_NOTE: "sticky note",
+  FILE_PDF: "file pdf",
+  LIST: "list",
+  CARET_UP: "caret up",
+  CARET_DOWN: "caret down",
+  SIGN_OUT:"sign out"
 };
 
 export const ALL = "all";

@@ -71,6 +71,15 @@ const ModalUpdates = () => {
               <ListItem>
                 Se reorganizaron distintos <Accent>formularios y espacios</Accent> para mantener mayor coherencia en los márgenes, alineaciones y estructura general, logrando una presentación más uniforme en todo el sistema.
               </ListItem>
+              <ListItem>
+                Se incorporó un nuevo <Accent>menú lateral de navegación</Accent> que permite acceder más rápido a las distintas secciones del sistema desde cualquier pantalla.
+              </ListItem>
+              <ListItem>
+                Ahora podés <Accent>ingresar directamente a los listados</Accent> haciendo click sobre el nombre de cada sección, evitando pasos innecesarios.
+              </ListItem>
+              <ListItem>
+                Se actualizó el menú de usuario a la derecha, para mantener una <Accent>estética más moderna y consistente</Accent> con el resto de la aplicación.
+              </ListItem>
             </List>
           </StyledModalContent>
           <Modal.Actions>
