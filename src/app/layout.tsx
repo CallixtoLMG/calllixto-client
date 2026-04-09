@@ -18,7 +18,7 @@ const inter = Inter({ subsets: ['latin'] });
 const NavigationContainer = styled.div`
   position: fixed;
   top: 60px;
-  padding: 10px 60px;
+  padding: 10px 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;

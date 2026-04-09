@@ -1,14 +1,10 @@
-import { Box, Flex, Icon as SIcon } from '@/common/components/custom';
+import { Box, Flex, Icon } from '@/common/components/custom';
 import { StyledModalHeader } from '@/common/components/modals/ModalShortcuts/styles';
 import { COLORS, ICONS, SIZES } from '@/common/constants';
 import { createContext, useContext, useState } from 'react';
 import { Modal, Popup, Transition } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { IconedButton } from '../../common/components/buttons';
-
-const Icon = styled(SIcon)`
-  cursor: pointer;
-`;
 
 const StyledModal = styled(Modal)`
   width: 80vw !important;
@@ -82,6 +78,8 @@ const NavActions = () => {
                 color={COLORS.BLUE}
                 size={SIZES.LARGE}
                 onClick={() => setOpen(true)}
+                pointer
+                margin="0"
               />
             }
             position="bottom right"

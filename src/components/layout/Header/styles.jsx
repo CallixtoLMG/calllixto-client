@@ -1,104 +1,97 @@
-import { Flex } from "@/common/components/custom";
-import Link from "next/link";
-import { Container as SContainer, Menu as SMenu } from "semantic-ui-react";
 import styled from "styled-components";
 
-export const MenuBadge = styled.span`
-  position: absolute;
-  top: 2px;
-  justify-self: anchor-center;
-  padding: 1px 6px;
-  font-size: 8px;
-  border-radius: 15px;
-  font-weight: 600;
-  pointer-events: none;
-  background-color: ${({ bgColor }) => bgColor};
-  color: ${({ color }) => color};
-`;
-
-const ModLink = styled(Link)`
-  display:flex;
-  position: relative;
-  align-items: center;
-  transition: all 0.2s ease-in-out;
-  font-size: 15px;
-`;
-
-const MenuItem = styled(SMenu.Item)`
-  position: relative;
-  height: 3.5rem;
-  background-color: ${({ $active }) =>
-    $active ? '#f5f5f5' : 'transparent'}!important;
-
-  padding: 12px 16px;
-
-  &:hover {
-    background-color: ${({ $backgroundColor }) =>
-    $backgroundColor && '#f5f5f5'}!important;
-  }
-
-  &::before {
-    display: ${({ $displayNone }) => $displayNone && 'none'}!important;
-  }
-`;
-
-const LeftHeaderDiv = styled(Flex)`
-  position: relative;
-  padding: ${({ padding = "0" }) => padding}!important;
-  align-items: center;
-  transition: all 0.2s ease-in-out;
-  font-size: 15px;
-  &:hover {
-    background-color: #f5f5f5!important;
-  };
-`;
-
-const RigthHeaderDiv = styled(Flex)`
-  position: relative;
-  padding: ${({ padding = "0.5rem" }) => padding}!important;
-  align-items: center;
-  transition: all 0.2s ease-in-out;
-  font-size: 15px;
-  &::before {
-    color:red;
-  }
-`;
-
-const Container = styled(SContainer)`
+export const HeaderBar = styled.header`
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: rgb(243, 244, 246);
+  border-bottom: 1px solid #e7e7e7;
   display: flex;
-  height: 60px!important;
-  width: 95%!important;
-
-  div:last-child {
-    margin-left: auto!important;
-  };
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 50px;
+  z-index: 1200;
 `;
 
-const Text = styled.p`
-  display: inline-block;
-  text-align: center;
-  position: relative;
-  padding:0!important;
-  margin: 0!important;
+export const HeaderLeft = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+`;
+
+export const HeaderRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+export const HamburgerButton = styled.button`
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 4px;
+  background: #f4f6f8;
+  cursor: pointer;
+  font-size: 20px;
+  transition: 0.2s ease;
+
   &:hover {
-    &:after{
-      transform: scaleX(1);
-      transform-origin: bottom left;
-    };
-  };
-  &:after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    transform: ${({ $active }) => ($active ? "scaleX(1)" : "scaleX(0)")};
-    height: 2px;
-    bottom: -2px;
-    left: 0;
-    background-color: #0087ca;
-    transform-origin: bottom right;
-    transition: transform 0.25s ease-out;
-  };
+    background: #e9eef3;
+  }
 `;
 
-export { Container, LeftHeaderDiv, MenuItem, ModLink, RigthHeaderDiv, Text };
+export const Brand = styled.div`
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+`;
+
+export const RightActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
+export const ClientBadge = styled.div`
+  height: 35px;
+  padding: 0 14px;
+  border-radius: 4px;
+  background: #2185d0;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  font-size: 13.5px;
+`;
+
+export const UserButton = styled.button`
+  height: 35px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 4px;
+  background: #2185d0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size:13.5px;
+  color: rgb(255, 255, 255);
+  transition: opacity .1s ease, background-color .1s ease, color .1s ease, box-shadow .1s ease, background .1s ease;
+  
+  &:hover {
+    background: #0d71bb;
+  }
+`;
+
+export const UserIcon = styled.span`
+  font-size: 16px;
+`;
+
+export const Overlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.28);
+  z-index: 1190;
+`;
 
