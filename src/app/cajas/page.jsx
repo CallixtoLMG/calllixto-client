@@ -30,7 +30,6 @@ const CashBalances = () => {
   }, [setLabels, refetch]);
 
   const cashBalances = useMemo(() => data?.cashBalances, [data]);
-  console.log(data)
   const { mutate, isPending } = useMutation({
     mutationFn: createCashBalance,
     onSuccess: async (response) => {
