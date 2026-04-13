@@ -37,8 +37,10 @@ const LoginForm = ({ onSubmit }) => {
       toast.error("Hubo un error al intentar ingresar, por favor intenta de nuevo.");
     },
   });
-  console.log("ENV", process.env.NEXT_PUBLIC_APP_ENV);
-  console.log("URL", process.env.NEXT_PUBLIC_URL);
+  console.log("NEXT_PUBLIC_URL", process.env.NEXT_PUBLIC_URL);
+  console.log("NEXT_PUBLIC_APP_ENV", process.env.NEXT_PUBLIC_APP_ENV);
+  console.log("NEXT_PUBLIC_COGNITO_USER_POOL_ID", process.env.NEXT_PUBLIC_COGNITO_USER_POOL_ID);
+  console.log("NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID", process.env.NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID);
   return (
     <Loader active={isPending}>
       <ModGrid>
