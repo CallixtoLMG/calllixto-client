@@ -112,7 +112,7 @@ const ExpenseForm = forwardRef(({
               rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
               required={isUpdating || !view}
-              placeholder="Cuenta Netflix"
+              placeholder="Netflix"
             />
           </FormField>
           <FormField flex="1">
