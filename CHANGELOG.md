@@ -95,7 +95,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Added the cashBalance entity with full integration: includes a dedicated modal (ModalOpenCashBalance) and dynamic entry popup (AddBillPopup).
 
-- Introduced SIZES constant in common/constants to avoid hardcoded Semantic UI size strings across components.
+- Introduced "SIZES" constant in common/constants to avoid hardcoded Semantic UI size strings across components.
 
 - Created utility function datePickerNow to get the current date for use in date pickers (returns raw Date object without formatting).
 
