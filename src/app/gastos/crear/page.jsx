@@ -21,7 +21,7 @@ const CreateExpense = () => {
 
   useEffect(() => {
     resetActions();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
