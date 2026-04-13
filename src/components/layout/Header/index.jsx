@@ -4,7 +4,7 @@ import { IconedButton } from "@/common/components/buttons";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
 import { COLORS, DEFAULT_SELECTED_CLIENT, ICONS, PAGES, getNavigationItems } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
-import { isCallixtoUser } from "@/roles";
+import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { UserMenu } from "..";
@@ -50,17 +50,46 @@ const Header = () => {
   const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
 
-  const shortcutMapping = {
-    [PAGES.CUSTOMERS.SHORTKEYS]: () => push(PAGES.CUSTOMERS.BASE),
-    [PAGES.SUPPLIERS.SHORTKEYS]: () => push(PAGES.SUPPLIERS.BASE),
-    [PAGES.BRANDS.SHORTKEYS]: () => push(PAGES.BRANDS.BASE),
-    [PAGES.PRODUCTS.SHORTKEYS]: () => push(PAGES.PRODUCTS.BASE),
-    [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
-    [PAGES.EXPENSES.SHORTKEYS]: () => push(PAGES.EXPENSES.BASE),
-    [PAGES.USERS.SHORTKEYS]: () => push(PAGES.USERS.BASE),
-    [PAGES.SETTINGS.SHORTKEYS]: () => push(PAGES.SETTINGS.BASE),
-    [PAGES.CASH_BALANCES.SHORTKEYS]: () => push(PAGES.CASH_BALANCES.BASE),
-  };
+  const shortcutMapping = useMemo(() => ([
+    {
+      key: PAGES.CUSTOMERS.SHORTKEYS,
+      action: () => push(PAGES.CUSTOMERS.BASE),
+    },
+    {
+      key: PAGES.SUPPLIERS.SHORTKEYS,
+      action: () => push(PAGES.SUPPLIERS.BASE),
+    },
+    {
+      key: PAGES.BRANDS.SHORTKEYS,
+      action: () => push(PAGES.BRANDS.BASE),
+    },
+    {
+      key: PAGES.PRODUCTS.SHORTKEYS,
+      action: () => push(PAGES.PRODUCTS.BASE),
+    },
+    {
+      key: PAGES.BUDGETS.SHORTKEYS,
+      action: () => push(PAGES.BUDGETS.BASE),
+    },
+    {
+      key: PAGES.EXPENSES.SHORTKEYS,
+      action: () => push(PAGES.EXPENSES.BASE),
+    },
+    {
+      key: PAGES.CASH_BALANCES.SHORTKEYS,
+      action: () => push(PAGES.CASH_BALANCES.BASE),
+    },
+    {
+      key: PAGES.USERS.SHORTKEYS,
+      action: () => push(PAGES.USERS.BASE),
+      condition: () => RULES.canUpdate[role],
+    },
+    {
+      key: PAGES.SETTINGS.SHORTKEYS,
+      action: () => push(PAGES.SETTINGS.BASE),
+      condition: () => RULES.canUpdate[role],
+    },
+  ]), [push, role]);
 
   useKeyboardShortcuts(shortcutMapping);
 

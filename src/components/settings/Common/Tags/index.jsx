@@ -1,11 +1,12 @@
-import { Box, Button, Flex, OverflowWrapper } from "@/common/components/custom";
+import { AccordionTitle, Box, Button, Flex, Icon, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SEMANTIC_COLORS, SIZES } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Accordion, Icon, Label } from "semantic-ui-react";
+import { Accordion, Label } from "semantic-ui-react";
+import { AnimatedContent, AnimatedInner } from "../styles";
 
 const EMPTY_TAG = {
   name: "",
@@ -108,62 +109,66 @@ const Tags = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon name="dropdown" />
+        <AccordionTitle active={isAccordionOpen} onClick={toggleAccordion}>
+          <Icon $height="20px" name={ICONS.CARET_UP} />
           Etiquetas
-        </Accordion.Title>
-        <Accordion.Content active={isAccordionOpen}>
-          <Box>
-            <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
-              <TextField
-                width={4}
-                label="Nombre"
-                placeholder="Nombre de la etiqueta"
-                value={tagToAdd.name}
-                onChange={handleNameChange}
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
-                error={errors?.name}
-                required
-              />
-              <DropdownField
-                selection
-                flex={1}
-                label="Color"
-                options={SEMANTIC_COLORS}
-                value={tagToAdd.color}
-                onChange={(e, { value }) => setTagToAdd({ ...tagToAdd, color: value })}
-              />
-              <TextField
-                flex={2}
-                label="Descripción"
-                placeholder="Descripción"
-                value={tagToAdd.description}
-                onChange={(e) => setTagToAdd({ ...tagToAdd, description: e.target.value })}
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
-                error={errors?.description}
-              />
-              <Button
-                size={SIZES.SMALL}
-                icon={ICONS.ADD}
-                content="Agregar"
-                labelPosition="left"
-                color={COLORS.GREEN}
-                type="button"
-                onClick={handleAddTag}
-                $marginTop="25px"
-              />
-            </Flex>
-            <Table
-              isLoading={false}
-              headers={headers}
-              elements={tags}
-              mainKey="name"
-              paginate={false}
-              actions={actions}
-              $tableHeight="40vh"
-              $actionButtonInside
-            />
-          </Box>
+        </AccordionTitle>
+        <Accordion.Content active>
+          <AnimatedContent active={isAccordionOpen}>
+            <AnimatedInner>
+              <Box>
+                <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
+                  <TextField
+                    width={4}
+                    label="Nombre"
+                    placeholder="Nombre de la etiqueta"
+                    value={tagToAdd.name}
+                    onChange={handleNameChange}
+                    onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
+                    error={errors?.name}
+                    required
+                  />
+                  <DropdownField
+                    selection
+                    flex={1}
+                    label="Color"
+                    options={SEMANTIC_COLORS}
+                    value={tagToAdd.color}
+                    onChange={(e, { value }) => setTagToAdd({ ...tagToAdd, color: value })}
+                  />
+                  <TextField
+                    flex={2}
+                    label="Descripción"
+                    placeholder="Descripción"
+                    value={tagToAdd.description}
+                    onChange={(e) => setTagToAdd({ ...tagToAdd, description: e.target.value })}
+                    onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
+                    error={errors?.description}
+                  />
+                  <Button
+                    size={SIZES.SMALL}
+                    icon={ICONS.ADD}
+                    content="Agregar"
+                    labelPosition="left"
+                    color={COLORS.GREEN}
+                    type="button"
+                    onClick={handleAddTag}
+                    $marginTop="25px"
+                  />
+                </Flex>
+                <Table
+                  isLoading={false}
+                  headers={headers}
+                  elements={tags}
+                  mainKey="name"
+                  paginate={false}
+                  actions={actions}
+                  $tableHeight="40vh"
+                  $actionButtonInside
+                />
+              </Box>
+            </AnimatedInner>
+          </AnimatedContent>
         </Accordion.Content>
       </Accordion>
     </Box>

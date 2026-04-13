@@ -1,11 +1,12 @@
-import { Box, Button, Flex } from "@/common/components/custom";
+import { AccordionTitle, Box, Button, Flex, Icon } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Accordion, Icon } from "semantic-ui-react";
+import { Accordion } from "semantic-ui-react";
+import { AnimatedContent, AnimatedInner } from "../styles";
 
 const EMPTY_INPUT = "";
 
@@ -65,54 +66,58 @@ const PaymentMethods = () => {
       color: COLORS.RED,
       onClick: handleRemoveMethod,
       tooltip: "Eliminar",
-      getKey: (method, index) => `delete_${method}_${index}`, 
+      getKey: (method, index) => `delete_${method}_${index}`,
     },
   ], [handleRemoveMethod]);
 
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon name="dropdown" />
+        <AccordionTitle active={isAccordionOpen} onClick={toggleAccordion}>
+          <Icon $height="20px" name={ICONS.CARET_UP} />
           Métodos de pago
-        </Accordion.Title>
-        <Accordion.Content active={isAccordionOpen}>
-          <Box>
-            <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
-              <TextField
-                width="50%"
-                label="Método"
-                placeholder="Tarjeta de credito"
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                  if (error) setError(null);
-                }}
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddPaymentMethods)}
-                error={error}
-              />
-              <Button
-                size={SIZES.SMALL}
-                icon={ICONS.ADD}
-                content="Agregar"
-                labelPosition="left"
-                color={COLORS.GREEN}
-                type="button"
-                onClick={handleAddPaymentMethods}
-                $marginTop="25px"
-              />
-            </Flex>
-            <Table
-              isLoading={false}
-              headers={headers}
-              elements={paymentMethods}
-              mainKey={(item) => item}
-              paginate={false}
-              actions={actions}
-              $tableHeight="40vh"
-              $actionButtonInside
-            />
-          </Box>
+        </AccordionTitle>
+        <Accordion.Content active>
+          <AnimatedContent active={isAccordionOpen}>
+            <AnimatedInner>
+              <Box>
+                <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
+                  <TextField
+                    width="50%"
+                    label="Método"
+                    placeholder="Tarjeta de credito"
+                    value={inputValue}
+                    onChange={(e) => {
+                      setInputValue(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    onKeyDown={(e) => handleEnterKeyDown(e, handleAddPaymentMethods)}
+                    error={error}
+                  />
+                  <Button
+                    size={SIZES.SMALL}
+                    icon={ICONS.ADD}
+                    content="Agregar"
+                    labelPosition="left"
+                    color={COLORS.GREEN}
+                    type="button"
+                    onClick={handleAddPaymentMethods}
+                    $marginTop="25px"
+                  />
+                </Flex>
+                <Table
+                  isLoading={false}
+                  headers={headers}
+                  elements={paymentMethods}
+                  mainKey={(item) => item}
+                  paginate={false}
+                  actions={actions}
+                  $tableHeight="40vh"
+                  $actionButtonInside
+                />
+              </Box>
+            </AnimatedInner>
+          </AnimatedContent>
         </Accordion.Content>
       </Accordion>
     </Box>

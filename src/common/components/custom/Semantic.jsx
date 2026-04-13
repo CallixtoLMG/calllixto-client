@@ -1,5 +1,6 @@
 import {
   Form,
+  Accordion as SAccordion,
   Button as SButton,
   Divider as SDivider,
   Dropdown as SDropdown,
@@ -11,7 +12,7 @@ import {
   MessageHeader as SMessageHeader,
   Modal as SModal,
   Segment as SSegment,
-  TextArea as STextarea,
+  TextArea as STextarea
 } from "semantic-ui-react";
 import styled from "styled-components";
 
@@ -309,4 +310,14 @@ export const IconButton = styled(SButton)`
 
 export const Divider = styled(SDivider)`
   margin: 10px!important;
+`;
+
+export const AccordionTitle = styled(SAccordion.Title)`
+  padding-bottom: 0px!important;
+
+  i {
+    transform: rotate(${({ active }) => (active ? "180deg" : "0deg")})!important;
+    transition: transform 0.3s ease!important;
+  }
+
 `;

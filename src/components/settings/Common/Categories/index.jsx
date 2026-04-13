@@ -1,11 +1,12 @@
-import { Box, Button, Flex, OverflowWrapper } from "@/common/components/custom";
+import { AccordionTitle, Box, Button, Flex, Icon, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SEMANTIC_COLORS, SIZES } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
-import { Accordion, Icon, Label } from "semantic-ui-react";
+import { Accordion, Label } from "semantic-ui-react";
+import { AnimatedContent, AnimatedInner } from "../styles";
 
 const EMPTY_CATEGORY = {
   name: "",
@@ -110,62 +111,66 @@ const Categories = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon name="dropdown" />
+        <AccordionTitle active={isAccordionOpen} onClick={toggleAccordion}>
+          <Icon $height="20px" name={ICONS.CARET_UP} />
           Categorias
-        </Accordion.Title>
-        <Accordion.Content active={isAccordionOpen}>
-          <Box>
-            <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
-              <TextField
-                width={4}
-                label="Nombre"
-                placeholder="Personal"
-                value={categoryToAdd.name}
-                onChange={handleNameChange}
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
-                error={errors?.name}
-                required
-              />
-              <DropdownField
-                selection
-                flex={1}
-                label="Color"
-                options={SEMANTIC_COLORS}
-                value={categoryToAdd.color}
-                onChange={(e, { value }) => setCategoryToAdd({ ...categoryToAdd, color: value })}
-              />
-              <TextField
-                flex={2}
-                label="Descripción"
-                placeholder="Mis cosas"
-                value={categoryToAdd.description}
-                onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
-                error={errors?.description}
-              />
-              <Button
-                size={SIZES.SMALL}
-                icon={ICONS.ADD}
-                content="Agregar"
-                labelPosition="left"
-                color={COLORS.GREEN}
-                type="button"
-                onClick={handleAddCategory}
-                $marginTop="25px"
-              />
-            </Flex>
-            <Table
-              isLoading={false}
-              headers={headers}
-              elements={categories}
-              mainKey="name"
-              paginate={false}
-              actions={actions}
-              $tableHeight="40vh"
-              $actionButtonInside
-            />
-          </Box>
+        </AccordionTitle>
+        <Accordion.Content active>
+          <AnimatedContent active={isAccordionOpen}>
+            <AnimatedInner>
+              <Box>
+                <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
+                  <TextField
+                    width={4}
+                    label="Nombre"
+                    placeholder="Personal"
+                    value={categoryToAdd.name}
+                    onChange={handleNameChange}
+                    onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
+                    error={errors?.name}
+                    required
+                  />
+                  <DropdownField
+                    selection
+                    flex={1}
+                    label="Color"
+                    options={SEMANTIC_COLORS}
+                    value={categoryToAdd.color}
+                    onChange={(e, { value }) => setCategoryToAdd({ ...categoryToAdd, color: value })}
+                  />
+                  <TextField
+                    flex={2}
+                    label="Descripción"
+                    placeholder="Mis cosas"
+                    value={categoryToAdd.description}
+                    onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
+                    onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
+                    error={errors?.description}
+                  />
+                  <Button
+                    size={SIZES.SMALL}
+                    icon={ICONS.ADD}
+                    content="Agregar"
+                    labelPosition="left"
+                    color={COLORS.GREEN}
+                    type="button"
+                    onClick={handleAddCategory}
+                    $marginTop="25px"
+                  />
+                </Flex>
+                <Table
+                  isLoading={false}
+                  headers={headers}
+                  elements={categories}
+                  mainKey="name"
+                  paginate={false}
+                  actions={actions}
+                  $tableHeight="40vh"
+                  $actionButtonInside
+                />
+              </Box>
+            </AnimatedInner>
+          </AnimatedContent>
         </Accordion.Content>
       </Accordion>
     </Box>

@@ -1,11 +1,12 @@
-import { Box, Button, Flex } from "@/common/components/custom";
+import { AccordionTitle, Box, Button, Flex, Icon } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
+import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Accordion, Icon } from "semantic-ui-react";
+import { Accordion } from "semantic-ui-react";
 
 const EMPTY_INPUT = "";
 
@@ -104,59 +105,63 @@ const Blacklist = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <Accordion.Title active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon name="dropdown" />
+        <AccordionTitle active={isAccordionOpen} onClick={toggleAccordion}>
+          <Icon $height="20px" name={ICONS.CARET_UP} />
           Productos bloqueados
-        </Accordion.Title>
-        <Accordion.Content active={isAccordionOpen}>
-          <Box>
-            <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
-              <TextField
-                width="50%"
-                label="Id(s)"
-                placeholder="A0001, A0002"
-                value={inputValue}
-                onChange={(e) => {
-                  setInputValue(e.target.value);
-                  if (error) setError(null);
-                }}
-                onKeyDown={(e) => handleEnterKeyDown(e, handleAddBlacklist)}
-                error={error}
-                showPopup
-                iconLabel
-                popupPosition="top right"
-                popupContent={
-                  <div>
-                    <p>* Para añadir un id nuevo a la lista, anótelo y luego pulse &quot;enter&quot; o haz click en el boton Agregar.</p>
-                    <p>* Puede agregar múltiples ids separados por coma, por ejemplo: PCMU123,PCMU124.</p>
-                  </div>
-                }
-              />
-              <Button
-                size={SIZES.SMALL}
-                icon={ICONS.ADD}
-                content="Agregar"
-                labelPosition="left"
-                color={COLORS.GREEN}
-                type="button"
-                onClick={handleAddBlacklist}
-                $marginTop="25px"
-              />
-            </Flex>
-            <Table
-              isLoading={false}
-              headers={headers}
-              elements={blacklist}
-              mainKey={(item) => item}
-              paginate={false}
-              actions={actions}
-              $tableHeight="40vh"
-              $actionButtonInside
-            />
-          </Box>
+        </AccordionTitle>
+        <Accordion.Content active>
+          <AnimatedContent active={isAccordionOpen}>
+            <AnimatedInner>
+              <Box>
+                <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
+                  <TextField
+                    width="50%"
+                    label="Id(s)"
+                    placeholder="A0001, A0002"
+                    value={inputValue}
+                    onChange={(e) => {
+                      setInputValue(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    onKeyDown={(e) => handleEnterKeyDown(e, handleAddBlacklist)}
+                    error={error}
+                    showPopup
+                    iconLabel
+                    popupPosition="top right"
+                    popupContent={
+                      <div>
+                        <p>* Para añadir un id nuevo a la lista, anótelo y luego pulse &quot;enter&quot; o haz click en el boton Agregar.</p>
+                        <p>* Puede agregar múltiples ids separados por coma, por ejemplo: PCMU123,PCMU124.</p>
+                      </div>
+                    }
+                  />
+                  <Button
+                    size={SIZES.SMALL}
+                    icon={ICONS.ADD}
+                    content="Agregar"
+                    labelPosition="left"
+                    color={COLORS.GREEN}
+                    type="button"
+                    onClick={handleAddBlacklist}
+                    $marginTop="25px"
+                  />
+                </Flex>
+                <Table
+                  isLoading={false}
+                  headers={headers}
+                  elements={blacklist}
+                  mainKey={(item) => item}
+                  paginate={false}
+                  actions={actions}
+                  $tableHeight="40vh"
+                  $actionButtonInside
+                />
+              </Box>
+            </AnimatedInner>
+          </AnimatedContent>
         </Accordion.Content>
-      </Accordion>
-    </Box>
+      </Accordion >
+    </Box >
   );
 };
 
