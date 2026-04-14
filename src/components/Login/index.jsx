@@ -37,6 +37,9 @@ const LoginForm = ({ onSubmit }) => {
       toast.error("Hubo un error al intentar ingresar, por favor intenta de nuevo.");
     },
   });
+
+  console.log("hola")
+  
   return (
     <Loader active={isPending}>
       <ModGrid>
