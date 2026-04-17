@@ -67,17 +67,17 @@ const CashBalanceMovements = ({ cashBalance }) => {
         <Form onSubmit={onSubmit}>
           <FlexColumn $rowGap="15px">
             <Flex $justifyContent="space-between">
-              <Header center>Movimientos de caja</Header>
+              <Header >Movimientos de caja</Header>
               <Flex $columnGap="15px">
                 {cashBalance.closeDate &&
-                  <Message width="fit-content" alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.GREY}>
+                  <Message width="fit-content" $alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.GREY}>
                     Fecha de cierre: {getFormatedDate(cashBalance?.closeDate, DATE_FORMATS.DATE_WITH_TIME)}
                   </Message>
                 }
-                <Message width="fit-content" alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.BLUE}>
+                <Message width="fit-content" $alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.BLUE}>
                   Monto inicial: {getFormatedNumber(cashBalance.initialAmount)}
                 </Message>
-                <Message width="fit-content" alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.GREEN}>
+                <Message width="fit-content" $alignContent="center" padding="0 10px" height="35px" margin="0" color={COLORS.GREEN}>
                   Monto actual: {getFormatedNumber(cashBalance.currentAmount)}
                 </Message>
               </Flex>

@@ -52,7 +52,7 @@ export const HEADERS = [
       return (
         <Flex $justifyContent="space-between">
           {primaryAddress}
-          {additionalAddresses && <AddressesTooltip lowTooltip addresses={additionalAddresses} />}
+          {additionalAddresses && <AddressesTooltip $lowTooltip addresses={additionalAddresses} />}
         </Flex>
       );
     },
@@ -68,7 +68,7 @@ export const HEADERS = [
       return (
         <Flex $width="fit-content" $justifyContent="space-between">
           {primaryPhone}
-          {additionalPhones && <PhonesTooltip lowTooltip phones={additionalPhones} />}
+          {additionalPhones && <PhonesTooltip $lowTooltip phones={additionalPhones} />}
         </Flex>
       );
     }

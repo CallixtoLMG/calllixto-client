@@ -78,7 +78,7 @@ const NavActions = () => {
                 color={COLORS.BLUE}
                 size={SIZES.LARGE}
                 onClick={() => setOpen(true)}
-                pointer
+                $pointer
                 margin="0"
               />
             }

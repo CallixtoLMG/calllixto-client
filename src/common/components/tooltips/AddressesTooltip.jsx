@@ -2,7 +2,7 @@ import { Flex, Icon } from "@/common/components/custom";
 import { COLORS, ICONS } from "@/common/constants";
 import { List, ListItem, Popup } from "semantic-ui-react";
 
-export const AddressesTooltip = ({ addresses, input, lowTooltip }) => {
+export const AddressesTooltip = ({ addresses, input, $lowTooltip }) => {
   return (
     <Popup
       size="mini"
@@ -20,7 +20,7 @@ export const AddressesTooltip = ({ addresses, input, lowTooltip }) => {
         input
           ? <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />
           : <Flex $marginLeft="5px" $marginRight="5px">
-            <Icon lowTooltip={lowTooltip} name={ICONS.LIST_UL} color={COLORS.BLUE} />
+            <Icon $lowTooltip={$lowTooltip} name={ICONS.LIST_UL} color={COLORS.BLUE} />
           </Flex>
       }
     />

@@ -111,12 +111,12 @@ const Categories = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <AccordionTitle active={isAccordionOpen} onClick={toggleAccordion}>
+        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
           <Icon $height="20px" name={ICONS.CARET_UP} />
           Categorias
         </AccordionTitle>
         <Accordion.Content active>
-          <AnimatedContent active={isAccordionOpen}>
+          <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>
               <Box>
                 <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">

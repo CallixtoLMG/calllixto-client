@@ -10,6 +10,7 @@ import {
   TextControlled,
   TextField
 } from "@/common/components/form";
+import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
 import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { removeNullish } from "@/common/utils";
 import { BRAND_STATES, getBrandSearchDescription, getBrandSearchTitle } from "@/components/brands/brands.constants";
@@ -145,10 +146,20 @@ const ProductForm = forwardRef(({
                   searchFields={['name', 'id']}
                   getResultProps={(supplier) => ({
                     key: supplier.id,
-                    title: getSupplierSearchTitle(supplier),
-                    description: getSupplierSearchDescription(supplier),
+                    title: supplier.name ?? "",
+                    description: supplier.comments ?? "",
                     value: supplier,
                   })}
+                  resultRenderer={({ value: supplier }) => (
+                    <SearchResultContent>
+                      <SearchResultTitle>
+                        {getSupplierSearchTitle(supplier)}
+                      </SearchResultTitle>
+                      <SearchResultDescription>
+                        {getSupplierSearchDescription(supplier)}
+                      </SearchResultDescription>
+                    </SearchResultContent>
+                  )}
                 />
               </FormField>
               <FormField flex="1">
@@ -171,10 +182,20 @@ const ProductForm = forwardRef(({
                   searchFields={['name', 'id']}
                   getResultProps={(brand) => ({
                     key: brand.id,
-                    title: getBrandSearchTitle(brand),
-                    description: getBrandSearchDescription(brand),
+                    title: brand.name ?? "",
+                    description: brand.comments ?? "",
                     value: brand,
                   })}
+                  resultRenderer={({ value: brand }) => (
+                    <SearchResultContent>
+                      <SearchResultTitle>
+                        {getBrandSearchTitle(brand)}
+                      </SearchResultTitle>
+                      <SearchResultDescription>
+                        {getBrandSearchDescription(brand)}
+                      </SearchResultDescription>
+                    </SearchResultContent>
+                  )}
                 />
               </FormField>
               <FormField flex="1">
@@ -212,7 +233,7 @@ const ProductForm = forwardRef(({
               required={isUpdating || !view}
             />
           </FormField>
-          <FormField flexDirection="row" flex="1">
+          <FormField $flexDirection="row" flex="1">
             <FormField $maxWidth="fit-content" flex="1" >
               <IconedButtonControlled
                 name="stockControl"
@@ -225,7 +246,7 @@ const ProductForm = forwardRef(({
             </FormField>
             {watchStockControl &&
               <FormField flex="1">
-                <Message minWidth="max-content" opacity={view} height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
+                <Message $minWidth="max-content" $opacity={view} height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
                   <Icon name={ICONS.BOXES} /> Stock: {product?.stock ?? 0}
                 </Message>
               </FormField>
@@ -241,7 +262,7 @@ const ProductForm = forwardRef(({
               disabled={!isUpdating && view}
             />
           </FormField>
-          <FormField flexDirection="row" flex="1">
+          <FormField $flexDirection="row" flex="1">
             <FormField flex="1">
               <PriceControlled
                 name="price"
@@ -249,7 +270,7 @@ const ProductForm = forwardRef(({
                 disabled={!isUpdating && view}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="end" flexDirection="row" flex="1">
+            <FormField $maxWidth="max-content" $alignItems="end" $flexDirection="row" flex="1">
               <IconedButtonControlled
                 name="editablePrice"
                 text={WatchEditablePrice ? "Deshabilitar precio editable" : "Habilitar precio editable"}
@@ -260,7 +281,7 @@ const ProductForm = forwardRef(({
               />
             </FormField>
           </FormField>
-          <FormField $alignItems="end" flexDirection="row" flex="1">
+          <FormField $alignItems="end" $flexDirection="row" flex="1">
             <FormField flex="1">
               <PercentField
                 width="55%"
@@ -280,7 +301,7 @@ const ProductForm = forwardRef(({
           </FormField>
         </FieldsContainer>
         <FieldsContainer>
-          <FormField flexDirection="row" flex="1">
+          <FormField $flexDirection="row" flex="1">
             <FormField flex="1" >
               <DropdownControlled
                 name="fractionConfig.unit"
@@ -290,7 +311,7 @@ const ProductForm = forwardRef(({
                 disabled={(!isUpdating && view || !watchFractionable)}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="end" flexDirection="row" flex="1">
+            <FormField $maxWidth="max-content" $alignItems="end" $flexDirection="row" flex="1">
               <IconedButtonControlled
                 name="fractionConfig.active"
                 text={watchFractionable ? "Deshabilitar producto fraccionable" : "Habilitar producto fraccionable"}

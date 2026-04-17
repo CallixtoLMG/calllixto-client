@@ -17,11 +17,11 @@ const OnCreate = ({ customerOptions, isLoading }) => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <AccordionTitle active={isAccordionOpen} onClick={toggleAccordion}>
+        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
           <Icon $height="20px" name={ICONS.CARET_UP} /> Al crear una venta
         </AccordionTitle>
         <Accordion.Content active>
-          <AnimatedContent active={isAccordionOpen}>
+          <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>
               <FlexColumn $rowGap="15px">
                 <GroupedButtonsControlled

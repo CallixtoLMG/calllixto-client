@@ -134,7 +134,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
     <FlexColumn $rowGap="15px">
       <FlexColumn $rowGap="15px">
         <Flex $justifyContent="space-between">
-          <Header center>Movimientos de stock</Header>
+          <Header >Movimientos de stock</Header>
           <Flex $columnGap="15px">
             <IconedButton
               labelPosition="left"
@@ -148,7 +148,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
                 setShowModal(true);
               }}
               iconOnly
-              />
+            />
             <IconedButton
               labelPosition="left"
               icon={ICONS.ARROW_UP}
@@ -159,9 +159,9 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
                 setStock(EMPTY_STOCK());
                 setModalMode(STOCK_MODAL_MODES.OUT);
                 setShowModal(true);
-              }} 
+              }}
               iconOnly
-              />
+            />
             <Message padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
               <Icon name={ICONS.BOXES} /> Stock: {product?.stock ?? 0}
             </Message>
@@ -195,7 +195,8 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
         onFilter={onFilter}
         filters={filters}
         setFilters={setFilters}
-        mainKey="budgetId"
+        mainKey="id"
+        disableDefaultPageLink
       />
       <ModalAction
         title={STOCK_FLOWS_MODAL_CONFIG[modalMode]?.title}

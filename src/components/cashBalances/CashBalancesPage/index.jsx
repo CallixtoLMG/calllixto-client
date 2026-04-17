@@ -65,7 +65,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
               minWidth="100px"
             />
             <DropdownControlled
-              minWidth="200px"
+              $minWidth="200px"
               width="18vw"
               name="paymentMethods"
               label="Método de pago"

@@ -54,7 +54,7 @@ const DeliveriesHistory = ({ history }) => {
                 <AccordionContent active={activeIndexes.includes(index)}>
                   <FlexColumn $rowGap="5px">
                     {entry.rows.map((row, index) => (
-                      <Flex textWrapMode="nowrap" $columnGap="10px" key={index}>
+                      <Flex $textWrapMode="nowrap" $columnGap="10px" key={index}>
                         <span> Id: <strong>{row.productId}</strong></span>
                         <span> Nombre: <strong>{row.productName}</strong></span>
                         <span> Cantidad: <strong>{row.quantity}</strong></span>

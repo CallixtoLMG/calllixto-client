@@ -36,7 +36,7 @@ export const Input = styled(SInput)`
   text-align: ${({ textAlign }) => textAlign} !important;
   &&& input{
     border-left: ${({ $iconLabel }) => ($iconLabel) && "none"} !important;
-    justify-items: ${({ justifyItems }) => justifyItems} !important;
+    justify-items: ${({ $justifyItems }) => $justifyItems} !important;
     padding: ${({ padding }) => padding} !important;
     opacity: ${({ disabled }) => disabled && "0.45"} !important;
   }
@@ -47,7 +47,7 @@ export const FormField = styled(Form.Field)`
   display: flex;
   flex: ${({ flex = 'none' }) => `${flex}!important`};
   margin: ${({ margin = "0" }) => margin} !important;
-  flex-direction: ${({ flexDirection = "column" }) => flexDirection} !important;
+  flex-direction: ${({ $flexDirection = "column" }) => $flexDirection} !important;
   height: ${({ $height }) => $height} !important;
   row-gap: ${({ $rowGap }) => $rowGap} !important;
   column-gap: ${({ $columnGap = '15px' }) => $columnGap} !important;
@@ -81,7 +81,7 @@ export const Label = styled(SLabel)`
   font-weight: ${({ fontWeight }) => fontWeight} !important;
   box-shadow: ${({ fontWeight }) => fontWeight && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
   pointer-events: ${({ pointerEvents }) => pointerEvents} !important;
-  z-index: ${({ zIndex }) => zIndex} !important;
+  z-index: ${({ $ZIndex }) => $ZIndex} !important;
 `;
 
 export const TextArea = styled(STextarea)`
@@ -90,7 +90,7 @@ export const TextArea = styled(STextarea)`
 `;
 
 export const Dropdown = styled(SDropdown)`
-  height: ${({ dropdownHeight = '38px' }) => `${dropdownHeight}!important`} ;
+  height: ${({ $dropdownHeight = '38px' }) => `${$dropdownHeight}!important`} ;
   padding: ${({ padding }) => `${padding}!important`} ;
   background-color: ${({ bgColor }) => `${bgColor}!important`};
   box-shadow: ${({ $boxShadow }) => $boxShadow && "0 1px 2px 0 rgba(34,36,38,.15)"} !important;
@@ -152,7 +152,7 @@ export const Dropdown = styled(SDropdown)`
 `;
 
 export const DropdownOption = styled(SDropdown)`
-  flex-flow: ${({ reverse }) => `${reverse && "row-reverse"}!important`} ;
+  flex-flow: ${({ $reverse }) => `${$reverse && "row-reverse"}!important`} ;
 &&&&{
   padding-left: ${({ $paddingLeft }) => $paddingLeft}!important;
 }
@@ -213,12 +213,12 @@ export const Icon = styled(SIcon)`
   align-self: center!important;
   align-content: ${({ $alignContent }) => `${$alignContent}!important;`} ;
   margin-right: ${({ $marginRight }) => $marginRight && `11px!important`} ;
-  top: ${({ lowTooltip, tooltip }) => (lowTooltip ? `-3px` : tooltip ? `-1px` : 'initial')} !important;
-  position: ${({ lowTooltip, tooltip }) => (lowTooltip || tooltip) && `relative!important`} ;
+  top: ${({ $lowTooltip, $tooltip }) => ($lowTooltip ? `-3px` : $tooltip ? `-1px` : 'initial')} !important;
+  position: ${({ $lowTooltip, $tooltip }) => ($lowTooltip || $tooltip) && `relative!important`} ;
   font-size: ${({ fontSize }) => `${fontSize}!important`} ;
   margin: ${({ margin }) => `${margin}!important;`};
   padding: ${({ padding }) => `${padding}!important;`};
-  cursor: ${({ pointer }) => pointer && "pointer"} !important;
+  cursor: ${({ $pointer }) => $pointer && "pointer"} !important;
   justify-items: ${({ justifyItems }) => `${justifyItems}!important;`};
   pointer-events: ${({ disablePointerEvents }) => (disablePointerEvents ? "none" : "all")} !important;
   line-height: ${({ $lineHeight }) => `${$lineHeight}!important;`};
@@ -238,14 +238,14 @@ export const MessageHeader = styled(SMessageHeader)`
 `;
 
 export const Message = styled(SMessage)`
-  align-content: ${({ alignContent }) => `${alignContent}!important`} ;
+  align-content: ${({ $alignContent }) => `${$alignContent}!important`} ;
   padding: ${({ padding }) => `${padding}!important`} ;
   height: ${({ height }) => `${height}!important`} ;
   height: ${({ height }) => `${height}!important`} ;
   width: ${({ width }) => `${width}!important`} ;
-  min-width: ${({ minWidth }) => `${minWidth}!important`} ;
+  min-width: ${({ $minWidth }) => `${$minWidth}!important`} ;
   margin: ${({ margin }) => `${margin}!important`} ;
-  opacity: ${({ opacity }) => `${opacity && "0.45"}!important`} ;
+  opacity: ${({ $opacity }) => `${$opacity && "0.45"}!important`} ;
 `;
 
 export const Button = styled(SButton)`
@@ -316,7 +316,7 @@ export const AccordionTitle = styled(SAccordion.Title)`
   padding-bottom: 0px!important;
 
   i {
-    transform: rotate(${({ active }) => (active ? "180deg" : "0deg")})!important;
+    transform: rotate(${({ $active }) => ($active ? "180deg" : "0deg")})!important;
     transition: transform 0.3s ease!important;
   }
 

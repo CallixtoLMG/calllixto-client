@@ -32,7 +32,7 @@ const ModalPDF = ({
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
   const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
-  const [dolarRate, setDolarRate] = useState(dolar);
+  const [dolarRate, setDolarRate] = useState(dolar ?? 0);
   const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
   const [showPrices, setShowPrices] = useState(defaults?.showPrices ?? true);
 
@@ -48,8 +48,12 @@ const ModalPDF = ({
   }, [dolar, initialDolarRateSet, showDolarExangeRate]);
 
   const formatValue = (value) => {
-    const formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
+    if (value == null || Number.isNaN(value)) return '';
+  
+    const formattedValue = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return formattedValue.includes('.')
+      ? formattedValue.split('.').slice(0, 2).join('.')
+      : formattedValue;
   };
 
   const handleDollarChange = (e) => {

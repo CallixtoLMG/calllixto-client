@@ -1,3 +1,4 @@
+export { default as BackToListButton } from './BackToListButton';
 export { default as GoBackButton } from './GoBack';
 export { default as IconedButton } from './Iconed';
 export { default as PopupActions } from './PopupActions';

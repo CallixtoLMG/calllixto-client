@@ -4,7 +4,7 @@ import { Flex } from "./Flex";
 
 export const Form = styled(SForm)`
   display: flex !important;
-  flex-direction: ${({ flexDirection = "column" }) => flexDirection} !important;
+  flex-direction: ${({ $flexDirection = "column" }) => $flexDirection} !important;
   row-gap: ${({ rowGap = "15px" }) => rowGap} !important;
   column-gap: ${({ columnGap }) => columnGap} !important;
   .field > label {

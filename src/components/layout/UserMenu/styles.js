@@ -58,7 +58,7 @@ export const SelectedClientText = styled.span`
 
 export const MenuBody = styled.div`
   padding: 10px 0;
-  padding: ${({ view }) => (view ? "10px" : "10px 0")};
+  padding: ${({ $view }) => ($view ? "10px" : "10px 0")};
 `;
 
 export const MenuActions = styled.div`

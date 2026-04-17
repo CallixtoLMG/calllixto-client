@@ -31,7 +31,7 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
   const containerRef = useRef(null);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [view, setView] = useState("main"); 
+  const [view, setView] = useState("main");
   const [searchTerm, setSearchTerm] = useState("");
 
   const clientItems = userData?.callixtoClients?.items;
@@ -40,7 +40,7 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
 
   const filteredClients = useMemo(() => {
     if (!searchTerm.trim()) return clients;
-  
+
     return clients.filter((client) =>
       client.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -104,26 +104,23 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
                 )}
               </UserMeta>
             </MenuHeader>
-
             <MenuBody >
               <MenuActions>
                 {isCallixtoUser(role) && (
                   <MenuAction type="button" onClick={() => setView("clients")}>
                     <span>
-                      <Icon tooltip color={COLORS.BLUE} name={ICONS.USER} />
-                      Cambiar cliente
+                      <Icon $tooltip color={COLORS.BLUE} name={ICONS.USER} />
+                      Cambiar cuenta
                     </span>
                     <Icon name={ICONS.CARET_RIGHT} />
                   </MenuAction>
                 )}
-
                 <MenuAction type="button" onClick={handleGoToChangePassword}>
                   <span>
-                    <Icon tooltip color={COLORS.YELLOW} name={ICONS.LOCK} />
+                    <Icon $tooltip color={COLORS.YELLOW} name={ICONS.LOCK} />
                     Cambiar contraseña
                   </span>
                 </MenuAction>
-
                 <MenuAction
                   type="button"
                   $danger
@@ -133,7 +130,7 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
                   }}
                 >
                   <span>
-                    <Icon tooltip color={COLORS.RED} name={ICONS.SIGN_OUT} />
+                    <Icon $tooltip color={COLORS.RED} name={ICONS.SIGN_OUT} />
                     Cerrar sesión
                   </span>
                 </MenuAction>
@@ -146,15 +143,14 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
           <>
             <MenuHeader>
               <BackButton type="button" onClick={() => setView("main")}>
-                <Icon tooltip name={ICONS.ARROW_LEFT} />
+                <Icon $tooltip name={ICONS.ARROW_LEFT} />
                 Atrás
               </BackButton>
-              <UserName>Cambiar cliente</UserName>
-              <UserMeta>Seleccioná un cliente disponible</UserMeta>
+              <UserName>Cambiar cuenta</UserName>
+              <UserMeta>Seleccioná un cuenta disponible</UserMeta>
             </MenuHeader>
-
-            <MenuBody view>
-              <MenuSectionLabel>Buscar cliente</MenuSectionLabel>
+            <MenuBody $view>
+              <MenuSectionLabel>Buscar cuenta</MenuSectionLabel>
               <SearchWrapper>
                 <SearchInput
                   type="text"
@@ -163,7 +159,6 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
                   placeholder="Callixto"
                 />
               </SearchWrapper>
-
               <ClientList>
                 {!filteredClients.length ? (
                   <EmptyState>No se encontraron clientes.</EmptyState>

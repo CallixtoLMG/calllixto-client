@@ -33,7 +33,8 @@ const CustomTable = ({
   filters = {},
   setFilters = () => { },
   onFilter = () => true,
-  onDownloadExcel
+  onDownloadExcel,
+  disableDefaultPageLink = false,
 }) => {
 
   const { push } = useRouter();
@@ -265,7 +266,8 @@ const CustomTable = ({
                               : header.href
                                 ? header.href
                                 : (
-                                  typeof page?.SHOW === "function" &&
+                                  !disableDefaultPageLink &&
+                                    typeof page?.SHOW === "function" &&
                                     element[mainKey]
                                     ? page.SHOW(element[mainKey], element)
                                     : undefined
@@ -276,7 +278,7 @@ const CustomTable = ({
                               key={`cell_${header.id}_${element[mainKey]}`}
                               align={header.align}
                               width={header.width}
-                              whiteSpace={header.whiteSpace}
+                              $whiteSpace={header.whiteSpace}
                             >
                               {href && (
                                 <LinkOverlay

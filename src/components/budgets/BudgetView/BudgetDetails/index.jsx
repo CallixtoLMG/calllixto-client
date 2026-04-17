@@ -1,5 +1,5 @@
 import { IconedButton } from "@/common/components/buttons";
-import { Dropdown, FieldsContainer, Flex, FlexColumn, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
 import { DropdownField, PriceControlled, PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
@@ -173,44 +173,50 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
       <Form onSubmit={handleSubmit(onSubmitDiscount)}>
         <ViewContainer>
           <FieldsContainer $rowGap="14px">
-            <FormField
-              flex="1"
-              label="Vendedor"
-              control={Input}
-              value={budget?.createdBy}
-              readOnly
-              disabled
-            />
-            {budget?.createdAt && (
+            <FormField flex="1">
               <FormField
-                flex="1"
-                label="Fecha de creación"
+                label="Vendedor"
                 control={Input}
-                value={getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)}
+                value={budget?.createdBy}
                 readOnly
                 disabled
               />
+            </FormField>
+            {budget?.createdAt && (
+              <FormField flex="1">
+                <FormField
+                  flex="1"
+                  label="Fecha de creación"
+                  control={Input}
+                  value={getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)}
+                  readOnly
+                  disabled
+                />
+              </FormField>
             )}
+            <FormField flex="1" />
           </FieldsContainer>
           <FieldsContainer>
             {budgetState && (
-              <FormField
-                flex="1"
-                label={budgetState.label}
-                control={Input}
-                value={budgetState.person}
-                readOnly
-                disabled
-              />
+              <FormField flex="1">
+                <FormField
+                  label={budgetState.label}
+                  control={Input}
+                  value={budgetState.person}
+                  readOnly
+                  disabled
+                />
+              </FormField>
             )}
             {budgetState && (
-              <FormField
-                flex="1"
-                label={budgetState.dateLabel}
-                control={Input}
-                value={budgetState.date}
-                disabled
-              />
+              <FormField flex="1">
+                <FormField
+                  label={budgetState.dateLabel}
+                  control={Input}
+                  value={budgetState.date}
+                  disabled
+                />
+              </FormField>
             )}
             {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) ? (
               <>
@@ -229,15 +235,16 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
             }
           </FieldsContainer>
           <FieldsContainer>
-            <FormField
-              flex="1"
-              label="Cliente"
-              control={Input}
-              value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
-              readOnly
-              disabled
-            />
             <FormField flex="1">
+              <FormField
+                label="Cliente"
+                control={Input}
+                value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
+                readOnly
+                disabled
+              />
+            </FormField>
+            <FormField $maxWidth="32.5%" flex="1">
               <DropdownField
                 selection
                 label="Dirección"
@@ -294,7 +301,18 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           {isBudgetConfirmed(budget?.state) ?
             <>
               <TotalList items={TOTAL_LIST_ITEMS} />
-              <FlexColumn $alignSelf="end" $rowGap="15px">
+              <Flex $alignSelf="end" $rowGap="15px">
+                <Popup
+                  trigger={
+                    <Icon
+                      fontSize="larger"
+                      name={ICONS.INFO_CIRCLE}
+                      color={COLORS.BLUE} />
+                  }
+                  content="Permite aplicar un descuento una vez confirmada la venta"
+                  position="left center"
+                  size="mini"
+                />
                 <Flex width="250px" $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
                   <PriceControlled
                     key={budget?.postConfirmDiscount ?? 'no-discount'}
@@ -343,7 +361,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                 </Flex>
                 <Flex $columnGap="15px" $alignSelf="end">
                 </Flex>
-              </FlexColumn>
+              </Flex>
             </>
             :
             <Total

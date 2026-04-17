@@ -50,8 +50,7 @@ const SidebarNavigation = ({ open, onClose, items = [], pathname }) => {
     },
   ]);
 
-  const handleNavigate = (href) => {
-    push(href);
+  const handleLinkClick = () => {
     handleClose();
   };
 
@@ -99,9 +98,9 @@ const SidebarNavigation = ({ open, onClose, items = [], pathname }) => {
                 <div key={item.id}>
                   <NavItemRow $active={active}>
                     <NavItemMain
+                      href={item.href || item.children?.[0]?.href}
                       $active={active}
-                      type="button"
-                      onClick={() => handleNavigate(item.href || item.children?.[0]?.href)}
+                      onClick={handleLinkClick}
                     >
                       <NavLabel>{item.label}</NavLabel>
                     </NavItemMain>
@@ -121,9 +120,9 @@ const SidebarNavigation = ({ open, onClose, items = [], pathname }) => {
                       {item.children.map((child) => (
                         <SubmenuItem
                           key={child.id}
-                          type="button"
+                          href={child.href}
                           $active={isSubItemActive(child.href)}
-                          onClick={() => handleNavigate(child.href)}
+                          onClick={handleLinkClick}
                         >
                           <span>{child.label}</span>
                           {child.badge && <Badge>{child.badge}</Badge>}
@@ -137,9 +136,9 @@ const SidebarNavigation = ({ open, onClose, items = [], pathname }) => {
             return (
               <NavItemButton
                 key={item.id}
-                type="button"
+                href={item.href}
                 $active={active}
-                onClick={() => handleNavigate(item.href)}
+                onClick={handleLinkClick}
               >
                 <NavItemContent>
                   <NavLabel>{item.label}</NavLabel>

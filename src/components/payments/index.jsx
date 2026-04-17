@@ -81,7 +81,7 @@ const Payments = ({
 
   return (
     <FlexColumn width="100%" $rowGap="15px" className="ui form">
-      <Flex $columnGap="15px" $justifyContent="space-between">
+      <Flex $justifyContent="space-between">
         <Header>
           Detalle de pagos
         </Header>
@@ -93,7 +93,7 @@ const Payments = ({
                   <Box width="fit-content">
                     <Button
                       icon={ICONS.ADD}
-                      isLoading={isLoading}
+                      loading={isLoading}
                       content="Agregar pago"
                       labelPosition="left"
                       color={COLORS.GREEN}

@@ -1,6 +1,6 @@
 import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
-import { ButtonsContainer, FieldsContainer, Flex, Form, FormField } from "@/common/components/custom";
+import { ButtonsContainer, FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { DropdownField, PriceField, TextAreaField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { TotalList } from "@/common/components/table";
@@ -83,8 +83,8 @@ export const ModalAddPayment = ({
       <Modal open={open} onClose={handleClose} >
         <Modal.Header>Agregar pago</Modal.Header>
         <Modal.Content>
-          <Flex as={Form}>
-            <FieldsContainer $justifyContent="space-between" $rowGap="15px" $columnGap="15px"  >
+          <Form>
+            <FieldsContainer $justifyContent="space-between" $rowGap="15px" $columnGap="15px">
               <FormField
                 flex="1"
                 selected={payment.date}
@@ -148,7 +148,7 @@ export const ModalAddPayment = ({
                 iconOnly
               />
             </FieldsContainer>
-            <FieldsContainer as={Form}>
+            <FieldsContainer>
               <TextAreaField
                 label="Comentarios"
                 value={payment.comments}
@@ -158,8 +158,8 @@ export const ModalAddPayment = ({
               />
             </FieldsContainer>
             <TotalList readOnly items={totalListItem} />
-          </Flex>
-        </Modal.Content >
+          </Form>
+        </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer>
             <IconedButton

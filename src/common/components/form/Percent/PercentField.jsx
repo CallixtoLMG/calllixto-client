@@ -29,10 +29,10 @@ export const PercentField = forwardRef(({
       $minWidth={$minWidth}
     >
       <Input
-       $minWidth={$minWidth}
+        $minWidth={$minWidth}
         value={value}
         icon
-        justifyItems={justifyItems}
+        $justifyItems={justifyItems}
         disabled={disabled}
         onChange={(e) => {
           const inputValue = e.target.value;

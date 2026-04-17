@@ -34,6 +34,7 @@ const SearchField = forwardRef(
       height,
       clearAfterSelect,
       onAfterChange,
+      resultRenderer,
     },
     ref
   ) => {
@@ -106,13 +107,19 @@ const SearchField = forwardRef(
       onSelect(null);
     };
 
+    const hasSelectedValue =
+      value != null &&
+      typeof value === 'object' &&
+      Object.keys(value).length > 0;
+
+
     return (
       <FormField
         $width={width}
         $minWidth={minWidth}
         $maxWidth={maxWidth}
         icon={
-          clearable && value ? {
+          clearable && hasSelectedValue ? {
             name: ICONS.CLOSE,
             link: true,
             onClick: handleClear,
@@ -121,13 +128,13 @@ const SearchField = forwardRef(
         required={required}
         label={label}
         placeholder={placeholder ?? label}
-        search
         minCharacters={minCharacters}
         noResultsMessage={noResultsMessage}
         control={Search}
         loading={loading}
         results={filtered.slice(0, maxResults).map(getResultProps)}
-        value={value ? getDisplayValue(value) : query}
+        resultRenderer={resultRenderer}
+        value={hasSelectedValue ? getDisplayValue(value) : query}
         onSearchChange={handleChange}
         onKeyDown={handleKeyDown}
         onResultSelect={handleSelect}
