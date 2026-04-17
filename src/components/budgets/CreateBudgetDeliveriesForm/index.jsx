@@ -40,7 +40,7 @@ const CreateBudgetDeliveriesForm = () => {
       value: (product) => {
         const { isCompleted } = getDeliveryStats(product);
         return (
-          <Flex $columnGap="10px" justifyContent="space-between">
+          <Flex $columnGap="10px" $justifyContent="space-between">
             {product.id}
             {isCompleted && (
               <Popup
@@ -48,7 +48,7 @@ const CreateBudgetDeliveriesForm = () => {
                   <Flex $alignItems="center" >
                     {isCompleted && (
                       <Icon
-                        dollar
+                        $lowTooltip
                         name={ICONS.CHECK}
                         color={COLORS.GREEN}
                       />

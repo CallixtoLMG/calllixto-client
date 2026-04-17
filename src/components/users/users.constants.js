@@ -26,7 +26,7 @@ export const USER_COLUMNS = [
             {user.username}
           </OverflowWrapper >
         </>
-        {user.comments && <CommentTooltip lowTooltip comment={user.comments} />}
+        {user.comments && <CommentTooltip $lowTooltip comment={user.comments} />}
       </Flex>,
     sortValue: (user) => user.username?.toLowerCase() ?? ""
 

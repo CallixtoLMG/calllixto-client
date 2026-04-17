@@ -25,6 +25,7 @@ const GoBackButton = () => {
       icon={ICONS.ARROW_LEFT}
       color={COLORS.GREY}
       onClick={handleClick}
+      iconOnly
     />
   );
 };

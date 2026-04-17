@@ -159,7 +159,7 @@ const UserForm = forwardRef(({
 
         </FieldsContainer>
         <FieldsContainer>
-          <FormField flexDirection="row" flex="1">
+          <FormField flex="1">
             <NumberControlled
               name="phoneNumber.areaCode"
               label="Código de área"
@@ -178,7 +178,7 @@ const UserForm = forwardRef(({
               required={isUpdating || !view}
             />
           </FormField>
-          <FormField flexDirection="row" flex="1">
+          <FormField flex="1">
             <NumberControlled
               name="phoneNumber.number"
               label="Número de teléfono"

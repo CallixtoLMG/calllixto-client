@@ -413,7 +413,8 @@ export const ICONS = {
   EYE_SLASH: "eye slash",
   COG: "cog",
   EXCLAMATION_CIRCLE: "exclamation circle",
-  SS: "tags",
+  TAGS: "tags",
+  TAG: "tag",
   ADDRESS_CARD: "address card",
   ARCHIVE: "archive",
   OPTIONS: "options",
@@ -440,6 +441,7 @@ export const ICONS = {
   STICKY_NOTE: "sticky note",
   FILE_PDF: "file pdf",
   LIST: "list",
+  LIST_ALTERNATE: "list alternate",
   CARET_UP: "caret up",
   CARET_DOWN: "caret down",
   SIGN_OUT:"sign out"

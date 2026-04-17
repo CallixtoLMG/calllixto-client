@@ -1,7 +1,7 @@
 "use client";
 import { UserProvider } from "@/User";
 import { RouteHistoryProvider } from "@/app/RouteHistoryContext";
-import { GoBackButton } from "@/common/components/buttons";
+import { BackToListButton, GoBackButton } from "@/common/components/buttons";
 import { PAGES } from "@/common/constants";
 import { BreadcrumProvider, Breadcrumb, Header, NavActions, NavActionsProvider, Toaster } from "@/components/layout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -32,7 +32,7 @@ const NavigationContainer = styled.div`
 const BreadcrumbContainer = styled.div`
   display: flex;
   align-items: center;
-  column-gap: 20px;
+  column-gap: 10px;
 `;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -73,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       <NavigationContainer>
                         <BreadcrumbContainer>
                           <GoBackButton />
+                          <BackToListButton />
                           <Breadcrumb />
                         </BreadcrumbContainer>
                         <NavActions />

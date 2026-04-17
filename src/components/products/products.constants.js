@@ -320,7 +320,7 @@ export const STOCK_TABLE_HEADERS = [
     sortable: true,
     sortValue: (stockFlows) => stockFlows.createdAt ?? "",
     value: (stockFlows) => (
-      <Flex whiteSpace="nowrap" $alignItems="center" >
+      <Flex $alignItems="center" >
         < Label ribbon width="fit-content" color={stockFlows.inflow ? COLORS.GREEN : COLORS.RED} >
           <Icon inverted name={stockFlows.inflow ? ICONS.ARROW_DOWN : ICONS.ARROW_UP} />
         </Label>
@@ -351,15 +351,16 @@ export const STOCK_TABLE_HEADERS = [
     width: 2,
     title: 'Id venta',
     value: (stockFlows) => stockFlows.budgetId,
-    href: (stockFlows) => stockFlows.budgetId ? `/budgets/${stockFlows.budgetId}` : undefined,
+    href: (stockFlows) => stockFlows.budgetId ? `/ventas/${stockFlows.budgetId}` : undefined,
   },
   {
     id: 4,
     key: "createdBy",
     sortable: true,
     sortValue: (stockFlows) => stockFlows.createdBy ?? "",
-    width: 2,
-    title: 'Creado por', value: (stockFlows) => stockFlows.createdBy
+    width: 1,
+    title: 'Creado por', value: (stockFlows) => stockFlows.createdBy,
+    whiteSpace: "nowrap",
   },
   {
     id: 5,
@@ -369,7 +370,8 @@ export const STOCK_TABLE_HEADERS = [
   {
     id: 6,
     width: 3,
-    title: 'Remito', value: (stockFlows) => stockFlows.deliveryNote
+    title: 'Remito', value: (stockFlows) => stockFlows.deliveryNote,
+    whiteSpace: "nowrap",
   },
   {
     id: 7,

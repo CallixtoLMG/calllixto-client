@@ -44,7 +44,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
           <ModalContent            >
             <Form>
               <FieldsContainer $columnGap="15px">
-                <FormField flexDirection="row" flex="1">
+                <FormField $flexDirection="row" flex="1">
                   <DatePickerControlled
                     flex="1"
                     rules={{
@@ -73,7 +73,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                     iconOnly
                   />
                 </FormField>
-                <FormField flexDirection="row" flex="1">
+                <FormField $flexDirection="row" flex="1">
                   <DatePickerControlled
                     flex="1"
                     name="closeDate"
@@ -104,8 +104,8 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                 </FormField>
               </FieldsContainer>
               <FieldsContainer $rowGap="10px">
-                <FormField flexDirection="row" flex="1">
-                  <FormField flexDirection="row" flex="20">
+                <FormField $flexDirection="row" flex="1">
+                  <FormField  $flexDirection="row" flex="20">
                     {watchAllMethods ? (
                       <FormField
                         label="Método de pago"
@@ -140,7 +140,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                       />
                     )}
                   </FormField>
-                  <FormField flexDirection="row" flex="1">
+                  <FormField $flexDirection="row" flex="1">
                     <IconedButton
                       text={watchAllMethods ? "Deseleccionar todos los métodos de pago" : "Seleccionar todos los métodos de pago"}
                       icon={watchAllMethods ? ICONS.MINUS : ICONS.ADD}

@@ -3,7 +3,7 @@ import { COLORS, ICONS } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { List, ListItem, Popup } from "semantic-ui-react";
 
-export const PhonesTooltip = ({ phones, input, lowTooltip }) => {
+export const PhonesTooltip = ({ phones, input, $lowTooltip }) => {
   return (
     <Popup
       size="mini"
@@ -21,7 +21,7 @@ export const PhonesTooltip = ({ phones, input, lowTooltip }) => {
         input
           ? <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />
           : <Flex $marginLeft="5px" $marginRight="5px">
-            <Icon lowTooltip={lowTooltip} name={ICONS.LIST_UL} color={COLORS.BLUE} />
+            <Icon $lowTooltip={$lowTooltip} name={ICONS.LIST_UL} color={COLORS.BLUE} />
           </Flex>
       }
     />

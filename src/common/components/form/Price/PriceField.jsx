@@ -49,7 +49,7 @@ export const PriceField = ({
         disabled={disabled}
         iconPosition="left"
         placeholder={placeholder}
-        justifyItems={justifyItems}
+        $justifyItems={justifyItems}
         onKeyDown={onKeyDown}
         readOnly={readOnly}
       >

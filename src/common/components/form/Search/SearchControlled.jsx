@@ -1,7 +1,8 @@
+import { forwardRef } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import SearchField from './SearchField';
 
-export const SearchControlled = ({
+export const SearchControlled = forwardRef(({
   name,
   rules,
   label,
@@ -9,8 +10,9 @@ export const SearchControlled = ({
   onAfterChange,
   clearAfterSelect,
   externalError,
+  resultRenderer,
   ...rest
-}) => {
+}, ref) => {
   const {
     formState: { errors },
   } = useFormContext();
@@ -21,6 +23,7 @@ export const SearchControlled = ({
       rules={rules}
       render={({ field: { onChange, value } }) => (
         <SearchField
+          ref={ref}
           {...rest}
           label={label}
           error={
@@ -37,8 +40,11 @@ export const SearchControlled = ({
           }}
           placeholder={placeholder ?? label}
           clearAfterSelect={clearAfterSelect}
+          resultRenderer={resultRenderer}
         />
       )}
     />
   );
-};
+});
+
+SearchControlled.displayName = 'SearchControlled';

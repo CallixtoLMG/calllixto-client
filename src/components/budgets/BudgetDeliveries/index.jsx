@@ -173,7 +173,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
 
   const areAllRowsCompleted = useMemo(() => {
     if (!operableProducts.length) return false;
-  
+
     return operableProducts.every((product) => {
       const current = Number(quantityByRow[product.rowId] ?? 0);
       const target = Number(getRowTargetQuantity(product) ?? 0);
@@ -294,15 +294,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
         const current = Number(quantityByRow[product.rowId] ?? 0);
         const target = Number(getRowTargetQuantity(product) ?? 0);
 
-        if (current === target) {
-          return mode === DELIVERY
-            ? "Limpiar entrega"
-            : "Limpiar descuento";
-        }
-
-        return mode === DELIVERY
-          ? "Completar entrega"
-          : "Completar descuento";
+        return current === target ? "Limpiar fila" : "Completar fila"
       },
       onClick: (product) => {
         const current = Number(quantityByRow[product.rowId] ?? 0);

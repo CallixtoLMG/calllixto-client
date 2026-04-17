@@ -166,7 +166,7 @@ const CreateBudgetPayments = ({
                     required
                   />
                 </FormField>
-                <FormField flexDirection="row" $alignItems="end" flex="1">
+                <FormField $flexDirection="row" $alignItems="end" flex="1">
                   <FormField flex="1">
                     <PriceField
                       key={`price-${payment.method}-${payment.date?.getTime()}`}

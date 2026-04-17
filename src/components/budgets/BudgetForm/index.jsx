@@ -11,6 +11,7 @@ import {
   TextControlled,
   TextField
 } from "@/common/components/form";
+import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { COLORS, DATE_FORMATS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
@@ -216,7 +217,7 @@ const BudgetForm = ({
       color: COLORS.RED,
       onClick: (element, index) => {
         removeProduct(index);
-    
+
         queueMicrotask(() => {
           trigger("productsValidation");
         });
@@ -497,7 +498,7 @@ const BudgetForm = ({
           <FormField flex="1" />
         </FieldsContainer>
         <FieldsContainer>
-          <FormField $justifyContent="end" flexDirection="row" flex="1">
+          <FormField $justifyContent="end" $flexDirection="row" flex="1">
             <NumberControlled
               flex="1"
               name="expirationOffsetDays"
@@ -529,7 +530,6 @@ const BudgetForm = ({
         <FieldsContainer>
           <FormField flex="1">
             <SearchControlled
-              ref={productSearchRef}
               name="customer"
               label="Cliente"
               required
@@ -556,16 +556,25 @@ const BudgetForm = ({
               searchFields={['name', 'id']}
               getResultProps={(customer) => ({
                 key: customer.id,
-                title: getCustomerSearchTitle(customer),
-                description: getCustomerSearchDescription(customer),
+                title: customer.name ?? "",
+                description: customer.comments ?? "",
                 value: customer,
               })}
+              resultRenderer={({ value: customer }) => (
+                <SearchResultContent>
+                  <SearchResultTitle>
+                    {getCustomerSearchTitle(customer)}
+                  </SearchResultTitle>
+                  <SearchResultDescription>
+                    {getCustomerSearchDescription(customer)}
+                  </SearchResultDescription>
+                </SearchResultContent>
+              )}
               persistSelection={true}
             />
           </FormField>
-          <FormField flex="1">
+          <FormField $maxWidth="32%" flex="1">
             <TextField
-              flex="2"
               label="Dirección"
               placeholder="Dirección"
               disabled
@@ -589,7 +598,6 @@ const BudgetForm = ({
           </FormField>
           <FormField flex="1">
             <TextField
-              flex="2"
               label="Teléfono"
               placeholder="Teléfono"
               disabled
@@ -622,6 +630,7 @@ const BudgetForm = ({
           />
           <FormField flex="1">
             <SearchControlled
+              ref={productSearchRef}
               name="product"
               label="Producto"
               required
@@ -637,10 +646,20 @@ const BudgetForm = ({
               searchFields={['name', 'id']}
               getResultProps={(product) => ({
                 key: product.id,
-                title: getProductSearchTitle(product),
-                description: getProductSearchDescription(product),
+                title: product.name ?? "",
+                description: product.comments ?? "",
                 value: product,
               })}
+              resultRenderer={({ value: product }) => (
+                <SearchResultContent>
+                  <SearchResultTitle>
+                    {getProductSearchTitle(product)}
+                  </SearchResultTitle>
+                  <SearchResultDescription>
+                    {getProductSearchDescription(product)}
+                  </SearchResultDescription>
+                </SearchResultContent>
+              )}
               onAfterChange={(selectedProduct) => {
                 appendProduct({
                   ...selectedProduct,

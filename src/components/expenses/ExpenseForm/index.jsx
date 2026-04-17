@@ -123,7 +123,7 @@ const ExpenseForm = forwardRef(({
               placeholder="18000"
             />
           </FormField>
-
+          {!view && <FormField flex="1" />}
         </FieldsContainer>
         <FieldsContainer $rowGap="5px">
           <FormField flex="1">

@@ -147,7 +147,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
             />
             <SearchControlled
               width="13vw"
-              minWidth="120px"
+              minWidth="125px"
               name="createdBy"
               label="Vendedor"
               placeholder="Leandro Gómez"

@@ -137,7 +137,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
           <OverflowWrapper maxWidth="25vw" popupContent={budget.customer.name}>
             {budget.customer.name}
           </OverflowWrapper>
-          {budget.comments && <CommentTooltip lowTooltip comment={budget.comments} />}
+          {budget.comments && <CommentTooltip $lowTooltip comment={budget.comments} />}
         </Flex>
       ),
       sortValue: (budget) => budget.customer.name ?? ""
@@ -486,7 +486,7 @@ export const mapStockFlowsToHistory = (stockFlows = []) => {
       productName: flow.productName,
       quantity: flow.quantity,
       comments: flow.comments,
-      dispatchComment:flow.dispatchComment
+      dispatchComment: flow.dispatchComment
     });
   }
 
@@ -547,7 +547,7 @@ export const buildBudgetDeliveriesColumns = ({
                   <Flex $alignItems="center" >
                     {isCompleted && (
                       <Icon
-                        dollar
+                        $lowTooltip
                         name={ICONS.CHECK}
                         color={COLORS.GREEN}
                       />

@@ -165,6 +165,7 @@ const CashBalanceForm = forwardRef(({
                       shouldDirty: true,
                     })}
                     height="38px"
+                    width="fit-content"
                   />
                 )}
               </FormField>
@@ -188,7 +189,7 @@ const CashBalanceForm = forwardRef(({
           <FormField disabled flex="1" />
           <FormField disabled flex="1" />
         </FieldsContainer>
-        {showBillsTable ?? (
+        {showBillsTable && (
           <>
             {cashBalance.state === CASH_BALANCE_STATES.OPEN.id && isUpdating ? (
               <BillDetails name="billsDetails" />
@@ -203,7 +204,7 @@ const CashBalanceForm = forwardRef(({
                 </FlexColumn>
                 {billsDetailsOnClose && (
                   <FlexColumn $rowGap="10px">
-                    <Header content="Detalle de billetes (cierre)"></Header>
+                    <Header content="Detalle de billetes (cierre)" />
                     <Table
                       headers={BILLS_DETAILS_TABLE_HEADERS}
                       elements={billsDetailsOnClose}
@@ -214,12 +215,14 @@ const CashBalanceForm = forwardRef(({
             )}
           </>
         )}
-        <TextAreaControlled
-          name="comments"
-          label="Comentarios"
-          placeholder="Solo billetes de 500"
-          disabled={!isUpdating}
-        />
+        <FormField>
+          <TextAreaControlled
+            name="comments"
+            label="Comentarios"
+            placeholder="Solo billetes de 500"
+            disabled={!isUpdating}
+          />
+        </FormField>
         {isUpdating && (
           <SubmitAndRestore
             isUpdating={isUpdating}

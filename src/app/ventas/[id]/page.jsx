@@ -174,7 +174,7 @@ const Budget = ({ params }) => {
                   {sendButtons.map(({ text, iconName, subOptions }) => (
                     <Flex key={iconName}>
                       {subOptions.length > 0 && (
-                        <DropdownOption reverse direction="left" text={text} pointing="left" className="link item">
+                        <DropdownOption $reverse direction="left" text={text} pointing="left" className="link item">
                           <DropdownMenu margin="0 10px 0 0" icon={iconName}>
                             {subOptions.map(({ key, href, text, iconName, color }) => (
                               <Flex key={key}>

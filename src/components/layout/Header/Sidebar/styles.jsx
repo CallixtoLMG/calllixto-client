@@ -1,6 +1,8 @@
 import { Button } from "semantic-ui-react";
 import styled, { css } from "styled-components";
 
+import Link from "next/link";
+
 export const SidebarContainer = styled.aside`
   position: fixed;
   top: 0;
@@ -65,10 +67,9 @@ export const NavSection = styled.div`
   flex-direction: column;
 `;
 
-export const NavItemButton = styled.button`
+export const NavItemButton = styled(Link)`
   min-height: 44px;
   width: 100%;
-  border: none;
   background: ${({ $active }) => ($active ? "#eef4ff" : "transparent")};
   color: ${({ $active }) => ($active ? "#2185d0" : "#1f2937")};
   display: flex;
@@ -77,6 +78,7 @@ export const NavItemButton = styled.button`
   padding: 0 28px 0 18px;
   cursor: pointer;
   transition: 0.2s ease;
+  text-decoration: none;
 
   &:hover {
     background: ${({ $active }) => ($active ? "#eef4ff" : "#E2E8F2")};
@@ -98,10 +100,9 @@ export const NavItemRow = styled.div`
   }
 `;
 
-export const NavItemMain = styled.button`
+export const NavItemMain = styled(Link)`
   flex: 1;
   min-height: 44px;
-  border: none;
   background: transparent;
   cursor: pointer;
   text-align: left;
@@ -109,6 +110,7 @@ export const NavItemMain = styled.button`
   display: flex;
   align-items: center;
   color: ${({ $active }) => ($active ? "#2185d0" : "#1f2937")};
+  text-decoration: none;
 `;
 
 export const NavItemToggle = styled.button`
@@ -157,10 +159,9 @@ export const SubmenuInner = styled.div`
   overflow: hidden;
 `;
 
-export const SubmenuItem = styled.button`
+export const SubmenuItem = styled(Link)`
   min-height: 38px;
   width: 100%;
-  border: none;
   padding: 0px 25px;
   display: flex;
   align-items: center;
@@ -168,6 +169,7 @@ export const SubmenuItem = styled.button`
   background: ${({ $active }) => ($active ? "#eef4ff" : "transparent")};
   color: ${({ $active }) => ($active ? "#2185d0" : "#4b5563")};
   cursor: pointer;
+  text-decoration: none;
 
   &:hover {
     background: #E2E8F2;

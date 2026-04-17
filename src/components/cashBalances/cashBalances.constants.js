@@ -66,7 +66,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
         <Flex $columnGap="7px" $justifyContent="space-between">
           {getFormatedDate(cashBalance.startDate, DATE_FORMATS.DATE_WITH_TIME)}
           <Flex $alignItems="center" $justifyContent="flex-end">
-            {cashBalance.comments && <CommentTooltip lowTooltip comment={cashBalance.comments} />}
+            {cashBalance.comments && <CommentTooltip $tooltip comment={cashBalance.comments} />}
           </Flex>
         </Flex>
       ),
@@ -126,7 +126,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
                   <Icon
                     name={ICONS.TAGS}
                     color={COLORS.BLUE}
-                    lowTooltip
+                    $lowTooltip
                   />
                 }
                 content={
@@ -257,7 +257,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
     sortable: true,
     sortValue: (element) => element.date ?? "",
     value: (element) => (
-      <Flex whiteSpace="nowrap" $alignItems="center">
+      <Flex $alignItems="center">
         <Label ribbon width="fit-content" color={element.quantity < 0 ? COLORS.RED : COLORS.GREEN}>
           <Icon inverted name={element.quantity < 0 ? ICONS.ARROW_UP : ICONS.ARROW_DOWN} />
         </Label>

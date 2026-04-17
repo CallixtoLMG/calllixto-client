@@ -17,11 +17,11 @@ const OnPrint = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <AccordionTitle active={isAccordionOpen} onClick={toggleAccordion}>
+        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
           <Icon $height="20px" name={ICONS.CARET_UP} /> Al imprimir una venta
         </AccordionTitle>
         <Accordion.Content active>
-          <AnimatedContent active={isAccordionOpen}>
+          <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>
               <FlexColumn $rowGap="15px">
                 <IconedButtonControlled
@@ -31,13 +31,14 @@ const OnPrint = () => {
                   icon={ICONS.EYE}
                   color={COLORS.BLUE}
                   basic={!defaultsPDF?.showPrices}
+                  width="fit-content"
                 />
                 <DropdownControlled
                   name="defaultsPDF.printPdfMode"
                   label="Modo de impresión por defecto"
                   options={Object.values(BUDGET_PDF_FORMAT).map(option => ({ value: option.key, key: option.key, text: <Flex>{option.title}</Flex> }))}
                   defaultValue={BUDGET_PDF_FORMAT.CLIENT.key}
-                  width="200px"
+                  width="fit-content"
                 />
                 <TextAreaControlled
                   name="defaultsPDF.customPDFDisclaimer"
