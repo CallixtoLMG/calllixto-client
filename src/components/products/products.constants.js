@@ -1,7 +1,7 @@
 import { Box, Flex, FlexColumn, Label, OverflowWrapper } from "@/common/components/custom";
 import { Text } from "@/common/components/form/Search/styles";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { SIZES } from "@/common/constants";
+import { COLORS, SIZES } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { Popup } from "semantic-ui-react";
 import { PriceLabel } from "../../common/components/form";
