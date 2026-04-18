@@ -17,7 +17,12 @@ import { toast } from "react-hot-toast";
 const Customer = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
-  const { data: customer, isLoading, refetch } = useGetCustomer(params.id);
+  const id = params?.id;
+
+  const { data: customer, isLoading, refetch } = useGetCustomer(id, {
+    enabled: !!id,
+  });
+  // const { data: customer, isLoading, refetch } = useGetCustomer(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -195,7 +200,7 @@ const Customer = ({ params }) => {
           loading: activeAction === DELETE,
           disabled: customer.hasBudgets || !!activeAction || isEditPending,
           iconOnly: true,
-          popupPosition:"bottom left"
+          popupPosition: "bottom left"
         },
       ];
 
