@@ -12,6 +12,8 @@ const EMPTY_PHONE = { ref: '', areaCode: '', number: '' };
 const EMPTY_ADDRESS = { ref: '', address: '' };
 const EMPTY_EMAIL = { ref: '', email: '' };
 
+const normalizeRef = (value = '') => value.trim().toLowerCase();
+
 export const ContactControlled = () => {
   const [error, setError] = useState();
   const [openPhone, setOpenPhone] = useState(false);
@@ -77,56 +79,123 @@ export const ContactControlled = () => {
     setter(prev => ({ ...prev, [field]: value }));
   };
 
+  const hasDuplicateRef = (fields = [], ref) => {
+    const normalizedRef = normalizeRef(ref);
+
+    if (!normalizedRef) return false;
+
+    return fields.some((item) => normalizeRef(item.ref) === normalizedRef);
+  };
+
+  const clearErrorField = (section, field) => {
+    if (!error?.[section]?.[field]) return;
+
+    setError((prev) => {
+      if (!prev?.[section]) return prev;
+
+      const nextSection = { ...prev[section] };
+      delete nextSection[field];
+
+      const next = { ...prev };
+
+      if (Object.keys(nextSection).length) {
+        next[section] = nextSection;
+      } else {
+        delete next[section];
+      }
+
+      return Object.keys(next).length ? next : undefined;
+    });
+  };
+
   const handleAddPhone = () => {
+    const nextError = {};
+
+    if (hasDuplicateRef(phoneFields, phoneToAdd.ref)) {
+      nextError.ref = 'La referencia ya existe.';
+    }
+
     if (!validatePhone(phoneToAdd)) {
-      setError({ phone: 'El área y el número deben sumar 10 dígitos.' });
+      nextError.phone = 'El área y el número deben sumar 10 dígitos.';
+    } else {
+      const phoneExists = phoneFields.some(
+        phone => getFormatedPhone(phone) === getFormatedPhone(phoneToAdd)
+      );
+
+      if (phoneExists) {
+        nextError.phone = 'El teléfono ya existe.';
+      }
+    }
+
+    if (Object.keys(nextError).length) {
+      setError({ phone: nextError });
       return;
     }
-    const phoneExists = phoneFields.some(phone => getFormatedPhone(phone) === getFormatedPhone(phoneToAdd));
-    if (phoneExists) {
-      setError({ phone: 'El teléfono ya existe.' });
-      return;
-    }
+
     appendPhone(phoneToAdd);
     setPhoneToAdd(EMPTY_PHONE);
-    setError();
-    setOpenPhone(false)
+    setError(undefined);
+    setOpenPhone(false);
   };
 
   const handleAddAddress = () => {
-    if (!addressToAdd.address) {
-      setError({ address: 'Campo requerido.' });
+    const nextError = {};
+
+    if (hasDuplicateRef(addressFields, addressToAdd.ref)) {
+      nextError.ref = 'La referencia ya existe.';
+    }
+
+    if (!addressToAdd.address?.trim()) {
+      nextError.address = 'Campo requerido.';
+    } else {
+      const addressExists = addressFields.some(
+        (address) => address.address === addressToAdd.address
+      );
+
+      if (addressExists) {
+        nextError.address = 'La dirección ya existe.';
+      }
+    }
+
+    if (Object.keys(nextError).length) {
+      setError({ address: nextError });
       return;
     }
-    const addressExists = addressFields.some(
-      (address) => address.address === addressToAdd.address
-    );
-    if (addressExists) {
-      setError({ address: 'La dirección ya existe.' });
-      return;
-    }
+
     appendAddress(addressToAdd);
     setAddressToAdd(EMPTY_ADDRESS);
-    setError();
-    setOpenAddress(false)
+    setError(undefined);
+    setOpenAddress(false);
   };
 
   const handleAddEmail = () => {
+    const nextError = {};
+
+    if (hasDuplicateRef(emailsFields, emailToAdd.ref)) {
+      nextError.ref = 'La referencia ya existe.';
+    }
+
     if (!validateEmail(emailToAdd.email)) {
-      setError({ email: 'El correo electrónico no es válido.' });
+      nextError.email = 'El correo electrónico no es válido.';
+    } else {
+      const emailExists = emailsFields.some(
+        (email) => email.email === emailToAdd.email
+      );
+
+      if (emailExists) {
+        nextError.email = 'El correo electrónico ya existe.';
+      }
+    }
+
+    if (Object.keys(nextError).length) {
+      setError({ email: nextError });
       return;
     }
-    const emailExists = emailsFields.some(
-      (email) => email.email === emailToAdd.email
-    );
-    if (emailExists) {
-      setError({ email: 'El correo electrónico ya existe.' });
-      return;
-    }
+
     appendEmail(emailToAdd);
     setEmailToAdd(EMPTY_EMAIL);
-    setError();
-    setOpenEmail(false)
+    setError(undefined);
+    setOpenEmail(false);
   };
 
   return (
@@ -141,8 +210,8 @@ export const ContactControlled = () => {
               ref={phoneButtonRef}
               onClick={() => setOpenPhone(true)}
               onKeyDown={(e) => {
-                handleEscapeKeyDown(e, () => setOpenPhone(false))
-                handleEnterKeyDown(e, () => setOpenPhone(true))
+                handleEscapeKeyDown(e, () => setOpenPhone(false));
+                handleEnterKeyDown(e, () => setOpenPhone(true));
               }}
             >
               <IconedButton
@@ -156,7 +225,7 @@ export const ContactControlled = () => {
           on='click'
           onClose={() => {
             setPhoneToAdd(EMPTY_PHONE);
-            setError();
+            setError(undefined);
             setOpenPhone(false);
             phoneButtonRef.current?.focus();
           }}
@@ -171,7 +240,15 @@ export const ContactControlled = () => {
                 control={Input}
                 placeholder="Casa"
                 value={phoneToAdd.ref}
-                onChange={(e) => updateFieldToAdd(setPhoneToAdd, 'ref', e.target.value)}
+                error={error?.phone?.ref ? {
+                  content: error.phone.ref,
+                  pointing: 'above',
+                } : null}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateFieldToAdd(setPhoneToAdd, 'ref', value);
+                  if (!hasDuplicateRef(phoneFields, value)) clearErrorField('phone', 'ref');
+                }}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPhone)}
               >
                 <input ref={phoneInputRef} />
@@ -180,8 +257,8 @@ export const ContactControlled = () => {
                 flex="1"
                 label="Área"
                 control={Input}
-                error={error?.phone ? {
-                  content: error.phone,
+                error={error?.phone?.phone ? {
+                  content: error.phone.phone,
                   pointing: 'above',
                 } : null}
                 required
@@ -191,7 +268,15 @@ export const ContactControlled = () => {
                 onChange={(e) => {
                   const value = e.target.value;
                   updateFieldToAdd(setPhoneToAdd, 'areaCode', value);
-                  if (validatePhone({ ...phoneToAdd, areaCode: value })) setError(undefined);
+
+                  if (
+                    validatePhone({ ...phoneToAdd, areaCode: value }) &&
+                    !phoneFields.some(
+                      phone => getFormatedPhone(phone) === getFormatedPhone({ ...phoneToAdd, areaCode: value })
+                    )
+                  ) {
+                    clearErrorField('phone', 'phone');
+                  }
                 }}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPhone)}
               />
@@ -199,8 +284,8 @@ export const ContactControlled = () => {
                 flex="1"
                 label="Número"
                 control={Input}
-                error={error?.phone ? {
-                  content: error.phone,
+                error={error?.phone?.phone ? {
+                  content: error.phone.phone,
                   pointing: 'above',
                 } : null}
                 required
@@ -210,7 +295,15 @@ export const ContactControlled = () => {
                 onChange={(e) => {
                   const value = e.target.value;
                   updateFieldToAdd(setPhoneToAdd, 'number', value);
-                  if (validatePhone({ ...phoneToAdd, number: value })) setError(undefined);
+
+                  if (
+                    validatePhone({ ...phoneToAdd, number: value }) &&
+                    !phoneFields.some(
+                      phone => getFormatedPhone(phone) === getFormatedPhone({ ...phoneToAdd, number: value })
+                    )
+                  ) {
+                    clearErrorField('phone', 'phone');
+                  }
                 }}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddPhone)}
               />
@@ -235,6 +328,7 @@ export const ContactControlled = () => {
           elements={phoneFields}
         />
       </Flex>
+
       <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
@@ -245,8 +339,8 @@ export const ContactControlled = () => {
               ref={addressButtonRef}
               onClick={() => setOpenAddress(true)}
               onKeyDown={(e) => {
-                handleEscapeKeyDown(e, () => setOpenAddress(false))
-                handleEnterKeyDown(e, () => setOpenAddress(true))
+                handleEscapeKeyDown(e, () => setOpenAddress(false));
+                handleEnterKeyDown(e, () => setOpenAddress(true));
               }}
             >
               <IconedButton
@@ -260,6 +354,7 @@ export const ContactControlled = () => {
           on='click'
           onClose={() => {
             setAddressToAdd(EMPTY_ADDRESS);
+            setError(undefined);
             setOpenAddress(false);
             addressButtonRef.current?.focus();
           }}
@@ -274,7 +369,15 @@ export const ContactControlled = () => {
                 control={Input}
                 placeholder="Casa"
                 value={addressToAdd.ref}
-                onChange={(e) => updateFieldToAdd(setAddressToAdd, 'ref', e.target.value)}
+                error={error?.address?.ref ? {
+                  content: error.address.ref,
+                  pointing: 'above',
+                } : null}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateFieldToAdd(setAddressToAdd, 'ref', value);
+                  if (!hasDuplicateRef(addressFields, value)) clearErrorField('address', 'ref');
+                }}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddAddress)}
               >
                 <input ref={addressInputRef} />
@@ -283,8 +386,8 @@ export const ContactControlled = () => {
                 flex="2"
                 label="Dirección"
                 control={Input}
-                error={error?.address ? {
-                  content: error.address,
+                error={error?.address?.address ? {
+                  content: error.address.address,
                   pointing: 'above',
                 } : null}
                 required
@@ -293,7 +396,14 @@ export const ContactControlled = () => {
                 onChange={(e) => {
                   const value = e.target.value;
                   updateFieldToAdd(setAddressToAdd, 'address', value);
-                  if (value.trim()) setError(undefined);
+
+                  const addressExists = addressFields.some(
+                    (address) => address.address === value
+                  );
+
+                  if (value.trim() && !addressExists) {
+                    clearErrorField('address', 'address');
+                  }
                 }}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddAddress)}
               />
@@ -319,6 +429,7 @@ export const ContactControlled = () => {
           elements={addressFields}
         />
       </Flex>
+
       <Flex $flex="1" $flexDirection="column">
         <Popup
           trigger={
@@ -329,8 +440,8 @@ export const ContactControlled = () => {
               ref={emailButtonRef}
               onClick={() => setOpenEmail(true)}
               onKeyDown={(e) => {
-                handleEscapeKeyDown(e, () => setOpenEmail(false))
-                handleEnterKeyDown(e, () => setOpenEmail(true))
+                handleEscapeKeyDown(e, () => setOpenEmail(false));
+                handleEnterKeyDown(e, () => setOpenEmail(true));
               }}
             >
               <IconedButton
@@ -344,6 +455,7 @@ export const ContactControlled = () => {
           on='click'
           onClose={() => {
             setEmailToAdd(EMPTY_EMAIL);
+            setError(undefined);
             setOpenEmail(false);
             emailButtonRef.current?.focus();
           }}
@@ -358,7 +470,15 @@ export const ContactControlled = () => {
                 control={Input}
                 placeholder="Trabajo"
                 value={emailToAdd.ref}
-                onChange={(e) => updateFieldToAdd(setEmailToAdd, 'ref', e.target.value)}
+                error={error?.email?.ref ? {
+                  content: error.email.ref,
+                  pointing: 'above',
+                } : null}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  updateFieldToAdd(setEmailToAdd, 'ref', value);
+                  if (!hasDuplicateRef(emailsFields, value)) clearErrorField('email', 'ref');
+                }}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddEmail)}
               >
                 <input ref={emailInputRef} />
@@ -367,8 +487,8 @@ export const ContactControlled = () => {
                 flex="2"
                 label="Email"
                 control={Input}
-                error={error?.email ? {
-                  content: error.email,
+                error={error?.email?.email ? {
+                  content: error.email.email,
                   pointing: 'above',
                 } : null}
                 required
@@ -377,7 +497,14 @@ export const ContactControlled = () => {
                 onChange={(e) => {
                   const value = e.target.value;
                   updateFieldToAdd(setEmailToAdd, 'email', value);
-                  if (validateEmail(value)) setError(undefined);
+
+                  const emailExists = emailsFields.some(
+                    (email) => email.email === value
+                  );
+
+                  if (validateEmail(value) && !emailExists) {
+                    clearErrorField('email', 'email');
+                  }
                 }}
                 onKeyDown={(e) => handleEnterKeyDown(e, handleAddEmail)}
               />
@@ -404,5 +531,5 @@ export const ContactControlled = () => {
         />
       </Flex>
     </FieldsContainer>
-  )
-}
+  );
+};
