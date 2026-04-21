@@ -38,8 +38,6 @@ const LoginForm = ({ onSubmit }) => {
     },
   });
 
-  console.log("hola")
-  
   return (
     <Loader active={isPending}>
       <ModGrid>
