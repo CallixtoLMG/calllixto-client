@@ -118,15 +118,13 @@ const Header = () => {
             color={COLORS.BLUE}
             text="Menú"
           />
-          <Brand>CallixtoGLM</Brand>
+          <Brand>CallixtoGLMM</Brand>
         </HeaderLeft>
-
         <HeaderRight>
           <RightActions>
             <ModalUpdates />
             <KeyboardShortcuts />
           </RightActions>
-
           {isCallixtoUser(role) && (
             <ClientBadge>{selectedClientId}</ClientBadge>
           )}
