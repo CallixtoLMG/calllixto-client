@@ -1,7 +1,7 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
-import { ENTITIES, SHORTKEYS } from "@/common/constants";
+import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { useKeyboardShortcuts, useSettingArrayField } from "@/hooks";
 import { forwardRef, useImperativeHandle } from "react";
