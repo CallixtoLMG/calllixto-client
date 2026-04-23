@@ -1,8 +1,8 @@
-import { AccordionTitle, Box, Button, Flex, Icon, OverflowWrapper } from "@/common/components/custom";
+import { AccordionTitle, Box, Button, FieldsContainer, Icon, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SEMANTIC_COLORS, SIZES } from "@/common/constants";
-import { handleEnterKeyDown } from "@/common/utils";
+import { createPriorityKeyDownHandler, handleEnterKeyDown } from "@/common/utils";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Accordion, Label } from "semantic-ui-react";
@@ -106,6 +106,11 @@ const Tags = () => {
     }
   };
 
+  const handleTagKeyDown = createPriorityKeyDownHandler({
+    shouldHandle: () => !!tagToAdd.name.trim(),
+    callback: handleAddTag,
+  });
+
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
@@ -115,29 +120,29 @@ const Tags = () => {
         </AccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
-            <AnimatedInner>
+            <AnimatedInner $active={isAccordionOpen}>
               <Box>
-                <Flex width="100%" padding="0 10px 10px 10px!important" $alignItems="flex-start" $columnGap="15px">
+                <FieldsContainer padding="0 10px 10px 10px!important" >
                   <TextField
-                    width={4}
+                    flex="1"
                     label="Nombre"
                     placeholder="Nombre de la etiqueta"
                     value={tagToAdd.name}
                     onChange={handleNameChange}
-                    onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
+                    onKeyDown={handleTagKeyDown}
                     error={errors?.name}
                     required
                   />
                   <DropdownField
                     selection
-                    flex={1}
+                    flex="1"
                     label="Color"
                     options={SEMANTIC_COLORS}
                     value={tagToAdd.color}
                     onChange={(e, { value }) => setTagToAdd({ ...tagToAdd, color: value })}
                   />
                   <TextField
-                    flex={2}
+                    flex="1"
                     label="Descripción"
                     placeholder="Descripción"
                     value={tagToAdd.description}
@@ -155,7 +160,7 @@ const Tags = () => {
                     onClick={handleAddTag}
                     $marginTop="25px"
                   />
-                </Flex>
+                </FieldsContainer>
                 <Table
                   isLoading={false}
                   headers={headers}

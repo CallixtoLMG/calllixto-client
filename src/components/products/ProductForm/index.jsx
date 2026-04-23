@@ -116,7 +116,7 @@ const ProductForm = forwardRef(({
               </FormField>
               <FormField flex="1">
                 <TextField
-                  width="50%"
+                  $truncateInput
                   label="Id"
                   value={getProductId(product?.id)}
                   iconLabel={`${getSupplierId(product?.id)} ${getBrandId(product?.id)}`}
@@ -200,7 +200,6 @@ const ProductForm = forwardRef(({
               </FormField>
               <FormField flex="1">
                 <TextControlled
-                  width="50%"
                   name="id"
                   label="Id"
                   required
@@ -246,7 +245,7 @@ const ProductForm = forwardRef(({
             </FormField>
             {watchStockControl &&
               <FormField flex="1">
-                <Message $minWidth="max-content" $opacity={view} height="38px" padding="0.5rem 1rem" margin="0" color={COLORS.BLUE} >
+                <Message $minWidth="max-content" $opacity={view} height="38px" margin="0" color={COLORS.BLUE} >
                   <Icon name={ICONS.BOXES} /> Stock: {product?.stock ?? 0}
                 </Message>
               </FormField>
@@ -260,6 +259,7 @@ const ProductForm = forwardRef(({
               name="cost"
               label="Costo"
               disabled={!isUpdating && view}
+              maxLength={19}
             />
           </FormField>
           <FormField $flexDirection="row" flex="1">
@@ -284,7 +284,7 @@ const ProductForm = forwardRef(({
           <FormField $alignItems="end" $flexDirection="row" flex="1">
             <FormField flex="1">
               <PercentField
-                width="55%"
+                width="50%"
                 label="Margen"
                 value={calculateMargin(watchPrice, watchCost)}
                 disabled={!isUpdating && view}

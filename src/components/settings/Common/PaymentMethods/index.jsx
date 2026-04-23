@@ -2,7 +2,7 @@ import { AccordionTitle, Box, Button, Flex, Icon } from "@/common/components/cus
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
-import { handleEnterKeyDown } from "@/common/utils";
+import { createPriorityKeyDownHandler } from "@/common/utils";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion } from "semantic-ui-react";
@@ -34,6 +34,11 @@ const PaymentMethods = () => {
     const method = inputValue.trim();
 
     if (!method) return;
+
+    if (method.length > 50) {
+      setError(`El método no puede superar los 50 caracteres.`);
+      return;
+    }
 
     if (paymentMethods.includes(method)) {
       setError(`El método [${method}] ya existe en la lista!`);
@@ -70,6 +75,11 @@ const PaymentMethods = () => {
     },
   ], [handleRemoveMethod]);
 
+  const handleMethodKeyDown = createPriorityKeyDownHandler({
+    shouldHandle: () => !!inputValue.trim(),
+    callback: handleAddPaymentMethods,
+  });
+
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
@@ -91,7 +101,7 @@ const PaymentMethods = () => {
                       setInputValue(e.target.value);
                       if (error) setError(null);
                     }}
-                    onKeyDown={(e) => handleEnterKeyDown(e, handleAddPaymentMethods)}
+                    onKeyDown={handleMethodKeyDown}
                     error={error}
                   />
                   <Button

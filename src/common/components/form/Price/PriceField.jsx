@@ -15,7 +15,8 @@ export const PriceField = ({
   onKeyDown,
   justifyItems,
   required,
-  readOnly
+  readOnly,
+  maxLength
 }) => {
   const isUserTyping = useRef(false);
   const [formattedValue, setFormattedValue] = useState(getNumberFormated(value ?? 0)[0]);
@@ -45,6 +46,7 @@ export const PriceField = ({
         width="inherit"
         value={formattedValue}
         onChange={handleChange}
+        maxLength={maxLength}
         onBlur={() => { isUserTyping.current = false; }}
         disabled={disabled}
         iconPosition="left"

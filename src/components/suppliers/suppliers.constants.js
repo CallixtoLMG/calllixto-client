@@ -28,10 +28,10 @@ export const SUPPLIERS_COLUMNS = [
     sortable: true,
     value: (supplier) =>
       <Flex $justifyContent="space-between">
-        <OverflowWrapper maxWidth="40vw" popupContent={supplier.name}>
+        <OverflowWrapper maxWidth="30vw" popupContent={supplier.name}>
           {supplier.name}
         </OverflowWrapper>
-        {supplier.comments && <CommentTooltip tooltip="true" comment={supplier.comments} />}
+        {supplier.comments && <CommentTooltip $lowTooltip comment={supplier.comments} />}
       </Flex>,
     sortValue: (supplier) => supplier.name ?? ""
   },
@@ -45,8 +45,10 @@ export const SUPPLIERS_COLUMNS = [
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(supplier.addresses || []);
       return (
         <Flex $justifyContent="space-between">
-          {primaryAddress}
-          {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
+          <OverflowWrapper maxWidth="30vw" popupContent={primaryAddress}>
+            {primaryAddress}
+          </OverflowWrapper>
+          {additionalAddresses && <AddressesTooltip $lowTooltip addresses={additionalAddresses} />}
         </Flex>
       );
     },
@@ -62,7 +64,7 @@ export const SUPPLIERS_COLUMNS = [
       return (
         <Flex $justifyContent="space-between">
           {primaryPhone}
-          {additionalPhones && <PhonesTooltip phones={additionalPhones} />}
+          {additionalPhones && <PhonesTooltip $lowTooltip phones={additionalPhones} />}
         </Flex>
       );
     }

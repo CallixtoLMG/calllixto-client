@@ -100,7 +100,7 @@ const Customer = ({ params }) => {
         toast.success("Cliente actualizado!");
         setIsUpdating(false);
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {
@@ -120,7 +120,7 @@ const Customer = ({ params }) => {
             : 'Cliente desactivado!'
         );
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {
@@ -136,7 +136,7 @@ const Customer = ({ params }) => {
         toast.success("Cliente eliminado permanentemente!");
         push(PAGES.CUSTOMERS.BASE);
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {

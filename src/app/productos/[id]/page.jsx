@@ -164,11 +164,8 @@ const Product = ({ params }) => {
         toast.success("Producto actualizado!");
         setIsUpdating(false);
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
-    },
-    onError: (error) => {
-      toast.error(`Error al actualizar el producto: ${error.message || error}`);
     },
     onSettled: () => {
       setActiveAction(null);
@@ -187,7 +184,7 @@ const Product = ({ params }) => {
             : 'producto desactivado!'
         );
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {
@@ -202,11 +199,8 @@ const Product = ({ params }) => {
       if (response.statusOk) {
         toast.success("Producto activado!");
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
-    },
-    onError: (error) => {
-      toast.error(`Error al activar el producto: ${error.message || error}`);
     },
     onSettled: () => {
       setActiveAction(null);
@@ -225,11 +219,8 @@ const Product = ({ params }) => {
           toast.success("Producto marcado como eliminado.");
         }
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
-    },
-    onError: (error) => {
-      toast.error(`Error al eliminar el producto: ${error.message || error}`);
     },
     onSettled: () => {
       setActiveAction(null);

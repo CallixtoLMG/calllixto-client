@@ -257,7 +257,7 @@ const Budget = ({ params }) => {
         toast.success('Presupuesto confirmado!');
         setIsModalConfirmationOpen(false);
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
   });
@@ -276,7 +276,7 @@ const Budget = ({ params }) => {
         toast.success('Presupuesto anulado!');
         setIsModalCancelOpen(false);
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onError: (error) => {

@@ -10,7 +10,7 @@ export const AddressesTooltip = ({ addresses, input, $lowTooltip }) => {
         <List>
           {addresses.map(address => (
             <ListItem key={`${address.ref}-${address.address}`}>
-              {address.ref ? `${address.ref}: ` : "Dirección: "}<b>{address.address}</b>
+              <b>{address.ref ? `${address.ref}: ` : "Dirección: "}</b> {address.address}
             </ListItem>
           ))}
         </List>

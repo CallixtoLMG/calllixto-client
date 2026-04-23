@@ -92,7 +92,12 @@ const Budgets = () => {
   useKeyboardShortcuts(() => push(PAGES.BUDGETS.CREATE), SHORTKEYS.ENTER);
 
   return (
-    <BudgetsPage onRefetch={refetch} isLoading={loading} budgets={loading ? [] : budgets} usersOptions={usersOptions} />
+    <BudgetsPage
+      onRefetch={refetch}
+      isLoading={loading}
+      budgets={loading ? [] : budgets}
+      usersOptions={usersOptions}
+    />
   )
 };
 

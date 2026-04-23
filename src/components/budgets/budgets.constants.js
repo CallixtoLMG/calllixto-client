@@ -533,13 +533,13 @@ export const buildBudgetDeliveriesColumns = ({
   const columns = [
     {
       id: 1,
-      title: "ID",
+      title: "Id",
       key: "id",
       sortable: true,
       value: (product) => {
         const { isCompleted } = getDeliveryStats(product);
         return (
-          <Flex $justifyContent="space-between">
+          <Flex $columnGap="5px" $justifyContent="space-between">
             {product.id}
             {isCompleted && (
               <Popup
@@ -569,7 +569,11 @@ export const buildBudgetDeliveriesColumns = ({
       key: "name",
       sortable: true,
       title: "Producto",
-      value: (product) => product.name,
+      value: (product) => (
+        <OverflowWrapper maxWidth="50vw" popupContent={product.name}>
+          {product.name}
+        </OverflowWrapper>
+      ),
       sortValue: (product) => product.name ?? "",
       width: 6,
     },

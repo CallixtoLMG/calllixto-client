@@ -1,40 +1,50 @@
-import { Flex, OverflowWrapper } from '@/common/components/custom';
+import { OverflowWrapper } from '@/common/components/custom';
 import { ENTITIES, ENTITY_VIEW, ICONS, INFO, PAGES, SIZES } from '@/common/constants';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { BreadcrumbDivider, BreadcrumbSection, Popup, Breadcrumb as SBreadcrumb, Label as SLabel } from 'semantic-ui-react';
+import { Popup, Breadcrumb as SBreadcrumb, BreadcrumbDivider as SBreadcrumbDivider, BreadcrumbSection as SBreadcrumbSection, Label as SLabel } from 'semantic-ui-react';
 import styled from "styled-components";
 import { useNavActionsContext } from '.';
 
 const Label = styled(SLabel)`
-  position: relative;
+  position: sticky!important;
   top: 5px;
   max-height: fit-content;
   margin-left: 10px!important;
 `;
 
-const Span = styled.span`
-  height: 35px!important;
+const Span = styled.div`
+  display: flex;
   align-items: center;
-  display: inline-flex;
+  min-width: 0;
+  width: 100%;
+  height: 35px !important;
+`;
+
+const BreadcrumbItemContent = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+`;
+
+const BreadcrumbName = styled.div`
+  min-width: 0;
+  max-width: 500px;
+  flex: 0 1 auto;
+`;
+
+const BreadcrumbDivider = styled(SBreadcrumbDivider)`
+  align-self: center;
+  position: inherit!important;
+`;
+
+const BreadcrumbSection = styled(SBreadcrumbSection)`
+  display: flex!important;
 `;
 
 const SSBreadcrumb = styled(SBreadcrumb)`
-  height: 35px!important;
-  align-content: center;
-  position: relative;
-  top: 2px;
   flex-flow: nowrap;
   display: flex!important;
-
-  div {
-    height:100%!important;
-    align-content: center;
-  }
-
-  i {
-    position: relative;
-    top: -10px;
-  }
 `;
 
 export const PATHNAME_ENTITY_MAP = {
@@ -116,24 +126,27 @@ const Breadcrumb = () => {
             {index !== 0 && (
               <BreadcrumbDivider icon={ICONS.CHEVRON_RIGHT} />
             )}
-            <OverflowWrapper $verticalAlign="baseline" popupContent={name} maxWidth="25vw">
-              <Flex>
-                <Span>{name}</Span>
-                {label && (
-                  <Popup
-                    content={label.popup}
-                    disabled={!label.popup}
-                    position="bottom center"
-                    size="mini"
-                    trigger={
-                      <Label pointing="left" color={label.color}>
-                        {label.title}
-                      </Label>
-                    }
-                  />
-                )}
-              </Flex>
-            </OverflowWrapper>
+            <BreadcrumbItemContent>
+              <BreadcrumbName>
+                <OverflowWrapper popupContent={name} maxWidth="100%">
+                  {name}
+                </OverflowWrapper>
+              </BreadcrumbName>
+
+              {label && (
+                <Popup
+                  content={label.popup}
+                  disabled={!label.popup}
+                  position="bottom center"
+                  size="mini"
+                  trigger={
+                    <Label pointing="left" color={label.color}>
+                      {label.title}
+                    </Label>
+                  }
+                />
+              )}
+            </BreadcrumbItemContent>
           </BreadcrumbSection>
         );
       })}

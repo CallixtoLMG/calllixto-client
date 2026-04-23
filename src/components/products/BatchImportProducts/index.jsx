@@ -330,7 +330,7 @@ export const BatchImportProducts = ({ isCreating }) => {
         handleModalClose();
         refetchProducts();
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
 
       if (response.unprocessed?.length) {

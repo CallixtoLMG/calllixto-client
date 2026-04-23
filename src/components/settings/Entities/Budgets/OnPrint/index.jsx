@@ -31,7 +31,6 @@ const OnPrint = () => {
                   icon={ICONS.EYE}
                   color={COLORS.BLUE}
                   basic={!defaultsPDF?.showPrices}
-                  width="fit-content"
                 />
                 <DropdownControlled
                   name="defaultsPDF.printPdfMode"

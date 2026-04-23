@@ -28,7 +28,7 @@ export const HEADERS = [
       const { tags, name, comments } = customer;
       return (
         <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper maxWidth="45vw" popupContent={name}>
+          <OverflowWrapper maxWidth="30vw" popupContent={name}>
             {name}
           </OverflowWrapper>
           <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
@@ -51,7 +51,9 @@ export const HEADERS = [
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(customer.addresses || []);
       return (
         <Flex $justifyContent="space-between">
-          {primaryAddress}
+          <OverflowWrapper maxWidth="30vw" popupContent={primaryAddress}>
+            {primaryAddress}
+          </OverflowWrapper>
           {additionalAddresses && <AddressesTooltip $lowTooltip addresses={additionalAddresses} />}
         </Flex>
       );
@@ -62,7 +64,7 @@ export const HEADERS = [
     id: 4,
     title: "Teléfono",
     width: 1,
-    whiteSpace:"nowrap",
+    whiteSpace: "nowrap",
     value: (customer) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(customer.phoneNumbers);
       return (

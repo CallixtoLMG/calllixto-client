@@ -20,6 +20,7 @@ export const ViewContainer = styled(Flex)`
 
 export const FieldsContainer = styled(Flex)`
   justify-content: ${({ $justifyContent }) => $justifyContent};
+  padding: ${({ $padding }) => $padding};
   flex-wrap: wrap;
   column-gap: ${({ $columnGap = '15px' }) => $columnGap} !important;
   row-gap: ${({ $rowGap = 'auto' }) => $rowGap} !important;

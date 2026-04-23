@@ -289,8 +289,10 @@ const CustomTable = ({
                                   }}
                                 />
                               )}
-
-                              <LinkContent>
+                              <LinkContent
+                                data-href={href || ""}
+                                data-clickable={!!href}
+                              >
                                 {header.value(element, index)}
                               </LinkContent>
                             </LinkCell>

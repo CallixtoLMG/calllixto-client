@@ -44,10 +44,15 @@ const DeliveriesHistory = ({ history }) => {
                 >
                   <Flex>
                     <Icon color={isReturn ? COLORS.ORANGE : COLORS.GREEN} name={ICONS.DROPDOWN} />
-                    <Flex $columnGap="15px">
+                    <Flex $columnGap="5px">
                       <Flex $columnGap="10px" width="70px" > {isReturn ? "Descuento" : "Entrega"} </Flex>
                       🕒{getFormatedDate(entry.date, DATE_FORMATS.DATE_WITH_TIME_SECONDS)}
-                      {entry.deliveryNote && ` – Remito: ${entry.deliveryNote}`}
+                      {entry.deliveryNote &&
+                        <OverflowWrapper
+                          popupContent={entry.deliveryNote}
+                          maxWidth="30vw"
+                        >{`–  Remito: ${entry.deliveryNote}`}
+                        </OverflowWrapper>}
                     </Flex>
                   </Flex>
                 </Accordion.Title>
@@ -56,7 +61,12 @@ const DeliveriesHistory = ({ history }) => {
                     {entry.rows.map((row, index) => (
                       <Flex $textWrapMode="nowrap" $columnGap="10px" key={index}>
                         <span> Id: <strong>{row.productId}</strong></span>
-                        <span> Nombre: <strong>{row.productName}</strong></span>
+                        <OverflowWrapper
+                          popupContent={row.productName}
+                          maxWidth="30vw"
+                        >
+                          <span> Nombre: <strong>{row.productName}</strong></span>
+                        </OverflowWrapper>
                         <span> Cantidad: <strong>{row.quantity}</strong></span>
 
                         {row.comments && (

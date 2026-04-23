@@ -1,6 +1,6 @@
 import { useConsumeStock } from "@/api/stock";
 import { IconedButton } from "@/common/components/buttons";
-import { FieldsContainer, Flex } from "@/common/components/custom";
+import { FieldsContainer, Flex, OverflowWrapper } from "@/common/components/custom";
 import { NumberField, TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { Table } from "@/common/components/table";
@@ -191,8 +191,13 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
     {
       id: 1,
       title: "Producto",
-      value: (product) => product.name,
+      value: (product) => (
+        <OverflowWrapper maxWidth="20vw" popupContent={product.name}>
+          {product.name}
+        </OverflowWrapper>
+      ),
       width: 6,
+      align: "left",
     },
     {
       id: 2,

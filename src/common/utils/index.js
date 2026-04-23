@@ -81,6 +81,25 @@ export const handleEnterKeyDown = (e, action) => {
   }
 };
 
+export const createPriorityKeyDownHandler = ({
+  callback,
+  key = "Enter",
+  shouldHandle = () => true,
+  preventDefault = true,
+  stopPropagation = true,
+}) => {
+  return (event) => {
+    if (event.key !== key) return;
+
+    if (!shouldHandle(event)) return;
+
+    if (preventDefault) event.preventDefault();
+    if (stopPropagation) event.stopPropagation();
+
+    callback?.(event);
+  };
+};
+
 export const handleKeyPressWithSubmit = (e, isActionEnabled, isLoading, handleSubmit, onConfirm) => {
   if (e.key === 'Enter' && isActionEnabled && !isLoading) {
     e.preventDefault();

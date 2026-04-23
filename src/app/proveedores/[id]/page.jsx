@@ -122,7 +122,7 @@ const Supplier = ({ params }) => {
         toast.success('Proveedor actualizado!');
         setIsUpdating(false);
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {
@@ -140,7 +140,7 @@ const Supplier = ({ params }) => {
           toast.success('Lista de productos del proveedor eliminada!');
           handleModalClose();
         } else {
-          toast.error(response.error.message);
+          toast.error(response.message);
         }
       },
       onSettled: () => {
@@ -157,7 +157,7 @@ const Supplier = ({ params }) => {
           toast.success('Proveedor eliminado permanentemente!');
           push(PAGES.SUPPLIERS.BASE);
         } else {
-          toast.error(response.error.message);
+          toast.error(response.message);
         }
       },
       onSettled: () => {
@@ -176,7 +176,7 @@ const Supplier = ({ params }) => {
             : 'Proveedor desactivado!'
         );
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {

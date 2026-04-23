@@ -2,7 +2,7 @@ import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { Popup } from "semantic-ui-react";
 import { Flex, Icon, Label, OverflowWrapper } from "../custom";
 
-export const TagsTooltip = ({ tags, tooltip, maxWidthOverflow, lineClamp, icon = ICONS.TAGS }) => {
+export const TagsTooltip = ({ tags, tooltip, maxWidthOverflow, lineClamp }) => {
   const validTags = (tags || []).filter(tag => tag && tag.name);
   if (!tags || tags.length === 0) return null;
 

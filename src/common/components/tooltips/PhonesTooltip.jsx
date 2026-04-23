@@ -11,7 +11,7 @@ export const PhonesTooltip = ({ phones, input, $lowTooltip }) => {
         <List>
           {phones.map(phone => (
             <ListItem key={`${phone.areaCode}-${phone.number}`}>
-              {phone.ref ? `${phone.ref}:` : "Contacto: "}<b>{getFormatedPhone(phone)}</b>
+              <b>  {phone.ref ? `${phone.ref}:` : "Contacto: "}</b> {getFormatedPhone(phone)}
             </ListItem>
           ))}
         </List>

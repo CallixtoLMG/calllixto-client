@@ -33,7 +33,7 @@ export const HEADERS = [
       const { tags, name, comments } = expense;
       return (
         <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper maxWidth="45vw" popupContent={name}>
+          <OverflowWrapper maxWidth="30vw" popupContent={name}>
             {name}
           </OverflowWrapper>
           <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">

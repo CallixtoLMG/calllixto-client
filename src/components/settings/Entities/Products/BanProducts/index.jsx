@@ -2,7 +2,7 @@ import { AccordionTitle, Box, Button, Flex, Icon } from "@/common/components/cus
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
-import { handleEnterKeyDown } from "@/common/utils";
+import { createPriorityKeyDownHandler } from "@/common/utils";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
@@ -102,6 +102,11 @@ const Blacklist = () => {
     },
   ], [handleRemoveId]);
 
+  const handleBlacklistKeyDown = createPriorityKeyDownHandler({
+    shouldHandle: () => !!inputValue.trim(),
+    callback: handleAddBlacklist,
+  });
+
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
@@ -123,7 +128,7 @@ const Blacklist = () => {
                       setInputValue(e.target.value);
                       if (error) setError(null);
                     }}
-                    onKeyDown={(e) => handleEnterKeyDown(e, handleAddBlacklist)}
+                    onKeyDown={handleBlacklistKeyDown}
                     error={error}
                     showPopup
                     iconLabel

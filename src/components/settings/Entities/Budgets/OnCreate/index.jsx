@@ -49,7 +49,6 @@ const OnCreate = ({ customerOptions, isLoading }) => {
                   width="300px"
                   label="Cliente por defecto"
                   disabled={isLoading}
-                  required
                   clearable
                   placeholder="A0001"
                   elements={customerOptions}

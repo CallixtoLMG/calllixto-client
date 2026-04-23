@@ -53,7 +53,7 @@ const BudgetView = ({
       if (response?.statusOk) {
         toast.success("Pago creado correctamente!");
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {
@@ -68,7 +68,7 @@ const BudgetView = ({
         toast.success("Pago actualizado!");
         refetch();
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {
@@ -83,7 +83,7 @@ const BudgetView = ({
         toast.success("Pago eliminado!");
         refetch();
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {

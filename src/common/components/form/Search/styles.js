@@ -27,9 +27,6 @@ export const Search = styled(SSearch)`
     width: 100%!important;
   };
   
-  &&& input{
-    padding-right :9.5px!important;
-  };
 `;
 
 export const Text = styled.p`

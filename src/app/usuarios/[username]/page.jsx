@@ -90,7 +90,7 @@ const User = ({ params }) => {
         toast.success("Usuario actualizado!");
         setIsUpdating(false);
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {
@@ -110,7 +110,7 @@ const User = ({ params }) => {
             : 'Usuario desactivado!'
         );
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {
@@ -126,7 +126,7 @@ const User = ({ params }) => {
         toast.success("Usuario eliminado permanentemente!");
         push(PAGES.USERS.BASE);
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {

@@ -37,7 +37,7 @@ const CashBalances = () => {
         toast.success('Caja creada correctamente!');
         push(PAGES.CASH_BALANCES.SHOW(response.cashBalance.id));
       } else {
-        toast.error(response.error.message);
+        toast.error(response.message);
       }
     },
     onSettled: () => {

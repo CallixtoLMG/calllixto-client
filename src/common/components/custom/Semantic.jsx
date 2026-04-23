@@ -211,7 +211,7 @@ export const DropdownMenu = styled(SDropdown.Menu)`
 
 export const Icon = styled(SIcon)`
   align-self: center!important;
-  align-content: ${({ $alignContent }) => `${$alignContent}!important;`} ;
+  align-content: ${({ $alignContent }) => `${$alignContent}!important`} ;
   margin-right: ${({ $marginRight }) => $marginRight && `11px!important`} ;
   top: ${({ $lowTooltip, $tooltip }) => ($lowTooltip ? `-3px` : $tooltip ? `-1px` : 'initial')} !important;
   position: ${({ $lowTooltip, $tooltip }) => ($lowTooltip || $tooltip) && `relative!important`} ;
@@ -239,7 +239,7 @@ export const MessageHeader = styled(SMessageHeader)`
 
 export const Message = styled(SMessage)`
   align-content: ${({ $alignContent }) => `${$alignContent}!important`} ;
-  padding: ${({ padding }) => `${padding}!important`} ;
+  padding: ${({ padding }) => `${padding ? padding : "9.5px 14px"}!important`} ;
   height: ${({ height }) => `${height}!important`} ;
   height: ${({ height }) => `${height}!important`} ;
   width: ${({ width }) => `${width}!important`} ;
@@ -261,6 +261,7 @@ export const Button = styled(SButton)`
     width: ${({ width = '110px' }) => `${width}!important`};
     margin-right: 0;
     position: ${({ position }) => `${position}!important`};
+    position: ${({ $minWidth }) => `${$minWidth}!important`};
 
     padding: ${({ $iconOnly, padding }) =>
     $iconOnly

@@ -118,7 +118,7 @@ const Header = () => {
             color={COLORS.BLUE}
             text="Menú"
           />
-          <Brand>CallixtoGLMM</Brand>
+          <Brand>CallixtoGLM</Brand>
         </HeaderLeft>
         <HeaderRight>
           <RightActions>

@@ -7,5 +7,5 @@ export const AnimatedContent = styled.div`
 `;
 
 export const AnimatedInner = styled.div`
-  overflow: hidden;
+  overflow: ${({ $active }) => ($active ? "visible" : "hidden")};
 `;

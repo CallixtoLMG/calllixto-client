@@ -34,7 +34,7 @@ const CreateBudgetDeliveriesForm = () => {
   const columns = useMemo(() => [
     {
       id: 1,
-      title: "ID",
+      title: "Id",
       key: "id",
       sortable: true,
       value: (product) => {
