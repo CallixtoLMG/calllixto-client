@@ -134,7 +134,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
     <FlexColumn $rowGap="15px">
       <FlexColumn $rowGap="15px">
         <Flex $justifyContent="space-between">
-          <Header >Movimientos de stockk</Header>
+          <Header >Movimientos de stock</Header>
           <Flex $columnGap="10px">
             <IconedButton
               labelPosition="left"
