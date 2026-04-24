@@ -301,8 +301,8 @@ const ProductForm = forwardRef(({
           </FormField>
         </FieldsContainer>
         <FieldsContainer>
-          <FormField $flexDirection="row" flex="1">
-            <FormField flex="1" >
+          <FormField $height="62px" $flexDirection="row" flex="1">
+            <FormField  flex="1" >
               <DropdownControlled
                 name="fractionConfig.unit"
                 label="Unidad de medida"
