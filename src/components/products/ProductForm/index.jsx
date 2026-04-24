@@ -253,7 +253,7 @@ const ProductForm = forwardRef(({
           </FormField>
           <FormField flex="1" />
         </FieldsContainer>
-        <FieldsContainer $alignItems="end">
+        <FieldsContainer>
           <FormField flex="1">
             <PriceControlled
               name="cost"
