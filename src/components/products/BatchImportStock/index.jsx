@@ -139,16 +139,51 @@ export const BatchImportStock = ({
 
     parsed.forEach((row) => {
 
-      const productId = String(row.productId ?? "").toUpperCase();
-
-      if (!productId || !productIndex[productId]) {
-        invalid.push({ ...row, msg: "Producto inexistente" });
+      const productId = String(row.productId ?? "").trim().toUpperCase();
+      const product = productIndex[productId];
+      
+      if (!productId || !product) {
+        invalid.push({ ...row, productId, msg: "Producto inexistente" });
         return;
       }
-
-      const quantity = Number(row.quantity);
-      if (!quantity || quantity <= 0) {
-        invalid.push({ ...row, msg: "Cantidad inválida" });
+      
+      if (!product.stockControl) {
+        invalid.push({
+          ...row,
+          productId,
+          msg: "El producto no tiene control de stock activado.",
+        });
+        return;
+      }
+      
+      const rawQuantity = row.quantity;
+      
+      if (rawQuantity === undefined || rawQuantity === null || rawQuantity === "") {
+        invalid.push({
+          ...row,
+          productId,
+          msg: "Cantidad requerida.",
+        });
+        return;
+      }
+      
+      const quantity = Number(rawQuantity);
+      
+      if (Number.isNaN(quantity)) {
+        invalid.push({
+          ...row,
+          productId,
+          msg: "Cantidad inválida.",
+        });
+        return;
+      }
+      
+      if (quantity <= 0) {
+        invalid.push({
+          ...row,
+          productId,
+          msg: "La cantidad debe ser mayor a 0.",
+        });
         return;
       }
 

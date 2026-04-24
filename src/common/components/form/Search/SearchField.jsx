@@ -108,9 +108,13 @@ const SearchField = forwardRef(
     };
 
     const hasSelectedValue =
-      value != null &&
-      typeof value === 'object' &&
-      Object.keys(value).length > 0;
+      value !== null &&
+      value !== undefined &&
+      (
+        typeof value === "object"
+          ? Object.keys(value).length > 0
+          : String(value).trim() !== ""
+      );
 
 
     return (

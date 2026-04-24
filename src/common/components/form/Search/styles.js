@@ -26,7 +26,10 @@ export const Search = styled(SSearch)`
   div.content{
     width: 100%!important;
   };
-  
+
+  &&& input{
+    padding-right: ${({ value }) => value ? "37px" : "14px"}!important;
+  };
 `;
 
 export const Text = styled.p`

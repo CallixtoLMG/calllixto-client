@@ -157,7 +157,7 @@ const BudgetsPage = ({ budgets, filterKey = BUDGETS_FILTERS_KEY, isLoading, onRe
                 key: option.key,
                 title: option.text,
                 description: option.id,
-                value: option.text
+                value: option.text,
               })}
               getDisplayValue={(value) => value ?? ''}
               persistSelection
