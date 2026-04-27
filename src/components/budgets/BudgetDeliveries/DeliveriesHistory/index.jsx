@@ -60,22 +60,21 @@ const DeliveriesHistory = ({ history }) => {
                   <FlexColumn $rowGap="5px">
                     {entry.rows.map((row, index) => (
                       <Flex $textWrapMode="nowrap" $columnGap="10px" key={index}>
-                        <span> Id: <strong>{row.productId}</strong></span>
+                        <span><strong> Id: </strong>{row.productId}</span>
                         <OverflowWrapper
                           popupContent={row.productName}
                           maxWidth="30vw"
                         >
-                          <span> Nombre: <strong>{row.productName}</strong></span>
+                          <span><strong> Nombre: </strong>{row.productName}</span>
                         </OverflowWrapper>
-                        <span> Cantidad: <strong>{row.quantity}</strong></span>
-
+                        <span><strong> Cantidad: </strong>{row.quantity}</span>
                         {row.comments && (
                           <OverflowWrapper
                             $alignSelf="left"
                             popupContent={row.comments}
                             maxWidth="50%"
                           >
-                            <span>Comentario: {row.comments}</span>
+                            <span><strong>Comentario:</strong> {row.comments}</span>
                           </OverflowWrapper>
                         )}
                         {row.dispatchComment && (

@@ -78,8 +78,8 @@ export const PRODUCT_COLUMNS = [
     value: (product) => {
       const { tags, name, comments } = product;
       return (
-        <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper maxWidth="50vw" popupContent={name}>
+        <Flex width="100%" $justifyContent="space-between" $alignItems="center">
+          <OverflowWrapper maxWidth="40vw" popupContent={name}>
             {name}
           </OverflowWrapper>
           <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
@@ -89,8 +89,7 @@ export const PRODUCT_COLUMNS = [
         </Flex>
       );
     },
-    sortValue: (product) => product.name ?? ""
-
+    sortValue: (product) => product.name ?? "",
   },
   {
     id: 4,

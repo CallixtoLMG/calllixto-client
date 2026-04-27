@@ -249,6 +249,7 @@ const CreateBudgetDeliveriesForm = () => {
             disabled={!hasPendingDeliveries && !hasAnyDelivered}
             height="38px"
             iconOnly
+            popupPosition="top left"
           />
         </Flex>
       </Flex>

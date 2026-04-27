@@ -80,7 +80,7 @@ const Payments = ({
   ];
 
   return (
-    <FlexColumn width="100%" $rowGap="15px" className="ui form">
+    <FlexColumn width="100%" $rowGap="15.1px" className="ui form">
       <Flex $justifyContent="space-between">
         <Header>
           Detalle de pagos
