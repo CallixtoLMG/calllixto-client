@@ -100,7 +100,7 @@ const Brand = ({ params }) => {
         toast.success("Marca actualizada!");
         setIsUpdating(false);
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -118,7 +118,7 @@ const Brand = ({ params }) => {
         toast.success("Marca eliminada permanentemente!");
         push(PAGES.BRANDS.BASE);
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -137,7 +137,7 @@ const Brand = ({ params }) => {
             : 'Marca desactivada!'
         );
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {

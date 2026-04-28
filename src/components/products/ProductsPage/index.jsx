@@ -75,7 +75,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
         toast.success('Producto eliminado!');
         setShowModal(false);
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
   });

@@ -112,7 +112,7 @@ const Expense = ({ params }) => {
         toast.success("Gasto actualizado!");
         expenseAllow.setIsUpdating(false);
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -134,7 +134,7 @@ const Expense = ({ params }) => {
         toast.success('Gasto anulado!');
         setIsModalCancelOpen(false);
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onError: (error) => {
@@ -149,7 +149,7 @@ const Expense = ({ params }) => {
         toast.success("Pago creado correctamente!");
         refetchPayments();
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -164,7 +164,7 @@ const Expense = ({ params }) => {
         toast.success("Pago actualizado!");
         refetchPayments();
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -179,7 +179,7 @@ const Expense = ({ params }) => {
         toast.success("Pago eliminado!");
         refetchPayments();
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {

@@ -35,7 +35,7 @@ const CreateExpense = () => {
         push(PAGES.EXPENSES.SHOW(response.expense.id));
         toast.success("Gasto creado!");
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
   });

@@ -1,7 +1,7 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
-import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
+import { ENTITIES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { useKeyboardShortcuts, useSettingArrayField } from "@/hooks";
 import { forwardRef, useImperativeHandle } from "react";
@@ -74,9 +74,9 @@ const CustomerForm = forwardRef(({
               name="name"
               label="Nombre"
               placeholder="Martín Bueno"
-              rules={RULES.REQUIRED}
-              disabled={!isUpdating && view}
-              required={isUpdating || !view}
+              // rules={RULES.REQUIRED}
+              // disabled={!isUpdating && view}
+              // required={isUpdating || !view}
             />
           </FormField>
           <FormField flex="1" />

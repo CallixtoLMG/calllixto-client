@@ -164,7 +164,7 @@ const Product = ({ params }) => {
         toast.success("Producto actualizado!");
         setIsUpdating(false);
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -184,7 +184,7 @@ const Product = ({ params }) => {
             : 'producto desactivado!'
         );
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -199,7 +199,7 @@ const Product = ({ params }) => {
       if (response.statusOk) {
         toast.success("Producto activado!");
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -219,7 +219,7 @@ const Product = ({ params }) => {
           toast.success("Producto marcado como eliminado.");
         }
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {

@@ -32,7 +32,7 @@ const CreateBrand = () => {
         push(PAGES.BRANDS.SHOW(response.brand.id))
         toast.success('Marca creada!');
       } else {
-        toast.error(response.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
   });
