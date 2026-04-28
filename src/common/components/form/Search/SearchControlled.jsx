@@ -8,6 +8,7 @@ export const SearchControlled = forwardRef(({
   label,
   placeholder,
   onAfterChange,
+  onQueryChange,
   clearAfterSelect,
   externalError,
   resultRenderer,
@@ -35,6 +36,7 @@ export const SearchControlled = forwardRef(({
           }
           value={value}
           onAfterChange={onAfterChange}
+          onQueryChange={onQueryChange}
           onSelect={(val) => {
             onChange(val);
           }}

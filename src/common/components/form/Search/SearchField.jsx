@@ -34,6 +34,7 @@ const SearchField = forwardRef(
       height,
       clearAfterSelect,
       onAfterChange,
+      onQueryChange,
       resultRenderer,
     },
     ref
@@ -77,8 +78,9 @@ const SearchField = forwardRef(
     useEffect(() => {
       if (value == null) {
         setQuery('');
+        onQueryChange?.('');
       }
-    }, [value]);
+    }, [value, onQueryChange]);
 
     const handleKeyDown = (e) => {
       if (e.key === 'Backspace' && value != null) {
@@ -88,6 +90,7 @@ const SearchField = forwardRef(
 
     const handleChange = (_, { value: inputValue }) => {
       setQuery(inputValue);
+      onQueryChange?.(inputValue);
     };
 
     const handleSelect = (_, { result }) => {
@@ -95,15 +98,18 @@ const SearchField = forwardRef(
 
       onSelect(selectedOption);
       onAfterChange?.(selectedOption);
+      onQueryChange?.(getDisplayValue(selectedOption));
 
       if (clearAfterSelect) {
         setQuery('');
+        onQueryChange?.('');
         onSelect(null);
       }
     };
 
     const handleClear = () => {
       setQuery('');
+      onQueryChange?.('');
       onSelect(null);
     };
 

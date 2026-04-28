@@ -29,6 +29,7 @@ import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import { ButtonGroup, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 import { CUSTOMER_STATES, getCustomerSearchDescription, getCustomerSearchTitle } from "../../customers/customers.constants";
+import ModalCreateCustomer from "../ModalCreateCustomer";
 import ModalProductUpdates from "../ModalProductUpdates";
 import ModalComment from "./ModalComment";
 import { Container, VerticalDivider } from "./styles";
@@ -69,6 +70,8 @@ const BudgetForm = ({
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [outdatedProducts, setOutdatedProducts] = useState([]);
   const [removedProducts, setRemovedProducts] = useState([]);
+  const [customerSearchQuery, setCustomerSearchQuery] = useState("");
+  const [isCreateCustomerModalOpen, setIsCreateCustomerModalOpen] = useState(false);
   const [isModalCommentOpen, setIsModalCommentOpen] = useState(false);
   const [isTableLoading, setIsTableLoading] = useState(false);
   const [shouldShowModal, setShouldShowModal] = useState(false);
@@ -209,6 +212,20 @@ const BudgetForm = ({
     setSelectedProduct(() => ({ ...product, index }));
     setIsModalCommentOpen(true);
   }, []);
+
+  const handleCreateCustomerClose = useCallback((customer) => {
+    setIsCreateCustomerModalOpen(false);
+
+    if (!customer) return;
+
+    setValue("customer", customer, {
+      shouldDirty: true,
+      shouldTouch: true,
+      shouldValidate: true,
+    });
+    clearErrors("customer");
+    trigger("customer");
+  }, [clearErrors, setValue, trigger]);
 
   const actions = [
     {
@@ -429,6 +446,11 @@ const BudgetForm = ({
   return (
     <>
       <ModalComment onAddComment={onAddComment} isModalOpen={isModalCommentOpen} onClose={setIsModalCommentOpen} product={selectedProduct} />
+      <ModalCreateCustomer
+        isModalOpen={isCreateCustomerModalOpen}
+        initialName={customerSearchQuery}
+        onClose={handleCreateCustomerClose}
+      />
       <ModalProductUpdates
         shouldShowModal={shouldShowModal}
         outdatedProducts={outdatedProducts}
@@ -554,6 +576,7 @@ const BudgetForm = ({
               }}
               elements={customers}
               searchFields={['name', 'id']}
+              onQueryChange={setCustomerSearchQuery}
               getResultProps={(customer) => ({
                 key: customer.id,
                 title: customer.name ?? "",
@@ -572,6 +595,17 @@ const BudgetForm = ({
               )}
               persistSelection={true}
             />
+            <Flex $justifyContent="flex-end" $marginTop="8px">
+              <IconedButton
+                type="button"
+                text="Agregar cliente"
+                icon={ICONS.ADD}
+                color={COLORS.BLUE}
+                basic
+                width="fit-content"
+                onClick={() => setIsCreateCustomerModalOpen(true)}
+              />
+            </Flex>
           </FormField>
           <FormField $maxWidth="32%" flex="1">
             <TextField
