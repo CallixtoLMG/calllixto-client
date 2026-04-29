@@ -1,6 +1,6 @@
 "use client";
 import { useDeleteCustomer, useEditCustomer, useGetCustomer, useSetCustomerState } from "@/api/customers";
-import { Message, MessageHeader } from "@/common/components/custom";
+import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
@@ -17,7 +17,12 @@ import { toast } from "react-hot-toast";
 const Customer = ({ params }) => {
   useValidateToken();
   const { push } = useRouter();
-  const { data: customer, isLoading, refetch } = useGetCustomer(params.id);
+  const id = params?.id;
+
+  const { data: customer, isLoading, refetch } = useGetCustomer(id, {
+    enabled: !!id,
+  });
+  // const { data: customer, isLoading, refetch } = useGetCustomer(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -33,10 +38,7 @@ const Customer = ({ params }) => {
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
     closeModal,
   } = useUnsavedChanges({
@@ -44,9 +46,6 @@ const Customer = ({ params }) => {
     onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
-    },
-    onSave: () => {
-      formRef.current?.submitForm();
     },
   });
 
@@ -100,9 +99,8 @@ const Customer = ({ params }) => {
       if (response.statusOk) {
         toast.success("Cliente actualizado!");
         setIsUpdating(false);
-        resolveSave();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -122,7 +120,7 @@ const Customer = ({ params }) => {
             : 'Cliente desactivado!'
         );
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -138,7 +136,7 @@ const Customer = ({ params }) => {
         toast.success("Cliente eliminado permanentemente!");
         push(PAGES.CUSTOMERS.BASE);
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -189,7 +187,7 @@ const Customer = ({ params }) => {
           text: isItemInactive(customer.state) ? "Activar" : "Desactivar",
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction || isEditPending,
-          width: "fit-content",
+          iconOnly: true
         },
         {
           id: 2,
@@ -201,6 +199,8 @@ const Customer = ({ params }) => {
           basic: true,
           loading: activeAction === DELETE,
           disabled: customer.hasBudgets || !!activeAction || isEditPending,
+          iconOnly: true,
+          popupPosition: "bottom left"
         },
       ];
 
@@ -218,10 +218,16 @@ const Customer = ({ params }) => {
     <Loader active={isLoading || !customer}>
       {!isItemInactive(customer?.state) && toggleButton}
       {isItemInactive(customer?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{customer.inactiveReason}</p>
-        </Message>
+        <FieldsContainer>
+          <FormField flex="1">
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{customer.inactiveReason}</p>
+            </Message>
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
+        </FieldsContainer>
       )}
       <CustomerForm
         ref={formRef}
@@ -235,9 +241,7 @@ const Customer = ({ params }) => {
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
-        onSave={handleSave}
-        onCancel={handleCancel}
-        isSaving={isSaving}
+        onContinue={handleContinue}
       />
       <ModalAction
         title={header}

@@ -2,8 +2,15 @@ import es from "date-fns/locale/es";
 import ReactDatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Controller, useFormContext } from "react-hook-form";
+import styled from "styled-components";
 import { FormField } from "../../custom";
 registerLocale("es", es);
+
+const SReactDatePicker = styled(ReactDatePicker)`
+  &&&{
+    opacity: ${({ disabled }) => disabled && "0.45"} !important;
+  }
+`;
 
 export const DatePickerControlled = ({
   name,
@@ -12,7 +19,7 @@ export const DatePickerControlled = ({
   width,
   height,
   rules,
-  placeholder = "Selecciona una fecha",
+  placeholder = "20-03-2025",
   defaultValue,
   dateFormat = "dd-MM-yyyy",
   showTimeSelect = false,
@@ -34,7 +41,7 @@ export const DatePickerControlled = ({
     <Controller
       name={name}
       rules={rules}
-      control={control} 
+      control={control}
       render={({ field: { onChange, value } }) => (
         <FormField
           flex={flex}
@@ -43,7 +50,7 @@ export const DatePickerControlled = ({
           label={label}
           required={required}
           icon={icon}
-          control={ReactDatePicker}
+          control={SReactDatePicker}
           error={!!errors?.[name] && {
             content: errors[name].message,
             pointing: 'above',

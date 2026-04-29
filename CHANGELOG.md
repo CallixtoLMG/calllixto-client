@@ -27,7 +27,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - CashBalances: The Add Bill** popup is now wrapped in a proper `<Form>` component for consistent visual layout with the rest of the page.
 
-- Breadcrumbs: Fixed issue where the arrow icon (">") would render prematurely before the full path label was loaded.
+- Breadcrumbs: Fixed issue where the arrow icon (" > ") would render prematurely before the full path label was loaded.
 
 ## 2025-11-11
 
@@ -95,7 +95,7 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Added the cashBalance entity with full integration: includes a dedicated modal (ModalOpenCashBalance) and dynamic entry popup (AddBillPopup).
 
-- Introduced SIZES constant in common/constants to avoid hardcoded Semantic UI size strings across components.
+- Introduced "SIZES" constant in common/constants to avoid hardcoded Semantic UI size strings across components.
 
 - Created utility function datePickerNow to get the current date for use in date pickers (returns raw Date object without formatting).
 

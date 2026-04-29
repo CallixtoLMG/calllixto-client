@@ -50,21 +50,30 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
             hydrated={hydrated}
           >
             <DropdownControlled
-              width="200px"
+              minWidth="150px"
+              width="min-content"
               name="state"
               label="Estado"
               options={CASH_BALANCE_STATES_OPTIONS}
               afterChange={onSubmit}
             />
-            <TextControlled name="id" label="Id" placeholder="A0009" width="80px" />
+            <TextControlled
+              name="id"
+              label="Id"
+              placeholder="A0009"
+              width="8vw"
+              minWidth="100px"
+            />
             <DropdownControlled
-              width="200px"
+              $minWidth="200px"
+              width="18vw"
               name="paymentMethods"
               label="Método de pago"
               placeholder="Efectivo"
               options={[SELECT_ALL_OPTION, ...paymentOptions]}
               afterChange={onSubmit}
               textMaxWidth="fit-content"
+              height="35px"
             />
           </Filters>
         </Form>

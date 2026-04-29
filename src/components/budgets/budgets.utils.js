@@ -6,7 +6,7 @@ import { getPrice, getTotal } from "@/components/products/products.utils";
 import { PriceLabel } from "../../common/components/form";
 import { BUDGET_STATES } from "./budgets.constants";
 
-export const getPopupContent = (budget) => {
+export const getBudgetListPopupContent = (budget) => {
   if (isBudgetConfirmed(budget?.state)) {
     return (
       <>
@@ -104,11 +104,12 @@ export const getProductsColumns = (dispatchPdf, budget, showPrices) => {
   ].filter(Boolean);
 };
 
-export const getTotalSum = (products, discount = 0, additionalCharge = 0) => {
-  const subtotal = products?.reduce((a, b) => a + getTotal(b), 0) ?? 0;
-  const discountedSubtotal = subtotal - (subtotal * (discount / 100));
-  const total = discountedSubtotal + (discountedSubtotal * (additionalCharge / 100));
-  return total;
+export const getTotalSum = (products = []) => {
+  if (!Array.isArray(products)) return 0;
+
+  return products.reduce((acc, product) => {
+    return acc + getTotal(product);
+  }, 0);
 };
 
 export const getSubtotal = (total, discountOrCharge) => {

@@ -3,35 +3,17 @@ import { useEditSetting, useListSettings } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
-import { ALL, ENTITIES, INFO, PAGES, SHORTKEYS } from "@/common/constants";
+import { ALL, ENTITIES, INFO, PAGES, SETTINGS_TAB_MAP, SETTINGS_TAB_REVERSE_MAP, SHORTKEYS } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
-import { GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY } from "@/components/settings/settings.constants";
+import { ENTITY_MAPPER, GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY, SUPPORTED_SETTINGS } from "@/components/settings/settings.constants";
 import { useKeyboardShortcuts, useRestoreEntity, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { pick } from "lodash";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-
-const ENTITY_MAPPER = {
-  PRODUCT: { name: "Productos" },
-  CUSTOMER: { name: "Clientes" },
-  BRAND: { name: "Marcas" },
-  BUDGET: { name: "Ventas" },
-  SUPPLIER: { name: "Proveedores" },
-  EXPENSE: { name: "Gastos" },
-  GENERAL: { name: "General" },
-};
-
-export const SUPPORTED_SETTINGS = {
-  PRODUCT: ['tags', 'blacklist'],
-  CUSTOMER: ['tags'],
-  GENERAL: ['paymentMethods'],
-  EXPENSE: ['tags', 'categories'],
-  BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
-};
 
 const Settings = () => {
   useValidateToken();
@@ -44,24 +26,23 @@ const Settings = () => {
   const [isLoading, setIsLoading] = useState(false);
   const methods = useForm();
   const formRef = useRef(null);
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const entityFromUrl = SETTINGS_TAB_MAP[tabParam];
+
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const { handleSubmit, reset, formState: { isDirty } } = methods;
   const [activeEntity, setActiveEntity] = useState(null);
   const {
-    showModal,
+    showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
     closeModal,
   } = useUnsavedChanges({
     formRef,
     onDiscard: async () => {
       methods.reset(data[activeEntity]);
-    },
-    onSave: () => {
-      methods.handleSubmit(mutateEdit)();
     },
   });
 
@@ -101,7 +82,6 @@ const Settings = () => {
       toast.success("Cambios guardados correctamente.");
       methods.reset(methods.getValues());
       queryClient.invalidateQueries({ queryKey: [[GET_SETTING_QUERY_KEY]], refetchType: ALL })
-      resolveSave();
     },
     onError: (error) => {
       toast.error(`Error al guardar cambios: ${error.message || error}`);
@@ -119,33 +99,53 @@ const Settings = () => {
     };
   }, [methods, mutateEdit, data, activeEntity]);
 
-  const handleEntityChange = useCallback(async (entity) => {
+  const handleEntityChange = useCallback(async (entity, options = {}) => {
     const canView = await onBeforeView();
     if (!canView) return;
 
     setActiveEntity(entity);
     setLabels([{ name: PAGES.SETTINGS.NAME }, { name: entity.label }]);
     reset(entity);
-  }, [onBeforeView, reset, setLabels]);
+
+    if (!options.skipUrlUpdate) {
+      const tabSlug = SETTINGS_TAB_REVERSE_MAP[entity.entity];
+      push(`${PAGES.SETTINGS.BASE}?tab=${tabSlug}`);
+    }
+  }, [onBeforeView, reset, setLabels, push]);
 
   const settings = useMemo(() => {
     if (!data?.settings) return [];
 
     const mappedEntities = data.settings
-    .filter((entity) => SUPPORTED_SETTINGS[entity.entity]?.some((setting) => !!entity[setting]))
-    .map((entity) => ({
-      ...entity,
-      label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
-    }));
+      .filter((entity) => SUPPORTED_SETTINGS[entity.entity]?.some((setting) => !!entity[setting]))
+      .map((entity) => ({
+        ...entity,
+        label: ENTITY_MAPPER[entity.entity]?.name || entity.entity,
+      }));
 
     return mappedEntities;
   }, [data]);
 
   useEffect(() => {
-    if (!activeEntity && settings.length) {
+    if (!settings.length) return;
+
+    if (!tabParam) {
+      setActiveTabIndex(0);
+      return;
+    }
+
+    const nextIndex = settings.findIndex(
+      (entity) => entity.entity === entityFromUrl
+    );
+
+    if (nextIndex >= 0) {
+      setActiveTabIndex(nextIndex);
+      handleEntityChange(settings[nextIndex], { skipUrlUpdate: true });
+    } else {
+      setActiveTabIndex(0);
       handleEntityChange(settings[0]);
     }
-  }, [settings, activeEntity, handleEntityChange]);
+  }, [settings, tabParam, handleEntityChange, entityFromUrl]);
 
   const validateShortcuts = {
     canConfirm: () => !isPending && isDirty,
@@ -179,6 +179,8 @@ const Settings = () => {
             onRefresh={handleSettingsRefresh}
             isLoading={isLoading}
             onBeforeView={onBeforeView}
+            activeIndex={activeTabIndex}
+            onActiveIndexChange={setActiveTabIndex}
           />
           <SubmitAndRestore
             isLoading={isPending}
@@ -188,11 +190,9 @@ const Settings = () => {
             submit
           />
           <UnsavedChangesModal
-            open={showModal}
+            open={showUnsavedModal}
             onDiscard={handleDiscard}
-            onSave={handleSave}
-            isSaving={isSaving}
-            onCancel={handleCancel}
+            onContinue={handleContinue}
           />
         </Form>
       </FormProvider>

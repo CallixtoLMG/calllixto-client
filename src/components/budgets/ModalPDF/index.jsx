@@ -32,7 +32,7 @@ const ModalPDF = ({
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
   const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
-  const [dolarRate, setDolarRate] = useState(dolar);
+  const [dolarRate, setDolarRate] = useState(dolar ?? 0);
   const [initialDolarRateSet, setInitialDolarRateSet] = useState(false);
   const [showPrices, setShowPrices] = useState(defaults?.showPrices ?? true);
 
@@ -48,8 +48,12 @@ const ModalPDF = ({
   }, [dolar, initialDolarRateSet, showDolarExangeRate]);
 
   const formatValue = (value) => {
-    const formattedValue = value?.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    return formattedValue?.includes('.') ? formattedValue.split('.').slice(0, 2).join('.') : formattedValue;
+    if (value == null || Number.isNaN(value)) return '';
+  
+    const formattedValue = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return formattedValue.includes('.')
+      ? formattedValue.split('.').slice(0, 2).join('.')
+      : formattedValue;
   };
 
   const handleDollarChange = (e) => {
@@ -77,7 +81,7 @@ const ModalPDF = ({
     <>
       <Transition visible={isModalOpen} animation='scale' duration={500}>
         <StyledModal closeIcon open={isModalOpen} onClose={() => onClose(false)} width="90vw" height="90vh">
-          <Modal.Header>Opciones de Impresión</Modal.Header>
+          <Modal.Header>Opciones de impresión</Modal.Header>
           <Modal.Content>
             <FlexColumn $rowGap="15px">
               <Flex $columnGap="15px" wrap="wrap" $rowGap="5px">
@@ -96,11 +100,12 @@ const ModalPDF = ({
                   />
                 ))}
                 <IconedButton
-                  text="Mostrar Precios"
+                  text="Mostrar precios"
                   icon={ICONS.EYE}
                   color={COLORS.BLUE}
                   onClick={() => setShowPrices(prev => !prev)}
                   basic={!showPrices}
+                  width="fit-content"
                 />
                 <Input
                   type="text"
@@ -117,6 +122,7 @@ const ModalPDF = ({
                       icon={ICONS.DOLLAR}
                       color={COLORS.GREEN}
                       basic={!showDolarExangeRate}
+                      width="fit-content"
                       onClick={() => {
                         setShowDolarExangeRate(prev => !prev);
                         if (!showDolarExangeRate) {

@@ -24,13 +24,14 @@ export const SUPPLIERS_COLUMNS = [
     title: "Nombre",
     align: "left",
     key: "name",
+    width: 5,
     sortable: true,
     value: (supplier) =>
       <Flex $justifyContent="space-between">
-        <OverflowWrapper maxWidth="40vw" popupContent={supplier.name}>
+        <OverflowWrapper maxWidth="30vw" popupContent={supplier.name}>
           {supplier.name}
         </OverflowWrapper>
-        {supplier.comments && <CommentTooltip tooltip="true" comment={supplier.comments} />}
+        {supplier.comments && <CommentTooltip $lowTooltip comment={supplier.comments} />}
       </Flex>,
     sortValue: (supplier) => supplier.name ?? ""
   },
@@ -39,13 +40,15 @@ export const SUPPLIERS_COLUMNS = [
     title: "Dirección",
     key: "addresses",
     sortable: true,
-    width: 4,
+    width: 5,
     value: (supplier) => {
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(supplier.addresses || []);
       return (
         <Flex $justifyContent="space-between">
-          {primaryAddress}
-          {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
+          <OverflowWrapper maxWidth="30vw" popupContent={primaryAddress}>
+            {primaryAddress}
+          </OverflowWrapper>
+          {additionalAddresses && <AddressesTooltip $lowTooltip addresses={additionalAddresses} />}
         </Flex>
       );
     },
@@ -54,13 +57,14 @@ export const SUPPLIERS_COLUMNS = [
   {
     id: 4,
     title: "Teléfono",
-    width: 2,
+    width: 1,
+    whiteSpace: "nowrap",
     value: (supplier) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(supplier.phoneNumbers);
       return (
         <Flex $justifyContent="space-between">
           {primaryPhone}
-          {additionalPhones && <PhonesTooltip phones={additionalPhones} />}
+          {additionalPhones && <PhonesTooltip $lowTooltip phones={additionalPhones} />}
         </Flex>
       );
     }
@@ -83,6 +87,13 @@ export const SUPPLIER_STATES = {
     icon: 'hourglass half',
   },
 };
+
+export const EXAMPLE_TEMPLATE_DATA_STOCK = [
+  ['Id', 'Fecha', 'Cantidad', 'Factura', 'Comentarios'],
+  ['AABB001', '5/10/200', 10, 'A001', 'Comentarios...1'],
+  ['AABB002', '25/3/2000', 20, 'A002', 'Comentarios...2'],
+  ['AABB003', '13/13/20000', 30, 'A003', 'Comentarios...3'],
+];
 
 export const EMPTY_SUPPLIER = { id: '', name: '', emails: [], phoneNumbers: [], addresses: [], comments: '' };
 export const EMPTY_FILTERS = { id: '', name: '', state: SUPPLIER_STATES.ACTIVE.id };

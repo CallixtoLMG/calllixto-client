@@ -1,7 +1,7 @@
 import { Box, Flex, Icon, Label, OverflowWrapper } from '@/common/components/custom';
 import { PriceLabel } from '@/common/components/form';
 import { CommentTooltip } from "@/common/components/tooltips";
-import { COLORS, DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SIZES } from '@/common/constants';
+import { ALL, COLORS, DATE_FORMATS, ICONS, IN, OUT, SELECT_ALL_OPTION, SIZES } from '@/common/constants';
 import { getFormatedDate } from '@/common/utils/dates';
 import { Popup } from 'semantic-ui-react';
 
@@ -61,11 +61,12 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       sortable: true,
       align: "left",
       width: 2,
+      whiteSpace: "nowrap",
       value: (cashBalance) => (
-        <Flex $justifyContent="space-between">
+        <Flex $columnGap="7px" $justifyContent="space-between">
           {getFormatedDate(cashBalance.startDate, DATE_FORMATS.DATE_WITH_TIME)}
-          <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
-            {cashBalance.comments && <CommentTooltip comment={cashBalance.comments} />}
+          <Flex $alignItems="center" $justifyContent="flex-end">
+            {cashBalance.comments && <CommentTooltip $tooltip comment={cashBalance.comments} />}
           </Flex>
         </Flex>
       ),
@@ -73,7 +74,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
     },
     {
       id: 3,
-      title: "Monto Inicial",
+      title: "Monto inicial",
       key: "initialAmount",
       sortable: true,
       align: "left",
@@ -83,7 +84,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
     },
     {
       id: 4,
-      title: "Monto Actual",
+      title: "Monto actual",
       key: "currentAmount",
       sortable: true,
       align: "left",
@@ -95,21 +96,54 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       id: 5,
       title: "Métodos de pago",
       align: "left",
-      value: (cashBalance) => (
-        <Flex $wrap $columnGap="5px" $rowGap="5px">
-          {(cashBalance.paymentMethods?.length > 0)
-            ? cashBalance.paymentMethods.map((method, index) => (
-              <Label width="fit-content" key={index} size={SIZES.TINY}>
-                {method}
-              </Label>
-            ))
-            :
-            <Label width="fit-content" size={SIZES.TINY}>
+      value: (cashBalance) => {
+        const methods = cashBalance.paymentMethods ?? [];
+
+        if (!methods.length) {
+          return (
+            <Label color={COLORS.BLUE} width="fit-content" size={SIZES.TINY}>
               Todos los métodos
             </Label>
-          }
-        </Flex>
-      ),
+          );
+        }
+
+        const visible = methods.slice(0, 2);
+        const hidden = methods.slice(2);
+
+        return (
+          <Flex $wrap $columnGap="5px" $rowGap="5px" $alignItems="center">
+            {visible.map((method, index) => (
+              <Label color={COLORS.BLUE} width="fit-content" key={index} size={SIZES.TINY}>
+                {method}
+              </Label>
+            ))}
+
+            {hidden.length > 0 && (
+              <Popup
+                size="mini"
+                hoverable
+                trigger={
+                  <Icon
+                    name={ICONS.TAGS}
+                    color={COLORS.BLUE}
+                    $lowTooltip
+                  />
+                }
+                content={
+                  <Flex $columnGap="5px" $wrap>
+                    {hidden.map((method, index) => (
+                      <Label color={COLORS.BLUE} width="fit-content" key={index} size="mini">
+                        {method}
+                      </Label>
+                    ))}
+                  </Flex>
+                }
+                position="top left"
+              />
+            )}
+          </Flex>
+        );
+      }
     },
   ];
 
@@ -118,6 +152,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
       id: 6,
       width: 2,
       title: "Fecha cierre",
+      whiteSpace: "nowrap",
       key: "closeDate",
       sortable: true,
       align: "left",
@@ -162,14 +197,12 @@ export const BILLS_DETAILS_TABLE_HEADERS = [
   {
     id: 1,
     title: "Denominación",
-    width: 4,
     key: "denomination",
     sortable: true,
     value: (billDetail) => <PriceLabel value={billDetail.denomination} />,
     sortValue: (billDetail) => billDetail.denomination ?? ""
   }, {
     id: 2,
-    width: 5,
     title: 'Cantidad',
     key: "quantity",
     align: "right",
@@ -179,7 +212,6 @@ export const BILLS_DETAILS_TABLE_HEADERS = [
   {
     id: 3,
     title: "Subtotal",
-    width: 8,
     key: "subtotal",
     align: "right",
     value: (billDetail) => {
@@ -221,10 +253,11 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
     title: 'Fecha',
     key: 'date',
     width: 3,
+    whiteSpace: "nowrap",
     sortable: true,
     sortValue: (element) => element.date ?? "",
     value: (element) => (
-      <Flex whiteSpace="nowrap" $alignItems="center">
+      <Flex $alignItems="center">
         <Label ribbon width="fit-content" color={element.quantity < 0 ? COLORS.RED : COLORS.GREEN}>
           <Icon inverted name={element.quantity < 0 ? ICONS.ARROW_UP : ICONS.ARROW_DOWN} />
         </Label>
@@ -245,7 +278,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
   },
   {
     id: 3,
-    title: 'Método de Pago',
+    title: 'Método de pago',
     key: 'method',
     sortable: true,
     sortValue: (element) => element.method ?? "",
@@ -279,33 +312,33 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
 
 export const CASH_BALANCE_MOVEMENTS_TYPE_OPTIONS = [
   {
-    key: "all",
+    key: ALL,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
         Todos&nbsp;
       </Flex>
     ),
-    value: "all",
+    value: ALL,
   },
   {
-    key: "in",
+    key: IN,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
         Ingresos&nbsp;
         <Icon name={ICONS.ARROW_DOWN} color={COLORS.GREEN} />
       </Flex>
     ),
-    value: "in",
+    value: IN,
   },
   {
-    key: "out",
+    key: OUT,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
         Egresos&nbsp;
         <Icon name={ICONS.ARROW_UP} color={COLORS.RED} />
       </Flex>
     ),
-    value: "out",
+    value: OUT,
   },
 ];
 

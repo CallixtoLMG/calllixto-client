@@ -1,7 +1,7 @@
 "use client";
 import { UserProvider } from "@/User";
 import { RouteHistoryProvider } from "@/app/RouteHistoryContext";
-import { GoBackButton } from "@/common/components/buttons";
+import { BackToListButton, GoBackButton } from "@/common/components/buttons";
 import { PAGES } from "@/common/constants";
 import { BreadcrumProvider, Breadcrumb, Header, NavActions, NavActionsProvider, Toaster } from "@/components/layout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -18,7 +18,7 @@ const inter = Inter({ subsets: ['latin'] });
 const NavigationContainer = styled.div`
   position: fixed;
   top: 60px;
-  padding: 10px 60px;
+  padding: 10px 50px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -26,13 +26,13 @@ const NavigationContainer = styled.div`
   background-color: #fff;
   width: 100%;
   border-bottom: 1px solid #ddd;
-  z-index: 2;
+  z-index: 3;
 `;
 
 const BreadcrumbContainer = styled.div`
   display: flex;
   align-items: center;
-  column-gap: 20px;
+  column-gap: 10px;
 `;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -73,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                       <NavigationContainer>
                         <BreadcrumbContainer>
                           <GoBackButton />
+                          <BackToListButton />
                           <Breadcrumb />
                         </BreadcrumbContainer>
                         <NavActions />

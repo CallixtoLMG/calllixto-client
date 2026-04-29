@@ -4,7 +4,7 @@ import styled from "styled-components";
 
 const SectionContainer = styled(Flex)`
   flex-direction: ${({ $flexDirection }) => $flexDirection};
-  justify-content: space-between;
+  justify-content: space-between!important;
   min-height: ${({ $minHeight = '35px' }) => $minHeight};
   align-items: ${({ $alignItems = "center" }) => $alignItems};
 

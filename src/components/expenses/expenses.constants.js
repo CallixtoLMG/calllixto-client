@@ -28,11 +28,12 @@ export const HEADERS = [
     id: 2,
     title: "Nombre",
     align: "left",
+    width: 4,
     value: (expense) => {
       const { tags, name, comments } = expense;
       return (
         <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper maxWidth="45vw" popupContent={name}>
+          <OverflowWrapper maxWidth="30vw" popupContent={name}>
             {name}
           </OverflowWrapper>
           <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
@@ -47,6 +48,7 @@ export const HEADERS = [
     id: 3,
     title: "Categorias",
     align: "right",
+    width:3,
     value: (expense) => {
       return (
         <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
@@ -59,6 +61,7 @@ export const HEADERS = [
     id: 4,
     title: "Monto",
     align: "left",
+    width: 2,
     value: (expense) => <PriceLabel value={expense.amount ?? 0} />,
   },
   {
@@ -66,6 +69,7 @@ export const HEADERS = [
     title: "Pagado",
     key: "paidAmount",
     sortable: true,
+    width: 2,
     align: "left",
     value: (expense) => <PriceLabel value={expense.paidAmount ?? 0} />,
     sortValue: (expense) => expense.paidAmount ?? 0
@@ -74,6 +78,7 @@ export const HEADERS = [
     id: 6,
     title: "Pendiente",
     key: "pendingAmount",
+    width: 2,
     sortable: true,
     align: "left",
     value: (expense) => {

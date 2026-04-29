@@ -18,7 +18,7 @@ if (typeof window !== "undefined") {
     [ENTITIES.SETTINGS]: 'entity, updatedAt',
     [LAST_UPDATED_AT]: 'id',
   });
-}
+};
 
 export { db };
 

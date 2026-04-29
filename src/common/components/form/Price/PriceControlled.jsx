@@ -13,6 +13,7 @@ export const PriceControlled = ({
   handlePriceChange,
   justifyItems,
   required,
+  maxLength,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -29,6 +30,7 @@ export const PriceControlled = ({
             label={label}
             width={width}
             value={value}
+            maxLength={maxLength}
             required={required}
             onChange={(newValue) => {
               onChange(newValue);

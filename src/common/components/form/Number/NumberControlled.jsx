@@ -23,6 +23,7 @@ export const NumberControlled = ({
   padding,
   required,
   onKeyDown,
+  icon = true,
   ...inputProps
 }) => {
   const { formState: { errors } } = useFormContext();
@@ -51,7 +52,7 @@ export const NumberControlled = ({
             <Input
               {...inputProps}
               {...rest}
-              icon
+              icon={icon}
               onKeyDown={onKeyDown}
               padding={padding}
               maxLength={maxLength}

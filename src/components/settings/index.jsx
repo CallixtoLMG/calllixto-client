@@ -11,8 +11,15 @@ import GeneralModule from "./Entities/General";
 import ProductsModule from "./Entities/Products";
 import SuppliersModule from "./Entities/Suppliers";
 
-const SettingsTabs = ({ onEntityChange, settings = [], onRefresh, isLoading, onBeforeView }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
+const SettingsTabs = ({
+  onEntityChange,
+  settings = [],
+  onRefresh,
+  isLoading,
+  onBeforeView,
+  activeIndex,
+  onActiveIndexChange,
+}) => {
   const [pendingTabIndex, setPendingTabIndex] = useState(null);
 
   const panes = settings.map((entity) => ({
@@ -34,7 +41,7 @@ const SettingsTabs = ({ onEntityChange, settings = [], onRefresh, isLoading, onB
     const canChange = await onBeforeView?.();
 
     if (canChange) {
-      setActiveIndex(nextIndex);
+      onActiveIndexChange?.(nextIndex);
       onEntityChange(settings[nextIndex]);
     } else {
       setPendingTabIndex(nextIndex);
@@ -57,6 +64,7 @@ const SettingsTabs = ({ onEntityChange, settings = [], onRefresh, isLoading, onB
         alignSelf="end"
         disabled={isLoading}
         loading={isLoading}
+        width="fit-content"
       />
       <Tab
         panes={panes}

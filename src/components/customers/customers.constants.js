@@ -21,14 +21,14 @@ export const HEADERS = [
     id: 2,
     title: 'Nombre',
     align: 'left',
-    width: 8,
+    width: 5,
     key: "name",
     sortable: true,
     value: (customer) => {
       const { tags, name, comments } = customer;
       return (
         <Flex $justifyContent="space-between" $alignItems="center">
-          <OverflowWrapper maxWidth="45vw" popupContent={name}>
+          <OverflowWrapper maxWidth="30vw" popupContent={name}>
             {name}
           </OverflowWrapper>
           <Flex $columnGap="7px" $alignItems="center" $justifyContent="flex-end">
@@ -45,14 +45,16 @@ export const HEADERS = [
     title: "Direccion",
     key: "addresses",
     sortable: true,
-    width: 5,
+    width: 4,
     align: "left",
     value: (customer) => {
       const { primaryAddress, additionalAddresses } = getAddressesForDisplay(customer.addresses || []);
       return (
         <Flex $justifyContent="space-between">
-          {primaryAddress}
-          {additionalAddresses && <AddressesTooltip addresses={additionalAddresses} />}
+          <OverflowWrapper maxWidth="30vw" popupContent={primaryAddress}>
+            {primaryAddress}
+          </OverflowWrapper>
+          {additionalAddresses && <AddressesTooltip $lowTooltip addresses={additionalAddresses} />}
         </Flex>
       );
     },
@@ -61,13 +63,14 @@ export const HEADERS = [
   {
     id: 4,
     title: "Teléfono",
-    width: 3,
+    width: 1,
+    whiteSpace: "nowrap",
     value: (customer) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(customer.phoneNumbers);
       return (
-        <Flex $justifyContent="space-between">
+        <Flex $width="fit-content" $justifyContent="space-between">
           {primaryPhone}
-          {additionalPhones && <PhonesTooltip phones={additionalPhones} />}
+          {additionalPhones && <PhonesTooltip $lowTooltip phones={additionalPhones} />}
         </Flex>
       );
     }

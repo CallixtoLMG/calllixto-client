@@ -32,16 +32,35 @@ const UsersPage = ({ users = [], isLoading, onRefetch, onDownloadExcel }) => {
             hydrated={hydrated}
           >
             <DropdownControlled
-              width="200px"
+              minWidth="150px"
+              width="min-content"
               name="state"
               label="Estado"
               options={USER_STATE_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
               afterChange={onSubmit}
             />
-            <TextControlled name="username" label="Usuario" placeholder="Martinb@hotmail.com" width="180px" />
-            <TextControlled name="firstName" label="Nombre" placeholder="Martín" width="180px" />
-            <TextControlled name="lastName" label="Apellido" placeholder="Bueno" width="180px" />
+            <TextControlled
+              name="username"
+              label="Usuario"
+              placeholder="Martinb@hotmail.com"
+              width="15vw"
+              minWidth="150px"
+            />
+            <TextControlled
+              name="firstName"
+              label="Nombre"
+              placeholder="Martín"
+              width="13vw"
+              minWidth="130px"
+            />
+            <TextControlled
+              name="lastName"
+              label="Apellido"
+              placeholder="Bueno"
+              width="13vw"
+              minWidth="130px"
+            />
           </Filters>
         </Form>
       </FormProvider>

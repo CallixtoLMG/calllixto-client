@@ -1,4 +1,5 @@
 import { FormField, Input } from "@/common/components/custom";
+import { ICONS } from "@/common/constants";
 import { getNumberFormated } from "@/common/utils";
 import { useRef, useState } from "react";
 import { Icon } from "semantic-ui-react";
@@ -14,7 +15,8 @@ export const PriceField = ({
   onKeyDown,
   justifyItems,
   required,
-  readOnly
+  readOnly,
+  maxLength
 }) => {
   const isUserTyping = useRef(false);
   const [formattedValue, setFormattedValue] = useState(getNumberFormated(value ?? 0)[0]);
@@ -41,18 +43,20 @@ export const PriceField = ({
       required={required}
     >
       <Input
+        width="inherit"
         value={formattedValue}
         onChange={handleChange}
+        maxLength={maxLength}
         onBlur={() => { isUserTyping.current = false; }}
         disabled={disabled}
         iconPosition="left"
         placeholder={placeholder}
-        justifyItems={justifyItems}
+        $justifyItems={justifyItems}
         onKeyDown={onKeyDown}
         readOnly={readOnly}
       >
-        <Icon name="dollar" />
-        <input />
+        <Icon name={ICONS.DOLLAR} />
+        <input style={{ width: "100%" }} />
       </Input>
     </FormField>
   );

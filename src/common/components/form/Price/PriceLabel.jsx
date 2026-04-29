@@ -10,7 +10,7 @@ const P = (styled.p)`
 export const PriceLabel = ({ value }) => {
   return (
     <Flex $alignItems="center" $justifyContent="space-between">
-      <Icon dollar="true" name={ICONS.DOLLAR} />
+      <Icon $lowTooltip name={ICONS.DOLLAR} />
       <P>{getFormatedNumber(value)}</P>
     </Flex>
   );

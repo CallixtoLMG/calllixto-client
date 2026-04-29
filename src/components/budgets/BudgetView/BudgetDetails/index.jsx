@@ -1,5 +1,5 @@
 import { IconedButton } from "@/common/components/buttons";
-import { Dropdown, FieldsContainer, Flex, FlexColumn, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
+import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, OverflowWrapper, TextArea, ViewContainer } from "@/common/components/custom";
 import { DropdownField, PriceControlled, PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
@@ -19,7 +19,11 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
   const formattedPaymentMethods = useMemo(() => budget?.paymentMethods?.join(' - '), [budget]);
   const budgetState = getBudgetState(budget);
   const [initializedContact, setInitializedContact] = useState(false);
-  const totalPending = (total - budget.paidAmount).toFixed(2);
+  const totalPending = (
+    (total ?? 0) -
+    (budget?.paidAmount ?? 0) -
+    (budget?.postConfirmDiscount ?? 0)
+  ).toFixed(2);
 
   const methods = useForm({
     defaultValues: {
@@ -32,9 +36,6 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
   const postConfirmDiscount = watch("postConfirmDiscount")
 
   const onSubmitDiscount = async ({ postConfirmDiscount }) => {
-    const isValid = await trigger("postConfirmDiscount");
-    if (!isValid) return;
-
     onConfirmBudgetDiscount({
       budgetId: budget.id,
       postConfirmDiscount: Number(postConfirmDiscount),
@@ -77,7 +78,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
     );
 
     return items;
-  }, [budget?.paidAmount, budget?.postConfirmDiscount, totalPending, total]);
+  }, [budget, totalPending, total]);
 
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => {
     return [
@@ -171,114 +172,126 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(onSubmitDiscount)}>
         <ViewContainer>
-          <Flex $justifyContent="space-between">
-            <FieldsContainer>
+          <FieldsContainer $rowGap="14px">
+            <FormField flex="1">
               <FormField
-                $width="300px"
                 label="Vendedor"
                 control={Input}
                 value={budget?.createdBy}
                 readOnly
                 disabled
               />
-              {budget?.createdAt && (
+            </FormField>
+            {budget?.createdAt && (
+              <FormField flex="1">
                 <FormField
-                  $width="180px"
+                  flex="1"
                   label="Fecha de creación"
                   control={Input}
                   value={getFormatedDate(budget.createdAt, DATE_FORMATS.DATE_WITH_TIME)}
                   readOnly
                   disabled
                 />
-              )}
-            </FieldsContainer>
-            <FieldsContainer>
-              {budgetState && (
+              </FormField>
+            )}
+            <FormField flex="1" />
+          </FieldsContainer>
+          <FieldsContainer>
+            {budgetState && (
+              <FormField flex="1">
                 <FormField
-                  $width="300px"
                   label={budgetState.label}
                   control={Input}
                   value={budgetState.person}
                   readOnly
                   disabled
                 />
-              )}
-              {budgetState && (
+              </FormField>
+            )}
+            {budgetState && (
+              <FormField flex="1">
                 <FormField
-                  $width="200px"
                   label={budgetState.dateLabel}
                   control={Input}
                   value={budgetState.date}
                   disabled
                 />
-              )}
-              {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) && (
+              </FormField>
+            )}
+            {!isBudgetConfirmed(budget?.state) && !isBudgetCancelled(budget?.state) ? (
+              <>
                 <FormField
-                  $width="200px"
+                  flex="1"
                   label="Fecha de vencimiento"
                   control={Input}
                   value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })}
                   disabled
                 />
-              )}
-            </FieldsContainer>
-          </Flex>
+                <FormField flex="1" />
+                <FormField flex="1" />
+              </>
+            )
+              : <FormField flex="1" />
+            }
+          </FieldsContainer>
           <FieldsContainer>
-            <FormField
-              $width="300px"
-              label="Cliente"
-              control={Input}
-              value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
-              readOnly
-              disabled
-            />
-            <DropdownField
-              flex="3"
-              selection
-              width="200px"
-              label="Dirección"
-              control={Dropdown}
-              value={selectedContact?.address || (budget?.pickUpInStore ? PICK_UP_IN_STORE : '')}
-              options={[
-                { key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE },
-                ...(budget?.customer?.addresses?.map((address) => ({
-                  key: address.address,
-                  text: address.ref ? `${address.ref}: ${address.address}` : address.address,
-                  value: address.address,
-                })) || [])
-              ]}
-              onChange={(e, { value }) =>
-                setSelectedContact((prev) => ({
-                  ...prev,
-                  address: value,
-                }))
-              }
-              disabled={!budget?.customer?.addresses?.length && !budget?.pickUpInStore}
-            />
-            <DropdownField
-              flex="2"
-              selection
-              label="Teléfono"
-              control={Dropdown}
-              value={selectedContact?.phone ?? ''}
-              options={budget?.customer?.phoneNumbers.map((phone) => {
-                const formattedPhone = getFormatedPhone(phone);
-                const label = phone.ref ? `${phone.ref}: ${formattedPhone}` : formattedPhone;
+            <FormField flex="1">
+              <FormField
+                label="Cliente"
+                control={Input}
+                value={budget?.customer?.name ? budget?.customer?.name : "No se ha seleccionado cliente"}
+                readOnly
+                disabled
+              />
+            </FormField>
+            <FormField $maxWidth="32.5%" flex="1">
+              <DropdownField
+                selection
+                label="Dirección"
+                control={Dropdown}
+                value={selectedContact?.address || (budget?.pickUpInStore ? PICK_UP_IN_STORE : '')}
+                options={[
+                  { key: 'pickup', text: PICK_UP_IN_STORE, value: PICK_UP_IN_STORE },
+                  ...(budget?.customer?.addresses?.map((address) => ({
+                    key: address.address,
+                    text: address.ref ? `${address.ref}: ${address.address}` : address.address,
+                    value: address.address,
+                  })) || [])
+                ]}
+                onChange={(e, { value }) =>
+                  setSelectedContact((prev) => ({
+                    ...prev,
+                    address: value,
+                  }))
+                }
+                disabled={!budget?.customer?.addresses?.length && !budget?.pickUpInStore}
+              />
+            </FormField>
+            <FormField flex="1">
+              <DropdownField
+                selection
+                label="Teléfono"
+                control={Dropdown}
+                value={selectedContact?.phone ?? ''}
+                options={(budget?.customer?.phoneNumbers ?? []).map((phone) => {
+                  const formattedPhone = getFormatedPhone(phone);
+                  const label = phone.ref ? `${phone.ref}: ${formattedPhone}` : formattedPhone;
 
-                return {
-                  key: formattedPhone,
-                  text: label,
-                  value: formattedPhone,
-                };
-              })}
-              onChange={(e, { value }) => {
-                setSelectedContact((prev) => ({
-                  ...prev,
-                  phone: value,
-                }));
-              }}
-              disabled={!budget?.customer?.phoneNumbers?.length}
-            />
+                  return {
+                    key: formattedPhone,
+                    text: label,
+                    value: formattedPhone,
+                  };
+                })}
+                onChange={(e, { value }) => {
+                  setSelectedContact((prev) => ({
+                    ...prev,
+                    phone: value,
+                  }));
+                }}
+                disabled={!budget?.customer?.phoneNumbers?.length}
+              />
+            </FormField>
           </FieldsContainer>
           <Table
             mainKey="key"
@@ -288,26 +301,22 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           {isBudgetConfirmed(budget?.state) ?
             <>
               <TotalList items={TOTAL_LIST_ITEMS} />
-              <FlexColumn $alignSelf="end" $rowGap="15px">
-                <Flex $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
-                  <IconedButton
-                    text="Completar"
-                    icon={ICONS.CHECK}
-                    color={COLORS.BLUE}
-                    onClick={() => {
-                      setValue(
-                        "postConfirmDiscount",
-                        Number(budget.postConfirmDiscount ?? 0) + Number(totalPending)
-                      );
-                      trigger("postConfirmDiscount");
-                    }}
-                    alignSelf="start"
-                    height="38px"
-                    disabled={isLoading}
-                  />
+              <Flex $alignSelf="end" $rowGap="15px">
+                <Popup
+                  trigger={
+                    <Icon
+                      fontSize="larger"
+                      name={ICONS.INFO_CIRCLE}
+                      color={COLORS.BLUE} />
+                  }
+                  content="Permite aplicar un descuento una vez confirmada la venta"
+                  position="left center"
+                  size="mini"
+                />
+                <Flex width="250px" $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
                   <PriceControlled
                     key={budget?.postConfirmDiscount ?? 'no-discount'}
-                    width="200px"
+                    width="160px"
                     placeholder="5.000"
                     name="postConfirmDiscount"
                     defaultValue={budget?.postConfirmDiscount ?? ''}
@@ -320,8 +329,25 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                     }}
                     justifyItems="right"
                   />
-                </Flex>
-                <Flex $columnGap="15px" $alignSelf="end">
+                  <IconedButton
+                    text={postConfirmDiscount ? "Limpiar monto" : "Completar monto"}
+                    icon={postConfirmDiscount ? ICONS.MINUS : ICONS.ADD}
+                    color={postConfirmDiscount ? COLORS.ORANGE : COLORS.BLUE}
+                    onClick={() => {
+                      setValue(
+                        "postConfirmDiscount",
+                        postConfirmDiscount
+                          ? ""
+                          : Number(budget.postConfirmDiscount ?? 0) + Number(totalPending),
+                        { shouldDirty: true, shouldTouch: true }
+                      );
+                      trigger("postConfirmDiscount");
+                    }}
+                    alignSelf="start"
+                    height="38px"
+                    disabled={isLoading}
+                    iconOnly
+                  />
                   <IconedButton
                     text="Aplicar descuento"
                     loading={isLoading}
@@ -330,9 +356,12 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                     icon={ICONS.CHECK}
                     color={COLORS.GREEN}
                     height="38px"
+                    iconOnly
                   />
                 </Flex>
-              </FlexColumn>
+                <Flex $columnGap="15px" $alignSelf="end">
+                </Flex>
+              </Flex>
             </>
             :
             <Total
@@ -344,25 +373,25 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
               additionalCharge={budget?.additionalCharge}
             />
           }
-          <FormField
-            control={Input}
-            label="Métodos de pago"
-            $width="100%"
-            value={formattedPaymentMethods}
-            readOnly
-            disabled
-          />
+          <FormField>
+            <FormField
+              control={Input}
+              label="Métodos de pago"
+              value={formattedPaymentMethods}
+              readOnly
+              disabled
+            />
+          </FormField>
           <FormField
             control={TextArea}
             label="Comentarios"
-            $width="100%"
             placeholder="Comentarios"
             value={budget?.comments}
             readOnly
           />
         </ViewContainer>
       </Form>
-    </FormProvider>
+    </FormProvider >
   );
 };
 

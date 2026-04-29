@@ -1,7 +1,7 @@
 import dayjs from "dayjs";
 import { isValidElement } from "react";
 import * as XLSX from "xlsx";
-import { ALL, CANCELLED, INACTIVE, REGEX } from "../constants";
+import { ALL, CANCELLED, COLORS, INACTIVE, REGEX } from "../constants";
 import { isDateAfter } from "./dates";
 
 export const getFormatedPrice = (number) => {
@@ -79,6 +79,25 @@ export const handleEnterKeyDown = (e, action) => {
     e.preventDefault();
     action(e);
   }
+};
+
+export const createPriorityKeyDownHandler = ({
+  callback,
+  key = "Enter",
+  shouldHandle = () => true,
+  preventDefault = true,
+  stopPropagation = true,
+}) => {
+  return (event) => {
+    if (event.key !== key) return;
+
+    if (!shouldHandle(event)) return;
+
+    if (preventDefault) event.preventDefault();
+    if (stopPropagation) event.stopPropagation();
+
+    callback?.(event);
+  };
 };
 
 export const handleKeyPressWithSubmit = (e, isActionEnabled, isLoading, handleSubmit, onConfirm) => {
@@ -210,6 +229,13 @@ export const isNewFeature = (releasedAt, days = 14) => {
   return !isDateAfter(new Date(), expirationDate);
 };
 
+export const removeNullish = (obj) =>
+  Object.fromEntries(
+    Object.entries(obj).filter(
+      ([_, value]) => value !== null && value !== undefined
+    )
+  );
+
 export const getNumberFormated = (value) => {
   const strNumber = String(value)
     .replace(/[^0-9.]/g, "")
@@ -229,13 +255,13 @@ export const getNumberFormated = (value) => {
   return [asString, asNumber];
 };
 
-export const mapToDropdownOptions = (items = []) =>
+export const mapToDropdownOptions = (items = [], color) =>
   items.map((item) => ({
     key: item?.toLowerCase().replace(/\s+/g, "_"),
     text: item,
     value: item,
     name: item,
-    color: "grey"
+    color: color || COLORS.GREY
   }));
 
 export const getLabelColor = (entity, states) => states?.[entity?.state]?.color;

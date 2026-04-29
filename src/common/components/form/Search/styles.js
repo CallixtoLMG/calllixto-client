@@ -1,7 +1,11 @@
 import { Search as SSearch } from "semantic-ui-react";
 import styled from "styled-components";
 
-const Search = styled(SSearch)`
+export const Search = styled(SSearch)`
+  width: ${({ $width }) => $width};
+  min-width: ${({ $minWidth }) => $minWidth}!important;
+  max-width: ${({ $maxWidth }) => $maxWidth}!important;
+
   div.results.transition.visible {
     width: 80vw !important;
     display: grid!important;
@@ -18,17 +22,36 @@ const Search = styled(SSearch)`
       border-radius: 0.28571429rem!important;
     };
   };
-div.content{
+
+  div.content{
     width: 100%!important;
-  }
+  };
+
+  &&& input{
+    padding-right: ${({ value }) => value ? "37px" : "14px"}!important;
+  };
 `;
 
-const Text = styled.p`
+export const Text = styled.p`
    margin: 0;
    display: inline;
 `;
 
-export {
-  Search, Text
-};
+export const SearchResultContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`;
+
+export const SearchResultTitle = styled.div`
+  display: flex;
+  font-weight: 700;
+  align-self: start;
+  font-family: Lato, 'Helvetica Neue', Arial, Helvetica, sans-serif;
+`;
+
+export const SearchResultDescription = styled.div`
+  color: rgba(0, 0, 0, .4);
+  font-size: 13px;
+`;
 

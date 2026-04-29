@@ -32,12 +32,9 @@ const CreateSupplier = () => {
         push(PAGES.SUPPLIERS.SHOW(response.supplier.id))
         toast.success('Proveedor creado!');
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response.message} (${response.error.message})`);
       }
     },
-    onError: (error) => {
-      toast.error(error.message);
-    }
   });
 
   return (

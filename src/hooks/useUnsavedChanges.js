@@ -1,24 +1,22 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
+const useUnsavedChanges = ({ formRef, onDiscard }) => {
   const [showModal, setShowModal] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
 
   const router = useRouter();
   const isDirtyRef = useRef(false);
   const skipNextNavigation = useRef(false);
-  const submitPromiseRef = useRef(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (formRef?.current && typeof formRef.current.isDirty === "function") {
+      if (formRef?.current?.isDirty) {
         isDirtyRef.current = formRef.current.isDirty();
       } else {
         isDirtyRef.current = false;
       }
     }, 300);
-  
+
     return () => clearInterval(interval);
   }, [formRef]);
 
@@ -70,43 +68,16 @@ const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
   const handleDiscard = useCallback(async () => {
     await onDiscard?.();
     isDirtyRef.current = false;
+    skipNextNavigation.current = true;
     closeModal();
   }, [onDiscard, closeModal]);
 
-  const handleSave = useCallback(async () => {
-    setIsSaving(true);
-
-    try {
-      const result = await new Promise((resolve, reject) => {
-        submitPromiseRef.current = { resolve, reject };
-        onSave?.();
-      });
-
-      isDirtyRef.current = false;
-      closeModal();
-      return result;
-    } catch (err) {
-      console.error("Error al guardar:", err);
-    } finally {
-      setIsSaving(false);
-      submitPromiseRef.current = null;
-    }
-  }, [onSave, closeModal]);
-
-  const resolveSave = useCallback(() => {
-    if (submitPromiseRef.current) {
-      submitPromiseRef.current.resolve();
-      submitPromiseRef.current = null;
-    }
-  }, []);
-
-  const handleCancel = useCallback(() => {
+  const handleContinue = useCallback(() => {
     closeModal();
   }, [closeModal]);
 
-  const onBeforeView = useCallback(async () => {
-    const isDirty = formRef.current?.isDirty?.();
-    if (isDirty) {
+  const onBeforeView = useCallback(() => {
+    if (formRef.current?.isDirty?.()) {
       setShowModal(true);
       return false;
     }
@@ -115,13 +86,10 @@ const useUnsavedChanges = ({ formRef, onDiscard, onSave }) => {
 
   return {
     showModal,
-    isSaving,
     handleDiscard,
-    handleSave,
-    handleCancel,
+    handleContinue,
     onBeforeView,
     closeModal,
-    resolveSave,
   };
 };
 

@@ -50,47 +50,49 @@ export const AddBillPopup = ({
 
   return (
     <>
-      <Flex $columnGap="14px" as={Form} flexDirection="row">
-        <DropdownField
-          dropdownHeight="38px"
-          height="auto"
-          label="Denominación"
-          width="200px"
-          selection
-          options={ARS_BILL_DENOMINATIONS}
-          value={billToAdd.denomination}
-          onChange={(e, { value }) => {
-            setBillToAdd({ ...billToAdd, denomination: value });
-          }}
-          error={
-            billErrors?.denomination && isDirty && {
-              content: billErrors.denomination,
-              pointing: "above"
+      <Flex as={Form} >
+        <Flex $columnGap="14px" $flexDirection="row">
+          <DropdownField
+            dropdownHeight="38px"
+            height="auto"
+            label="Denominación"
+            width="200px"
+            selection
+            options={ARS_BILL_DENOMINATIONS}
+            value={billToAdd.denomination}
+            onChange={(e, { value }) => {
+              setBillToAdd({ ...billToAdd, denomination: value });
+            }}
+            error={
+              billErrors?.denomination && isDirty && {
+                content: billErrors.denomination,
+                pointing: "above"
+              }
             }
-          }
-          placeholder="Seleccionar"
-        />
-        <NumberField
-          label="Cantidad"
-          width="200px"
-          value={billToAdd.quantity}
-          onChange={(value) => {
-            setBillToAdd({ ...billToAdd, quantity: value });
-          }}
-          error={billErrors?.quantity && isDirty &&  {
-            content: billErrors.quantity,
-            pointing: "above"
-          }}
-        />
-        <IconedButton
-          text="Agregar"
-          alignSelf="end"
-          height="38px"
-          icon={ICONS.CHECK}
-          color={COLORS.GREEN}
-          onClick={handleAdd}
-          onKeyDown={(e) => handleEnterKeyDown(e, handleAdd)}
-        />
+            placeholder="Seleccionar"
+          />
+          <NumberField
+            label="Cantidad"
+            width="200px"
+            value={billToAdd.quantity}
+            onChange={(value) => {
+              setBillToAdd({ ...billToAdd, quantity: value });
+            }}
+            error={billErrors?.quantity && isDirty && {
+              content: billErrors.quantity,
+              pointing: "above"
+            }}
+          />
+          <IconedButton
+            text="Agregar"
+            alignSelf="end"
+            height="38px"
+            icon={ICONS.CHECK}
+            color={COLORS.GREEN}
+            onClick={handleAdd}
+            onKeyDown={(e) => handleEnterKeyDown(e, handleAdd)}
+          />
+        </Flex>
       </Flex>
     </>
   );

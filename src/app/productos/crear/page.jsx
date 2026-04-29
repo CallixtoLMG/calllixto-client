@@ -41,7 +41,7 @@ const CreateProduct = () => {
         push(PAGES.PRODUCTS.SHOW(response.product.id))
         toast.success('Producto creado!');
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onError: (error) => {

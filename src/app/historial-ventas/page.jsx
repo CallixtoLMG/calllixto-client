@@ -2,10 +2,10 @@
 import { useListBudgetsHistory } from "@/api/budgets";
 import { useGetSetting } from "@/api/settings";
 import { useListUsers } from "@/api/users";
-import { ENTITIES } from "@/common/constants";
+import { ENTITIES, PAGES } from "@/common/constants";
 import BudgetsHistoryFilter from "@/components/budgets/BudgetsHistoryFilters";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
-import { BASE_BUDGETS_HISTORY_RANGES, BUDGETS_HISTORY_FILTERS_KEY, DATE_RANGE_KEY, buildCustomHistoryRanges } from "@/components/budgets/budgets.constants";
+import { BASE_BUDGETS_HISTORY_RANGES, BUDGETS_HISTORY_FILTERS_KEY, BUDGET_STATES, DATE_RANGE_KEY, buildCustomHistoryRanges } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useValidateToken } from "@/hooks";
 import useFilterParams from "@/hooks/useFilterParams";
@@ -45,8 +45,17 @@ const BudgetsHistory = () => {
     () => [...BASE_BUDGETS_HISTORY_RANGES, ...customPresets],
     [customPresets]
   );
+  const budgets = useMemo(() => {
+    if (!budgetsData) return [];
 
-  const budgets = useMemo(() => budgetsData ?? [], [budgetsData]);
+    return budgetsData.map(budget => ({
+      ...budget,
+      href:
+        budget.state === BUDGET_STATES.DRAFT.id
+          ? PAGES.BUDGETS.DRAFT(budget.id)
+          : PAGES.BUDGETS.SHOW(budget.id),
+    }));
+  }, [budgetsData]);
   const users = useMemo(() => usersData?.users, [usersData]);
   const loading = useMemo(() => isLoadingBudgets || isLoadingUsers || isRefetching, [isLoadingBudgets, isLoadingUsers, isRefetching]);
 
@@ -84,7 +93,7 @@ const BudgetsHistory = () => {
       {dateRange.startDate && dateRange.endDate && (
         <BudgetsPage
           isLoading={loading}
-          budgets={budgets}
+          budgets={loading ? [] : budgets}
           filterKey={BUDGETS_HISTORY_FILTERS_KEY}
           usersOptions={usersOptions}
         />

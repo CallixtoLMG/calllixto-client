@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useCancelExpense, useEditExpense, useGetExpense } from "@/api/expenses";
 import { useCreatePayment, useDeletePayment, useEditPayment, useGetPayments } from "@/api/payments";
-import { Flex, Message, MessageHeader } from "@/common/components/custom";
+import { FieldsContainer, Flex, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { UnsavedChangesModal } from "@/common/components/modals";
 import ModalCancel from "@/common/components/modals/ModalCancel";
@@ -11,6 +11,7 @@ import { isItemCancelled } from "@/common/utils";
 import { getFormatedDate, isDateAfter, now } from "@/common/utils/dates";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import Payments from "@/components/payments";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
@@ -18,7 +19,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
-import Payments from "@/components/payments";
 
 const Expense = ({ params }) => {
   useValidateToken();
@@ -51,14 +51,6 @@ const Expense = ({ params }) => {
     setLabels([{ name: PAGES.EXPENSES.NAME }, { name: expense?.name }]);
     refetch();
   }, [setLabels, expense, refetch]);
-
-  const { handleProtectedAction } = useProtectedAction({
-    onBeforeView: async () => {
-      const expenseOk = await expenseUnsaved.onBeforeView?.();
-      const paymentsOk = await paymentsUnsaved.onBeforeView?.();
-      return expenseOk && paymentsOk;
-    },
-  });
 
   useEffect(() => {
     const actionsList = [];
@@ -95,18 +87,18 @@ const Expense = ({ params }) => {
 
   const expenseUnsaved = useUnsavedChanges({
     formRef: expenseFormRef,
-    onSave: () => expenseFormRef.current.submitForm(),
-    onDiscard: () => expenseFormRef.current.resetForm(),
+    onDiscard: () => expenseFormRef.current?.resetForm(),
   });
 
-  const expenseAllow = useAllowUpdate({ canUpdate: RULES.canUpdate[role], onBeforeView: expenseUnsaved.onBeforeView });
+  const onBeforeView = expenseUnsaved.onBeforeView;
 
-  const paymentsFormRef = useRef();
+  const expenseAllow = useAllowUpdate({
+    canUpdate: RULES.canUpdate[role],
+    onBeforeView,
+  });
 
-  const paymentsUnsaved = useUnsavedChanges({
-    formRef: paymentsFormRef,
-    onSave: () => paymentsFormRef.current.submitForm(),
-    onDiscard: () => paymentsFormRef.current.resetForm(),
+  const { handleProtectedAction } = useProtectedAction({
+    onBeforeView,
   });
 
   const handleModalClose = () => {
@@ -119,14 +111,12 @@ const Expense = ({ params }) => {
       if (response.statusOk) {
         toast.success("Gasto actualizado!");
         expenseAllow.setIsUpdating(false);
-        expenseUnsaved.resolveSave();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
       handleModalClose();
-      expenseUnsaved.closeModal();
     },
   });
 
@@ -144,7 +134,7 @@ const Expense = ({ params }) => {
         toast.success('Gasto anulado!');
         setIsModalCancelOpen(false);
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onError: (error) => {
@@ -159,7 +149,7 @@ const Expense = ({ params }) => {
         toast.success("Pago creado correctamente!");
         refetchPayments();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -174,7 +164,7 @@ const Expense = ({ params }) => {
         toast.success("Pago actualizado!");
         refetchPayments();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -183,13 +173,13 @@ const Expense = ({ params }) => {
   });
 
   const { mutate: mutateDeletePayment, isPending: isDeletePending } = useMutation({
-    mutationFn: (paymentId) => deletePayment(paymentId, ENTITIES.EXPENSE,expense.id),
+    mutationFn: (paymentId) => deletePayment(paymentId, ENTITIES.EXPENSE, expense.id),
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pago eliminado!");
         refetchPayments();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -217,13 +207,6 @@ const Expense = ({ params }) => {
             isUpdating={expenseAllow.isUpdating && !isItemCancelled(expense?.state)}
             view
           />
-          <UnsavedChangesModal
-            open={expenseUnsaved.showModal}
-            onSave={expenseUnsaved.handleSave}
-            onDiscard={expenseUnsaved.handleDiscard}
-            isSaving={expenseUnsaved.isSaving}
-            onCancel={expenseUnsaved.handleCancel}
-          />
         </Tab.Pane>
       ),
     },
@@ -233,14 +216,17 @@ const Expense = ({ params }) => {
         <Tab.Pane>
           <Loader active={isLoadingPayments || isRefetching}>
             {!isItemCancelled(expense?.state) && expense.expirationDate && (
-              <Flex $justifyContent="space-between">
-                <TextField
-                  width="20%"
-                  value={getFormatedDate(expense.expirationDate, DATE_FORMATS.ONLY_DATE)}
-                  label="Fecha de Vencimiento"
-                  disabled
-                />
-              </Flex>
+              <FieldsContainer>
+                <FormField flex="1">
+                  <TextField
+                    value={getFormatedDate(expense.expirationDate, DATE_FORMATS.ONLY_DATE)}
+                    label="Fecha de vencimiento"
+                    disabled
+                  />
+                </FormField>
+                <FormField flex="1" />
+                <FormField flex="1" />
+              </FieldsContainer>
             )}
             <Payments
               payments={payments.map(payment => ({ ...payment, isOverdue: isDateAfter(payment.date, expense.expirationDate) })) ?? []}
@@ -263,11 +249,10 @@ const Expense = ({ params }) => {
     },
   ];
 
-  const handleTabChange = async (_, { activeIndex }) => {
-    if (await expenseUnsaved.onBeforeView() && await paymentsUnsaved.onBeforeView()) {
+  const handleTabChange = (_, { activeIndex }) => {
+    if (onBeforeView()) {
       setActiveIndex(activeIndex);
-      const newUrl = window.location.pathname;
-      router.replace(newUrl);
+      router.replace(window.location.pathname);
     }
   };
 
@@ -278,10 +263,15 @@ const Expense = ({ params }) => {
   return (
     <Loader active={isLoading || !expense}>
       {isItemCancelled(expense?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de cancelación</MessageHeader>
-          <p>{expense.cancelledMsg}</p>
-        </Message>
+        <FieldsContainer>
+          <FormField flex="1">
+            <Message negative>
+              <MessageHeader>Motivo de cancelación</MessageHeader>
+              <p>{expense.cancelledMsg}</p>
+            </Message>
+          </FormField>
+          <FormField flex="1" />
+        </FieldsContainer>
       )}
       <Tab
         panes={panes}
@@ -295,6 +285,11 @@ const Expense = ({ params }) => {
         isLoading={isCancelPending}
         id={expense?.id}
         header={`Desea anular el gasto ${expense?.name}?`}
+      />
+      <UnsavedChangesModal
+        open={expenseUnsaved.showModal}
+        onDiscard={expenseUnsaved.handleDiscard}
+        onContinue={expenseUnsaved.closeModal}
       />
     </Loader>
   );

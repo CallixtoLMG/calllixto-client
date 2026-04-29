@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form } from "@/common/components/custom";
+import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { ContactControlled, ContactView, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
@@ -47,27 +47,30 @@ const SupplierForm = forwardRef(({
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleForm)}>
-        <FieldsContainer>
-          <TextControlled
-            width="150px"
-            name="id"
-            label="Id"
-            placeholder="A1"
-            rules={RULES.REQUIRED_TWO_DIGIT}
-            onChange={value => value.toUpperCase()}
-            disabled={view}
-            maxLength={2}
-            required
-          />
-          <TextControlled
-            width="40%"
-            name="name"
-            label="Nombre"
-            placeholder="Suministro Estrella"
-            rules={RULES.REQUIRED}
-            disabled={!isUpdating && view}
-            required
-          />
+        <FieldsContainer $columnGap="15px">
+          <FormField flex="1">
+            <TextControlled
+              name="id"
+              label="Id"
+              placeholder="A1"
+              rules={RULES.REQUIRED_TWO_DIGIT}
+              onChange={value => value.toUpperCase()}
+              disabled={view}
+              maxLength={2}
+              required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flex="1">
+            <TextControlled
+              name="name"
+              label="Nombre"
+              placeholder="Suministro Estrella"
+              rules={RULES.REQUIRED}
+              disabled={!isUpdating && view}
+              required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flex="1" />
         </FieldsContainer>
         {(!view || isUpdating) ? <ContactControlled /> : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
         <TextAreaControlled name="comments" label="Comentarios" placeholder="Siempre demora en los pedidos" readOnly={!isUpdating && view} />
@@ -82,7 +85,7 @@ const SupplierForm = forwardRef(({
           />
         )}
       </Form>
-    </FormProvider>
+    </FormProvider >
   )
 });
 

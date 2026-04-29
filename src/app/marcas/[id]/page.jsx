@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useDeleteBrand, useEditBrand, useGetBrand, useSetBrandState } from "@/api/brands";
 import { useHasProductsByBrandId } from "@/api/products";
-import { Message, MessageHeader } from "@/common/components/custom";
+import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
@@ -34,20 +34,13 @@ const Brand = ({ params }) => {
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
-    closeModal,
   } = useUnsavedChanges({
     formRef,
     onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
-    },
-    onSave: () => {
-      formRef.current?.submitForm();
     },
   });
 
@@ -106,9 +99,8 @@ const Brand = ({ params }) => {
       if (response.statusOk) {
         toast.success("Marca actualizada!");
         setIsUpdating(false);
-        resolveSave();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -126,7 +118,7 @@ const Brand = ({ params }) => {
         toast.success("Marca eliminada permanentemente!");
         push(PAGES.BRANDS.BASE);
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -145,7 +137,7 @@ const Brand = ({ params }) => {
             : 'Marca desactivada!'
         );
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -196,7 +188,7 @@ const Brand = ({ params }) => {
           onClick: handleClick(isItemInactive(brand?.state) ? ACTIVE : INACTIVE),
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction,
-          width: "fit-content",
+          iconOnly:true
         },
         {
           id: 2,
@@ -208,6 +200,7 @@ const Brand = ({ params }) => {
           loading: activeAction === DELETE,
           disabled: hasAssociatedProducts || !!activeAction,
           tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
+          iconOnly:true
         },
       ] : [];
       setActions(actions);
@@ -223,10 +216,16 @@ const Brand = ({ params }) => {
     <Loader active={isLoading || isLoadingProducts || !brand}>
       {!isItemInactive(brand?.state) && toggleButton}
       {isItemInactive(brand?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{brand.inactiveReason}</p>
-        </Message>
+        <FieldsContainer>
+          <FormField flex="1">
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{brand.inactiveReason}</p>
+            </Message>
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
+        </FieldsContainer>
       )}
       <BrandForm
         ref={formRef}
@@ -240,9 +239,7 @@ const Brand = ({ params }) => {
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
-        onSave={handleSave}
-        isSaving={isSaving}
-        onCancel={handleCancel}
+        onContinue={handleContinue}
       />
       <ModalAction
         title={header}

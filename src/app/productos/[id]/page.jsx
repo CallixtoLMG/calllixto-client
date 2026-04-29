@@ -1,7 +1,8 @@
 "use client";
 import { useUserContext } from "@/User";
 import { useDeleteProduct, useEditProduct, useGetProduct, useRecoverProduct, useSetProductState } from "@/api/products";
-import { Flex, Message, MessageHeader } from "@/common/components/custom";
+import { useCreateStockFlow, useGetStockFlow } from "@/api/stock";
+import { FieldsContainer, Flex, FormField, Message, MessageHeader } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
@@ -10,22 +11,37 @@ import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, RECOVER } from "@/common/consta
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductChanges from "@/components/products/ProductChanges";
 import ProductForm from "@/components/products/ProductForm";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
+import ProductStock from "@/components/products/ProductStock";
+import { GET_STOCK_FLOW_QUERY_KEY, PRODUCT_STATES, STOCK_TAB_INDEX } from "@/components/products/products.constants";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
-import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useAllowUpdate, useLazyTabs, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Tab } from "semantic-ui-react";
+import { GET_PRODUCT_QUERY_KEY } from "../../../components/products/products.constants";
 
 const Product = ({ params }) => {
   useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
-  const { data: product, isLoading, refetch } = useGetProduct(params.id);
+  const { data: product, isLoading: isLoadingProduct, refetch: isRefetchingProduct } = useGetProduct(params.id);
+
+  const {
+    activeIndex,
+    onTabChange: onLazyTabChange,
+    hasVisited,
+  } = useLazyTabs({
+    initialIndex: 0,
+    lazyIndexes: STOCK_TAB_INDEX !== null ? [STOCK_TAB_INDEX] : [],
+  });
+  const queryClient = useQueryClient();
+  const { data: stockFlows, isLoading: isLoadingsStockFlows, refetch: isRefetchingStockFlows } = useGetStockFlow(params.id, {
+    enabled: hasVisited(STOCK_TAB_INDEX),
+  });
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -37,15 +53,12 @@ const Product = ({ params }) => {
   const deleteProduct = useDeleteProduct();
   const setProductState = useSetProductState();
   const recoverProduct = useRecoverProduct();
+  const createStockFlow = useCreateStockFlow();
   const formRef = useRef(null);
-
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
     closeModal,
   } = useUnsavedChanges({
@@ -54,10 +67,13 @@ const Product = ({ params }) => {
       formRef.current?.resetForm();
       setIsUpdating(false);
     },
-    onSave: () => {
-      formRef.current?.submitForm();
-    },
   });
+
+  const handleTabChange = (_, { activeIndex }) => {
+    if (onBeforeView()) {
+      onLazyTabChange(_, { activeIndex });
+    }
+  };
 
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
     canUpdate: RULES.canUpdate[role],
@@ -80,8 +96,8 @@ const Product = ({ params }) => {
         }
       }
     ]);
-    refetch();
-  }, [setLabels, product, refetch]);
+    isRefetchingProduct();
+  }, [setLabels, product, isRefetchingProduct, isRefetchingStockFlows]);
 
   const handlePrint = useReactToPrint({
     content: () => printRef.current,
@@ -147,13 +163,9 @@ const Product = ({ params }) => {
       if (response.statusOk) {
         toast.success("Producto actualizado!");
         setIsUpdating(false);
-        resolveSave();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
-    },
-    onError: (error) => {
-      toast.error(`Error al actualizar el producto: ${error.message || error}`);
     },
     onSettled: () => {
       setActiveAction(null);
@@ -172,7 +184,7 @@ const Product = ({ params }) => {
             : 'producto desactivado!'
         );
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -187,11 +199,8 @@ const Product = ({ params }) => {
       if (response.statusOk) {
         toast.success("Producto activado!");
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
-    },
-    onError: (error) => {
-      toast.error(`Error al activar el producto: ${error.message || error}`);
     },
     onSettled: () => {
       setActiveAction(null);
@@ -210,15 +219,35 @@ const Product = ({ params }) => {
           toast.success("Producto marcado como eliminado.");
         }
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
-    },
-    onError: (error) => {
-      toast.error(`Error al eliminar el producto: ${error.message || error}`);
     },
     onSettled: () => {
       setActiveAction(null);
       handleModalClose();
+    },
+  });
+
+  const { mutate: mutateCreateStockFlow, isPending: isPendingCreateStockFlow } = useMutation({
+    mutationFn: createStockFlow,
+    onSuccess: (response) => {
+      if (response.statusOk) {
+        toast.success("Movimiento de stock registrado");
+        queryClient.invalidateQueries({
+          queryKey: [GET_STOCK_FLOW_QUERY_KEY, params.id],
+          exact: true,
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: [GET_PRODUCT_QUERY_KEY, params.id],
+          exact: true,
+        });
+      } else {
+        toast.error(response.error?.message || "Error al registrar el movimiento");
+      }
+    },
+    onError: (error) => {
+      toast.error(`Error al crear movimiento de stock: ${error.message || error}`);
     },
   });
 
@@ -280,9 +309,10 @@ const Product = ({ params }) => {
           icon: ICONS.BARCODE,
           color: COLORS.BLUE,
           onClick: () => setTimeout(handlePrint),
-          text: "Código",
+          text: "Imprimir código de barras",
           loading: activeAction === "print",
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         },
       ];
       if (!isProductDeleted(product?.state) && !isProductInactive(product?.state)) {
@@ -291,10 +321,10 @@ const Product = ({ params }) => {
           icon: isProductOOS(product?.state) ? ICONS.BOX : ICONS.BAN,
           color: COLORS.ORANGE,
           onClick: handleClick(isProductOOS(product?.state) ? "inStock" : "outOfStock"),
-          text: isProductOOS(product?.state) ? "En stock" : PRODUCT_STATES.OOS.singularTitle,
-          width: "fit-content",
+          text: isProductOOS(product?.state) ? "Cambiar estado a en stock" : "Cambiar estado a sin stock",
           loading: activeAction === "outOfStock",
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         });
       }
       if (!isProductDeleted(product?.state)) {
@@ -304,9 +334,9 @@ const Product = ({ params }) => {
           color: COLORS.GREY,
           onClick: handleClick(isProductInactive(product?.state) ? ACTIVE : INACTIVE),
           text: isProductInactive(product?.state) ? "Activar" : "Desactivar",
-          width: "fit-content",
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         });
         actions.push({
           id: 4,
@@ -317,6 +347,7 @@ const Product = ({ params }) => {
           basic: true,
           loading: activeAction === "softDelete",
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         });
       }
       if (isProductDeleted(product?.state)) {
@@ -326,9 +357,9 @@ const Product = ({ params }) => {
           color: COLORS.GREEN,
           onClick: handleClick('recover'),
           text: "Recuperar",
-          width: "fit-content",
           loading: activeAction === "recover",
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         });
         actions.push({
           id: 6,
@@ -339,6 +370,7 @@ const Product = ({ params }) => {
           basic: true,
           loading: activeAction === "hardDelete",
           disabled: !!activeAction || isEditPending,
+          iconOnly: true,
         });
       }
 
@@ -347,7 +379,7 @@ const Product = ({ params }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product, activeAction, isEditPending, setActions]);
 
-  if (!isLoading && !product) {
+  if (!isLoadingProduct && !product) {
     push(PAGES.NOT_FOUND.BASE);
   }
 
@@ -360,10 +392,16 @@ const Product = ({ params }) => {
             {!isProductDeleted(product?.state) && !isProductInactive(product?.state) && toggleButton}
           </Flex>
           {isProductInactive(product?.state) && (
-            <Message negative>
-              <MessageHeader>Motivo de inactivación</MessageHeader>
-              <p>{product.inactiveReason}</p>
-            </Message>
+            <FieldsContainer $marginBottom="15px">
+              <FormField flex="1">
+                <Message negative>
+                  <MessageHeader>Motivo de inactivación</MessageHeader>
+                  <p>{product.inactiveReason}</p>
+                </Message>
+              </FormField>
+              <FormField flex="1" />
+              <FormField flex="1" />
+            </FieldsContainer>
           )}
           <ProductForm
             ref={formRef}
@@ -387,15 +425,33 @@ const Product = ({ params }) => {
     },
   ];
 
+  if (product?.stockControl) {
+    panes.push({
+      menuItem: "Control de stock",
+      render: () => (
+        <Tab.Pane>
+          <ProductStock
+            product={product}
+            stockFlows={stockFlows}
+            onCreateStockFlow={mutateCreateStockFlow}
+            isLoading={isPendingCreateStockFlow || isLoadingsStockFlows}
+          />
+        </Tab.Pane>
+      ),
+    });
+  }
+
   return (
-    <Loader active={isLoading || !product}>
-      <Tab panes={panes} />
+    <Loader active={isLoadingProduct || !product}>
+      <Tab
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={handleTabChange}
+      />
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
-        onSave={handleSave}
-        isSaving={isSaving}
-        onCancel={handleCancel}
+        onContinue={handleContinue}
       />
       {product && (
         <OnlyPrint>

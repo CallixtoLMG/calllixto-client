@@ -1,7 +1,7 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form } from "@/common/components/custom";
+import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { ContactControlled, ContactView, DropdownControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
-import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
+import { ENTITIES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { useKeyboardShortcuts, useSettingArrayField } from "@/hooks";
 import { forwardRef, useImperativeHandle } from "react";
@@ -68,40 +68,47 @@ const CustomerForm = forwardRef(({
   return (
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleCreate)} onKeyDown={preventSend}>
-        <FieldsContainer>
-          <TextControlled
-            width="40%"
-            name="name"
-            label="Nombre"
-            placeholder="Martín Bueno"
-            rules={RULES.REQUIRED}
-            disabled={!isUpdating && view}
-            required
-          />
+        <FieldsContainer $columnGap="15px">
+          <FormField flex="1">
+            <TextControlled
+              name="name"
+              label="Nombre"
+              placeholder="Martín Bueno"
+              // rules={RULES.REQUIRED}
+              // disabled={!isUpdating && view}
+              // required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
         </FieldsContainer>
         {isUpdating || !view
           ? <ContactControlled />
           : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
-        <FieldsContainer>
-          <DropdownControlled
-            disabled={!isUpdating && view}
-            width={(!isUpdating && view) ? "fit-content" : "40%"}
-            name="tags"
-            label="Etiquetas"
-            placeholder="Selecciona etiquetas"
-            height="fit-content"
-            multiple
-            clearable={isUpdating && !view}
-            icon={(!isUpdating && view) ? null : undefined}
-            search={isUpdating && !view}
-            selection
-            optionsMapper={optionsMapper}
-            options={Object.values(tagsOptions)}
-            renderLabel={(item) => ({
-              color: item.value.color,
-              content: item.value.name,
-            })}
-          />
+        <FieldsContainer  $columnGap="15px">
+          <FormField flex="1">
+            <DropdownControlled
+              disabled={!isUpdating && view}
+              name="tags"
+              label="Etiquetas"
+              placeholder="Selecciona etiquetas"
+              height="fit-content"
+              multiple
+              clearable={isUpdating && !view}
+              icon={(!isUpdating && view) ? null : undefined}
+              search={isUpdating && !view}
+              selection
+              optionsMapper={optionsMapper}
+              noResultsMessage="No hay opciones disponibles"
+              options={Object.values(tagsOptions)}
+              renderLabel={(item) => ({
+                color: item.value.color,
+                content: item.value.name,
+              })}
+            />
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
         </FieldsContainer>
         <TextAreaControlled name="comments" label="Comentarios" placeholder="No era tan bueno" readOnly={!isUpdating && view} />
         {(isUpdating || !view) && (

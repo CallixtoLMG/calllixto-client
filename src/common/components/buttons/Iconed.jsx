@@ -1,7 +1,7 @@
 import { SIZES } from '@/common/constants';
 import { forwardRef } from 'react';
-import { Icon } from 'semantic-ui-react';
-import { Button } from '../custom';
+import { Icon, Popup } from 'semantic-ui-react';
+import { Button, Flex } from '../custom';
 
 const IconedButton = forwardRef(({
   text,
@@ -11,23 +11,29 @@ const IconedButton = forwardRef(({
   basic,
   disabled,
   loading,
-  width = 'fit-content',
-  height,
+  width,
+  height = '35px',
   submit,
   position,
   alignSelf,
   onKeyDown,
-  padding
+  padding,
+  iconOnly = false,
+  popupPosition = 'top center',
+  popupInverted = false,
+  popupDisabled = false,
+  popupContent,
 }, ref) => {
-  return (
+  const buttonElement = (
     <Button
       size={SIZES.SMALL}
       icon
+      $iconOnly={iconOnly}
       $alignSelf={alignSelf}
-      labelPosition="left"
+      labelPosition={iconOnly ? undefined : 'left'}
       position={position}
       basic={basic}
-      width={width}
+      width={width || (iconOnly ? '35px' : '110px')}
       padding={padding}
       height={height}
       color={color}
@@ -39,8 +45,30 @@ const IconedButton = forwardRef(({
       ref={ref}
     >
       <Icon name={icon} />
-      {text}
+      {!iconOnly && text}
     </Button>
+  );
+
+  const shouldShowTooltip = iconOnly && !popupDisabled;
+
+  if (!shouldShowTooltip) {
+    return buttonElement;
+  }
+
+  const popupTrigger = (
+    <Flex $alignSelf="end">
+      {buttonElement}
+    </Flex>
+  );
+
+  return (
+    <Popup
+      content={popupContent || text}
+      position={popupPosition}
+      inverted={popupInverted}
+      size={SIZES.TINY}
+      trigger={popupTrigger}
+    />
   );
 });
 

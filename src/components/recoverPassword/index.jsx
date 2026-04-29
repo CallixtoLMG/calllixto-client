@@ -76,7 +76,7 @@ const RecoverPasswordForm = () => {
               height={100}
               priority
             />
-            <Text>{isCodeSent ? "Cambiar Contraseña" : "Recuperar Contraseña"}</Text>
+            <Text>{isCodeSent ? "Cambiar contraseña" : "Recuperar contraseña"}</Text>
           </div>
         </ModHeader>
         <FormProvider {...methods}>
@@ -123,12 +123,12 @@ const RecoverPasswordForm = () => {
                       );
                     },
                   }}
-                  placeholder="Nuevo Contraseña"
+                  placeholder="Nuevo contraseña"
                   showPasswordRequirements
                 />
                 <PasswordControlled
                   name="confirmPassword"
-                  placeholder="Confirmar Nueva Contraseña"
+                  placeholder="Confirmar nueva contraseña"
                   rules={{
                     ...RULES.REQUIRED,
                     validate: (value) =>
@@ -143,7 +143,7 @@ const RecoverPasswordForm = () => {
               size={SIZES.LARGE}
               disabled={isCodeSent ? isConfirmResetPending : isRecoverPasswordPending}
             >
-              {isCodeSent ? "Cambiar Contraseña" : "Enviar"}
+              {isCodeSent ? "Cambiar contraseña" : "Enviar"}
             </ModButton>
             <RedirectLink onClick={() => push(PAGES.LOGIN.BASE)}>
               Volver al inicio de sesión

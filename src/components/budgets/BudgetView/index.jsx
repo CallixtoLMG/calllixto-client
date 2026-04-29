@@ -1,14 +1,19 @@
 import { useConfirmBudgetDiscount } from "@/api/budgets";
 import { useCreatePayment, useDeletePayment, useEditPayment } from "@/api/payments";
+import { useListStockFlowsByBudget } from "@/api/stock";
 import { ENTITIES } from "@/common/constants";
+import BudgetDeliveries from "@/components/budgets/BudgetDeliveries";
+import DeliveriesHistory from "@/components/budgets/BudgetDeliveries/DeliveriesHistory";
 import BudgetDetails from "@/components/budgets/BudgetView/BudgetDetails";
 import { Loader } from "@/components/layout";
 import Payments from "@/components/payments";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
+import { FlexColumn } from "../../../common/components/custom";
+import { mapBudgetToDeliveryForm, mapStockFlowsToHistory } from "../budgets.constants";
 import { isBudgetCancelled, isBudgetExpired, isBudgetPending } from "../budgets.utils";
 
 const BudgetView = ({
@@ -21,29 +26,34 @@ const BudgetView = ({
   refetch,
   paymentsMade,
   isLoadingPayments,
-  refetchPayments,
+  activeIndex,
+  onTabChange,
 }) => {
-  const searchParams = useSearchParams();
-  const tabParam = searchParams.get("tab");
-  const initialTabIndex = tabParam === "pagos" ? 1 : 0;
-  const [activeIndex, setActiveIndex] = useState(initialTabIndex);
-  const router = useRouter();
   const editPayment = useEditPayment();
   const createPayment = useCreatePayment();
   const deletePayment = useDeletePayment();
   const confirmBudgetDiscount = useConfirmBudgetDiscount();
   const [isModalPaymentOpen, setIsModalPaymentOpen] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const { data: stockFlowsByBudget, isLoading: isLoadingStockFlowsByBudget } = useListStockFlowsByBudget({ budgetId: budget.id });
+
+  const stockFlowsByBudgetHistory = useMemo(
+    () => mapStockFlowsToHistory(stockFlowsByBudget ?? []),
+    [stockFlowsByBudget]
+  );
+
+  const methods = useForm({
+    defaultValues: undefined,
+    shouldUnregister: false,
+  });
 
   const { mutate: mutateCreatePayment, isPending: isCreatePending } = useMutation({
     mutationFn: (payment) => createPayment(payment, ENTITIES.BUDGET, budget.id),
     onSuccess: (response) => {
       if (response?.statusOk) {
         toast.success("Pago creado correctamente!");
-        refetchPayments();
-        refetch();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -56,10 +66,9 @@ const BudgetView = ({
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pago actualizado!");
-        refetchPayments();
         refetch();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -72,10 +81,9 @@ const BudgetView = ({
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Pago eliminado!");
-        refetchPayments();
         refetch();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -135,27 +143,43 @@ const BudgetView = ({
             </Loader>
           ),
         },
+        {
+          key: "deliveries",
+          label: "Entregas",
+          component: (
+            <FlexColumn $rowGap="15px">
+              <Loader active={isLoadingStockFlowsByBudget}>
+                <BudgetDeliveries onSuccess={refetch} budgetId={budget.id} state={budget.state} />
+                {!!stockFlowsByBudgetHistory.length &&
+                  <DeliveriesHistory history={stockFlowsByBudgetHistory} />
+                }
+              </Loader>
+            </FlexColumn>
+          ),
+        },
       ]
       : []),
   ];
+
+  useEffect(() => {
+    if (!budget) return;
+
+    methods.reset(mapBudgetToDeliveryForm(budget));
+  }, [budget, methods]);
 
   const panes = modules.map((mod) => ({
     menuItem: mod.label,
     render: () => <Tab.Pane>{mod.component}</Tab.Pane>,
   }));
 
-  const handleTabChange = async (_, { activeIndex }) => {
-    setActiveIndex(activeIndex);
-    const newUrl = window.location.pathname;
-    router.replace(newUrl);
-  };
-
   return (
-    <Tab
-      panes={panes}
-      activeIndex={activeIndex}
-      onTabChange={handleTabChange}
-    />
+    <FormProvider {...methods}>
+      <Tab
+        panes={panes}
+        activeIndex={activeIndex}
+        onTabChange={onTabChange}
+      />
+    </FormProvider>
   );
 };
 

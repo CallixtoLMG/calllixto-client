@@ -21,7 +21,7 @@ const CreateExpense = () => {
 
   useEffect(() => {
     resetActions();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -35,11 +35,8 @@ const CreateExpense = () => {
         push(PAGES.EXPENSES.SHOW(response.expense.id));
         toast.success("Gasto creado!");
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
-    },
-    onError: (error) => {
-      toast.error(error.message);
     },
   });
 

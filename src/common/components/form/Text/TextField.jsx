@@ -5,11 +5,15 @@ import { Popup } from "semantic-ui-react";
 import styled, { css } from "styled-components";
 
 const TruncateInput = styled.div`
-  width: 100%;
+  width: 0;
+  max-width: 100%!important;
+  min-width: 0!important;
+  flex: 1 1 auto!important;
+
   height: 38px;
   padding: 9.5px 14px;
   border: 1px solid #d4d4d5;
-  border-radius: 4px;
+  border-radius: ${({ $truncateInput }) => `${$truncateInput ? "0 4px 4px 0" : "4px"}!important`} ;
   background-color: #f9f9f9;
   font-size: 14px;
   color: rgba(0, 0, 0, 0.87);
@@ -43,6 +47,8 @@ export const TextField = forwardRef(({
   name,
   flex,
   width,
+  minWidth,
+  maxWidth,
   label,
   placeholder,
   iconLabel,
@@ -57,6 +63,8 @@ export const TextField = forwardRef(({
   popupPosition = "top center",
   readOnly,
   textAlign,
+  $truncateInput,
+  onKeyDown
 }, ref) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -84,11 +92,12 @@ export const TextField = forwardRef(({
       {typeof iconLabel === "string" || typeof iconLabel === "object" ? iconLabel : null}
     </StyledLabel>
   );
-
   return (
     <FormField
       flex={flex}
       $width={width}
+      $minWidth={minWidth}
+      $maxWidth={maxWidth}
       label={label}
       control={Input}
       error={error}
@@ -103,7 +112,7 @@ export const TextField = forwardRef(({
           textAlign={textAlign}
         >
           {iconLabel && showIconLabel()}
-          <TruncateInput>
+          <TruncateInput $truncateInput={$truncateInput}>
             <OverflowWrapper popupContent={value} maxWidth="100%">
               {value}
             </OverflowWrapper>
@@ -118,13 +127,14 @@ export const TextField = forwardRef(({
           onChange={onChange}
           readOnly={readOnly}
           maxLength={maxLength}
+          onKeyDown={onKeyDown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           $iconLabel={iconLabel}
           ref={ref}
         >
           {iconLabel && showIconLabel()}
-          <input ref={ref}/>
+          <input ref={ref} />
         </Input>
       )}
     </FormField>

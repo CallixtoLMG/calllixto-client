@@ -14,6 +14,7 @@ export const PercentField = forwardRef(({
   disabled,
   justifyItems,
   onBlur,
+  $minWidth,
 }, ref) => {
 
   return (
@@ -25,11 +26,13 @@ export const PercentField = forwardRef(({
       control={Input}
       disabled={disabled}
       error={error}
+      $minWidth={$minWidth}
     >
       <Input
+        $minWidth={$minWidth}
         value={value}
         icon
-        justifyItems={justifyItems}
+        $justifyItems={justifyItems}
         disabled={disabled}
         onChange={(e) => {
           const inputValue = e.target.value;
@@ -52,7 +55,7 @@ export const PercentField = forwardRef(({
         onBlur={onBlur}
         ref={ref}
       >
-        <input />
+        <input style={{ width: "100%" }} />
         <Icon name={ICONS.PERCENT} size={SIZES.SMALL} />
       </Input>
     </FormField>

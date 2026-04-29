@@ -107,14 +107,28 @@ export function useCreateItem() {
 export function usePostUpdateItem() {
   const invalidate = useInvalidateQueries();
 
-  const postItem = async ({ entity, value = {}, url, responseEntity, invalidateQueries = [], params = {}, attributes }) => {
+  const postItem = async ({
+    entity,
+    value = {},
+    url,
+    responseEntity,
+    invalidateQueries = [],
+    params = {},
+    attributes,
+    skipStorageUpdate = false, 
+  }) => {
     const { data } = await getInstance().post(url, value, { params });
 
-    if (data.statusOk) {
-      await updateOrCreateStorageItem({
-        entity,
-        value: attributes ? pick(data[responseEntity], getDefaultAttributes(attributes)) : data[responseEntity]
-      });
+    if (data?.statusOk) {
+      if (!skipStorageUpdate && responseEntity) {
+        await updateOrCreateStorageItem({
+          entity,
+          value: attributes
+            ? pick(data[responseEntity], getDefaultAttributes(attributes))
+            : data[responseEntity],
+        });
+      }
+
       invalidate(invalidateQueries);
     }
 
@@ -122,7 +136,7 @@ export function usePostUpdateItem() {
   };
 
   return postItem;
-};
+}
 
 export function useEditItem() {
   const invalidate = useInvalidateQueries();

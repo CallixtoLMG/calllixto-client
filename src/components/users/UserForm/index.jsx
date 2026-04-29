@@ -1,5 +1,5 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
-import { FieldsContainer, Form } from "@/common/components/custom";
+import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
 import { RULES, SHORTKEYS } from "@/common/constants";
 import { validateEmail } from "@/common/utils";
@@ -63,125 +63,141 @@ const UserForm = forwardRef(({
     <FormProvider {...methods}>
       <Form onSubmit={handleSubmit(handleCreate)}>
         <FieldsContainer>
-          <TextControlled
-            width="25%"
-            name="username"
-            label="Usuario"
-            placeholder="martinb@hotmail.com"
-            rules={{
-              required: "Este campo es obligatorio.",
-              validate: {
-                email: (value) => validateEmail(value) || "El correo electrónico no es válido.",
-              },
-            }}
-            disabled={view}
-            iconLabel={!view}
-            popupPosition="bottom left"
-            showPopup={!view}
-            popupContent="Introduce el email del usuario."
-            required
-          />
-          <DropdownControlled
-            height="38px"
-            width="25%"
-            name="role"
-            label="Rol"
-            icon={(!isUpdating && view) ? null : undefined}
-            defaultValue={user?.role || "user"}
-            rules={RULES.REQUIRED}
-            options={USERS_ROLE_OPTIONS}
-            disabled={!isUpdating && view}
-          />
+          <FormField flex="1">
+            <TextControlled
+              name="username"
+              label="Usuario"
+              placeholder="martinb@hotmail.com"
+              rules={{
+                required: "Este campo es obligatorio.",
+                validate: {
+                  email: (value) => validateEmail(value) || "El correo electrónico no es válido.",
+                },
+              }}
+              disabled={view}
+              iconLabel={!view}
+              popupPosition="bottom left"
+              showPopup={!view}
+              popupContent="Introduce el email del usuario."
+              required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flex="1">
+            <DropdownControlled
+              height="38px"
+              name="role"
+              label="Rol"
+              icon={(!isUpdating && view) ? null : undefined}
+              defaultValue={user?.role || "user"}
+              rules={RULES.REQUIRED}
+              options={USERS_ROLE_OPTIONS}
+              disabled={!isUpdating && view}
+            />
+          </FormField>
+          <FormField flex="1" />
         </FieldsContainer>
         <FieldsContainer>
-          <TextControlled
-            width="25%"
-            name="firstName"
-            label="Nombre"
-            placeholder="Martín"
-            rules={RULES.REQUIRED}
-            disabled={!isUpdating && view}
-            required
-          />
-          <TextControlled
-            width="25%"
-            name="lastName"
-            label="Apellido"
-            placeholder="Bueno"
-            rules={RULES.REQUIRED}
-            disabled={!isUpdating && view}
-            required
-          />
-          <DatePickerControlled
-            disabled={!isUpdating && view}
-            name="birthDate"
-            label="Fecha de nacimiento"
-            placeholder="16-11-2025"
-            width="180px"
-            defaultValue={getPastDate(18, "years")}
-            maxDate={new Date()}
-            showMonthDropdown
-            showYearDropdown
-            scrollableYearDropdown
-            yearDropdownItemNumber={80}
-            rules={{
-              required: "Campo requerido.",
-              validate: (value) => {
-                const today = new Date();
-                const minBirthDate = new Date();
-                minBirthDate.setFullYear(today.getFullYear() - 18);
-                return value <= minBirthDate || "El usuario debe tener al menos 18 años.";
-              }
-            }}
-            required
-          />
+          <FormField flex="1">
+            <TextControlled
+              name="firstName"
+              label="Nombre"
+              placeholder="Martín"
+              rules={RULES.REQUIRED}
+              disabled={!isUpdating && view}
+              required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flex="1">
+            <TextControlled
+              name="lastName"
+              label="Apellido"
+              placeholder="Bueno"
+              rules={RULES.REQUIRED}
+              disabled={!isUpdating && view}
+              required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flex="1" />
+
         </FieldsContainer>
         <FieldsContainer>
-          <TextControlled
-            width="51%"
-            name="address"
-            label="Dirección"
-            placeholder="Mitre 525 9c"
-            rules={RULES.REQUIRED}
-            disabled={!isUpdating && view}
-            required
-          />
-          <NumberControlled
-            width="130px"
-            name="phoneNumber.areaCode"
-            label="Código de Área"
-            placeholder="385"
-            maxLength="4"
-            rules={{
-              required: "El código de área es requerido.",
-              validate: (value) => {
-                const number = watch("phoneNumber.number") ?? '';
-                return (value + number).length === 10 || "El área y el número deben sumar 10 dígitos.";
-              },
-            }}
-            onChange={() => isSubmitted && trigger("phoneNumber.number")}
-            disabled={!isUpdating && view}
-            normalMode
-            required
-          />
-          <NumberControlled
-            width="150px"
-            name="phoneNumber.number"
-            label="Número de Teléfono"
-            placeholder="5228706"
-            rules={{
-              required: "El número de teléfono es requerido.",
-              validate: (value) => {
-                const areaCode = watch("phoneNumber.areaCode") ?? '';
-                return (areaCode + value).length === 10 || "El área y el número deben sumar 10 dígitos.";
-              },
-            }}
-            onChange={() => isSubmitted && trigger("phoneNumber.areaCode")}
-            disabled={!isUpdating && view}
-            maxLength="7"
-            normalMode
-            required
-          />
+          <FormField flex="1">
+            <DatePickerControlled
+              disabled={!isUpdating && view}
+              name="birthDate"
+              label="Fecha de nacimiento"
+              placeholder="16-11-2025"
+              defaultValue={getPastDate(18, "years")}
+              maxDate={new Date()}
+              showMonthDropdown
+              showYearDropdown
+              scrollableYearDropdown
+              yearDropdownItemNumber={80}
+              rules={{
+                required: "Campo requerido.",
+                validate: (value) => {
+                  const today = new Date();
+                  const minBirthDate = new Date();
+                  minBirthDate.setFullYear(today.getFullYear() - 18);
+                  return value <= minBirthDate || "El usuario debe tener al menos 18 años.";
+                }
+              }}
+              required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flex="1">
+            <TextControlled
+              name="address"
+              label="Dirección"
+              placeholder="Mitre 525 9c"
+              rules={RULES.REQUIRED}
+              disabled={!isUpdating && view}
+              required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flex="1" />
+
+        </FieldsContainer>
+        <FieldsContainer>
+          <FormField flex="1">
+            <NumberControlled
+              name="phoneNumber.areaCode"
+              label="Código de área"
+              placeholder="385"
+              maxLength="4"
+              rules={{
+                required: "El código de área es requerido.",
+                validate: (value) => {
+                  const number = watch("phoneNumber.number") ?? '';
+                  return (value + number).length === 10 || "El área y el número deben sumar 10 dígitos.";
+                },
+              }}
+              onChange={() => isSubmitted && trigger("phoneNumber.number")}
+              disabled={!isUpdating && view}
+              normalMode
+              required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flex="1">
+            <NumberControlled
+              name="phoneNumber.number"
+              label="Número de teléfono"
+              placeholder="5228706"
+              rules={{
+                required: "El número de teléfono es requerido.",
+                validate: (value) => {
+                  const areaCode = watch("phoneNumber.areaCode") ?? '';
+                  return (areaCode + value).length === 10 || "El área y el número deben sumar 10 dígitos.";
+                },
+              }}
+              onChange={() => isSubmitted && trigger("phoneNumber.areaCode")}
+              disabled={!isUpdating && view}
+              maxLength="7"
+              normalMode
+              required={isUpdating || !view}
+            />
+          </FormField>
+          <FormField flex="1" />
         </FieldsContainer>
         <FieldsContainer>
           <TextAreaControlled name="comments" label="Comentarios" placeholder="Martin Bueno no era un cliente?" readOnly={!isUpdating && view} />
@@ -197,7 +213,7 @@ const UserForm = forwardRef(({
           />
         )}
       </Form>
-    </FormProvider>
+    </FormProvider >
   );
 });
 

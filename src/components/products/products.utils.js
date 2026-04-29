@@ -59,8 +59,13 @@ export const getPrice = ({ fractionConfig, price }) =>
     : price;
 
 export const getTotal = (product) => {
-  const price = getPrice(product);
-  return price * product.quantity * (1 - (product.discount / 100)) ?? 0;
+  if (!product) return 0;
+
+  const price = Number(getPrice(product)) || 0;
+  const quantity = Number(product.quantity) || 0;
+  const discount = Number(product.discount) || 0;
+
+  return price * quantity * (1 - discount / 100);
 };
 
 export const calculateMargin = (price, cost) => {

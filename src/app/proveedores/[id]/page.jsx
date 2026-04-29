@@ -2,7 +2,7 @@
 import { useUserContext } from "@/User";
 import { useDeleteBySupplierId, useProductsBySupplierId } from "@/api/products";
 import { useDeleteSupplier, useEditSupplier, useGetSupplier, useSetSupplierState } from "@/api/suppliers";
-import { Icon, Message, MessageHeader, } from "@/common/components/custom";
+import { Button, DropdownItem, FieldsContainer, FormField, Icon, Message, MessageHeader, } from "@/common/components/custom";
 import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
@@ -10,9 +10,11 @@ import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges"
 import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
 import { downloadExcel, isItemInactive } from "@/common/utils";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext, } from "@/components/layout";
-import { PRODUCT_STATES } from "@/components/products/products.constants";
+import { BatchImportStock } from "@/components/products/BatchImportStock";
+import { DISCOUNT_STOCK, PRODUCT_STATES, UPLOAD_STOCK } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
+import { EXAMPLE_TEMPLATE_DATA_STOCK } from "@/components/suppliers/suppliers.constants";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
@@ -20,6 +22,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
+import { Dropdown } from "semantic-ui-react";
 
 const Supplier = ({ params }) => {
   useValidateToken();
@@ -29,8 +32,7 @@ const Supplier = ({ params }) => {
   const { data: products, isLoading: loadingProducts, refetch: refetchProducts } = useProductsBySupplierId(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalAction, setModalAction] = useState(null);
+  const [confirmationAction, setConfirmationAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
   const [isExcelLoading, setIsExcelLoading] = useState(false);
   const [reason, setReason] = useState("");
@@ -39,20 +41,13 @@ const Supplier = ({ params }) => {
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
-    closeModal,
   } = useUnsavedChanges({
     formRef,
     onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
-    },
-    onSave: () => {
-      formRef.current?.submitForm();
     },
   });
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
@@ -116,8 +111,7 @@ const Supplier = ({ params }) => {
   };
 
   const handleModalClose = () => {
-    setIsModalOpen(false);
-    setModalAction(null);
+    setConfirmationAction(null);
     setReason("");
   };
 
@@ -127,9 +121,8 @@ const Supplier = ({ params }) => {
       if (response.statusOk) {
         toast.success('Proveedor actualizado!');
         setIsUpdating(false);
-        resolveSave();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -147,7 +140,7 @@ const Supplier = ({ params }) => {
           toast.success('Lista de productos del proveedor eliminada!');
           handleModalClose();
         } else {
-          toast.error(response.error.message);
+          toast.error(`${response?.message} (${response?.error?.message})`);
         }
       },
       onSettled: () => {
@@ -164,7 +157,7 @@ const Supplier = ({ params }) => {
           toast.success('Proveedor eliminado permanentemente!');
           push(PAGES.SUPPLIERS.BASE);
         } else {
-          toast.error(response.error.message);
+          toast.error(`${response?.message} (${response?.error?.message})`);
         }
       },
       onSettled: () => {
@@ -183,7 +176,7 @@ const Supplier = ({ params }) => {
             : 'Proveedor desactivado!'
         );
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -193,39 +186,38 @@ const Supplier = ({ params }) => {
   });
 
   const handleActionConfirm = async () => {
-    if (modalAction === INACTIVE && !reason) {
+    if (confirmationAction === INACTIVE && !reason) {
       toast.error("Debe proporcionar una razón para desactivar el proveedor.");
       return;
     }
 
-    setActiveAction(modalAction);
+    setActiveAction(confirmationAction);
 
-    if (modalAction === "deleteBatch") {
+    if (confirmationAction === "deleteBatch") {
       mutateDeleteBatch();
     }
 
-    if (modalAction === "deleteSupplier") {
+    if (confirmationAction === "deleteSupplier") {
       mutateDelete();
     }
 
-    if (modalAction === ACTIVE || modalAction === INACTIVE) {
+    if (confirmationAction === ACTIVE || confirmationAction === INACTIVE) {
       mutateState({
         id: supplier.id,
-        state: modalAction,
-        ...(modalAction === INACTIVE && { inactiveReason: reason }),
+        state: confirmationAction,
+        ...(confirmationAction === INACTIVE && { inactiveReason: reason }),
       });
     }
 
     handleModalClose();
   };
 
-  const {
-    header,
-    confirmText = '',
-    icon = ICONS.QUESTION,
-  } = modalConfig[modalAction] || {};
+  const { header, confirmText = '', icon = ICONS.QUESTION } =
+    modalConfig[confirmationAction] || {};
+
   const requiresConfirmation =
-    modalAction === "deleteSupplier" || modalAction === "deleteBatch";
+    confirmationAction === "deleteSupplier" ||
+    confirmationAction === "deleteBatch";
 
   useEffect(() => {
     const handleBarCodePrint = () => {
@@ -284,22 +276,23 @@ const Supplier = ({ params }) => {
     let actions = [];
 
     if (RULES.canRemove[role]) {
-      const handleClick = (action) => () => handleProtectedAction(() => {
-        setModalAction(action);
-        setIsModalOpen(true);
-      });
+      const handleClick = (action) => () =>
+        handleProtectedAction(() => {
+          setConfirmationAction(action);
+        });
 
       actions = [{
         id: 1,
         icon: ICONS.BARCODE,
         color: COLORS.BLUE,
-        text: "Códigos",
+        text: "Imprimir códigos de barra",
         onClick: handleBarCodePrint,
         loading: activeAction === "print",
         disabled: !!activeAction || isEditPending || !hasAssociatedProducts,
         tooltip: !hasAssociatedProducts
           ? 'No existen productos de este proveedor.'
           : false,
+        iconOnly: true
       },
       {
         id: 2,
@@ -311,68 +304,102 @@ const Supplier = ({ params }) => {
         onClick: handleClick(isItemInactive(supplier?.state) ? ACTIVE : INACTIVE),
         loading: activeAction === ACTIVE || activeAction === INACTIVE,
         disabled: !!activeAction || isEditPending,
-        width: "fit-content",
+        iconOnly: true
       },
       {
         id: 3,
-        icon: ICONS.FILE_EXCEL,
-        text: "Descargar productos",
-        onClick: () => {
-          if (products?.length) {
-            setIsExcelLoading(true);
-            handleDownloadExcel();
-            setIsExcelLoading(false);
-          } else {
-            toast("No hay productos de este proveedor para descargar.", {
-              icon: (
-                <Icon
-                  margin="0"
-                  toast
-                  name={ICONS.INFO_CIRCLE}
-                  color={COLORS.BLUE}
+        iconOnly: true,
+        button: (
+          <Dropdown
+            pointing
+            as={Button}
+            text="Stock/Excel"
+            icon={ICONS.FILE_EXCEL}
+            width="fit-content"
+            floating
+            labeled
+            button
+            className="icon"
+            disabled={
+              isExcelLoading ||
+              !!activeAction ||
+              loadingProducts ||
+              isEditPending ||
+              !hasAssociatedProducts
+            }
+          >
+            <Dropdown.Menu>
+              <DropdownItem
+                onClick={() => {
+                  if (products?.length) {
+                    setIsExcelLoading(true);
+                    handleDownloadExcel();
+                    setIsExcelLoading(false);
+                  } else {
+                    toast("No hay productos de este proveedor para descargar.", {
+                      icon: (
+                        <Icon
+                          margin="0"
+                          toast
+                          name={ICONS.INFO_CIRCLE}
+                          color={COLORS.BLUE}
+                        />
+                      ),
+                    });
+                  }
+                }}
+              >
+                <Icon name={ICONS.DOWNLOAD} color="blue" />
+                Descargar productos
+              </DropdownItem>
+              <DropdownItem  >
+                <BatchImportStock
+                  mode={UPLOAD_STOCK}
+                  supplierId={supplier?.id}
+                  products={products}
                 />
-              ),
-            });
-          }
-        },
-        loading: isExcelLoading,
-        disabled:
-          isExcelLoading ||
-          !!activeAction ||
-          loadingProducts ||
-          isEditPending ||
-          !hasAssociatedProducts,
-        tooltip: !hasAssociatedProducts
-          ? 'No existen productos de este proveedor.'
-          : false,
-        width: "fit-content",
+              </DropdownItem>
+              <DropdownItem  >
+                <BatchImportStock
+                  mode={DISCOUNT_STOCK}
+                  supplierId={supplier?.id}
+                  products={products}
+                />
+              </DropdownItem>
+              <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA_STOCK, "Ejemplo de tabla stock")}>
+                <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla stock
+              </DropdownItem>
+            </Dropdown.Menu>
+          </Dropdown>
+        ),
       },
       {
         id: 4,
         icon: ICONS.LIST_UL,
         color: COLORS.RED,
-        text: "Eliminar productos",
+        text: "Eliminar todos los productos del proveedor",
         onClick: handleClick('deleteBatch'),
         loading: activeAction === "deleteBatch",
         disabled: !hasAssociatedProducts || !!activeAction || isEditPending,
         tooltip: !hasAssociatedProducts
           ? 'No existen productos de este proveedor.'
           : false,
-        width: "fit-content",
+        iconOnly: true
       },
       {
         id: 5,
         icon: ICONS.TRASH,
         color: COLORS.RED,
-        text: "Eliminar",
+        text: "Eliminar proveedor",
         onClick: handleClick('deleteSupplier'),
         loading: activeAction === "deleteSupplier",
         disabled: hasAssociatedProducts || !!activeAction || isEditPending,
         tooltip: hasAssociatedProducts
           ? 'No se puede eliminar este proveedor, existen productos asociados.'
           : false,
-        width: "fit-content",
+        iconOnly: true,
         basic: true,
+        popupPosition: "bottom right"
       }];
     }
 
@@ -388,10 +415,16 @@ const Supplier = ({ params }) => {
     <Loader active={isLoading || loadingProducts || !supplier}>
       {!isItemInactive(supplier?.state) && toggleButton}
       {isItemInactive(supplier?.state) && (
-        <Message negative>
-          <MessageHeader>Motivo de inactivación</MessageHeader>
-          <p>{supplier.inactiveReason}</p>
-        </Message>
+        <FieldsContainer>
+          <FormField flex="1">
+            <Message negative>
+              <MessageHeader>Motivo de inactivación</MessageHeader>
+              <p>{supplier.inactiveReason}</p>
+            </Message>
+          </FormField>
+          <FormField flex="1" />
+          <FormField flex="1" />
+        </FieldsContainer>
       )}
       <SupplierForm
         ref={formRef}
@@ -410,16 +443,14 @@ const Supplier = ({ params }) => {
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
-        onSave={handleSave}
-        isSaving={isSaving}
-        onCancel={handleCancel}
+        onContinue={handleContinue}
       />
       <ModalAction
         title={header}
         onConfirm={handleActionConfirm}
         confirmationWord={requiresConfirmation ? confirmText : ""}
         confirmButtonIcon={icon}
-        showModal={isModalOpen}
+        showModal={!!confirmationAction}
         setShowModal={handleModalClose}
         isLoading={
           isDeleteBatchPending ||
@@ -428,7 +459,7 @@ const Supplier = ({ params }) => {
         }
         noConfirmation={!requiresConfirmation}
         bodyContent={
-          modalAction === INACTIVE && (
+          confirmationAction === INACTIVE && (
             <TextField
               placeholder="Motivo"
               value={reason}

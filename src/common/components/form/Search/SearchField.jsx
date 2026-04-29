@@ -26,12 +26,16 @@ const SearchField = forwardRef(
       getDisplayValue = (element) => element?.name ?? '',
       label,
       width,
+      minWidth,
+      maxWidth,
       required,
       disabled,
       error,
       height,
       clearAfterSelect,
       onAfterChange,
+      onQueryChange,
+      resultRenderer,
     },
     ref
   ) => {
@@ -74,8 +78,9 @@ const SearchField = forwardRef(
     useEffect(() => {
       if (value == null) {
         setQuery('');
+        onQueryChange?.('');
       }
-    }, [value]);
+    }, [value, onQueryChange]);
 
     const handleKeyDown = (e) => {
       if (e.key === 'Backspace' && value != null) {
@@ -85,6 +90,7 @@ const SearchField = forwardRef(
 
     const handleChange = (_, { value: inputValue }) => {
       setQuery(inputValue);
+      onQueryChange?.(inputValue);
     };
 
     const handleSelect = (_, { result }) => {
@@ -92,23 +98,38 @@ const SearchField = forwardRef(
 
       onSelect(selectedOption);
       onAfterChange?.(selectedOption);
+      onQueryChange?.(getDisplayValue(selectedOption));
 
       if (clearAfterSelect) {
         setQuery('');
+        onQueryChange?.('');
         onSelect(null);
       }
     };
 
     const handleClear = () => {
       setQuery('');
+      onQueryChange?.('');
       onSelect(null);
     };
+
+    const hasSelectedValue =
+      value !== null &&
+      value !== undefined &&
+      (
+        typeof value === "object"
+          ? Object.keys(value).length > 0
+          : String(value).trim() !== ""
+      );
+
 
     return (
       <FormField
         $width={width}
+        $minWidth={minWidth}
+        $maxWidth={maxWidth}
         icon={
-          clearable && value ? {
+          clearable && hasSelectedValue ? {
             name: ICONS.CLOSE,
             link: true,
             onClick: handleClear,
@@ -117,13 +138,13 @@ const SearchField = forwardRef(
         required={required}
         label={label}
         placeholder={placeholder ?? label}
-        search
         minCharacters={minCharacters}
         noResultsMessage={noResultsMessage}
         control={Search}
         loading={loading}
         results={filtered.slice(0, maxResults).map(getResultProps)}
-        value={value ? getDisplayValue(value) : query}
+        resultRenderer={resultRenderer}
+        value={hasSelectedValue ? getDisplayValue(value) : query}
         onSearchChange={handleChange}
         onKeyDown={handleKeyDown}
         onResultSelect={handleSelect}

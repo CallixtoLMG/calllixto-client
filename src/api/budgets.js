@@ -2,7 +2,7 @@ import { DATE_FORMATS, ENTITIES, IN_MS } from "@/common/constants";
 import { getDefaultListParams } from '@/common/utils';
 import { getDateWithOffset } from "@/common/utils/dates";
 import { GET_BUDGET_QUERY_KEY, LIST_ATTRIBUTES, LIST_BUDGETS_HISTORY_QUERY_KEY, LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
-import { CANCEL, CONFIRM, PATHS, PAYMENTS } from "@/fetchUrls";
+import { CANCEL, CONFIRM, PATHS } from "@/fetchUrls";
 import { useQuery } from "@tanstack/react-query";
 import { getInstance } from './axios';
 import { entityList, listItems, useCreateItem, useEditItem, usePatchItem } from "./common";
@@ -161,20 +161,4 @@ export const useCancelBudget = () => {
   };
 
   return cancelBudget;
-};
-
-export const useUpdatePayments = () => {
-  const editItem = useEditItem();
-
-  const updatePayments = async ({ budget: { paymentsMade, updatedAt }, id }) => {
-    return editItem({
-      entity: ENTITIES.BUDGETS,
-      url: `${PATHS.BUDGETS}/${id}/${PAYMENTS}`,
-      value: { paymentsMade, updatedAt },
-      responseEntity: ENTITIES.BUDGET,
-      invalidateQueries: [[LIST_BUDGETS_QUERY_KEY], [GET_BUDGET_QUERY_KEY, id]]
-    });
-  };
-
-  return updatePayments;
 };

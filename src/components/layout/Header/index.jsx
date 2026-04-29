@@ -1,21 +1,31 @@
 'use client';
 import { useUserContext } from "@/User";
-import { Flex, Icon, Label } from "@/common/components/custom";
+import { IconedButton } from "@/common/components/buttons";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
-import { BADGE_CONFIG, DEFAULT_SELECTED_CLIENT, ICONS, PAGES } from "@/common/constants";
+import { COLORS, DEFAULT_SELECTED_CLIENT, ICONS, PAGES, getNavigationItems } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES, isCallixtoUser } from "@/roles";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Button, Menu } from "semantic-ui-react";
-import UserMenu from "../UserMenu";
-import { Container, MenuBadge, MenuItem, ModLink, RigthHeaderDiv, Text } from "./styles";
+import { useEffect, useMemo, useState } from "react";
+import { UserMenu } from "..";
+import SidebarNavigation from "./Sidebar";
+import {
+  Brand,
+  ClientBadge,
+  HeaderBar,
+  HeaderLeft,
+  HeaderRight,
+  Overlay,
+  RightActions,
+  UserButton
+} from "./styles";
 
 const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
   const [selectedClientId, setSelectedClientId] = useState(DEFAULT_SELECTED_CLIENT);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -24,6 +34,8 @@ const Header = () => {
       setSelectedClientId(client);
     }
   }, []);
+
+  const navigationItems = useMemo(() => getNavigationItems(role), [role]);
 
   const handleClientChange = (client) => {
     localStorage.setItem("selectedClientId", client);
@@ -38,104 +50,108 @@ const Header = () => {
   const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
 
-  const shortcutMapping = {
-    [PAGES.CUSTOMERS.SHORTKEYS]: () => push(PAGES.CUSTOMERS.BASE),
-    [PAGES.SUPPLIERS.SHORTKEYS]: () => push(PAGES.SUPPLIERS.BASE),
-    [PAGES.BRANDS.SHORTKEYS]: () => push(PAGES.BRANDS.BASE),
-    [PAGES.PRODUCTS.SHORTKEYS]: () => push(PAGES.PRODUCTS.BASE),
-    [PAGES.BUDGETS.SHORTKEYS]: () => push(PAGES.BUDGETS.BASE),
-    [PAGES.EXPENSES.SHORTKEYS]: () => push(PAGES.EXPENSES.BASE),
-    [PAGES.USERS.SHORTKEYS]: () => push(PAGES.USERS.BASE),
-    [PAGES.SETTINGS.SHORTKEYS]: () => push(PAGES.SETTINGS.BASE),
-    [PAGES.CASH_BALANCES.SHORTKEYS]: () => push(PAGES.CASH_BALANCES.BASE),
-  };
+  const shortcutMapping = useMemo(() => ([
+    {
+      key: PAGES.CUSTOMERS.SHORTKEYS,
+      action: () => push(PAGES.CUSTOMERS.BASE),
+    },
+    {
+      key: PAGES.SUPPLIERS.SHORTKEYS,
+      action: () => push(PAGES.SUPPLIERS.BASE),
+    },
+    {
+      key: PAGES.BRANDS.SHORTKEYS,
+      action: () => push(PAGES.BRANDS.BASE),
+    },
+    {
+      key: PAGES.PRODUCTS.SHORTKEYS,
+      action: () => push(PAGES.PRODUCTS.BASE),
+    },
+    {
+      key: PAGES.BUDGETS.SHORTKEYS,
+      action: () => push(PAGES.BUDGETS.BASE),
+    },
+    {
+      key: PAGES.EXPENSES.SHORTKEYS,
+      action: () => push(PAGES.EXPENSES.BASE),
+    },
+    {
+      key: PAGES.CASH_BALANCES.SHORTKEYS,
+      action: () => push(PAGES.CASH_BALANCES.BASE),
+    },
+    {
+      key: PAGES.USERS.SHORTKEYS,
+      action: () => push(PAGES.USERS.BASE),
+      condition: () => RULES.canUpdate[role],
+    },
+    {
+      key: PAGES.SETTINGS.SHORTKEYS,
+      action: () => push(PAGES.SETTINGS.BASE),
+      condition: () => RULES.canUpdate[role],
+    },
+  ]), [push, role]);
 
   useKeyboardShortcuts(shortcutMapping);
+
+  if (!showHeader) return null;
+
+  if (!userData?.isAuthorized) {
+    return (
+      <HeaderBar>
+        <HeaderLeft>
+          <Brand>CallixtoGLM</Brand>
+        </HeaderLeft>
+        <HeaderRight>
+          <UserButton onClick={handleLogout}>Ingresar</UserButton>
+        </HeaderRight>
+      </HeaderBar>
+    );
+  }
+
   return (
     <>
-      {showHeader && (
-        <Menu fixed="top">
-          <Container>
-            {!userData?.isAuthorized ? (
-              <Flex>
-                <RigthHeaderDiv>
-                  <MenuItem $displayNone onClick={handleLogout}>
-                    <Button icon>
-                      <Icon name={ICONS.USER} /> Ingresar
-                    </Button>
-                  </MenuItem>
-                </RigthHeaderDiv>
-              </Flex>
-            ) : (
-              <>
-                <Flex>
-                  {Object.values(PAGES)
-                    .filter((page) => {
-                      if (!page.NAME) return false;
+      <HeaderBar>
+        <HeaderLeft>
+          <IconedButton
+            onClick={() => setIsSidebarOpen(true)}
+            icon={ICONS.LIST}
+            color={COLORS.BLUE}
+            text="Menú"
+          />
+          <Brand>CallixtoGLM</Brand>
+        </HeaderLeft>
+        <HeaderRight>
+          <RightActions>
+            <ModalUpdates />
+            <KeyboardShortcuts />
+          </RightActions>
+          {isCallixtoUser(role) && (
+            <ClientBadge>{selectedClientId}</ClientBadge>
+          )}
+          <UserMenu
+            trigger={
+              <IconedButton
+                icon={ICONS.USER}
+                color={COLORS.BLUE}
+                text={userData.name}
+                width="fit-content"
 
-                      if (page.NAME === PAGES.USERS.NAME) {
-                        return isCallixtoUser(role);
-                      }
-
-                      if (page.NAME === PAGES.SETTINGS.NAME) {
-                        return RULES.canUpdate[role];
-                      }
-
-                      return true;
-                    })
-                    .map((page) => (
-                      <ModLink key={page.BASE} href={page.BASE}>
-                        <MenuItem
-                          $backgroundColor
-                          $active={pathname.includes(page.BASE)}
-                          $hasBadge={Boolean(page.BADGE)}
-                        >
-                          <Text padding="0px" $active={pathname.includes(page.BASE)}>
-                            {page.NAME}
-                          </Text>
-                          {page.BADGE && BADGE_CONFIG[page.BADGE] && (
-                            <MenuBadge
-                              bgColor={BADGE_CONFIG[page.BADGE].bgColor}
-                              color={BADGE_CONFIG[page.BADGE].color}
-                            >
-                              {BADGE_CONFIG[page.BADGE].label}
-                            </MenuBadge>
-                          )}
-                        </MenuItem>
-                      </ModLink>
-                    ))}
-                </Flex>
-                <Flex>
-                  <RigthHeaderDiv>
-                    <Flex $columnGap="10px">
-                      <ModalUpdates />
-                      <KeyboardShortcuts />
-                    </Flex>
-                  </RigthHeaderDiv>
-                  {isCallixtoUser(role) && (
-                    <RigthHeaderDiv>
-                      <Label height="36px">{selectedClientId}</Label>
-                    </RigthHeaderDiv>
-                  )}
-                  <RigthHeaderDiv>
-                    <UserMenu
-                      trigger={
-                        <Button icon>
-                          <Icon padding="0 20px 0 0" name={ICONS.USER} />{userData.name}
-                        </Button>
-                      }
-                      onLogout={handleLogout}
-                      onClientChange={handleClientChange}
-                      userData={userData}
-                      selectedClient={selectedClientId}
-                    />
-                  </RigthHeaderDiv>
-                </Flex>
-              </>
-            )}
-          </Container>
-        </Menu>
-      )}
+              />
+            }
+            onLogout={handleLogout}
+            onClientChange={handleClientChange}
+            userData={userData}
+            selectedClient={selectedClientId}
+          />
+        </HeaderRight>
+      </HeaderBar>
+      <SidebarNavigation
+        open={isSidebarOpen}
+        pathname={pathname}
+        items={navigationItems}
+        onClose={() => setIsSidebarOpen(false)}
+      />
+      {isSidebarOpen && <Overlay onClick={() => setIsSidebarOpen(false)} />}
     </>
   );
 };

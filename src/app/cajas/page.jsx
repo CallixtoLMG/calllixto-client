@@ -30,7 +30,6 @@ const CashBalances = () => {
   }, [setLabels, refetch]);
 
   const cashBalances = useMemo(() => data?.cashBalances, [data]);
-
   const { mutate, isPending } = useMutation({
     mutationFn: createCashBalance,
     onSuccess: async (response) => {
@@ -38,7 +37,7 @@ const CashBalances = () => {
         toast.success('Caja creada correctamente!');
         push(PAGES.CASH_BALANCES.SHOW(response.cashBalance.id));
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -47,12 +46,12 @@ const CashBalances = () => {
   });
 
   const paymentMethodOptions = useMemo(() => {
-    return mapToDropdownOptions(paymentMethods?.paymentMethods || []);
+    return mapToDropdownOptions(paymentMethods?.paymentMethods || [], COLORS.BLUE);
   }, [paymentMethods]);
 
   const handleDownloadExcel = useCallback((elements) => {
     if (!elements.length) return;
-    const headers = ['ID', 'Estado', 'Fecha de inicio', 'Fecha de cierre', 'Métodos de pago', 'Monto inicial', 'Monto actual', 'Desgloce de Billetes (Inicio)', 'Desgloce de Billetes (Cierre)', 'Comentarios'];
+    const headers = ['ID', 'Estado', 'Fecha de inicio', 'Fecha de cierre', 'Métodos de pago', 'Monto inicial', 'Monto actual', 'Desgloce de billetes (Inicio)', 'Desgloce de billetes (Cierre)', 'Comentarios'];
     const mappedCashBalances = elements.map(cashBalance => {
       const cashBalanceState = CASH_BALANCE_STATES[cashBalance.state]?.singularTitle || cashBalance.state;
 
@@ -77,7 +76,7 @@ const CashBalances = () => {
         cashBalance.comments,
       ];
     });
-    downloadExcel([headers, ...mappedCashBalances], "Lista de Cajas");
+    downloadExcel([headers, ...mappedCashBalances], "Lista de cajas");
   }, []);
 
   useEffect(() => {

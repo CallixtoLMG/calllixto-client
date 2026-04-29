@@ -45,20 +45,13 @@ const CashBalance = ({ params }) => {
   const {
     showModal: showUnsavedModal,
     handleDiscard,
-    handleSave,
-    resolveSave,
-    handleCancel,
-    isSaving,
+    handleContinue,
     onBeforeView,
-    closeModal,
   } = useUnsavedChanges({
     formRef,
     onDiscard: async () => {
       formRef.current?.resetForm();
       setIsUpdating(false);
-    },
-    onSave: () => {
-      formRef.current?.submitForm();
     },
   });
 
@@ -112,9 +105,8 @@ const CashBalance = ({ params }) => {
       if (response.statusOk) {
         toast.success("Caja actualizada!");
         setIsUpdating(false);
-        resolveSave();
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -131,7 +123,7 @@ const CashBalance = ({ params }) => {
         toast.success("Caja eliminada permanentemente!");
         push(PAGES.CASH_BALANCES.BASE);
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -146,7 +138,7 @@ const CashBalance = ({ params }) => {
       if (response.statusOk) {
         toast.success("Caja cerrada!");
       } else {
-        toast.error(response.error.message);
+        toast.error(`${response?.message} (${response?.error?.message})`);
       }
     },
     onSettled: () => {
@@ -248,9 +240,7 @@ const CashBalance = ({ params }) => {
       <UnsavedChangesModal
         open={showUnsavedModal}
         onDiscard={handleDiscard}
-        onSave={handleSave}
-        isSaving={isSaving}
-        onCancel={handleCancel}
+        onContinue={handleContinue}
       />
       <ModalAction
         title={header}
@@ -287,11 +277,12 @@ const CashBalance = ({ params }) => {
                 />
                 <IconedButton
                   icon={ICONS.CLOCK}
-                  text="Ahora"
+                  text="Establecer fecha actual"
                   color={COLORS.BLUE}
                   onClick={() => form.setValue("closeDate", datePickerNow())}
                   alignSelf="end"
                   height="38px"
+                  iconOnly
                 />
               </FieldsContainer>
               <FieldsContainer>
