@@ -117,6 +117,7 @@ const ModalCreateCustomer = ({ isModalOpen, onClose, initialName = "" }) => {
                     validate: (value) => !!value?.trim() || "El nombre es requerido.",
                   }}
                   ref={nameInputRef}
+                  required
                 />
                 <FormField flex="1" />
                 <FormField flex="1" />

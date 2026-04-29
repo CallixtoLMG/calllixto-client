@@ -19,7 +19,7 @@ const StyledModal = styled(Modal)`
 `;
 
 const ModalUpdates = () => {
-  const activeVersion = '2026-03-30';
+  const activeVersion = '2026-04-29';
   const latestNews = window?.localStorage?.getItem('latestNews');
   const [open, setOpen] = useState(!latestNews || isDateBefore(latestNews, activeVersion));
 
@@ -56,6 +56,9 @@ const ModalUpdates = () => {
               </ListItem>
               <ListItem>
                 El stock se descuenta automáticamente al <Accent>confirmar o registrar una entrega</Accent> en un presupuesto, siempre que el producto tenga el control de stock habilitado.
+              </ListItem>
+              <ListItem>
+              En la página de <Accent>Crear Venta</Accent> ahora podés crear un cliente directamente sin salir de la venta.
               </ListItem>
             </List>
             <StyledListHeader>

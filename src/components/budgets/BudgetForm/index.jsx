@@ -550,62 +550,64 @@ const BudgetForm = ({
           <FormField flex="1" />
         </FieldsContainer>
         <FieldsContainer>
-          <FormField flex="1">
-            <SearchControlled
-              name="customer"
-              label="Cliente"
-              required
-              clearable
-              placeholder="Martín Bueno"
-              rules={{
-                validate: {
-                  required: (value) => !!value?.id || "Campo requerido.",
-                  activeCustomer: (value) =>
-                    value?.state === CUSTOMER_STATES.ACTIVE.id ||
-                    "No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.",
-                  requiredAddress: (value) =>
-                    isBudgetConfirmed(watchState) &&
-                      (!value?.addresses.length && !watchPickUp)
-                      ? "Dirección requerida."
-                      : true,
-                  requiredPhone: (value) =>
-                    isBudgetConfirmed(watchState) && !value?.phoneNumbers.length
-                      ? "Teléfono requerido."
-                      : true,
-                }
-              }}
-              elements={customers}
-              searchFields={['name', 'id']}
-              onQueryChange={setCustomerSearchQuery}
-              getResultProps={(customer) => ({
-                key: customer.id,
-                title: customer.name ?? "",
-                description: customer.comments ?? "",
-                value: customer,
-              })}
-              resultRenderer={({ value: customer }) => (
-                <SearchResultContent>
-                  <SearchResultTitle>
-                    {getCustomerSearchTitle(customer)}
-                  </SearchResultTitle>
-                  <SearchResultDescription>
-                    {getCustomerSearchDescription(customer)}
-                  </SearchResultDescription>
-                </SearchResultContent>
-              )}
-              persistSelection={true}
-            />
-            <Flex $justifyContent="flex-end" $marginTop="8px">
+          <FormField $flexDirection="row" flex="1">
+            <FormField flex="1">
+              <SearchControlled
+                name="customer"
+                label="Cliente"
+                required
+                clearable
+                placeholder="Martín Bueno"
+                rules={{
+                  validate: {
+                    required: (value) => !!value?.id || "Campo requerido.",
+                    activeCustomer: (value) =>
+                      value?.state === CUSTOMER_STATES.ACTIVE.id ||
+                      "No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.",
+                    requiredAddress: (value) =>
+                      isBudgetConfirmed(watchState) &&
+                        (!value?.addresses.length && !watchPickUp)
+                        ? "Dirección requerida."
+                        : true,
+                    requiredPhone: (value) =>
+                      isBudgetConfirmed(watchState) && !value?.phoneNumbers.length
+                        ? "Teléfono requerido."
+                        : true,
+                  }
+                }}
+                elements={customers}
+                searchFields={['name', 'id']}
+                onQueryChange={setCustomerSearchQuery}
+                getResultProps={(customer) => ({
+                  key: customer.id,
+                  title: customer.name ?? "",
+                  description: customer.comments ?? "",
+                  value: customer,
+                })}
+                resultRenderer={({ value: customer }) => (
+                  <SearchResultContent>
+                    <SearchResultTitle>
+                      {getCustomerSearchTitle(customer)}
+                    </SearchResultTitle>
+                    <SearchResultDescription>
+                      {getCustomerSearchDescription(customer)}
+                    </SearchResultDescription>
+                  </SearchResultContent>
+                )}
+                persistSelection={true}
+              />
+            </FormField>
+            <FormField $maxWidth="max-content" $alignItems="end" $flexDirection="row" flex="1">
               <IconedButton
                 type="button"
                 text="Agregar cliente"
                 icon={ICONS.ADD}
                 color={COLORS.BLUE}
-                basic
-                width="fit-content"
                 onClick={() => setIsCreateCustomerModalOpen(true)}
+                iconOnly
+                height="38px"
               />
-            </Flex>
+            </FormField>
           </FormField>
           <FormField $maxWidth="32%" flex="1">
             <TextField
@@ -813,7 +815,7 @@ const BudgetForm = ({
             </IconedButton>
           }
         />
-      </Form>
+      </Form >
     </>
   );
 };
