@@ -90,9 +90,9 @@ export const SUPPLIER_STATES = {
 
 export const EXAMPLE_TEMPLATE_DATA_STOCK = [
   ['Id', 'Fecha', 'Cantidad', 'Factura', 'Comentarios'],
-  ['AABB001', '5/10/200', 10, 'A001', 'Comentarios...1'],
-  ['AABB002', '25/3/2000', 20, 'A002', 'Comentarios...2'],
-  ['AABB003', '13/13/20000', 30, 'A003', 'Comentarios...3'],
+  ['AABB001', '05/10/2025', 10, 'A001', 'Comentarios...'],
+  ['AABB002', '25/03/2025', 20, 'A002', 'Comentarios...'],
+  ['AABB003', '13/12/2025', 30, 'A003', 'Comentarios...'],
 ];
 
 export const EMPTY_SUPPLIER = { id: '', name: '', emails: [], phoneNumbers: [], addresses: [], comments: '' };

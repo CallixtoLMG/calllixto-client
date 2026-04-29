@@ -10,6 +10,7 @@ import { ConfirmDownloadModal } from "@/components/products/ConfirmDownloadModal
 import { ModalBatchImport } from "@/components/products/ModalBatchImport";
 import { useMutation } from "@tanstack/react-query";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
@@ -18,6 +19,8 @@ import * as XLSX from "xlsx";
 import { NumberControlled } from "../../../common/components/form";
 import { DISCOUNT_STOCK, UPLOAD_STOCK } from "../products.constants";
 import { BatchImportIcon } from "./styles";
+
+dayjs.extend(customParseFormat);
 
 export const BatchImportStock = ({
   mode,
@@ -82,29 +85,75 @@ export const BatchImportStock = ({
   };
 
   const parseExcelDate = (value) => {
-    if (!value) return null;
+    if (value === undefined || value === null || value === "") {
+      return {
+        date: null,
+        error: "Fecha requerida. Usá el formato DD/MM/AAAA, por ejemplo 05/10/2025.",
+      };
+    }
+
+    if (value instanceof Date) {
+      return {
+        date: dayjs(value).isValid() ? value : null,
+        error: dayjs(value).isValid()
+          ? null
+          : "Fecha inválida. Usá el formato DD/MM/AAAA.",
+      };
+    }
 
     if (typeof value === "number") {
-      return dayjs("1899-12-30")
-        .add(value, "day")
-        .toDate();
+      const date = dayjs("1899-12-30").add(value, "day");
+
+      return {
+        date: date.isValid() ? date.toDate() : null,
+        error: date.isValid()
+          ? null
+          : "Fecha inválida. Usá el formato DD/MM/AAAA.",
+      };
     }
 
-    const strict = dayjs(value, ["D/M/YYYY", "DD/MM/YYYY"], true);
+    const rawValue = String(value).trim();
 
-    if (!strict.isValid()) return null;
+    const normalizedValue = rawValue.replace(/-/g, "/");
 
-    const [day, month, year] = value.split("/").map(Number);
+    const validFormat = /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(normalizedValue);
 
-    if (
-      day < 1 || day > 31 ||
-      month < 1 || month > 12 ||
-      year < 1000 || year > 9999
-    ) {
-      return null;
+    if (!validFormat) {
+      return {
+        date: null,
+        error: `Formato de fecha inválido [${rawValue}]. Usá DD/MM/AAAA. Ejemplo: 05/10/2025.`,
+      };
     }
 
-    return strict.toDate();
+    const [day, month, year] = normalizedValue.split("/").map(Number);
+
+    if (year < 1000 || year > 9999) {
+      return {
+        date: null,
+        error: `Año inválido [${year}]. Usá un año de 4 dígitos, por ejemplo 2025.`,
+      };
+    }
+
+    if (month < 1 || month > 12) {
+      return {
+        date: null,
+        error: `Mes inválido [${month}]. El mes debe estar entre 1 y 12.`,
+      };
+    }
+
+    const parsed = dayjs(normalizedValue, ["D/M/YYYY", "DD/MM/YYYY"], true);
+
+    if (!parsed.isValid()) {
+      return {
+        date: null,
+        error: `Día inválido [${day}] para el mes indicado. Revisá la fecha y usá DD/MM/AAAA.`,
+      };
+    }
+
+    return {
+      date: parsed.toDate(),
+      error: null,
+    };
   };
 
   const parseExcel = (data) => {
@@ -141,12 +190,12 @@ export const BatchImportStock = ({
 
       const productId = String(row.productId ?? "").trim().toUpperCase();
       const product = productIndex[productId];
-      
+
       if (!productId || !product) {
         invalid.push({ ...row, productId, msg: "Producto inexistente" });
         return;
       }
-      
+
       if (!product.stockControl) {
         invalid.push({
           ...row,
@@ -155,9 +204,9 @@ export const BatchImportStock = ({
         });
         return;
       }
-      
+
       const rawQuantity = row.quantity;
-      
+
       if (rawQuantity === undefined || rawQuantity === null || rawQuantity === "") {
         invalid.push({
           ...row,
@@ -166,9 +215,9 @@ export const BatchImportStock = ({
         });
         return;
       }
-      
+
       const quantity = Number(rawQuantity);
-      
+
       if (Number.isNaN(quantity)) {
         invalid.push({
           ...row,
@@ -177,7 +226,7 @@ export const BatchImportStock = ({
         });
         return;
       }
-      
+
       if (quantity <= 0) {
         invalid.push({
           ...row,
@@ -188,13 +237,13 @@ export const BatchImportStock = ({
       }
 
       const originalDate = row.date;
-      const parsedDate = parseExcelDate(originalDate);
+      const { date: parsedDate, error: dateError } = parseExcelDate(originalDate);
 
-      if (!parsedDate) {
+      if (dateError) {
         invalid.push({
           ...row,
-          originalDate, 
-          msg: "Fecha inválida",
+          originalDate,
+          msg: dateError,
         });
         return;
       }
@@ -202,7 +251,7 @@ export const BatchImportStock = ({
       valid.push({
         productId,
         date: parsedDate,
-        quantity: isDiscount ? -Math.abs(quantity) : Math.abs(quantity),
+        quantity: Math.abs(quantity),
         invoiceNumber: row.invoiceNumber,
         comments: row.comments,
       });

@@ -228,7 +228,7 @@ const CreateBudgetDeliveriesForm = () => {
     <FlexColumn width="100%" $rowGap="20px">
       <Flex $columnGap="15px" $justifyContent="space-between">
         <Header>Productos</Header>
-        <Flex $columnGap="15px">
+        <Flex $columnGap="15.1px">
           <TextField
             width="250px"
             label="Remito"

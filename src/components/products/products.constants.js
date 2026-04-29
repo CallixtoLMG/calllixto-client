@@ -148,10 +148,10 @@ export const BAN_FILTERS = [
 ];
 
 export const EXAMPLE_TEMPLATE_DATA = [
-  ['Id', 'Nombre', 'Costo', 'Precio', 'Comentarios'],
-  ['AABB001', "Producto 1", 100, 200, 'Comentarios...'],
-  ['AABB002', "Producto 2", 200, 300, 'Comentarios...'],
-  ['AABB003', "Producto 3", 300, 400, 'Comentarios...'],
+  ['Id', 'Nombre', 'Costo', 'Precio', 'Control de stock', 'Comentarios'],
+  ['AABB001', "Producto 1", 100, 200, 'Si', 'Comentarios...'],
+  ['AABB002', "Producto 2", 200, 300, 'No', 'Comentarios...'],
+  ['AABB003', "Producto 3", 300, 400, 'Si', 'Comentarios...'],
 ];
 
 export const PRODUCT_STATES = {
