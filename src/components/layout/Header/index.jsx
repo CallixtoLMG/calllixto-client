@@ -47,7 +47,7 @@ const Header = () => {
     push(PAGES.LOGIN.BASE);
   };
 
-  const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE];
+  const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE, PAGES.MAINTENANCE.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
 
   const shortcutMapping = useMemo(() => ([
