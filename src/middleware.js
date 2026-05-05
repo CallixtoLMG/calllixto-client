@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
-import { MAINTENANCE_MODE, MAINTENANCE_PAGE, MAINTENANCE_PUBLIC_PATHS } from "./common/constants/maintenance";
-
-const isPublicMaintenancePath = (pathname) =>
-  MAINTENANCE_PUBLIC_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+import { MAINTENANCE_MODE, MAINTENANCE_PAGE } from "./common/constants/maintenance";
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
-  if (!MAINTENANCE_MODE || isPublicMaintenancePath(pathname)) {
+  if (!MAINTENANCE_MODE || pathname === MAINTENANCE_PAGE.BASE) {
     return NextResponse.next();
   }
 
