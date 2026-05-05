@@ -3,14 +3,12 @@ import { useCreateBrand } from "@/api/brands";
 import { PAGES } from "@/common/constants";
 import BrandForm from "@/components/brands/BrandForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateBrand = () => {
-  useValidateToken();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const { push } = useRouter();

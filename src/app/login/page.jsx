@@ -9,7 +9,7 @@ import { toast } from "react-hot-toast";
 const Login = () => {
   useEffect(() => {
     if (consumeSessionEndedNotification()) {
-      toast.error("Tu sesion finalizo. Volve a ingresar para continuar.");
+      toast.error("Tu sesión finalizó. Volvé a ingresar para continuar.");
     }
 
     signOut();

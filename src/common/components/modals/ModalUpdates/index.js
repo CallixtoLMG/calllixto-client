@@ -1,7 +1,7 @@
 'use client';
 import { COLORS, ICONS, SIZES } from '@/common/constants';
 import { isDateBefore } from '@/common/utils/dates';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { List, ListItem, Modal, Popup, Transition } from 'semantic-ui-react';
 import styled from 'styled-components';
 import { IconedButton } from '../../buttons';
@@ -18,68 +18,10 @@ const StyledModal = styled(Modal)`
   overflow: auto;
 `;
 
-const LATEST_NEWS_KEY = 'latestNews';
-const ACTIVE_VERSION = '2026-05-5';
-
-const isBrowser = () => typeof window !== 'undefined' && typeof document !== 'undefined';
-
-const getCookie = (key) => {
-  if (!isBrowser()) return null;
-
-  const cookie = document.cookie
-    .split('; ')
-    .find((item) => item.startsWith(`${key}=`));
-
-  if (!cookie) return null;
-  return decodeURIComponent(cookie.substring(key.length + 1));
-};
-
-const setCookie = (key, value) => {
-  if (!isBrowser()) return;
-
-  const expires = new Date();
-  expires.setFullYear(expires.getFullYear() + 1);
-
-  const secure = window.location.protocol === 'https:' ? '; Secure' : '';
-  document.cookie = `${key}=${encodeURIComponent(value)}; path=/; expires=${expires.toUTCString()}; SameSite=Lax${secure}`;
-};
-
-const getLatestNewsVersion = () => {
-  if (!isBrowser()) return null;
-  return getCookie(LATEST_NEWS_KEY) || window.localStorage.getItem(LATEST_NEWS_KEY);
-};
-
-const saveLatestNewsVersion = () => {
-  if (!isBrowser()) return;
-  window.localStorage.setItem(LATEST_NEWS_KEY, ACTIVE_VERSION);
-  setCookie(LATEST_NEWS_KEY, ACTIVE_VERSION);
-};
-
-const shouldShowUpdates = () => {
-  const latestNews = getLatestNewsVersion();
-  return !latestNews || isDateBefore(latestNews, ACTIVE_VERSION);
-};
-
 const ModalUpdates = () => {
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    setOpen(shouldShowUpdates());
-
-    const handleStorage = (event) => {
-      if (event.key === LATEST_NEWS_KEY && !shouldShowUpdates()) {
-        setOpen(false);
-      }
-    };
-
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
-  }, []);
-
-  const handleClose = () => {
-    saveLatestNewsVersion();
-    setOpen(false);
-  };
+  const activeVersion = '2026-06-06';
+  const latestNews = typeof window !== 'undefined' ? window.localStorage.getItem('latestNews') : activeVersion;
+  const [open, setOpen] = useState(!latestNews || isDateBefore(latestNews, activeVersion));
 
   return (
     <>
@@ -99,7 +41,7 @@ const ModalUpdates = () => {
         size={SIZES.TINY}
       />
       <Transition visible={open} animation="scale" duration={500}>
-        <StyledModal open={open} onClose={handleClose}>
+        <StyledModal open={open} onClose={() => setOpen(false)}>
           <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas novedades - 30 - 03 - 2026" />
           <StyledModalContent>
             <StyledListHeader>
@@ -149,7 +91,10 @@ const ModalUpdates = () => {
               text="Cerrar"
               icon={ICONS.REMOVE}
               color={COLORS.RED}
-              onClick={handleClose}
+              onClick={() => {
+                window.localStorage.setItem('latestNews', activeVersion);
+                setOpen(false);
+              }}
             />
           </Modal.Actions>
         </StyledModal>

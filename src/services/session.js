@@ -1,10 +1,10 @@
 import { DEFAULT_SELECTED_CLIENT, USER_DATA_KEY } from "@/common/constants";
 
 export const TOKEN_KEY = "token";
-export const SESSION_EXPIRATION_KEY = "sessionExpiration";
 export const SELECTED_CLIENT_KEY = "selectedClientId";
 export const SESSION_ENDED_NOTIFICATION_KEY = "sessionEndedNotification";
 
+const SESSION_EXPIRATION_KEY = "sessionExpiration";
 const DEFAULT_SESSION_DURATION_MS = 8 * 60 * 60 * 1000;
 const COOKIE_PATH = "/";
 
@@ -17,7 +17,7 @@ const normalizeBase64 = (value) => {
   return normalized.padEnd(normalized.length + ((4 - normalized.length % 4) % 4), "=");
 };
 
-export const decodeJwtPayload = (token) => {
+const decodeJwtPayload = (token) => {
   if (!token || typeof token !== "string") return null;
 
   try {
@@ -30,7 +30,7 @@ export const decodeJwtPayload = (token) => {
   }
 };
 
-export const getTokenExpiration = (token) => {
+const getTokenExpiration = (token) => {
   const payload = decodeJwtPayload(token);
   if (!payload?.exp) return null;
 
@@ -87,37 +87,15 @@ const removeCookie = (key) => {
   document.cookie = `${key}=; path=${COOKIE_PATH}; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax`;
 };
 
-export const getSessionExpiration = () => getCookie(SESSION_EXPIRATION_KEY);
-
-export const setSessionExpiration = (expiresAt) => {
-  const expiration = expiresAt || getDefaultExpiration();
-  setCookie(SESSION_EXPIRATION_KEY, expiration, expiration);
-  return expiration;
-};
-
-export const isSessionExpired = () => {
-  const expiration = getSessionExpiration();
-  if (!expiration) return true;
-
-  const expirationTime = new Date(expiration).getTime();
-  return Number.isNaN(expirationTime) || expirationTime <= Date.now();
-};
-
-export const getToken = () => {
-  if (isSessionExpired()) return null;
-  return getCookie(TOKEN_KEY);
-};
+export const getToken = () => getCookie(TOKEN_KEY);
 
 export const setToken = (token) => {
   const expiration = getTokenExpiration(token) || getDefaultExpiration();
   setCookie(TOKEN_KEY, token, expiration);
-  setSessionExpiration(expiration);
   return expiration;
 };
 
 export const getUserData = () => {
-  if (isSessionExpired()) return null;
-
   const encodedUserData = getCookie(USER_DATA_KEY);
   if (!encodedUserData) return null;
 
@@ -131,15 +109,13 @@ export const getUserData = () => {
 };
 
 export const setUserData = (userData) => {
-  const expiration = getSessionExpiration() || getDefaultExpiration();
-  setCookie(USER_DATA_KEY, encodeJson(userData), expiration);
+  setCookie(USER_DATA_KEY, encodeJson(userData), getDefaultExpiration());
 };
 
 export const getSelectedClientId = () => getCookie(SELECTED_CLIENT_KEY) || DEFAULT_SELECTED_CLIENT;
 
 export const setSelectedClientId = (clientId) => {
-  const expiration = getSessionExpiration() || getDefaultExpiration();
-  setCookie(SELECTED_CLIENT_KEY, clientId || DEFAULT_SELECTED_CLIENT, expiration);
+  setCookie(SELECTED_CLIENT_KEY, clientId || DEFAULT_SELECTED_CLIENT, getDefaultExpiration());
 };
 
 export const clearSession = () => {
@@ -148,19 +124,10 @@ export const clearSession = () => {
   removeCookie(SESSION_EXPIRATION_KEY);
 };
 
-export const clearSessionAndClient = () => {
-  clearSession();
-  removeCookie(SELECTED_CLIENT_KEY);
-};
-
-export const isAuthenticated = () => {
-  const userData = getUserData();
-  return Boolean(getToken() && userData?.isAuthorized && !isSessionExpired());
-};
-
 export const markSessionEnded = () => {
   if (!isBrowser()) return;
   window.sessionStorage.setItem(SESSION_ENDED_NOTIFICATION_KEY, "true");
+  setCookie(SESSION_ENDED_NOTIFICATION_KEY, "true", new Date(Date.now() + 60 * 1000).toISOString());
 };
 
 export const expireSession = () => {
@@ -171,7 +138,11 @@ export const expireSession = () => {
 export const consumeSessionEndedNotification = () => {
   if (!isBrowser()) return false;
 
-  const shouldNotify = window.sessionStorage.getItem(SESSION_ENDED_NOTIFICATION_KEY) === "true";
+  const shouldNotify =
+    window.sessionStorage.getItem(SESSION_ENDED_NOTIFICATION_KEY) === "true" ||
+    getCookie(SESSION_ENDED_NOTIFICATION_KEY) === "true";
+
   window.sessionStorage.removeItem(SESSION_ENDED_NOTIFICATION_KEY);
+  removeCookie(SESSION_ENDED_NOTIFICATION_KEY);
   return shouldNotify;
 };

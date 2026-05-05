@@ -8,7 +8,7 @@ import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constan
 import { isItemInactive } from "@/common/utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UserForm from "@/components/users/UserForm";
-import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -16,7 +16,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 
 const User = ({ params }) => {
-  useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
   const { data: user, isLoading, refetch } = useGetUser(decodeURIComponent(params.username));

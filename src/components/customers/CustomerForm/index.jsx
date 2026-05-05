@@ -74,9 +74,9 @@ const CustomerForm = forwardRef(({
               name="name"
               label="Nombre"
               placeholder="Martín Bueno"
-              // rules={RULES.REQUIRED}
-              // disabled={!isUpdating && view}
-              // required={isUpdating || !view}
+              rules={RULES.REQUIRED}
+              disabled={!isUpdating && view}
+              required={isUpdating || !view}
             />
           </FormField>
           <FormField flex="1" />

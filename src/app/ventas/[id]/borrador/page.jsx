@@ -14,7 +14,7 @@ import { BUDGET_STATES, buildConsumeStockFlows, } from "@/components/budgets/bud
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import CreateBudgetPayments from "@/components/payments/CreateBudgetPayment";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { useBudgetTotals, useValidateToken } from "@/hooks";
+import { useBudgetTotals } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
@@ -23,7 +23,6 @@ import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
 const BudgetDraft = ({ params }) => {
-  useValidateToken();
   const { id } = params;
   const { userData } = useUserContext();
   const { push } = useRouter();

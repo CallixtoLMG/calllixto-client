@@ -8,7 +8,6 @@ const UserContext = createContext();
 const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState({});
   const [role, setRole] = useState('user');
-  const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   useEffect(() => {
     const getData = async () => {
@@ -16,7 +15,6 @@ const UserProvider = ({ children }) => {
       if (sessionData) {
         setUserData(sessionData);
       }
-      setIsSessionLoading(false);
     }
 
     getData();
@@ -36,7 +34,7 @@ const UserProvider = ({ children }) => {
   };
 
   return (
-    <UserContext.Provider value={{ userData, setUserData: updateUserData, role, isSessionLoading }}>
+    <UserContext.Provider value={{ userData, setUserData: updateUserData, role }}>
       {children}
     </UserContext.Provider>
   );

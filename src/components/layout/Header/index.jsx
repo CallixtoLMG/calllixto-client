@@ -30,7 +30,7 @@ const Header = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const client = getSelectedClientId() ?? DEFAULT_SELECTED_CLIENT;
+      const client = getSelectedClientId();
       saveSelectedClientId(client);
       setSelectedClientId(client);
     }

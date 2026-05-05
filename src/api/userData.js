@@ -1,10 +1,10 @@
 import { URL, VALIDATE } from "@/fetchUrls";
+import { ROLES } from "@/roles";
 import {
   clearSession,
   getSelectedClientId,
-  getToken,
   getUserData as getSessionUserData,
-  isSessionExpired,
+  getToken,
   setUserData as setSessionUserData,
 } from "@/services/session";
 import axios from "axios";
@@ -18,7 +18,7 @@ export async function getUserData() {
   }
 
   const token = getToken();
-  if (!token || isSessionExpired()) {
+  if (!token) {
     clearSession();
     return null;
   }
@@ -46,7 +46,7 @@ export async function getUserData() {
 };
 
 function setSelectedClientData(data) {
-  if (data?.clientId === 'callixto') {
+  if (data?.clientId === ROLES.CALLIXTO) {
     const selectedClientId = getSelectedClientId();
     const selectedClient = data?.callixtoClients?.items?.find(client => client.id === selectedClientId);
     data.selectedClient = selectedClient ?? null;
