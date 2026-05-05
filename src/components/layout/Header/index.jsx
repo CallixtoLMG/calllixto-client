@@ -5,6 +5,7 @@ import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
 import { COLORS, DEFAULT_SELECTED_CLIENT, ICONS, PAGES, getNavigationItems } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES, isCallixtoUser } from "@/roles";
+import { getSelectedClientId, setSelectedClientId as saveSelectedClientId } from "@/services/session";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { UserMenu } from "..";
@@ -29,8 +30,8 @@ const Header = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const client = localStorage.getItem("selectedClientId") ?? DEFAULT_SELECTED_CLIENT;
-      localStorage.setItem("selectedClientId", client);
+      const client = getSelectedClientId() ?? DEFAULT_SELECTED_CLIENT;
+      saveSelectedClientId(client);
       setSelectedClientId(client);
     }
   }, []);
@@ -38,7 +39,7 @@ const Header = () => {
   const navigationItems = useMemo(() => getNavigationItems(role), [role]);
 
   const handleClientChange = (client) => {
-    localStorage.setItem("selectedClientId", client);
+    saveSelectedClientId(client);
     setSelectedClientId(client);
     location.reload();
   };

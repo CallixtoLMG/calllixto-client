@@ -1,12 +1,14 @@
 'use client';
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { getUserData } from './api/userData';
+import { setUserData as setSessionUserData } from './services/session';
 
 const UserContext = createContext();
 
 const UserProvider = ({ children }) => {
   const [userData, setUserData] = useState({});
   const [role, setRole] = useState('user');
+  const [isSessionLoading, setIsSessionLoading] = useState(true);
 
   useEffect(() => {
     const getData = async () => {
@@ -14,6 +16,7 @@ const UserProvider = ({ children }) => {
       if (sessionData) {
         setUserData(sessionData);
       }
+      setIsSessionLoading(false);
     }
 
     getData();
@@ -25,8 +28,15 @@ const UserProvider = ({ children }) => {
     }
   }, [userData]);
 
+  const updateUserData = (data) => {
+    setUserData(data);
+    if (data?.isAuthorized) {
+      setSessionUserData(data);
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ userData, setUserData, role }}>
+    <UserContext.Provider value={{ userData, setUserData: updateUserData, role, isSessionLoading }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,23 +1,26 @@
-import { USER_DATA_KEY } from "@/common/constants";
 import { URL, VALIDATE } from "@/fetchUrls";
+import {
+  clearSession,
+  getSelectedClientId,
+  getToken,
+  getUserData as getSessionUserData,
+  isSessionExpired,
+  setUserData as setSessionUserData,
+} from "@/services/session";
 import axios from "axios";
 
 export async function getUserData() {
-  let dataString = localStorage.getItem(USER_DATA_KEY);
-  let data = null;
-
-  if (dataString) {
-    try {
-      data = JSON.parse(dataString);
-    } catch (e) {
-      console.error("Error parsing userData from localStorage:", e);
-      localStorage.removeItem(USER_DATA_KEY);
-    }
-  }
+  const data = getSessionUserData();
 
   if (data?.isAuthorized) {
     setSelectedClientData(data);
     return data;
+  }
+
+  const token = getToken();
+  if (!token || isSessionExpired()) {
+    clearSession();
+    return null;
   }
 
   try {
@@ -26,24 +29,25 @@ export async function getUserData() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        authorization: `Bearer ${localStorage.getItem("token")}`
+        authorization: `Bearer ${token}`
       }
     });
 
     if (response.data) {
       setSelectedClientData(response.data);
-      localStorage.setItem(USER_DATA_KEY, JSON.stringify(response.data));
+      setSessionUserData(response.data);
       return response.data;
     }
   } catch (e) {
     console.error("Error fetching userData from server:", e);
+    clearSession();
     return null;
   }
 };
 
 function setSelectedClientData(data) {
   if (data?.clientId === 'callixto') {
-    const selectedClientId = localStorage.getItem('selectedClientId');
+    const selectedClientId = getSelectedClientId();
     const selectedClient = data?.callixtoClients?.items?.find(client => client.id === selectedClientId);
     data.selectedClient = selectedClient ?? null;
   }
