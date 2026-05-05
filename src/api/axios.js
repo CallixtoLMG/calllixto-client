@@ -1,5 +1,5 @@
 import { PAGES } from "@/common/constants";
-import { clearSession, getSelectedClientId, getToken, getUserData } from "@/services/session";
+import { expireSession, getSelectedClientId, getToken, getUserData } from "@/services/session";
 import axios from 'axios';
 import { isCallixtoUser } from "../roles";
 
@@ -45,7 +45,7 @@ export const getInstance = () => {
         const status = error?.response?.status;
 
         if ([401, 403].includes(status) && typeof window !== "undefined") {
-          clearSession();
+          expireSession();
 
           if (window.location.pathname !== PAGES.LOGIN.BASE) {
             window.location.replace(PAGES.LOGIN.BASE);

@@ -3,6 +3,7 @@ import { DEFAULT_SELECTED_CLIENT, USER_DATA_KEY } from "@/common/constants";
 export const TOKEN_KEY = "token";
 export const SESSION_EXPIRATION_KEY = "sessionExpiration";
 export const SELECTED_CLIENT_KEY = "selectedClientId";
+export const SESSION_ENDED_NOTIFICATION_KEY = "sessionEndedNotification";
 
 const DEFAULT_SESSION_DURATION_MS = 8 * 60 * 60 * 1000;
 const COOKIE_PATH = "/";
@@ -155,4 +156,22 @@ export const clearSessionAndClient = () => {
 export const isAuthenticated = () => {
   const userData = getUserData();
   return Boolean(getToken() && userData?.isAuthorized && !isSessionExpired());
+};
+
+export const markSessionEnded = () => {
+  if (!isBrowser()) return;
+  window.sessionStorage.setItem(SESSION_ENDED_NOTIFICATION_KEY, "true");
+};
+
+export const expireSession = () => {
+  markSessionEnded();
+  clearSession();
+};
+
+export const consumeSessionEndedNotification = () => {
+  if (!isBrowser()) return false;
+
+  const shouldNotify = window.sessionStorage.getItem(SESSION_ENDED_NOTIFICATION_KEY) === "true";
+  window.sessionStorage.removeItem(SESSION_ENDED_NOTIFICATION_KEY);
+  return shouldNotify;
 };

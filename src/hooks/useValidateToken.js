@@ -1,6 +1,6 @@
 import { useUserContext } from '@/User';
 import { PAGES } from '@/common/constants';
-import { clearSession, getToken, isSessionExpired } from '@/services/session';
+import { expireSession, getToken, isSessionExpired } from '@/services/session';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -13,13 +13,13 @@ const useValidateToken = () => {
 
     const token = getToken();
     if (!token || isSessionExpired()) {
-      clearSession();
+      expireSession();
       push(PAGES.LOGIN.BASE);
       return;
     }
 
     if (userData.hasOwnProperty('isAuthorized') && !userData.isAuthorized) {
-      clearSession();
+      expireSession();
       push(PAGES.LOGIN.BASE);
     }
   }, [isSessionLoading, push, userData]);
