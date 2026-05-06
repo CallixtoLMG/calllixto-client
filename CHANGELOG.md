@@ -13,6 +13,8 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - Added middleware guards to redirect unauthenticated users to login and redirect all routes to maintenance when maintenance mode is enabled.
 
+- Added contextual help popups to configurable Settings sections, including tags, payment methods, categories, blocked products, and budget defaults.
+
 ### Changed
 
 - Updated the default `/` route to redirect to `/ventas`.

@@ -61,3 +61,13 @@ export const SUPPORTED_SETTINGS = {
   EXPENSE: ['tags', 'categories'],
   BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
 };
+
+export const SETTINGS_HELP_TEXTS = {
+  TAGS: "Permite crear etiquetas para clasificar elementos y encontrarlos mas facilmente.",
+  PAYMENT_METHODS: "Permite definir los metodos de pago disponibles para ventas, presupuestos y movimientos.",
+  BLACKLIST: "Permite bloquear productos especificos para evitar que se utilicen en determinadas operaciones.",
+  CATEGORIES: "Permite organizar gastos o productos en grupos para facilitar el analisis y la gestion.",
+  BUDGET_GENERAL: "Permite configurar valores generales para consultar y revisar ventas.",
+  BUDGET_ON_CREATE: "Permite definir valores predeterminados que se completan al crear una venta.",
+  BUDGET_ON_PRINT: "Permite configurar como se muestra e imprime el PDF de una venta.",
+};

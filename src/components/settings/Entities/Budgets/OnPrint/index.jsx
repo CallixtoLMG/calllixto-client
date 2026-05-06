@@ -1,8 +1,10 @@
-import { AccordionTitle, Box, Flex, FlexColumn, Icon } from "@/common/components/custom";
+import { Box, Flex, FlexColumn } from "@/common/components/custom";
 import { DropdownControlled, IconedButtonControlled, TextAreaControlled } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { BUDGET_PDF_FORMAT } from "@/components/budgets/budgets.constants";
+import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
+import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion, } from "semantic-ui-react";
@@ -17,9 +19,13 @@ const OnPrint = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon $height="20px" name={ICONS.CARET_UP} /> Al imprimir una venta
-        </AccordionTitle>
+        <SettingsAccordionTitle
+          active={isAccordionOpen}
+          helpText={SETTINGS_HELP_TEXTS.BUDGET_ON_PRINT}
+          onClick={toggleAccordion}
+        >
+          Al imprimir una venta
+        </SettingsAccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>

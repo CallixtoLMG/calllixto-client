@@ -1,8 +1,10 @@
-import { AccordionTitle, Box, FlexColumn, Icon } from "@/common/components/custom";
+import { Box, FlexColumn } from "@/common/components/custom";
 import { GroupedButtonsControlled, NumberControlled, SearchControlled } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
+import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
+import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion } from "semantic-ui-react";
@@ -17,9 +19,13 @@ const OnCreate = ({ customerOptions, isLoading }) => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon $height="20px" name={ICONS.CARET_UP} /> Al crear una venta
-        </AccordionTitle>
+        <SettingsAccordionTitle
+          active={isAccordionOpen}
+          helpText={SETTINGS_HELP_TEXTS.BUDGET_ON_CREATE}
+          onClick={toggleAccordion}
+        >
+          Al crear una venta
+        </SettingsAccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>

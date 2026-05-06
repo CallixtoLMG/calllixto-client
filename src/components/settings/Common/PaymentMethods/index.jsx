@@ -1,11 +1,13 @@
-import { AccordionTitle, Box, Button, Flex, Icon } from "@/common/components/custom";
+import { Box, Button, Flex } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
 import { createPriorityKeyDownHandler } from "@/common/utils";
+import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion } from "semantic-ui-react";
+import SettingsAccordionTitle from "../SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "../styles";
 
 const EMPTY_INPUT = "";
@@ -83,10 +85,13 @@ const PaymentMethods = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon $height="20px" name={ICONS.CARET_UP} />
+        <SettingsAccordionTitle
+          active={isAccordionOpen}
+          helpText={SETTINGS_HELP_TEXTS.PAYMENT_METHODS}
+          onClick={toggleAccordion}
+        >
           Métodos de pago
-        </AccordionTitle>
+        </SettingsAccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>
