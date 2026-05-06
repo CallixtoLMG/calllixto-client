@@ -21,7 +21,7 @@ import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.co
 import { isBudgetConfirmed, isBudgetDraft } from '@/components/budgets/budgets.utils';
 import { Loader } from "@/components/layout";
 import { LIST_ATTRIBUTES, PRODUCT_STATES, getProductSearchDescription, getProductSearchTitle } from "@/components/products/products.constants";
-import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS } from "@/components/products/products.utils";
+import { getBrandId, getPrice, getProductId, getSupplierId, getTotal, isProductOOS, normalizeBudgetProductFractionConfig } from "@/components/products/products.utils";
 import { useKeyboardShortcuts } from "@/hooks";
 import { pick } from "lodash";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -59,7 +59,7 @@ const BudgetForm = ({
     formState: { isDirty, errors },
   } = useFormContext();
 
-  const { append: appendProduct, remove: removeProduct, update: updateProduct } = useFieldArray({
+  const { append: appendProduct, remove: removeProduct, update: updateProduct, replace: replaceProducts } = useFieldArray({
     control,
     name: "products"
   });
@@ -118,28 +118,30 @@ const BudgetForm = ({
   }, [isCloning, budget?.products, products, hasShownModal]);
 
   const handleConfirmUpdate = () => {
-    const currentProducts = watchProducts;
+    const currentProducts = Array.isArray(watchProducts) ? watchProducts : [];
 
     const updatedProducts = currentProducts.map(product => {
       const outdated = outdatedProducts.find(op => op.id === product.id);
 
       const base = outdated ?? product;
-
-      return {
+      const price = Number(base.price ?? product.price ?? 0);
+      const nextProduct = {
         ...product,
         name: base.name,
-        price: Number(base.price ?? product.price ?? 0),
+        price,
         quantity: Number(product.quantity ?? 1),
         discount: Number(product.discount ?? 0),
         editablePrice: base.editablePrice ?? product.editablePrice ?? false,
-        fractionConfig: base.fractionConfig
-          ? {
-            ...base.fractionConfig,
-            value: Number(base.fractionConfig.value ?? 1),
-            price: Number(base.fractionConfig.price ?? base.price ?? 0),
-          }
-          : product.fractionConfig,
         state: base.state,
+      };
+      const fractionConfig = normalizeBudgetProductFractionConfig(product, {
+        ...base,
+        price,
+      });
+
+      return {
+        ...nextProduct,
+        ...(fractionConfig && { fractionConfig }),
       };
     });
 
@@ -147,10 +149,13 @@ const BudgetForm = ({
       p => !removedProducts.some(r => r.id === p.id)
     );
 
+    replaceProducts(finalProducts);
     setValue("products", finalProducts, {
       shouldDirty: true,
       shouldTouch: true,
+      shouldValidate: true,
     });
+    trigger("productsValidation");
 
     setShouldShowModal(false);
     setIsTableLoading(false);
@@ -160,9 +165,11 @@ const BudgetForm = ({
   const handleCancelUpdate = () => {
     if (!initialClonedProductsRef.current) return;
 
+    replaceProducts(initialClonedProductsRef.current);
     setValue("products", initialClonedProductsRef.current, {
       shouldDirty: false,
       shouldTouch: false,
+      shouldValidate: true,
     });
 
     setValue("expirationOffsetDays", "", { shouldDirty: false });
@@ -339,8 +346,11 @@ const BudgetForm = ({
               unit={product.fractionConfig.unit}
               defaultValueFallback={1}
               onChange={(value) => {
-                const safeValue = value ?? 1;
-                setValue(`products[${index}].fractionConfig.price`, safeValue * product.price);
+                const safeValue = Number(value ?? 1);
+                setValue(`products[${index}].fractionConfig.price`, safeValue * Number(product.price ?? 0), {
+                  shouldDirty: true,
+                  shouldTouch: true,
+                });
               }}
               allowsDecimal
               defaultValue={1}

@@ -8,6 +8,7 @@ import { v4 as uuid } from 'uuid';
 import { NumberField, PriceLabel, TextField } from "../../common/components/form";
 import { CommentTooltip } from "../../common/components/tooltips";
 import { PRODUCT_STATES } from "../products/products.constants";
+import { normalizeBudgetProductFractionConfig } from "../products/products.utils";
 import { getBudgetListPopupContent, isBudgetCancelled, isBudgetConfirmed } from "./budgets.utils";
 
 export const LIST_BUDGETS_QUERY_KEY = 'listAllBudgets';
@@ -434,11 +435,7 @@ export const createClonedBudget = ({
       delivered: 0,
       stockFlows: [],
       ...(product.fractionConfig?.active && {
-        fractionConfig: {
-          ...product.fractionConfig,
-          value: product.fractionConfig.value || 1,
-          price: product.price,
-        },
+        fractionConfig: normalizeBudgetProductFractionConfig(product),
       }),
     })),
     createdBy: user?.name,
