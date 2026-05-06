@@ -53,10 +53,36 @@ export const isProductDeleted = (status) => {
   return status === PRODUCT_STATES.DELETED.id;
 };
 
-export const getPrice = ({ fractionConfig, price }) =>
-  fractionConfig?.active && fractionConfig?.value != null
-    ? fractionConfig.value * price
-    : price;
+const toNumber = (value, fallback = 0) => {
+  const numberValue = Number(value);
+  return Number.isFinite(numberValue) ? numberValue : fallback;
+};
+
+export const getPrice = ({ fractionConfig, price }) => {
+  const safePrice = toNumber(price);
+
+  if (!fractionConfig?.active || fractionConfig.value == null) return safePrice;
+
+  return toNumber(fractionConfig.value) * safePrice;
+};
+
+export const normalizeBudgetProductFractionConfig = (product, baseProduct = product) => {
+  const fractionConfig = {
+    ...(product?.fractionConfig ?? {}),
+    ...(baseProduct?.fractionConfig ?? {}),
+  };
+
+  if (!Object.keys(fractionConfig).length) return undefined;
+  if (!fractionConfig.active) return fractionConfig;
+
+  const value = toNumber(product?.fractionConfig?.value ?? fractionConfig.value, 1);
+
+  return {
+    ...fractionConfig,
+    value,
+    price: value * toNumber(baseProduct?.price ?? product?.price),
+  };
+};
 
 export const getTotal = (product) => {
   if (!product) return 0;
