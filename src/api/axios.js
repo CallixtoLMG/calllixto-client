@@ -1,28 +1,19 @@
-import { DEFAULT_SELECTED_CLIENT, USER_DATA_KEY } from "@/common/constants";
+import { PAGES } from "@/common/constants";
+import { expireSession, getSelectedClientId, getToken, getUserData } from "@/services/session";
 import axios from 'axios';
 import { isCallixtoUser } from "../roles";
-
-const getToken = () => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('token');
-};
 
 const getClientId = () => {
   if (typeof window === 'undefined') return null;
 
-  const userDataString = localStorage.getItem(USER_DATA_KEY);
-  if (!userDataString) return null;
+  const userData = getUserData();
+  if (!userData) return null;
 
-  try {
-    const userData = JSON.parse(userDataString);
-    if (isCallixtoUser(userData.clientId)) {
-      return localStorage.getItem("selectedClientId") ?? DEFAULT_SELECTED_CLIENT
-    }
-    return userData.clientId;
-  } catch (e) {
-    console.error("Error parsing userData from localStorage:", e);
-    return null;
-  };
+  if (isCallixtoUser(userData.clientId)) {
+    return getSelectedClientId();
+  }
+
+  return userData.clientId;
 };
 
 let axiosInstance = null;
@@ -30,12 +21,41 @@ let axiosInstance = null;
 export const getInstance = () => {
   if (!axiosInstance) {
     axiosInstance = axios.create({
-      baseURL: `${process.env.NEXT_PUBLIC_URL}${getClientId()}`,
       timeout: 60000,
-      headers: {
-        authorization: `Bearer ${getToken()}`
-      },
     });
+
+    axiosInstance.interceptors.request.use((config) => {
+      const token = getToken();
+      const clientId = getClientId();
+
+      if (clientId) {
+        config.baseURL = `${process.env.NEXT_PUBLIC_URL}${clientId}`;
+      }
+
+      if (token) {
+        config.headers.authorization = `Bearer ${token}`;
+      }
+
+      return config;
+    });
+
+    axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const status = error?.response?.status;
+
+        if ([401, 403].includes(status) && typeof window !== "undefined") {
+          expireSession();
+
+          if (window.location.pathname !== PAGES.LOGIN.BASE) {
+            window.location.replace(PAGES.LOGIN.BASE);
+          }
+        }
+
+        return Promise.reject(error);
+      }
+    );
   }
+
   return axiosInstance;
 };

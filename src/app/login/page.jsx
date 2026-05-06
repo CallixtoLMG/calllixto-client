@@ -1,15 +1,19 @@
 "use client";
 import { login } from "@/api/login";
-import { USER_DATA_KEY } from "@/common/constants";
 import LoginForm from "@/components/Login";
+import { clearSession, consumeSessionEndedNotification } from "@/services/session";
 import { signOut } from "@aws-amplify/auth";
 import { useEffect } from "react";
+import { toast } from "react-hot-toast";
 
 const Login = () => {
   useEffect(() => {
+    if (consumeSessionEndedNotification()) {
+      toast.error("Tu sesión finalizó. Volvé a ingresar para continuar.");
+    }
+
     signOut();
-    localStorage.removeItem('token');
-    localStorage.removeItem(USER_DATA_KEY);
+    clearSession();
   }, []);
   return <LoginForm onSubmit={login} />;
 };

@@ -3,14 +3,12 @@ import { useCreateExpense, useGetExpense } from "@/api/expenses";
 import { PAGES } from "@/common/constants";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateExpense = () => {
-  useValidateToken();
   const { push } = useRouter();
   const searchParams = useSearchParams();
   const cloneId = searchParams.get("clonar");

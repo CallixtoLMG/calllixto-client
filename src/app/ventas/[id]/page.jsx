@@ -16,7 +16,7 @@ import ModalPDF from "@/components/budgets/ModalPDF";
 import { BUDGET_STATES, PAYMENTS_TAB_INDEX, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import { isBudgetCancelled, isBudgetDraft, isBudgetExpired, isBudgetPending } from "@/components/budgets/budgets.utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useBudgetTotals, useLazyTabs, useValidateToken } from "@/hooks";
+import { useBudgetTotals, useLazyTabs } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
@@ -26,7 +26,6 @@ import { Dropdown } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 
 const Budget = ({ params }) => {
-  useValidateToken();
   const { role } = useUserContext();
   const { userData } = useUserContext();
   const { setLabels } = useBreadcrumContext();

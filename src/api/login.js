@@ -3,6 +3,7 @@ import { PATHS, URL } from '@/fetchUrls';
 import { confirmResetPassword, confirmSignIn, fetchAuthSession, signIn } from '@aws-amplify/auth';
 import { Amplify } from 'aws-amplify';
 import axios from "axios";
+import { setToken } from '@/services/session';
 
 Amplify.configure(awsConfig);
 
@@ -22,7 +23,7 @@ export async function login({ username, password, newPassword }) {
     if (user.nextStep?.signInStep === 'DONE') {
       const session = await fetchAuthSession();
       const accessToken = session.tokens.accessToken.toString();
-      localStorage.setItem('token', accessToken);
+      setToken(accessToken);
     }
 
   } catch (error) {

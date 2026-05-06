@@ -3,14 +3,12 @@ import { useCreateUser } from "@/api/users";
 import { PAGES } from "@/common/constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UserForm from "@/components/users/UserForm";
-import { useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateUser = () => {
-  useValidateToken();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const { push } = useRouter();
