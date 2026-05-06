@@ -3,6 +3,34 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-05-06
+
+### Added
+
+- Added centralized session handling using client-side cookies for token and user data.
+
+- Added Axios interceptors to automatically attach the bearer token to requests and expire the session on `401` or `403` responses.
+
+- Added middleware guards to redirect unauthenticated users to login and redirect all routes to maintenance when maintenance mode is enabled.
+
+### Changed
+
+- Updated the default `/` route to redirect to `/ventas`.
+
+- Updated session expiration feedback so login shows a clear message when the user is redirected after the session ends.
+
+- Updated selected client handling to use the centralized session helpers instead of direct storage access.
+
+- Updated unsaved changes handling so discarding changes resumes the pending navigation, route change, tab change, or protected action.
+
+- Extended unsaved changes protection to create forms for customers, brands, products, suppliers, users, expenses, and budgets.
+
+### Removed
+
+- Removed repeated page-level `useValidateToken` checks in favor of middleware and Axios interceptor handling.
+
+- Removed the unused home page content, keeping `/ventas` as the main application entry point.
+
 ## 2025-11-19
 
 ### Added

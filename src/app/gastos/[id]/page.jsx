@@ -249,9 +249,13 @@ const Expense = ({ params }) => {
   ];
 
   const handleTabChange = (_, { activeIndex }) => {
-    if (onBeforeView()) {
+    const changeTab = () => {
       setActiveIndex(activeIndex);
       router.replace(window.location.pathname);
+    };
+
+    if (onBeforeView(changeTab)) {
+      changeTab();
     }
   };
 

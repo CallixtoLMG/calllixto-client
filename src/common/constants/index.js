@@ -160,11 +160,6 @@ const SETTINGS_NAV_ITEMS = [
     href: "/configuracion?tab=clientes",
   },
   {
-    id: "settings-suppliers",
-    label: "Proveedores",
-    href: "/configuracion?tab=proveedores",
-  },
-  {
     id: "settings-budgets",
     label: "Ventas",
     href: "/configuracion?tab=ventas",

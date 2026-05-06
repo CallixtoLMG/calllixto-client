@@ -7,6 +7,8 @@ const useUnsavedChanges = ({ formRef, onDiscard }) => {
   const router = useRouter();
   const isDirtyRef = useRef(false);
   const skipNextNavigation = useRef(false);
+  const skipNextPopState = useRef(false);
+  const pendingActionRef = useRef(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -37,6 +39,7 @@ const useUnsavedChanges = ({ formRef, onDiscard }) => {
 
     router.push = (...args) => {
       if (isDirtyRef.current && !skipNextNavigation.current && !showModal) {
+        pendingActionRef.current = () => originalPush(...args);
         setShowModal(true);
       } else {
         originalPush(...args);
@@ -50,8 +53,17 @@ const useUnsavedChanges = ({ formRef, onDiscard }) => {
 
   useEffect(() => {
     const handlePopState = (e) => {
+      if (skipNextPopState.current) {
+        skipNextPopState.current = false;
+        return;
+      }
+
       if (isDirtyRef.current) {
         e.preventDefault?.();
+        pendingActionRef.current = () => {
+          skipNextPopState.current = true;
+          history.back();
+        };
         setShowModal(true);
         history.pushState(null, "", window.location.href);
       }
@@ -69,15 +81,23 @@ const useUnsavedChanges = ({ formRef, onDiscard }) => {
     await onDiscard?.();
     isDirtyRef.current = false;
     skipNextNavigation.current = true;
+    const pendingAction = pendingActionRef.current;
+    pendingActionRef.current = null;
     closeModal();
+    pendingAction?.();
+    setTimeout(() => {
+      skipNextNavigation.current = false;
+    }, 0);
   }, [onDiscard, closeModal]);
 
   const handleContinue = useCallback(() => {
+    pendingActionRef.current = null;
     closeModal();
   }, [closeModal]);
 
-  const onBeforeView = useCallback(() => {
+  const onBeforeView = useCallback((pendingAction) => {
     if (formRef.current?.isDirty?.()) {
+      pendingActionRef.current = typeof pendingAction === "function" ? pendingAction : null;
       setShowModal(true);
       return false;
     }

@@ -1,11 +1,13 @@
 "use client";
 import { useCreateCustomer } from "@/api/customers";
+import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { PAGES } from "@/common/constants";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateCustomer = () => {
@@ -13,6 +15,11 @@ const CreateCustomer = () => {
   const { resetActions, setInfo } = useNavActionsContext();
   const { push } = useRouter();
   const createCustomer = useCreateCustomer();
+  const formRef = useRef(null);
+  const customerUnsaved = useUnsavedChanges({
+    formRef,
+    onDiscard: () => formRef.current?.resetForm(),
+  });
 
   useEffect(() => {
     resetActions();
@@ -40,10 +47,18 @@ const CreateCustomer = () => {
   });
 
   return (
-    <CustomerForm
-      onSubmit={mutate}
-      isLoading={isPending}
-    />
+    <>
+      <CustomerForm
+        ref={formRef}
+        onSubmit={mutate}
+        isLoading={isPending}
+      />
+      <UnsavedChangesModal
+        open={customerUnsaved.showModal}
+        onDiscard={customerUnsaved.handleDiscard}
+        onContinue={customerUnsaved.handleContinue}
+      />
+    </>
   )
 };
 

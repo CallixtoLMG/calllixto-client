@@ -1,7 +1,6 @@
 import { IconedButton } from "@/common/components/buttons";
 import { FlexColumn } from "@/common/components/custom";
 import { COLORS, ICONS } from "@/common/constants";
-import { useEffect, useState } from "react";
 import { Tab } from "semantic-ui-react";
 import BrandsModule from "./Entities/Brands";
 import BudgetsModule from "./Entities/Budgets";
@@ -20,8 +19,6 @@ const SettingsTabs = ({
   activeIndex,
   onActiveIndexChange,
 }) => {
-  const [pendingTabIndex, setPendingTabIndex] = useState(null);
-
   const panes = settings.map((entity) => ({
     menuItem: entity.label,
     render: () => (
@@ -38,20 +35,17 @@ const SettingsTabs = ({
   }));
 
   const handleTabChange = async (_, { activeIndex: nextIndex }) => {
-    const canChange = await onBeforeView?.();
-
-    if (canChange) {
+    const changeTab = () => {
       onActiveIndexChange?.(nextIndex);
       onEntityChange(settings[nextIndex]);
-    } else {
-      setPendingTabIndex(nextIndex);
+    };
+
+    const canChange = await onBeforeView?.(changeTab);
+
+    if (canChange) {
+      changeTab();
     }
   };
-
-  useEffect(() => {
-    if (pendingTabIndex !== null) {
-    }
-  }, [pendingTabIndex]);
 
   return (
     <FlexColumn>

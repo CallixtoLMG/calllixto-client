@@ -85,7 +85,7 @@ const CustomerForm = forwardRef(({
         {isUpdating || !view
           ? <ContactControlled />
           : <ContactView phoneNumbers={phones} addresses={addresses} emails={emails} />}
-        <FieldsContainer  $columnGap="15px">
+        <FieldsContainer $columnGap="15px">
           <FormField flex="1">
             <DropdownControlled
               disabled={!isUpdating && view}

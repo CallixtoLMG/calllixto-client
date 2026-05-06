@@ -1,11 +1,13 @@
 "use client";
 import { useCreateExpense, useGetExpense } from "@/api/expenses";
+import { UnsavedChangesModal } from "@/common/components/modals";
 import { PAGES } from "@/common/constants";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateExpense = () => {
@@ -16,6 +18,11 @@ const CreateExpense = () => {
   const { resetActions } = useNavActionsContext();
   const createExpense = useCreateExpense();
   const { data: expenseToClone, isLoading: loadingClone } = useGetExpense(cloneId);
+  const formRef = useRef(null);
+  const expenseUnsaved = useUnsavedChanges({
+    formRef,
+    onDiscard: () => formRef.current?.resetForm(),
+  });
 
   useEffect(() => {
     resetActions();
@@ -49,12 +56,20 @@ const CreateExpense = () => {
   }, [expenseToClone]);
 
   return (
-    <ExpenseForm
-      onSubmit={mutate}
-      isLoading={isPending || loadingClone}
-      expense={clonedExpense}
-      isCloning={!!clonedExpense}
-    />
+    <>
+      <ExpenseForm
+        ref={formRef}
+        onSubmit={mutate}
+        isLoading={isPending || loadingClone}
+        expense={clonedExpense}
+        isCloning={!!clonedExpense}
+      />
+      <UnsavedChangesModal
+        open={expenseUnsaved.showModal}
+        onDiscard={expenseUnsaved.handleDiscard}
+        onContinue={expenseUnsaved.handleContinue}
+      />
+    </>
   );
 };
 

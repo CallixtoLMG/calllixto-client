@@ -1,11 +1,13 @@
 "use client";
 import { useCreateBrand } from "@/api/brands";
+import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { PAGES } from "@/common/constants";
 import BrandForm from "@/components/brands/BrandForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import { useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateBrand = () => {
@@ -13,6 +15,11 @@ const CreateBrand = () => {
   const { resetActions } = useNavActionsContext();
   const { push } = useRouter();
   const createBrand = useCreateBrand();
+  const formRef = useRef(null);
+  const brandUnsaved = useUnsavedChanges({
+    formRef,
+    onDiscard: () => formRef.current?.resetForm(),
+  });
 
   useEffect(() => {
     resetActions();
@@ -36,7 +43,14 @@ const CreateBrand = () => {
   });
 
   return (
-    <BrandForm onSubmit={mutate} isLoading={isPending} />
+    <>
+      <BrandForm ref={formRef} onSubmit={mutate} isLoading={isPending} />
+      <UnsavedChangesModal
+        open={brandUnsaved.showModal}
+        onDiscard={brandUnsaved.handleDiscard}
+        onContinue={brandUnsaved.handleContinue}
+      />
+    </>
   )
 };
 
