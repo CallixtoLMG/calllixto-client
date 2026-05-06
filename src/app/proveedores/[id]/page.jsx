@@ -15,7 +15,7 @@ import { DISCOUNT_STOCK, PRODUCT_STATES, UPLOAD_STOCK } from "@/components/produ
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { EXAMPLE_TEMPLATE_DATA_STOCK } from "@/components/suppliers/suppliers.constants";
-import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -25,7 +25,6 @@ import { useReactToPrint } from "react-to-print";
 import { Dropdown } from "semantic-ui-react";
 
 const Supplier = ({ params }) => {
-  useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
   const { data: supplier, isLoading, refetch: refetchSupplier } = useGetSupplier(params.id);

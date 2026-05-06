@@ -9,14 +9,13 @@ import { BatchImportProducts } from "@/components/products/BatchImportProducts";
 import ProductsPage from "@/components/products/ProductsPage";
 import { EXAMPLE_TEMPLATE_DATA, PRODUCT_STATES } from "@/components/products/products.constants";
 import { getFormatedMargin } from "@/components/products/products.utils";
-import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
+import { useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 import { Dropdown } from "semantic-ui-react";
 
 const Products = () => {
-  useValidateToken();
   const { role } = useUserContext();
   const { data, isLoading, isRefetching, refetch } = useListProducts();
   const { setLabels } = useBreadcrumContext();

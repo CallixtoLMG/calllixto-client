@@ -7,12 +7,10 @@ import BudgetsHistoryFilter from "@/components/budgets/BudgetsHistoryFilters";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { BASE_BUDGETS_HISTORY_RANGES, BUDGETS_HISTORY_FILTERS_KEY, BUDGET_STATES, DATE_RANGE_KEY, buildCustomHistoryRanges } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useValidateToken } from "@/hooks";
 import useFilterParams from "@/hooks/useFilterParams";
 import { useEffect, useMemo, useState } from "react";
 
 const BudgetsHistory = () => {
-  useValidateToken();
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => setHydrated(true), []);
 

@@ -1,15 +1,5 @@
-"use client";
-import React from 'react';
-import { Container, Subtitle, Title } from "./styles";
+import { redirect } from "next/navigation";
 
-const Home: React.FC = () => {
-
-  return (
-    <Container>
-      <Title>Bienvenido a Callixto!</Title>
-      <Subtitle>Gracias por elegirnos. ¡Estamos encantados de ser parte de su viaje!</Subtitle>
-    </Container>
-  );
-};
-
-export default Home;
+export default function Home() {
+  redirect("/ventas");
+}

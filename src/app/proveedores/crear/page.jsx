@@ -4,14 +4,13 @@ import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges"
 import { PAGES } from "@/common/constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SupplierForm from "@/components/suppliers/SupplierForm";
-import { useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateSupplier = () => {
-  useValidateToken();
   const { push } = useRouter();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();

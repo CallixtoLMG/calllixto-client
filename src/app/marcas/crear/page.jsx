@@ -4,14 +4,13 @@ import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges"
 import { PAGES } from "@/common/constants";
 import BrandForm from "@/components/brands/BrandForm";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateBrand = () => {
-  useValidateToken();
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const { push } = useRouter();

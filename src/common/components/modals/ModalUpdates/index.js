@@ -19,8 +19,8 @@ const StyledModal = styled(Modal)`
 `;
 
 const ModalUpdates = () => {
-  const activeVersion = '2026-04-29';
-  const latestNews = window?.localStorage?.getItem('latestNews');
+  const activeVersion = '2026-06-06';
+  const latestNews = typeof window !== 'undefined' ? window.localStorage.getItem('latestNews') : activeVersion;
   const [open, setOpen] = useState(!latestNews || isDateBefore(latestNews, activeVersion));
 
   return (

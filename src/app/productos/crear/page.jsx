@@ -7,14 +7,13 @@ import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges"
 import { ENTITIES, PAGES } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateProduct = () => {
-  useValidateToken();
   const { push } = useRouter();
   const { data: brands, isLoading: isLoadingBrands, refetch: refetchBrands, isRefetching: isBrandsRefetching } = useListBrands();
   const { data: suppliers, isLoading: isLoadingSuppliers, refetch: refetchSuppliers, isRefetching: isSupplierRefetching } = useListSuppliers();

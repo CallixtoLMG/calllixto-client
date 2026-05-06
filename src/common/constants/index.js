@@ -4,9 +4,11 @@ import { Icon, List, ListItem } from "semantic-ui-react";
 import { Accent } from "../components/custom";
 import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
 import { ENTITIES } from "./entities";
+import { MAINTENANCE_PAGE } from "./maintenance";
 
 export * from './dates';
 export * from './entities';
+export * from './maintenance';
 export * from './semantic';
 export * from './time';
 
@@ -113,6 +115,7 @@ export const PAGES = {
   RESTORE_PASSWORD: {
     BASE: "/recuperar-contrasena"
   },
+  MAINTENANCE: MAINTENANCE_PAGE,
   NOT_FOUND: {
     BASE: "/ups"
   },
