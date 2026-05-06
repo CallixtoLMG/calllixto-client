@@ -13,7 +13,7 @@ const GoBackButton = () => {
     if (previous && previous !== location.pathname) {
       router.push(previous);
     } else {
-      router.push(PAGES.BASE);
+      router.push(PAGES.BUDGETS.BASE);
     }
   };
 
