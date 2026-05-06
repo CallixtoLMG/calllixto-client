@@ -1,8 +1,8 @@
-import { AccordionTitle, Box, FlexColumn, Icon } from "@/common/components/custom";
+import { Box, FlexColumn } from "@/common/components/custom";
 import { DropdownControlled } from "@/common/components/form";
-import { ICONS } from "@/common/constants";
+import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
-import { BUDGET_RANGE_DATE_MONTH_OPTIONS } from "@/components/settings/settings.constants";
+import { BUDGET_RANGE_DATE_MONTH_OPTIONS, SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useState } from "react";
 import { Accordion, } from "semantic-ui-react";
 import { HistoryDateRangesControlled } from "./HistoryDateRangesControlled";
@@ -14,9 +14,13 @@ const General = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon $height="20px" name={ICONS.CARET_UP} /> General
-        </AccordionTitle>
+        <SettingsAccordionTitle
+          active={isAccordionOpen}
+          helpText={SETTINGS_HELP_TEXTS.BUDGET_GENERAL}
+          onClick={toggleAccordion}
+        >
+          General
+        </SettingsAccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>

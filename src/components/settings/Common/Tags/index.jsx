@@ -1,11 +1,13 @@
-import { AccordionTitle, Box, Button, FieldsContainer, Icon, OverflowWrapper } from "@/common/components/custom";
+import { Box, Button, FieldsContainer, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
 import { COLORS, DELETE, ICONS, SEMANTIC_COLORS, SIZES } from "@/common/constants";
 import { createPriorityKeyDownHandler, handleEnterKeyDown } from "@/common/utils";
+import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Accordion, Label } from "semantic-ui-react";
+import SettingsAccordionTitle from "../SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "../styles";
 
 const EMPTY_TAG = {
@@ -114,10 +116,13 @@ const Tags = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
-          <Icon $height="20px" name={ICONS.CARET_UP} />
+        <SettingsAccordionTitle
+          active={isAccordionOpen}
+          helpText={SETTINGS_HELP_TEXTS.TAGS}
+          onClick={toggleAccordion}
+        >
           Etiquetas
-        </AccordionTitle>
+        </SettingsAccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner $active={isAccordionOpen}>
