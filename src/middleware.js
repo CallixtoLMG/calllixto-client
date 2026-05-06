@@ -1,3 +1,4 @@
+import { PAGES } from "@/common/constants";
 import { NextResponse } from "next/server";
 import { MAINTENANCE_MODE, MAINTENANCE_PAGE } from "./common/constants/maintenance";
 
@@ -5,10 +6,10 @@ const TOKEN_KEY = "token";
 const SESSION_ENDED_NOTIFICATION_KEY = "sessionEndedNotification";
 
 const PUBLIC_ROUTES_WHEN_AVAILABLE = [
-  "/",
-  "/login",
-  "/recuperar-contrasena",
-  "/cambiar-contrasena",
+  PAGES.BASE,
+  PAGES.LOGIN.BASE,
+  PAGES.RESTORE_PASSWORD.BASE,
+  PAGES.CHANGE_PASSWORD.BASE,
   MAINTENANCE_PAGE.BASE,
 ];
 
@@ -22,9 +23,7 @@ export function middleware(request) {
       return NextResponse.next();
     }
 
-    const maintenanceUrl = request.nextUrl.clone();
-    maintenanceUrl.pathname = MAINTENANCE_PAGE.BASE;
-    return NextResponse.redirect(maintenanceUrl);
+    return NextResponse.redirect(new URL(MAINTENANCE_PAGE.BASE, request.url));
   }
 
   if (isPublicRoute(pathname)) {
@@ -32,10 +31,7 @@ export function middleware(request) {
   }
 
   if (!request.cookies.get(TOKEN_KEY)?.value) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/login";
-
-    const response = NextResponse.redirect(url);
+    const response = NextResponse.redirect(new URL(PAGES.LOGIN.BASE, request.url));
     response.cookies.set(SESSION_ENDED_NOTIFICATION_KEY, "true", {
       maxAge: 60,
       path: "/",

@@ -12,7 +12,7 @@ import axios from "axios";
 export async function getUserData() {
   const data = getSessionUserData();
 
-  if (data?.isAuthorized) {
+  if (data) {
     setSelectedClientData(data);
     return data;
   }
