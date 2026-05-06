@@ -1,12 +1,13 @@
 "use client";
 import { useCreateUser } from "@/api/users";
+import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { PAGES } from "@/common/constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UserForm from "@/components/users/UserForm";
-import { useValidateToken } from "@/hooks";
+import { useUnsavedChanges, useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateUser = () => {
@@ -15,6 +16,11 @@ const CreateUser = () => {
   const { resetActions } = useNavActionsContext();
   const { push } = useRouter();
   const createUser = useCreateUser();
+  const formRef = useRef(null);
+  const userUnsaved = useUnsavedChanges({
+    formRef,
+    onDiscard: () => formRef.current?.resetForm(),
+  });
   useEffect(() => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -37,7 +43,14 @@ const CreateUser = () => {
   });
 
   return (
-    <UserForm onSubmit={mutate} isLoading={isPending} />
+    <>
+      <UserForm ref={formRef} onSubmit={mutate} isLoading={isPending} />
+      <UnsavedChangesModal
+        open={userUnsaved.showModal}
+        onDiscard={userUnsaved.handleDiscard}
+        onContinue={userUnsaved.handleContinue}
+      />
+    </>
   )
 };
 

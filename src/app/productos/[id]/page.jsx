@@ -70,8 +70,10 @@ const Product = ({ params }) => {
   });
 
   const handleTabChange = (_, { activeIndex }) => {
-    if (onBeforeView()) {
-      onLazyTabChange(_, { activeIndex });
+    const changeTab = () => onLazyTabChange(_, { activeIndex });
+
+    if (onBeforeView(changeTab)) {
+      changeTab();
     }
   };
 

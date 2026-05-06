@@ -6,6 +6,7 @@ import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
 import { useConsumeStock } from "@/api/stock";
+import { UnsavedChangesModal } from "@/common/components/modals";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { mapToDropdownOptions } from "@/common/utils";
 import BudgetForm from "@/components/budgets/BudgetForm";
@@ -14,7 +15,7 @@ import { BUDGET_STATES, buildConsumeStockFlows, createClonedBudget, createEmptyB
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import CreateBudgetPayments from "@/components/payments/CreateBudgetPayment";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { useBudgetTotals, useValidateToken } from "@/hooks";
+import { useBudgetTotals, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
@@ -69,6 +70,11 @@ const CreateBudget = () => {
     reValidateMode: "onChange",
     shouldUnregister: false,
   });
+  const formRef = useRef(null);
+  const budgetUnsaved = useUnsavedChanges({
+    formRef,
+    onDiscard: () => methods.reset(defaultValues),
+  });
 
   const clonedDefaults = useMemo(() => {
     if (!isCloning || !budget) return null;
@@ -104,6 +110,13 @@ const CreateBudget = () => {
   const defaultValues = clonedDefaults || draftDefaults || emptyDefaults;
 
   const hasResetRef = useRef(false);
+
+  useEffect(() => {
+    formRef.current = {
+      isDirty: () => methods.formState.isDirty,
+      resetForm: () => methods.reset(defaultValues),
+    };
+  }, [defaultValues, methods]);
 
   useEffect(() => {
     if (!defaultValues) return;
@@ -189,8 +202,10 @@ const CreateBudget = () => {
         data.state === BUDGET_STATES.CONFIRMED.id ||
         data.state === BUDGET_STATES.PENDING.id
       ) {
+        methods.reset(data);
         push(PAGES.BUDGETS.SHOW(budgetId));
       } else {
+        methods.reset(data);
         push(`${PAGES.BUDGETS.SHOW(budgetId)}/borrador`);
       }
 
@@ -250,6 +265,11 @@ const CreateBudget = () => {
         <Tab
           panes={panes}
           defaultActiveIndex={0}
+        />
+        <UnsavedChangesModal
+          open={budgetUnsaved.showModal}
+          onDiscard={budgetUnsaved.handleDiscard}
+          onContinue={budgetUnsaved.handleContinue}
         />
       </FormProvider>
     </Loader>

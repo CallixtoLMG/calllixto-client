@@ -3,13 +3,14 @@ import { useListBrands } from "@/api/brands";
 import { useCreateProduct } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
 import { useListSuppliers } from "@/api/suppliers";
+import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductForm from "@/components/products/ProductForm";
-import { useValidateToken } from "@/hooks";
+import { useUnsavedChanges, useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toast } from "react-hot-toast";
 
 const CreateProduct = () => {
@@ -21,6 +22,11 @@ const CreateProduct = () => {
   const { setLabels } = useBreadcrumContext();
   const { resetActions } = useNavActionsContext();
   const createProduct = useCreateProduct();
+  const formRef = useRef(null);
+  const productUnsaved = useUnsavedChanges({
+    formRef,
+    onDiscard: () => formRef.current?.resetForm(),
+  });
 
   useEffect(() => {
     resetActions();
@@ -52,11 +58,17 @@ const CreateProduct = () => {
   return (
     <Loader active={isLoadingBrands || isLoadingSuppliers || isBrandsRefetching || isSupplierRefetching}>
       <ProductForm
+        ref={formRef}
         brands={brands?.brands ?? []}
         suppliers={suppliers?.suppliers ?? []}
         onSubmit={mutate}
         isLoading={isPending}
         blacklist={blacklist?.blacklist}
+      />
+      <UnsavedChangesModal
+        open={productUnsaved.showModal}
+        onDiscard={productUnsaved.handleDiscard}
+        onContinue={productUnsaved.handleContinue}
       />
     </Loader>
   )

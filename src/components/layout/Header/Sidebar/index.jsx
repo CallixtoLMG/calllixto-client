@@ -2,7 +2,7 @@
 
 import { COLORS, ICONS, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Icon } from "semantic-ui-react";
 import {
@@ -26,7 +26,6 @@ import {
 } from "./styles";
 
 const SidebarNavigation = ({ open, onClose, items = [], pathname }) => {
-  const { push } = useRouter();
   const [openGroups, setOpenGroups] = useState({});
   const searchParams = useSearchParams();
 
