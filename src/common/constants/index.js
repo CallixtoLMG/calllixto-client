@@ -438,6 +438,7 @@ export const ICONS = {
   MINUS: "minus",
   STICKY_NOTE: "sticky note",
   FILE_PDF: "file pdf",
+  PRINT: "print",
   LIST: "list",
   LIST_ALTERNATE: "list alternate",
   CARET_UP: "caret up",

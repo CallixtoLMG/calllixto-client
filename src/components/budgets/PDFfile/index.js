@@ -75,9 +75,9 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <Title as="h3" $textAlign="left" $alignSelf="left" $cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
             {clientPdf && (
               <>
-                <Title $textAlign="left" as="h4">{client?.name?.toUpperCase() || "Maderera Las Tapias"}</Title>
+                <Title $textAlign="left" $alignSelf="left" as="h4">{client?.name?.toUpperCase() || "Maderera Las Tapias"}</Title>
                 <Title $textAlign="left" $alignSelf="left" as="h4">CUIT: {client?.cuil?.toUpperCase() || "CUIT"}</Title>
-                <Title as="h4">{client?.taxCondition || "Condición IVA"}</Title>
+                <Title $textAlign="left" $alignSelf="left" as="h4">{client?.taxCondition || "Condición IVA"}</Title>
               </>
             )}
           </FlexColumn>
@@ -164,7 +164,7 @@ const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRat
             <DataContainer width="100%">
               <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Formas de pago</Title>
               <Divider />
-              <Title as="h4" $alignSelf="left" $textAlignLast="left" $minHeight="30px">
+              <Title as="h4" $alignSelf="left" $textAlign="left" $textAlignLast="left" $minHeight="30px">
                 {budget?.paymentMethods?.join(" | ")}
               </Title>
             </DataContainer>

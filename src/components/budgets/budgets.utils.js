@@ -104,6 +104,52 @@ export const getProductsColumns = (dispatchPdf, budget, showPrices) => {
   ].filter(Boolean);
 };
 
+export const getDeliveryPrintColumns = () => [
+  {
+    id: 1,
+    title: "Tipo",
+    key: "type",
+    value: (delivery) => delivery.type,
+    width: 1,
+  },
+  {
+    id: 2,
+    title: "Fecha",
+    key: "date",
+    value: (delivery) => delivery.date,
+    width: 2,
+  },
+  {
+    id: 3,
+    title: "Remito",
+    key: "deliveryNote",
+    value: (delivery) => delivery.deliveryNote,
+    width: 1,
+  },
+  {
+    id: 4,
+    title: "Id",
+    key: "productId",
+    value: (delivery) => delivery.productId,
+    width: 1,
+  },
+  {
+    id: 5,
+    title: "Producto",
+    key: "productName",
+    align: "left",
+    value: (delivery) => delivery.productName,
+    width: 4,
+  },
+  {
+    id: 6,
+    title: "Cantidad",
+    key: "quantity",
+    value: (delivery) => delivery.quantity,
+    width: 1,
+  },
+];
+
 export const getTotalSum = (products = []) => {
   if (!Array.isArray(products)) return 0;
 
