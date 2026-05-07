@@ -3,6 +3,7 @@ import { GroupedButtonsControlled, NumberControlled, SearchControlled } from "@/
 import { COLORS, ICONS } from "@/common/constants";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
+import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
 import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useState } from "react";
@@ -31,7 +32,12 @@ const OnCreate = ({ customerOptions, isLoading }) => {
             <AnimatedInner>
               <FlexColumn $rowGap="15px">
                 <GroupedButtonsControlled
-                  label="Estado por defecto"
+                   label="Estado por defecto"
+                  // label={
+                  //   <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_DEFAULT_STATE}>
+                  //     Estado por defecto
+                  //   </SettingsFieldLabel>
+                  // }
                   name="defaultsCreate.state"
                   width="fit-content"
                   color={defaultsCreate?.state === BUDGET_STATES.CONFIRMED.id ? COLORS.GREEN : COLORS.ORANGE}
@@ -41,7 +47,11 @@ const OnCreate = ({ customerOptions, isLoading }) => {
                   ]}
                 />
                 <GroupedButtonsControlled
-                  label="Entrega por defecto"
+                  label={
+                    <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_DEFAULT_DELIVERY}>
+                      Entrega por defecto
+                    </SettingsFieldLabel>
+                  }
                   width="fit-content"
                   color={COLORS.BLUE}
                   name="defaultsCreate.pickUpInStore"
@@ -53,7 +63,11 @@ const OnCreate = ({ customerOptions, isLoading }) => {
                 <SearchControlled
                   name="defaultsCreate.customer"
                   width="300px"
-                  label="Cliente por defecto"
+                  label={
+                    <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_DEFAULT_CUSTOMER}>
+                      Cliente por defecto
+                    </SettingsFieldLabel>
+                  }
                   disabled={isLoading}
                   clearable
                   placeholder="A0001"
@@ -70,7 +84,11 @@ const OnCreate = ({ customerOptions, isLoading }) => {
                 />
                 <NumberControlled
                   name="defaultsCreate.expirationOffsetDays"
-                  label="Días para el vencimiento por defecto"
+                  label={
+                    <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_DEFAULT_EXPIRATION_DAYS}>
+                      Días para el vencimiento por defecto
+                    </SettingsFieldLabel>
+                  }
                   width="fit-content"
                   placeholder="15"
                 />

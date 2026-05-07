@@ -21,8 +21,7 @@ const Label = styled(SLabel)`
   padding: 0!important;
   color: rgba(0, 0, 0, .87)!important;
   background-color: inherit!important;
-  font-size: 13px!important;
-  margin-bottom: 4px!important;
+  font-size: 14px!important;
   line-height: 20px!important;
 `;
 
