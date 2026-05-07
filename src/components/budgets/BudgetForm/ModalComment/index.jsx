@@ -1,7 +1,7 @@
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, Form } from "@/common/components/custom";
 import { TextControlled, TextField } from "@/common/components/form";
-import { COLORS, ICONS } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, FIELD_LABELS, ICONS } from "@/common/constants";
 import { useEffect, useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Modal, Transition } from "semantic-ui-react";
@@ -45,9 +45,9 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
                 }}
               >
                 <FieldsContainer>
-                  <TextField flex="1" label="Id" placeholder={product?.id} readOnly />
-                  <TextField flex="1" label="Nombre" placeholder={product?.name} readOnly />
-                  <TextField width="100px" label="Cantidad" placeholder={product?.quantity} readOnly />
+                  <TextField flex="1" label={FIELD_LABELS.ID} placeholder={product?.id} readOnly />
+                  <TextField flex="1" label={FIELD_LABELS.NAME} placeholder={product?.name} readOnly />
+                  <TextField width="100px" label={FIELD_LABELS.QUANTITY} placeholder={product?.quantity} readOnly />
                 </FieldsContainer>
                 <FieldsContainer>
                   <TextControlled
@@ -63,8 +63,8 @@ const ModalComment = ({ isModalOpen, onClose, product, onAddComment }) => {
         </Modal.Content>
         <Modal.Actions>
           <ButtonsContainer>
-            <IconedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} />
-            <IconedButton text="Confirmar" icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleSubmit(onAddComment)} disabled={!isDirty} />
+            <IconedButton text={BUTTON_TEXTS.CANCEL} icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} />
+            <IconedButton text={BUTTON_TEXTS.CONFIRM} icon={ICONS.CHECK} color={COLORS.GREEN} onClick={handleSubmit(onAddComment)} disabled={!isDirty} />
           </ButtonsContainer>
         </Modal.Actions>
       </Modal>

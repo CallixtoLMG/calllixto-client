@@ -1,5 +1,5 @@
 import { Icon } from "@/common/components/custom";
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { Popup } from "semantic-ui-react";
 
 const SettingsInfoIcon = ({ content }) => {
@@ -14,6 +14,7 @@ const SettingsInfoIcon = ({ content }) => {
     <Popup
       content={content}
       position="top center"
+      size={SIZES.TINY}
       trigger={
         <span
           aria-label="Ayuda"

@@ -4,7 +4,7 @@ import { ButtonsContainer, FieldsContainer, Form, FormField } from "@/common/com
 import { DropdownField, PriceField, TextAreaField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { TotalList } from "@/common/components/table";
-import { COLORS, ENTITIES, ICONS, RULES, SIZES } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, ENTITIES, FIELD_LABELS, ICONS, RULES, SIZES } from "@/common/constants";
 import { handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { useEffect, useMemo, useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
@@ -92,7 +92,7 @@ export const ModalAddPayment = ({
                 dateFormat="dd-MM-yyyy"
                 disabled={isTotalCovered}
                 maxDate={new Date()}
-                label="Fecha"
+                label={FIELD_LABELS.DATE}
                 placeholder="16-11-2025"
                 control={DatePicker}
               />
@@ -112,7 +112,7 @@ export const ModalAddPayment = ({
                 <PriceField
                   placeholder="10000"
                   required
-                  label="Monto"
+                  label={FIELD_LABELS.AMOUNT}
                   value={payment.amount}
                   onChange={(value) => {
                     setPayment({ ...payment, amount: value ?? 0 });
@@ -150,7 +150,7 @@ export const ModalAddPayment = ({
             </FieldsContainer>
             <FieldsContainer>
               <TextAreaField
-                label="Comentarios"
+                label={FIELD_LABELS.COMMENTS}
                 value={payment.comments}
                 placeholder="Primer pago"
                 onChange={e => setPayment({ ...payment, comments: e.target.value })}
@@ -164,7 +164,7 @@ export const ModalAddPayment = ({
           <ButtonsContainer>
             <IconedButton
               icon={ICONS.CLOSE}
-              text="Cancelar"
+              text={BUTTON_TEXTS.CANCEL}
               color={COLORS.RED}
               onClick={() => {
                 handleClose()
@@ -174,7 +174,7 @@ export const ModalAddPayment = ({
             />
             <IconedButton
               icon={ICONS.ADD}
-              text="Agregar"
+              text={BUTTON_TEXTS.ADD}
               color={COLORS.GREEN}
               onClick={handleAddPayment}
               disabled={isTotalCovered || isLoading}

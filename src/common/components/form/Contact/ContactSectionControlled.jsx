@@ -1,4 +1,4 @@
-import { COLORS, ICONS } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, ICONS, TOOLTIPS } from "@/common/constants";
 import { handleEnterKeyDown, handleEscapeKeyDown } from "@/common/utils";
 import { useEffect, useRef, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
@@ -136,7 +136,7 @@ export const ContactSectionControlled = ({
               );
             })}
             <IconedButton
-              text="Agregar"
+              text={BUTTON_TEXTS.ADD}
               icon={ICONS.ADD}
               color={COLORS.GREEN}
               onClick={handleAdd}
@@ -152,7 +152,7 @@ export const ContactSectionControlled = ({
         $wrap={tableWrap}
         headers={tableHeaders}
         actions={[
-          { id: 1, icon: ICONS.TRASH, color: COLORS.RED, onClick: (item, index) => remove(index), tooltip: 'Eliminar' }
+          { id: 1, icon: ICONS.TRASH, color: COLORS.RED, onClick: (item, index) => remove(index), tooltip: TOOLTIPS.DELETE }
         ]}
         elements={fields}
       />

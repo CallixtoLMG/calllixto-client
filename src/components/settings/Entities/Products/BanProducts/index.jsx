@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, DELETE, ICONS, SIZES, TOOLTIPS } from "@/common/constants";
 import { createPriorityKeyDownHandler } from "@/common/utils";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
@@ -99,7 +99,7 @@ const Blacklist = () => {
       icon: ICONS.TRASH,
       color: COLORS.RED,
       onClick: handleRemoveId,
-      tooltip: "Eliminar",
+      tooltip: TOOLTIPS.DELETE,
       getKey: (id, index) => `delete_${id}_${index}`,
     },
   ], [handleRemoveId]);
@@ -148,7 +148,7 @@ const Blacklist = () => {
                   <Button
                     size={SIZES.SMALL}
                     icon={ICONS.ADD}
-                    content="Agregar"
+                    content={BUTTON_TEXTS.ADD}
                     labelPosition="left"
                     color={COLORS.GREEN}
                     type="button"

@@ -1,4 +1,5 @@
 import { Box, Flex, FlexColumn, Label, OverflowWrapper } from "@/common/components/custom";
+import { FIELD_LABELS } from "@/common/constants";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "../../common/components/tooltips";
 
@@ -10,7 +11,7 @@ export const LIST_ATTRIBUTES = ['id', 'name', 'addresses', 'phoneNumbers', 'comm
 export const HEADERS = [
   {
     id: 1,
-    title: "Id",
+    title: FIELD_LABELS.ID,
     key: "id",
     sortable: true,
     width: 1,
@@ -19,7 +20,7 @@ export const HEADERS = [
   },
   {
     id: 2,
-    title: 'Nombre',
+    title: FIELD_LABELS.NAME,
     align: 'left',
     width: 5,
     key: "name",
@@ -42,7 +43,7 @@ export const HEADERS = [
   },
   {
     id: 3,
-    title: "Direccion",
+    title: FIELD_LABELS.ADDRESS,
     key: "addresses",
     sortable: true,
     width: 4,
@@ -62,7 +63,7 @@ export const HEADERS = [
   },
   {
     id: 4,
-    title: "Teléfono",
+    title: FIELD_LABELS.PHONE,
     width: 1,
     whiteSpace: "nowrap",
     value: (customer) => {

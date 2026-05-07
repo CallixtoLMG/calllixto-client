@@ -1,7 +1,7 @@
 import { IconedButton } from "@/common/components/buttons";
 import { Box, Flex, FlexColumn } from "@/common/components/custom";
 import { Table } from "@/common/components/table";
-import { COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS, TOOLTIPS } from "@/common/constants";
 import { useRef, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
@@ -61,7 +61,7 @@ export const BillDetails = ({ name }) => {
             icon: ICONS.TRASH,
             color: COLORS.RED,
             onClick: (billDetail, index) => removeBillDetails(index),
-            tooltip: "Eliminar",
+            tooltip: TOOLTIPS.DELETE,
           },
         ]}
         elements={billDetailsFields}

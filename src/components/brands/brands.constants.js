@@ -1,6 +1,6 @@
 import { Box, Flex, Label, OverflowWrapper } from '@/common/components/custom';
 import { CommentTooltip } from "@/common/components/tooltips";
-import { COLORS } from '@/common/constants';
+import { COLORS, FIELD_LABELS } from '@/common/constants';
 import { Popup } from 'semantic-ui-react';
 
 export const GET_BRAND_QUERY_KEY = 'getBrand';
@@ -11,7 +11,7 @@ export const LIST_ATTRIBUTES = ['id', 'name', 'comments',  'state', 'inactiveRea
 export const BRAND_COLUMNS = [
   {
     id: 1,
-    title: "Id",
+    title: FIELD_LABELS.ID,
     key: "id",
     sortable: true,
     width: 1,
@@ -20,7 +20,7 @@ export const BRAND_COLUMNS = [
   },
   {
     id: 2,
-    title: "Nombre",
+    title: FIELD_LABELS.NAME,
     key: "name",
     sortable: true,
     align: "left",

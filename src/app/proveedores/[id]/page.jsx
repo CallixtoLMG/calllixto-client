@@ -7,7 +7,7 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
 import { downloadExcel, isItemInactive } from "@/common/utils";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext, } from "@/components/layout";
 import { BatchImportStock } from "@/components/products/BatchImportStock";
@@ -460,7 +460,7 @@ const Supplier = ({ params }) => {
         bodyContent={
           confirmationAction === INACTIVE && (
             <TextField
-              placeholder="Motivo"
+              placeholder={PLACEHOLDERS.REASON}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

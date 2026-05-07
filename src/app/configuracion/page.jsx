@@ -3,7 +3,7 @@ import { useEditSetting, useListSettings } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { Form } from "@/common/components/custom";
 import { UnsavedChangesModal } from "@/common/components/modals";
-import { ALL, ENTITIES, INFO, PAGES, SETTINGS_TAB_MAP, SETTINGS_TAB_REVERSE_MAP, SHORTKEYS } from "@/common/constants";
+import { ALL, BUTTON_TEXTS, ENTITIES, INFO, PAGES, SETTINGS_TAB_MAP, SETTINGS_TAB_REVERSE_MAP, SHORTKEYS } from "@/common/constants";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SettingsTabs from "@/components/settings";
 import { ENTITY_MAPPER, GET_SETTING_QUERY_KEY, LIST_SETTINGS_QUERY_KEY, SUPPORTED_SETTINGS } from "@/components/settings/settings.constants";
@@ -185,7 +185,7 @@ const Settings = () => {
             isLoading={isPending}
             onReset={() => reset(data[activeEntity])}
             isDirty={isDirty}
-            text="Actualizar"
+            text={BUTTON_TEXTS.UPDATE}
             submit
           />
           <UnsavedChangesModal

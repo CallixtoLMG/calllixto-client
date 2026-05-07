@@ -1,3 +1,4 @@
+import { ERROR_MESSAGES, FIELD_LABELS } from "@/common/constants";
 import { ADDRESS_TABLE_HEADERS } from "../form.constants";
 import { ContactSectionControlled } from "./ContactSectionControlled";
 import { EMPTY_ADDRESS, hasDuplicateRef } from "./contact.helpers";
@@ -19,7 +20,7 @@ export const AddressControlled = () => (
       }
 
       if (!addressToAdd.address?.trim()) {
-        nextError.address = 'Campo requerido.';
+        nextError.address = ERROR_MESSAGES.REQUIRED_FIELD;
       } else {
         const addressExists = addressFields.some(
           (address) => address.address === addressToAdd.address
@@ -36,14 +37,14 @@ export const AddressControlled = () => (
       {
         name: 'ref',
         flex: '1',
-        label: 'Referencia',
+        label: FIELD_LABELS.REFERENCE,
         placeholder: 'Casa',
         shouldClearError: ({ fields, value }) => !hasDuplicateRef(fields, value),
       },
       {
         name: 'address',
         flex: '2',
-        label: 'Dirección',
+        label: FIELD_LABELS.ADDRESS,
         placeholder: 'Mitre 525 9c',
         required: true,
         shouldClearError: ({ fields, value }) => (

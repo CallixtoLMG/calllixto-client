@@ -6,7 +6,7 @@ import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/com
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import BrandForm from "@/components/brands/BrandForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -253,7 +253,7 @@ const Brand = ({ params }) => {
         bodyContent={
           modalAction === INACTIVE && (
             <TextField
-              placeholder="Motivo"
+              placeholder={PLACEHOLDERS.REASON}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

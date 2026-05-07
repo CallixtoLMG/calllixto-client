@@ -4,7 +4,7 @@ import { useDeleteUser, useEditUser, useGetUser, useSetUserState } from "@/api/u
 import { FieldsContainer, FormField, Input, Message, MessageHeader } from "@/common/components/custom";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UserForm from "@/components/users/UserForm";
@@ -244,7 +244,7 @@ const User = ({ params }) => {
           modalAction === INACTIVE && (
             <Input
               type="text"
-              placeholder="Motivo"
+              placeholder={PLACEHOLDERS.REASON}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

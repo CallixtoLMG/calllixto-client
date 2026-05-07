@@ -1,3 +1,5 @@
+import { formatCount, PLURAL_LABELS } from "@/common/utils/pluralization";
+
 export const LIST_SETTINGS_QUERY_KEY = "listSettings";
 export const GET_SETTING_QUERY_KEY = "getSetting";
 
@@ -17,21 +19,15 @@ export const BASE_HISTORY_RANGES = [
 export const BUDGETS_RANGE_DATE_UNIT_CONFIG = {
   day: {
     max: 31,
-    singular: "día",
-    plural: "días",
-    article: { singular: "Último", plural: "Últimos" },
+    ...PLURAL_LABELS.day,
   },
   week: {
     max: 7,
-    singular: "semana",
-    plural: "semanas",
-    article: { singular: "Última", plural: "Últimas" },
+    ...PLURAL_LABELS.week,
   },
   month: {
     max: 12,
-    singular: "mes",
-    plural: "meses",
-    article: { singular: "Último", plural: "Últimos" },
+    ...PLURAL_LABELS.month,
   },
 };
 
@@ -40,7 +36,7 @@ export const BUDGET_RANGE_DATE_MONTH_OPTIONS = Array.from({ length: 12 }, (_, i)
   return {
     key: value,
     value,
-    text: value === 1 ? "1 mes" : `${value} meses`,
+    text: formatCount(value, "month"),
   };
 });
 

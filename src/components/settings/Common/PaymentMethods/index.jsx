@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, DELETE, ICONS, SIZES, TOOLTIPS } from "@/common/constants";
 import { createPriorityKeyDownHandler } from "@/common/utils";
 import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -72,7 +72,7 @@ const PaymentMethods = () => {
       icon: ICONS.TRASH,
       color: COLORS.RED,
       onClick: handleRemoveMethod,
-      tooltip: "Eliminar",
+      tooltip: TOOLTIPS.DELETE,
       getKey: (method, index) => `delete_${method}_${index}`,
     },
   ], [handleRemoveMethod]);
@@ -112,7 +112,7 @@ const PaymentMethods = () => {
                   <Button
                     size={SIZES.SMALL}
                     icon={ICONS.ADD}
-                    content="Agregar"
+                    content={BUTTON_TEXTS.ADD}
                     labelPosition="left"
                     color={COLORS.GREEN}
                     type="button"

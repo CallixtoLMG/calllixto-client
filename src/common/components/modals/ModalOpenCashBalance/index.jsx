@@ -1,6 +1,6 @@
 import { ButtonsContainer, FieldsContainer, Form, FormField, Input } from "@/common/components/custom";
 import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePickerControlled";
-import { COLORS, ENTITIES, ICONS, SIZES } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, ENTITIES, ERROR_MESSAGES, FIELD_LABELS, ICONS, SIZES } from "@/common/constants";
 import { datePickerNow, getPastDate } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
@@ -48,7 +48,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                   <DatePickerControlled
                     flex="1"
                     rules={{
-                      required: "Campo obligatorio.",
+                      required: ERROR_MESSAGES.REQUIRED_FIELD_ALT,
                       validate: {
                         minDate: (value) =>
                           value >= getPastDate(1, "months") || "No puede seleccionar una fecha anterior a un mes.",
@@ -119,7 +119,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                         rules={{
                           validate: (value) => {
                             if (watchAllMethods) return true;
-                            return (value && value.length > 0) || "Campo requerido";
+                            return (value && value.length > 0) || ERROR_MESSAGES.REQUIRED_FIELD_SHORT;
                           }
                         }}
                         name="paymentMethods"
@@ -208,20 +208,20 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                 <BillDetails name="billsDetails" />
               )}
               <FieldsContainer>
-                <TextAreaControlled name="comments" label="Comentarios" placeholder="Solo billetes de 500" />
+                <TextAreaControlled name="comments" label={FIELD_LABELS.COMMENTS} placeholder="Solo billetes de 500" />
               </FieldsContainer>
             </Form>
           </ModalContent>
           <Modal.Actions>
             <ButtonsContainer width="100%">
               <IconedButton
-                text="Cancelar"
+                text={BUTTON_TEXTS.CANCEL}
                 icon={ICONS.CANCEL}
                 color={COLORS.RED}
                 onClick={onClose}
               />
               <IconedButton
-                text="Confirmar"
+                text={BUTTON_TEXTS.CONFIRM}
                 icon={ICONS.CHECK}
                 color={COLORS.GREEN}
                 width="fit-content"
