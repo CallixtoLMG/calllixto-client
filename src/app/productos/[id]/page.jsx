@@ -7,7 +7,7 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, RECOVER } from "@/common/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS, RECOVER } from "@/common/constants";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductChanges from "@/components/products/ProductChanges";
 import ProductForm from "@/components/products/ProductForm";
@@ -471,7 +471,7 @@ const Product = ({ params }) => {
         bodyContent={
           modalAction === INACTIVE ? (
             <TextField
-              placeholder="Motivo"
+              placeholder={PLACEHOLDERS.REASON}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

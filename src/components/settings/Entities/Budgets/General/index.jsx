@@ -1,5 +1,6 @@
 import { Box, FlexColumn } from "@/common/components/custom";
 import { DropdownControlled } from "@/common/components/form";
+import { ERROR_MESSAGES } from "@/common/constants";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
 import { BUDGET_RANGE_DATE_MONTH_OPTIONS, SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
@@ -23,7 +24,7 @@ const General = () => {
         </SettingsAccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
-            <AnimatedInner>
+            <AnimatedInner $active={isAccordionOpen}>
               <FlexColumn $rowGap="15px">
                 <DropdownControlled
                   name="defaultPageDateRange.value"
@@ -32,7 +33,7 @@ const General = () => {
                   placeholder="Seleccione un rango"
                   options={BUDGET_RANGE_DATE_MONTH_OPTIONS}
                   rules={{
-                    required: "Campo requerido",
+                    required: ERROR_MESSAGES.REQUIRED_FIELD_SHORT,
                   }}
                 />
                 <HistoryDateRangesControlled />

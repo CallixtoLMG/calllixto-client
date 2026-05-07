@@ -7,11 +7,19 @@ and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
+- Common: Added a centralized pluralization utility with reusable helpers and shared Spanish singular/plural labels.
+
+- Common: Added reusable text constants for shared button texts, field labels, placeholders, validation messages, confirmation words, and tooltips.
+
 - Budgets: Added a print action for confirmed budget deliveries, available when delivery history exists.
 
 - Budgets: Added a dedicated printable deliveries report using the shared PDF layout components and common table headers.
 
 ### Changed
+
+- Texts: Replaced repeated manual singular/plural handling in date ranges and product count messages with the shared pluralization helpers.
+
+- Texts: Replaced repeated hardcoded labels, button texts, placeholders, tooltips, and required-field messages with shared constants in common components, forms, settings, tables, products, budgets, payments, and cash balances.
 
 - Contact forms: Refactored contact handling into reusable phone, email, and address view/controlled components while preserving the existing UI and form behavior.
 

@@ -28,7 +28,7 @@ const OnPrint = () => {
         </SettingsAccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
-            <AnimatedInner>
+            <AnimatedInner $active={isAccordionOpen}>
               <FlexColumn $rowGap="15px">
                 <IconedButtonControlled
                   name="defaultsPDF.showPrices"

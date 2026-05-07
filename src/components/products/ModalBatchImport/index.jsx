@@ -2,7 +2,7 @@ import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, Form, FormField, Label, Segment, } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, ICONS } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, ICONS } from "@/common/constants";
 import { Loader } from "@/components/layout";
 import { FormProvider } from "react-hook-form";
 import { Icon, Modal, Transition } from "semantic-ui-react";
@@ -83,7 +83,7 @@ export const ModalBatchImport = ({
                 <WaitMsg>Esto puede demorar unos minutos...</WaitMsg>
               )}
               <IconedButton
-                text="Cancelar"
+                text={BUTTON_TEXTS.CANCEL}
                 icon={ICONS.X}
                 color={COLORS.RED}
                 disabled={isLoading || isPending}

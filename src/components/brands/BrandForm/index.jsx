@@ -1,7 +1,7 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { TextAreaControlled, TextControlled } from "@/common/components/form";
-import { RULES, SHORTKEYS } from "@/common/constants";
+import { FIELD_LABELS, RULES, SHORTKEYS } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -51,7 +51,7 @@ const BrandForm = forwardRef(({
           <FormField flex="1">
             <TextControlled
               name="id"
-              label="Id"
+              label={FIELD_LABELS.ID}
               placeholder="CX"
               rules={RULES.REQUIRED_TWO_DIGIT}
               onChange={value => value.toUpperCase()}
@@ -63,7 +63,7 @@ const BrandForm = forwardRef(({
           <FormField flex="1">
             <TextControlled
               name="name"
-              label="Nombre"
+              label={FIELD_LABELS.NAME}
               placeholder="CallixtoGLM"
               rules={RULES.REQUIRED}
               disabled={view && !isUpdating}
@@ -72,7 +72,7 @@ const BrandForm = forwardRef(({
           </FormField>
           <FormField flex="1" />
         </FieldsContainer>
-        <TextAreaControlled name="comments" label="Comentarios" placeholder="Una marca macanuda" readOnly={view && !isUpdating} />
+        <TextAreaControlled name="comments" label={FIELD_LABELS.COMMENTS} placeholder="Una marca macanuda" readOnly={view && !isUpdating} />
         {(isUpdating || !view) && (
           <SubmitAndRestore
             isUpdating={isUpdating}

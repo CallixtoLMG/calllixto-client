@@ -1,7 +1,7 @@
 import { Box, Button, FieldsContainer, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, DELETE, ICONS, SEMANTIC_COLORS, SIZES } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, DELETE, FIELD_LABELS, ICONS, SEMANTIC_COLORS, SIZES, TOOLTIPS } from "@/common/constants";
 import { createPriorityKeyDownHandler, handleEnterKeyDown } from "@/common/utils";
 import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useEffect, useState } from "react";
@@ -46,7 +46,7 @@ const Categories = () => {
     },
     {
       id: "description",
-      title: "Descripción",
+      title: FIELD_LABELS.DESCRIPTION,
       align: "left",
       value: (category) => (
         <span>
@@ -64,7 +64,7 @@ const Categories = () => {
       icon: ICONS.TRASH,
       color: COLORS.RED,
       onClick: (category, index) => remove(index),
-      tooltip: "Eliminar",
+      tooltip: TOOLTIPS.DELETE,
     },
   ];
 
@@ -131,7 +131,7 @@ const Categories = () => {
               <Box>
                 <FieldsContainer padding="0 10px 10px 10px!important" >
                   <TextField
-                    label="Nombre"
+                    label={FIELD_LABELS.NAME}
                     placeholder="Personal"
                     value={categoryToAdd.name}
                     onChange={handleNameChange}
@@ -143,14 +143,14 @@ const Categories = () => {
                   <DropdownField
                     flex="1"
                     selection
-                    label="Color"
+                    label={FIELD_LABELS.COLOR}
                     options={SEMANTIC_COLORS}
                     value={categoryToAdd.color}
                     onChange={(e, { value }) => setCategoryToAdd({ ...categoryToAdd, color: value })}
                   />
                   <TextField
                     flex="1"
-                    label="Descripción"
+                    label={FIELD_LABELS.DESCRIPTION}
                     placeholder="Mis cosas"
                     value={categoryToAdd.description}
                     onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
@@ -160,7 +160,7 @@ const Categories = () => {
                   <Button
                     size={SIZES.SMALL}
                     icon={ICONS.ADD}
-                    content="Agregar"
+                    content={BUTTON_TEXTS.ADD}
                     labelPosition="left"
                     color={COLORS.GREEN}
                     type="button"

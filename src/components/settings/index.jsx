@@ -1,6 +1,6 @@
 import { IconedButton } from "@/common/components/buttons";
 import { FlexColumn } from "@/common/components/custom";
-import { COLORS, ICONS } from "@/common/constants";
+import { BUTTON_TEXTS, COLORS, ICONS } from "@/common/constants";
 import { Tab } from "semantic-ui-react";
 import BrandsModule from "./Entities/Brands";
 import BudgetsModule from "./Entities/Budgets";
@@ -51,7 +51,7 @@ const SettingsTabs = ({
     <FlexColumn>
       <IconedButton
         icon={ICONS.REFRESH}
-        text="Actualizar"
+        text={BUTTON_TEXTS.UPDATE}
         color={COLORS.BLUE}
         onClick={onRefresh}
         position="absolute"
