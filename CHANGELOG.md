@@ -3,6 +3,20 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-05-07
+
+### Added
+
+- Budgets: Added a print action for confirmed budget deliveries, available when delivery history exists.
+
+- Budgets: Added a dedicated printable deliveries report using the shared PDF layout components and common table headers.
+
+### Changed
+
+- Contact forms: Refactored contact handling into reusable phone, email, and address view/controlled components while preserving the existing UI and form behavior.
+
+- Contact forms: Added shared contact section components to reduce duplicated popup, table, validation, and React Hook Form field array logic.
+
 ## 2026-05-06
 
 ### Added
