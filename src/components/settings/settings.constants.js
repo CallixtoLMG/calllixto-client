@@ -66,4 +66,13 @@ export const SETTINGS_HELP_TEXTS = {
   BUDGET_GENERAL: "Permite configurar valores generales para consultar y revisar ventas.",
   BUDGET_ON_CREATE: "Permite definir valores predeterminados que se completan al crear una venta.",
   BUDGET_ON_PRINT: "Permite configurar como se muestra e imprime el PDF de una venta.",
+  BUDGET_DEFAULT_PAGE_DATE_RANGE: "Define el rango de fechas que se muestra por defecto al entrar al listado de ventas.",
+  BUDGET_HISTORY_DATE_RANGES: "Permite agregar accesos rapidos de fechas para consultar ventas anteriores en el historial.",
+  BUDGET_DEFAULT_STATE: "Define si las nuevas ventas se crean como confirmadas o pendientes por defecto.",
+  BUDGET_DEFAULT_DELIVERY: "Define si las nuevas ventas se preparan para retirar en local o para enviar a domicilio.",
+  BUDGET_DEFAULT_CUSTOMER: "Permite seleccionar un cliente que se carga automaticamente al crear una venta.",
+  BUDGET_DEFAULT_EXPIRATION_DAYS: "Define cuantos dias tendra una venta antes de vencer por defecto.",
+  BUDGET_DEFAULT_SHOW_PRICES: "Define si el PDF de la venta muestra precios por defecto.",
+  BUDGET_DEFAULT_PRINT_MODE: "Define el formato de impresion que se selecciona por defecto para el PDF.",
+  BUDGET_PDF_DISCLAIMER: "Permite agregar un texto aclaratorio que se muestra en el PDF de la venta.",
 };

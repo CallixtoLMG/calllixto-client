@@ -24,6 +24,7 @@ export const IconedButtonControlled = forwardRef(({
           $maxWidth={$maxWidth}
           $width={width}
           height={height}
+          width={width}
           label={label}
           text={text}
           icon={icon}

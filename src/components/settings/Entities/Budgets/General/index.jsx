@@ -1,6 +1,7 @@
 import { Box, FlexColumn } from "@/common/components/custom";
 import { DropdownControlled } from "@/common/components/form";
 import { ERROR_MESSAGES } from "@/common/constants";
+import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
 import { BUDGET_RANGE_DATE_MONTH_OPTIONS, SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
@@ -28,7 +29,11 @@ const General = () => {
               <FlexColumn $rowGap="15px">
                 <DropdownControlled
                   name="defaultPageDateRange.value"
-                  label="Rango de fechas por defecto Ventas"
+                  label={
+                    <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_DEFAULT_PAGE_DATE_RANGE}>
+                      Rango de fechas por defecto Ventas
+                    </SettingsFieldLabel>
+                  }
                   width="fit-content"
                   placeholder="Seleccione un rango"
                   options={BUDGET_RANGE_DATE_MONTH_OPTIONS}
