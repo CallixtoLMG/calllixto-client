@@ -95,6 +95,16 @@ const useUnsavedChanges = ({ formRef, onDiscard }) => {
     closeModal();
   }, [closeModal]);
 
+  const runWithoutPrompt = useCallback((action) => {
+    isDirtyRef.current = false;
+    skipNextNavigation.current = true;
+    pendingActionRef.current = null;
+    action?.();
+    setTimeout(() => {
+      skipNextNavigation.current = false;
+    }, 0);
+  }, []);
+
   const onBeforeView = useCallback((pendingAction) => {
     if (formRef.current?.isDirty?.()) {
       pendingActionRef.current = typeof pendingAction === "function" ? pendingAction : null;
@@ -110,6 +120,7 @@ const useUnsavedChanges = ({ formRef, onDiscard }) => {
     handleContinue,
     onBeforeView,
     closeModal,
+    runWithoutPrompt,
   };
 };
 

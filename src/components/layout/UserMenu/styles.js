@@ -51,7 +51,7 @@ export const UserMeta = styled.div`
   flex-direction: column;
 `;
 
-export const SelectedClientText = styled.span`
+export const SelectedAccountText = styled.span`
   color: #2185d0;
   font-weight: 600;
 `;
@@ -145,7 +145,7 @@ export const SearchInput = styled.input`
   }
 `;
 
-export const ClientList = styled.div`
+export const AccountList = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -168,7 +168,7 @@ export const ClientList = styled.div`
   }
 `;
 
-export const ClientItem = styled.button`
+export const AccountItem = styled.button`
   width: 100%;
   min-height: 42px;
   border: none;

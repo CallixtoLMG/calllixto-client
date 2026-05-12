@@ -52,7 +52,7 @@ const OnPrint = () => {
                     </SettingsFieldLabel>
                   }
                   options={Object.values(BUDGET_PDF_FORMAT).map(option => ({ value: option.key, key: option.key, text: <Flex>{option.title}</Flex> }))}
-                  defaultValue={BUDGET_PDF_FORMAT.CLIENT.key}
+                  defaultValue={BUDGET_PDF_FORMAT.CUSTOMER.key}
                   width="fit-content"
                 />
                 <TextAreaControlled

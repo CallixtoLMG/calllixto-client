@@ -2,7 +2,7 @@ import { URL, VALIDATE } from "@/fetchUrls";
 import { ROLES } from "@/roles";
 import {
   clearSession,
-  getSelectedClientId,
+  getSelectedAccountId,
   getUserData as getSessionUserData,
   getToken,
   setUserData as setSessionUserData,
@@ -13,7 +13,7 @@ export async function getUserData() {
   const data = getSessionUserData();
 
   if (data) {
-    setSelectedClientData(data);
+    setSelectedAccountData(data);
     return data;
   }
 
@@ -34,7 +34,7 @@ export async function getUserData() {
     });
 
     if (response.data) {
-      setSelectedClientData(response.data);
+      setSelectedAccountData(response.data);
       setSessionUserData(response.data);
       return response.data;
     }
@@ -45,10 +45,14 @@ export async function getUserData() {
   }
 };
 
-function setSelectedClientData(data) {
-  if (data?.clientId === ROLES.CALLIXTO) {
-    const selectedClientId = getSelectedClientId();
-    const selectedClient = data?.callixtoClients?.items?.find(client => client.id === selectedClientId);
-    data.selectedClient = selectedClient ?? null;
+function setSelectedAccountData(data) {
+  const accountId = data?.accountId;
+
+  if (accountId === ROLES.CALLIXTO) {
+    const selectedAccountId = getSelectedAccountId();
+    const accounts = data?.accounts?.items ?? [];
+    const selectedAccount = accounts.find(account => account.id === selectedAccountId);
+
+    data.selectedAccount = selectedAccount ?? null;
   }
 };

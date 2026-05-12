@@ -4,8 +4,8 @@ import { Icon, List, ListItem } from "semantic-ui-react";
 import { Accent } from "../components/custom";
 import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
 import { ENTITIES } from "./entities";
-import { ERROR_MESSAGES } from "./texts";
 import { MAINTENANCE_PAGE } from "./maintenance";
+import { ERROR_MESSAGES } from "./texts";
 
 export * from './dates';
 export * from './entities';
@@ -14,7 +14,7 @@ export * from './semantic';
 export * from './texts';
 export * from './time';
 
-export const DEFAULT_SELECTED_CLIENT = "callixto";
+export const DEFAULT_SELECTED_ACCOUNT = "callixto";
 
 export const PAGES = {
   BASE: "/",

@@ -20,7 +20,7 @@ const ModalPDF = ({
   budget,
   isModalOpen,
   onClose,
-  client,
+  account,
   total,
   subtotal,
   subtotalAfterDiscount,
@@ -28,7 +28,7 @@ const ModalPDF = ({
   defaults = {}
 }) => {
   const printRef = useRef();
-  const [printPdfMode, setPrintPdfMode] = useState(defaults?.printPdfMode ?? BUDGET_PDF_FORMAT.CLIENT.key);
+  const [printPdfMode, setPrintPdfMode] = useState(defaults?.printPdfMode ?? BUDGET_PDF_FORMAT.CUSTOMER.key);
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
   const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
@@ -49,7 +49,7 @@ const ModalPDF = ({
 
   const formatValue = (value) => {
     if (value == null || Number.isNaN(value)) return '';
-  
+
     const formattedValue = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return formattedValue.includes('.')
       ? formattedValue.split('.').slice(0, 2).join('.')
@@ -140,8 +140,7 @@ const ModalPDF = ({
                 <PDFfile
                   ref={printRef}
                   budget={budget}
-                  client={client}
-                  id={client?.id}
+                  account={account}
                   printPdfMode={printPdfMode}
                   subtotal={subtotal}
                   subtotalAfterDiscount={subtotalAfterDiscount}
@@ -179,8 +178,7 @@ const ModalPDF = ({
         <PDFfile
           ref={printRef}
           budget={budget}
-          client={client}
-          id={client?.id}
+          account={account}
           printPdfMode={printPdfMode}
           subtotal={subtotal}
           subtotalAfterDiscount={subtotalAfterDiscount}

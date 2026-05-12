@@ -95,6 +95,11 @@ const Budget = ({ params }) => {
     }
 
     if (budget) {
+      if (isBudgetDraft(budget.state)) {
+        push(PAGES.BUDGETS.DRAFT(params.id));
+        return;
+      }
+
       budget.products = budget.products.map((product) => ({
         ...product, key: uuid(),
       }))
@@ -112,7 +117,7 @@ const Budget = ({ params }) => {
         phone: getFormatedPhone(budget.customer?.phoneNumbers?.[0])
       });
     }
-  }, [setLabels, budget, push, isLoading]);
+  }, [setLabels, budget, push, isLoading, params.id]);
 
   useEffect(() => {
     if (budget) {
@@ -283,6 +288,10 @@ const Budget = ({ params }) => {
     }
   });
 
+  if (!isLoading && budget && isBudgetDraft(budget.state)) {
+    return <Loader active />;
+  }
+
   return (
     <Loader active={isLoading || !budget || isLoadingBudgetSettings || isRefetchingSettings}>
       {(isBudgetPending(budget?.state) || isBudgetExpired(budget?.state)) && (
@@ -325,7 +334,7 @@ const Budget = ({ params }) => {
         isModalOpen={isModalPDFOpen}
         onClose={setIsModalPDFOpen}
         budget={{ ...budget, paymentsMade }}
-        client={userData?.selectedClient ?? userData?.client}
+        account={userData?.selectedAccount ?? userData?.account}
         total={total}
         subtotal={subtotal}
         subtotalAfterDiscount={subtotalAfterDiscount}
