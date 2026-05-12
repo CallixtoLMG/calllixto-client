@@ -8,8 +8,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BackButton,
-  ClientItem,
-  ClientList,
+  AccountItem,
+  AccountList,
   EmptyState,
   MenuAction,
   MenuActions,
@@ -20,12 +20,12 @@ import {
   MenuSectionLabel,
   SearchInput,
   SearchWrapper,
-  SelectedClientText,
+  SelectedAccountText,
   UserMeta,
   UserName
 } from "./styles";
 
-const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
+const UserMenu = ({ trigger, onLogout, onAccountChange, selectedAccount }) => {
   const { push } = useRouter();
   const { userData, role } = useUserContext();
   const containerRef = useRef(null);
@@ -34,17 +34,17 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
   const [view, setView] = useState("main");
   const [searchTerm, setSearchTerm] = useState("");
 
-  const clientItems = userData?.callixtoClients?.items;
+  const accountItems = userData?.accounts?.items;
 
-  const clients = useMemo(() => clientItems ?? [], [clientItems]);
+  const accounts = useMemo(() => accountItems ?? [], [accountItems]);
 
-  const filteredClients = useMemo(() => {
-    if (!searchTerm.trim()) return clients;
+  const filteredAccounts = useMemo(() => {
+    if (!searchTerm.trim()) return accounts;
 
-    return clients.filter((client) =>
-      client.name.toLowerCase().includes(searchTerm.toLowerCase())
+    return accounts.filter((account) =>
+      account.name.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [clients, searchTerm]);
+  }, [accounts, searchTerm]);
 
   useEffect(() => {
     if (!isOpen) {
@@ -74,14 +74,14 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
     push(PAGES.CHANGE_PASSWORD.BASE);
   };
 
-  const handleSelectClient = (clientId) => {
-    onClientChange(clientId);
+  const handleSelectAccount = (accountId) => {
+    onAccountChange(accountId);
     setIsOpen(false);
   };
 
-  const selectedClientName = useMemo(() => {
-    return clients.find((client) => client.id === selectedClient)?.name || selectedClient;
-  }, [clients, selectedClient]);
+  const selectedAccountName = useMemo(() => {
+    return accounts.find((account) => account.id === selectedAccount)?.name || selectedAccount;
+  }, [accounts, selectedAccount]);
 
   return (
     <MenuContainer ref={containerRef}>
@@ -94,10 +94,10 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
             <MenuHeader>
               <UserName>{userData?.name}</UserName>
               <UserMeta>
-                {selectedClientName ? (
+                {selectedAccountName ? (
                   <>
                     Local activo
-                    <SelectedClientText>{selectedClientName}</SelectedClientText>
+                    <SelectedAccountText>{selectedAccountName}</SelectedAccountText>
                   </>
                 ) : (
                   "Cuenta"
@@ -107,7 +107,7 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
             <MenuBody >
               <MenuActions>
                 {isCallixtoUser(role) && (
-                  <MenuAction type="button" onClick={() => setView("clients")}>
+                  <MenuAction type="button" onClick={() => setView("accounts")}>
                     <span>
                       <Icon $tooltip color={COLORS.BLUE} name={ICONS.USER} />
                       Cambiar cuenta
@@ -139,7 +139,7 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
           </>
         )}
 
-        {view === "clients" && (
+        {view === "accounts" && (
           <>
             <MenuHeader>
               <BackButton type="button" onClick={() => setView("main")}>
@@ -147,7 +147,7 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
                 Atrás
               </BackButton>
               <UserName>Cambiar cuenta</UserName>
-              <UserMeta>Seleccioná un cuenta disponible</UserMeta>
+              <UserMeta>Selecciona una cuenta disponible</UserMeta>
             </MenuHeader>
             <MenuBody $view>
               <MenuSectionLabel>Buscar cuenta</MenuSectionLabel>
@@ -159,27 +159,27 @@ const UserMenu = ({ trigger, onLogout, onClientChange, selectedClient }) => {
                   placeholder="Callixto"
                 />
               </SearchWrapper>
-              <ClientList>
-                {!filteredClients.length ? (
-                  <EmptyState>No se encontraron clientes.</EmptyState>
+              <AccountList>
+                {!filteredAccounts.length ? (
+                  <EmptyState>No se encontraron cuentas.</EmptyState>
                 ) : (
-                  filteredClients.map((client) => {
-                    const isActive = String(selectedClient) === String(client.id);
+                  filteredAccounts.map((account) => {
+                    const isActive = String(selectedAccount) === String(account.id);
 
                     return (
-                      <ClientItem
-                        key={client.id}
+                      <AccountItem
+                        key={account.id}
                         type="button"
                         $active={isActive}
-                        onClick={() => handleSelectClient(client.id)}
+                        onClick={() => handleSelectAccount(account.id)}
                       >
-                        <span>{client.name}</span>
+                        <span>{account.name}</span>
                         {isActive && <Icon name={ICONS.CHECK} />}
-                      </ClientItem>
+                      </AccountItem>
                     );
                   })
                 )}
-              </ClientList>
+              </AccountList>
             </MenuBody>
           </>
         )}

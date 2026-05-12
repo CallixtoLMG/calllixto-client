@@ -1,7 +1,7 @@
-import { DEFAULT_SELECTED_CLIENT, USER_DATA_KEY } from "@/common/constants";
+import { DEFAULT_SELECTED_ACCOUNT, USER_DATA_KEY } from "@/common/constants";
 
 export const TOKEN_KEY = "token";
-export const SELECTED_CLIENT_KEY = "selectedClientId";
+export const SELECTED_ACCOUNT_KEY = "selectedAccountId";
 export const SESSION_ENDED_NOTIFICATION_KEY = "sessionEndedNotification";
 
 const SESSION_EXPIRATION_KEY = "sessionExpiration";
@@ -112,10 +112,15 @@ export const setUserData = (userData) => {
   setCookie(USER_DATA_KEY, encodeJson(userData), getDefaultExpiration());
 };
 
-export const getSelectedClientId = () => getCookie(SELECTED_CLIENT_KEY) || DEFAULT_SELECTED_CLIENT;
+export const getSelectedAccountId = () => {
+  const selectedAccountId = getCookie(SELECTED_ACCOUNT_KEY);
+  if (selectedAccountId) return selectedAccountId;
 
-export const setSelectedClientId = (clientId) => {
-  setCookie(SELECTED_CLIENT_KEY, clientId || DEFAULT_SELECTED_CLIENT, getDefaultExpiration());
+  return DEFAULT_SELECTED_ACCOUNT;
+};
+
+export const setSelectedAccountId = (accountId) => {
+  setCookie(SELECTED_ACCOUNT_KEY, accountId || DEFAULT_SELECTED_ACCOUNT, getDefaultExpiration());
 };
 
 export const clearSession = () => {

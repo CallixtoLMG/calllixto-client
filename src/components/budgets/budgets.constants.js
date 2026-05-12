@@ -232,8 +232,8 @@ export const BUDGET_PDF_FORMAT = {
     key: "dispatch",
     title: "Remito"
   },
-  CLIENT: {
-    key: 'client',
+  CUSTOMER: {
+    key: 'customer',
     icon: ICONS.ADDRESS_CARD,
     title: 'Cliente',
   },

@@ -2,17 +2,17 @@
 import { useUserContext } from "@/User";
 import { IconedButton } from "@/common/components/buttons";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
-import { COLORS, DEFAULT_SELECTED_CLIENT, ICONS, PAGES, getNavigationItems } from "@/common/constants";
+import { COLORS, DEFAULT_SELECTED_ACCOUNT, ICONS, PAGES, getNavigationItems } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES, isCallixtoUser } from "@/roles";
-import { getSelectedClientId, setSelectedClientId as saveSelectedClientId } from "@/services/session";
+import { getSelectedAccountId, setSelectedAccountId as saveSelectedAccountId } from "@/services/session";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { UserMenu } from "..";
 import SidebarNavigation from "./Sidebar";
 import {
   Brand,
-  ClientBadge,
+  AccountBadge,
   HeaderBar,
   HeaderLeft,
   HeaderRight,
@@ -25,22 +25,22 @@ const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const [selectedClientId, setSelectedClientId] = useState(DEFAULT_SELECTED_CLIENT);
+  const [selectedAccountId, setSelectedAccountId] = useState(DEFAULT_SELECTED_ACCOUNT);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const client = getSelectedClientId();
-      saveSelectedClientId(client);
-      setSelectedClientId(client);
+      const account = getSelectedAccountId();
+      saveSelectedAccountId(account);
+      setSelectedAccountId(account);
     }
   }, []);
 
   const navigationItems = useMemo(() => getNavigationItems(role), [role]);
 
-  const handleClientChange = (client) => {
-    saveSelectedClientId(client);
-    setSelectedClientId(client);
+  const handleAccountChange = (account) => {
+    saveSelectedAccountId(account);
+    setSelectedAccountId(account);
     location.reload();
   };
 
@@ -127,7 +127,7 @@ const Header = () => {
             <KeyboardShortcuts />
           </RightActions>
           {isCallixtoUser(role) && (
-            <ClientBadge>{selectedClientId}</ClientBadge>
+            <AccountBadge>{selectedAccountId}</AccountBadge>
           )}
           <UserMenu
             trigger={
@@ -140,9 +140,9 @@ const Header = () => {
               />
             }
             onLogout={handleLogout}
-            onClientChange={handleClientChange}
+            onAccountChange={handleAccountChange}
             userData={userData}
-            selectedClient={selectedClientId}
+            selectedAccount={selectedAccountId}
           />
         </HeaderRight>
       </HeaderBar>

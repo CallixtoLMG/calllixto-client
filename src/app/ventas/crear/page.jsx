@@ -202,10 +202,10 @@ const CreateBudget = () => {
         data.state === BUDGET_STATES.PENDING.id
       ) {
         methods.reset(data);
-        push(PAGES.BUDGETS.SHOW(budgetId));
+        budgetUnsaved.runWithoutPrompt(() => push(PAGES.BUDGETS.SHOW(budgetId)));
       } else {
         methods.reset(data);
-        push(`${PAGES.BUDGETS.SHOW(budgetId)}/borrador`);
+        budgetUnsaved.runWithoutPrompt(() => push(`${PAGES.BUDGETS.SHOW(budgetId)}/borrador`));
       }
 
     } catch (error) {

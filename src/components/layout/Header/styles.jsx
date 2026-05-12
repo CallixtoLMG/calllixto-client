@@ -54,7 +54,7 @@ export const RightActions = styled.div`
   gap: 10px;
 `;
 
-export const ClientBadge = styled.div`
+export const AccountBadge = styled.div`
   height: 35px;
   padding: 0 14px;
   border-radius: 4px;

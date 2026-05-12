@@ -1,19 +1,21 @@
 import { PAGES } from "@/common/constants";
-import { expireSession, getSelectedClientId, getToken, getUserData } from "@/services/session";
+import { expireSession, getSelectedAccountId, getToken, getUserData } from "@/services/session";
 import axios from 'axios';
 import { isCallixtoUser } from "../roles";
 
-const getClientId = () => {
+const getAccountId = () => {
   if (typeof window === 'undefined') return null;
 
   const userData = getUserData();
   if (!userData) return null;
 
-  if (isCallixtoUser(userData.clientId)) {
-    return getSelectedClientId();
+  const accountId = userData.accountId;
+
+  if (isCallixtoUser(accountId)) {
+    return getSelectedAccountId();
   }
 
-  return userData.clientId;
+  return accountId;
 };
 
 let axiosInstance = null;
@@ -26,10 +28,10 @@ export const getInstance = () => {
 
     axiosInstance.interceptors.request.use((config) => {
       const token = getToken();
-      const clientId = getClientId();
+      const accountId = getAccountId();
 
-      if (clientId) {
-        config.baseURL = `${process.env.NEXT_PUBLIC_URL}${clientId}`;
+      if (accountId) {
+        config.baseURL = `${process.env.NEXT_PUBLIC_URL}${accountId}`;
       }
 
       if (token) {
