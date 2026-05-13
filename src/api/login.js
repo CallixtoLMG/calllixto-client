@@ -7,27 +7,43 @@ import { setToken } from '@/services/session';
 
 Amplify.configure(awsConfig);
 
-export async function login({ username, password, newPassword }) {
+const completeAuthenticatedSession = async () => {
+  const session = await fetchAuthSession();
+  const accessToken = session.tokens.accessToken.toString();
+  setToken(accessToken);
+};
+
+export async function login({ username, password }) {
   try {
     const user = await signIn({
       username,
       password,
     });
 
-    if (user.nextStep?.signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
-      await confirmSignIn({
-        challengeResponse: newPassword,
-      });
-    }
-
     if (user.nextStep?.signInStep === 'DONE') {
-      const session = await fetchAuthSession();
-      const accessToken = session.tokens.accessToken.toString();
-      setToken(accessToken);
+      await completeAuthenticatedSession();
     }
 
+    return user;
   } catch (error) {
     console.error('Error durante el ingreso:', error);
+    throw error;
+  }
+}
+
+export async function confirmNewPasswordRequired({ newPassword }) {
+  try {
+    const user = await confirmSignIn({
+      challengeResponse: newPassword,
+    });
+
+    if (user.nextStep?.signInStep === 'DONE') {
+      await completeAuthenticatedSession();
+    }
+
+    return user;
+  } catch (error) {
+    console.error('Error al confirmar nueva contrasena:', error);
     throw error;
   }
 }

@@ -3,6 +3,28 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-05-13
+
+### Added
+
+- Auth: Added support for Cognito first-login temporary password challenges, redirecting users to the existing password recovery screen in first-login mode and completing the flow with `confirmSignIn`.
+
+## 2026-05-12
+
+### Changed
+
+- Accounts: Updated the frontend account context to use `accountId`, `accounts`, `selectedAccountId`, and account-based session helpers.
+
+- Accounts: Updated Axios and local Dexie database selection to resolve requests and local storage from the active account.
+
+- Budgets: Renamed budget PDF account data usage from client to account, and renamed the customer-facing PDF mode from `client` to `customer`.
+
+- Suppliers: Added a popup message to the disabled Stock/Excel action when a supplier has no products.
+
+### Removed
+
+- Accounts: Removed legacy `clientId`, `callixtoClients`, `selectedClient`, and selected-client session compatibility from the active frontend flow.
+
 ## 2026-05-07
 
 ### Added
