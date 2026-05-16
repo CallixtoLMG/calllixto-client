@@ -392,7 +392,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                 setDeliveryNote(e.target.value)
               }
             />
-            <Flex $columnGap="14px" $alignSelf="self-end" >
+            <Flex $columnGap="14px" $alignSelf="flex-end" >
               <IconedButton
                 icon={areAllRowsCompleted ? ICONS.UNDO : ICONS.ADD}
                 color={areAllRowsCompleted ? COLORS.ORANGE : COLORS.BLUE}
@@ -415,7 +415,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                 actions={actions}
                 $actionButtonInside
               />
-              <Flex $alignSelf="self-end">
+              <Flex $alignSelf="flex-end">
                 {mode === ADJUST_DELIVERY &&
                   <small>Las cantidades ingresadas se restarán de las unidades entregadas actualmente.</small>
                 }

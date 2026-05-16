@@ -21,6 +21,8 @@ export const Flex = styled(Common)`
   display: flex;
   grid-column-gap: ${({ $columnGap }) => $columnGap};
   grid-row-gap: ${({ $rowGap }) => $rowGap};
+  column-gap: ${({ $columnGap }) => $columnGap};
+  row-gap: ${({ $rowGap }) => $rowGap};
   flex: ${({ $flex }) => $flex};
   align-items: ${({ $alignItems }) => $alignItems};
   justify-content: ${({ $justifyContent }) => $justifyContent};

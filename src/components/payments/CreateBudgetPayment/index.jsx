@@ -223,9 +223,9 @@ const CreateBudgetPayments = ({
                   }}
                   onKeyDown={(e) => handleEnterKeyDown(e, handleAddPayment)}
                 />
-                <FormField $alignSelf="end" $width="fit-content">
+                <FormField $alignSelf="flex-end" $width="fit-content">
                   <IconedButton
-                    $alignSelf="end"
+                    alignSelf="flex-end"
                     size={SIZES.SMALL}
                     icon={ICONS.ADD}
                     text="Agregar detalle de pago"
