@@ -14,7 +14,7 @@ import {
 import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, DATE_FORMATS, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS, SIZES, TOOLTIPS } from "@/common/constants";
+import { COLORS, DATE_FORMATS, ICONS, RULES, SHORTKEYS, SIZES } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay, removeNullish } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
@@ -246,7 +246,7 @@ const BudgetForm = ({
           trigger("productsValidation");
         });
       },
-      tooltip: TOOLTIPS.DELETE,
+      tooltip: 'Eliminar',
       width: "100%"
     },
     {
@@ -273,7 +273,7 @@ const BudgetForm = ({
   const BUDGET_FORM_PRODUCT_COLUMNS = useMemo(() => [
     {
       id: 1,
-      title: FIELD_LABELS.ID,
+      title: "Id",
       value: (product) => (
         <>
           <Popup
@@ -300,7 +300,7 @@ const BudgetForm = ({
     },
     {
       id: 2,
-      title: FIELD_LABELS.QUANTITY,
+      title: "Cantidad",
       value: (product, index) => (
         <NumberControlled
           padding="9px 14px"
@@ -314,7 +314,7 @@ const BudgetForm = ({
     },
     {
       id: 3,
-      title: FIELD_LABELS.NAME,
+      title: "Nombre",
       value: (product) => (
         <Container>
           <OverflowWrapper maxWidth="30vw" popupContent={product.name}>
@@ -362,7 +362,7 @@ const BudgetForm = ({
     },
     {
       id: 5,
-      title: FIELD_LABELS.PRICE,
+      title: "Precio",
       value: (product, index) => {
         return product.editablePrice
           ? (
@@ -406,7 +406,7 @@ const BudgetForm = ({
     },
     {
       id: 7,
-      title: FIELD_LABELS.TOTAL,
+      title: "Total",
       value: (product) => <PriceLabel value={getTotal(product)} />,
       width: 3
     },
@@ -536,7 +536,7 @@ const BudgetForm = ({
               name="expirationOffsetDays"
               rules={{
                 validate: {
-                  positive: (value) => value > 0 || ERROR_MESSAGES.REQUIRED_FIELD
+                  positive: (value) => value > 0 || 'Campo requerido.'
                 },
               }}
               maxLength={3}
@@ -570,7 +570,7 @@ const BudgetForm = ({
                 placeholder="Martín Bueno"
                 rules={{
                   validate: {
-                    required: (value) => !!value?.id || ERROR_MESSAGES.REQUIRED_FIELD,
+                    required: (value) => !!value?.id || "Campo requerido.",
                     activeCustomer: (value) =>
                       value?.state === CUSTOMER_STATES.ACTIVE.id ||
                       "No es posible confirmar ni dejar en estado pendiente o borrador, presupuestos con clientes inactivos.",
@@ -797,7 +797,7 @@ const BudgetForm = ({
             )}
           />
         </FieldsContainer>
-        <TextAreaControlled name="comments" label={FIELD_LABELS.COMMENTS} placeholder="Pago con billetes de 100" />
+        <TextAreaControlled name="comments" label="Comentarios" placeholder="Pago con billetes de 100" />
         <SubmitAndRestore
           canSubmitWithoutChanges={canSubmit}
           isLoading={isLoading && !isBudgetDraft(watchState)}

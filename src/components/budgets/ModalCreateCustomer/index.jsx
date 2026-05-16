@@ -2,7 +2,7 @@ import { useCreateCustomer } from "@/api/customers";
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { NumberControlled, TextControlled } from "@/common/components/form";
-import { BUTTON_TEXTS, COLORS, FIELD_LABELS, ICONS } from "@/common/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -110,7 +110,7 @@ const ModalCreateCustomer = ({ isModalOpen, onClose, initialName = "" }) => {
                 <TextControlled
                   flex="1"
                   name="name"
-                  label={FIELD_LABELS.NAME}
+                  label="Nombre"
                   placeholder="Martín Bueno"
                   rules={{
                     required: "El nombre es requerido.",
@@ -197,14 +197,14 @@ const ModalCreateCustomer = ({ isModalOpen, onClose, initialName = "" }) => {
         <Modal.Actions>
           <ButtonsContainer>
             <IconedButton
-              text={BUTTON_TEXTS.CANCEL}
+              text="Cancelar"
               icon={ICONS.CANCEL}
               disabled={isLoading}
               color={COLORS.RED}
               onClick={handleClose}
             />
             <IconedButton
-              text={BUTTON_TEXTS.CREATE}
+              text="Crear"
               icon={ICONS.ADD}
               disabled={isLoading}
               loading={isLoading}

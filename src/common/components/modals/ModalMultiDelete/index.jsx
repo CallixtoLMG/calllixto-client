@@ -1,6 +1,6 @@
 import { ButtonsContainer } from "@/common/components/custom";
 import { Table } from "@/common/components/table";
-import { BUTTON_TEXTS, COLORS, CONFIRMATION_WORDS, ICONS, PLACEHOLDERS } from "@/common/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Header, Transition } from 'semantic-ui-react';
@@ -23,7 +23,7 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
   const handleConfirmationTextChange = (e) => {
     const text = e.target.value;
     setConfirmationText(text);
-    setIsDeleteEnabled(text.toLowerCase() === CONFIRMATION_WORDS.DELETE);
+    setIsDeleteEnabled(text.toLowerCase() === 'eliminar');
   };
 
   return (
@@ -40,7 +40,7 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
         <Modal.Actions>
           <Form onSubmit={handleSubmit(onConfirm)}>
             <TextField
-              placeholder={PLACEHOLDERS.CONFIRM_DELETE}
+              placeholder="Escriba 'eliminar' para confirmar"
               value={confirmationText}
               onChange={handleConfirmationTextChange}
               ref={inputElement}
@@ -50,14 +50,14 @@ const ModalMultiDelete = ({ open, onClose, onConfirm, elements, isLoading, title
             />
             <ButtonsContainer>
               <IconedButton
-                text={BUTTON_TEXTS.CANCEL}
+                text="Cancelar"
                 icon={ICONS.TIMES}
                 color={COLORS.GREY}
                 onClick={onClose}
                 disabled={isLoading}
               />
               <IconedButton
-                text={BUTTON_TEXTS.DELETE}
+                text="Eliminar"
                 icon={ICONS.TRASH}
                 disabled={!isDeleteEnabled || isLoading}
                 loading={isLoading}

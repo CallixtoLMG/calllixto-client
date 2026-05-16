@@ -11,7 +11,7 @@ import {
   TextField
 } from "@/common/components/form";
 import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
-import { COLORS, ENTITIES, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { removeNullish } from "@/common/utils";
 import { BRAND_STATES, getBrandSearchDescription, getBrandSearchTitle } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES, getSupplierSearchDescription, getSupplierSearchTitle } from "@/components/suppliers/suppliers.constants";
@@ -117,7 +117,7 @@ const ProductForm = forwardRef(({
               <FormField flex="1">
                 <TextField
                   $truncateInput
-                  label={FIELD_LABELS.ID}
+                  label="Id"
                   value={getProductId(product?.id)}
                   iconLabel={`${getSupplierId(product?.id)} ${getBrandId(product?.id)}`}
                   disabled
@@ -137,7 +137,7 @@ const ProductForm = forwardRef(({
                   required
                   rules={{
                     validate: {
-                      required: (value) => !!value?.id || ERROR_MESSAGES.REQUIRED_FIELD,
+                      required: (value) => !!value?.id || 'Campo requerido.',
                       activeSupplier: (value) =>
                         value?.state === SUPPLIER_STATES.ACTIVE.id || 'No es posible usar un proveedor inactivo.',
                     },
@@ -173,7 +173,7 @@ const ProductForm = forwardRef(({
                   required
                   rules={{
                     validate: {
-                      required: (value) => !!value?.id || ERROR_MESSAGES.REQUIRED_FIELD,
+                      required: (value) => !!value?.id || 'Campo requerido.',
                       activeBrand: (value) =>
                         value?.state === BRAND_STATES.ACTIVE.id || 'No es posible usar una marca inactiva.',
                     },
@@ -201,11 +201,11 @@ const ProductForm = forwardRef(({
               <FormField flex="1">
                 <TextControlled
                   name="id"
-                  label={FIELD_LABELS.ID}
+                  label="Id"
                   required
                   placeholder="A0001"
                   rules={{
-                    required: ERROR_MESSAGES.REQUIRED_FIELD_ALT,
+                    required: "Este campo es obligatorio.",
                     validate: (value) => {
                       if (blacklist?.includes(value.trim().toUpperCase())) {
                         return "Este id se encuentra dentro de la lista de productos bloqueados.";
@@ -225,7 +225,7 @@ const ProductForm = forwardRef(({
           <FormField flex="1">
             <TextControlled
               name="name"
-              label={FIELD_LABELS.NAME}
+              label="Nombre"
               placeholder="Televisor 100”"
               rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
@@ -257,7 +257,7 @@ const ProductForm = forwardRef(({
           <FormField flex="1">
             <PriceControlled
               name="cost"
-              label={FIELD_LABELS.COST}
+              label="Costo"
               disabled={!isUpdating && view}
               maxLength={19}
             />
@@ -266,7 +266,7 @@ const ProductForm = forwardRef(({
             <FormField flex="1">
               <PriceControlled
                 name="price"
-                label={FIELD_LABELS.PRICE}
+                label="Precio"
                 disabled={!isUpdating && view}
               />
             </FormField>
@@ -345,7 +345,7 @@ const ProductForm = forwardRef(({
         </FieldsContainer>
         <TextAreaControlled
           name="comments"
-          label={FIELD_LABELS.COMMENTS}
+          label="Comentarios"
           placeholder="Realmente son muchas pulgadas"
           readOnly={!isUpdating && view}
         />

@@ -15,7 +15,7 @@ import CashBalanceMovements from "@/components/cashBalances/CashBalanceMovements
 import { CASH_BALANCE_STATES, CLOSED } from "@/components/cashBalances/cashBalances.constants";
 import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -25,6 +25,7 @@ import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
 const CashBalance = ({ params }) => {
+  useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
   const { data: cashBalance, isLoading, refetch } = useGetCashBalance(params.id);

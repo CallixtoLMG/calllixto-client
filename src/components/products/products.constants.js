@@ -1,7 +1,7 @@
 import { Box, Flex, FlexColumn, Icon, Label, OverflowWrapper } from "@/common/components/custom";
 import { Text } from "@/common/components/form/Search/styles";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { ALL, BUTTON_TEXTS, COLORS, DATE_FORMATS, FIELD_LABELS as COMMON_FIELD_LABELS, ICONS, IN, OUT, SIZES } from "@/common/constants";
+import { ALL, COLORS, DATE_FORMATS, ICONS, IN, OUT, SIZES } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { Popup } from "semantic-ui-react";
@@ -46,7 +46,7 @@ export const ATTRIBUTES = {
 export const PRODUCT_COLUMNS = [
   {
     id: 1,
-    title: COMMON_FIELD_LABELS.ID,
+    title: "Id",
     key: "id",
     sortable: true,
     align: "left",
@@ -71,7 +71,7 @@ export const PRODUCT_COLUMNS = [
   },
   {
     id: 2,
-    title: COMMON_FIELD_LABELS.NAME,
+    title: "Nombre",
     key: "name",
     align: "left",
     sortable: true,
@@ -102,7 +102,7 @@ export const PRODUCT_COLUMNS = [
   },
   {
     id: 5,
-    title: COMMON_FIELD_LABELS.PRICE,
+    title: "Precio",
     width: 2,
     key: "price",
     sortable: true,
@@ -114,22 +114,22 @@ export const PRODUCT_COLUMNS = [
 export const IMPORT_PRODUCTS_COLUMNS = [
   {
     id: 1,
-    title: COMMON_FIELD_LABELS.ID,
+    title: "Id",
     width: 2,
   },
   {
     id: 2,
-    title: COMMON_FIELD_LABELS.NAME,
+    title: "Nombre",
     align: "left",
   },
   {
     id: 3,
-    title: COMMON_FIELD_LABELS.PRICE,
+    title: "Precio",
     width: 2,
   },
   {
     id: 4,
-    title: COMMON_FIELD_LABELS.COMMENTS,
+    title: "Comentarios",
     align: "left",
   }
 ];
@@ -137,18 +137,18 @@ export const IMPORT_PRODUCTS_COLUMNS = [
 export const BAN_PRODUCTS_COLUMNS = [
   {
     id: 1,
-    title: COMMON_FIELD_LABELS.ID,
+    title: "Id",
     value: (product) =>
       product.id
   },
 ];
 
 export const BAN_FILTERS = [
-  { value: 'id', placeholder: COMMON_FIELD_LABELS.ID },
+  { value: 'id', placeholder: 'Id' },
 ];
 
 export const EXAMPLE_TEMPLATE_DATA = [
-  [COMMON_FIELD_LABELS.ID, COMMON_FIELD_LABELS.NAME, COMMON_FIELD_LABELS.COST, COMMON_FIELD_LABELS.PRICE, 'Control de stock', COMMON_FIELD_LABELS.COMMENTS],
+  ['Id', 'Nombre', 'Costo', 'Precio', 'Control de stock', 'Comentarios'],
   ['AABB001', "Producto 1", 100, 200, 'Si', 'Comentarios...'],
   ['AABB002', "Producto 2", 200, 300, 'No', 'Comentarios...'],
   ['AABB003', "Producto 3", 300, 400, 'Si', 'Comentarios...'],
@@ -314,7 +314,7 @@ export const STOCK_TYPE_OPTIONS = [
 export const STOCK_TABLE_HEADERS = [
   {
     id: 1,
-    title: COMMON_FIELD_LABELS.DATE,
+    title: 'Fecha',
     key: "date",
     sortable: true,
     sortValue: (stockFlows) => stockFlows.createdAt ?? "",
@@ -340,7 +340,7 @@ export const STOCK_TABLE_HEADERS = [
     sortable: true,
     sortValue: (stockFlows) => stockFlows.quantity ?? "",
     width: 2,
-    title: COMMON_FIELD_LABELS.QUANTITY, value: (stockFlows) => stockFlows.quantity
+    title: 'Cantidad', value: (stockFlows) => stockFlows.quantity
   },
   {
     id: 3,
@@ -376,7 +376,7 @@ export const STOCK_TABLE_HEADERS = [
     id: 7,
     width: 9,
     align: "left",
-    title: COMMON_FIELD_LABELS.COMMENTS, value: (stockFlows) => <OverflowWrapper maxWidth="15vw" popupContent={stockFlows.comments}> {stockFlows.comments} </OverflowWrapper>
+    title: 'Comentarios', value: (stockFlows) => <OverflowWrapper maxWidth="15vw" popupContent={stockFlows.comments}> {stockFlows.comments} </OverflowWrapper>
   },
 ];
 
@@ -396,22 +396,22 @@ export const STOCK_FLOWS_MODAL_CONFIG = {
     title: "Ingreso de stock",
     icon: ICONS.ARROW_DOWN,
     titleIconColor: COLORS.GREEN,
-    confirmText: BUTTON_TEXTS.ADD,
+    confirmText: "Agregar",
   },
   out: {
     title: "Egreso de stock",
     icon: ICONS.ARROW_UP,
     titleIconColor: COLORS.RED,
-    confirmText: BUTTON_TEXTS.ADD,
+    confirmText: "Agregar",
   },
   edit: {
     title: "Editar ingreso",
     icon: ICONS.EDIT,
-    confirmText: BUTTON_TEXTS.UPDATE,
+    confirmText: "Actualizar",
   },
   delete: {
     icon: ICONS.TRASH,
-    confirmText: BUTTON_TEXTS.DELETE,
+    confirmText: "Eliminar",
   },
 };
 

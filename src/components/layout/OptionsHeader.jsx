@@ -1,5 +1,5 @@
 import ModalAction from '@/common/components/modals/ModalAction';
-import { BUTTON_TEXTS, COLORS, ICONS, SIZES } from '@/common/constants';
+import { COLORS, ICONS, SIZES } from '@/common/constants';
 import { useRestoreEntity } from '@/hooks';
 import { useState } from 'react';
 import { Icon } from 'semantic-ui-react';
@@ -59,7 +59,7 @@ const OptionsDropdown = ({ entity, queryKey, text }) => {
       <ModalAction
         title={`¿Actualizar ${text}?`}
         onConfirm={handleConfirm}
-        confirmButtonText={BUTTON_TEXTS.UPDATE}
+        confirmButtonText="Actualizar"
         confirmButtonIcon={ICONS.REFRESH}
         showModal={showModal}
         setShowModal={setShowModal}

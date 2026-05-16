@@ -20,22 +20,11 @@ const LoginForm = ({ onSubmit }) => {
 
   const { mutate: login, isPending } = useMutation({
     mutationFn: async (dataLogin) => {
-      const loginResult = await onSubmit(dataLogin);
-      if (loginResult?.nextStep?.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED") {
-        return loginResult;
-      }
-
+      await onSubmit(dataLogin);
       const data = await getUserData();
-      return { userData: data };
+      return data;
     },
-    onSuccess: (result) => {
-      if (result?.nextStep?.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED") {
-        toast.success("Código correcto! Ahora debes cambiar tu contrasena para completar el ingreso.");
-        push(`${PAGES.RESTORE_PASSWORD.BASE}?primerIngreso=true`);
-        return;
-      }
-
-      const userData = result?.userData;
+    onSuccess: (userData) => {
       if (userData) {
         setUserData(userData);
         toast.success("Ingreso exitoso!");

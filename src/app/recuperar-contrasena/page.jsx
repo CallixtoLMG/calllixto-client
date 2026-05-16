@@ -1,7 +1,8 @@
+"use client";
 import RecoverPasswordForm from "../../components/recoverPassword";
 
-const RecoverPassword = ({ searchParams }) => {
-  return (<RecoverPasswordForm isFirstLogin={searchParams?.primerIngreso === "true"} />)
+const RecoverPassword = () => {
+  return (<RecoverPasswordForm />)
 };
 
 export default RecoverPassword;

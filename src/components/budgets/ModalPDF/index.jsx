@@ -1,7 +1,7 @@
 import { useDolarExangeRate } from "@/api/external";
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, Flex, FlexColumn, Input } from "@/common/components/custom";
-import { BUTTON_TEXTS, COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { OnlyPrint } from "@/components/layout";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
@@ -20,7 +20,7 @@ const ModalPDF = ({
   budget,
   isModalOpen,
   onClose,
-  account,
+  client,
   total,
   subtotal,
   subtotalAfterDiscount,
@@ -28,7 +28,7 @@ const ModalPDF = ({
   defaults = {}
 }) => {
   const printRef = useRef();
-  const [printPdfMode, setPrintPdfMode] = useState(defaults?.printPdfMode ?? BUDGET_PDF_FORMAT.CUSTOMER.key);
+  const [printPdfMode, setPrintPdfMode] = useState(defaults?.printPdfMode ?? BUDGET_PDF_FORMAT.CLIENT.key);
   const [formattedDolarRate, setFormattedDolarRate] = useState('');
   const [showDolarExangeRate, setShowDolarExangeRate] = useState(false);
   const { data: dolar } = useDolarExangeRate({ enabled: showDolarExangeRate });
@@ -49,7 +49,7 @@ const ModalPDF = ({
 
   const formatValue = (value) => {
     if (value == null || Number.isNaN(value)) return '';
-
+  
     const formattedValue = value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     return formattedValue.includes('.')
       ? formattedValue.split('.').slice(0, 2).join('.')
@@ -140,7 +140,8 @@ const ModalPDF = ({
                 <PDFfile
                   ref={printRef}
                   budget={budget}
-                  account={account}
+                  client={client}
+                  id={client?.id}
                   printPdfMode={printPdfMode}
                   subtotal={subtotal}
                   subtotalAfterDiscount={subtotalAfterDiscount}
@@ -156,7 +157,7 @@ const ModalPDF = ({
           <Modal.Actions>
             <ButtonsContainer width="100%">
               <IconedButton
-                text={BUTTON_TEXTS.CANCEL}
+                text="Cancelar"
                 icon={ICONS.CANCEL}
                 color={COLORS.RED}
                 onClick={() => onClose(false)}
@@ -178,7 +179,8 @@ const ModalPDF = ({
         <PDFfile
           ref={printRef}
           budget={budget}
-          account={account}
+          client={client}
+          id={client?.id}
           printPdfMode={printPdfMode}
           subtotal={subtotal}
           subtotalAfterDiscount={subtotalAfterDiscount}

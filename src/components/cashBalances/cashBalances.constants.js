@@ -1,7 +1,7 @@
 import { Box, Flex, Icon, Label, OverflowWrapper } from '@/common/components/custom';
 import { PriceLabel } from '@/common/components/form';
 import { CommentTooltip } from "@/common/components/tooltips";
-import { ALL, COLORS, DATE_FORMATS, FIELD_LABELS, ICONS, IN, OUT, SELECT_ALL_OPTION, SIZES } from '@/common/constants';
+import { ALL, COLORS, DATE_FORMATS, ICONS, IN, OUT, SELECT_ALL_OPTION, SIZES } from '@/common/constants';
 import { getFormatedDate } from '@/common/utils/dates';
 import { Popup } from 'semantic-ui-react';
 
@@ -33,7 +33,7 @@ export const getCashBalanceColumns = (state = CASH_BALANCE_STATES.OPEN.id) => {
   const columns = [
     {
       id: 1,
-      title: FIELD_LABELS.ID,
+      title: "Id",
       key: "id",
       sortable: true,
       width: 1,
@@ -203,7 +203,7 @@ export const BILLS_DETAILS_TABLE_HEADERS = [
     sortValue: (billDetail) => billDetail.denomination ?? ""
   }, {
     id: 2,
-    title: FIELD_LABELS.QUANTITY,
+    title: 'Cantidad',
     key: "quantity",
     align: "right",
     value: (billDetail) => billDetail.quantity,
@@ -250,7 +250,7 @@ export const EMPTY_CASH_BALANCE_MOVEMENTS_FILTERS = {
 export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
   {
     id: 1,
-    title: FIELD_LABELS.DATE,
+    title: 'Fecha',
     key: 'date',
     width: 3,
     whiteSpace: "nowrap",
@@ -269,7 +269,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
   },
   {
     id: 2,
-    title: FIELD_LABELS.AMOUNT,
+    title: 'Monto',
     key: 'quantity',
     sortable: true,
     sortValue: (element) => element.amount ?? "",
@@ -278,7 +278,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
   },
   {
     id: 3,
-    title: FIELD_LABELS.PAYMENT_METHOD,
+    title: 'Método de pago',
     key: 'method',
     sortable: true,
     sortValue: (element) => element.method ?? "",
@@ -287,7 +287,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
   },
   {
     id: 4,
-    title: FIELD_LABELS.ID,
+    title: 'Id',
     key: 'id',
     sortable: true,
     sortValue: (element) => element.movementId ?? "",
@@ -299,7 +299,7 @@ export const CASH_BALANCE_MOVEMENTS_TABLE_HEADERS = [
   },
   {
     id: 5,
-    title: FIELD_LABELS.COMMENTS,
+    title: 'Comentarios',
     width: 6,
     align: "left",
     value: (element) => (

@@ -1,7 +1,7 @@
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
-import { BUTTON_TEXTS, COLORS, ICONS, SIZES } from "@/common/constants";
+import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import CreateBudgetPayments from "@/components/payments/CreateBudgetPayment";
 import { useMemo, useRef } from "react";
@@ -93,14 +93,14 @@ const ModalConfirmation = ({
             <Modal.Actions>
               <ButtonsContainer width="100%">
                 <IconedButton
-                  text={BUTTON_TEXTS.CANCEL}
+                  text="Cancelar"
                   icon={ICONS.CANCEL}
                   disabled={isLoading}
                   color={COLORS.RED}
                   onClick={() => onClose(false)}
                 />
                 <IconedButton
-                  text={BUTTON_TEXTS.CONFIRM}
+                  text="Confirmar"
                   icon={ICONS.CHECK}
                   disabled={isLoading}
                   loading={isLoading}

@@ -1,7 +1,7 @@
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
-import { BUTTON_TEXTS, COLORS, ICONS, PLACEHOLDERS } from "@/common/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { useState } from "react";
 import { Modal, Transition } from "semantic-ui-react";
 import { Message, ModalContent } from "./styles";
@@ -17,7 +17,7 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id, header })
         <ModalContent>
           <Message>
             <TextField
-              placeholder={PLACEHOLDERS.REASON}
+              placeholder="Motivo"
               value={cancelReason}
               onChange={(e) => setCancelReason(e.target.value)}
               tabIndex="0"
@@ -26,7 +26,7 @@ const ModalCancel = ({ isModalOpen, onClose, onConfirm, isLoading, id, header })
         </ModalContent>
         <Modal.Actions>
           <ButtonsContainer width="100%" $marginTop="10px">
-            <IconedButton text={BUTTON_TEXTS.CANCEL} icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} />
+            <IconedButton text="Cancelar" icon={ICONS.CANCEL} color={COLORS.RED} onClick={() => onClose(false)} disabled={isLoading} />
             <IconedButton
               text="Anular"
               icon={ICONS.BAN}

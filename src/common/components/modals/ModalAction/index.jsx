@@ -1,5 +1,5 @@
 import { ButtonsContainer } from "@/common/components/custom";
-import { BUTTON_TEXTS, COLORS, CONFIRMATION_WORDS, ICONS, PLACEHOLDERS } from "@/common/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { handleKeyPressWithSubmit } from "@/common/utils";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
@@ -11,9 +11,9 @@ import { Form, Message, ModalContent } from "./styles";
 const ModalAction = ({
   title,
   onConfirm,
-  confirmationWord = CONFIRMATION_WORDS.DELETE,
-  placeholder = PLACEHOLDERS.confirmAction(confirmationWord),
-  confirmButtonText = BUTTON_TEXTS.CONFIRM,
+  confirmationWord = 'eliminar',
+  placeholder = `Escriba "${confirmationWord}" para confirmar`,
+  confirmButtonText = 'Confirmar',
   confirmButtonIcon = 'check',
   titleIcon = 'check',
   titleIconColor,
@@ -98,7 +98,7 @@ const ModalAction = ({
             )}
             <ButtonsContainer>
               <IconedButton
-                text={BUTTON_TEXTS.CANCEL}
+                text="Cancelar"
                 icon={ICONS.TIMES}
                 color={COLORS.RED}
                 onClick={() => setShowModal(false)}

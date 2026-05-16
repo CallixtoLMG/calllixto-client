@@ -1,14 +1,14 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useDeleteUser, useEditUser, useGetUser, useSetUserState, useUpdateUserRole } from "@/api/users";
+import { useDeleteUser, useEditUser, useGetUser, useSetUserState } from "@/api/users";
 import { FieldsContainer, FormField, Input, Message, MessageHeader } from "@/common/components/custom";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
+import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UserForm from "@/components/users/UserForm";
-import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 
 const User = ({ params }) => {
+  useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
   const { data: user, isLoading, refetch } = useGetUser(decodeURIComponent(params.username));
@@ -26,7 +27,6 @@ const User = ({ params }) => {
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
   const editUser = useEditUser();
-  const updateUserRole = useUpdateUserRole();
   const deleteUser = useDeleteUser();
   const setUserState = useSetUserState();
 
@@ -37,7 +37,6 @@ const User = ({ params }) => {
     handleDiscard,
     handleContinue,
     onBeforeView,
-    closeModal,
   } = useUnsavedChanges({
     formRef,
     onDiscard: async () => {
@@ -84,17 +83,8 @@ const User = ({ params }) => {
     setReason("");
   };
 
-  const updateUser = async ({ user: userData, role: roleData }) => {
-    const responses = await Promise.all([
-      ...(userData ? [editUser(userData)] : []),
-      ...(roleData ? [updateUserRole(roleData)] : []),
-    ]);
-
-    return responses.find(response => !response.statusOk) || { statusOk: true };
-  };
-
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: updateUser,
+    mutationFn: editUser,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Usuario actualizado!");
@@ -235,7 +225,6 @@ const User = ({ params }) => {
         isUpdating={isUpdating && !isItemInactive(user?.state)}
         view
         isDeletePending={isDeletePending}
-        separateRoleUpdate
       />
       <UnsavedChangesModal
         open={showUnsavedModal}
@@ -256,7 +245,7 @@ const User = ({ params }) => {
           modalAction === INACTIVE && (
             <Input
               type="text"
-              placeholder={PLACEHOLDERS.REASON}
+              placeholder="Motivo"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

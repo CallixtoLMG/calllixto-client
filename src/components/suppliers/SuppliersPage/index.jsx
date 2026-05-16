@@ -1,6 +1,6 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { ENTITIES, FIELD_LABELS, PAGES } from "@/common/constants";
+import { ENTITIES, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { useFilters } from "@/hooks";
 import { FormProvider } from "react-hook-form";
@@ -35,21 +35,21 @@ const SuppliersPage = ({ isLoading, suppliers = [], onRefetch, onDownloadExcel }
               minWidth="150px"
               width="min-content"
               name="state"
-              label={FIELD_LABELS.STATE}
+              label="Estado"
               options={SUPPLIER_STATES_OPTIONS}
               defaultValue={EMPTY_FILTERS.state}
               afterChange={onSubmit}
             />
             <TextControlled
               name="id"
-              label={FIELD_LABELS.ID}
+              label="Id"
               placeholder="SE"
               width="8vw"
               minWidth="80px"
             />
             <TextControlled
               name="name"
-              label={FIELD_LABELS.NAME}
+              label="Nombre"
               placeholder="Suministro Estrella"
               width="20vw"
               minWidth="200px"

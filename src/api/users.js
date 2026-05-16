@@ -65,7 +65,7 @@ export const useEditUser = () => {
   const editItemByParam = useEditItem();
 
   const editUser = async (user) => {
-    const { previousVersions, role, ...cleanUser } = user;
+    const { previousVersions, ...cleanUser } = user;
     const response = await editItemByParam({
       entity: ENTITIES.USERS,
       url: PATHS.USER,
@@ -79,26 +79,6 @@ export const useEditUser = () => {
   };
 
   return editUser;
-};
-
-export const useUpdateUserRole = () => {
-  const editItemByParam = useEditItem();
-
-  const updateUserRole = ({ username, role }) => {
-    return editItemByParam({
-      entity: ENTITIES.USERS,
-      url: `${PATHS.USER}/role`,
-      params: { username },
-      value: { role },
-      invalidateQueries: [
-        [LIST_USERS_QUERY_KEY],
-        [GET_USER_QUERY_KEY, username],
-      ],
-      skipStorageUpdate: true,
-    });
-  };
-
-  return updateUserRole;
 };
 
 export const useDeleteUser = () => {

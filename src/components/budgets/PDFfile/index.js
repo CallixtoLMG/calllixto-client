@@ -24,8 +24,8 @@ const Field = ({ label, value, width = "80px", $justifyContent, ...rest }) => (
   </Flex>
 );
 
-const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, total, selectedContact, showPrices, customPDFDisclaimer }, ref) => {
-  const customerPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CUSTOMER.key, [printPdfMode]);
+const PDFfile = forwardRef(({ budget, client, printPdfMode, id, dolarExchangeRate = 0, subtotal, subtotalAfterDiscount, total, selectedContact, showPrices, customPDFDisclaimer }, ref) => {
+  const clientPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.CLIENT.key, [printPdfMode]);
   const dispatchPdf = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.DISPATCH.key, [printPdfMode]);
   const internal = useMemo(() => printPdfMode === BUDGET_PDF_FORMAT.INTERNAL.key, [printPdfMode]);
   const filteredColumns = useMemo(() => getProductsColumns(dispatchPdf, budget, showPrices), [budget, dispatchPdf, showPrices]);
@@ -73,11 +73,11 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
         <Flex $alignItems="center" $marginBottom="15px" $justifyContent="space-between">
           <FlexColumn width="150px">
             <Title as="h3" $textAlign="left" $alignSelf="left" $cancelled={isBudgetCancelled(budget?.state)}>N° {budget?.id}</Title>
-            {customerPdf && (
+            {clientPdf && (
               <>
-                <Title $textAlign="left" $alignSelf="left" as="h4">{account?.name?.toUpperCase() || "Maderera Las Tapias"}</Title>
-                <Title $textAlign="left" $alignSelf="left" as="h4">CUIT: {account?.cuil?.toUpperCase() || "CUIT"}</Title>
-                <Title $textAlign="left" $alignSelf="left" as="h4">{account?.taxCondition || "Condición IVA"}</Title>
+                <Title $textAlign="left" as="h4">{client?.name?.toUpperCase() || "Maderera Las Tapias"}</Title>
+                <Title $textAlign="left" $alignSelf="left" as="h4">CUIT: {client?.cuil?.toUpperCase() || "CUIT"}</Title>
+                <Title as="h4">{client?.taxCondition || "Condición IVA"}</Title>
               </>
             )}
           </FlexColumn>
@@ -85,7 +85,7 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
             {isBudgetCancelled(budget?.state) && <Title as="h2">{BUDGET_STATES.CANCELLED.title.toUpperCase()}</Title>}
             {isBudgetDraft(budget?.state) && <Title as="h2">{BUDGET_STATES.DRAFT.title.toUpperCase()}</Title>}
             {dispatchPdf && <Title as="h2">REMITO</Title>}
-            {customerPdf && (
+            {clientPdf && (
               <FlexColumn $rowGap="10px">
                 <Title as="h2">X</Title>
                 <Title as="h5">DOCUMENTO NO VÁLIDO COMO FACTURA</Title>
@@ -94,7 +94,7 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
             {internal && <Title as="h2">INTERNO</Title>}
           </FlexColumn>
           <Box width="150px">
-            {customerPdf && <Image src={`/accounts/${account?.id}.png`} alt="Logo empresa" />}
+            {clientPdf && <Image src={`/clients/${id}.png`} alt="Logo empresa" />}
           </Box>
         </Flex>
         <Divider />
@@ -104,7 +104,7 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
             <Field $justifyContent="flex-end" label="Fecha" value={getFormatedDate()} />
           </Flex>
           <Flex $justifyContent="space-between">
-            <Field label="Teléfonos" value={account?.phoneNumbers?.map(getFormatedPhone).join(' | ')} />
+            <Field label="Teléfonos" value={client?.phoneNumbers?.map(getFormatedPhone).join(' | ')} />
             <Field $justifyContent="flex-end" label="Válido hasta" value={getDateWithOffset({ date: budget?.createdAt, offset: budget?.expirationOffsetDays })} />
           </Flex>
         </SectionContainer>
@@ -139,9 +139,9 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
           />
         )
       }
-      {account?.id === 'maderera-las-tapias' && (
+      {client?.id === 'maderera-las-tapias' && (
         <Box width="100%">
-          {customerPdf && customPDFDisclaimer}
+          {clientPdf && customPDFDisclaimer}
         </Box>
       )}
       <FlexColumn $rowGap="15px">
@@ -164,7 +164,7 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
             <DataContainer width="100%">
               <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Formas de pago</Title>
               <Divider />
-              <Title as="h4" $alignSelf="left" $textAlign="left" $textAlignLast="left" $minHeight="30px">
+              <Title as="h4" $alignSelf="left" $textAlignLast="left" $minHeight="30px">
                 {budget?.paymentMethods?.join(" | ")}
               </Title>
             </DataContainer>

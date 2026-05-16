@@ -1,11 +1,9 @@
-import { Box, Button, Flex } from "@/common/components/custom";
+import { AccordionTitle, Box, Button, Flex, Icon } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { BUTTON_TEXTS, COLORS, DELETE, ICONS, SIZES, TOOLTIPS } from "@/common/constants";
+import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
 import { createPriorityKeyDownHandler } from "@/common/utils";
-import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
-import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion } from "semantic-ui-react";
@@ -99,7 +97,7 @@ const Blacklist = () => {
       icon: ICONS.TRASH,
       color: COLORS.RED,
       onClick: handleRemoveId,
-      tooltip: TOOLTIPS.DELETE,
+      tooltip: "Eliminar",
       getKey: (id, index) => `delete_${id}_${index}`,
     },
   ], [handleRemoveId]);
@@ -112,13 +110,10 @@ const Blacklist = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <SettingsAccordionTitle
-          active={isAccordionOpen}
-          helpText={SETTINGS_HELP_TEXTS.BLACKLIST}
-          onClick={toggleAccordion}
-        >
+        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
+          <Icon $height="20px" name={ICONS.CARET_UP} />
           Productos bloqueados
-        </SettingsAccordionTitle>
+        </AccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>
@@ -148,7 +143,7 @@ const Blacklist = () => {
                   <Button
                     size={SIZES.SMALL}
                     icon={ICONS.ADD}
-                    content={BUTTON_TEXTS.ADD}
+                    content="Agregar"
                     labelPosition="left"
                     color={COLORS.GREEN}
                     type="button"

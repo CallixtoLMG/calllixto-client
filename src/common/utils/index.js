@@ -4,15 +4,6 @@ import * as XLSX from "xlsx";
 import { ALL, CANCELLED, COLORS, INACTIVE, REGEX } from "../constants";
 import { isDateAfter } from "./dates";
 
-export {
-  formatCount,
-  formatLastCount,
-  getPluralLabel,
-  isSingularCount,
-  PLURAL_LABELS,
-  pluralize,
-} from "./pluralization";
-
 export const getFormatedPrice = (number) => {
   const safeNumber = Number(number) ?? 0;
   return safeNumber.toLocaleString('es-AR', {

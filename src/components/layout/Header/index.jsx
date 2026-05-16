@@ -2,17 +2,16 @@
 import { useUserContext } from "@/User";
 import { IconedButton } from "@/common/components/buttons";
 import { KeyboardShortcuts, ModalUpdates } from "@/common/components/modals";
-import { COLORS, DEFAULT_SELECTED_ACCOUNT, ICONS, PAGES, getNavigationItems } from "@/common/constants";
+import { COLORS, DEFAULT_SELECTED_CLIENT, ICONS, PAGES, getNavigationItems } from "@/common/constants";
 import { useKeyboardShortcuts } from "@/hooks";
 import { RULES, isCallixtoUser } from "@/roles";
-import { getSelectedAccountId, setSelectedAccountId as saveSelectedAccountId } from "@/services/session";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { UserMenu } from "..";
 import SidebarNavigation from "./Sidebar";
 import {
   Brand,
-  AccountBadge,
+  ClientBadge,
   HeaderBar,
   HeaderLeft,
   HeaderRight,
@@ -25,22 +24,22 @@ const Header = () => {
   const pathname = usePathname();
   const { push } = useRouter();
   const { userData, role } = useUserContext();
-  const [selectedAccountId, setSelectedAccountId] = useState(DEFAULT_SELECTED_ACCOUNT);
+  const [selectedClientId, setSelectedClientId] = useState(DEFAULT_SELECTED_CLIENT);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const account = getSelectedAccountId();
-      saveSelectedAccountId(account);
-      setSelectedAccountId(account);
+      const client = localStorage.getItem("selectedClientId") ?? DEFAULT_SELECTED_CLIENT;
+      localStorage.setItem("selectedClientId", client);
+      setSelectedClientId(client);
     }
   }, []);
 
   const navigationItems = useMemo(() => getNavigationItems(role), [role]);
 
-  const handleAccountChange = (account) => {
-    saveSelectedAccountId(account);
-    setSelectedAccountId(account);
+  const handleClientChange = (client) => {
+    localStorage.setItem("selectedClientId", client);
+    setSelectedClientId(client);
     location.reload();
   };
 
@@ -48,7 +47,7 @@ const Header = () => {
     push(PAGES.LOGIN.BASE);
   };
 
-  const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE, PAGES.MAINTENANCE.BASE];
+  const routesWithoutHeader = [PAGES.LOGIN.BASE, PAGES.RESTORE_PASSWORD.BASE];
   const showHeader = !routesWithoutHeader.includes(pathname);
 
   const shortcutMapping = useMemo(() => ([
@@ -127,7 +126,7 @@ const Header = () => {
             <KeyboardShortcuts />
           </RightActions>
           {isCallixtoUser(role) && (
-            <AccountBadge>{selectedAccountId}</AccountBadge>
+            <ClientBadge>{selectedClientId}</ClientBadge>
           )}
           <UserMenu
             trigger={
@@ -140,9 +139,9 @@ const Header = () => {
               />
             }
             onLogout={handleLogout}
-            onAccountChange={handleAccountChange}
+            onClientChange={handleClientChange}
             userData={userData}
-            selectedAccount={selectedAccountId}
+            selectedClient={selectedClientId}
           />
         </HeaderRight>
       </HeaderBar>

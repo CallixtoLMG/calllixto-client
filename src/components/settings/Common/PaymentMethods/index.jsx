@@ -1,13 +1,11 @@
-import { Box, Button, Flex } from "@/common/components/custom";
+import { AccordionTitle, Box, Button, Flex, Icon } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { BUTTON_TEXTS, COLORS, DELETE, ICONS, SIZES, TOOLTIPS } from "@/common/constants";
+import { COLORS, DELETE, ICONS, SIZES } from "@/common/constants";
 import { createPriorityKeyDownHandler } from "@/common/utils";
-import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Accordion } from "semantic-ui-react";
-import SettingsAccordionTitle from "../SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "../styles";
 
 const EMPTY_INPUT = "";
@@ -72,7 +70,7 @@ const PaymentMethods = () => {
       icon: ICONS.TRASH,
       color: COLORS.RED,
       onClick: handleRemoveMethod,
-      tooltip: TOOLTIPS.DELETE,
+      tooltip: "Eliminar",
       getKey: (method, index) => `delete_${method}_${index}`,
     },
   ], [handleRemoveMethod]);
@@ -85,13 +83,10 @@ const PaymentMethods = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <SettingsAccordionTitle
-          active={isAccordionOpen}
-          helpText={SETTINGS_HELP_TEXTS.PAYMENT_METHODS}
-          onClick={toggleAccordion}
-        >
+        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
+          <Icon $height="20px" name={ICONS.CARET_UP} />
           Métodos de pago
-        </SettingsAccordionTitle>
+        </AccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner>
@@ -112,7 +107,7 @@ const PaymentMethods = () => {
                   <Button
                     size={SIZES.SMALL}
                     icon={ICONS.ADD}
-                    content={BUTTON_TEXTS.ADD}
+                    content="Agregar"
                     labelPosition="left"
                     color={COLORS.GREEN}
                     type="button"

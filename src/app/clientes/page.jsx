@@ -5,11 +5,12 @@ import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import CustomersPage from "@/components/customers/CustomersPage";
 import { CUSTOMER_STATES } from "@/components/customers/customers.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Customers = () => {
+  useValidateToken();
   const { data, isLoading, isRefetching, refetch } = useListCustomers();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();

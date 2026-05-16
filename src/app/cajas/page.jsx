@@ -8,13 +8,14 @@ import { downloadExcel, mapToDropdownOptions } from "@/common/utils";
 import CashBalancesPage from "@/components/cashBalances/CashBalancesPage";
 import { CASH_BALANCE_STATES } from "@/components/cashBalances/cashBalances.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import toast from "react-hot-toast";
 
 const CashBalances = () => {
+  useValidateToken();
   const { data, isLoading, isRefetching, refetch } = useListCashBalances();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();

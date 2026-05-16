@@ -6,12 +6,13 @@ import { downloadExcel, getFormatedPhone } from "@/common/utils";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import SuppliersPage from "@/components/suppliers/SuppliersPage";
 import { SUPPLIER_STATES } from "@/components/suppliers/suppliers.constants";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Suppliers = () => {
+  useValidateToken();
   const { data, isLoading, isRefetching, refetch } = useListSuppliers();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();

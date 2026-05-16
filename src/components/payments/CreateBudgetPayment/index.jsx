@@ -4,7 +4,7 @@ import { FieldsContainer, Flex, FlexColumn, FormField, Icon, OverflowWrapper, Se
 import { DropdownField, PriceField, PriceLabel, TextField } from "@/common/components/form";
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { Table, TotalList } from "@/common/components/table";
-import { COLORS, ENTITIES, FIELD_LABELS, ICONS, RULES, SIZES, TOOLTIPS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, RULES, SIZES } from "@/common/constants";
 import { calculateTotals, handleEnterKeyDown, mapToDropdownOptions } from "@/common/utils";
 import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { useEffect, useMemo, useState } from "react";
@@ -46,14 +46,14 @@ const getPaymentTableHeaders = () => [
   {
     id: 'amount',
     width: 3,
-    title: FIELD_LABELS.AMOUNT,
+    title: 'Monto',
     value: (element) => <PriceLabel value={element.amount} />
   },
   {
     id: 'comments',
     width: 9,
     align: "left",
-    title: FIELD_LABELS.COMMENTS,
+    title: 'Comentarios',
     value: (element) => (
       <OverflowWrapper maxWidth="30vw" popupContent={element.comments}>
         {element.comments}
@@ -146,7 +146,7 @@ const CreateBudgetPayments = ({
                   dateFormat="dd-MM-yyyy"
                   disabled={isTotalCovered}
                   maxDate={new Date()}
-                  label={FIELD_LABELS.DATE}
+                  label="Fecha"
                   required
                   error={showErrors && !payment.date ? RULES.REQUIRED.required : undefined}
                   placeholder="16-11-2025"
@@ -172,7 +172,7 @@ const CreateBudgetPayments = ({
                       key={`price-${payment.method}-${payment.date?.getTime()}`}
                       placeholder="10000"
                       required
-                      label={FIELD_LABELS.AMOUNT}
+                      label="Monto"
                       value={payment.amount}
                       onChange={(value) => {
                         setPayment({ ...payment, amount: value ?? 0 });
@@ -214,7 +214,7 @@ const CreateBudgetPayments = ({
               <FieldsContainer $rowGap="15px">
                 <TextField
                   flex="1"
-                  label={FIELD_LABELS.COMMENTS}
+                  label="Comentarios"
                   placeholder="Primer pago"
                   disabled={isTotalCovered}
                   value={payment.comments}
@@ -252,7 +252,7 @@ const CreateBudgetPayments = ({
                   icon: ICONS.TRASH,
                   color: COLORS.RED,
                   onClick: (_, index) => removePayment(index),
-                  tooltip: TOOLTIPS.DELETE,
+                  tooltip: 'Eliminar',
                 },
               ]}
             />

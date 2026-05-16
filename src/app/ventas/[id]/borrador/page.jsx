@@ -6,25 +6,24 @@ import { useListCustomers } from "@/api/customers";
 import { useListProducts } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
 import { useConsumeStock } from "@/api/stock";
-import { UnsavedChangesModal } from "@/common/components/modals";
 import { ENTITIES, PAGES } from "@/common/constants";
 import { mapToDropdownOptions } from "@/common/utils";
 import BudgetForm from "@/components/budgets/BudgetForm";
 import CreateBudgetDeliveriesForm from "@/components/budgets/CreateBudgetDeliveriesForm";
 import { BUDGET_STATES, buildConsumeStockFlows, } from "@/components/budgets/budgets.constants";
-import { isBudgetDraft } from "@/components/budgets/budgets.utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import CreateBudgetPayments from "@/components/payments/CreateBudgetPayment";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
-import { useBudgetTotals, useUnsavedChanges } from "@/hooks";
+import { useBudgetTotals, useValidateToken } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { FormProvider, useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
 const BudgetDraft = ({ params }) => {
+  useValidateToken();
   const { id } = params;
   const { userData } = useUserContext();
   const { push } = useRouter();
@@ -81,33 +80,16 @@ const BudgetDraft = ({ params }) => {
     reValidateMode: "onChange",
     shouldUnregister: false,
   });
-  const formRef = useRef(null);
-  const budgetValues = useMemo(() => {
-    if (!budget) return undefined;
 
-    return {
+  useEffect(() => {
+    if (!budget) return;
+
+    methods.reset({
       ...budget,
       createdBy: userData?.name,
       paymentsMade: budget.paymentsMade || [],
-    };
-  }, [budget, userData?.name]);
-  const budgetUnsaved = useUnsavedChanges({
-    formRef,
-    onDiscard: () => methods.reset(budgetValues),
-  });
-
-  useEffect(() => {
-    if (!budgetValues) return;
-
-    methods.reset(budgetValues);
-  }, [budgetValues, methods]);
-
-  useEffect(() => {
-    formRef.current = {
-      isDirty: () => methods.formState.isDirty,
-      resetForm: () => methods.reset(budgetValues),
-    };
-  }, [budgetValues, methods]);
+    });
+  }, [budget, methods, userData]);
 
   const watchProducts = useWatch({ control: methods.control, name: "products" });
   const watchGlobalDiscount = useWatch({ control: methods.control, name: "globalDiscount", });
@@ -136,29 +118,14 @@ const BudgetDraft = ({ params }) => {
     refetchPaymentMethods();
   }, [id, setLabels, refetchProductsData, refetchPaymentMethods]);
 
-  useEffect(() => {
-    if (loadingBudget) return;
-
-    if (!budget) {
-      push(PAGES.NOT_FOUND.BASE);
-      return;
-    }
-
-    if (!isBudgetDraft(budget.state)) {
-      push(PAGES.BUDGETS.SHOW(id));
-    }
-  }, [budget, id, loadingBudget, push]);
-
   const handleSubmitDraft = async (data) => {
     await editMutation.mutateAsync(data);
     toast.success("Presupuesto guardado");
 
     if (data.state === BUDGET_STATES.DRAFT.id) {
-      methods.reset(data);
-      budgetUnsaved.runWithoutPrompt(() => push(PAGES.BUDGETS.DRAFT(id)));
+      push(PAGES.BUDGETS.DRAFT(id));
     } else {
-      methods.reset(data);
-      budgetUnsaved.runWithoutPrompt(() => push(PAGES.BUDGETS.SHOW(id)));
+      push(PAGES.BUDGETS.SHOW(id));
     }
   };
 
@@ -197,8 +164,7 @@ const BudgetDraft = ({ params }) => {
     }
 
     toast.success("Presupuesto confirmado");
-    methods.reset(data);
-    budgetUnsaved.runWithoutPrompt(() => push(PAGES.BUDGETS.SHOW(id)));
+    push(PAGES.BUDGETS.SHOW(id));
   };
 
   const panes = [
@@ -245,13 +211,9 @@ const BudgetDraft = ({ params }) => {
       : []),
   ];
 
-  if (
-    loadingBudget ||
-    loadingProducts ||
-    loadingCustomers ||
-    !budget ||
-    !isBudgetDraft(budget.state)
-  ) {
+  /* ---------------------- Render ------------------------- */
+
+  if (loadingBudget || loadingProducts || loadingCustomers) {
     return <Loader active />;
   }
 
@@ -261,11 +223,6 @@ const BudgetDraft = ({ params }) => {
         <Tab
           panes={panes}
           defaultActiveIndex={0} />
-        <UnsavedChangesModal
-          open={budgetUnsaved.showModal}
-          onDiscard={budgetUnsaved.handleDiscard}
-          onContinue={budgetUnsaved.handleContinue}
-        />
       </FormProvider>
     </Loader>
   );

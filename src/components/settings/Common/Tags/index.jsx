@@ -1,13 +1,11 @@
-import { Box, Button, FieldsContainer, OverflowWrapper } from "@/common/components/custom";
+import { AccordionTitle, Box, Button, FieldsContainer, Icon, OverflowWrapper } from "@/common/components/custom";
 import { DropdownField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { BUTTON_TEXTS, COLORS, DELETE, FIELD_LABELS, ICONS, SEMANTIC_COLORS, SIZES, TOOLTIPS } from "@/common/constants";
+import { COLORS, DELETE, ICONS, SEMANTIC_COLORS, SIZES } from "@/common/constants";
 import { createPriorityKeyDownHandler, handleEnterKeyDown } from "@/common/utils";
-import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useEffect, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Accordion, Label } from "semantic-ui-react";
-import SettingsAccordionTitle from "../SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "../styles";
 
 const EMPTY_TAG = {
@@ -47,7 +45,7 @@ const Tags = () => {
     },
     {
       id: "description",
-      title: FIELD_LABELS.DESCRIPTION,
+      title: "Descripción",
       align: "left",
       value: (tag) => (
         <OverflowWrapper maxWidth="35vw" popupContent={tag.description}>
@@ -63,7 +61,7 @@ const Tags = () => {
       icon: ICONS.TRASH,
       color: COLORS.RED,
       onClick: (tag, index) => remove(index),
-      tooltip: TOOLTIPS.DELETE,
+      tooltip: "Eliminar",
     },
   ];
 
@@ -116,13 +114,10 @@ const Tags = () => {
   return (
     <Box $marginBottom="5px">
       <Accordion fluid>
-        <SettingsAccordionTitle
-          active={isAccordionOpen}
-          helpText={SETTINGS_HELP_TEXTS.TAGS}
-          onClick={toggleAccordion}
-        >
+        <AccordionTitle $active={isAccordionOpen} onClick={toggleAccordion}>
+          <Icon $height="20px" name={ICONS.CARET_UP} />
           Etiquetas
-        </SettingsAccordionTitle>
+        </AccordionTitle>
         <Accordion.Content active>
           <AnimatedContent $active={isAccordionOpen}>
             <AnimatedInner $active={isAccordionOpen}>
@@ -130,7 +125,7 @@ const Tags = () => {
                 <FieldsContainer padding="0 10px 10px 10px!important" >
                   <TextField
                     flex="1"
-                    label={FIELD_LABELS.NAME}
+                    label="Nombre"
                     placeholder="Nombre de la etiqueta"
                     value={tagToAdd.name}
                     onChange={handleNameChange}
@@ -141,15 +136,15 @@ const Tags = () => {
                   <DropdownField
                     selection
                     flex="1"
-                    label={FIELD_LABELS.COLOR}
+                    label="Color"
                     options={SEMANTIC_COLORS}
                     value={tagToAdd.color}
                     onChange={(e, { value }) => setTagToAdd({ ...tagToAdd, color: value })}
                   />
                   <TextField
                     flex="1"
-                    label={FIELD_LABELS.DESCRIPTION}
-                    placeholder={FIELD_LABELS.DESCRIPTION}
+                    label="Descripción"
+                    placeholder="Descripción"
                     value={tagToAdd.description}
                     onChange={(e) => setTagToAdd({ ...tagToAdd, description: e.target.value })}
                     onKeyDown={(e) => handleEnterKeyDown(e, handleAddTag)}
@@ -158,7 +153,7 @@ const Tags = () => {
                   <Button
                     size={SIZES.SMALL}
                     icon={ICONS.ADD}
-                    content={BUTTON_TEXTS.ADD}
+                    content="Agregar"
                     labelPosition="left"
                     color={COLORS.GREEN}
                     type="button"

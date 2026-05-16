@@ -6,12 +6,13 @@ import { downloadExcel } from "@/common/utils";
 import ExpensesPage from "@/components/expenses/ExpensesPage";
 import { EXPENSE_STATES } from "@/components/expenses/expenses.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useKeyboardShortcuts } from "@/hooks";
+import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Expenses = () => {
+  useValidateToken();
   const { data, isLoading, isRefetching, refetch } = useListExpenses();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();

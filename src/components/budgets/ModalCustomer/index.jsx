@@ -2,7 +2,7 @@ import { useEditCustomer } from "@/api/customers";
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { NumberControlled, TextControlled, TextField } from "@/common/components/form";
-import { BUTTON_TEXTS, COLORS, ICONS, RULES } from "@/common/constants";
+import { COLORS, ICONS, RULES } from "@/common/constants";
 import { useEffect, useRef, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -170,14 +170,14 @@ const ModalCustomer = ({ isModalOpen, onClose, customer }) => {
         <Modal.Actions>
           <ButtonsContainer >
             <IconedButton
-              text={BUTTON_TEXTS.CANCEL}
+              text="Cancelar"
               icon={ICONS.CANCEL}
               disabled={isLoading}
               color={COLORS.RED}
               onClick={() => onClose(false)}
             />
             <IconedButton
-              text={BUTTON_TEXTS.CONFIRM}
+              text="Confirmar"
               icon={ICONS.CHECK}
               disabled={isLoading}
               loading={isLoading}

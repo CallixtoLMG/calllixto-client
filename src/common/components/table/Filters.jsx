@@ -1,6 +1,6 @@
 import { Button as CustomButton, DropdownItem, Flex, Label } from '@/common/components/custom';
 import ModalAction from '@/common/components/modals/ModalAction';
-import { BUTTON_TEXTS, COLORS, ENTITIES, ICONS, PAGES, SIZES } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, PAGES, SIZES } from "@/common/constants";
 import { LIST_BRANDS_QUERY_KEY } from "@/components/brands/brands.constants";
 import { LIST_BUDGETS_QUERY_KEY } from "@/components/budgets/budgets.constants";
 import { LIST_CASH_BALANCES_QUERY_KEY } from '@/components/cashBalances/cashBalances.constants';
@@ -93,7 +93,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
             iconOnly
           />
           {onRefetch &&
-            <Dropdown width="130px" pointing as={CustomButton} text={BUTTON_TEXTS.UPDATE} icon={ICONS.REFRESH} floating labeled button className='icon'>
+            <Dropdown width="130px" pointing as={CustomButton} text='Actualizar' icon={ICONS.REFRESH} floating labeled button className='icon'>
               <Dropdown.Menu>
                 <DropdownItem onClick={onRefetch}>
                   <Icon color={COLORS.BLUE} name={ICONS.DOWNLOAD} />Actualización rápida
@@ -109,7 +109,7 @@ const Filters = ({ children, onRestoreFilters, onRefetch, entity, appliedCount, 
       <ModalAction
         title={`¿Quieres realizar una actualización completa de ${text} ?  `}
         onConfirm={handleConfirmHardUpdate}
-        confirmButtonText={BUTTON_TEXTS.UPDATE}
+        confirmButtonText="Actualizar"
         confirmButtonIcon={ICONS.REFRESH}
         showModal={showModal}
         setShowModal={setShowModal}

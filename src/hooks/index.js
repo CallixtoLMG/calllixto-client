@@ -8,3 +8,5 @@ export { default as useProtectedAction } from './useProtectedAction';
 export { default as useRestoreEntity } from './useRestoreEntity';
 export { default as useSettingArrayField } from './useSettingArrayField';
 export { default as useUnsavedChanges } from './useUnsavedChanges';
+export { default as useValidateToken } from './useValidateToken';
+

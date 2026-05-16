@@ -6,9 +6,8 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { ModalAction, ModalMultiDelete } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
-import { COLORS, ENTITIES, FIELD_LABELS, ICONS, PAGES, TOOLTIPS } from "@/common/constants";
+import { COLORS, ENTITIES, ICONS, PAGES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
-import { formatCount, pluralize } from "@/common/utils/pluralization";
 import { OnlyPrint } from "@/components/layout";
 import { useFilters } from "@/hooks";
 import { RULES } from "@/roles";
@@ -57,7 +56,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
         setSelectedProduct(product);
         setShowModal(true);
       },
-      tooltip: TOOLTIPS.DELETE
+      tooltip: 'Eliminar'
     }
   ] : [];
 
@@ -107,7 +106,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
       return response.deletedCount;
     },
     onSuccess: (deletedCount) => {
-      toast.success(`${formatCount(deletedCount, "product")} ${pluralize(deletedCount, "eliminado", "eliminados")}!`);
+      toast.success(`${deletedCount} productos eliminados!`);
       setSelectedProducts({});
       setShowConfirmDeleteModal(false);
     },
@@ -117,7 +116,6 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
   });
 
   const selectionActions = useMemo(() => {
-    const selectedProductsCount = Object.keys(selectedProducts).length;
     const actions = [
       <IconedButton
         key={2}
@@ -131,7 +129,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
       actions.unshift(
         <IconedButton
           key={1}
-          text={`Eliminar ${pluralize(selectedProductsCount, "producto", "productos")}`}
+          text="Eliminar productos"
           icon={ICONS.TRASH}
           color={COLORS.RED}
           onClick={() => setShowConfirmDeleteModal(true)}
@@ -141,7 +139,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
 
     return actions;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [role, selectedProducts]);
+  }, [role]);
 
   return (
     <>
@@ -160,7 +158,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
                 minWidth="150px"
                 width="min-content"
                 name="state"
-                label={FIELD_LABELS.STATE}
+                label="Estado"
                 options={PRODUCT_STATES_OPTIONS}
                 defaultValue={EMPTY_FILTERS.state}
                 afterChange={() => {
@@ -170,14 +168,14 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
               />
               <TextControlled
                 name="id"
-                label={FIELD_LABELS.ID}
+                label="Id"
                 placeholder="SECG001"
                 width="12vw"
                 minWidth="100px"
               />
               <TextControlled
                 name="name"
-                label={FIELD_LABELS.NAME}
+                label="Nombre"
                 placeholder="Caramelito"
                 width="20vw"
                 minWidth="200px"
@@ -223,7 +221,7 @@ const ProductsPage = ({ products = [], isLoading, onRefetch, onDownloadExcel }) 
         title={`¿Estás seguro de que desea eliminar${Object.values(selectedProducts).some(
           p => p.state === PRODUCT_STATES.DELETED.id) ?
           " PERMANENTEMENTE" :
-          ""} ${pluralize(Object.values(selectedProducts).length, "este producto", "estos productos")}?`
+          ""} estos productos?`
         }
         isLoading={deleteIsPending}
         headers={PRODUCT_COLUMNS}

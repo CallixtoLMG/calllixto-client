@@ -1,10 +1,9 @@
-import { FIELD_LABELS } from "@/common/constants";
 import { OverflowWrapper } from "../custom";
 
 export const PHONE_TABLE_HEADERS = [
   {
     id: 1,
-    title: FIELD_LABELS.REFERENCE,
+    title: 'Referencia',
     align: "left",
     value: (phone) =>
     (
@@ -15,13 +14,13 @@ export const PHONE_TABLE_HEADERS = [
   },
   {
     id: 2,
-    title: FIELD_LABELS.AREA,
+    title: 'Área',
     align: "left",
     value: (phone) => phone.areaCode
   },
   {
     id: 3,
-    title: FIELD_LABELS.NUMBER,
+    title: 'Número',
     align: "left",
     value: (phone) => phone.number
   }
@@ -30,7 +29,7 @@ export const PHONE_TABLE_HEADERS = [
 export const ADDRESS_TABLE_HEADERS = [
   {
     id: 1,
-    title: FIELD_LABELS.REFERENCE,
+    title: 'Referencia',
     align: "left",
     value: (address) =>
     (
@@ -41,7 +40,7 @@ export const ADDRESS_TABLE_HEADERS = [
   },
   {
     id: 2,
-    title: FIELD_LABELS.ADDRESS,
+    title: 'Dirección',
     align: "left",
     value: (address) =>
     (
@@ -55,7 +54,7 @@ export const ADDRESS_TABLE_HEADERS = [
 export const EMAIL_TABLE_HEADERS = [
   {
     id: 1,
-    title: FIELD_LABELS.REFERENCE,
+    title: 'Referencia',
     align: "left",
     value: (email) =>
     (
@@ -66,7 +65,7 @@ export const EMAIL_TABLE_HEADERS = [
   },
   {
     id: 2,
-    title: FIELD_LABELS.EMAIL,
+    title: 'Email',
     align: "left",
     value: (email) => (
       <OverflowWrapper maxWidth="12vw" popupContent={email.email}>

@@ -14,7 +14,7 @@ import { Header } from "../../products/ProductStock/styles";
 import { ADJUST_DELIVERY, DELIVERY, buildBudgetDeliveriesColumns, getDeliveryStats, hasInvalidStockQuantities } from "../budgets.constants";
 import { isBudgetCancelled } from "../budgets.utils";
 
-const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => {
+const BudgetDeliveries = ({ budgetId, onSuccess, state }) => {
   const consumeStock = useConsumeStock();
 
   const { control, setValue } = useFormContext();
@@ -350,16 +350,6 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                 </>
               }
             />
-            {canPrint && (
-              <IconedButton
-                icon={ICONS.PRINT}
-                color={COLORS.BLUE}
-                text="Imprimir entregas"
-                onClick={onPrint}
-                iconOnly
-                popupPosition="top left"
-              />
-            )}
           </Flex>
         </Flex>
         <Table

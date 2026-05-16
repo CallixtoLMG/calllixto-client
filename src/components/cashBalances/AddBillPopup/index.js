@@ -1,7 +1,7 @@
 import { IconedButton } from "@/common/components/buttons";
 import { Flex, Form } from "@/common/components/custom";
 import { DropdownField, NumberField } from "@/common/components/form";
-import { BUTTON_TEXTS, COLORS, FIELD_LABELS, ICONS } from "@/common/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { handleEnterKeyDown } from "@/common/utils";
 import { ARS_BILL_DENOMINATIONS, EMPTY_BILL } from "@/components/cashBalances/cashBalances.constants";
 import { useEffect, useState } from "react";
@@ -72,7 +72,7 @@ export const AddBillPopup = ({
             placeholder="Seleccionar"
           />
           <NumberField
-            label={FIELD_LABELS.QUANTITY}
+            label="Cantidad"
             width="200px"
             value={billToAdd.quantity}
             onChange={(value) => {
@@ -84,7 +84,7 @@ export const AddBillPopup = ({
             }}
           />
           <IconedButton
-            text={BUTTON_TEXTS.ADD}
+            text="Agregar"
             alignSelf="end"
             height="38px"
             icon={ICONS.CHECK}
