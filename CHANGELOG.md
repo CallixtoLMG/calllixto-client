@@ -3,6 +3,18 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-05-16
+
+### Added
+
+- Users: Added support for the `Sadmin` role (`superadmin`) between Callixto and Admin in the role hierarchy.
+
+### Changed
+
+- Users: Separated role updates from the general user update flow, using the dedicated `user/role` endpoint when the role changes.
+
+- Users: Display Callixto users' role in the form while keeping it read-only.
+
 ## 2026-05-13
 
 ### Added
