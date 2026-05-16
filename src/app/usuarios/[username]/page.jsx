@@ -1,6 +1,6 @@
 "use client";
 import { useUserContext } from "@/User";
-import { useDeleteUser, useEditUser, useGetUser, useSetUserState } from "@/api/users";
+import { useDeleteUser, useEditUser, useGetUser, useSetUserState, useUpdateUserRole } from "@/api/users";
 import { FieldsContainer, FormField, Input, Message, MessageHeader } from "@/common/components/custom";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
@@ -26,6 +26,7 @@ const User = ({ params }) => {
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
   const editUser = useEditUser();
+  const updateUserRole = useUpdateUserRole();
   const deleteUser = useDeleteUser();
   const setUserState = useSetUserState();
 
@@ -36,6 +37,7 @@ const User = ({ params }) => {
     handleDiscard,
     handleContinue,
     onBeforeView,
+    closeModal,
   } = useUnsavedChanges({
     formRef,
     onDiscard: async () => {
@@ -82,8 +84,17 @@ const User = ({ params }) => {
     setReason("");
   };
 
+  const updateUser = async ({ user: userData, role: roleData }) => {
+    const responses = await Promise.all([
+      ...(userData ? [editUser(userData)] : []),
+      ...(roleData ? [updateUserRole(roleData)] : []),
+    ]);
+
+    return responses.find(response => !response.statusOk) || { statusOk: true };
+  };
+
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: editUser,
+    mutationFn: updateUser,
     onSuccess: (response) => {
       if (response.statusOk) {
         toast.success("Usuario actualizado!");
@@ -224,6 +235,7 @@ const User = ({ params }) => {
         isUpdating={isUpdating && !isItemInactive(user?.state)}
         view
         isDeletePending={isDeletePending}
+        separateRoleUpdate
       />
       <UnsavedChangesModal
         open={showUnsavedModal}

@@ -1,5 +1,6 @@
 export const ROLES = {
   CALLIXTO: 'callixto',
+  SADMIN: 'sadmin',
   ADMIN: 'admin',
   USER: 'user',
 }
@@ -8,9 +9,14 @@ const CALLIXTO = {
   [ROLES.CALLIXTO]: true,
 }
 
+const SADMIN = {
+  [ROLES.SADMIN]: true,
+  ...CALLIXTO
+}
+
 const ADMIN = {
   [ROLES.ADMIN]: true,
-  ...CALLIXTO
+  ...SADMIN
 }
 
 export const RULES = {
