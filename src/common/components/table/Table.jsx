@@ -406,7 +406,7 @@ const CustomTable = ({
           )}
         </Table>
         {onDownloadExcel && (
-          <Flex width="100%" $justifyContent="flex-end" >
+          <Flex width="fit-content" $alignSelf="flex-end">
             <IconedButton
               text="Descargar excel"
               icon={ICONS.FILE_EXCEL}

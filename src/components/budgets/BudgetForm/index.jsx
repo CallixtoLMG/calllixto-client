@@ -496,7 +496,7 @@ const BudgetForm = ({
             </ButtonGroup>
           </FormField>
           <GroupedButtonsControlled
-            $alignItems="self-end"
+            $alignItems="flex-end"
             name="pickUpInStore"
             width="fit-content"
             color={COLORS.BLUE}
@@ -530,7 +530,7 @@ const BudgetForm = ({
           <FormField flex="1" />
         </FieldsContainer>
         <FieldsContainer>
-          <FormField $justifyContent="end" $flexDirection="row" flex="1">
+          <FormField $justifyContent="flex-end" $flexDirection="row" flex="1">
             <NumberControlled
               flex="1"
               name="expirationOffsetDays"
@@ -607,7 +607,7 @@ const BudgetForm = ({
                 persistSelection={true}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="end" $flexDirection="row" flex="1">
+            <FormField $maxWidth="max-content" $alignItems="flex-end" $flexDirection="row" flex="1">
               <IconedButton
                 type="button"
                 text="Agregar cliente"

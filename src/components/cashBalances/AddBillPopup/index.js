@@ -85,7 +85,7 @@ export const AddBillPopup = ({
           />
           <IconedButton
             text={BUTTON_TEXTS.ADD}
-            alignSelf="end"
+            alignSelf="flex-end"
             height="38px"
             icon={ICONS.CHECK}
             color={COLORS.GREEN}

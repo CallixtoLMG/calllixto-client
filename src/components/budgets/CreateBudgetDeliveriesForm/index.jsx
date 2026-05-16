@@ -245,7 +245,7 @@ const CreateBudgetDeliveriesForm = () => {
             icon={hasPendingDeliveries ? ICONS.ADD : ICONS.MINUS}
             color={hasPendingDeliveries ? COLORS.BLUE : COLORS.ORANGE}
             onClick={handleToggleAllDeliveries}
-            alignSelf="end"
+            alignSelf="flex-end"
             disabled={!hasPendingDeliveries && !hasAnyDelivered}
             height="38px"
             iconOnly

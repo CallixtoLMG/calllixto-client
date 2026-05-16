@@ -301,7 +301,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
           {isBudgetConfirmed(budget?.state) ?
             <>
               <TotalList items={TOTAL_LIST_ITEMS} />
-              <Flex $alignSelf="end" $rowGap="15px">
+              <Flex $alignSelf="flex-end" $rowGap="15px">
                 <Popup
                   trigger={
                     <Icon
@@ -313,7 +313,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                   position="left center"
                   size="mini"
                 />
-                <Flex width="250px" $alignSelf="end" $alignItems="flex-end" $columnGap="10px">
+                <Flex width="250px" $alignSelf="flex-end" $alignItems="flex-end" $columnGap="10px">
                   <PriceControlled
                     key={budget?.postConfirmDiscount ?? 'no-discount'}
                     width="160px"
@@ -359,7 +359,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                     iconOnly
                   />
                 </Flex>
-                <Flex $columnGap="15px" $alignSelf="end">
+                <Flex $columnGap="15px" $alignSelf="flex-end">
                 </Flex>
               </Flex>
             </>

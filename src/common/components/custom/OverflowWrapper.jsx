@@ -9,7 +9,7 @@ const OverflowText = styled.div`
   max-width: ${({ $maxWidth }) => $maxWidth || "100%"};
   min-width: 0;
   height: ${({ $height }) => $height}!important;
-  align-self: ${({ $alignSelf = "end" }) => $alignSelf}!important;
+  align-self: ${({ $alignSelf = "flex-end" }) => $alignSelf}!important;
   pointer-events: auto;
   position: relative;
   line-height: normal;

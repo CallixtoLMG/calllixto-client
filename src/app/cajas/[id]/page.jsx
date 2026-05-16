@@ -279,7 +279,7 @@ const CashBalance = ({ params }) => {
                   text="Establecer fecha actual"
                   color={COLORS.BLUE}
                   onClick={() => form.setValue("closeDate", datePickerNow())}
-                  alignSelf="end"
+                  alignSelf="flex-end"
                   height="38px"
                   iconOnly
                 />

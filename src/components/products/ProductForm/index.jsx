@@ -270,7 +270,7 @@ const ProductForm = forwardRef(({
                 disabled={!isUpdating && view}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="end" $flexDirection="row" flex="1">
+            <FormField $maxWidth="max-content" $alignItems="flex-end" $flexDirection="row" flex="1">
               <IconedButtonControlled
                 name="editablePrice"
                 text={WatchEditablePrice ? "Deshabilitar precio editable" : "Habilitar precio editable"}
@@ -281,7 +281,7 @@ const ProductForm = forwardRef(({
               />
             </FormField>
           </FormField>
-          <FormField $alignItems="end" $flexDirection="row" flex="1">
+          <FormField $alignItems="flex-end" $flexDirection="row" flex="1">
             <FormField flex="1">
               <PercentField
                 width="50%"
@@ -311,7 +311,7 @@ const ProductForm = forwardRef(({
                 disabled={(!isUpdating && view || !watchFractionable)}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="end" $flexDirection="row" flex="1">
+            <FormField $maxWidth="max-content" $alignItems="flex-end" $flexDirection="row" flex="1">
               <IconedButtonControlled
                 name="fractionConfig.active"
                 text={watchFractionable ? "Deshabilitar producto fraccionable" : "Habilitar producto fraccionable"}

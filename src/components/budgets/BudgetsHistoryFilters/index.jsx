@@ -86,7 +86,7 @@ const BudgetsHistoryFilter = ({
               afterChange={(date) => handleDateChange("endDate", date)}
               width="fit-content"
             />
-            <Flex $columnGap="15px" $alignItems="end">
+            <Flex $columnGap="15px" $alignItems="flex-end">
               <IconedButton
                 disabled={isLoading}
                 isLoading={isLoading}

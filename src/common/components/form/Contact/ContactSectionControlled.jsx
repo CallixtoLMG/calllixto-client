@@ -141,7 +141,7 @@ export const ContactSectionControlled = ({
               color={COLORS.GREEN}
               onClick={handleAdd}
               onKeyDown={(e) => handleEnterKeyDown(e, handleAdd)}
-              alignSelf="end"
+              alignSelf="flex-end"
               height="38px"
             />
           </FieldsContainer>
