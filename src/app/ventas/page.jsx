@@ -3,15 +3,15 @@ import { useListBudgets } from "@/api/budgets";
 import { useGetSetting } from "@/api/settings";
 import { useListUsers } from "@/api/users";
 import { COLORS, ENTITIES, ICONS, PAGES, SHORTKEYS } from "@/common/constants";
+import { formatLastCount } from "@/common/utils/pluralization";
 import BudgetsPage from "@/components/budgets/BudgetsPage";
 import { BUDGET_STATES, DEFAULT_DATE_RANGE_VALUE } from "@/components/budgets/budgets.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
+import { useKeyboardShortcuts } from "@/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
 const Budgets = () => {
-  useValidateToken();
   const { data: usersData, isLoading: isLoadingUsers } = useListUsers();
   const { setLabels } = useBreadcrumContext();
   const { setActions } = useNavActionsContext();
@@ -31,9 +31,7 @@ const Budgets = () => {
     setLabels([{
       name: PAGES.BUDGETS.NAME,
       label: {
-        title: rangeValue === 1
-          ? 'Último mes'
-          : `Últimos ${rangeValue} meses`,
+        title: formatLastCount(rangeValue, "month"),
         color: COLORS.BLUE,
         popup: <>Para ver el historial completo de Ventas haga click en <b>Historial</b></>
       }

@@ -37,7 +37,7 @@ const BreadcrumbContainer = styled.div`
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hide = [PAGES.LOGIN.BASE, PAGES.BASE, PAGES.NOT_FOUND.BASE, PAGES.CHANGE_PASSWORD.BASE, PAGES.RESTORE_PASSWORD.BASE];
+  const hide = [PAGES.LOGIN.BASE, PAGES.BASE, PAGES.NOT_FOUND.BASE, PAGES.CHANGE_PASSWORD.BASE, PAGES.RESTORE_PASSWORD.BASE, PAGES.MAINTENANCE.BASE];
   const show = !hide.includes(pathname);
 
   const [queryClient] = useState(

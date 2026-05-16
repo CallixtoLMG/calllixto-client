@@ -4,25 +4,23 @@ import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/com
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 
 const Customer = ({ params }) => {
-  useValidateToken();
   const { push } = useRouter();
   const id = params?.id;
 
   const { data: customer, isLoading, refetch } = useGetCustomer(id, {
     enabled: !!id,
   });
-  // const { data: customer, isLoading, refetch } = useGetCustomer(params.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -258,7 +256,7 @@ const Customer = ({ params }) => {
           modalAction === INACTIVE && (
             <TextField
               ref={reasonInputRef}
-              placeholder="Motivo"
+              placeholder={PLACEHOLDERS.REASON}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

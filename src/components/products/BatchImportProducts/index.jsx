@@ -2,9 +2,10 @@ import { useCreateBatch, useEditBatch, useListProducts } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
 import { Button } from "@/common/components/custom";
 import { PriceControlled, TextControlled } from "@/common/components/form";
-import { COLORS, ENTITIES, ICONS } from "@/common/constants";
+import { COLORS, ENTITIES, FIELD_LABELS, ICONS, TOOLTIPS } from "@/common/constants";
 import { downloadExcel, normalizeText } from "@/common/utils";
 import { now } from "@/common/utils/dates";
+import { formatCount, pluralize } from "@/common/utils/pluralization";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -354,7 +355,7 @@ export const BatchImportProducts = ({ isCreating }) => {
       id: 1,
       icon: ICONS.TRASH,
       color: COLORS.RED,
-      tooltip: 'Eliminar',
+      tooltip: TOOLTIPS.DELETE,
       onClick: (element, index) => {
         deleteProduct(index);
       },
@@ -363,32 +364,32 @@ export const BatchImportProducts = ({ isCreating }) => {
 
   const PRODUCTS_COLUMNS = [
     {
-      title: "Id",
+      title: FIELD_LABELS.ID,
       value: (product) => product.id,
       id: 1,
       width: 2
     },
     {
-      title: "Nombre", value: (product, index) => (
+      title: FIELD_LABELS.NAME, value: (product, index) => (
         <TextControlled
           name={`importProducts[${index}].name`}
-          placeholder="Nombre"
+          placeholder={FIELD_LABELS.NAME}
         />
       ), id: 2, align: 'left'
     },
     {
-      title: "Costo", value: (product, index) => (
+      title: FIELD_LABELS.COST, value: (product, index) => (
         <PriceControlled
           name={`importProducts[${index}].cost`}
-          placeholder="Costo"
+          placeholder={FIELD_LABELS.COST}
         />
       ), id: 3, width: 2
     },
     {
-      title: "Precio", value: (product, index) => (
+      title: FIELD_LABELS.PRICE, value: (product, index) => (
         <PriceControlled
           name={`importProducts[${index}].price`}
-          placeholder="Precio"
+          placeholder={FIELD_LABELS.PRICE}
         />
       ), id: 4, width: 2
     },
@@ -417,10 +418,10 @@ export const BatchImportProducts = ({ isCreating }) => {
       width: 2
     },
     {
-      title: "Comentarios", value: (product, index) => (
+      title: FIELD_LABELS.COMMENTS, value: (product, index) => (
         <TextControlled
           name={`importProducts[${index}].comments`}
-          placeholder="Comentarios"
+          placeholder={FIELD_LABELS.COMMENTS}
         />
       ), id: 5, align: 'left'
     },
@@ -469,9 +470,8 @@ export const BatchImportProducts = ({ isCreating }) => {
         title="Confirmar descarga"
         description={
           <>
-            {`Se ha${downloadProducts.length === 1 ? '' : 'n'} encontrado ${downloadProducts.length
-              } producto${downloadProducts.length === 1 ? '' : 's'} (de ${totalProducts}) ${importSettings.confirmation
-              } existente${downloadProducts.length === 1 ? '' : 's'} en la lista.`}
+            {`${pluralize(downloadProducts.length, "Se ha encontrado", "Se han encontrado")} ${formatCount(downloadProducts.length, "product")} (de ${totalProducts}) ${importSettings.confirmation
+              } ${pluralize(downloadProducts.length, "existente", "existentes")} en la lista.`}
             <br />
             (incluídos los temporalmente eliminados)
             <br />
@@ -486,7 +486,7 @@ export const BatchImportProducts = ({ isCreating }) => {
         title="Confirmar descarga"
         description={
           <>
-            {`Se han encontrado ${unprocessedProductsCount} de ${selectedFile} productos con errores que no pueden ser importados.`}
+            {`${pluralize(unprocessedProductsCount, "Se ha encontrado", "Se han encontrado")} ${formatCount(unprocessedProductsCount, "product")} de ${selectedFile} con ${pluralize(unprocessedProductsCount, "error", "errores")} que ${pluralize(unprocessedProductsCount, "no puede ser importado", "no pueden ser importados")}.`}
             <br />
             ¿Deseas descargar un archivo de Excel con estos productos?
           </>

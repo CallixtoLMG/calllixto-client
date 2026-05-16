@@ -1,5 +1,7 @@
 "use client";
-import { confirmReset, recoverPassword } from "@/api/login";
+import { useUserContext } from "@/User";
+import { confirmNewPasswordRequired, confirmReset, recoverPassword } from "@/api/login";
+import { getUserData } from "@/api/userData";
 import { Form } from "@/common/components/custom";
 import { PasswordControlled, TextControlled } from "@/common/components/form";
 import { ICONS, PAGES, PASSWORD_REQUIREMENTS, RULES, SIZES } from "@/common/constants";
@@ -11,22 +13,23 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { ModButton, ModGrid, ModGridColumn, ModHeader, RedirectLink, Text } from "./styles";
 
-const RecoverPasswordForm = () => {
+const RecoverPasswordForm = ({ isFirstLogin = false }) => {
   const { push } = useRouter();
+  const { setUserData } = useUserContext();
   const methods = useForm();
-  const { handleSubmit, control, reset, watch } = methods;
-  const [isCodeSent, setIsCodeSent] = useState(false);
+  const { handleSubmit, reset, watch } = methods;
+  const [isCodeSent, setIsCodeSent] = useState(isFirstLogin);
 
   const newPassword = watch("newPassword", "");
 
   useEffect(() => {
-    if (!isCodeSent) {
+    if (!isCodeSent && !isFirstLogin) {
       reset({
         newPassword: "",
         confirmPassword: "",
       });
     }
-  }, [isCodeSent, reset]);
+  }, [isCodeSent, isFirstLogin, reset]);
 
   const { mutate: onRecoverPassword, isPending: isRecoverPasswordPending } = useMutation({
     mutationFn: recoverPassword,
@@ -64,6 +67,45 @@ const RecoverPasswordForm = () => {
     },
   });
 
+  const { mutate: onConfirmFirstLogin, isPending: isConfirmFirstLoginPending } = useMutation({
+    mutationFn: async (passwordData) => {
+      const result = await confirmNewPasswordRequired({
+        newPassword: passwordData.newPassword,
+      });
+
+      if (result.nextStep?.signInStep !== "DONE") {
+        throw new Error("El cambio de contrasena no completo el ingreso.");
+      }
+
+      const data = await getUserData();
+      return data;
+    },
+    onSuccess: (userData) => {
+      if (userData) {
+        setUserData(userData);
+        toast.success("Contrasena cambiada con exito.");
+        push(PAGES.BUDGETS.BASE);
+      } else {
+        toast.error("No se pudieron obtener los datos del usuario.");
+      }
+    },
+    onError: (error) => {
+      if (error.name?.includes("InvalidPasswordException")) {
+        toast.error("La contrasena no cumple con los requisitos.");
+      } else {
+        toast.error("Hubo un error al cambiar la contrasena.");
+        console.error("Error:", error);
+      }
+    },
+  });
+
+  const isChangingPassword = isCodeSent || isFirstLogin;
+  const isSubmitPending = isFirstLogin
+    ? isConfirmFirstLoginPending
+    : isCodeSent
+      ? isConfirmResetPending
+      : isRecoverPasswordPending;
+
   return (
     <ModGrid>
       <ModGridColumn>
@@ -82,11 +124,15 @@ const RecoverPasswordForm = () => {
         <FormProvider {...methods}>
           <Form
             onSubmit={handleSubmit((data) => {
-              isCodeSent ? onConfirmReset(data) : onRecoverPassword(data);
+              if (isFirstLogin) {
+                onConfirmFirstLogin(data);
+              } else {
+                isCodeSent ? onConfirmReset(data) : onRecoverPassword(data);
+              }
             })}
             size={SIZES.LARGE}
           >
-            {!isCodeSent ? (
+            {!isChangingPassword ? (
               <TextControlled
                 name="username"
                 rules={{
@@ -102,13 +148,15 @@ const RecoverPasswordForm = () => {
               />
             ) : (
               <>
-                <TextControlled
-                  name="confirmationCode"
-                  rules={RULES.REQUIRED}
+                {!isFirstLogin && (
+                  <TextControlled
+                    name="confirmationCode"
+                    rules={RULES.REQUIRED}
                   placeholder="Código de recuperación"
-                  icon={ICONS.MAIL_SQUARE}
-                  iconPosition="left"
-                />
+                    icon={ICONS.MAIL_SQUARE}
+                    iconPosition="left"
+                  />
+                )}
                 <PasswordControlled
                   name="newPassword"
                   rules={{
@@ -138,10 +186,10 @@ const RecoverPasswordForm = () => {
               </>
             )}
             <ModButton
-              loading={isCodeSent ? isConfirmResetPending : isRecoverPasswordPending}
+              loading={isSubmitPending}
               fluid="true"
               size={SIZES.LARGE}
-              disabled={isCodeSent ? isConfirmResetPending : isRecoverPasswordPending}
+              disabled={isSubmitPending}
             >
               {isCodeSent ? "Cambiar contraseña" : "Enviar"}
             </ModButton>

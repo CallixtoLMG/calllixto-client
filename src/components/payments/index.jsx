@@ -1,6 +1,6 @@
 import { PriceLabel } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
-import { COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
+import { COLORS, CONFIRMATION_WORDS, DATE_FORMATS, FIELD_LABELS, ICONS, PLACEHOLDERS, SIZES, TOOLTIPS } from "@/common/constants";
 import { calculateTotals } from "@/common/utils";
 import { getFormatedDate, getSortedPaymentsByDate } from "@/common/utils/dates";
 import { ModalAddPayment } from "@/components/payments/ModalAddPayment";
@@ -38,14 +38,14 @@ const getPaymentTableHeaders = () => [
   {
     id: 'amount',
     width: 3,
-    title: 'Monto',
+    title: FIELD_LABELS.AMOUNT,
     value: (element) => <PriceLabel value={element.amount} />
   },
   {
     id: 'comments',
     width: 9,
     align: "left",
-    title: 'Comentarios',
+    title: FIELD_LABELS.COMMENTS,
     value: (element) => (
       <OverflowWrapper maxWidth="30vw" popupContent={element.comments}>
         {element.comments}
@@ -144,7 +144,7 @@ const Payments = ({
                 setPaymentToDelete(element);
                 setShowDeleteModal(true);
               },
-              tooltip: 'Eliminar',
+              tooltip: TOOLTIPS.DELETE,
             },
             {
               id: 2,
@@ -154,7 +154,7 @@ const Payments = ({
                 setPaymentToEdit(element);
                 setIsModalPaymentOpen(true);
               },
-              tooltip: "Editar",
+              tooltip: TOOLTIPS.EDIT,
               width: "100%"
             }
           ]
@@ -169,8 +169,8 @@ const Payments = ({
         }}
         showModal={showDeleteModal}
         setShowModal={setShowDeleteModal}
-        confirmationWord="eliminar"
-        placeholder='Escriba "eliminar" para confirmar'
+        confirmationWord={CONFIRMATION_WORDS.DELETE}
+        placeholder={PLACEHOLDERS.confirmAction(CONFIRMATION_WORDS.DELETE)}
         confirmButtonIcon={ICONS.TRASH}
         isLoading={isLoading}
       />

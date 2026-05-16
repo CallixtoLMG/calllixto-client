@@ -7,7 +7,7 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES } from "@/common/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS, SIZES } from "@/common/constants";
 import { downloadExcel, isItemInactive } from "@/common/utils";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext, } from "@/components/layout";
 import { BatchImportStock } from "@/components/products/BatchImportStock";
@@ -15,17 +15,16 @@ import { DISCOUNT_STOCK, PRODUCT_STATES, UPLOAD_STOCK } from "@/components/produ
 import { getFormatedMargin } from "@/components/products/products.utils";
 import SupplierForm from "@/components/suppliers/SupplierForm";
 import { EXAMPLE_TEMPLATE_DATA_STOCK } from "@/components/suppliers/suppliers.constants";
-import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
-import { Dropdown } from "semantic-ui-react";
+import { Dropdown, Popup } from "semantic-ui-react";
 
 const Supplier = ({ params }) => {
-  useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
   const { data: supplier, isLoading, refetch: refetchSupplier } = useGetSupplier(params.id);
@@ -280,6 +279,15 @@ const Supplier = ({ params }) => {
         handleProtectedAction(() => {
           setConfirmationAction(action);
         });
+      const isStockExcelDisabled =
+        isExcelLoading ||
+        !!activeAction ||
+        loadingProducts ||
+        isEditPending ||
+        !hasAssociatedProducts;
+      const stockExcelTooltip = !loadingProducts && !hasAssociatedProducts
+        ? "No se puede importar stock porque no existen productos de este proveedor."
+        : false;
 
       actions = [{
         id: 1,
@@ -310,67 +318,76 @@ const Supplier = ({ params }) => {
         id: 3,
         iconOnly: true,
         button: (
-          <Dropdown
-            pointing
-            as={Button}
-            text="Stock/Excel"
-            icon={ICONS.FILE_EXCEL}
-            width="fit-content"
-            floating
-            labeled
-            button
-            className="icon"
-            disabled={
-              isExcelLoading ||
-              !!activeAction ||
-              loadingProducts ||
-              isEditPending ||
-              !hasAssociatedProducts
-            }
-          >
-            <Dropdown.Menu>
-              <DropdownItem
-                onClick={() => {
-                  if (products?.length) {
-                    setIsExcelLoading(true);
-                    handleDownloadExcel();
-                    setIsExcelLoading(false);
-                  } else {
-                    toast("No hay productos de este proveedor para descargar.", {
-                      icon: (
-                        <Icon
-                          margin="0"
-                          toast
-                          name={ICONS.INFO_CIRCLE}
-                          color={COLORS.BLUE}
-                        />
-                      ),
-                    });
-                  }
-                }}
-              >
-                <Icon name={ICONS.DOWNLOAD} color="blue" />
-                Descargar productos
-              </DropdownItem>
-              <DropdownItem  >
-                <BatchImportStock
-                  mode={UPLOAD_STOCK}
-                  supplierId={supplier?.id}
-                  products={products}
-                />
-              </DropdownItem>
-              <DropdownItem  >
-                <BatchImportStock
-                  mode={DISCOUNT_STOCK}
-                  supplierId={supplier?.id}
-                  products={products}
-                />
-              </DropdownItem>
-              <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA_STOCK, "Ejemplo de tabla stock")}>
-                <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla stock
-              </DropdownItem>
-            </Dropdown.Menu>
-          </Dropdown>
+          <Popup
+            disabled={!stockExcelTooltip}
+            position="top center"
+            size={SIZES.TINY}
+            content={(
+              <div>
+                <div><strong>Stock/Excel</strong></div>
+                <div>{stockExcelTooltip}</div>
+              </div>
+            )}
+            trigger={(
+              <div>
+                <Dropdown
+                  pointing
+                  as={Button}
+                  text="Stock/Excel"
+                  icon={ICONS.FILE_EXCEL}
+                  width="fit-content"
+                  floating
+                  labeled
+                  button
+                  className="icon"
+                  disabled={isStockExcelDisabled}
+                >
+                  <Dropdown.Menu>
+                    <DropdownItem
+                      onClick={() => {
+                        if (products?.length) {
+                          setIsExcelLoading(true);
+                          handleDownloadExcel();
+                          setIsExcelLoading(false);
+                        } else {
+                          toast("No hay productos de este proveedor para descargar.", {
+                            icon: (
+                              <Icon
+                                margin="0"
+                                toast
+                                name={ICONS.INFO_CIRCLE}
+                                color={COLORS.BLUE}
+                              />
+                            ),
+                          });
+                        }
+                      }}
+                    >
+                      <Icon name={ICONS.DOWNLOAD} color="blue" />
+                      Descargar productos
+                    </DropdownItem>
+                    <DropdownItem  >
+                      <BatchImportStock
+                        mode={UPLOAD_STOCK}
+                        supplierId={supplier?.id}
+                        products={products}
+                      />
+                    </DropdownItem>
+                    <DropdownItem  >
+                      <BatchImportStock
+                        mode={DISCOUNT_STOCK}
+                        supplierId={supplier?.id}
+                        products={products}
+                      />
+                    </DropdownItem>
+                    <DropdownItem onClick={() => downloadExcel(EXAMPLE_TEMPLATE_DATA_STOCK, "Ejemplo de tabla stock")}>
+                      <Icon name={ICONS.FILE_EXCEL_OUTLINE} />Plantilla stock
+                    </DropdownItem>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </div>
+            )}
+          />
         ),
       },
       {
@@ -461,7 +478,7 @@ const Supplier = ({ params }) => {
         bodyContent={
           confirmationAction === INACTIVE && (
             <TextField
-              placeholder="Motivo"
+              placeholder={PLACEHOLDERS.REASON}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

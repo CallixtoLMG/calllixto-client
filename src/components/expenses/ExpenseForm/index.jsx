@@ -119,7 +119,9 @@ const ExpenseForm = forwardRef(({
             <PriceControlled
               name="amount"
               label="Monto"
+              rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
+              required={isUpdating || !view}
               placeholder="18000"
             />
           </FormField>

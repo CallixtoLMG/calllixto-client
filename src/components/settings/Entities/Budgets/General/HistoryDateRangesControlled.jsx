@@ -1,8 +1,10 @@
 import { IconedButton } from "@/common/components/buttons";
 import { FlexColumn, Icon } from "@/common/components/custom";
 import { DropdownField } from "@/common/components/form";
-import { COLORS, ICONS } from "@/common/constants";
-import { BASE_HISTORY_RANGES, BUDGETS_RANGE_DATE_UNIT_CONFIG, BUDGETS_RANGE_DATE_UNIT_OPTIONS } from "@/components/settings/settings.constants";
+import { BUTTON_TEXTS, COLORS, FIELD_LABELS, ICONS } from "@/common/constants";
+import { formatCount, formatLastCount } from "@/common/utils/pluralization";
+import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
+import { BASE_HISTORY_RANGES, BUDGETS_RANGE_DATE_UNIT_CONFIG, BUDGETS_RANGE_DATE_UNIT_OPTIONS, SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useMemo, useRef, useState } from "react";
 import { useFieldArray, useFormContext } from "react-hook-form";
 import { Form, Popup } from "semantic-ui-react";
@@ -11,12 +13,8 @@ import { Label, List, ListItem } from "./styles";
 
 const getRangeLabel = ({ value, unit }) => {
   if (!unit || !value) return "";
-  const config = BUDGETS_RANGE_DATE_UNIT_CONFIG[unit];
-  const num = Number(value);
 
-  return num === 1
-    ? `${config.article.singular} ${config.singular}`
-    : `${config.article.plural} ${num} ${config.plural}`;
+  return formatLastCount(value, unit);
 };
 
 export const HistoryDateRangesControlled = () => {
@@ -42,9 +40,7 @@ export const HistoryDateRangesControlled = () => {
       return {
         key: v,
         value: v,
-        text: v === 1
-          ? `1 ${BUDGETS_RANGE_DATE_UNIT_CONFIG[unit].singular}`
-          : `${v} ${BUDGETS_RANGE_DATE_UNIT_CONFIG[unit].plural}`,
+        text: formatCount(v, unit),
       };
     });
   }, [unit]);
@@ -67,7 +63,11 @@ export const HistoryDateRangesControlled = () => {
   return (
     <FlexColumn width="50%" $rowGap="15px">
       <FlexColumn>
-        <Label> Opciones de fechas Historial Ventas</Label>
+        <Label>
+          <SettingsFieldLabel helpText={SETTINGS_HELP_TEXTS.BUDGET_HISTORY_DATE_RANGES}>
+            Opciones de fechas Historial Ventas
+          </SettingsFieldLabel>
+        </Label>
         <List divided verticalAlign="middle">
           {BASE_HISTORY_RANGES.map(range => (
             <ListItem key={range.key}>
@@ -95,7 +95,7 @@ export const HistoryDateRangesControlled = () => {
         trigger={
           <div ref={buttonRef}>
             <IconedButton
-              text="Agregar"
+              text={BUTTON_TEXTS.ADD}
               icon={ICONS.ADD}
               color={COLORS.GREEN}
               onClick={() => setOpen(true)}
@@ -116,7 +116,7 @@ export const HistoryDateRangesControlled = () => {
         <Form>
           <FlexColumn $rowGap="10px" width="300px">
             <DropdownField
-              label="Unidad"
+              label={FIELD_LABELS.UNIT}
               placeholder="Seleccione unidad"
               options={BUDGETS_RANGE_DATE_UNIT_OPTIONS}
               value={unit}
@@ -127,7 +127,7 @@ export const HistoryDateRangesControlled = () => {
               }}
             />
             <DropdownField
-              label="Cantidad"
+              label={FIELD_LABELS.QUANTITY}
               placeholder="Seleccione cantidad"
               options={valueOptions}
               value={value}
@@ -136,7 +136,7 @@ export const HistoryDateRangesControlled = () => {
               onChange={(_, data) => setValue(data.value)}
             />
             <IconedButton
-              text="Agregar"
+              text={BUTTON_TEXTS.ADD}
               icon={ICONS.ADD}
               color={COLORS.GREEN}
               disabled={!unit || !value}

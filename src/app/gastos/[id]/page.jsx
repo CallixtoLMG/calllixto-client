@@ -12,7 +12,7 @@ import { getFormatedDate, isDateAfter, now } from "@/common/utils/dates";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import Payments from "@/components/payments";
-import { useAllowUpdate, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -21,7 +21,6 @@ import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
 const Expense = ({ params }) => {
-  useValidateToken();
   const { role, userData } = useUserContext();
   const { push } = useRouter();
   const { data: expense, isLoading, refetch } = useGetExpense(params.id);
@@ -250,9 +249,13 @@ const Expense = ({ params }) => {
   ];
 
   const handleTabChange = (_, { activeIndex }) => {
-    if (onBeforeView()) {
+    const changeTab = () => {
       setActiveIndex(activeIndex);
       router.replace(window.location.pathname);
+    };
+
+    if (onBeforeView(changeTab)) {
+      changeTab();
     }
   };
 

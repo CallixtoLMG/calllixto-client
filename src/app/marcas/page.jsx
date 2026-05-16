@@ -6,13 +6,12 @@ import { downloadExcel } from "@/common/utils";
 import BrandsPage from "@/components/brands/BrandsPage";
 import { BRAND_STATES } from "@/components/brands/brands.constants";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
-import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
+import { useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Brands = () => {
-  useValidateToken();
   const { data, isLoading, isRefetching, refetch } = useListBrands();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();

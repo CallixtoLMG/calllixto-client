@@ -7,13 +7,12 @@ import { getFormatedDate } from "@/common/utils/dates";
 import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UsersPage from "@/components/users/UserPage";
 import { USERS_ROLE_OPTIONS, USER_STATES } from "@/components/users/users.constants";
-import { useKeyboardShortcuts, useValidateToken } from "@/hooks";
+import { useKeyboardShortcuts } from "@/hooks";
 import { RULES } from "@/roles";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo } from "react";
 
 const Users = () => {
-  useValidateToken();
   const { data, isLoading, isRefetching, refetch } = useListUsers();
   const { role } = useUserContext();
   const { setLabels } = useBreadcrumContext();

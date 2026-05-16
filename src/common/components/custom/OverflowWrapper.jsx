@@ -12,6 +12,7 @@ const OverflowText = styled.div`
   align-self: ${({ $alignSelf = "end" }) => $alignSelf}!important;
   pointer-events: auto;
   position: relative;
+  line-height: normal;
   z-index: 2;
   cursor: ${({ $clickable }) => ($clickable ? "pointer" : "inherit")};
 

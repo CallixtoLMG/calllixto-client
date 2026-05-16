@@ -1,17 +1,19 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
-import { RULES, SHORTKEYS } from "@/common/constants";
+import { ERROR_MESSAGES, FIELD_LABELS, RULES, SHORTKEYS } from "@/common/constants";
 import { validateEmail } from "@/common/utils";
 import { getPastDate } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks";
+import { ROLES, isCallixtoUser } from "@/roles";
+import { isEqual } from "lodash";
 import { forwardRef, useImperativeHandle } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { DatePickerControlled } from "../../../common/components/form/DatePicker";
-import { EMPTY_USER, USERS_ROLE_OPTIONS } from "../users.constants";
+import { EMPTY_USER, ROLE_LABELS, USERS_ROLE_OPTIONS } from "../users.constants";
 
 const UserForm = forwardRef(({
-  user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending
+  user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending, separateRoleUpdate = false
 }, ref) => {
 
   const getInitialValues = (user) => ({
@@ -30,6 +32,29 @@ const UserForm = forwardRef(({
   });
 
   const { trigger, watch, handleSubmit, reset, formState: { isDirty, isSubmitted } } = methods;
+  const isCallixtoRole = isCallixtoUser(user?.role);
+  const roleOptions = isCallixtoRole
+    ? [
+      {
+        key: ROLES.CALLIXTO,
+        text: ROLE_LABELS.CALLIXTO,
+        value: ROLES.CALLIXTO,
+      },
+      ...USERS_ROLE_OPTIONS,
+    ]
+    : USERS_ROLE_OPTIONS;
+
+  const getEditPayload = (data) => {
+    const currentValues = getInitialValues(user);
+    const { role, ...userData } = data;
+    const { role: currentRole, ...currentUserData } = currentValues;
+
+    return {
+      role: role !== currentRole ? { username: data.username, role } : null,
+      user: !isEqual(userData, currentUserData) ? userData : null,
+    };
+  };
+
   useImperativeHandle(ref, () => ({
     isDirty: () => isDirty,
     submitForm: () => handleSubmit(handleCreate)(),
@@ -37,7 +62,7 @@ const UserForm = forwardRef(({
   }));
 
   const handleCreate = (data) => {
-    onSubmit(data);
+    onSubmit(separateRoleUpdate ? getEditPayload(data) : data);
     reset(data);
   };
 
@@ -69,7 +94,7 @@ const UserForm = forwardRef(({
               label="Usuario"
               placeholder="martinb@hotmail.com"
               rules={{
-                required: "Este campo es obligatorio.",
+                required: ERROR_MESSAGES.REQUIRED_FIELD_ALT,
                 validate: {
                   email: (value) => validateEmail(value) || "El correo electrónico no es válido.",
                 },
@@ -90,8 +115,8 @@ const UserForm = forwardRef(({
               icon={(!isUpdating && view) ? null : undefined}
               defaultValue={user?.role || "user"}
               rules={RULES.REQUIRED}
-              options={USERS_ROLE_OPTIONS}
-              disabled={!isUpdating && view}
+              options={roleOptions}
+              disabled={isCallixtoRole || (!isUpdating && view)}
             />
           </FormField>
           <FormField flex="1" />
@@ -100,7 +125,7 @@ const UserForm = forwardRef(({
           <FormField flex="1">
             <TextControlled
               name="firstName"
-              label="Nombre"
+              label={FIELD_LABELS.NAME}
               placeholder="Martín"
               rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
@@ -134,7 +159,7 @@ const UserForm = forwardRef(({
               scrollableYearDropdown
               yearDropdownItemNumber={80}
               rules={{
-                required: "Campo requerido.",
+                required: ERROR_MESSAGES.REQUIRED_FIELD,
                 validate: (value) => {
                   const today = new Date();
                   const minBirthDate = new Date();
@@ -200,7 +225,7 @@ const UserForm = forwardRef(({
           <FormField flex="1" />
         </FieldsContainer>
         <FieldsContainer>
-          <TextAreaControlled name="comments" label="Comentarios" placeholder="Martin Bueno no era un cliente?" readOnly={!isUpdating && view} />
+          <TextAreaControlled name="comments" label={FIELD_LABELS.COMMENTS} placeholder="Martin Bueno no era un cliente?" readOnly={!isUpdating && view} />
         </FieldsContainer>
         {(isUpdating || !view) && (
           <SubmitAndRestore

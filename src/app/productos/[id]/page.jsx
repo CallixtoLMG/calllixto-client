@@ -7,14 +7,14 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, RECOVER } from "@/common/constants";
+import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS, RECOVER } from "@/common/constants";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import ProductChanges from "@/components/products/ProductChanges";
 import ProductForm from "@/components/products/ProductForm";
 import ProductStock from "@/components/products/ProductStock";
 import { GET_STOCK_FLOW_QUERY_KEY, PRODUCT_STATES, STOCK_TAB_INDEX } from "@/components/products/products.constants";
 import { isProductDeleted, isProductInactive, isProductOOS } from "@/components/products/products.utils";
-import { useAllowUpdate, useLazyTabs, useProtectedAction, useUnsavedChanges, useValidateToken } from "@/hooks";
+import { useAllowUpdate, useLazyTabs, useProtectedAction, useUnsavedChanges } from "@/hooks";
 import { RULES } from "@/roles";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -25,7 +25,6 @@ import { Tab } from "semantic-ui-react";
 import { GET_PRODUCT_QUERY_KEY } from "../../../components/products/products.constants";
 
 const Product = ({ params }) => {
-  useValidateToken();
   const { role } = useUserContext();
   const { push } = useRouter();
   const { data: product, isLoading: isLoadingProduct, refetch: isRefetchingProduct } = useGetProduct(params.id);
@@ -70,8 +69,10 @@ const Product = ({ params }) => {
   });
 
   const handleTabChange = (_, { activeIndex }) => {
-    if (onBeforeView()) {
-      onLazyTabChange(_, { activeIndex });
+    const changeTab = () => onLazyTabChange(_, { activeIndex });
+
+    if (onBeforeView(changeTab)) {
+      changeTab();
     }
   };
 
@@ -470,7 +471,7 @@ const Product = ({ params }) => {
         bodyContent={
           modalAction === INACTIVE ? (
             <TextField
-              placeholder="Motivo"
+              placeholder={PLACEHOLDERS.REASON}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />

@@ -4,13 +4,17 @@ import { Icon, List, ListItem } from "semantic-ui-react";
 import { Accent } from "../components/custom";
 import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
 import { ENTITIES } from "./entities";
+import { MAINTENANCE_PAGE } from "./maintenance";
+import { ERROR_MESSAGES } from "./texts";
 
 export * from './dates';
 export * from './entities';
+export * from './maintenance';
 export * from './semantic';
+export * from './texts';
 export * from './time';
 
-export const DEFAULT_SELECTED_CLIENT = "callixto";
+export const DEFAULT_SELECTED_ACCOUNT = "callixto";
 
 export const PAGES = {
   BASE: "/",
@@ -113,6 +117,7 @@ export const PAGES = {
   RESTORE_PASSWORD: {
     BASE: "/recuperar-contrasena"
   },
+  MAINTENANCE: MAINTENANCE_PAGE,
   NOT_FOUND: {
     BASE: "/ups"
   },
@@ -155,11 +160,6 @@ const SETTINGS_NAV_ITEMS = [
     id: "settings-customers",
     label: "Clientes",
     href: "/configuracion?tab=clientes",
-  },
-  {
-    id: "settings-suppliers",
-    label: "Proveedores",
-    href: "/configuracion?tab=proveedores",
   },
   {
     id: "settings-budgets",
@@ -289,10 +289,10 @@ export const REGEX = {
 
 export const RULES = {
   REQUIRED: {
-    required: 'Campo requerido.'
+    required: ERROR_MESSAGES.REQUIRED_FIELD
   },
   REQUIRED_PRODUCT: (value) => ({
-    required: value !== false ? 'Campo requerido.' : 'Es necesario elegir un producto',
+    required: value !== false ? ERROR_MESSAGES.REQUIRED_FIELD : ERROR_MESSAGES.REQUIRED_PRODUCT,
   }),
   REQUIRED_POSITIVE_NUMBER: {
     required: "El monto es obligatorio",
@@ -304,7 +304,7 @@ export const RULES = {
     }
   },
   REQUIRED_TWO_DIGIT: {
-    required: 'Campo requerido.',
+    required: ERROR_MESSAGES.REQUIRED_FIELD,
     pattern: { value: REGEX.TWO_DIGIT_ID, message: 'El id debe ser de 2 cifras alfanumérico' }
   },
   REQUIRED_BRAND_AND_SUPPLIER: (brand, supplier) => ({
@@ -440,6 +440,7 @@ export const ICONS = {
   MINUS: "minus",
   STICKY_NOTE: "sticky note",
   FILE_PDF: "file pdf",
+  PRINT: "print",
   LIST: "list",
   LIST_ALTERNATE: "list alternate",
   CARET_UP: "caret up",

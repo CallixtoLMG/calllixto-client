@@ -1,3 +1,5 @@
+import { formatCount, PLURAL_LABELS } from "@/common/utils/pluralization";
+
 export const LIST_SETTINGS_QUERY_KEY = "listSettings";
 export const GET_SETTING_QUERY_KEY = "getSetting";
 
@@ -17,21 +19,15 @@ export const BASE_HISTORY_RANGES = [
 export const BUDGETS_RANGE_DATE_UNIT_CONFIG = {
   day: {
     max: 31,
-    singular: "día",
-    plural: "días",
-    article: { singular: "Último", plural: "Últimos" },
+    ...PLURAL_LABELS.day,
   },
   week: {
     max: 7,
-    singular: "semana",
-    plural: "semanas",
-    article: { singular: "Última", plural: "Últimas" },
+    ...PLURAL_LABELS.week,
   },
   month: {
     max: 12,
-    singular: "mes",
-    plural: "meses",
-    article: { singular: "Último", plural: "Últimos" },
+    ...PLURAL_LABELS.month,
   },
 };
 
@@ -40,7 +36,7 @@ export const BUDGET_RANGE_DATE_MONTH_OPTIONS = Array.from({ length: 12 }, (_, i)
   return {
     key: value,
     value,
-    text: value === 1 ? "1 mes" : `${value} meses`,
+    text: formatCount(value, "month"),
   };
 });
 
@@ -60,4 +56,23 @@ export const SUPPORTED_SETTINGS = {
   GENERAL: ['paymentMethods'],
   EXPENSE: ['tags', 'categories'],
   BUDGET: ['allowConfirmExpired', 'allowCreateWithIncompleteCustomer', 'defaultPageDateRange', 'defaultsCreate', 'defaultsPDF', 'historyDateRanges'],
+};
+
+export const SETTINGS_HELP_TEXTS = {
+  TAGS: "Permite crear etiquetas para clasificar elementos y encontrarlos mas facilmente.",
+  PAYMENT_METHODS: "Permite definir los metodos de pago disponibles para ventas, presupuestos y movimientos.",
+  BLACKLIST: "Permite bloquear productos especificos para evitar que se utilicen en determinadas operaciones.",
+  CATEGORIES: "Permite organizar gastos o productos en grupos para facilitar el analisis y la gestion.",
+  BUDGET_GENERAL: "Permite configurar valores generales para consultar y revisar ventas.",
+  BUDGET_ON_CREATE: "Permite definir valores predeterminados que se completan al crear una venta.",
+  BUDGET_ON_PRINT: "Permite configurar como se muestra e imprime el PDF de una venta.",
+  BUDGET_DEFAULT_PAGE_DATE_RANGE: "Define el rango de fechas que se muestra por defecto al entrar al listado de ventas.",
+  BUDGET_HISTORY_DATE_RANGES: "Permite agregar accesos rapidos de fechas para consultar ventas anteriores en el historial.",
+  BUDGET_DEFAULT_STATE: "Define si las nuevas ventas se crean como confirmadas o pendientes por defecto.",
+  BUDGET_DEFAULT_DELIVERY: "Define si las nuevas ventas se preparan para retirar en local o para enviar a domicilio.",
+  BUDGET_DEFAULT_CUSTOMER: "Permite seleccionar un cliente que se carga automaticamente al crear una venta.",
+  BUDGET_DEFAULT_EXPIRATION_DAYS: "Define cuantos dias tendra una venta antes de vencer por defecto.",
+  BUDGET_DEFAULT_SHOW_PRICES: "Define si el PDF de la venta muestra precios por defecto.",
+  BUDGET_DEFAULT_PRINT_MODE: "Define el formato de impresion que se selecciona por defecto para el PDF.",
+  BUDGET_PDF_DISCLAIMER: "Permite agregar un texto aclaratorio que se muestra en el PDF de la venta.",
 };

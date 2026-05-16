@@ -3,6 +3,92 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-05-16
+
+### Added
+
+- Users: Added support for the `Sadmin` role (`superadmin`) between Callixto and Admin in the role hierarchy.
+
+### Changed
+
+- Users: Separated role updates from the general user update flow, using the dedicated `user/role` endpoint when the role changes.
+
+- Users: Display Callixto users' role in the form while keeping it read-only.
+
+## 2026-05-13
+
+### Added
+
+- Auth: Added support for Cognito first-login temporary password challenges, redirecting users to the existing password recovery screen in first-login mode and completing the flow with `confirmSignIn`.
+
+## 2026-05-12
+
+### Changed
+
+- Accounts: Updated the frontend account context to use `accountId`, `accounts`, `selectedAccountId`, and account-based session helpers.
+
+- Accounts: Updated Axios and local Dexie database selection to resolve requests and local storage from the active account.
+
+- Budgets: Renamed budget PDF account data usage from client to account, and renamed the customer-facing PDF mode from `client` to `customer`.
+
+- Suppliers: Added a popup message to the disabled Stock/Excel action when a supplier has no products.
+
+### Removed
+
+- Accounts: Removed legacy `clientId`, `callixtoClients`, `selectedClient`, and selected-client session compatibility from the active frontend flow.
+
+## 2026-05-07
+
+### Added
+
+- Common: Added a centralized pluralization utility with reusable helpers and shared Spanish singular/plural labels.
+
+- Common: Added reusable text constants for shared button texts, field labels, placeholders, validation messages, confirmation words, and tooltips.
+
+- Budgets: Added a print action for confirmed budget deliveries, available when delivery history exists.
+
+- Budgets: Added a dedicated printable deliveries report using the shared PDF layout components and common table headers.
+
+### Changed
+
+- Texts: Replaced repeated manual singular/plural handling in date ranges and product count messages with the shared pluralization helpers.
+
+- Texts: Replaced repeated hardcoded labels, button texts, placeholders, tooltips, and required-field messages with shared constants in common components, forms, settings, tables, products, budgets, payments, and cash balances.
+
+- Contact forms: Refactored contact handling into reusable phone, email, and address view/controlled components while preserving the existing UI and form behavior.
+
+- Contact forms: Added shared contact section components to reduce duplicated popup, table, validation, and React Hook Form field array logic.
+
+## 2026-05-06
+
+### Added
+
+- Added centralized session handling using client-side cookies for token and user data.
+
+- Added Axios interceptors to automatically attach the bearer token to requests and expire the session on `401` or `403` responses.
+
+- Added middleware guards to redirect unauthenticated users to login and redirect all routes to maintenance when maintenance mode is enabled.
+
+- Added contextual help popups to configurable Settings sections, including tags, payment methods, categories, blocked products, and budget defaults.
+
+### Changed
+
+- Updated the default `/` route to redirect to `/ventas`.
+
+- Updated session expiration feedback so login shows a clear message when the user is redirected after the session ends.
+
+- Updated selected client handling to use the centralized session helpers instead of direct storage access.
+
+- Updated unsaved changes handling so discarding changes resumes the pending navigation, route change, tab change, or protected action.
+
+- Extended unsaved changes protection to create forms for customers, brands, products, suppliers, users, expenses, and budgets.
+
+### Removed
+
+- Removed repeated page-level `useValidateToken` checks in favor of middleware and Axios interceptor handling.
+
+- Removed the unused home page content, keeping `/ventas` as the main application entry point.
+
 ## 2025-11-19
 
 ### Added
