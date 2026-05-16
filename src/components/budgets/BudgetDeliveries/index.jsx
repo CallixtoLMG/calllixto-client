@@ -1,6 +1,6 @@
 import { useConsumeStock } from "@/api/stock";
 import { IconedButton } from "@/common/components/buttons";
-import { FieldsContainer, Flex, OverflowWrapper } from "@/common/components/custom";
+import { Box, FieldsContainer, Flex, OverflowWrapper } from "@/common/components/custom";
 import { NumberField, TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { Table } from "@/common/components/table";
@@ -319,46 +319,52 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
       <FlexColumn width="100%" $rowGap="15px" className="ui form">
         <Flex $columnGap="15px" $justifyContent="space-between">
           <Header>Productos</Header>
-          <Flex $columnGap="15px">
-            <IconedButton
-              labelPosition="left"
-              icon={ICONS.ARROW_UP}
-              color={COLORS.GREEN}
-              text={!canDeliver ? "Se han entregado todos los productos" : "Entregar productos"}
-              disabled={!canDeliver || isBudgetCancelled(state)}
-              onClick={() => {
-                setMode(DELIVERY);
-                setShowModal(true);
-              }}
-              iconOnly
-            />
-            <IconedButton
-              labelPosition="left"
-              icon={ICONS.ARROW_DOWN}
-              color={COLORS.ORANGE}
-              disabled={!canReturn}
-              onClick={() => {
-                setMode(ADJUST_DELIVERY);
-                setShowModal(true);
-              }}
-              iconOnly
-              popupPosition="top left"
-              popupContent={
-                <>
-                  <strong><div>Descontar entregas</div></strong>
-                  <div>Permite reducir unidades entregadas cuando se registró una entrega por error.</div>
-                </>
-              }
-            />
-            {canPrint && (
+          <Flex>
+            <Box>
               <IconedButton
-                icon={ICONS.PRINT}
-                color={COLORS.BLUE}
-                text="Imprimir entregas"
-                onClick={onPrint}
+                labelPosition="left"
+                icon={ICONS.ARROW_UP}
+                color={COLORS.GREEN}
+                text={!canDeliver ? "Se han entregado todos los productos" : "Entregar productos"}
+                disabled={!canDeliver || isBudgetCancelled(state)}
+                onClick={() => {
+                  setMode(DELIVERY);
+                  setShowModal(true);
+                }}
+                iconOnly
+              />
+            </Box>
+            <Box $marginLeft="15px">
+              <IconedButton
+                labelPosition="left"
+                icon={ICONS.ARROW_DOWN}
+                color={COLORS.ORANGE}
+                disabled={!canReturn}
+                onClick={() => {
+                  setMode(ADJUST_DELIVERY);
+                  setShowModal(true);
+                }}
                 iconOnly
                 popupPosition="top left"
+                popupContent={
+                  <>
+                    <strong><div>Descontar entregas</div></strong>
+                    <div>Permite reducir unidades entregadas cuando se registró una entrega por error.</div>
+                  </>
+                }
               />
+            </Box>
+            {canPrint && (
+              <Box $marginLeft="15px">
+                <IconedButton
+                  icon={ICONS.PRINT}
+                  color={COLORS.BLUE}
+                  text="Imprimir entregas"
+                  onClick={onPrint}
+                  iconOnly
+                  popupPosition="top left"
+                />
+              </Box>
             )}
           </Flex>
         </Flex>

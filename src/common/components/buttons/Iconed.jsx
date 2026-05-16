@@ -56,7 +56,7 @@ const IconedButton = forwardRef(({
   }
 
   const popupTrigger = (
-    <Flex $alignSelf="end">
+    <Flex $alignSelf={alignSelf || "flex-end"}>
       {buttonElement}
     </Flex>
   );
