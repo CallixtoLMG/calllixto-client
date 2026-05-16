@@ -1,6 +1,6 @@
 import { DropdownControlled, TextControlled } from '@/common/components/form';
 import { Filters, Table } from '@/common/components/table';
-import { ENTITIES, FIELD_LABELS, PAGES } from "@/common/constants";
+import { ENTITIES, PAGES } from "@/common/constants";
 import { createFilter } from '@/common/utils';
 import { useFilters } from "@/hooks";
 import { FormProvider } from 'react-hook-form';
@@ -34,14 +34,14 @@ const CustomersPage = ({ customers = [], isLoading, onRefetch, onDownloadExcel }
               minWidth="150px"
               width="min-content"
               name="state"
-              label={FIELD_LABELS.STATE}
+              label="Estado"
               options={CUSTOMER_STATES_OPTIONS}
               value={EMPTY_FILTERS.state}
               afterChange={onSubmit}
             />
             <TextControlled
               name="name"
-              label={FIELD_LABELS.NAME}
+              label="Nombre"
               placeholder="Martín Bueno"
               width="20vw"
               minWidth="200px"

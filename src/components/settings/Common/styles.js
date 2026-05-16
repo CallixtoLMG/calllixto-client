@@ -9,7 +9,3 @@ export const AnimatedContent = styled.div`
 export const AnimatedInner = styled.div`
   overflow: ${({ $active }) => ($active ? "visible" : "hidden")};
 `;
-
-export const Span = styled.span`
-  font-weight: 700;
-`

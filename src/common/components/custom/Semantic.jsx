@@ -316,7 +316,7 @@ export const Divider = styled(SDivider)`
 export const AccordionTitle = styled(SAccordion.Title)`
   padding-bottom: 0px!important;
 
-  > i:first-child {
+  i {
     transform: rotate(${({ $active }) => ($active ? "180deg" : "0deg")})!important;
     transition: transform 0.3s ease!important;
   }

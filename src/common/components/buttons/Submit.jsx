@@ -1,10 +1,10 @@
-import { BUTTON_TEXTS, COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { IconedButton } from "./";
 
 export const Submit = ({ isUpdating, isLoading, isDirty, onClick, disabled, color = COLORS.GREEN, icon, text, submit }) => {
   return (
     <IconedButton
-      text={text ? text : isUpdating ? BUTTON_TEXTS.UPDATE : BUTTON_TEXTS.CREATE}
+      text={text ? text : isUpdating ? "Actualizar" : "Crear"}
       icon={icon ? icon : isUpdating ? ICONS.EDIT : ICONS.ADD}
       disabled={isLoading || !isDirty || disabled}
       loading={isLoading}

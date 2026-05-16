@@ -1,6 +1,6 @@
 import { Box, Flex, Label, OverflowWrapper } from "@/common/components/custom";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "@/common/components/tooltips";
-import { COLORS, FIELD_LABELS } from "@/common/constants";
+import { COLORS } from "@/common/constants";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 import { Popup } from "semantic-ui-react";
 
@@ -12,7 +12,7 @@ export const LIST_ATTRIBUTES = ["id", "name", "addresses", "phoneNumbers", "comm
 export const SUPPLIERS_COLUMNS = [
   {
     id: 1,
-    title: FIELD_LABELS.ID,
+    title: "Id",
     key: "id",
     sortable: true,
     width: 1,
@@ -21,7 +21,7 @@ export const SUPPLIERS_COLUMNS = [
   },
   {
     id: 2,
-    title: FIELD_LABELS.NAME,
+    title: "Nombre",
     align: "left",
     key: "name",
     width: 5,
@@ -37,7 +37,7 @@ export const SUPPLIERS_COLUMNS = [
   },
   {
     id: 3,
-    title: FIELD_LABELS.ADDRESS,
+    title: "Dirección",
     key: "addresses",
     sortable: true,
     width: 5,
@@ -56,7 +56,7 @@ export const SUPPLIERS_COLUMNS = [
   },
   {
     id: 4,
-    title: FIELD_LABELS.PHONE,
+    title: "Teléfono",
     width: 1,
     whiteSpace: "nowrap",
     value: (supplier) => {
@@ -89,7 +89,7 @@ export const SUPPLIER_STATES = {
 };
 
 export const EXAMPLE_TEMPLATE_DATA_STOCK = [
-  [FIELD_LABELS.ID, FIELD_LABELS.DATE, FIELD_LABELS.QUANTITY, 'Factura', FIELD_LABELS.COMMENTS],
+  ['Id', 'Fecha', 'Cantidad', 'Factura', 'Comentarios'],
   ['AABB001', '05/10/2025', 10, 'A001', 'Comentarios...'],
   ['AABB002', '25/03/2025', 20, 'A002', 'Comentarios...'],
   ['AABB003', '13/12/2025', 30, 'A003', 'Comentarios...'],

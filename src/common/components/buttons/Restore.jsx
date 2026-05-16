@@ -1,10 +1,10 @@
-import { BUTTON_TEXTS, COLORS, ICONS } from "@/common/constants";
+import { COLORS, ICONS } from "@/common/constants";
 import { IconedButton } from "./";
 
 export const Restore = ({ isUpdating, isLoading, isDirty, onClick, disabled }) => {
   return (
     <IconedButton
-      text={isUpdating ? "Restaurar" : BUTTON_TEXTS.CLEAR}
+      text={isUpdating ? "Restaurar" : "Limpiar"}
       icon={isUpdating ? ICONS.UNDO :ICONS.DELETE}
       disabled={isLoading || !isDirty || disabled}
       color={COLORS.BROWN}

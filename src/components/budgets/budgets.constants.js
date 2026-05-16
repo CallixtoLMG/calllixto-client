@@ -1,7 +1,6 @@
 import { Box, Flex, Icon, OverflowWrapper } from "@/common/components/custom";
-import { ALL, COLORS, DATE_FORMATS, FIELD_LABELS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
+import { ALL, COLORS, DATE_FORMATS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
 import { getLabelColor } from "@/common/utils";
-import { formatLastCount } from "@/common/utils/pluralization";
 import { getDateWithOffset, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
 import { parse } from "date-fns";
 import { Label, Popup } from "semantic-ui-react";
@@ -80,7 +79,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
   const columns = [
     {
       id: 1,
-      title: FIELD_LABELS.ID,
+      title: "Id",
       key: "id",
       sortable: true,
       width: 1,
@@ -146,7 +145,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
     },
     {
       id: 3,
-      title: FIELD_LABELS.DATE,
+      title: "Fecha",
       key: "date",
       sortable: true,
       whiteSpace: "nowrap",
@@ -157,7 +156,7 @@ export const getBudgetColumns = (state = BUDGET_STATES.CONFIRMED.id) => {
     },
     {
       id: 4,
-      title: FIELD_LABELS.TOTAL,
+      title: "Total",
       key: "total",
       sortable: true,
       width: 2,
@@ -232,8 +231,8 @@ export const BUDGET_PDF_FORMAT = {
     key: "dispatch",
     title: "Remito"
   },
-  CUSTOMER: {
-    key: 'customer',
+  CLIENT: {
+    key: 'client',
     icon: ICONS.ADDRESS_CARD,
     title: 'Cliente',
   },
@@ -337,11 +336,30 @@ export const BASE_BUDGETS_HISTORY_RANGES = [
   },
 ];
 
+const UNIT_CONFIG = {
+  day: {
+    singular: "día",
+    plural: "días",
+    article: { singular: "Último", plural: "Últimos" },
+  },
+  week: {
+    singular: "semana",
+    plural: "semanas",
+    article: { singular: "Última", plural: "Últimas" },
+  },
+  month: {
+    singular: "mes",
+    plural: "meses",
+    article: { singular: "Último", plural: "Últimos" },
+  },
+};
+
 export const buildCustomHistoryRanges = (historyDateRanges = []) => {
   return historyDateRanges
     .filter(r => r.unit && r.value)
     .map((range) => {
       const valueNum = Number(range.value);
+      const config = UNIT_CONFIG[range.unit];
 
       const offset =
         range.unit === 'week'
@@ -366,7 +384,10 @@ export const buildCustomHistoryRanges = (historyDateRanges = []) => {
       );
 
       return {
-        label: formatLastCount(valueNum, range.unit),
+        label:
+          valueNum === 1
+            ? `${config.article.singular} ${config.singular}`
+            : `${config.article.plural} ${valueNum} ${config.plural}`,
         value: `custom_${range.unit}_${valueNum}`,
         getRange: () => ({
           startDate: parsedDate,
@@ -509,7 +530,7 @@ export const buildBudgetDeliveriesColumns = ({
   const columns = [
     {
       id: 1,
-      title: FIELD_LABELS.ID,
+      title: "Id",
       key: "id",
       sortable: true,
       value: (product) => {
@@ -557,7 +578,7 @@ export const buildBudgetDeliveriesColumns = ({
       id: 3,
       key: "quantity",
       sortable: true,
-      title: FIELD_LABELS.QUANTITY,
+      title: "Cantidad",
       value: (product) => product.quantity,
       sortValue: (product) => Number(product.quantity),
       width: 2,
@@ -610,7 +631,7 @@ export const buildBudgetDeliveriesColumns = ({
     columns.push({
       id: 6,
       key: "comments",
-      title: FIELD_LABELS.COMMENTS,
+      title: "Comentarios",
       value: (product, index) => (
         <TextField
           placeholder="Entrega parcial"

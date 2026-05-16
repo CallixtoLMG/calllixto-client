@@ -1,7 +1,7 @@
 import { Box, Flex, OverflowWrapper } from "@/common/components/custom";
 import { PriceLabel } from "@/common/components/form";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { FIELD_LABELS, ICONS, SELECT_ALL_OPTION } from "@/common/constants";
+import { ICONS, SELECT_ALL_OPTION } from "@/common/constants";
 import { getLabelColor } from "@/common/utils";
 import { Label } from "semantic-ui-react";
 
@@ -14,7 +14,7 @@ export const LIST_ATTRIBUTES = ["id", "name", "categories", "tags", "amount", "e
 export const HEADERS = [
   {
     id: 1,
-    title: FIELD_LABELS.ID,
+    title: "Id",
     width: 1,
     value: (expense) => (
       <Box width="60px">
@@ -26,7 +26,7 @@ export const HEADERS = [
   },
   {
     id: 2,
-    title: FIELD_LABELS.NAME,
+    title: "Nombre",
     align: "left",
     width: 4,
     value: (expense) => {
@@ -59,7 +59,7 @@ export const HEADERS = [
   },
   {
     id: 4,
-    title: FIELD_LABELS.AMOUNT,
+    title: "Monto",
     align: "left",
     width: 2,
     value: (expense) => <PriceLabel value={expense.amount ?? 0} />,

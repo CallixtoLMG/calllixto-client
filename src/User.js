@@ -1,7 +1,6 @@
 'use client';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { getUserData } from './api/userData';
-import { setUserData as setSessionUserData } from './services/session';
 
 const UserContext = createContext();
 
@@ -26,15 +25,8 @@ const UserProvider = ({ children }) => {
     }
   }, [userData]);
 
-  const updateUserData = (data) => {
-    setUserData(data);
-    if (data?.isAuthorized) {
-      setSessionUserData(data);
-    }
-  };
-
   return (
-    <UserContext.Provider value={{ userData, setUserData: updateUserData, role }}>
+    <UserContext.Provider value={{ userData, setUserData, role }}>
       {children}
     </UserContext.Provider>
   );

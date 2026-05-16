@@ -118,8 +118,6 @@ export const USER_STATE_OPTIONS = Object.values(USER_STATES)
   }));
 
 export const ROLE_LABELS = {
-  CALLIXTO: 'Callixto',
-  SADMIN: 'Super administrador',
   ADMIN: 'Administrador',
   USER: 'Usuario',
 };

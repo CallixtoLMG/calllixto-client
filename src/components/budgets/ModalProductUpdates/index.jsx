@@ -1,6 +1,6 @@
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, Icon, Message } from "@/common/components/custom";
-import { BUTTON_TEXTS, COLORS, ICONS, SIZES } from "@/common/constants";
+import { COLORS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
 import { useEffect, useMemo, useRef } from "react";
@@ -122,7 +122,7 @@ const ModalProductUpdates = ({
         <Modal.Actions>
           <ButtonsContainer>
             <IconedButton
-              text={BUTTON_TEXTS.CANCEL}
+              text="Cancelar"
               icon={ICONS.CANCEL}
               color={COLORS.RED}
               onClick={onCancel}

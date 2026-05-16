@@ -1,12 +1,11 @@
 import { ENTITIES, LAST_UPDATED_AT } from '@/common/constants';
 import { config } from "@/config";
-import { getSelectedAccountId } from '@/services/session';
 import Dexie from 'dexie';
 
 let db;
 
 if (typeof window !== "undefined") {
-  db = new Dexie(`${config.APP_ENV}-Callixto-${getSelectedAccountId()}`);
+  db = new Dexie(`${config.APP_ENV}-Callixto-${localStorage.getItem("selectedClientId")}`);
   db.version(1).stores({
     [ENTITIES.CUSTOMERS]: 'id, updatedAt',
     [ENTITIES.BRANDS]: 'id, updatedAt',
