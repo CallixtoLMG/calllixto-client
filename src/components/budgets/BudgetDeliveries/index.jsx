@@ -82,7 +82,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
         quantity: quantityByRow[p.rowId],
         comments: commentsByRow[p.rowId]?.trim() || undefined,
         date: new Date().toISOString(),
-        stockControl: p.stockControl ?? true,
+        stockControl: p.stockControl === true,
       }));
 
   const handleConfirm = () => {

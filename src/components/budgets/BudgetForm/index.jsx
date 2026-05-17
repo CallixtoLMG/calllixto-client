@@ -132,6 +132,7 @@ const BudgetForm = ({
         quantity: Number(product.quantity ?? 1),
         discount: Number(product.discount ?? 0),
         editablePrice: base.editablePrice ?? product.editablePrice ?? false,
+        stockControl: base.stockControl ?? product.stockControl,
         state: base.state,
       };
       const fractionConfig = normalizeBudgetProductFractionConfig(product, {

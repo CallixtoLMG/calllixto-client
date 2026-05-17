@@ -639,7 +639,7 @@ export const buildConsumeStockFlows = (products = []) => {
       quantity: Number(p.delivered),
       comments: p.deliveryComment?.trim() || undefined,
       date: new Date().toISOString(),
-      stockControl: p.stockControl ?? true,
+      stockControl: p.stockControl === true,
       dispatchComment: p.dispatchComment
     }));
 };
