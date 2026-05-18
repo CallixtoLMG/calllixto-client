@@ -1,8 +1,8 @@
 import { Box, Flex, Icon, OverflowWrapper } from "@/common/components/custom";
 import { ALL, COLORS, DATE_FORMATS, FIELD_LABELS, ICONS, SELECT_ALL_OPTION, SORTING } from "@/common/constants";
 import { getLabelColor } from "@/common/utils";
-import { formatLastCount } from "@/common/utils/pluralization";
 import { getDateWithOffset, getFormatedDate, getStartOfUnit, now } from "@/common/utils/dates";
+import { formatLastCount } from "@/common/utils/pluralization";
 import { parse } from "date-fns";
 import { Label, Popup } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
@@ -545,8 +545,9 @@ export const buildBudgetDeliveriesColumns = ({
       key: "name",
       sortable: true,
       title: "Producto",
+      align: "left",
       value: (product) => (
-        <OverflowWrapper maxWidth="50vw" popupContent={product.name}>
+        <OverflowWrapper maxWidth="40vw" popupContent={product.name}>
           {product.name}
         </OverflowWrapper>
       ),
@@ -560,7 +561,7 @@ export const buildBudgetDeliveriesColumns = ({
       title: FIELD_LABELS.QUANTITY,
       value: (product) => product.quantity,
       sortValue: (product) => Number(product.quantity),
-      width: 2,
+      width: 1,
     },
     {
       id: 4,
@@ -603,7 +604,7 @@ export const buildBudgetDeliveriesColumns = ({
         return pending;
       },
       sortValue: (product) => getDeliveryStats(product).pending,
-      width: 2,
+      width: 1,
     },
   ];
   if (create) {

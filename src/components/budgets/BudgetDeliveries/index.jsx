@@ -143,7 +143,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
     );
   }, [operableProducts, quantityByRow]);
 
-  const headers = useMemo(
+  const budgetsDeliveriesHeaders = useMemo(
     () => buildBudgetDeliveriesColumns({
       create: false,
       setValue,
@@ -187,7 +187,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
     );
   }, [operableProducts, quantityByRow]);
 
-  const modalColumns = useMemo(() => [
+  const modalDeliveriesColumns = useMemo(() => [
     {
       id: 1,
       title: "Producto",
@@ -370,7 +370,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
         </Flex>
         <Table
           mainKey="rowId"
-          headers={headers}
+          headers={budgetsDeliveriesHeaders}
           elements={products}
         />
       </FlexColumn>
@@ -416,7 +416,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
             <FlexColumn width="100%" >
               <Table
                 mainKey="rowId"
-                headers={modalColumns}
+                headers={modalDeliveriesColumns}
                 elements={operableProducts}
                 actions={actions}
                 $actionButtonInside

@@ -269,7 +269,7 @@ const Expense = ({ params }) => {
         <FieldsContainer>
           <FormField flex="1">
             <Message negative>
-              <MessageHeader>Motivo de cancelación</MessageHeader>
+              <MessageHeader>Motivo de anulación</MessageHeader>
               <p>{expense.cancelledMsg}</p>
             </Message>
           </FormField>

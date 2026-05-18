@@ -1,7 +1,7 @@
 import { Box, Flex, FlexColumn, Icon, Label, OverflowWrapper } from "@/common/components/custom";
 import { Text } from "@/common/components/form/Search/styles";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { ALL, BUTTON_TEXTS, COLORS, DATE_FORMATS, FIELD_LABELS as COMMON_FIELD_LABELS, ICONS, IN, OUT, SIZES } from "@/common/constants";
+import { ALL, BUTTON_TEXTS, COLORS, FIELD_LABELS as COMMON_FIELD_LABELS, DATE_FORMATS, ICONS, IN, OUT, SIZES } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { Popup } from "semantic-ui-react";
@@ -97,6 +97,7 @@ export const PRODUCT_COLUMNS = [
     key: "stock",
     sortable: true,
     width: 1,
+    align: "end",
     value: (product) => (product?.stock || 0),
     sortValue: (product) => product.stock ?? ""
   },

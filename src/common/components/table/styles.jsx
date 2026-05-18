@@ -111,6 +111,7 @@ const LinkCell = styled(STable.Cell)`
   cursor: pointer;
   position: relative;
   white-space: ${({ $whiteSpace }) => `${$whiteSpace}!important`};
+  text-align: ${({ align }) => `${align}!important`};
 
   &:hover ${ActionsContainer} {
     opacity: 0.8;
