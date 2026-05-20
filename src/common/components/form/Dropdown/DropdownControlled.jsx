@@ -1,5 +1,13 @@
 import { Controller, useFormContext } from "react-hook-form";
+import { forwardRef } from "react";
 import { Dropdown, FormField } from "../../custom";
+
+const DropdownControl = forwardRef(({ dropdownMinWidth, ...props }, ref) => (
+  <Dropdown {...props} ref={ref} $minWidth={dropdownMinWidth} />
+));
+
+DropdownControl.displayName = "DropdownControl";
+
 export const DropdownControlled = ({
   name,
   width,
@@ -36,7 +44,6 @@ export const DropdownControlled = ({
           <FormField
             {...rest}
             icon={icon}
-            minWidth={minWidth}
             height={height}
             $width={width}
             $maxWidth={maxWidth}
@@ -47,7 +54,8 @@ export const DropdownControlled = ({
             search={search}
             required={required}
             selection
-            control={Dropdown}
+            control={DropdownControl}
+            dropdownMinWidth={minWidth}
             multiple={multiple}
             renderLabel={(item) => {
               if (typeof item === "string") return item;

@@ -98,7 +98,7 @@ export const Dropdown = styled(SDropdown)`
 
   &&& {
     opacity: ${({ disabled }) => disabled && "0.45"} !important;
-    min-width: ${({ minWidth }) => `${minWidth}!important`};
+    min-width: ${({ $minWidth }) => `${$minWidth}!important`};
   }
   
   .text{
