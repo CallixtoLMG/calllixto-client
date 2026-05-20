@@ -20,7 +20,8 @@ export const DropdownControlled = ({
   icon,
   textMaxWidth,
   minWidth,
-  maxWidth
+  maxWidth,
+  dataTestId = `dropdown-${name}`
 }) => {
   const { formState: { errors } } = useFormContext();
 
@@ -78,6 +79,7 @@ export const DropdownControlled = ({
               afterChange?.(value);
             }}
             disabled={disabled}
+            data-testid={dataTestId}
             error={errors?.[name] && (pickErrors ? pickErrors.includes(errors[name]?.type) : true) && {
               content: errors[name]?.message,
               pointing: 'above',

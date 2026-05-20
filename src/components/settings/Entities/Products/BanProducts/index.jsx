@@ -116,6 +116,7 @@ const Blacklist = () => {
           active={isAccordionOpen}
           helpText={SETTINGS_HELP_TEXTS.BLACKLIST}
           onClick={toggleAccordion}
+          dataTestId="settings-blocked-products-accordion"
         >
           Productos bloqueados
         </SettingsAccordionTitle>
@@ -135,6 +136,7 @@ const Blacklist = () => {
                     }}
                     onKeyDown={handleBlacklistKeyDown}
                     error={error}
+                    dataTestId="settings-blocked-product-field"
                     showPopup
                     iconLabel
                     popupPosition="top right"
@@ -154,6 +156,7 @@ const Blacklist = () => {
                     type="button"
                     onClick={handleAddBlacklist}
                     $marginTop="25px"
+                    data-testid="settings-blocked-product-add-button"
                   />
                 </Flex>
                 <Table

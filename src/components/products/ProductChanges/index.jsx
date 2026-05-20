@@ -9,7 +9,7 @@ import { PRODUCT_STATES } from "../products.constants";
 import { List, Span } from "./styles";
 
 const withOverflow = (value, color = "inherit") => (
-  <OverflowWrapper $verticalAlign="bottom" popupContent={value} maxWidth="45%">
+  <OverflowWrapper height="18px" $verticalAlign="bottom" popupContent={value} maxWidth="45%">
     <Span color={color}>{value}</Span>
   </OverflowWrapper>
 );

@@ -1,7 +1,7 @@
 import { BUTTON_TEXTS, COLORS, ICONS } from "@/common/constants";
 import { IconedButton } from "./";
 
-export const Submit = ({ isUpdating, isLoading, isDirty, onClick, disabled, color = COLORS.GREEN, icon, text, submit }) => {
+export const Submit = ({ isUpdating, isLoading, isDirty, onClick, disabled, color = COLORS.GREEN, icon, text, submit, dataTestId }) => {
   return (
     <IconedButton
       text={text ? text : isUpdating ? BUTTON_TEXTS.UPDATE : BUTTON_TEXTS.CREATE}
@@ -12,6 +12,7 @@ export const Submit = ({ isUpdating, isLoading, isDirty, onClick, disabled, colo
       color={color}
       onClick={onClick}
       width="130px"
+      dataTestId={dataTestId}
     />
   )
 }

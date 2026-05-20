@@ -2,8 +2,8 @@ import { Box, Flex, FlexColumn } from "@/common/components/custom";
 import { DropdownControlled, IconedButtonControlled, TextAreaControlled } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { BUDGET_PDF_FORMAT } from "@/components/budgets/budgets.constants";
-import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
+import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
 import { SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
 import { useState } from "react";
@@ -42,6 +42,7 @@ const OnPrint = () => {
                   icon={ICONS.EYE}
                   color={COLORS.BLUE}
                   width="fit-content"
+                  minWidth="fit-content"
                   basic={!defaultsPDF?.showPrices}
                 />
                 <DropdownControlled

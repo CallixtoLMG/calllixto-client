@@ -96,7 +96,13 @@ const ModalProductUpdates = ({
 
   return (
     <Transition visible={shouldShowModal} animation='scale' duration={500}>
-      <Modal closeOnDimmerClick={false} open={shouldShowModal} onClose={onCancel} size={SIZES.LARGE}>
+      <Modal
+        closeOnDimmerClick={false}
+        open={shouldShowModal}
+        onClose={onCancel}
+        size={SIZES.LARGE}
+        data-testid="budget-product-updates-modal"
+      >
         <Modal.Header>¿Le gustaría actualizar el presupuesto debido a las recientes modificaciones en algunos productos?</Modal.Header>
         <Message margin="10px 21px 0 21px" size="mini" >Confirmar esta acción solo actualizará el <strong>PRECIO</strong> de los productos, de lo contrario mantendrán el precio anterior.<Icon name={ICONS.INFO_CIRCLE}/></Message>
         <ModalContent>
@@ -126,6 +132,7 @@ const ModalProductUpdates = ({
               icon={ICONS.CANCEL}
               color={COLORS.RED}
               onClick={onCancel}
+              dataTestId="budget-product-updates-keep-previous-button"
             />
             <IconedButton
               text="Confirmar"
@@ -133,6 +140,7 @@ const ModalProductUpdates = ({
               color={COLORS.GREEN}
               onClick={onConfirm}
               ref={confirmButtonRef}
+              dataTestId="budget-product-updates-apply-current-button"
             />
           </ButtonsContainer>
         </Modal.Actions>

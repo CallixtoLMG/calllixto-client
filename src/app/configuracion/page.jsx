@@ -186,6 +186,7 @@ const Settings = () => {
             onReset={() => reset(data[activeEntity])}
             isDirty={isDirty}
             text={BUTTON_TEXTS.UPDATE}
+            submitDataTestId="settings-update-button"
             submit
           />
           <UnsavedChangesModal

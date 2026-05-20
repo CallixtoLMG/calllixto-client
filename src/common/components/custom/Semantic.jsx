@@ -261,7 +261,7 @@ export const Button = styled(SButton)`
     width: ${({ width = '110px' }) => `${width}!important`};
     margin-right: 0;
     position: ${({ position }) => `${position}!important`};
-    position: ${({ $minWidth }) => `${$minWidth}!important`};
+    min-width: ${({ $minWidth }) => `${$minWidth}!important`};
 
     padding: ${({ $iconOnly, padding }) =>
     $iconOnly

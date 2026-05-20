@@ -23,12 +23,15 @@ const IconedButton = forwardRef(({
   popupInverted = false,
   popupDisabled = false,
   popupContent,
+  minWidth,
+  dataTestId,
 }, ref) => {
   const buttonElement = (
     <Button
       size={SIZES.SMALL}
       icon
       $iconOnly={iconOnly}
+      $minWidth={minWidth}
       $alignSelf={alignSelf}
       labelPosition={iconOnly ? undefined : 'left'}
       position={position}
@@ -42,6 +45,7 @@ const IconedButton = forwardRef(({
       loading={loading}
       type={submit ? 'submit' : 'button'}
       onKeyDown={onKeyDown}
+      data-testid={dataTestId}
       ref={ref}
     >
       <Icon name={icon} />

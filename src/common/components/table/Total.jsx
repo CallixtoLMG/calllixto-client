@@ -68,6 +68,7 @@ export const Total = ({
             value={globalDiscount}
             onChange={onGlobalDiscountChange}
             width="100px"
+            dataTestId="budget-global-discount-field"
           />
         )
       },
@@ -84,6 +85,7 @@ export const Total = ({
             value={additionalCharge}
             onChange={onAdditionalChargeChange}
             width="100px"
+            dataTestId="budget-additional-charge-field"
           />
         )
       }

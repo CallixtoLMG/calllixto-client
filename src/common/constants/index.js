@@ -204,7 +204,7 @@ export const getNavigationItems = (role) => {
       badge: PAGES.PRODUCTS.BADGE,
     },
     {
-      id: "sales",
+      id: "budgets",
       label: "Ventas",
       icon: ICONS.SHOPPING_CART,
       children: buildEntityChildren(PAGES.BUDGETS, [
