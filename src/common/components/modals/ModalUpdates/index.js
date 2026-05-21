@@ -42,7 +42,7 @@ const ModalUpdates = () => {
       />
       <Transition visible={open} animation="scale" duration={500}>
         <StyledModal open={open} onClose={() => setOpen(false)}>
-          <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas novedades - 16 - 05 - 2026" />
+          <StyledModalHeader icon={ICONS.BULLHORN} content="Últimas novedades - 20 - 05 - 2026" />
           <StyledModalContent>
             <StyledListHeader>
               <Icon name={ICONS.ADD} color={COLORS.BLUE} />Nuevo
