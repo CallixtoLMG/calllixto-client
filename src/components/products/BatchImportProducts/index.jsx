@@ -1,6 +1,5 @@
 import { useCreateBatch, useEditBatch, useListProducts } from "@/api/products";
 import { useGetSetting } from "@/api/settings";
-import { Button } from "@/common/components/custom";
 import { PriceControlled, TextControlled } from "@/common/components/form";
 import { COLORS, ENTITIES, FIELD_LABELS, ICONS, TOOLTIPS } from "@/common/constants";
 import { downloadExcel, normalizeText } from "@/common/utils";
@@ -10,11 +9,10 @@ import { useMutation } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Checkbox, Icon } from "semantic-ui-react";
+import { Checkbox } from "semantic-ui-react";
 import * as XLSX from "xlsx";
+import { BatchImport } from "../BatchImport";
 import { ConfirmDownloadModal } from "../ConfirmDownloadModal";
-import { ModalBatchImport } from "../ModalBatchImport";
-import { BatchImportIcon } from "./styles";
 
 export const BatchImportProducts = ({ isCreating }) => {
   const { data, isLoading: loadingProducts, refetch: refetchProducts } = useListProducts();
@@ -82,40 +80,24 @@ export const BatchImportProducts = ({ isCreating }) => {
     };
   }, [isCreating, watchProducts, isLoading, handleBatchAction]);
 
-  const handleClick = useCallback(async () => {
+  const handleBeforeOpenFile = useCallback(async () => {
     await refetchProducts();
-    inputRef.current.value = null;
-    inputRef?.current?.click();
-  }, [inputRef, refetchProducts]);
+  }, [refetchProducts]);
 
   const handleModalClose = () => {
     setOpen(false);
   };
 
-  const handleFileUpload = async (e) => {
+  const handleBeforeRead = async () => {
     reset();
-    const file = e?.target.files[0];
-    if (!file || loadingProducts) return;
-    setOpen(true);
-    setIsLoading(true);
+    return refetchBlacklist().then(result => result.data.blacklist || []);
+  };
+
+  const handleFileRead = async (data, { beforeReadData }) => {
     try {
-      setSelectedFile(file.name);
-      const updatedBlacklist = await refetchBlacklist().then(result => result.data.blacklist || []);
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        try {
-          const data = event.target.result;
-          await processFile(data, products, updatedBlacklist);
-        } catch (error) {
-          console.error("Error processing file:", error);
-        }
-      };
-      reader.readAsBinaryString(file);
+      await processFile(data, products, beforeReadData);
     } catch (error) {
-      console.error("Error al cargar los datos necesarios:", error);
-    }
-    finally {
-      setIsLoading(false);
+      console.error("Error processing file:", error);
     }
   };
 
@@ -135,6 +117,9 @@ export const BatchImportProducts = ({ isCreating }) => {
       costo: "cost",
       precio: "price",
       stock: "stockControl",
+      stockcontrol: "stockControl",
+      "control de stock": "stockControl",
+      "controlar stock": "stockControl",
       estado: "state",
       comentarios: "comments",
     };
@@ -429,41 +414,31 @@ export const BatchImportProducts = ({ isCreating }) => {
 
   return (
     <>
-      <input
-        ref={inputRef}
-        type="file"
-        id="file"
-        accept=".xlsx, .xls, .xlsm"
-        style={{ display: 'none' }}
-        onChange={handleFileUpload}
-      />
-      <Button
-        height="fit-content"
-        width="fit-content"
-        $iconOnly
-        $paddingLeft="0"
-        as={BatchImportIcon}
-        onClick={handleClick}
-        type="button"
-      >
-        <Icon name={importSettings.icon} color={importSettings.color} />
-        {importSettings.button}
-      </Button>
-      <ModalBatchImport
+      <BatchImport
         open={open}
         onClose={handleModalClose}
+        onOpen={() => setOpen(true)}
+        onBeforeOpenFile={handleBeforeOpenFile}
+        onBeforeRead={handleBeforeRead}
+        onFileRead={handleFileRead}
+        onFileError={(error) => console.error("Error al cargar los datos necesarios:", error)}
         methods={methods}
         formRef={formRef}
-        products={watchProducts}
+        inputRef={inputRef}
+        rows={watchProducts}
         columns={PRODUCTS_COLUMNS}
         actions={actions}
         selectedFile={selectedFile}
+        setSelectedFile={setSelectedFile}
         importSettings={importSettings}
-        importedProductsCount={importedProductsCount}
+        importedRowsCount={importedProductsCount}
         isLoading={isLoading}
-        loadingProducts={loadingProducts}
+        setIsLoading={setIsLoading}
+        loadingRows={loadingProducts}
         isPending={isPending}
         onSubmit={onSubmitForm}
+        openBeforeRead
+        accept=".xlsx, .xls, .xlsm"
       />
       <ConfirmDownloadModal
         open={showConfirmationModal}

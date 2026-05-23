@@ -9,7 +9,7 @@ import { PRODUCT_STATES } from "../products.constants";
 import { List, Span } from "./styles";
 
 const withOverflow = (value, color = "inherit") => (
-  <OverflowWrapper $verticalAlign="bottom" popupContent={value} maxWidth="45%">
+  <OverflowWrapper as="span" $display="inline" $verticalAlign="baseline" popupContent={value} maxWidth="45%">
     <Span color={color}>{value}</Span>
   </OverflowWrapper>
 );
@@ -41,6 +41,12 @@ const renderState = ({ oldValue, newValue }) => {
 const renderEditablePrice = ({ oldValue, newValue }) => (
   <Span key={ATTRIBUTES.EDITABLE_PRICE}>
     {getLabel(ATTRIBUTES.EDITABLE_PRICE)}: <Span color={COLORS.GREY}>{oldValue ? LABELS.ACTIVE : LABELS.INACTIVE}</Span> → {newValue ? LABELS.ACTIVE : LABELS.INACTIVE}
+  </Span>
+);
+
+const renderStockControl = ({ oldValue, newValue }) => (
+  <Span key={ATTRIBUTES.STOCK_CONTROL}>
+    {getLabel(ATTRIBUTES.STOCK_CONTROL)}: <Span color={COLORS.GREY}>{oldValue ? LABELS.ACTIVE : LABELS.INACTIVE}</Span> → {newValue ? LABELS.ACTIVE : LABELS.INACTIVE}
   </Span>
 );
 
@@ -88,6 +94,7 @@ const renderFunctions = {
   [ATTRIBUTES.NAME]: renderName,
   [ATTRIBUTES.COMMENTS]: renderComments,
   [ATTRIBUTES.STATE]: renderState,
+  [ATTRIBUTES.STOCK_CONTROL]: renderStockControl,
   [ATTRIBUTES.EDITABLE_PRICE]: renderEditablePrice,
   [ATTRIBUTES.PRICE]: renderPrice,
   [ATTRIBUTES.COST]: renderCost,
