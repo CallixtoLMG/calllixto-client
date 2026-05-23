@@ -1,3 +1,4 @@
+import { PAGE_CONSTANTS } from "@/common/constants/pages";
 import { formatCount, PLURAL_LABELS } from "@/common/utils/pluralization";
 
 export const LIST_SETTINGS_QUERY_KEY = "listSettings";
@@ -41,12 +42,12 @@ export const BUDGET_RANGE_DATE_MONTH_OPTIONS = Array.from({ length: 12 }, (_, i)
 });
 
 export const ENTITY_MAPPER = {
-  PRODUCT: { name: "Productos" },
-  CUSTOMER: { name: "Clientes" },
-  BRAND: { name: "Marcas" },
-  BUDGET: { name: "Ventas" },
-  SUPPLIER: { name: "Proveedores" },
-  EXPENSE: { name: "Gastos" },
+  PRODUCT: { name: PAGE_CONSTANTS.PRODUCTS.NAME },
+  CUSTOMER: { name: PAGE_CONSTANTS.CUSTOMERS.NAME },
+  BRAND: { name: PAGE_CONSTANTS.BRANDS.NAME },
+  BUDGET: { name: PAGE_CONSTANTS.BUDGETS.NAME },
+  SUPPLIER: { name: PAGE_CONSTANTS.SUPPLIERS.NAME },
+  EXPENSE: { name: PAGE_CONSTANTS.EXPENSES.NAME },
   GENERAL: { name: "General" },
 };
 

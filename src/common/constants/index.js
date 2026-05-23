@@ -5,11 +5,13 @@ import { Accent } from "../components/custom";
 import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
 import { ENTITIES } from "./entities";
 import { MAINTENANCE_PAGE } from "./maintenance";
+import { PAGE_CONSTANTS } from "./pages";
 import { ERROR_MESSAGES } from "./texts";
 
 export * from './dates';
 export * from './entities';
 export * from './maintenance';
+export * from './pages';
 export * from './semantic';
 export * from './texts';
 export * from './time';
@@ -17,110 +19,66 @@ export * from './time';
 export const DEFAULT_SELECTED_ACCOUNT = "callixto";
 
 export const PAGES = {
-  BASE: "/",
+  BASE: PAGE_CONSTANTS.BASE,
   CUSTOMERS: {
-    BASE: "/clientes",
-    CREATE: "/clientes/crear",
+    ...PAGE_CONSTANTS.CUSTOMERS,
     UPDATE: (id) => `/clientes/${id}?update=true`,
     SHOW: (id) => `/clientes/${id}`,
-    NAME: 'Clientes',
-    SINGULAR_NAME: "Cliente",
-    SHORTKEYS: 'Control+1',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   SUPPLIERS: {
-    BASE: "/proveedores",
-    CREATE: "/proveedores/crear",
+    ...PAGE_CONSTANTS.SUPPLIERS,
     UPDATE: (id) => `/proveedores/${id}?update=true`,
     SHOW: (id) => `/proveedores/${id}`,
-    NAME: 'Proveedores',
-    SINGULAR_NAME: "Proveedor",
-    SHORTKEYS: 'Control+2',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   BRANDS: {
-    BASE: "/marcas",
-    CREATE: "/marcas/crear",
+    ...PAGE_CONSTANTS.BRANDS,
     UPDATE: (id) => `/marcas/${id}?update=true`,
     SHOW: (id) => `/marcas/${id}`,
-    NAME: 'Marcas',
-    SINGULAR_NAME: "Marca",
-    SHORTKEYS: 'Control+3',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   PRODUCTS: {
-    BASE: "/productos",
-    CREATE: "/productos/crear",
+    ...PAGE_CONSTANTS.PRODUCTS,
     UPDATE: (id) => `/productos/${id}?update=true`,
     SHOW: (id) => `/productos/${id}`,
-    NAME: 'Productos',
-    SINGULAR_NAME: "Producto",
-    SHORTKEYS: 'Control+4',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   BUDGETS: {
-    BASE: "/ventas",
-    CREATE: "/ventas/crear",
+    ...PAGE_CONSTANTS.BUDGETS,
     CLONE: (id) => `/ventas/crear?clonar=${id}`,
     SHOW: (id) => `/ventas/${id}`,
     DRAFT: (id) => `/ventas/${id}/borrador`,
-    NAME: 'Ventas',
-    SINGULAR_NAME: "Venta",
-    SHORTKEYS: 'Control+5',
     BADGE: isNewFeature('2025-01-20') ? 'new' : undefined
   },
   EXPENSES: {
-    BASE: "/gastos",
-    CREATE: "/gastos/crear",
+    ...PAGE_CONSTANTS.EXPENSES,
     CLONE: (id) => `/gastos/crear?clonar=${id}`,
     UPDATE: (id) => `/gastos/${id}?update=true`,
     SHOW: (id) => `/gastos/${id}`,
-    NAME: 'Gastos',
-    SINGULAR_NAME: "Gasto",
-    SHORTKEYS: 'Control+6',
     BADGE: isNewFeature('2025-01-01') ? 'new' : undefined
   },
   CASH_BALANCES: {
-    BASE: "/cajas",
-    CREATE: "/cajas/crear",
+    ...PAGE_CONSTANTS.CASH_BALANCES,
     UPDATE: (id) => `/cajas/${id}?update=true`,
     SHOW: (id) => `/cajas/${id}`,
-    NAME: 'Cajas',
-    SINGULAR_NAME: "Caja",
-    SHORTKEYS: 'Control+7',
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
   USERS: {
-    BASE: "/usuarios",
-    CREATE: "/usuarios/crear",
+    ...PAGE_CONSTANTS.USERS,
     SHOW: (id) => `/usuarios/${id}`,
-    NAME: 'Usuarios',
-    SINGULAR_NAME: "Usuario",
-    SHORTKEYS: 'Control+8',
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
-  BUDGETS_HISTORY: {
-    BASE: "/historial-ventas",
-  },
-  LOGIN: {
-    BASE: "/login"
-  },
+  BUDGETS_HISTORY: PAGE_CONSTANTS.BUDGETS_HISTORY,
+  LOGIN: PAGE_CONSTANTS.LOGIN,
   SETTINGS: {
-    BASE: "/configuracion",
-    NAME: 'Configuración',
-    SHORTKEYS: 'Control+9',
+    ...PAGE_CONSTANTS.SETTINGS,
     BADGE: isNewFeature('2026-01-01') ? 'new' : undefined
   },
-  CHANGE_PASSWORD: {
-    BASE: "/cambiar-contrasena"
-  },
-  RESTORE_PASSWORD: {
-    BASE: "/recuperar-contrasena"
-  },
+  CHANGE_PASSWORD: PAGE_CONSTANTS.CHANGE_PASSWORD,
+  RESTORE_PASSWORD: PAGE_CONSTANTS.RESTORE_PASSWORD,
   MAINTENANCE: MAINTENANCE_PAGE,
-  NOT_FOUND: {
-    BASE: "/ups"
-  },
+  NOT_FOUND: PAGE_CONSTANTS.NOT_FOUND,
 };
 
 const buildEntityChildren = (page, extra = []) => {
@@ -153,22 +111,22 @@ const SETTINGS_NAV_ITEMS = [
   },
   {
     id: "settings-products",
-    label: "Productos",
+    label: PAGE_CONSTANTS.PRODUCTS.NAME,
     href: "/configuracion?tab=productos",
   },
   {
     id: "settings-customers",
-    label: "Clientes",
+    label: PAGE_CONSTANTS.CUSTOMERS.NAME,
     href: "/configuracion?tab=clientes",
   },
   {
     id: "settings-budgets",
-    label: "Ventas",
+    label: PAGE_CONSTANTS.BUDGETS.NAME,
     href: "/configuracion?tab=ventas",
   },
   {
     id: "settings-expenses",
-    label: "Gastos",
+    label: PAGE_CONSTANTS.EXPENSES.NAME,
     href: "/configuracion?tab=gastos",
   },
 ];
