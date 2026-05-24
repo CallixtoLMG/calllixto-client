@@ -14,8 +14,6 @@ export * from './semantic';
 export * from './texts';
 export * from './time';
 
-export const DEFAULT_SELECTED_ACCOUNT = "callixto";
-
 export const PAGES = {
   BASE: "/",
   CUSTOMERS: {
