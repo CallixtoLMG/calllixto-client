@@ -74,6 +74,7 @@ const CustomerForm = forwardRef(({
               name="name"
               label="Nombre"
               placeholder="Martín Bueno"
+              dataTestId="customer-name-field"
               rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
               required={isUpdating || !view}

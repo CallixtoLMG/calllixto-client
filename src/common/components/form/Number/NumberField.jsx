@@ -19,6 +19,7 @@ export const NumberField = ({
   required,
   onKeyDown,
   error,
+  dataTestId,
   ...inputProps
 }) => {
   return (
@@ -30,6 +31,7 @@ export const NumberField = ({
       required={required}
       control={Input}
       error={error}
+      data-testid={dataTestId}
     >
       <Input
         {...inputProps}

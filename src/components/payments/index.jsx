@@ -104,6 +104,7 @@ const Payments = ({
                       }}
                       disabled={isTotalCovered || isLoading}
                       width="fit-content"
+                      data-testid="budget-add-payment-button"
                     />
                   </Box>
                 }

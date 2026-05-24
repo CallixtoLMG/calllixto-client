@@ -39,7 +39,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
   return (
     <FormProvider {...methods}>
       <Transition visible={open} onStart={handleOnStart} animation="scale" duration={500}>
-        <Modal size={SIZES.LARGE} open={open} onClose={onClose}>
+        <Modal size={SIZES.LARGE} open={open} onClose={onClose} data-testid="open-cash-balance-modal">
           <Header icon="inbox" content="Abrir caja" />
           <ModalContent            >
             <Form>
@@ -168,6 +168,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                           trigger("paymentMethods");
                         }
                       }}
+                      dataTestId="cash-balance-select-all-payment-methods"
                     />
                   </FormField>
                 </FormField>
@@ -180,6 +181,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                     label="Monto inicial"
                     name="initialAmount"
                     required
+                    dataTestId="cash-balance-initial-amount-field"
                   />
                 </FormField>
                 {showBillsTable ? (
@@ -208,7 +210,12 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                 <BillDetails name="billsDetails" />
               )}
               <FieldsContainer>
-                <TextAreaControlled name="comments" label={FIELD_LABELS.COMMENTS} placeholder="Solo billetes de 500" />
+                <TextAreaControlled
+                  name="comments"
+                  label={FIELD_LABELS.COMMENTS}
+                  placeholder="Solo billetes de 500"
+                  dataTestId="cash-balance-comments-field"
+                />
               </FieldsContainer>
             </Form>
           </ModalContent>
@@ -228,6 +235,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                 loading={isLoading}
                 disabled={isLoading}
                 onClick={handleSubmit(onSubmit)}
+                dataTestId="cash-balance-open-confirm"
               />
             </ButtonsContainer>
           </Modal.Actions>

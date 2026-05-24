@@ -109,6 +109,7 @@ const ExpenseForm = forwardRef(({
             <TextControlled
               name="name"
               label="Detalle"
+              dataTestId="expense-name-field"
               rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
               required={isUpdating || !view}

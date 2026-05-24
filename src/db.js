@@ -6,7 +6,8 @@ import Dexie from 'dexie';
 let db;
 
 if (typeof window !== "undefined") {
-  db = new Dexie(`${config.APP_ENV}-Callixto-${getSelectedAccountId()}`);
+  const accountStorageKey = getSelectedAccountId() || "no-account";
+  db = new Dexie(`${config.APP_ENV}-Callixto-${accountStorageKey}`);
   db.version(1).stores({
     [ENTITIES.CUSTOMERS]: 'id, updatedAt',
     [ENTITIES.BRANDS]: 'id, updatedAt',

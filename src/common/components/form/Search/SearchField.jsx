@@ -36,6 +36,7 @@ const SearchField = forwardRef(
       onAfterChange,
       onQueryChange,
       resultRenderer,
+      dataTestId,
     },
     ref
   ) => {
@@ -150,6 +151,7 @@ const SearchField = forwardRef(
         onResultSelect={handleSelect}
         disabled={disabled}
         error={error}
+        data-testid={dataTestId}
       />
     );
   }

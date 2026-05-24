@@ -308,6 +308,7 @@ const BudgetForm = ({
           width="80px"
           name={`products[${index}].quantity`}
           disabled={isProductOOS(product.state)}
+          data-testid={`budget-product-${index}-quantity-field`}
           allowsDecimal
         />
       ),
@@ -377,9 +378,14 @@ const BudgetForm = ({
                 });
               }}
               justifyItems="right"
+              dataTestId={`budget-product-${index}-price-field`}
             />
           )
-          : <PriceLabel width="100%" value={getPrice(product)} />
+          : (
+            <div data-testid={`budget-product-${index}-price-label`}>
+              <PriceLabel width="100%" value={getPrice(product)} />
+            </div>
+          )
       },
       width: 2
     },
@@ -393,6 +399,7 @@ const BudgetForm = ({
             name={`products[${index}].discount`}
             defaultValue={product.discount ?? 0}
             disabled={isProductOOS(product.state)}
+            dataTestId={`budget-product-${index}-discount-field`}
             handleChange={(v) => {
               setValue(`products.${index}.discount`, Number(v ?? 0), {
                 shouldDirty: true,
@@ -479,6 +486,7 @@ const BudgetForm = ({
                 icon={ICONS.CHECK}
                 basic={!isConfirmed}
                 color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
+                dataTestId="budget-state-confirmed-button"
                 onClick={() => setValue("state", BUDGET_STATES.CONFIRMED.id, {
                   shouldDirty: true,
                   shouldTouch: true,
@@ -489,6 +497,7 @@ const BudgetForm = ({
                 icon={ICONS.HOURGLASS_HALF}
                 basic={isConfirmed}
                 color={isConfirmed ? COLORS.GREEN : COLORS.ORANGE}
+                dataTestId="budget-state-pending-button"
                 onClick={() => setValue("state", BUDGET_STATES.PENDING.id, {
                   shouldDirty: true,
                   shouldTouch: true,
@@ -543,6 +552,7 @@ const BudgetForm = ({
               maxLength={3}
               label="Dias para el vencimiento"
               placeholder="3"
+              data-testid="budget-expiration-days-field"
               required
             />
           </FormField>
@@ -568,6 +578,7 @@ const BudgetForm = ({
                 label="Cliente"
                 required
                 clearable
+                dataTestId="budget-customer-search"
                 placeholder="Martín Bueno"
                 rules={{
                   validate: {
@@ -682,6 +693,7 @@ const BudgetForm = ({
               label="Producto"
               required
               clearAfterSelect
+              dataTestId="budget-product-search"
               placeholder="Televisor 100”"
               externalError={
                 errors.productsValidation && {
@@ -811,6 +823,7 @@ const BudgetForm = ({
           icon={currentState.icon}
           text={currentState.singularTitle}
           submit
+          submitDataTestId="budget-submit-current-state-button"
           extraButton={
             <IconedButton
               icon={BUDGET_STATES.DRAFT.icon}
@@ -822,6 +835,7 @@ const BudgetForm = ({
               color={BUDGET_STATES.DRAFT.color}
               width="fit-content"
               text={BUDGET_STATES.DRAFT.singularTitle}
+              dataTestId="budget-submit-draft-button"
             >
             </IconedButton>
           }

@@ -94,6 +94,7 @@ const ModalAction = ({
                 onChange={handleConfirmationTextChange}
                 tabIndex="0"
                 width="300px"
+                dataTestId="modal-confirmation-input"
               />
             )}
             <ButtonsContainer>
@@ -103,6 +104,7 @@ const ModalAction = ({
                 color={COLORS.RED}
                 onClick={() => setShowModal(false)}
                 disabled={isLoading}
+                dataTestId="modal-cancel"
               />
               <IconedButton
                 text={confirmButtonText}
@@ -112,6 +114,7 @@ const ModalAction = ({
                 color={COLORS.GREEN}
                 submit
                 width="fit-content"
+                dataTestId="modal-confirm"
               />
             </ButtonsContainer>
           </Form>
