@@ -12,7 +12,13 @@ const PUBLIC_ROUTES_WHEN_AVAILABLE = [
   MAINTENANCE_PAGE.BASE,
 ];
 
-const isPublicRoute = (pathname) => PUBLIC_ROUTES_WHEN_AVAILABLE.includes(pathname);
+const PUBLIC_ROUTE_PREFIXES_WHEN_AVAILABLE = [
+  "/presupuestos",
+];
+
+const isPublicRoute = (pathname) =>
+  PUBLIC_ROUTES_WHEN_AVAILABLE.includes(pathname) ||
+  PUBLIC_ROUTE_PREFIXES_WHEN_AVAILABLE.some((route) => pathname === route || pathname.startsWith(`${route}/`));
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;

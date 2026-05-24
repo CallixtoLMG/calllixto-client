@@ -1,7 +1,7 @@
 "use client";
 import { COLORS, ICONS } from "@/common/constants";
 import { Header, Icon } from "semantic-ui-react";
-import { MainContainer } from "../ups/styles";
+import { MainContainer } from "@/app/(private)/ups/styles";
 
 const Maintenance = () => (
   <MainContainer>
