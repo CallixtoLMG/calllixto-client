@@ -1,5 +1,4 @@
 "use client";
-import { useUserContext } from "@/User";
 import { getUserData } from "@/api/userData";
 import { ICONS, PAGES, RULES, SIZES } from "@/common/constants";
 import { Loader } from "@/components/layout";
@@ -14,7 +13,6 @@ import { PasswordControlled, TextControlled } from "../../common/components/form
 import { ModButton, ModGrid, ModGridColumn, ModHeader, PasswordLink, Text } from "./styles";
 
 const LoginForm = ({ onSubmit }) => {
-  const { setUserData } = useUserContext();
   const { push } = useRouter();
   const methods = useForm();
   const { handleSubmit } = methods;
@@ -41,7 +39,6 @@ const LoginForm = ({ onSubmit }) => {
       const userData = result?.userData;
       if (userData) {
         setIsRedirecting(true);
-        setUserData(userData);
         toast.success("Ingreso exitoso!");
         push(PAGES.BUDGETS.BASE);
       } else {

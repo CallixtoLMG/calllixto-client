@@ -1,45 +1,15 @@
 "use client";
-import { UserProvider } from "@/User";
-import { RouteHistoryProvider } from "@/app/RouteHistoryContext";
-import { BackToListButton, GoBackButton } from "@/common/components/buttons";
-import { PAGES } from "@/common/constants";
-import { BreadcrumProvider, Breadcrumb, Header, NavActions, NavActionsProvider, Toaster } from "@/components/layout";
+import { Toaster } from "@/components/layout";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Inter } from 'next/font/google';
-import { usePathname } from "next/navigation";
 import { useState } from "react";
 import 'semantic-ui-css/semantic.min.css';
-import styled from "styled-components";
 import StyledComponentsRegistry from './registry';
-import { GlobalStyle, LayoutChildrenContainer } from "./stylesLayout";
+import { GlobalStyle } from "./stylesLayout";
 
 const inter = Inter({ subsets: ['latin'] });
 
-const NavigationContainer = styled.div`
-  position: fixed;
-  top: 60px;
-  padding: 10px 50px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  column-gap: 20px;
-  background-color: #fff;
-  width: 100%;
-  border-bottom: 1px solid #ddd;
-  z-index: 3;
-`;
-
-const BreadcrumbContainer = styled.div`
-  display: flex;
-  align-items: center;
-  column-gap: 10px;
-`;
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const hide = [PAGES.LOGIN.BASE, PAGES.BASE, PAGES.NOT_FOUND.BASE, PAGES.CHANGE_PASSWORD.BASE, PAGES.RESTORE_PASSWORD.BASE, PAGES.MAINTENANCE.BASE];
-  const show = !hide.includes(pathname);
-
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -64,28 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               duration: 4000
             }} />
           <QueryClientProvider client={queryClient}>
-            <UserProvider>
-              <RouteHistoryProvider>
-                <Header />
-                <NavActionsProvider>
-                  <BreadcrumProvider pathname={pathname}>
-                    {show && (
-                      <NavigationContainer>
-                        <BreadcrumbContainer>
-                          <GoBackButton />
-                          <BackToListButton />
-                          <Breadcrumb />
-                        </BreadcrumbContainer>
-                        <NavActions />
-                      </NavigationContainer>
-                    )}
-                    <LayoutChildrenContainer>
-                      {children}
-                    </LayoutChildrenContainer>
-                  </BreadcrumProvider>
-                </NavActionsProvider>
-              </RouteHistoryProvider>
-            </UserProvider>
+            {children}
           </QueryClientProvider>
         </body>
       </StyledComponentsRegistry>

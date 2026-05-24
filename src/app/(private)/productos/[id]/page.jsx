@@ -22,7 +22,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Tab } from "semantic-ui-react";
-import { GET_PRODUCT_QUERY_KEY } from "../../../components/products/products.constants";
+import { GET_PRODUCT_QUERY_KEY } from "@/components/products/products.constants";
 
 const Product = ({ params }) => {
   const { role } = useUserContext();
