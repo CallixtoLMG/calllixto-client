@@ -39,7 +39,6 @@ const LoginForm = ({ onSubmit }) => {
       const userData = result?.userData;
       if (userData) {
         setIsRedirecting(true);
-        // setUserData(userData);
         toast.success("Ingreso exitoso!");
         push(PAGES.BUDGETS.BASE);
       } else {
