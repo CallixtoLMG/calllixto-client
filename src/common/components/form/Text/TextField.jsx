@@ -64,7 +64,8 @@ export const TextField = forwardRef(({
   readOnly,
   textAlign,
   $truncateInput,
-  onKeyDown
+  onKeyDown,
+  dataTestId
 }, ref) => {
   const [isFocused, setIsFocused] = useState(false);
 
@@ -103,6 +104,7 @@ export const TextField = forwardRef(({
       error={error}
       disabled={disabled}
       required={required}
+      data-testid={dataTestId}
     >
       {disabled ? (
         <Input
