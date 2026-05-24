@@ -1,24 +1,21 @@
 "use client";
 
 import { useAddSupplierStock } from "@/api/stock";
-import { Button } from "@/common/components/custom";
 import { TextControlled } from "@/common/components/form";
 import { COLORS, ICONS } from "@/common/constants";
 import { downloadExcel, normalizeText } from "@/common/utils";
 import { getDateUTC } from "@/common/utils/dates";
+import { BatchImport } from "@/components/products/BatchImport";
 import { ConfirmDownloadModal } from "@/components/products/ConfirmDownloadModal";
-import { ModalBatchImport } from "@/components/products/ModalBatchImport";
 import { useMutation } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
-import { Icon } from "semantic-ui-react";
 import * as XLSX from "xlsx";
 import { NumberControlled } from "../../../common/components/form";
 import { DISCOUNT_STOCK, UPLOAD_STOCK } from "../products.constants";
-import { BatchImportIcon } from "./styles";
 
 dayjs.extend(customParseFormat);
 
@@ -57,30 +54,16 @@ export const BatchImportStock = ({
     },
   };
 
-  const handleOpenFile = () => {
+  const handleBeforeOpenFile = () => {
     reset();
-    inputRef.current.value = null;
-    inputRef.current.click();
   };
 
-  const handleFileUpload = async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setSelectedFile(file.name);
-    setIsLoading(true);
-
+  const handleFileRead = async (data, { open }) => {
     try {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        parseExcel(event.target.result);
-        setOpenModal(true);
-      };
-      reader.readAsBinaryString(file);
+      parseExcel(data);
+      open();
     } catch (err) {
       toast.error("Error al leer el archivo");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -393,40 +376,25 @@ export const BatchImportStock = ({
 
   return (
     <>
-      <input
-        ref={inputRef}
-        type="file"
-        accept=".xlsx,.xls,.xlsm"
-        style={{ display: "none" }}
-        onChange={handleFileUpload}
-      />
-      <Button
-        height="fit-content"
-        width="fit-content"
-        $paddingLeft="0"
-        as={BatchImportIcon}
-        onClick={handleOpenFile}
-        type="button"
-        $iconOnly
-      >
-        <Icon
-          name={importSettings.icon}
-          color={importSettings.color}
-        />
-        {importSettings.title}
-      </Button>
-      <ModalBatchImport
+      <BatchImport
         open={openModal}
         onClose={handleCloseModal}
+        onOpen={() => setOpenModal(true)}
+        onBeforeOpenFile={handleBeforeOpenFile}
+        onFileRead={handleFileRead}
+        onFileError={() => toast.error("Error al leer el archivo")}
         methods={methods}
         formRef={formRef}
-        products={flows}
+        inputRef={inputRef}
+        rows={flows}
         columns={STOCK_COLUMNS}
         actions={actions}
         selectedFile={selectedFile}
+        setSelectedFile={setSelectedFile}
         importSettings={importSettings}
-        importedProductsCount={flows.length}
+        importedRowsCount={flows.length}
         isLoading={isLoading}
+        setIsLoading={setIsLoading}
         isPending={isPending}
         onSubmit={onSubmitForm}
       />
