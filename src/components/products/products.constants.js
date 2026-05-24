@@ -35,6 +35,7 @@ export const ATTRIBUTES = {
   NAME: "name",
   COMMENTS: "comments",
   STATE: "state",
+  STOCK_CONTROL: "stockControl",
   EDITABLE_PRICE: "editablePrice",
   PRICE: "price",
   COST: "cost",
@@ -220,6 +221,7 @@ export const FIELD_LABELS = {
   fractionConfig: "Medida",
   tags: "Etiquetas",
   editablePrice: "Precio editable",
+  stockControl: "Control de stock",
   price: "Precio",
   cost: "Costo",
 };

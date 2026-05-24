@@ -122,6 +122,7 @@ const Categories = () => {
           active={isAccordionOpen}
           helpText={SETTINGS_HELP_TEXTS.CATEGORIES}
           onClick={toggleAccordion}
+          dataTestId="settings-categories-accordion"
         >
           Categorias
         </SettingsAccordionTitle>
@@ -139,6 +140,7 @@ const Categories = () => {
                     error={errors?.name}
                     required
                     flex="1"
+                    dataTestId="settings-category-name-field"
                   />
                   <DropdownField
                     flex="1"
@@ -147,6 +149,7 @@ const Categories = () => {
                     options={SEMANTIC_COLORS}
                     value={categoryToAdd.color}
                     onChange={(e, { value }) => setCategoryToAdd({ ...categoryToAdd, color: value })}
+                    dataTestId="settings-category-color-dropdown"
                   />
                   <TextField
                     flex="1"
@@ -156,6 +159,7 @@ const Categories = () => {
                     onChange={(e) => setCategoryToAdd({ ...categoryToAdd, description: e.target.value })}
                     onKeyDown={(e) => handleEnterKeyDown(e, handleAddCategory)}
                     error={errors?.description}
+                    dataTestId="settings-category-description-field"
                   />
                   <Button
                     size={SIZES.SMALL}
@@ -166,6 +170,7 @@ const Categories = () => {
                     type="button"
                     onClick={handleAddCategory}
                     $marginTop="25px"
+                    data-testid="settings-category-add-button"
                   />
                 </FieldsContainer>
               <Table

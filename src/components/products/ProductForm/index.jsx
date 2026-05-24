@@ -133,6 +133,7 @@ const ProductForm = forwardRef(({
                   name="supplier"
                   label="Proveedor"
                   placeholder="Suministro Estrella"
+                  dataTestId="product-supplier-search"
                   persistSelection
                   required
                   rules={{
@@ -169,6 +170,7 @@ const ProductForm = forwardRef(({
                   name="brand"
                   label="Marca"
                   placeholder="CallixtoGLM"
+                  dataTestId="product-brand-search"
                   persistSelection
                   required
                   rules={{
@@ -202,6 +204,7 @@ const ProductForm = forwardRef(({
                 <TextControlled
                   name="id"
                   label={FIELD_LABELS.ID}
+                  dataTestId="product-id-field"
                   required
                   placeholder="A0001"
                   rules={{
@@ -227,6 +230,7 @@ const ProductForm = forwardRef(({
               name="name"
               label={FIELD_LABELS.NAME}
               placeholder="Televisor 100”"
+              dataTestId="product-name-field"
               rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
               required={isUpdating || !view}
@@ -239,6 +243,7 @@ const ProductForm = forwardRef(({
                 text={watchStockControl ? "Deshabilitar control de stock" : "Habilitar control de stock"}
                 icon={ICONS.BOXES}
                 color={COLORS.BLUE}
+                dataTestId="product-stock-control-toggle"
                 disabled={!isUpdating && view}
                 iconOnly
               />
@@ -258,6 +263,7 @@ const ProductForm = forwardRef(({
             <PriceControlled
               name="cost"
               label={FIELD_LABELS.COST}
+              dataTestId="product-cost-field"
               disabled={!isUpdating && view}
               maxLength={19}
             />
@@ -267,6 +273,7 @@ const ProductForm = forwardRef(({
               <PriceControlled
                 name="price"
                 label={FIELD_LABELS.PRICE}
+                dataTestId="product-price-field"
                 disabled={!isUpdating && view}
               />
             </FormField>
@@ -306,6 +313,7 @@ const ProductForm = forwardRef(({
               <DropdownControlled
                 name="fractionConfig.unit"
                 label="Unidad de medida"
+                dataTestId="product-unit-dropdown"
                 options={Object.values(MEASSURE_UNITS)}
                 defaultValue={Object.values(MEASSURE_UNITS)[0].value}
                 disabled={(!isUpdating && view || !watchFractionable)}
@@ -316,6 +324,7 @@ const ProductForm = forwardRef(({
                 name="fractionConfig.active"
                 text={watchFractionable ? "Deshabilitar producto fraccionable" : "Habilitar producto fraccionable"}
                 icon={ICONS.CUT}
+                dataTestId="product-fraction-toggle"
                 disabled={!isUpdating && view}
                 color={COLORS.BLUE}
                 iconOnly

@@ -37,6 +37,7 @@ const useNavActionsContext = () => {
 const NavActions = () => {
   const { actions, info } = useNavActionsContext();
   const [open, setOpen] = useState(false);
+  const getActionTestId = (text) => text ? `nav-action-${text.toLowerCase()}` : undefined;
 
   return (
     <>
@@ -64,6 +65,7 @@ const NavActions = () => {
                   iconOnly={iconOnly}
                   popupContent={popupContent}
                   popupPosition={popupPosition}
+                  dataTestId={getActionTestId(text)}
                 />
               )}
             </Box>

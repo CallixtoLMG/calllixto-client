@@ -79,6 +79,7 @@ export const ContactSectionControlled = ({
             width="fit-content"
             tabIndex={0}
             role="button"
+            data-testid={`contact-add-${section}`}
             ref={buttonRef}
             onClick={() => setOpen(true)}
             onKeyDown={(e) => {
@@ -130,6 +131,7 @@ export const ContactSectionControlled = ({
                     }
                   }}
                   onKeyDown={(e) => handleEnterKeyDown(e, handleAdd)}
+                  data-testid={`contact-${section}-${fieldConfig.name}`}
                 >
                   {index === 0 ? <input ref={firstInputRef} /> : undefined}
                 </FormField>
@@ -143,6 +145,7 @@ export const ContactSectionControlled = ({
               onKeyDown={(e) => handleEnterKeyDown(e, handleAdd)}
               alignSelf="flex-end"
               height="38px"
+              dataTestId={`contact-confirm-${section}`}
             />
           </FieldsContainer>
         </Form>

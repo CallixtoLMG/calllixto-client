@@ -332,6 +332,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                   setShowModal(true);
                 }}
                 iconOnly
+                dataTestId="budget-open-delivery-modal-button"
               />
             </Box>
             <Box $marginLeft="15px">
@@ -397,6 +398,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
               onChange={(e) =>
                 setDeliveryNote(e.target.value)
               }
+              dataTestId="budget-delivery-note-field"
             />
             <Flex $columnGap="14px" $alignSelf="flex-end" >
               <IconedButton
@@ -411,6 +413,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                 disabled={!operableProducts.length}
                 iconOnly
                 popupPosition="top left"
+                dataTestId="budget-complete-all-deliveries-button"
               />
             </Flex>
             <FlexColumn width="100%" >

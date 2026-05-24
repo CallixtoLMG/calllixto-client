@@ -52,6 +52,11 @@ const Expense = ({ params }) => {
   }, [setLabels, expense, refetch]);
 
   useEffect(() => {
+    if (!expense) {
+      setActions([]);
+      return;
+    }
+
     const actionsList = [];
 
     if (RULES.canRemove[role]) {

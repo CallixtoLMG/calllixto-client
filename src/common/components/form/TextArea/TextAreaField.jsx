@@ -9,7 +9,8 @@ export const TextAreaField = forwardRef(({
   disabled,
   readOnly,
   onChange,
-  error
+  error,
+  dataTestId
 }, ref) => {
   return (
     <FormField
@@ -22,6 +23,7 @@ export const TextAreaField = forwardRef(({
       readOnly={readOnly}
       onChange={onChange}
       error={error}
+      data-testid={dataTestId}
       ref={ref}
     />
   );

@@ -5,6 +5,7 @@ import { Loader } from "@/components/layout";
 import { useMutation } from "@tanstack/react-query";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Form } from "../../common/components/custom";
@@ -15,6 +16,7 @@ const LoginForm = ({ onSubmit }) => {
   const { push } = useRouter();
   const methods = useForm();
   const { handleSubmit } = methods;
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const { mutate: login, isPending } = useMutation({
     mutationFn: async (dataLogin) => {
@@ -28,6 +30,7 @@ const LoginForm = ({ onSubmit }) => {
     },
     onSuccess: (result) => {
       if (result?.nextStep?.signInStep === "CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED") {
+        setIsRedirecting(true);
         toast.success("Código correcto! Ahora debes cambiar tu contrasena para completar el ingreso.");
         push(`${PAGES.RESTORE_PASSWORD.BASE}?primerIngreso=true`);
         return;
@@ -35,6 +38,8 @@ const LoginForm = ({ onSubmit }) => {
 
       const userData = result?.userData;
       if (userData) {
+        setIsRedirecting(true);
+        // setUserData(userData);
         toast.success("Ingreso exitoso!");
         push(PAGES.BUDGETS.BASE);
       } else {
@@ -47,7 +52,7 @@ const LoginForm = ({ onSubmit }) => {
   });
 
   return (
-    <Loader active={isPending}>
+    <Loader active={isPending || isRedirecting}>
       <ModGrid>
         <ModGridColumn>
           <ModHeader as="h3">

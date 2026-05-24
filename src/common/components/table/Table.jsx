@@ -248,7 +248,7 @@ const CustomTable = ({
                   if (page) {
                     const rowKey = typeof mainKey === "function" ? mainKey(element, index) : element[mainKey];
                     return (
-                      <TableRow key={rowKey || index}>
+                      <TableRow key={rowKey || index} data-testid="table-row" data-row-id={rowKey || ""}>
                         {isSelectable && (
                           <Cell $basic={basic}>
                             <CenteredFlex>
@@ -292,6 +292,7 @@ const CustomTable = ({
                               <LinkContent
                                 data-href={href || ""}
                                 data-clickable={!!href}
+                                data-testid={`table-cell-${header.key || header.id}`}
                               >
                                 {header.value(element, index)}
                               </LinkContent>
@@ -307,7 +308,7 @@ const CustomTable = ({
                                   onOpen={() => setPopupOpenId(element[mainKey])}
                                   onClose={() => setPopupOpenId(null)}
                                   position="left center"
-                                  trigger={<Button icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
+                                  trigger={<Button type="button" data-testid="table-row-actions-trigger" icon circular color={COLORS.BLUE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                   buttons={actions.map((action, idx) => {
                                     const resolvedIcon = resolveActionProp(action.icon, element, index);
                                     const resolvedColor = resolveActionProp(action.color, element, index);
@@ -330,6 +331,7 @@ const CustomTable = ({
                                         loading={resolvedLoading}
                                         basic={resolvedBasic}
                                         iconOnly={action.iconOnly}
+                                        dataTestId={`table-row-action-${action.id}`}
                                       />
                                     );
                                   })}
@@ -345,7 +347,7 @@ const CustomTable = ({
                   }
                   const rowKey = typeof mainKey === "function" ? mainKey(element, index) : element[mainKey];
                   return (
-                    <TableRow key={rowKey || index}>
+                    <TableRow key={rowKey || index} data-testid="table-row" data-row-id={rowKey || ""}>
                       {headers.map(header => (
                         <Cell
                           key={`cell_${header.id}`}
@@ -366,7 +368,7 @@ const CustomTable = ({
                                 onOpen={() => setPopupOpenId(element[mainKey])}
                                 onClose={() => setPopupOpenId(null)}
                                 position="left center"
-                                trigger={<Button type="button" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
+                                trigger={<Button type="button" data-testid="table-row-actions-trigger" icon circular color={COLORS.ORANGE} size="mini"><Icon name={ICONS.COG} /></Button>}
                                 buttons={actions.map((action, idx) => {
                                   const resolvedIcon = resolveActionProp(action.icon, element, index);
                                   const resolvedColor = resolveActionProp(action.color, element, index);
@@ -388,6 +390,7 @@ const CustomTable = ({
                                       loading={resolvedLoading}
                                       basic={resolvedBasic}
                                       iconOnly={action.iconOnly}
+                                      dataTestId={`table-row-action-${action.id}`}
                                     />
                                   );
                                 })}

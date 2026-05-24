@@ -4,7 +4,7 @@ import { Popup } from "semantic-ui-react";
 import styled, { css } from "styled-components";
 
 const OverflowText = styled.div`
-  display: inline-block;
+  display: ${({ $display }) => $display || "inline-block"};
   width: fit-content;
   max-width: ${({ $maxWidth }) => $maxWidth || "100%"};
   min-width: 0;
@@ -34,6 +34,7 @@ const OverflowText = styled.div`
 
 export const OverflowWrapper = ({
   children,
+  as,
   popupContent,
   position = "top center",
   maxWidth = "100%",
@@ -41,6 +42,7 @@ export const OverflowWrapper = ({
   height,
   $verticalAlign,
   $alignSelf,
+  $display,
   onClick,
 }) => {
   const { push } = useRouter();
@@ -103,12 +105,14 @@ export const OverflowWrapper = ({
       disabled={!isTruncated}
       trigger={
         <OverflowText
+          as={as}
           ref={textRef}
           $maxWidth={maxWidth}
           $lineClamp={$lineClamp}
           $height={height}
           $verticalAlign={$verticalAlign}
           $alignSelf={$alignSelf}
+          $display={$display}
           $clickable={isClickable}
           onClick={handleClick}
         >
