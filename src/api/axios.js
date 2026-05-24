@@ -1,7 +1,6 @@
 import { PAGES } from "@/common/constants";
 import { expireSession, getSelectedAccountId, getToken, getUserData } from "@/services/session";
 import axios from 'axios';
-import { isCallixtoUser } from "../roles";
 
 const getAccountId = () => {
   if (typeof window === 'undefined') return null;
@@ -9,13 +8,7 @@ const getAccountId = () => {
   const userData = getUserData();
   if (!userData) return null;
 
-  const accountId = userData.accountId;
-
-  if (isCallixtoUser(accountId)) {
-    return getSelectedAccountId();
-  }
-
-  return accountId;
+  return getSelectedAccountId(userData);
 };
 
 let axiosInstance = null;

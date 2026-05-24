@@ -5,6 +5,7 @@ import {
   getSelectedAccountId,
   getUserData as getSessionUserData,
   getToken,
+  setSelectedAccountId,
   setUserData as setSessionUserData,
 } from "@/services/session";
 import axios from "axios";
@@ -46,12 +47,16 @@ export async function getUserData() {
 };
 
 function setSelectedAccountData(data) {
-  const accountId = data?.accountId;
+  const role = data?.role ?? data?.roles?.[0];
 
-  if (accountId === ROLES.CALLIXTO) {
-    const selectedAccountId = getSelectedAccountId();
+  if (role === ROLES.CALLIXTO) {
+    const selectedAccountId = getSelectedAccountId(data);
     const accounts = data?.accounts?.items ?? [];
     const selectedAccount = accounts.find(account => account.id === selectedAccountId);
+
+    if (selectedAccountId) {
+      setSelectedAccountId(selectedAccountId);
+    }
 
     data.selectedAccount = selectedAccount ?? null;
   }
