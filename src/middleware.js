@@ -13,7 +13,7 @@ const PUBLIC_ROUTES_WHEN_AVAILABLE = [
 ];
 
 const PUBLIC_ROUTE_PREFIXES_WHEN_AVAILABLE = [
-  "/presupuestos",
+  "/ventas",
 ];
 
 const isPublicRoute = (pathname) =>
