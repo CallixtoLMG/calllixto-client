@@ -1,20 +1,10 @@
-import { getCashBalanceById } from "@/api/cashBalances.server";
-import { PAGE_CONSTANTS } from "@/common/constants/pages";
-import { redirect } from "next/navigation";
-import CashBalancePage from "./CashBalancePage";
+import { getEntityById } from "@/api/entity";
+import PageClient from "./page.client";
 
 const CashBalance = async ({ params }) => {
-  const { cashBalance, status } = await getCashBalanceById(params?.id);
+  const cashBalance = await getEntityById({ id: params?.id, path: "cash-balances", responseEntity: "cashBalance" });
 
-  if ([401, 403].includes(status)) {
-    redirect(PAGE_CONSTANTS.LOGIN.BASE);
-  }
-
-  if (!cashBalance) {
-    redirect(PAGE_CONSTANTS.NOT_FOUND.BASE);
-  }
-
-  return <CashBalancePage cashBalance={cashBalance} />;
+  return <PageClient cashBalance={cashBalance} />;
 };
 
 export default CashBalance;

@@ -25,13 +25,12 @@ import toast from "react-hot-toast";
 import { Dropdown } from "semantic-ui-react";
 import { v4 as uuid } from 'uuid';
 
-const BudgetPage = ({ budget: initialBudget }) => {
+const PageClient = ({ budget }) => {
   const { role } = useUserContext();
   const { userData } = useUserContext();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const { push, refresh } = useRouter();
-  const [budget, setBudget] = useState(initialBudget);
   const {
     activeIndex,
     onTabChange,
@@ -59,10 +58,6 @@ const BudgetPage = ({ budget: initialBudget }) => {
     resetActions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    setBudget(initialBudget);
-  }, [initialBudget]);
 
   const methods = useForm({
     defaultValues: budget,
@@ -257,7 +252,7 @@ const BudgetPage = ({ budget: initialBudget }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        setBudget((currentBudget) => response.budget ?? currentBudget);
+        refresh();
         toast.success('Presupuesto confirmado!');
         setIsModalConfirmationOpen(false);
       } else {
@@ -277,7 +272,7 @@ const BudgetPage = ({ budget: initialBudget }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        setBudget((currentBudget) => response.budget ?? currentBudget);
+        refresh();
         toast.success('Presupuesto anulado!');
         setIsModalCancelOpen(false);
       } else {
@@ -370,4 +365,4 @@ const BudgetPage = ({ budget: initialBudget }) => {
   );
 };
 
-export default BudgetPage;
+export default PageClient;

@@ -1,20 +1,10 @@
-import { getSupplierById } from "@/api/suppliers.server";
-import { PAGE_CONSTANTS } from "@/common/constants/pages";
-import { redirect } from "next/navigation";
-import SupplierPage from "./SupplierPage";
+import { getEntityById } from "@/api/entity";
+import PageClient from "./page.client";
 
 const Supplier = async ({ params }) => {
-  const { supplier, status } = await getSupplierById(params?.id);
+  const supplier = await getEntityById({ id: params?.id, path: "suppliers", responseEntity: "supplier" });
 
-  if ([401, 403].includes(status)) {
-    redirect(PAGE_CONSTANTS.LOGIN.BASE);
-  }
-
-  if (!supplier) {
-    redirect(PAGE_CONSTANTS.NOT_FOUND.BASE);
-  }
-
-  return <SupplierPage supplier={supplier} />;
+  return <PageClient supplier={supplier} />;
 };
 
 export default Supplier;

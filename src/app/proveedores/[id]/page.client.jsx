@@ -24,10 +24,9 @@ import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Dropdown, Popup } from "semantic-ui-react";
 
-const SupplierPage = ({ supplier: initialSupplier }) => {
+const PageClient = ({ supplier }) => {
   const { role } = useUserContext();
-  const { push } = useRouter();
-  const [supplier, setSupplier] = useState(initialSupplier);
+  const { push, refresh } = useRouter();
   const { data: products, isLoading: loadingProducts, refetch: refetchProducts } = useProductsBySupplierId(supplier.id);
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
@@ -118,7 +117,7 @@ const SupplierPage = ({ supplier: initialSupplier }) => {
     mutationFn: editSupplier,
     onSuccess: (response) => {
       if (response.statusOk) {
-        setSupplier((currentSupplier) => response.supplier ?? currentSupplier);
+        refresh();
         toast.success('Proveedor actualizado!');
         setIsUpdating(false);
       } else {
@@ -170,7 +169,7 @@ const SupplierPage = ({ supplier: initialSupplier }) => {
     mutationFn: setSupplierState,
     onSuccess: (response, variables) => {
       if (response.statusOk) {
-        setSupplier((currentSupplier) => response.supplier ?? currentSupplier);
+        refresh();
         toast.success(
           variables.state === ACTIVE
             ? 'Proveedor activado!'
@@ -487,4 +486,4 @@ const SupplierPage = ({ supplier: initialSupplier }) => {
   );
 };
 
-export default SupplierPage;
+export default PageClient;

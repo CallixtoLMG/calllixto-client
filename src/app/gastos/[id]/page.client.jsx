@@ -20,10 +20,9 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
-const ExpensePage = ({ expense: initialExpense }) => {
+const PageClient = ({ expense }) => {
   const { role, userData } = useUserContext();
-  const { push } = useRouter();
-  const [expense, setExpense] = useState(initialExpense);
+  const { push, refresh } = useRouter();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalCancelOpen, setIsModalCancelOpen] = useState(false);
@@ -107,7 +106,7 @@ const ExpensePage = ({ expense: initialExpense }) => {
     mutationFn: editExpense,
     onSuccess: (response) => {
       if (response.statusOk) {
-        setExpense((currentExpense) => response.expense ?? currentExpense);
+        refresh();
         toast.success("Gasto actualizado!");
         expenseAllow.setIsUpdating(false);
       } else {
@@ -130,7 +129,7 @@ const ExpensePage = ({ expense: initialExpense }) => {
     },
     onSuccess: (response) => {
       if (response.statusOk) {
-        setExpense((currentExpense) => response.expense ?? currentExpense);
+        refresh();
         toast.success('Gasto anulado!');
         setIsModalCancelOpen(false);
       } else {
@@ -295,4 +294,4 @@ const ExpensePage = ({ expense: initialExpense }) => {
   );
 };
 
-export default ExpensePage;
+export default PageClient;

@@ -1,32 +1,32 @@
 "use client";
-import { useDeleteCustomer, useEditCustomer, useSetCustomerState } from "@/api/customers";
+import { useUserContext } from "@/User";
+import { useDeleteBrand, useEditBrand, useSetBrandState } from "@/api/brands";
+import { useHasProductsByBrandId } from "@/api/products";
 import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
 import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
-import CustomerForm from "@/components/customers/CustomerForm";
-import { useBreadcrumContext, useNavActionsContext } from "@/components/layout";
+import BrandForm from "@/components/brands/BrandForm";
+import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import { useAllowUpdate, useProtectedAction, useUnsavedChanges } from "@/hooks";
+import { RULES } from "@/roles";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 
-const CustomerPage = ({ customer: initialCustomer }) => {
-  const { push } = useRouter();
-  const [customer, setCustomer] = useState(initialCustomer);
+const PageClient = ({ brand }) => {
+  const { role } = useUserContext();
+  const { push, refresh } = useRouter();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState(null);
   const [activeAction, setActiveAction] = useState(null);
   const [reason, setReason] = useState("");
-  const editCustomer = useEditCustomer();
-  const deleteCustomer = useDeleteCustomer();
-  const setCustomerState = useSetCustomerState();
-  const reasonInputRef = useRef(null);
+  const editBrand = useEditBrand();
   const formRef = useRef(null);
 
   const {
@@ -44,9 +44,14 @@ const CustomerPage = ({ customer: initialCustomer }) => {
   });
 
   const { isUpdating, toggleButton, setIsUpdating } = useAllowUpdate({
-    canUpdate: true,
+    canUpdate: RULES.canUpdate[role],
     onBeforeView,
   });
+
+  const deleteBrand = useDeleteBrand();
+  const setBrandState = useSetBrandState();
+
+  const { hasAssociatedProducts, isLoadingProducts } = useHasProductsByBrandId(brand?.id);
   const { handleProtectedAction } = useProtectedAction({ formRef, onBeforeView });
 
   useEffect(() => {
@@ -55,30 +60,30 @@ const CustomerPage = ({ customer: initialCustomer }) => {
   }, []);
 
   useEffect(() => {
-    setLabels([{ name: PAGES.CUSTOMERS.NAME }, { name: customer?.name }]);
-  }, [customer, setLabels]);
+    setLabels([{ name: PAGES.BRANDS.NAME }, { name: brand?.name }]);
+  }, [setLabels, brand]);
 
   const modalConfig = useMemo(() => ({
     delete: {
       header: (
-        <>¿Está seguro que desea eliminar el cliente <i>{customer?.name} ({customer?.id}) </i> ?</>
+        <>¿Está seguro que desea eliminar la marca <i>{brand?.name} ({brand?.id}) </i> ?</>
       ),
       confirmText: "eliminar",
-      icon: ICONS.TRASH
+      icon: ICONS.TRASH,
     },
     active: {
       header: (
-        <>¿Está seguro que desea activar el cliente <i>{customer?.name} ({customer?.id}) </i> ?</>
+        <>¿Está seguro que desea activar la marca <i>{brand?.name} ({brand?.id}) </i> ?</>
       ),
       icon: ICONS.PLAY_CIRCLE
     },
     inactive: {
       header: (
-        <>¿Está seguro que desea desactivar el cliente <i>{customer?.name} ({customer?.id}) </i> ?</>
+        <>¿Está seguro que desea desactivar la marca <i>{brand?.name} ({brand?.id}) </i> ?</>
       ),
       icon: ICONS.PAUSE_CIRCLE
     },
-  }), [customer]);
+  }), [brand]);
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -87,11 +92,11 @@ const CustomerPage = ({ customer: initialCustomer }) => {
   };
 
   const { mutate: mutateEdit, isPending: isEditPending } = useMutation({
-    mutationFn: editCustomer,
+    mutationFn: editBrand,
     onSuccess: (response) => {
       if (response.statusOk) {
-        setCustomer((currentCustomer) => response.customer ?? currentCustomer);
-        toast.success("Cliente actualizado!");
+        refresh();
+        toast.success("Marca actualizada!");
         setIsUpdating(false);
       } else {
         toast.error(`${response?.message} (${response?.error?.message})`);
@@ -104,16 +109,13 @@ const CustomerPage = ({ customer: initialCustomer }) => {
     },
   });
 
-  const { mutate: mutateState, isPending: isMutateStatePending } = useMutation({
-    mutationFn: setCustomerState,
-    onSuccess: (response, variables) => {
+
+  const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
+    mutationFn: () => deleteBrand(brand.id),
+    onSuccess: (response) => {
       if (response.statusOk) {
-        setCustomer((currentCustomer) => response.customer ?? currentCustomer);
-        toast.success(
-          variables.state === ACTIVE
-            ? 'Cliente activado!'
-            : 'Cliente desactivado!'
-        );
+        toast.success("Marca eliminada permanentemente!");
+        push(PAGES.BRANDS.BASE);
       } else {
         toast.error(`${response?.message} (${response?.error?.message})`);
       }
@@ -124,12 +126,16 @@ const CustomerPage = ({ customer: initialCustomer }) => {
     },
   });
 
-  const { mutate: mutateDelete, isPending: isDeletePending } = useMutation({
-    mutationFn: () => deleteCustomer(customer.id),
-    onSuccess: (response) => {
+  const { mutate: mutateState, isPending: isMutateStatePending } = useMutation({
+    mutationFn: setBrandState,
+    onSuccess: (response, variables) => {
       if (response.statusOk) {
-        toast.success("Cliente eliminado permanentemente!");
-        push(PAGES.CUSTOMERS.BASE);
+        refresh();
+        toast.success(
+          variables.state === ACTIVE
+            ? 'Marca activada!'
+            : 'Marca desactivada!'
+        );
       } else {
         toast.error(`${response?.message} (${response?.error?.message})`);
       }
@@ -142,7 +148,7 @@ const CustomerPage = ({ customer: initialCustomer }) => {
 
   const handleActionConfirm = async () => {
     if (modalAction === INACTIVE && !reason) {
-      toast.error("Debe proporcionar una razón para desactivar al cliente.");
+      toast.error("Debe proporcionar una razón para desactivar la marca.");
       return;
     }
 
@@ -154,7 +160,7 @@ const CustomerPage = ({ customer: initialCustomer }) => {
 
     if (modalAction === ACTIVE || modalAction === INACTIVE) {
       mutateState({
-        id: customer.id,
+        id: brand.id,
         state: modalAction,
         ...(modalAction === INACTIVE && { inactiveReason: reason }),
       });
@@ -167,65 +173,62 @@ const CustomerPage = ({ customer: initialCustomer }) => {
   const requiresConfirmation = modalAction === DELETE;
 
   useEffect(() => {
-    const handleClick = (action) => () => handleProtectedAction(() => {
-      setModalAction(action);
-      setIsModalOpen(true);
-    });
+    if (brand) {
+      const handleClick = (action) => () => handleProtectedAction(() => {
+        setModalAction(action);
+        setIsModalOpen(true);
+      });
 
-    if (customer) {
-      const actions = [
+      const actions = RULES.canRemove[role] ? [
         {
           id: 1,
-          icon: isItemInactive(customer.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
+          icon: isItemInactive(brand?.state) ? ICONS.PLAY_CIRCLE : ICONS.PAUSE_CIRCLE,
           color: COLORS.GREY,
-          onClick: handleClick(isItemInactive(customer.state) ? ACTIVE : INACTIVE),
-          text: isItemInactive(customer.state) ? "Activar" : "Desactivar",
+          text: isItemInactive(brand?.state) ? "Activar" : "Desactivar",
+          onClick: handleClick(isItemInactive(brand?.state) ? ACTIVE : INACTIVE),
           loading: (activeAction === ACTIVE || activeAction === INACTIVE),
-          disabled: !!activeAction || isEditPending,
-          iconOnly: true
+          disabled: !!activeAction,
+          iconOnly:true
         },
         {
           id: 2,
           icon: ICONS.TRASH,
           color: COLORS.RED,
-          onClick: handleClick(DELETE),
           text: "Eliminar",
-          tooltip: customer.hasBudgets ? "No se puede eliminar este cliente, existen presupuestos asociados." : false,
           basic: true,
+          onClick: handleClick(DELETE),
           loading: activeAction === DELETE,
-          disabled: customer.hasBudgets || !!activeAction || isEditPending,
-          iconOnly: true,
-          popupPosition: "bottom left"
+          disabled: hasAssociatedProducts || !!activeAction,
+          tooltip: hasAssociatedProducts ? "No se puede eliminar esta marca, existen productos asociados." : false,
+          iconOnly:true
         },
-      ];
-
+      ] : [];
       setActions(actions);
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customer, activeAction, isMutateStatePending, isDeletePending, isEditPending, setActions]);
+  }, [role, brand, activeAction, isMutateStatePending, isDeletePending, setActions, hasAssociatedProducts]);
 
   return (
-    <>
-      {!isItemInactive(customer?.state) && toggleButton}
-      {isItemInactive(customer?.state) && (
+    <Loader active={isLoadingProducts}>
+      {!isItemInactive(brand?.state) && toggleButton}
+      {isItemInactive(brand?.state) && (
         <FieldsContainer>
           <FormField flex="1">
             <Message negative>
               <MessageHeader>Motivo de inactivación</MessageHeader>
-              <p>{customer.inactiveReason}</p>
+              <p>{brand.inactiveReason}</p>
             </Message>
           </FormField>
           <FormField flex="1" />
           <FormField flex="1" />
         </FieldsContainer>
       )}
-      <CustomerForm
+      <BrandForm
         ref={formRef}
-        customer={customer}
+        brand={brand}
         onSubmit={mutateEdit}
         isLoading={isEditPending}
-        isUpdating={isUpdating && !isItemInactive(customer?.state)}
+        isUpdating={isUpdating && !isItemInactive(brand?.state)}
         view
         isDeletePending={isDeletePending}
       />
@@ -244,11 +247,9 @@ const CustomerPage = ({ customer: initialCustomer }) => {
         isLoading={isDeletePending || isMutateStatePending}
         noConfirmation={!requiresConfirmation}
         disableButtons={!reason && modalAction === INACTIVE}
-        reasonInputRef={reasonInputRef}
         bodyContent={
           modalAction === INACTIVE && (
             <TextField
-              ref={reasonInputRef}
               placeholder={PLACEHOLDERS.REASON}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -256,8 +257,8 @@ const CustomerPage = ({ customer: initialCustomer }) => {
           )
         }
       />
-    </>
+    </Loader>
   );
 };
 
-export default CustomerPage;
+export default PageClient;

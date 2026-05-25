@@ -1,5 +1,7 @@
+import { PAGE_CONSTANTS } from "@/common/constants/pages";
+import { isCallixtoUser, ROLES } from "@/roles";
 import { cookies } from "next/headers";
-import { ROLES, isCallixtoUser } from "@/roles";
+import { redirect } from "next/navigation";
 
 const TOKEN_KEY = "token";
 const USER_DATA_KEY = "userData";
@@ -23,34 +25,25 @@ const decodeCookieJson = (value) => {
   }
 };
 
-export const getServerAccountId = () => {
+const getServerAuth = () => {
   const cookieStore = cookies();
   const userData = decodeCookieJson(cookieStore.get(USER_DATA_KEY)?.value);
-  const accountId = userData?.accountId;
-
-  if (!accountId) return null;
-
-  if (isCallixtoUser(accountId)) {
-    return cookieStore.get(SELECTED_ACCOUNT_KEY)?.value || DEFAULT_SELECTED_ACCOUNT;
-  }
-
-  return accountId;
-};
-
-export const getServerAuth = () => {
-  const cookieStore = cookies();
+  const userAccountId = userData?.accountId;
+  const accountId = isCallixtoUser(userAccountId)
+    ? cookieStore.get(SELECTED_ACCOUNT_KEY)?.value || DEFAULT_SELECTED_ACCOUNT
+    : userAccountId;
 
   return {
     token: cookieStore.get(TOKEN_KEY)?.value,
-    accountId: getServerAccountId(),
+    accountId,
   };
 };
 
-export const getServerEntityById = async ({ id, path, responseEntity }) => {
+export const getEntityById = async ({ id, path, responseEntity }) => {
   const { token, accountId } = getServerAuth();
 
   if (!id || !token || !accountId) {
-    return { [responseEntity]: null, status: 401 };
+    redirect(PAGE_CONSTANTS.LOGIN.BASE);
   }
 
   const accountBaseUrl = `${process.env.NEXT_PUBLIC_URL}${accountId}`.replace(/\/$/, "");
@@ -61,14 +54,20 @@ export const getServerEntityById = async ({ id, path, responseEntity }) => {
     cache: "no-store",
   });
 
+  if ([401, 403].includes(response.status)) {
+    redirect(PAGE_CONSTANTS.LOGIN.BASE);
+  }
+
   if (!response.ok) {
-    return { [responseEntity]: null, status: response.status };
+    redirect(PAGE_CONSTANTS.NOT_FOUND.BASE);
   }
 
   const data = await response.json();
+  const entity = data?.[responseEntity];
 
-  return {
-    [responseEntity]: data?.[responseEntity] ?? null,
-    status: response.status,
-  };
+  if (!entity) {
+    redirect(PAGE_CONSTANTS.NOT_FOUND.BASE);
+  }
+
+  return entity;
 };

@@ -24,10 +24,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "react-hot-toast";
 import { Tab } from "semantic-ui-react";
 
-const CashBalancePage = ({ cashBalance: initialCashBalance }) => {
+const PageClient = ({ cashBalance }) => {
   const { role } = useUserContext();
-  const { push } = useRouter();
-  const [cashBalance, setCashBalance] = useState(initialCashBalance);
+  const { push, refresh } = useRouter();
   const { setLabels } = useBreadcrumContext();
   const { resetActions, setActions } = useNavActionsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -102,7 +101,7 @@ const CashBalancePage = ({ cashBalance: initialCashBalance }) => {
     mutationFn: editCashBalance,
     onSuccess: (response) => {
       if (response.statusOk) {
-        setCashBalance((currentCashBalance) => response.cashBalance ?? currentCashBalance);
+        refresh();
         toast.success("Caja actualizada!");
         setIsUpdating(false);
       } else {
@@ -136,7 +135,7 @@ const CashBalancePage = ({ cashBalance: initialCashBalance }) => {
     mutationFn: (data) => closeCashBalance(cashBalance.id, data),
     onSuccess: (response) => {
       if (response.statusOk) {
-        setCashBalance((currentCashBalance) => response.cashBalance ?? currentCashBalance);
+        refresh();
         toast.success("Caja cerrada!");
       } else {
         toast.error(`${response?.message} (${response?.error?.message})`);
@@ -314,4 +313,4 @@ const CashBalancePage = ({ cashBalance: initialCashBalance }) => {
   );
 };
 
-export default CashBalancePage;
+export default PageClient;

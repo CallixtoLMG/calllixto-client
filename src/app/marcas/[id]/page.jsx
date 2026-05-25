@@ -1,20 +1,10 @@
-import { getBrandById } from "@/api/brands.server";
-import { PAGE_CONSTANTS } from "@/common/constants/pages";
-import { redirect } from "next/navigation";
-import BrandPage from "./BrandPage";
+import { getEntityById } from "@/api/entity";
+import PageClient from "./page.client";
 
 const Brand = async ({ params }) => {
-  const { brand, status } = await getBrandById(params?.id);
+  const brand = await getEntityById({ id: params?.id, path: "brands", responseEntity: "brand" });
 
-  if ([401, 403].includes(status)) {
-    redirect(PAGE_CONSTANTS.LOGIN.BASE);
-  }
-
-  if (!brand) {
-    redirect(PAGE_CONSTANTS.NOT_FOUND.BASE);
-  }
-
-  return <BrandPage brand={brand} />;
+  return <PageClient brand={brand} />;
 };
 
 export default Brand;

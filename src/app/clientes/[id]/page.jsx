@@ -1,20 +1,10 @@
-import { getCustomerById } from "@/api/customers.server";
-import { PAGE_CONSTANTS } from "@/common/constants/pages";
-import { redirect } from "next/navigation";
-import CustomerPage from "./CustomerPage";
+import { getEntityById } from "@/api/entity";
+import PageClient from "./page.client";
 
 const Customer = async ({ params }) => {
-  const { customer, status } = await getCustomerById(params?.id);
+  const customer = await getEntityById({ id: params?.id, path: "customers", responseEntity: "customer" });
 
-  if ([401, 403].includes(status)) {
-    redirect(PAGE_CONSTANTS.LOGIN.BASE);
-  }
-
-  if (!customer) {
-    redirect(PAGE_CONSTANTS.NOT_FOUND.BASE);
-  }
-
-  return <CustomerPage customer={customer} />;
+  return <PageClient customer={customer} />;
 };
 
 export default Customer;

@@ -23,10 +23,9 @@ import { toast } from "react-hot-toast";
 import { useReactToPrint } from "react-to-print";
 import { Tab } from "semantic-ui-react";
 
-const ProductPage = ({ product: initialProduct }) => {
+const PageClient = ({ product }) => {
   const { role } = useUserContext();
-  const { push } = useRouter();
-  const [product, setProduct] = useState(initialProduct);
+  const { push, refresh } = useRouter();
 
   const {
     activeIndex,
@@ -160,7 +159,7 @@ const ProductPage = ({ product: initialProduct }) => {
     mutationFn: editProduct,
     onSuccess: (response) => {
       if (response.statusOk) {
-        setProduct((currentProduct) => response.product ?? currentProduct);
+        refresh();
         toast.success("Producto actualizado!");
         setIsUpdating(false);
       } else {
@@ -178,7 +177,7 @@ const ProductPage = ({ product: initialProduct }) => {
     mutationFn: setProductState,
     onSuccess: (response, variables) => {
       if (response.statusOk) {
-        setProduct((currentProduct) => response.product ?? currentProduct);
+        refresh();
         toast.success(
           variables.state === ACTIVE
             ? 'producto activado!'
@@ -198,7 +197,7 @@ const ProductPage = ({ product: initialProduct }) => {
     mutationFn: () => recoverProduct(product),
     onSuccess: (response) => {
       if (response.statusOk) {
-        setProduct((currentProduct) => response.product ?? currentProduct);
+        refresh();
         toast.success("Producto activado!");
       } else {
         toast.error(`${response?.message} (${response?.error?.message})`);
@@ -232,12 +231,9 @@ const ProductPage = ({ product: initialProduct }) => {
 
   const { mutate: mutateCreateStockFlow, isPending: isPendingCreateStockFlow } = useMutation({
     mutationFn: createStockFlow,
-    onSuccess: (response, variables) => {
+    onSuccess: (response) => {
       if (response.statusOk) {
-        setProduct((currentProduct) => ({
-          ...currentProduct,
-          stock: (currentProduct?.stock ?? 0) + (variables.inflow ? variables.quantity : -variables.quantity),
-        }));
+        refresh();
         toast.success("Movimiento de stock registrado");
         queryClient.invalidateQueries({
           queryKey: [GET_STOCK_FLOW_QUERY_KEY, product.id],
@@ -480,4 +476,4 @@ const ProductPage = ({ product: initialProduct }) => {
   );
 };
 
-export default ProductPage;
+export default PageClient;

@@ -1,20 +1,10 @@
-import { getExpenseById } from "@/api/expenses.server";
-import { PAGE_CONSTANTS } from "@/common/constants/pages";
-import { redirect } from "next/navigation";
-import ExpensePage from "./ExpensePage";
+import { getEntityById } from "@/api/entity";
+import PageClient from "./page.client";
 
 const Expense = async ({ params }) => {
-  const { expense, status } = await getExpenseById(params?.id);
+  const expense = await getEntityById({ id: params?.id, path: "expenses", responseEntity: "expense" });
 
-  if ([401, 403].includes(status)) {
-    redirect(PAGE_CONSTANTS.LOGIN.BASE);
-  }
-
-  if (!expense) {
-    redirect(PAGE_CONSTANTS.NOT_FOUND.BASE);
-  }
-
-  return <ExpensePage expense={expense} />;
+  return <PageClient expense={expense} />;
 };
 
 export default Expense;
