@@ -17,6 +17,7 @@ import { toast } from "react-hot-toast";
 
 const User = ({ params }) => {
   const { role } = useUserContext();
+  const canUpdateUserRole = RULES.canUpdateUserRole[role];
   const { push } = useRouter();
   const { data: user, isLoading, refetch } = useGetUser(decodeURIComponent(params.username));
   const { setLabels } = useBreadcrumContext();
@@ -87,7 +88,7 @@ const User = ({ params }) => {
   const updateUser = async ({ user: userData, role: roleData }) => {
     const responses = await Promise.all([
       ...(userData ? [editUser(userData)] : []),
-      ...(roleData ? [updateUserRole(roleData)] : []),
+      ...(canUpdateUserRole && roleData ? [updateUserRole(roleData)] : []),
     ]);
 
     return responses.find(response => !response.statusOk) || { statusOk: true };
@@ -236,6 +237,7 @@ const User = ({ params }) => {
         view
         isDeletePending={isDeletePending}
         separateRoleUpdate
+        canUpdateRole={canUpdateUserRole}
       />
       <UnsavedChangesModal
         open={showUnsavedModal}

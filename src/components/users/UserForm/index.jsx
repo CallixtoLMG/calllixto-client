@@ -13,7 +13,7 @@ import { DatePickerControlled } from "../../../common/components/form/DatePicker
 import { EMPTY_USER, ROLE_LABELS, USERS_ROLE_OPTIONS } from "../users.constants";
 
 const UserForm = forwardRef(({
-  user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending, separateRoleUpdate = false
+  user = EMPTY_USER, onSubmit, isLoading, isUpdating, view, isDeletePending, separateRoleUpdate = false, canUpdateRole = true
 }, ref) => {
 
   const getInitialValues = (user) => ({
@@ -50,7 +50,7 @@ const UserForm = forwardRef(({
     const { role: currentRole, ...currentUserData } = currentValues;
 
     return {
-      role: role !== currentRole ? { username: data.username, role } : null,
+      role: canUpdateRole && role !== currentRole ? { username: data.username, role } : null,
       user: !isEqual(userData, currentUserData) ? userData : null,
     };
   };
@@ -116,7 +116,7 @@ const UserForm = forwardRef(({
               defaultValue={user?.role || "user"}
               rules={RULES.REQUIRED}
               options={roleOptions}
-              disabled={isCallixtoRole || (!isUpdating && view)}
+              disabled={!canUpdateRole || isCallixtoRole || (!isUpdating && view)}
             />
           </FormField>
           <FormField flex="1" />
@@ -175,9 +175,7 @@ const UserForm = forwardRef(({
               name="address"
               label="Dirección"
               placeholder="Mitre 525 9c"
-              rules={RULES.REQUIRED}
               disabled={!isUpdating && view}
-              required={isUpdating || !view}
             />
           </FormField>
           <FormField flex="1" />
@@ -191,8 +189,8 @@ const UserForm = forwardRef(({
               placeholder="385"
               maxLength="4"
               rules={{
-                required: "El código de área es requerido.",
                 validate: (value) => {
+                  if (!value) return true;
                   const number = watch("phoneNumber.number") ?? '';
                   return (value + number).length === 10 || "El área y el número deben sumar 10 dígitos.";
                 },
@@ -200,7 +198,7 @@ const UserForm = forwardRef(({
               onChange={() => isSubmitted && trigger("phoneNumber.number")}
               disabled={!isUpdating && view}
               normalMode
-              required={isUpdating || !view}
+              defaultValue=""
             />
           </FormField>
           <FormField flex="1">
@@ -209,8 +207,8 @@ const UserForm = forwardRef(({
               label="Número de teléfono"
               placeholder="5228706"
               rules={{
-                required: "El número de teléfono es requerido.",
                 validate: (value) => {
+                  if (!value) return true;
                   const areaCode = watch("phoneNumber.areaCode") ?? '';
                   return (areaCode + value).length === 10 || "El área y el número deben sumar 10 dígitos.";
                 },
@@ -219,7 +217,7 @@ const UserForm = forwardRef(({
               disabled={!isUpdating && view}
               maxLength="7"
               normalMode
-              required={isUpdating || !view}
+              defaultValue=""
             />
           </FormField>
           <FormField flex="1" />

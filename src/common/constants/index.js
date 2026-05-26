@@ -1,5 +1,5 @@
 import { encodeUri, isNewFeature } from "@/common/utils";
-import { RULES as ROLES, isCallixtoUser } from "@/roles";
+import { RULES as ROLES } from "@/roles";
 import { Icon, List, ListItem } from "semantic-ui-react";
 import { Accent } from "../components/custom";
 import { StyledListHeader, StyledModalContent } from "../components/modals/ModalShortcuts/styles";
@@ -230,7 +230,7 @@ export const getNavigationItems = (role) => {
       href: PAGES.CASH_BALANCES.BASE,
       badge: PAGES.CASH_BALANCES.BADGE,
     },
-    isCallixtoUser(role) && {
+    ROLES.canManageUsers[role] && {
       id: "users",
       label: PAGES.USERS.NAME,
       icon: ICONS.USER,
