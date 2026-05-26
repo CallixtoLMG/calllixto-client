@@ -2,6 +2,7 @@ import { Box, Flex, FlexColumn, Icon, Label, OverflowWrapper } from "@/common/co
 import { Text } from "@/common/components/form/Search/styles";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
 import { ALL, BUTTON_TEXTS, COLORS, FIELD_LABELS as COMMON_FIELD_LABELS, CONTENT_SIZES, DATE_FORMATS, ICONS, IN, OUT, POPUP_POSITIONS, SIZES } from "@/common/constants";
+import { BUDGETS_PAGE } from "@/common/constants/routes";
 import { getFormatedPrice } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { Popup } from "semantic-ui-react";
@@ -353,7 +354,7 @@ export const STOCK_TABLE_HEADERS = [
     width: 2,
     title: 'Id venta',
     value: (stockFlows) => stockFlows.budgetId,
-    href: (stockFlows) => stockFlows.budgetId ? `/ventas/${stockFlows.budgetId}` : undefined,
+    href: (stockFlows) => stockFlows.budgetId ? `${BUDGETS_PAGE}/${stockFlows.budgetId}` : undefined,
   },
   {
     id: 4,

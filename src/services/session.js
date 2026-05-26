@@ -1,11 +1,12 @@
-import { USER_DATA_KEY } from "@/common/constants";
+import {
+  SELECTED_ACCOUNT_KEY,
+  SESSION_ENDED_NOTIFICATION_KEY,
+  SESSION_EXPIRATION_KEY,
+  TOKEN_KEY,
+  USER_DATA_KEY,
+} from "@/common/constants/session";
 import { isCallixtoUser } from "@/roles";
 
-export const TOKEN_KEY = "token";
-export const SELECTED_ACCOUNT_KEY = "selectedAccountId";
-export const SESSION_ENDED_NOTIFICATION_KEY = "sessionEndedNotification";
-
-const SESSION_EXPIRATION_KEY = "sessionExpiration";
 const DEFAULT_SESSION_DURATION_MS = 8 * 60 * 60 * 1000;
 const COOKIE_PATH = "/";
 
