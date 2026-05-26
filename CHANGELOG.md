@@ -3,6 +3,36 @@
 This project adheres to [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 2026-05-24
+
+### Changed
+
+- Tables: Moved row actions into a reserved final column with a visible actions header indicator, avoiding overlap with row content.
+
+- Products: Fixed batch-selection actions changing the table column layout when products are selected.
+
+- Settings: Kept configuration tabs in a stable order, independently of the last updated setting returned by the backend.
+
+- Common: Centralized repeated intrinsic content sizes and popup positions into shared constants.
+
+- Entity details: Converted customer, supplier, brand, product, expense, cash balance, and budget dynamic detail pages to server-first routes with dedicated `page.client.jsx` interactive components.
+
+- Data loading: Centralized authenticated server-side entity detail loading and redirects, refreshing server data after client mutations while preserving auxiliary client-side queries.
+
+- Navigation: Moved the root `/` redirect to `/ventas` into Next.js configuration.
+
+## 2026-05-23
+
+### Changed
+
+- Auth routes: Separated public and private App Router layouts, keeping login and password recovery/change flows outside authenticated validation.
+
+- Public links: Prepared the public routing structure for future shared budget links without changing existing visible URLs.
+
+- Products: Unified product and stock bulk import flows around a reusable `BatchImport` component while preserving their specific validation and submission behavior.
+
+- Products: Added stock control changes to the product history display and corrected stock control parsing from the product import template.
+
 ## 2026-05-20
 
 ### Added

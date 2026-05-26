@@ -1,5 +1,5 @@
 import { Box, Flex, FlexColumn, Label, OverflowWrapper } from "@/common/components/custom";
-import { FIELD_LABELS } from "@/common/constants";
+import { CONTENT_SIZES, FIELD_LABELS } from "@/common/constants";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "../../common/components/tooltips";
 
@@ -69,7 +69,7 @@ export const HEADERS = [
     value: (customer) => {
       const { primaryPhone, additionalPhones } = getPhonesForDisplay(customer.phoneNumbers);
       return (
-        <Flex $width="fit-content" $justifyContent="space-between">
+        <Flex $width={CONTENT_SIZES.FIT} $justifyContent="space-between">
           {primaryPhone}
           {additionalPhones && <PhonesTooltip $lowTooltip phones={additionalPhones} />}
         </Flex>
@@ -103,7 +103,7 @@ export const CUSTOMER_STATES_OPTIONS = Object.values(CUSTOMER_STATES)
     key: id,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
-        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+        {title}&nbsp;<Label width={CONTENT_SIZES.FIT} color={color} circular empty />
       </Flex>
     ),
     value: id

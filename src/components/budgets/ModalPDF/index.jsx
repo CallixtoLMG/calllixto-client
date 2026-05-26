@@ -1,7 +1,7 @@
 import { useDolarExangeRate } from "@/api/external";
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, Flex, FlexColumn, Input } from "@/common/components/custom";
-import { BUTTON_TEXTS, COLORS, ICONS } from "@/common/constants";
+import { CONTENT_SIZES, BUTTON_TEXTS, COLORS, ICONS } from "@/common/constants";
 import { OnlyPrint } from "@/components/layout";
 import { useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
@@ -90,8 +90,8 @@ const ModalPDF = ({
                     key={key}
                     text={title}
                     icon={icon}
-                    paddingLeft="fit-content"
-                    width="fit-content"
+                    paddingLeft={CONTENT_SIZES.FIT}
+                    width={CONTENT_SIZES.FIT}
                     basic={printPdfMode !== key}
                     color={COLORS.BLUE}
                     onClick={() => {
@@ -105,7 +105,7 @@ const ModalPDF = ({
                   color={COLORS.BLUE}
                   onClick={() => setShowPrices(prev => !prev)}
                   basic={!showPrices}
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
                 />
                 <Input
                   type="text"
@@ -122,7 +122,7 @@ const ModalPDF = ({
                       icon={ICONS.DOLLAR}
                       color={COLORS.GREEN}
                       basic={!showDolarExangeRate}
-                      width="fit-content"
+                      width={CONTENT_SIZES.FIT}
                       onClick={() => {
                         setShowDolarExangeRate(prev => !prev);
                         if (!showDolarExangeRate) {

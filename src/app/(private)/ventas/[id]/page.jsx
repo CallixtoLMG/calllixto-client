@@ -6,7 +6,7 @@ import { useGetSetting } from "@/api/settings";
 import { IconedButton } from "@/common/components/buttons";
 import { DropdownItem, DropdownMenu, DropdownOption, Flex, Icon, Menu, Message, MessageHeader } from "@/common/components/custom";
 import ModalCancel from "@/common/components/modals/ModalCancel";
-import { COLORS, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ENTITIES, EXTERNAL_APIS, ICONS, PAGES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import BudgetView from "@/components/budgets/BudgetView";
@@ -304,7 +304,7 @@ const Budget = ({ params }) => {
             icon={ICONS.CHECK}
             color={COLORS.GREEN}
             onClick={handleConfirm}
-            width="fit-content"
+            width={CONTENT_SIZES.FIT}
           />
         </Flex>
       )}

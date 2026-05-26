@@ -11,7 +11,7 @@ import {
   TextField
 } from "@/common/components/form";
 import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
-import { COLORS, ENTITIES, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ENTITIES, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS } from "@/common/constants";
 import { removeNullish } from "@/common/utils";
 import { BRAND_STATES, getBrandSearchDescription, getBrandSearchTitle } from "@/components/brands/brands.constants";
 import { SUPPLIER_STATES, getSupplierSearchDescription, getSupplierSearchTitle } from "@/components/suppliers/suppliers.constants";
@@ -237,7 +237,7 @@ const ProductForm = forwardRef(({
             />
           </FormField>
           <FormField $flexDirection="row" flex="1">
-            <FormField $maxWidth="fit-content" flex="1" >
+            <FormField $maxWidth={CONTENT_SIZES.FIT} flex="1" >
               <IconedButtonControlled
                 name="stockControl"
                 text={watchStockControl ? "Deshabilitar control de stock" : "Habilitar control de stock"}
@@ -250,7 +250,7 @@ const ProductForm = forwardRef(({
             </FormField>
             {watchStockControl &&
               <FormField flex="1">
-                <Message $minWidth="max-content" $opacity={view} height="38px" margin="0" color={COLORS.BLUE} >
+                <Message $minWidth={CONTENT_SIZES.MAX} $opacity={view} height="38px" margin="0" color={COLORS.BLUE} >
                   <Icon name={ICONS.BOXES} /> Stock: {product?.stock ?? 0}
                 </Message>
               </FormField>
@@ -277,7 +277,7 @@ const ProductForm = forwardRef(({
                 disabled={!isUpdating && view}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="flex-end" $flexDirection="row" flex="1">
+            <FormField $maxWidth={CONTENT_SIZES.MAX} $alignItems="flex-end" $flexDirection="row" flex="1">
               <IconedButtonControlled
                 name="editablePrice"
                 text={WatchEditablePrice ? "Deshabilitar precio editable" : "Habilitar precio editable"}
@@ -319,7 +319,7 @@ const ProductForm = forwardRef(({
                 disabled={(!isUpdating && view || !watchFractionable)}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="flex-end" $flexDirection="row" flex="1">
+            <FormField $maxWidth={CONTENT_SIZES.MAX} $alignItems="flex-end" $flexDirection="row" flex="1">
               <IconedButtonControlled
                 name="fractionConfig.active"
                 text={watchFractionable ? "Deshabilitar producto fraccionable" : "Habilitar producto fraccionable"}

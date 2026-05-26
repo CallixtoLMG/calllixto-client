@@ -5,7 +5,7 @@ import { PhoneControlled } from './PhoneControlled';
 
 export const ContactControlled = () => {
   return (
-    <FieldsContainer $columnGap="50px">
+    <FieldsContainer $columnGap="15px">
       <PhoneControlled />
       <AddressControlled />
       <EmailControlled />

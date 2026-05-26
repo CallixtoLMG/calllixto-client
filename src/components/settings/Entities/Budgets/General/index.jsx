@@ -1,6 +1,6 @@
 import { Box, FlexColumn } from "@/common/components/custom";
 import { DropdownControlled } from "@/common/components/form";
-import { ERROR_MESSAGES } from "@/common/constants";
+import { CONTENT_SIZES, ERROR_MESSAGES } from "@/common/constants";
 import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
@@ -34,7 +34,7 @@ const General = () => {
                       Rango de fechas por defecto Ventas
                     </SettingsFieldLabel>
                   }
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
                   placeholder="Seleccione un rango"
                   options={BUDGET_RANGE_DATE_MONTH_OPTIONS}
                   rules={{

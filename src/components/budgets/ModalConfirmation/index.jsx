@@ -1,7 +1,7 @@
 import { IconedButton } from "@/common/components/buttons";
 import { ButtonsContainer, FieldsContainer, Flex, FlexColumn } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
-import { BUTTON_TEXTS, COLORS, ICONS, SIZES } from "@/common/constants";
+import { CONTENT_SIZES, BUTTON_TEXTS, COLORS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPhone } from "@/common/utils";
 import CreateBudgetPayments from "@/components/payments/CreateBudgetPayment";
 import { useMemo, useRef } from "react";
@@ -58,7 +58,7 @@ const ModalConfirmation = ({
                 Desea confirmar el presupuesto?
                 <GroupedButtonsControlled
                   color={COLORS.BLUE}
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
                   name="pickUpInStore"
                   buttons={[
                     { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },

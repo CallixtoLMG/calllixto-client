@@ -4,7 +4,7 @@ import { useDeleteUser, useEditUser, useGetUser, useSetUserState, useUpdateUserR
 import { FieldsContainer, FormField, Input, Message, MessageHeader } from "@/common/components/custom";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
+import { CONTENT_SIZES, ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
 import UserForm from "@/components/users/UserForm";
@@ -189,7 +189,7 @@ const User = ({ params }) => {
             onClick: handleClick(isItemInactive(user?.state) ? ACTIVE : INACTIVE),
             loading: (activeAction === ACTIVE || activeAction === INACTIVE),
             disabled: !!activeAction,
-            width: "fit-content",
+            width: CONTENT_SIZES.FIT,
           },
           {
             id: 2,

@@ -1,6 +1,6 @@
 import { Box, Flex, Label, OverflowWrapper } from "@/common/components/custom";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip } from "@/common/components/tooltips";
-import { COLORS, FIELD_LABELS } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, FIELD_LABELS } from "@/common/constants";
 import { getAddressesForDisplay, getPhonesForDisplay } from "@/common/utils";
 import { Popup } from "semantic-ui-react";
 
@@ -103,7 +103,7 @@ export const SUPPLIER_STATES_OPTIONS = Object.values(SUPPLIER_STATES)
     key: id,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
-        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+        {title}&nbsp;<Label width={CONTENT_SIZES.FIT} color={color} circular empty />
       </Flex>
     ),
     value: id
@@ -130,12 +130,12 @@ export const getSupplierSearchDescription = (supplier) => (
           <Popup
             trigger={<Label color={COLORS.GREY} size="mini">Inactivo</Label>}
             content={supplier.inactiveReason ?? 'Motivo no especificado'}
-            position="top center"
+            position={POPUP_POSITIONS.TOP_CENTER}
             size="mini"
           />
         )}
       </Flex>
-      <Box width="fit-content">
+      <Box width={CONTENT_SIZES.FIT}>
         {supplier.comments ? (
           <CommentTooltip comment={supplier.comments} />
         ) : (

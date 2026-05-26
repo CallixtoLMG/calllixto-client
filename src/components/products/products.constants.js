@@ -1,7 +1,7 @@
 import { Box, Flex, FlexColumn, Icon, Label, OverflowWrapper } from "@/common/components/custom";
 import { Text } from "@/common/components/form/Search/styles";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { ALL, BUTTON_TEXTS, COLORS, FIELD_LABELS as COMMON_FIELD_LABELS, DATE_FORMATS, ICONS, IN, OUT, SIZES } from "@/common/constants";
+import { ALL, BUTTON_TEXTS, COLORS, FIELD_LABELS as COMMON_FIELD_LABELS, CONTENT_SIZES, DATE_FORMATS, ICONS, IN, OUT, POPUP_POSITIONS, SIZES } from "@/common/constants";
 import { getFormatedPrice } from "@/common/utils";
 import { getFormatedDate } from "@/common/utils/dates";
 import { Popup } from "semantic-ui-react";
@@ -57,13 +57,13 @@ export const PRODUCT_COLUMNS = [
         <Popup
           size={SIZES.TINY}
           content={product.supplierName}
-          position="top center"
+          position={POPUP_POSITIONS.TOP_CENTER}
           trigger={<span>{getSupplierId(product.id)}</span>}
         />&nbsp;
         <Popup
           size={SIZES.TINY}
           content={product.brandName}
-          position="top center"
+          position={POPUP_POSITIONS.TOP_CENTER}
           trigger={<span>{getBrandId(product.id)}</span>}
         />&nbsp;
         <span>{getProductId(product.id)}</span>
@@ -195,7 +195,7 @@ export const PRODUCT_STATES_OPTIONS = Object.values(PRODUCT_STATES)
     key: id,
     text: (
       <Flex $alignItems="center" $justifyContent="space-between">
-        {title}&nbsp;<Label width="fit-content" color={color} circular empty />
+        {title}&nbsp;<Label width={CONTENT_SIZES.FIT} color={color} circular empty />
       </Flex>
     ),
     value: id
@@ -257,7 +257,7 @@ export const getProductSearchDescription = (product) => (
     >
       <Flex $columnGap="7px">
         {product.state === PRODUCT_STATES.OOS.id && (
-          <Label width="fit-content" size={SIZES.TINY} color={COLORS.ORANGE}>
+          <Label width={CONTENT_SIZES.FIT} size={SIZES.TINY} color={COLORS.ORANGE}>
             Sin Stock
           </Label>
         )}
@@ -265,7 +265,7 @@ export const getProductSearchDescription = (product) => (
           <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />
         )}
       </Flex>
-      <Box width="fit-content">
+      <Box width={CONTENT_SIZES.FIT}>
         {product.comments ? (
           <CommentTooltip comment={product.comments} />
         ) : (
@@ -323,7 +323,7 @@ export const STOCK_TABLE_HEADERS = [
     sortValue: (stockFlows) => stockFlows.createdAt ?? "",
     value: (stockFlows) => (
       <Flex $alignItems="center" >
-        < Label ribbon width="fit-content" color={stockFlows.inflow ? COLORS.GREEN : COLORS.RED} >
+        < Label ribbon width={CONTENT_SIZES.FIT} color={stockFlows.inflow ? COLORS.GREEN : COLORS.RED} >
           <Icon inverted name={stockFlows.inflow ? ICONS.ARROW_DOWN : ICONS.ARROW_UP} />
         </Label>
         <Box width="100%">

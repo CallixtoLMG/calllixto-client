@@ -1,3 +1,4 @@
+import { CONTENT_SIZES } from "@/common/constants";
 import { Button } from "@/common/components/custom";
 import { ModalBatchImport } from "@/components/products/ModalBatchImport";
 import { Icon } from "semantic-ui-react";
@@ -78,8 +79,8 @@ export const BatchImport = ({
         onChange={handleFileUpload}
       />
       <Button
-        height="fit-content"
-        width="fit-content"
+        height={CONTENT_SIZES.FIT}
+        width={CONTENT_SIZES.FIT}
         $paddingLeft="0"
         as={BatchImportIcon}
         onClick={handleOpenFile}

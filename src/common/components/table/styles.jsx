@@ -66,40 +66,40 @@ const HeaderCell = styled(STable.HeaderCell)`
   width: ${({ $width }) => $width}!important;
   padding: ${({ padding }) => padding}!important;
   max-height: ${({ maxhHeight }) => maxhHeight}!important;
+  cursor: ${({ $cursor }) => $cursor}!important;
 `;
 
 const ActionsContainer = styled.td`
-  position: absolute;
-  right: ${({ $header }) => $header ? "auto" : "0"};
+  position: ${({ $header }) => $header ? "absolute" : "static"};
   left: ${({ $header }) => $header ? "-100px" : "auto"};
-  top: ${({ $header }) => $header ? "0px" : "50%"};
-  transform: ${({ $actionButtonInside, $header }) => {
-    if ($actionButtonInside) return 'translateY(-50%)';
-    return $header ? 'translateX(calc(100%))' : "translateY(-50%) translateX(calc(100%))";
-  }} !important;
-  transition: all 0.1s ease-in-out!important;
-  opacity: ${({ $header, $open }) => $header || $open ? "1" : "0"};
-  visibility: ${({ $header, $open, $stillShow }) => $header || $open && $stillShow ? "visible" : "hidden"};
-  border: none!important;
-  padding: ${({ $header }) => $header && "0!important"};
-  padding-left: 5px !important;
+  top: ${({ $header }) => $header ? "0" : "auto"};
+  transform: ${({ $header }) => $header ? 'translateX(calc(100%))' : "none"} !important;
+  width: ${({ $header }) => $header ? "auto" : "52px"} !important;
+  min-width: ${({ $header }) => $header ? "auto" : "52px"} !important;
+  max-width: ${({ $header }) => $header ? "none" : "52px"} !important;
+  height: ${({ $header }) => $header ? "auto" : "37px"} !important;
+  border: ${({ $header }) => $header ? "none!important" : undefined};
+  padding: ${({ $header }) => $header ? "0 0 0 5px" : "2px"} !important;
+  text-align: center !important;
+  vertical-align: middle !important;
 `;
 
 const InnerActionsContainer = styled(Flex)`
-  border: ${({ $actionButtonInside }) => $actionButtonInside ? 'none' : "1px solid #d4d4d5"} !important;
-  background-color: ${({ $actionButtonInside }) => $actionButtonInside ? 'none' : "#f7f7f7"} !important;
-  padding: ${({ $actionButtonInside, $header }) => {
-    if ($actionButtonInside) return '0';
-    return $header ? '8px 5px' : '5px';
-  }} !important;
-  border-radius: ${({ $header }) => $header ? "10px 0 0 10px" : "0 10px 10px 0"};
+  justify-content: center;
+  border: ${({ $header }) => $header ? "1px solid #d4d4d5" : "none"} !important;
+  background-color: ${({ $header }) => $header ? "#f7f7f7" : "transparent"} !important;
+  padding: ${({ $header }) => $header ? "8px 5px" : "0"} !important;
+  border-radius: ${({ $header }) => $header ? "10px 0 0 10px" : "0"};
   column-gap: 3px;
+  transition: opacity 0.1s ease-in-out!important;
+  opacity: ${({ $header, $open }) => $header || $open ? "1" : "0"};
+  visibility: ${({ $header, $open }) => $header || $open ? "visible" : "hidden"};
 `;
 
 const TableRow = styled(STable.Row)`
   position: relative;
 
-  &:hover ${ActionsContainer} {
+  &:hover ${InnerActionsContainer} {
     opacity: 0.8;
     visibility: visible;
   }
@@ -112,11 +112,6 @@ const LinkCell = styled(STable.Cell)`
   position: relative;
   white-space: ${({ $whiteSpace }) => `${$whiteSpace}!important`};
   text-align: ${({ align }) => `${align}!important`};
-
-  &:hover ${ActionsContainer} {
-    opacity: 0.8;
-    visibility: visible;
-  }
 `;
 
 const LinkOverlay = styled.a`

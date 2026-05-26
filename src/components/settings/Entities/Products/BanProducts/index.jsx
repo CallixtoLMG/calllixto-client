@@ -1,7 +1,7 @@
 import { Box, Button, Flex } from "@/common/components/custom";
 import { TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { BUTTON_TEXTS, COLORS, DELETE, ICONS, SIZES, TOOLTIPS } from "@/common/constants";
+import { POPUP_POSITIONS, BUTTON_TEXTS, COLORS, DELETE, ICONS, SIZES, TOOLTIPS } from "@/common/constants";
 import { createPriorityKeyDownHandler } from "@/common/utils";
 import SettingsAccordionTitle from "@/components/settings/Common/SettingsAccordionTitle";
 import { AnimatedContent, AnimatedInner } from "@/components/settings/Common/styles";
@@ -139,7 +139,7 @@ const Blacklist = () => {
                     dataTestId="settings-blocked-product-field"
                     showPopup
                     iconLabel
-                    popupPosition="top right"
+                    popupPosition={POPUP_POSITIONS.TOP_RIGHT}
                     popupContent={
                       <div>
                         <p>* Para añadir un id nuevo a la lista, anótelo y luego pulse &quot;enter&quot; o haz click en el boton Agregar.</p>

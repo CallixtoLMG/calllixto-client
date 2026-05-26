@@ -1,5 +1,5 @@
 import { Flex, Icon } from "@/common/components/custom";
-import { COLORS, ICONS } from "@/common/constants";
+import { POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
 import { List, ListItem, Popup } from "semantic-ui-react";
 
 export const AddressesTooltip = ({ addresses, input, $lowTooltip }) => {
@@ -15,7 +15,7 @@ export const AddressesTooltip = ({ addresses, input, $lowTooltip }) => {
           ))}
         </List>
       }
-      position="top center"
+      position={POPUP_POSITIONS.TOP_CENTER}
       trigger={
         input
           ? <Icon name={ICONS.LIST_UL} color={COLORS.BLUE} />

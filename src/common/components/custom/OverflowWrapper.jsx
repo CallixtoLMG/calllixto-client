@@ -1,3 +1,4 @@
+import { CONTENT_SIZES, POPUP_POSITIONS } from "@/common/constants/semantic";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Popup } from "semantic-ui-react";
@@ -5,7 +6,7 @@ import styled, { css } from "styled-components";
 
 const OverflowText = styled.div`
   display: ${({ $display }) => $display || "inline-block"};
-  width: fit-content;
+  width: ${CONTENT_SIZES.FIT};
   max-width: ${({ $maxWidth }) => $maxWidth || "100%"};
   min-width: 0;
   height: ${({ $height }) => $height}!important;
@@ -36,7 +37,7 @@ export const OverflowWrapper = ({
   children,
   as,
   popupContent,
-  position = "top center",
+  position = POPUP_POSITIONS.TOP_CENTER,
   maxWidth = "100%",
   $lineClamp = 1,
   height,

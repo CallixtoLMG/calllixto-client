@@ -1,5 +1,5 @@
 import { ButtonsContainer, Modal } from "@/common/components/custom";
-import { COLORS, ICONS } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ICONS } from "@/common/constants";
 import { Transition } from "semantic-ui-react";
 import { IconedButton } from "../../buttons";
 
@@ -16,7 +16,7 @@ const UnsavedChangesModal = ({ open, onDiscard, onContinue }) => (
             text="Continuar editando"
             icon={ICONS.EDIT}
             color={COLORS.BLUE}
-            width="fit-content"
+            width={CONTENT_SIZES.FIT}
             basic
             onClick={onContinue}
           />
@@ -24,7 +24,7 @@ const UnsavedChangesModal = ({ open, onDiscard, onContinue }) => (
             text="Descartar cambios"
             icon={ICONS.TIMES}
             color={COLORS.RED}
-            width="fit-content"
+            width={CONTENT_SIZES.FIT}
             onClick={onDiscard}
           />
         </ButtonsContainer>

@@ -2,7 +2,7 @@ import { useGetSetting } from '@/api/settings';
 import { Flex } from '@/common/components/custom';
 import { DropdownControlled, TextControlled } from '@/common/components/form';
 import { Filters, Table } from '@/common/components/table';
-import { ENTITIES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
+import { CONTENT_SIZES, ENTITIES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter } from '@/common/utils';
 import { useFilters } from "@/hooks";
 import { useMemo } from 'react';
@@ -49,7 +49,7 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel }) 
           >
             <DropdownControlled
               minWidth="150px"
-              width="min-content"
+              width={CONTENT_SIZES.MIN}
               name="state"
               label="Estado"
               options={EXPENSES_STATE_OPTIONS}
@@ -72,7 +72,7 @@ const ExpensesPage = ({ expenses = [], isLoading, onRefetch, onDownloadExcel }) 
             />
             <DropdownControlled
               minWidth="150px"
-              width="min-content"
+              width={CONTENT_SIZES.MIN}
               maxWidth="300px"
               name="categories"
               label="Categorias"

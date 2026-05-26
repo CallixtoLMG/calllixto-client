@@ -3,7 +3,7 @@ import { Dropdown, FieldsContainer, Flex, Form, FormField, Icon, Input, Label, O
 import { DropdownField, PriceControlled, PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from "@/common/components/table";
 import { CommentTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
+import { POPUP_POSITIONS, COLORS, DATE_FORMATS, ICONS, SIZES } from "@/common/constants";
 import { getFormatedPercentage, getFormatedPhone } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { PRODUCT_STATES } from "@/components/products/products.constants";
@@ -89,7 +89,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
             <Popup
               size={SIZES.TINY}
               trigger={<span>{getSupplierId(product.id)}</span>}
-              position="top center"
+              position={POPUP_POSITIONS.TOP_CENTER}
               on="hover"
               content={product.supplierName}
             />
@@ -97,7 +97,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
             <Popup
               size={SIZES.TINY}
               trigger={<span>{getBrandId(product.id)}</span>}
-              position="top center"
+              position={POPUP_POSITIONS.TOP_CENTER}
               on="hover"
               content={product.brandName}
             />
@@ -134,7 +134,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                   <Popup
                     size="mini"
                     content={product.dispatchComment}
-                    position="top center"
+                    position={POPUP_POSITIONS.TOP_CENTER}
                     trigger={<Icon name={ICONS.TRUCK} color={COLORS.ORANGE} />}
                   />
                 )}
@@ -310,7 +310,7 @@ const BudgetDetails = ({ budget, subtotal, subtotalAfterDiscount, total, selecte
                       color={COLORS.BLUE} />
                   }
                   content="Permite aplicar un descuento una vez confirmada la venta"
-                  position="left center"
+                  position={POPUP_POSITIONS.LEFT_CENTER}
                   size="mini"
                 />
                 <Flex width="250px" $alignSelf="flex-end" $alignItems="flex-end" $columnGap="10px">

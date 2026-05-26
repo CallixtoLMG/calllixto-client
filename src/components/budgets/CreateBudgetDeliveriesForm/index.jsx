@@ -2,7 +2,7 @@ import { IconedButton } from "@/common/components/buttons";
 import { Flex, FlexColumn, Icon } from "@/common/components/custom";
 import { NumberField, TextField } from "@/common/components/form";
 import { Table } from "@/common/components/table";
-import { COLORS, ICONS } from "@/common/constants";
+import { POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
 import { useMemo } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
@@ -56,7 +56,7 @@ const CreateBudgetDeliveriesForm = () => {
                   </Flex>
                 }
                 content="Entrega completa"
-                position="right center"
+                position={POPUP_POSITIONS.RIGHT_CENTER}
                 size="mini"
               />
             )}
@@ -249,7 +249,7 @@ const CreateBudgetDeliveriesForm = () => {
             disabled={!hasPendingDeliveries && !hasAnyDelivered}
             height="38px"
             iconOnly
-            popupPosition="top left"
+            popupPosition={POPUP_POSITIONS.TOP_LEFT}
           />
         </Flex>
       </Flex>

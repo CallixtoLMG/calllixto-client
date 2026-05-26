@@ -7,7 +7,7 @@ import { PriceField } from "@/common/components/form";
 import { DatePickerControlled } from "@/common/components/form/DatePicker";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { COLORS, DELETE, ICONS, PAGES } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, DELETE, ICONS, PAGES } from "@/common/constants";
 import { datePickerNow, getDateUTC } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import CashBalanceForm from "@/components/cashBalances/CashBalanceForm";
@@ -178,7 +178,7 @@ const CashBalance = ({ params }) => {
           icon: ICONS.CLOSE,
           color: COLORS.ORANGE,
           text: "Cerrar caja",
-          width: "fit-content",
+          width: CONTENT_SIZES.FIT,
           basic: true,
           onClick: handleClick(CLOSED),
         });
@@ -260,7 +260,7 @@ const CashBalance = ({ params }) => {
                 <DatePickerControlled
                   name="closeDate"
                   label="Fecha de cierre"
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
                   showMonthDropdown
                   showYearDropdown
                   showTimeSelect

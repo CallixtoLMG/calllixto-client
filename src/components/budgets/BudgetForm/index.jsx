@@ -14,7 +14,7 @@ import {
 import { SearchResultContent, SearchResultDescription, SearchResultTitle } from "@/common/components/form/Search/styles";
 import { Table, Total } from "@/common/components/table";
 import { AddressesTooltip, CommentTooltip, PhonesTooltip, TagsTooltip } from "@/common/components/tooltips";
-import { COLORS, DATE_FORMATS, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS, SIZES, TOOLTIPS } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, DATE_FORMATS, ERROR_MESSAGES, FIELD_LABELS, ICONS, RULES, SHORTKEYS, SIZES, TOOLTIPS } from "@/common/constants";
 import { getAddressesForDisplay, getFormatedPhone, getPhonesForDisplay, removeNullish } from "@/common/utils";
 import { getDateWithOffset, getFormatedDate } from "@/common/utils/dates";
 import { BUDGET_STATES, PICK_UP_IN_STORE } from "@/components/budgets/budgets.constants";
@@ -280,7 +280,7 @@ const BudgetForm = ({
           <Popup
             size={SIZES.TINY}
             trigger={<span>{getSupplierId(product.id)}</span>}
-            position="top center"
+            position={POPUP_POSITIONS.TOP_CENTER}
             on="hover"
             content={product.supplierName}
           />
@@ -288,7 +288,7 @@ const BudgetForm = ({
           <Popup
             size={SIZES.TINY}
             trigger={<span>{getBrandId(product.id)}</span>}
-            position="top center"
+            position={POPUP_POSITIONS.TOP_CENTER}
             on="hover"
             content={product.brandName}
           />
@@ -327,7 +327,7 @@ const BudgetForm = ({
             {product.tags && <TagsTooltip maxWidthOverflow="5vw" tooltip="true" tags={product.tags} />}
             {product.comments && <CommentTooltip tooltip="true" comment={product.comments} />}
             {(!!product.dispatchComment || !!product?.dispatch?.comment) && (
-              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position="top center" trigger={<Icon lineHeight="normal" name={ICONS.TRUCK} color={COLORS.BLUE} />} />
+              <Popup size="mini" content={product.dispatchComment || product?.dispatch?.comment} position={POPUP_POSITIONS.TOP_CENTER} trigger={<Icon lineHeight="normal" name={ICONS.TRUCK} color={COLORS.BLUE} />} />
             )}
           </Flex>
         </Container>
@@ -508,7 +508,7 @@ const BudgetForm = ({
           <GroupedButtonsControlled
             $alignItems="flex-end"
             name="pickUpInStore"
-            width="fit-content"
+            width={CONTENT_SIZES.FIT}
             color={COLORS.BLUE}
             buttons={[
               { text: PICK_UP_IN_STORE, icon: ICONS.WAREHOUSE, value: true },
@@ -619,7 +619,7 @@ const BudgetForm = ({
                 persistSelection={true}
               />
             </FormField>
-            <FormField $maxWidth="max-content" $alignItems="flex-end" $flexDirection="row" flex="1">
+            <FormField $maxWidth={CONTENT_SIZES.MAX} $alignItems="flex-end" $flexDirection="row" flex="1">
               <IconedButton
                 type="button"
                 text="Agregar cliente"
@@ -771,7 +771,7 @@ const BudgetForm = ({
                 <Flex $columnGap="5px" wrap="wrap" $rowGap="5px">
                   <Button
                     padding="0 18px"
-                    width="fit-content"
+                    width={CONTENT_SIZES.FIT}
                     type="button"
                     basic={value?.length !== paymentMethods?.length}
                     color={COLORS.BLUE}
@@ -789,7 +789,7 @@ const BudgetForm = ({
                   {paymentMethods?.map(({ key, text, value: methodValue }) => (
                     <Button
                       padding="0 18px"
-                      width="fit-content"
+                      width={CONTENT_SIZES.FIT}
                       key={key}
                       basic={!value?.includes(methodValue)}
                       color={COLORS.BLUE}
@@ -833,7 +833,7 @@ const BudgetForm = ({
               type="button"
               onClick={handleSubmit(handleDraft)}
               color={BUDGET_STATES.DRAFT.color}
-              width="fit-content"
+              width={CONTENT_SIZES.FIT}
               text={BUDGET_STATES.DRAFT.singularTitle}
               dataTestId="budget-submit-draft-button"
             >

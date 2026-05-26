@@ -2,7 +2,7 @@ import { IconedButton } from "@/common/components/buttons";
 import { Flex, Form } from "@/common/components/custom";
 import { DropdownControlled } from "@/common/components/form";
 import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePickerControlled";
-import { COLORS, ICONS } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ICONS } from "@/common/constants";
 import { getDateUTC } from "@/common/utils/dates";
 import { FormProvider, useForm } from "react-hook-form";
 
@@ -61,7 +61,7 @@ const BudgetsHistoryFilter = ({
       <Form>
         <Flex $columnGap="15px" $rowGap="15px">
           <DropdownControlled
-            width="fit-content"
+            width={CONTENT_SIZES.FIT}
             name="presetDays"
             label="Rangos predefinidos"
             placeholder="Hoy, esta semana, etc."
@@ -77,14 +77,14 @@ const BudgetsHistoryFilter = ({
               label="Desde"
               dateFormat="dd-MM-yyyy"
               afterChange={(date) => handleDateChange("startDate", date)}
-              width="fit-content"
+              width={CONTENT_SIZES.FIT}
             />
             <DatePickerControlled
               name="endDate"
               label="Hasta"
               dateFormat="dd-MM-yyyy"
               afterChange={(date) => handleDateChange("endDate", date)}
-              width="fit-content"
+              width={CONTENT_SIZES.FIT}
             />
             <Flex $columnGap="15px" $alignItems="flex-end">
               <IconedButton
