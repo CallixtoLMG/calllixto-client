@@ -49,7 +49,7 @@ const Users = () => {
   }, []);
 
   useEffect(() => {
-    const actions = RULES.canCreate[role] ? [
+    const actions = RULES.canManageUsers[role] ? [
       {
         id: 1,
         icon: ICONS.ADD,
@@ -61,7 +61,13 @@ const Users = () => {
     setActions(actions);
   }, [push, role, setActions, loading]);
 
-  useKeyboardShortcuts(() => push(PAGES.USERS.CREATE), SHORTKEYS.ENTER);
+  useKeyboardShortcuts([
+    {
+      key: SHORTKEYS.ENTER,
+      action: () => push(PAGES.USERS.CREATE),
+      condition: () => RULES.canManageUsers[role],
+    },
+  ]);
 
   return (
     <UsersPage

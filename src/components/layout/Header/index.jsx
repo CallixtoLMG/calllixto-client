@@ -87,7 +87,7 @@ const Header = () => {
     {
       key: PAGES.USERS.SHORTKEYS,
       action: () => push(PAGES.USERS.BASE),
-      condition: () => RULES.canUpdate[role],
+      condition: () => RULES.canManageUsers[role],
     },
     {
       key: PAGES.SETTINGS.SHORTKEYS,
