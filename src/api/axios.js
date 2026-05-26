@@ -1,4 +1,4 @@
-import { PAGES } from "@/common/constants";
+import { LOGIN_PAGE } from "@/common/constants/routes";
 import { expireSession, getSelectedAccountId, getToken, getUserData } from "@/services/session";
 import axios from 'axios';
 
@@ -42,8 +42,8 @@ export const getInstance = () => {
         if ([401, 403].includes(status) && typeof window !== "undefined") {
           expireSession();
 
-          if (window.location.pathname !== PAGES.LOGIN.BASE) {
-            window.location.replace(PAGES.LOGIN.BASE);
+          if (window.location.pathname !== LOGIN_PAGE) {
+            window.location.replace(LOGIN_PAGE);
           }
         }
 
