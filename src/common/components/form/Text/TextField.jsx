@@ -1,5 +1,5 @@
 import { FormField, Icon, Input, Label, OverflowWrapper } from "@/common/components/custom";
-import { COLORS, ICONS, SIZES } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, ICONS, POPUP_POSITIONS, SIZES } from "@/common/constants";
 import { forwardRef, useState } from "react";
 import { Popup } from "semantic-ui-react";
 import styled, { css } from "styled-components";
@@ -60,7 +60,7 @@ export const TextField = forwardRef(({
   error,
   showPopup = false,
   popupContent,
-  popupPosition = "top center",
+  popupPosition = POPUP_POSITIONS.TOP_CENTER,
   readOnly,
   textAlign,
   $truncateInput,
@@ -73,7 +73,7 @@ export const TextField = forwardRef(({
     <StyledLabel
       $hasError={!!error}
       $isFocused={isFocused}
-      width="fit-content"
+      width={CONTENT_SIZES.FIT}
       height="100%"
     >
       {showPopup && (

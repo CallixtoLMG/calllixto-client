@@ -1,4 +1,4 @@
-import { COLORS, ICONS, SIZES } from '@/common/constants';
+import { COLORS, ICONS, POPUP_POSITIONS, SIZES } from '@/common/constants';
 import { useState } from 'react';
 import { List, Modal, Popup, Transition } from 'semantic-ui-react';
 import { IconedButton } from '../../buttons';
@@ -12,8 +12,8 @@ const KeyboardShortcuts = () => {
     <>
       <Popup
         content='Accesos rápidos'
-        trigger={<Icon margin="0" pointer="true" size={SIZES.LARGE} name={ICONS.KEYBOARD} color={COLORS.BLUE} onClick={() => setOpen(true)} />}
-        position='bottom right'
+        trigger={<Icon $pointer margin="0" size={SIZES.LARGE} name={ICONS.KEYBOARD} color={COLORS.BLUE} onClick={() => setOpen(true)} />}
+        position={POPUP_POSITIONS.BOTTOM_RIGHT}
         size={SIZES.TINY}
       />
       <Transition visible={open} animation='scale' duration={500}>

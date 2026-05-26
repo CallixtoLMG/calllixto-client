@@ -1,6 +1,6 @@
 import { ButtonsContainer, FieldsContainer, Form, FormField, Input } from "@/common/components/custom";
 import { DatePickerControlled } from "@/common/components/form/DatePicker/DatePickerControlled";
-import { BUTTON_TEXTS, COLORS, ENTITIES, ERROR_MESSAGES, FIELD_LABELS, ICONS, SIZES } from "@/common/constants";
+import { CONTENT_SIZES, BUTTON_TEXTS, COLORS, ENTITIES, ERROR_MESSAGES, FIELD_LABELS, ICONS, SIZES } from "@/common/constants";
 import { datePickerNow, getPastDate } from "@/common/utils/dates";
 import { BillDetails } from "@/components/cashBalances/BillsDetails";
 import { getBillsTotal } from "@/components/cashBalances/cashBalances.utils";
@@ -78,7 +78,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                     flex="1"
                     name="closeDate"
                     label="Fecha de cierre"
-                    width="fit-content"
+                    width={CONTENT_SIZES.FIT}
                     showMonthDropdown
                     showYearDropdown
                     showTimeSelect
@@ -231,7 +231,7 @@ const ModalOpenCashBalance = ({ open, onClose, onSubmit, paymentOptions, isLoadi
                 text={BUTTON_TEXTS.CONFIRM}
                 icon={ICONS.CHECK}
                 color={COLORS.GREEN}
-                width="fit-content"
+                width={CONTENT_SIZES.FIT}
                 loading={isLoading}
                 disabled={isLoading}
                 onClick={handleSubmit(onSubmit)}

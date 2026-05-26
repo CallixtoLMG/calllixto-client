@@ -1,6 +1,6 @@
 import { Box, Flex, Icon } from '@/common/components/custom';
 import { StyledModalHeader } from '@/common/components/modals/ModalShortcuts/styles';
-import { COLORS, ICONS, SIZES } from '@/common/constants';
+import { POPUP_POSITIONS, COLORS, ICONS, SIZES } from '@/common/constants';
 import { createContext, useContext, useState } from 'react';
 import { Modal, Popup, Transition } from 'semantic-ui-react';
 import styled from 'styled-components';
@@ -84,7 +84,7 @@ const NavActions = () => {
                 margin="0"
               />
             }
-            position="bottom right"
+            position={POPUP_POSITIONS.BOTTOM_RIGHT}
             size={SIZES.TINY}
           />
         )}

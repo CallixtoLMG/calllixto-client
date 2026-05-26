@@ -1,3 +1,4 @@
+import { CONTENT_SIZES } from "@/common/constants";
 import { Box, Flex, FlexColumn } from "@/common/components/custom";
 import { PriceLabel } from "@/common/components/form";
 import { Table, Total, TotalList } from '@/common/components/table';
@@ -115,7 +116,7 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
           </Flex>
           <Flex $justifyContent="space-between">
             <Field flex="1" label="Dirección" value={selectedContact?.address} />
-            <Field width="fit-content" $justifyContent="flex-end" label="Teléfono" value={selectedContact?.phone} />
+            <Field width={CONTENT_SIZES.FIT} $justifyContent="flex-end" label="Teléfono" value={selectedContact?.phone} />
           </Flex>
         </SectionContainer>
         <Divider />
@@ -156,7 +157,7 @@ const PDFfile = forwardRef(({ budget, account, printPdfMode, dolarExchangeRate =
               <DataContainer width="100%">
                 <Title as="h4" $alignSelf="left" $textAlignLast="left" $slim>Cotización en USD a tasa de cambio: <b>{getFormatedPrice(dolarExchangeRate)}</b></Title>
                 <Divider />
-                <Title as="h4" $alignSelf="left" width="fit-content" $minHeight="30px">
+                <Title as="h4" $alignSelf="left" width={CONTENT_SIZES.FIT} $minHeight="30px">
                   <PriceLabel value={total / parseInt(dolarExchangeRate)} />
                 </Title>
               </DataContainer>

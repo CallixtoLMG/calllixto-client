@@ -1,7 +1,7 @@
 import { IconedButton } from "@/common/components/buttons";
 import { Box, Flex, FlexColumn } from "@/common/components/custom";
 import { Table } from "@/common/components/table";
-import { COLORS, ICONS, TOOLTIPS } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, COLORS, ICONS, TOOLTIPS } from "@/common/constants";
 import { useRef, useState } from "react";
 import { useFieldArray } from "react-hook-form";
 import { Popup } from "semantic-ui-react";
@@ -26,7 +26,7 @@ export const BillDetails = ({ name }) => {
         <Popup
           trigger={
             <Box
-              width="fit-content"
+              width={CONTENT_SIZES.FIT}
               tabIndex={0}
               role="button"
               ref={billButtonRef}
@@ -44,7 +44,7 @@ export const BillDetails = ({ name }) => {
           on="click"
           onClose={handleClosePopup}
           closeOnDocumentClick
-          position="top left"
+          position={POPUP_POSITIONS.TOP_LEFT}
         >
           <AddBillPopup
             billDetailsFields={billDetailsFields}

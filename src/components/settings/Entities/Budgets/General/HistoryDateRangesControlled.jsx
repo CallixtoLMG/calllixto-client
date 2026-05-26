@@ -1,7 +1,7 @@
 import { IconedButton } from "@/common/components/buttons";
 import { FlexColumn, Icon } from "@/common/components/custom";
 import { DropdownField } from "@/common/components/form";
-import { BUTTON_TEXTS, COLORS, FIELD_LABELS, ICONS } from "@/common/constants";
+import { POPUP_POSITIONS, BUTTON_TEXTS, COLORS, FIELD_LABELS, ICONS } from "@/common/constants";
 import { formatCount, formatLastCount } from "@/common/utils/pluralization";
 import SettingsFieldLabel from "@/components/settings/Common/SettingsFieldLabel";
 import { BASE_HISTORY_RANGES, BUDGETS_RANGE_DATE_UNIT_CONFIG, BUDGETS_RANGE_DATE_UNIT_OPTIONS, SETTINGS_HELP_TEXTS } from "@/components/settings/settings.constants";
@@ -104,7 +104,7 @@ export const HistoryDateRangesControlled = () => {
         }
         open={open}
         on="click"
-        position="top left"
+        position={POPUP_POSITIONS.TOP_LEFT}
         closeOnDocumentClick
         onClose={() => {
           setUnit(null);

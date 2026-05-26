@@ -15,6 +15,7 @@ import {
   TextArea as STextarea
 } from "semantic-ui-react";
 import styled from "styled-components";
+import { CONTENT_SIZES } from "@/common/constants/semantic";
 
 export const Segment = styled(SSegment)`
   height: ${({ height = 'auto' }) => height} !important;
@@ -72,7 +73,7 @@ export const FormField = styled(Form.Field)`
 
 export const Label = styled(SLabel)`
   width: ${({ width }) => width ? width : '100%'} !important;
-  height: ${({ height }) => height ? height : 'fit-content'} !important;
+  height: ${({ height }) => height ? height : CONTENT_SIZES.FIT} !important;
   margin: ${({ margin }) => margin ? margin : '0'} !important;
   padding: ${({ padding }) => padding} !important;
   align-content: center;
@@ -128,13 +129,13 @@ export const Dropdown = styled(SDropdown)`
   }
   
   ${({ multiple }) => multiple && `
-    min-height: fit-content!important;
+    min-height: ${CONTENT_SIZES.FIT}!important;
     &&&&&& div.item {
-      min-height: fit-content!important;
+      min-height: ${CONTENT_SIZES.FIT}!important;
       padding: 0.35rem 0.4rem!important;
       font-size: 12px!important;
       div{
-        width: fit-content!important;
+        width: ${CONTENT_SIZES.FIT}!important;
       }
     }
     div.divider.default.text{

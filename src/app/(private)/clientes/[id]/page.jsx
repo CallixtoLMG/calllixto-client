@@ -4,7 +4,7 @@ import { FieldsContainer, FormField, Message, MessageHeader } from "@/common/com
 import { TextField } from "@/common/components/form";
 import ModalAction from "@/common/components/modals/ModalAction";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS } from "@/common/constants";
+import { ACTIVE, COLORS, DELETE, ICONS, INACTIVE, PAGES, PLACEHOLDERS, POPUP_POSITIONS } from "@/common/constants";
 import { isItemInactive } from "@/common/utils";
 import CustomerForm from "@/components/customers/CustomerForm";
 import { Loader, useBreadcrumContext, useNavActionsContext } from "@/components/layout";
@@ -198,7 +198,7 @@ const Customer = ({ params }) => {
           loading: activeAction === DELETE,
           disabled: customer.hasBudgets || !!activeAction || isEditPending,
           iconOnly: true,
-          popupPosition: "bottom left"
+          popupPosition: POPUP_POSITIONS.BOTTOM_LEFT
         },
       ];
 

@@ -1,4 +1,4 @@
-import { SIZES } from '@/common/constants';
+import { POPUP_POSITIONS, SIZES } from '@/common/constants';
 import { forwardRef } from 'react';
 import { Icon, Popup } from 'semantic-ui-react';
 import { Button, Flex } from '../custom';
@@ -19,7 +19,7 @@ const IconedButton = forwardRef(({
   onKeyDown,
   padding,
   iconOnly = false,
-  popupPosition = 'top center',
+  popupPosition = POPUP_POSITIONS.TOP_CENTER,
   popupInverted = false,
   popupDisabled = false,
   popupContent,

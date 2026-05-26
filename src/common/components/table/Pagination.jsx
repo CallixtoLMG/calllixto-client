@@ -1,4 +1,4 @@
-import { PAGE_SIZE_OPTIONS } from "@/common/constants";
+import { POPUP_POSITIONS, PAGE_SIZE_OPTIONS } from "@/common/constants";
 import { Popup, Pagination as SPagination } from "semantic-ui-react";
 import { Dropdown } from "../custom";
 import ElementCounter from "./ElementCounter";
@@ -47,7 +47,7 @@ const Pagination = ({
             $textAlign="center"
           />
         )}
-        position="left center"
+        position={POPUP_POSITIONS.LEFT_CENTER}
         mouseEnterDelay={500}
       />
     </PaginationContainer>

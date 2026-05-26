@@ -1,5 +1,5 @@
 import { OverflowWrapper } from '@/common/components/custom';
-import { ENTITIES, ENTITY_VIEW, ICONS, INFO, PAGES, SIZES } from '@/common/constants';
+import { CONTENT_SIZES, POPUP_POSITIONS, ENTITIES, ENTITY_VIEW, ICONS, INFO, PAGES, SIZES } from '@/common/constants';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { Popup, Breadcrumb as SBreadcrumb, BreadcrumbDivider as SBreadcrumbDivider, BreadcrumbSection as SBreadcrumbSection, Label as SLabel } from 'semantic-ui-react';
 import styled from "styled-components";
@@ -8,7 +8,7 @@ import { useNavActionsContext } from '.';
 const Label = styled(SLabel)`
   position: sticky!important;
   top: 5px;
-  max-height: fit-content;
+  max-height: ${CONTENT_SIZES.FIT};
   margin-left: 10px!important;
 `;
 
@@ -137,7 +137,7 @@ const Breadcrumb = () => {
                 <Popup
                   content={label.popup}
                   disabled={!label.popup}
-                  position="bottom center"
+                  position={POPUP_POSITIONS.BOTTOM_CENTER}
                   size="mini"
                   trigger={
                     <Label pointing="left" color={label.color}>

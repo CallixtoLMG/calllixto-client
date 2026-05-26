@@ -1,5 +1,5 @@
 import { Icon } from "@/common/components/custom";
-import { COLORS, ICONS, SIZES } from "@/common/constants";
+import { POPUP_POSITIONS, COLORS, ICONS, SIZES } from "@/common/constants";
 import { Popup } from "semantic-ui-react";
 
 const SettingsInfoIcon = ({ content }) => {
@@ -13,7 +13,7 @@ const SettingsInfoIcon = ({ content }) => {
   return (
     <Popup
       content={content}
-      position="top center"
+      position={POPUP_POSITIONS.TOP_CENTER}
       size={SIZES.TINY}
       trigger={
         <span

@@ -4,7 +4,7 @@ import { Box, FieldsContainer, Flex, OverflowWrapper } from "@/common/components
 import { NumberField, TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import { Table } from "@/common/components/table";
-import { COLORS, ICONS } from "@/common/constants";
+import { POPUP_POSITIONS, COLORS, ICONS } from "@/common/constants";
 import { useMutation } from "@tanstack/react-query";
 import { useCallback, useMemo, useState } from "react";
 import { useFormContext, useWatch } from "react-hook-form";
@@ -346,7 +346,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                   setShowModal(true);
                 }}
                 iconOnly
-                popupPosition="top left"
+                popupPosition={POPUP_POSITIONS.TOP_LEFT}
                 popupContent={
                   <>
                     <strong><div>Descontar entregas</div></strong>
@@ -363,7 +363,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                   text="Imprimir entregas"
                   onClick={onPrint}
                   iconOnly
-                  popupPosition="top left"
+                  popupPosition={POPUP_POSITIONS.TOP_LEFT}
                 />
               </Box>
             )}
@@ -412,7 +412,7 @@ const BudgetDeliveries = ({ budgetId, onSuccess, state, canPrint, onPrint }) => 
                 onClick={handleToggleAll}
                 disabled={!operableProducts.length}
                 iconOnly
-                popupPosition="top left"
+                popupPosition={POPUP_POSITIONS.TOP_LEFT}
                 dataTestId="budget-complete-all-deliveries-button"
               />
             </Flex>

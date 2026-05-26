@@ -4,7 +4,7 @@ import { DropdownControlled, NumberField, TextControlled, TextField } from "@/co
 import { DatePicker } from "@/common/components/form/DatePicker";
 import { ModalAction } from "@/common/components/modals";
 import { Filters, Table } from "@/common/components/table";
-import { ALL, COLORS, ICONS, IN, OUT, PAGES, RULES as VALIDATE_RULES } from "@/common/constants";
+import { CONTENT_SIZES, ALL, COLORS, ICONS, IN, OUT, PAGES, RULES as VALIDATE_RULES } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { useFilters } from "@/hooks";
 import { useState } from "react";
@@ -176,7 +176,7 @@ const ProductStock = ({ onCreateStockFlow, product, isLoading, stockFlows }) => 
           <Form onSubmit={onSubmit}>
             <Filters appliedCount={appliedCount} hydrated={hydrated} entity="STOCK" onRestoreFilters={onRestoreFilters}>
               <DropdownControlled
-                width="fit-content"
+                width={CONTENT_SIZES.FIT}
                 name="type"
                 options={STOCK_TYPE_OPTIONS}
                 label="Tipo"

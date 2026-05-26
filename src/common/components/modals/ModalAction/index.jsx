@@ -1,5 +1,5 @@
 import { ButtonsContainer } from "@/common/components/custom";
-import { BUTTON_TEXTS, COLORS, CONFIRMATION_WORDS, ICONS, PLACEHOLDERS } from "@/common/constants";
+import { CONTENT_SIZES, BUTTON_TEXTS, COLORS, CONFIRMATION_WORDS, ICONS, PLACEHOLDERS } from "@/common/constants";
 import { handleKeyPressWithSubmit } from "@/common/utils";
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from "react-hook-form";
@@ -113,7 +113,7 @@ const ModalAction = ({
                 loading={isLoading}
                 color={COLORS.GREEN}
                 submit
-                width="fit-content"
+                width={CONTENT_SIZES.FIT}
                 dataTestId="modal-confirm"
               />
             </ButtonsContainer>

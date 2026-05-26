@@ -1,6 +1,6 @@
 import { DropdownControlled, TextControlled } from "@/common/components/form";
 import { Filters, Table } from "@/common/components/table";
-import { ENTITIES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
+import { CONTENT_SIZES, ENTITIES, PAGES, SELECT_ALL_OPTION } from "@/common/constants";
 import { createFilter } from "@/common/utils";
 import { useFilters } from "@/hooks";
 import { useMemo } from "react";
@@ -51,7 +51,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
           >
             <DropdownControlled
               minWidth="150px"
-              width="min-content"
+              width={CONTENT_SIZES.MIN}
               name="state"
               label="Estado"
               options={CASH_BALANCE_STATES_OPTIONS}
@@ -72,7 +72,7 @@ const CashBalancesPage = ({ cashBalances = [], isLoading, onRefetch, paymentOpti
               placeholder="Efectivo"
               options={[SELECT_ALL_OPTION, ...paymentOptions]}
               afterChange={onSubmit}
-              textMaxWidth="fit-content"
+              textMaxWidth={CONTENT_SIZES.FIT}
               height="35px"
             />
           </Filters>

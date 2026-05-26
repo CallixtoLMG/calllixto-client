@@ -1,7 +1,7 @@
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { DropdownControlled, NumberControlled, TextAreaControlled, TextControlled } from "@/common/components/form";
-import { ERROR_MESSAGES, FIELD_LABELS, RULES, SHORTKEYS } from "@/common/constants";
+import { POPUP_POSITIONS, ERROR_MESSAGES, FIELD_LABELS, RULES, SHORTKEYS } from "@/common/constants";
 import { validateEmail } from "@/common/utils";
 import { getPastDate } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks";
@@ -101,7 +101,7 @@ const UserForm = forwardRef(({
               }}
               disabled={view}
               iconLabel={!view}
-              popupPosition="bottom left"
+              popupPosition={POPUP_POSITIONS.BOTTOM_LEFT}
               showPopup={!view}
               popupContent="Introduce el email del usuario."
               required={isUpdating || !view}

@@ -7,7 +7,7 @@ import PrintBarCodes from "@/common/components/custom/PrintBarCodes";
 import { TextField } from "@/common/components/form";
 import { ModalAction } from "@/common/components/modals";
 import UnsavedChangesModal from "@/common/components/modals/ModalUnsavedChanges";
-import { ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS, SIZES } from "@/common/constants";
+import { POPUP_POSITIONS, CONTENT_SIZES, ACTIVE, COLORS, ICONS, INACTIVE, PAGES, PLACEHOLDERS, SIZES } from "@/common/constants";
 import { downloadExcel, isItemInactive } from "@/common/utils";
 import { Loader, OnlyPrint, useBreadcrumContext, useNavActionsContext, } from "@/components/layout";
 import { BatchImportStock } from "@/components/products/BatchImportStock";
@@ -320,7 +320,7 @@ const Supplier = ({ params }) => {
         button: (
           <Popup
             disabled={!stockExcelTooltip}
-            position="top center"
+            position={POPUP_POSITIONS.TOP_CENTER}
             size={SIZES.TINY}
             content={(
               <div>
@@ -335,7 +335,7 @@ const Supplier = ({ params }) => {
                   as={Button}
                   text="Stock/Excel"
                   icon={ICONS.FILE_EXCEL}
-                  width="fit-content"
+                  width={CONTENT_SIZES.FIT}
                   floating
                   labeled
                   button
@@ -416,7 +416,7 @@ const Supplier = ({ params }) => {
           : false,
         iconOnly: true,
         basic: true,
-        popupPosition: "bottom right"
+        popupPosition: POPUP_POSITIONS.BOTTOM_RIGHT
       }];
     }
 

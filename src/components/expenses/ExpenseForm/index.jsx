@@ -2,7 +2,7 @@ import { useGetSetting } from "@/api/settings";
 import { SubmitAndRestore } from "@/common/components/buttons";
 import { FieldsContainer, Form, FormField } from "@/common/components/custom";
 import { DropdownControlled, PriceControlled, TextAreaControlled, TextControlled, TextField } from "@/common/components/form";
-import { ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
+import { CONTENT_SIZES, ENTITIES, RULES, SHORTKEYS } from "@/common/constants";
 import { preventSend } from "@/common/utils";
 import { now } from "@/common/utils/dates";
 import { useKeyboardShortcuts } from "@/hooks";
@@ -169,7 +169,7 @@ const ExpenseForm = forwardRef(({
               name="tags"
               label="Etiquetas"
               placeholder="Selecciona etiquetas"
-              height="fit-content"
+              height={CONTENT_SIZES.FIT}
               multiple
               clearable={isUpdating && !view}
               icon={(!isUpdating && view) ? null : undefined}

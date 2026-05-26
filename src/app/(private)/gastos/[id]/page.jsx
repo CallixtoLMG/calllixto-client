@@ -6,7 +6,7 @@ import { FieldsContainer, Flex, FormField, Message, MessageHeader } from "@/comm
 import { TextField } from "@/common/components/form";
 import { UnsavedChangesModal } from "@/common/components/modals";
 import ModalCancel from "@/common/components/modals/ModalCancel";
-import { COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES } from "@/common/constants";
+import { CONTENT_SIZES, COLORS, DATE_FORMATS, ENTITIES, ICONS, PAGES } from "@/common/constants";
 import { isItemCancelled } from "@/common/utils";
 import { getFormatedDate, isDateAfter, now } from "@/common/utils/dates";
 import ExpenseForm from "@/components/expenses/ExpenseForm";
@@ -79,7 +79,7 @@ const Expense = ({ params }) => {
         basic: true,
         onClick: handleAnular,
         text: "Anular",
-        width: "fit-content",
+        width: CONTENT_SIZES.FIT,
       });
     }
 
